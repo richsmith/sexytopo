@@ -1,0 +1,64 @@
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+        <org.hwyl.sexytopo.control.GraphView android:id="@+id/graphView" android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+    <LinearLayout
+        style="@android:style/Holo.ButtonBar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="1px"
+        android:weightSum="1.2">
+
+        <ImageButton
+            android:layout_weight="0.2"
+            android:src="@drawable/move"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/buttonMove"
+            />
+        <ImageButton
+            android:layout_weight="0.2"
+            android:src="@drawable/pencil"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/buttonDraw"
+            />
+        <ImageButton
+            android:layout_weight="0.2"
+            android:src="@drawable/zoom_in"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/buttonZoomIn"
+            />
+        <ImageButton
+            android:layout_weight="0.2"
+            android:src="@drawable/zoom_out"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/buttonZoomOut"
+            />
+        <ImageButton
+            android:layout_weight="0.2"
+            android:src="@drawable/arrow_circle_left"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/buttonUndo"
+            />
+        <ImageButton
+            android:layout_weight="0.2"
+            android:src="@drawable/arrow_up"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/buttonMenu"
+            />
+    </LinearLayout>
+
+</LinearLayout>

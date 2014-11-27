@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+   <item
+        android:id="@+id/buttonRedo"
+        android:title="Redo"/>
+
+    <item
+        android:id="@+id/buttonEraser"
+        android:title="Eraser"/>
+    <item
+        android:id="@+id/buttonText"
+        android:title="Text"/>
+    <item
+        android:id="@+id/buttonColour"
+        android:title="Pick Colour"/>
+    <item
+        android:id="@+id/buttonDisplay"
+        android:title="Display..."/>
+</menu>
