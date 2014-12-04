@@ -6,7 +6,7 @@
         android:title="Redo"/>
 
     <item
-        android:id="@+id/buttonEraser"
+        android:id="@+id/buttonErase"
         android:title="Eraser"/>
     <item
         android:id="@+id/buttonText"

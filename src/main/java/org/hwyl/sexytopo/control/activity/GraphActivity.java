@@ -114,6 +114,9 @@ public abstract class GraphActivity extends SexyTopoActivity implements View.OnC
             case R.id.buttonMove:
                 graphView.currentSketchTool = GraphView.SketchTool.MOVE;
                 break;
+            case R.id.buttonErase:
+                graphView.currentSketchTool = GraphView.SketchTool.ERASE;
+                break;
             case R.id.buttonZoomIn:
                 graphView.zoom(ZOOM_INCREMENT);
                 graphView.invalidate();

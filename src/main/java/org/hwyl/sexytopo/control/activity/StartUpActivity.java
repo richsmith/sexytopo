@@ -38,10 +38,9 @@ public class StartUpActivity extends SexyTopoActivity {
         SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
         String activeSurveyName = preferences.getString(SexyTopo.ACTIVE_SURVEY_NAME, null);
 
-        Toast.makeText(getApplicationContext(), "Loading Survey " + activeSurveyName,
+        Toast.makeText(getApplicationContext(),
+                getString(R.string.loading_survey) + " " + activeSurveyName,
                 Toast.LENGTH_SHORT).show();
-
-
 
         Survey survey = Loader.loadSurvey(activeSurveyName);
 
@@ -52,7 +51,7 @@ public class StartUpActivity extends SexyTopoActivity {
 
         SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
 
-        String defaultNameBase = getBaseContext().getString(R.string.default_survey_name);
+        String defaultNameBase = getString(R.string.default_survey_name);
         String defaultName = Util.getNextDefaultSurveyName(defaultNameBase);
 
         Survey survey = new Survey(defaultName);

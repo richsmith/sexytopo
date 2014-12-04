@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created by Cary Bass http://commons.wikipedia.com/wiki/User:Bastique on January 20, 2006 -->
+<svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" version="1.1" width="600" height="525" id="svg3069" inkscape:version="0.48.2 r9819" sodipodi:docname="DIN_4844-2_Warnung_vor_magnetischem_Feld_D-W013.svg">
+  <metadata id="metadata3085">
+    <rdf:RDF>
+      <cc:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+        <dc:title/>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview pagecolor="#ffffff" bordercolor="#666666" borderopacity="1" objecttolerance="10" gridtolerance="10" guidetolerance="10" inkscape:pageopacity="0" inkscape:pageshadow="2" inkscape:window-width="1360" inkscape:window-height="718" id="namedview3083" showgrid="false" inkscape:zoom="0.95047619" inkscape:cx="300" inkscape:cy="258.45161" inkscape:window-x="-8" inkscape:window-y="-8" inkscape:window-maximized="1" inkscape:current-layer="svg3069"/>
+  <defs id="defs3073">
+    <path d="M 2.8117,-1.046 A 3 3 0 0 1 .5,2.958 V 4.5119 A 10.5 10.5 0 0 1 2,25.3078 V 25.8661 A 15 15 0 0 0 14.7975,8.5433 15 15 0 0 0 23.4007,-11.201 L 22.9172,-10.9218 A 10.5 10.5 0 0 1 4.1574,-1.8229 z M 6.2265,7.825 A 10 10 0 0 1 -6.2265,7.825 9.5 9.5 0 0 0 -8.4021,10.5667 13.5 13.5 0 0 0 8.4021,10.5667 10 10 0 0 0 6.2265,7.825 z" id="p" transform="scale(10,-10) translate(26,-26)"/>
+  </defs>
+  <g id="g4049">
+    <path d="M 597.6,499.6 313.8,8 C 310.9,3 305.6,0 299.9,0 294.2,0 288.9,3.1 286,8 L 2.2,499.6 c -2.9,5 -2.9,11.1 0,16 2.9,5 8.2,8 13.9,8 h 567.6 c 5.7,0 11,-3.1 13.9,-8 2.9,-5 2.9,-11.1 0,-16 z" id="sign_border" inkscape:connector-curvature="0"/>
+    <polygon points="555.875,491.5 43.875,491.5 299.875,48.2 " id="polygon7" style="fill:#ffdc32;fill-opacity:1;stroke:none;overflow:visible" transform="matrix(1,0,0,0.99591458,0.125,2.0332437)"/>
+    <g transform="translate(685.5859,23.357703)" id="g2978">
+      <g id="g2942" style="fill:#000000;stroke:#000000">
+        <rect y="208.2478" x="-392.22946" height="225.88577" width="8.932188" id="rect2934" style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.88582665;stroke-linecap:square;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"/>
+        <rect transform="matrix(0.965926,-0.258819,0.258819,0.965926,0,0)" style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.88582653;stroke-linecap:square;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" id="rect2940" width="8.932188" height="147.93304" x="-462.147" y="135.91931"/>
+      </g>
+      <g id="g2946" transform="matrix(0.866025,-0.5,0.5,0.866025,-212.5458,-150.8503)" style="fill:#000000;stroke:#000000">
+        <rect style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.88582665;stroke-linecap:square;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" id="rect2948" width="8.932188" height="225.88577" x="-392.22946" y="208.2478"/>
+        <rect y="135.91931" x="-462.147" height="147.93304" width="8.932188" id="rect2950" style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.88582653;stroke-linecap:square;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" transform="matrix(0.965926,-0.258819,0.258819,0.965926,0,0)"/>
+      </g>
+      <g transform="matrix(0.5,-0.866025,0.866025,0.5,-472.0409,-175.2175)" id="g2952" style="fill:#000000;stroke:#000000">
+        <rect y="208.2478" x="-392.22946" height="225.88577" width="8.932188" id="rect2954" style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.88582665;stroke-linecap:square;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"/>
+        <rect transform="matrix(0.965926,-0.258819,0.258819,0.965926,0,0)" style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.88582653;stroke-linecap:square;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" id="rect2956" width="8.932188" height="147.93304" x="-462.147" y="135.91931"/>
+      </g>
+      <rect y="-500.70599" x="-325.65689" height="302.24036" width="8.932188" id="rect2960" style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.88582659;stroke-linecap:square;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" transform="matrix(2.701365e-7,-1,1,1.508884e-7,0,0)"/>
+      <rect transform="matrix(-0.258819,-0.965926,0.965926,-0.258819,0,0)" style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.88582665;stroke-linecap:square;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" id="rect2962" width="8.932189" height="147.93307" x="-214.3521" y="-531.64728"/>
+      <g transform="matrix(-0.5,-0.866026,0.866026,-0.5,-859.8043,145.9731)" id="g2964" style="fill:#000000;stroke:#000000">
+        <rect y="208.2478" x="-392.22946" height="225.88577" width="8.932188" id="rect2966" style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.88582665;stroke-linecap:square;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"/>
+        <rect transform="matrix(0.965926,-0.258819,0.258819,0.965926,0,0)" style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.88582653;stroke-linecap:square;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" id="rect2968" width="8.932188" height="147.93304" x="-462.147" y="135.91931"/>
+      </g>
+      <g id="g2970" transform="matrix(-0.866026,-0.500001,0.500001,-0.866026,-884.1717,405.4684)" style="fill:#000000;stroke:#000000">
+        <rect style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.88582665;stroke-linecap:square;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" id="rect2972" width="8.932188" height="225.88577" x="-392.22946" y="208.2478"/>
+        <rect y="135.91931" x="-462.147" height="147.93304" width="8.932188" id="rect2974" style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.88582653;stroke-linecap:square;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" transform="matrix(0.965926,-0.258819,0.258819,0.965926,0,0)"/>
+      </g>
+    </g>
+  </g>
+</svg>

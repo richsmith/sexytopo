@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2" -->
 <resources>
+
     <string name="app_name">SexyTopo</string>
     <string name="action_table">Table</string>
     <string name="action_plan">Plan</string>
@@ -31,6 +32,7 @@
     <string name="menu_delete_row">Delete to End of Branch</string>
     <string name="title_activity_start_up">StartUpActivity</string>
     <string name="default_survey_name">NewSurvey</string>
+    <string name="loading_survey">Loading</string>
     <string name="title_activity_survey">Survey</string>
     <string name="field_survey_name">Survey Name</string>
     <string name="dialog_new_survey_title">New Survey</string>
@@ -42,5 +44,6 @@
     <string name="delete">Delete</string>
     <string name="title_activity_help">Help</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_guide">Guide</string>
 
 </resources>

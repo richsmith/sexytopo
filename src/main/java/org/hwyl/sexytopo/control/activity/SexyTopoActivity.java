@@ -1,6 +1,5 @@
 package org.hwyl.sexytopo.control.activity;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,10 +14,10 @@ import android.widget.Toast;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.io.Saver;
 import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.model.Survey;
-import org.hwyl.sexytopo.control.SurveyManager;
 
 import java.io.File;
 
@@ -68,7 +67,9 @@ public class SexyTopoActivity extends ActionBarActivity {
             case R.id.action_settings:
                 startActivity(SettingsActivity.class);
                 return true;
-
+            case R.id.action_help:
+                startActivity(GuideActivity.class);
+                return true;
 
             case R.id.action_file_new:
                 startNewSurvey();
