@@ -23,21 +23,4 @@ public class ExtendedElevationActivity extends GraphActivity {
         return projection;
     }
 
-
-    /*
-    private ProjectionStrategy extendedElevationProjection = new ExtendedElevationProjection();
-
-    public ProjectionStrategy getProjectionStrategy() {
-        return extendedElevationProjection;
-    }
-
-    public class ExtendedElevationProjection extends ProjectionStrategy {
-
-        @Override
-        public Space<Coord2D> getProjection(Survey survey) {
-            Space<Coord3D> space3D = Space3DTransformer.transformTo3D(survey);
-            Space<Coord2D> projection = Projection2D.ELEVATION_NS.project(space3D); // fixme N-S is just temp
-            return projection;
-        }
-    }*/
 }

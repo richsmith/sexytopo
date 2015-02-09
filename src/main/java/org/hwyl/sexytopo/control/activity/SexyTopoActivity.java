@@ -222,17 +222,7 @@ public class SexyTopoActivity extends ActionBarActivity {
         for (File file : surveyDirectories) {
             arrayAdapter.add(file.getName());
         }
-        /*
-        arrayAdapter.add("Hardik");
-        arrayAdapter.add("Archit");
-        arrayAdapter.add("Jignesh");
-        arrayAdapter.add("Umang");
-        arrayAdapter.add("Ogof Ffynnon Ddu");
-        arrayAdapter.add("Hardik");
-        arrayAdapter.add("Archit");
-        arrayAdapter.add("Jignesh");
-        arrayAdapter.add("Umang");
-        arrayAdapter.add("Gatti");*/
+
         builderSingle.setNegativeButton("Cancel",
                 new DialogInterface.OnClickListener() {
 

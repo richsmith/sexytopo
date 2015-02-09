@@ -103,10 +103,8 @@ public abstract class GraphActivity extends SexyTopoActivity implements View.OnC
         switch(id) {
 
             case R.id.buttonColour:
-                //DialogFragment dialog = new ColourDialog();
-                Dialog d = x();
-                d.show();
-                //dialog.show();
+                Dialog dialog = createColourSelectionDialog();
+                dialog.show();
                 break;
             case R.id.buttonDraw:
                 graphView.currentSketchTool = GraphView.SketchTool.DRAW;
@@ -141,8 +139,8 @@ public abstract class GraphActivity extends SexyTopoActivity implements View.OnC
     }
 
 
-    private Dialog x() {
-        //final String[] colours = new String[]{"Black", "Blue", "Green", "Orange"};
+    private Dialog createColourSelectionDialog() {
+
         final Map<String, Integer> coloursToId = new HashMap<String, Integer>() {{
             put("Black", Color.BLACK);
             put("Cyan", Color.CYAN);
@@ -152,7 +150,7 @@ public abstract class GraphActivity extends SexyTopoActivity implements View.OnC
         }};
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Pick colour") //R.string.pick_color)
-           .setItems(coloursToId.keySet().toArray(new String[]{}) /*R.array.colors_array*/, new DialogInterface.OnClickListener() {
+           .setItems(coloursToId.keySet().toArray(new String[]{}), new DialogInterface.OnClickListener() {
                public void onClick(DialogInterface dialog, int which) {
 
                    Sketch sketch = getSketch(getSurvey());
@@ -166,26 +164,5 @@ public abstract class GraphActivity extends SexyTopoActivity implements View.OnC
 
     }
 
-
-/*
-    public class ColourDialog extends DialogFragment {
-        public ColourDialog() {
-            //this
-            //
-            // .
-        }
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle("pick a colour")
-                    .setItems(new String[]{"orange", "black", "fucking Google", "blue", "pink", "red", "green"}, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            // The 'which' argument contains the index position
-                            // of the selected item
-                        }
-                    });
-            return builder.create();
-        }
-    }*/
 
 }

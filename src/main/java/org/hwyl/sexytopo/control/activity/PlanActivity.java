@@ -22,21 +22,4 @@ public class PlanActivity extends GraphActivity {
         return projection;
     }
 
-
-    //private ProjectionStrategy planProjection = new PlanProjection();
-
-    /*
-    public ProjectionStrategy getProjectionStrategy() {
-        return planProjection;
-    }
-
-    public class PlanProjection extends ProjectionStrategy {
-
-        @Override
-        public Space<Coord2D> getProjection(Survey survey) {
-            Space<Coord3D> space3D = Space3DTransformer.transformTo3D(survey);
-            Space<Coord2D> projection = Projection2D.PLAN.project(space3D);
-            return projection;
-        }
-    }*/
 }

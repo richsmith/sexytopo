@@ -45,11 +45,13 @@ private boolean firstTime = true;
     private Space<Coord2D> projection;
     private Sketch sketch;
 
-    public static final int STATION_COLOUR = Color.RED;
+
     public static final int LEG_COLOUR = Color.RED;
+    public static final int LEG_STROKE_WIDTH = 5;
     public static final int HIGHLIGHT_COLOUR = Color.YELLOW;
     public static final int DEFAULT_SKETCH_COLOUR = Color.BLACK;
 
+    public static final int STATION_COLOUR = Color.RED;
     public static final int STATION_DIAMETER = 10;
     public static final int HIGHLIGHT_DIAMETER = 12;
     public static final int HIGHLIGHT_STROKE_WIDTH = 5;
@@ -61,13 +63,10 @@ private boolean firstTime = true;
     }
     public SketchTool currentSketchTool = SketchTool.MOVE;
 
-
-
-
-
     private Paint stationPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint legPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint drawPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Paint highlightPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
 
     public GraphView(Context context) {
@@ -80,14 +79,13 @@ private boolean firstTime = true;
         initialise();
     }
 
-
-
     private void initialise() {
 
         stationPaint.setColor(STATION_COLOUR);
 
         legPaint.setARGB(127, 255, 0, 0);
-        legPaint.setStrokeWidth(5);
+        legPaint.setStrokeWidth(LEG_STROKE_WIDTH);
+        legPaint.setColor(LEG_COLOUR);
 
 
         drawPaint.setColor(DEFAULT_SKETCH_COLOUR);
@@ -95,6 +93,10 @@ private boolean firstTime = true;
         drawPaint.setStyle(Paint.Style.STROKE);
         drawPaint.setStrokeJoin(Paint.Join.ROUND);
         drawPaint.setStrokeCap(Paint.Cap.ROUND);
+
+        highlightPaint.setStyle(Paint.Style.STROKE);
+        highlightPaint.setStrokeWidth(HIGHLIGHT_STROKE_WIDTH);
+        highlightPaint.setColor(HIGHLIGHT_COLOUR);
     }
 
 
@@ -389,11 +391,6 @@ private boolean firstTime = true;
         for (Map.Entry<Station, Coord2D> entry : space.getStationMap().entrySet()) {
             Coord2D translatedStation = surveyCoordsToViewCoords(entry.getValue());
 
-            Paint highlightPaint = new Paint();
-            highlightPaint.setStyle(Paint.Style.STROKE);
-            highlightPaint.setStrokeWidth(HIGHLIGHT_STROKE_WIDTH);
-            highlightPaint.setColor(HIGHLIGHT_COLOUR);
-
             if (entry.getKey() == survey.getActiveStation()) {
                 stationPaint.setColor(HIGHLIGHT_COLOUR);
                 canvas.drawCircle((int) (translatedStation.getX()), (int) (translatedStation.getY()),
@@ -425,24 +422,6 @@ private boolean firstTime = true;
 
     }
 
-/*
-    private BoundingBox getBoundingBox(Space<Coord2D> space) {
-        Set<Coord2D> points = space.getAllCoords();
-
-        int minX = Integer.MAX_VALUE;
-        int maxX = Integer.MIN_VALUE;
-        int minY = Integer.MAX_VALUE;
-        int maxY = Integer.MIN_VALUE;
-
-        for (Coord2D point : points) {
-            minX = Math.min((int)point.getX(), minX);
-            maxX = Math.max((int)point.getX(), maxX);
-            minY = Math.min((int)point.getY(), minY);
-            maxY = Math.max((int)point.getY(), maxY);
-        }
-
-        return new BoundingBox(minX, minY, maxX - minX, maxY - minY);
-    }*/
 
 
     public void zoom(double amount) {
@@ -453,9 +432,8 @@ private boolean firstTime = true;
 
         surveyToViewScale += amount;
 
-        //viewpointOffset = viewpointOffset.scale(surveyToViewScale);
-        //currentX *= surveyToViewScale;
-        //currentY *= surveyToViewScale;
+        // need to scale the centre of the screen...
+        // or adjust offset by scaled delta from the centre
     }
 
     public void undo() {
@@ -467,25 +445,6 @@ private boolean firstTime = true;
         sketch.redo();
         invalidate();
     }
-
-
-    private class BoundingBox {
-        private final int x;
-        private final int y;
-        private final int width;
-        private final int height;
-
-        private BoundingBox(int x, int y, int width, int height) {
-            this.x = x;
-            this.y = y;
-            this.width = width;
-            this.height = height;
-
-        }
-    }
-
-
-
 
 
 }
