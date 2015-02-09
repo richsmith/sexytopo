@@ -2,7 +2,6 @@ package org.hwyl.sexytopo.control.io;
 
 import android.content.Context;
 
-import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.model.Survey;
 
 import java.io.File;
@@ -24,7 +23,8 @@ public class Saver {
 
     }
 
-    private static void saveFile(Context context, String filename, String contents) throws IOException {
+
+    public static void saveFile(Context context, String filename, String contents) throws IOException {
 
         Util.ensureSurveyDirectoryExists();
         Util.ensureDirectoriesInPathExist(filename);

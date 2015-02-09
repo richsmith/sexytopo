@@ -4,7 +4,6 @@ import org.hwyl.sexytopo.model.Survey;
 import org.hwyl.sexytopo.model.table.TableCol;
 import org.hwyl.sexytopo.util.GraphToListTranslator;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +31,6 @@ public class SurvexExporter {
 
         return text;
     }
-
 
 
     private static String getEntry(TableCol tableCol, Map map) {

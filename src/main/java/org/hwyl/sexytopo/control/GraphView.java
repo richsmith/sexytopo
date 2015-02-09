@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -50,7 +51,10 @@ private boolean firstTime = true;
     public static final int DEFAULT_SKETCH_COLOUR = Color.BLACK;
 
     public static final int STATION_DIAMETER = 10;
-    public static final int HIGHLIGHT_DIAMETER = 14;
+    public static final int HIGHLIGHT_DIAMETER = 12;
+    public static final int HIGHLIGHT_STROKE_WIDTH = 5;
+
+    public static final double DELETE_PATHS_WITHIN_N_PIXELS= 5.0;
 
     public enum SketchTool {
         MOVE, DRAW, ERASE
@@ -119,9 +123,18 @@ private boolean firstTime = true;
 
 
 
+
+    final Handler handler = new Handler();
+    Runnable mLongPressed = new Runnable() {
+        public void run() {
+            Log.i("foobar", "Long press!");
+        }
+    };
+
+
     final GestureDetector gestureDetector = new GestureDetector(new GestureDetector.SimpleOnGestureListener() {
         public void onLongPress(MotionEvent e) {
-            Log.e("", "Longpress detected");
+            Log.e("foobar", "Longpress detected");
         }
     });
 
@@ -130,11 +143,11 @@ private boolean firstTime = true;
         return gestureDetector.onTouchEvent(event);
     };*/
 
-
-
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+
+        //gestureDetector.onTouchEvent(event);
+
         switch (currentSketchTool) {
             case MOVE:
                 return handleMove(event);
@@ -167,17 +180,17 @@ private boolean firstTime = true;
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 actionDownPointOnView = touchPointOnView;
-                Path newPath = sketch.startNewPath();
-                newPath.moveTo((float)surveyCoords.getX(), (float)surveyCoords.getY());
+                Coord2D start = surveyCoords;
+                Sketch.PathDetail newPath = sketch.startNewPath(start);
                 break;
             case MotionEvent.ACTION_MOVE:
-                Path activePath = sketch.getActivePath();
-                activePath.lineTo((float)surveyCoords.getX(), (float)surveyCoords.getY());
+                Sketch.PathDetail activePath = sketch.getActivePath();
+                activePath.lineTo(surveyCoords);
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
                 if (touchPointOnView.equals(actionDownPointOnView)) {
-                    sketch.getActivePath().lineTo((float)surveyCoords.getX(), (float)surveyCoords.getY());
+                    sketch.getActivePath().lineTo(surveyCoords);
                 } // FIXME keep this?
                 sketch.finishPath();
                 break;
@@ -196,6 +209,7 @@ private boolean firstTime = true;
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                handler.postDelayed(mLongPressed, 500);
                 actionDownPointOnView = touchPointOnView;
                 actionDownViewpointOffset = viewpointOffset;
                 break;
@@ -204,8 +218,9 @@ private boolean firstTime = true;
                         touchPointOnView.minus(actionDownPointOnView).scale(1 / surveyToViewScale);
                 viewpointOffset = actionDownViewpointOffset.minus(surveyDelta);
                 invalidate();
-                break;
+                // fall through
             case MotionEvent.ACTION_UP:
+                handler.removeCallbacks(mLongPressed);
                 break;
             default:
                 return false;
@@ -218,9 +233,15 @@ private boolean firstTime = true;
     private boolean handleErase(MotionEvent event) {
 
         Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
+        Coord2D touchPointOnSurvey = viewCoordsToSurveyCoords(touchPointOnView);
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                Sketch.PathDetail closestPath = sketch.findNearestPathWithin(sketch.getPathDetails(), touchPointOnSurvey, DELETE_PATHS_WITHIN_N_PIXELS);
+                if (closestPath != null) {
+                    sketch.getPathDetails().remove(closestPath);
+                    invalidate();
+                }
             case MotionEvent.ACTION_MOVE:
                 break;
             case MotionEvent.ACTION_UP:
@@ -232,6 +253,25 @@ private boolean firstTime = true;
         return true;
     }
 
+
+    /*
+    private List<Sketch.PathDetail> findAllPathsNearPoint() {
+        // we could try to be more sophisticated if this is slow; e.g. only consider paths on the screen
+        List<Sketch.PathDetail> foundPaths = new ArrayList<>();
+        for (Sketch.PathDetail path : sketch.getPathDetails()) {
+            if (isPathNearPoint(path.getPath(), DELETE_PATHS_WITHIN_N_PIXELS)) {
+                foundPaths.add(path);
+            }
+        }
+        return foundPaths;
+    }*/
+
+    // Util?
+    private static boolean isPathNearPoint(Path path, double AllowedDelta) {
+        // now what? might be worth looking here:
+        // http://stackoverflow.com/questions/7972780/how-do-i-find-all-the-points-in-a-path-in-android
+        return false;
+    }
 
 
     /*
@@ -275,19 +315,7 @@ private boolean firstTime = true;
 
         drawSurvey(canvas, projection);
 
-
-        Matrix matrix = new Matrix();
-        matrix.setTranslate(-(float) viewpointOffset.getX(), -(float) viewpointOffset.getY());
-        matrix.postScale((float) (surveyToViewScale), (float) (surveyToViewScale));
-
-
-        for (Sketch.PathDetail pathDetail : sketch.getPathDetails()) {
-            Path translatedPath = new Path(pathDetail.getPath());
-            translatedPath.transform(matrix);
-            drawPaint.setColor(pathDetail.getColour());
-            canvas.drawPath(translatedPath, drawPaint);
-        }
-
+        drawSketch(canvas, sketch);
 
     }
 
@@ -361,10 +389,15 @@ private boolean firstTime = true;
         for (Map.Entry<Station, Coord2D> entry : space.getStationMap().entrySet()) {
             Coord2D translatedStation = surveyCoordsToViewCoords(entry.getValue());
 
+            Paint highlightPaint = new Paint();
+            highlightPaint.setStyle(Paint.Style.STROKE);
+            highlightPaint.setStrokeWidth(HIGHLIGHT_STROKE_WIDTH);
+            highlightPaint.setColor(HIGHLIGHT_COLOUR);
+
             if (entry.getKey() == survey.getActiveStation()) {
                 stationPaint.setColor(HIGHLIGHT_COLOUR);
                 canvas.drawCircle((int) (translatedStation.getX()), (int) (translatedStation.getY()),
-                        STATION_DIAMETER + HIGHLIGHT_DIAMETER, stationPaint);
+                        STATION_DIAMETER + HIGHLIGHT_DIAMETER, highlightPaint);
             }
                 stationPaint.setColor(STATION_COLOUR);
             //}
@@ -375,6 +408,22 @@ private boolean firstTime = true;
         }
     }
 
+
+    private void drawSketch(Canvas canvas, Sketch sketch) {
+
+        Matrix matrix = new Matrix();
+        matrix.setTranslate(-(float) viewpointOffset.getX(), -(float) viewpointOffset.getY());
+        matrix.postScale((float) (surveyToViewScale), (float) (surveyToViewScale));
+
+
+        for (Sketch.PathDetail pathDetail : sketch.getPathDetails()) {
+            Path translatedPath = new Path(pathDetail.getAndroidPath());
+            translatedPath.transform(matrix);
+            drawPaint.setColor(pathDetail.getColour());
+            canvas.drawPath(translatedPath, drawPaint);
+        }
+
+    }
 
 /*
     private BoundingBox getBoundingBox(Space<Coord2D> space) {

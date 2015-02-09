@@ -16,10 +16,12 @@ import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.io.Saver;
+import org.hwyl.sexytopo.control.io.TherionExporter;
 import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.model.Survey;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Created by rls on 26/07/14.
@@ -87,7 +89,7 @@ public class SexyTopoActivity extends ActionBarActivity {
                 saveSurveyAsName();
                 return true;
             case R.id.action_file_export:
-                //exportSurvey();
+                exportSurvey();
                 return true;
 
 
@@ -96,6 +98,18 @@ public class SexyTopoActivity extends ActionBarActivity {
                 return super.onOptionsItemSelected(item);
         }
 
+    }
+
+    private void exportSurvey() {
+        try {
+            Survey survey = getSurvey();
+            String content = TherionExporter.export(survey);
+            String filename = Util.getPathForSurveyFile(survey.getName(), "th");
+            Saver.saveFile(this, filename, content);
+        } catch(IOException e) {
+            Log.d(SexyTopo.TAG, "Error exporting survey: " + e);
+            showSimpleToast("Error exporting survey");
+        }
     }
 
 

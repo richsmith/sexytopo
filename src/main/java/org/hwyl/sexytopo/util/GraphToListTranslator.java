@@ -1,6 +1,5 @@
 package org.hwyl.sexytopo.util;
 
-import org.hwyl.sexytopo.control.activity.TableActivity;
 import org.hwyl.sexytopo.model.Leg;
 import org.hwyl.sexytopo.model.Station;
 import org.hwyl.sexytopo.model.Survey;
@@ -16,10 +15,6 @@ import java.util.Map;
  */
 public class GraphToListTranslator {
 
-/*
-    public static List<Map<TableCol, Object>> toListOfSurveyListEntries(Survey survey) {
-        return createListOfLegsFromStation(survey.getOrigin());
-    }*/
 
     private static GraphToListTranslator instance = new GraphToListTranslator();
 
@@ -56,21 +51,6 @@ public class GraphToListTranslator {
 
         return list;
     }
-
-
-
-/*
-    private static List<Map<TableCol, Object>> createListOfLegsFromStation(Station from) {
-        List<Map<TableCol, Object>> maps = new ArrayList<>();
-        for (Leg leg : from.getOnwardLegs()) {
-            Map<TableCol, Object> map = createMap(from, leg);
-            maps.add(map);
-            if (leg.hasDestination()) {
-                maps.addAll(createListOfLegsFromStation(leg.getDestination()));
-            }
-        }
-        return maps;
-    }*/
 
 
     public static Map<TableCol, Object> createMap(SurveyListEntry entry) {

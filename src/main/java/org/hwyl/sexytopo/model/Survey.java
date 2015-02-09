@@ -4,7 +4,6 @@ import org.hwyl.sexytopo.control.util.StationNamer;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -58,6 +57,19 @@ public class Survey {
 
     public List<Station> getAllStations() {
         return getConnectedStations(origin);
+    }
+
+    public List<Leg> getAllLegs() {
+        return getConnectedLegs(origin);
+    }
+
+    public List<Leg> getConnectedLegs(Station root) {
+        List<Leg> legs = new ArrayList<>();
+        legs.addAll(root.getOnwardLegs());
+        for (Leg leg : root.getConnectedOnwardLegs()) {
+            legs.addAll(getConnectedLegs(leg.getDestination()));
+        }
+        return legs;
     }
 
     private List<Station> getConnectedStations(Station root) {
