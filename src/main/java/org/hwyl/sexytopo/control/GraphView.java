@@ -423,17 +423,29 @@ private boolean firstTime = true;
     }
 
 
+    public void zoom(double delta) {
 
-    public void zoom(double amount) {
-
-        if ((surveyToViewScale + amount) <= 0) {
+        if ((surveyToViewScale + delta) <= 0) {
             return; // no point allowing zooming out so that the survey is a point
         }
 
-        surveyToViewScale += amount;
+        // first record where we are
+        Coord2D centre = new Coord2D((double) getWidth() / 2, (double) getHeight() / 2);
+        Coord2D centreInSurveyCoords = viewCoordsToSurveyCoords(centre);
 
-        // need to scale the centre of the screen...
-        // or adjust offset by scaled delta from the centre
+        // then perform the actual zoom
+        surveyToViewScale += delta;
+
+        // centreInSurveyCoords stays the same as we zoom...
+        // we now work out where the new offset is to keep centre
+        // in the same place in the view
+        double screenWidthInMetres = getWidth() / surveyToViewScale;
+        double screenHeightInMetres = getHeight() / surveyToViewScale;
+
+        double x = centreInSurveyCoords.getX() - (screenWidthInMetres / 2);
+        double y = centreInSurveyCoords.getY() - (screenHeightInMetres / 2);
+
+        viewpointOffset = new Coord2D(x, y);
     }
 
     public void undo() {
