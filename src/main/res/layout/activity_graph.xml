@@ -9,55 +9,141 @@
             android:layout_height="0dp"
             android:layout_weight="1"/>
 
+
+
     <LinearLayout
-        style="@android:style/Holo.ButtonBar"
+
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="0px"
+        android:weightSum="1.4"
+        android:background="@color/panelBackground"
+        >
+
+        <ImageButton
+            android:layout_weight="0.2"
+            android:src="@drawable/empty"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:scaleType="fitCenter"
+            android:id="@+id/buttonBlack"
+            android:tint="@color/sketchBlack"
+            />
+        <ImageButton
+            android:layout_weight="0.2"
+            android:src="@drawable/empty"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:scaleType="fitCenter"
+            android:id="@+id/buttonGreen"
+            />
+        <ImageButton
+            android:layout_weight="0.2"
+            android:src="@drawable/empty"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:scaleType="fitCenter"
+            android:id="@+id/buttonBlue"
+            />
+        <ImageButton
+            android:layout_weight="0.2"
+            android:src="@drawable/empty"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:scaleType="fitCenter"
+            android:id="@+id/buttonZoomIn2"
+            />
+        <ImageButton
+            android:layout_weight="0.2"
+            android:src="@drawable/empty"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:scaleType="fitCenter"
+            android:id="@+id/buttonZoomOut2"
+            />
+        <ImageButton
+            android:layout_weight="0.2"
+            android:src="@drawable/zoom_out"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:scaleType="fitCenter"
+            android:id="@+id/buttonZoomOut"
+            />
+        <ImageButton
+            android:layout_weight="0.2"
+            android:src="@drawable/zoom_in"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:scaleType="fitCenter"
+            android:id="@+id/buttonZoomIn"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="1px"
-        android:weightSum="1.2">
+        android:weightSum="1.4"
+        android:background="@color/panelBackground">
 
         <ImageButton
             android:layout_weight="0.2"
             android:src="@drawable/move"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
+            android:scaleType="fitCenter"
             android:id="@+id/buttonMove"
             />
         <ImageButton
             android:layout_weight="0.2"
             android:src="@drawable/pencil"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
+            android:scaleType="fitCenter"
             android:id="@+id/buttonDraw"
             />
         <ImageButton
             android:layout_weight="0.2"
-            android:src="@drawable/zoom_in"
+            android:src="@drawable/eraser"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/buttonZoomIn"
+            android:layout_height="50dp"
+            android:scaleType="fitCenter"
+            android:id="@+id/buttonErase"
             />
         <ImageButton
             android:layout_weight="0.2"
-            android:src="@drawable/zoom_out"
+            android:src="@drawable/text"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/buttonZoomOut"
+            android:layout_height="50dp"
+            android:scaleType="fitCenter"
+            android:id="@+id/buttonText"
             />
         <ImageButton
             android:layout_weight="0.2"
-            android:src="@drawable/arrow_circle_left"
+            android:src="@drawable/settings"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
+            android:scaleType="fitCenter"
+            android:id="@+id/buttonMenu"
+            />
+        <ImageButton
+            android:layout_weight="0.2"
+            android:src="@drawable/undo"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:scaleType="fitCenter"
             android:id="@+id/buttonUndo"
             />
         <ImageButton
             android:layout_weight="0.2"
-            android:src="@drawable/arrow_up"
+            android:src="@drawable/redo"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/buttonMenu"
+            android:layout_height="50dp"
+            android:scaleType="fitCenter"
+            android:id="@+id/buttonRedo"
             />
     </LinearLayout>
 

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <color name="panelBackground">#FFFFFF</color>
+
+    <color name="sketchBlack">#000000</color>
+    <color name="sketchBlue">#0000FF</color>
+    <color name="paintGreen">#00FF00</color>
+
+</resources>

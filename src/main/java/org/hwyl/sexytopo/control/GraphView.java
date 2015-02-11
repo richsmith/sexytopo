@@ -47,12 +47,12 @@ private boolean firstTime = true;
 
 
     public static final int LEG_COLOUR = Color.RED;
-    public static final int LEG_STROKE_WIDTH = 5;
+    public static final int LEG_STROKE_WIDTH = 4;
     public static final int HIGHLIGHT_COLOUR = Color.YELLOW;
     public static final int DEFAULT_SKETCH_COLOUR = Color.BLACK;
 
     public static final int STATION_COLOUR = Color.RED;
-    public static final int STATION_DIAMETER = 10;
+    public static final int STATION_DIAMETER = 8;
     public static final int HIGHLIGHT_DIAMETER = 12;
     public static final int HIGHLIGHT_STROKE_WIDTH = 5;
 

@@ -5,5 +5,6 @@ package org.hwyl.sexytopo.control.graph;
  */
 public enum Action {
     MOVE,
-    DRAW
+    DRAW,
+    ERASE
 }
