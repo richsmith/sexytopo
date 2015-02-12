@@ -23,16 +23,23 @@
 
         <ImageButton
             android:layout_weight="0.2"
-            android:src="@drawable/empty"
+            android:src="@drawable/black"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:scaleType="fitCenter"
             android:id="@+id/buttonBlack"
-            android:tint="@color/sketchBlack"
             />
         <ImageButton
             android:layout_weight="0.2"
-            android:src="@drawable/empty"
+            android:src="@drawable/orange"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:scaleType="fitCenter"
+            android:id="@+id/buttonOrange"
+            />
+        <ImageButton
+            android:layout_weight="0.2"
+            android:src="@drawable/green"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:scaleType="fitCenter"
@@ -40,7 +47,7 @@
             />
         <ImageButton
             android:layout_weight="0.2"
-            android:src="@drawable/empty"
+            android:src="@drawable/blue"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:scaleType="fitCenter"
@@ -48,19 +55,11 @@
             />
         <ImageButton
             android:layout_weight="0.2"
-            android:src="@drawable/empty"
+            android:src="@drawable/purple"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:scaleType="fitCenter"
-            android:id="@+id/buttonZoomIn2"
-            />
-        <ImageButton
-            android:layout_weight="0.2"
-            android:src="@drawable/empty"
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:scaleType="fitCenter"
-            android:id="@+id/buttonZoomOut2"
+            android:id="@+id/buttonPurple"
             />
         <ImageButton
             android:layout_weight="0.2"

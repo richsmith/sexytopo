@@ -41,6 +41,8 @@ private boolean firstTime = true;
     // zoom in increases this, zooming out decreases it
     private double surveyToViewScale = 10.0; // 10 pixels is one metre
 
+    public static final double MAX_ZOOM = 30.0;
+
     private Survey survey;
     private Space<Coord2D> projection;
     private Sketch sketch;
@@ -57,6 +59,20 @@ private boolean firstTime = true;
     public static final int HIGHLIGHT_STROKE_WIDTH = 5;
 
     public static final double DELETE_PATHS_WITHIN_N_PIXELS= 5.0;
+
+
+    public enum BrushColour {
+        BLACK(Color.BLACK),
+        ORANGE(Color.RED),
+        GREEN(Color.GREEN),
+        BLUE(Color.BLUE),
+        PURPLE(Color.MAGENTA);
+
+        private final int colour;
+        private BrushColour(int colour) {
+            this.colour = colour;
+        }
+    }
 
     public enum SketchTool {
         MOVE, DRAW, ERASE
@@ -425,8 +441,10 @@ private boolean firstTime = true;
 
     public void zoom(double delta) {
 
-        if ((surveyToViewScale + delta) <= 0) {
-            return; // no point allowing zooming out so that the survey is a point
+        double newZoom = surveyToViewScale + delta;
+
+        if (0 >= newZoom || newZoom >= MAX_ZOOM) {
+            return;
         }
 
         // first record where we are
@@ -434,7 +452,7 @@ private boolean firstTime = true;
         Coord2D centreInSurveyCoords = viewCoordsToSurveyCoords(centre);
 
         // then perform the actual zoom
-        surveyToViewScale += delta;
+        surveyToViewScale += newZoom;
 
         // centreInSurveyCoords stays the same as we zoom...
         // we now work out where the new offset is to keep centre
@@ -456,6 +474,15 @@ private boolean firstTime = true;
     public void redo() {
         sketch.redo();
         invalidate();
+    }
+
+    public void setBrushColour(BrushColour brushColour) {
+        sketch.setActiveColour(brushColour.colour);
+    }
+
+
+    public void setSketchTool(SketchTool sketchTool) {
+        this.currentSketchTool = sketchTool;
     }
 
 

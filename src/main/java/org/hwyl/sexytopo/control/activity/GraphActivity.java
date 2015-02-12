@@ -24,7 +24,6 @@ import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,18 +31,46 @@ import java.util.Map;
  * Created by rls on 13/10/14.
  */
 public abstract class GraphActivity extends SexyTopoActivity implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
+
     private static final double ZOOM_INCREMENT = 1.0;
+
+
+    private static final int[] BUTTON_IDS = new int[] {
+        R.id.buttonDraw,
+        R.id.buttonMove,
+        R.id.buttonErase,
+        R.id.buttonZoomIn,
+        R.id.buttonZoomOut,
+        R.id.buttonUndo,
+        R.id.buttonRedo,
+        R.id.buttonMenu,
+        R.id.buttonBlack,
+        R.id.buttonOrange,
+        R.id.buttonBlue,
+        R.id.buttonGreen,
+        R.id.buttonPurple
+    };
 
     private GraphView graphView;
 
-    private Map<GraphView.SketchTool, Integer> sketchToolToButtonId
-            = new EnumMap<GraphView.SketchTool, Integer>(GraphView.SketchTool.class) {{
-        put(GraphView.SketchTool.MOVE, R.id.buttonMove);
-        put(GraphView.SketchTool.DRAW, R.id.buttonDraw);
-        put(GraphView.SketchTool.ERASE, R.id.buttonErase);
+    private Map<Integer, GraphView.SketchTool> buttonIdToSketchTool
+            = new HashMap<Integer, GraphView.SketchTool>() {{
+        put(R.id.buttonMove, GraphView.SketchTool.MOVE);
+        put(R.id.buttonDraw, GraphView.SketchTool.DRAW);
+        put(R.id.buttonErase, GraphView.SketchTool.ERASE);
     }};
 
-    private GraphView.SketchTool DEFAULT_SKETCH_TOOL = GraphView.SketchTool.MOVE;
+    private Map<Integer, GraphView.BrushColour> buttonIdToBrushColour
+            = new HashMap<Integer, GraphView.BrushColour>() {{
+        put(R.id.buttonBlack, GraphView.BrushColour.BLACK);
+        put(R.id.buttonOrange, GraphView.BrushColour.ORANGE);
+        put(R.id.buttonBlue, GraphView.BrushColour.BLUE);
+        put(R.id.buttonGreen, GraphView.BrushColour.GREEN);
+        put(R.id.buttonPurple, GraphView.BrushColour.PURPLE);
+    }};
+
+    private int DEFAULT_SKETCH_TOOL_SELECTION = R.id.buttonMove;
+    private int DEFAULT_BRUSH_COLOUR_SELECTION = R.id.buttonBlack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,28 +90,18 @@ public abstract class GraphActivity extends SexyTopoActivity implements View.OnC
 
         setContentView(R.layout.activity_graph);
 
-        View drawButton = findViewById(R.id.buttonDraw);
-        drawButton.setOnClickListener(this);
-        View moveButton = findViewById(R.id.buttonMove);
-        moveButton.setOnClickListener(this);
-        View eraseButton = findViewById(R.id.buttonErase);
-        eraseButton.setOnClickListener(this);
-        View zoomInButton = findViewById(R.id.buttonZoomIn);
-        zoomInButton.setOnClickListener(this);
-        View zoomOutButton = findViewById(R.id.buttonZoomOut);
-        zoomOutButton.setOnClickListener(this);
-        View undoButton = findViewById(R.id.buttonUndo);
-        undoButton.setOnClickListener(this);
-        View redoButton = findViewById(R.id.buttonRedo);
-        redoButton.setOnClickListener(this);
-        View menuButton = findViewById(R.id.buttonMenu);
-        menuButton.setOnClickListener(this);
+        for (int id : BUTTON_IDS) {
+            View button = findViewById(id);
+            button.setOnClickListener(this);
+        }
 
         graphView = (GraphView)(findViewById(R.id.graphView));
         syncGraphWithSurvey();
 
-        setSketchTool(DEFAULT_SKETCH_TOOL);
+        selectSketchTool(DEFAULT_SKETCH_TOOL_SELECTION);
+        selectBrushColour(DEFAULT_BRUSH_COLOUR_SELECTION);
     }
+
 
     @Override
     protected void onStart() {
@@ -122,13 +139,9 @@ public abstract class GraphActivity extends SexyTopoActivity implements View.OnC
                 dialog.show();
                 break;
             case R.id.buttonDraw:
-                setSketchTool(GraphView.SketchTool.DRAW);
-                break;
             case R.id.buttonMove:
-                setSketchTool(GraphView.SketchTool.MOVE);
-                break;
             case R.id.buttonErase:
-                setSketchTool(GraphView.SketchTool.ERASE);
+                selectSketchTool(id);
                 break;
             case R.id.buttonZoomIn:
                 graphView.zoom(ZOOM_INCREMENT);
@@ -144,6 +157,13 @@ public abstract class GraphActivity extends SexyTopoActivity implements View.OnC
             case R.id.buttonRedo:
                 graphView.redo();
                 break;
+            case R.id.buttonBlack:
+            case R.id.buttonOrange:
+            case R.id.buttonBlue:
+            case R.id.buttonGreen:
+            case R.id.buttonPurple:
+                selectBrushColour(id);
+                break;
 
             case R.id.buttonMenu:
                 View v = findViewById(R.id.buttonMenu);
@@ -156,17 +176,34 @@ public abstract class GraphActivity extends SexyTopoActivity implements View.OnC
         return true;
     }
 
-    private void setSketchTool(GraphView.SketchTool selectedTool) {
-        graphView.currentSketchTool = selectedTool;
 
+    private void selectBrushColour(int selectedId) {
 
-        for (GraphView.SketchTool sketchTool : sketchToolToButtonId.keySet()) {
+        GraphView.BrushColour brushColour = buttonIdToBrushColour.get(selectedId);
+        graphView.setBrushColour(brushColour);
 
-            int id = sketchToolToButtonId.get(sketchTool);
+        for (int id : buttonIdToBrushColour.keySet()) {
             View button = findViewById(id);
 
-            if (sketchTool == selectedTool) {
-                button.getBackground().setColorFilter(new LightingColorFilter(0xFFFFFFFF, 0xFFAA0000));
+            if (id == selectedId) {
+                button.getBackground().setColorFilter(new LightingColorFilter(0xFFFFFFFF, 0xFF004400));
+            } else {
+                button.getBackground().setColorFilter(null);
+            }
+        }
+    }
+
+
+    private void selectSketchTool(int selectedId) {
+
+        GraphView.SketchTool sketchTool = buttonIdToSketchTool.get(selectedId);
+        graphView.setSketchTool(sketchTool);
+
+        for (int id : buttonIdToSketchTool.keySet()) {
+            View button = findViewById(id);
+
+            if (id == selectedId) {
+                button.getBackground().setColorFilter(new LightingColorFilter(0xFFFFFFFF, 0xFF440000));
             } else {
                 button.getBackground().setColorFilter(null);
             }
