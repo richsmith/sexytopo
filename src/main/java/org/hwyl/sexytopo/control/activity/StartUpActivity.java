@@ -10,7 +10,7 @@ import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.io.Loader;
 import org.hwyl.sexytopo.control.io.Util;
-import org.hwyl.sexytopo.model.Survey;
+import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.control.SurveyManager;
 
 public class StartUpActivity extends SexyTopoActivity {
@@ -42,10 +42,19 @@ public class StartUpActivity extends SexyTopoActivity {
                 getString(R.string.loading_survey) + " " + activeSurveyName,
                 Toast.LENGTH_SHORT).show();
 
-        Survey survey = Loader.loadSurvey(activeSurveyName);
+        Survey survey;
+        try {
+            survey = Loader.loadSurvey(activeSurveyName);
+        } catch (Exception e) {
+            survey = createNewActiveSurvey();
+            Toast.makeText(getApplicationContext(),
+                    getString(R.string.loading_survey_error),
+                    Toast.LENGTH_SHORT).show();
+        }
 
         return survey;
     }
+
 
     private Survey createNewActiveSurvey() {
 

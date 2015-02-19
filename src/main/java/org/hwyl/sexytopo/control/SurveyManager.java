@@ -2,8 +2,6 @@ package org.hwyl.sexytopo.control;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -11,9 +9,8 @@ import android.widget.Toast;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.io.Saver;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
-import org.hwyl.sexytopo.model.Leg;
-import org.hwyl.sexytopo.model.Survey;
-import org.hwyl.sexytopo.test.TestSurveyCreator;
+import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.util.List;
 

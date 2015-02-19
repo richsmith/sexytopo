@@ -8,6 +8,7 @@ import android.text.Editable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -18,7 +19,7 @@ import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.io.Saver;
 import org.hwyl.sexytopo.control.io.TherionExporter;
 import org.hwyl.sexytopo.control.io.Util;
-import org.hwyl.sexytopo.model.Survey;
+import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.io.File;
 import java.io.IOException;
@@ -72,6 +73,9 @@ public class SexyTopoActivity extends ActionBarActivity {
             case R.id.action_help:
                 startActivity(GuideActivity.class);
                 return true;
+            case R.id.action_about:
+                openAboutDialog();
+                return true;
 
             case R.id.action_file_new:
                 startNewSurvey();
@@ -97,6 +101,30 @@ public class SexyTopoActivity extends ActionBarActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+
+    }
+
+    private void openAboutDialog() {
+        // Inflate the about message contents
+        View messageView = getLayoutInflater().inflate(R.layout.about_dialog, null, false);
+
+        // When linking text, force to always use default color. This works
+        // around a pressed color state bug.
+        //TextView textView = (TextView) messageView.findViewById(R.id.about_credits);
+        //int defaultColor = textView.getTextColors().getDefaultColor();
+        //textView.setTextColor(defaultColor);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setIcon(R.drawable.laser_icon_small)
+                .setTitle(getText(R.string.app_name) + " v" + SexyTopo.VERSION)
+                .setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // do nothing
+                    }
+                })
+                .setView(messageView);
+        builder.create().show();
 
     }
 

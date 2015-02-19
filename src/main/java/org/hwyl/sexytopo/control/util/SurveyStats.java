@@ -1,7 +1,7 @@
 package org.hwyl.sexytopo.control.util;
 
-import org.hwyl.sexytopo.model.Leg;
-import org.hwyl.sexytopo.model.Survey;
+import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.util.List;
 

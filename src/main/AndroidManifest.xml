@@ -13,33 +13,33 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="org.hwyl.sexytopo.control.activity.TableActivity"
+            android:name=".control.activity.TableActivity"
             android:label="@string/title_activity_table" >
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name="org.hwyl.sexytopo.control.activity.SettingsActivity"
+            android:name=".control.activity.SettingsActivity"
             android:label="@string/title_activity_settings" >
         </activity>
         <activity
-            android:name="org.hwyl.sexytopo.control.activity.PlanActivity"
+            android:name=".control.activity.PlanActivity"
             android:label="@string/title_activity_plan" >
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name="org.hwyl.sexytopo.control.activity.ExtendedElevationActivity"
+            android:name=".control.activity.ExtendedElevationActivity"
             android:label="@string/title_activity_elevation" >
         </activity>
         <activity
-            android:name="org.hwyl.sexytopo.control.activity.DeviceActivity"
+            android:name=".control.activity.DeviceActivity"
             android:label="@string/title_activity_device" >
         </activity>
         <activity
-            android:name="org.hwyl.sexytopo.control.activity.StartUpActivity"
+            android:name=".control.activity.StartUpActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -48,17 +48,24 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="org.hwyl.sexytopo.control.activity.SurveyActivity"
+            android:name=".control.activity.SurveyActivity"
             android:label="@string/title_activity_survey" >
         </activity>
         <activity
-            android:name="org.hwyl.sexytopo.control.activity.GuideActivity"
+            android:name=".control.activity.GuideActivity"
             android:label="@string/title_activity_guide"
-            android:parentActivityName="org.hwyl.sexytopo.control.activity.SexyTopoActivity" >
+            android:parentActivityName=".control.activity.SexyTopoActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.hwyl.sexytopo.control.activity.SexyTopoActivity" />
         </activity>
+
+        <service
+            android:name=".control.AudioService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
+
     </application>
 
 </manifest>

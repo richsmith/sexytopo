@@ -1,13 +1,12 @@
-package org.hwyl.sexytopo.model;
+package org.hwyl.sexytopo.model.survey;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by rls on 16/07/14.
  */
-public class Station {
+public class Station extends SurveyComponent {
 
     private final String name;
     private List<Leg> onwardLegs = new ArrayList<>();

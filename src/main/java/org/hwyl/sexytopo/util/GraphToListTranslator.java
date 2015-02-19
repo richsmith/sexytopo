@@ -1,8 +1,8 @@
 package org.hwyl.sexytopo.util;
 
-import org.hwyl.sexytopo.model.Leg;
-import org.hwyl.sexytopo.model.Station;
-import org.hwyl.sexytopo.model.Survey;
+import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.Station;
+import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.table.TableCol;
 
 import java.util.ArrayList;

@@ -1,7 +1,10 @@
 package org.hwyl.sexytopo.model.graph;
 
-import org.hwyl.sexytopo.model.Leg;
-import org.hwyl.sexytopo.model.Station;
+import org.hwyl.sexytopo.control.util.Space3DTransformer;
+import org.hwyl.sexytopo.control.util.Space3DTransformerForElevation;
+import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.Station;
+import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.util.Map;
 
@@ -9,6 +12,7 @@ import java.util.Map;
  * Created by rls on 26/07/14.
  */
 public enum Projection2D {
+
     PLAN {
         public Coord2D project(Coord3D coord3D) {
             return new Coord2D(coord3D.getX(), coord3D.getY());
@@ -23,11 +27,32 @@ public enum Projection2D {
         public Coord2D project(Coord3D coord3D) {
             return new Coord2D(coord3D.getX(), coord3D.getZ());
         }
+    },
+    EXTENDED_ELEVATION {
+        public Coord2D project(Coord3D coord3D) {
+            return ELEVATION_NS.project(coord3D);
+        }
     };
+
+    private static Space3DTransformer space3DTransformer =
+            new Space3DTransformer();
+    private static Space3DTransformerForElevation space3DTransformerForElevation =
+            new Space3DTransformerForElevation();
+
+    private Space<Coord3D> transform(Survey survey) {
+        if (this == EXTENDED_ELEVATION) {
+            return space3DTransformerForElevation.transformTo3D(survey);
+        } else {
+            return space3DTransformer.transformTo3D(survey);
+        }
+    }
 
     public abstract Coord2D project(Coord3D coord3D);
 
-    public Space<Coord2D> project(Space<Coord3D> space3D) {
+    public Space<Coord2D> project(Survey survey) {
+
+        Space<Coord3D> space3D = transform(survey);
+
         Space<Coord2D> space2D = new Space<>();
 
         for (Map.Entry<Station, Coord3D> entry : space3D.getStationMap().entrySet()) {
@@ -48,4 +73,5 @@ public enum Projection2D {
 
         return space2D;
     }
+
 }

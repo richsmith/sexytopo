@@ -5,7 +5,7 @@ import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
 import org.hwyl.sexytopo.SexyTopo;
-import org.hwyl.sexytopo.model.Leg;
+import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.control.SurveyManager;
 
 import java.io.DataInputStream;

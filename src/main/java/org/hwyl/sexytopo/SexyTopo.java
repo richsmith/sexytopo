@@ -2,7 +2,6 @@ package org.hwyl.sexytopo;
 
 import android.os.Environment;
 
-import java.io.File;
 import java.util.UUID;
 
 /**
@@ -11,7 +10,7 @@ import java.util.UUID;
 public class SexyTopo {
 
     public static final String APP_NAME = "SexyTopo";
-    public static final String VERSION = "0.5";
+    public static final String VERSION = "0.8";
 
     public static final String TAG = APP_NAME; // for writing debug log
 

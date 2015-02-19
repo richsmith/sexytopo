@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.control.util;
 
-import org.hwyl.sexytopo.model.Station;
+import org.hwyl.sexytopo.model.survey.Station;
 
 /**
  * Created by rls on 24/07/14.

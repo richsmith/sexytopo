@@ -6,5 +6,6 @@
     <color name="sketchBlack">#000000</color>
     <color name="sketchBlue">#0000FF</color>
     <color name="paintGreen">#00FF00</color>
+    <color name="sketchOrange">#FFA500</color>
 
 </resources>

@@ -22,9 +22,9 @@ import android.widget.Toast;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
-import org.hwyl.sexytopo.model.Leg;
-import org.hwyl.sexytopo.model.Station;
-import org.hwyl.sexytopo.model.Survey;
+import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.Station;
+import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.table.TableCol;
 import org.hwyl.sexytopo.util.GraphToListTranslator;
 

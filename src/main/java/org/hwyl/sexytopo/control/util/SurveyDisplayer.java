@@ -3,7 +3,7 @@ package org.hwyl.sexytopo.control.util;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
-import org.hwyl.sexytopo.model.Survey;
+import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 
 /**

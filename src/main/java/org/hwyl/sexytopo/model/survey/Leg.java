@@ -1,9 +1,9 @@
-package org.hwyl.sexytopo.model;
+package org.hwyl.sexytopo.model.survey;
 
 /**
  * Created by rls on 16/07/14.
  */
-public class Leg {
+public class Leg extends SurveyComponent{
 
     private final double distance; // in metres
     private final double bearing;
@@ -20,6 +20,11 @@ public class Leg {
                double bearing,
                double inclination,
                Station destination) {
+
+        if (destination == null) {
+            throw new IllegalArgumentException("Destination of leg should not be null");
+        }
+
         this.distance = distance;
         this.bearing = bearing;
         this.inclination = inclination;

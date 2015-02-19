@@ -5,8 +5,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.control.io.Saver;
-import org.hwyl.sexytopo.model.Survey;
+import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.test.TestSurveyCreator;
 

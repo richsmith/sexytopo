@@ -1,31 +1,41 @@
-package org.hwyl.sexytopo.control;
+package org.hwyl.sexytopo.control.graph;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.os.Handler;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.GestureDetector;
+import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.PopupMenu;
+import android.widget.PopupWindow;
 
-import org.hwyl.sexytopo.model.Station;
-import org.hwyl.sexytopo.model.Survey;
+import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.control.activity.GraphActivity;
+import org.hwyl.sexytopo.control.util.SpaceFlipper;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Space;
+import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
+import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.Station;
+import org.hwyl.sexytopo.model.survey.Survey;
+import org.hwyl.sexytopo.util.Space2DUtils;
 
 import java.util.Map;
 
 /**
  * Created by rls on 27/07/14.
  */
-public class GraphView extends View {
+public class GraphView extends View implements PopupMenu.OnMenuItemClickListener {
 
     // FIXME hack!
 private boolean firstTime = true;
@@ -37,11 +47,13 @@ private boolean firstTime = true;
     private Coord2D actionDownPointOnView = Coord2D.ORIGIN;
     private Coord2D actionDownViewpointOffset = Coord2D.ORIGIN;
 
+    private Station selectedStation;
+
     // ratio of metres on the survey to pixels on the view
     // zoom in increases this, zooming out decreases it
     private double surveyToViewScale = 10.0; // 10 pixels is one metre
 
-    public static final double MAX_ZOOM = 30.0;
+    public static final double MAX_ZOOM = 60.0;
 
     private Survey survey;
     private Space<Coord2D> projection;
@@ -56,15 +68,39 @@ private boolean firstTime = true;
     public static final int STATION_COLOUR = Color.RED;
     public static final int STATION_DIAMETER = 8;
     public static final int HIGHLIGHT_DIAMETER = 12;
-    public static final int HIGHLIGHT_STROKE_WIDTH = 5;
+    public static final int STATION_LABEL_SIZE = 18;
 
-    public static final double DELETE_PATHS_WITHIN_N_PIXELS= 5.0;
+    public static final int GRID_COLOUR = Color.LTGRAY;
+
+    public static final double DELETE_PATHS_WITHIN_N_PIXELS = 5.0;
+    public static final double SELECTION_SENSITIVITY_IN_PIXELS = 25;
+
+    private static final int SKETCH_ORANGE = 0xFFFFA500;
+    private static final int SKETCH_GREEN = 0xFF00DD00;
+
+
+    public static final int STATION_LABEL_OFFSET = 10;
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.setActiveStation:
+                if (selectedStation != null) {
+                    survey.setActiveStation(selectedStation);
+                    invalidate();
+                }
+                return true;
+        }
+
+        return false;
+    }
 
 
     public enum BrushColour {
+
         BLACK(Color.BLACK),
-        ORANGE(Color.RED),
-        GREEN(Color.GREEN),
+        ORANGE(SKETCH_ORANGE),
+        GREEN(SKETCH_GREEN),
         BLUE(Color.BLUE),
         PURPLE(Color.MAGENTA);
 
@@ -75,7 +111,7 @@ private boolean firstTime = true;
     }
 
     public enum SketchTool {
-        MOVE, DRAW, ERASE
+        MOVE, DRAW, ERASE, SELECT
     }
     public SketchTool currentSketchTool = SketchTool.MOVE;
 
@@ -83,6 +119,8 @@ private boolean firstTime = true;
     private Paint legPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint drawPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint highlightPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Paint gridPaint = new Paint();
+
 
 
     public GraphView(Context context) {
@@ -98,31 +136,37 @@ private boolean firstTime = true;
     private void initialise() {
 
         stationPaint.setColor(STATION_COLOUR);
+        stationPaint.setTextSize(STATION_LABEL_SIZE);
+
+        //highlightPaint.setStyle(Paint.Style.STROKE);
+        //highlightPaint.setStrokeWidth(HIGHLIGHT_STROKE_WIDTH);
+        highlightPaint.setColor(HIGHLIGHT_COLOUR);
 
         legPaint.setARGB(127, 255, 0, 0);
         legPaint.setStrokeWidth(LEG_STROKE_WIDTH);
         legPaint.setColor(LEG_COLOUR);
 
+        gridPaint.setColor(GRID_COLOUR);
 
         drawPaint.setColor(DEFAULT_SKETCH_COLOUR);
         drawPaint.setStrokeWidth(3);
         drawPaint.setStyle(Paint.Style.STROKE);
         drawPaint.setStrokeJoin(Paint.Join.ROUND);
         drawPaint.setStrokeCap(Paint.Cap.ROUND);
-
-        highlightPaint.setStyle(Paint.Style.STROKE);
-        highlightPaint.setStrokeWidth(HIGHLIGHT_STROKE_WIDTH);
-        highlightPaint.setColor(HIGHLIGHT_COLOUR);
     }
 
 
     public void setSurvey(Survey survey) {
-        this.survey = survey; // FIXME might be able to get away with not passing in the full survey
+        this.survey = survey;
     }
 
 
     public void setProjection(Space<Coord2D> projection) {
-        this.projection = projection;
+        // We're going to flip the projection vertically because we want North at the top and
+        // the survey is recorded assuming that that is the +ve axis. However, on the
+        // screen this is reversed: DOWN is the +ve access. I think this makes sense...
+        // we just have to remember to reverse the flip when exporting the sketch :)
+        this.projection = SpaceFlipper.flipVertically(projection);
     }
 
 
@@ -131,40 +175,8 @@ private boolean firstTime = true;
     }
 
 
-    public void centreViewOnActiveStation() {
-        Coord2D activeStationCoord = projection.getStationMap().get(survey.getActiveStation());
-        double viewWidthInMetres = getWidth() * (1 / surveyToViewScale);
-        double viewHeightInMetres = getHeight() * (1 / surveyToViewScale);
-        Coord2D delta = new Coord2D(viewWidthInMetres / 2, viewHeightInMetres / 2);
-        viewpointOffset = activeStationCoord.minus(delta);
-    }
-
-
-
-
-    final Handler handler = new Handler();
-    Runnable mLongPressed = new Runnable() {
-        public void run() {
-            Log.i("foobar", "Long press!");
-        }
-    };
-
-
-    final GestureDetector gestureDetector = new GestureDetector(new GestureDetector.SimpleOnGestureListener() {
-        public void onLongPress(MotionEvent e) {
-            Log.e("foobar", "Longpress detected");
-        }
-    });
-
-    /*
-    public boolean onTouchEvent(MotionEvent event) {
-        return gestureDetector.onTouchEvent(event);
-    };*/
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-
-        //gestureDetector.onTouchEvent(event);
 
         switch (currentSketchTool) {
             case MOVE:
@@ -173,6 +185,8 @@ private boolean firstTime = true;
                 return handleDraw(event);
             case ERASE:
                 return handleErase(event);
+            case SELECT:
+                return handleSelect(event);
         }
         return false;
     }
@@ -185,7 +199,7 @@ private boolean firstTime = true;
     }
 
     private Coord2D surveyCoordsToViewCoords(Coord2D coords) {
-        return coords.flipVertically().minus(viewpointOffset).scale(surveyToViewScale);
+        return coords.minus(viewpointOffset).scale(surveyToViewScale);
     }
 
 
@@ -199,10 +213,10 @@ private boolean firstTime = true;
             case MotionEvent.ACTION_DOWN:
                 actionDownPointOnView = touchPointOnView;
                 Coord2D start = surveyCoords;
-                Sketch.PathDetail newPath = sketch.startNewPath(start);
+                PathDetail newPath = sketch.startNewPath(start);
                 break;
             case MotionEvent.ACTION_MOVE:
-                Sketch.PathDetail activePath = sketch.getActivePath();
+                PathDetail activePath = sketch.getActivePath();
                 activePath.lineTo(surveyCoords);
                 invalidate();
                 break;
@@ -227,7 +241,6 @@ private boolean firstTime = true;
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                handler.postDelayed(mLongPressed, 500);
                 actionDownPointOnView = touchPointOnView;
                 actionDownViewpointOffset = viewpointOffset;
                 break;
@@ -238,7 +251,6 @@ private boolean firstTime = true;
                 invalidate();
                 // fall through
             case MotionEvent.ACTION_UP:
-                handler.removeCallbacks(mLongPressed);
                 break;
             default:
                 return false;
@@ -255,7 +267,9 @@ private boolean firstTime = true;
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                Sketch.PathDetail closestPath = sketch.findNearestPathWithin(sketch.getPathDetails(), touchPointOnSurvey, DELETE_PATHS_WITHIN_N_PIXELS);
+                PathDetail closestPath =
+                        sketch.findNearestPathWithin(sketch.getPathDetails(),
+                                touchPointOnSurvey, DELETE_PATHS_WITHIN_N_PIXELS);
                 if (closestPath != null) {
                     sketch.getPathDetails().remove(closestPath);
                     invalidate();
@@ -272,51 +286,78 @@ private boolean firstTime = true;
     }
 
 
-    /*
-    private List<Sketch.PathDetail> findAllPathsNearPoint() {
-        // we could try to be more sophisticated if this is slow; e.g. only consider paths on the screen
-        List<Sketch.PathDetail> foundPaths = new ArrayList<>();
-        for (Sketch.PathDetail path : sketch.getPathDetails()) {
-            if (isPathNearPoint(path.getPath(), DELETE_PATHS_WITHIN_N_PIXELS)) {
-                foundPaths.add(path);
-            }
-        }
-        return foundPaths;
-    }*/
 
-    // Util?
-    private static boolean isPathNearPoint(Path path, double AllowedDelta) {
-        // now what? might be worth looking here:
-        // http://stackoverflow.com/questions/7972780/how-do-i-find-all-the-points-in-a-path-in-android
-        return false;
+    private boolean handleSelect(MotionEvent event) {
+
+        Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
+        Coord2D touchPointOnSurvey = viewCoordsToSurveyCoords(touchPointOnView);
+
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+
+                double selectionTolerance =
+                        SELECTION_SENSITIVITY_IN_PIXELS / surveyToViewScale;
+
+                selectedStation = findNearestStationWithinDelta(projection,
+                        touchPointOnSurvey, selectionTolerance);
+
+                if (selectedStation == null) {
+                    return true;
+                } else if (true) {
+                    // forget the pop-up menu for now... just select what we're pointing at
+                    survey.setActiveStation(selectedStation);
+                    invalidate();
+                    return true;
+                }
+
+                LinearLayout ll = new LinearLayout(this.getContext());
+                Button dummyView = new Button(getContext());
+                ll.addView(dummyView);
+                dummyView.setText("foo");
+                PopupWindow window = new PopupWindow(ll);
+                window.showAtLocation(this, Gravity.CENTER, (int)event.getX(), (int)event.getY());
+                //window.showAtLocation(this, Gravity.CENTER, 150, 150);
+                window.showAsDropDown(this);
+                window.update((int)event.getX(), (int)event.getY(), 0, 0);
+
+                PopupMenu popup = new PopupMenu(this.getContext(), window.getContentView());
+                popup.getMenuInflater().inflate(R.menu.graph_station_selected, popup.getMenu());
+                popup.setOnMenuItemClickListener(this);
+                popup.show();
+
+            case MotionEvent.ACTION_MOVE:
+                break;
+            case MotionEvent.ACTION_UP:
+                break;
+            default:
+                return false;
+        }
+
+        return true;
     }
 
 
-    /*
-    private static void getElementsToDraw(Space<Coord2D> space, int x, int y, int height, int width) {
+    private static Station findNearestStationWithinDelta(Space<Coord2D> space, Coord2D target, double delta) {
+        double shortest = Double.MAX_VALUE;
+        Station best = null;
 
-        Set<Coord2D> visibleStations = new HashSet<>();
+        for (Station station : space.getStationMap().keySet()) {
+            Coord2D point = space.getStationMap().get(station);
+            double distance = Space2DUtils.getDistance(point, target);
 
-        for (Coord2D coord2D : space.getStationMap()) {
-            if (isWithin(coord2D, x, x + width, y, y + height)) {
-                visibleStations.add(coord2D);
+            if (distance > delta) {
+                continue;
+            }
+
+            if (best == null || (distance < shortest)) {
+                best = station;
+                shortest = distance;
             }
         }
 
-        Set<Line<Coord2D>> visibleLegs = new HashSet<>();
+        return best;
 
-        for (Line<Coord2D> line : space.getLegMap()) {
-            if (isWithin(line.getStart(), x, x + width, y, y + height) ||
-                isWithin(line.getEnd(), x, x + width, y, y + height)) {
-                visibleLegs.add(line);
-            }
-        }
     }
-
-    private static boolean isWithin(Coord2D coord2D, int minX, int maxX, int minY, int maxY) {
-        return minX <= coord2D.getX() && coord2D.getX() <= maxX &&
-               minY <= coord2D.getY() && coord2D.getY() <= maxX;
-    }*/
 
 
     @Override
@@ -329,7 +370,9 @@ private boolean firstTime = true;
             firstTime = false;
         }
 
-        drawGrid(canvas);
+        if (getDisplayPreference(GraphActivity.DisplayPreference.SHOW_GRID)) {
+            drawGrid(canvas);
+        }
 
         drawSurvey(canvas, projection);
 
@@ -339,10 +382,6 @@ private boolean firstTime = true;
 
 
     private void drawGrid(Canvas canvas) {
-
-
-        Paint axisPaint = new Paint();
-        axisPaint.setColor(Color.LTGRAY);
 
         // FIXME need a better tick size function when we sort out zooming
         //scale           <-zoom out 1  10   20    zoom in->
@@ -356,8 +395,8 @@ private boolean firstTime = true;
         for (int n = numberTicksJustBeforeViewpointOffsetX; true; n++) {
             double xSurvey = n * tickSizeInMetres;
             int xView = (int)((xSurvey - viewpointOffset.getX()) * surveyToViewScale);
-            axisPaint.setStrokeWidth(n % 10 == 0? 3 : 1);
-            canvas.drawLine(xView, 0, xView, getHeight(), axisPaint);
+            gridPaint.setStrokeWidth(n % 10 == 0 ? 3 : 1);
+            canvas.drawLine(xView, 0, xView, getHeight(), gridPaint);
             if (xView >= getWidth()) {
                 break;
             }
@@ -368,8 +407,8 @@ private boolean firstTime = true;
         for (int n = numberTicksJustBeforeViewpointOffsetY; true; n++) {
             double ySurvey = n * tickSizeInMetres;
             int yView = (int)((ySurvey - viewpointOffset.getY()) * surveyToViewScale);
-            axisPaint.setStrokeWidth(n % 10 == 0? 3 : 1);
-            canvas.drawLine(0, yView, getWidth(), yView, axisPaint);
+            gridPaint.setStrokeWidth(n % 10 == 0 ? 3 : 1);
+            canvas.drawLine(0, yView, getWidth(), yView, gridPaint);
             if (yView >= getHeight()) {
                 break;
             }
@@ -393,9 +432,29 @@ private boolean firstTime = true;
 
     private void drawSurvey(Canvas canvas, Space<Coord2D> space) {
 
-        for (Line<Coord2D> leg : space.getLegMap().values()) {
-            Coord2D translatedStart = surveyCoordsToViewCoords(leg.getStart());
-            Coord2D translatedEnd = surveyCoordsToViewCoords(leg.getEnd());
+        drawLegs(canvas, space);
+
+        drawStations(canvas, space);
+
+        // highlight active station after everything else to ensure it's on top
+        highlightActiveStation(canvas);
+    }
+
+
+    private void drawLegs(Canvas canvas, Space<Coord2D> space) {
+
+        Map<Leg, Line<Coord2D>> legMap = space.getLegMap();
+
+        for (Leg leg : legMap.keySet()) {
+
+            if (!getDisplayPreference(GraphActivity.DisplayPreference.SHOW_SPLAYS) &&
+                    !leg.hasDestination()) {
+                continue;
+            }
+            Line<Coord2D> line = legMap.get(leg);
+
+            Coord2D translatedStart = surveyCoordsToViewCoords(line.getStart());
+            Coord2D translatedEnd = surveyCoordsToViewCoords(line.getEnd());
             canvas.drawLine(
                     (int)(translatedStart.getX()), (int)(translatedStart.getY()),
                     (int)(translatedEnd.getX()), (int)(translatedEnd.getY()),
@@ -403,22 +462,54 @@ private boolean firstTime = true;
 
         }
 
+    }
 
+
+    private void drawStations(Canvas canvas, Space<Coord2D> space) {
         for (Map.Entry<Station, Coord2D> entry : space.getStationMap().entrySet()) {
+
+
+            Station station = entry.getKey();
             Coord2D translatedStation = surveyCoordsToViewCoords(entry.getValue());
+            int x = (int)(translatedStation.getX());
+            int y = (int)(translatedStation.getY());
 
-            if (entry.getKey() == survey.getActiveStation()) {
-                stationPaint.setColor(HIGHLIGHT_COLOUR);
-                canvas.drawCircle((int) (translatedStation.getX()), (int) (translatedStation.getY()),
-                        STATION_DIAMETER + HIGHLIGHT_DIAMETER, highlightPaint);
+            if (station == survey.getActiveStation()) {
+                canvas.drawCircle(x, y,
+                        STATION_DIAMETER, highlightPaint);
+            } else {
+                canvas.drawCircle(x, y,
+                        STATION_DIAMETER, stationPaint);
             }
-                stationPaint.setColor(STATION_COLOUR);
-            //}
-            canvas.drawCircle((int)(translatedStation.getX()), (int)(translatedStation.getY()),
-                    STATION_DIAMETER, stationPaint);
 
+            if (getDisplayPreference(GraphActivity.DisplayPreference.SHOW_STATION_LABELS)) {
+                canvas.drawText(station.getName(),
+                        x + STATION_LABEL_OFFSET,
+                        y + STATION_LABEL_OFFSET,
+                        stationPaint);
+            }
 
         }
+    }
+
+
+    private void highlightActiveStation(Canvas canvas) {
+        Coord2D activeStationCoord = projection.getStationMap().get(survey.getActiveStation());
+        Coord2D activeStationViewCoord = surveyCoordsToViewCoords(activeStationCoord);
+        canvas.drawCircle((int)activeStationViewCoord.getX(), (int)activeStationViewCoord.getY(),
+                HIGHLIGHT_DIAMETER, highlightPaint);
+        canvas.drawCircle((int)activeStationViewCoord.getX(), (int)activeStationViewCoord.getY(),
+                STATION_DIAMETER, stationPaint);
+    }
+
+
+
+    private boolean getDisplayPreference(GraphActivity.DisplayPreference preference) {
+        SharedPreferences preferences =
+            getContext().getSharedPreferences("display", Context.MODE_PRIVATE);
+        boolean isSelected =
+            preferences.getBoolean(preference.toString(), preference.getDefault());
+        return isSelected;
     }
 
 
@@ -429,7 +520,7 @@ private boolean firstTime = true;
         matrix.postScale((float) (surveyToViewScale), (float) (surveyToViewScale));
 
 
-        for (Sketch.PathDetail pathDetail : sketch.getPathDetails()) {
+        for (PathDetail pathDetail : sketch.getPathDetails()) {
             Path translatedPath = new Path(pathDetail.getAndroidPath());
             translatedPath.transform(matrix);
             drawPaint.setColor(pathDetail.getColour());
@@ -437,6 +528,26 @@ private boolean firstTime = true;
         }
 
     }
+
+
+
+    public void centreViewOnActiveStation() {
+        Coord2D activeStationCoord = projection.getStationMap().get(survey.getActiveStation());
+        centreViewOnSurveyPoint(activeStationCoord);
+    }
+
+
+    public void centreViewOnSurveyPoint(Coord2D point) {
+
+        double xDeltaInMetres = ((double)getWidth() / 2) / surveyToViewScale;
+        double yDeltaInMetres = ((double)getHeight() / 2) / surveyToViewScale;
+
+        double x = point.getX() - xDeltaInMetres;
+        double y = point.getY() - yDeltaInMetres;
+
+        viewpointOffset = new Coord2D(x, y);
+    }
+
 
 
     public void zoom(double delta) {
@@ -452,29 +563,23 @@ private boolean firstTime = true;
         Coord2D centreInSurveyCoords = viewCoordsToSurveyCoords(centre);
 
         // then perform the actual zoom
-        surveyToViewScale += newZoom;
+        surveyToViewScale = newZoom;
 
-        // centreInSurveyCoords stays the same as we zoom...
-        // we now work out where the new offset is to keep centre
-        // in the same place in the view
-        double screenWidthInMetres = getWidth() / surveyToViewScale;
-        double screenHeightInMetres = getHeight() / surveyToViewScale;
-
-        double x = centreInSurveyCoords.getX() - (screenWidthInMetres / 2);
-        double y = centreInSurveyCoords.getY() - (screenHeightInMetres / 2);
-
-        viewpointOffset = new Coord2D(x, y);
+        centreViewOnSurveyPoint(centreInSurveyCoords);
     }
+
 
     public void undo() {
         sketch.undo();
         invalidate();
     }
 
+
     public void redo() {
         sketch.redo();
         invalidate();
     }
+
 
     public void setBrushColour(BrushColour brushColour) {
         sketch.setActiveColour(brushColour.colour);

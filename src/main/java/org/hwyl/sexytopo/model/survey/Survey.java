@@ -1,4 +1,4 @@
-package org.hwyl.sexytopo.model;
+package org.hwyl.sexytopo.model.survey;
 
 import org.hwyl.sexytopo.control.util.StationNamer;
 import org.hwyl.sexytopo.model.sketch.Sketch;
@@ -20,8 +20,16 @@ public class Survey {
     private Sketch planSketch = new Sketch();
     private Sketch elevationSketch = new Sketch();
 
+    public void setPlanSketch(Sketch planSketch) {
+        this.planSketch = planSketch;
+    }
+
     public Sketch getPlanSketch() {
         return planSketch;
+    }
+
+    public void setElevationSketch(Sketch elevationSketch) {
+        this.elevationSketch = elevationSketch;
     }
 
     public Sketch getElevationSketch() {
@@ -98,4 +106,5 @@ public class Survey {
         }
 
     }
+
 }

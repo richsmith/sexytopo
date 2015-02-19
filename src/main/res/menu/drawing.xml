@@ -1,20 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-   <item
-        android:id="@+id/buttonRedo"
-        android:title="Redo"/>
-
     <item
-        android:id="@+id/buttonErase"
-        android:title="Eraser"/>
+        android:id="@+id/buttonDeleteLastLeg"
+        android:title="@string/sketch_menu_delete_last_leg"/>
+    <item
+        android:id="@+id/buttonCentreView"
+        android:title="@string/sketch_menu_centre_view"/>
     <item
         android:id="@+id/buttonText"
-        android:title="Text"/>
-    <item
-        android:id="@+id/buttonColour"
-        android:title="Pick Colour"/>
-    <item
-        android:id="@+id/buttonDisplay"
-        android:title="Display..."/>
+        android:title="Text"
+        android:icon="@drawable/text"/>
+    <item android:id="@+id/buttonShowGrid"
+        android:title="@string/sketch_menu_show_grid"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:checkable="true"/>
+    <item android:id="@+id/buttonShowSplays"
+        android:title="@string/sketch_menu_show_splays"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:checkable="true"/>
+    <item android:id="@+id/buttonShowStationLabels"
+        android:title="@string/sketch_menu_show_station_labels"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:checkable="true"/>
 </menu>

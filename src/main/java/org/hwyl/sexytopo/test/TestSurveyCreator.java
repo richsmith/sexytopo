@@ -1,15 +1,12 @@
 package org.hwyl.sexytopo.test;
 
-import org.hwyl.sexytopo.control.util.StationNamer;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
-import org.hwyl.sexytopo.model.Leg;
-import org.hwyl.sexytopo.model.Station;
-import org.hwyl.sexytopo.model.Survey;
+import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.Station;
+import org.hwyl.sexytopo.model.survey.Survey;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 /**
  * Created by rls on 29/07/14.

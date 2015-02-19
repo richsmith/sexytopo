@@ -5,7 +5,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
 
-        <org.hwyl.sexytopo.control.GraphView android:id="@+id/graphView" android:layout_width="match_parent"
+        <org.hwyl.sexytopo.control.graph.GraphView
+            android:id="@+id/graphView" android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"/>
 
@@ -114,11 +115,11 @@
             />
         <ImageButton
             android:layout_weight="0.2"
-            android:src="@drawable/text"
+            android:src="@drawable/select"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:scaleType="fitCenter"
-            android:id="@+id/buttonText"
+            android:id="@+id/buttonSelect"
             />
         <ImageButton
             android:layout_weight="0.2"

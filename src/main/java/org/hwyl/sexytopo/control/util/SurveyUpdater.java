@@ -1,12 +1,9 @@
 package org.hwyl.sexytopo.control.util;
 
-import android.util.Log;
-
 import org.hwyl.sexytopo.SexyTopo;
-import org.hwyl.sexytopo.control.util.StationNamer;
-import org.hwyl.sexytopo.model.Leg;
-import org.hwyl.sexytopo.model.Station;
-import org.hwyl.sexytopo.model.Survey;
+import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.Station;
+import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +12,11 @@ import java.util.List;
  * Created by rls on 23/07/14.
  */
 public class SurveyUpdater {
+
+    static {
+        //MediaPlayer mediaPlayer = MediaPlayer.create(context, R.raw.sound_file_1);
+        //mediaPlayer.start(); // no need to call prepare(); create() does that for you
+    }
 
 
     private static final double MAX_DISTANCE_DIFF = 0.2;

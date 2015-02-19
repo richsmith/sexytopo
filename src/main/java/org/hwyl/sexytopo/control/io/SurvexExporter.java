@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.control.io;
 
-import org.hwyl.sexytopo.model.Survey;
+import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.table.TableCol;
 import org.hwyl.sexytopo.util.GraphToListTranslator;
 

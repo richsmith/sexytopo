@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="aboutText">
+        <p>SexyTopo is written and maintained by Rich Smith (rls@hwyl.org), copyright 2015.</p>
+        \n\n
+        <ul>
+            <li>Hellie Brooke</li>
+        </ul>
+        <p>This program is free software: you can redistribute it and/or modify
+        it under the terms of the GNU General Public License version 3
+        as published by the Free Software Foundation.</p>
+\n\n
+        <p>This program is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE  See the
+        GNU General Public License for more details.</p>
+\n\n
+        <p>You should have received a copy of the GNU General Public License
+        along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</p>
+\n\n
+        <big>Hello Iam Big</big> \n
+        <small>Iam Small</small>  \n
+        <b>Iam bold</b> \n
+        <strike>Vanish 100$</strike>\n
+        <a href="http://bigknol.com">Goto Bigknol</a>
+        X<sub>2</sub>Y \n
+        X<sup>30</sup>Z \n
+        <u>Underline</u> \n
+        <i>Hi Five </i> \n
+        <tt>Hi Six</tt>\n
+                <big>Hello Iam Big</big> \n
+        <small>Iam Small</small>  \n
+        <b>Iam bold</b> \n
+        <strike>Vanish 100$</strike>\n
+        <a href="http://bigknol.com">Goto Bigknol</a>
+        X<sub>2</sub>Y \n
+        X<sup>30</sup>Z \n
+        <u>Underline</u> \n
+        <i>Hi Five </i> \n
+        <tt>Hi Six</tt>\n
+                <big>Hello Iam Big</big> \n
+        <small>Iam Small</small>  \n
+        <b>Iam bold</b> \n
+        <strike>Vanish 100$</strike>\n
+        <a href="http://bigknol.com">Goto Bigknol</a>
+        X<sub>2</sub>Y \n
+        X<sup>30</sup>Z \n
+        <u>Underline</u> \n
+        <i>Hi Five </i> \n
+        <tt>Hi Six</tt>\n
+                <big>Hello Iam Big</big> \n
+        <small>Iam Small</small>  \n
+        <b>Iam bold</b> \n
+        <strike>Vanish 100$</strike>\n
+        <a href="http://bigknol.com">Goto Bigknol</a>
+        X<sub>2</sub>Y \n
+        X<sup>30</sup>Z \n
+        <u>Underline</u> \n
+        <i>Hi Five </i> \n
+        <tt>Hi Six</tt>\n
+                <big>Hello Iam Big</big> \n
+        <small>Iam Small</small>  \n
+        <b>Iam bold</b> \n
+        <strike>Vanish 100$</strike>\n
+        <a href="http://bigknol.com">Goto Bigknol</a>
+        X<sub>2</sub>Y \n
+        X<sup>30</sup>Z \n
+        <u>Underline</u> \n
+        <i>Hi Five </i> \n
+        <tt>Hi Six</tt>\n
+   </string>
+</resources>

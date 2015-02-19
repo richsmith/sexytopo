@@ -3,9 +3,8 @@ package org.hwyl.sexytopo.test;
 import android.test.InstrumentationTestCase;
 
 import org.hwyl.sexytopo.control.util.StationNamer;
-import org.hwyl.sexytopo.model.Leg;
-import org.hwyl.sexytopo.model.Station;
-import org.hwyl.sexytopo.model.Survey;
+import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.Station;
 
 /**
  * Created by rls on 26/07/14.

@@ -3,9 +3,11 @@ package org.hwyl.sexytopo.control.io;
 import android.util.Log;
 
 import org.hwyl.sexytopo.SexyTopo;
-import org.hwyl.sexytopo.model.Leg;
-import org.hwyl.sexytopo.model.Station;
-import org.hwyl.sexytopo.model.Survey;
+import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.Station;
+import org.hwyl.sexytopo.model.survey.Survey;
+import org.hwyl.sexytopo.model.sketch.Sketch;
+import org.json.JSONException;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -19,13 +21,27 @@ import java.util.Map;
  */
 public class Loader {
 
-    public static Survey loadSurvey(String name) {
+    public static Survey loadSurvey(String name) throws JSONException {
 
         String path = Util.getPathForSurveyFile(name, "svx");
         String text = slurpFile(path);
 
         Survey survey = new Survey(name);
         parse(text, survey);
+
+        String planPath = Util.getPathForDataFile(survey.getName(), "plan", "json");
+        if (Util.doesFileExist(planPath)) {
+            String planText = slurpFile(planPath);
+            Sketch plan = SketchJsonTranslater.translate(planText);
+            survey.setPlanSketch(plan);
+        }
+
+        String elevationPath = Util.getPathForDataFile(survey.getName(), "ext-elevation", "json");
+        if (Util.doesFileExist(elevationPath)) {
+            String elevationText = slurpFile(elevationPath);
+            Sketch elevation = SketchJsonTranslater.translate(elevationText);
+            survey.setElevationSketch(elevation);
+        }
 
         return survey;
 

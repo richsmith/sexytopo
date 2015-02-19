@@ -1,16 +1,14 @@
 package org.hwyl.sexytopo.control.activity;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
+import android.content.SharedPreferences;
 import android.graphics.LightingColorFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -18,11 +16,11 @@ import android.widget.PopupMenu;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
-import org.hwyl.sexytopo.control.GraphView;
-import org.hwyl.sexytopo.model.Survey;
+import org.hwyl.sexytopo.control.graph.GraphView;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.Sketch;
+import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,15 +28,20 @@ import java.util.Map;
 /**
  * Created by rls on 13/10/14.
  */
-public abstract class GraphActivity extends SexyTopoActivity implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
+public abstract class GraphActivity extends SexyTopoActivity
+        implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
 
-    private static final double ZOOM_INCREMENT = 1.0;
+    private static final double ZOOM_INCREMENT = 2.0;
+
+    private static final int DEFAULT_SKETCH_TOOL_SELECTION = R.id.buttonMove;
+    private static final int DEFAULT_BRUSH_COLOUR_SELECTION = R.id.buttonBlack;
 
 
     private static final int[] BUTTON_IDS = new int[] {
         R.id.buttonDraw,
         R.id.buttonMove,
         R.id.buttonErase,
+        R.id.buttonSelect,
         R.id.buttonZoomIn,
         R.id.buttonZoomOut,
         R.id.buttonUndo,
@@ -53,14 +56,15 @@ public abstract class GraphActivity extends SexyTopoActivity implements View.OnC
 
     private GraphView graphView;
 
-    private Map<Integer, GraphView.SketchTool> buttonIdToSketchTool
+    private static final Map<Integer, GraphView.SketchTool> BUTTON_ID_TO_SKETCH_TOOL
             = new HashMap<Integer, GraphView.SketchTool>() {{
         put(R.id.buttonMove, GraphView.SketchTool.MOVE);
         put(R.id.buttonDraw, GraphView.SketchTool.DRAW);
         put(R.id.buttonErase, GraphView.SketchTool.ERASE);
+        put(R.id.buttonSelect, GraphView.SketchTool.SELECT);
     }};
 
-    private Map<Integer, GraphView.BrushColour> buttonIdToBrushColour
+    private static final Map<Integer, GraphView.BrushColour> BUTTON_ID_TO_BRUSH_COLOUR
             = new HashMap<Integer, GraphView.BrushColour>() {{
         put(R.id.buttonBlack, GraphView.BrushColour.BLACK);
         put(R.id.buttonOrange, GraphView.BrushColour.ORANGE);
@@ -69,8 +73,24 @@ public abstract class GraphActivity extends SexyTopoActivity implements View.OnC
         put(R.id.buttonPurple, GraphView.BrushColour.PURPLE);
     }};
 
-    private int DEFAULT_SKETCH_TOOL_SELECTION = R.id.buttonMove;
-    private int DEFAULT_BRUSH_COLOUR_SELECTION = R.id.buttonBlack;
+    public enum DisplayPreference {
+        SHOW_GRID(R.id.buttonShowGrid, true),
+        SHOW_SPLAYS(R.id.buttonShowSplays, true),
+        SHOW_STATION_LABELS(R.id.buttonShowStationLabels, true);
+
+        private int controlId;
+        private boolean defaultValue;
+
+        private DisplayPreference(int id, boolean defaultValue) {
+            this.controlId = id;
+            this.defaultValue = defaultValue;
+        }
+
+        public boolean getDefault() {
+            return defaultValue;
+        }
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +115,9 @@ public abstract class GraphActivity extends SexyTopoActivity implements View.OnC
             button.setOnClickListener(this);
         }
 
+
+
+
         graphView = (GraphView)(findViewById(R.id.graphView));
         syncGraphWithSurvey();
 
@@ -118,6 +141,7 @@ public abstract class GraphActivity extends SexyTopoActivity implements View.OnC
     protected abstract Sketch getSketch(Survey survey);
     protected abstract Space<Coord2D> getProjection(Survey survey);
 
+
     @Override
     public void onClick(View view) {
         int id = view.getId();
@@ -127,20 +151,43 @@ public abstract class GraphActivity extends SexyTopoActivity implements View.OnC
 
     public boolean onMenuItemClick(MenuItem item) {
         int id = item.getItemId();
-        return handleAction(id);
+
+        switch(id) {
+
+            case R.id.buttonShowGrid:
+                setDisplayPreference(DisplayPreference.SHOW_GRID, !item.isChecked());
+                graphView.invalidate();
+                return true;
+            case R.id.buttonShowSplays:
+                setDisplayPreference(DisplayPreference.SHOW_SPLAYS, !item.isChecked());
+                graphView.invalidate();
+                return true;
+            case R.id.buttonShowStationLabels:
+                setDisplayPreference(DisplayPreference.SHOW_STATION_LABELS, !item.isChecked());
+                graphView.invalidate();
+                return true;
+            default:
+                return handleAction(id);
+        }
+
+    }
+
+    private void setDisplayPreference(DisplayPreference preference, boolean value) {
+        SharedPreferences preferences = getSharedPreferences("display", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(preference.toString(), value);
+        editor.commit();
     }
 
     public boolean handleAction(int id) {
-        GraphView graphView = (GraphView)(findViewById(R.id.graphView));
-        switch(id) {
 
-            case R.id.buttonColour:
-                Dialog dialog = createColourSelectionDialog();
-                dialog.show();
-                break;
+        GraphView graphView = (GraphView)(findViewById(R.id.graphView));
+
+        switch(id) {
             case R.id.buttonDraw:
             case R.id.buttonMove:
             case R.id.buttonErase:
+            case R.id.buttonSelect:
                 selectSketchTool(id);
                 break;
             case R.id.buttonZoomIn:
@@ -166,23 +213,44 @@ public abstract class GraphActivity extends SexyTopoActivity implements View.OnC
                 break;
 
             case R.id.buttonMenu:
-                View v = findViewById(R.id.buttonMenu);
-                PopupMenu popup = new PopupMenu(this, v);
-                popup.getMenuInflater().inflate(R.menu.drawing, popup.getMenu());
-                popup.setOnMenuItemClickListener(this);
-                popup.show();
+                openDisplayMenu();
+                break;
+            case R.id.buttonCentreView:
+                graphView.centreViewOnActiveStation();
+                graphView.invalidate();
                 break;
         }
         return true;
     }
 
 
+    private void openDisplayMenu() {
+
+        View view = findViewById(R.id.buttonMenu);
+        PopupMenu popup = new PopupMenu(this, view);
+        Menu menu = popup.getMenu();
+        popup.getMenuInflater().inflate(R.menu.drawing, menu);
+        popup.setOnMenuItemClickListener(this);
+
+        SharedPreferences preferences = getSharedPreferences("display", Context.MODE_PRIVATE);
+
+        for (DisplayPreference preference : DisplayPreference.values()) {
+            MenuItem menuItem = menu.findItem(preference.controlId);
+            boolean isSelected =
+                    preferences.getBoolean(preference.toString(), preference.defaultValue);
+            menuItem.setChecked(isSelected);
+        }
+
+        popup.show();
+    }
+
+
     private void selectBrushColour(int selectedId) {
 
-        GraphView.BrushColour brushColour = buttonIdToBrushColour.get(selectedId);
+        GraphView.BrushColour brushColour = BUTTON_ID_TO_BRUSH_COLOUR.get(selectedId);
         graphView.setBrushColour(brushColour);
 
-        for (int id : buttonIdToBrushColour.keySet()) {
+        for (int id : BUTTON_ID_TO_BRUSH_COLOUR.keySet()) {
             View button = findViewById(id);
 
             if (id == selectedId) {
@@ -196,10 +264,10 @@ public abstract class GraphActivity extends SexyTopoActivity implements View.OnC
 
     private void selectSketchTool(int selectedId) {
 
-        GraphView.SketchTool sketchTool = buttonIdToSketchTool.get(selectedId);
+        GraphView.SketchTool sketchTool = BUTTON_ID_TO_SKETCH_TOOL.get(selectedId);
         graphView.setSketchTool(sketchTool);
 
-        for (int id : buttonIdToSketchTool.keySet()) {
+        for (int id : BUTTON_ID_TO_SKETCH_TOOL.keySet()) {
             View button = findViewById(id);
 
             if (id == selectedId) {
@@ -211,32 +279,5 @@ public abstract class GraphActivity extends SexyTopoActivity implements View.OnC
 
 
     }
-
-
-    private Dialog createColourSelectionDialog() {
-
-        final Map<String, Integer> coloursToId = new HashMap<String, Integer>() {{
-            put("Black", Color.BLACK);
-            put("Cyan", Color.CYAN);
-            put("Green", Color.GREEN);
-            put("Blue", Color.BLUE);
-            put("Magenta", Color.MAGENTA);
-        }};
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Pick colour") //R.string.pick_color)
-           .setItems(coloursToId.keySet().toArray(new String[]{}), new DialogInterface.OnClickListener() {
-               public void onClick(DialogInterface dialog, int which) {
-
-                   Sketch sketch = getSketch(getSurvey());
-                   String selectedColour = coloursToId.keySet().toArray(new String[]{})[which];
-                   sketch.setActiveColour(coloursToId.get(selectedColour));
-
-               }
-           });
-
-        return builder.create();
-
-    }
-
 
 }

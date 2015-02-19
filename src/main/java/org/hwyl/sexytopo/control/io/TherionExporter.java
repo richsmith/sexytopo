@@ -1,6 +1,7 @@
 package org.hwyl.sexytopo.control.io;
 
-import org.hwyl.sexytopo.model.Survey;
+import org.hwyl.sexytopo.model.survey.Survey;
+import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 
 /**
@@ -45,7 +46,7 @@ public class TherionExporter {
 
     public static String exportSketch(Sketch sketch) {
         String text = "";
-        for (Sketch.PathDetail pathDetail : sketch.getPathDetails()) {
+        for (PathDetail pathDetail : sketch.getPathDetails()) {
             //pathDetail.getPath();
         }
 

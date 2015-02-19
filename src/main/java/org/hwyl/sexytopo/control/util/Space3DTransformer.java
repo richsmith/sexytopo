@@ -1,32 +1,41 @@
 package org.hwyl.sexytopo.control.util;
 
 import org.hwyl.sexytopo.model.graph.Coord3D;
-import org.hwyl.sexytopo.model.Leg;
+import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Space;
-import org.hwyl.sexytopo.model.Station;
-import org.hwyl.sexytopo.model.Survey;
+import org.hwyl.sexytopo.model.survey.Station;
+import org.hwyl.sexytopo.model.survey.Survey;
 
 /**
  * Created by rls on 26/07/14.
  */
 public class Space3DTransformer {
 
+    // These were originally static methods but because we want to override one it has
+    // to be OO. Thanks Java for your stupid inability to override static methods.
 
-    public static Space transformTo3D(Survey survey) {
+    public Space transformTo3D(Survey survey) {
+        return transformTo3D(survey.getOrigin());
+    }
+
+
+    public Space transformTo3D(Station root) {
         Space space = new Space();
-        update(space, survey.getOrigin(), Coord3D.ORIGIN);
+        update(space, root, Coord3D.ORIGIN);
         return space;
     }
 
-    private static void update(Space<Coord3D> space, Station station, Coord3D coord3D) {
+
+    private void update(Space<Coord3D> space, Station station, Coord3D coord3D) {
         space.addStation(station, coord3D);
         for (Leg leg : station.getOnwardLegs()) {
             update(space, leg, coord3D);
         }
     }
 
-    private static void update(Space<Coord3D> space, Leg leg, Coord3D start) {
+
+    private void update(Space<Coord3D> space, Leg leg, Coord3D start) {
         Coord3D end = transform(start, leg);
         Line<Coord3D> line = new Line<>(start, end);
         space.addLeg(leg, line);
@@ -35,7 +44,8 @@ public class Space3DTransformer {
         }
     }
 
-    public static Coord3D transform(Coord3D start, Leg leg) {
+
+    public Coord3D transform(Coord3D start, Leg leg) {
         double r = leg.getDistance();
         double phi = leg.getBearing();
         double theta = leg.getInclination();

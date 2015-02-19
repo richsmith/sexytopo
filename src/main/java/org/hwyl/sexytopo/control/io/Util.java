@@ -1,8 +1,6 @@
 package org.hwyl.sexytopo.control.io;
 
-import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
-import org.hwyl.sexytopo.model.Survey;
 
 import java.io.File;
 import java.util.HashSet;
@@ -77,6 +75,16 @@ public class Util {
 
     public static String getPathForSurveyFile(String name, String extension) {
         return getDirectoryForSurveyFile(name) + File.separatorChar + name + "." + extension;
+    }
+
+    public static String getPathForDataFile(String surveyName, String name, String extension) {
+        return getDirectoryForSurveyFile(surveyName) + File.separatorChar + name + "." + extension;
+    }
+
+
+    public static boolean doesFileExist(String path) {
+        File filename = new File(path);
+        return filename.exists();
     }
 
     public boolean doesSurveyNeedSaving() {

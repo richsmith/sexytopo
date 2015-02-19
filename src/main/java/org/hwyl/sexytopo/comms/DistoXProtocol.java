@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.comms;
 
-import org.hwyl.sexytopo.model.Leg;
+import org.hwyl.sexytopo.model.survey.Leg;
 
 /**
  * Created by rls on 22/07/14.
