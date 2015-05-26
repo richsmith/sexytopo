@@ -6,35 +6,44 @@
     <h1>SexyTopo Guide</h1>
 
 	<h2>Overview</h2>
-    <p>SexyTopo is an app for surveying caves and underground spaces. It is designed to work with a DistoX or DistoX2 measuring tool which the surveyor uses to measure out survey legs. The app communicates with the DistoX wirelessly over Bluetooth and automatically creates a model of the cave from measurements made with the device.</p>
+    <p>SexyTopo is an app for surveying caves and underground spaces. It is designed to work with a Disto-X or Disto-X2 measuring tool which the surveyor uses to measure out survey legs. The app communicates with the DistoX wirelessly over Bluetooth and automatically creates a model of the cave from measurements made with the device.</p>
 
     <h2>Setup</h2>
 	<p>SexyTopo runs on Android devices (the newer/more powerful the better). For obvious reasons a water- and dust-proof device is recommended. It is possible to control SexyTopo with finger movements but it is designed for use with a stylus.</p>
-	<p>The Android device needs to have bluetooth communication turned on and be paired with the DistoX before it can 
+	<p>The Android device needs to have bluetooth communication turned on and be paired with a Disto-X before it can receive readings.
 
 	<h2>Calibration</h2>
-	<p>The DistoX device needs calibration before it can be used reliably. This is not just a theoretical requirement; without calibration, measurements can be significantly off. Calibration needs to be performed after XXXXXXXXXX</p>
-	<p>Calibration is not yet implemented in SexyTopo. Calibration will need to be performed using another software package, such as PocketTopo.
+	<p>The DistoX device needs calibration before it can be used reliably. This is not just a theoretical requirement; without calibration, measurements can be significantly off.</p>
+	<p>However, calibration is not yet implemented in SexyTopo. Calibration will need to be performed using another software package, such as PocketTopo.</p>
 
 	<h2>Surveying</h2>
 	<p>Selection of survey points is a skill that is improved with practice.</p>
 	<p>Legs are added to the survey at the <strong>active station</strong>. By default the active station is the newest station added to the survey. In typical use a surveyor will take a number of splays from the active station and then take </p>
-	<p>To create a new station make three repeated readings
+	<p>To create a new station make three repeated readings. If three readings in a row are sufficiently similar, SexyTopo creates a new station.</p>
 
 	<h2>Sketching</h2>
 	<p>The sketch views (plan and extended elevation) can be accessed through buttons on the Action Bar at the top of the screen. These show a projection of the calculated survey on a canvas so that a sketch of the cave can be drawn on top.</p>
 	<p>Several sketching tools are provided via a toolbar at the bottom of the screen:
 	<ol>
 	  <li><img src="../../res/drawable-hdpi/black.png"><strong>Colours</strong> set the current sketching colour</li>
-	  <li><img src="@drawable/blue"><strong>Zoom Out</strong></li>
-	  <li><img src="file:///res/drawable-hdpi/black.png"><strong>Zoom In</strong></li>
-	  <li><img src="file://main/res/drawable-hdpi/black.png"><strong>Move</strong> </li>
+	  <li><img src="@drawable/blue"><strong>Zoom Out</strong> lets you see more of the survey</li>
+	  <li><img src="file:///res/drawable-hdpi/black.png"><strong>Zoom In</strong> lets you focus on the detail of the survey</li>
+	  <li><img src="file://main/res/drawable-hdpi/black.png"><strong>Move</strong> allows you to drag the survey around to see different parts</li>
 	  <li><img src="file://src/main/res/drawable-hdpi/black.png"><strong>Draw</strong></li>
 	  <li><img src=""><strong>Erase</strong> deletes lines sketched in Draw mode</li>
 	  <li><img src=""><strong>Settings</strong> opens an extended commands menu</li>
-	  <li><img src=""><strong>Undo</strong> </li>
+	  <li><img src=""><strong>Undo</strong></li>
 	  <li><img src=""><strong>Redo</strong></li>
 	</ol>
 	</p>
+
+    <h2>Troubleshooting</h2>
+    <h3>Problems talking to the Disto-X</h3>
+    <p>Try turning the Disto-X off and back on. Try unpairing and re-pairing, or even turning bluetooth off and on again. It shouldn't make
+        a difference but you could kill SexyTopo and reopen it. Check you haven't paired with the
+        wrong Disto (the Unpair dialog shows which Distos are paired).</p>
+    <p>If all else fails a factory reset of the Disto-X may be necessary. Press CLEAR, FUNC and MEM (the latter has a floppy disk or save icon) for five seconds.</p>
+    <h3>Strange Measurements</h3>
+    <p>The Disto-X may need calibrating. See the calibration section above.</p>
   </body>
 </html>

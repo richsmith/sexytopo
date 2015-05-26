@@ -18,6 +18,7 @@ public class SexyTopo {
     public static final int NUM_OF_REPEATS_FOR_NEW_STATION = 3;
 
     public static final String SURVEY_UPDATED_EVENT = "surveyUpdatedEvent";
+    public static final String DEVICE_LOG_UPDATED_EVENT = "deviceLogUpdatedEvent";
 
     private static final String ROOT = Environment.getExternalStorageDirectory().toString();
     public static final String APP_PATH = ROOT + "/" + APP_NAME;
@@ -26,5 +27,8 @@ public class SexyTopo {
     public static final String ACTIVE_SURVEY_NAME = "activeSurveyName";
 
     public static final String BLANK_STATION_NAME = "-";
+
+    public static final String GENERAL_PREFS = "generalPrefs";
+    public static final String REVERSE_MEASUREMENTS_PREFERENCE = "reverseMeasurements";
 
 }

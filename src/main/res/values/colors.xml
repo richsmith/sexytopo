@@ -8,4 +8,7 @@
     <color name="paintGreen">#00FF00</color>
     <color name="sketchOrange">#FFA500</color>
 
+    <color name="error">#FF0000</color>
+    <color name="standard">#000000</color>
+
 </resources>

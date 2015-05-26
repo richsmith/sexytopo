@@ -1,13 +1,9 @@
 package org.hwyl.sexytopo.util;
 
-import android.util.Log;
-import android.widget.LinearLayout;
-
-import java.util.LinkedList;
-import java.util.List;
-
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
@@ -15,6 +11,9 @@ import android.widget.TableRow;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
+
+import java.util.LinkedList;
+import java.util.List;
 
 // see http://blog.stylingandroid.com/archives/432
 
@@ -43,9 +42,10 @@ public class ScrollingTable extends LinearLayout
 
     }
 
-    protected void onLayout2( boolean changed, int l, int t, int r, int b ) {
+    @SuppressLint("WrongCall")
+    protected void onLayout2( boolean changed, int l, int t, int r, int b ) throws Exception {
 
-        super.onLayout( changed, l, t, r, b );
+        super.onLayout(changed, l, t, r, b);
 
         List<Integer> colWidths = new LinkedList<Integer>();
 

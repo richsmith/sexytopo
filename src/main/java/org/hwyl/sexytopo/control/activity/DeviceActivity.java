@@ -1,77 +1,225 @@
 package org.hwyl.sexytopo.control.activity;
 
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.CompoundButton;
+import android.widget.ScrollView;
+import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.comms.DistoXPoller;
+import org.hwyl.sexytopo.control.Log;
 
+import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-public class DeviceActivity extends SexyTopoActivity {
+public class DeviceActivity extends SexyTopoActivity/* implements BroadcastReceiver*/ {
 
 
-    DistoXPoller comms;
+    public static final String DISTO_X_PREFIX = "DistoX";
+
+    private DistoXPoller comms;
+
+    private static final BluetoothAdapter BLUETOOTH_ADAPTER = BluetoothAdapter.getDefaultAdapter();
+
+    private DeviceLogUpdateReceiver logUpdateReceiver;
+    private StateChangeReceiver csr;
+
+    private boolean doConnection = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-    /*}
+        setupSwitchListeners();
+
+        setupLogView();
+
+        updateStatuses();
+
+        csr = new StateChangeReceiver();
+
+        IntentFilter pairFilter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
+        registerReceiver(csr, pairFilter);
+        IntentFilter bluetoothFilter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
+        registerReceiver(csr, bluetoothFilter);
+    }
 
 
     @Override
-    protected void onStart() {*/
-        final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (bluetoothAdapter == null) {
-            Toast.makeText(getApplicationContext(), "No Bluetooth capabilities detected",
-                    Toast.LENGTH_SHORT).show();
+    protected void onResume() {
+        super.onResume();
+        logUpdateReceiver.update();
+        updateStatuses();
+    }
+
+    private void updateStatuses() {
+        updateBluetooth();
+        updatePairedStatus();
+        updateConnectionStatus();
+    }
+
+    private void setupLogView() {
+        if (logUpdateReceiver == null) {
+            TextView logView = (TextView)findViewById(R.id.deviceLog);
+            ScrollView scrollView = (ScrollView)findViewById(R.id.scrollView);
+            logUpdateReceiver = new DeviceLogUpdateReceiver(scrollView, logView);
+
+            IntentFilter filter = new IntentFilter(SexyTopo.DEVICE_LOG_UPDATED_EVENT);
+            LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
+            broadcastManager.registerReceiver(logUpdateReceiver, filter);
+        }
+    }
+
+    private void setupSwitchListeners() {
+        Switch bluetoothSwitch = (Switch)(findViewById(R.id.bluetoothSwitch));
+        bluetoothSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                toggleBluetooth(buttonView);
+            }
+        });
+
+        Switch connectionSwitch = (Switch)(findViewById(R.id.connectionSwitch));
+        connectionSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                toggleConnection(buttonView);
+            }
+        });
+    }
+
+
+    public void startConnection() {
+
+
+
+        if (comms != null) {
+            stopConnection();
+        }
+
+        try {
+            assert comms == null;
+            BluetoothDevice bluetoothDevice = getDistoX();
+            comms = new DistoXPoller(this, bluetoothDevice, dataManager);
+            comms.start();
+        } catch (Exception e) {
+            Log.device("Error starting thread:\n" + e.getMessage());
+        }
+    }
+
+
+    public void stopConnection() {
+
+        if (comms == null || !comms.isAlive()) {
             return;
         }
 
-        if (! bluetoothAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            int REQUEST_ENABLE_BT = 1; // fix this see http://stackoverflow.com/questions/8188277/error-checking-if-bluetooth-is-enabled-in-android-request-enable-bt-cannot-be-r
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        Log.device(getString(R.string.device_log_stopping));
+
+        try {
+            comms.kill();
+            comms.join();
+            comms = null;
+            Log.device(getString(R.string.device_log_stopped));
+        } catch (Exception e) {
+            Log.device("Error stopping thread:\n" + e.getMessage());
+        }
+    }
+
+
+    private void updateBluetooth() {
+
+        if (BLUETOOTH_ADAPTER == null) {
+            Toast.makeText(getApplicationContext(), "No Bluetooth capabilities detected",
+                    Toast.LENGTH_SHORT).show();
         }
 
-        //bluetoothAdapter.startDiscovery();
-        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
-        // If there are paired devices
-        if (pairedDevices.size() > 0) {
-            // Loop through paired devices
-            for (BluetoothDevice device : pairedDevices) {
-                Toast.makeText(getApplicationContext(), "Paired: " + device.getName(), Toast.LENGTH_SHORT).show();
-                // Add the name and address to an array adapter to show in a ListView
-                //mArrayAdapter.add(device.getName() + "\n" + device.getAddress());
-                Object ignore = device;
-            }
+        Switch bluetoothSwitch = (Switch)(findViewById(R.id.bluetoothSwitch));
+
+        if (BLUETOOTH_ADAPTER == null) {
+            bluetoothSwitch.setChecked(false);
+            bluetoothSwitch.setEnabled(false);
+        } else if (BLUETOOTH_ADAPTER.isEnabled()) {
+            bluetoothSwitch.setChecked(true);
+        } else {
+            bluetoothSwitch.setChecked(false);
         }
 
-        // Create a BroadcastReceiver for ACTION_FOUND
+        findViewById(R.id.pairButton).setEnabled(bluetoothSwitch.isChecked());
+        findViewById(R.id.unpairButton).setEnabled(bluetoothSwitch.isChecked());
+    }
+
+
+    public void toggleBluetooth(View view) {
+        Switch bluetoothSwitch = (Switch)view;
+        if (bluetoothSwitch.isChecked()) {
+            BluetoothAdapter.getDefaultAdapter().enable();
+        } else {
+            BluetoothAdapter.getDefaultAdapter().disable();
+        }
+        updateBluetooth();
+    }
+
+
+    public void toggleConnection(View view) {
+        Switch connectionSwitch = (Switch)view;
+        if (connectionSwitch.isChecked()) {
+            Log.device(getString(R.string.device_log_connection_requested));
+            doConnection = true;
+            startConnection();
+        } else {
+            Log.device(getString(R.string.device_log_connection_stop_requested));
+            doConnection = false;
+            stopConnection();
+        }
+    }
+
+
+    public void clearLog(View view) {
+        Log.clearDeviceLog();
+    }
+
+
+    public void requestPair(View view) {
+
+        Log.device("Pairing requested (please wait)");
+
         final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                // When discovery finds a device
-                if (BluetoothDevice.ACTION_FOUND.equals(action)) {
 
+            public void onReceive(Context context, Intent intent) {
+
+                String action = intent.getAction();
+                if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                     BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
-                    String name = device.getName();
-                    //if (isDistoX(name)) {
-                        doConnection(device);
-                    //}
-
-
+                    if (isDistoX(device)) {
+                        Log.device("DistoX detected");
+                        pair(device);
+                    } else {
+                        Log.device("Device detected but it is not a DistoX");
+                    }
                 }
             }
         };
@@ -79,19 +227,176 @@ public class DeviceActivity extends SexyTopoActivity {
         // Register the BroadcastReceiver
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver(broadcastReceiver, filter); // Don't forget to unregister during onDestroy
-        bluetoothAdapter.startDiscovery();
+        BLUETOOTH_ADAPTER.startDiscovery();
     }
 
 
-    public void doConnection(BluetoothDevice bluetoothDevice) {
+    private void updatePairedStatus() {
 
-        if (comms != null && comms.isAlive()) {
-            return; // we don't need to start the thread if it's already running
+        Set<BluetoothDevice> distos = getPairedDistos();
+
+        Switch bluetoothSwitch = (Switch)(findViewById(R.id.bluetoothSwitch));
+
+        TextView deviceList = (TextView)(findViewById(R.id.deviceList));
+        deviceList.setTextColor(distos.size() == 1? Color.BLACK : Color.RED);
+        deviceList.setText(describeNDevices(distos.size()));
+
+
+        // Allow connections iff we have one connected DistoX
+        Switch connectionSwitch = (Switch)(findViewById(R.id.connectionSwitch));
+        if (distos.size() == 1 && bluetoothSwitch.isChecked()) {
+            connectionSwitch.setEnabled(true);
+        } else {
+            connectionSwitch.setChecked(false);
+            connectionSwitch.setEnabled(false);
+            stopConnection();
+        }
+    }
+
+    private void updateConnectionStatus() {
+        Switch connectionSwitch = (Switch)(findViewById(R.id.connectionSwitch));
+        connectionSwitch.setChecked(doConnection);
+    }
+
+
+    public void requestUnpair(View view) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+
+        Set<BluetoothDevice> set = getPairedDistos();
+        final List<BluetoothDevice> devices = new ArrayList<>(set);
+        List<String> names = new ArrayList<>();
+        for (BluetoothDevice device : devices) {
+            names.add(device.getName());
         }
 
-        comms = new DistoXPoller(bluetoothDevice, dataManager);
-        comms.start();
+        final Set<BluetoothDevice> selected = new HashSet<>();
+
+        builder.setMultiChoiceItems(names.toArray(new String[]{}), null,
+                new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                        selected.add(devices.get(which));
+                    }
+                });
+        builder.setNegativeButton(getString(R.string.cancel), null);
+        builder.setPositiveButton(getString(R.string.unpair_command),
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        for (BluetoothDevice device : selected) {
+                            unpair(device);
+                        }
+                        updatePairedStatus();
+                    }
+                });
+
+        builder.show();
+
+
     }
 
 
+    private void unpair(BluetoothDevice device) {
+        try {
+            Log.device("Unpairing " + device.getName());
+            Method m = device.getClass().getMethod("removeBond", (Class[]) null);
+            m.invoke(device, (Object[])null);
+            Log.device("Unpairing successful");
+        } catch (Exception e) {
+            Log.device("Error unpairing: " + e.getMessage());
+        }
+    }
+
+
+    private void pair(BluetoothDevice device) {
+        try {
+            Log.device("Pairing with " + device.getName());
+            Method m = device.getClass().getMethod("createBond", (Class[]) null);
+            m.invoke(device, (Object[])null);
+        } catch (Exception e) {
+            Log.device("Error pairing: " + e.getMessage());
+        }
+
+    }
+
+
+    private String describeNDevices(int n) {
+        return n + " " +
+                getString(n == 1? R.string.device_singular : R.string.device_plural);
+    }
+
+
+    private static boolean isDistoX(BluetoothDevice device) {
+        String name = device.getName();
+        return name.startsWith(DISTO_X_PREFIX);
+    }
+
+
+    private static Set<BluetoothDevice> getPairedDistos() {
+        Set<BluetoothDevice> pairedDevices = BLUETOOTH_ADAPTER.getBondedDevices();
+        Set<BluetoothDevice> pairedDistoXes = new HashSet<>();
+        for (BluetoothDevice device : pairedDevices) {
+            if (isDistoX(device)) {
+                pairedDistoXes.add(device);
+            }
+        }
+        return pairedDistoXes;
+    }
+
+
+    private static BluetoothDevice getDistoX() {
+        Set<BluetoothDevice> distoXes = getPairedDistos();
+
+        if (distoXes.size() != 1) {
+            throw new IllegalStateException(distoXes.size() + " DistoXes paired");
+        }
+
+        return distoXes.toArray(new BluetoothDevice[]{})[0];
+    }
+
+
+    private class DeviceLogUpdateReceiver extends BroadcastReceiver {
+
+        private final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("HH:mm");
+
+        private ScrollView scrollView;
+        private TextView logView;
+
+        private DeviceLogUpdateReceiver(ScrollView scrollView, TextView logView) {
+            this.scrollView = scrollView;
+            this.logView = logView;
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            update();
+        }
+
+        private void update() {
+
+            StringBuilder logText = new StringBuilder();
+
+            for (Log.Message message : Log.getDeviceLog()) {
+                String timestamp = TIMESTAMP_FORMAT.format(message.getTimestamp());
+                logText.append("\n" + timestamp + " " + message.getText());
+            }
+
+            logView.setText(logText);
+            scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+
+            scrollView.invalidate();
+
+        }
+
+    }
+
+    private class StateChangeReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            updateStatuses();
+        }
+    }
 }

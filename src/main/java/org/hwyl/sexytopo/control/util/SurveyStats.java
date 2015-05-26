@@ -1,5 +1,7 @@
 package org.hwyl.sexytopo.control.util;
 
+import org.hwyl.sexytopo.model.graph.Coord3D;
+import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Survey;
 
@@ -37,6 +39,20 @@ public class SurveyStats {
 
     public static int calcNumberStations(Survey survey) {
         return survey.getAllStations().size();
+    }
+
+    public static double calcHeightRange(Survey survey) {
+        Space3DTransformer transformer = new Space3DTransformer();
+        Space<Coord3D> space = transformer.transformTo3D(survey);
+
+        double min = Double.MAX_VALUE, max = Double.MIN_VALUE;
+
+        for (Coord3D point : space.getStationMap().values()) {
+            max = Math.max(max, point.getZ());
+            min = Math.min(min, point.getZ());
+        }
+
+        return max - min;
     }
 
 

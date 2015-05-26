@@ -5,10 +5,10 @@
     <item
         android:id="@+id/setActiveStation"
         android:title="@string/menu_set_active_station"/>
-
+<!--
     <item
         android:id="@+id/editLeg"
-        android:title="@string/menu_edit_leg"/>
+        android:title="@string/menu_edit_leg"/>-->
     <item
         android:id="@+id/deleteToEndOfBranch"
         android:title="@string/menu_delete_row"/>

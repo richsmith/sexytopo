@@ -12,9 +12,6 @@ public class Space3DTransformerForElevation  extends Space3DTransformer {
     public Coord3D transform(Coord3D start, Leg leg) {
         double r = leg.getDistance();
 
-        //double phi = leg.getBearing();
-        //phi = ( 90 < phi && phi < 270)? 180 : 0;
-
         double phi = 0;
 
         double theta = leg.getInclination();
@@ -30,7 +27,7 @@ public class Space3DTransformerForElevation  extends Space3DTransformer {
         y += start.getY();
         z += start.getZ();
 
-        return new Coord3D((int)x, (int)y, (int)z);
+        return new Coord3D(x, y, z);
     }
 
 }

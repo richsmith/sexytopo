@@ -51,9 +51,9 @@ private boolean firstTime = true;
 
     // ratio of metres on the survey to pixels on the view
     // zoom in increases this, zooming out decreases it
-    private double surveyToViewScale = 10.0; // 10 pixels is one metre
+    private double surveyToViewScale = 60.0; // 10 pixels is one metre
 
-    public static final double MAX_ZOOM = 60.0;
+    public static final double MAX_ZOOM = 120.0;
 
     private Survey survey;
     private Space<Coord2D> projection;

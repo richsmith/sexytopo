@@ -9,10 +9,12 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnLongClickListener;
+import android.view.WindowManager;
 import android.widget.PopupMenu;
 import android.widget.ScrollView;
 import android.widget.TableLayout;
@@ -59,6 +61,7 @@ public class TableActivity extends SexyTopoActivity
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_table);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         BroadcastReceiver receiver = new BroadcastReceiver() {
             @Override
@@ -202,66 +205,6 @@ public class TableActivity extends SexyTopoActivity
         return true;
     }
 
-/*
-    private void syncTableWithSurvey2() {
-
-        Survey survey = getSurvey();
-
-        List<Map<TableCol, Object>> tableEntries = graphToListTranslator.toListOfSurveyListEntries(survey);
-
-        if (tableEntries.size() == 0) {
-            Toast.makeText(getApplicationContext(), "No data",
-                    Toast.LENGTH_SHORT).show();
-        }
-
-        TableLayout tableLayout = (TableLayout)(findViewById(R.id.BodyTable));
-        tableLayout.removeAllViews();
-
-        for (Map<TableCol, Object> map : tableEntries) {
-
-            TableRow tableRow = (TableRow)LayoutInflater.from(this).inflate(R.layout.table_row, null);
-
-
-
-            for (TableCol col : TableCol.values()) {
-
-                String display = map.containsKey(col)? col.format(map.get(col)) : "?";
-                int id = TABLE_COL_BY_ANDROID_ID.get(col);
-                TextView textView = (TextView)tableRow.findViewById(id);
-                textView.setText(display);
-
-                //textView.setOnLongClickListener(onLongClickTableRow);
-
-                if (col == TableCol.FROM || col == TableCol.TO) {
-                    final Station station = (Station)(map.get(col));
-                    textView.setOnLongClickListener(new OnLongClickListener() {
-                        @Override
-                        public boolean onLongClick(final View view) {
-                            PopupMenu.OnMenuItemClickListener listener =
-                                    new PopupMenu.OnMenuItemClickListener() {
-                                        @Override
-                                        public boolean onMenuItemClick(MenuItem menuItem) {
-                                            view.setBackgroundColor(Color.GRAY);
-                                            clickForStation(station);
-                                            return true;
-                                        }
-                                    };
-                            showPopup(view, R.menu.table_station_selected, listener);
-                            return true;
-                        }
-                    });
-                }
-            }
-
-            int numRows = tableLayout.getChildCount();
-            tableLayout.addView(tableRow, numRows);
-        }
-
-        tableLayout.requestLayout();
-
-        ScrollView scrollView = (ScrollView)(findViewById(R.id.BodyTableScrollView));
-        scrollView.fullScroll(View.FOCUS_DOWN);
-    }*/
 
     private void clickForStation(Station station) {
         getSurvey().setActiveStation(station);
@@ -296,7 +239,9 @@ public class TableActivity extends SexyTopoActivity
 
             cellBeingClicked.setBackgroundColor(Color.WHITE);
 
-            PopupMenu popup = new PopupMenu(getBaseContext(), cellBeingClicked);
+            ActionBar actionBar = getSupportActionBar();
+
+            PopupMenu popup = new PopupMenu(actionBar.getThemedContext(), cellBeingClicked);
             popup.getMenuInflater().inflate(R.menu.table_station_selected, popup.getMenu());
             popup.setOnMenuItemClickListener(TableActivity.this);
             popup.show();

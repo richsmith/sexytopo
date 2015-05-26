@@ -10,6 +10,7 @@
     <string name="action_survey">Survey</string>
     <string name="action_settings">Settings</string>
     <string name="action_device">DistoX</string>
+    <string name="action_calibration">Calibration</string>
     <string name="action_help">Help</string>
     <string name="action_about">About</string>
     <string name="action_file_new">New</string>
@@ -18,6 +19,10 @@
     <string name="action_file_save">Save</string>
     <string name="action_file_save_as">Save As…</string>
     <string name="action_file_export">Export…</string>
+    <string name="action_tools">Tools ▶</string>
+    <string name="action_undo_last_leg">Undo last leg</string>
+    <string name="action_do_back_measurements">Back Measurements</string>
+    <string name="loaded">Loaded</string>
     <string name="table_head_from">From</string>
     <string name="table_head_to">To</string>
     <string name="table_head_distance">Dist</string>
@@ -30,11 +35,12 @@
     <string name="menu_set_active_station">Set Active Station</string>
     <string name="menu_edit_leg">Edit Leg</string>
     <string name="menu_delete_row">Delete to End of Branch</string>
-    <string name="sketch_menu_delete_last_leg">Undo Last Leg</string>
+    <string name="sketch_menu_delete_last_leg">Undo Last Reading</string>
     <string name="sketch_menu_centre_view">Go to Active</string>
     <string name="sketch_menu_show_grid">Graph Paper</string>
     <string name="sketch_menu_show_station_labels">Station Labels</string>
     <string name="sketch_menu_show_splays">Show Splays</string>
+    <string name="sketch_menu_back_measurements">Reverse Legs</string>
     <string name="title_activity_start_up">StartUpActivity</string>
     <string name="default_survey_name">NewSurvey</string>
     <string name="loading_survey">Loading</string>
@@ -51,5 +57,28 @@
     <string name="title_activity_help">Help</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_guide">Guide</string>
-
+    <string name="bluetooth_status">Bluetooth</string>
+    <string name="connect_automatically">Connect</string>
+    <string name="bluetooth_none">No Bluetooth capabilities</string>
+    <string name="paired_status">Paired With</string>
+    <string name="request_pair">Pair…</string>
+    <string name="request_unpair">Unpair…</string>
+    <string name="unpair_command">Unpair</string>
+    <string name="bluetooth_on">On</string>
+    <string name="device_singular">DistoX</string>
+    <string name="device_plural">DistoXes</string>
+    <string name="bluetooth_off">Off</string>
+    <string name="disto_connection_instructions">To pair: turn on the DistoX, click \'Pair…\', wait, and enter \'0000\' if a code is requested.</string>
+    <string name="device_log_connection_requested">Connection requested</string>
+    <string name="device_log_connected">Connected</string>
+    <string name="device_log_connecting">Connecting&#8230;</string>
+    <string name="device_log_waiting">Waiting for data&#8230;</string>
+    <string name="device_log_received">Received measurement</string>
+    <string name="device_log_connection_stop_requested">Connection close requested</string>
+    <string name="device_log_stopping">Closing connection&#8230;</string>
+    <string name="device_log_stopped">Connection closed</string>
+    <string name="title_activity_calibration">Calibration</string>
+    <string name="log">Log</string>
+    <string name="clear_log">Clear</string>
+    <string name="error_prefix">Error:</string>
 </resources>

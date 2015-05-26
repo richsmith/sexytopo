@@ -9,63 +9,134 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="org.hwyl.sexytopo.control.activity.DeviceActivity">
 
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-
-        <TextView
-            android:layout_marginRight="5dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Device:"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="None"
-            android:id="@+id/deviceName"/>
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_marginRight="5dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Status:"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Not Connected"
-            android:id="@+id/textView"/>
-    </LinearLayout>
-
-    <CheckBox
-        android:layout_width="wrap_content"
+    <Switch
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Automatically Connect"
-        android:id="@+id/checkBox"
-        android:checked="true" />
+        android:text="@string/bluetooth_status"
+        android:layout_gravity="end"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/bluetoothSwitch" />
 
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center"
+        android:background="#dddddd"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:padding="5dp"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="@string/paired_status"/>
+
+            <TextView
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text=""
+                android:id="@+id/deviceList"/>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content">
+            <Button
+                android:width="100dp"
+                android:layout_margin="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/request_pair"
+                android:id="@+id/pairButton"
+                android:onClick="requestPair"/>
+            <Button
+                android:width="100dp"
+                android:layout_margin="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/request_unpair"
+                android:id="@+id/unpairButton"
+                android:onClick="requestUnpair"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/disto_connection_instructions"/>
+    </LinearLayout>
+
+    <Switch
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/connect_automatically"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:checked="false"
+        android:id="@+id/connectionSwitch" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_gravity="center"
+        android:background="#dddddd"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:padding="5dp"
+        android:layout_height="match_parent">
+
+        <!--
+        <Button
+            android:width="100dp"
+            android:layout_margin="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/clear_log"
+            android:textSize="8dp"
+            android:id="@+id/clearLogButton"
+            android:onClick="clearLog"/>-->
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#dddddd"
+            android:layout_marginTop="10dp"
+            android:id="@+id/scrollView" >
+
+            <TextView
+                android:padding="3dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="courier"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:id="@+id/deviceLog"/>
+
+        </ScrollView>
+
+    </LinearLayout>
+
+    <!--
     <Button
         android:src="@drawable/move"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Calibrate"
         android:id="@+id/buttonCalibrate"
-        />
+        />-->
 
 
 </LinearLayout>

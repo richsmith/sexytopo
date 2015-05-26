@@ -10,6 +10,7 @@
     <item
         android:id="@+id/buttonText"
         android:title="Text"
+        android:visible="false"
         android:icon="@drawable/text"/>
     <item android:id="@+id/buttonShowGrid"
         android:title="@string/sketch_menu_show_grid"
@@ -21,6 +22,11 @@
         android:checkable="true"/>
     <item android:id="@+id/buttonShowStationLabels"
         android:title="@string/sketch_menu_show_station_labels"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:checkable="true"/>
+    <item android:id="@+id/buttonBackMeasurements"
+        android:title="@string/sketch_menu_back_measurements"
+        android:visible="false"
         android:icon="@android:drawable/ic_menu_preferences"
         android:checkable="true"/>
 </menu>

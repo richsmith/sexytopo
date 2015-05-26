@@ -1,8 +1,10 @@
 package org.hwyl.sexytopo.control.activity;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.util.Log;
@@ -16,6 +18,7 @@ import android.widget.Toast;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.SurveyManager;
+import org.hwyl.sexytopo.control.io.Loader;
 import org.hwyl.sexytopo.control.io.Saver;
 import org.hwyl.sexytopo.control.io.TherionExporter;
 import org.hwyl.sexytopo.control.io.Util;
@@ -27,13 +30,12 @@ import java.io.IOException;
 /**
  * Created by rls on 26/07/14.
  */
-public class SexyTopoActivity extends ActionBarActivity {
+public abstract class SexyTopoActivity extends ActionBarActivity {
 
     protected SurveyManager dataManager;
 
     public SexyTopoActivity() {
         super();
-
         dataManager = SurveyManager.getInstance(this);
 
     }
@@ -43,6 +45,14 @@ public class SexyTopoActivity extends ActionBarActivity {
 
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.action_bar, menu);
+
+
+        MenuItem menuItem = menu.findItem(R.id.action_back_measurements);
+        SharedPreferences preferences = getSharedPreferences(SexyTopo.GENERAL_PREFS, Context.MODE_PRIVATE);
+        boolean isSelected =
+                preferences.getBoolean(SexyTopo.REVERSE_MEASUREMENTS_PREFERENCE, false);
+        menuItem.setChecked(isSelected);
+
         return true;
     }
 
@@ -66,6 +76,9 @@ public class SexyTopoActivity extends ActionBarActivity {
                 return true;
             case R.id.action_survey:
                 startActivity(SurveyActivity.class);
+                return true;
+            case R.id.action_calibration:
+                startActivity(CalibrationActivity.class);
                 return true;
             case R.id.action_settings:
                 startActivity(SettingsActivity.class);
@@ -97,12 +110,20 @@ public class SexyTopoActivity extends ActionBarActivity {
                 return true;
 
 
+            case R.id.action_undo_last_leg:
+                undoLastLeg();
+                return true;
+            case R.id.action_back_measurements:
+                setReverseMeasurementsPreference(item);
+                return true;
+
 
             default:
                 return super.onOptionsItemSelected(item);
         }
 
     }
+
 
     private void openAboutDialog() {
         // Inflate the about message contents
@@ -144,6 +165,7 @@ public class SexyTopoActivity extends ActionBarActivity {
     private void startActivity(Class clazz) {
         if (! clazz.isInstance(this)) {
             Intent intent = new Intent(this, clazz);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
         }
     }
@@ -265,31 +287,39 @@ public class SexyTopoActivity extends ActionBarActivity {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String strName = arrayAdapter.getItem(which);
-                        AlertDialog.Builder builderInner = new AlertDialog.Builder(
-                                SexyTopoActivity.this);
-                        builderInner.setMessage(strName);
-                        builderInner.setTitle("Your Selected Item is");
-                        builderInner.setPositiveButton("Ok",
-                                new DialogInterface.OnClickListener() {
-
-                                    @Override
-                                    public void onClick(
-                                            DialogInterface dialog,
-                                            int which) {
-                                        dialog.dismiss();
-                                    }
-                                });
-                        builderInner.show();
+                        String surveyName = arrayAdapter.getItem(which);
+                        try {
+                            Survey survey = Loader.loadSurvey( surveyName);
+                            SurveyManager.getInstance(SexyTopoActivity.this).setCurrentSurvey(survey);
+                            showSimpleToast(getString(R.string.loaded) + " " + surveyName);
+                        } catch (Exception e) {
+                            showSimpleToast(getString(R.string.error_prefix) + e.getMessage());
+                        }
                     }
                 });
         builderSingle.show();
     }
 
 
+    private void undoLastLeg() {
+        getSurvey().undoLeg();
+        SurveyManager.getInstance(this).broadcastSurveyUpdated();
+
+    }
+
+    private void setReverseMeasurementsPreference(MenuItem item) {
+        item.setChecked(!item.isChecked());
+        SharedPreferences preferences = getSharedPreferences(SexyTopo.GENERAL_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(SexyTopo.REVERSE_MEASUREMENTS_PREFERENCE, item.isChecked());
+        editor.commit();
+    }
+
+
     protected Survey getSurvey() {
         return SurveyManager.getInstance(this).getCurrentSurvey();
     }
+
 
     protected void setSurvey(Survey survey) {
         SurveyManager.getInstance(this).setCurrentSurvey(survey);

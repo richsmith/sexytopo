@@ -23,20 +23,21 @@ public class SurveyUpdater {
     private static final double MAX_BEARING_DIFF = 1;
     private static final double MAX_INCLINATION_DIFF = 1;
 
+
     public static void update(Survey survey, List<Leg> legs) {
         for (Leg leg : legs) {
             update(survey, leg);
         }
     }
 
+
     public static void update(Survey survey, Leg leg) {
-
-
         Station activeStation = survey.getActiveStation();
         activeStation.getOnwardLegs().add(leg);
 
-        createNewStationIfRequired(survey);
+        survey.addUndoEntry(activeStation, leg);
 
+        createNewStationIfRequired(survey);
     }
 
 
@@ -56,13 +57,15 @@ public class SurveyUpdater {
                 Leg newLeg = Leg.upgradeSplayToConnectedLeg(selectedLeg, newStation);
                 activeStation.getOnwardLegs().add(newLeg);
 
+                for (Leg leg : legs) {
+                    survey.undoLeg();
+                }
+                survey.addUndoEntry(activeStation, newLeg);
+
                 survey.setActiveStation(newStation);
             }
         }
     }
-
-
-    //private static void replaceRepeatedLegsWithLegToNewStation(Station activeStation, List<Leg> repeatedLegs, Station newStation) {}
 
 
     private static List<Leg> getLatestNLegs(Station station, int n) {
@@ -102,6 +105,5 @@ public class SurveyUpdater {
         // assuming the first one is going to have the most care taken...
         return repeats.get(0);
     }
-
 
 }

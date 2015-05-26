@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.test.TestSurveyCreator;
@@ -27,6 +28,16 @@ public class SurveyActivity extends SexyTopoActivity implements View.OnClickList
         generateButton.setOnClickListener(this);
     }
 
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+        updateStats();
+
+
+
+    }
+
 
     @Override
     public void onClick(View view) {
@@ -39,6 +50,15 @@ public class SurveyActivity extends SexyTopoActivity implements View.OnClickList
                 break;
 
         }
+    }
+
+    private void updateStats() {
+
+        Survey survey = getSurvey();
+        double longestLeg = SurveyStats.calcLongestLeg(survey);
+        int numberOfStations = SurveyStats.calcNumberStations(survey);
+        double length = SurveyStats.calcTotalLength(survey);
+        double heightRange = SurveyStats.calcHeightRange(survey);
     }
 
 }

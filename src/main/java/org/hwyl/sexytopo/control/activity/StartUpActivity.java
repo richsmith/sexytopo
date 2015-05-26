@@ -8,10 +8,11 @@ import android.widget.Toast;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.control.Log;
+import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.io.Loader;
 import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.model.survey.Survey;
-import org.hwyl.sexytopo.control.SurveyManager;
 
 public class StartUpActivity extends SexyTopoActivity {
 
@@ -20,8 +21,32 @@ public class StartUpActivity extends SexyTopoActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_up);
 
+
+
+
+        /*
+        // If there are paired devices
+        if (pairedDevices.size() > 0) {
+            // Loop through paired devices
+            for (BluetoothDevice device : pairedDevices) {
+                Toast.makeText(getApplicationContext(), "Paired: " + device.getName(), Toast.LENGTH_SHORT).show();
+                // Add the name and address to an array adapter to show in a ListView
+                //mArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+                if (name == null) {
+                    name = device.getName();
+                } else {
+                    //throw new IllegalStateException("More than one device paired");
+                }
+            }
+        }
+
+        return name;*/
+
+
         Survey survey = isThereAnActiveSurvey()? loadActiveSurvey() : createNewActiveSurvey();
         SurveyManager.getInstance(this).setCurrentSurvey(survey);
+
+        Log.setContext(this);
 
         Intent intent = new Intent(this, DeviceActivity.class);
         startActivity(intent);

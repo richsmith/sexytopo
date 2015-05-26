@@ -35,6 +35,16 @@ public class Leg extends SurveyComponent{
         return new Leg(splay.distance, splay.bearing, splay.inclination, destination);
     }
 
+    public Leg reverse() {
+        double reversedBearing = (getBearing() + 180.0) % 360.0;
+        double reversedInclination = -getInclination();
+        if (hasDestination()) {
+            return new Leg(getDistance(), reversedBearing, reversedInclination, getDestination());
+        } else {
+            return new Leg(getDistance(), reversedBearing, reversedInclination);
+        }
+    }
+
     public double getDistance() {
         return distance;
     }

@@ -2,6 +2,7 @@ package org.hwyl.sexytopo.control;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -12,6 +13,7 @@ import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Survey;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,12 +40,23 @@ public class SurveyManager {
 
     public SurveyManager(Context context) {
         this.context = context;
-        //broadcastManager =  LocalBroadcastManager.getInstance(context);
     }
 
     public void updateSurvey(List<Leg> legs) {
 
+        /*SharedPreferences preferences =
+                context.getSharedPreferences(Context.MODE_PRIVATE);*/
+
         if (legs.size() > 0) {
+
+            SharedPreferences preferences =
+                    context.getSharedPreferences(SexyTopo.GENERAL_PREFS, 0);
+            boolean reverseLegs =
+                    preferences.getBoolean(SexyTopo.REVERSE_MEASUREMENTS_PREFERENCE, false);
+            if (reverseLegs) {
+                legs = reverseLegs(legs);
+            }
+
             SurveyUpdater.update(currentSurvey, legs);
 
 
@@ -61,6 +74,14 @@ public class SurveyManager {
         broadcastSurveyUpdated();
     }
 
+    private List<Leg> reverseLegs(List<Leg> legs) {
+        List<Leg> reversed = new ArrayList<Leg>();
+        for (Leg leg : legs) {
+            reversed.add(leg.reverse());
+        }
+        return reversed;
+    }
+
     public void broadcastSurveyUpdated() {
 
         Intent intent = new Intent(SexyTopo.SURVEY_UPDATED_EVENT);
@@ -72,15 +93,6 @@ public class SurveyManager {
     }
 
     public Survey getCurrentSurvey() {
-
-        /*
-        if (currentSurvey.getAllStations().size() <= 1) {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-            if (prefs.getBoolean("demo_mode", true)) {
-                currentSurvey = TestSurveyCreator.create(10, 5);
-            }
-        }*/
-
         return currentSurvey;
     }
 

@@ -4,9 +4,8 @@ import org.hwyl.sexytopo.control.util.StationNamer;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Stack;
 
 /**
  * Created by rls on 16/07/14.
@@ -20,24 +19,12 @@ public class Survey {
     private Sketch planSketch = new Sketch();
     private Sketch elevationSketch = new Sketch();
 
-    public void setPlanSketch(Sketch planSketch) {
-        this.planSketch = planSketch;
-    }
-
-    public Sketch getPlanSketch() {
-        return planSketch;
-    }
-
-    public void setElevationSketch(Sketch elevationSketch) {
-        this.elevationSketch = elevationSketch;
-    }
-
-    public Sketch getElevationSketch() {
-        return elevationSketch;
-    }
 
     private final Station origin = new Station(StationNamer.generateOriginName());
     private Station activeStation = origin;
+
+
+    private Stack<UndoEntry> undoStack = new Stack<>();
 
     public Survey(String name) {
         this.name = name;
@@ -56,7 +43,27 @@ public class Survey {
     }
 
     public Station getActiveStation() {
-        return activeStation;
+        if (activeStation == null) {
+            return origin;
+        } else {
+            return activeStation;
+        }
+    }
+
+    public void setPlanSketch(Sketch planSketch) {
+        this.planSketch = planSketch;
+    }
+
+    public Sketch getPlanSketch() {
+        return planSketch;
+    }
+
+    public void setElevationSketch(Sketch elevationSketch) {
+        this.elevationSketch = elevationSketch;
+    }
+
+    public Sketch getElevationSketch() {
+        return elevationSketch;
     }
 
     public Station getOrigin() {
@@ -93,18 +100,37 @@ public class Survey {
         return stations;
     }
 
-    public void sanityCheckNoDuplicateNames() {
-        List<Station> stations = getAllStations();
-        Set<String> names = new HashSet<>();
-        for (Station station : stations) {
-            String name = station.getName();
-            if (names.contains(name)) {
-                throw new IllegalStateException("Duplicated station name " + name);
-            } else {
-                names.add(station.getName());
+
+    private void fixActiveStation() {
+        activeStation = origin;
+    }
+
+
+    public void addUndoEntry(Station station, Leg leg) {
+        undoStack.push(new UndoEntry(station, leg));
+    }
+
+
+    public void undoLeg() {
+        if (!undoStack.isEmpty()) {
+            UndoEntry entry = undoStack.pop();
+            entry.station.getOnwardLegs().remove(entry.leg);
+            if (entry.leg.hasDestination() && entry.leg.getDestination() == activeStation) {
+                fixActiveStation();
             }
         }
-
     }
+
+
+
+    private class UndoEntry {
+        private Station station;
+        private Leg leg;
+        private UndoEntry(Station station, Leg leg) {
+            this.station = station;
+            this.leg = leg;
+        }
+    }
+
 
 }

@@ -2,11 +2,13 @@ package org.hwyl.sexytopo.comms;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.util.Log;
+import android.content.Context;
 
+import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
-import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
+import org.hwyl.sexytopo.model.survey.Leg;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -19,139 +21,172 @@ import java.util.List;
  */
 public class DistoXPoller extends Thread {
 
-    private int POLLING_FREQUENCY = 5 * 1000;
-    private int INTER_PACKET_DELAY = 1 * 100;
+    private static final int POLLING_FREQUENCY = 5 * 1000;
+    private static final int INTER_PACKET_DELAY = 1 * 100;
 
     private SurveyManager surveyManager;
     private BluetoothDevice bluetoothDevice;
+    private Context context;
+
     private BluetoothSocket socket;
 
-
-    private boolean isConnected = false;
-
+    private boolean isAlive = true;
 
     byte[] previousPacket = null;
 
 
-    public DistoXPoller(BluetoothDevice bluetoothDevice, SurveyManager surveyManager) {
+    public DistoXPoller(Context context,
+            BluetoothDevice bluetoothDevice, SurveyManager surveyManager) {
+
+        this.context = context;
         this.surveyManager = surveyManager;
         this.bluetoothDevice = bluetoothDevice;
     }
 
 
     public void run() {
-        while(true) {
-            try {
-                sleep(POLLING_FREQUENCY);
 
-                if (! ensureConnection()) {
+        while(isAlive) {
+            try {
+
+                if (!ensureConnection()) {
+                    sleep(POLLING_FREQUENCY);
                     continue;
                 }
 
                 List<Leg> legs = slurpAllData(socket);
                 surveyManager.updateSurvey(legs);
 
+                sleep(POLLING_FREQUENCY);
+
             } catch (Exception e) {
-                Log.e(SexyTopo.TAG, "Error: " + e);
+                Log.device("General error: " + e);
                 disconnect();
-            } finally {
-                try {
-                    socket.close();
-                } catch (Exception e) {}
             }
         }
 
 
+    }
+
+    public void kill() {
+        isAlive = false;
+        disconnect();
+    }
+
+    private void setupConnection() {
+        try {
+            // socket = bluetoothDevice.createRfcommSocketToServiceRecord(SexyTopo.DISTO_X_UUID);
+            socket = bluetoothDevice.createInsecureRfcommSocketToServiceRecord(SexyTopo.DISTO_X_UUID);
+        } catch (IOException e) {
+            Log.device("Error setting up connection: " + e.getMessage());
+        }
 
     }
 
     private boolean ensureConnection() {
 
-        if (! isConnected) {
+        if (socket == null || !socket.isConnected()) {
             try {
+                Log.device(context.getString(R.string.device_log_connecting));
                 socket = bluetoothDevice.createRfcommSocketToServiceRecord(SexyTopo.DISTO_X_UUID);
-                socket.connect();
-                isConnected = true;
+
+                socket.connect(); // blocks until connection is complete or fails with an exception
+                assert socket.isConnected();
+                Log.device(context.getString(R.string.device_log_connected));
             } catch (Exception e) {
-                isConnected = false;
-                Log.e(SexyTopo.TAG, "Error trying to connect to DistoX: " + e);
+                Log.device("Error connecting: " + e.getMessage());
             }
         }
 
-        return isConnected;
+        return socket.isConnected();
     }
 
     private void disconnect() {
         try {
-            if (isConnected) {
-                isConnected = false;
+            if (socket != null && socket.isConnected()) {
                 socket.close();
             }
         } catch (Exception e) {
-            Log.e(SexyTopo.TAG, "Error disconnecting from DistoX: " + e);
+            Log.device("Error disconnecting: " + e.getMessage());
         }
     }
 
 
 
-    public List<Leg> slurpAllData(BluetoothSocket socket) throws IOException, InterruptedException {
+    public List<Leg> slurpAllData(BluetoothSocket socket) {
 
-
-
-        Log.d(SexyTopo.TAG, "Checking if data are available...");
+        Log.device(context.getString(R.string.device_log_waiting));
 
         List<Leg> legs = new ArrayList<>();
 
-
-        DataInputStream inStream = new DataInputStream(socket.getInputStream());
-        DataOutputStream outStream = new DataOutputStream(socket.getOutputStream());
-
+        DataInputStream inStream = null;
+        DataOutputStream outStream = null;
 
 
-        while (true) {
+        try {
 
-            byte[] packet = new byte[8];
-            inStream.readFully(packet, 0, 8);
-            Log.d(SexyTopo.TAG, "Received data: " + DistoXProtocol.describeDataPacket(packet));
+            inStream = new DataInputStream(socket.getInputStream());
+            outStream = new DataOutputStream(socket.getOutputStream());
 
-            //if (! DistoXProtocol.isDataPacket(dataPacket)) {
-              //  continue;
-            //}
+            while (isAlive) {
+                byte[] packet = new byte[8];
+                inStream.readFully(packet, 0, 8);
 
-            byte type = (byte)( packet[0] & 0x3f);
-            Log.d(SexyTopo.TAG, "Type is " + type);
+                Log.d("Received data: " + DistoXProtocol.describeDataPacket(packet));
 
-            byte[] acknowledgePacket = DistoXProtocol.createAcknowledgementPacket(packet);
-            outStream.write(acknowledgePacket, 0, acknowledgePacket.length);
-            Log.d(SexyTopo.TAG, "Sent Ack: " + DistoXProtocol.describeAcknowledgementPacket(acknowledgePacket));
+                byte type = (byte) (packet[0] & 0x3f);
+
+                byte[] acknowledgePacket = DistoXProtocol.createAcknowledgementPacket(packet);
+                outStream.write(acknowledgePacket, 0, acknowledgePacket.length);
+                Log.d(SexyTopo.TAG, "Sent Ack: " + DistoXProtocol.describeAcknowledgementPacket(acknowledgePacket));
 
 
-            if (( packet[0] & 0x03) == 0) {
-                Log.d(SexyTopo.TAG, "0x03 flag tripped (whatever that is...)");
-                break;
-            } else if (type != 0x01) {
-                Log.d(SexyTopo.TAG, "packet not data type?");
-                continue;
+                if ((packet[0] & 0x03) == 0) {
+                    // Think this means the acknowledgment has been accepted
+                    break;
+                } else if (type != 0x01) {
+                    Log.device("Unexpected data type");
+                    continue;
+                }
+
+                if (arePacketsTheSame(packet, previousPacket)) {
+                    continue;
+
+                } else {
+                    Log.device(context.getString(R.string.device_log_received));
+                    Leg leg = DistoXProtocol.parseDataPacket(packet);
+                    legs.add(leg);
+                    previousPacket = packet;
+                    continue;
+                }
+
+                //pauseForDistoXToCatchUp();
             }
-            Log.d(SexyTopo.TAG, "packet does appear to be data type :)");
 
-            if (previousPacket != null && arePacketsTheSame(packet, previousPacket)) {
-                continue;
-
+        } catch (IOException e) {
+            if (e.getMessage().toLowerCase().contains("bt socket closed")) {
+                //Log.device("Connection closed"); not sure if we need to bother the user with this..
+                disconnect();
             } else {
-                Leg leg = DistoXProtocol.parseDataPacket(packet);
-                legs.add(leg);
-                previousPacket = packet;
-                break;
+                Log.device("Communication error: " + e.getMessage());
+                disconnect();
             }
 
-            //pauseForDistoXToCatchUp();
+        } catch (Exception e) {
+            Log.device("General error: " + e);
+            disconnect();
+
+        } finally {
+            try {
+                inStream.close();
+                outStream.close();
+            } catch (Exception e) {
+                // ignore any errors; they are expected if the socket has been closed
+            }
+
+            // whatever happens, return the precious data :)
+            return legs;
         }
-
-        int count = legs.size();
-        count++;
-
-        return legs;
     }
 
     private void pauseForDistoXToCatchUp() throws InterruptedException {
@@ -159,11 +194,17 @@ public class DistoXPoller extends Thread {
     }
 
     private boolean arePacketsTheSame(byte[] packet0, byte[] packet1) {
+
+        if (packet0 == null ^ packet1 == null) {
+            return false;
+        }
+
         for (int i = 0; i < packet0.length; i++) {
             if (packet0[i] != packet1[i]) {
                 return false;
             }
         }
+
         return true;
     }
 

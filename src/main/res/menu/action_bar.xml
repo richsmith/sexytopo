@@ -19,7 +19,9 @@
     <item android:id="@+id/action_file"
         android:title="@string/action_file"
         app:showAsAction="never">
-        <menu>
+        <menu xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools">
             <item android:id="@+id/action_file_new"
                 android:title="@string/action_file_new" />
             <item android:id="@+id/action_file_open"
@@ -34,6 +36,18 @@
                 android:title="@string/action_file_delete" />
         </menu>
     </item>
+    <item android:id="@+id/action_tools"
+        android:title="@string/action_tools"
+        app:showAsAction="never">
+        <menu>
+            <item android:id="@+id/action_undo_last_leg"
+                android:title="@string/action_undo_last_leg" />
+            <item android:id="@+id/action_back_measurements"
+                android:title="@string/action_do_back_measurements"
+                android:checkable="true"/>
+            <!--android:visible="false"-->
+        </menu>
+    </item>
     <item android:id="@+id/action_survey"
         android:title="@string/action_survey"
         android:orderInCategory="100"
@@ -42,8 +56,13 @@
         android:title="@string/action_device"
         android:orderInCategory="100"
         app:showAsAction="never" />
+    <item android:id="@+id/action_calibration"
+        android:title="@string/action_calibration"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
+        android:visible="false"
         android:orderInCategory="100"
         app:showAsAction="never" />
     <item android:id="@+id/action_help"

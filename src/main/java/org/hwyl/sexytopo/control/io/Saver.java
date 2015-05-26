@@ -28,7 +28,7 @@ public class Saver {
         saveFile(context, planFilename, planText);
 
         String elevationFilename = Util.getPathForDataFile(survey.getName(), "ext-elevation", "json");
-        String elevationText = SketchJsonTranslater.translate(survey.getPlanSketch());
+        String elevationText = SketchJsonTranslater.translate(survey.getElevationSketch());
         saveFile(context, elevationFilename, elevationText);
 
     }

@@ -13,7 +13,7 @@ import org.hwyl.sexytopo.model.survey.Survey;
 public class Space3DTransformer {
 
     // These were originally static methods but because we want to override one it has
-    // to be OO. Thanks Java for your stupid inability to override static methods.
+    // to be OO. Thanks Java for your stupid inability to override static methods :/
 
     public Space transformTo3D(Survey survey) {
         return transformTo3D(survey.getOrigin());
@@ -61,7 +61,7 @@ public class Space3DTransformer {
         y += start.getY();
         z += start.getZ();
 
-        return new Coord3D((int)x, (int)y, (int)z);
+        return new Coord3D(x, y, z);
     }
 
 }

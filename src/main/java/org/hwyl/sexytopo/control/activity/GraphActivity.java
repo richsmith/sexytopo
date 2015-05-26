@@ -31,7 +31,7 @@ import java.util.Map;
 public abstract class GraphActivity extends SexyTopoActivity
         implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
 
-    private static final double ZOOM_INCREMENT = 2.0;
+    private static final double ZOOM_INCREMENT = 4.0;
 
     private static final int DEFAULT_SKETCH_TOOL_SELECTION = R.id.buttonMove;
     private static final int DEFAULT_BRUSH_COLOUR_SELECTION = R.id.buttonBlack;
@@ -96,7 +96,6 @@ public abstract class GraphActivity extends SexyTopoActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         BroadcastReceiver receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -106,17 +105,13 @@ public abstract class GraphActivity extends SexyTopoActivity
         LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
         broadcastManager.registerReceiver(receiver, new IntentFilter(SexyTopo.SURVEY_UPDATED_EVENT));
 
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
         setContentView(R.layout.activity_graph);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         for (int id : BUTTON_IDS) {
             View button = findViewById(id);
             button.setOnClickListener(this);
         }
-
-
-
 
         graphView = (GraphView)(findViewById(R.id.graphView));
         syncGraphWithSurvey();
@@ -136,6 +131,7 @@ public abstract class GraphActivity extends SexyTopoActivity
         graphView.setSurvey(survey);
         graphView.setProjection(getProjection(survey));
         graphView.setSketch(getSketch(survey));
+        graphView.invalidate();
     }
 
     protected abstract Sketch getSketch(Survey survey);
@@ -218,6 +214,10 @@ public abstract class GraphActivity extends SexyTopoActivity
             case R.id.buttonCentreView:
                 graphView.centreViewOnActiveStation();
                 graphView.invalidate();
+                break;
+            case R.id.buttonDeleteLastLeg:
+                getSurvey().undoLeg();
+                syncGraphWithSurvey();
                 break;
         }
         return true;
