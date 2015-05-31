@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="0px"
-        android:weightSum="1.4"
+        android:weightSum="1.6"
         android:background="@color/panelBackground"
         >
 
@@ -29,6 +29,14 @@
             android:layout_height="50dp"
             android:scaleType="fitCenter"
             android:id="@+id/buttonBlack"
+            />
+        <ImageButton
+            android:layout_weight="0.2"
+            android:src="@drawable/brown"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:scaleType="fitCenter"
+            android:id="@+id/buttonBrown"
             />
         <ImageButton
             android:layout_weight="0.2"

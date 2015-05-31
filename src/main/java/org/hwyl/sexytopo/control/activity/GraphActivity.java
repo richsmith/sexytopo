@@ -48,13 +48,12 @@ public abstract class GraphActivity extends SexyTopoActivity
         R.id.buttonRedo,
         R.id.buttonMenu,
         R.id.buttonBlack,
+        R.id.buttonBrown,
         R.id.buttonOrange,
         R.id.buttonBlue,
         R.id.buttonGreen,
         R.id.buttonPurple
     };
-
-    private GraphView graphView;
 
     private static final Map<Integer, GraphView.SketchTool> BUTTON_ID_TO_SKETCH_TOOL
             = new HashMap<Integer, GraphView.SketchTool>() {{
@@ -67,6 +66,7 @@ public abstract class GraphActivity extends SexyTopoActivity
     private static final Map<Integer, GraphView.BrushColour> BUTTON_ID_TO_BRUSH_COLOUR
             = new HashMap<Integer, GraphView.BrushColour>() {{
         put(R.id.buttonBlack, GraphView.BrushColour.BLACK);
+        put(R.id.buttonBrown, GraphView.BrushColour.BROWN);
         put(R.id.buttonOrange, GraphView.BrushColour.ORANGE);
         put(R.id.buttonBlue, GraphView.BrushColour.BLUE);
         put(R.id.buttonGreen, GraphView.BrushColour.GREEN);
@@ -90,6 +90,8 @@ public abstract class GraphActivity extends SexyTopoActivity
             return defaultValue;
         }
     }
+
+    private GraphView graphView;
 
 
     @Override
@@ -201,10 +203,12 @@ public abstract class GraphActivity extends SexyTopoActivity
                 graphView.redo();
                 break;
             case R.id.buttonBlack:
+            case R.id.buttonBrown:
             case R.id.buttonOrange:
             case R.id.buttonBlue:
             case R.id.buttonGreen:
             case R.id.buttonPurple:
+                selectSketchTool(R.id.buttonDraw);
                 selectBrushColour(id);
                 break;
 

@@ -75,6 +75,7 @@ private boolean firstTime = true;
     public static final double DELETE_PATHS_WITHIN_N_PIXELS = 5.0;
     public static final double SELECTION_SENSITIVITY_IN_PIXELS = 25;
 
+    private static final int SKETCH_BROWN = 0xFFA52A2A;
     private static final int SKETCH_ORANGE = 0xFFFFA500;
     private static final int SKETCH_GREEN = 0xFF00DD00;
 
@@ -99,6 +100,7 @@ private boolean firstTime = true;
     public enum BrushColour {
 
         BLACK(Color.BLACK),
+        BROWN(SKETCH_BROWN),
         ORANGE(SKETCH_ORANGE),
         GREEN(SKETCH_GREEN),
         BLUE(Color.BLUE),
