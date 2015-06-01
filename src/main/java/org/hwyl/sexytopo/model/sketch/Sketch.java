@@ -2,6 +2,7 @@ package org.hwyl.sexytopo.model.sketch;
 
 import android.graphics.Color;
 
+import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.util.Space2DUtils;
 
@@ -14,7 +15,10 @@ import java.util.List;
 public class Sketch {
 
     private List<PathDetail> pathDetails = new ArrayList<>();
-    private List<PathDetail> undonePathDetails = new ArrayList<>();
+    private List<TextDetail> textDetails = new ArrayList<>();
+
+    private List<SketchDetail> sketchHistory = new ArrayList<>();
+    private List<SketchDetail> undoneHistory = new ArrayList<>();
 
 
     private PathDetail activePath;
@@ -24,6 +28,10 @@ public class Sketch {
 
     public void setPathDetails(List<PathDetail> pathDetails) {
         this.pathDetails = pathDetails;
+    }
+
+    public void setTextDetails(List<TextDetail> textDetails) {
+        this.textDetails = textDetails;
     }
 
 
@@ -40,12 +48,15 @@ public class Sketch {
     public PathDetail startNewPath(Coord2D start) {
         activePath = new PathDetail(start, activeColour);
         pathDetails.add(activePath);
+        sketchHistory.add(activePath);
+        undoneHistory.clear();
         return activePath;
     }
 
 
     public void lineTo(Coord2D point) {
         activePath.lineTo(point);
+        undoneHistory.clear();
     }
 
 
@@ -53,6 +64,16 @@ public class Sketch {
         activePath = null;
     }
 
+    public void addTextDetail(Coord2D location, String text) {
+        TextDetail textDetail = new TextDetail(location, text, activeColour);
+        textDetails.add(textDetail);
+        sketchHistory.add(textDetail);
+        undoneHistory.clear();
+    }
+
+    public List<TextDetail> getTextDetails() {
+        return textDetails;
+    }
 
     public void setActiveColour(int colour) {
         this.activeColour = colour;
@@ -60,17 +81,40 @@ public class Sketch {
 
 
     public void undo() {
-        if (!pathDetails.isEmpty()) {
-            PathDetail path = pathDetails.remove(pathDetails.size() - 1);
-            undonePathDetails.add(path);
+        if (!sketchHistory.isEmpty()) {
+            SketchDetail toUndo = sketchHistory.remove(sketchHistory.size() - 1);
+
+            if (toUndo instanceof PathDetail) {
+                pathDetails.remove(toUndo);
+            } else if (toUndo instanceof TextDetail) {
+                textDetails.remove(toUndo);
+            }
+
+            undoneHistory.add(toUndo);
         }
     }
 
 
     public void redo() {
-        if (!undonePathDetails.isEmpty()) {
-            PathDetail path = undonePathDetails.remove(undonePathDetails.size() - 1);
-            pathDetails.add(path);
+
+        if (!undoneHistory.isEmpty()) {
+            SketchDetail toRedo = undoneHistory.remove(undoneHistory.size() - 1);
+
+            if (toRedo instanceof PathDetail) {
+                pathDetails.add((PathDetail) toRedo);
+            } else if (toRedo instanceof TextDetail) {
+                textDetails.add((TextDetail) toRedo);
+            }
+
+            sketchHistory.add(toRedo);
+        }
+    }
+
+    public void deleteDetail(SketchDetail sketchDetail) {
+        if (sketchDetail instanceof PathDetail) {
+            pathDetails.remove(sketchDetail);
+        } else if (sketchDetail instanceof TextDetail) {
+            textDetails.remove(sketchDetail);
         }
     }
 
@@ -92,6 +136,30 @@ public class Sketch {
         return closest;
     }
 
+    public SketchDetail findNearestDetailWithin(Coord2D point, double delta) {
+
+        SketchDetail closest = null;
+        double minDistance = Double.MAX_VALUE;
+
+        for (PathDetail path : pathDetails) {
+            double distance = getClosestDistance(point, path.getPath());
+            if (distance < delta && distance < minDistance) {
+                closest = path;
+                minDistance = distance;
+            }
+        }
+
+        for (TextDetail textDetail : textDetails) {
+            double distance = Space2DUtils.getDistance(point, textDetail.getLocation());
+            if (distance < delta && distance < minDistance) {
+                closest = textDetail;
+                minDistance = distance;
+            }
+        }
+
+        return closest;
+    }
+
 
     private static double getClosestDistance(Coord2D point, List<Coord2D> line) {
         double minDistance = Double.MAX_VALUE;
@@ -100,7 +168,7 @@ public class Sketch {
                 minDistance = Math.min(minDistance,
                         Space2DUtils.getDistanceFromLine(point, line.get(i), line.get(j)));
             } catch (Exception e) {
-                int ignore = 12;
+                Log.d("Error calculating minimum distance: " + e);
             }
         }
         return minDistance;

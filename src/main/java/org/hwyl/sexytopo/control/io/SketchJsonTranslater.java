@@ -1,8 +1,10 @@
 package org.hwyl.sexytopo.control.io;
 
+import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
+import org.hwyl.sexytopo.model.sketch.TextDetail;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,6 +20,9 @@ public class SketchJsonTranslater {
     public static final String PATHS_TAG = "paths";
     public static final String POINTS_TAG = "points";
     public static final String COLOUR_TAG = "colour";
+    public static final String LABELS_TAG = "labels";
+    public static final String TEXT_TAG = "text";
+    public static final String LOCATION_TAG = "location";
     public static final String X_TAG = "x";
     public static final String Y_TAG = "y";
 
@@ -37,25 +42,49 @@ public class SketchJsonTranslater {
 
         JSONObject json = new JSONObject();
 
-        JSONArray array = new JSONArray();
+        JSONArray pathDetailArray = new JSONArray();
         for (PathDetail pathDetail : sketch.getPathDetails()) {
-            array.put(toJson(pathDetail));
+            pathDetailArray.put(toJson(pathDetail));
         }
+        json.put(PATHS_TAG, pathDetailArray);
 
-        json.put(PATHS_TAG, array);
+        JSONArray textDetailArray = new JSONArray();
+        for (TextDetail textDetail : sketch.getTextDetails()) {
+            textDetailArray.put(toJson(textDetail));
+        }
+        json.put(LABELS_TAG, textDetailArray);
+
+
 
         return json;
     }
 
     public static Sketch toSketch(JSONObject json) throws JSONException {
-        JSONArray array = json.getJSONArray(PATHS_TAG);
-        List<PathDetail> pathDetails = new ArrayList<>();
-        for (JSONObject object : toList(array)) {
-            pathDetails.add(toPathDetail(object));
-        }
 
         Sketch sketch = new Sketch();
-        sketch.setPathDetails(pathDetails);
+
+        try {
+            JSONArray pathsArray = json.getJSONArray(PATHS_TAG);
+            List<PathDetail> pathDetails = new ArrayList<>();
+            for (JSONObject object : toList(pathsArray)) {
+                pathDetails.add(toPathDetail(object));
+            }
+            sketch.setPathDetails(pathDetails);
+        } catch (JSONException e) {
+            Log.e("Failed to load sketch paths: " + e);
+        }
+
+        try {
+            JSONArray labelsArray = json.getJSONArray(LABELS_TAG);
+            List<TextDetail> textDetails = new ArrayList<>();
+            for (JSONObject object : toList(labelsArray)) {
+                textDetails.add(toTextDetail(object));
+            }
+            sketch.setTextDetails(textDetails);
+        } catch (JSONException e) {
+            Log.e("Failed to load sketch labels: " + e);
+        }
+
         return sketch;
     }
 
@@ -87,6 +116,28 @@ public class SketchJsonTranslater {
 
         PathDetail pathDetail = new PathDetail(path, colour);
         return pathDetail;
+    }
+
+
+    public static JSONObject toJson(TextDetail textDetail) throws JSONException {
+
+        JSONObject json = new JSONObject();
+        json.put(LOCATION_TAG, toJson(textDetail.getLocation()));
+        json.put(TEXT_TAG, textDetail.getText());
+        json.put(COLOUR_TAG, textDetail.getColour());
+
+        return json;
+    }
+
+
+    public static TextDetail toTextDetail(JSONObject json) throws JSONException {
+
+        int colour = json.getInt(COLOUR_TAG);
+        Coord2D location = toCoord2D(json.getJSONObject(LOCATION_TAG));
+        String text = json.getString(TEXT_TAG);
+
+        TextDetail textDetail = new TextDetail(location, text, colour);
+        return textDetail;
     }
 
 

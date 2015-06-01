@@ -40,6 +40,7 @@ public abstract class GraphActivity extends SexyTopoActivity
     private static final int[] BUTTON_IDS = new int[] {
         R.id.buttonDraw,
         R.id.buttonMove,
+        R.id.buttonText,
         R.id.buttonErase,
         R.id.buttonSelect,
         R.id.buttonZoomIn,
@@ -59,6 +60,7 @@ public abstract class GraphActivity extends SexyTopoActivity
             = new HashMap<Integer, GraphView.SketchTool>() {{
         put(R.id.buttonMove, GraphView.SketchTool.MOVE);
         put(R.id.buttonDraw, GraphView.SketchTool.DRAW);
+        put(R.id.buttonText, GraphView.SketchTool.TEXT);
         put(R.id.buttonErase, GraphView.SketchTool.ERASE);
         put(R.id.buttonSelect, GraphView.SketchTool.SELECT);
     }};
@@ -185,6 +187,7 @@ public abstract class GraphActivity extends SexyTopoActivity
             case R.id.buttonDraw:
             case R.id.buttonMove:
             case R.id.buttonErase:
+            case R.id.buttonText:
             case R.id.buttonSelect:
                 selectSketchTool(id);
                 break;
@@ -208,7 +211,6 @@ public abstract class GraphActivity extends SexyTopoActivity
             case R.id.buttonBlue:
             case R.id.buttonGreen:
             case R.id.buttonPurple:
-                selectSketchTool(R.id.buttonDraw);
                 selectBrushColour(id);
                 break;
 

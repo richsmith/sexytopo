@@ -5,9 +5,11 @@ import android.view.View;
 import android.widget.TextView;
 
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.control.Log;
+import org.hwyl.sexytopo.control.SurveyManager;
+import org.hwyl.sexytopo.control.io.Saver;
 import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.model.survey.Survey;
-import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.test.TestSurveyCreator;
 
 public class SurveyActivity extends SexyTopoActivity implements View.OnClickListener {
@@ -48,7 +50,13 @@ public class SurveyActivity extends SexyTopoActivity implements View.OnClickList
                 Survey currentSurvey = TestSurveyCreator.create(10, 5);
                 SurveyManager.getInstance(this).setCurrentSurvey(currentSurvey);
                 break;
-
+            case R.id.buttonSaveSurvey:
+                try {
+                    Saver.save(this, getSurvey());
+                } catch (Exception e) {
+                    showSimpleToast("Error saving survey");
+                    Log.e("Error saving survey: " + e);
+                }
         }
     }
 

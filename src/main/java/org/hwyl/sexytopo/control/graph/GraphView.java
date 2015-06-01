@@ -1,6 +1,8 @@
 package org.hwyl.sexytopo.control.graph;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -12,7 +14,9 @@ import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.PopupWindow;
@@ -25,6 +29,8 @@ import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
+import org.hwyl.sexytopo.model.sketch.SketchDetail;
+import org.hwyl.sexytopo.model.sketch.TextDetail;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -68,7 +74,9 @@ private boolean firstTime = true;
     public static final int STATION_COLOUR = Color.RED;
     public static final int STATION_DIAMETER = 8;
     public static final int HIGHLIGHT_DIAMETER = 12;
-    public static final int STATION_LABEL_SIZE = 18;
+    public static final int STATION_LABEL_SIZE = 20;
+
+    public static final int LABEL_SIZE = 34;
 
     public static final int GRID_COLOUR = Color.LTGRAY;
 
@@ -113,13 +121,14 @@ private boolean firstTime = true;
     }
 
     public enum SketchTool {
-        MOVE, DRAW, ERASE, SELECT
+        MOVE, DRAW, ERASE, TEXT, SELECT
     }
     public SketchTool currentSketchTool = SketchTool.MOVE;
 
     private Paint stationPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint legPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint drawPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Paint labelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint highlightPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint gridPaint = new Paint();
 
@@ -155,6 +164,9 @@ private boolean firstTime = true;
         drawPaint.setStyle(Paint.Style.STROKE);
         drawPaint.setStrokeJoin(Paint.Join.ROUND);
         drawPaint.setStrokeCap(Paint.Cap.ROUND);
+
+        labelPaint.setColor(STATION_COLOUR);
+        labelPaint.setTextSize(LABEL_SIZE);
     }
 
 
@@ -187,6 +199,8 @@ private boolean firstTime = true;
                 return handleDraw(event);
             case ERASE:
                 return handleErase(event);
+            case TEXT:
+                return handleText(event);
             case SELECT:
                 return handleSelect(event);
         }
@@ -269,11 +283,13 @@ private boolean firstTime = true;
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                PathDetail closestPath =
+                /*SketchDetail closestDetail =
                         sketch.findNearestPathWithin(sketch.getPathDetails(),
-                                touchPointOnSurvey, DELETE_PATHS_WITHIN_N_PIXELS);
-                if (closestPath != null) {
-                    sketch.getPathDetails().remove(closestPath);
+                                touchPointOnSurvey, DELETE_PATHS_WITHIN_N_PIXELS);*/
+                SketchDetail closestDetail = sketch.findNearestDetailWithin(
+                        touchPointOnSurvey, DELETE_PATHS_WITHIN_N_PIXELS);
+                if (closestDetail != null) {
+                    sketch.deleteDetail(closestDetail);
                     invalidate();
                 }
             case MotionEvent.ACTION_MOVE:
@@ -285,6 +301,39 @@ private boolean firstTime = true;
         }
 
         return true;
+    }
+
+
+    private boolean handleText(MotionEvent event) {
+
+        final Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
+        final Coord2D touchPointOnSurvey = viewCoordsToSurveyCoords(touchPointOnView);
+
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                final EditText input = new EditText(getContext());
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setView(input)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                sketch.addTextDetail(touchPointOnSurvey, input.getText().toString());
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        });
+                AlertDialog dialog = builder.create();
+                dialog.getWindow().setSoftInputMode(
+                        WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+                dialog.show();
+                return true;
+            default:
+                return false;
+        }
     }
 
 
@@ -527,6 +576,13 @@ private boolean firstTime = true;
             translatedPath.transform(matrix);
             drawPaint.setColor(pathDetail.getColour());
             canvas.drawPath(translatedPath, drawPaint);
+        }
+
+        for (TextDetail textDetail : sketch.getTextDetails()) {
+            Coord2D location = surveyCoordsToViewCoords(textDetail.getLocation());
+            String text = textDetail.getText();
+            labelPaint.setColor(textDetail.getColour());
+            canvas.drawText(text, (float)location.getX(), (float)location.getY(), labelPaint);
         }
 
     }

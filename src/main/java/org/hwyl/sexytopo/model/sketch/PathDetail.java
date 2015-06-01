@@ -10,21 +10,19 @@ import java.util.List;
 /**
 * Created by rls on 15/02/15.
 */
-public class PathDetail {
+public class PathDetail extends SketchDetail {
 
     private final List<Coord2D> path;
-    private final int colour;
 
     public PathDetail(Coord2D start, int colour) {
+        super(colour);
         this.path = new ArrayList<>();
         path.add(start);
-        this.colour = colour;
     }
 
     public PathDetail(List<Coord2D> paths, int colour) {
+        super(colour);
         this.path = paths;
-        this.colour = colour;
-
     }
 
     public void lineTo(Coord2D point) {
@@ -48,9 +46,5 @@ public class PathDetail {
             }
         }
         return androidPath;
-    }
-
-    public int getColour() {
-        return colour;
     }
 }
