@@ -34,7 +34,7 @@
     <string name="title_activity_device">DistoX</string>
     <string name="menu_set_active_station">Set Active Station</string>
     <string name="menu_edit_leg">Edit Leg</string>
-    <string name="menu_delete_row">Delete to End of Branch</string>
+    <string name="menu_delete_row">Delete Row</string>
     <string name="sketch_menu_delete_last_leg">Undo Last Reading</string>
     <string name="sketch_menu_centre_view">Go to Active</string>
     <string name="sketch_menu_show_grid">Graph Paper</string>
@@ -87,4 +87,7 @@
     <string name="manual_edit_distance">Distance (m)</string>
     <string name="manual_edit_declination">Declination (&#176;)</string>
     <string name="manual_edit_inclination">Inclination (&#176;)</string>
+    <string name="delete_question">Delete?</string>
+    <string name="no_data">No Data</string>
+    <string name="delete_row_question">Delete Row?</string>
 </resources>

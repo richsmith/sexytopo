@@ -34,7 +34,7 @@ import org.hwyl.sexytopo.model.sketch.TextDetail;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
-import org.hwyl.sexytopo.util.Space2DUtils;
+import org.hwyl.sexytopo.control.util.Space2DUtils;
 
 import java.util.Map;
 

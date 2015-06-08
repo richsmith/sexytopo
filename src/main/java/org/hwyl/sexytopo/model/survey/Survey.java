@@ -1,6 +1,7 @@
 package org.hwyl.sexytopo.model.survey;
 
 import org.hwyl.sexytopo.control.util.StationNamer;
+import org.hwyl.sexytopo.control.util.SurveyTools;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 
 import java.util.ArrayList;
@@ -43,11 +44,7 @@ public class Survey {
     }
 
     public Station getActiveStation() {
-        if (activeStation == null) {
-            return origin;
-        } else {
-            return activeStation;
-        }
+        return activeStation;
     }
 
     public void setPlanSketch(Sketch planSketch) {
@@ -71,43 +68,82 @@ public class Survey {
     }
 
     public List<Station> getAllStations() {
-        return getConnectedStations(origin);
+        return getAllStations(origin);
     }
 
     public List<Leg> getAllLegs() {
-        return getConnectedLegs(origin);
+        return getAllLegs(origin);
     }
 
-    public List<Leg> getConnectedLegs(Station root) {
+    public static List<Leg> getAllLegs(Station root) {
         List<Leg> legs = new ArrayList<>();
         legs.addAll(root.getOnwardLegs());
         for (Leg leg : root.getConnectedOnwardLegs()) {
-            legs.addAll(getConnectedLegs(leg.getDestination()));
+            legs.addAll(getAllLegs(leg.getDestination()));
         }
         return legs;
     }
 
-    private List<Station> getConnectedStations(Station root) {
+    public static List<Station> getAllStations(Station root) {
 
         List<Station> stations = new ArrayList<>();
         stations.add(root);
 
         for (Leg leg : root.getConnectedOnwardLegs()) {
             Station destination = leg.getDestination();
-            stations.addAll(getConnectedStations(destination));
+            stations.addAll(getAllStations(destination));
         }
 
         return stations;
     }
 
 
-    private void fixActiveStation() {
-        activeStation = origin;
+    public void checkActiveStation() {
+        List<Station> stations = getAllStations();
+        if (!stations.contains(activeStation)) {
+            activeStation = findNewActiveStation();
+        }
+    }
+
+    private Station findNewActiveStation() {
+        if (!undoStack.isEmpty()) {
+            return undoStack.peek().station;
+        } else {
+            return origin;
+        }
     }
 
 
     public void addUndoEntry(Station station, Leg leg) {
         undoStack.push(new UndoEntry(station, leg));
+    }
+
+    public void deleteLeg(final Leg toDelete) {
+        SurveyTools.traverse(
+            this,
+            new SurveyTools.SurveyTraversalCallback() {
+                @Override
+                public boolean call(Station origin, Leg leg) {
+                    if (leg == toDelete) {
+                        origin.getOnwardLegs().remove(toDelete);
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            });
+
+        List<Station> stations = getAllStations();
+        List<Leg> legs = getAllLegs();
+        List<UndoEntry> invalidEntries = new ArrayList<>();
+        for (UndoEntry entry : undoStack) {
+            if (!stations.contains(entry.station) || !legs.contains(entry.leg)) {
+                invalidEntries.add(entry);
+            }
+        }
+        undoStack.removeAll(invalidEntries);
+
+        checkActiveStation();
     }
 
 
@@ -116,11 +152,10 @@ public class Survey {
             UndoEntry entry = undoStack.pop();
             entry.station.getOnwardLegs().remove(entry.leg);
             if (entry.leg.hasDestination() && entry.leg.getDestination() == activeStation) {
-                fixActiveStation();
+                checkActiveStation();
             }
         }
     }
-
 
 
     private class UndoEntry {

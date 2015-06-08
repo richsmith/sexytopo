@@ -4,7 +4,7 @@ import android.graphics.Color;
 
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.model.graph.Coord2D;
-import org.hwyl.sexytopo.util.Space2DUtils;
+import org.hwyl.sexytopo.control.util.Space2DUtils;
 
 import java.util.ArrayList;
 import java.util.List;

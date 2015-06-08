@@ -3,6 +3,7 @@ package org.hwyl.sexytopo.control.util;
 import org.hwyl.sexytopo.model.graph.Coord3D;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.util.List;
@@ -39,6 +40,18 @@ public class SurveyStats {
 
     public static int calcNumberStations(Survey survey) {
         return survey.getAllStations().size();
+    }
+
+    public static int calcNumberSubStations(Station origin) {
+        return Survey.getAllStations(origin).size() - 1;
+    }
+
+    public static int calcNumberLegs(Survey survey) {
+        return survey.getAllLegs().size();
+    }
+
+    public static int calcNumberSubLegs(Station origin) {
+        return Survey.getAllLegs(origin).size();
     }
 
     public static double calcHeightRange(Survey survey) {

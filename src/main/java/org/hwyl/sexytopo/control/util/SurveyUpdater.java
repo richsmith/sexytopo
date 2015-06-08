@@ -84,6 +84,7 @@ public class SurveyUpdater {
         }
     }
 
+
     public static void editLeg(Survey survey, final Leg toEdit, final Leg edited) {
         SurveyTools.traverse(
                 survey,
@@ -99,6 +100,11 @@ public class SurveyUpdater {
                         }
                     }
                 });
+    }
+
+
+    public static void deleteLeg(Survey survey, final Leg toDelete) {
+        survey.deleteLeg(toDelete);
     }
 
 

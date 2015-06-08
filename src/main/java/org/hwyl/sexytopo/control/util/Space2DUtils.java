@@ -1,4 +1,4 @@
-package org.hwyl.sexytopo.util;
+package org.hwyl.sexytopo.control.util;
 
 import org.hwyl.sexytopo.model.graph.Coord2D;
 

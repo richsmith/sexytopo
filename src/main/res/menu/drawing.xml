@@ -7,11 +7,6 @@
     <item
         android:id="@+id/buttonCentreView"
         android:title="@string/sketch_menu_centre_view"/>
-    <item
-        android:id="@+id/buttonText"
-        android:title="Text"
-        android:visible="false"
-        android:icon="@drawable/text"/>
     <item android:id="@+id/buttonShowGrid"
         android:title="@string/sketch_menu_show_grid"
         android:icon="@android:drawable/ic_menu_preferences"
