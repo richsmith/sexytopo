@@ -81,4 +81,10 @@
     <string name="log">Log</string>
     <string name="clear_log">Clear</string>
     <string name="error_prefix">Error:</string>
+    <string name="manual_add_station_title">Add Station</string>
+    <string name="manual_add_splay_title">Add Splay</string>
+    <string name="manual_edit_leg_title">Edit Leg</string>
+    <string name="manual_edit_distance">Distance (m)</string>
+    <string name="manual_edit_declination">Declination (&#176;)</string>
+    <string name="manual_edit_inclination">Inclination (&#176;)</string>
 </resources>

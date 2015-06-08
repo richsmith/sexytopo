@@ -326,7 +326,7 @@ public abstract class SexyTopoActivity extends ActionBarActivity {
     }
 
 
-    protected void showSimpleToast(String message) {
+    public void showSimpleToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
     }
 

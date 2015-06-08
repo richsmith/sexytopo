@@ -41,6 +41,23 @@ public class SurveyUpdater {
     }
 
 
+    public static void updateWithNewStation(Survey survey, Leg leg) {
+
+        Station activeStation = survey.getActiveStation();
+
+        if (!leg.hasDestination()) {
+            Station newStation = new Station(StationNamer.generateNextStationName(activeStation));
+            leg = Leg.upgradeSplayToConnectedLeg(leg, newStation);
+        }
+
+
+        // FIXME; could the below be moved into Survey? And from elsewhere in this file?
+        activeStation.getOnwardLegs().add(leg);
+        survey.addUndoEntry(activeStation, leg);
+        survey.setActiveStation(leg.getDestination());
+    }
+
+
     private static void createNewStationIfRequired(Survey survey) {
 
         Station activeStation = survey.getActiveStation();
@@ -65,6 +82,23 @@ public class SurveyUpdater {
                 survey.setActiveStation(newStation);
             }
         }
+    }
+
+    public static void editLeg(Survey survey, final Leg toEdit, final Leg edited) {
+        SurveyTools.traverse(
+                survey,
+                new SurveyTools.SurveyTraversalCallback() {
+                    @Override
+                    public boolean call(Station origin, Leg leg) {
+                        if (leg == toEdit) {
+                            origin.getOnwardLegs().remove(toEdit);
+                            origin.getOnwardLegs().add(edited);
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                });
     }
 
 

@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.control.table.ManualEntry;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -88,7 +89,7 @@ public class TableActivity extends SexyTopoActivity
 
 
 
-    private void syncTableWithSurvey() {
+    public void syncTableWithSurvey() {
 
         Survey survey = getSurvey();
 
@@ -276,6 +277,10 @@ public class TableActivity extends SexyTopoActivity
                 Station station = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
                 getSurvey().setActiveStation(station);
                 return true;
+            case R.id.editLeg:
+                Leg toEdit = surveyEntry.getLeg();
+                ManualEntry.editLeg(this, getSurvey(), toEdit);
+                return true;
             case R.id.deleteToEndOfBranch:
                 new AlertDialog.Builder(this)
                     //.setIcon(android.R.drawable.ic_dialog_alert)
@@ -300,5 +305,16 @@ public class TableActivity extends SexyTopoActivity
         }
 
     }
+
+
+    public void manuallyAddStation(View view) {
+        ManualEntry.addStation(this, getSurvey());
+    }
+
+
+    public void manuallyAddSplay(View view) {
+        ManualEntry.addSplay(this, getSurvey());
+    }
+
 
 }
