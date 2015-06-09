@@ -222,5 +222,10 @@ public class TableActivity extends SexyTopoActivity
         ManualEntry.addSplay(this, getSurvey());
     }
 
+    public void deleteLastLeg(View view) {
+        getSurvey().undoLeg();
+        syncTableWithSurvey();
+    }
+
 
 }
