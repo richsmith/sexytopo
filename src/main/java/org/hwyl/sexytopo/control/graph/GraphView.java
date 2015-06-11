@@ -107,21 +107,40 @@ private boolean firstTime = true;
 
     public enum BrushColour {
 
-        BLACK(Color.BLACK),
-        BROWN(SKETCH_BROWN),
-        ORANGE(SKETCH_ORANGE),
-        GREEN(SKETCH_GREEN),
-        BLUE(Color.BLUE),
-        PURPLE(Color.MAGENTA);
+        BLACK(R.id.buttonBlack, Color.BLACK),
+        BROWN(R.id.buttonBrown, SKETCH_BROWN),
+        ORANGE(R.id.buttonOrange, SKETCH_ORANGE),
+        GREEN(R.id.buttonGreen, SKETCH_GREEN),
+        BLUE(R.id.buttonBlue, Color.BLUE),
+        PURPLE(R.id.buttonPurple, Color.MAGENTA);
 
+        private final int id;
         private final int colour;
-        private BrushColour(int colour) {
+        private BrushColour(int id, int colour) {
+            this.id = id;
             this.colour = colour;
+        }
+
+        public int getId() {
+            return id;
         }
     }
 
     public enum SketchTool {
-        MOVE, DRAW, ERASE, TEXT, SELECT
+        MOVE(R.id.buttonMove),
+        DRAW(R.id.buttonDraw),
+        ERASE(R.id.buttonErase),
+        TEXT(R.id.buttonText),
+        SELECT(R.id.buttonSelect);
+
+        private int id;
+        private SketchTool(int id) {
+            this.id = id;
+        }
+
+        public int getId() {
+            return id;
+        }
     }
     public SketchTool currentSketchTool = SketchTool.MOVE;
 
