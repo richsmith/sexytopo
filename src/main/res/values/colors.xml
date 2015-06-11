@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <color name="panelBackground">#FFFFFF</color>
+    <color name="panelBackground">#7FAF7F</color>
+    <color name="headerBackground">#7FAF7F</color>
 
     <color name="sketchBlack">#000000</color>
     <color name="sketchBlue">#0000FF</color>
