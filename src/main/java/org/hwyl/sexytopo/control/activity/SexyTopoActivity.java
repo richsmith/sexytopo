@@ -153,7 +153,7 @@ public abstract class SexyTopoActivity extends ActionBarActivity {
         try {
             Survey survey = getSurvey();
             String content = TherionExporter.export(survey);
-            String filename = Util.getPathForSurveyFile(survey.getName(), "th");
+            String filename = Util.getPathForSurveyFile(survey.getName(), "txt");
             Saver.saveFile(this, filename, content);
         } catch(IOException e) {
             Log.d(SexyTopo.TAG, "Error exporting survey: " + e);
