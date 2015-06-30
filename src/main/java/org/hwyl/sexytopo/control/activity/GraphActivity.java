@@ -63,6 +63,7 @@ public abstract class GraphActivity extends SexyTopoActivity
 
 
     public enum DisplayPreference {
+        SNAP_TO_LINES(R.id.buttonSnapToLines, true),
         SHOW_GRID(R.id.buttonShowGrid, true),
         SHOW_SPLAYS(R.id.buttonShowSplays, true),
         SHOW_STATION_LABELS(R.id.buttonShowStationLabels, true);
@@ -149,7 +150,9 @@ public abstract class GraphActivity extends SexyTopoActivity
         int id = item.getItemId();
 
         switch(id) {
-
+            case R.id.buttonSnapToLines:
+                setDisplayPreference(DisplayPreference.SNAP_TO_LINES, !item.isChecked());
+                return true;
             case R.id.buttonShowGrid:
                 setDisplayPreference(DisplayPreference.SHOW_GRID, !item.isChecked());
                 graphView.invalidate();

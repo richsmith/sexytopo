@@ -23,6 +23,7 @@ import android.widget.PopupWindow;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.activity.GraphActivity;
+import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.control.util.SpaceFlipper;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
@@ -34,7 +35,6 @@ import org.hwyl.sexytopo.model.sketch.TextDetail;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
-import org.hwyl.sexytopo.control.util.Space2DUtils;
 
 import java.util.Map;
 
@@ -116,7 +116,7 @@ private boolean firstTime = true;
 
         private final int id;
         private final int colour;
-        private BrushColour(int id, int colour) {
+        BrushColour(int id, int colour) {
             this.id = id;
             this.colour = colour;
         }
@@ -134,7 +134,7 @@ private boolean firstTime = true;
         SELECT(R.id.buttonSelect);
 
         private int id;
-        private SketchTool(int id) {
+        SketchTool(int id) {
             this.id = id;
         }
 
@@ -247,7 +247,7 @@ private boolean firstTime = true;
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 actionDownPointOnView = touchPointOnView;
-                Coord2D start = surveyCoords;
+                Coord2D start = findStartOfSketchLine(surveyCoords);
                 PathDetail newPath = sketch.startNewPath(start);
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -266,6 +266,18 @@ private boolean firstTime = true;
         }
 
          return true;
+    }
+
+    
+    private Coord2D findStartOfSketchLine(Coord2D pointTouched) {
+
+        Coord2D startOfSketchLine = pointTouched;
+        double DELTA_FOR_SNAP_TO_LINE_PX = 10.0;
+        double deltaInMetres = surveyToViewScale * DELTA_FOR_SNAP_TO_LINE_PX;
+        if (getDisplayPreference(GraphActivity.DisplayPreference.SNAP_TO_LINES)) {
+            PathDetail pathDetail = sketch.findNearestPathWithin(pointTouched, deltaInMetres);
+        }
+        return pointTouched;
     }
 
 
@@ -487,8 +499,8 @@ private boolean firstTime = true;
 
     }
 
-    private static double roundDown(double value, double factor)
-    {
+    private static double roundDown(double value, double factor) {
+        // FIXME, this is crazy code
         double total = 1;
         for (int i = 0; true; i++) {
 

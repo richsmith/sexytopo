@@ -119,13 +119,12 @@ public class Sketch {
     }
 
 
-    public static PathDetail findNearestPathWithin(List<PathDetail> paths, Coord2D point,
-                                                   double delta) {
+    public PathDetail findNearestPathWithin(Coord2D point, double delta) {
 
         PathDetail closest = null;
         double minDistance = Double.MAX_VALUE;
 
-        for (PathDetail path : paths) {
+        for (PathDetail path : pathDetails) {
             double distance = getClosestDistance(point, path.getPath());
             if (distance < delta && distance < minDistance) {
                 closest = path;

@@ -7,6 +7,10 @@
     <item
         android:id="@+id/buttonCentreView"
         android:title="@string/sketch_menu_centre_view"/>
+    <item android:id="@+id/buttonSnapToLines"
+        android:title="@string/sketch_menu_snap_to_lines"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:checkable="true"/>
     <item android:id="@+id/buttonShowGrid"
         android:title="@string/sketch_menu_show_grid"
         android:icon="@android:drawable/ic_menu_preferences"
