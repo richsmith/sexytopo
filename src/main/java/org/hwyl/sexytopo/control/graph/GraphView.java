@@ -81,7 +81,8 @@ private boolean firstTime = true;
     public static final int GRID_COLOUR = Color.LTGRAY;
 
     public static final double DELETE_PATHS_WITHIN_N_PIXELS = 5.0;
-    public static final double SELECTION_SENSITIVITY_IN_PIXELS = 25;
+    public static final double SELECTION_SENSITIVITY_IN_PIXELS = 25.0;
+    public static final double SNAP_TO_LINE_SENSITIVITY_IN_PIXELS = 25.0;
 
     private static final int SKETCH_BROWN = 0xFFA52A2A;
     private static final int SKETCH_ORANGE = 0xFFFFA500;
@@ -268,18 +269,24 @@ private boolean firstTime = true;
          return true;
     }
 
-    
+
     private Coord2D findStartOfSketchLine(Coord2D pointTouched) {
 
-        Coord2D startOfSketchLine = pointTouched;
-        double DELTA_FOR_SNAP_TO_LINE_PX = 10.0;
-        double deltaInMetres = surveyToViewScale * DELTA_FOR_SNAP_TO_LINE_PX;
-        if (getDisplayPreference(GraphActivity.DisplayPreference.SNAP_TO_LINES)) {
-            PathDetail pathDetail = sketch.findNearestPathWithin(pointTouched, deltaInMetres);
+        if (!getDisplayPreference(GraphActivity.DisplayPreference.SNAP_TO_LINES)) {
+            return pointTouched;
+
+        } else {
+            Coord2D startOfSketchLine = pointTouched;
+            double deltaInMetres = SNAP_TO_LINE_SENSITIVITY_IN_PIXELS / surveyToViewScale;
+
+            Coord2D closestPathEnd = sketch.findNearestPathEndWithin(pointTouched, deltaInMetres);
+            if (closestPathEnd != null) {
+                return closestPathEnd;
+            }
         }
+
         return pointTouched;
     }
-
 
 
     private boolean handleMove(MotionEvent event) {

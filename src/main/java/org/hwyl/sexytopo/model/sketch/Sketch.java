@@ -119,6 +119,27 @@ public class Sketch {
     }
 
 
+    public Coord2D findNearestPathEndWithin(Coord2D point, double delta) {
+
+        Coord2D closest = null;
+        double minDistance = Double.MAX_VALUE;
+
+        for (PathDetail path : pathDetails) {
+
+            Coord2D start = path.getPath().get(0);
+            Coord2D end = path.getPath().get(path.getPath().size() - 1);
+            for (Coord2D coord2D : new Coord2D[]{start, end}) {
+                double distance = Space2DUtils.getDistance(point, coord2D);
+                if (distance < delta && distance < minDistance) {
+                    closest = coord2D;
+                    minDistance = distance;
+                }
+            }
+        }
+        return closest;
+    }
+
+
     public PathDetail findNearestPathWithin(Coord2D point, double delta) {
 
         PathDetail closest = null;
