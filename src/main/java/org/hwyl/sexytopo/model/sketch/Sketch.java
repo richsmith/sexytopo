@@ -119,12 +119,16 @@ public class Sketch {
     }
 
 
-    public Coord2D findNearestPathEndWithin(Coord2D point, double delta) {
+    public Coord2D findEligibleSnapPointWithin(Coord2D point, double delta) {
 
         Coord2D closest = null;
         double minDistance = Double.MAX_VALUE;
 
         for (PathDetail path : pathDetails) {
+
+            if (activePath == path) {
+                continue;
+            }
 
             Coord2D start = path.getPath().get(0);
             Coord2D end = path.getPath().get(path.getPath().size() - 1);
