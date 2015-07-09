@@ -10,7 +10,7 @@ public class TextDetail extends SketchDetail {
     private final Coord2D location;
     private final String text;
 
-    public TextDetail(Coord2D location, String text, int colour) {
+    public TextDetail(Coord2D location, String text, Colour colour) {
         super(colour);
         this.location = location;
         this.text = text;

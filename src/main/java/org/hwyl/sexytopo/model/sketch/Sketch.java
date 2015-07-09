@@ -23,7 +23,7 @@ public class Sketch {
 
     private PathDetail activePath;
 
-    private int activeColour = Color.BLACK;
+    private Colour activeColour = Colour.BLACK;
 
 
     public void setPathDetails(List<PathDetail> pathDetails) {
@@ -75,7 +75,7 @@ public class Sketch {
         return textDetails;
     }
 
-    public void setActiveColour(int colour) {
+    public void setActiveColour(Colour colour) {
         this.activeColour = colour;
     }
 

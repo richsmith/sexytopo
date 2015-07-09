@@ -65,9 +65,9 @@ public class TherionExporter {
         List<String> lines = new ArrayList<>();
 
         for (PathDetail pathDetail : sketch.getPathDetails()) {
-            lines.add("POLYLINE BLACK");
+            lines.add("POLYLINE " + pathDetail.getColour().toString());
             for (Coord2D coords : pathDetail.getPath()) {
-                lines.add(coords.getX() + "\t" + coords.getY());
+                lines.add(coords.getX() + "\t" + -coords.getY());
             }
 
         }
