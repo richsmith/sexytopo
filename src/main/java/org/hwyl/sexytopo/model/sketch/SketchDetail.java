@@ -5,13 +5,13 @@ package org.hwyl.sexytopo.model.sketch;
  */
 public abstract class SketchDetail {
 
-    private final int colour;
+    private final Colour colour;
 
-    protected SketchDetail(int colour) {
+    protected SketchDetail(Colour colour) {
         this.colour = colour;
     }
 
-    public int getColour() {
+    public Colour getColour() {
         return colour;
     }
 }

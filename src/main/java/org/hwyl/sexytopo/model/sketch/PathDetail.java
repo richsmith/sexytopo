@@ -14,13 +14,13 @@ public class PathDetail extends SketchDetail {
 
     private final List<Coord2D> path;
 
-    public PathDetail(Coord2D start, int colour) {
+    public PathDetail(Coord2D start, Colour colour) {
         super(colour);
         this.path = new ArrayList<>();
         path.add(start);
     }
 
-    public PathDetail(List<Coord2D> paths, int colour) {
+    public PathDetail(List<Coord2D> paths, Colour colour) {
         super(colour);
         this.path = paths;
     }

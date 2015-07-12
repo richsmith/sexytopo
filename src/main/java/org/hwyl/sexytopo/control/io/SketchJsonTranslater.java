@@ -2,6 +2,7 @@ package org.hwyl.sexytopo.control.io;
 
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.model.graph.Coord2D;
+import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.TextDetail;
@@ -92,7 +93,7 @@ public class SketchJsonTranslater {
     public static JSONObject toJson(PathDetail pathDetail) throws JSONException {
 
         JSONObject json = new JSONObject();
-        json.put(COLOUR_TAG, pathDetail.getColour());
+        json.put(COLOUR_TAG, pathDetail.getColour().toString());
 
         JSONArray points = new JSONArray();
         for (Coord2D coord : pathDetail.getPath()) {
@@ -106,7 +107,7 @@ public class SketchJsonTranslater {
 
     public static PathDetail toPathDetail(JSONObject json) throws JSONException {
 
-        int colour = json.getInt(COLOUR_TAG);
+        Colour colour = Colour.valueOf(json.getString(COLOUR_TAG));
 
         JSONArray array = json.getJSONArray(POINTS_TAG);
         List<Coord2D> path = new ArrayList<>();
@@ -124,7 +125,7 @@ public class SketchJsonTranslater {
         JSONObject json = new JSONObject();
         json.put(LOCATION_TAG, toJson(textDetail.getLocation()));
         json.put(TEXT_TAG, textDetail.getText());
-        json.put(COLOUR_TAG, textDetail.getColour());
+        json.put(COLOUR_TAG, textDetail.getColour().toString());
 
         return json;
     }
@@ -132,7 +133,7 @@ public class SketchJsonTranslater {
 
     public static TextDetail toTextDetail(JSONObject json) throws JSONException {
 
-        int colour = json.getInt(COLOUR_TAG);
+        Colour colour = Colour.valueOf(json.getString(COLOUR_TAG));
         Coord2D location = toCoord2D(json.getJSONObject(LOCATION_TAG));
         String text = json.getString(TEXT_TAG);
 

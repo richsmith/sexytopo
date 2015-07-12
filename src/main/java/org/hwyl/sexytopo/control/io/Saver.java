@@ -2,6 +2,7 @@ package org.hwyl.sexytopo.control.io;
 
 import android.content.Context;
 
+import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.json.JSONException;
 
@@ -17,20 +18,34 @@ public class Saver {
 
     public static void save(Context context, Survey survey) throws IOException, JSONException {
 
-        Util.ensureDirectoryExists(Util.getDirectoryForSurveyFile(survey.getName()));
+        saveSurveyData(context, survey, "svx");
+        saveSketch(context, survey, survey.getPlanSketch(), "plan", "json");
+        saveSketch(context, survey, survey.getElevationSketch(), "elevation", "json");
 
-        String filename = Util.getPathForSurveyFile(survey.getName(), "svx");
+    }
+
+
+    public static void autosave(Context context, Survey survey) throws IOException, JSONException {
+        saveSurveyData(context, survey, "svx.autosave");
+        saveSketch(context, survey, survey.getPlanSketch(), "plan", "json.autosave");
+        saveSketch(context, survey, survey.getElevationSketch(), "elevation", "json.autosave");
+    }
+
+
+    private static void saveSurveyData(Context context, Survey survey, String extension)
+            throws IOException {
+        String filename = Util.getPathForSurveyFile(survey.getName(), extension);
         String surveyText = SurvexExporter.export(survey);
         saveFile(context, filename, surveyText);
+    }
 
-        String planFilename = Util.getPathForDataFile(survey.getName(), "plan", "json");
-        String planText = SketchJsonTranslater.translate(survey.getPlanSketch());
+
+    private static void saveSketch(Context context, Survey survey, Sketch sketch,
+                                   String type, String extension)
+            throws IOException, JSONException {
+        String planFilename = Util.getPathForDataFile(survey.getName(), type, extension);
+        String planText = SketchJsonTranslater.translate(sketch);
         saveFile(context, planFilename, planText);
-
-        String elevationFilename = Util.getPathForDataFile(survey.getName(), "ext-elevation", "json");
-        String elevationText = SketchJsonTranslater.translate(survey.getElevationSketch());
-        saveFile(context, elevationFilename, elevationText);
-
     }
 
 
@@ -51,9 +66,5 @@ public class Saver {
             stream.close();
         }
     }
-
-
-
-
 
 }

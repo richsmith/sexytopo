@@ -28,6 +28,7 @@ import org.hwyl.sexytopo.control.util.SpaceFlipper;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Space;
+import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchDetail;
@@ -69,7 +70,7 @@ private boolean firstTime = true;
     public static final int LEG_COLOUR = Color.RED;
     public static final int LEG_STROKE_WIDTH = 4;
     public static final int HIGHLIGHT_COLOUR = Color.YELLOW;
-    public static final int DEFAULT_SKETCH_COLOUR = Color.BLACK;
+    public static final Colour DEFAULT_SKETCH_COLOUR = Colour.BLACK;
 
     public static final int STATION_COLOUR = Color.RED;
     public static final int STATION_DIAMETER = 8;
@@ -83,10 +84,6 @@ private boolean firstTime = true;
     public static final double DELETE_PATHS_WITHIN_N_PIXELS = 5.0;
     public static final double SELECTION_SENSITIVITY_IN_PIXELS = 25.0;
     public static final double SNAP_TO_LINE_SENSITIVITY_IN_PIXELS = 25.0;
-
-    private static final int SKETCH_BROWN = 0xFFA52A2A;
-    private static final int SKETCH_ORANGE = 0xFFFFA500;
-    private static final int SKETCH_GREEN = 0xFF00DD00;
 
 
     public static final int STATION_LABEL_OFFSET = 10;
@@ -108,16 +105,16 @@ private boolean firstTime = true;
 
     public enum BrushColour {
 
-        BLACK(R.id.buttonBlack, Color.BLACK),
-        BROWN(R.id.buttonBrown, SKETCH_BROWN),
-        ORANGE(R.id.buttonOrange, SKETCH_ORANGE),
-        GREEN(R.id.buttonGreen, SKETCH_GREEN),
-        BLUE(R.id.buttonBlue, Color.BLUE),
-        PURPLE(R.id.buttonPurple, Color.MAGENTA);
+        BLACK(R.id.buttonBlack, Colour.BLACK),
+        BROWN(R.id.buttonBrown, Colour.BROWN),
+        ORANGE(R.id.buttonOrange, Colour.ORANGE),
+        GREEN(R.id.buttonGreen, Colour.GREEN),
+        BLUE(R.id.buttonBlue, Colour.BLUE),
+        PURPLE(R.id.buttonPurple, Colour.PURPLE);
 
         private final int id;
-        private final int colour;
-        BrushColour(int id, int colour) {
+        private final Colour colour;
+        BrushColour(int id, Colour colour) {
             this.id = id;
             this.colour = colour;
         }
@@ -179,7 +176,7 @@ private boolean firstTime = true;
 
         gridPaint.setColor(GRID_COLOUR);
 
-        drawPaint.setColor(DEFAULT_SKETCH_COLOUR);
+        drawPaint.setColor(DEFAULT_SKETCH_COLOUR.intValue);
         drawPaint.setStrokeWidth(3);
         drawPaint.setStyle(Paint.Style.STROKE);
         drawPaint.setStrokeJoin(Paint.Join.ROUND);
@@ -245,23 +242,39 @@ private boolean firstTime = true;
         Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
         Coord2D surveyCoords = viewCoordsToSurveyCoords(touchPointOnView);
 
+        boolean snapToLines = getDisplayPreference(GraphActivity.DisplayPreference.SNAP_TO_LINES);
+
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 actionDownPointOnView = touchPointOnView;
-                Coord2D start = findStartOfSketchLine(surveyCoords);
-                PathDetail newPath = sketch.startNewPath(start);
+                Coord2D start = surveyCoords;
+                if (snapToLines) {
+                    Coord2D snappedStart = considerSnapToSketchLine(start);
+                    if (snappedStart != null) {
+                        start = snappedStart;
+                    }
+                }
+                sketch.startNewPath(start);
                 break;
+
             case MotionEvent.ACTION_MOVE:
-                PathDetail activePath = sketch.getActivePath();
-                activePath.lineTo(surveyCoords);
+                sketch.getActivePath().lineTo(surveyCoords);
                 invalidate();
                 break;
+
             case MotionEvent.ACTION_UP:
-                if (touchPointOnView.equals(actionDownPointOnView)) {
+                if (touchPointOnView.equals(actionDownPointOnView)) { // handle dots
                     sketch.getActivePath().lineTo(surveyCoords);
-                } // FIXME keep this?
+                } else if (snapToLines) {
+                    Coord2D snappedEnd = considerSnapToSketchLine(surveyCoords);
+                    if (snappedEnd != null) {
+                        sketch.getActivePath().lineTo(snappedEnd);
+                        invalidate();
+                    }
+                }
                 sketch.finishPath();
                 break;
+
             default:
                 return false;
         }
@@ -270,22 +283,16 @@ private boolean firstTime = true;
     }
 
 
-    private Coord2D findStartOfSketchLine(Coord2D pointTouched) {
+    private Coord2D considerSnapToSketchLine(Coord2D pointTouched) {
 
-        if (!getDisplayPreference(GraphActivity.DisplayPreference.SNAP_TO_LINES)) {
-            return pointTouched;
+        double deltaInMetres = SNAP_TO_LINE_SENSITIVITY_IN_PIXELS / surveyToViewScale;
 
+        Coord2D closestPathEnd = sketch.findEligibleSnapPointWithin(pointTouched, deltaInMetres);
+        if (closestPathEnd != null) {
+            return closestPathEnd;
         } else {
-            Coord2D startOfSketchLine = pointTouched;
-            double deltaInMetres = SNAP_TO_LINE_SENSITIVITY_IN_PIXELS / surveyToViewScale;
-
-            Coord2D closestPathEnd = sketch.findNearestPathEndWithin(pointTouched, deltaInMetres);
-            if (closestPathEnd != null) {
-                return closestPathEnd;
-            }
+            return null;
         }
-
-        return pointTouched;
     }
 
 
@@ -612,14 +619,14 @@ private boolean firstTime = true;
         for (PathDetail pathDetail : sketch.getPathDetails()) {
             Path translatedPath = new Path(pathDetail.getAndroidPath());
             translatedPath.transform(matrix);
-            drawPaint.setColor(pathDetail.getColour());
+            drawPaint.setColor(pathDetail.getColour().intValue);
             canvas.drawPath(translatedPath, drawPaint);
         }
 
         for (TextDetail textDetail : sketch.getTextDetails()) {
             Coord2D location = surveyCoordsToViewCoords(textDetail.getLocation());
             String text = textDetail.getText();
-            labelPaint.setColor(textDetail.getColour());
+            labelPaint.setColor(textDetail.getColour().intValue);
             canvas.drawText(text, (float)location.getX(), (float)location.getY(), labelPaint);
         }
 
