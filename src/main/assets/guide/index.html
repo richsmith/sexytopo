@@ -6,23 +6,38 @@
     <h1>SexyTopo Guide</h1>
 
 	<h2>Overview</h2>
-    <p>SexyTopo is an app for surveying caves and underground spaces. It is designed to work with a Disto-X or Disto-X2 measuring tool which the surveyor uses to measure out survey legs. The app communicates with the DistoX wirelessly over Bluetooth and automatically creates a model of the cave from measurements made with the device.</p>
+    <p>SexyTopo is an app for surveying caves and underground spaces. It is designed to work with a Disto-X or Disto-X2 measuring tool which the surveyor uses to measure out survey legs. It is also possible (though significantly less convenient) to use SexyTopo as a tool for manual entry of survey data.</p>
 
     <h2>Setup</h2>
 	<p>SexyTopo runs on Android devices (the newer/more powerful the better). For obvious reasons a water- and dust-proof device is recommended. It is possible to control SexyTopo with finger movements but it is designed for use with a stylus.</p>
-	<p>The Android device needs to have bluetooth communication turned on and be paired with a Disto-X before it can receive readings.
+	<p>The Android device needs to have bluetooth communication turned on and be paired with a Disto-X before it can receive readings. This can be done through the DistoX page (accessible from the Action Bar extended menu, or the menu key on older devices).</p>
+	  <p>The DistoX page lays out the steps needed to connect to the DistoX in order. A small console at the bottom reports status updates as you go though the steps.</p>
+<ol>
+<li>First, you need to turn on Bluetooth connectivity (if it isn't on already).</li>
+<li>The next step is to pair the DistoX with the device running SexyTopo: ensure the DistoX is turned on, and then click "Pair". (Enter "0000" if the device's O/S asks for it). Note that by design you can only pair one DistoX at once (this avoids confusion!) To change the DistoX the device is paired with, click "Unpair", then "Pair".</li>
+<li>With the DistoX paired, click the "Connect" switch to begin communication between the devices. Any readings taken by the device should now show up in the data views, though remember to calibrate the DistoX before using it for serious data collection.</li>
+</ol>
+<p>Messages received from the DistoX, and any errors, will be reported in the console. You don't need to worry about reading the console if everything is working OK.</p>
+
+	<h2>Data Table Screen</h2>
+    <p>This is a tabular view of the collected data. It can be accessed through the first icon on the Action Bar. It is intended that most interaction with SexyTopo should be through the graph screens but it useful to check the raw data occasionally.</p>
+	<p>There are on-screen buttons for manually inputting data. There are separate buttons for adding new stations and splays and another button deletes the last measurement. You can get a context menu to edit existing data by long-pressing on a table cell.</p>
+	<p>The context menu also contains commands for setting the active station (see the XXXXXXXXXXXXXXXXXXXX for more details) or deleting data (note that if you delete a station, any onward legs or stations from that station is also lost).
 
 	<h2>Calibration</h2>
 	<p>The DistoX device needs calibration before it can be used reliably. This is not just a theoretical requirement; without calibration, measurements can be significantly off.</p>
-	<p>However, calibration is not yet implemented in SexyTopo. Calibration will need to be performed using another software package, such as PocketTopo.</p>
+	<p>However, calibration is not yet implemented in SexyTopo. Calibration will need to be performed using another software package, such as PocketTopo on a PDA or Windows laptop.</p>
 
-	<h2>Surveying</h2>
-	<p>Selection of survey points is a skill that is improved with practice.</p>
-	<p>Legs are added to the survey at the <strong>active station</strong>. By default the active station is the newest station added to the survey. In typical use a surveyor will take a number of splays from the active station and then take </p>
-	<p>To create a new station make three repeated readings. If three readings in a row are sufficiently similar, SexyTopo creates a new station.</p>
+	<h2>Surveying with SexyTopo</h2>
+	<p>A full description of surveying is beyond the scope of this document but this is a brief overview of how to survey with SexyTopo.</p>
+	<p>Surveying consists of moving through the cave along a series of locations known as <strong>stations</strong>. These points are connected together through measurements known as <strong>legs</strong> (or <strong>shots</strong> in some countries). This collection of stations and legs make up the skeleton of the survey, or <strong>centreline</strong>. The survey may also contain legs that do not connect to a station but help sketch out the shape of the cave (known as <strong>splays</strong>).
+	<p>Typically, a surveyor will start at a station and take several splays (ideally the job will be split between at least one caver taking the measurements and another piloting SexyTopo). A common method is to use the LRUD mnemonic and do Left, Right, Up and Down splays from the station, but additional splays may be useful in complex parts of the cave. Then the surveyor will look for the next station. You can instruct SexyTopo to create a new station (rather than a splay) by repeating a measurement three times. If the readings are sufficiently close, a new station is added. The surveyor then updates the sketches of the plan and profile on the graph screens, before moving to the new station and repeating the process.</p>
+	<p>Legs are added to the survey at the <strong>active station</strong>. By default the active station is the newest station added to the survey. In the standard order of things (as described above) the active station should automatically be the one you want, but you will want to change it in case of a mistake or to make a branch in the cave. For example, you may have created a new station but forgotten to take splays at the station before. Here you can select the previous station as the active station, take any required splays, then set the new station as the active station.</p>
+<p>Branches are just as easy to add. Select the station you wish to branch off as the active station, and then create a new station as before.</p> 
 
-	<h2>Sketching</h2>
-	<p>The sketch views (plan and extended elevation) can be accessed through buttons on the Action Bar at the top of the screen. These show a projection of the calculated survey on a canvas so that a sketch of the cave can be drawn on top.</p>
+
+	<h2>Graph view: Plan Sketch and Elevation Sketch pages</h2>
+	<p>The sketch views (plan and extended elevation) can be accessed through buttons on the Action Bar at the top of the screen. These show a projection of the calculated survey on a canvas so that a sketch of the cave can be drawn on top. The plan view is an intuitive map of the cave whilst the extended elevation is an "unrolled" view of the vertical layout of the cave that may take some getting used to.</p>
 	<p>Several sketching tools are provided via a toolbar at the bottom of the screen:
 	<ol>
 	  <li><img src="../../res/drawable-hdpi/black.png"><strong>Colours</strong> set the current sketching colour</li>
@@ -31,17 +46,26 @@
 	  <li><img src="file://main/res/drawable-hdpi/black.png"><strong>Move</strong> allows you to drag the survey around to see different parts</li>
 	  <li><img src="file://src/main/res/drawable-hdpi/black.png"><strong>Draw</strong></li>
 	  <li><img src=""><strong>Erase</strong> deletes lines sketched in Draw mode</li>
+	  <li><img src=""><strong>Text</strong> allows you to enter  text at points you choose</li>
+	  <li><img src=""><strong>Select</strong> picks out a station as the active station when you click on it</li>
 	  <li><img src=""><strong>Settings</strong> opens an extended commands menu</li>
-	  <li><img src=""><strong>Undo</strong></li>
-	  <li><img src=""><strong>Redo</strong></li>
+	  <li><img src=""><strong>Undo</strong>Undoes the last sketching command</li>
+	  <li><img src=""><strong>Redo</strong>Cancels the last undo</li>
 	</ol>
 	</p>
 
+	<h2>File Handling</h2>
+	<p>Export to Therion exports a .txt file suitable for importing to Therion. The format of this file follows the structure of the PocketTopo to Therion export format.</p>
+
+	<h2>Tools Menu</h2>
+	<p>The Tools menu option has a couple of useful tools. It provides a shortcut to undo the last measurement recorded and an option to enable back readings. Whilst this option is on any readings that are taken are inverted as if they are being taken from the target back to the origin. This is handy for getting legs from stations that are difficult or unpleasant to take readings from.</p>
+
     <h2>Troubleshooting</h2>
+	<p>In typical caver fashion, you've probably cajoled someone into lending you their shiny DistoX, completely failed to have a practice with it and assumed you'd just wing it. Now you've found yourself in the sharp end of some crappy hole somewhere realising that you have no idea why your surveying kit doesn't work. Luckily you've found SexyTopo has a help file and you're desperately trying to scan through it looking for some hope. First of all, don't panic...</p>
     <h3>Problems talking to the Disto-X</h3>
     <p>Try turning the Disto-X off and back on. Try unpairing and re-pairing, or even turning bluetooth off and on again. It shouldn't make
         a difference but you could kill SexyTopo and reopen it. Check you haven't paired with the
-        wrong Disto (the Unpair dialog shows which Distos are paired).</p>
+        wrong Disto (the Unpair dialog shows which Distos are paired). Check theon-screen console on the DistoX page: it may show an error message or give some clue as to what is wrong.</p>
     <p>If all else fails a factory reset of the Disto-X may be necessary. Press CLEAR, FUNC and MEM (the latter has a floppy disk or save icon) for five seconds.</p>
     <h3>Strange Measurements</h3>
     <p>The Disto-X may need calibrating. See the calibration section above.</p>
