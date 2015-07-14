@@ -7,7 +7,7 @@
     <string name="action_plan">Plan</string>
     <string name="action_elevation">Elevation</string>
     <string name="action_file">File ▶</string>
-    <string name="action_survey">Survey</string>
+    <string name="action_survey">Stats</string>
     <string name="action_settings">Settings</string>
     <string name="action_device">DistoX</string>
     <string name="action_calibration">Calibration</string>
@@ -47,7 +47,7 @@
     <string name="default_survey_name">NewSurvey</string>
     <string name="loading_survey">Loading</string>
     <string name="loading_survey_error">Error Loading Survey</string>
-    <string name="title_activity_survey">Survey</string>
+    <string name="title_activity_survey">Stats</string>
     <string name="field_survey_name">Survey Name</string>
     <string name="dialog_new_survey_title">New Survey</string>
     <string name="dialog_save_as_title">Save As</string>

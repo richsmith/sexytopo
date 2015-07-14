@@ -53,11 +53,7 @@
         </activity>
         <activity
             android:name=".control.activity.GuideActivity"
-            android:label="@string/title_activity_guide"
-            android:parentActivityName=".control.activity.SexyTopoActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.hwyl.sexytopo.control.activity.SexyTopoActivity" />
+            android:label="@string/title_activity_guide">
         </activity>
 
         <service
@@ -68,11 +64,7 @@
 
         <activity
             android:name=".control.activity.CalibrationActivity"
-            android:label="@string/title_activity_calibration"
-            android:parentActivityName=".SexyTopoActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="SexyTopoActivity" />
+            android:label="@string/title_activity_calibration">
         </activity>
 
     </application>
