@@ -36,6 +36,67 @@
         android:id="@+id/buttonGenerateSurvey"
         />
 
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stretchColumns="1">
+        <TableRow>
+            <TextView
+                android:text="@string/stats_length"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:gravity="start"
+                />
+            <TextView
+                android:id="@+id/statsFieldLength"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:gravity="end"/>
+        </TableRow>
+        <TableRow>
+            <TextView
+                android:text="@string/stats_vertical_range"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:gravity="start"
+                />
+            <TextView
+                android:id="@+id/statsFieldDepth"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:gravity="end"/>
+        </TableRow>
+        <TableRow>
+            <TextView
+                android:text="@string/stats_number_stations"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:gravity="start"
+                />
+            <TextView
+                android:id="@+id/statsFieldNumberStations"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:gravity="end"/>
+        </TableRow>
+        <TableRow>
+            <TextView
+                android:text="@string/stats_longest_leg"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:gravity="start"
+                />
+            <TextView
+                android:id="@+id/statsFieldLongestLeg"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:gravity="end"/>
+        </TableRow>
+        <TableRow>
+            <TextView
+                android:text="@string/stats_shortest_leg"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:gravity="start"
+                />
+            <TextView
+                android:id="@+id/statsFieldShortestLeg"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:gravity="end"/>
+        </TableRow>
+    </TableLayout>
+
 
 
 </LinearLayout>

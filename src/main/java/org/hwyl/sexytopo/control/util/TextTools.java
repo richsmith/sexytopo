@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.control.util;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 /**
@@ -23,5 +24,15 @@ public class TextTools {
             sb.append(item);
         }
         return sb.toString();
+    }
+
+    public static String format(Integer number) {
+        DecimalFormat formatter = new DecimalFormat("#,##0");
+        return formatter.format(number);
+    }
+
+    public static String formatTo2dp(Number number) {
+        DecimalFormat formatter = new DecimalFormat("#,##0.00");
+        return formatter.format(number);
     }
 }

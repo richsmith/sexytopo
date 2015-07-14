@@ -9,6 +9,7 @@ import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.io.Saver;
 import org.hwyl.sexytopo.control.util.SurveyStats;
+import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.test.TestSurveyCreator;
 
@@ -63,10 +64,22 @@ public class SurveyActivity extends SexyTopoActivity implements View.OnClickList
     private void updateStats() {
 
         Survey survey = getSurvey();
-        double longestLeg = SurveyStats.calcLongestLeg(survey);
-        int numberOfStations = SurveyStats.calcNumberStations(survey);
         double length = SurveyStats.calcTotalLength(survey);
+        setStatsField(R.id.statsFieldLength, TextTools.formatTo2dp(length));
         double heightRange = SurveyStats.calcHeightRange(survey);
+        setStatsField(R.id.statsFieldDepth, TextTools.formatTo2dp(heightRange));
+        int numberOfStations = SurveyStats.calcNumberStations(survey);
+        setStatsField(R.id.statsFieldNumberStations, TextTools.format(numberOfStations));
+        double shortestLeg = SurveyStats.calcShortestLeg(survey);
+        setStatsField(R.id.statsFieldShortestLeg, TextTools.formatTo2dp(shortestLeg));
+        double longestLeg = SurveyStats.calcLongestLeg(survey);
+        setStatsField(R.id.statsFieldLongestLeg, TextTools.formatTo2dp(longestLeg));
+
+    }
+
+    private void setStatsField(int id, String text) {
+        TextView textView = (TextView)findViewById(id);
+        textView.setText(text);
     }
 
 }
