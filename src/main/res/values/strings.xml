@@ -22,6 +22,7 @@
     <string name="action_tools">Tools ▶</string>
     <string name="action_undo_last_leg">Undo last leg</string>
     <string name="action_do_back_measurements">Back Measurements</string>
+    <string name="action_generate_test_survey">Generate Test Survey</string>
     <string name="loaded">Loaded</string>
     <string name="table_head_from">From</string>
     <string name="table_head_to">To</string>

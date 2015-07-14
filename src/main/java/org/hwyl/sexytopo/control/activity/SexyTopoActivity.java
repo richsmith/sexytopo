@@ -23,6 +23,7 @@ import org.hwyl.sexytopo.control.io.Saver;
 import org.hwyl.sexytopo.control.io.TherionExporter;
 import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.model.survey.Survey;
+import org.hwyl.sexytopo.test.TestSurveyCreator;
 
 import java.io.File;
 import java.io.IOException;
@@ -115,6 +116,9 @@ public abstract class SexyTopoActivity extends ActionBarActivity {
                 return true;
             case R.id.action_back_measurements:
                 setReverseMeasurementsPreference(item);
+                return true;
+            case R.id.action_generate_test_survey:
+                generateTestSurvey();
                 return true;
 
 
@@ -313,6 +317,22 @@ public abstract class SexyTopoActivity extends ActionBarActivity {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean(SexyTopo.REVERSE_MEASUREMENTS_PREFERENCE, item.isChecked());
         editor.commit();
+    }
+
+    private void generateTestSurvey() {
+        new AlertDialog.Builder(this)
+                .setTitle("Generate Test Data")
+                .setMessage("Replace the existing survey with randomly-generated data?")
+                .setCancelable(false)
+                .setPositiveButton("Replace", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Survey currentSurvey = TestSurveyCreator.create(10, 5);
+                        SurveyManager.getInstance(SexyTopoActivity.this).setCurrentSurvey(currentSurvey);
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+
     }
 
 

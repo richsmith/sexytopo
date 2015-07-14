@@ -45,7 +45,8 @@
             <item android:id="@+id/action_back_measurements"
                 android:title="@string/action_do_back_measurements"
                 android:checkable="true"/>
-            <!--android:visible="false"-->
+            <item android:id="@+id/action_generate_test_survey"
+                android:title="@string/action_generate_test_survey" />
         </menu>
     </item>
     <item android:id="@+id/action_survey"
@@ -59,6 +60,7 @@
     <item android:id="@+id/action_calibration"
         android:title="@string/action_calibration"
         android:orderInCategory="100"
+        android:visible="false"
         app:showAsAction="never" />
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"

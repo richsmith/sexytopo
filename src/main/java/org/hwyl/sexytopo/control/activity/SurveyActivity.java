@@ -5,13 +5,9 @@ import android.view.View;
 import android.widget.TextView;
 
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.control.Log;
-import org.hwyl.sexytopo.control.SurveyManager;
-import org.hwyl.sexytopo.control.io.Saver;
 import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.survey.Survey;
-import org.hwyl.sexytopo.test.TestSurveyCreator;
 
 public class SurveyActivity extends SexyTopoActivity implements View.OnClickListener {
 
@@ -21,49 +17,40 @@ public class SurveyActivity extends SexyTopoActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_survey);
 
-        Survey survey = SurveyManager.getInstance(this).getCurrentSurvey();
-        TextView nameField = (TextView)(findViewById(R.id.survey_name));
-        nameField.setText(survey.getName());
-
+        /*
         View saveButton = findViewById(R.id.buttonSaveSurvey);
         saveButton.setOnClickListener(this);
-        View generateButton = findViewById(R.id.buttonGenerateSurvey);
-        generateButton.setOnClickListener(this);
+        */
     }
 
     @Override
     protected void onResume() {
-
         super.onResume();
         updateStats();
-
-
-
     }
 
 
     @Override
     public void onClick(View view) {
-
+        /*
         switch (view.getId()) {
-
-            case R.id.buttonGenerateSurvey:
-                Survey currentSurvey = TestSurveyCreator.create(10, 5);
-                SurveyManager.getInstance(this).setCurrentSurvey(currentSurvey);
-                break;
-            case R.id.buttonSaveSurvey:
+               case R.id.buttonSaveSurvey:
                 try {
                     Saver.save(this, getSurvey());
                 } catch (Exception e) {
                     showSimpleToast("Error saving survey");
                     Log.e("Error saving survey: " + e);
                 }
-        }
+        }*/
     }
 
     private void updateStats() {
 
         Survey survey = getSurvey();
+
+        //TextView nameField = (TextView)(findViewById(R.id.survey_name));
+        //nameField.setText(survey.getName());
+
         double length = SurveyStats.calcTotalLength(survey);
         setStatsField(R.id.statsFieldLength, TextTools.formatTo2dp(length));
         double heightRange = SurveyStats.calcHeightRange(survey);
