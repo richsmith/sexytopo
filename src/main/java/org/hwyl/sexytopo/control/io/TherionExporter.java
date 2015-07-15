@@ -92,19 +92,7 @@ public class TherionExporter {
             Coord2D end = line.getEnd();
             lines.add(start.getX() + "\t" + start.getY() + "\t" + end.getX() + "\t" + end.getY());
         }
-
-        /*
-        for (Map.Entry<Leg, Line<Coord2D>> entry : space.getLegMap().entrySet()) {
-            Leg leg = entry.getKey();
-            if (! leg.hasDestination()) {
-                Line<Coord2D> line = entry.getValue();
-                Coord2D start = line.getStart();
-                Coord2D end = line.getEnd();
-                lines.add(start.getX() + "\t" + start.getY() + "\t" + end.getX() + "\t" + end.getY());
-            }
-        }*/
-
-
+        
         return TextTools.join(lines, "\n");
     }
 
