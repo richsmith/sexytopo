@@ -2,13 +2,17 @@ package org.hwyl.sexytopo.control.io;
 
 import android.content.Context;
 
+import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.json.JSONException;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 /**
  * Created by rls on 03/08/14.
@@ -19,52 +23,47 @@ public class Saver {
     public static void save(Context context, Survey survey) throws IOException, JSONException {
 
         saveSurveyData(context, survey, "svx");
-        saveSketch(context, survey, survey.getPlanSketch(), "plan", "json");
-        saveSketch(context, survey, survey.getElevationSketch(), "elevation", "json");
+        saveSketch(context, survey, survey.getPlanSketch(), SexyTopo.PLAN_SKETCH_EXTENSION);
+        saveSketch(context, survey, survey.getElevationSketch(), SexyTopo.EXT_ELEVATION_SKETCH_EXTENSION);
 
     }
 
 
     public static void autosave(Context context, Survey survey) throws IOException, JSONException {
         saveSurveyData(context, survey, "svx.autosave");
-        saveSketch(context, survey, survey.getPlanSketch(), "plan", "json.autosave");
-        saveSketch(context, survey, survey.getElevationSketch(), "elevation", "json.autosave");
+        saveSketch(context, survey, survey.getPlanSketch(), SexyTopo.PLAN_SKETCH_EXTENSION + ".autosave");
+        saveSketch(context, survey, survey.getElevationSketch(), SexyTopo.EXT_ELEVATION_SKETCH_EXTENSION + ".autosave");
     }
 
 
     private static void saveSurveyData(Context context, Survey survey, String extension)
             throws IOException {
-        String filename = Util.getPathForSurveyFile(survey.getName(), extension);
+        String path = Util.getPathForSurveyFile(survey.getName(), extension);
         String surveyText = SurvexExporter.export(survey);
-        saveFile(context, filename, surveyText);
+        saveFile(context, path, surveyText);
     }
 
 
-    private static void saveSketch(Context context, Survey survey, Sketch sketch,
-                                   String type, String extension)
+    private static void saveSketch(Context context, Survey survey, Sketch sketch, String extension)
             throws IOException, JSONException {
-        String planFilename = Util.getPathForDataFile(survey.getName(), type, extension);
+        String path = Util.getPathForSurveyFile(survey.getName(), extension);
         String planText = SketchJsonTranslater.translate(sketch);
-        saveFile(context, planFilename, planText);
+        saveFile(context, path, planText);
     }
 
 
-    public static void saveFile(Context context, String filename, String contents) throws IOException {
 
-        Util.ensureSurveyDirectoryExists();
-        Util.ensureDirectoriesInPathExist(filename);
+    public static void saveFile(Context context, String path, String contents) throws IOException {
+
+        File filePath = new File(path);
+        String location = filePath.getParentFile().getPath();
+        Util.ensureDirectoriesInPathExist(location);
 
 
-        File surveyFile = new File(filename);
+        Writer writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(path), "utf-8"));
+            writer.write(contents);
 
-
-        FileOutputStream stream = new FileOutputStream(surveyFile);
-
-        try {
-            stream.write(contents.getBytes());
-        } finally {
-            stream.close();
-        }
     }
 
 }

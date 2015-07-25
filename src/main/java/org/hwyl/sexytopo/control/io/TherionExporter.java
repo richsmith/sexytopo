@@ -92,7 +92,7 @@ public class TherionExporter {
             Coord2D end = line.getEnd();
             lines.add(start.getX() + "\t" + start.getY() + "\t" + end.getX() + "\t" + end.getY());
         }
-        
+
         return TextTools.join(lines, "\n");
     }
 

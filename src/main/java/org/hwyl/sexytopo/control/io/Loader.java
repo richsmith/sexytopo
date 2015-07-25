@@ -29,14 +29,14 @@ public class Loader {
         Survey survey = new Survey(name);
         parse(text, survey);
 
-        String planPath = Util.getPathForDataFile(survey.getName(), "plan", "json");
+        String planPath = Util.getPathForSurveyFile(survey.getName(), SexyTopo.PLAN_SKETCH_EXTENSION);
         if (Util.doesFileExist(planPath)) {
             String planText = slurpFile(planPath);
             Sketch plan = SketchJsonTranslater.translate(planText);
             survey.setPlanSketch(plan);
         }
 
-        String elevationPath = Util.getPathForDataFile(survey.getName(), "ext-elevation", "json");
+        String elevationPath = Util.getPathForSurveyFile(survey.getName(), SexyTopo.EXT_ELEVATION_SKETCH_EXTENSION);
         if (Util.doesFileExist(elevationPath)) {
             String elevationText = slurpFile(elevationPath);
             Sketch elevation = SketchJsonTranslater.translate(elevationText);

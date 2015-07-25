@@ -97,4 +97,5 @@
     <string name="stats_number_stations">Number of Stations</string>
     <string name="stats_longest_leg">Longest Leg (m)</string>
     <string name="stats_shortest_leg">Shortest Leg (m)</string>
+    <string name="pref_station_symbol">Station symbol</string>
 </resources>

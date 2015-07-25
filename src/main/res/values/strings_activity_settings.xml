@@ -47,6 +47,12 @@
         <item>-1</item>
     </string-array>
 
+    <string name="pref_title_station_symbol">Station symbol</string>
+    <string-array name="pref_station_symbol">
+        <item>Disc</item>
+        <item>Cross</item>
+    </string-array>
+
     <string name="pref_title_system_sync_settings">System sync settings</string>
 
     <!-- Example settings for Notifications -->

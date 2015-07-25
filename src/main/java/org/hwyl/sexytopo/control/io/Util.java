@@ -11,24 +11,34 @@ import java.util.Set;
  */
 public class Util {
 
+
     public static void ensureSurveyDirectoryExists() {
-        File surveyDirectory = new File(SexyTopo.SURVEY_PATH);
-        if (! surveyDirectory.exists()) {
+        ensureDirectoryExists(SexyTopo.EXTERNAL_SURVEY_DIR);
+    }
+
+
+    public static void ensureDirectoriesInPathExist(String path) {
+
+        new File(path).mkdirs();
+    }
+
+
+    private static void ensureDirectoryExists(String path) {
+        File surveyDirectory = new File(path);
+        if (!surveyDirectory.exists()) {
             surveyDirectory.mkdirs();
         }
     }
 
-    public static void ensureDirectoriesInPathExist(String path) {
-        String[] dirs = path.split(File.separator);
-    }
 
     public static File[] getSurveyDirectories() {
         ensureSurveyDirectoryExists();
-        File surveyDirectory = new File(SexyTopo.SURVEY_PATH);
+        File surveyDirectory = new File(SexyTopo.EXTERNAL_SURVEY_DIR);
         File surveyDirectories[] = surveyDirectory.listFiles();
         return surveyDirectories;
     }
-    
+
+
     public static String getNextDefaultSurveyName(String defaultName) {
 
         Set<String> existingSurveyNames = getExistingSurveyNames();
@@ -38,8 +48,8 @@ public class Util {
         }
 
         for (int i = 0; i < existingSurveyNames.size(); i++) {
-            String name = defaultName + (i == 0? "" : ("-" + (i + 1)));
-            if (! existingSurveyNames.contains(name)) {
+            String name = defaultName + (i == 0 ? "" : ("-" + (i + 1)));
+            if (!existingSurveyNames.contains(name)) {
                 return name;
             }
         }
@@ -50,6 +60,7 @@ public class Util {
 
     }
 
+
     private static Set<String> getExistingSurveyNames() {
         File[] surveyDirectories = getSurveyDirectories();
         Set<String> existingSurveyNames = new HashSet<String>();
@@ -59,26 +70,20 @@ public class Util {
         return existingSurveyNames;
     }
 
-    public static void ensureDirectoryExists(String path) {
-        new File(path).mkdirs();
-    }
 
     public static String getDirectoryForSurveyFile(String name) {
-        return SexyTopo.SURVEY_PATH + File.separatorChar + name;
-    }
-
-    public static void deleteSurvey(String name) {
-        String path = getDirectoryForSurveyFile(name);
-        File surveyDirectory = new File(path);
-        surveyDirectory.delete();
+        return SexyTopo.EXTERNAL_SURVEY_DIR + File.separator + name;
     }
 
     public static String getPathForSurveyFile(String name, String extension) {
-        return getDirectoryForSurveyFile(name) + File.separatorChar + name + "." + extension;
+        String directory = getDirectoryForSurveyFile(name);
+        return directory + File.separator + name + "." + extension;
     }
 
-    public static String getPathForDataFile(String surveyName, String name, String extension) {
-        return getDirectoryForSurveyFile(surveyName) + File.separatorChar + name + "." + extension;
+
+    public static void deleteSurvey(String name) throws Exception {
+        String surveyDirectory = getDirectoryForSurveyFile(name);
+        new File(surveyDirectory).delete();
     }
 
 
@@ -87,8 +92,4 @@ public class Util {
         return filename.exists();
     }
 
-    public boolean doesSurveyNeedSaving() {
-        // FIXME
-        return true;
-    }
 }

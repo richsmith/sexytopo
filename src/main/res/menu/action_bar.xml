@@ -64,7 +64,7 @@
         app:showAsAction="never" />
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
-        android:visible="false"
+        android:visible="true"
         android:orderInCategory="100"
         app:showAsAction="never" />
     <item android:id="@+id/action_help"

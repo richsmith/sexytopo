@@ -12,6 +12,20 @@ public class TextTools {
         return n + " " + ((n == 1)? noun : noun + "s");
     }
 
+    public static String join(String joiner, Object ... list) {
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for (Object item : list) {
+            if (first) {
+                first = false;
+            } else {
+                sb.append(joiner);
+            }
+            sb.append(item.toString());
+        }
+        return sb.toString();
+    }
+
     public static String join(List<String> list, String joiner) {
         StringBuilder sb = new StringBuilder();
         boolean first = true;
