@@ -2,6 +2,7 @@ package org.hwyl.sexytopo.control.io;
 
 import android.content.Context;
 
+import org.apache.commons.io.FileUtils;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -10,8 +11,11 @@ import org.json.JSONException;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.io.Writer;
 
 /**
@@ -60,9 +64,7 @@ public class Saver {
         Util.ensureDirectoriesInPathExist(location);
 
 
-        Writer writer = new BufferedWriter(new OutputStreamWriter(
-                new FileOutputStream(path), "utf-8"));
-            writer.write(contents);
+        FileUtils.writeStringToFile(filePath, contents);
 
     }
 

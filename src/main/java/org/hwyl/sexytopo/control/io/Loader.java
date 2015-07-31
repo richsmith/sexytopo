@@ -26,6 +26,10 @@ public class Loader {
         String path = Util.getPathForSurveyFile(name, "svx");
         String text = slurpFile(path);
 
+        if (text.length() == 0) {
+            throw new IllegalArgumentException("Empty save file");
+        }
+
         Survey survey = new Survey(name);
         parse(text, survey);
 
@@ -61,7 +65,7 @@ public class Loader {
                 text.append('\n');
             }
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             Log.d(SexyTopo.TAG, "Error trying to read " + filename + ": " + e.getMessage());
         }
         return text.toString();
