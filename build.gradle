@@ -5,7 +5,7 @@ android {
     buildToolsVersion '20.0.0'
 
     defaultConfig {
-        minSdkVersion 14
+        minSdkVersion 18
         targetSdkVersion 21
         versionCode 4
         versionName "1.0.3"
@@ -22,8 +22,17 @@ android {
     }
 }
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:support-v4:21.0.2'
     compile 'com.android.support:appcompat-v7:21.0.2'
+    compile group: 'com.google.guava', name: 'guava', version: '18.0'
+    compile 'commons-io:commons-io:2.4'
+
+
 }
+
