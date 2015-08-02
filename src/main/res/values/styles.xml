@@ -1,10 +1,16 @@
-<resources>
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Base application theme.-->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
 
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light">
+        <item name="actionBarStyle">@style/ActionBarHack</item>
     </style>
+
+    <style name="ActionBarHack" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+        <item name="background">@color/panelBackground</item>
+    </style>
+
 
     <style name="HeaderRow">
         <item name="android:background">#7FAF7F</item>
