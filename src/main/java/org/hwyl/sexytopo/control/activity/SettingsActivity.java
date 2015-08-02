@@ -1,11 +1,12 @@
 package org.hwyl.sexytopo.control.activity;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 
 import org.hwyl.sexytopo.R;
 
-public class SettingsActivity extends SexyTopoActivity {
+public class SettingsActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

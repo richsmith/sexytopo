@@ -121,6 +121,7 @@ public abstract class GraphActivity extends SexyTopoActivity
     @Override
     protected void onResume() {
         super.onResume();
+        graphView.initialise();
         syncGraphWithSurvey();
         initialiseSketchTool();
         initialiseBrushColour();

@@ -23,6 +23,7 @@ import android.widget.PopupWindow;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.activity.GraphActivity;
+import org.hwyl.sexytopo.control.util.PreferenceAccess;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.control.util.SpaceFlipper;
 import org.hwyl.sexytopo.model.graph.Coord2D;
@@ -68,12 +69,15 @@ private boolean firstTime = true;
 
 
     public static final int LEG_COLOUR = Color.RED;
-    public static final int LEG_STROKE_WIDTH = 4;
+    public static final int LEG_STROKE_WIDTH = 2;
     public static final int HIGHLIGHT_COLOUR = Color.YELLOW;
     public static final Colour DEFAULT_SKETCH_COLOUR = Colour.BLACK;
 
     public static final int STATION_COLOUR = Color.RED;
     public static final int STATION_DIAMETER = 8;
+    public static final int CROSS_DIAMETER = 16;
+    public static final int STATION_STROKE_WIDTH = 3;
+
     public static final int HIGHLIGHT_DIAMETER = 12;
     public static final int STATION_LABEL_SIZE = 20;
 
@@ -161,9 +165,13 @@ private boolean firstTime = true;
         initialise();
     }
 
-    private void initialise() {
+    public void initialise() {
+
+
+
 
         stationPaint.setColor(STATION_COLOUR);
+        stationPaint.setStrokeWidth(STATION_STROKE_WIDTH);
         stationPaint.setTextSize(STATION_LABEL_SIZE);
 
         //highlightPaint.setStyle(Paint.Style.STROKE);
@@ -171,7 +179,8 @@ private boolean firstTime = true;
         highlightPaint.setColor(HIGHLIGHT_COLOUR);
 
         legPaint.setARGB(127, 255, 0, 0);
-        legPaint.setStrokeWidth(LEG_STROKE_WIDTH);
+        int legStrokeWidth = PreferenceAccess.getInt(getContext(), "pref_leg_width", 3);
+        legPaint.setStrokeWidth(legStrokeWidth);
         legPaint.setColor(LEG_COLOUR);
 
         gridPaint.setColor(GRID_COLOUR);
@@ -183,6 +192,7 @@ private boolean firstTime = true;
         drawPaint.setStrokeCap(Paint.Cap.ROUND);
 
         labelPaint.setColor(STATION_COLOUR);
+        int textSize = PreferenceAccess.getInt(getContext(), "pref_station_label_font_size", 3);
         labelPaint.setTextSize(LABEL_SIZE);
     }
 
@@ -571,11 +581,9 @@ private boolean firstTime = true;
             int y = (int)(translatedStation.getY());
 
             if (station == survey.getActiveStation()) {
-                canvas.drawCircle(x, y,
-                        STATION_DIAMETER, highlightPaint);
+                drawStation(canvas, x, y, highlightPaint);
             } else {
-                canvas.drawCircle(x, y,
-                        STATION_DIAMETER, stationPaint);
+                drawStation(canvas, x, y, stationPaint);
             }
 
             if (getDisplayPreference(GraphActivity.DisplayPreference.SHOW_STATION_LABELS)) {
@@ -586,6 +594,18 @@ private boolean firstTime = true;
             }
 
         }
+    }
+
+    private void drawStation(Canvas canvas, float x, float y, Paint paint) {
+        /*getContext().getSharedPreferences();
+        if (get)
+        canvas.drawCircle(x, y, STATION_DIAMETER, paint);*/
+
+        int crossDiameter =
+                PreferenceAccess.getInt(this.getContext(), "pref_station_diameter", CROSS_DIAMETER);
+
+        canvas.drawLine(x , y - crossDiameter / 2, x, y + crossDiameter / 2, paint);
+        canvas.drawLine(x - crossDiameter / 2, y, x + crossDiameter / 2, y, paint);
     }
 
 

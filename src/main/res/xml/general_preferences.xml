@@ -3,35 +3,55 @@
 
     <PreferenceCategory
         android:title="Sketch Display"
-        android:key="pref_key_storage_settings">
-        <CheckBoxPreference
+        android:key="pref_sketch_display">
+        <!--<CheckBoxPreference
             android:key="pref_key_auto_delete"
             android:summary="foo 2"
             android:title="foo 3"
-            android:defaultValue="false"/>
-        <Preference
-            android:key="pref_key_sms_delete_limit"
-            android:summary="foo 4"
+            android:defaultValue="false"/>-->
+        <EditTextPreference
+            android:key="pref_leg_width"
+            android:inputType="number"
+            android:numeric="integer"
+            android:defaultValue="3"
+            android:summary="How wide to draw legs"
             android:title="Sketch line thickness"/>
+        <EditTextPreference
+            android:key="pref_station_diameter"
+            android:inputType="number"
+            android:numeric="integer"
+            android:defaultValue="16"
+            android:summary="How big to draw station symbols"
+            android:title="Station Diameter"/>
+        <EditTextPreference
+            android:key="pref_station_label_font_size"
+            android:inputType="number"
+            android:numeric="integer"
+            android:defaultValue="22"
+            android:summary="Font size of station labels"
+            android:title="Station Label Size"/>
+        <!--
         <ListPreference
             android:key="pref_station_symbol"
             android:title="@string/pref_station_symbol"
             android:dialogTitle="@string/pref_station_symbol"
             android:entries="@array/pref_station_labels"
             android:entryValues="@array/pref_station_labels"
-            android:defaultValue="@string/pref_station_symbol" />
+            android:defaultValue="@string/pref_station_symbol" />-->
 
     </PreferenceCategory>
 
-
+<!--
 <PreferenceCategory
-    android:title="foo 1"
-    android:key="pref_key_storage_settings">
-    <CheckBoxPreference
-        android:key="pref_key_auto_delete"
-        android:summary="foo 2"
-        android:title="foo 3"
-        android:defaultValue="false"/>
+    android:title="DistoX Communication"
+    android:key="pref_distox_communication">
+    <EditTextPreference
+        android:key="pref_distox_inter_packet_delay"
+        android:inputType="number"
+        android:numeric="integer"
+        android:defaultValue="22"
+        android:summary="Font size of station labels"
+        android:title="Station Label Size"/>
     <Preference
         android:key="pref_key_sms_delete_limit"
         android:dependency="pref_key_auto_delete"
@@ -42,5 +62,5 @@
         android:dependency="pref_key_auto_delete"
         android:summary="foo 6"
         android:title="foo 7" />
-</PreferenceCategory>
+</PreferenceCategory>-->
 </PreferenceScreen>
