@@ -11,7 +11,6 @@
         <item name="background">@color/panelBackground</item>
     </style>
 
-
     <style name="HeaderRow">
         <item name="android:background">#7FAF7F</item>
         <item name="android:layout_width">wrap_content</item>

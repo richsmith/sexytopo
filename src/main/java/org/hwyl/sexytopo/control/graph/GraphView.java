@@ -404,14 +404,22 @@ private boolean firstTime = true;
                 double selectionTolerance =
                         SELECTION_SENSITIVITY_IN_PIXELS / surveyToViewScale;
 
-                selectedStation = findNearestStationWithinDelta(projection,
+                Station newSelectedStation = findNearestStationWithinDelta(projection,
                         touchPointOnSurvey, selectionTolerance);
+                /*
 
                 if (selectedStation == null) {
                     return true;
                 } else if (true) {
                     // forget the pop-up menu for now... just select what we're pointing at
                     survey.setActiveStation(selectedStation);
+                    invalidate();
+                    return true;
+                }*/
+
+
+                if (selectedStation != newSelectedStation) {
+                    survey.setActiveStation(newSelectedStation);
                     invalidate();
                     return true;
                 }
