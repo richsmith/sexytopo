@@ -118,7 +118,27 @@ public class Survey {
         undoStack.push(new UndoEntry(station, leg));
     }
 
-    public void deleteLeg(final Leg toDelete) {
+
+    public void deleteStation(final Station toDelete) {
+        if (toDelete == getOrigin()) {
+            return;
+        }
+
+        SurveyTools.traverse(this, new SurveyTools.SurveyTraversalCallback() {
+            @Override
+            public boolean call(Station origin, Leg leg) {
+                if (leg.hasDestination() && leg.getDestination() == toDelete) {
+                    origin.getOnwardLegs().remove(leg);
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        });
+    }
+
+
+    public void undoLeg(final Leg toDelete) {
         SurveyTools.traverse(
             this,
             new SurveyTools.SurveyTraversalCallback() {

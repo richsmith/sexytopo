@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:layout_margin="0px">
+
+
+    <Button
+        android:id="@+id/graph_station_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/panelBackground"
+        android:text="Station"
+        android:padding="10dp" />
+
+    <Button
+        android:id="@+id/graph_station_delete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/abc_cab_background_internal_bg"
+        android:text="Delete"
+        android:padding="10dp"/>
+
+    <!--
+    <Button
+        android:id="@+id/graph_station_switchback"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/abc_cab_background_internal_bg"
+        android:text="Switchback" />-->
+
+    <Button
+        android:id="@+id/graph_station_reverse"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/abc_cab_background_internal_bg"
+        android:text="Reverse"
+        android:padding="10dp"/>
+    <!--<Button
+        android:id="@+id/button4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/abc_item_background_holo_light"
+        android:text="Set Entrance" />-->
+
+
+</LinearLayout>

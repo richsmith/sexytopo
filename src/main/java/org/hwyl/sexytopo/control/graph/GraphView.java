@@ -11,21 +11,25 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewParent;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.PopupWindow;
 
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.GraphActivity;
 import org.hwyl.sexytopo.control.util.PreferenceAccess;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.control.util.SpaceFlipper;
+import org.hwyl.sexytopo.control.util.SurveyStats;
+import org.hwyl.sexytopo.control.util.SurveyUpdater;
+import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Space;
@@ -43,7 +47,7 @@ import java.util.Map;
 /**
  * Created by rls on 27/07/14.
  */
-public class GraphView extends View implements PopupMenu.OnMenuItemClickListener {
+public class GraphView extends View {
 
     // FIXME hack!
 private boolean firstTime = true;
@@ -54,8 +58,6 @@ private boolean firstTime = true;
     // These variables are used in handling the dragging of the viewing window
     private Coord2D actionDownPointOnView = Coord2D.ORIGIN;
     private Coord2D actionDownViewpointOffset = Coord2D.ORIGIN;
-
-    private Station selectedStation;
 
     // ratio of metres on the survey to pixels on the view
     // zoom in increases this, zooming out decreases it
@@ -76,8 +78,9 @@ private boolean firstTime = true;
     public static final int STATION_COLOUR = Color.RED;
     public static final int STATION_DIAMETER = 8;
     public static final int CROSS_DIAMETER = 16;
-    public static final int STATION_STROKE_WIDTH = 3;
+    public static final int STATION_STROKE_WIDTH = 5;
 
+    public static final int HIGHLIGHT_OUTLINE = 4;
     public static final int HIGHLIGHT_DIAMETER = 12;
     public static final int STATION_LABEL_SIZE = 20;
 
@@ -92,19 +95,6 @@ private boolean firstTime = true;
 
     public static final int STATION_LABEL_OFFSET = 10;
 
-    @Override
-    public boolean onMenuItemClick(MenuItem item) {
-        switch(item.getItemId()) {
-            case R.id.setActiveStation:
-                if (selectedStation != null) {
-                    survey.setActiveStation(selectedStation);
-                    invalidate();
-                }
-                return true;
-        }
-
-        return false;
-    }
 
 
     public enum BrushColour {
@@ -167,15 +157,12 @@ private boolean firstTime = true;
 
     public void initialise() {
 
-
-
-
         stationPaint.setColor(STATION_COLOUR);
         stationPaint.setStrokeWidth(STATION_STROKE_WIDTH);
         stationPaint.setTextSize(STATION_LABEL_SIZE);
 
-        //highlightPaint.setStyle(Paint.Style.STROKE);
-        //highlightPaint.setStrokeWidth(HIGHLIGHT_STROKE_WIDTH);
+        highlightPaint.setStyle(Paint.Style.STROKE);
+        highlightPaint.setStrokeWidth(STATION_STROKE_WIDTH + HIGHLIGHT_OUTLINE);
         highlightPaint.setColor(HIGHLIGHT_COLOUR);
 
         legPaint.setARGB(127, 255, 0, 0);
@@ -406,38 +393,18 @@ private boolean firstTime = true;
 
                 Station newSelectedStation = findNearestStationWithinDelta(projection,
                         touchPointOnSurvey, selectionTolerance);
-                /*
 
-                if (selectedStation == null) {
+                if (newSelectedStation == null) {
                     return true;
-                } else if (true) {
-                    // forget the pop-up menu for now... just select what we're pointing at
-                    survey.setActiveStation(selectedStation);
-                    invalidate();
-                    return true;
-                }*/
 
-
-                if (selectedStation != newSelectedStation) {
+                } else if (newSelectedStation != survey.getActiveStation()) {
                     survey.setActiveStation(newSelectedStation);
                     invalidate();
                     return true;
+
+                } else { // double selection opens context menu
+                    showContextMenu(event, newSelectedStation);
                 }
-
-                LinearLayout ll = new LinearLayout(this.getContext());
-                Button dummyView = new Button(getContext());
-                ll.addView(dummyView);
-                dummyView.setText("foo");
-                PopupWindow window = new PopupWindow(ll);
-                window.showAtLocation(this, Gravity.CENTER, (int)event.getX(), (int)event.getY());
-                //window.showAtLocation(this, Gravity.CENTER, 150, 150);
-                window.showAsDropDown(this);
-                window.update((int)event.getX(), (int)event.getY(), 0, 0);
-
-                PopupMenu popup = new PopupMenu(this.getContext(), window.getContentView());
-                popup.getMenuInflater().inflate(R.menu.graph_station_selected, popup.getMenu());
-                popup.setOnMenuItemClickListener(this);
-                popup.show();
 
             case MotionEvent.ACTION_MOVE:
                 break;
@@ -448,6 +415,52 @@ private boolean firstTime = true;
         }
 
         return true;
+    }
+
+
+    private void showContextMenu(MotionEvent event, final Station station) {
+
+        OnClickListener listener = new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                switch(view.getId()) {
+                    case R.id.graph_station_reverse:
+                        SurveyUpdater.reverseLeg(survey, station);
+                        SurveyManager.getInstance(getContext()).broadcastSurveyUpdated();
+                        invalidate();
+                        break;
+                    case R.id.graph_station_delete:
+                        askAboutDeletingStation(station);
+                        invalidate();
+                        break;
+                }
+            }
+        };
+
+        PopupWindow menu = StationContextMenu.getFakeStationContextMenu(
+                getContext(), station, listener);
+        menu.showAtLocation(this, Gravity.LEFT | Gravity.TOP,
+                (int)(event.getX()), (int)(event.getY()));
+    }
+
+    private void askAboutDeletingStation(final Station station) {
+        int legsToBeDeleted = SurveyStats.calcNumberSubLegs(station);
+        int stationsToBeDeleted = SurveyStats.calcNumberSubStations(station);
+        String message = "This will delete\n" +
+                TextTools.pluralise(legsToBeDeleted, "leg") +
+                " and " + TextTools.pluralise(stationsToBeDeleted, "station");
+        new AlertDialog.Builder(getContext())
+                .setMessage(message)
+                .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        survey.deleteStation(station);
+                        SurveyManager.getInstance(getContext()).broadcastSurveyUpdated();
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
     }
 
 
@@ -551,7 +564,7 @@ private boolean firstTime = true;
         drawStations(canvas, space);
 
         // highlight active station after everything else to ensure it's on top
-        highlightActiveStation(canvas);
+        //highlightActiveStation(canvas);
     }
 
 
@@ -588,10 +601,15 @@ private boolean firstTime = true;
             int x = (int)(translatedStation.getX());
             int y = (int)(translatedStation.getY());
 
+
+            int crossDiameter =
+                    PreferenceAccess.getInt(this.getContext(), "pref_station_diameter", CROSS_DIAMETER);
+
             if (station == survey.getActiveStation()) {
-                drawStation(canvas, x, y, highlightPaint);
+                drawStation(canvas, highlightPaint, x, y, crossDiameter + HIGHLIGHT_OUTLINE);
+                drawStation(canvas, stationPaint, x, y, crossDiameter);
             } else {
-                drawStation(canvas, x, y, stationPaint);
+                drawStation(canvas, stationPaint, x, y, crossDiameter);
             }
 
             if (getDisplayPreference(GraphActivity.DisplayPreference.SHOW_STATION_LABELS)) {
@@ -604,14 +622,7 @@ private boolean firstTime = true;
         }
     }
 
-    private void drawStation(Canvas canvas, float x, float y, Paint paint) {
-        /*getContext().getSharedPreferences();
-        if (get)
-        canvas.drawCircle(x, y, STATION_DIAMETER, paint);*/
-
-        int crossDiameter =
-                PreferenceAccess.getInt(this.getContext(), "pref_station_diameter", CROSS_DIAMETER);
-
+    private void drawStation(Canvas canvas, Paint paint, float x, float y, int crossDiameter) {
         canvas.drawLine(x , y - crossDiameter / 2, x, y + crossDiameter / 2, paint);
         canvas.drawLine(x - crossDiameter / 2, y, x + crossDiameter / 2, y, paint);
     }

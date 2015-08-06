@@ -1,6 +1,7 @@
 package org.hwyl.sexytopo.control.util;
 
 import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -104,7 +105,7 @@ public class SurveyUpdater {
 
 
     public static void deleteLeg(Survey survey, final Leg toDelete) {
-        survey.deleteLeg(toDelete);
+        survey.undoLeg(toDelete);
     }
 
 
@@ -139,11 +140,29 @@ public class SurveyUpdater {
 
     }
 
-
-
     private static Leg selectLegToKeepFromRepeats(List<Leg> repeats) {
         // assuming the first one is going to have the most care taken...
         return repeats.get(0);
+    }
+
+    public static void reverseLeg(Survey survey, final Station toReverse) {
+        Log.d("reversing " + toReverse.getName());
+        SurveyTools.traverse(
+            survey,
+            new SurveyTools.SurveyTraversalCallback() {
+                @Override
+                public boolean call(Station origin, Leg leg) {
+                    Log.d("checking " + leg.getDestination().getName());
+                    if (leg.hasDestination() && leg.getDestination() == toReverse) {
+                        Leg reversed = leg.reverse();
+                        origin.getOnwardLegs().remove(leg);
+                        origin.addOnwardLeg(reversed);
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            });
     }
 
 }
