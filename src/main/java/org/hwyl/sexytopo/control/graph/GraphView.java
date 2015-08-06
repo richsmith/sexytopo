@@ -562,9 +562,6 @@ private boolean firstTime = true;
         drawLegs(canvas, space);
 
         drawStations(canvas, space);
-
-        // highlight active station after everything else to ensure it's on top
-        //highlightActiveStation(canvas);
     }
 
 
@@ -626,17 +623,6 @@ private boolean firstTime = true;
         canvas.drawLine(x , y - crossDiameter / 2, x, y + crossDiameter / 2, paint);
         canvas.drawLine(x - crossDiameter / 2, y, x + crossDiameter / 2, y, paint);
     }
-
-
-    private void highlightActiveStation(Canvas canvas) {
-        Coord2D activeStationCoord = projection.getStationMap().get(survey.getActiveStation());
-        Coord2D activeStationViewCoord = surveyCoordsToViewCoords(activeStationCoord);
-        canvas.drawCircle((int)activeStationViewCoord.getX(), (int)activeStationViewCoord.getY(),
-                HIGHLIGHT_DIAMETER, highlightPaint);
-        canvas.drawCircle((int)activeStationViewCoord.getX(), (int)activeStationViewCoord.getY(),
-                STATION_DIAMETER, stationPaint);
-    }
-
 
 
     private boolean getDisplayPreference(GraphActivity.DisplayPreference preference) {
