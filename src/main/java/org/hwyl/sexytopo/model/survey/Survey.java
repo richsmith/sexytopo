@@ -129,6 +129,7 @@ public class Survey {
             public boolean call(Station origin, Leg leg) {
                 if (leg.hasDestination() && leg.getDestination() == toDelete) {
                     origin.getOnwardLegs().remove(leg);
+                    checkActiveStation();
                     return true;
                 } else {
                     return false;
