@@ -2,6 +2,7 @@ package org.hwyl.sexytopo.model.survey;
 
 import org.hwyl.sexytopo.control.util.StationNamer;
 import org.hwyl.sexytopo.control.util.SurveyTools;
+import org.hwyl.sexytopo.control.util.Wrapper;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 
 import java.util.ArrayList;
@@ -136,6 +137,29 @@ public class Survey {
                 }
             }
         });
+    }
+
+    public Leg getReferringLeg(final Station station) {
+
+        if (station == getOrigin()) {
+            return null;
+        }
+
+        final Wrapper wrapper = new Wrapper();
+        SurveyTools.traverse(
+                this,
+                new SurveyTools.SurveyTraversalCallback() {
+                    @Override
+                    public boolean call(Station origin, Leg leg) {
+                        if (leg.getDestination() == station) {
+                            wrapper.value = leg;
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                });
+        return (Leg)(wrapper.value);
     }
 
 
