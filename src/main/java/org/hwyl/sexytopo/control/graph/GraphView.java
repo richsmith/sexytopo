@@ -11,14 +11,10 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
 import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewParent;
 import android.view.WindowManager;
 import android.widget.EditText;
-import android.widget.PopupMenu;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
@@ -29,9 +25,7 @@ import org.hwyl.sexytopo.control.util.CrossSectioner;
 import org.hwyl.sexytopo.control.util.PreferenceAccess;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.control.util.SpaceFlipper;
-import org.hwyl.sexytopo.control.util.SpaceMover;
 import org.hwyl.sexytopo.control.util.SurveyStats;
-import org.hwyl.sexytopo.control.util.SurveyTools;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Coord2D;
@@ -39,6 +33,7 @@ import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
+import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchDetail;
@@ -48,6 +43,7 @@ import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by rls on 27/07/14.
@@ -601,13 +597,14 @@ private boolean firstTime = true;
     }
 
 
-    private void drawCrossSections(Canvas canvas, Map<CrossSection, Coord2D> crossSections) {
-        for (CrossSection crossSection : crossSections.keySet()) {
-            Coord2D centreOnSurvey = crossSections.get(crossSection);
+    private void drawCrossSections(Canvas canvas, Set<CrossSectionDetail> crossSectionDetails) {
+        for (CrossSectionDetail sectionDetail : crossSectionDetails) {
+            Coord2D centreOnSurvey = sectionDetail.getPosition();
             Coord2D centreOnView = surveyCoordsToViewCoords(centreOnSurvey);
             drawStation(canvas, stationPaint, (float) centreOnView.getX(), (float) centreOnView.getY(), STATION_DIAMETER);
 
-            String description = crossSection.getStation().getName() + " X-section";
+            String description =
+                    sectionDetail.getCrossSection().getStation().getName() + " X-section";
             if (getDisplayPreference(GraphActivity.DisplayPreference.SHOW_STATION_LABELS)) {
                 canvas.drawText(description,
                         (float) centreOnView.getX(),
@@ -615,12 +612,8 @@ private boolean firstTime = true;
                         stationPaint);
             }
 
-            Space<Coord2D> relativeProjection = crossSection.getProjection();
-            // flip vertically to account for +ve axis being down on screen and up on survey
-            relativeProjection = SpaceFlipper.flipVertically(relativeProjection);
+            Space<Coord2D> projection = sectionDetail.getProjection();
 
-            // convert legs from relative to origin to relative to x-section centre
-            Space<Coord2D> projection = SpaceMover.move(relativeProjection, centreOnSurvey);
 
             drawLegs(canvas, projection);
         }
@@ -711,7 +704,7 @@ private boolean firstTime = true;
         }
 
         for (TextDetail textDetail : sketch.getTextDetails()) {
-            Coord2D location = surveyCoordsToViewCoords(textDetail.getLocation());
+            Coord2D location = surveyCoordsToViewCoords(textDetail.getPosition());
             String text = textDetail.getText();
             labelPaint.setColor(textDetail.getColour().intValue);
             canvas.drawText(text, (float)location.getX(), (float)location.getY(), labelPaint);

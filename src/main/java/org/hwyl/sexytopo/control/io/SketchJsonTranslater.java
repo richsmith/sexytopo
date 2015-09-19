@@ -11,7 +11,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by rls on 15/02/15.
@@ -66,7 +68,7 @@ public class SketchJsonTranslater {
 
         try {
             JSONArray pathsArray = json.getJSONArray(PATHS_TAG);
-            List<PathDetail> pathDetails = new ArrayList<>();
+            Set<PathDetail> pathDetails = new HashSet<>();
             for (JSONObject object : toList(pathsArray)) {
                 pathDetails.add(toPathDetail(object));
             }
@@ -77,7 +79,7 @@ public class SketchJsonTranslater {
 
         try {
             JSONArray labelsArray = json.getJSONArray(LABELS_TAG);
-            List<TextDetail> textDetails = new ArrayList<>();
+            Set<TextDetail> textDetails = new HashSet<>();
             for (JSONObject object : toList(labelsArray)) {
                 textDetails.add(toTextDetail(object));
             }
@@ -123,7 +125,7 @@ public class SketchJsonTranslater {
     public static JSONObject toJson(TextDetail textDetail) throws JSONException {
 
         JSONObject json = new JSONObject();
-        json.put(LOCATION_TAG, toJson(textDetail.getLocation()));
+        json.put(LOCATION_TAG, toJson(textDetail.getPosition()));
         json.put(TEXT_TAG, textDetail.getText());
         json.put(COLOUR_TAG, textDetail.getColour().toString());
 

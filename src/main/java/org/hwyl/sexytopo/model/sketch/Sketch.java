@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.model.sketch;
 
-import android.graphics.Color;
+import com.google.common.collect.Sets;
 
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.model.graph.Coord2D;
@@ -8,36 +8,39 @@ import org.hwyl.sexytopo.control.util.Space2DUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by rls on 23/09/14.
  */
 public class Sketch {
 
-    private List<PathDetail> pathDetails = new ArrayList<>();
-    private List<TextDetail> textDetails = new ArrayList<>();
+    private Set<PathDetail> pathDetails = new HashSet<>();
+    private Set<TextDetail> textDetails = new HashSet<>();
+    private Set<CrossSectionDetail> crossSections = new HashSet<>();
+    private Set[] allSketchDetailSets = new Set[]{pathDetails, textDetails, crossSections};
+
 
     private List<SketchDetail> sketchHistory = new ArrayList<>();
     private List<SketchDetail> undoneHistory = new ArrayList<>();
 
-
     private PathDetail activePath;
-
     private Colour activeColour = Colour.BLACK;
 
 
-    public void setPathDetails(List<PathDetail> pathDetails) {
+    public void setPathDetails(Set<PathDetail> pathDetails) {
         this.pathDetails = pathDetails;
     }
 
-    public void setTextDetails(List<TextDetail> textDetails) {
+    public void setTextDetails(Set<TextDetail> textDetails) {
         this.textDetails = textDetails;
     }
 
 
-    public List<PathDetail> getPathDetails() {
+    public Set<PathDetail> getPathDetails() {
         return pathDetails;
     }
 
@@ -50,17 +53,14 @@ public class Sketch {
     public PathDetail startNewPath(Coord2D start) {
         activePath = new PathDetail(start, activeColour);
         pathDetails.add(activePath);
-        sketchHistory.add(activePath);
-        undoneHistory.clear();
+        addSketchDetail(activePath);
         return activePath;
     }
 
-
-    public void lineTo(Coord2D point) {
-        activePath.lineTo(point);
+    private void addSketchDetail(SketchDetail sketchDetail) {
+        sketchHistory.add(sketchDetail);
         undoneHistory.clear();
     }
-
 
     public void finishPath() {
         activePath = null;
@@ -69,11 +69,10 @@ public class Sketch {
     public void addTextDetail(Coord2D location, String text) {
         TextDetail textDetail = new TextDetail(location, text, activeColour);
         textDetails.add(textDetail);
-        sketchHistory.add(textDetail);
-        undoneHistory.clear();
+        addSketchDetail(textDetail);
     }
 
-    public List<TextDetail> getTextDetails() {
+    public Set<TextDetail> getTextDetails() {
         return textDetails;
     }
 
@@ -90,6 +89,8 @@ public class Sketch {
                 pathDetails.remove(toUndo);
             } else if (toUndo instanceof TextDetail) {
                 textDetails.remove(toUndo);
+            } else if (toUndo instanceof CrossSectionDetail) {
+                crossSections.remove(toUndo);
             }
 
             undoneHistory.add(toUndo);
@@ -106,6 +107,8 @@ public class Sketch {
                 pathDetails.add((PathDetail) toRedo);
             } else if (toRedo instanceof TextDetail) {
                 textDetails.add((TextDetail) toRedo);
+            } else if (toRedo instanceof CrossSectionDetail) {
+                crossSections.add((CrossSectionDetail) toRedo);
             }
 
             sketchHistory.add(toRedo);
@@ -117,7 +120,7 @@ public class Sketch {
             pathDetails.remove(sketchDetail);
         } else if (sketchDetail instanceof TextDetail) {
             textDetails.remove(sketchDetail);
-        } else if (sketchDetail instanceof CrossSection) {
+        } else if (sketchDetail instanceof CrossSectionDetail) {
             crossSections.remove(sketchDetail);
         }
     }
@@ -148,20 +151,12 @@ public class Sketch {
     }
 
 
-    public PathDetail findNearestPathWithin(Coord2D point, double delta) {
-
-        PathDetail closest = null;
-        double minDistance = Double.MAX_VALUE;
-
-        for (PathDetail path : pathDetails) {
-            double distance = getClosestDistance(point, path.getPath());
-            if (distance < delta && distance < minDistance) {
-                closest = path;
-                minDistance = distance;
-            }
+    private Set<SketchDetail> allSketchDetails() {
+        Set<SketchDetail> all = new HashSet<>();
+        for (Set set : allSketchDetailSets) {
+            all.addAll(set);
         }
-
-        return closest;
+        return all;
     }
 
     public SketchDetail findNearestDetailWithin(Coord2D point, double delta) {
@@ -169,26 +164,10 @@ public class Sketch {
         SketchDetail closest = null;
         double minDistance = Double.MAX_VALUE;
 
-        for (PathDetail path : pathDetails) {
-            double distance = getClosestDistance(point, path.getPath());
+        for (SketchDetail detail : allSketchDetails()) {
+            double distance = detail.getDistanceFrom(point);
             if (distance < delta && distance < minDistance) {
-                closest = path;
-                minDistance = distance;
-            }
-        }
-
-        for (TextDetail textDetail : textDetails) {
-            double distance = Space2DUtils.getDistance(point, textDetail.getLocation());
-            if (distance < delta && distance < minDistance) {
-                closest = textDetail;
-                minDistance = distance;
-            }
-        }
-
-        for (CrossSection section : crossSections.keySet()) {
-            double distance = Space2DUtils.getDistance(point, crossSections.get(section));
-            if (distance < delta && distance < minDistance) {
-                closest = section;
+                closest = detail;
                 minDistance = distance;
             }
         }
@@ -197,27 +176,13 @@ public class Sketch {
     }
 
 
-    private static double getClosestDistance(Coord2D point, List<Coord2D> line) {
-        double minDistance = Double.MAX_VALUE;
-        for (int i = 0, j = 1; i < (line.size() - 1); i++, j++) {
-            try {
-                minDistance = Math.min(minDistance,
-                        Space2DUtils.getDistanceFromLine(point, line.get(i), line.get(j)));
-            } catch (Exception e) {
-                Log.d("Error calculating minimum distance: " + e);
-            }
-        }
-        return minDistance;
-    }
-
-
-    private Map<CrossSection, Coord2D> crossSections = new HashMap<>();
-
     public void addCrossSection(CrossSection crossSection, Coord2D touchPointOnSurvey) {
-        crossSections.put(crossSection, touchPointOnSurvey);
+        CrossSectionDetail sectionDetail = new CrossSectionDetail(crossSection, touchPointOnSurvey);
+        crossSections.add(sectionDetail);
+        addSketchDetail(sectionDetail);
     }
 
-    public Map<CrossSection, Coord2D> getCrossSections() {
+    public Set<CrossSectionDetail> getCrossSections() {
         return crossSections;
     }
 }

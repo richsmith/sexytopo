@@ -17,7 +17,7 @@ import java.util.Set;
 /**
  * Represents a cross-section of a passage at a specified angle on a top-down plan sketch.
  */
-public class CrossSection extends SketchDetail {
+public class CrossSection {
 
     private Station station;
     private double angle;
@@ -25,7 +25,6 @@ public class CrossSection extends SketchDetail {
     private static Space3DTransformer transformer = new Space3DTransformer();
 
     public CrossSection(Station station, double angle) {
-        super(Colour.NONE);
         this.station = station;
         this.angle = angle;
     }
