@@ -44,5 +44,13 @@
         android:background="@drawable/abc_item_background_holo_light"
         android:text="Set Entrance" />-->
 
+    <Button
+        android:id="@+id/graph_station_new_cross_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/abc_cab_background_internal_bg"
+        android:text="New Cross-Section"
+        android:padding="10dp"/>
+
 
 </LinearLayout>

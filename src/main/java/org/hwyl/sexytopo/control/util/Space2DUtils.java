@@ -55,4 +55,8 @@ public class Space2DUtils {
     public static double getDistance(Coord2D a, Coord2D b) {
         return Math.sqrt(Math.pow((a.getX() - b.getX()), 2) + Math.pow((a.getY() - b.getY()), 2));
     }
+
+    public static double adjustAngle(double angle, double delta) {
+         return angle + delta % 360;
+    }
 }

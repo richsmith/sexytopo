@@ -276,6 +276,10 @@ public abstract class GraphActivity extends SexyTopoActivity
         for (GraphView.SketchTool sketchTool : GraphView.SketchTool.values()) {
 
             View button = findViewById(sketchTool.getId());
+            if (button == null) {
+                continue; // some tools are not linked to a toolbar button
+            }
+
             ColorFilter filter = null;
             if (sketchTool == toSelect) {
                 filter = new LightingColorFilter(0xFFFFFFFF, 0xFF440000);

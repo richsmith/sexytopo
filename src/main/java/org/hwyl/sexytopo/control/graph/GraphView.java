@@ -20,20 +20,25 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.PopupMenu;
 import android.widget.PopupWindow;
+import android.widget.Toast;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.GraphActivity;
+import org.hwyl.sexytopo.control.util.CrossSectioner;
 import org.hwyl.sexytopo.control.util.PreferenceAccess;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.control.util.SpaceFlipper;
+import org.hwyl.sexytopo.control.util.SpaceMover;
 import org.hwyl.sexytopo.control.util.SurveyStats;
+import org.hwyl.sexytopo.control.util.SurveyTools;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.Colour;
+import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchDetail;
@@ -123,7 +128,8 @@ private boolean firstTime = true;
         DRAW(R.id.buttonDraw),
         ERASE(R.id.buttonErase),
         TEXT(R.id.buttonText),
-        SELECT(R.id.buttonSelect);
+        SELECT(R.id.buttonSelect),
+        POSITION_CROSS_SECTION(R.id.graph_station_new_cross_section);
 
         private int id;
         SketchTool(int id) {
@@ -135,6 +141,8 @@ private boolean firstTime = true;
         }
     }
     public SketchTool currentSketchTool = SketchTool.MOVE;
+    // used to jump back to the previous tool when using one-use tools
+    private SketchTool previousSketchTool = SketchTool.MOVE;
 
     private Paint stationPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint legPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -217,11 +225,11 @@ private boolean firstTime = true;
                 return handleText(event);
             case SELECT:
                 return handleSelect(event);
+            case POSITION_CROSS_SECTION:
+                return handlePositionCrossSection(event);
         }
         return false;
     }
-
-
 
 
     private Coord2D viewCoordsToSurveyCoords(Coord2D coords) {
@@ -418,6 +426,26 @@ private boolean firstTime = true;
     }
 
 
+    private boolean handlePositionCrossSection(MotionEvent event) {
+
+        Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
+        Coord2D touchPointOnSurvey = viewCoordsToSurveyCoords(touchPointOnView);
+
+
+
+        final Station station = survey.getActiveStation();
+
+        CrossSection crossSection = CrossSectioner.section(survey, station);
+
+        sketch.addCrossSection(crossSection, touchPointOnSurvey);
+
+        setSketchTool(previousSketchTool);
+        invalidate();
+
+        return true;
+    }
+
+
     private void showContextMenu(MotionEvent event, final Station station) {
 
         OnClickListener listener = new OnClickListener() {
@@ -433,6 +461,11 @@ private boolean firstTime = true;
                         askAboutDeletingStation(station);
                         invalidate();
                         break;
+                    case R.id.graph_station_new_cross_section:
+                        setSketchTool(SketchTool.POSITION_CROSS_SECTION);
+                        Toast.makeText(getContext(), R.string.position_cross_section_instruction,
+                                Toast.LENGTH_SHORT).show();
+                        break;
                 }
             }
         };
@@ -440,7 +473,7 @@ private boolean firstTime = true;
         PopupWindow menu = StationContextMenu.getFakeStationContextMenu(
                 getContext(), station, listener);
         menu.showAtLocation(this, Gravity.LEFT | Gravity.TOP,
-                (int)(event.getX()), (int)(event.getY()));
+                (int) (event.getX()), (int) (event.getY()));
     }
 
     private void askAboutDeletingStation(final Station station) {
@@ -503,9 +536,12 @@ private boolean firstTime = true;
 
         drawSurvey(canvas, projection);
 
+        drawCrossSections(canvas, sketch.getCrossSections());
+
         drawSketch(canvas, sketch);
 
     }
+
 
 
     private void drawGrid(Canvas canvas) {
@@ -562,6 +598,32 @@ private boolean firstTime = true;
         drawLegs(canvas, space);
 
         drawStations(canvas, space);
+    }
+
+
+    private void drawCrossSections(Canvas canvas, Map<CrossSection, Coord2D> crossSections) {
+        for (CrossSection crossSection : crossSections.keySet()) {
+            Coord2D centreOnSurvey = crossSections.get(crossSection);
+            Coord2D centreOnView = surveyCoordsToViewCoords(centreOnSurvey);
+            drawStation(canvas, stationPaint, (float) centreOnView.getX(), (float) centreOnView.getY(), STATION_DIAMETER);
+
+            String description = crossSection.getStation().getName() + " X-section";
+            if (getDisplayPreference(GraphActivity.DisplayPreference.SHOW_STATION_LABELS)) {
+                canvas.drawText(description,
+                        (float) centreOnView.getX(),
+                        (float) centreOnView.getY(),
+                        stationPaint);
+            }
+
+            Space<Coord2D> relativeProjection = crossSection.getProjection();
+            // flip vertically to account for +ve axis being down on screen and up on survey
+            relativeProjection = SpaceFlipper.flipVertically(relativeProjection);
+
+            // convert legs from relative to origin to relative to x-section centre
+            Space<Coord2D> projection = SpaceMover.move(relativeProjection, centreOnSurvey);
+
+            drawLegs(canvas, projection);
+        }
     }
 
 

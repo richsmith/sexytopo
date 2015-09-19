@@ -7,6 +7,7 @@ import android.graphics.Color;
  */
 public enum Colour {
 
+    NONE(0),
     BLACK(Color.BLACK),
     BROWN(0xFFA52A2A),
     ORANGE(0xFFFFA500),

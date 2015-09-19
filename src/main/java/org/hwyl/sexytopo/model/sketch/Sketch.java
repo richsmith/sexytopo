@@ -7,7 +7,9 @@ import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by rls on 23/09/14.
@@ -115,6 +117,8 @@ public class Sketch {
             pathDetails.remove(sketchDetail);
         } else if (sketchDetail instanceof TextDetail) {
             textDetails.remove(sketchDetail);
+        } else if (sketchDetail instanceof CrossSection) {
+            crossSections.remove(sketchDetail);
         }
     }
 
@@ -181,6 +185,14 @@ public class Sketch {
             }
         }
 
+        for (CrossSection section : crossSections.keySet()) {
+            double distance = Space2DUtils.getDistance(point, crossSections.get(section));
+            if (distance < delta && distance < minDistance) {
+                closest = section;
+                minDistance = distance;
+            }
+        }
+
         return closest;
     }
 
@@ -199,4 +211,13 @@ public class Sketch {
     }
 
 
+    private Map<CrossSection, Coord2D> crossSections = new HashMap<>();
+
+    public void addCrossSection(CrossSection crossSection, Coord2D touchPointOnSurvey) {
+        crossSections.put(crossSection, touchPointOnSurvey);
+    }
+
+    public Map<CrossSection, Coord2D> getCrossSections() {
+        return crossSections;
+    }
 }

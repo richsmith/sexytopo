@@ -31,7 +31,11 @@ public class StationContextMenu {
         fakeMenu.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
         fakeMenu.setContentView(view);
 
-        int[] ids = new int[] {R.id.graph_station_delete, R.id.graph_station_reverse};
+        int[] ids = new int[] {
+                R.id.graph_station_delete,
+                R.id.graph_station_reverse,
+                R.id.graph_station_new_cross_section
+        };
         for (int id : ids) {
             ((Button)(view.findViewById(id))).setOnClickListener(new View.OnClickListener() {
                 @Override
