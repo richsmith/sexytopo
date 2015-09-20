@@ -532,7 +532,7 @@ private boolean firstTime = true;
 
         drawSurvey(canvas, projection);
 
-        drawCrossSections(canvas, sketch.getCrossSections());
+        drawCrossSections(canvas, sketch.getCrossSectionDetails());
 
         drawSketch(canvas, sketch);
 

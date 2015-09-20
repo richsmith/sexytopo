@@ -19,8 +19,8 @@ import java.util.Set;
  */
 public class CrossSection {
 
-    private Station station;
-    private double angle;
+    private final Station station;
+    private final double angle;
 
     private static Space3DTransformer transformer = new Space3DTransformer();
 
@@ -54,5 +54,9 @@ public class CrossSection {
 
     public Station getStation() {
         return station;
+    }
+
+    public double getAngle() {
+        return angle;
     }
 }

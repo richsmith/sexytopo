@@ -36,14 +36,14 @@ public class Loader {
         String planPath = Util.getPathForSurveyFile(survey.getName(), SexyTopo.PLAN_SKETCH_EXTENSION);
         if (Util.doesFileExist(planPath)) {
             String planText = slurpFile(planPath);
-            Sketch plan = SketchJsonTranslater.translate(planText);
+            Sketch plan = SketchJsonTranslater.translate(survey, planText);
             survey.setPlanSketch(plan);
         }
 
         String elevationPath = Util.getPathForSurveyFile(survey.getName(), SexyTopo.EXT_ELEVATION_SKETCH_EXTENSION);
         if (Util.doesFileExist(elevationPath)) {
             String elevationText = slurpFile(elevationPath);
-            Sketch elevation = SketchJsonTranslater.translate(elevationText);
+            Sketch elevation = SketchJsonTranslater.translate(survey, elevationText);
             survey.setElevationSketch(elevation);
         }
 

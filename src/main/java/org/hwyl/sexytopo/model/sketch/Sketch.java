@@ -1,16 +1,11 @@
 package org.hwyl.sexytopo.model.sketch;
 
-import com.google.common.collect.Sets;
-
-import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -20,8 +15,8 @@ public class Sketch {
 
     private Set<PathDetail> pathDetails = new HashSet<>();
     private Set<TextDetail> textDetails = new HashSet<>();
-    private Set<CrossSectionDetail> crossSections = new HashSet<>();
-    private Set[] allSketchDetailSets = new Set[]{pathDetails, textDetails, crossSections};
+    private Set<CrossSectionDetail> crossSectionDetails = new HashSet<>();
+    private Set[] allSketchDetailSets = new Set[]{pathDetails, textDetails, crossSectionDetails};
 
 
     private List<SketchDetail> sketchHistory = new ArrayList<>();
@@ -90,7 +85,7 @@ public class Sketch {
             } else if (toUndo instanceof TextDetail) {
                 textDetails.remove(toUndo);
             } else if (toUndo instanceof CrossSectionDetail) {
-                crossSections.remove(toUndo);
+                crossSectionDetails.remove(toUndo);
             }
 
             undoneHistory.add(toUndo);
@@ -108,7 +103,7 @@ public class Sketch {
             } else if (toRedo instanceof TextDetail) {
                 textDetails.add((TextDetail) toRedo);
             } else if (toRedo instanceof CrossSectionDetail) {
-                crossSections.add((CrossSectionDetail) toRedo);
+                crossSectionDetails.add((CrossSectionDetail) toRedo);
             }
 
             sketchHistory.add(toRedo);
@@ -121,7 +116,7 @@ public class Sketch {
         } else if (sketchDetail instanceof TextDetail) {
             textDetails.remove(sketchDetail);
         } else if (sketchDetail instanceof CrossSectionDetail) {
-            crossSections.remove(sketchDetail);
+            crossSectionDetails.remove(sketchDetail);
         }
     }
 
@@ -178,11 +173,15 @@ public class Sketch {
 
     public void addCrossSection(CrossSection crossSection, Coord2D touchPointOnSurvey) {
         CrossSectionDetail sectionDetail = new CrossSectionDetail(crossSection, touchPointOnSurvey);
-        crossSections.add(sectionDetail);
+        crossSectionDetails.add(sectionDetail);
         addSketchDetail(sectionDetail);
     }
 
-    public Set<CrossSectionDetail> getCrossSections() {
-        return crossSections;
+    public Set<CrossSectionDetail> getCrossSectionDetails() {
+        return crossSectionDetails;
+    }
+
+    public void setCrossSectionDetails(Set<CrossSectionDetail> crossSectionDetails) {
+        this.crossSectionDetails = crossSectionDetails;
     }
 }

@@ -202,6 +202,25 @@ public class Survey {
         }
     }
 
+    public Station getStationByName(final String name) {
+        final Wrapper wrapper = new Wrapper();
+        SurveyTools.traverse(
+                this,
+                new SurveyTools.SurveyTraversalCallback() {
+                    @Override
+                    public boolean call(Station origin, Leg leg) {
+                        if (origin.getName().equals(name)) {
+                            wrapper.value = origin;
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                });
+
+        return (Station)(wrapper.value);
+    }
+
 
     private class UndoEntry {
         private Station station;

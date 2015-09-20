@@ -3,9 +3,13 @@ package org.hwyl.sexytopo.control.io;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.sketch.Colour;
+import org.hwyl.sexytopo.model.sketch.CrossSection;
+import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.TextDetail;
+import org.hwyl.sexytopo.model.survey.Station;
+import org.hwyl.sexytopo.model.survey.Survey;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,8 +28,11 @@ public class SketchJsonTranslater {
     public static final String POINTS_TAG = "points";
     public static final String COLOUR_TAG = "colour";
     public static final String LABELS_TAG = "labels";
+    public static final String CROSS_SECTIONS_TAG = "x-sections";
     public static final String TEXT_TAG = "text";
-    public static final String LOCATION_TAG = "location";
+    public static final String STATION_ID_TAG = "station-id";
+    public static final String POSITION_TAG = "location";
+    public static final String ANGLE_TAG = "angle";
     public static final String X_TAG = "x";
     public static final String Y_TAG = "y";
 
@@ -35,9 +42,9 @@ public class SketchJsonTranslater {
     }
 
 
-    public static Sketch translate(String string) throws JSONException {
+    public static Sketch translate(Survey survey, String string) throws JSONException {
         JSONObject json = new JSONObject(string);
-        return toSketch(json);
+        return toSketch(survey, json);
     }
 
 
@@ -57,12 +64,16 @@ public class SketchJsonTranslater {
         }
         json.put(LABELS_TAG, textDetailArray);
 
-
+        JSONArray crossSectionDetailArray = new JSONArray();
+        for (CrossSectionDetail crossSectionDetail : sketch.getCrossSectionDetails()) {
+            crossSectionDetailArray.put(toJson(crossSectionDetail));
+        }
+        json.put(CROSS_SECTIONS_TAG, crossSectionDetailArray);
 
         return json;
     }
 
-    public static Sketch toSketch(JSONObject json) throws JSONException {
+    public static Sketch toSketch(Survey survey, JSONObject json) throws JSONException {
 
         Sketch sketch = new Sketch();
 
@@ -84,6 +95,17 @@ public class SketchJsonTranslater {
                 textDetails.add(toTextDetail(object));
             }
             sketch.setTextDetails(textDetails);
+        } catch (JSONException e) {
+            Log.e("Failed to load sketch labels: " + e);
+        }
+
+        try {
+            JSONArray crossSectionsArray = json.getJSONArray(CROSS_SECTIONS_TAG);
+            Set<CrossSectionDetail> crossSectionDetails = new HashSet<>();
+            for (JSONObject object : toList(crossSectionsArray)) {
+                crossSectionDetails.add(toCrossSectionDetail(survey, object));
+            }
+            sketch.setCrossSectionDetails(crossSectionDetails);
         } catch (JSONException e) {
             Log.e("Failed to load sketch labels: " + e);
         }
@@ -125,7 +147,7 @@ public class SketchJsonTranslater {
     public static JSONObject toJson(TextDetail textDetail) throws JSONException {
 
         JSONObject json = new JSONObject();
-        json.put(LOCATION_TAG, toJson(textDetail.getPosition()));
+        json.put(POSITION_TAG, toJson(textDetail.getPosition()));
         json.put(TEXT_TAG, textDetail.getText());
         json.put(COLOUR_TAG, textDetail.getColour().toString());
 
@@ -136,11 +158,37 @@ public class SketchJsonTranslater {
     public static TextDetail toTextDetail(JSONObject json) throws JSONException {
 
         Colour colour = Colour.valueOf(json.getString(COLOUR_TAG));
-        Coord2D location = toCoord2D(json.getJSONObject(LOCATION_TAG));
+        Coord2D location = toCoord2D(json.getJSONObject(POSITION_TAG));
         String text = json.getString(TEXT_TAG);
 
         TextDetail textDetail = new TextDetail(location, text, colour);
         return textDetail;
+    }
+
+
+    public static JSONObject toJson(CrossSectionDetail crossSectionDetail) throws JSONException {
+
+        JSONObject json = new JSONObject();
+        json.put(STATION_ID_TAG, crossSectionDetail.getCrossSection().getStation().getName());
+        json.put(POSITION_TAG, toJson(crossSectionDetail.getPosition()));
+        json.put(ANGLE_TAG, crossSectionDetail.getCrossSection().getAngle());
+
+        return json;
+    }
+
+
+    public static CrossSectionDetail toCrossSectionDetail(Survey survey, JSONObject json) throws JSONException {
+
+        Coord2D position = toCoord2D(json.getJSONObject(POSITION_TAG));
+        double angle = json.getDouble(ANGLE_TAG);
+
+        String stationdId = json.getString(STATION_ID_TAG);
+        Station station = survey.getStationByName(stationdId);
+
+        CrossSectionDetail crossSectionDetail =
+                new CrossSectionDetail(new CrossSection(station, angle), position);
+
+        return crossSectionDetail;
     }
 
 
