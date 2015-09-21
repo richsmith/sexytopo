@@ -39,7 +39,10 @@ import java.util.List;
 import java.util.Map;
 
 public class TableActivity extends SexyTopoActivity
-        implements PopupMenu.OnMenuItemClickListener, OnLongClickListener {
+        implements
+            PopupMenu.OnMenuItemClickListener,
+            PopupMenu.OnDismissListener,
+            OnLongClickListener {
 
     private GraphToListTranslator graphToListTranslator = new GraphToListTranslator();
 
@@ -159,17 +162,16 @@ public class TableActivity extends SexyTopoActivity
 
         selectedCell.setBackgroundColor(Color.WHITE);
 
-        PopupMenu popup = new PopupMenu(getBaseContext(), selectedCell);
+        PopupMenu popup = new PopupMenu(this, selectedCell);
         popup.getMenuInflater().inflate(id, popup.getMenu());
-        popup.setOnMenuItemClickListener(listener);
+        popup.setOnMenuItemClickListener(this);
+        popup.setOnDismissListener(this);
         popup.show();
     }
 
 
     @Override
     public boolean onMenuItemClick(MenuItem menuItem) {
-
-        cellBeingClicked.setBackgroundColor(Color.LTGRAY);
 
         final TableCol col = fieldToTableCol.get(cellBeingClicked);
         final GraphToListTranslator.SurveyListEntry surveyEntry =
@@ -210,6 +212,12 @@ public class TableActivity extends SexyTopoActivity
                 return false;
         }
 
+    }
+
+
+    @Override
+    public void onDismiss(PopupMenu popupMenu) {
+        cellBeingClicked.setBackgroundColor(getResources().getColor(R.color.tableBackground));
     }
 
 
