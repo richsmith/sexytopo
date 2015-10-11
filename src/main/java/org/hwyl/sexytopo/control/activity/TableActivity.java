@@ -191,6 +191,7 @@ public class TableActivity extends SexyTopoActivity
             case R.id.setActiveStation:
                 Station station = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
                 getSurvey().setActiveStation(station);
+                syncTableWithSurvey();
                 return true;
             case R.id.editLeg:
                 Leg toEdit = surveyEntry.getLeg();

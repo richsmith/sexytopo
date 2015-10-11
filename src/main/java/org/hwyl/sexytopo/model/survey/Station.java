@@ -27,6 +27,16 @@ public class Station extends SurveyComponent {
         onwardLegs.add(leg);
     }
 
+    public List<Leg> getUnconnectedOnwardLegs() {
+        List<Leg> unconnectedOnwardLegs = new ArrayList<>();
+        for (Leg leg : onwardLegs) {
+            if (!leg.hasDestination()) {
+                unconnectedOnwardLegs.add(leg);
+            }
+        }
+        return unconnectedOnwardLegs;
+    }
+
     public List<Leg> getConnectedOnwardLegs() {
         List<Leg> connectedOnwardLegs = new ArrayList<>();
         for (Leg leg : onwardLegs) {

@@ -36,14 +36,15 @@ public class GraphToListTranslator {
 
         List<SurveyListEntry> list = new ArrayList<>();
 
-        for (Leg leg : from.getOnwardLegs()) {
-
+        for (Leg leg : from.getUnconnectedOnwardLegs()) {
             SurveyListEntry entry = new SurveyListEntry(from, leg);
             list.add(entry);
+        }
 
-            if (leg.hasDestination()) {
-                list.addAll(createListOfEntriesFromStation(leg.getDestination()));
-            }
+        for (Leg leg : from.getConnectedOnwardLegs()) {
+            SurveyListEntry entry = new SurveyListEntry(from, leg);
+            list.add(entry);
+            list.addAll(createListOfEntriesFromStation(leg.getDestination()));
         }
 
         return list;
