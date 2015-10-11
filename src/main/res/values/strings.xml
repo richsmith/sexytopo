@@ -89,6 +89,10 @@
     <string name="manual_edit_distance">Distance (m)</string>
     <string name="manual_edit_declination">Declination (&#176;)</string>
     <string name="manual_edit_inclination">Inclination (&#176;)</string>
+    <string name="manual_edit_left">Left (m)</string>
+    <string name="manual_edit_right">Right (m)</string>
+    <string name="manual_edit_up">Up (m)</string>
+    <string name="manual_edit_down">Down (m)</string>
     <string name="delete_question">Delete?</string>
     <string name="no_data">No Data</string>
     <string name="delete_row_question">Delete Row?</string>

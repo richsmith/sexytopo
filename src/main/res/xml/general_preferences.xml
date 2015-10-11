@@ -4,11 +4,6 @@
     <PreferenceCategory
         android:title="Sketch Display"
         android:key="pref_sketch_display">
-        <!--<CheckBoxPreference
-            android:key="pref_key_auto_delete"
-            android:summary="foo 2"
-            android:title="foo 3"
-            android:defaultValue="false"/>-->
         <EditTextPreference
             android:key="pref_leg_width"
             android:inputType="number"
@@ -39,6 +34,15 @@
             android:entryValues="@array/pref_station_labels"
             android:defaultValue="@string/pref_station_symbol" />-->
 
+    </PreferenceCategory>
+        <PreferenceCategory
+        android:title="Manual Data Entry"
+        android:key="pref_manual_data_entry">
+        <CheckBoxPreference
+            android:key="pref_key_lrud_fields"
+            android:summary="Show fields for entering LRUDs (Left-Right-Up-Down) for each new station"
+            android:title="LRUD entries"
+            android:defaultValue="false"/>
     </PreferenceCategory>
 
 <!--

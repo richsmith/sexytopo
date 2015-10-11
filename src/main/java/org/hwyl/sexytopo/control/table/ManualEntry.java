@@ -1,6 +1,7 @@
 package org.hwyl.sexytopo.control.table;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,10 +13,12 @@ import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.TableActivity;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
+import org.hwyl.sexytopo.model.table.LRUD;
 
 /**
- * Created by rls on 04/06/15.
+ * Handles manual data entry in the TableActivity. Revolves around creating and reacting to dialogs.
  */
 public class ManualEntry {
 
@@ -23,10 +26,14 @@ public class ManualEntry {
 
 
     public static void addStation(final TableActivity tableActivity, final Survey survey) {
-        AlertDialog dialog = createDialog(tableActivity,
+
+
+
+        AlertDialog dialog = createDialog(R.layout.leg_edit_dialog,
+                tableActivity,
                 new EditCallback() {
                     @Override
-                    public void submit(Leg leg) {
+                    public void submit(Leg leg, Dialog dialog) {
                         SurveyUpdater.updateWithNewStation(survey, leg);
                         SurveyManager.getInstance(tableActivity).broadcastSurveyUpdated();
                         tableActivity.syncTableWithSurvey();
@@ -35,11 +42,14 @@ public class ManualEntry {
         dialog.setTitle(R.string.manual_add_station_title);
     }
 
+
+
     public static void addSplay(final TableActivity tableActivity, final Survey survey) {
-        AlertDialog dialog = createDialog(tableActivity,
+        AlertDialog dialog = createDialog(R.layout.leg_edit_dialog,
+                tableActivity,
                 new EditCallback() {
                     @Override
-                    public void submit(Leg leg) {
+                    public void submit(Leg leg, Dialog dialog) {
                         SurveyUpdater.update(survey, leg);
                         SurveyManager.getInstance(tableActivity).broadcastSurveyUpdated();
                         tableActivity.syncTableWithSurvey();
@@ -53,9 +63,10 @@ public class ManualEntry {
                                final Survey survey,
                                final Leg toEdit) {
 
-        AlertDialog dialog = createDialog(tableActivity,
+        AlertDialog dialog = createDialog(R.layout.leg_edit_dialog,
+                tableActivity,
                 new EditCallback() {
-                    public void submit(Leg edited) {
+                    public void submit(Leg edited, Dialog dialog) {
                         if (toEdit.hasDestination()) {
                             edited = new Leg(
                                     edited.getDistance(),
@@ -79,14 +90,60 @@ public class ManualEntry {
     }
 
 
-    private static AlertDialog createDialog(final TableActivity tableActivity,
+    public static void addStationWithLruds(final TableActivity tableActivity, final Survey survey) {
+
+        AlertDialog dialog = createDialog(R.layout.leg_edit_dialog_with_lruds,
+                tableActivity,
+                new EditCallback() {
+                    @Override
+                    public void submit(Leg leg, Dialog dialog) {
+                        Station station = survey.getActiveStation();
+                        SurveyUpdater.updateWithNewStation(survey, leg);
+                        Station newActiveStation = survey.getActiveStation();
+                        survey.setActiveStation(station);
+                        createLrudIfPresent(survey, station, dialog, R.id.editDistanceLeft, LRUD.LEFT);
+                        createLrudIfPresent(survey, station, dialog, R.id.editDistanceRight, LRUD.RIGHT);
+                        createLrudIfPresent(survey, station, dialog, R.id.editDistanceUp, LRUD.UP);
+                        createLrudIfPresent(survey, station, dialog, R.id.editDistanceDown, LRUD.DOWN);
+                        survey.setActiveStation(newActiveStation);
+                        SurveyManager.getInstance(tableActivity).broadcastSurveyUpdated();
+                        tableActivity.syncTableWithSurvey();
+                    }
+                });
+        dialog.setTitle(R.string.manual_add_station_title);
+    }
+
+
+    private static void createLrudIfPresent(Survey survey, Station station,
+                                            Dialog dialog, int fieldId,
+                                            LRUD direction) {
+        Double value = getFieldValue(dialog, fieldId);
+        if (value != null) {
+            Leg leg = direction.createSplay(survey, station, value);
+            SurveyUpdater.update(survey, leg);
+        }
+
+    }
+
+
+    private static Double getFieldValue(Dialog dialog, int id) {
+        try {
+            TextView field = (TextView) (dialog.findViewById(id));
+            return Double.parseDouble(field.getText().toString());
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+
+    private static AlertDialog createDialog(int layoutId, final TableActivity tableActivity,
                             final EditCallback editCallback) {
 
 
         AlertDialog.Builder builder = new AlertDialog.Builder(tableActivity);
 
         LayoutInflater inflater = tableActivity.getLayoutInflater();
-        final View dialogView = inflater.inflate(R.layout.leg_edit_dialog, null);
+        final View dialogView = inflater.inflate(layoutId, null);
         builder
             .setView(dialogView)
             .setTitle(R.string.manual_add_station_title)
@@ -113,40 +170,31 @@ public class ManualEntry {
         dialog.setButton(DialogInterface.BUTTON_POSITIVE, "Save", new DialogInterface.OnClickListener() {
 
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(DialogInterface dialogInterface, int which) {
 
-
-                TextView editDistance = ((TextView) dialogView.findViewById(R.id.editDistance));
-                Double distance = getData(editDistance);
-
-                TextView editDeclination = ((TextView)(dialogView.findViewById(R.id.editDeclination)));
-                Double declination = getData(editDeclination);
-
-                TextView editInclination = ((TextView)(dialogView.findViewById(R.id.editInclination)));
-                Double inclination = getData(editInclination);
+                Double distance = getFieldValue(dialog, R.id.editDistance);
+                Double declination = getFieldValue(dialog, R.id.editDeclination);
+                Double inclination = getFieldValue(dialog, R.id.editInclination);
 
                 if (distance == null || !Leg.isDistanceLegal(distance)) {
+                    TextView editDistance = ((TextView) dialogView.findViewById(R.id.editDistance));
                     editDistance.setError("Bad distance");
                     tableActivity.showSimpleToast("Bad distance");
                 } else if (declination == null || !Leg.isDeclinationLegal(declination)) {
+                    TextView editDeclination = ((TextView)(dialogView.findViewById(R.id.editDeclination)));
                     tableActivity.showSimpleToast("Bad declination");
                     editDeclination.setError("Bad declination");
                 } else if (inclination == null || !Leg.isInclinationLegal(inclination)) {
-                    tableActivity.showSimpleToast("Bad inclination");
+                    TextView editInclination = ((TextView)(dialogView.findViewById(R.id.editInclination)));
+                    editInclination.setError("Bad inclination");
+                    tableActivity.showSimpleToast("Bad inclination " + inclination);
                 } else {
-                    dialog.dismiss();
+                    dialogInterface.dismiss();
                     Leg leg = new Leg(distance, declination, inclination);
-                    editCallback.submit(leg);
+                    editCallback.submit(leg, dialog);
                 }
             }
 
-            private Double getData(TextView textView) {
-                try {
-                    return Double.parseDouble(textView.getText().toString());
-                } catch (Exception e) {
-                    return null;
-                }
-            }
         });
 
         return dialog;
@@ -154,7 +202,7 @@ public class ManualEntry {
     }
 
     public interface EditCallback {
-        public void submit(Leg leg);
+        void submit(Leg leg, Dialog dialog);
     }
 
 }

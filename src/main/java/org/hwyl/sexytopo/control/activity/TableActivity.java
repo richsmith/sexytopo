@@ -140,7 +140,7 @@ public class TableActivity extends SexyTopoActivity
     }
 
 
-    //@Override
+    @Override
     public boolean onLongClick(View view) {
         TextView textView = (TextView)view;
         cellBeingClicked = textView;
@@ -222,7 +222,11 @@ public class TableActivity extends SexyTopoActivity
 
 
     public void manuallyAddStation(View view) {
-        ManualEntry.addStation(this, getSurvey());
+        if (getBooleanPreference("pref_key_lrud_fields")) {
+            ManualEntry.addStationWithLruds(this, getSurvey());
+        } else {
+            ManualEntry.addStation(this, getSurvey());
+        }
     }
 
 

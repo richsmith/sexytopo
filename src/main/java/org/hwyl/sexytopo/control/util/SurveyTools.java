@@ -55,7 +55,7 @@ public class SurveyTools {
     }
 
     public interface SurveyTraversalCallback {
-        public boolean call(Station origin, Leg leg);
+        boolean call(Station origin, Leg leg);
     }
 
 

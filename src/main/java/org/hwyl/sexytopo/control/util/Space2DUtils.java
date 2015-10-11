@@ -57,6 +57,10 @@ public class Space2DUtils {
     }
 
     public static double adjustAngle(double angle, double delta) {
-         return angle + delta % 360;
+        double newAngle = angle + delta;
+        while (newAngle < 0) {
+            newAngle += 360;
+        }
+         return newAngle % 360;
     }
 }
