@@ -138,7 +138,7 @@ private boolean firstTime = true;
     }
     public SketchTool currentSketchTool = SketchTool.MOVE;
     // used to jump back to the previous tool when using one-use tools
-    private SketchTool previousSketchTool = SketchTool.MOVE;
+    private SketchTool previousSketchTool = SketchTool.SELECT;
 
     private Paint stationPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint legPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -427,10 +427,7 @@ private boolean firstTime = true;
         Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
         Coord2D touchPointOnSurvey = viewCoordsToSurveyCoords(touchPointOnView);
 
-
-
         final Station station = survey.getActiveStation();
-
         CrossSection crossSection = CrossSectioner.section(survey, station);
 
         sketch.addCrossSection(crossSection, touchPointOnSurvey);
