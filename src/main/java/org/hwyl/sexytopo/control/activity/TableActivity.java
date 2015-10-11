@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.control.graph.GraphView;
 import org.hwyl.sexytopo.control.table.ManualEntry;
 import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
@@ -123,6 +124,10 @@ public class TableActivity extends SexyTopoActivity
                 TextView textView = (TextView) tableRow.findViewById(id);
                 textView.setText(display);
 
+                if (isActiveStation(map.get(col))) {
+                    textView.setBackgroundColor(GraphView.HIGHLIGHT_COLOUR);
+                }
+
                 fieldToSurveyEntry.put(textView, entry);
                 fieldToTableCol.put(textView, col);
 
@@ -139,6 +144,10 @@ public class TableActivity extends SexyTopoActivity
         scrollView.fullScroll(View.FOCUS_DOWN);
     }
 
+    private boolean isActiveStation(Object object) {
+        return (object instanceof Station) &&
+                ((Station)object) == getSurvey().getActiveStation();
+    }
 
     @Override
     public boolean onLongClick(View view) {
