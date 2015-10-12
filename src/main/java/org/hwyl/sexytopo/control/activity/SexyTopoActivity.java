@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
+import android.preference.ListPreference;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
@@ -40,6 +42,19 @@ public abstract class SexyTopoActivity extends ActionBarActivity {
         super();
         dataManager = SurveyManager.getInstance(this);
 
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        setOrientation();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setOrientation();
     }
 
     @Override
@@ -354,6 +369,23 @@ public abstract class SexyTopoActivity extends ActionBarActivity {
     protected boolean getBooleanPreference(String name) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         return preferences.getBoolean(name, false);
+    }
+
+    protected String getStringPreference(String name) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        return preferences.getString(name, "");
+    }
+
+    private void setOrientation() {
+        String orientationPreference = getStringPreference("pref_orientation");
+
+        if (orientationPreference.equals("Force Portrait")) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        } else if (orientationPreference.equals("Force Landscape")) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+        }
     }
 
 }

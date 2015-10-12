@@ -2,6 +2,19 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
+    android:title="General"
+    android:key="pref_general">
+    <ListPreference
+        android:key="pref_orientation"
+        android:title="Orientation"
+        android:summary="Override device orientation"
+        android:dialogTitle="Select Orientation"
+        android:entries="@array/pref_orientation_options"
+        android:entryValues="@array/pref_orientation_options"
+        android:defaultValue="auto" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:title="Sketch Display"
         android:key="pref_sketch_display">
         <EditTextPreference

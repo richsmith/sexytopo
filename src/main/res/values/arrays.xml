@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="pref_orientation_options">
+        <item name="auto">Auto (sensor or device default)</item>
+        <item name="portrait">Force Portrait</item>
+        <item name="landscape">Force Landscape</item>
+    </string-array>
     <string-array name="pref_station_labels">
         <item name="disc">Disc</item>
         <item name="cross">Cross</item>
