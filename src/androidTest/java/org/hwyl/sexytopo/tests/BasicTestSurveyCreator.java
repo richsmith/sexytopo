@@ -7,9 +7,9 @@ import org.hwyl.sexytopo.model.survey.Survey;
 /**
  * Created by rls on 13/10/15.
  */
-public class CreateSurvey {
+public class BasicTestSurveyCreator {
 
-    public Survey createStraight() {
+    public static Survey createStraight() {
         Survey survey = new Survey("Test Straight Survey");
 
         Leg leg0 = new Leg(5, 0, 0);
@@ -25,7 +25,7 @@ public class CreateSurvey {
 
     }
 
-    public Survey createRightRight() {
+    public static Survey createRightRight() {
         Survey survey = new Survey("Test n-shaped Survey");
 
         Leg leg0 = new Leg(5, 0, 0);
