@@ -1,5 +1,7 @@
 package org.hwyl.sexytopo.model.survey;
 
+import org.hwyl.sexytopo.control.util.Space2DUtils;
+
 /**
  * Created by rls on 16/07/14.
  */
@@ -61,7 +63,7 @@ public class Leg extends SurveyComponent{
     }
 
     public Leg rotate(double delta) {
-        double adjustedBearing = (getBearing() + delta) % 360.0;
+        double adjustedBearing = Space2DUtils.adjustAngle(getBearing(), delta);
         if (hasDestination()) {
             return new Leg(getDistance(), adjustedBearing, getInclination(), getDestination());
         } else {
