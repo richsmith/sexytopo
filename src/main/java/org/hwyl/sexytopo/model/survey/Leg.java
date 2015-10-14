@@ -38,7 +38,7 @@ public class Leg extends SurveyComponent{
             throw new IllegalArgumentException("Distance should be positive; actual" + distance);
         }
 
-        if (! isDeclinationLegal(bearing)) {
+        if (!isDeclinationLegal(bearing)) {
             throw new IllegalArgumentException(
                     "Bearing should be at least 0 and less than 360; actual=" + bearing);
         }
@@ -52,6 +52,10 @@ public class Leg extends SurveyComponent{
         this.bearing = bearing;
         this.inclination = inclination;
         this.destination = destination;
+    }
+
+    public Leg(Leg leg, Station destination) {
+        this(leg.distance, leg.bearing, leg.inclination, destination);
     }
 
     public static Leg upgradeSplayToConnectedLeg(Leg splay, Station destination) {

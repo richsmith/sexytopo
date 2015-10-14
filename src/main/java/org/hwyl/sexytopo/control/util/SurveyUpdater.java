@@ -103,6 +103,30 @@ public class SurveyUpdater {
                 });
     }
 
+    public static void editStation(Survey survey, Station toEdit, Station edited) {
+
+        boolean weAreRenamingAStation = ! edited.getName().equals(toEdit);
+        if (weAreRenamingAStation) {
+            Station existing = survey.getStationByName(edited.getName());
+            if (existing != null) {
+                throw new IllegalArgumentException("New station name is not unique");
+            }
+        }
+
+        if (toEdit == survey.getOrigin()) {
+            survey.setOrigin(edited);
+        } else {
+            Leg referringLeg = survey.getReferringLeg(toEdit);
+            Leg editedLeg = new Leg(referringLeg, edited);
+            editLeg(survey, referringLeg, editedLeg);
+        }
+    }
+
+    public static void renameStation(Survey survey, Station station, String name) {
+        Station renamed = new Station(station, name);
+        editStation(survey, station, renamed);
+    }
+
 
     public static void deleteLeg(Survey survey, final Leg toDelete) {
         survey.undoLeg(toDelete);

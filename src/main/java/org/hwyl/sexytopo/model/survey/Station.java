@@ -15,6 +15,11 @@ public class Station extends SurveyComponent {
         this.name = name;
     }
 
+    public Station(Station station, String name) {
+        this.name = name;
+        this.onwardLegs = station.onwardLegs;
+    }
+
     public String getName() {
         return name;
     }

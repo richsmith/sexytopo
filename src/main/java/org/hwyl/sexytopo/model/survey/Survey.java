@@ -22,7 +22,7 @@ public class Survey {
     private Sketch elevationSketch = new Sketch();
 
 
-    private final Station origin = new Station(StationNamer.generateOriginName());
+    private Station origin = new Station(StationNamer.generateOriginName());
     private Station activeStation = origin;
 
 
@@ -66,6 +66,10 @@ public class Survey {
 
     public Station getOrigin() {
         return origin;
+    }
+
+    public void setOrigin(Station origin) {
+        this.origin = origin;
     }
 
     public List<Station> getAllStations() {
