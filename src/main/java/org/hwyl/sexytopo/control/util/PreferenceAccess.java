@@ -19,5 +19,10 @@ public class PreferenceAccess {
                 .getString(id, Integer.toString(defaultInt)));
     }
 
+    public static boolean getBoolean(Context context, String id, boolean defaultBoolean) {
+
+        return getPreferences(context).getBoolean(id, defaultBoolean);
+    }
+
 
 }

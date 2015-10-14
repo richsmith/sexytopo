@@ -72,6 +72,7 @@ private boolean firstTime = true;
 
 
     public static final int LEG_COLOUR = Color.RED;
+    public static final int LATEST_LEG_COLOUR = Color.MAGENTA;
     public static final int LEG_STROKE_WIDTH = 2;
     public static final int HIGHLIGHT_COLOUR = Color.YELLOW;
     public static final Colour DEFAULT_SKETCH_COLOUR = Colour.BLACK;
@@ -629,12 +630,19 @@ private boolean firstTime = true;
             }
             Line<Coord2D> line = legMap.get(leg);
 
+            if (PreferenceAccess.getBoolean(getContext(), "pref_key_highlight_latest_leg", true)
+                    && survey.getMostRecentLeg() == leg) {
+                legPaint.setColor(LATEST_LEG_COLOUR);
+            }
+
             Coord2D translatedStart = surveyCoordsToViewCoords(line.getStart());
             Coord2D translatedEnd = surveyCoordsToViewCoords(line.getEnd());
             canvas.drawLine(
                     (int)(translatedStart.getX()), (int)(translatedStart.getY()),
                     (int)(translatedEnd.getX()), (int)(translatedEnd.getY()),
                     legPaint);
+
+            legPaint.setColor(LEG_COLOUR);
 
         }
 

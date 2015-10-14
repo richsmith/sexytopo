@@ -48,6 +48,10 @@ public class Survey {
         return activeStation;
     }
 
+    public Leg getMostRecentLeg() {
+        return undoStack.empty()? null : undoStack.peek().leg;
+    }
+
     public void setPlanSketch(Sketch planSketch) {
         this.planSketch = planSketch;
     }

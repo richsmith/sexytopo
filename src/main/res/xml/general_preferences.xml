@@ -17,6 +17,11 @@
     <PreferenceCategory
         android:title="Sketch Display"
         android:key="pref_sketch_display">
+        <CheckBoxPreference
+            android:key="pref_key_highlight_latest_leg"
+            android:summary="Show most recent measurement in purple"
+            android:title="Highlight latest leg"
+            android:defaultValue="true"/>
         <EditTextPreference
             android:key="pref_leg_width"
             android:inputType="number"
