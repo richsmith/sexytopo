@@ -49,26 +49,7 @@ public class TextTools {
         DecimalFormat formatter = new DecimalFormat("#,##0.00");
         return formatter.format(number);
     }
-
-    public static String advanceLastNumber2(String originatingName) {
-
-        String firstPartOfString = "";
-        String lastNumberString = "";
-
-
-        String digitSoFar;
-        for (int i = originatingName.length() - 1; i >= 0; i--) {
-            char c = originatingName.charAt(i);
-            if (! Character.isDigit(c)) {
-                firstPartOfString = originatingName.substring(0, i + 1);
-                lastNumberString = originatingName.substring(i + 1);
-                break;
-            }
-        }
-
-        int value = Integer.parseInt(lastNumberString);
-        return firstPartOfString + ++value;
-    }
+    
 
     public static String advanceLastNumber(String originatingName) {
 
