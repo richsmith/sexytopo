@@ -1,56 +1,44 @@
 package org.hwyl.sexytopo.control.util;
 
 import org.hwyl.sexytopo.model.survey.Station;
+import org.hwyl.sexytopo.model.survey.Survey;
 
-/**
- * Created by rls on 24/07/14.
- */
+
 public class StationNamer {
 
-    public static final String BRANCH_SEPARATOR = "B";
-    public static final String STATION_NUMBER_SEPARATOR = ".";
-    public static final String PREFIX = "S";
-
     public static String generateOriginName() {
-        return PREFIX + Integer.toString(1);
+        return Integer.toString(1);
     }
 
-    public static String generateNextStationName(Station originatingStation) {
+
+    public static String generateNextStationName(Survey survey, Station originatingStation) {
 
         int numberOfExistingConnections = originatingStation.getConnectedOnwardLegs().size();
 
         String originatingName = originatingStation.getName();
 
         if (numberOfExistingConnections == 0) {
-            return advanceLastNumber(originatingName);
+            return generateNextStationInLine(survey, originatingName);
         } else {
-            return generateNextBranch(originatingName, numberOfExistingConnections);
+            return generateNextBranch(survey, originatingName);
         }
     }
 
-
-    public static String advanceLastNumber(String originatingName) {
-
-        String firstPartOfString = "";
-        String lastNumberString = "";
-
-
-        for (int i = originatingName.length() - 1; i >= 0; i--) {
-            char c = originatingName.charAt(i);
-            if (! Character.isDigit(c)) {
-                firstPartOfString = originatingName.substring(0, i + 1);
-                lastNumberString = originatingName.substring(i + 1);
-                break;
+    public static String generateNextBranch(Survey survey, String originatingName) {
+        for (int i = 1; ; i++) {
+            String candidateName = i + ".1";
+            if (survey.getStationByName(candidateName) == null) {
+                return candidateName;
             }
         }
-
-        int value = Integer.parseInt(lastNumberString);
-        return firstPartOfString + ++value;
     }
 
-
-    public static String generateNextBranch(String originatingName, int branchNumber) {
-        return originatingName + BRANCH_SEPARATOR + branchNumber + STATION_NUMBER_SEPARATOR + 1;
+    public static String generateNextStationInLine(Survey survey, String originatingName) {
+        String candidateName = TextTools.advanceLastNumber(originatingName);
+        while (survey.getStationByName(candidateName) != null) {
+            candidateName = TextTools.advanceLastNumber(originatingName);
+        }
+        return candidateName;
     }
 
 }

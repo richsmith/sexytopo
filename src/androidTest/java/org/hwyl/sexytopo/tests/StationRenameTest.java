@@ -8,26 +8,24 @@ import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
-/**
- * Created by rls on 14/10/15.
- */
+
 public class StationRenameTest extends AndroidTestCase {
 
     public void testGetStationByNameGetsExistingStation() {
-        Survey testSurvey = BasicTestSurveyCreator.createStraight();
-        Station s1 = testSurvey.getStationByName("S1");
-        Assert.assertEquals("S1", s1.getName());
+        Survey testSurvey = BasicTestSurveyCreator.createStraightNorth();
+        Station s1 = testSurvey.getStationByName("1");
+        Assert.assertEquals("1", s1.getName());
     }
 
     public void testGetStationByNameCanFail() {
-        Survey testSurvey = BasicTestSurveyCreator.createStraight();
+        Survey testSurvey = BasicTestSurveyCreator.createStraightNorth();
         Station shouldBeNull = testSurvey.getStationByName("I DO NOT EXIST :P");
         Assert.assertEquals(null, shouldBeNull);
     }
 
     public void testRenameOriginStation() {
-        Survey testSurvey = BasicTestSurveyCreator.createStraight();
-        Station s1 = testSurvey.getStationByName("S1");
+        Survey testSurvey = BasicTestSurveyCreator.createStraightNorth();
+        Station s1 = testSurvey.getStationByName("1");
         SurveyUpdater.renameStation(testSurvey, s1, "ShinyNewNameOrigin");
 
         Station shinyNewStation = testSurvey.getStationByName("ShinyNewNameOrigin");
@@ -35,8 +33,8 @@ public class StationRenameTest extends AndroidTestCase {
     }
 
     public void testRenameStation() {
-        Survey testSurvey = BasicTestSurveyCreator.createStraight();
-        Station s2 = testSurvey.getStationByName("S2");
+        Survey testSurvey = BasicTestSurveyCreator.createStraightNorth();
+        Station s2 = testSurvey.getStationByName("2");
         SurveyUpdater.renameStation(testSurvey, s2, "ShinyNewName");
 
         Station shinyNewStation = testSurvey.getStationByName("ShinyNewName");
@@ -46,9 +44,9 @@ public class StationRenameTest extends AndroidTestCase {
     //@Test(expected= IllegalArgumentException.class)
     public void testRenamingToExistingNameFails() {
         try {
-            Survey testSurvey = BasicTestSurveyCreator.createStraight();
-            Station s2 = testSurvey.getStationByName("S2");
-            SurveyUpdater.renameStation(testSurvey, s2, "S1");
+            Survey testSurvey = BasicTestSurveyCreator.createStraightNorth();
+            Station s2 = testSurvey.getStationByName("2");
+            SurveyUpdater.renameStation(testSurvey, s2, "1");
             Assert.fail();
         } catch(IllegalArgumentException e) {
             Assert.assertTrue(true);

@@ -49,4 +49,62 @@ public class TextTools {
         DecimalFormat formatter = new DecimalFormat("#,##0.00");
         return formatter.format(number);
     }
+
+    public static String advanceLastNumber2(String originatingName) {
+
+        String firstPartOfString = "";
+        String lastNumberString = "";
+
+
+        String digitSoFar;
+        for (int i = originatingName.length() - 1; i >= 0; i--) {
+            char c = originatingName.charAt(i);
+            if (! Character.isDigit(c)) {
+                firstPartOfString = originatingName.substring(0, i + 1);
+                lastNumberString = originatingName.substring(i + 1);
+                break;
+            }
+        }
+
+        int value = Integer.parseInt(lastNumberString);
+        return firstPartOfString + ++value;
+    }
+
+    public static String advanceLastNumber(String originatingName) {
+
+
+        if (originatingName.length() == 0) {
+            return "1";
+        }
+
+        int lastDigitChar = -1;
+        int firstDigitChar = -1;
+
+        for (int i = originatingName.length() - 1; i >= 0; i--) {
+            char c = originatingName.charAt(i);
+
+
+            if (lastDigitChar == -1 && Character.isDigit(c)) {
+                lastDigitChar = i;
+            }
+
+            if (Character.isDigit(c)) {
+                firstDigitChar = i;
+            }
+
+            if (! Character.isDigit(c) && firstDigitChar > -1) {
+                break;
+            }
+        }
+
+        if (lastDigitChar == -1) {
+            return originatingName + "1";
+        } else {
+            int value = Integer.parseInt(originatingName.substring(firstDigitChar, lastDigitChar + 1));
+            value++;
+            String firstPart = originatingName.substring(0, firstDigitChar);
+            String lastPart = originatingName.substring(lastDigitChar + 1);
+            return firstPart + value + lastPart;
+        }
+    }
 }

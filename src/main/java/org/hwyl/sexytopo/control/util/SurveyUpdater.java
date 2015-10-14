@@ -47,7 +47,8 @@ public class SurveyUpdater {
         Station activeStation = survey.getActiveStation();
 
         if (!leg.hasDestination()) {
-            Station newStation = new Station(StationNamer.generateNextStationName(activeStation));
+            Station newStation =
+                    new Station(StationNamer.generateNextStationName(survey, activeStation));
             leg = Leg.upgradeSplayToConnectedLeg(leg, newStation);
         }
 
@@ -67,7 +68,8 @@ public class SurveyUpdater {
             List<Leg> legs = getLatestNLegs(activeStation, SexyTopo.NUM_OF_REPEATS_FOR_NEW_STATION);
 
             if (areLegsAboutTheSame(legs)) {
-                Station newStation = new Station(StationNamer.generateNextStationName(activeStation));
+                Station newStation =
+                        new Station(StationNamer.generateNextStationName(survey, activeStation));
 
                 Leg selectedLeg = selectLegToKeepFromRepeats(legs);
                 activeStation.getOnwardLegs().removeAll(legs);
