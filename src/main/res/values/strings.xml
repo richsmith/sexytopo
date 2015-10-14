@@ -34,6 +34,7 @@
     <string name="title_activity_elevation">Elevation</string>
     <string name="title_activity_device">DistoX</string>
     <string name="menu_set_active_station">Set Active Station</string>
+    <string name="menu_rename_station">Rename Station</string>
     <string name="menu_edit_leg">Edit Leg</string>
     <string name="menu_delete_row">Delete Row</string>
     <string name="sketch_menu_delete_last_leg">Undo Last Reading</string>

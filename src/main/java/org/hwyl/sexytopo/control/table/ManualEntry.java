@@ -6,10 +6,13 @@ import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.SurveyManager;
+import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
 import org.hwyl.sexytopo.control.activity.TableActivity;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Leg;
@@ -199,6 +202,33 @@ public class ManualEntry {
 
         return dialog;
 
+    }
+
+    public static void renameStation(final TableActivity activity,
+                                     final Survey survey, final Station toRename) {
+
+        final EditText renameField = new EditText(activity);
+        renameField.setText(toRename.getName());
+
+        new AlertDialog.Builder(activity)
+                .setTitle("Edit name")
+                .setView(renameField)
+                .setPositiveButton("Rename", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        String newName = renameField.getText().toString();
+                        try {
+                            SurveyUpdater.renameStation(survey, toRename, newName);
+                            activity.syncTableWithSurvey();
+                        } catch (Exception e) {
+                            activity.showSimpleToast("Rename failed: name must be unique");
+                        }
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                    }
+                })
+                .show();
     }
 
     public interface EditCallback {

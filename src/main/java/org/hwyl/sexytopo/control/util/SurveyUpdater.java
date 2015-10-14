@@ -120,6 +120,10 @@ public class SurveyUpdater {
             Leg editedLeg = new Leg(referringLeg, edited);
             editLeg(survey, referringLeg, editedLeg);
         }
+
+        if (survey.getActiveStation() == toEdit) {
+            survey.setActiveStation(edited);
+        }
     }
 
     public static void renameStation(Survey survey, Station station, String name) {
