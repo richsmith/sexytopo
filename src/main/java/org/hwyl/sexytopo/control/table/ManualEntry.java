@@ -152,13 +152,13 @@ public class ManualEntry {
             .setTitle(R.string.manual_add_station_title)
             .setPositiveButton("Save", new DialogInterface.OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dialog, int which) {
+                public void onClick(DialogInterface dialog, int buttonId) {
                     // do nothing
                 }
             })
             .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dialog, int which) {
+                public void onClick(DialogInterface dialog, int buttonId) {
                     // do nothing
                 }
             });
@@ -173,7 +173,7 @@ public class ManualEntry {
         dialog.setButton(DialogInterface.BUTTON_POSITIVE, "Save", new DialogInterface.OnClickListener() {
 
             @Override
-            public void onClick(DialogInterface dialogInterface, int which) {
+            public void onClick(DialogInterface dialogInterface, int buttonId) {
 
                 Double distance = getFieldValue(dialog, R.id.editDistance);
                 Double declination = getFieldValue(dialog, R.id.editDeclination);
@@ -214,7 +214,7 @@ public class ManualEntry {
                 .setTitle("Edit name")
                 .setView(renameField)
                 .setPositiveButton("Rename", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
+                    public void onClick(DialogInterface dialog, int buttonId) {
                         String newName = renameField.getText().toString();
                         try {
                             SurveyUpdater.renameStation(survey, toRename, newName);
@@ -225,7 +225,8 @@ public class ManualEntry {
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
+                    public void onClick(DialogInterface dialog, int buttonId) {
+                        // do nothing
                     }
                 })
                 .show();
