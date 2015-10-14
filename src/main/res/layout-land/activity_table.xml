@@ -1,14 +1,54 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:keepScreenOn="true">
 
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout1"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:background="@color/panelBackground" >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <ImageButton
+                android:id="@+id/buttonAddStation"
+                android:layout_width="@dimen/toolbar_button_height"
+                android:layout_height="@dimen/toolbar_button_height"
+                android:src="@drawable/add"
+                android:scaleType="fitCenter"
+                android:onClick="manuallyAddStation"/>
+
+            <ImageButton
+                android:id="@+id/buttonAddSplay"
+                android:layout_width="@dimen/toolbar_button_height"
+                android:layout_height="@dimen/toolbar_button_height"
+                android:src="@drawable/add_splay"
+                android:scaleType="fitCenter"
+                android:onClick="manuallyAddSplay"/>
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/buttonDeleteLastLeg"
+            android:layout_width="@dimen/toolbar_button_height"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:scaleType="fitCenter"
+            android:src="@drawable/bin"
+            android:onClick="deleteLastLeg"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true" />
+
+    </RelativeLayout>
+
     <org.hwyl.sexytopo.util.ScrollingTable
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:orientation="vertical" android:layout_weight="1"
-        android:layout_height="0dp">
+        android:layout_height="match_parent">
         <TableLayout android:layout_height="wrap_content"
             android:layout_width="match_parent" android:id="@+id/HeaderTable">
             <TableRow style="@style/HeaderRow">
@@ -58,41 +98,4 @@
         </ScrollView>
     </org.hwyl.sexytopo.util.ScrollingTable>
 
-    <RelativeLayout
-        android:id="@+id/relativeLayout1"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/panelBackground" >
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-        <ImageButton
-            android:id="@+id/buttonAddStation"
-            android:layout_width="@dimen/toolbar_button_height"
-            android:layout_height="@dimen/toolbar_button_height"
-            android:src="@drawable/add"
-            android:scaleType="fitCenter"
-            android:onClick="manuallyAddStation"/>
-
-        <ImageButton
-            android:id="@+id/buttonAddSplay"
-            android:layout_width="@dimen/toolbar_button_height"
-            android:layout_height="@dimen/toolbar_button_height"
-            android:src="@drawable/add_splay"
-            android:scaleType="fitCenter"
-            android:onClick="manuallyAddSplay"/>
-        </LinearLayout>
-
-        <ImageButton
-            android:id="@+id/buttonDeleteLastLeg"
-            android:layout_width="@dimen/toolbar_button_height"
-            android:layout_height="@dimen/toolbar_button_height"
-            android:scaleType="fitCenter"
-            android:src="@drawable/bin"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:onClick="deleteLastLeg"/>
-
-    </RelativeLayout>
 </LinearLayout>
