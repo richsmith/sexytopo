@@ -3,6 +3,8 @@ package org.hwyl.sexytopo.control.table;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -210,6 +212,34 @@ public class ManualEntry {
         final EditText renameField = new EditText(activity);
         renameField.setText(toRename.getName());
 
+
+        renameField.addTextChangedListener(new TextWatcher() {
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // TODO - nothing
+            }
+
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // TODO - nothing
+            }
+
+            public void afterTextChanged(Editable s) {
+
+                String currentName = toRename.getName();
+                String currentText = renameField.getText().toString();
+
+                // only check for non-null or max length
+                if (currentText.isEmpty()) {
+                    renameField.setError("Cannot be blank");
+                } else if (!currentText.equals(currentName) && (survey.getStationByName(currentText) != null)) {
+                    renameField.setError("Station name must be unique");
+                } else {
+                    renameField.setError(null);
+                }
+            }
+        });
+
+
+
         new AlertDialog.Builder(activity)
                 .setTitle("Edit name")
                 .setView(renameField)
@@ -220,7 +250,7 @@ public class ManualEntry {
                             SurveyUpdater.renameStation(survey, toRename, newName);
                             activity.syncTableWithSurvey();
                         } catch (Exception e) {
-                            activity.showSimpleToast("Rename failed: name must be unique");
+                            activity.showSimpleToast("Rename failed");
                         }
                     }
                 })
