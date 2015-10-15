@@ -36,7 +36,8 @@ public class CrossSection {
 
         for (Leg leg : getSplays(station)) {
 
-            Leg rotated = leg.rotate(angle);
+            // first of all normalise to match the angle of the cross section
+            Leg rotated = leg.rotate(-angle);
             Coord3D coord3D = transformer.transform(Coord3D.ORIGIN, rotated);
             Coord2D coord2D = new Coord2D(coord3D.getX(), coord3D.getZ());
             Line<Coord2D> line = new Line<>(Coord2D.ORIGIN, coord2D);
