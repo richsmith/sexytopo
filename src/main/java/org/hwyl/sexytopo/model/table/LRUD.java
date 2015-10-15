@@ -15,13 +15,15 @@ public enum LRUD {
         public Leg createSplay(Survey survey, Station station, double distance) {
             double angle = Space2DUtils.adjustAngle(
                     CrossSectioner.getAngleOfSection(survey, station),
-                    180.0);
+                    -90.0);
             return new Leg(distance, angle, 0);
         }
     },
     RIGHT {
         public Leg createSplay(Survey survey, Station station, double distance) {
-            double angle = CrossSectioner.getAngleOfSection(survey, station);
+            double angle = Space2DUtils.adjustAngle(
+                    CrossSectioner.getAngleOfSection(survey, station),
+                    90.0);
             return new Leg(distance, angle, 0);
         }
     },

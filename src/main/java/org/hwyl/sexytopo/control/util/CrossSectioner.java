@@ -26,15 +26,16 @@ public class CrossSectioner {
         if (numIncomingLegs == 1 && numOutgoingLegs == 1) {
             double incomingBearing = getIncomingBearing(survey, station);
             double outgoingBearing = getOutgoingBearing(station);
-            angle = (Space2DUtils.adjustAngle((incomingBearing + 180.0), outgoingBearing) / 2);
+            //angle = Space2DUtils.adjustAngle((incomingBearing + 180.0) + outgoingBearing) / 2));
+            angle = (incomingBearing + outgoingBearing) / 2;
         } else if (numIncomingLegs == 1) {
             // just consider the incoming leg (end of a passage or, lots of ways on)
             double incomingBearing = getIncomingBearing(survey, station);
-            angle = Space2DUtils.adjustAngle(incomingBearing, 90);
+            angle = incomingBearing;
         } else if (numOutgoingLegs == 1) {
             // just consider the outgoing leg (must be doing X-section at the origin)
             double outgoingBearing = getOutgoingBearing(station);
-            angle = Space2DUtils.adjustAngle(outgoingBearing, 90);
+            angle = outgoingBearing;
         } else {
             // at the origin with no or lots of outgoing legs?? No idea....
             angle = 0;
