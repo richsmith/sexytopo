@@ -34,8 +34,7 @@ public class CrossSection {
         Space<Coord2D> projection = new Space<>();
         projection.addStation(station, Coord2D.ORIGIN);
 
-        for (Leg leg : getSplays(station)) {
-
+        for (Leg leg : station.getUnconnectedOnwardLegs()) {
             // first of all normalise to match the angle of the cross section
             Leg rotated = leg.rotate(-angle);
             Coord3D coord3D = transformer.transform(Coord3D.ORIGIN, rotated);
@@ -45,12 +44,6 @@ public class CrossSection {
         }
 
         return projection;
-    }
-
-    private static Set<Leg> getSplays(Station station) {
-        Set<Leg> legs = new HashSet<>(station.getOnwardLegs());
-        legs.removeAll(station.getConnectedOnwardLegs());
-        return legs;
     }
 
     public Station getStation() {
