@@ -26,7 +26,6 @@ public class CrossSectioner {
         if (numIncomingLegs == 1 && numOutgoingLegs == 1) {
             double incomingBearing = getIncomingBearing(survey, station);
             double outgoingBearing = getOutgoingBearing(station);
-            //angle = Space2DUtils.adjustAngle((incomingBearing + 180.0) + outgoingBearing) / 2));
             angle = (incomingBearing + outgoingBearing) / 2;
         } else if (numIncomingLegs == 1) {
             // just consider the incoming leg (end of a passage or, lots of ways on)
