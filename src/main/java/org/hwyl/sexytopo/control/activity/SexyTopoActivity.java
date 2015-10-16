@@ -32,7 +32,7 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Created by rls on 26/07/14.
+ * Base class for all activities that use the action bar.
  */
 public abstract class SexyTopoActivity extends ActionBarActivity {
 
@@ -174,7 +174,7 @@ public abstract class SexyTopoActivity extends ActionBarActivity {
             Survey survey = getSurvey();
             String content = TherionExporter.export(survey);
             String filename = Util.getPathForSurveyFile(survey.getName(), "txt");
-            Saver.saveFile(this, filename, content);
+            Saver.saveFile(filename, content);
         } catch(IOException e) {
             Log.d(SexyTopo.TAG, "Error exporting survey: " + e);
             showSimpleToast("Error exporting survey");
@@ -192,7 +192,7 @@ public abstract class SexyTopoActivity extends ActionBarActivity {
 
     private void saveSurvey() {
         try {
-            Saver.save(this, getSurvey());
+            Saver.save(getSurvey());
         } catch (Exception e) {
             Log.d(SexyTopo.TAG, "Error saving survey: " + e);
             showSimpleToast("Error saving survey");
@@ -216,7 +216,7 @@ public abstract class SexyTopoActivity extends ActionBarActivity {
                         String oldName = survey.getName();
                         try {
                             survey.setName(newName);
-                            Saver.save(SexyTopoActivity.this, survey);
+                            Saver.save(survey);
                         } catch (Exception e) {
                             survey.setName(oldName);
                             showSimpleToast("Error saving survey with new name");
@@ -233,12 +233,13 @@ public abstract class SexyTopoActivity extends ActionBarActivity {
 
     private void startNewSurvey() {
 
+        warnIfNotSaved();
+
         final EditText input = new EditText(this);
         input.setText("NewSurvey");
 
         new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.dialog_new_survey_title))
-                .setMessage(getString(R.string.field_survey_name))
                 .setView(input)
                 .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
@@ -279,6 +280,8 @@ public abstract class SexyTopoActivity extends ActionBarActivity {
 
     private void openSurvey() {
 
+        warnIfNotSaved();
+
         File[] surveyDirectories = Util.getSurveyDirectories();
 
         AlertDialog.Builder builderSingle = new AlertDialog.Builder(
@@ -318,6 +321,13 @@ public abstract class SexyTopoActivity extends ActionBarActivity {
                     }
                 });
         builderSingle.show();
+    }
+
+
+    private void warnIfNotSaved() {
+        if (!getSurvey().isSaved()) {
+            showSimpleToast(getString(R.string.warning_survey_not_saved));
+        }
     }
 
 

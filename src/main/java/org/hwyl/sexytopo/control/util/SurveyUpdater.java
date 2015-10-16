@@ -35,7 +35,7 @@ public class SurveyUpdater {
     public static void update(Survey survey, Leg leg) {
         Station activeStation = survey.getActiveStation();
         activeStation.getOnwardLegs().add(leg);
-
+        survey.setSaved(false);
         survey.addUndoEntry(activeStation, leg);
 
         createNewStationIfRequired(survey);
@@ -55,6 +55,7 @@ public class SurveyUpdater {
 
         // FIXME; could the below be moved into Survey? And from elsewhere in this file?
         activeStation.getOnwardLegs().add(leg);
+        survey.setSaved(false);
         survey.addUndoEntry(activeStation, leg);
         survey.setActiveStation(leg.getDestination());
     }
@@ -103,6 +104,7 @@ public class SurveyUpdater {
                         }
                     }
                 });
+        survey.setSaved(false);
     }
 
     public static void editStation(Survey survey, Station toEdit, Station edited) {
@@ -126,6 +128,8 @@ public class SurveyUpdater {
         if (survey.getActiveStation() == toEdit) {
             survey.setActiveStation(edited);
         }
+
+        survey.setSaved(false);
     }
 
     public static void renameStation(Survey survey, Station station, String name) {
@@ -182,7 +186,6 @@ public class SurveyUpdater {
             new SurveyTools.SurveyTraversalCallback() {
                 @Override
                 public boolean call(Station origin, Leg leg) {
-                    Log.d("checking " + leg.getDestination().getName());
                     if (leg.hasDestination() && leg.getDestination() == toReverse) {
                         Leg reversed = leg.reverse();
                         origin.getOnwardLegs().remove(leg);
@@ -193,6 +196,8 @@ public class SurveyUpdater {
                     }
                 }
             });
+
+        survey.setSaved(false);
     }
 
 }

@@ -25,6 +25,7 @@ public class Survey {
     private Station origin = new Station(StationNamer.generateOriginName());
     private Station activeStation = origin;
 
+    private boolean isSaved = true;
 
     private Stack<UndoEntry> undoStack = new Stack<>();
 
@@ -46,6 +47,17 @@ public class Survey {
 
     public Station getActiveStation() {
         return activeStation;
+    }
+
+    public void setSaved(boolean isSaved) {
+        this.isSaved = isSaved;
+        planSketch.setSaved(isSaved);
+        elevationSketch.setSaved(isSaved);
+
+    }
+
+    public boolean isSaved() {
+        return isSaved && planSketch.isSaved() && elevationSketch.isSaved();
     }
 
     public Leg getMostRecentLeg() {
@@ -145,6 +157,8 @@ public class Survey {
                 }
             }
         });
+
+        setSaved(false);
     }
 
     public Leg getReferringLeg(final Station station) {
@@ -201,6 +215,7 @@ public class Survey {
 
 
     public void undoLeg() {
+        // FIXME; can we consolidate the two undoLeg methods?
         if (!undoStack.isEmpty()) {
             UndoEntry entry = undoStack.pop();
             entry.station.getOnwardLegs().remove(entry.leg);
@@ -208,6 +223,7 @@ public class Survey {
                 checkActiveStation();
             }
         }
+        setSaved(false);
     }
 
     public Station getStationByName(final String name) {

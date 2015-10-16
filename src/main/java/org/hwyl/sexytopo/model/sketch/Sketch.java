@@ -25,6 +25,15 @@ public class Sketch {
     private PathDetail activePath;
     private Colour activeColour = Colour.BLACK;
 
+    private boolean isSaved = true;
+
+    public boolean isSaved() {
+        return isSaved;
+    }
+
+    public void setSaved(boolean isSaved) {
+        this.isSaved = isSaved;
+    }
 
     public void setPathDetails(Set<PathDetail> pathDetails) {
         this.pathDetails = pathDetails;
@@ -53,6 +62,7 @@ public class Sketch {
     }
 
     private void addSketchDetail(SketchDetail sketchDetail) {
+        isSaved = true;
         sketchHistory.add(sketchDetail);
         undoneHistory.clear();
     }

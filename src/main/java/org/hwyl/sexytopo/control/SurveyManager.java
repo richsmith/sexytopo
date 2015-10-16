@@ -61,7 +61,7 @@ public class SurveyManager {
 
 
             try {
-                Saver.autosave(context, currentSurvey);
+                Saver.autosave(currentSurvey);
             } catch (Exception e) {
                 Log.e(SexyTopo.TAG, "Error autosaving survey: " + e);
                 Toast.makeText(context, "Error autosaving survey: " + e.getMessage(),

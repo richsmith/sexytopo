@@ -50,7 +50,7 @@
     <string name="loading_survey_error">Error Loading Survey</string>
     <string name="title_activity_survey">Stats</string>
     <string name="field_survey_name">Survey Name</string>
-    <string name="dialog_new_survey_title">New Survey</string>
+    <string name="dialog_new_survey_title">New Survey: Enter Name</string>
     <string name="dialog_save_as_title">Save As</string>
     <string name="dialog_delete_survey_title">Delete Survey?</string>
     <string name="dialog_delete_survey_content">This will delete any file(s) with the same name as this survey</string>
@@ -104,4 +104,5 @@
     <string name="stats_shortest_leg">Shortest Leg (m)</string>
     <string name="pref_station_symbol">Station symbol</string>
     <string name="position_cross_section_instruction">Select where to draw cross-section</string>
+    <string name="warning_survey_not_saved">Warning: current survey not saved</string>
 </resources>
