@@ -27,10 +27,10 @@
         <TextView
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:text="@string/manual_edit_declination"
+            android:text="@string/manual_edit_azimuth"
             />
         <EditText
-            android:id="@+id/editDeclination"
+            android:id="@+id/editAzimuth"
             android:layout_width="100dp"
             android:layout_height="50dp"
             android:inputType="number|numberDecimal"/>

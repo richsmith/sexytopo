@@ -27,7 +27,7 @@
     <string name="table_head_from">From</string>
     <string name="table_head_to">To</string>
     <string name="table_head_distance">Dist</string>
-    <string name="table_head_bearing">Decl</string>
+    <string name="table_head_bearing">Azm</string>
     <string name="table_head_elevation">Incl</string>
     <string name="title_activity_table">Table</string>
     <string name="title_activity_plan">Plan</string>
@@ -88,7 +88,7 @@
     <string name="manual_add_splay_title">Add Splay</string>
     <string name="manual_edit_leg_title">Edit Leg</string>
     <string name="manual_edit_distance">Distance (m)</string>
-    <string name="manual_edit_declination">Declination (&#176;)</string>
+    <string name="manual_edit_azimuth">Azimuth (&#176;)</string>
     <string name="manual_edit_inclination">Inclination (&#176;)</string>
     <string name="manual_edit_left">Left (m)</string>
     <string name="manual_edit_right">Right (m)</string>

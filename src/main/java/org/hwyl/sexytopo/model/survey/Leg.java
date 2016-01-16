@@ -38,7 +38,7 @@ public class Leg extends SurveyComponent{
             throw new IllegalArgumentException("Distance should be positive; actual" + distance);
         }
 
-        if (!isDeclinationLegal(bearing)) {
+        if (!isAzimuthLegal(bearing)) {
             throw new IllegalArgumentException(
                     "Bearing should be at least 0 and less than 360; actual=" + bearing);
         }
@@ -99,8 +99,8 @@ public class Leg extends SurveyComponent{
         return distance >= MIN_DISTANCE;
     }
 
-    public static boolean isDeclinationLegal(double declination) {
-        return MIN_BEARING <= declination && declination < MAX_BEARING;
+    public static boolean isAzimuthLegal(double azimuth) {
+        return MIN_BEARING <= azimuth && azimuth < MAX_BEARING;
     }
 
     public static boolean isInclinationLegal(double inclination) {

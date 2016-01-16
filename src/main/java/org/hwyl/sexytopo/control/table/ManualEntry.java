@@ -12,9 +12,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.SurveyManager;
-import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
 import org.hwyl.sexytopo.control.activity.TableActivity;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Leg;
@@ -88,7 +86,7 @@ public class ManualEntry {
 
         ((TextView) (dialog.findViewById(R.id.editDistance)))
                 .setText("" + toEdit.getDistance());
-        ((TextView) (dialog.findViewById(R.id.editDeclination)))
+        ((TextView) (dialog.findViewById(R.id.editAzimuth)))
                 .setText("" + toEdit.getBearing());
         ((TextView) (dialog.findViewById(R.id.editInclination)))
                 .setText("" + toEdit.getInclination());
@@ -178,24 +176,24 @@ public class ManualEntry {
             public void onClick(DialogInterface dialogInterface, int buttonId) {
 
                 Double distance = getFieldValue(dialog, R.id.editDistance);
-                Double declination = getFieldValue(dialog, R.id.editDeclination);
+                Double azimuth = getFieldValue(dialog, R.id.editAzimuth);
                 Double inclination = getFieldValue(dialog, R.id.editInclination);
 
                 if (distance == null || !Leg.isDistanceLegal(distance)) {
                     TextView editDistance = ((TextView) dialogView.findViewById(R.id.editDistance));
                     editDistance.setError("Bad distance");
                     tableActivity.showSimpleToast("Bad distance");
-                } else if (declination == null || !Leg.isDeclinationLegal(declination)) {
-                    TextView editDeclination = ((TextView)(dialogView.findViewById(R.id.editDeclination)));
-                    tableActivity.showSimpleToast("Bad declination");
-                    editDeclination.setError("Bad declination");
+                } else if (azimuth == null || !Leg.isAzimuthLegal(azimuth)) {
+                    TextView editAzimuth = ((TextView)(dialogView.findViewById(R.id.editAzimuth)));
+                    tableActivity.showSimpleToast("Bad azimuth");
+                    editAzimuth.setError("Bad azimuth");
                 } else if (inclination == null || !Leg.isInclinationLegal(inclination)) {
                     TextView editInclination = ((TextView)(dialogView.findViewById(R.id.editInclination)));
                     editInclination.setError("Bad inclination");
                     tableActivity.showSimpleToast("Bad inclination " + inclination);
                 } else {
                     dialogInterface.dismiss();
-                    Leg leg = new Leg(distance, declination, inclination);
+                    Leg leg = new Leg(distance, azimuth, inclination);
                     editCallback.submit(leg, dialog);
                 }
             }
