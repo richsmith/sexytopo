@@ -10,8 +10,8 @@ public class DistoXProtocol {
     private static final int ADMIN = 0;
     private static final int DISTANCE_LOW_BYTE = 1;
     private static final int DISTANCE_HIGH_BYTE = 2;
-    private static final int DECLINATION_LOW_BYTE = 3;
-    private static final int DECLINATION_HIGH_BYTE = 4;
+    private static final int AZIMUTH_LOW_BYTE = 3;
+    private static final int AZIMUTH_HIGH_BYTE = 4;
     private static final int INCLINATION_LOW_BYTE = 5;
     private static final int INCLINATION_HIGH_BYTE = 6;
     private static final int ROLL_ANGLE_HIGH_BYTE = 7;
@@ -35,9 +35,6 @@ public class DistoXProtocol {
 
 
     public static Leg parseDataPacket(byte[] dataPacket) {
-
-
-
         int d0 = (int)(dataPacket[ADMIN] & 0x40 );
         int d1  = (int)(dataPacket[DISTANCE_LOW_BYTE] & 0xff);
         if (d1 < 0) d1 += 256;
@@ -46,9 +43,8 @@ public class DistoXProtocol {
         // double d =  (((int)mBuffer[0]) & 0x40) * 1024.0 + (mBuffer[1] & 0xff) * 1.0 + (mBuffer[2] & 0xff) * 256.0;
         double distance =  (d0 * 1024 + d2 * 256 + d1 * 1) / 1000.0; // in mm
 
-
-        int b3 = (int)(dataPacket[DECLINATION_LOW_BYTE] & 0xff); if ( b3 < 0 ) b3 += 256;
-        int b4 = (int)(dataPacket[DECLINATION_HIGH_BYTE] & 0xff); if ( b4 < 0 ) b4 += 256;
+        int b3 = (int)(dataPacket[AZIMUTH_LOW_BYTE] & 0xff); if ( b3 < 0 ) b3 += 256;
+        int b4 = (int)(dataPacket[AZIMUTH_HIGH_BYTE] & 0xff); if ( b4 < 0 ) b4 += 256;
         // double b = (mBuffer[3] & 0xff) + (mBuffer[4] & 0xff) * 256.0;
         double b = b3 + b4 * 256.0;
         double bearing  = b * 180.0 / 32768.0;
