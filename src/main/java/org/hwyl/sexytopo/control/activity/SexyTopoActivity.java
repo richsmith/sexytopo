@@ -21,6 +21,7 @@ import android.widget.Toast;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.SurveyManager;
+import org.hwyl.sexytopo.control.io.CompassExporter;
 import org.hwyl.sexytopo.control.io.Loader;
 import org.hwyl.sexytopo.control.io.Saver;
 import org.hwyl.sexytopo.control.io.TherionExporter;
@@ -172,9 +173,18 @@ public abstract class SexyTopoActivity extends ActionBarActivity {
     private void exportSurvey() {
         try {
             Survey survey = getSurvey();
+
+            // Therion text file
             String content = TherionExporter.export(survey);
             String filename = Util.getPathForSurveyFile(survey.getName(), "txt");
             Saver.saveFile(filename, content);
+
+            // Compass dat file
+            CompassExporter exporter = new CompassExporter();
+            String datFilename = Util.getPathForSurveyFile(survey.getName(), "dat");
+            String datContents = exporter.export(survey);
+            Saver.saveFile(datFilename, datContents);
+
         } catch(IOException e) {
             Log.d(SexyTopo.TAG, "Error exporting survey: " + e);
             showSimpleToast("Error exporting survey");
