@@ -9,6 +9,7 @@ import org.hwyl.sexytopo.model.survey.Survey;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
  * Created by rls on 23/07/14.
  */
@@ -69,10 +70,9 @@ public class SurveyUpdater {
             List<Leg> legs = getLatestNLegs(activeStation, SexyTopo.NUM_OF_REPEATS_FOR_NEW_STATION);
 
             if (areLegsAboutTheSame(legs)) {
-                Station newStation =
-                        new Station(StationNamer.generateNextStationName(survey, activeStation));
+                Station newStation = new Station(StationNamer.generateNextStationName(survey, activeStation));
 
-                Leg selectedLeg = selectLegToKeepFromRepeats(legs);
+                Leg selectedLeg = averageLegs(legs);
                 activeStation.getOnwardLegs().removeAll(legs);
 
                 Leg newLeg = Leg.upgradeSplayToConnectedLeg(selectedLeg, newStation);
@@ -174,9 +174,43 @@ public class SurveyUpdater {
 
     }
 
-    private static Leg selectLegToKeepFromRepeats(List<Leg> repeats) {
-        // assuming the first one is going to have the most care taken...
-        return repeats.get(0);
+    /**
+     * Given some legs that we expect are "about the same", average their values into one leg.
+     * @param repeats
+     * @return
+     */
+    public static Leg averageLegs(List<Leg> repeats) {
+        int count = repeats.size();
+        double dist = 0.0, inc = 0.0;
+        double[] azms = new double[count];
+        for (int i=0; i < count; i++) {
+            Leg leg = repeats.get(i);
+            dist += leg.getDistance();
+            inc += leg.getInclination();
+            azms[i] = leg.getBearing();
+        }
+        dist /= count;
+        inc /= count;
+        return new Leg(dist, averageAzms(azms), inc);
+    }
+
+    /** Average some azimuth values together, even if they span the 360/0 boundary */
+    private static double averageAzms(double[] azms) {
+        // Azimuth values jump at the 360/0 boundary, so we must be careful to ensure that
+        // values {359, 1} average to 0 rather than the incorrect value 180
+        double sum = 0.0;
+        double min = Leg.MAX_BEARING, max = Leg.MIN_BEARING;
+        for (int i=0; i<azms.length; i++) {
+            if (azms[i] < min) min = azms[i];
+            if (azms[i] > max) max = azms[i];
+        }
+        boolean splitOverZero = max - min > 180;
+        double[] correctedAzms = new double[azms.length];
+        for (int i=0; i<azms.length; i++) {
+            correctedAzms[i] = (splitOverZero && azms[i] < 180) ? azms[i] + 360: azms[i];
+            sum += correctedAzms[i];
+        }
+        return (sum / correctedAzms.length) % 360;
     }
 
     public static void reverseLeg(Survey survey, final Station toReverse) {

@@ -5,8 +5,12 @@ import android.test.AndroidTestCase;
 import junit.framework.Assert;
 
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
+import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class StationRenameTest extends AndroidTestCase {
@@ -52,4 +56,15 @@ public class StationRenameTest extends AndroidTestCase {
             Assert.assertTrue(true);
         }
     }
+
+    public void testAverageLegs() {
+        Leg leg1 = new Leg(10, 359, -1);
+        Leg leg2 = new Leg(20,   1, +1);
+        List<Leg> legs = new ArrayList<>(2); legs.add(leg1); legs.add(leg2);
+        Leg avgLeg = SurveyUpdater.averageLegs(legs);
+        Assert.assertEquals("Dist", 15.0, avgLeg.getDistance());
+        Assert.assertEquals("Azm", 0.0, avgLeg.getBearing());
+        Assert.assertEquals("Inc", 0.0, avgLeg.getInclination());
+    }
+
 }
