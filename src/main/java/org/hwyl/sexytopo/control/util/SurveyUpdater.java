@@ -7,6 +7,7 @@ import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -39,12 +40,12 @@ public class SurveyUpdater {
         survey.setSaved(false);
         survey.addUndoEntry(activeStation, leg);
 
-        createNewStationIfRequired(survey);
+        createNewStationIfBacksight(survey);
+        createNewStationIfTripleShot(survey);
     }
 
 
     public static void updateWithNewStation(Survey survey, Leg leg) {
-
         Station activeStation = survey.getActiveStation();
 
         if (!leg.hasDestination()) {
@@ -52,7 +53,6 @@ public class SurveyUpdater {
                     new Station(StationNamer.generateNextStationName(survey, activeStation));
             leg = Leg.upgradeSplayToConnectedLeg(leg, newStation);
         }
-
 
         // FIXME; could the below be moved into Survey? And from elsewhere in this file?
         activeStation.getOnwardLegs().add(leg);
@@ -62,7 +62,13 @@ public class SurveyUpdater {
     }
 
 
-    private static void createNewStationIfRequired(Survey survey) {
+    /**
+     * Examine splays of the current active station to determine if we should promote a
+     * "triple-shot" of close-enough splays to a new named station.
+     * @param survey
+     * @return <tt>true</tt> if new station was created
+     */
+    private static boolean createNewStationIfTripleShot(Survey survey) {
 
         Station activeStation = survey.getActiveStation();
         if (activeStation.getOnwardLegs().size() >= SexyTopo.NUM_OF_REPEATS_FOR_NEW_STATION) {
@@ -72,10 +78,10 @@ public class SurveyUpdater {
             if (areLegsAboutTheSame(legs)) {
                 Station newStation = new Station(StationNamer.generateNextStationName(survey, activeStation));
 
-                Leg selectedLeg = averageLegs(legs);
-                activeStation.getOnwardLegs().removeAll(legs);
+                Leg newLeg = averageLegs(legs);
+                newLeg = Leg.upgradeSplayToConnectedLeg(newLeg, newStation);
 
-                Leg newLeg = Leg.upgradeSplayToConnectedLeg(selectedLeg, newStation);
+                activeStation.getOnwardLegs().removeAll(legs);
                 activeStation.getOnwardLegs().add(newLeg);
 
                 for (Leg leg : legs) {
@@ -84,8 +90,47 @@ public class SurveyUpdater {
                 survey.addUndoEntry(activeStation, newLeg);
 
                 survey.setActiveStation(newStation);
+                return true;
             }
         }
+        return false;
+    }
+
+
+    /**
+     * Examine splays of the current active station to determine if the previous two were a
+     * foreward and backsight; if so, promote to a new named station.
+     * @param survey
+     * @return <tt>true</tt> if new station was created
+     */
+    private static boolean createNewStationIfBacksight(Survey survey) {
+
+        Station activeStation = survey.getActiveStation();
+        if (activeStation.getOnwardLegs().size() >= 2) {
+
+            List<Leg> legs = getLatestNLegs(activeStation, 2);
+            Leg fore = legs.get(legs.size()-2);
+            Leg back = legs.get(legs.size()-1);  // TODO: check for "reverse mode" to see if backsight comes first?
+
+            if (areLegsBacksights(fore, back)) {
+                Station newStation = new Station(StationNamer.generateNextStationName(survey, activeStation));
+
+                Leg newLeg = averageBacksights(fore, back);
+                newLeg = Leg.upgradeSplayToConnectedLeg(newLeg, newStation);
+
+                activeStation.getOnwardLegs().removeAll(legs);
+                activeStation.getOnwardLegs().add(newLeg);
+
+                for (Leg leg : legs) {
+                    survey.undoLeg();
+                }
+                survey.addUndoEntry(activeStation, newLeg);
+
+                survey.setActiveStation(newStation);
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -149,8 +194,8 @@ public class SurveyUpdater {
         return lastNLegs;
     }
 
-    private static boolean areLegsAboutTheSame(List<Leg> legs) {
 
+    private static boolean areLegsAboutTheSame(List<Leg> legs) {
         double minDistance = Double.POSITIVE_INFINITY, maxDistance = Double.NEGATIVE_INFINITY;
         double minBearing = Double.POSITIVE_INFINITY, maxBearing = Double.NEGATIVE_INFINITY;
         double minInclination = Double.POSITIVE_INFINITY, maxInclination = Double.NEGATIVE_INFINITY;
@@ -171,8 +216,20 @@ public class SurveyUpdater {
         return distanceDiff <= MAX_DISTANCE_DIFF &&
                bearingDiff <= MAX_BEARING_DIFF &&
                inclinationDiff <= MAX_INCLINATION_DIFF;
-
     }
+
+
+    /**
+     * Given two legs, determine if they are in agreement as foresight and backsight.
+     * @param fore Presumed shot FROM->TO
+     * @param back Presumed shot TO->FROM
+     * @return
+     */
+    public static boolean areLegsBacksights(Leg fore, Leg back) {
+        Leg correctedBack = back.asBacksight();
+        return areLegsAboutTheSame(Arrays.asList(fore, correctedBack));
+    }
+
 
     /**
      * Given some legs that we expect are "about the same", average their values into one leg.
@@ -194,6 +251,13 @@ public class SurveyUpdater {
         return new Leg(dist, averageAzms(azms), inc);
     }
 
+
+    /** Given a foresight and backsight which may not exactly agree, produce an averaged foresight */
+    public static Leg averageBacksights(Leg fore, Leg back) {
+        return averageLegs(Arrays.asList(fore, back.asBacksight()));
+    }
+
+
     /** Average some azimuth values together, even if they span the 360/0 boundary */
     private static double averageAzms(double[] azms) {
         // Azimuth values jump at the 360/0 boundary, so we must be careful to ensure that
@@ -206,12 +270,13 @@ public class SurveyUpdater {
         }
         boolean splitOverZero = max - min > 180;
         double[] correctedAzms = new double[azms.length];
-        for (int i=0; i<azms.length; i++) {
+        for (int i=0; i < azms.length; i++) {
             correctedAzms[i] = (splitOverZero && azms[i] < 180) ? azms[i] + 360: azms[i];
             sum += correctedAzms[i];
         }
         return (sum / correctedAzms.length) % 360;
     }
+
 
     public static void reverseLeg(Survey survey, final Station toReverse) {
         Log.d("reversing " + toReverse.getName());

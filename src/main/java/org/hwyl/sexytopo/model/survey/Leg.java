@@ -43,7 +43,7 @@ public class Leg extends SurveyComponent{
                     "Bearing should be at least 0 and less than 360; actual=" + bearing);
         }
 
-        if (! isInclinationLegal(inclination)) {
+        if (!isInclinationLegal(inclination)) {
             throw new IllegalArgumentException(
                     "Inclination should be up to +-90; actual=" + inclination);
         }
@@ -73,6 +73,21 @@ public class Leg extends SurveyComponent{
         } else {
             return new Leg(getDistance(), adjustedBearing, getInclination());
         }
+    }
+
+    /**
+     * Produce the exact opposite backsight for this leg.
+     * @param destination The new destination (aka the former source)
+     * @return
+     */
+    public Leg asBacksight(Station destination) {
+        double backAzm = (getBearing() + 180) % 360;
+        return new Leg(getDistance(), backAzm, -1 * getInclination(), destination);
+    }
+
+    /** Produce the exact opposite backsight for this splay leg. */
+    public Leg asBacksight() {
+        return asBacksight(Survey.NULL_STATION);
     }
 
     public double getDistance() {

@@ -67,4 +67,17 @@ public class StationRenameTest extends AndroidTestCase {
         Assert.assertEquals("Inc", 0.0, avgLeg.getInclination());
     }
 
+    public void testBacksights() {
+        Leg fore1 = new Leg(10, 180, +42);
+        Leg back1 = new Leg(10,   0, -42);
+        Assert.assertTrue(
+                "Legs should be perfectly-equal backsights",
+                SurveyUpdater.areLegsBacksights(fore1, back1));
+
+        Leg back2 = new Leg(15, 90, 0);
+        Assert.assertFalse(
+                "Legs should not be considered backsights for each other",
+                SurveyUpdater.areLegsBacksights(fore1, back2));
+    }
+
 }
