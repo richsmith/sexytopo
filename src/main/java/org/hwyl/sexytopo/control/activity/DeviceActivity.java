@@ -344,14 +344,19 @@ public class DeviceActivity extends SexyTopoActivity/* implements BroadcastRecei
 
 
     private static Set<BluetoothDevice> getPairedDistos() {
-        if (BLUETOOTH_ADAPTER == null) return new HashSet<>(0);
-        Set<BluetoothDevice> pairedDevices = BLUETOOTH_ADAPTER.getBondedDevices();
+        
+        if (BLUETOOTH_ADAPTER == null) {
+            return new HashSet<>(0);
+        }
+        
         Set<BluetoothDevice> pairedDistoXes = new HashSet<>();
+        Set<BluetoothDevice> pairedDevices = BLUETOOTH_ADAPTER.getBondedDevices();
         for (BluetoothDevice device : pairedDevices) {
             if (isDistoX(device)) {
                 pairedDistoXes.add(device);
             }
         }
+        
         return pairedDistoXes;
     }
 
