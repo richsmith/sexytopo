@@ -6,6 +6,7 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
+
 /**
  * Created by rls on 08/10/14.
  */
@@ -47,7 +48,7 @@ public class Util {
             return defaultName;
         }
 
-        for (int i = 0; i < existingSurveyNames.size(); i++) {
+        for (int i = 0; i <= existingSurveyNames.size(); i++) {
             String name = defaultName + (i == 0 ? "" : ("-" + (i + 1)));
             if (!existingSurveyNames.contains(name)) {
                 return name;

@@ -1,3 +1,11 @@
 /build
 *.apk
 manifest-merger-release-report.txt
+.gradle
+gradlew
+gradlew.bat
+gradle
+local.properties
+src/main/gen/org/hwyl/sexytopo/BuildConfig.java
+src/main/gen/org/hwyl/sexytopo/Manifest.java
+src/main/gen/org/hwyl/sexytopo/R.java
