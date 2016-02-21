@@ -48,7 +48,7 @@ import java.util.Set;
 /**
  * Created by rls on 27/07/14.
  */
-public abstract class GraphView extends View {
+public class GraphView extends View {
 
     // FIXME hack!
 private boolean firstTime = true;
