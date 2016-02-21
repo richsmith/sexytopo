@@ -13,13 +13,7 @@ import java.util.Set;
 public class Util {
 
 
-    public static void ensureSurveyDirectoryExists() {
-        ensureDirectoryExists(SexyTopo.EXTERNAL_SURVEY_DIR);
-    }
-
-
     public static void ensureDirectoriesInPathExist(String path) {
-
         new File(path).mkdirs();
     }
 
@@ -33,10 +27,17 @@ public class Util {
 
 
     public static File[] getSurveyDirectories() {
-        ensureSurveyDirectoryExists();
+        ensureDirectoryExists(SexyTopo.EXTERNAL_SURVEY_DIR);
         File surveyDirectory = new File(SexyTopo.EXTERNAL_SURVEY_DIR);
         File surveyDirectories[] = surveyDirectory.listFiles();
         return surveyDirectories;
+    }
+
+    public static File[] getImportFiles() {
+        ensureDirectoryExists(SexyTopo.EXTERNAL_IMPORT_DIR);
+        File importDirectory = new File(SexyTopo.EXTERNAL_IMPORT_DIR);
+        File importFiles[] = importDirectory.listFiles();
+        return importFiles;
     }
 
 

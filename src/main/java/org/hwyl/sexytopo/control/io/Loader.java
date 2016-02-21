@@ -51,7 +51,7 @@ public class Loader {
 
     }
 
-    private static String slurpFile(String filename) {
+    public static String slurpFile(String filename) {
 
         StringBuilder text = new StringBuilder();
 

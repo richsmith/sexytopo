@@ -88,4 +88,8 @@ public class TextTools {
             return firstPart + value + lastPart;
         }
     }
+
+    public static String[] toArrayOfLines(String text) {
+        return text.split("\\r?\\n");
+    }
 }

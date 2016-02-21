@@ -23,6 +23,7 @@ import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.io.CompassExporter;
 import org.hwyl.sexytopo.control.io.Loader;
+import org.hwyl.sexytopo.control.io.PocketTopoTxtImporter;
 import org.hwyl.sexytopo.control.io.Saver;
 import org.hwyl.sexytopo.control.io.TherionExporter;
 import org.hwyl.sexytopo.control.io.Util;
@@ -288,7 +289,7 @@ public abstract class SexyTopoActivity extends ActionBarActivity {
     }
 
 
-    private void openSurvey() {
+    private void openSurveyx() {
 
         warnIfNotSaved();
 
@@ -332,6 +333,54 @@ public abstract class SexyTopoActivity extends ActionBarActivity {
                 });
         builderSingle.show();
     }
+
+
+    private void openSurvey() {
+
+        warnIfNotSaved();
+
+        File[] importFiles = Util.getImportFiles();
+
+        AlertDialog.Builder builderSingle = new AlertDialog.Builder(this);
+        builderSingle.setTitle("Import Survey");
+        final ArrayAdapter<File> arrayAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.select_dialog_item);
+
+        for (File file : importFiles) {
+            arrayAdapter.add(file);
+        }
+
+        builderSingle.setNegativeButton("Cancel",
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        builderSingle.setAdapter(arrayAdapter,
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        File file = arrayAdapter.getItem(which);
+                        try {
+
+                            String text = Loader.slurpFile(file.getAbsolutePath());
+                            Survey survey = PocketTopoTxtImporter.parse(text);
+                            survey.checkActiveStation();
+                            SurveyManager.getInstance(SexyTopoActivity.this).setCurrentSurvey(survey);
+                            showSimpleToast("Imported" + " " + survey.getName());
+                        } catch (Exception e) {
+                            showSimpleToast(getString(R.string.error_prefix) + e.getMessage());
+                        }
+                    }
+                });
+        builderSingle.show();
+    }
+
 
 
     private void warnIfNotSaved() {
