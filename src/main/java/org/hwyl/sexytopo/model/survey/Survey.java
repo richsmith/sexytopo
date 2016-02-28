@@ -145,7 +145,7 @@ public class Survey {
             return;
         }
 
-        SurveyTools.traverse(this, new SurveyTools.SurveyTraversalCallback() {
+        SurveyTools.traverseLegs(this, new SurveyTools.SurveyLegTraversalCallback() {
             @Override
             public boolean call(Station origin, Leg leg) {
                 if (leg.hasDestination() && leg.getDestination() == toDelete) {
@@ -168,9 +168,9 @@ public class Survey {
         }
 
         final Wrapper wrapper = new Wrapper();
-        SurveyTools.traverse(
+        SurveyTools.traverseLegs(
                 this,
-                new SurveyTools.SurveyTraversalCallback() {
+                new SurveyTools.SurveyLegTraversalCallback() {
                     @Override
                     public boolean call(Station origin, Leg leg) {
                         if (leg.getDestination() == station) {
@@ -186,19 +186,19 @@ public class Survey {
 
 
     public void undoLeg(final Leg toDelete) {
-        SurveyTools.traverse(
-            this,
-            new SurveyTools.SurveyTraversalCallback() {
-                @Override
-                public boolean call(Station origin, Leg leg) {
-                    if (leg == toDelete) {
-                        origin.getOnwardLegs().remove(toDelete);
-                        return true;
-                    } else {
-                        return false;
+        SurveyTools.traverseLegs(
+                this,
+                new SurveyTools.SurveyLegTraversalCallback() {
+                    @Override
+                    public boolean call(Station origin, Leg leg) {
+                        if (leg == toDelete) {
+                            origin.getOnwardLegs().remove(toDelete);
+                            return true;
+                        } else {
+                            return false;
+                        }
                     }
-                }
-            });
+                });
 
         List<Station> stations = getAllStations();
         List<Leg> legs = getAllLegs();
@@ -228,13 +228,13 @@ public class Survey {
 
     public Station getStationByName(final String name) {
         final Wrapper wrapper = new Wrapper();
-        SurveyTools.traverse(
+        SurveyTools.traverseStations(
                 this,
-                new SurveyTools.SurveyTraversalCallback() {
+                new SurveyTools.SurveyStationTraversalCallback() {
                     @Override
-                    public boolean call(Station origin, Leg leg) {
-                        if (origin.getName().equals(name)) {
-                            wrapper.value = origin;
+                    public boolean call(Station station) {
+                        if (station.getName().equals(name)) {
+                            wrapper.value = station;
                             return true;
                         } else {
                             return false;

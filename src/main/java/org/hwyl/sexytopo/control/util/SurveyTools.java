@@ -1,7 +1,5 @@
 package org.hwyl.sexytopo.control.util;
 
-import com.google.common.base.Optional;
-
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -13,11 +11,11 @@ import java.util.Iterator;
  */
 public class SurveyTools {
 
-    public static void traverse(Survey survey, SurveyTraversalCallback callback) {
-        traverse(survey.getOrigin(), callback);
+    public static void traverseLegs(Survey survey, SurveyLegTraversalCallback callback) {
+        traverseLegs(survey.getOrigin(), callback);
     }
 
-    public static boolean traverseIterator(Station station, SurveyTraversalCallback callback) {
+    public static boolean traverseIterator(Station station, SurveyLegTraversalCallback callback) {
 
         // use an iterator because the callback might mutate the list of legs
         Iterator<Leg> i = station.getOnwardLegs().iterator();
@@ -28,14 +26,14 @@ public class SurveyTools {
             if (isFinished) {
                 return isFinished;
             } else if (leg.hasDestination()) {
-                return traverse(leg.getDestination(), callback);
+                return traverseLegs(leg.getDestination(), callback);
             }
         }
 
         return false;
     }
 
-    public static boolean traverse(Station station, SurveyTraversalCallback callback) {
+    public static boolean traverseLegs(Station station, SurveyLegTraversalCallback callback) {
 
         for (Leg leg : station.getOnwardLegs()) {
 
@@ -44,7 +42,7 @@ public class SurveyTools {
             if (isFinished) {
                 return true;
             } else if (leg.hasDestination()) {
-                isFinished =  traverse(leg.getDestination(), callback);
+                isFinished = traverseLegs(leg.getDestination(), callback);
                 if (isFinished) {
                     return true;
                 }
@@ -54,8 +52,34 @@ public class SurveyTools {
         return false;
     }
 
-    public interface SurveyTraversalCallback {
+    public interface SurveyLegTraversalCallback {
         boolean call(Station origin, Leg leg);
+    }
+
+    public static void traverseStations(Survey survey, SurveyStationTraversalCallback callback) {
+        traverseStations(survey.getOrigin(), callback);
+    }
+
+    public static boolean traverseStations(Station station, SurveyStationTraversalCallback callback) {
+
+        boolean isFinished = callback.call(station);
+
+        if (isFinished) {
+            return true;
+        }
+
+        for (Leg leg : station.getConnectedOnwardLegs()) {
+            isFinished = traverseStations(leg.getDestination(), callback);
+            if (isFinished) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public interface SurveyStationTraversalCallback {
+        boolean call(Station station);
     }
 
 

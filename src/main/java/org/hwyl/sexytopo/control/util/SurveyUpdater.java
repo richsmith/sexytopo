@@ -90,9 +90,9 @@ public class SurveyUpdater {
 
 
     public static void editLeg(Survey survey, final Leg toEdit, final Leg edited) {
-        SurveyTools.traverse(
+        SurveyTools.traverseLegs(
                 survey,
-                new SurveyTools.SurveyTraversalCallback() {
+                new SurveyTools.SurveyLegTraversalCallback() {
                     @Override
                     public boolean call(Station origin, Leg leg) {
                         if (leg == toEdit) {
@@ -181,21 +181,21 @@ public class SurveyUpdater {
 
     public static void reverseLeg(Survey survey, final Station toReverse) {
         Log.d("reversing " + toReverse.getName());
-        SurveyTools.traverse(
-            survey,
-            new SurveyTools.SurveyTraversalCallback() {
-                @Override
-                public boolean call(Station origin, Leg leg) {
-                    if (leg.hasDestination() && leg.getDestination() == toReverse) {
-                        Leg reversed = leg.reverse();
-                        origin.getOnwardLegs().remove(leg);
-                        origin.addOnwardLeg(reversed);
-                        return true;
-                    } else {
-                        return false;
+        SurveyTools.traverseLegs(
+                survey,
+                new SurveyTools.SurveyLegTraversalCallback() {
+                    @Override
+                    public boolean call(Station origin, Leg leg) {
+                        if (leg.hasDestination() && leg.getDestination() == toReverse) {
+                            Leg reversed = leg.reverse();
+                            origin.getOnwardLegs().remove(leg);
+                            origin.addOnwardLeg(reversed);
+                            return true;
+                        } else {
+                            return false;
+                        }
                     }
-                }
-            });
+                });
 
         survey.setSaved(false);
     }
