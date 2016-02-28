@@ -1,7 +1,5 @@
 package org.hwyl.sexytopo.model.sketch;
 
-import android.graphics.Path;
-
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.graph.Coord2D;
@@ -9,9 +7,6 @@ import org.hwyl.sexytopo.model.graph.Coord2D;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
-* Created by rls on 15/02/15.
-*/
 public class PathDetail extends SketchDetail {
 
     private final List<Coord2D> path;
@@ -34,22 +29,6 @@ public class PathDetail extends SketchDetail {
     public List<Coord2D> getPath() {
         return path;
     }
-
-    public Path getAndroidPath() {
-        Path androidPath = new Path();
-
-        boolean first = true;
-        for (Coord2D point : path) {
-            if (first) {
-                androidPath.moveTo((float) point.getX(), (float) point.getY());
-                first = false;
-            } else {
-                androidPath.lineTo((float) point.getX(), (float) point.getY());
-            }
-        }
-        return androidPath;
-    }
-
 
     @Override
     public double getDistanceFrom(Coord2D point) {

@@ -42,6 +42,7 @@ import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -230,13 +231,21 @@ private boolean firstTime = true;
 
 
     private Coord2D viewCoordsToSurveyCoords(Coord2D coords) {
-        return coords.scale(1 / surveyToViewScale).plus(viewpointOffset);
+        // The more elegant way to do this is:
+        // return coords.scale(1 / surveyToViewScale).plus(viewpointOffset);
+        // ...but this method gets hit hard (profiled) so let's avoid creating intermediate objects:
+        return new Coord2D(((coords.getX() * (1 / surveyToViewScale)) + viewpointOffset.getX()),
+                ((coords.getY() * (1 / surveyToViewScale)) + viewpointOffset.getY()));
     }
+
 
     private Coord2D surveyCoordsToViewCoords(Coord2D coords) {
-        return coords.minus(viewpointOffset).scale(surveyToViewScale);
+        // The more elegant way to do this is:
+        // return coords.minus(viewpointOffset).scale(surveyToViewScale);
+        // ...but this method gets hit hard (profiled) so let's avoid creating intermediate objects:
+        return new Coord2D(((coords.getX() - viewpointOffset.getX()) * surveyToViewScale),
+                ((coords.getY() - viewpointOffset.getY()) * surveyToViewScale));
     }
-
 
 
     private boolean handleDraw(MotionEvent event) {
@@ -630,20 +639,20 @@ private boolean firstTime = true;
             }
             Line<Coord2D> line = legMap.get(leg);
 
+            Coord2D start = surveyCoordsToViewCoords(line.getStart());
+            Coord2D end = surveyCoordsToViewCoords(line.getEnd());
+
             if (PreferenceAccess.getBoolean(getContext(), "pref_key_highlight_latest_leg", true)
                     && survey.getMostRecentLeg() == leg) {
                 legPaint.setColor(LATEST_LEG_COLOUR);
             }
 
-            Coord2D translatedStart = surveyCoordsToViewCoords(line.getStart());
-            Coord2D translatedEnd = surveyCoordsToViewCoords(line.getEnd());
             canvas.drawLine(
-                    (int)(translatedStart.getX()), (int)(translatedStart.getY()),
-                    (int)(translatedEnd.getX()), (int)(translatedEnd.getY()),
-                    legPaint);
+                (float)(start.getX()), (float)(start.getY()),
+                (float)(end.getX()), (float)(end.getY()),
+                legPaint);
 
             legPaint.setColor(LEG_COLOUR);
-
         }
 
     }
@@ -652,15 +661,14 @@ private boolean firstTime = true;
     private void drawStations(Canvas canvas, Space<Coord2D> space) {
         for (Map.Entry<Station, Coord2D> entry : space.getStationMap().entrySet()) {
 
+            int crossDiameter =
+                    PreferenceAccess.getInt(this.getContext(), "pref_station_diameter", CROSS_DIAMETER);
 
             Station station = entry.getKey();
             Coord2D translatedStation = surveyCoordsToViewCoords(entry.getValue());
+
             int x = (int)(translatedStation.getX());
             int y = (int)(translatedStation.getY());
-
-
-            int crossDiameter =
-                    PreferenceAccess.getInt(this.getContext(), "pref_station_diameter", CROSS_DIAMETER);
 
             if (station == survey.getActiveStation()) {
                 drawStation(canvas, highlightPaint, x, y, crossDiameter + HIGHLIGHT_OUTLINE);
@@ -696,16 +704,25 @@ private boolean firstTime = true;
 
     private void drawSketch(Canvas canvas, Sketch sketch) {
 
-        Matrix matrix = new Matrix();
-        matrix.setTranslate(-(float) viewpointOffset.getX(), -(float) viewpointOffset.getY());
-        matrix.postScale((float) (surveyToViewScale), (float) (surveyToViewScale));
-
 
         for (PathDetail pathDetail : sketch.getPathDetails()) {
-            Path translatedPath = new Path(pathDetail.getAndroidPath());
-            translatedPath.transform(matrix);
-            drawPaint.setColor(pathDetail.getColour().intValue);
-            canvas.drawPath(translatedPath, drawPaint);
+
+            List<Coord2D> path = pathDetail.getPath();
+            Coord2D from = null;
+            for (Coord2D point : path) {
+                if (from == null) {
+                    from = surveyCoordsToViewCoords(point);
+                    continue;
+                } else {
+                    Coord2D to = surveyCoordsToViewCoords(point);
+                    drawPaint.setColor(pathDetail.getColour().intValue);
+                    canvas.drawLine(
+                            (float) from.getX(), (float) from.getY(),
+                            (float) to.getX(), (float) to.getY(),
+                            drawPaint);
+                    from = to;
+                }
+            }
         }
 
         for (TextDetail textDetail : sketch.getTextDetails()) {
@@ -714,9 +731,26 @@ private boolean firstTime = true;
             labelPaint.setColor(textDetail.getColour().intValue);
             canvas.drawText(text, (float)location.getX(), (float)location.getY(), labelPaint);
         }
+    }
+
+
+    private boolean isLineOnscreen(Coord2D start, Coord2D end) {
+        //[Not currently used since it has some problems...]
+        // We check to see if either end of the line is onscreen before drawing it
+        // but in theory both ends could be offscreen and still have some of the line
+        // onscreen. In practice doesn't seem to be a huge problem for sketches but survey
+        // legs can be much longer than the screen.
+        //
+        // This method should be looked at further...
+        return isOnscreen(start) && isOnscreen(end);
 
     }
 
+
+    private boolean isOnscreen(Coord2D coord) {
+        return (0 <= coord.getX() && coord.getX() <= getWidth()) &&
+                (0 <= coord.getY() && coord.getY() <= getHeight());
+    }
 
 
     public void centreViewOnActiveStation() {
@@ -735,7 +769,6 @@ private boolean firstTime = true;
 
         viewpointOffset = new Coord2D(x, y);
     }
-
 
 
     public void zoom(double delta) {
