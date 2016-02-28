@@ -25,7 +25,7 @@ public class SurvexExporter {
             text += getEntry(TableCol.FROM, map);
             text += getEntry(TableCol.TO, map);
             text += getEntry(TableCol.DISTANCE, map);
-            text += getEntry(TableCol.BEARING, map);
+            text += getEntry(TableCol.AZIMUTH, map);
             text += getEntry(TableCol.INCLINATION, map);
             text += "\n";
         }

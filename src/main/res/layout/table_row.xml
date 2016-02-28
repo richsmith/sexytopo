@@ -3,6 +3,6 @@
 <TextView android:id="@+id/tableRowFrom" android:text="AX" style="@style/BodyText" android:layout_weight="1" />
 <TextView android:id="@+id/tableRowTo" android:text="BX" style="@style/BodyText" android:layout_weight="1" />
 <TextView android:id="@+id/tableRowDistance" android:text="1.46" style="@style/BodyText" android:layout_weight="1" />
-<TextView android:id="@+id/tableRowBearing" android:text="2.36" style="@style/BodyText" android:layout_weight="1" />
+<TextView android:id="@+id/tableRowAzimuth" android:text="2.36" style="@style/BodyText" android:layout_weight="1" />
 <TextView android:id="@+id/tableRowInclination" android:text="2.36" style="@style/BodyText" android:layout_weight="1" />
 </TableRow>

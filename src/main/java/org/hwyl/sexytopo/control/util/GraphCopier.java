@@ -16,10 +16,10 @@ public class GraphCopier {
             Leg legCopy;
             if (leg.hasDestination()) {
                 Station destinationCopy = copy(leg.getDestination());
-                legCopy = new Leg(leg.getDistance(), leg.getBearing(), leg.getInclination(),
+                legCopy = new Leg(leg.getDistance(), leg.getAzimuth(), leg.getInclination(),
                         destinationCopy);
             } else {
-                legCopy = new Leg(leg.getDistance(), leg.getBearing(), leg.getInclination());
+                legCopy = new Leg(leg.getDistance(), leg.getAzimuth(), leg.getInclination());
             }
 
             stationCopy.addOnwardLeg(legCopy);

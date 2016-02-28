@@ -20,7 +20,7 @@ public class LrudTest extends AndroidTestCase {
         double angle = CrossSectioner.getAngleOfSection(testSurvey, s2);
         Leg splay = LRUD.LEFT.createSplay(testSurvey, s2, 5);
 
-        Assert.assertEquals(270.0, splay.getBearing());
+        Assert.assertEquals(270.0, splay.getAzimuth());
     }
 
 
@@ -31,6 +31,6 @@ public class LrudTest extends AndroidTestCase {
         double angle = CrossSectioner.getAngleOfSection(testSurvey, s2);
         Leg splay = LRUD.RIGHT.createSplay(testSurvey, s2, 5);
 
-        Assert.assertEquals(90.0, splay.getBearing());
+        Assert.assertEquals(90.0, splay.getAzimuth());
     }
 }

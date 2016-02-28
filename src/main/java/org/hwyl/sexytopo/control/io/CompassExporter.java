@@ -49,7 +49,7 @@ public class CompassExporter {
             Station from = entry.getFrom();
             String to = leg.hasDestination() ? leg.getDestination().toString() : this.splayStationFrom(from);
             double dist = leg.getDistance() * METERS_TO_FEET;  // all Compass lengths are decimal feet!
-            double azm = leg.getBearing();
+            double azm = leg.getAzimuth();
             double inc = leg.getInclination();
 
             sb.append(String.format("%s\t%s\t%.2f\t%.2f\t%.2f\t", from, to, dist, azm, inc));

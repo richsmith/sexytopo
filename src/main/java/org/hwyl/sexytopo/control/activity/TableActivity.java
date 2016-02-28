@@ -58,7 +58,7 @@ public class TableActivity extends SexyTopoActivity
             put(TableCol.FROM, R.id.tableRowFrom);
             put(TableCol.TO, R.id.tableRowTo);
             put(TableCol.DISTANCE, R.id.tableRowDistance);
-            put(TableCol.BEARING, R.id.tableRowBearing);
+            put(TableCol.AZIMUTH, R.id.tableRowAzimuth);
             put(TableCol.INCLINATION, R.id.tableRowInclination);
 
         }};

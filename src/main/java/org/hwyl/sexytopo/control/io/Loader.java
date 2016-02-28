@@ -95,12 +95,12 @@ public class Loader {
         Station to = retrieveOrCreateStation(nameToStation, fields[1]);
 
         double distance = Double.parseDouble(fields[2]);
-        double bearing = Double.parseDouble(fields[3]);
+        double azimuth = Double.parseDouble(fields[3]);
         double inclination = Double.parseDouble(fields[4]);
 
         Leg leg = (to == Survey.NULL_STATION)?
-            new Leg(distance, bearing, inclination) :
-            new Leg(distance, bearing, inclination, to);
+            new Leg(distance, azimuth, inclination) :
+            new Leg(distance, azimuth, inclination, to);
 
         from.addOnwardLeg(leg);
 

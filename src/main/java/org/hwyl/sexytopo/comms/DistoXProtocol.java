@@ -47,7 +47,7 @@ public class DistoXProtocol {
         int b4 = (int)(dataPacket[AZIMUTH_HIGH_BYTE] & 0xff); if ( b4 < 0 ) b4 += 256;
         // double b = (mBuffer[3] & 0xff) + (mBuffer[4] & 0xff) * 256.0;
         double b = b3 + b4 * 256.0;
-        double bearing  = b * 180.0 / 32768.0;
+        double azimuth  = b * 180.0 / 32768.0;
 
         int c5 = (int)(dataPacket[INCLINATION_LOW_BYTE] & 0xff); if ( c5 < 0 ) c5 += 256;
         int c6 = (int)(dataPacket[INCLINATION_HIGH_BYTE] & 0xff); if ( c6 < 0 ) c6 += 256;
@@ -61,7 +61,7 @@ public class DistoXProtocol {
         double r = r7;
         double roll = r * 180.0 / 128.0;
 
-        Leg leg = new Leg(distance, bearing, inclination);
+        Leg leg = new Leg(distance, azimuth, inclination);
         return leg;
     }
 

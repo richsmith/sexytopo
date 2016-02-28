@@ -21,7 +21,7 @@ public class SurveyUpdater {
 
 
     private static final double MAX_DISTANCE_DIFF = 0.2;
-    private static final double MAX_BEARING_DIFF = 1;
+    private static final double MAX_AZIMUTH_DIFF = 1;
     private static final double MAX_INCLINATION_DIFF = 1;
 
 
@@ -152,24 +152,24 @@ public class SurveyUpdater {
     private static boolean areLegsAboutTheSame(List<Leg> legs) {
 
         double minDistance = Double.POSITIVE_INFINITY, maxDistance = Double.NEGATIVE_INFINITY;
-        double minBearing = Double.POSITIVE_INFINITY, maxBearing = Double.NEGATIVE_INFINITY;
+        double minAzimuth = Double.POSITIVE_INFINITY, maxAzimuth = Double.NEGATIVE_INFINITY;
         double minInclination = Double.POSITIVE_INFINITY, maxInclination = Double.NEGATIVE_INFINITY;
 
         for (Leg leg : legs) {
             minDistance = Math.min(leg.getDistance(), minDistance);
             maxDistance = Math.max(leg.getDistance(), maxDistance);
-            minBearing = Math.min(leg.getBearing(), minBearing);
-            maxBearing = Math.max(leg.getBearing(), maxBearing);
+            minAzimuth = Math.min(leg.getAzimuth(), minAzimuth);
+            maxAzimuth = Math.max(leg.getAzimuth(), maxAzimuth);
             minInclination = Math.min(leg.getInclination(), minInclination);
             maxInclination = Math.max(leg.getInclination(), maxInclination);
         }
 
         double distanceDiff = maxDistance - minDistance;
-        double bearingDiff = maxBearing - minBearing;
+        double azimuthDiff = maxAzimuth - minAzimuth;
         double inclinationDiff = maxInclination - minInclination;
 
         return distanceDiff <= MAX_DISTANCE_DIFF &&
-               bearingDiff <= MAX_BEARING_DIFF &&
+               azimuthDiff <= MAX_AZIMUTH_DIFF &&
                inclinationDiff <= MAX_INCLINATION_DIFF;
 
     }

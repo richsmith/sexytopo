@@ -47,7 +47,7 @@ public class Space3DTransformer {
 
     public Coord3D transform(Coord3D start, Leg leg) {
         double r = leg.getDistance();
-        double phi = leg.getBearing();
+        double phi = leg.getAzimuth();
         double theta = leg.getInclination();
 
         phi = Math.toRadians(phi);

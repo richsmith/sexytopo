@@ -73,7 +73,7 @@ public class ManualEntry {
                         if (toEdit.hasDestination()) {
                             edited = new Leg(
                                     edited.getDistance(),
-                                    edited.getBearing(),
+                                    edited.getAzimuth(),
                                     edited.getInclination(),
                                     toEdit.getDestination());
                         }
@@ -87,7 +87,7 @@ public class ManualEntry {
         ((TextView) (dialog.findViewById(R.id.editDistance)))
                 .setText("" + toEdit.getDistance());
         ((TextView) (dialog.findViewById(R.id.editAzimuth)))
-                .setText("" + toEdit.getBearing());
+                .setText("" + toEdit.getAzimuth());
         ((TextView) (dialog.findViewById(R.id.editInclination)))
                 .setText("" + toEdit.getInclination());
     }

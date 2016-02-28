@@ -55,7 +55,7 @@
                 <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_from"/>
                 <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_to"/>
                 <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_distance"/>
-                <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_bearing"/>
+                <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_azimuth"/>
                 <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_elevation"/>
             </TableRow>
 
@@ -83,7 +83,7 @@
                     <TextView style="@style/BodyText" android:layout_weight="1" android:height="0dp" android:text="@string/table_head_from"/>
                     <TextView style="@style/BodyText" android:layout_weight="1" android:height="0dp" android:text="@string/table_head_to"/>
                     <TextView style="@style/BodyText" android:layout_weight="1" android:height="0dp" android:text="@string/table_head_distance"/>
-                    <TextView style="@style/BodyText" android:layout_weight="1" android:height="0dp" android:text="@string/table_head_bearing"/>
+                    <TextView style="@style/BodyText" android:layout_weight="1" android:height="0dp" android:text="@string/table_head_azimuth"/>
                     <TextView style="@style/BodyText" android:layout_weight="1" android:height="0dp" android:text="@string/table_head_elevation"/>
                 </TableRow>
                 <TableRow style="@style/BodyRow">

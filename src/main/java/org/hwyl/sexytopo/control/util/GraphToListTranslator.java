@@ -61,7 +61,7 @@ public class GraphToListTranslator {
         map.put(TableCol.FROM, from);
         map.put(TableCol.TO, leg.getDestination());
         map.put(TableCol.DISTANCE, leg.getDistance());
-        map.put(TableCol.BEARING, leg.getBearing());
+        map.put(TableCol.AZIMUTH, leg.getAzimuth());
         map.put(TableCol.INCLINATION, leg.getInclination());
 
         return map;

@@ -24,17 +24,17 @@ public class CrossSectioner {
 
         double angle;
         if (numIncomingLegs == 1 && numOutgoingLegs == 1) {
-            double incomingBearing = getIncomingBearing(survey, station);
-            double outgoingBearing = getOutgoingBearing(station);
-            angle = (incomingBearing + outgoingBearing) / 2;
+            double incomingAzimuth = getIncomingAzimuth(survey, station);
+            double outgoingAzimuth = getOutgoingAzimuth(station);
+            angle = (incomingAzimuth + outgoingAzimuth) / 2;
         } else if (numIncomingLegs == 1) {
             // just consider the incoming leg (end of a passage or, lots of ways on)
-            double incomingBearing = getIncomingBearing(survey, station);
-            angle = incomingBearing;
+            double incomingAzimuth = getIncomingAzimuth(survey, station);
+            angle = incomingAzimuth;
         } else if (numOutgoingLegs == 1) {
             // just consider the outgoing leg (must be doing X-section at the origin)
-            double outgoingBearing = getOutgoingBearing(station);
-            angle = outgoingBearing;
+            double outgoingAzimuth = getOutgoingAzimuth(station);
+            angle = outgoingAzimuth;
         } else {
             // at the origin with no or lots of outgoing legs?? No idea....
             angle = 0;
@@ -43,12 +43,12 @@ public class CrossSectioner {
         return angle;
     }
 
-    private static double getIncomingBearing(Survey survey, Station station) {
-        return survey.getReferringLeg(station).getBearing();
+    private static double getIncomingAzimuth(Survey survey, Station station) {
+        return survey.getReferringLeg(station).getAzimuth();
     }
 
-    private static double getOutgoingBearing(Station station) {
-        return station.getConnectedOnwardLegs().get(0).getBearing();
+    private static double getOutgoingAzimuth(Station station) {
+        return station.getConnectedOnwardLegs().get(0).getAzimuth();
     }
 
 }

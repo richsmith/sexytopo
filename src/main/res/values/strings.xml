@@ -28,7 +28,7 @@
     <string name="table_head_from">From</string>
     <string name="table_head_to">To</string>
     <string name="table_head_distance">Dist</string>
-    <string name="table_head_bearing">Azm</string>
+    <string name="table_head_azimuth">Azm</string>
     <string name="table_head_elevation">Incl</string>
     <string name="title_activity_table">Table</string>
     <string name="title_activity_plan">Plan</string>

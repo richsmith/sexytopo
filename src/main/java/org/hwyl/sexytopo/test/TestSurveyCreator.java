@@ -43,14 +43,14 @@ public class TestSurveyCreator {
 
 
             double distance = 5 + random.nextInt(10);
-            double bearing = 40 + random.nextInt(100);
+            double azimuth = 40 + random.nextInt(100);
             double inclination = -20 + random.nextInt(40);
 
-            Leg leg0 = new Leg(distance, bearing, inclination);
+            Leg leg0 = new Leg(distance, azimuth, inclination);
             SurveyUpdater.update(survey, leg0);
-            Leg leg1 = new Leg(distance, bearing, inclination);
+            Leg leg1 = new Leg(distance, azimuth, inclination);
             SurveyUpdater.update(survey, leg1);
-            Leg leg2 = new Leg(distance, bearing, inclination);
+            Leg leg2 = new Leg(distance, azimuth, inclination);
             SurveyUpdater.update(survey, leg2);
         }
 
