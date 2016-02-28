@@ -2,6 +2,8 @@ package org.hwyl.sexytopo.model.table;
 
 import org.hwyl.sexytopo.R;
 
+import java.util.Locale;
+
 /**
  * Created by rls on 04/08/14.
  */
@@ -25,5 +27,9 @@ public enum TableCol {
 
     public String format(Object object) {
         return String.format(format, object);
+    }
+
+    public String format(Object object, Locale locale) {
+        return String.format(locale, format, object);
     }
 }

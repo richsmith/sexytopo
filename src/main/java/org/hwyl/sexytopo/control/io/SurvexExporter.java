@@ -5,6 +5,7 @@ import org.hwyl.sexytopo.model.table.TableCol;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -35,7 +36,7 @@ public class SurvexExporter {
 
     private static String getEntry(TableCol tableCol, Map map) {
         Object value = map.get(tableCol);
-        String text = tableCol.format(value);
+        String text = tableCol.format(value, Locale.UK);
         return text + "\t";
     }
 
