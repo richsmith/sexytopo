@@ -18,6 +18,7 @@
     <string name="action_file_delete">Delete</string>
     <string name="action_file_save">Save</string>
     <string name="action_file_save_as">Save As…</string>
+    <string name="action_file_import">Import…</string>
     <string name="action_file_export">Export…</string>
     <string name="action_tools">Tools ▶</string>
     <string name="action_undo_last_leg">Undo last leg</string>

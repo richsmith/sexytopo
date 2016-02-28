@@ -18,6 +18,8 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.SurveyManager;
@@ -32,6 +34,8 @@ import org.hwyl.sexytopo.test.TestSurveyCreator;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Base class for all activities that use the action bar.
@@ -123,6 +127,9 @@ public abstract class SexyTopoActivity extends ActionBarActivity {
                 return true;
             case R.id.action_file_save_as:
                 saveSurveyAsName();
+                return true;
+            case R.id.action_file_import:
+                importSurvey();
                 return true;
             case R.id.action_file_export:
                 exportSurvey();
@@ -289,7 +296,7 @@ public abstract class SexyTopoActivity extends ActionBarActivity {
     }
 
 
-    private void openSurveyx() {
+    private void openSurvey() {
 
         warnIfNotSaved();
 
@@ -335,21 +342,22 @@ public abstract class SexyTopoActivity extends ActionBarActivity {
     }
 
 
-    private void openSurvey() {
+    private void importSurvey() {
 
         warnIfNotSaved();
 
         File[] importFiles = Util.getImportFiles();
+        final Map<String, File> nameToFiles = new HashMap<>();
+        for (File file : importFiles) {
+            nameToFiles.put(file.getName(), file);
+        }
 
         AlertDialog.Builder builderSingle = new AlertDialog.Builder(this);
         builderSingle.setTitle("Import Survey");
-        final ArrayAdapter<File> arrayAdapter = new ArrayAdapter<>(
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.select_dialog_item);
-
-        for (File file : importFiles) {
-            arrayAdapter.add(file);
-        }
+        arrayAdapter.addAll(nameToFiles.keySet());
 
         builderSingle.setNegativeButton("Cancel",
                 new DialogInterface.OnClickListener() {
@@ -365,11 +373,11 @@ public abstract class SexyTopoActivity extends ActionBarActivity {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        File file = arrayAdapter.getItem(which);
+                        File file = nameToFiles.get(arrayAdapter.getItem(which));
                         try {
-
                             String text = Loader.slurpFile(file.getAbsolutePath());
-                            Survey survey = PocketTopoTxtImporter.parse(text);
+                            String name = FilenameUtils.getBaseName(file.getName());
+                            Survey survey = PocketTopoTxtImporter.parse(name, text);
                             survey.checkActiveStation();
                             SurveyManager.getInstance(SexyTopoActivity.this).setCurrentSurvey(survey);
                             showSimpleToast("Imported" + " " + survey.getName());
