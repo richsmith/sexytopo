@@ -84,8 +84,18 @@ public class Util {
 
 
     public static void deleteSurvey(String name) throws Exception {
-        String surveyDirectory = getDirectoryForSurveyFile(name);
-        new File(surveyDirectory).delete();
+        File surveyDirectory = new File(getDirectoryForSurveyFile(name));
+        deleteFileAndAnyContents(surveyDirectory);
+    }
+
+
+    private static void deleteFileAndAnyContents(File file) {
+        if (file.isDirectory())
+            for (File child : file.listFiles()) {
+                deleteFileAndAnyContents(child);
+            }
+
+        file.delete();
     }
 
 

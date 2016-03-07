@@ -54,7 +54,9 @@
     <string name="dialog_new_survey_title">New Survey: Enter Name</string>
     <string name="dialog_save_as_title">Save As</string>
     <string name="dialog_delete_survey_title">Delete Survey?</string>
-    <string name="dialog_delete_survey_content">This will delete any file(s) with the same name as this survey</string>
+    <string name="dialog_delete_survey_content">This will delete the current survey and any associated files (this cannot be undone).</string>
+    <string name="errorDeletingSurvey">Error deleting survey</string>
+    <string name="cannotDeleteUnsavedSurvey">Cannot delete unsaved survey</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>

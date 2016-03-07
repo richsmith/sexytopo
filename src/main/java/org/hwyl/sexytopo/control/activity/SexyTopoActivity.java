@@ -275,6 +275,11 @@ public abstract class SexyTopoActivity extends ActionBarActivity {
 
     private void deleteSurvey() {
 
+        if (!getSurvey().isSaved()) {
+            showSimpleToast(getString(R.string.cannotDeleteUnsavedSurvey));
+            return;
+        }
+
         new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.dialog_delete_survey_title))
                 .setMessage(getString(R.string.dialog_delete_survey_content))
@@ -283,9 +288,11 @@ public abstract class SexyTopoActivity extends ActionBarActivity {
                         try {
                             String surveyName = getSurvey().getName();
                             Util.deleteSurvey(surveyName);
+                            setSurvey(new Survey(""));
+                            startNewSurvey();
                         } catch (Exception e) {
-                            showSimpleToast("Error deleting survey");
-                            Log.d(SexyTopo.TAG, "Error deleting survey: " + e);
+                            showSimpleToast(getString(R.string.errorDeletingSurvey));
+                                    Log.d(SexyTopo.TAG, "Error deleting survey: " + e);
                         }
                     }
                 }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
