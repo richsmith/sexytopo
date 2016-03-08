@@ -21,6 +21,10 @@ public class Saver {
 
     public static void save(Survey survey) throws IOException, JSONException {
 
+        if (survey.getName().equals("") || survey.getName().contains("/")) {
+            throw new IllegalArgumentException("Illegal survey name");
+        }
+
         saveSurveyData(survey, "svx");
         saveSketch(survey, survey.getPlanSketch(), SexyTopo.PLAN_SKETCH_EXTENSION);
         saveSketch(survey, survey.getElevationSketch(), SexyTopo.EXT_ELEVATION_SKETCH_EXTENSION);

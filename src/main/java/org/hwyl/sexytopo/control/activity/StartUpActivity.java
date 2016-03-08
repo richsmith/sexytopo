@@ -82,18 +82,8 @@ public class StartUpActivity extends SexyTopoActivity {
 
 
     private Survey createNewActiveSurvey() {
-
-        SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
-
-        String defaultNameBase = getString(R.string.default_survey_name);
-        String defaultName = Util.getNextDefaultSurveyName(defaultNameBase);
-
+        String defaultName = Util.getNextDefaultSurveyName(this);
         Survey survey = new Survey(defaultName);
-
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(SexyTopo.ACTIVE_SURVEY_NAME, defaultName);
-        editor.commit();
-
         return survey;
     }
 

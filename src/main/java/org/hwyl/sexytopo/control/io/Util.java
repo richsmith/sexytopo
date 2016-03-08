@@ -1,10 +1,15 @@
 package org.hwyl.sexytopo.control.io;
 
+import android.content.Context;
+
+import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
 
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -40,26 +45,39 @@ public class Util {
         return importFiles;
     }
 
+    public static String getNextDefaultSurveyName(Context context) {
+        String defaultNameBase = context.getString(R.string.default_survey_name);
+        return getNextDefaultSurveyName(defaultNameBase);
+    }
+
 
     public static String getNextDefaultSurveyName(String defaultName) {
 
         Set<String> existingSurveyNames = getExistingSurveyNames();
 
-        if (existingSurveyNames.isEmpty()) {
+        if (!existingSurveyNames.contains(defaultName)) {
             return defaultName;
         }
 
-        for (int i = 0; i <= existingSurveyNames.size(); i++) {
-            String name = defaultName + (i == 0 ? "" : ("-" + (i + 1)));
-            if (!existingSurveyNames.contains(name)) {
-                return name;
+        for (String name : existingSurveyNames) {
+            Pattern pattern = Pattern.compile("(.+-)(\\d+)\\z");
+            Matcher matcher = pattern.matcher(name);
+            boolean foundMatch = matcher.find();
+            if (!foundMatch) {
+                continue;
+            } else {
+                String withoutSuffix = matcher.group(1);
+                int numberSuffix = Integer.parseInt(matcher.group(2));
+                return withoutSuffix + (++numberSuffix);
             }
         }
 
-        // shouldn't get here
-        throw new IllegalStateException(
-                "Programming error trying to find next default name for " + defaultName);
+        return defaultName + "-2";
+    }
 
+
+    public static boolean isSurveyNameUnique(String name) {
+        return !getExistingSurveyNames().contains(name);
     }
 
 

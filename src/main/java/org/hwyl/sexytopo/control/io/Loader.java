@@ -26,10 +26,6 @@ public class Loader {
         String path = Util.getPathForSurveyFile(name, "svx");
         String text = slurpFile(path);
 
-        if (text.length() == 0) {
-            throw new IllegalArgumentException("Empty save file");
-        }
-
         Survey survey = new Survey(name);
         parse(text, survey);
 

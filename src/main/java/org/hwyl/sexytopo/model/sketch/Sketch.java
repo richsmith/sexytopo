@@ -62,7 +62,7 @@ public class Sketch {
     }
 
     private void addSketchDetail(SketchDetail sketchDetail) {
-        isSaved = true;
+        setSaved(false);
         sketchHistory.add(sketchDetail);
         undoneHistory.clear();
     }
