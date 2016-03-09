@@ -49,6 +49,11 @@ public class TextTools {
         DecimalFormat formatter = new DecimalFormat("#,##0.00");
         return formatter.format(number);
     }
+
+    public static String formatTo0dp(Number number) {
+        DecimalFormat formatter = new DecimalFormat("#,##0");
+        return formatter.format(number);
+    }
     
 
     public static String advanceLastNumber(String originatingName) {

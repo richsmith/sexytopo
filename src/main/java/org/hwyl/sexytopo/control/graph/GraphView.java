@@ -6,9 +6,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -87,7 +85,8 @@ private boolean firstTime = true;
     public static final int HIGHLIGHT_DIAMETER = 12;
     public static final int STATION_LABEL_SIZE = 20;
 
-    public static final int LABEL_SIZE = 34;
+    public static final int LEGEND_SIZE = 18;
+    public static final int LEGEND_COLOUR = Color.BLACK;
 
     public static final int GRID_COLOUR = Color.LTGRAY;
 
@@ -147,6 +146,7 @@ private boolean firstTime = true;
     private Paint drawPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint labelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint highlightPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Paint legendPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint gridPaint = new Paint();
 
 
@@ -184,9 +184,12 @@ private boolean firstTime = true;
         drawPaint.setStrokeJoin(Paint.Join.ROUND);
         drawPaint.setStrokeCap(Paint.Cap.ROUND);
 
+        legendPaint.setColor(LEGEND_COLOUR);
+        legendPaint.setTextSize(LEGEND_SIZE);
+
         labelPaint.setColor(STATION_COLOUR);
         int textSize = PreferenceAccess.getInt(getContext(), "pref_station_label_font_size", 3);
-        labelPaint.setTextSize(LABEL_SIZE);
+        labelPaint.setTextSize(textSize);
     }
 
 
@@ -543,6 +546,8 @@ private boolean firstTime = true;
 
         drawSketch(canvas, sketch);
 
+        drawLegend(canvas, survey);
+
     }
 
 
@@ -731,6 +736,28 @@ private boolean firstTime = true;
             labelPaint.setColor(textDetail.getColour().intValue);
             canvas.drawText(text, (float)location.getX(), (float)location.getY(), labelPaint);
         }
+    }
+
+
+    private void drawLegend(Canvas canvas, Survey survey) {
+
+        String surveyLabel =
+            survey.getName() +
+            " L" + TextTools.formatTo0dp(SurveyStats.calcTotalLength(survey)) +
+            " H" + TextTools.formatTo0dp(SurveyStats.calcHeightRange(survey));
+
+        float offsetX = getWidth() * 0.03f;
+        float offsetY = getHeight() - offsetX / 2;
+        canvas.drawText(surveyLabel, offsetX, offsetY, legendPaint);
+
+        float scaleWidth = (float)surveyToViewScale * 1;
+        float scaleOffsetY = getHeight() - (offsetX * 2);
+        canvas.drawLine(offsetX, scaleOffsetY, offsetX + scaleWidth, scaleOffsetY, legendPaint);
+        final float TICK_SIZE = 5;
+        canvas.drawLine(offsetX, scaleOffsetY, offsetX, scaleOffsetY - TICK_SIZE, legendPaint);
+        canvas.drawLine(offsetX + scaleWidth, scaleOffsetY, offsetX + scaleWidth, scaleOffsetY - TICK_SIZE, legendPaint);
+        canvas.drawText("1m", offsetX + scaleWidth + 5, scaleOffsetY, legendPaint);
+
     }
 
 
