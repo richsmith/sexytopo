@@ -747,11 +747,11 @@ private boolean firstTime = true;
             " H" + TextTools.formatTo0dp(SurveyStats.calcHeightRange(survey));
 
         float offsetX = getWidth() * 0.03f;
-        float offsetY = getHeight() - offsetX / 2;
+        float offsetY = getHeight() - LEGEND_SIZE * 2;
         canvas.drawText(surveyLabel, offsetX, offsetY, legendPaint);
 
         float scaleWidth = (float)surveyToViewScale * 1;
-        float scaleOffsetY = getHeight() - (offsetX * 2);
+        float scaleOffsetY = getHeight() - (LEGEND_SIZE * 4);
         canvas.drawLine(offsetX, scaleOffsetY, offsetX + scaleWidth, scaleOffsetY, legendPaint);
         final float TICK_SIZE = 5;
         canvas.drawLine(offsetX, scaleOffsetY, offsetX, scaleOffsetY - TICK_SIZE, legendPaint);
