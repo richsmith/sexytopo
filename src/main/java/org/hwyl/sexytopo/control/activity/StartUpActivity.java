@@ -22,7 +22,7 @@ public class StartUpActivity extends SexyTopoActivity {
         setContentView(R.layout.activity_start_up);
 
 
-
+        Util.ensureDataDirectoriesExist();
 
         /*
         // If there are paired devices

@@ -30,6 +30,11 @@ public class Util {
         }
     }
 
+    public static void ensureDataDirectoriesExist() {
+        ensureDirectoryExists(SexyTopo.EXTERNAL_SURVEY_DIR);
+        ensureDirectoryExists(SexyTopo.EXTERNAL_IMPORT_DIR);
+    }
+
 
     public static File[] getSurveyDirectories() {
         ensureDirectoryExists(SexyTopo.EXTERNAL_SURVEY_DIR);
