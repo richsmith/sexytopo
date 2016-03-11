@@ -43,6 +43,7 @@ public class Loader {
             survey.setElevationSketch(elevation);
         }
 
+        survey.setSaved(true);
         return survey;
 
     }

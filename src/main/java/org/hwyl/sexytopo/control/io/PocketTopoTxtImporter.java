@@ -37,6 +37,8 @@ public class PocketTopoTxtImporter {
         Sketch plan = getPlan(text);
         survey.setPlanSketch(plan);
 
+        survey.setSaved(true);
+
         return survey;
     }
 
