@@ -22,7 +22,9 @@ public class SurveyStats {
 
         double total = 0.0;
         for (Leg leg : legs) {
-            total += leg.getDistance();
+            if (leg.hasDestination()) {
+                total += leg.getDistance();
+            }
         }
 
         return total;
