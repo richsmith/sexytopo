@@ -8,7 +8,7 @@
         <ListPreference
             android:key="pref_orientation"
             android:title="Orientation"
-            android:summary="Override device orientation"
+            android:summary="Override device orientation on the Table and Graph views"
             android:dialogTitle="Select Orientation"
             android:entries="@array/pref_orientation_options"
             android:entryValues="@array/pref_orientation_options"
