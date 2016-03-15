@@ -75,17 +75,11 @@ public class Leg extends SurveyComponent{
         }
     }
 
-    /**
-     * Produce the exact opposite backsight for this leg.
-     * @param destination The new destination (aka the former source)
-     * @return
-     */
     public Leg asBacksight(Station destination) {
-        double backAzm = (getBearing() + 180) % 360;
-        return new Leg(getDistance(), backAzm, -1 * getInclination(), destination);
+        double backAzimuth = Space2DUtils.adjustAngle(getAzimuth(), 180.0);
+        return new Leg(getDistance(), backAzimuth, -1 * getInclination(), destination);
     }
 
-    /** Produce the exact opposite backsight for this splay leg. */
     public Leg asBacksight() {
         return asBacksight(Survey.NULL_STATION);
     }

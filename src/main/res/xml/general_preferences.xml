@@ -2,21 +2,34 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
-    android:title="General"
-    android:key="pref_general">
-    <ListPreference
-        android:key="pref_orientation"
-        android:title="Orientation"
-        android:summary="Override device orientation"
-        android:dialogTitle="Select Orientation"
-        android:entries="@array/pref_orientation_options"
-        android:entryValues="@array/pref_orientation_options"
-        android:defaultValue="auto" />
+        android:title="General"
+        android:key="pref_general">
+
+        <ListPreference
+            android:key="pref_orientation"
+            android:title="Orientation"
+            android:summary="Override device orientation"
+            android:dialogTitle="Select Orientation"
+            android:entries="@array/pref_orientation_options"
+            android:entryValues="@array/pref_orientation_options"
+            android:defaultValue="auto" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Disto-X Communication"
+        android:key="pref_distox_communication">
+
+        <CheckBoxPreference
+            android:key="pref_backsight_promotion"
+            android:summary="Replace pairs of inverted readings with a new station leg"
+            android:title="Automatic backsight promotion"
+            android:defaultValue="false"/>
     </PreferenceCategory>
 
     <PreferenceCategory
         android:title="Sketch Display"
         android:key="pref_sketch_display">
+
         <CheckBoxPreference
             android:key="pref_key_highlight_latest_leg"
             android:summary="Show most recent measurement in purple"
@@ -43,19 +56,12 @@
             android:defaultValue="22"
             android:summary="Font size of station labels"
             android:title="Station Label Size"/>
-        <!--
-        <ListPreference
-            android:key="pref_station_symbol"
-            android:title="@string/pref_station_symbol"
-            android:dialogTitle="@string/pref_station_symbol"
-            android:entries="@array/pref_station_labels"
-            android:entryValues="@array/pref_station_labels"
-            android:defaultValue="@string/pref_station_symbol" />-->
-
     </PreferenceCategory>
-        <PreferenceCategory
+
+    <PreferenceCategory
         android:title="Manual Data Entry"
         android:key="pref_manual_data_entry">
+
         <CheckBoxPreference
             android:key="pref_key_lrud_fields"
             android:summary="Show fields for entering LRUDs (Left-Right-Up-Down) for each new station"
@@ -63,26 +69,4 @@
             android:defaultValue="false"/>
     </PreferenceCategory>
 
-<!--
-<PreferenceCategory
-    android:title="DistoX Communication"
-    android:key="pref_distox_communication">
-    <EditTextPreference
-        android:key="pref_distox_inter_packet_delay"
-        android:inputType="number"
-        android:numeric="integer"
-        android:defaultValue="22"
-        android:summary="Font size of station labels"
-        android:title="Station Label Size"/>
-    <Preference
-        android:key="pref_key_sms_delete_limit"
-        android:dependency="pref_key_auto_delete"
-        android:summary="foo 4"
-        android:title="foo 5"/>
-    <Preference
-        android:key="pref_key_mms_delete_limit"
-        android:dependency="pref_key_auto_delete"
-        android:summary="foo 6"
-        android:title="foo 7" />
-</PreferenceCategory>-->
 </PreferenceScreen>

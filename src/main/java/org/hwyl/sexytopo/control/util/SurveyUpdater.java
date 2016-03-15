@@ -27,21 +27,37 @@ public class SurveyUpdater {
     private static final double MAX_INCLINATION_DIFF = 1;
 
 
+    public static void update(Survey survey, List<Leg> legs, boolean considerBacksightPromotion) {
+        for (Leg leg : legs) {
+            update(survey, leg, considerBacksightPromotion);
+        }
+    }
+
+
     public static void update(Survey survey, List<Leg> legs) {
         for (Leg leg : legs) {
             update(survey, leg);
         }
     }
 
-
     public static void update(Survey survey, Leg leg) {
+        update(survey, leg, false);
+    }
+
+    public static void update(Survey survey, Leg leg, boolean considerBacksightPromotion) {
         Station activeStation = survey.getActiveStation();
         activeStation.getOnwardLegs().add(leg);
         survey.setSaved(false);
         survey.addUndoEntry(activeStation, leg);
 
-        createNewStationIfBacksight(survey);
-        createNewStationIfTripleShot(survey);
+        if (considerBacksightPromotion) {
+            boolean createdNewStation = createNewStationIfBacksight(survey);
+            if (!createdNewStation) {
+                createNewStationIfTripleShot(survey);
+            }
+        } else {
+            createNewStationIfTripleShot(survey);
+        }
     }
 
 
@@ -62,12 +78,6 @@ public class SurveyUpdater {
     }
 
 
-    /**
-     * Examine splays of the current active station to determine if we should promote a
-     * "triple-shot" of close-enough splays to a new named station.
-     * @param survey
-     * @return <tt>true</tt> if new station was created
-     */
     private static boolean createNewStationIfTripleShot(Survey survey) {
 
         Station activeStation = survey.getActiveStation();
@@ -97,20 +107,15 @@ public class SurveyUpdater {
     }
 
 
-    /**
-     * Examine splays of the current active station to determine if the previous two were a
-     * foreward and backsight; if so, promote to a new named station.
-     * @param survey
-     * @return <tt>true</tt> if new station was created
-     */
     private static boolean createNewStationIfBacksight(Survey survey) {
-
+        // Examine splays of the current active station to determine if the previous two were a
+        // foreward and backsight; if so, promote to a new named station
         Station activeStation = survey.getActiveStation();
         if (activeStation.getOnwardLegs().size() >= 2) {
 
             List<Leg> legs = getLatestNLegs(activeStation, 2);
-            Leg fore = legs.get(legs.size()-2);
-            Leg back = legs.get(legs.size()-1);  // TODO: check for "reverse mode" to see if backsight comes first?
+            Leg fore = legs.get(legs.size() - 2);
+            Leg back = legs.get(legs.size() - 1);  // TODO: check for "reverse mode" to see if backsight comes first?
 
             if (areLegsBacksights(fore, back)) {
                 Station newStation = new Station(StationNamer.generateNextStationName(survey, activeStation));
@@ -219,51 +224,40 @@ public class SurveyUpdater {
     }
 
 
-    /**
-     * Given two legs, determine if they are in agreement as foresight and backsight.
-     * @param fore Presumed shot FROM->TO
-     * @param back Presumed shot TO->FROM
-     * @return
-     */
     public static boolean areLegsBacksights(Leg fore, Leg back) {
+        // Given two legs, determine if they are in agreement as foresight and backsight.
         Leg correctedBack = back.asBacksight();
         return areLegsAboutTheSame(Arrays.asList(fore, correctedBack));
     }
 
-
-    /**
-     * Given some legs that we expect are "about the same", average their values into one leg.
-     * @param repeats
-     * @return
-     */
     public static Leg averageLegs(List<Leg> repeats) {
         int count = repeats.size();
-        double dist = 0.0, inc = 0.0;
-        double[] azms = new double[count];
+        double distance = 0.0, inclination = 0.0;
+        double[] azimuths = new double[count];
         for (int i=0; i < count; i++) {
             Leg leg = repeats.get(i);
-            dist += leg.getDistance();
-            inc += leg.getInclination();
-            azms[i] = leg.getBearing();
+            distance += leg.getDistance();
+            inclination += leg.getInclination();
+            azimuths[i] = leg.getAzimuth();
         }
-        dist /= count;
-        inc /= count;
-        return new Leg(dist, averageAzms(azms), inc);
+        distance /= count;
+        inclination /= count;
+        return new Leg(distance, averageAzimuths(azimuths), inclination);
     }
 
 
-    /** Given a foresight and backsight which may not exactly agree, produce an averaged foresight */
     public static Leg averageBacksights(Leg fore, Leg back) {
+        // Given a foresight and backsight which may not exactly agree, produce an averaged foresight
         return averageLegs(Arrays.asList(fore, back.asBacksight()));
     }
 
 
     /** Average some azimuth values together, even if they span the 360/0 boundary */
-    private static double averageAzms(double[] azms) {
+    private static double averageAzimuths(double[] azms) {
         // Azimuth values jump at the 360/0 boundary, so we must be careful to ensure that
         // values {359, 1} average to 0 rather than the incorrect value 180
         double sum = 0.0;
-        double min = Leg.MAX_BEARING, max = Leg.MIN_BEARING;
+        double min = Leg.MAX_AZIMUTH, max = Leg.MIN_AZIMUTH;
         for (int i=0; i<azms.length; i++) {
             if (azms[i] < min) min = azms[i];
             if (azms[i] > max) max = azms[i];

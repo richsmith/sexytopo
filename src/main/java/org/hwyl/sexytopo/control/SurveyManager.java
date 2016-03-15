@@ -57,7 +57,10 @@ public class SurveyManager {
                 legs = reverseLegs(legs);
             }
 
-            SurveyUpdater.update(currentSurvey, legs);
+            boolean automaticBacksightPromotion =
+                    preferences.getBoolean( "pref_key_highlight_latest_leg", false);
+
+            SurveyUpdater.update(currentSurvey, legs, automaticBacksightPromotion);
 
 
             try {
