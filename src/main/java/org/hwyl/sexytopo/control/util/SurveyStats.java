@@ -63,7 +63,8 @@ public class SurveyStats {
     }
 
     public static int calcNumberSubStations(Station origin) {
-        return Survey.getAllStations(origin).size();
+        // -1 here because we don't want to include the origin
+        return Survey.getAllStations(origin).size() - 1;
     }
 
     public static int calcNumberLegs(Survey survey) {
