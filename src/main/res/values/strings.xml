@@ -37,6 +37,7 @@
     <string name="menu_set_active_station">Set Active Station</string>
     <string name="menu_rename_station">Rename Station</string>
     <string name="menu_edit_leg">Edit Leg</string>
+    <string name="menu_upgrade_row">Force New Station</string>
     <string name="menu_delete_row">Delete Row</string>
     <string name="sketch_menu_delete_last_leg">Undo Last Reading</string>
     <string name="sketch_menu_centre_view">Go to Active</string>

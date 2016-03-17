@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.graph.GraphView;
 import org.hwyl.sexytopo.control.table.ManualEntry;
 import org.hwyl.sexytopo.control.util.SurveyStats;
@@ -158,7 +159,14 @@ public class TableActivity extends SexyTopoActivity
         if (col == TableCol.FROM || col == TableCol.TO) {
             showPopup(view, R.menu.table_station_selected, this);
         } else {
-            showPopup(view, R.menu.table_measurement_selected, this);
+            final GraphToListTranslator.SurveyListEntry surveyEntry =
+                    fieldToSurveyEntry.get(cellBeingClicked);
+            Leg leg = surveyEntry.getLeg();
+            if (leg.hasDestination()) {
+                showPopup(view, R.menu.table_full_leg_selected, this);
+            } else {
+                showPopup(view, R.menu.table_splay_selected, this);
+            }
         }
 
         return true;
@@ -200,6 +208,11 @@ public class TableActivity extends SexyTopoActivity
             case R.id.editLeg:
                 Leg toEdit = surveyEntry.getLeg();
                 ManualEntry.editLeg(this, getSurvey(), toEdit);
+                return true;
+            case R.id.upgradeRow:
+                Leg toUpgrade = surveyEntry.getLeg();
+                SurveyUpdater.upgradeSplayToConnectedLeg(getSurvey(), toUpgrade);
+                syncTableWithSurvey();
                 return true;
             case R.id.deleteRow:
                 int legsToBeDeleted = SurveyStats.calcNumberSubLegs(surveyEntry.getFrom());

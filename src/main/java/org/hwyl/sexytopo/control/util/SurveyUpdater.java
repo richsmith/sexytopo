@@ -77,6 +77,15 @@ public class SurveyUpdater {
         survey.setActiveStation(leg.getDestination());
     }
 
+    public static void upgradeSplayToConnectedLeg(Survey survey, Leg leg) {
+        Station newStation = new Station(getNextStationName(survey));
+        Leg newLeg = Leg.upgradeSplayToConnectedLeg(leg, newStation);
+        editLeg(survey, leg, newLeg);
+    }
+
+    private static String getNextStationName(Survey survey) {
+        return StationNamer.generateNextStationName(survey, survey.getActiveStation());
+    }
 
     private static boolean createNewStationIfTripleShot(Survey survey) {
 
@@ -86,7 +95,7 @@ public class SurveyUpdater {
             List<Leg> legs = getLatestNLegs(activeStation, SexyTopo.NUM_OF_REPEATS_FOR_NEW_STATION);
 
             if (areLegsAboutTheSame(legs)) {
-                Station newStation = new Station(StationNamer.generateNextStationName(survey, activeStation));
+                Station newStation = new Station(getNextStationName(survey));
 
                 Leg newLeg = averageLegs(legs);
                 newLeg = Leg.upgradeSplayToConnectedLeg(newLeg, newStation);
@@ -118,7 +127,7 @@ public class SurveyUpdater {
             Leg back = legs.get(legs.size() - 1);  // TODO: check for "reverse mode" to see if backsight comes first?
 
             if (areLegsBacksights(fore, back)) {
-                Station newStation = new Station(StationNamer.generateNextStationName(survey, activeStation));
+                Station newStation = new Station(getNextStationName(survey));
 
                 Leg newLeg = averageBacksights(fore, back);
                 newLeg = Leg.upgradeSplayToConnectedLeg(newLeg, newStation);

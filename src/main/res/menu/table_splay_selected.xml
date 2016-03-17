@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/editLeg"
+        android:title="@string/menu_edit_leg"/>
+    <item
+        android:id="@+id/upgradeRow"
+        android:title="@string/menu_upgrade_row"/>
+    <item
+        android:id="@+id/deleteRow"
+        android:title="@string/menu_delete_row"/>
+</menu>
