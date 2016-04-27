@@ -71,6 +71,7 @@ private boolean firstTime = true;
 
 
     public static final int LEG_COLOUR = Color.RED;
+	public static final int SPLAY_COLOUR = Color.PINK;
     public static final int LATEST_LEG_COLOUR = Color.MAGENTA;
     public static final int LEG_STROKE_WIDTH = 2;
     public static final int HIGHLIGHT_COLOUR = Color.YELLOW;
@@ -650,14 +651,24 @@ private boolean firstTime = true;
             if (PreferenceAccess.getBoolean(getContext(), "pref_key_highlight_latest_leg", true)
                     && survey.getMostRecentLeg() == leg) {
                 legPaint.setColor(LATEST_LEG_COLOUR);
-            }
+            } else if (!leg.hasDestination()) {
+				legPaint.setColor(SPLAY_COLOUR);
+			} else {
+				legPaint.setColor(LEG_COLOUR);
+			}
+
+			boolean legIsHorizontalish = -45 < leg.getInclination() && leg.getInclination() < 45;
+			if (legIsHorizontalish) {
+				drawPaint.setStyle(Paint.Style.STROKE);
+			} else {
+				drawPaint.setStyle(Paint.Style.DOTTED);
+			}
 
             canvas.drawLine(
                 (float)(start.getX()), (float)(start.getY()),
                 (float)(end.getX()), (float)(end.getY()),
                 legPaint);
 
-            legPaint.setColor(LEG_COLOUR);
         }
 
     }
