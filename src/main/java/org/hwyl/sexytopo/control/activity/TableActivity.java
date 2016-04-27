@@ -129,6 +129,10 @@ public class TableActivity extends SexyTopoActivity
                     textView.setBackgroundColor(GraphView.HIGHLIGHT_COLOUR);
                 }
 
+				if (entry.getLeg().hasDestination()) {
+					//textView.setStyle(BOLD); FIXME
+				}
+
                 fieldToSurveyEntry.put(textView, entry);
                 fieldToTableCol.put(textView, col);
 
