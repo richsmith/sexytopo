@@ -36,7 +36,7 @@
     <string name="title_activity_device">DistoX</string>
     <string name="menu_set_active_station">Set Active Station</string>
     <string name="menu_rename_station">Rename Station</string>
-    <string name="menu_edit_leg">Edit Leg</string>
+    <string name="menu_edit_leg">Edit Row</string>
     <string name="menu_upgrade_row">Force New Station</string>
     <string name="menu_delete_row">Delete Row</string>
     <string name="sketch_menu_delete_last_leg">Undo Last Reading</string>
@@ -72,10 +72,10 @@
     <string name="title_activity_help">Help</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_guide">Guide</string>
-    <string name="bluetooth_status">Bluetooth</string>
-    <string name="connect_automatically">Connect</string>
+    <string name="bluetooth_status">1. Bluetooth</string>
+    <string name="connect_automatically">3. Connect</string>
     <string name="bluetooth_none">No Bluetooth capabilities</string>
-    <string name="paired_status">Paired With</string>
+    <string name="paired_status">2. Paired With</string>
     <string name="request_pair">Pair…</string>
     <string name="request_unpair">Unpair…</string>
     <string name="unpair_command">Unpair</string>
