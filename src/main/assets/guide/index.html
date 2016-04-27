@@ -20,9 +20,17 @@
 <p>Messages received from the DistoX, and any errors, will be reported in the console. You don't need to worry about reading the console if everything is working OK.</p>
 
 <h2>Data Table Screen</h2>
-<p>This is a tabular view of the collected data. It can be accessed through the first icon on the Action Bar. It is intended that most interaction with SexyTopo should be through the graph screens but it useful to check the raw data occasionally.</p>
-<p>There are on-screen buttons for manually inputting data. There are separate buttons for adding new stations and splays and another button deletes the last measurement. You can get a context menu to edit existing data by long-pressing on a table cell.</p>
-<p>The context menu also contains commands for setting the active station (see <a href="#surveyingWithSexyTopo">Surveying with SexyTopo</a> for more details) or deleting data (note that if you delete a station, any splays, onward legs, or station linked to said legs are also lost).
+<p>This is a tabular view of the collected data. It can be accessed through the first icon on the Action Bar. It is intended that most interaction with SexyTopo should be through the graph screens but it is occasionally useful to check the raw data.</p>
+<p>There are on-screen buttons for manually inputting data: there are two buttons for adding new stations and splays. Another button deletes the last measurement inputted or read from the Disto.</p>
+<p>Long-pressing on a table cell activates a context menu, which will have different options depening on whether the cell is a station or a measurement and if the row represents a full leg or a splay.
+<h3>Table Context Menu</h3>
+<ul>
+	<li><strong>Set Active Station</strong> (only available for stations) sets the station as the current active one so measurements are considered to be made from that station (see <a href="#surveyingWithSexyTopo">Surveying with SexyTopo</a> for more details on this).</li>
+	<li><strong>Rename Station</strong> (only available for stations) brings up a dialog allowing you to rename the station.</li>
+	<li><strong>Edit Row</strong></li> brings up a dialog for directly editing the data in the current leg or splay (distance, azimuth, inclination).</li>
+	<li><strong>Delete Row</strong></li> deletes the leg or splay represented by the selected row (note that if you delete a station, any splays, onward legs, or station linked to said legs are also lost).</li>
+	<li><strong>Force New Station</strong></li> (only available for splays) essentially upgrades a splay to a full leg, creating a new station in the survey. If using a Disto, this bypasses the usual requirement to shoot three splays in succession to create a new station. Misuse of this feature can result in an inaccurate survey.</li>
+</ul>
 
 <h2>Calibration</h2>
 <p>The DistoX device needs calibration before it can be used reliably. This is not just a theoretical requirement; without calibration, measurements can be significantly off.</p>
@@ -31,7 +39,7 @@
 <a name="surveyingWithSexyTopo"><h2>Surveying with SexyTopo</h2></a>
 <p>A full description of surveying is beyond the scope of this document but this is a brief overview of how to survey with SexyTopo.</p>
 <p>Surveying consists of moving through the cave along a series of locations known as <strong>stations</strong>. These points are connected together through measurements known as <strong>legs</strong> (or <strong>shots</strong> in some countries). This collection of stations and legs make up the skeleton of the survey, or <strong>centreline</strong>. The survey may also contain legs that do not connect to a station but help measure out the shape of the cave (known as <strong>splays</strong>).
-<p>Typically, a surveyor will start at a station and take several splays (ideally the job will be split between at least one caver taking the measurements and another piloting SexyTopo). A common method is to use the LRUD mnemonic and do Left, Right, Up and Down splays from the station, but additional splays may be useful, especially in complex parts of the cave. Then the surveyor will look for the next station. You can instruct SexyTopo to create a new station (rather than a splay) by repeating a measurement three times. If the readings are sufficiently close, a new station is added. The surveyor then updates the sketches of the plan and profile on the graph screens, before moving to the new station and repeating the process.</p>
+<p>Typically, a surveyor will start at a station and take several splays (ideally the job will be split between at least one caver taking the measurements and another piloting SexyTopo). A common method is to use the LRUD mnemonic and do Left, Right, Up and Down splays from the station, but additional splays are often useful, especially in complex parts of the cave. Then the surveyor will look for the next station. You can instruct SexyTopo to create a new station (rather than a splay) by repeating a measurement three times. If the readings are sufficiently close, a new station is added. The surveyor then updates the sketches of the plan and profile on the graph screens, before moving to the new station and repeating the process.</p>
 <p>Legs are added to the survey at the <strong>active station</strong>. By default the active station is the newest station added to the survey. In the standard order of things (as described above) the active station should automatically be the one you want, but you will want to change it in case of a mistake or to make a branch in the cave. For example, you may have created a new station but forgotten to take splays at the station before. Here you can select the previous station as the active station, take any required splays, then set the new station as the active station.</p>
 <p>Branches are just as easy to add. Select the station you wish to branch off as the active station, and then create a new station as before.</p>
 
@@ -83,11 +91,11 @@
 <h2>Troubleshooting</h2>
 <p>In typical caver fashion, you've probably cajoled someone into lending you their shiny DistoX, completely failed to have a practice with it and assumed you'd just wing it. Now you've found yourself in the sharp end of some crappy hole somewhere realising that you have no idea why your surveying kit doesn't work. Luckily you've found SexyTopo has a help file and you're desperately trying to scan through it looking for some hope. First of all, don't panic...</p>
 <h3>Problems talking to the Disto-X</h3>
-<p>Try turning the Disto-X off and back on. Try unpairing and re-pairing, or even turning bluetooth off and on again. It shouldn't make
-	a difference but you could kill SexyTopo and reopen it. Check you haven't paired with the
-	wrong Disto (the Unpair dialog shows which Distos are paired). Check theon-screen console on the DistoX page: it may show an error message or give some clue as to what is wrong.</p>
-<p>If all else fails a factory reset of the Disto-X may be necessary. Press CLEAR, FUNC and MEM (the latter has a floppy disk or save icon) for five seconds.</p>
+<p>Check the following are true: bluetooth is turned on on the device, the device is paired with the Disto and the Connect switch is on. Check the on-screen console on the DistoX page: it may show an error message or give some clue as to what is wrong.</p>
+<p>If that fails, try turning the Disto-X off and back on. Try unpairing and re-pairing, or even turning bluetooth off and on again. It shouldn't make a difference but you could kill SexyTopo and reopen it. Check you haven't paired with the wrong Disto (the Unpair dialog shows which Distos are paired).</p>
+<p>If all else fails a factory reset of the Disto-X may be necessary. Press CLEAR, FUNC and MEM (the latter has a floppy disk or save icon) for five seconds. Note that this is an option of last resort and requires recalibrating the Disto-X.</p>
 <h3>Strange Measurements</h3>
 <p>The Disto-X may need calibrating. See the calibration section above.</p>
+
 </body>
 </html>
