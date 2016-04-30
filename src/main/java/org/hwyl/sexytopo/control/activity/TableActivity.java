@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
@@ -130,8 +131,10 @@ public class TableActivity extends SexyTopoActivity
                 }
 
 				if (entry.getLeg().hasDestination()) {
-					//textView.setStyle(BOLD); FIXME
-				}
+					textView.setTypeface(textView.getTypeface(), Typeface.BOLD);
+                } else {
+                    textView.setTypeface(textView.getTypeface(), Typeface.NORMAL);
+                }
 
                 fieldToSurveyEntry.put(textView, entry);
                 fieldToTableCol.put(textView, col);
