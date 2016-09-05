@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.util.Log;
 import android.view.Menu;
@@ -39,7 +40,7 @@ import java.util.Map;
 /**
  * Base class for all activities that use the action bar.
  */
-public abstract class SexyTopoActivity extends ActionBarActivity {
+public abstract class SexyTopoActivity extends AppCompatActivity {
 
     protected SurveyManager dataManager;
 
