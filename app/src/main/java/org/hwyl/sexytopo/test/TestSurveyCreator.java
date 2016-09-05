@@ -4,6 +4,7 @@ import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
+import org.hwyl.sexytopo.model.table.LRUD;
 
 import java.util.List;
 import java.util.Random;
@@ -52,8 +53,18 @@ public class TestSurveyCreator {
             SurveyUpdater.update(survey, leg1);
             Leg leg2 = new Leg(distance, azimuth, inclination);
             SurveyUpdater.update(survey, leg2);
+
+            Station newStation = survey.getMostRecentLeg().getDestination();
+            createLruds(survey, newStation);
         }
 
+    }
+
+    public static void createLruds(Survey survey, Station station) {
+        for (LRUD lrud : LRUD.values()) {
+            Leg splay = lrud.createSplay(survey, station, 1 + random.nextInt(4));
+            SurveyUpdater.update(survey, splay);
+        }
     }
 
     public static <T> T getRandom(List<T> list) {
