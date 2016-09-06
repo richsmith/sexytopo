@@ -127,7 +127,7 @@ public class TableActivity extends SexyTopoActivity
                 textView.setText(display);
 
                 if (isActiveStation(map.get(col))) {
-                    textView.setBackgroundColor(GraphView.HIGHLIGHT_COLOUR);
+                    textView.setBackgroundColor(GraphView.HIGHLIGHT_COLOUR.intValue);
                 }
 
 				if (entry.getLeg().hasDestination()) {

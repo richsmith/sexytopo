@@ -70,26 +70,23 @@ private boolean firstTime = true;
     private Sketch sketch;
 
 
-    public static final int LEG_COLOUR = Color.RED;
-	public static final int SPLAY_COLOUR = 0xFFC0CB;
-    public static final int LATEST_LEG_COLOUR = Color.MAGENTA;
-    public static final int LEG_STROKE_WIDTH = 2;
-    public static final int HIGHLIGHT_COLOUR = Color.YELLOW;
+    public static final Colour LEG_COLOUR = Colour.RED;
+	public static final Colour SPLAY_COLOUR = Colour.PINK;
+    public static final Colour LATEST_LEG_COLOUR = Colour.MAGENTA;
+    public static final Colour HIGHLIGHT_COLOUR = Colour.GOLD;
     public static final Colour DEFAULT_SKETCH_COLOUR = Colour.BLACK;
 
-    public static final int STATION_COLOUR = Color.RED;
+    public static final int STATION_COLOUR = Colour.DARK_RED.intValue;;
     public static final int STATION_DIAMETER = 8;
     public static final int CROSS_DIAMETER = 16;
     public static final int STATION_STROKE_WIDTH = 5;
 
     public static final int HIGHLIGHT_OUTLINE = 4;
-    public static final int HIGHLIGHT_DIAMETER = 12;
     public static final int STATION_LABEL_SIZE = 20;
 
     public static final int LEGEND_SIZE = 18;
-    public static final int LEGEND_COLOUR = Color.BLACK;
-
-    public static final int GRID_COLOUR = Color.LTGRAY;
+    public static final Colour LEGEND_COLOUR = Colour.BLACK;
+    public static final Colour GRID_COLOUR = Colour.LIGHT_GREY;
 
     public static final double DELETE_PATHS_WITHIN_N_PIXELS = 5.0;
     public static final double SELECTION_SENSITIVITY_IN_PIXELS = 25.0;
@@ -170,14 +167,14 @@ private boolean firstTime = true;
 
         highlightPaint.setStyle(Paint.Style.STROKE);
         highlightPaint.setStrokeWidth(STATION_STROKE_WIDTH + HIGHLIGHT_OUTLINE);
-        highlightPaint.setColor(HIGHLIGHT_COLOUR);
+        highlightPaint.setColor(HIGHLIGHT_COLOUR.intValue);
 
         legPaint.setARGB(127, 255, 0, 0);
         int legStrokeWidth = PreferenceAccess.getInt(getContext(), "pref_leg_width", 3);
         legPaint.setStrokeWidth(legStrokeWidth);
-        legPaint.setColor(LEG_COLOUR);
+        legPaint.setColor(LEG_COLOUR.intValue);
 
-        gridPaint.setColor(GRID_COLOUR);
+        gridPaint.setColor(GRID_COLOUR.intValue);
 
         drawPaint.setColor(DEFAULT_SKETCH_COLOUR.intValue);
         drawPaint.setStrokeWidth(3);
@@ -185,7 +182,7 @@ private boolean firstTime = true;
         drawPaint.setStrokeJoin(Paint.Join.ROUND);
         drawPaint.setStrokeCap(Paint.Cap.ROUND);
 
-        legendPaint.setColor(LEGEND_COLOUR);
+        legendPaint.setColor(LEGEND_COLOUR.intValue);
         legendPaint.setTextSize(LEGEND_SIZE);
 
         labelPaint.setColor(STATION_COLOUR);
@@ -650,11 +647,11 @@ private boolean firstTime = true;
 
             if (PreferenceAccess.getBoolean(getContext(), "pref_key_highlight_latest_leg", true)
                     && survey.getMostRecentLeg() == leg) {
-                legPaint.setColor(LATEST_LEG_COLOUR);
+                legPaint.setColor(LATEST_LEG_COLOUR.intValue);
             } else if (!leg.hasDestination()) {
-				legPaint.setColor(SPLAY_COLOUR);
+				legPaint.setColor(SPLAY_COLOUR.intValue);
 			} else {
-				legPaint.setColor(LEG_COLOUR);
+				legPaint.setColor(LEG_COLOUR.intValue);
 			}
 
 			boolean legIsHorizontalish = -45 < leg.getInclination() && leg.getInclination() < 45;
