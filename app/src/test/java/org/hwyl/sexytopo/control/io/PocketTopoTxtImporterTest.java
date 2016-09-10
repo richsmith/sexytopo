@@ -1,19 +1,19 @@
-package org.hwyl.sexytopo.tests;
+package org.hwyl.sexytopo.control.io;
 
 import android.test.AndroidTestCase;
 
 import org.hwyl.sexytopo.control.io.PocketTopoTxtImporter;
-import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
+import org.junit.Assert;
+import org.junit.Test;
 
-import java.util.List;
 import java.util.Set;
 
 /**
  * Created by rls on 09/11/15.
  */
-public class PocketTopoTxtImporterTest extends AndroidTestCase {
+public class PocketTopoTxtImporterTest {
 
         public static final String FAKE_TEXT =
             "TRIP\n" +
@@ -49,17 +49,20 @@ public class PocketTopoTxtImporterTest extends AndroidTestCase {
             "70.600\t-23.300\n" +
             "70.800\t-23.300";
 
+    @Test
     public void testGetSection() {
         String section = PocketTopoTxtImporter.getSection(FAKE_TEXT, "DATA");
-        assertEquals("1.0\t\t193.78\t0.41\t9.118\t>\n1.0\t\t328.51\t14.60\t4.709\t>", section);
+        Assert.assertEquals("1.0\t\t193.78\t0.41\t9.118\t>\n1.0\t\t328.51\t14.60\t4.709\t>", section);
     }
 
+    @Test
     public void testGetNamedSubSection() {
         String section = PocketTopoTxtImporter.getSection(FAKE_TEXT, "ELEVATION");
         String stationsSubSection = PocketTopoTxtImporter.getNamedSubSection(section, "STATIONS");
-        assertEquals("0.000\t0.000\t1.0\n-10.255\t1.283\t1.1", stationsSubSection);
+        Assert.assertEquals("0.000\t0.000\t1.0\n10.335\t0.789\t1.1", stationsSubSection);
     }
 
+    @Test
     public void testParsePolylines() {
         String section = PocketTopoTxtImporter.getSection(FAKE_TEXT, "PLAN");
         Set<PathDetail> paths = PocketTopoTxtImporter.parsePolylines(section);
@@ -71,8 +74,8 @@ public class PocketTopoTxtImporterTest extends AndroidTestCase {
             }
         }
 
-        assertEquals(4.980, brownPath.getPath().get(0).getX());
-        assertEquals(-55.180, brownPath.getPath().get(0).getY());
+        Assert.assertEquals(4.980, brownPath.getPath().get(0).getX(), 0.01);
+        Assert.assertEquals(55.180, brownPath.getPath().get(0).getY(), 0.01);
 
     }
 }

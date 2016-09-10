@@ -1,16 +1,17 @@
-package org.hwyl.sexytopo.tests;
-
-import android.test.AndroidTestCase;
+package org.hwyl.sexytopo.control.util;
 
 import junit.framework.Assert;
 
+import org.hwyl.sexytopo.BasicTestSurveyCreator;
 import org.hwyl.sexytopo.control.util.CrossSectioner;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
+import org.junit.Test;
 
 
-public class CrossSectionerTest extends AndroidTestCase {
+public class CrossSectionerTest {
 
+    @Test
     public void testStraightNorthCrossSection() {
         Survey testSurvey = BasicTestSurveyCreator.createStraightNorth();
 
@@ -19,6 +20,7 @@ public class CrossSectionerTest extends AndroidTestCase {
         Assert.assertEquals(0.0, angle);
     }
 
+    @Test
     public void testStraightSouthCrossSection() {
         Survey testSurvey = BasicTestSurveyCreator.createStraightSouth();
 

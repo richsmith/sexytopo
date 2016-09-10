@@ -21,8 +21,10 @@ public class Saver {
 
     public static void save(Survey survey) throws IOException, JSONException {
 
-        if (survey.getName().equals("") || survey.getName().contains("/")) {
-            throw new IllegalArgumentException("Illegal survey name");
+        if (survey.getName().equals("")) {
+            throw new IllegalArgumentException("Not saved; survey name cannot be empty");
+        } else if (survey.getName().contains("/")) {
+            throw new IllegalArgumentException("Not saved; survey name cannot contain a slash");
         }
 
         saveSurveyData(survey, "svx");

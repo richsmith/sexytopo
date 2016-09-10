@@ -1,32 +1,36 @@
-package org.hwyl.sexytopo.tests;
+package org.hwyl.sexytopo.control.util;
 
-import android.test.AndroidTestCase;
 
 import junit.framework.Assert;
 
+import org.hwyl.sexytopo.BasicTestSurveyCreator;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class StationRenameTest extends AndroidTestCase {
+public class StationRenameTest {
 
+    @Test
     public void testGetStationByNameGetsExistingStation() {
         Survey testSurvey = BasicTestSurveyCreator.createStraightNorth();
         Station s1 = testSurvey.getStationByName("1");
         Assert.assertEquals("1", s1.getName());
     }
 
+    @Test
     public void testGetStationByNameCanFail() {
         Survey testSurvey = BasicTestSurveyCreator.createStraightNorth();
         Station shouldBeNull = testSurvey.getStationByName("I DO NOT EXIST :P");
         Assert.assertEquals(null, shouldBeNull);
     }
 
+    @Test
     public void testRenameOriginStation() {
         Survey testSurvey = BasicTestSurveyCreator.createStraightNorth();
         Station s1 = testSurvey.getStationByName("1");
@@ -36,6 +40,7 @@ public class StationRenameTest extends AndroidTestCase {
         Assert.assertEquals("ShinyNewNameOrigin", shinyNewStation.getName());
     }
 
+    @Test
     public void testRenameStation() {
         Survey testSurvey = BasicTestSurveyCreator.createStraightNorth();
         Station s2 = testSurvey.getStationByName("2");
@@ -57,16 +62,18 @@ public class StationRenameTest extends AndroidTestCase {
         }
     }
 
+    @Test
     public void testAverageLegs() {
         Leg leg1 = new Leg(10, 359, -1);
         Leg leg2 = new Leg(20,   1, +1);
         List<Leg> legs = new ArrayList<>(2); legs.add(leg1); legs.add(leg2);
         Leg avgLeg = SurveyUpdater.averageLegs(legs);
         Assert.assertEquals("Dist", 15.0, avgLeg.getDistance());
-        Assert.assertEquals("Azm", 0.0, avgLeg.getBearing());
+        Assert.assertEquals("Azm", 0.0, avgLeg.getAzimuth());
         Assert.assertEquals("Inc", 0.0, avgLeg.getInclination());
     }
 
+    @Test
     public void testBacksights() {
         Leg fore1 = new Leg(10, 180, +42);
         Leg back1 = new Leg(10,   0, -42);

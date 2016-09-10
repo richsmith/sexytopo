@@ -1,18 +1,19 @@
-package org.hwyl.sexytopo.tests;
-
-import android.test.AndroidTestCase;
+package org.hwyl.sexytopo.model.table;
 
 import junit.framework.Assert;
 
+import org.hwyl.sexytopo.BasicTestSurveyCreator;
 import org.hwyl.sexytopo.control.util.CrossSectioner;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.table.LRUD;
+import org.junit.Test;
 
 
-public class LrudTest extends AndroidTestCase {
+public class LrudTest {
 
+    @Test
     public void testStraightNorthCrossSectionLeftSplay() {
         Survey testSurvey = BasicTestSurveyCreator.createStraightNorth();
 
@@ -24,6 +25,7 @@ public class LrudTest extends AndroidTestCase {
     }
 
 
+    @Test
     public void testStraightNorthCrossSectionRightSplay() {
         Survey testSurvey = BasicTestSurveyCreator.createStraightNorth();
 
