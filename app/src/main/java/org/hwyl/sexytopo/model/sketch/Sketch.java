@@ -1,7 +1,7 @@
 package org.hwyl.sexytopo.model.sketch;
 
-import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
+import org.hwyl.sexytopo.model.graph.Coord2D;
 
 import java.util.ArrayList;
 import java.util.HashSet;

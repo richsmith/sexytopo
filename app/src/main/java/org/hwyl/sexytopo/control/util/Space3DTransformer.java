@@ -1,9 +1,9 @@
 package org.hwyl.sexytopo.control.util;
 
 import org.hwyl.sexytopo.model.graph.Coord3D;
-import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Space;
+import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 

@@ -2,15 +2,12 @@ package org.hwyl.sexytopo.control.io;
 
 import org.hwyl.sexytopo.BasicTestSketchCreator;
 import org.hwyl.sexytopo.BasicTestSurveyCreator;
-import org.hwyl.sexytopo.control.io.XviTranslater;
 import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- * Created by rls on 09/11/15.
- */
+
 public class XviTranslaterTest {
 
     @Test

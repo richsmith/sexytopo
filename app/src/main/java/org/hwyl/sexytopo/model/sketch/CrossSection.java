@@ -1,18 +1,12 @@
 package org.hwyl.sexytopo.model.sketch;
 
-import android.graphics.Color;
-
 import org.hwyl.sexytopo.control.util.Space3DTransformer;
-import org.hwyl.sexytopo.control.util.StationRotator;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Coord3D;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Represents a cross-section of a passage at a specified angle on a top-down plan sketch.

@@ -3,16 +3,15 @@ package org.hwyl.sexytopo.control.io;
 import android.util.Log;
 
 import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
-import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.json.JSONException;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 

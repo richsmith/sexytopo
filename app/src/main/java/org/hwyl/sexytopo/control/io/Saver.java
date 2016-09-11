@@ -2,7 +2,6 @@ package org.hwyl.sexytopo.control.io;
 
 import org.apache.commons.io.FileUtils;
 import org.hwyl.sexytopo.SexyTopo;
-import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.json.JSONException;

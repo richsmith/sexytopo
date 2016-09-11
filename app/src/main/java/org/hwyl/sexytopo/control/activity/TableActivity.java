@@ -24,9 +24,9 @@ import android.widget.Toast;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
-import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.graph.GraphView;
 import org.hwyl.sexytopo.control.table.ManualEntry;
+import org.hwyl.sexytopo.control.util.GraphToListTranslator;
 import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.control.util.TextTools;
@@ -34,7 +34,6 @@ import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.table.TableCol;
-import org.hwyl.sexytopo.control.util.GraphToListTranslator;
 
 import java.util.EnumMap;
 import java.util.HashMap;

@@ -1,6 +1,5 @@
 package org.hwyl.sexytopo.control.util;
 
-import org.hwyl.sexytopo.model.graph.Coord;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Space;

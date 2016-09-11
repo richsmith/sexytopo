@@ -3,8 +3,8 @@ package org.hwyl.sexytopo.test;
 import android.test.InstrumentationTestCase;
 
 import org.hwyl.sexytopo.control.util.Space3DTransformer;
-import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.graph.Coord3D;
+import org.hwyl.sexytopo.model.survey.Leg;
 
 /**
  * Created by rls on 28/07/14.
