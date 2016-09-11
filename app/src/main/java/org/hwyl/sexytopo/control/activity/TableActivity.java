@@ -183,7 +183,7 @@ public class TableActivity extends SexyTopoActivity
 
         TextView selectedCell = (TextView)view;
 
-        selectedCell.setBackgroundColor(Color.WHITE);
+        selectedCell.setTextColor(Color.RED);
 
         PopupMenu popup = new PopupMenu(this, selectedCell);
         popup.getMenuInflater().inflate(id, popup.getMenu());
@@ -250,7 +250,9 @@ public class TableActivity extends SexyTopoActivity
 
     @Override
     public void onDismiss(PopupMenu popupMenu) {
-        cellBeingClicked.setBackgroundColor(getResources().getColor(R.color.tableBackground));
+        // Ideally this colour should be named somewhere, but for now...
+        int usualTextColour = Color.rgb(0x7F, 0x7F, 0x7F);
+        cellBeingClicked.setTextColor(usualTextColour);
     }
 
 
