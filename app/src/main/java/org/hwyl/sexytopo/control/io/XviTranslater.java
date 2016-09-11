@@ -26,7 +26,7 @@ public class XviTranslater {
     public static final String SKETCHLINE_COMMAND = "set XVIsketchlines";
     public static final String GRID_COMMAND = "set XVIgrid";
 
-    private static String getXvi(Survey survey, Sketch sketch, Projection2D projection) {
+    public static String toXvi(Survey survey, Sketch sketch, Projection2D projection) {
 
         Space<Coord2D> space = projection.project(survey);
 
