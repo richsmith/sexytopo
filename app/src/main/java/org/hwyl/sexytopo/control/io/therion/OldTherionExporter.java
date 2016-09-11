@@ -1,5 +1,6 @@
-package org.hwyl.sexytopo.control.io;
+package org.hwyl.sexytopo.control.io.therion;
 
+import org.hwyl.sexytopo.control.io.SurvexExporter;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 /**

@@ -25,7 +25,7 @@ import org.hwyl.sexytopo.control.io.CompassExporter;
 import org.hwyl.sexytopo.control.io.Loader;
 import org.hwyl.sexytopo.control.io.PocketTopoTxtImporter;
 import org.hwyl.sexytopo.control.io.Saver;
-import org.hwyl.sexytopo.control.io.TherionExporter;
+import org.hwyl.sexytopo.control.io.therion.TherionTxtExporter;
 import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.test.TestSurveyCreator;
@@ -181,7 +181,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             Survey survey = getSurvey();
 
             // Therion text file
-            String content = TherionExporter.export(survey);
+            String content = TherionTxtExporter.export(survey);
             String filename = Util.getPathForSurveyFile(survey.getName(), "txt");
             Saver.saveFile(filename, content);
 

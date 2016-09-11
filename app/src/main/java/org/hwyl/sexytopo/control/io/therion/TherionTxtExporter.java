@@ -1,5 +1,6 @@
-package org.hwyl.sexytopo.control.io;
+package org.hwyl.sexytopo.control.io.therion;
 
+import org.hwyl.sexytopo.control.io.SurvexExporter;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
@@ -17,7 +18,7 @@ import java.util.Map;
 /**
  * Created by rls on 11/12/14.
  */
-public class TherionExporter {
+public class TherionTxtExporter {
 
 
 
