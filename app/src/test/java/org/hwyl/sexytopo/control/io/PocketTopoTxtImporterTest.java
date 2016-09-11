@@ -1,8 +1,5 @@
 package org.hwyl.sexytopo.control.io;
 
-import android.test.AndroidTestCase;
-
-import org.hwyl.sexytopo.control.io.PocketTopoTxtImporter;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.junit.Assert;
@@ -34,9 +31,6 @@ public class PocketTopoTxtImporterTest {
             "4.980\t-55.180\n" +
             "POLYLINE RED\n" +
             "3.780\t-48.580\n" +
-            "POLYLINE BROWN\n" +
-            "6.780\t6.370\n" +
-            "7.580\t5.870\n" +
             "\n" +
             "ELEVATION\n" +
             "STATIONS\n" +
