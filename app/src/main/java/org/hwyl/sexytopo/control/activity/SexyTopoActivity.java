@@ -17,16 +17,15 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import org.apache.commons.io.FilenameUtils;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.SurveyManager;
-import org.hwyl.sexytopo.control.io.CompassExporter;
-import org.hwyl.sexytopo.control.io.Loader;
-import org.hwyl.sexytopo.control.io.PocketTopoTxtImporter;
-import org.hwyl.sexytopo.control.io.Saver;
-import org.hwyl.sexytopo.control.io.therion.TherionTxtExporter;
 import org.hwyl.sexytopo.control.io.Util;
+import org.hwyl.sexytopo.control.io.basic.Loader;
+import org.hwyl.sexytopo.control.io.basic.Saver;
+import org.hwyl.sexytopo.control.io.thirdparty.CompassExporter;
+import org.hwyl.sexytopo.control.io.thirdparty.therion.TherionTxtExporter;
+import org.hwyl.sexytopo.control.io.translation.ImportManager;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.test.TestSurveyCreator;
 
@@ -403,12 +402,10 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         File file = nameToFiles.get(arrayAdapter.getItem(which));
                         try {
-                            String text = Loader.slurpFile(file.getAbsolutePath());
-                            String name = FilenameUtils.getBaseName(file.getName());
-                            Survey survey = PocketTopoTxtImporter.parse(name, text);
+                            Survey survey = ImportManager.toSurvey(file);
                             survey.checkActiveStation();
                             SurveyManager.getInstance(SexyTopoActivity.this).setCurrentSurvey(survey);
-                            showSimpleToast("Imported" + " " + survey.getName());
+                            showSimpleToast("Imported " + survey.getName());
                         } catch (Exception e) {
                             showSimpleToast(getString(R.string.error_prefix) + e.getMessage());
                         }

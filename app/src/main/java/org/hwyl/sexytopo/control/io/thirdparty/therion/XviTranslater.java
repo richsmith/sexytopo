@@ -1,4 +1,4 @@
-package org.hwyl.sexytopo.control.io;
+package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Coord2D;

@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.control.io;
 
+import org.hwyl.sexytopo.control.io.thirdparty.PocketTopoTxtImporter;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.junit.Assert;

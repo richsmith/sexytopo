@@ -1,4 +1,4 @@
-package org.hwyl.sexytopo.control.io;
+package org.hwyl.sexytopo.control.io.thirdparty;
 
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
 import org.hwyl.sexytopo.model.survey.Survey;

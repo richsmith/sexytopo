@@ -1,5 +1,7 @@
-package org.hwyl.sexytopo.control.io;
+package org.hwyl.sexytopo.control.io.thirdparty;
 
+import org.hwyl.sexytopo.control.io.translation.Importer;
+import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Coord2D;
@@ -10,6 +12,7 @@ import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,10 +23,12 @@ import java.util.regex.Pattern;
 /**
  * Basic import for the .txt file that is exported by PocketTopo.
  */
-public class PocketTopoTxtImporter {
+public class PocketTopoTxtImporter implements Importer {
 
 
-    public static Survey parse(String name, String text) {
+    public Survey toSurvey(File file) {
+
+        String text = Loader.slurpFile(file.getAbsolutePath());
 
         // FIXME we're ignoring the metadata for now
 
@@ -41,6 +46,12 @@ public class PocketTopoTxtImporter {
 
         return survey;
     }
+
+
+    public boolean canHandleFile(File file) {
+        return file.getName().endsWith("txt");
+    }
+
 
     private static void parseDataAndUpdateSurvey(Survey survey, String fullText) {
         String text = getSection(fullText, "DATA");

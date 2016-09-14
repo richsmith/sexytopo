@@ -1,17 +1,25 @@
-package org.hwyl.sexytopo.control.io.therion;
+package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
+import org.hwyl.sexytopo.control.io.translation.Importer;
+import org.hwyl.sexytopo.model.survey.Survey;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 
-public class TherionImporter {
+public class TherionImporter implements Importer {
 
-    public void toSurveyAndTemplate(String text) {
+    public Survey toSurvey(File file) {
+
+        Survey survey = new Survey(file.getName());
+        return survey;
+    }
 
 
-
-
+    public boolean canHandleFile(File file) {
+        return file.getName().endsWith("zip");
     }
 
 

@@ -1,6 +1,6 @@
-package org.hwyl.sexytopo.control.io.therion;
+package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
-import org.hwyl.sexytopo.control.io.SurvexExporter;
+import org.hwyl.sexytopo.control.io.thirdparty.SurvexExporter;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;

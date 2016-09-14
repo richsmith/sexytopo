@@ -2,6 +2,7 @@ package org.hwyl.sexytopo.control.io;
 
 import org.hwyl.sexytopo.BasicTestSketchCreator;
 import org.hwyl.sexytopo.BasicTestSurveyCreator;
+import org.hwyl.sexytopo.control.io.thirdparty.therion.XviTranslater;
 import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.junit.Assert;
