@@ -1,4 +1,4 @@
-package org.hwyl.sexytopo.control.io.thirdparty.therion;
+package org.hwyl.sexytopo.control.io.thirdparty.xvi;
 
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Coord2D;
@@ -14,10 +14,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by rls on 09/11/15.
- */
-public class XviTranslater {
+
+public class XviExporter {
 
     public static final String GRIDS_COMMAND = "set XVIgrids";
     public static final String STATIONS_COMMAND = "set XVIstations";

@@ -48,6 +48,10 @@ public class Loader {
 
     }
 
+    public static String slurpFile(File file) {
+        return slurpFile(file.getAbsolutePath());
+    }
+
     public static String slurpFile(String filename) {
 
         StringBuilder text = new StringBuilder();
