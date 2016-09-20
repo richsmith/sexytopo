@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.control.io.translation;
 
-import org.hwyl.sexytopo.control.io.thirdparty.PocketTopoTxtImporter;
+import org.hwyl.sexytopo.control.io.thirdparty.pockettopo.PocketTopoTxtImporter;
 import org.hwyl.sexytopo.control.io.thirdparty.therion.TherionImporter;
 import org.hwyl.sexytopo.model.survey.Survey;
 

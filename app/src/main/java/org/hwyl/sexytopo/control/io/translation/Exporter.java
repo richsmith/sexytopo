@@ -4,5 +4,5 @@ import org.hwyl.sexytopo.model.survey.Survey;
 
 
 public interface Exporter {
-    public void save(Survey survey);
+    public String export(Survey survey);
 }

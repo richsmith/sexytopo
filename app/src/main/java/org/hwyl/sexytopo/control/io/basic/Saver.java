@@ -2,7 +2,7 @@ package org.hwyl.sexytopo.control.io.basic;
 
 import org.apache.commons.io.FileUtils;
 import org.hwyl.sexytopo.SexyTopo;
-import org.hwyl.sexytopo.control.io.thirdparty.SurvexExporter;
+import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexExporter;
 import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -47,7 +47,7 @@ public class Saver {
     private static void saveSurveyData(Survey survey, String extension)
             throws IOException {
         String path = Util.getPathForSurveyFile(survey.getName(), extension);
-        String surveyText = SurvexExporter.export(survey);
+        String surveyText = new SurvexExporter().export(survey);
         saveFile(path, surveyText);
     }
 

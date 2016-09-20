@@ -1,6 +1,9 @@
 package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
+import org.hwyl.sexytopo.control.io.basic.Loader;
+import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexImporter;
 import org.hwyl.sexytopo.control.io.translation.Importer;
+import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.io.File;
@@ -11,9 +14,12 @@ import java.util.List;
 
 public class TherionImporter implements Importer {
 
-    public Survey toSurvey(File file) {
+    public Survey toSurvey(File file) throws Exception {
 
         Survey survey = new Survey(file.getName());
+
+        getCentreline(Loader.slurpFile(file.getAbsolutePath()), survey);
+
         return survey;
     }
 
@@ -23,10 +29,12 @@ public class TherionImporter implements Importer {
     }
 
 
-    public static void getCentreline(String text) throws Exception {
+    public static void getCentreline(String text, Survey survey) throws Exception {
         List<String> lines = Arrays.asList(text.split("\n"));
 
         List<String> block = getContentsOfBeginEndBlock(lines, "centreline");
+        String centrelineText = TextTools.join("\n", block);
+        SurvexImporter.parse(centrelineText, survey);
 
     }
 

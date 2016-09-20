@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
-import org.hwyl.sexytopo.control.io.thirdparty.SurvexExporter;
+import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexExporter;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 /**
@@ -8,6 +8,11 @@ import org.hwyl.sexytopo.model.survey.Survey;
  */
 public class OldTherionExporter {
 
+    private OldTherionExporter instance = new OldTherionExporter();
+
+    public OldTherionExporter getInstance() {
+        return instance;
+    }
 
 
     public static String export(Survey survey) {
@@ -36,6 +41,6 @@ public class OldTherionExporter {
 
     private static String getCentreline(Survey survey) {
         return "data normal from to length compass clino\n\n" +
-                SurvexExporter.export(survey);
+                new SurvexExporter().export(survey);
     }
 }

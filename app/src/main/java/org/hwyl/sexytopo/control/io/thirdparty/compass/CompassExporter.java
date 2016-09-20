@@ -1,4 +1,4 @@
-package org.hwyl.sexytopo.control.io.thirdparty;
+package org.hwyl.sexytopo.control.io.thirdparty.compass;
 
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
 import org.hwyl.sexytopo.model.survey.Leg;

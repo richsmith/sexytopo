@@ -23,7 +23,7 @@ import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.control.io.basic.Saver;
-import org.hwyl.sexytopo.control.io.thirdparty.CompassExporter;
+import org.hwyl.sexytopo.control.io.thirdparty.compass.CompassExporter;
 import org.hwyl.sexytopo.control.io.thirdparty.therion.TherionTxtExporter;
 import org.hwyl.sexytopo.control.io.translation.ImportManager;
 import org.hwyl.sexytopo.model.survey.Survey;

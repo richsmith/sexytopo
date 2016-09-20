@@ -1,4 +1,4 @@
-package org.hwyl.sexytopo.control.io.thirdparty;
+package org.hwyl.sexytopo.control.io.thirdparty.pockettopo;
 
 import org.hwyl.sexytopo.control.io.translation.Importer;
 import org.hwyl.sexytopo.control.io.basic.Loader;

@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
-import org.hwyl.sexytopo.control.io.thirdparty.SurvexExporter;
+import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexExporter;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
@@ -41,7 +41,7 @@ public class TherionTxtExporter {
 
     public static String exportData(Survey survey) {
         String data = "DATA\n";
-        data += SurvexExporter.export(survey);
+        data += new SurvexExporter().export(survey);
         return data;
     }
 

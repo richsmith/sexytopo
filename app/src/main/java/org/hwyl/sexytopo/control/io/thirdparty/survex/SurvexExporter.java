@@ -1,5 +1,6 @@
-package org.hwyl.sexytopo.control.io.thirdparty;
+package org.hwyl.sexytopo.control.io.thirdparty.survex;
 
+import org.hwyl.sexytopo.control.io.translation.Exporter;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.table.TableCol;
@@ -8,14 +9,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-/**
- * Created by rls on 03/08/14.
- */
-public class SurvexExporter {
+
+public class SurvexExporter implements Exporter {
 
     private static GraphToListTranslator graphToListTranslator = new GraphToListTranslator();
 
-    public static String export(Survey survey) {
+    public String export(Survey survey) {
 
         List<GraphToListTranslator.SurveyListEntry> list = graphToListTranslator.toListOfSurveyListEntries(survey);
         List<Map<TableCol, Object>> data = graphToListTranslator.toListOfColMaps(survey);
