@@ -3,8 +3,7 @@ package org.hwyl.sexytopo.control.util;
 
 import junit.framework.Assert;
 
-import org.hwyl.sexytopo.BasicTestSurveyCreator;
-import org.hwyl.sexytopo.control.util.SurveyUpdater;
+import org.hwyl.sexytopo.testhelpers.BasicTestSurveyCreator;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;

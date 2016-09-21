@@ -1,12 +1,10 @@
-package org.hwyl.sexytopo;
+package org.hwyl.sexytopo.testhelpers;
 
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Survey;
 
-/**
- * Created by rls on 13/10/15.
- */
+
 public class BasicTestSurveyCreator {
 
     public static Survey createStraightNorth() {

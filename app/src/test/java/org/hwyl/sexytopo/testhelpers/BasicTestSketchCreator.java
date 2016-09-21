@@ -1,8 +1,7 @@
-package org.hwyl.sexytopo;
+package org.hwyl.sexytopo.testhelpers;
 
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.sketch.Sketch;
-import org.hwyl.sexytopo.model.survey.Survey;
 
 
 public class BasicTestSketchCreator {
