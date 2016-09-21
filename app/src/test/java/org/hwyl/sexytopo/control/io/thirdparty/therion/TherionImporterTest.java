@@ -195,4 +195,11 @@ public class TherionImporterTest {
         List<String> output = TherionImporter.getContentsOfBeginEndBlock(LINES, "block");
     }
 
+    @Test
+    public void testTitleExtraction() {
+        String actual = TherionImporter.getSurveyName(FAKE_TEXT);
+        String expected = "White Lightning";
+        Assert.assertEquals(expected, actual);
+    }
+
 }

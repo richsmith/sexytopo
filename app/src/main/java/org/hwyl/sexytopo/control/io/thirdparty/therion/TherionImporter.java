@@ -51,7 +51,7 @@ public class TherionImporter implements Importer {
         String contents = Loader.slurpFile(file);
 
         String name = getSurveyName(contents);
-        Survey survey = new Survey(file.getName());
+        Survey survey = new Survey(name);
 
         List<String> lines = Arrays.asList(contents.split("\n"));
         updateCentreline(lines, survey);
@@ -59,7 +59,7 @@ public class TherionImporter implements Importer {
         return survey;
     }
 
-    private static String getSurveyName(String text) {
+    public static String getSurveyName(String text) {
         Pattern pattern = Pattern.compile("-title\\s*\"(.*)+?\"");
         Matcher matcher = pattern.matcher(text);
         matcher.find();
