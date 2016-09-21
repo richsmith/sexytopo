@@ -14,14 +14,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.GRIDS_COMMAND;
+import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.GRID_COMMAND;
+import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.SHOT_COMMAND;
+import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.SKETCHLINE_COMMAND;
+import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.STATIONS_COMMAND;
+
 
 public class XviExporter {
-
-    public static final String GRIDS_COMMAND = "set XVIgrids";
-    public static final String STATIONS_COMMAND = "set XVIstations";
-    public static final String SHOT_COMMAND = "set XVIshots";
-    public static final String SKETCHLINE_COMMAND = "set XVIsketchlines";
-    public static final String GRID_COMMAND = "set XVIgrid";
 
     public static String toXvi(Survey survey, Sketch sketch, Projection2D projection) {
 
