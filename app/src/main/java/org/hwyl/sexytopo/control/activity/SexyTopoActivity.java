@@ -27,7 +27,7 @@ import org.hwyl.sexytopo.control.io.thirdparty.compass.CompassExporter;
 import org.hwyl.sexytopo.control.io.thirdparty.therion.TherionTxtExporter;
 import org.hwyl.sexytopo.control.io.translation.ImportManager;
 import org.hwyl.sexytopo.model.survey.Survey;
-import org.hwyl.sexytopo.test.TestSurveyCreator;
+import org.hwyl.sexytopo.demo.TestSurveyCreator;
 
 import java.io.File;
 import java.io.IOException;

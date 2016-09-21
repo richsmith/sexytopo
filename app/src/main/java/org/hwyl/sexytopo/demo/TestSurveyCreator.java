@@ -1,4 +1,4 @@
-package org.hwyl.sexytopo.test;
+package org.hwyl.sexytopo.demo;
 
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Leg;

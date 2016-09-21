@@ -1,4 +1,4 @@
-package org.hwyl.sexytopo.control.io;
+package org.hwyl.sexytopo.control.io.thirdparty.pockettopo;
 
 import org.hwyl.sexytopo.control.io.thirdparty.pockettopo.PocketTopoTxtImporter;
 import org.hwyl.sexytopo.model.sketch.Colour;

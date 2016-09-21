@@ -1,19 +1,17 @@
-package org.hwyl.sexytopo.test;
+package org.hwyl.sexytopo.control.util;
 
-import android.test.InstrumentationTestCase;
-
-import org.hwyl.sexytopo.control.util.Space3DTransformer;
 import org.hwyl.sexytopo.model.graph.Coord3D;
 import org.hwyl.sexytopo.model.survey.Leg;
-
-/**
- * Created by rls on 28/07/14.
- */
-public class Space3DTransformerTest extends InstrumentationTestCase {
+import org.junit.Assert;
+import org.junit.Test;
 
 
-    Space3DTransformer transformer;
+public class Space3DTransformerTest {
 
+
+    Space3DTransformer transformer = new Space3DTransformer();
+
+    @Test
     public void testTransform1MNorth() {
         Leg north1MLeg = new Leg(1, 0, 0);
         Coord3D result = transformer.transform(Coord3D.ORIGIN, north1MLeg);
@@ -21,6 +19,7 @@ public class Space3DTransformerTest extends InstrumentationTestCase {
         assertEquals(expected, result);
     }
 
+    @Test
     public void testTransform1MEast() {
         Leg east1MLeg = new Leg(1, 90, 0);
         Coord3D result = transformer.transform(Coord3D.ORIGIN, east1MLeg);
@@ -28,6 +27,7 @@ public class Space3DTransformerTest extends InstrumentationTestCase {
         assertEquals(expected, result);
     }
 
+    @Test
     public void testTransform1MUp() {
         Leg up1MLeg = new Leg(1, 0, 90);
         Coord3D result = transformer.transform(Coord3D.ORIGIN, up1MLeg);
@@ -35,6 +35,7 @@ public class Space3DTransformerTest extends InstrumentationTestCase {
         assertEquals(expected, result);
     }
 
+    @Test
     public void testTransform1MDown() {
         Leg up1MLeg = new Leg(1, 0, -90);
         Coord3D result = transformer.transform(Coord3D.ORIGIN, up1MLeg);
@@ -42,6 +43,7 @@ public class Space3DTransformerTest extends InstrumentationTestCase {
         assertEquals(expected, result);
     }
 
+    @Test
     public void testTransform2MNorth() {
         Leg north2MLeg = new Leg(2, 0, 0);
         Coord3D result = transformer.transform(Coord3D.ORIGIN, north2MLeg);
@@ -49,6 +51,7 @@ public class Space3DTransformerTest extends InstrumentationTestCase {
         assertEquals(expected, result);
     }
 
+    @Test
     public void testTransform3N3E3S3W() {
         Leg n3 = new Leg(3, 0, 0);
         Coord3D result = transformer.transform(Coord3D.ORIGIN, n3);
@@ -61,6 +64,7 @@ public class Space3DTransformerTest extends InstrumentationTestCase {
         assertEquals(Coord3D.ORIGIN, result);
     }
 
+    @Test
     public void testTransform10mNEUAndBack() {
         Leg northEastAndUp10M = new Leg(10, 45, 45);
         Coord3D result = transformer.transform(Coord3D.ORIGIN, northEastAndUp10M);
@@ -70,4 +74,18 @@ public class Space3DTransformerTest extends InstrumentationTestCase {
         assertEquals(Coord3D.ORIGIN, result);
     }
 
+    private void assertEquals(Coord3D zero, Coord3D one) {
+
+        double x0 = zero.getX();
+        double y0 = zero.getY();
+        double z0 = zero.getZ();
+        double x1 = one.getX();
+        double y1 = one.getY();
+        double z1 = one.getZ();
+
+        double delta = 0.0001;
+        Assert.assertEquals(x0, x1, delta);
+        Assert.assertEquals(y0, y1, delta);
+        Assert.assertEquals(z0, z1, delta);
+    }
 }
