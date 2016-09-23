@@ -45,4 +45,22 @@ public class Coord2D extends Coord {
     public Coord2D flipVertically() {
         return new Coord2D(x, -y);
     }
+
+    @Override
+    public boolean equals(Object object) {
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        } else {
+            Coord2D coord2D = (Coord2D)object;
+
+            return (coord2D.x == x) && (coord2D.y == y);
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        double result = x;
+        result = 31 * result + y;
+        return (int)result;
+    }
 }
