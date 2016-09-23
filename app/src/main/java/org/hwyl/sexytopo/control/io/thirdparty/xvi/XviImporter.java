@@ -24,15 +24,16 @@ public class XviImporter implements Importer {
 
     public Survey toSurvey(File file) throws Exception {
         Survey survey = new Survey(file.getName());
-        String contents = Loader.slurpFile(file);
-        Sketch sketch = getSketch(contents);
+        Sketch sketch = getSketch(file);
         survey.setPlanSketch(sketch);
         return survey;
     }
 
-    public static Sketch getSketch(String contents) throws Exception {
+    public static Sketch getSketch(File file) throws Exception {
+
         Sketch sketch = new Sketch();
 
+        String contents = Loader.slurpFile(file);
         Set<PathDetail> pathDetails = parseSketchlineBlock(contents);
         sketch.setPathDetails(pathDetails);
 

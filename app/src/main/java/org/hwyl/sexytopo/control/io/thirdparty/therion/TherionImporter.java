@@ -32,12 +32,11 @@ public class TherionImporter implements Importer {
             } else if (file.getName().endsWith("xvi")) {
                 String filenameNoExtension = FilenameUtils.removeExtension(file.getName());
                 if (filenameNoExtension.endsWith("_p")) {
-                    String contents = Loader.slurpFile(file);
-                    Sketch sketch = XviImporter.getSketch(contents);
+                    Sketch sketch = XviImporter.getSketch(file);
                     survey.setPlanSketch(sketch);
                 } else if (filenameNoExtension.endsWith("_e")) {
                     String contents = Loader.slurpFile(file);
-                    Sketch sketch = XviImporter.getSketch(contents);
+                    Sketch sketch = XviImporter.getSketch(file);
                     survey.setElevationSketch(sketch);
                 }
 
