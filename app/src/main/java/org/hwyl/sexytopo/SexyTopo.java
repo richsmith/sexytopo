@@ -42,4 +42,5 @@ public class SexyTopo {
     public static final String PLAN_SKETCH_EXTENSION = "plan.json";
     public static final String EXT_ELEVATION_SKETCH_EXTENSION = "ext-elevation.json";
 
+    public static final double ALLOWED_DOUBLE_DELTA_FOR_TESTS = 0.0001;
 }
