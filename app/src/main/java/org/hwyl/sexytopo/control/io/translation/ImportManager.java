@@ -3,6 +3,7 @@ package org.hwyl.sexytopo.control.io.translation;
 import org.hwyl.sexytopo.control.io.thirdparty.pockettopo.PocketTopoTxtImporter;
 import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexImporter;
 import org.hwyl.sexytopo.control.io.thirdparty.therion.TherionImporter;
+import org.hwyl.sexytopo.control.io.thirdparty.xvi.XviImporter;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.io.File;
@@ -15,6 +16,7 @@ public class ImportManager {
 
     private static final List<? extends Importer> importers = Arrays.asList(
         new TherionImporter(),
+        new XviImporter(),
         new SurvexImporter(),
         new PocketTopoTxtImporter()
     );
