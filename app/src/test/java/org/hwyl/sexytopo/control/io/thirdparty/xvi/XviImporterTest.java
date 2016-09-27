@@ -51,18 +51,17 @@ public class XviImporterTest {
     public void testNoCommandMatchRaiseError() throws Exception {
         String simpleText = "set Commandx {foo}";
         String contents = XviImporter.getBlockContents(simpleText, "set Command");
-        Assert.assertEquals("{foo}", contents);
     }
 
 
-    @Test(expected=Exception.class)
+    @Test
     public void testParseBlockEntriesSingle() throws Exception {
         String simpleText = "{foo}";
         List<String> contents = XviImporter.parseBlockEntries(simpleText);
         Assert.assertEquals("foo", contents.get(0));
     }
 
-    @Test(expected=Exception.class)
+    @Test
     public void testParseBlockEntriesMultiple() throws Exception {
         String simpleText = "{foo}{bar}";
         List<String> contents = XviImporter.parseBlockEntries(simpleText);
@@ -70,7 +69,15 @@ public class XviImporterTest {
         Assert.assertEquals("bar", contents.get(1));
     }
 
-    @Test(expected=Exception.class)
+    @Test
+    public void testParseBlockEntriesWithMultipleItems() throws Exception {
+        String simpleText = "{foo extra}\n{bar more}";
+        List<String> contents = XviImporter.parseBlockEntries(simpleText);
+        Assert.assertEquals("foo extra", contents.get(0));
+        Assert.assertEquals("bar more", contents.get(1));
+    }
+
+    @Test
     public void testParseBlockEntriesMultipleWithWhitespace() throws Exception {
         String simpleText = "\t{foo}\n   {bar}";
         List<String> contents = XviImporter.parseBlockEntries(simpleText);

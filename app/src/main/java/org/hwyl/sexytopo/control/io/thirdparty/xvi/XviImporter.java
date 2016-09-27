@@ -17,10 +17,13 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.GRID_COMMAND;
 import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.SKETCHLINE_COMMAND;
 
 
 public class XviImporter implements Importer {
+
+    private static XviImporter instance = new XviImporter();
 
     public Survey toSurvey(File file) throws Exception {
         Survey survey = new Survey(file.getName());
@@ -34,7 +37,10 @@ public class XviImporter implements Importer {
         Sketch sketch = new Sketch();
 
         String contents = Loader.slurpFile(file);
-        Set<PathDetail> pathDetails = parseSketchlineBlock(contents);
+
+        Grid grid = instance.parseGrid(contents);
+
+        Set<PathDetail> pathDetails = parseSketchlineBlock(grid, contents);
         sketch.setPathDetails(pathDetails);
 
         return sketch;
@@ -45,29 +51,47 @@ public class XviImporter implements Importer {
         return file.getName().endsWith("xvi");
     }
 
-    public static Set<PathDetail> parseSketchlineBlock(String contents) throws Exception {
+
+
+
+    public Grid parseGrid(String contents) throws Exception {
+        String gridBlock = getBlockContents(contents, GRID_COMMAND);
+        List<String> values = Arrays.asList(gridBlock.split("\\s"));
+        double x = Double.parseDouble(values.get(0));
+        double y = Double.parseDouble(values.get(1));
+        double dx = Double.parseDouble(values.get(2));
+        double dy = Double.parseDouble(values.get(5));
+        double nx = Double.parseDouble(values.get(6));
+        double ny = Double.parseDouble(values.get(7));
+        Grid grid = new Grid(x, y, dx, dy, nx, ny);
+        return grid;
+    }
+
+
+    public static Set<PathDetail> parseSketchlineBlock(Grid grid, String contents) throws Exception {
         String sketchBlock = getBlockContents(contents, SKETCHLINE_COMMAND);
         List<String> entries = parseBlockEntries(sketchBlock);
         Set<PathDetail> pathDetails = new HashSet<>();
         for (String entry : entries) {
-            PathDetail pathDetail = parseSketchEntry(entry);
+            PathDetail pathDetail = parseSketchEntry(grid, entry);
             pathDetails.add(pathDetail);
         }
         return pathDetails;
     }
 
+
     public static List<String> parseBlockEntries(String content) {
         List<String> entries = new ArrayList<>();
-        Pattern pattern = Pattern.compile("{(.*)}");
+        Pattern pattern = Pattern.compile("\\{(.*?)\\}");
         Matcher matcher = pattern.matcher(content);
         while (matcher.find()) {
-            entries.add(matcher.group());
+            entries.add(matcher.group(1));
         }
         return entries;
     }
 
 
-    public static PathDetail parseSketchEntry(String entry) throws IllegalArgumentException {
+    public static PathDetail parseSketchEntry(Grid grid, String entry) throws IllegalArgumentException {
         List<String> tokens = Arrays.asList(entry.split(" "));
 
         if (tokens.size() <= 1) {
@@ -91,6 +115,10 @@ public class XviImporter implements Importer {
         for (int i = 1; i < tokens.size();) {
             double x = Double.parseDouble(tokens.get(i++));
             double y = Double.parseDouble(tokens.get(i++));
+
+            x += -grid.x;
+            x += -grid.y;
+
             Coord2D coord2D = new Coord2D(x, y);
             points.add(coord2D);
         }
@@ -158,4 +186,18 @@ public class XviImporter implements Importer {
         throw new Exception("Could not match command in text");
     }
 
+    class Grid {
+        double x, y, dx, dy, nx, ny;
+        Grid(double x, double y, double dx, double dy, double nx, double ny) {
+            this.x = x;
+            this.y = y;
+            this.dx = dx;
+            this.dy = dy;
+            this.nx = nx;
+            this.ny = ny;
+        }
+    }
+
 }
+
+
