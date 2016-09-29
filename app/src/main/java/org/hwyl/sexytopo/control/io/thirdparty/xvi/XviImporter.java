@@ -39,8 +39,9 @@ public class XviImporter implements Importer {
         String contents = Loader.slurpFile(file);
 
         Grid grid = instance.parseGrid(contents);
+        double scale = grid.dy;
 
-        Set<PathDetail> pathDetails = parseSketchlineBlock(grid, contents);
+        Set<PathDetail> pathDetails = parseSketchlineBlock(scale, contents);
         sketch.setPathDetails(pathDetails);
 
         return sketch;
@@ -52,15 +53,16 @@ public class XviImporter implements Importer {
     }
 
 
-
-
     public Grid parseGrid(String contents) throws Exception {
+
         String gridBlock = getBlockContents(contents, GRID_COMMAND);
         List<String> values = Arrays.asList(gridBlock.split("\\s"));
         double x = Double.parseDouble(values.get(0));
         double y = Double.parseDouble(values.get(1));
         double dx = Double.parseDouble(values.get(2));
-        double dy = Double.parseDouble(values.get(5));
+        // 0
+        // 0
+        double dy = Double.parseDouble(values.get(5)); // grid * cfactor
         double nx = Double.parseDouble(values.get(6));
         double ny = Double.parseDouble(values.get(7));
         Grid grid = new Grid(x, y, dx, dy, nx, ny);
@@ -68,12 +70,12 @@ public class XviImporter implements Importer {
     }
 
 
-    public static Set<PathDetail> parseSketchlineBlock(Grid grid, String contents) throws Exception {
+    public static Set<PathDetail> parseSketchlineBlock(double scale, String contents) throws Exception {
         String sketchBlock = getBlockContents(contents, SKETCHLINE_COMMAND);
         List<String> entries = parseBlockEntries(sketchBlock);
         Set<PathDetail> pathDetails = new HashSet<>();
         for (String entry : entries) {
-            PathDetail pathDetail = parseSketchEntry(grid, entry);
+            PathDetail pathDetail = parseSketchEntry(scale, entry);
             pathDetails.add(pathDetail);
         }
         return pathDetails;
@@ -91,7 +93,7 @@ public class XviImporter implements Importer {
     }
 
 
-    public static PathDetail parseSketchEntry(Grid grid, String entry) throws IllegalArgumentException {
+    public static PathDetail parseSketchEntry(double scale, String entry) throws IllegalArgumentException {
         List<String> tokens = Arrays.asList(entry.split(" "));
 
         if (tokens.size() <= 1) {
@@ -116,10 +118,10 @@ public class XviImporter implements Importer {
             double x = Double.parseDouble(tokens.get(i++));
             double y = Double.parseDouble(tokens.get(i++));
 
-            x += -grid.x;
-            x += -grid.y;
+            x /= scale;
+            y /= scale;
 
-            Coord2D coord2D = new Coord2D(x, y);
+            Coord2D coord2D = new Coord2D(x, -y);
             points.add(coord2D);
         }
 
