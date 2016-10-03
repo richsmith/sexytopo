@@ -1,5 +1,9 @@
 package org.hwyl.sexytopo.control.io.thirdparty.compass;
 
+import android.content.Context;
+
+import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.control.io.translation.Exporter;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -16,7 +20,7 @@ import java.util.List;
  *
  * Created by driggs on 1/16/16.
  */
-public class CompassExporter {
+public class CompassExporter implements Exporter {
 
     private static DateFormat dateFormat = new SimpleDateFormat("MM dd yyyy");
     private static GraphToListTranslator graphToListTranslator = new GraphToListTranslator();
@@ -62,6 +66,11 @@ public class CompassExporter {
         sb.append('\f');  // ASCII formfeed denotes end of survey
 
         return sb.toString();
+    }
+
+    @Override
+    public String getExportTypeName(Context context) {
+        return context.getString(R.string.third_party_compass);
     }
 
     /**

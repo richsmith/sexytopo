@@ -118,4 +118,7 @@
     <string name="pref_station_symbol">Station symbol</string>
     <string name="position_cross_section_instruction">Select where to draw cross-section</string>
     <string name="warning_survey_not_saved">Warning: current survey not saved</string>
+    <string name="third_party_therion">Therion</string>
+    <string name="third_party_pocket_topo_txt">PocketTopo .txt</string>
+    <string name="third_party_compass">Compass</string>
 </resources>

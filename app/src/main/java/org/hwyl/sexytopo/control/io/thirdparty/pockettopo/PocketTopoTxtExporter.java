@@ -1,6 +1,10 @@
-package org.hwyl.sexytopo.control.io.thirdparty.therion;
+package org.hwyl.sexytopo.control.io.thirdparty.pockettopo;
 
+import android.content.Context;
+
+import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexExporter;
+import org.hwyl.sexytopo.control.io.translation.Exporter;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
@@ -15,14 +19,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by rls on 11/12/14.
- */
-public class TherionTxtExporter {
+
+public class PocketTopoTxtExporter implements Exporter {
 
 
-
-    public static String export(Survey survey) {
+    public String export(Survey survey) {
 
         String text = "TRIP\n";
         text += "DATE 1970-01-01\n";
@@ -36,6 +37,11 @@ public class TherionTxtExporter {
 
 
         return text;
+    }
+
+    @Override
+    public String getExportTypeName(Context context) {
+        return context.getString(R.string.third_party_pocket_topo_txt);
     }
 
 

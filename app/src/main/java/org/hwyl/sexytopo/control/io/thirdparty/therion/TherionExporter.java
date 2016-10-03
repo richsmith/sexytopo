@@ -1,21 +1,23 @@
 package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
+import android.content.Context;
+
+import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexExporter;
+import org.hwyl.sexytopo.control.io.translation.Exporter;
 import org.hwyl.sexytopo.model.survey.Survey;
 
-/**
- * Created by rls on 29/06/15.
- */
-public class OldTherionExporter {
 
-    private OldTherionExporter instance = new OldTherionExporter();
+public class TherionExporter implements Exporter {
 
-    public OldTherionExporter getInstance() {
+    private TherionExporter instance = new TherionExporter();
+
+    public TherionExporter getInstance() {
         return instance;
     }
 
 
-    public static String export(Survey survey) {
+    public String export(Survey survey) {
 
         String centerlineText =
                 "centreline\n\n" +
@@ -29,6 +31,13 @@ public class OldTherionExporter {
 
         return surveyText;
     }
+
+
+    @Override
+    public String getExportTypeName(Context context) {
+        return context.getString(R.string.third_party_therion);
+    }
+
 
     public static String indent(String text) {
         String indented = "";
