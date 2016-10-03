@@ -120,5 +120,6 @@
     <string name="warning_survey_not_saved">Warning: current survey not saved</string>
     <string name="third_party_therion">Therion</string>
     <string name="third_party_pocket_topo_txt">PocketTopo .txt</string>
+    <string name="third_party_survex">Survex</string>
     <string name="third_party_compass">Compass</string>
 </resources>

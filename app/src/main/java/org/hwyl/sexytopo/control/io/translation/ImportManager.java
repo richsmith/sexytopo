@@ -14,7 +14,7 @@ import java.util.List;
 public class ImportManager {
 
 
-    private static final List<? extends Importer> importers = Arrays.asList(
+    private static final List<? extends Importer> IMPORTERS = Arrays.asList(
         new TherionImporter(),
         new XviImporter(),
         new SurvexImporter(),
@@ -29,7 +29,7 @@ public class ImportManager {
     }
 
     private static Importer chooseImporter(File file) throws IllegalArgumentException {
-        for (Importer importer: importers) {
+        for (Importer importer: IMPORTERS) {
             if (importer.canHandleFile(file)) {
                 return importer;
             }

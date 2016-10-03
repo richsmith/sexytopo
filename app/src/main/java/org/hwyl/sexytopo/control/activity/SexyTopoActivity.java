@@ -180,7 +180,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             Survey survey = getSurvey();
 
             // Therion text file
-            String content = PocketTopoTxtExporter.export(survey);
+            String content = new PocketTopoTxtExporter().export(survey);
             String filename = Util.getPathForSurveyFile(survey.getName(), "txt");
             Saver.saveFile(filename, content);
 

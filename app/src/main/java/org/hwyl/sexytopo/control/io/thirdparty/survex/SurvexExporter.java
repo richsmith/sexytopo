@@ -1,5 +1,7 @@
 package org.hwyl.sexytopo.control.io.thirdparty.survex;
 
+import android.content.Context;
+
 import org.hwyl.sexytopo.control.io.translation.Exporter;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -30,6 +32,12 @@ public class SurvexExporter implements Exporter {
         }
 
         return text;
+    }
+
+
+    @Override
+    public String getExportTypeName(Context context) {
+        return null;
     }
 
 
