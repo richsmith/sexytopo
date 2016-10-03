@@ -31,7 +31,7 @@ public class XviExporter {
         text += multilineField(STATIONS_COMMAND, getStationsText(space));
         text += multilineField(SHOT_COMMAND, getLegsText(space));
         text += multilineField(SKETCHLINE_COMMAND, getSketchLinesText(sketch));
-        text += field(GRID_COMMAND, "");
+        text += field(GRID_COMMAND, getGridText(sketch));
         return text;
     }
 
@@ -74,6 +74,33 @@ public class XviExporter {
         fields.add(pathDetail.getColour().toString());
         fields.addAll(pathDetail.getPath());
         return field("\t", TextTools.join(" ", fields));
+    }
+
+    private static String getGridText(Sketch sketch) {
+        // cfactor = 100 * planDPI / (2.54 * planscale)
+        double scale = getScale();
+
+        double[] values = new double[] {
+            -1.0, // FIXME
+            -1.0, // FIXME
+            -1.0, // FIXME
+            0.0,
+            0.0,
+            scale,
+            -1.0, // FIXME
+            -1.0 // FIXME
+        };
+
+        return TextTools.join(" ", values);
+    }
+
+
+    private static double getScale() {
+        final double PLAN_DPI = 200;
+        final double PLAN_SCALE = 100;
+        final double CENTIMETRES_PER_METRE = 2.54;
+        final double scale = 100 * PLAN_DPI / (CENTIMETRES_PER_METRE * PLAN_SCALE);
+        return scale;
     }
 
     private static String field(String text, String content) {
