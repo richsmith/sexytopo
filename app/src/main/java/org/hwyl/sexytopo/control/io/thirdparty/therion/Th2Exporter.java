@@ -11,7 +11,7 @@ public class Th2Exporter {
 
     public String asText(Survey survey) {
         List<String> lines = new LinkedList<>();
-        lines.add(getHeader());
+        lines.add(TherionExporter.getEncodingText());
         lines.add(getXviBlock(survey));
         return TextTools.join(lines, "\n\n");
     }
@@ -34,8 +34,5 @@ public class Th2Exporter {
         return TextTools.join(fields, " ");
     }
 
-    public String getHeader() {
-        return "encoding utf-8";
-    }
 
 }
