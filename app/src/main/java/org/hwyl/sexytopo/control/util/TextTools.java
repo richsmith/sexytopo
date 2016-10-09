@@ -26,16 +26,16 @@ public class TextTools {
         return sb.toString();
     }
 
-    public static String join(List<String> list, String joiner) {
+    public static String join(List<?> list, String joiner) {
         StringBuilder sb = new StringBuilder();
         boolean first = true;
-        for (String item : list) {
+        for (Object item : list) {
             if (first) {
                 first = false;
             } else {
                 sb.append(joiner);
             }
-            sb.append(item);
+            sb.append(item.toString());
         }
         return sb.toString();
     }

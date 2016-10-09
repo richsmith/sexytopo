@@ -4,6 +4,7 @@ import android.content.Context;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.control.util.TextTools;
 
 import java.io.File;
 import java.util.HashSet;
@@ -12,9 +13,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-/**
- * Created by rls on 08/10/14.
- */
 public class Util {
 
 
@@ -33,6 +31,7 @@ public class Util {
     public static void ensureDataDirectoriesExist() {
         ensureDirectoryExists(SexyTopo.EXTERNAL_SURVEY_DIR);
         ensureDirectoryExists(SexyTopo.EXTERNAL_IMPORT_DIR);
+        ensureDirectoryExists(SexyTopo.EXTERNAL_EXPORT_DIR);
     }
 
 
@@ -105,9 +104,8 @@ public class Util {
         return directory + File.separator + name + "." + extension;
     }
 
-    public static String getExportDirectoryPathForSurvey(String name) {
-        String directory = getDirectoryPathForSurvey(name);
-        return SexyTopo.EXTERNAL_SURVEY_DIR + File.separator + name;
+    public static String getExportDirectoryPath(String exportFormat, String name) {
+        return TextTools.join(File.separator, SexyTopo.EXTERNAL_EXPORT_DIR, exportFormat, name);
     }
 
 

@@ -7,9 +7,7 @@ import org.hwyl.sexytopo.control.util.TextTools;
 import java.io.File;
 import java.util.UUID;
 
-/**
- * Created by rls on 22/07/14.
- */
+
 public class SexyTopo {
 
     public static final String APP_NAME = "SexyTopo";
@@ -26,12 +24,14 @@ public class SexyTopo {
     private static final String EXTERNAL_ROOT = Environment.getExternalStorageDirectory().toString();
     public static final String APP_DIR = APP_NAME;
     public static final String SURVEY_DIR = "Surveys";
-    public static final String IMPORT_DIR = "Import Here";
+    public static final String IMPORT_DIR = "To Import";
     public static final String EXPORT_DIR = "Exported";
     public static final String EXTERNAL_SURVEY_DIR =
             TextTools.join(File.separator, EXTERNAL_ROOT, APP_DIR, SURVEY_DIR);
     public static final String EXTERNAL_IMPORT_DIR =
             TextTools.join(File.separator, EXTERNAL_ROOT, APP_DIR, IMPORT_DIR);
+    public static final String EXTERNAL_EXPORT_DIR =
+            TextTools.join(File.separator, EXTERNAL_ROOT, APP_DIR, EXPORT_DIR);
 
     public static final String ACTIVE_SURVEY_NAME = "activeSurveyName";
 

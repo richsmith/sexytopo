@@ -10,6 +10,7 @@ import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -91,7 +92,7 @@ public class XviExporter {
             -1.0 // FIXME
         };
 
-        return TextTools.join(" ", values);
+        return TextTools.join(" ", Arrays.asList(values));
     }
 
 
