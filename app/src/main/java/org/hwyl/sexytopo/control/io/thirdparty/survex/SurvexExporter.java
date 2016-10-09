@@ -2,7 +2,7 @@ package org.hwyl.sexytopo.control.io.thirdparty.survex;
 
 import android.content.Context;
 
-import org.hwyl.sexytopo.control.io.translation.Exporter;
+import org.hwyl.sexytopo.control.io.translation.SingleFileExporter;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.table.TableCol;
@@ -12,11 +12,11 @@ import java.util.Locale;
 import java.util.Map;
 
 
-public class SurvexExporter implements Exporter {
+public class SurvexExporter extends SingleFileExporter {
 
     private static GraphToListTranslator graphToListTranslator = new GraphToListTranslator();
 
-    public String export(Survey survey) {
+    public String getContent(Survey survey) {
 
         List<GraphToListTranslator.SurveyListEntry> list = graphToListTranslator.toListOfSurveyListEntries(survey);
         List<Map<TableCol, Object>> data = graphToListTranslator.toListOfColMaps(survey);

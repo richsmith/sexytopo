@@ -7,7 +7,7 @@ import org.hwyl.sexytopo.control.io.translation.Exporter;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 
-public class TherionExporter implements Exporter {
+public class TherionExporter extends Exporter {
 
 
     public String export(Survey survey) {

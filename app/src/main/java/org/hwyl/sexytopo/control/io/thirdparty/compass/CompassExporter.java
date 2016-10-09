@@ -3,7 +3,7 @@ package org.hwyl.sexytopo.control.io.thirdparty.compass;
 import android.content.Context;
 
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.control.io.translation.Exporter;
+import org.hwyl.sexytopo.control.io.translation.SingleFileExporter;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -20,7 +20,7 @@ import java.util.List;
  *
  * Created by driggs on 1/16/16.
  */
-public class CompassExporter implements Exporter {
+public class CompassExporter extends SingleFileExporter {
 
     private static DateFormat dateFormat = new SimpleDateFormat("MM dd yyyy");
     private static GraphToListTranslator graphToListTranslator = new GraphToListTranslator();
@@ -34,7 +34,7 @@ public class CompassExporter implements Exporter {
      * @param survey
      * @return
      */
-    public String export(Survey survey) {
+    public String getContent(Survey survey) {
         List<GraphToListTranslator.SurveyListEntry> data = graphToListTranslator.toListOfSurveyListEntries(survey);
         String surveyDate = dateFormat.format(Calendar.getInstance().getTime());
 
@@ -67,6 +67,13 @@ public class CompassExporter implements Exporter {
 
         return sb.toString();
     }
+
+
+    @Override
+    public String getFileExtension() {
+        return "dat";
+    }
+
 
     @Override
     public String getExportTypeName(Context context) {

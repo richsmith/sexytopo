@@ -15,8 +15,8 @@ public class ThconfigExporter {
         String[] lines = new String[] {
             TherionExporter.getEncodingText(),
             "source " + name + ".th",
-            "export map -proj plan -layout local -o " + name + "-plan.pdf",
-            "export map -proj extended -layout local -o " + name + "-ee.pdf"
+            "getContent map -proj plan -layout local -o " + name + "-plan.pdf",
+            "getContent map -proj extended -layout local -o " + name + "-ee.pdf"
         };
 
         return TextTools.join(Arrays.asList(lines), "\n\n");

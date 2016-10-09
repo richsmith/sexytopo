@@ -47,7 +47,7 @@ public class Saver {
     private static void saveSurveyData(Survey survey, String extension)
             throws IOException {
         String path = Util.getPathForSurveyFile(survey.getName(), extension);
-        String surveyText = new SurvexExporter().export(survey);
+        String surveyText = new SurvexExporter().getContent(survey);
         saveFile(path, surveyText);
     }
 

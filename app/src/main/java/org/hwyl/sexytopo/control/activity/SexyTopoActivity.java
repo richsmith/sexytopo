@@ -23,14 +23,13 @@ import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.control.io.basic.Saver;
-import org.hwyl.sexytopo.control.io.thirdparty.compass.CompassExporter;
-import org.hwyl.sexytopo.control.io.thirdparty.pockettopo.PocketTopoTxtExporter;
+import org.hwyl.sexytopo.control.io.translation.ExportManager;
+import org.hwyl.sexytopo.control.io.translation.Exporter;
 import org.hwyl.sexytopo.control.io.translation.ImportManager;
-import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.demo.TestSurveyCreator;
+import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -176,24 +175,48 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
     public void exportSurvey() {  // public due to stupid Reflection requirements
-        try {
-            Survey survey = getSurvey();
 
-            // Therion text file
-            String content = new PocketTopoTxtExporter().export(survey);
-            String filename = Util.getPathForSurveyFile(survey.getName(), "txt");
-            Saver.saveFile(filename, content);
+        final Survey survey = getSurvey();
 
-            // Compass dat file
-            CompassExporter exporter = new CompassExporter();
-            String datFilename = Util.getPathForSurveyFile(survey.getName(), "dat");
-            String datContents = exporter.export(survey);
-            Saver.saveFile(datFilename, datContents);
+        AlertDialog.Builder builderSingle = new AlertDialog.Builder(
+                this);
 
-        } catch(IOException e) {
-            Log.d(SexyTopo.TAG, "Error exporting survey: " + e);
-            showSimpleToast("Error exporting survey");
+        builderSingle.setTitle(getString(R.string.export_survey));
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.select_dialog_item);
+
+        final Map<String, Exporter> nameToExporter = new HashMap<>();
+
+        for (Exporter exporter : ExportManager.EXPORTERS) {
+            String name = exporter.getExportTypeName(this);
+            arrayAdapter.add(name);
+            nameToExporter.put(name, exporter);
         }
+
+        builderSingle.setNegativeButton(getString(R.string.cancel),
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        builderSingle.setAdapter(arrayAdapter,
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    String name = arrayAdapter.getItem(which);
+                    Exporter selectedExporter = nameToExporter.get(name);
+                    try {
+                        selectedExporter.export(survey);
+                    } catch (Exception e) {
+                        showSimpleToast(getString(R.string.error_prefix) + e.getMessage());
+                    }
+                }
+            });
+        builderSingle.show();
     }
 
 

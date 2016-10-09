@@ -4,7 +4,7 @@ import android.content.Context;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexExporter;
-import org.hwyl.sexytopo.control.io.translation.Exporter;
+import org.hwyl.sexytopo.control.io.translation.SingleFileExporter;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
@@ -20,10 +20,10 @@ import java.util.List;
 import java.util.Map;
 
 
-public class PocketTopoTxtExporter implements Exporter {
+public class PocketTopoTxtExporter extends SingleFileExporter {
 
 
-    public String export(Survey survey) {
+    public String getContent(Survey survey) {
 
         String text = "TRIP\n";
         text += "DATE 1970-01-01\n";
@@ -39,15 +39,10 @@ public class PocketTopoTxtExporter implements Exporter {
         return text;
     }
 
-    @Override
-    public String getExportTypeName(Context context) {
-        return context.getString(R.string.third_party_pocket_topo_txt);
-    }
-
 
     public static String exportData(Survey survey) {
         String data = "DATA\n";
-        data += new SurvexExporter().export(survey);
+        data += new SurvexExporter().getContent(survey);
         return data;
     }
 
@@ -103,5 +98,16 @@ public class PocketTopoTxtExporter implements Exporter {
         return TextTools.join(lines, "\n");
     }
 
+
+    @Override
+    public String getFileExtension() {
+        return "txt";
+    }
+
+
+    @Override
+    public String getExportTypeName(Context context) {
+        return context.getString(R.string.third_party_pocket_topo_txt);
+    }
 
 }

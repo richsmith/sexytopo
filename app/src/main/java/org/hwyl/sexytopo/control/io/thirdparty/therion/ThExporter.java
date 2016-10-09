@@ -40,7 +40,7 @@ public class ThExporter {
 
     private static String getCentreline(Survey survey) {
         return "data normal from to length compass clino\n\n" +
-            new SurvexExporter().export(survey);
+            new SurvexExporter().getContent(survey);
     }
 
 

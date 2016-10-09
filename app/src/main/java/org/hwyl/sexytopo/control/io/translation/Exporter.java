@@ -4,9 +4,13 @@ import android.content.Context;
 
 import org.hwyl.sexytopo.model.survey.Survey;
 
+import java.io.IOException;
 
-public interface Exporter {
-    public String export(Survey survey);
 
-    public String getExportTypeName(Context context);
+public abstract class Exporter {
+
+    public abstract void export(Survey survey) throws IOException;
+
+    public abstract String getExportTypeName(Context context);
+
 }
