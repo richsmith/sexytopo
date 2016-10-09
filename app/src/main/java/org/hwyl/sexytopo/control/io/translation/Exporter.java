@@ -18,18 +18,6 @@ public abstract class Exporter {
 
     public abstract String getExportDirectoryName();
 
-        /*
-    private String createExportDirectoryIfRequired(Survey survey) {
-        String path = getExportDirectoryPath(survey);
-        Util.ensureDirectoriesInPathExist(path);
-        return path;
-    }
-
-
-    private String getExportDirectoryPath(Survey survey) {
-        return Util.getExportDirectoryPath(
-                survey.getName()) + File.separator + getExportDirectoryName();
-    }*/
 
     protected void saveToExportDirectory(Survey survey, String filename, String content)
             throws IOException {
