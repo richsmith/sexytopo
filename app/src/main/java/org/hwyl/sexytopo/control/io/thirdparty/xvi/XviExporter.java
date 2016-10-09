@@ -23,7 +23,7 @@ import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.STATIONS_
 
 public class XviExporter {
 
-    public static String toXvi(Survey survey, Sketch sketch, Projection2D projection) {
+    public static String getContent(Survey survey, Sketch sketch, Projection2D projection) {
 
         Space<Coord2D> space = projection.project(survey);
 

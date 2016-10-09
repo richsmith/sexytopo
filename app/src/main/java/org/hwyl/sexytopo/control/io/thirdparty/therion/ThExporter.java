@@ -6,7 +6,7 @@ import org.hwyl.sexytopo.model.survey.Survey;
 
 public class ThExporter {
 
-    public String export(Survey survey) {
+    public static String getContent(Survey survey) {
 
         String text =
             TherionExporter.getEncodingText() + "\n" +

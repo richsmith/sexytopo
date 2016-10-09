@@ -96,18 +96,23 @@ public class Util {
     }
 
 
-    public static String getDirectoryForSurveyFile(String name) {
+    public static String getDirectoryPathForSurvey(String name) {
         return SexyTopo.EXTERNAL_SURVEY_DIR + File.separator + name;
     }
 
     public static String getPathForSurveyFile(String name, String extension) {
-        String directory = getDirectoryForSurveyFile(name);
+        String directory = getDirectoryPathForSurvey(name);
         return directory + File.separator + name + "." + extension;
+    }
+
+    public static String getExportDirectoryPathForSurvey(String name) {
+        String directory = getDirectoryPathForSurvey(name);
+        return SexyTopo.EXTERNAL_SURVEY_DIR + File.separator + name;
     }
 
 
     public static void deleteSurvey(String name) throws Exception {
-        File surveyDirectory = new File(getDirectoryForSurveyFile(name));
+        File surveyDirectory = new File(getDirectoryPathForSurvey(name));
         deleteFileAndAnyContents(surveyDirectory);
     }
 

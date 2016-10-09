@@ -27,6 +27,7 @@ public class SexyTopo {
     public static final String APP_DIR = APP_NAME;
     public static final String SURVEY_DIR = "Surveys";
     public static final String IMPORT_DIR = "Import Here";
+    public static final String EXPORT_DIR = "Exported";
     public static final String EXTERNAL_SURVEY_DIR =
             TextTools.join(File.separator, EXTERNAL_ROOT, APP_DIR, SURVEY_DIR);
     public static final String EXTERNAL_IMPORT_DIR =

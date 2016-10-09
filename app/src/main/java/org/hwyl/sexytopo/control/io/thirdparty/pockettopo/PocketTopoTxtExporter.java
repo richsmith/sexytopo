@@ -110,4 +110,10 @@ public class PocketTopoTxtExporter extends SingleFileExporter {
         return context.getString(R.string.third_party_pocket_topo_txt);
     }
 
+
+    @Override
+    public String getExportDirectoryName() {
+        return "pockettopo-txt";
+    }
+
 }

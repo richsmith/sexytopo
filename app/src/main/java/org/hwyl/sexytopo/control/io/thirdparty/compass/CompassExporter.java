@@ -80,6 +80,13 @@ public class CompassExporter extends SingleFileExporter {
         return context.getString(R.string.third_party_compass);
     }
 
+
+    @Override
+    public String getExportDirectoryName() {
+        return "compass";
+    }
+
+
     /**
      * Produce a unique TO station name for a splay shot (Compass doesn't allow anonymous stations).
      * @param from

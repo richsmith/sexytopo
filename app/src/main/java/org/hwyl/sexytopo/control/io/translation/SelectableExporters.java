@@ -8,14 +8,12 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class ExportManager {
+public class SelectableExporters {
 
     public static final List<? extends Exporter> EXPORTERS = Arrays.asList(
         new TherionExporter(),
         new SurvexExporter(),
         new PocketTopoTxtExporter()
     );
-
-
 
 }

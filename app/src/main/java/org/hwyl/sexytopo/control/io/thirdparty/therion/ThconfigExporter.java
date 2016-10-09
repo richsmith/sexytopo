@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 public class ThconfigExporter {
 
-    public String export(Survey survey) {
+    public static String getContent(Survey survey) {
 
         String name = survey.getName();
 

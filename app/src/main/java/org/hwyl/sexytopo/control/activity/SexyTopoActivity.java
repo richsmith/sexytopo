@@ -23,7 +23,7 @@ import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.control.io.basic.Saver;
-import org.hwyl.sexytopo.control.io.translation.ExportManager;
+import org.hwyl.sexytopo.control.io.translation.SelectableExporters;
 import org.hwyl.sexytopo.control.io.translation.Exporter;
 import org.hwyl.sexytopo.control.io.translation.ImportManager;
 import org.hwyl.sexytopo.demo.TestSurveyCreator;
@@ -189,7 +189,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
         final Map<String, Exporter> nameToExporter = new HashMap<>();
 
-        for (Exporter exporter : ExportManager.EXPORTERS) {
+        for (Exporter exporter : SelectableExporters.EXPORTERS) {
             String name = exporter.getExportTypeName(this);
             arrayAdapter.add(name);
             nameToExporter.put(name, exporter);

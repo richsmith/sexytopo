@@ -2,6 +2,7 @@ package org.hwyl.sexytopo.control.io.thirdparty.survex;
 
 import android.content.Context;
 
+import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.io.translation.SingleFileExporter;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -35,16 +36,28 @@ public class SurvexExporter extends SingleFileExporter {
     }
 
 
-    @Override
-    public String getExportTypeName(Context context) {
-        return null;
-    }
-
-
     private static String getEntry(TableCol tableCol, Map map) {
         Object value = map.get(tableCol);
         String text = tableCol.format(value, Locale.UK);
         return text + "\t";
+    }
+
+
+    @Override
+    public String getFileExtension() {
+        return "svx";
+    }
+
+
+    @Override
+    public String getExportTypeName(Context context) {
+        return context.getString(R.string.third_party_survex);
+    }
+
+
+    @Override
+    public String getExportDirectoryName() {
+        return "survex";
     }
 
 }

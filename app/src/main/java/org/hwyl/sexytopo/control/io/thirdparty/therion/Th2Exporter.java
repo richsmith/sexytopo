@@ -9,14 +9,14 @@ import java.util.List;
 
 public class Th2Exporter {
 
-    public String asText(Survey survey) {
+    public static String getContent(Survey survey) {
         List<String> lines = new LinkedList<>();
         lines.add(TherionExporter.getEncodingText());
         lines.add(getXviBlock(survey));
         return TextTools.join(lines, "\n\n");
     }
 
-    public String getXviBlock(Survey survey) {
+    public static String getXviBlock(Survey survey) {
         List<String> lines = new LinkedList<>();
         lines.add(getXviLine("xth_me_area_adjust", 0, 0, 0, 0)); // map box bottom left x1,y1 to top right x2, y2?
         lines.add(getXviLine("zoom_to", 100)); // zoom adjustment (100%?)
