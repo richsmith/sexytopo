@@ -34,6 +34,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+
 /**
  * Base class for all activities that use the action bar.
  */
@@ -181,7 +182,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         AlertDialog.Builder builderSingle = new AlertDialog.Builder(
                 this);
 
-        builderSingle.setTitle(getString(R.string.export_survey));
+        builderSingle.setTitle(getString(R.string.select_export_type));
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.select_dialog_item);
@@ -211,6 +212,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                     Exporter selectedExporter = nameToExporter.get(name);
                     try {
                         selectedExporter.export(survey);
+                        showSimpleToast(R.string.export_successful);
                     } catch (Exception e) {
                         showSimpleToast(getString(R.string.error_prefix) + e.getMessage());
                     }
@@ -510,6 +512,10 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     public void showSimpleToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+    }
+
+    public void showSimpleToast(int id) {
+        showSimpleToast(getString(id));
     }
 
     protected boolean getBooleanPreference(String name) {
