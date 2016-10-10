@@ -105,7 +105,7 @@ public class Util {
     }
 
     public static String getExportDirectoryPath(String exportFormat, String name) {
-        return TextTools.join(File.separator, SexyTopo.EXTERNAL_EXPORT_DIR, exportFormat, name);
+        return TextTools.joinAll(File.separator, SexyTopo.EXTERNAL_EXPORT_DIR, exportFormat, name);
     }
 
 

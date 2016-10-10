@@ -27,11 +27,11 @@ public class SexyTopo {
     public static final String IMPORT_DIR = "To Import";
     public static final String EXPORT_DIR = "Exported";
     public static final String EXTERNAL_SURVEY_DIR =
-            TextTools.join(File.separator, EXTERNAL_ROOT, APP_DIR, SURVEY_DIR);
+            TextTools.joinAll(File.separator, EXTERNAL_ROOT, APP_DIR, SURVEY_DIR);
     public static final String EXTERNAL_IMPORT_DIR =
-            TextTools.join(File.separator, EXTERNAL_ROOT, APP_DIR, IMPORT_DIR);
+            TextTools.joinAll(File.separator, EXTERNAL_ROOT, APP_DIR, IMPORT_DIR);
     public static final String EXTERNAL_EXPORT_DIR =
-            TextTools.join(File.separator, EXTERNAL_ROOT, APP_DIR, EXPORT_DIR);
+            TextTools.joinAll(File.separator, EXTERNAL_ROOT, APP_DIR, EXPORT_DIR);
 
     public static final String ACTIVE_SURVEY_NAME = "activeSurveyName";
 

@@ -74,7 +74,7 @@ public class PocketTopoTxtExporter extends SingleFileExporter {
 
         }
 
-        return TextTools.join(lines, "\n");
+        return TextTools.join("\n", lines);
     }
 
 
@@ -95,7 +95,7 @@ public class PocketTopoTxtExporter extends SingleFileExporter {
             lines.add(start.getX() + "\t" + start.getY() + "\t" + end.getX() + "\t" + end.getY());
         }
 
-        return TextTools.join(lines, "\n");
+        return TextTools.join("\n", lines);
     }
 
 

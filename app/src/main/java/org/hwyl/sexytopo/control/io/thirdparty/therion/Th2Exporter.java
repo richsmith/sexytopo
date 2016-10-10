@@ -13,7 +13,7 @@ public class Th2Exporter {
         List<String> lines = new LinkedList<>();
         lines.add(TherionExporter.getEncodingText());
         lines.add(getXviBlock(survey));
-        return TextTools.join(lines, "\n\n");
+        return TextTools.join("\n\n", lines);
     }
 
     public static String getXviBlock(Survey survey) {
@@ -21,7 +21,7 @@ public class Th2Exporter {
         lines.add(getXviLine("xth_me_area_adjust", 0, 0, 0, 0)); // map box bottom left x1,y1 to top right x2, y2?
         lines.add(getXviLine("zoom_to", 100)); // zoom adjustment (100%?)
         lines.add(getXviLine("xth_me_image_insert", "{}", "{}", survey.getName() + ".xvi", 0, "{}"));
-        return TextTools.join(lines, "\n");
+        return TextTools.join("\n", lines);
     }
 
     private static String getXviLine(String command, Object... values) {
@@ -31,7 +31,7 @@ public class Th2Exporter {
         for (Object value : values) {
             fields.add(value.toString());
         }
-        return TextTools.join(fields, " ");
+        return TextTools.join(" ", fields);
     }
 
 

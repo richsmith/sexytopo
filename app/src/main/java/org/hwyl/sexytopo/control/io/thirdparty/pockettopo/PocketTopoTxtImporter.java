@@ -144,7 +144,7 @@ public class PocketTopoTxtImporter implements Importer {
             }
         }
 
-        return TextTools.join(subSection, "\n");
+        return TextTools.join("\n", subSection);
     }
 
     public static Set<PathDetail> parsePolylines(String text) {

@@ -45,7 +45,7 @@ public class XviExporter {
     }
 
     private static String getStationText(Station station, Coord2D coords) {
-        return field("\t", TextTools.join(" ", coords.getX(), coords.getY(), station.getName()));
+        return field("\t", TextTools.joinAll(" ", coords.getX(), coords.getY(), station.getName()));
     }
 
     private static String getLegsText(Space<Coord2D> space) {
@@ -59,7 +59,8 @@ public class XviExporter {
     private static String getLegText(Line<Coord2D> line) {
         Coord2D start = line.getStart();
         Coord2D end = line.getEnd();
-        return field("\t", TextTools.join(" ", start.getX(), start.getY(), end.getX(), end.getY()));
+        return field("\t", TextTools.joinAll(" ",
+                start.getX(), start.getY(), end.getX(), end.getY()));
     }
 
     private static String getSketchLinesText(Sketch sketch) {
@@ -81,7 +82,7 @@ public class XviExporter {
         // cfactor = 100 * planDPI / (2.54 * planscale)
         double scale = getScale();
 
-        double[] values = new double[] {
+        Double[] values = new Double[] {
             -1.0, // FIXME
             -1.0, // FIXME
             -1.0, // FIXME

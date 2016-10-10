@@ -1,6 +1,7 @@
 package org.hwyl.sexytopo.control.util;
 
 import java.text.DecimalFormat;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -12,7 +13,12 @@ public class TextTools {
         return n + " " + ((n == 1)? noun : noun + "s");
     }
 
-    public static String join(String joiner, Object ... list) {
+    public static String joinAll(String joiner, Object ... list) {
+
+        if (list.length == 1 && list[0] instanceof Collection) {
+            throw new IllegalArgumentException("Wrong method called; should be join()");
+        }
+
         StringBuilder sb = new StringBuilder();
         boolean first = true;
         for (Object item : list) {
@@ -26,7 +32,7 @@ public class TextTools {
         return sb.toString();
     }
 
-    public static String join(List<?> list, String joiner) {
+    public static String join(String joiner, List<?> list) {
         StringBuilder sb = new StringBuilder();
         boolean first = true;
         for (Object item : list) {

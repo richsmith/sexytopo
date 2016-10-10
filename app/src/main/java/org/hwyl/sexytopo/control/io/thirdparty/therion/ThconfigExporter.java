@@ -19,7 +19,7 @@ public class ThconfigExporter {
             "export map -proj extended -layout local -o \"" + name + "-ee.pdf\""
         };
 
-        return TextTools.join(Arrays.asList(lines), "\n\n");
+        return TextTools.join("\n\n", Arrays.asList(lines));
     }
 
 }
