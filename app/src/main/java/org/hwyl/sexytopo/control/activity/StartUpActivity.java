@@ -1,8 +1,6 @@
 package org.hwyl.sexytopo.control.activity;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -10,8 +8,8 @@ import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
-import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.control.io.Util;
+import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 public class StartUpActivity extends SexyTopoActivity {
@@ -53,15 +51,13 @@ public class StartUpActivity extends SexyTopoActivity {
     }
 
     private boolean isThereAnActiveSurvey() {
-        SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
-        return preferences.contains(SexyTopo.ACTIVE_SURVEY_NAME);
+        return getPreferences().contains(SexyTopo.ACTIVE_SURVEY_NAME);
     }
 
 
     public Survey loadActiveSurvey() {
 
-        SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
-        String activeSurveyName = preferences.getString(SexyTopo.ACTIVE_SURVEY_NAME, null);
+        String activeSurveyName = getPreferences().getString(SexyTopo.ACTIVE_SURVEY_NAME, "Error");
 
         Toast.makeText(getApplicationContext(),
                 getString(R.string.loading_survey) + " " + activeSurveyName,

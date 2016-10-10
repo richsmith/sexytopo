@@ -244,10 +244,14 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
      * This is used to set whether a survey will be reopened when opening SexyTopo
      */
     private void updateRememberedSurvey() {
-        SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences preferences = getPreferences();
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(SexyTopo.ACTIVE_SURVEY_NAME, getSurvey().getName());
         editor.commit();
+    }
+
+    protected SharedPreferences getPreferences() {
+        return PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
     }
 
 
@@ -270,6 +274,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                             survey.setName(newName);
                             setSurvey(new Survey(Util.getNextDefaultSurveyName(SexyTopoActivity.this)));
                             Saver.save(survey);
+                            updateRememberedSurvey();
                         } catch (Exception e) {
                             survey.setName(oldName);
                             showSimpleToast(getString(R.string.errorSavingSurvey));
