@@ -74,7 +74,10 @@ public class XviExporter {
     private static String getSketchLineText(PathDetail pathDetail) {
         List<Object> fields = new LinkedList<>();
         fields.add(pathDetail.getColour().toString());
-        fields.addAll(pathDetail.getPath());
+        for (Coord2D coord2D : pathDetail.getPath()) {
+            fields.add(coord2D.getX());
+            fields.add(coord2D.getY());
+        }
         return field("\t", TextTools.join(" ", fields));
     }
 

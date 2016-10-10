@@ -88,14 +88,14 @@ public class XviImporterTest {
     @Test
     public void testParseSketchEntryGetsRightColour() throws Exception {
         String simpleText = "red 0 0";
-        PathDetail pathDetail = XviImporter.parseSketchEntry(simpleText);
+        PathDetail pathDetail = XviImporter.parseSketchEntry(1, simpleText);
         Assert.assertEquals(Colour.RED, pathDetail.getColour());
     }
 
     @Test
     public void testParseSketchEntryParsesFirstEntry() throws Exception {
         String simpleText = "red 0 0";
-        PathDetail pathDetail = XviImporter.parseSketchEntry(simpleText);
+        PathDetail pathDetail = XviImporter.parseSketchEntry(1, simpleText);
         Assert.assertEquals(Coord2D.ORIGIN, pathDetail.getPath().get(0));
         Assert.assertEquals(1, pathDetail.getPath().size());
     }
@@ -103,7 +103,7 @@ public class XviImporterTest {
     @Test
     public void testParseSketchEntryParsesSecondEntry() throws Exception {
         String simpleText = "blue 0 0 1 0";
-        PathDetail pathDetail = XviImporter.parseSketchEntry(simpleText);
+        PathDetail pathDetail = XviImporter.parseSketchEntry(1, simpleText);
         Assert.assertEquals(new Coord2D(1, 0), pathDetail.getPath().get(1));
         Assert.assertEquals(2, pathDetail.getPath().size());
     }
@@ -111,12 +111,12 @@ public class XviImporterTest {
     @Test(expected=IllegalArgumentException.class)
     public void testParseSketchEntryFailsForUnevenData() throws Exception {
         String simpleText = "red 0 0 1";
-        PathDetail pathDetail = XviImporter.parseSketchEntry(simpleText);
+        PathDetail pathDetail = XviImporter.parseSketchEntry(1, simpleText);
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void testParseSketchEntryFailsForUnknownFirstCommand() throws Exception {
         String simpleText = "connect 0 0";
-        PathDetail pathDetail = XviImporter.parseSketchEntry(simpleText);
+        PathDetail pathDetail = XviImporter.parseSketchEntry(1, simpleText);
     }
 }
