@@ -10,6 +10,7 @@ import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,7 +33,7 @@ public class XviExporter {
         text += multilineField(STATIONS_COMMAND, getStationsText(space));
         text += multilineField(SHOT_COMMAND, getLegsText(space));
         text += multilineField(SKETCHLINE_COMMAND, getSketchLinesText(sketch));
-        text += field(GRID_COMMAND, getGridText(sketch));
+        text += field(GRID_COMMAND, getGridText(sketch, space));
         return text;
     }
 
@@ -81,19 +82,25 @@ public class XviExporter {
         return field("\t", TextTools.join(" ", fields));
     }
 
-    private static String getGridText(Sketch sketch) {
+    private static String getGridText(Sketch sketch, Space<Coord2D> space) {
         // cfactor = 100 * planDPI / (2.54 * planscale)
         double scale = getScale();
 
+        Extremes extremes = getExtremes(space);
+        DecimalFormat df = new DecimalFormat("#.00000");
+        df.format(0.912385);
+        double width = Math.ceil(extremes.maxX - extremes.minX);
+        double height = Math.ceil(extremes.maxY - extremes.minY);
+
         Double[] values = new Double[] {
-            -1.0, // FIXME
-            -1.0, // FIXME
-            -1.0, // FIXME
+            (extremes.minX - 1) * scale,
+            (extremes.minY - 1) * scale,
+            scale,
             0.0,
             0.0,
             scale,
-            -1.0, // FIXME
-            -1.0 // FIXME
+            width + 2,
+            height + 2
         };
 
         return TextTools.join(" ", Arrays.asList(values));
@@ -108,11 +115,45 @@ public class XviExporter {
         return scale;
     }
 
+    private static Extremes getExtremes(Space<Coord2D> space) {
+        Double minX = null, maxX = null, minY = null, maxY = null;
+        for (Line<Coord2D> line : space.getLegMap().values()) {
+            for (Coord2D point : new Coord2D[]{line.getStart(), line.getEnd()}) {
+                if (minX == null || point.getX() < minX) {
+                    minX = point.getX();
+                }
+                if (maxX == null || point.getX() > maxX) {
+                    maxX = point.getX();
+                }
+                if (minY == null || point.getY() < minY) {
+                    minY = point.getY();
+                }
+                if (maxY == null || point.getY() > maxY) {
+                    maxY = point.getY();
+                }
+            }
+        }
+        return new Extremes(minX, maxX, minY, maxY);
+
+    }
+
     private static String field(String text, String content) {
         return text + " {" + content + "}\n";
     }
 
     private static String multilineField(String text, String content) {
         return text + " {\n" + content + "}\n";
+    }
+
+
+}
+
+class Extremes {
+    final double minX, maxX, minY, maxY;
+    Extremes(double minX, double maxX, double minY, double maxY) {
+        this.minX = minX;
+        this.maxX = maxX;
+        this.minY = minY;
+        this.maxY = maxY;
     }
 }
