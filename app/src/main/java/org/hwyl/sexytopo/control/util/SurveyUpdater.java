@@ -81,6 +81,7 @@ public class SurveyUpdater {
         Station newStation = new Station(getNextStationName(survey));
         Leg newLeg = Leg.upgradeSplayToConnectedLeg(leg, newStation);
         editLeg(survey, leg, newLeg);
+        survey.setActiveStation(newStation);
     }
 
     private static String getNextStationName(Survey survey) {
