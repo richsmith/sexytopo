@@ -33,12 +33,14 @@ public class TherionExporter extends Exporter {
     private void handleProjection(Survey survey, Projection2D projection, String suffix)
             throws IOException {
 
+        double scale = getScale();
+
         Space<Coord2D> space = projection.project(survey);
         String filename = survey.getName() + " " + suffix;
-        String th2PlanContent = Th2Exporter.getContent(survey, getScale(), filename, space);
+        String th2PlanContent = Th2Exporter.getContent(survey, scale, filename, space);
         saveToExportDirectory(survey, filename + ".th2", th2PlanContent);
 
-        String xviPlanContent = XviExporter.getContent(survey.getPlanSketch(), space);
+        String xviPlanContent = XviExporter.getContent(survey.getPlanSketch(), space, scale);
         saveToExportDirectory(survey, filename + ".xvi", xviPlanContent);
 
     }

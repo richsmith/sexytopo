@@ -1,7 +1,6 @@
 package org.hwyl.sexytopo.control.io.thirdparty.xvi;
 
 import org.hwyl.sexytopo.control.io.thirdparty.therion.SketchDimensions;
-import org.hwyl.sexytopo.control.io.thirdparty.therion.TherionExporter;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
@@ -24,78 +23,80 @@ import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.STATIONS_
 
 public class XviExporter {
 
-    public static String getContent(Sketch sketch, Space<Coord2D> space ) {
+    public static String getContent(Sketch sketch, Space<Coord2D> space, double scale) {
 
         String text = field(GRIDS_COMMAND, "1 m");
-        text += multilineField(STATIONS_COMMAND, getStationsText(space));
-        text += multilineField(SHOT_COMMAND, getLegsText(space));
-        text += multilineField(SKETCHLINE_COMMAND, getSketchLinesText(sketch));
-        text += field(GRID_COMMAND, getGridText(sketch, space));
+        text += multilineField(STATIONS_COMMAND, getStationsText(space, scale));
+        text += multilineField(SHOT_COMMAND, getLegsText(space, scale));
+        text += multilineField(SKETCHLINE_COMMAND, getSketchLinesText(sketch, scale));
+        text += field(GRID_COMMAND, getGridText(space, scale));
         return text;
     }
 
-    private static String getStationsText(Space<Coord2D> space) {
+    private static String getStationsText(Space<Coord2D> space, double scale) {
         StringBuilder builder = new StringBuilder();
         for (Map.Entry<Station, Coord2D> entry: space.getStationMap().entrySet()) {
-            builder.append(getStationText(entry.getKey(), entry.getValue()));
+            builder.append(getStationText(entry.getKey(), entry.getValue(), scale));
         }
         return builder.toString();
     }
 
-    private static String getStationText(Station station, Coord2D coords) {
-        return field("\t", TextTools.joinAll(" ", coords.getX(), coords.getY(), station.getName()));
+    private static String getStationText(Station station, Coord2D coords, double scale) {
+        String x = TextTools.formatTo2dp(coords.getX() * scale);
+        String y = TextTools.formatTo2dp(coords.getY() * scale);
+        return field("\t", TextTools.joinAll(" ", x, y, station.getName()));
     }
 
-    private static String getLegsText(Space<Coord2D> space) {
+    private static String getLegsText(Space<Coord2D> space, double scale) {
         StringBuilder builder = new StringBuilder();
         for (Line<Coord2D> line: space.getLegMap().values()) {
-            builder.append(getLegText(line));
+            builder.append(getLegText(line, scale));
         }
         return builder.toString();
     }
 
-    private static String getLegText(Line<Coord2D> line) {
+    private static String getLegText(Line<Coord2D> line, double scale) {
         Coord2D start = line.getStart();
+        String startX = TextTools.formatTo2dp(start.getX() * scale);
+        String startY = TextTools.formatTo2dp(start.getY() * scale);
         Coord2D end = line.getEnd();
-        return field("\t", TextTools.joinAll(" ",
-                start.getX(), start.getY(), end.getX(), end.getY()));
+        String endX = TextTools.formatTo2dp(end.getX() * scale);
+        String endY = TextTools.formatTo2dp(end.getY() * scale);
+        return field("\t", TextTools.joinAll(" ", startX, startY, endX, endY));
     }
 
-    private static String getSketchLinesText(Sketch sketch) {
+    private static String getSketchLinesText(Sketch sketch, double scale) {
         StringBuilder builder = new StringBuilder();
         for (PathDetail pathDetail : sketch.getPathDetails()) {
-            builder.append(getSketchLineText(pathDetail));
+            builder.append(getSketchLineText(pathDetail, scale));
         }
         return builder.toString();
     }
 
-    private static String getSketchLineText(PathDetail pathDetail) {
+    private static String getSketchLineText(PathDetail pathDetail, double scale) {
         List<Object> fields = new LinkedList<>();
         fields.add(pathDetail.getColour().toString());
         for (Coord2D coord2D : pathDetail.getPath()) {
-            fields.add(coord2D.getX());
-            fields.add(- coord2D.getY());
+            String x = TextTools.formatTo2dp(coord2D.getX() * scale);
+            String y = TextTools.formatTo2dp(- coord2D.getY() * scale);
+            fields.add(x);
+            fields.add(y);
         }
         return field("\t", TextTools.join(" ", fields));
     }
 
-    private static String getGridText(Sketch sketch, Space<Coord2D> space) {
-        // cfactor = 100 * planDPI / (2.54 * planscale)
-        double scale = TherionExporter.getScale();
-
-        SketchDimensions extremes = SketchDimensions.getDimensions(space);
-        double width = Math.round(extremes.maxX - extremes.minX);
-        double height = Math.round(extremes.maxY - extremes.minY);
+    private static String getGridText(Space<Coord2D> space, double scale) {
+        SketchDimensions dimensions = SketchDimensions.getDimensions(space);
 
         Double[] values = new Double[] {
-            (extremes.minX - 1) * scale,
-            (extremes.minY - 1) * scale,
+            (dimensions.minX - 1) * scale,
+            (dimensions.minY - 1) * scale,
             scale,
             0.0,
             0.0,
             scale,
-            width + 2,
-            height + 2
+            dimensions.getWidth() + 2,
+            dimensions.getHeight() + 2
         };
 
         return TextTools.join(" ", Arrays.asList(values));
