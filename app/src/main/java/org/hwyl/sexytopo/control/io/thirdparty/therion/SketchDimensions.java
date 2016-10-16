@@ -16,7 +16,15 @@ public class SketchDimensions {
         this.maxY = maxY;
     }
 
-    public static SketchDimensions getExtremes(Space<Coord2D> space) {
+    public double getWidth() {
+        return Math.abs(maxX - minX);
+    }
+
+    public double getHeight() {
+        return Math.abs(maxY - minY);
+    }
+
+    public static SketchDimensions getDimensions(Space<Coord2D> space) {
         Double minX = null, maxX = null, minY = null, maxY = null;
         for (Line<Coord2D> line : space.getLegMap().values()) {
             for (Coord2D point : new Coord2D[]{line.getStart(), line.getEnd()}) {

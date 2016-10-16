@@ -52,15 +52,15 @@ public class SurveyActivity extends SexyTopoActivity implements View.OnClickList
         //nameField.setText(survey.getName());
 
         double length = SurveyStats.calcTotalLength(survey);
-        setStatsField(R.id.statsFieldLength, TextTools.formatTo2dp(length));
+        setStatsField(R.id.statsFieldLength, TextTools.formatTo2dpWithComma(length));
         double heightRange = SurveyStats.calcHeightRange(survey);
-        setStatsField(R.id.statsFieldDepth, TextTools.formatTo2dp(heightRange));
+        setStatsField(R.id.statsFieldDepth, TextTools.formatTo2dpWithComma(heightRange));
         int numberOfStations = SurveyStats.calcNumberStations(survey);
-        setStatsField(R.id.statsFieldNumberStations, TextTools.format(numberOfStations));
+        setStatsField(R.id.statsFieldNumberStations, TextTools.formatWithComma(numberOfStations));
         double shortestLeg = SurveyStats.calcShortestLeg(survey);
-        setStatsField(R.id.statsFieldShortestLeg, TextTools.formatTo2dp(shortestLeg));
+        setStatsField(R.id.statsFieldShortestLeg, TextTools.formatTo2dpWithComma(shortestLeg));
         double longestLeg = SurveyStats.calcLongestLeg(survey);
-        setStatsField(R.id.statsFieldLongestLeg, TextTools.formatTo2dp(longestLeg));
+        setStatsField(R.id.statsFieldLongestLeg, TextTools.formatTo2dpWithComma(longestLeg));
 
     }
 

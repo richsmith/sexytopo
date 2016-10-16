@@ -15,7 +15,9 @@ public class XviExporterTest {
         Survey testSurvey = BasicTestSurveyCreator.createStraightNorth();
         BasicTestSketchCreator.drawOneHorizontalLine(testSurvey.getPlanSketch());
 
-        String xvi = XviExporter.getContent(testSurvey, testSurvey.getPlanSketch(), Projection2D.PLAN);
+        String xvi = XviExporter.getContent(
+                testSurvey.getPlanSketch(),
+                Projection2D.PLAN.project(testSurvey));
 
         Assert.assertTrue(xvi.contains("{BLACK 5.0 0.0 10.0 0.0}"));
     }

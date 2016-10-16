@@ -105,7 +105,7 @@ public class PocketTopoTxtImporter implements Importer {
     }
 
     public static String getSection(String text, String header) {
-        // a section in .txt format appears to be made up of a header, followed by the content,
+        // a section in .txt formatWithComma appears to be made up of a header, followed by the content,
         // followed by a blank line. There are no intermediate blank lines.
 
         text = text + "\n\n"; // hack (ensure last section is terminated by newline)
@@ -126,7 +126,7 @@ public class PocketTopoTxtImporter implements Importer {
     }
 
     public static String getNamedSubSection(String text, String header) {
-        // a section in .txt format appears to be made up of a header, followed by the content,
+        // a section in .txt formatWithComma appears to be made up of a header, followed by the content,
         // followed by either another header (one line of uppercase text) or end of text
 
         List<String> subSection = new LinkedList<>();

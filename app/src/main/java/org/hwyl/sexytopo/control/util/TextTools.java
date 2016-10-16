@@ -9,6 +9,11 @@ import java.util.List;
  */
 public class TextTools {
 
+    final static DecimalFormat dp0WithCommaFormatter = new DecimalFormat("#,##0");
+    final static DecimalFormat dp2WithCommaFormatter = new DecimalFormat("#,##0.00");
+    final static DecimalFormat dp2WithoutCommaFormatter = new DecimalFormat("##0.00");
+
+
     public static String pluralise(int n, String noun) {
         return n + " " + ((n == 1)? noun : noun + "s");
     }
@@ -46,19 +51,20 @@ public class TextTools {
         return sb.toString();
     }
 
-    public static String format(Integer number) {
-        DecimalFormat formatter = new DecimalFormat("#,##0");
-        return formatter.format(number);
+    public static String formatWithComma(Integer number) {
+        return dp0WithCommaFormatter.format(number);
+    }
+
+    public static String formatTo2dpWithComma(Number number) {
+        return dp2WithCommaFormatter.format(number);
     }
 
     public static String formatTo2dp(Number number) {
-        DecimalFormat formatter = new DecimalFormat("#,##0.00");
-        return formatter.format(number);
+        return dp2WithoutCommaFormatter.format(number);
     }
 
-    public static String formatTo0dp(Number number) {
-        DecimalFormat formatter = new DecimalFormat("#,##0");
-        return formatter.format(number);
+    public static String formatTo0dpWithComma(Number number) {
+        return dp0WithCommaFormatter.format(number);
     }
     
 

@@ -1,16 +1,15 @@
 package org.hwyl.sexytopo.control.io.thirdparty.xvi;
 
+import org.hwyl.sexytopo.control.io.thirdparty.therion.SketchDimensions;
+import org.hwyl.sexytopo.control.io.thirdparty.therion.TherionExporter;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
-import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Station;
-import org.hwyl.sexytopo.model.survey.Survey;
 
-import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,9 +24,7 @@ import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.STATIONS_
 
 public class XviExporter {
 
-    public static String getContent(Survey survey, Sketch sketch, Projection2D projection) {
-
-        Space<Coord2D> space = projection.project(survey);
+    public static String getContent(Sketch sketch, Space<Coord2D> space ) {
 
         String text = field(GRIDS_COMMAND, "1 m");
         text += multilineField(STATIONS_COMMAND, getStationsText(space));
@@ -77,20 +74,18 @@ public class XviExporter {
         fields.add(pathDetail.getColour().toString());
         for (Coord2D coord2D : pathDetail.getPath()) {
             fields.add(coord2D.getX());
-            fields.add(coord2D.getY());
+            fields.add(- coord2D.getY());
         }
         return field("\t", TextTools.join(" ", fields));
     }
 
     private static String getGridText(Sketch sketch, Space<Coord2D> space) {
         // cfactor = 100 * planDPI / (2.54 * planscale)
-        double scale = getScale();
+        double scale = TherionExporter.getScale();
 
-        Extremes extremes = getExtremes(space);
-        DecimalFormat df = new DecimalFormat("#.00000");
-        df.format(0.912385);
-        double width = Math.ceil(extremes.maxX - extremes.minX);
-        double height = Math.ceil(extremes.maxY - extremes.minY);
+        SketchDimensions extremes = SketchDimensions.getDimensions(space);
+        double width = Math.round(extremes.maxX - extremes.minX);
+        double height = Math.round(extremes.maxY - extremes.minY);
 
         Double[] values = new Double[] {
             (extremes.minX - 1) * scale,
@@ -106,37 +101,6 @@ public class XviExporter {
         return TextTools.join(" ", Arrays.asList(values));
     }
 
-
-    private static double getScale() {
-        final double PLAN_DPI = 200;
-        final double PLAN_SCALE = 100;
-        final double CENTIMETRES_PER_METRE = 2.54;
-        final double scale = 100 * PLAN_DPI / (CENTIMETRES_PER_METRE * PLAN_SCALE);
-        return scale;
-    }
-
-    private static Extremes getExtremes(Space<Coord2D> space) {
-        Double minX = null, maxX = null, minY = null, maxY = null;
-        for (Line<Coord2D> line : space.getLegMap().values()) {
-            for (Coord2D point : new Coord2D[]{line.getStart(), line.getEnd()}) {
-                if (minX == null || point.getX() < minX) {
-                    minX = point.getX();
-                }
-                if (maxX == null || point.getX() > maxX) {
-                    maxX = point.getX();
-                }
-                if (minY == null || point.getY() < minY) {
-                    minY = point.getY();
-                }
-                if (maxY == null || point.getY() > maxY) {
-                    maxY = point.getY();
-                }
-            }
-        }
-        return new Extremes(minX, maxX, minY, maxY);
-
-    }
-
     private static String field(String text, String content) {
         return text + " {" + content + "}\n";
     }
@@ -146,14 +110,4 @@ public class XviExporter {
     }
 
 
-}
-
-class Extremes {
-    final double minX, maxX, minY, maxY;
-    Extremes(double minX, double maxX, double minY, double maxY) {
-        this.minX = minX;
-        this.maxX = maxX;
-        this.minY = minY;
-        this.maxY = maxY;
-    }
 }

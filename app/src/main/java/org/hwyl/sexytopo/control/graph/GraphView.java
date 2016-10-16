@@ -43,9 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Created by rls on 27/07/14.
- */
+
 public class GraphView extends View {
 
     // FIXME hack!
@@ -750,8 +748,8 @@ private boolean firstTime = true;
 
         String surveyLabel =
             survey.getName() +
-            " L" + TextTools.formatTo0dp(SurveyStats.calcTotalLength(survey)) +
-            " H" + TextTools.formatTo0dp(SurveyStats.calcHeightRange(survey));
+            " L" + TextTools.formatTo0dpWithComma(SurveyStats.calcTotalLength(survey)) +
+            " H" + TextTools.formatTo0dpWithComma(SurveyStats.calcHeightRange(survey));
 
         float offsetX = getWidth() * 0.03f;
         float offsetY = getHeight() - LEGEND_SIZE * 2;
