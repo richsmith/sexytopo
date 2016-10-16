@@ -227,7 +227,8 @@ public class DeviceActivity extends SexyTopoActivity/* implements BroadcastRecei
                         Log.device("DistoX detected");
                         pair(device);
                     } else {
-                        Log.device("Device detected but it is not a DistoX");
+                        String name = device.getName();
+                        Log.device("Device \"" + name + "\"detected but it is not a DistoX");
                     }
                 }
             }
@@ -339,7 +340,7 @@ public class DeviceActivity extends SexyTopoActivity/* implements BroadcastRecei
 
     private static boolean isDistoX(BluetoothDevice device) {
         String name = device.getName();
-        return name.startsWith(DISTO_X_PREFIX);
+        return name.toLowerCase().contains(DISTO_X_PREFIX.toLowerCase());
     }
 
 
