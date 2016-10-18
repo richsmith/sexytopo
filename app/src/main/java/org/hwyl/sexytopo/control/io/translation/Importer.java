@@ -8,7 +8,7 @@ import java.io.File;
 
 public abstract class Importer {
 
-    public abstract Survey toSurvey(File file) throws Exception ;
+    public abstract Survey toSurvey(File file) throws Exception;
 
     public abstract boolean canHandleFile(File file);
 

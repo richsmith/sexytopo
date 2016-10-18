@@ -5,6 +5,7 @@ import android.content.Context;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.util.TextTools;
+import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.io.File;
 import java.util.HashSet;
@@ -133,6 +134,23 @@ public class Util {
     public static boolean doesFileExist(String path) {
         File filename = new File(path);
         return filename.exists();
+    }
+
+    public static String getImportSourceDirectoryPath(Survey survey) {
+        String surveyDirectory = getDirectoryPathForSurvey(survey.getName());
+        String path = surveyDirectory + File.separator + SexyTopo.IMPORT_SOURCE_DIR;
+        return path;
+    }
+
+    public static boolean wasSurveyImported(Survey survey) {
+        String path = getImportSourceDirectoryPath(survey);
+        File file = new File(path);
+        return (file.exists() && file.listFiles().length > 0);
+    }
+
+    public static File getFileSurveyWasImportedFrom(Survey survey) {
+        String path = getImportSourceDirectoryPath(survey);
+        return new File(path).listFiles()[0];
     }
 
 }

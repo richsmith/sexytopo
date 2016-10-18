@@ -78,7 +78,7 @@ public class XviExporter {
         fields.add(pathDetail.getColour().toString());
         for (Coord2D coord2D : pathDetail.getPath()) {
             String x = TextTools.formatTo2dp(coord2D.getX() * scale);
-            String y = TextTools.formatTo2dp(- coord2D.getY() * scale);
+            String y = TextTools.formatTo2dp((-coord2D.getY() + 0.0) * scale); // +0.0 to avoid -0.0
             fields.add(x);
             fields.add(y);
         }

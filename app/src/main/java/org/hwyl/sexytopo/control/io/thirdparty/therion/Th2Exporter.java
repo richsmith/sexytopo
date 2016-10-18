@@ -19,6 +19,20 @@ public class Th2Exporter {
         return TextTools.join("\n\n", lines);
     }
 
+    public static String updateOriginalContent(
+            Survey survey, double scale, String filename, Space<Coord2D> projection,
+            String originalFileContent) {
+        String newContent = stripXTherion(originalFileContent);
+        newContent += "\n" + getXviBlock(survey, scale, filename, projection);
+        return newContent;
+    }
+
+
+    public static String stripXTherion(String originalFileContent) {
+        return originalFileContent.replaceAll("(\\s*##XTHERION##.*?)", "");
+    }
+
+
     public static String getXviBlock(
             Survey survey, double scale, String filename, Space<Coord2D> projection) {
 
@@ -50,6 +64,7 @@ public class Th2Exporter {
 
         return TextTools.join("\n", lines);
     }
+
 
     private static String getXviLine(String command, Object... values) {
         List<String> fields = new LinkedList<>();

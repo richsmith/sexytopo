@@ -17,8 +17,9 @@ public class XviExporterTest {
 
         String xvi = XviExporter.getContent(
                 testSurvey.getPlanSketch(),
-                Projection2D.PLAN.project(testSurvey));
+                Projection2D.PLAN.project(testSurvey),
+                1.0);
 
-        Assert.assertTrue(xvi.contains("{BLACK 5.0 0.0 10.0 0.0}"));
+        Assert.assertTrue(xvi.contains("{BLACK 5.00 0.00 10.00 0.00}"));
     }
 }
