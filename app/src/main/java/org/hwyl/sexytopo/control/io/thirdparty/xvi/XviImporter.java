@@ -21,7 +21,7 @@ import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.GRID_COMM
 import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.SKETCHLINE_COMMAND;
 
 
-public class XviImporter implements Importer {
+public class XviImporter extends Importer {
 
     private static XviImporter instance = new XviImporter();
 

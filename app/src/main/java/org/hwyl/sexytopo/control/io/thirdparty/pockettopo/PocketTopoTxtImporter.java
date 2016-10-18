@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 /**
  * Basic import for the .txt file that is exported by PocketTopo.
  */
-public class PocketTopoTxtImporter implements Importer {
+public class PocketTopoTxtImporter extends Importer {
 
 
     public Survey toSurvey(File file) {
@@ -32,7 +32,7 @@ public class PocketTopoTxtImporter implements Importer {
 
         // FIXME we're ignoring the metadata for now
 
-        Survey survey = new Survey("test");
+        Survey survey = new Survey(getDefaultName(file));
 
         parseDataAndUpdateSurvey(survey, text);
 

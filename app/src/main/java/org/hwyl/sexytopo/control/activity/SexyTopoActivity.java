@@ -23,9 +23,9 @@ import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.control.io.basic.Saver;
-import org.hwyl.sexytopo.control.io.translation.SelectableExporters;
 import org.hwyl.sexytopo.control.io.translation.Exporter;
 import org.hwyl.sexytopo.control.io.translation.ImportManager;
+import org.hwyl.sexytopo.control.io.translation.SelectableExporters;
 import org.hwyl.sexytopo.demo.TestSurveyCreator;
 import org.hwyl.sexytopo.model.survey.Survey;
 
@@ -433,9 +433,18 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                         File file = nameToFiles.get(arrayAdapter.getItem(which));
                         try {
                             Survey survey = ImportManager.toSurvey(file);
-                            survey.checkActiveStation();
-                            SurveyManager.getInstance(SexyTopoActivity.this).setCurrentSurvey(survey);
-                            showSimpleToast("Imported " + survey.getName());
+
+                            if (Util.doesSurveyExist(survey.getName())) {
+                                confirmToProceed(
+                                        R.string.continue_question,
+                                        R.string.survey_already_exists,
+                                        R.string.replace,
+                                        R.string.cancel,
+                                        "saveImportedSurvey", survey, file);
+                            } else {
+                                saveImportedSurvey(survey, file);
+                            }
+
                         } catch (Exception e) {
                             showSimpleToast(getString(R.string.error_prefix) + e.getMessage());
                         }
@@ -444,30 +453,54 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         builderSingle.show();
     }
 
+    private void saveImportedSurvey(Survey survey, File file) throws Exception {
+
+        survey.checkActiveStation();
+        Saver.save(survey);
+        ImportManager.saveACopyOfSourceInput(survey, file);
+        SurveyManager.getInstance(SexyTopoActivity.this).setCurrentSurvey(survey);
+        showSimpleToast("Imported " + survey.getName());
+    }
+
+
+    protected void confirmToProceed(
+            int titleId, int messageId, int confirmId, int cancelId,
+            final String methodToCallIfProceeding,
+            final Object... args) {
+
+        new AlertDialog.Builder(this)
+                .setTitle(getString(titleId))
+                .setMessage(getString(messageId))
+                .setPositiveButton(confirmId, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        invokeMethod(methodToCallIfProceeding, args);
+                    }
+                }).setNegativeButton(getString(cancelId), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // Do nothing.
+            }
+        }).show();
+    }
+
+
     protected void confirmToProceedIfNotSaved(final String methodToCallIfProceeding) {
         if (getSurvey().isSaved()) {
             invokeMethod(methodToCallIfProceeding);
             return;
         }
 
-        new AlertDialog.Builder(this)
-                .setTitle(getString(R.string.continue_question))
-                .setMessage(getString(R.string.warning_survey_not_saved))
-                .setPositiveButton(R.string.carry_on, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        invokeMethod(methodToCallIfProceeding);
-                    }
-                }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        // Do nothing.
-                    }
-        }).show();
+        confirmToProceed(
+                R.string.continue_question,
+                R.string.warning_survey_not_saved,
+                R.string.carry_on,
+                R.string.cancel,
+                methodToCallIfProceeding);
     }
 
-    protected void invokeMethod(String name) {
+    protected void invokeMethod(String name, Object... args) {
         try {
             Method method = getClass().getMethod(name);
-            method.invoke(this);
+            method.invoke(this, args);
         } catch (Exception e) {
             Log.e(SexyTopo.TAG, "Programming error: " + e);
         }

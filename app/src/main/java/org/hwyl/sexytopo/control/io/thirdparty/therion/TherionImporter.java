@@ -17,7 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class TherionImporter implements Importer {
+public class TherionImporter extends Importer {
 
     public Survey toSurvey(File directory) throws Exception {
 

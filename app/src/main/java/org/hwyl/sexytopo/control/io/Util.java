@@ -80,6 +80,11 @@ public class Util {
     }
 
 
+    public static boolean doesSurveyExist(String name) {
+        return getExistingSurveyNames().contains(name);
+    }
+
+
     public static boolean isSurveyNameUnique(String name) {
         return !getExistingSurveyNames().contains(name);
     }

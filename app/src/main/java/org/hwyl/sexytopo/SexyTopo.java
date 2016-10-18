@@ -33,6 +33,8 @@ public class SexyTopo {
     public static final String EXTERNAL_EXPORT_DIR =
             TextTools.joinAll(File.separator, EXTERNAL_ROOT, APP_DIR, EXPORT_DIR);
 
+    public static final String IMPORT_SOURCE_DIR = "Import Source";
+
     public static final String ACTIVE_SURVEY_NAME = "activeSurveyName";
 
     public static final String BLANK_STATION_NAME = "-";

@@ -1,13 +1,18 @@
 package org.hwyl.sexytopo.control.io.translation;
 
+import org.apache.commons.io.FilenameUtils;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.io.File;
 
 
-public interface Importer {
+public abstract class Importer {
 
-    public Survey toSurvey(File file) throws Exception ;
+    public abstract Survey toSurvey(File file) throws Exception ;
 
-    public boolean canHandleFile(File file);
+    public abstract boolean canHandleFile(File file);
+
+    public String getDefaultName(File file) {
+        return FilenameUtils.removeExtension(file.getName());
+    }
 }

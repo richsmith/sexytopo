@@ -12,12 +12,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class SurvexImporter implements Importer {
+public class SurvexImporter extends Importer {
 
     @Override
     public Survey toSurvey(File file) throws Exception {
         String text = Loader.slurpFile(file.getAbsolutePath());
-        Survey survey = new Survey(file.getName());
+        Survey survey = new Survey(getDefaultName(file));
         parse(text, survey);
         return survey;
     }
