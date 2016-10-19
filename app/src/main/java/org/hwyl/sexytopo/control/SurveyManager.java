@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.io.basic.Saver;
+import org.hwyl.sexytopo.control.util.PreferenceAccess;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -16,9 +17,7 @@ import org.hwyl.sexytopo.model.survey.Survey;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by rls on 22/07/14.
- */
+
 public class SurveyManager {
 
     private static SurveyManager instance;
@@ -29,23 +28,18 @@ public class SurveyManager {
         return instance;
     }
 
-
-
     private final Context context;
-
 
     private LocalBroadcastManager broadcastManager;
 
-    private static Survey currentSurvey = new Survey("CHANGETHIS"); // FIXME, create elsewhere
+    // This should be created or loaded on startup
+    private static Survey currentSurvey = new Survey("ERROR");
 
     public SurveyManager(Context context) {
         this.context = context;
     }
 
     public void updateSurvey(List<Leg> legs) {
-
-        /*SharedPreferences preferences =
-                context.getSharedPreferences(Context.MODE_PRIVATE);*/
 
         if (legs.size() > 0) {
 
@@ -57,11 +51,10 @@ public class SurveyManager {
                 legs = reverseLegs(legs);
             }
 
-            boolean automaticBacksightPromotion =
-                    preferences.getBoolean( "pref_key_highlight_latest_leg", false);
+            boolean automaticBacksightPromotion = PreferenceAccess.getBoolean(
+                    context, "pref_backsight_promotion", false);
 
             SurveyUpdater.update(currentSurvey, legs, automaticBacksightPromotion);
-
 
             try {
                 Saver.autosave(currentSurvey);
@@ -69,9 +62,7 @@ public class SurveyManager {
                 Log.e(SexyTopo.TAG, "Error autosaving survey: " + e);
                 Toast.makeText(context, "Error autosaving survey: " + e.getMessage(),
                         Toast.LENGTH_SHORT).show();
-
             }
-
         }
 
         broadcastSurveyUpdated();
