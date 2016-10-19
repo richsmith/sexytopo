@@ -55,7 +55,7 @@
     <string name="open_survey">Open Survey</string>
     <string name="no_surveys">No surveys found to open</string>
     <string name="select_export_type">Select export format</string>
-    <string name="export_successful">Export completed</string>
+    <string name="export_successful">export completed</string>
     <string name="dialog_new_survey_title">New Survey: Enter Name</string>
     <string name="dialog_new_survey_name_must_be_unique">Failed: survey name must be unique</string>
     <string name="surveySaved">Saved</string>

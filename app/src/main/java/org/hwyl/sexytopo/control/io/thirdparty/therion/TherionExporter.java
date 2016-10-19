@@ -32,6 +32,7 @@ public class TherionExporter extends Exporter {
 
     public void export(Survey survey) throws IOException {
 
+        th2Files.clear();
         readOriginalFilesIfPresent(survey);
 
         String thconfigContent = ThconfigExporter.getContent(survey);

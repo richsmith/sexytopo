@@ -62,9 +62,9 @@ public class ThExporter {
 
     private static String getCentrelineText(Survey survey) {
         String centrelineText =
-            "centreline\n\n" +
+            "\ncentreline\n" +
             indent(getCentreline(survey)) + "\n\n" +
-            "endcentreline";
+            "endcentreline\n";
         return centrelineText;
     }
 

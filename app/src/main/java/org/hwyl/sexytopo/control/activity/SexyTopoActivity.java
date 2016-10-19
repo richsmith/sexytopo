@@ -32,6 +32,8 @@ import org.hwyl.sexytopo.model.survey.Survey;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 
@@ -212,7 +214,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                     Exporter selectedExporter = nameToExporter.get(name);
                     try {
                         selectedExporter.export(survey);
-                        showSimpleToast(R.string.export_successful);
+                        showSimpleToast(survey.getName() + " " +
+                                getString(R.string.export_successful));
                     } catch (Exception e) {
                         showSimpleToast(getString(R.string.error_prefix) + e.getMessage());
                     }
@@ -453,8 +456,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         builderSingle.show();
     }
 
-    private void saveImportedSurvey(Survey survey, File file) throws Exception {
-
+    public void saveImportedSurvey(Survey survey, File file) throws Exception {
         survey.checkActiveStation();
         Saver.save(survey);
         ImportManager.saveACopyOfSourceInput(survey, file);
@@ -499,10 +501,15 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     protected void invokeMethod(String name, Object... args) {
         try {
-            Method method = getClass().getMethod(name);
+            List<Class> classes = new LinkedList<>();
+            for (Object arg : args) {
+                classes.add(arg.getClass());
+            }
+            Method method = getClass().getMethod(name, classes.toArray(new Class[]{}));
             method.invoke(this, args);
+
         } catch (Exception e) {
-            Log.e(SexyTopo.TAG, "Programming error: " + e);
+            showSimpleToast("Programming error: " + e);
         }
     }
 

@@ -12,9 +12,8 @@ import org.hwyl.sexytopo.model.survey.Survey;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 public class TherionImporter extends Importer {
@@ -27,15 +26,13 @@ public class TherionImporter extends Importer {
 
             if (file.getName().endsWith("th")) {
                 survey = parseTh(file);
-                break;
 
             } else if (file.getName().endsWith("xvi")) {
                 String filenameNoExtension = FilenameUtils.removeExtension(file.getName());
-                if (filenameNoExtension.endsWith("_p")) {
+                if (filenameNoExtension.endsWith(TherionExporter.PLAN_SUFFIX)) {
                     Sketch sketch = XviImporter.getSketch(file);
                     survey.setPlanSketch(sketch);
-                } else if (filenameNoExtension.endsWith("_e")) {
-                    String contents = Loader.slurpFile(file);
+                } else if (filenameNoExtension.endsWith(TherionExporter.EE_SUFFIX)) {
                     Sketch sketch = XviImporter.getSketch(file);
                     survey.setElevationSketch(sketch);
                 }
@@ -49,7 +46,7 @@ public class TherionImporter extends Importer {
     private static Survey parseTh(File file) throws Exception {
         String contents = Loader.slurpFile(file);
 
-        String name = getSurveyName(contents);
+        String name = getSurveyName(file);
         Survey survey = new Survey(name);
 
         List<String> lines = Arrays.asList(contents.split("\n"));
@@ -58,11 +55,14 @@ public class TherionImporter extends Importer {
         return survey;
     }
 
-    public static String getSurveyName(String text) {
-        Pattern pattern = Pattern.compile("-title\\s*\"(.*)+?\"");
+    public static String getSurveyName(File file) {
+        return FilenameUtils.getBaseName(file.getName());
+        /* Regexing probably isn't worth it; just using the filename is more reliable...
+        Pattern pattern = Pattern.compile("survey\\s*\"(.*)+?\"");
         Matcher matcher = pattern.matcher(text);
         matcher.find();
         return matcher.group(1);
+        */
     }
 
 
@@ -81,7 +81,20 @@ public class TherionImporter extends Importer {
 
     public static void updateCentreline(List<String> lines, Survey survey) throws Exception {
         List<String> block = getContentsOfBeginEndBlock(lines, "centreline");
-        String centrelineText = TextTools.join("\n", block);
+        List<String> sanitised = new LinkedList<>();
+
+        for (String line: block) {
+            String trimmed = line.trim();
+            if (trimmed.equals("")) {
+                continue;
+            } else if (trimmed.startsWith("data")) {
+                continue;
+            } else {
+                sanitised.add(trimmed);
+            }
+        }
+
+        String centrelineText = TextTools.join("\n", sanitised);
         SurvexImporter.parse(centrelineText, survey);
 
     }
@@ -114,6 +127,9 @@ public class TherionImporter extends Importer {
                 } else {
                     throw new Exception("End block tag " + endTag + " encountered before block start");
                 }
+
+            } else if (!foundStartBlock) {
+                continue;
             }
 
             contents.add(line);
