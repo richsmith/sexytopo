@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo;
 
+import android.content.Context;
 import android.os.Environment;
 
 import org.hwyl.sexytopo.control.util.TextTools;
@@ -46,4 +47,8 @@ public class SexyTopo {
     public static final String EXT_ELEVATION_SKETCH_EXTENSION = "ext-elevation.json";
 
     public static final double ALLOWED_DOUBLE_DELTA_FOR_TESTS = 0.0001;
+
+    // This is extremely hacky but quite useful for getting a context when it's not sensible
+    // to pass one around
+    public static Context context;
 }

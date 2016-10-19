@@ -4,9 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-/**
- * Created by rls on 01/08/15.
- */
+
 public class PreferenceAccess {
 
     private static SharedPreferences getPreferences(Context context) {
@@ -14,9 +12,13 @@ public class PreferenceAccess {
     }
 
     public static int getInt(Context context, String id, int defaultInt) {
-
         return Integer.parseInt(getPreferences(context)
                 .getString(id, Integer.toString(defaultInt)));
+    }
+
+    public static float getFloat(Context context, String id, float defaultFloat) {
+        return Float.parseFloat(getPreferences(context)
+                .getString(id, Float.toString(defaultFloat)));
     }
 
     public static boolean getBoolean(Context context, String id, boolean defaultBoolean) {

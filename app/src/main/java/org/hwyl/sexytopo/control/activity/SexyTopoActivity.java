@@ -47,19 +47,20 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     public SexyTopoActivity() {
         super();
         dataManager = SurveyManager.getInstance(this);
-
     }
 
 
     @Override
     protected void onStart() {
         super.onStart();
+        SexyTopo.context = this;
         setOrientation();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        SexyTopo.context = this;
         setOrientation();
     }
 

@@ -24,6 +24,22 @@
             android:summary="Replace pairs of inverted readings with a new station leg"
             android:title="Automatic backsight promotion"
             android:defaultValue="false"/>
+
+        <EditTextPreference
+            android:key="pref_max_distance_delta"
+            android:inputType="numberDecimal"
+            android:numeric="decimal"
+            android:defaultValue="0.2"
+            android:summary="How much error tolerated when deciding whether to create a new station"
+            android:title="Max distance delta (m)"/>
+
+        <EditTextPreference
+            android:key="pref_max_angle_delta"
+            android:inputType="numberDecimal"
+            android:numeric="decimal"
+            android:defaultValue="1"
+            android:summary="How much error tolerated when deciding whether to create a new station"
+            android:title="Max angle delta (degrees)"/>
     </PreferenceCategory>
 
     <PreferenceCategory

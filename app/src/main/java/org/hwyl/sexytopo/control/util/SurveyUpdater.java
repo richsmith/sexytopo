@@ -22,9 +22,8 @@ public class SurveyUpdater {
     }
 
 
-    private static final double MAX_DISTANCE_DIFF = 0.2;
-    private static final double MAX_AZIMUTH_DIFF = 1;
-    private static final double MAX_INCLINATION_DIFF = 1;
+    private static final float DEFAULT_MAX_DISTANCE_DELTA = 0.2f;
+    private static final float DEFAULT_MAX_ANGLE_DELTA = 1.0f;
 
 
     public static void update(Survey survey, List<Leg> legs, boolean considerBacksightPromotion) {
@@ -228,9 +227,34 @@ public class SurveyUpdater {
         double azimuthDiff = maxAzimuth - minAzimuth;
         double inclinationDiff = maxInclination - minInclination;
 
-        return distanceDiff <= MAX_DISTANCE_DIFF &&
-               azimuthDiff <= MAX_AZIMUTH_DIFF &&
-               inclinationDiff <= MAX_INCLINATION_DIFF;
+        double maxDistanceDelta = getMaxDistanceDelta();
+        double maxAngleDelta = getMaxAngleDelta();
+
+        return distanceDiff <= maxDistanceDelta &&
+               azimuthDiff <= maxAngleDelta &&
+               inclinationDiff <= maxAngleDelta;
+    }
+
+    private static float getMaxDistanceDelta() {
+        try {
+            float maxDistanceDiff = PreferenceAccess.getFloat(
+                    SexyTopo.context, "pref_max_distance_delta", DEFAULT_MAX_DISTANCE_DELTA);
+            return maxDistanceDiff;
+        } catch (Exception exception) {
+            // just in case the static Context trick doesn't work :)
+            return DEFAULT_MAX_DISTANCE_DELTA;
+        }
+    }
+
+    private static float getMaxAngleDelta() {
+        try {
+            float maxAngleDelta = PreferenceAccess.getFloat(
+                    SexyTopo.context, "pref_max_angle_delta", DEFAULT_MAX_ANGLE_DELTA);
+            return maxAngleDelta;
+        } catch (Exception exception) {
+            // just in case the static Context trick doesn't work :)
+            return DEFAULT_MAX_ANGLE_DELTA;
+        }
     }
 
 
