@@ -9,21 +9,27 @@ import java.util.List;
 
 public class PathDetail extends SketchDetail {
 
+
     private final List<Coord2D> path;
 
     public PathDetail(Coord2D start, Colour colour) {
         super(colour);
         this.path = new ArrayList<>();
         path.add(start);
+        updateBoundingBox(start);
     }
 
     public PathDetail(List<Coord2D> paths, Colour colour) {
         super(colour);
         this.path = paths;
+        for (Coord2D point : paths) {
+            updateBoundingBox(point);
+        }
     }
 
     public void lineTo(Coord2D point) {
         path.add(point);
+        updateBoundingBox(point);
     }
 
     public List<Coord2D> getPath() {
@@ -34,6 +40,7 @@ public class PathDetail extends SketchDetail {
     public double getDistanceFrom(Coord2D point) {
         return getClosestDistance(point, getPath());
     }
+
 
     private static double getClosestDistance(Coord2D point, List<Coord2D> line) {
         double minDistance = Double.MAX_VALUE;
