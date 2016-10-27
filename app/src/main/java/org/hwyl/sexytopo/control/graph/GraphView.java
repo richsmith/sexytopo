@@ -669,11 +669,11 @@ private boolean firstTime = true;
 
 
     private void drawStations(Canvas canvas, Space<Coord2D> space) {
+
+        int crossDiameter =
+                PreferenceAccess.getInt(this.getContext(), "pref_station_diameter", CROSS_DIAMETER);
+
         for (Map.Entry<Station, Coord2D> entry : space.getStationMap().entrySet()) {
-
-            int crossDiameter =
-                    PreferenceAccess.getInt(this.getContext(), "pref_station_diameter", CROSS_DIAMETER);
-
             Station station = entry.getKey();
             Coord2D translatedStation = surveyCoordsToViewCoords(entry.getValue());
 
@@ -716,6 +716,10 @@ private boolean firstTime = true;
 
 
         for (PathDetail pathDetail : sketch.getPathDetails()) {
+
+            if (!couldBeOnScreen(pathDetail)) {
+                continue;
+            }
 
             List<Coord2D> path = pathDetail.getPath();
             Coord2D from = null;
@@ -766,22 +770,10 @@ private boolean firstTime = true;
     }
 
 
-    private boolean isLineOnscreen(Coord2D start, Coord2D end) {
-        //[Not currently used since it has some problems...]
-        // We check to see if either end of the line is onscreen before drawing it
-        // but in theory both ends could be offscreen and still have some of the line
-        // onscreen. In practice doesn't seem to be a huge problem for sketches but survey
-        // legs can be much longer than the screen.
-        //
-        // This method should be looked at further...
-        return isOnscreen(start) && isOnscreen(end);
-
-    }
-
-
-    private boolean isOnscreen(Coord2D coord) {
-        return (0 <= coord.getX() && coord.getX() <= getWidth()) &&
-                (0 <= coord.getY() && coord.getY() <= getHeight());
+    private boolean couldBeOnScreen(SketchDetail sketchDetail) {
+        Coord2D topLeft = viewCoordsToSurveyCoords(Coord2D.ORIGIN);
+        Coord2D bottomRight = viewCoordsToSurveyCoords(new Coord2D(getWidth(), getHeight()));
+        return sketchDetail.intersectsRectangle(topLeft, bottomRight);
     }
 
 
