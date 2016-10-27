@@ -9,8 +9,8 @@ public abstract class SketchDetail {
 
     private double left = Double.POSITIVE_INFINITY;
     private double right = Double.NEGATIVE_INFINITY;
-    private double top = Double.NEGATIVE_INFINITY;
-    private double bottom = Double.POSITIVE_INFINITY;
+    private double top = Double.POSITIVE_INFINITY;
+    private double bottom = Double.NEGATIVE_INFINITY;
 
     protected SketchDetail(Colour colour) {
         this.colour = colour;
@@ -30,7 +30,7 @@ public abstract class SketchDetail {
         double right1 = rectangleBottomRight.getX();
         double bottom1 = rectangleBottomRight.getY();
 
-        return (right >= left1 && left <= right1) && (top >= bottom1 && bottom <= top1);
+        return (right >= left1 && left <= right1) && (top <= bottom1 && bottom >= top1);
     }
 
     protected void updateBoundingBox(Coord2D point) {
