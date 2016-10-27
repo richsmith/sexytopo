@@ -4,6 +4,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -197,7 +198,7 @@ public class TherionImporterTest {
 
     @Test
     public void testTitleExtraction() {
-        String actual = TherionImporter.getSurveyName(FAKE_TEXT);
+        String actual = TherionImporter.getSurveyName(new File(FAKE_TEXT));
         String expected = "White Lightning";
         Assert.assertEquals(expected, actual);
     }
