@@ -198,7 +198,7 @@ public class TherionImporterTest {
 
     @Test
     public void testTitleExtraction() {
-        String actual = TherionImporter.getSurveyName(new File(FAKE_TEXT));
+        String actual = TherionImporter.getSurveyName(new File("White Lightning"));
         String expected = "White Lightning";
         Assert.assertEquals(expected, actual);
     }
