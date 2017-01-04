@@ -6,7 +6,9 @@ import org.hwyl.sexytopo.control.util.Wrapper;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 /**
@@ -24,6 +26,8 @@ public class Survey {
 
     private Station origin = new Station(StationNamer.generateOriginName());
     private Station activeStation = origin;
+
+    private Map<Station, Survey> stationsToSurveyConnections = new HashMap<>();
 
     private boolean isSaved = true;
 
