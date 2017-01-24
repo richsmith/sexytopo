@@ -1,8 +1,6 @@
 package org.hwyl.sexytopo.model.graph;
 
-/**
- * Created by rls on 26/07/14.
- */
+
 public class Coord3D extends Coord {
 
 
@@ -29,12 +27,6 @@ public class Coord3D extends Coord {
     }
 
     @Override
-    public String toString() {
-        return String.format("(%f, %f, %f)", x, y, z);
-    }
-
-
-    @Override
     public boolean equals(Object object) {
         if (object == null || getClass() != object.getClass()) {
             return false;
@@ -45,7 +37,6 @@ public class Coord3D extends Coord {
         }
     }
 
-
     @Override
     public int hashCode() {
         double result = x;
@@ -54,4 +45,9 @@ public class Coord3D extends Coord {
         return (int)result;
     }
 
+
+    @Override
+    public String toString() {
+        return String.format("(%f, %f, %f)", x, y, z);
+    }
 }

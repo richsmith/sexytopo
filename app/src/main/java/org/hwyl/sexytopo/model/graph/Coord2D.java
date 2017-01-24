@@ -1,8 +1,6 @@
 package org.hwyl.sexytopo.model.graph;
 
-/**
- * Created by rls on 26/07/14.
- */
+
 public class Coord2D extends Coord {
 
     public static final Coord2D ORIGIN = new Coord2D(0, 0);

@@ -53,4 +53,14 @@
         android:padding="10dp"/>
 
 
+    <Button
+        android:id="@+id/graph_station_start_new_survey"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/abc_cab_background_internal_bg"
+        android:text="@string/menu_start_new_survey"
+        android:padding="10dp"/>
+
+
+
 </LinearLayout>

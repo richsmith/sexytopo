@@ -7,13 +7,13 @@ import org.hwyl.sexytopo.model.sketch.Sketch;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
-/**
- * Created by rls on 16/07/14.
- */
+
 public class Survey {
 
     public static final Station NULL_STATION = new Station("-");
@@ -27,7 +27,7 @@ public class Survey {
     private Station origin = new Station(StationNamer.generateOriginName());
     private Station activeStation = origin;
 
-    private Map<Station, Survey> stationsToSurveyConnections = new HashMap<>();
+    private Map<Station, Set<SurveyConnection>> stationsToSurveyConnections = new HashMap<>();
 
     private boolean isSaved = true;
 
@@ -122,6 +122,54 @@ public class Survey {
         return stations;
     }
 
+    public void connect(Station joinInThisSurvey, Survey survey, Station joinInOtherSurvey) {
+
+        if (survey.getName().equals(getName())) {
+            throw new IllegalArgumentException("Can't join a survey onto itself");
+        } else if (isConnectedTo(survey)) {
+            throw new IllegalArgumentException("Already connected to that survey");
+        }
+
+        SurveyConnection connection = new SurveyConnection(joinInOtherSurvey, survey);
+
+        Set<SurveyConnection> connections;
+        if (stationsToSurveyConnections.containsKey(joinInThisSurvey)) {
+            connections = stationsToSurveyConnections.get(joinInThisSurvey);
+        } else {
+            connections = new HashSet<>();
+            stationsToSurveyConnections.put(joinInThisSurvey, connections);
+        }
+
+        connections.add(connection);
+    }
+
+    public boolean isConnectedTo(Survey other) {
+        for (Station station : getConnectedSurveys().keySet()) {
+            if (isStationConnectedTo(station, other)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isStationConnectedTo(Station station, Survey other) {
+        String surveyName = other.getName();
+        if (!stationsToSurveyConnections.containsKey(station)) {
+            return false;
+        } else {
+            Set<SurveyConnection> connections = stationsToSurveyConnections.get(station);
+            for (SurveyConnection connection : connections) {
+                if (connection.otherSurvey.getName().equals(surveyName)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    public Map<Station, Set<SurveyConnection>> getConnectedSurveys() {
+        return stationsToSurveyConnections;
+    }
 
     public void checkActiveStation() {
         List<Station> stations = getAllStations();

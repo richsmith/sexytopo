@@ -27,6 +27,7 @@ import org.hwyl.sexytopo.control.io.translation.Exporter;
 import org.hwyl.sexytopo.control.io.translation.ImportManager;
 import org.hwyl.sexytopo.control.io.translation.SelectableExporters;
 import org.hwyl.sexytopo.demo.TestSurveyCreator;
+import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.io.File;
@@ -281,7 +282,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                             updateRememberedSurvey();
                         } catch (Exception e) {
                             survey.setName(oldName);
-                            showSimpleToast(getString(R.string.errorSavingSurvey));
+                            showSimpleToast(R.string.errorSavingSurvey);
                             Log.d(SexyTopo.TAG, "Error saving survey: " + e);
                         }
                     }
@@ -311,7 +312,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                             Survey survey = new Survey(name);
                             setSurvey(survey);
                         } else {
-                            showSimpleToast(getString(R.string.dialog_new_survey_name_must_be_unique));
+                            showSimpleToast(R.string.dialog_new_survey_name_must_be_unique);
                         }
                     }
                 }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
@@ -320,6 +321,51 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             }
         }).show();
     }
+
+
+    public void continueSurvey(final Station joinPoint) {
+
+        final Survey currentSurvey = getSurvey();
+
+        if (!currentSurvey.isSaved()) {
+            showSimpleToast(R.string.cannotExtendUnsavedSurvey);
+            return;
+        }
+
+        final EditText input = new EditText(this);
+
+        String defaultName = Util.getNextDefaultSurveyName(currentSurvey.getName());
+        input.setText(defaultName);
+
+        new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.dialog_new_survey_title))
+                .setView(input)
+                .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        Editable value = input.getText();
+                        String name = value.toString();
+                        if (Util.isSurveyNameUnique(name)) {
+                            Survey newSurvey = new Survey(name);
+                            currentSurvey.connect(joinPoint, newSurvey, newSurvey.getOrigin());
+                            newSurvey.connect(newSurvey.getOrigin(), currentSurvey, joinPoint);
+                            setSurvey(newSurvey);
+                            try {
+                                Saver.save(currentSurvey);
+                                Saver.save(newSurvey);
+                            } catch (Exception exception) {
+                                showSimpleToast("Couldn't save new connection");
+                            }
+                        } else {
+                            showSimpleToast(R.string.dialog_new_survey_name_must_be_unique);
+                        }
+                    }
+                }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // Do nothing.
+            }
+        }).show();
+    }
+
 
     private void deleteSurvey() {
 
@@ -338,7 +384,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                             Util.deleteSurvey(surveyName);
                             startNewSurvey();
                         } catch (Exception e) {
-                            showSimpleToast(getString(R.string.errorDeletingSurvey));
+                            showSimpleToast(R.string.errorDeletingSurvey);
                                     Log.d(SexyTopo.TAG, "Error deleting survey: " + e);
                         }
                     }
@@ -585,5 +631,40 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
         }
     }
+
+    /*
+    private class ImportTask extends AsyncTask<File, Void, Survey> {
+
+        private File file;
+
+        protected Survey doInBackground(File... files) {
+            this.file = files[0];
+
+            try {
+                return ImportManager.toSurvey(file);
+            } catch (Exception exception) {
+
+            }
+        }
+
+        protected void onPostExecute(Survey survey) {
+
+            if (Util.doesSurveyExist(survey.getName())) {
+                confirmToProceed(
+                        R.string.continue_question,
+                        R.string.survey_already_exists,
+                        R.string.replace,
+                        R.string.cancel,
+                        "saveImportedSurvey", survey, file);
+            } else {
+                try {
+                saveImportedSurvey(survey, file);
+                } catch (Exception exception) {
+
+                }
+            }
+
+        }
+    }*/
 
 }

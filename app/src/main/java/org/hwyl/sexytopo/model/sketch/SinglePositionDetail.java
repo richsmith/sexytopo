@@ -4,7 +4,7 @@ import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 
 
-public class SinglePositionDetail extends SketchDetail {
+public abstract class SinglePositionDetail extends SketchDetail {
     protected final Coord2D position;
 
     protected SinglePositionDetail(Colour colour, Coord2D position) {

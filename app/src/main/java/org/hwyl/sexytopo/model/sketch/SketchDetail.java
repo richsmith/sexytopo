@@ -22,6 +22,7 @@ public abstract class SketchDetail {
 
     public abstract double getDistanceFrom(Coord2D point);
 
+    public abstract SketchDetail translate(Coord2D point);
 
     public boolean intersectsRectangle(Coord2D rectangleTopLeft, Coord2D rectangleBottomRight) {
 

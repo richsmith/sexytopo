@@ -9,12 +9,12 @@ import org.hwyl.sexytopo.model.survey.Survey;
 public class PlanActivity extends GraphActivity {
 
     @Override
-    protected Sketch getSketch(Survey survey) {
+    public Sketch getSketch(Survey survey) {
         return survey.getPlanSketch();
     }
 
     @Override
-    protected Space<Coord2D> getProjection(Survey survey) {
+    public Space<Coord2D> getProjection(Survey survey) {
         Space<Coord2D> projection = Projection2D.PLAN.project(survey);
         return projection;
     }

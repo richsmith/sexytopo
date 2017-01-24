@@ -11,9 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 
 
-/**
- * Created by rls on 23/07/14.
- */
 public class SurveyUpdater {
 
     static {

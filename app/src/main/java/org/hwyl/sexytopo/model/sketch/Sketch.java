@@ -8,9 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Created by rls on 23/09/14.
- */
+
 public class Sketch {
 
     private Set<PathDetail> pathDetails = new HashSet<>();
@@ -193,5 +191,25 @@ public class Sketch {
 
     public void setCrossSectionDetails(Set<CrossSectionDetail> crossSectionDetails) {
         this.crossSectionDetails = crossSectionDetails;
+    }
+
+    public void updateWithTranslation(Coord2D point) {
+        Set<PathDetail> newPathDetails = new HashSet<>();
+        for (PathDetail pathDetail : pathDetails) {
+            newPathDetails.add(pathDetail.translate(point));
+        }
+        pathDetails = newPathDetails;
+
+        Set<TextDetail> newTextDetails = new HashSet<>();
+        for (TextDetail textDetail : textDetails) {
+            newTextDetails.add(textDetail.translate(point));
+        }
+        textDetails = newTextDetails;
+
+        Set<CrossSectionDetail> newCrossSectionDetails = new HashSet<>();
+        for (CrossSectionDetail crossSectionDetail : crossSectionDetails) {
+            newCrossSectionDetails.add(crossSectionDetail.translate(point));
+        }
+        crossSectionDetails = newCrossSectionDetails;
     }
 }

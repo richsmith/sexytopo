@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/panelBackground"
-        android:text="Station"
+        android:text="@string/menu_station_label"
         android:padding="10dp" />
 
     <Button
@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/abc_cab_background_internal_bg"
-        android:text="Delete"
+        android:text="@string/menu_delete_station"
         android:padding="10dp"/>
 
     <Button
@@ -27,7 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/abc_cab_background_internal_bg"
-        android:text="Reverse"
+        android:text="@string/menu_reverse"
         android:padding="10dp"/>
 
     <!--<Button
@@ -42,8 +42,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/abc_cab_background_internal_bg"
-        android:text="New Cross-Section"
+        android:text="@string/menu_new_cross_section"
         android:padding="10dp"/>
-
 
 </LinearLayout>

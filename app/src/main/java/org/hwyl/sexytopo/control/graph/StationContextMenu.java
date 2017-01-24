@@ -34,7 +34,8 @@ public class StationContextMenu {
         int[] ids = new int[] {
                 R.id.graph_station_delete,
                 R.id.graph_station_reverse,
-                R.id.graph_station_new_cross_section
+                R.id.graph_station_new_cross_section,
+                R.id.graph_station_start_new_survey
         };
         for (int id : ids) {
             ((Button)(view.findViewById(id))).setOnClickListener(new View.OnClickListener() {

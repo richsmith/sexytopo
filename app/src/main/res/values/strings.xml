@@ -39,12 +39,18 @@
     <string name="menu_edit_leg">Edit Row</string>
     <string name="menu_upgrade_row">Force New Station</string>
     <string name="menu_delete_row">Delete Row</string>
+    <string name="menu_station_label">Station</string>
+    <string name="menu_new_cross_section">New Cross-Section</string>
+    <string name="menu_delete_station">Delete</string>
+    <string name="menu_reverse">Reverse</string>
+    <string name="menu_start_new_survey">Start New Survey Here</string>
     <string name="sketch_menu_delete_last_leg">Undo Last Reading</string>
     <string name="sketch_menu_centre_view">Go to Active</string>
     <string name="sketch_menu_show_grid">Graph Paper</string>
     <string name="sketch_menu_snap_to_lines">Snap to Lines</string>
     <string name="sketch_menu_show_station_labels">Station Labels</string>
     <string name="sketch_menu_show_splays">Show Splays</string>
+    <string name="sketch_menu_show_connect">Linked Surveys</string>
     <string name="sketch_menu_back_measurements">Reverse Legs</string>
     <string name="title_activity_start_up">StartUpActivity</string>
     <string name="default_survey_name">NewSurvey</string>
@@ -65,6 +71,7 @@
     <string name="dialog_delete_survey_content">This will delete the current survey and any associated files (this cannot be undone).</string>
     <string name="errorDeletingSurvey">Failed: error deleting survey</string>
     <string name="cannotDeleteUnsavedSurvey">Failed: cannot delete unsaved survey</string>
+    <string name="cannotExtendUnsavedSurvey">Failed: cannot extend unsaved survey</string>
     <string name="import_survey">Import Survey</string>
     <string name="no_imports">No import files found</string>
     <string name="ok">OK</string>
@@ -127,4 +134,5 @@
     <string name="third_party_pocket_topo_txt">PocketTopo .txt</string>
     <string name="third_party_survex">Survex</string>
     <string name="third_party_compass">Compass</string>
+
 </resources>

@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.PopupWindow;
-import android.widget.Toast;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.SurveyManager;
@@ -39,15 +38,13 @@ import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 
 public class GraphView extends View {
-
-    // FIXME hack!
-private boolean firstTime = true;
 
     // The offset of the viewing window (what can be seen on the screen) from the whole survey
     private Coord2D viewpointOffset = Coord2D.ORIGIN;
@@ -62,9 +59,13 @@ private boolean firstTime = true;
 
     public static final double MAX_ZOOM = 120.0;
 
+    private GraphActivity activity;
+
     private Survey survey;
     private Space<Coord2D> projection;
     private Sketch sketch;
+
+    private Map<Survey, Space<Coord2D>> translatedConnectedSurveys = new HashMap<>();
 
 
     public static final Colour LEG_COLOUR = Colour.RED;
@@ -73,7 +74,7 @@ private boolean firstTime = true;
     public static final Colour HIGHLIGHT_COLOUR = Colour.GOLD;
     public static final Colour DEFAULT_SKETCH_COLOUR = Colour.BLACK;
 
-    public static final int STATION_COLOUR = Colour.DARK_RED.intValue;;
+    public static final int STATION_COLOUR = Colour.DARK_RED.intValue;
     public static final int STATION_DIAMETER = 8;
     public static final int CROSS_DIAMETER = 16;
     public static final int STATION_STROKE_WIDTH = 5;
@@ -185,6 +186,11 @@ private boolean firstTime = true;
         labelPaint.setColor(STATION_COLOUR);
         int textSize = PreferenceAccess.getInt(getContext(), "pref_station_label_font_size", 3);
         labelPaint.setTextSize(textSize);
+    }
+
+
+    public void setActivity(GraphActivity graphActivity) {
+        this.activity = graphActivity;
     }
 
 
@@ -464,9 +470,13 @@ private boolean firstTime = true;
                         break;
                     case R.id.graph_station_new_cross_section:
                         setSketchTool(SketchTool.POSITION_CROSS_SECTION);
-                        Toast.makeText(getContext(), R.string.position_cross_section_instruction,
-                                Toast.LENGTH_SHORT).show();
+                        activity.showSimpleToast(R.string.position_cross_section_instruction);
                         break;
+                    case R.id.graph_station_start_new_survey:
+                        if (!survey.isSaved()) {
+                            activity.showSimpleToast(R.string.cannotExtendUnsavedSurvey);
+                        }
+                        activity.continueSurvey(station);
                 }
             }
         };
@@ -526,25 +536,43 @@ private boolean firstTime = true;
 
         super.onDraw(canvas);
 
-        if (firstTime) {
-            centreViewOnActiveStation();
-            firstTime = false;
-        }
-
         if (getDisplayPreference(GraphActivity.DisplayPreference.SHOW_GRID)) {
             drawGrid(canvas);
         }
 
-        drawSurvey(canvas, projection);
+        drawSurvey(canvas, survey, projection, 255);
 
-        drawCrossSections(canvas, sketch.getCrossSectionDetails());
-
-        drawSketch(canvas, sketch);
+        if (getDisplayPreference(GraphActivity.DisplayPreference.SHOW_CONNECTIONS)) {
+            drawOtherSurveys(canvas, projection, 127);
+        }
 
         drawLegend(canvas, survey);
-
     }
 
+    private void drawSurvey(Canvas canvas, Survey survey, Space<Coord2D> projection, int alpha) {
+
+        drawSurveyData(canvas, projection, alpha);
+
+        drawCrossSections(canvas, sketch.getCrossSectionDetails(), alpha);
+
+        drawSketch(canvas, activity.getSketch(survey), alpha);
+    }
+
+
+    private void drawOtherSurveys(Canvas canvas, Space<Coord2D> projection, int alpha) {
+
+        if (translatedConnectedSurveys.size() < survey.getConnectedSurveys().size()) {
+            this.translatedConnectedSurveys =
+                    ConnectedSurveys.getTranslatedConnectedSurveys(activity, survey, projection);
+        }
+
+        for (Survey translatedConnectedSurvey : translatedConnectedSurveys.keySet()) {
+            Space<Coord2D> connectedProjection =
+                    SpaceFlipper.flipVertically(
+                        translatedConnectedSurveys.get(translatedConnectedSurvey));
+            drawSurvey(canvas, translatedConnectedSurvey, connectedProjection, alpha);
+        }
+    }
 
 
     private void drawGrid(Canvas canvas) {
@@ -596,23 +624,26 @@ private boolean firstTime = true;
         }
     }
 
-    private void drawSurvey(Canvas canvas, Space<Coord2D> space) {
+    private void drawSurveyData(Canvas canvas, Space<Coord2D> space, int alpha) {
 
-        drawLegs(canvas, space);
+        drawLegs(canvas, space, alpha);
 
-        drawStations(canvas, space);
+        drawStations(canvas, space, alpha);
     }
 
 
-    private void drawCrossSections(Canvas canvas, Set<CrossSectionDetail> crossSectionDetails) {
+    private void drawCrossSections(Canvas canvas, Set<CrossSectionDetail> crossSectionDetails, int alpha) {
         for (CrossSectionDetail sectionDetail : crossSectionDetails) {
             Coord2D centreOnSurvey = sectionDetail.getPosition();
             Coord2D centreOnView = surveyCoordsToViewCoords(centreOnSurvey);
-            drawStation(canvas, stationPaint, (float) centreOnView.getX(), (float) centreOnView.getY(), STATION_DIAMETER);
+            drawStation(canvas, stationPaint,
+                    (float) centreOnView.getX(), (float) centreOnView.getY(),
+                    STATION_DIAMETER, alpha);
 
             String description =
                     sectionDetail.getCrossSection().getStation().getName() + " X-section";
             if (getDisplayPreference(GraphActivity.DisplayPreference.SHOW_STATION_LABELS)) {
+                stationPaint.setAlpha(alpha);
                 canvas.drawText(description,
                         (float) centreOnView.getX(),
                         (float) centreOnView.getY(),
@@ -622,12 +653,14 @@ private boolean firstTime = true;
             Space<Coord2D> projection = sectionDetail.getProjection();
 
 
-            drawLegs(canvas, projection);
+            drawLegs(canvas, projection, alpha);
         }
     }
 
 
-    private void drawLegs(Canvas canvas, Space<Coord2D> space) {
+    private void drawLegs(Canvas canvas, Space<Coord2D> space, int alpha) {
+
+        legPaint.setAlpha(alpha);
 
         Map<Leg, Line<Coord2D>> legMap = space.getLegMap();
 
@@ -668,7 +701,9 @@ private boolean firstTime = true;
     }
 
 
-    private void drawStations(Canvas canvas, Space<Coord2D> space) {
+    private void drawStations(Canvas canvas, Space<Coord2D> space, int alpha) {
+
+        stationPaint.setAlpha(alpha);
 
         int crossDiameter =
                 PreferenceAccess.getInt(this.getContext(), "pref_station_diameter", CROSS_DIAMETER);
@@ -681,10 +716,10 @@ private boolean firstTime = true;
             int y = (int)(translatedStation.getY());
 
             if (station == survey.getActiveStation()) {
-                drawStation(canvas, highlightPaint, x, y, crossDiameter + HIGHLIGHT_OUTLINE);
-                drawStation(canvas, stationPaint, x, y, crossDiameter);
+                drawStation(canvas, highlightPaint, x, y, crossDiameter + HIGHLIGHT_OUTLINE, alpha);
+                drawStation(canvas, stationPaint, x, y, crossDiameter, alpha);
             } else {
-                drawStation(canvas, stationPaint, x, y, crossDiameter);
+                drawStation(canvas, stationPaint, x, y, crossDiameter, alpha);
             }
 
             if (getDisplayPreference(GraphActivity.DisplayPreference.SHOW_STATION_LABELS)) {
@@ -697,7 +732,7 @@ private boolean firstTime = true;
         }
     }
 
-    private void drawStation(Canvas canvas, Paint paint, float x, float y, int crossDiameter) {
+    private void drawStation(Canvas canvas, Paint paint, float x, float y, int crossDiameter, int alpha) {
         canvas.drawLine(x , y - crossDiameter / 2, x, y + crossDiameter / 2, paint);
         canvas.drawLine(x - crossDiameter / 2, y, x + crossDiameter / 2, y, paint);
     }
@@ -712,8 +747,9 @@ private boolean firstTime = true;
     }
 
 
-    private void drawSketch(Canvas canvas, Sketch sketch) {
+    private void drawSketch(Canvas canvas, Sketch sketch, int alpha) {
 
+        drawPaint.setAlpha(alpha);
 
         for (PathDetail pathDetail : sketch.getPathDetails()) {
 

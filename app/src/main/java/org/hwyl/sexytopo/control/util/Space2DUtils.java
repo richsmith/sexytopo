@@ -1,6 +1,13 @@
 package org.hwyl.sexytopo.control.util;
 
 import org.hwyl.sexytopo.model.graph.Coord2D;
+import org.hwyl.sexytopo.model.graph.Line;
+import org.hwyl.sexytopo.model.graph.Space;
+import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.Station;
+
+import java.util.Map;
+
 
 /**
  * Created by rls on 16/02/15.
@@ -62,5 +69,32 @@ public class Space2DUtils {
             newAngle += 360;
         }
          return newAngle % 360;
+    }
+
+    public static Space<Coord2D> transform(Space<Coord2D> space, Coord2D point) {
+
+        Space<Coord2D> newSpace = new Space<>();
+
+        Map<Station, Coord2D> stations = space.getStationMap();
+        for (Station station : stations.keySet()) {
+            Coord2D coord = stations.get(station);
+            Coord2D newCoord = coord.plus(point);
+            newSpace.addStation(station, newCoord);
+        }
+
+        Map<Leg, Line<Coord2D>> legs = space.getLegMap();
+        for (Leg leg : legs.keySet()) {
+            Line<Coord2D> line = legs.get(leg);
+            Line<Coord2D> newLine = transformLine(line, point);
+            newSpace.addLeg(leg, newLine);
+        }
+
+        return newSpace;
+    }
+
+    public static Line<Coord2D> transformLine(Line<Coord2D> line, Coord2D point) {
+        Coord2D start = line.getStart();
+        Coord2D end = line.getEnd();
+        return new Line<Coord2D>(start.plus(point), end.plus(point));
     }
 }

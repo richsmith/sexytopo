@@ -5,9 +5,7 @@ import org.hwyl.sexytopo.control.util.SpaceMover;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Space;
 
-/**
- * Created by rls on 19/09/15.
- */
+
 public class CrossSectionDetail extends SinglePositionDetail {
 
     private final CrossSection crossSection;
@@ -32,5 +30,10 @@ public class CrossSectionDetail extends SinglePositionDetail {
         Space<Coord2D> projection = SpaceMover.move(relativeProjection, getPosition());
 
         return projection;
+    }
+
+    @Override
+    public CrossSectionDetail translate(Coord2D point) {
+        return new CrossSectionDetail(getCrossSection(), getPosition().plus(point));
     }
 }

@@ -28,12 +28,12 @@ public class Saver {
             throw new IllegalArgumentException("Not saved; survey name cannot contain a slash");
         }
 
+        saveMetadata(survey);
         saveSurveyData(survey, "svx");
         saveSketch(survey, survey.getPlanSketch(), SexyTopo.PLAN_SKETCH_EXTENSION);
         saveSketch(survey, survey.getElevationSketch(), SexyTopo.EXT_ELEVATION_SKETCH_EXTENSION);
         survey.setSaved(true);
     }
-
 
     public static void autosave(Survey survey) throws IOException, JSONException {
         saveSurveyData(survey, "svx" + "." + AUTOSAVE_EXTENSION);
@@ -60,6 +60,9 @@ public class Saver {
     }
 
 
+    private static void saveMetadata(Survey survey) {
+
+    }
 
     public static void saveFile(String path, String contents) throws IOException {
 
@@ -71,5 +74,6 @@ public class Saver {
         FileUtils.writeStringToFile(filePath, contents);
 
     }
+
 
 }

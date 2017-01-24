@@ -16,4 +16,9 @@ public class TextDetail extends SinglePositionDetail {
         return text;
     }
 
+
+    @Override
+    public TextDetail translate(Coord2D point) {
+        return new TextDetail(getPosition().plus(point), getText(), getColour());
+    }
 }

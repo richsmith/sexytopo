@@ -19,9 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Created by rls on 15/02/15.
- */
+
 public class SketchJsonTranslater {
 
     public static final String PATHS_TAG = "paths";
@@ -205,7 +203,7 @@ public class SketchJsonTranslater {
     }
 
 
-    private static List<JSONObject> toList(JSONArray array) throws JSONException {
+    public static List<JSONObject> toList(JSONArray array) throws JSONException {
         List<JSONObject> list = new ArrayList<>();
         for (int i = 0; i < array.length(); i++) {
             list.add(array.getJSONObject(i));

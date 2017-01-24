@@ -66,7 +66,8 @@ public abstract class GraphActivity extends SexyTopoActivity
         SNAP_TO_LINES(R.id.buttonSnapToLines, true),
         SHOW_GRID(R.id.buttonShowGrid, true),
         SHOW_SPLAYS(R.id.buttonShowSplays, true),
-        SHOW_STATION_LABELS(R.id.buttonShowStationLabels, true);
+        SHOW_STATION_LABELS(R.id.buttonShowStationLabels, true),
+        SHOW_CONNECTIONS(R.id.buttonShowConnections, true);
 
         private int controlId;
         private boolean defaultValue;
@@ -106,6 +107,7 @@ public abstract class GraphActivity extends SexyTopoActivity
         }
 
         graphView = (GraphView)(findViewById(R.id.graphView));
+        graphView.setActivity(this);
     }
 
 
@@ -128,6 +130,13 @@ public abstract class GraphActivity extends SexyTopoActivity
     }
 
 
+    @Override
+    public void setSurvey(Survey survey) {
+        super.setSurvey(survey);
+        graphView.centreViewOnActiveStation();
+    }
+
+
     private void syncGraphWithSurvey() {
         Survey survey = getSurvey();
         graphView.setSurvey(survey);
@@ -136,8 +145,9 @@ public abstract class GraphActivity extends SexyTopoActivity
         graphView.invalidate();
     }
 
-    protected abstract Sketch getSketch(Survey survey);
-    protected abstract Space<Coord2D> getProjection(Survey survey);
+    public abstract Sketch getSketch(Survey survey);
+
+    public abstract Space<Coord2D> getProjection(Survey survey);
 
 
     @Override
@@ -164,6 +174,10 @@ public abstract class GraphActivity extends SexyTopoActivity
                 return true;
             case R.id.buttonShowStationLabels:
                 setDisplayPreference(DisplayPreference.SHOW_STATION_LABELS, !item.isChecked());
+                graphView.invalidate();
+                return true;
+            case R.id.buttonShowConnections:
+                setDisplayPreference(DisplayPreference.SHOW_CONNECTIONS, !item.isChecked());
                 graphView.invalidate();
                 return true;
             default:
