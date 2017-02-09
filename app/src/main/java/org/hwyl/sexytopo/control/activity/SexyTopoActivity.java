@@ -297,8 +297,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     public void startNewSurvey() {  // public due to stupid Reflection requirements
 
         final EditText input = new EditText(this);
-        String currentSurveyName = getSurvey().getName();
-        String defaultName = Util.getNextDefaultSurveyName(currentSurveyName);
+        String defaultName = Util.getNextDefaultSurveyName(this);
         input.setText(defaultName);
 
         new AlertDialog.Builder(this)
@@ -334,7 +333,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
         final EditText input = new EditText(this);
 
-        String defaultName = Util.getNextDefaultSurveyName(currentSurvey.getName());
+        String defaultName = Util.getNextAvailableName(currentSurvey.getName());
         input.setText(defaultName);
 
         new AlertDialog.Builder(this)

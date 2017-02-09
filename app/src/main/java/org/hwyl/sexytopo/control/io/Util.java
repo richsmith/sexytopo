@@ -81,6 +81,27 @@ public class Util {
     }
 
 
+    public static String getNextAvailableName(String basename) {
+        String name = basename;
+        do {
+            name = getNextName(name);
+        } while (doesSurveyExist(name));
+        return  name;
+    }
+
+    public static String getNextName(String basename) {
+        if (basename.length() == 0) {
+            return "name";
+        }
+        char last = basename.charAt(basename.length() - 1);
+        if (Character.isDigit(last)) {
+            return TextTools.advanceLastNumber(basename);
+        } else {
+            return basename + "-2";
+        }
+    }
+
+
     public static boolean doesSurveyExist(String name) {
         return getExistingSurveyNames().contains(name);
     }
