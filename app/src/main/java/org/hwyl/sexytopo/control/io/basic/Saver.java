@@ -20,7 +20,7 @@ public class Saver {
     public static final String AUTOSAVE_EXTENSION = ".autosave";
 
 
-    public static void save(Survey survey) throws IOException, JSONException {
+    public static void save(Survey survey) throws IOException, JSONException, Exception {
 
         if (survey.getName().equals("")) {
             throw new IllegalArgumentException("Not saved; survey name cannot be empty");
@@ -28,7 +28,7 @@ public class Saver {
             throw new IllegalArgumentException("Not saved; survey name cannot contain a slash");
         }
 
-        saveMetadata(survey);
+        saveMetadata(survey, SexyTopo.METADATA_EXTENSION);
         saveSurveyData(survey, "svx");
         saveSketch(survey, survey.getPlanSketch(), SexyTopo.PLAN_SKETCH_EXTENSION);
         saveSketch(survey, survey.getElevationSketch(), SexyTopo.EXT_ELEVATION_SKETCH_EXTENSION);
@@ -60,8 +60,10 @@ public class Saver {
     }
 
 
-    private static void saveMetadata(Survey survey) {
-
+    private static void saveMetadata(Survey survey, String extension) throws Exception {
+        String path = Util.getPathForSurveyFile(survey.getName(), extension);
+        String metadataText = MetadataTranslater.translate(survey);
+        saveFile(path, metadataText);
     }
 
     public static void saveFile(String path, String contents) throws IOException {

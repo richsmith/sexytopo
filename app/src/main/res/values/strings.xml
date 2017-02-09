@@ -44,6 +44,7 @@
     <string name="menu_delete_station">Delete</string>
     <string name="menu_reverse">Reverse</string>
     <string name="menu_start_new_survey">Start New Survey Here</string>
+    <string name="menu_unlink_survey">Unlink Linked Survey</string>
     <string name="sketch_menu_delete_last_leg">Undo Last Reading</string>
     <string name="sketch_menu_centre_view">Go to Active</string>
     <string name="sketch_menu_show_grid">Graph Paper</string>

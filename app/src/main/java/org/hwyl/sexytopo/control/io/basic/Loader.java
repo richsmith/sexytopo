@@ -14,21 +14,47 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
-/**
- * Created by rls on 08/10/14.
- */
+
 public class Loader {
 
-    public static Survey loadSurvey(String name) throws JSONException {
+    public static Survey loadSurvey(String name) throws Exception {
+        Set<String> surveyNamesNotToLoad = new HashSet<>();
+        return loadSurvey(name, surveyNamesNotToLoad);
+    }
 
+    public static Survey loadSurvey(String name, Set<String> surveyNamesNotToLoad) throws Exception {
+        Survey survey = new Survey(name);
+        loadSurveyData(name, survey);
+        loadSketches(survey);
+        surveyNamesNotToLoad.add(name);
+        loadMetadata(survey, surveyNamesNotToLoad);
+        survey.setSaved(true);
+        return survey;
+    }
+
+    private static void loadMetadata(Survey survey, Set<String> surveyNamesNotToLoad)
+            throws Exception {
+        String metadataPath = Util.getPathForSurveyFile(
+                survey.getName(), SexyTopo.METADATA_EXTENSION);
+        if (Util.doesFileExist(metadataPath)) {
+            String metadataText = slurpFile(metadataPath);
+            MetadataTranslater.translateAndUpdate(survey, metadataText, surveyNamesNotToLoad);
+        }
+    }
+
+
+    private static void loadSurveyData(String name, Survey survey) {
         String path = Util.getPathForSurveyFile(name, "svx");
         String text = slurpFile(path);
-
-        Survey survey = new Survey(name);
         parse(text, survey);
+    }
 
+
+    private static void loadSketches(Survey survey) throws JSONException {
         String planPath = Util.getPathForSurveyFile(survey.getName(), SexyTopo.PLAN_SKETCH_EXTENSION);
         if (Util.doesFileExist(planPath)) {
             String planText = slurpFile(planPath);
@@ -42,11 +68,8 @@ public class Loader {
             Sketch elevation = SketchJsonTranslater.translate(survey, elevationText);
             survey.setElevationSketch(elevation);
         }
-
-        survey.setSaved(true);
-        return survey;
-
     }
+
 
     public static String slurpFile(File file) {
         return slurpFile(file.getAbsolutePath());
