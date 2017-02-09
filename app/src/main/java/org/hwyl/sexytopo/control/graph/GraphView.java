@@ -11,12 +11,16 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.PopupWindow;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.GraphActivity;
+import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
+import org.hwyl.sexytopo.control.io.Util;
+import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.control.util.CrossSectioner;
 import org.hwyl.sexytopo.control.util.PreferenceAccess;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
@@ -38,6 +42,7 @@ import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -477,15 +482,25 @@ public class GraphView extends View {
                             activity.showSimpleToast(R.string.cannotExtendUnsavedSurvey);
                         }
                         activity.continueSurvey(station);
+                        break;
+                    case R.id.graph_station_unlink_survey:
+                        unlinkSurvey
+                        break;
                 }
             }
         };
 
         PopupWindow menu = StationContextMenu.getFakeStationContextMenu(
                 getContext(), station, listener);
+
+        boolean hasLinkedSurveys = survey.getConnectedSurveys().containsKey(station);
+        View unlinkSurveyButton = menu.getContentView().findViewById(R.id.graph_station_unlink_survey);
+        unlinkSurveyButton.setEnabled(hasLinkedSurveys);
+
         menu.showAtLocation(this, Gravity.LEFT | Gravity.TOP,
                 (int) (event.getX()), (int) (event.getY()));
     }
+
 
     private void askAboutDeletingStation(final Station station) {
         int legsToBeDeleted = SurveyStats.calcNumberSubLegs(station);
@@ -507,6 +522,57 @@ public class GraphView extends View {
                 .show();
     }
 
+
+    private void selectSurveyToUnlink() {
+        public void openSurvey() {  // public due to stupid Reflection requirements
+
+            File[] surveyDirectories = Util.getSurveyDirectories();
+
+            if (surveyDirectories.length == 0) {
+                showSimpleToast(getString(R.string.no_surveys));
+                return;
+            }
+
+            AlertDialog.Builder builderSingle = new AlertDialog.Builder(
+                    this);
+
+            builderSingle.setTitle(getString(R.string.open_survey));
+            final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
+                    this,
+                    android.R.layout.select_dialog_item);
+
+            for (File file : surveyDirectories) {
+                arrayAdapter.add(file.getName());
+            }
+
+            builderSingle.setNegativeButton(getString(R.string.cancel),
+                    new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+
+            builderSingle.setAdapter(arrayAdapter,
+                    new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String surveyName = arrayAdapter.getItem(which);
+                            try {
+                                Survey survey = Loader.loadSurvey(surveyName);
+                                SurveyManager.getInstance(SexyTopoActivity.this).setCurrentSurvey(survey);
+                                updateRememberedSurvey();
+                                showSimpleToast(getString(R.string.loaded) + " " + surveyName);
+                            } catch (Exception e) {
+                                showSimpleToast(getString(R.string.error_prefix) + e.getMessage());
+                            }
+                        }
+                    });
+            builderSingle.show();
+        }
+    }
 
     private static Station findNearestStationWithinDelta(Space<Coord2D> space, Coord2D target, double delta) {
         double shortest = Double.MAX_VALUE;
@@ -543,7 +609,7 @@ public class GraphView extends View {
         drawSurvey(canvas, survey, projection, 255);
 
         if (getDisplayPreference(GraphActivity.DisplayPreference.SHOW_CONNECTIONS)) {
-            drawOtherSurveys(canvas, projection, 127);
+            drawOtherSurveys(canvas, projection, 50);
         }
 
         drawLegend(canvas, survey);
@@ -660,8 +726,6 @@ public class GraphView extends View {
 
     private void drawLegs(Canvas canvas, Space<Coord2D> space, int alpha) {
 
-        legPaint.setAlpha(alpha);
-
         Map<Leg, Line<Coord2D>> legMap = space.getLegMap();
 
         for (Leg leg : legMap.keySet()) {
@@ -684,7 +748,9 @@ public class GraphView extends View {
 				legPaint.setColor(LEG_COLOUR.intValue);
 			}
 
-			boolean legIsHorizontalish = -45 < leg.getInclination() && leg.getInclination() < 45;
+            legPaint.setAlpha(alpha);
+
+            boolean legIsHorizontalish = -45 < leg.getInclination() && leg.getInclination() < 45;
 			if (legIsHorizontalish) {
 				drawPaint.setStyle(Paint.Style.STROKE);
 			} else {
@@ -733,6 +799,7 @@ public class GraphView extends View {
     }
 
     private void drawStation(Canvas canvas, Paint paint, float x, float y, int crossDiameter, int alpha) {
+        paint.setAlpha(alpha);
         canvas.drawLine(x , y - crossDiameter / 2, x, y + crossDiameter / 2, paint);
         canvas.drawLine(x - crossDiameter / 2, y, x + crossDiameter / 2, y, paint);
     }
@@ -749,8 +816,6 @@ public class GraphView extends View {
 
     private void drawSketch(Canvas canvas, Sketch sketch, int alpha) {
 
-        drawPaint.setAlpha(alpha);
-
         for (PathDetail pathDetail : sketch.getPathDetails()) {
 
             if (!couldBeOnScreen(pathDetail)) {
@@ -766,6 +831,8 @@ public class GraphView extends View {
                 } else {
                     Coord2D to = surveyCoordsToViewCoords(point);
                     drawPaint.setColor(pathDetail.getColour().intValue);
+                    drawPaint.setAlpha(alpha);
+
                     canvas.drawLine(
                             (float) from.getX(), (float) from.getY(),
                             (float) to.getX(), (float) to.getY(),

@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -27,8 +28,15 @@ public class MetadataTranslater {
 
 
     public static void translateAndUpdate(Survey survey, String string) throws Exception {
+        Set<String> surveyNamesNotToLoad = new HashSet<>();
+        translateAndUpdate(survey, string, surveyNamesNotToLoad);
+    }
+
+
+    public static void translateAndUpdate(
+            Survey survey, String string, Set<String> surveyNamesNotToLoad) throws Exception {
         JSONObject json = new JSONObject(string);
-        translateAndUpdate(survey, json);
+        translateAndUpdate(survey, json, surveyNamesNotToLoad);
     }
 
 
@@ -73,14 +81,13 @@ public class MetadataTranslater {
     }
 
 
-    private static void translateAndUpdate(Survey survey, JSONObject json) throws Exception {
+    private static void translateAndUpdate(Survey survey, JSONObject json, Set<String> surveyNamesNotToLoad) throws Exception {
         translateAndUpdateActiveStation(survey, json);
-        translateAndUpdateConnections(survey, json);
+        translateAndUpdateConnections(survey, json, surveyNamesNotToLoad);
     }
 
     private static void translateAndUpdateActiveStation(Survey survey, JSONObject json)
-            throws Exception{
-
+            throws Exception {
         try {
             String activeStationName = json.getString(ACTIVE_STATION_TAG);
             Station activeStation = survey.getStationByName(activeStationName);
@@ -89,13 +96,12 @@ public class MetadataTranslater {
             Log.e("Could not load active station: " + exception.toString());
             throw new Exception("Error loading active station");
         }
-
-
     }
 
 
-    private static void translateAndUpdateConnections(Survey survey, JSONObject json)
-            throws Exception {
+    private static void translateAndUpdateConnections(
+            Survey survey, JSONObject json, Set<String> surveyNamesNotToLoad) throws Exception {
+
        try {
            JSONObject connectionsObject = json.getJSONObject(CONNECTIONS_TAG);
            Map<String, JSONArray> outerMap = toMap(connectionsObject);
@@ -112,20 +118,31 @@ public class MetadataTranslater {
                    String connectedSurveyName = connectionPair.get(0).toString();
                    String connectionPointName = connectionPair.get(1).toString();
 
-                   try {
-                       Survey connectedSurvey = Loader.loadSurvey(connectedSurveyName);
-                       Station connectionPoint =
-                               connectedSurvey.getStationByName(connectionPointName);
-                       if (connectionPoint == null) {
-                           Log.e("Connection point not found: " + connectionPoint.getName());
-                           throw new Exception("Connection point not found");
-                       }
-                       survey.connect(station, connectedSurvey, connectionPoint);
-                   } catch (Exception exception) {
-                       // the linked survey or connecting station has probably been deleted;
-                       // not much we can do...
-                       Log.e("Could not load connected survey " + connectedSurveyName);
+                   if (surveyNamesNotToLoad.contains(connectedSurveyName)) {
+                       // if this survey is already loaded, don't do the whole infinite loop thing
                        continue;
+
+                   } else {
+                       // we *really* want to avoid infinite loops :)
+                       // this should be added on load, but just as a precaution..
+                       surveyNamesNotToLoad.add(connectedSurveyName);
+
+                       try {
+                           Survey connectedSurvey =
+                                   Loader.loadSurvey(connectedSurveyName, surveyNamesNotToLoad);
+                           Station connectionPoint =
+                                   connectedSurvey.getStationByName(connectionPointName);
+                           if (connectionPoint == null) {
+                               Log.e("Connection point not found: " + connectionPoint.getName());
+                               throw new Exception("Connection point not found");
+                           }
+                           survey.connect(station, connectedSurvey, connectionPoint);
+                       } catch (Exception exception) {
+                           // the linked survey or connecting station has probably been deleted;
+                           // not much we can do...
+                           Log.e("Could not load connected survey " + connectedSurveyName);
+                           continue;
+                       }
                    }
                }
            }
