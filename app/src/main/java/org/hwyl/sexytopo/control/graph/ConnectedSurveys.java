@@ -2,6 +2,7 @@ package org.hwyl.sexytopo.control.graph;
 
 import org.hwyl.sexytopo.control.activity.GraphActivity;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
+import org.hwyl.sexytopo.control.util.SpaceFlipper;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.Sketch;
@@ -36,22 +37,31 @@ public class ConnectedSurveys {
             for (SurveyConnection connection : connections.get(connectingStation)) {
 
                 Station otherConnectingStation = connection.stationInOtherSurvey;
+
                 Survey otherSurvey = connection.otherSurvey;
+
 
                 if (haveWeAlreadyDoneThisSurvey(translated, otherSurvey, original)) {
                     continue;
                 }
 
-                Space<Coord2D> otherProjection = activity.getProjection(connection.otherSurvey);
+                // create a new copy of the survey so we can edit the associated sketch
+                // (this might seem a bit messy but it's reasonably elegant, honest)
+                Survey lightweightSurveyCopy = new Survey(otherSurvey.getName());
+                lightweightSurveyCopy.setOrigin(otherSurvey.getOrigin());
+
+                Space<Coord2D> otherProjection = SpaceFlipper.flipVertically(activity.getProjection(connection.otherSurvey));
                 Coord2D otherConnectingStationLocation = otherProjection.getStationMap().get(otherConnectingStation);
                 Coord2D transformation = connectingStationLocation.minus(otherConnectingStationLocation);
 
-                Sketch sketch = activity.getSketch(otherSurvey);
-                sketch.updateWithTranslation(transformation);
+                Sketch translatedPlan = otherSurvey.getPlanSketch().getTranslatedCopy(transformation);
+                lightweightSurveyCopy.setPlanSketch(translatedPlan);
+                Sketch translatedElevation = otherSurvey.getElevationSketch().getTranslatedCopy(transformation);
+                lightweightSurveyCopy.setElevationSketch(translatedElevation);
 
                 otherProjection = Space2DUtils.transform(otherProjection, transformation);
 
-                translated.put(otherSurvey, otherProjection);
+                translated.put(lightweightSurveyCopy, otherProjection);
 
                 updateTranslatedConnectedSurveys(activity, original, translated, otherSurvey, otherProjection);
             }

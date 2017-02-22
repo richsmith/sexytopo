@@ -21,18 +21,11 @@ public class SexyTopo {
 
     public static final String SURVEY_UPDATED_EVENT = "surveyUpdatedEvent";
     public static final String DEVICE_LOG_UPDATED_EVENT = "deviceLogUpdatedEvent";
-
-    private static final String EXTERNAL_ROOT = Environment.getExternalStorageDirectory().toString();
+    
     public static final String APP_DIR = APP_NAME;
     public static final String SURVEY_DIR = "Surveys";
     public static final String IMPORT_DIR = "To Import";
     public static final String EXPORT_DIR = "Exported";
-    public static final String EXTERNAL_SURVEY_DIR =
-            TextTools.joinAll(File.separator, EXTERNAL_ROOT, APP_DIR, SURVEY_DIR);
-    public static final String EXTERNAL_IMPORT_DIR =
-            TextTools.joinAll(File.separator, EXTERNAL_ROOT, APP_DIR, IMPORT_DIR);
-    public static final String EXTERNAL_EXPORT_DIR =
-            TextTools.joinAll(File.separator, EXTERNAL_ROOT, APP_DIR, EXPORT_DIR);
 
     public static final String IMPORT_SOURCE_DIR = "Import Source";
 
@@ -52,4 +45,20 @@ public class SexyTopo {
     // This is extremely hacky but quite useful for getting a context when it's not sensible
     // to pass one around
     public static Context context;
+
+    public static String getExternalRoot() {
+        return Environment.getExternalStorageDirectory().toString();
+    }
+
+    public static String getExternalSurveyDirectory() {
+        return TextTools.joinAll(File.separator, getExternalRoot(), APP_DIR, SURVEY_DIR);
+    }
+
+    public static String getExternalImportDirectory() {
+        return TextTools.joinAll(File.separator, getExternalRoot(), APP_DIR, SURVEY_DIR);
+    }
+
+    public static String getExternalExportDirectory() {
+        return TextTools.joinAll(File.separator, getExternalRoot(), APP_DIR, SURVEY_DIR);
+    }
 }

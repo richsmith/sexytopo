@@ -11,6 +11,9 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import static org.mockito.Matchers.anySet;
+import static org.mockito.Matchers.anyString;
+
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(Loader.class)
@@ -67,7 +70,7 @@ public class MetadataTranslaterTest {
         Survey connected = new Survey("connected");
 
         PowerMockito.mockStatic(Loader.class);
-        Mockito.when(Loader.loadSurvey("connected")).thenReturn(connected);
+        Mockito.when(Loader.loadSurvey(anyString(), anySet())).thenReturn(connected);
 
         MetadataTranslater.translateAndUpdate(survey, json);
         Assert.assertEquals(1, survey.getConnectedSurveys().size());

@@ -46,7 +46,7 @@
     <string name="menu_start_new_survey">Start New Survey Here</string>
     <string name="menu_unlink_survey">Unlink Linked Survey</string>
     <string name="sketch_menu_delete_last_leg">Undo Last Reading</string>
-    <string name="sketch_menu_centre_view">Go to Active</string>
+    <string name="sketch_menu_centre_view">Centre on Active</string>
     <string name="sketch_menu_show_grid">Graph Paper</string>
     <string name="sketch_menu_snap_to_lines">Snap to Lines</string>
     <string name="sketch_menu_show_station_labels">Station Labels</string>
@@ -60,6 +60,7 @@
     <string name="title_activity_survey">Stats</string>
     <string name="field_survey_name">Survey Name</string>
     <string name="open_survey">Open Survey</string>
+    <string name="unlink_survey">Unlink Survey</string>
     <string name="no_surveys">No surveys found to open</string>
     <string name="select_export_type">Select export format</string>
     <string name="export_successful">export completed</string>

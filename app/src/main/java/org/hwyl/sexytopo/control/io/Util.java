@@ -30,22 +30,22 @@ public class Util {
     }
 
     public static void ensureDataDirectoriesExist() {
-        ensureDirectoryExists(SexyTopo.EXTERNAL_SURVEY_DIR);
-        ensureDirectoryExists(SexyTopo.EXTERNAL_IMPORT_DIR);
-        ensureDirectoryExists(SexyTopo.EXTERNAL_EXPORT_DIR);
+        ensureDirectoryExists(SexyTopo.getExternalSurveyDirectory());
+        ensureDirectoryExists(SexyTopo.getExternalImportDirectory());
+        ensureDirectoryExists(SexyTopo.getExternalExportDirectory());
     }
 
 
     public static File[] getSurveyDirectories() {
-        ensureDirectoryExists(SexyTopo.EXTERNAL_SURVEY_DIR);
-        File surveyDirectory = new File(SexyTopo.EXTERNAL_SURVEY_DIR);
+        ensureDirectoryExists(SexyTopo.getExternalSurveyDirectory());
+        File surveyDirectory = new File(SexyTopo.getExternalSurveyDirectory());
         File surveyDirectories[] = surveyDirectory.listFiles();
         return surveyDirectories;
     }
 
     public static File[] getImportFiles() {
-        ensureDirectoryExists(SexyTopo.EXTERNAL_IMPORT_DIR);
-        File importDirectory = new File(SexyTopo.EXTERNAL_IMPORT_DIR);
+        ensureDirectoryExists(SexyTopo.getExternalImportDirectory());
+        File importDirectory = new File(SexyTopo.getExternalImportDirectory());
         File importFiles[] = importDirectory.listFiles();
         return importFiles;
     }
@@ -123,7 +123,7 @@ public class Util {
 
 
     public static String getDirectoryPathForSurvey(String name) {
-        return SexyTopo.EXTERNAL_SURVEY_DIR + File.separator + name;
+        return SexyTopo.getExternalSurveyDirectory() + File.separator + name;
     }
 
     public static String getPathForSurveyFile(String name, String extension) {
@@ -132,7 +132,7 @@ public class Util {
     }
 
     public static String getExportDirectoryPath(String exportFormat, String name) {
-        return TextTools.joinAll(File.separator, SexyTopo.EXTERNAL_EXPORT_DIR, exportFormat, name);
+        return TextTools.joinAll(File.separator, SexyTopo.getExternalExportDirectory(), exportFormat, name);
     }
 
 

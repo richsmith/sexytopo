@@ -11,16 +11,12 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.PopupWindow;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.GraphActivity;
-import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
-import org.hwyl.sexytopo.control.io.Util;
-import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.control.util.CrossSectioner;
 import org.hwyl.sexytopo.control.util.PreferenceAccess;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
@@ -41,9 +37,10 @@ import org.hwyl.sexytopo.model.sketch.TextDetail;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
+import org.hwyl.sexytopo.model.survey.SurveyConnection;
 
-import java.io.File;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -200,7 +197,11 @@ public class GraphView extends View {
 
 
     public void setSurvey(Survey survey) {
-        this.survey = survey;
+        if (survey != this.survey) {
+            this.survey = survey;
+            centreViewOnActiveStation();
+
+        }
     }
 
 
@@ -484,7 +485,7 @@ public class GraphView extends View {
                         activity.continueSurvey(station);
                         break;
                     case R.id.graph_station_unlink_survey:
-                        unlinkSurvey
+                        activity.unlinkSurvey(station);
                         break;
                 }
             }
@@ -523,57 +524,6 @@ public class GraphView extends View {
     }
 
 
-    private void selectSurveyToUnlink() {
-        public void openSurvey() {  // public due to stupid Reflection requirements
-
-            File[] surveyDirectories = Util.getSurveyDirectories();
-
-            if (surveyDirectories.length == 0) {
-                showSimpleToast(getString(R.string.no_surveys));
-                return;
-            }
-
-            AlertDialog.Builder builderSingle = new AlertDialog.Builder(
-                    this);
-
-            builderSingle.setTitle(getString(R.string.open_survey));
-            final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
-                    this,
-                    android.R.layout.select_dialog_item);
-
-            for (File file : surveyDirectories) {
-                arrayAdapter.add(file.getName());
-            }
-
-            builderSingle.setNegativeButton(getString(R.string.cancel),
-                    new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-
-            builderSingle.setAdapter(arrayAdapter,
-                    new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            String surveyName = arrayAdapter.getItem(which);
-                            try {
-                                Survey survey = Loader.loadSurvey(surveyName);
-                                SurveyManager.getInstance(SexyTopoActivity.this).setCurrentSurvey(survey);
-                                updateRememberedSurvey();
-                                showSimpleToast(getString(R.string.loaded) + " " + surveyName);
-                            } catch (Exception e) {
-                                showSimpleToast(getString(R.string.error_prefix) + e.getMessage());
-                            }
-                        }
-                    });
-            builderSingle.show();
-        }
-    }
-
     private static Station findNearestStationWithinDelta(Space<Coord2D> space, Coord2D target, double delta) {
         double shortest = Double.MAX_VALUE;
         Station best = null;
@@ -609,7 +559,7 @@ public class GraphView extends View {
         drawSurvey(canvas, survey, projection, 255);
 
         if (getDisplayPreference(GraphActivity.DisplayPreference.SHOW_CONNECTIONS)) {
-            drawOtherSurveys(canvas, projection, 50);
+            drawConnectedSurveys(canvas, projection, 50);
         }
 
         drawLegend(canvas, survey);
@@ -617,7 +567,7 @@ public class GraphView extends View {
 
     private void drawSurvey(Canvas canvas, Survey survey, Space<Coord2D> projection, int alpha) {
 
-        drawSurveyData(canvas, projection, alpha);
+        drawSurveyData(survey, canvas, projection, alpha);
 
         drawCrossSections(canvas, sketch.getCrossSectionDetails(), alpha);
 
@@ -625,19 +575,34 @@ public class GraphView extends View {
     }
 
 
-    private void drawOtherSurveys(Canvas canvas, Space<Coord2D> projection, int alpha) {
+    private void drawConnectedSurveys(Canvas canvas, Space<Coord2D> projection, int alpha) {
 
-        if (translatedConnectedSurveys.size() < survey.getConnectedSurveys().size()) {
+        if (doTranslatedConnectedSurveysNeedUpdating()) {
             this.translatedConnectedSurveys =
                     ConnectedSurveys.getTranslatedConnectedSurveys(activity, survey, projection);
         }
 
         for (Survey translatedConnectedSurvey : translatedConnectedSurveys.keySet()) {
             Space<Coord2D> connectedProjection =
-                    SpaceFlipper.flipVertically(
-                        translatedConnectedSurveys.get(translatedConnectedSurvey));
+                        translatedConnectedSurveys.get(translatedConnectedSurvey);
             drawSurvey(canvas, translatedConnectedSurvey, connectedProjection, alpha);
         }
+    }
+
+    private boolean doTranslatedConnectedSurveysNeedUpdating() {
+        Set<Survey> flatSetOfConnectedSurveys = getFlatSetOfConnectedSurveys();
+        Set<Survey> flatSetOfTranslatedConnectedSurveys = translatedConnectedSurveys.keySet();
+        return !flatSetOfConnectedSurveys.equals(flatSetOfTranslatedConnectedSurveys);
+    }
+
+    private Set<Survey> getFlatSetOfConnectedSurveys() {
+        Set<Survey> flatSet = new HashSet<>();
+        for (Set<SurveyConnection> connectionSet : survey.getConnectedSurveys().values()) {
+            for (SurveyConnection connection : connectionSet) {
+                flatSet.add(connection.otherSurvey);
+            }
+        }
+        return flatSet;
     }
 
 
@@ -690,11 +655,11 @@ public class GraphView extends View {
         }
     }
 
-    private void drawSurveyData(Canvas canvas, Space<Coord2D> space, int alpha) {
+    private void drawSurveyData(Survey survey, Canvas canvas, Space<Coord2D> space, int alpha) {
 
         drawLegs(canvas, space, alpha);
 
-        drawStations(canvas, space, alpha);
+        drawStations(survey, canvas, space, alpha);
     }
 
 
@@ -767,7 +732,7 @@ public class GraphView extends View {
     }
 
 
-    private void drawStations(Canvas canvas, Space<Coord2D> space, int alpha) {
+    private void drawStations(Survey survey, Canvas canvas, Space<Coord2D> space, int alpha) {
 
         stationPaint.setAlpha(alpha);
 
@@ -789,7 +754,11 @@ public class GraphView extends View {
             }
 
             if (getDisplayPreference(GraphActivity.DisplayPreference.SHOW_STATION_LABELS)) {
-                canvas.drawText(station.getName(),
+                String name = station.getName();
+                if (station == survey.getOrigin()) {
+                    name = name + " (" + survey.getName() + ")";
+                }
+                canvas.drawText(name,
                         x + STATION_LABEL_OFFSET,
                         y + STATION_LABEL_OFFSET,
                         stationPaint);
@@ -881,8 +850,16 @@ public class GraphView extends View {
 
 
     public void centreViewOnActiveStation() {
-        Coord2D activeStationCoord = projection.getStationMap().get(survey.getActiveStation());
-        centreViewOnSurveyPoint(activeStationCoord);
+        // call this in a post thread so we can ask for the view to be centred even before the
+        // view is fully drawn
+        post(new Runnable() {
+            @Override
+            public void run() {
+                Coord2D activeStationCoord =
+                        projection.getStationMap().get(survey.getActiveStation());
+                centreViewOnSurveyPoint(activeStationCoord);
+            }
+        });
     }
 
 

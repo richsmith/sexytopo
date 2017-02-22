@@ -14,8 +14,6 @@ public class Sketch {
     private Set<PathDetail> pathDetails = new HashSet<>();
     private Set<TextDetail> textDetails = new HashSet<>();
     private Set<CrossSectionDetail> crossSectionDetails = new HashSet<>();
-    private Set[] allSketchDetailSets = new Set[]{pathDetails, textDetails, crossSectionDetails};
-
 
     private List<SketchDetail> sketchHistory = new ArrayList<>();
     private List<SketchDetail> undoneHistory = new ArrayList<>();
@@ -155,6 +153,7 @@ public class Sketch {
 
 
     private Set<SketchDetail> allSketchDetails() {
+        Set[] allSketchDetailSets = new Set[] {pathDetails, textDetails, crossSectionDetails};
         Set<SketchDetail> all = new HashSet<>();
         for (Set set : allSketchDetailSets) {
             all.addAll(set);
@@ -193,23 +192,28 @@ public class Sketch {
         this.crossSectionDetails = crossSectionDetails;
     }
 
-    public void updateWithTranslation(Coord2D point) {
+    public Sketch getTranslatedCopy(Coord2D point) {
+        Sketch sketch = new Sketch();
+
         Set<PathDetail> newPathDetails = new HashSet<>();
         for (PathDetail pathDetail : pathDetails) {
             newPathDetails.add(pathDetail.translate(point));
         }
-        pathDetails = newPathDetails;
+        sketch.setPathDetails(newPathDetails);
 
         Set<TextDetail> newTextDetails = new HashSet<>();
         for (TextDetail textDetail : textDetails) {
             newTextDetails.add(textDetail.translate(point));
         }
-        textDetails = newTextDetails;
+        sketch.setTextDetails(newTextDetails);
 
         Set<CrossSectionDetail> newCrossSectionDetails = new HashSet<>();
         for (CrossSectionDetail crossSectionDetail : crossSectionDetails) {
             newCrossSectionDetails.add(crossSectionDetail.translate(point));
         }
-        crossSectionDetails = newCrossSectionDetails;
+        sketch.setCrossSectionDetails(newCrossSectionDetails);
+
+        return sketch;
     }
+
 }

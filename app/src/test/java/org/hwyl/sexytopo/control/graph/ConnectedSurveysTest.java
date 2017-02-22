@@ -86,7 +86,8 @@ public class ConnectedSurveysTest {
                         activity, currentSurvey, planProjection);
 
         Assert.assertEquals(translated.size(), 2);
-        Space<Coord2D> projection = translated.get(joinedSurvey1);
+
+        Space<Coord2D> projection = translated.values().iterator().next();
         Coord2D newStationPoint = getStationPosition(projection, "2");
         Assert.assertEquals(3.0, newStationPoint.getY(), SexyTopo.ALLOWED_DOUBLE_DELTA_FOR_TESTS);
     }
@@ -113,7 +114,9 @@ public class ConnectedSurveysTest {
                 ConnectedSurveys.getTranslatedConnectedSurveys(
                         activity, currentSurvey, planProjection);
 
-        PathDetail translatedPathDetail = sketch.getPathDetails().toArray(new PathDetail[] {})[0];
+        Sketch translatedSketch = translated.keySet().iterator().next().getPlanSketch();
+        PathDetail translatedPathDetail =
+                translatedSketch.getPathDetails().toArray(new PathDetail[] {})[0];
         List<Coord2D> coords = translatedPathDetail.getPath();
         Assert.assertEquals(new Coord2D(0, 1), coords.get(0));
         Assert.assertEquals(new Coord2D(0, 2), coords.get(1));

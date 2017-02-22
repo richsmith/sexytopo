@@ -20,6 +20,7 @@
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonBlack"
+            android:hapticFeedbackEnabled="true"
             />
         <ImageButton
             android:layout_weight="0.2"
@@ -28,6 +29,7 @@
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonBrown"
+            android:hapticFeedbackEnabled="true"
             />
         <ImageButton
             android:layout_weight="0.2"
@@ -36,6 +38,7 @@
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonOrange"
+            android:hapticFeedbackEnabled="true"
             />
         <ImageButton
             android:layout_weight="0.2"
@@ -44,6 +47,7 @@
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonGreen"
+            android:hapticFeedbackEnabled="true"
             />
         <ImageButton
             android:layout_weight="0.2"
@@ -52,6 +56,7 @@
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonBlue"
+            android:hapticFeedbackEnabled="true"
             />
         <ImageButton
             android:layout_weight="0.2"
@@ -60,6 +65,7 @@
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonPurple"
+            android:hapticFeedbackEnabled="true"
             />
         <ImageButton
             android:layout_weight="0.2"
@@ -68,6 +74,7 @@
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonZoomOut"
+            android:hapticFeedbackEnabled="true"
             />
         <ImageButton
             android:layout_weight="0.2"
@@ -76,6 +83,7 @@
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonZoomIn"
+            android:hapticFeedbackEnabled="true"
             />
     </LinearLayout>
 
@@ -94,6 +102,7 @@
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonMove"
+            android:hapticFeedbackEnabled="true"
             />
         <ImageButton
             android:layout_weight="0.2"
@@ -102,6 +111,7 @@
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonDraw"
+            android:hapticFeedbackEnabled="true"
             />
         <ImageButton
             android:layout_weight="0.2"
@@ -110,6 +120,7 @@
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonErase"
+            android:hapticFeedbackEnabled="true"
             />
         <ImageButton
             android:layout_weight="0.2"
@@ -118,6 +129,7 @@
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonText"
+            android:hapticFeedbackEnabled="true"
             />
         <ImageButton
             android:layout_weight="0.2"
@@ -126,6 +138,7 @@
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonSelect"
+            android:hapticFeedbackEnabled="true"
             />
         <ImageButton
             android:layout_weight="0.2"
@@ -134,6 +147,7 @@
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonMenu"
+            android:hapticFeedbackEnabled="true"
             />
         <ImageButton
             android:layout_weight="0.2"
@@ -142,6 +156,7 @@
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonUndo"
+            android:hapticFeedbackEnabled="true"
             />
         <ImageButton
             android:layout_weight="0.2"
@@ -150,6 +165,7 @@
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonRedo"
+            android:hapticFeedbackEnabled="true"
             />
     </LinearLayout>
 

@@ -29,6 +29,7 @@ import org.hwyl.sexytopo.control.io.translation.SelectableExporters;
 import org.hwyl.sexytopo.demo.TestSurveyCreator;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
+import org.hwyl.sexytopo.model.survey.SurveyConnection;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -36,6 +37,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -364,6 +366,95 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             }
         }).show();
     }
+
+
+    public void unlinkSurvey(final Station station) {
+
+        try {
+            Survey survey = getSurvey();
+
+            Set<SurveyConnection> linked = survey.getConnectedSurveys().get(station);
+            if (linked.size() < 1) {
+                throw new Exception("Can't find any surveys to unlink");
+            } else if (linked.size() == 1) {
+                SurveyConnection onlyConnection = linked.iterator().next();
+                unlinkSurveyConnection(survey, station,
+                        onlyConnection.otherSurvey, onlyConnection.stationInOtherSurvey);
+            } else {
+                chooseSurveyToUnlink(survey, station);
+            }
+        } catch (Exception exception) {
+            showSimpleToast("Error unlinking survey: " + exception.getMessage());
+        }
+    }
+
+
+    private void chooseSurveyToUnlink(final Survey survey, final Station station) {
+
+        AlertDialog.Builder builderSingle = new AlertDialog.Builder(
+                this);
+
+        builderSingle.setTitle(getString(R.string.unlink_survey));
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.select_dialog_item);
+
+        final Set<SurveyConnection> connections = survey.getConnectedSurveys().get(station);
+
+        for (SurveyConnection connection : connections) {
+            arrayAdapter.add(connection.otherSurvey.getName());
+        }
+
+        builderSingle.setNegativeButton(getString(R.string.cancel),
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        builderSingle.setAdapter(arrayAdapter,
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String surveyName = arrayAdapter.getItem(which);
+                        try {
+                            for (SurveyConnection connection : connections) {
+                                if (connection.otherSurvey.getName().equals(surveyName)) {
+                                    Survey to = connection.otherSurvey;
+                                    Station stationTo = connection.stationInOtherSurvey;
+                                    unlinkSurveyConnection(survey, station, to, stationTo);
+
+                                    return;
+                                }
+                            }
+                            throw new Exception("couldn't find linked survey");
+
+                        } catch (Exception e) {
+                            showSimpleToast(getString(R.string.error_prefix) + e.getMessage());
+                        }
+                    }
+                });
+        builderSingle.show();
+    }
+
+
+    private void unlinkSurveyConnection(Survey from, Station stationFrom,
+                                        Survey to, Station stationTo) throws Exception {
+        from.disconnect(stationFrom, to);
+        Saver.save(from);
+        SurveyManager.getInstance(this).broadcastSurveyUpdated();
+
+        try {
+            to.disconnect(stationTo, from);
+            Saver.save(to);
+        } catch (Exception exception) {
+            // don't do anything; the other survey may have been modified so not much we can do
+        }
+    }
+
 
 
     private void deleteSurvey() {

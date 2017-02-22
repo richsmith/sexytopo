@@ -7,8 +7,10 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.ColorFilter;
 import android.graphics.LightingColorFilter;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.view.HapticFeedbackConstants;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,9 +25,7 @@ import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Survey;
 
-/**
- * Created by rls on 13/10/14.
- */
+
 public abstract class GraphActivity extends SexyTopoActivity
         implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
 
@@ -72,7 +72,7 @@ public abstract class GraphActivity extends SexyTopoActivity
         private int controlId;
         private boolean defaultValue;
 
-        private DisplayPreference(int id, boolean defaultValue) {
+        DisplayPreference(int id, boolean defaultValue) {
             this.controlId = id;
             this.defaultValue = defaultValue;
         }
@@ -114,7 +114,9 @@ public abstract class GraphActivity extends SexyTopoActivity
     @Override
     protected void onStart() {
         super.onStart();
+        graphView.initialise();
         syncGraphWithSurvey();
+        graphView.centreViewOnActiveStation();
         initialiseSketchTool();
         initialiseBrushColour();
     }
@@ -123,24 +125,16 @@ public abstract class GraphActivity extends SexyTopoActivity
     @Override
     protected void onResume() {
         super.onResume();
-        graphView.initialise();
         syncGraphWithSurvey();
         initialiseSketchTool();
         initialiseBrushColour();
     }
 
 
-    @Override
-    public void setSurvey(Survey survey) {
-        super.setSurvey(survey);
-        graphView.centreViewOnActiveStation();
-    }
-
-
     private void syncGraphWithSurvey() {
         Survey survey = getSurvey();
-        graphView.setSurvey(survey);
         graphView.setProjection(getProjection(survey));
+        graphView.setSurvey(survey);
         graphView.setSketch(getSketch(survey));
         graphView.invalidate();
     }
@@ -197,6 +191,7 @@ public abstract class GraphActivity extends SexyTopoActivity
     public boolean handleAction(int id) {
 
         GraphView graphView = (GraphView)(findViewById(R.id.graphView));
+        graphView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
 
         for (GraphView.SketchTool sketchTool: GraphView.SketchTool.values()) {
             if (sketchTool.getId() == id) {
@@ -296,6 +291,8 @@ public abstract class GraphActivity extends SexyTopoActivity
 
             ColorFilter filter = null;
             if (sketchTool == toSelect) {
+                button.setHovered(true);
+                button.setHapticFeedbackEnabled(true);
                 filter = new LightingColorFilter(0xFFFFFFFF, 0xFF440000);
             }
 
@@ -333,10 +330,11 @@ public abstract class GraphActivity extends SexyTopoActivity
             View button = findViewById(brushColour.getId());
             ColorFilter filter = null;
             if (brushColour == toSelect) {
-                filter = new LightingColorFilter(0xFFFFFFFF, 0xFF004400);
+                button.getBackground().setColorFilter(0xe0f47521, PorterDuff.Mode.SRC_ATOP);
+                button.invalidate();
+            } else {
+                button.getBackground().clearColorFilter();
             }
-
-            button.getBackground().setColorFilter(filter);
         }
     }
 

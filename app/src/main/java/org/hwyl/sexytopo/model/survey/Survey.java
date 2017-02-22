@@ -109,6 +109,7 @@ public class Survey {
         return legs;
     }
 
+
     public static List<Station> getAllStations(Station root) {
 
         List<Station> stations = new ArrayList<>();
@@ -121,6 +122,7 @@ public class Survey {
 
         return stations;
     }
+
 
     public void connect(Station joinInThisSurvey, Survey survey, Station joinInOtherSurvey) {
 
@@ -142,6 +144,26 @@ public class Survey {
 
         connections.add(connection);
     }
+
+
+    public void disconnect(Station joinInThisSurvey, Survey otherSurvey) throws Exception {
+        Set<SurveyConnection> connections = stationsToSurveyConnections.get(joinInThisSurvey);
+
+        SurveyConnection foundConnection = null;
+
+        for (SurveyConnection connection : connections) {
+            if (connection.otherSurvey == otherSurvey) {
+                connections.remove(connection);
+                if (connections.size() == 0) {
+                    stationsToSurveyConnections.remove(joinInThisSurvey);
+                }
+                return;
+            }
+        }
+        throw new Exception("tried to disconnect unconnected survey");
+
+    }
+
 
     public boolean isConnectedTo(Survey other) {
         for (Station station : getConnectedSurveys().keySet()) {
@@ -305,6 +327,11 @@ public class Survey {
             this.station = station;
             this.leg = leg;
         }
+    }
+
+
+    public String toString() {
+        return "[Survey " + getName() + "]";
     }
 
 

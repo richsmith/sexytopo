@@ -284,19 +284,19 @@ public class SurveyUpdater {
 
 
     /** Average some azimuth values together, even if they span the 360/0 boundary */
-    private static double averageAzimuths(double[] azms) {
+    private static double averageAzimuths(double[] azimuths) {
         // Azimuth values jump at the 360/0 boundary, so we must be careful to ensure that
         // values {359, 1} average to 0 rather than the incorrect value 180
         double sum = 0.0;
         double min = Leg.MAX_AZIMUTH, max = Leg.MIN_AZIMUTH;
-        for (int i=0; i<azms.length; i++) {
-            if (azms[i] < min) min = azms[i];
-            if (azms[i] > max) max = azms[i];
+        for (int i = 0; i < azimuths.length; i++) {
+            if (azimuths[i] < min) min = azimuths[i];
+            if (azimuths[i] > max) max = azimuths[i];
         }
         boolean splitOverZero = max - min > 180;
-        double[] correctedAzms = new double[azms.length];
-        for (int i=0; i < azms.length; i++) {
-            correctedAzms[i] = (splitOverZero && azms[i] < 180) ? azms[i] + 360: azms[i];
+        double[] correctedAzms = new double[azimuths.length];
+        for (int i=0; i < azimuths.length; i++) {
+            correctedAzms[i] = (splitOverZero && azimuths[i] < 180) ? azimuths[i] + 360: azimuths[i];
             sum += correctedAzms[i];
         }
         return (sum / correctedAzms.length) % 360;
@@ -323,5 +323,6 @@ public class SurveyUpdater {
 
         survey.setSaved(false);
     }
+
 
 }
