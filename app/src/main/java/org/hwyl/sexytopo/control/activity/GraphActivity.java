@@ -63,6 +63,7 @@ public abstract class GraphActivity extends SexyTopoActivity
 
 
     public enum DisplayPreference {
+        AUTO_RECENTRE(R.id.buttonAutoRecentre, true),
         SNAP_TO_LINES(R.id.buttonSnapToLines, true),
         SHOW_GRID(R.id.buttonShowGrid, true),
         SHOW_SPLAYS(R.id.buttonShowSplays, true),
@@ -83,20 +84,30 @@ public abstract class GraphActivity extends SexyTopoActivity
     }
 
     private GraphView graphView;
-
+    private SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        BroadcastReceiver receiver = new BroadcastReceiver() {
+        BroadcastReceiver updatedReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 syncGraphWithSurvey();
             }
         };
         LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
-        broadcastManager.registerReceiver(receiver, new IntentFilter(SexyTopo.SURVEY_UPDATED_EVENT));
+        broadcastManager.registerReceiver(updatedReceiver,
+                new IntentFilter(SexyTopo.SURVEY_UPDATED_EVENT));
+
+        BroadcastReceiver createdReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                handleAutoRecentre();
+            }
+        };
+        broadcastManager.registerReceiver(createdReceiver,
+                new IntentFilter(SexyTopo.NEW_STATION_CREATED_EVENT));
 
         setContentView(R.layout.activity_graph);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -108,17 +119,17 @@ public abstract class GraphActivity extends SexyTopoActivity
 
         graphView = (GraphView)(findViewById(R.id.graphView));
         graphView.setActivity(this);
+
+        preferences = getSharedPreferences("display", Context.MODE_PRIVATE);
+
+        graphView.centreViewOnActiveStation();
     }
 
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        graphView.initialise();
-        syncGraphWithSurvey();
-        graphView.centreViewOnActiveStation();
-        initialiseSketchTool();
-        initialiseBrushColour();
+    private void handleAutoRecentre() {
+        if (preferences.getBoolean(DisplayPreference.AUTO_RECENTRE.toString(), false)) {
+            graphView.centreViewOnActiveStation();
+        }
     }
 
 
@@ -174,6 +185,10 @@ public abstract class GraphActivity extends SexyTopoActivity
                 setDisplayPreference(DisplayPreference.SHOW_CONNECTIONS, !item.isChecked());
                 graphView.invalidate();
                 return true;
+            case R.id.buttonAutoRecentre:
+                setDisplayPreference(DisplayPreference.AUTO_RECENTRE, !item.isChecked());
+                graphView.invalidate();
+                return true;
             default:
                 return handleAction(id);
         }
@@ -181,7 +196,6 @@ public abstract class GraphActivity extends SexyTopoActivity
     }
 
     private void setDisplayPreference(DisplayPreference preference, boolean value) {
-        SharedPreferences preferences = getSharedPreferences("display", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean(preference.toString(), value);
         editor.commit();

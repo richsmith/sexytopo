@@ -47,6 +47,7 @@
     <string name="menu_unlink_survey">Unlink Linked Survey</string>
     <string name="sketch_menu_delete_last_leg">Undo Last Reading</string>
     <string name="sketch_menu_centre_view">Centre on Active</string>
+    <string name="sketch_menu_auto_recentre">Auto-Recentre</string>
     <string name="sketch_menu_show_grid">Graph Paper</string>
     <string name="sketch_menu_snap_to_lines">Snap to Lines</string>
     <string name="sketch_menu_show_station_labels">Station Labels</string>

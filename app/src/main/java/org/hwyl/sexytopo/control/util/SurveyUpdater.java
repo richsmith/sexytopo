@@ -23,37 +23,44 @@ public class SurveyUpdater {
     private static final float DEFAULT_MAX_ANGLE_DELTA = 1.0f;
 
 
-    public static void update(Survey survey, List<Leg> legs, boolean considerBacksightPromotion) {
+    public static boolean update(Survey survey, List<Leg> legs, boolean considerBacksightPromotion) {
+        boolean anyStationsAdded = false;
         for (Leg leg : legs) {
-            update(survey, leg, considerBacksightPromotion);
+            anyStationsAdded = anyStationsAdded || update(survey, leg, considerBacksightPromotion);
         }
+        return anyStationsAdded;
     }
 
 
-    public static void update(Survey survey, List<Leg> legs) {
+    public static boolean update(Survey survey, List<Leg> legs) {
+        boolean anyStationsAdded = false;
         for (Leg leg : legs) {
-            update(survey, leg);
+            anyStationsAdded = anyStationsAdded || update(survey, leg);
         }
+        return anyStationsAdded;
     }
 
-    public static void update(Survey survey, Leg leg) {
-        update(survey, leg, false);
+    public static boolean update(Survey survey, Leg leg) {
+        return update(survey, leg, false);
     }
 
-    public static void update(Survey survey, Leg leg, boolean considerBacksightPromotion) {
+    public static boolean update(Survey survey, Leg leg, boolean considerBacksightPromotion) {
+        boolean createdNewStation = false;
         Station activeStation = survey.getActiveStation();
         activeStation.getOnwardLegs().add(leg);
         survey.setSaved(false);
         survey.addUndoEntry(activeStation, leg);
 
         if (considerBacksightPromotion) {
-            boolean createdNewStation = createNewStationIfBacksight(survey);
+            createdNewStation = createNewStationIfBacksight(survey);
             if (!createdNewStation) {
-                createNewStationIfTripleShot(survey);
+                createdNewStation = createNewStationIfTripleShot(survey);
             }
         } else {
-            createNewStationIfTripleShot(survey);
+            createdNewStation = createNewStationIfTripleShot(survey);
         }
+
+        return createdNewStation;
     }
 
 

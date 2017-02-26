@@ -38,7 +38,9 @@ public class ManualEntry {
                     @Override
                     public void submit(Leg leg, Dialog dialog) {
                         SurveyUpdater.updateWithNewStation(survey, leg);
-                        SurveyManager.getInstance(tableActivity).broadcastSurveyUpdated();
+                        SurveyManager manager = SurveyManager.getInstance(tableActivity);
+                        manager.broadcastSurveyUpdated();
+                        manager.broadcastNewStationCreated();
                         tableActivity.syncTableWithSurvey();
                     }
                 });

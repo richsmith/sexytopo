@@ -3,6 +3,7 @@ package org.hwyl.sexytopo.control.graph;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.activity.GraphActivity;
 import org.hwyl.sexytopo.control.activity.PlanActivity;
+import org.hwyl.sexytopo.control.util.SpaceFlipper;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Projection2D;
@@ -46,7 +47,7 @@ public class ConnectedSurveysTest {
 
 
     @Test
-    public void testConnectedSurveyGetsTranslatedCorrectly() {
+    public void testConnectedSurveyGetsTranslatedCorrectly() throws Exception {
 
         Survey currentSurvey = getBasicSurvey("current");
         Survey joinedSurvey = getBasicSurvey("joined");
@@ -55,20 +56,22 @@ public class ConnectedSurveysTest {
 
         GraphActivity activity = new PlanActivity();
 
-        Space<Coord2D> planProjection = Projection2D.PLAN.project(currentSurvey);
+        Space<Coord2D> planProjection =
+                SpaceFlipper.flipVertically(Projection2D.PLAN.project(currentSurvey));
         Map<Survey, Space<Coord2D>> translated =
                 ConnectedSurveys.getTranslatedConnectedSurveys(
                         activity, currentSurvey, planProjection);
 
         Assert.assertEquals(translated.size(), 1);
-        Space<Coord2D> projection = translated.get(joinedSurvey);
+        Survey translatedSurvey = getNamedSurvey(translated, "joined");
+        Space<Coord2D> projection = translated.get(translatedSurvey);
         Coord2D newStationPoint = getStationPosition(projection, "2");
-        Assert.assertEquals(2.0, newStationPoint.getY(), SexyTopo.ALLOWED_DOUBLE_DELTA_FOR_TESTS);
+        Assert.assertEquals(-2.0, newStationPoint.getY(), SexyTopo.ALLOWED_DOUBLE_DELTA_FOR_TESTS);
     }
 
 
     @Test
-    public void testSecondaryConnectedSurveyGetsTranslatedCorrectly() {
+    public void testSecondaryConnectedSurveyGetsTranslatedCorrectly() throws Exception {
 
         Survey currentSurvey = getBasicSurvey("current");
         Survey joinedSurvey0 = getBasicSurvey("joined-0");
@@ -80,16 +83,28 @@ public class ConnectedSurveysTest {
 
         GraphActivity activity = new PlanActivity();
 
-        Space<Coord2D> planProjection = Projection2D.PLAN.project(currentSurvey);
+        Space<Coord2D> planProjection =
+                SpaceFlipper.flipVertically(Projection2D.PLAN.project(currentSurvey));
         Map<Survey, Space<Coord2D>> translated =
                 ConnectedSurveys.getTranslatedConnectedSurveys(
                         activity, currentSurvey, planProjection);
 
         Assert.assertEquals(translated.size(), 2);
 
-        Space<Coord2D> projection = translated.values().iterator().next();
+        Survey translatedSurvey = getNamedSurvey(translated, "joined-1");
+        Space<Coord2D> projection = translated.get(translatedSurvey);
+
         Coord2D newStationPoint = getStationPosition(projection, "2");
-        Assert.assertEquals(3.0, newStationPoint.getY(), SexyTopo.ALLOWED_DOUBLE_DELTA_FOR_TESTS);
+        Assert.assertEquals(-3.0, newStationPoint.getY(), SexyTopo.ALLOWED_DOUBLE_DELTA_FOR_TESTS);
+    }
+
+    private Survey getNamedSurvey(Map<Survey, Space<Coord2D>> map, String name) throws Exception {
+        for (Survey survey : map.keySet()) {
+            if (survey.getName().equals(name)) {
+                return survey;
+            }
+        }
+        throw new Exception("Could not find survey " + name);
     }
 
 

@@ -54,7 +54,12 @@ public class SurveyManager {
             boolean automaticBacksightPromotion = PreferenceAccess.getBoolean(
                     context, "pref_backsight_promotion", false);
 
-            SurveyUpdater.update(currentSurvey, legs, automaticBacksightPromotion);
+            boolean stationAdded =
+                    SurveyUpdater.update(currentSurvey, legs, automaticBacksightPromotion);
+
+            if (stationAdded) {
+                broadcastNewStationCreated();
+            }
 
             try {
                 Saver.autosave(currentSurvey);
@@ -77,9 +82,14 @@ public class SurveyManager {
     }
 
     public void broadcastSurveyUpdated() {
+        broadcast(new Intent(SexyTopo.SURVEY_UPDATED_EVENT));
+    }
 
-        Intent intent = new Intent(SexyTopo.SURVEY_UPDATED_EVENT);
+    public void broadcastNewStationCreated() {
+        broadcast(new Intent(SexyTopo.NEW_STATION_CREATED_EVENT));
+    }
 
+    private void broadcast(Intent intent) {
         if (broadcastManager == null) {
             broadcastManager = LocalBroadcastManager.getInstance(context);
         }
