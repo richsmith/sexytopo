@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.control.io.basic;
 
+import android.content.Context;
 import android.util.Log;
 
 import org.hwyl.sexytopo.SexyTopo;
@@ -21,48 +22,52 @@ import java.util.Set;
 
 public class Loader {
 
-    public static Survey loadSurvey(String name) throws Exception {
+    public static Survey loadSurvey(Context context, String name) throws Exception {
         Set<String> surveyNamesNotToLoad = new HashSet<>();
-        return loadSurvey(name, surveyNamesNotToLoad);
+        return loadSurvey(context, name, surveyNamesNotToLoad);
     }
 
-    public static Survey loadSurvey(String name, Set<String> surveyNamesNotToLoad) throws Exception {
+    public static Survey loadSurvey(Context context, String name, Set<String> surveyNamesNotToLoad)
+            throws Exception {
         Survey survey = new Survey(name);
-        loadSurveyData(name, survey);
-        loadSketches(survey);
+        loadSurveyData(context, name, survey);
+        loadSketches(context, survey);
         surveyNamesNotToLoad.add(name);
-        loadMetadata(survey, surveyNamesNotToLoad);
+        loadMetadata(context, survey, surveyNamesNotToLoad);
         survey.setSaved(true);
         return survey;
     }
 
-    private static void loadMetadata(Survey survey, Set<String> surveyNamesNotToLoad)
+    private static void loadMetadata(Context context, Survey survey, Set<String> surveyNamesNotToLoad)
             throws Exception {
         String metadataPath = Util.getPathForSurveyFile(
-                survey.getName(), SexyTopo.METADATA_EXTENSION);
+                context, survey.getName(), SexyTopo.METADATA_EXTENSION);
         if (Util.doesFileExist(metadataPath)) {
             String metadataText = slurpFile(metadataPath);
-            MetadataTranslater.translateAndUpdate(survey, metadataText, surveyNamesNotToLoad);
+            MetadataTranslater.translateAndUpdate(
+                    context, survey, metadataText, surveyNamesNotToLoad);
         }
     }
 
 
-    private static void loadSurveyData(String name, Survey survey) {
-        String path = Util.getPathForSurveyFile(name, "svx");
+    private static void loadSurveyData(Context context, String name, Survey survey) {
+        String path = Util.getPathForSurveyFile(context, name, "svx");
         String text = slurpFile(path);
         parse(text, survey);
     }
 
 
-    private static void loadSketches(Survey survey) throws JSONException {
-        String planPath = Util.getPathForSurveyFile(survey.getName(), SexyTopo.PLAN_SKETCH_EXTENSION);
+    private static void loadSketches(Context context, Survey survey) throws JSONException {
+        String planPath = Util.getPathForSurveyFile(
+                context, survey.getName(), SexyTopo.PLAN_SKETCH_EXTENSION);
         if (Util.doesFileExist(planPath)) {
             String planText = slurpFile(planPath);
             Sketch plan = SketchJsonTranslater.translate(survey, planText);
             survey.setPlanSketch(plan);
         }
 
-        String elevationPath = Util.getPathForSurveyFile(survey.getName(), SexyTopo.EXT_ELEVATION_SKETCH_EXTENSION);
+        String elevationPath = Util.getPathForSurveyFile(
+                context, survey.getName(), SexyTopo.EXT_ELEVATION_SKETCH_EXTENSION);
         if (Util.doesFileExist(elevationPath)) {
             String elevationText = slurpFile(elevationPath);
             Sketch elevation = SketchJsonTranslater.translate(survey, elevationText);

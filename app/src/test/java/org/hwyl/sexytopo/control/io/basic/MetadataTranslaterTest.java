@@ -1,5 +1,7 @@
 package org.hwyl.sexytopo.control.io.basic;
 
+import android.content.Context;
+
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.testhelpers.BasicTestSurveyCreator;
@@ -11,6 +13,7 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;
 
@@ -32,7 +35,7 @@ public class MetadataTranslaterTest {
     public void testActiveStationIsTParsed() throws Exception {
         Survey survey = new Survey("test");
         String text = "{\"active-station\":\"1\",\"connections\":{}}";
-        MetadataTranslater.translateAndUpdate(survey, text);
+        MetadataTranslater.translateAndUpdate(null, survey, text);
         Assert.assertEquals(survey.getActiveStation().getName(), "1");
     }
 
@@ -55,7 +58,7 @@ public class MetadataTranslaterTest {
         Survey testSurvey = BasicTestSurveyCreator.createStraightNorth();
         testSurvey.setActiveStation(testSurvey.getStationByName("2"));
 
-        MetadataTranslater.translateAndUpdate(testSurvey, json);
+        MetadataTranslater.translateAndUpdate(null, testSurvey, json);
         Assert.assertEquals("1", testSurvey.getActiveStation().getName());
         Assert.assertEquals(0, testSurvey.getConnectedSurveys().size());
 
@@ -70,9 +73,10 @@ public class MetadataTranslaterTest {
         Survey connected = new Survey("connected");
 
         PowerMockito.mockStatic(Loader.class);
-        Mockito.when(Loader.loadSurvey(anyString(), anySet())).thenReturn(connected);
+        Mockito.when(Loader.loadSurvey(
+                (Context)anyObject(), anyString(), anySet())).thenReturn(connected);
 
-        MetadataTranslater.translateAndUpdate(survey, json);
+        MetadataTranslater.translateAndUpdate(null, survey, json);
         Assert.assertEquals(1, survey.getConnectedSurveys().size());
     }
 

@@ -1,5 +1,7 @@
 package org.hwyl.sexytopo.control.io.translation;
 
+import android.content.Context;
+
 import org.apache.commons.io.FileUtils;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.io.Util;
@@ -32,8 +34,10 @@ public class ImportManager {
         return survey;
     }
 
-    public static void saveACopyOfSourceInput(Survey survey, File source) throws IOException {
-        String surveyDirectory = Util.getDirectoryPathForSurvey(survey.getName());
+    public static void saveACopyOfSourceInput(Context context, Survey survey, File source)
+            throws IOException {
+
+        String surveyDirectory = Util.getDirectoryPathForSurvey(context, survey.getName());
         String path = surveyDirectory + File.separator + SexyTopo.IMPORT_SOURCE_DIR;
         Util.ensureDirectoriesInPathExist(path);
 

@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.hwyl.sexytopo.SexyTopo.context;
+
 
 /**
  * Base class for all activities that use the action bar.
@@ -56,14 +58,14 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        SexyTopo.context = this;
+        context = this;
         setOrientation();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        SexyTopo.context = this;
+        context = this;
         setOrientation();
     }
 
@@ -217,7 +219,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                     String name = arrayAdapter.getItem(which);
                     Exporter selectedExporter = nameToExporter.get(name);
                     try {
-                        selectedExporter.export(survey);
+                        selectedExporter.export(SexyTopoActivity.this, survey);
                         showSimpleToast(survey.getName() + " " +
                                 getString(R.string.export_successful));
                     } catch (Exception e) {
@@ -239,7 +241,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     private void saveSurvey() {
         try {
-            Saver.save(getSurvey());
+            Saver.save(this, getSurvey());
             updateRememberedSurvey();
         } catch (Exception e) {
             Log.d(SexyTopo.TAG, "Error saving survey: " + e);
@@ -280,7 +282,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                         try {
                             survey.setName(newName);
                             setSurvey(new Survey(Util.getNextDefaultSurveyName(SexyTopoActivity.this)));
-                            Saver.save(survey);
+                            Saver.save(SexyTopoActivity.this, survey);
                             updateRememberedSurvey();
                         } catch (Exception e) {
                             survey.setName(oldName);
@@ -309,7 +311,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         Editable value = input.getText();
                         String name = value.toString();
-                        if (Util.isSurveyNameUnique(name)) {
+                        if (Util.isSurveyNameUnique(SexyTopoActivity.this, name)) {
                             Survey survey = new Survey(name);
                             setSurvey(survey);
                         } else {
@@ -335,7 +337,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
         final EditText input = new EditText(this);
 
-        String defaultName = Util.getNextAvailableName(currentSurvey.getName());
+        String defaultName = Util.getNextAvailableName(this, currentSurvey.getName());
         input.setText(defaultName);
 
         new AlertDialog.Builder(this)
@@ -345,14 +347,14 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         Editable value = input.getText();
                         String name = value.toString();
-                        if (Util.isSurveyNameUnique(name)) {
+                        if (Util.isSurveyNameUnique(SexyTopoActivity.this, name)) {
                             Survey newSurvey = new Survey(name);
                             currentSurvey.connect(joinPoint, newSurvey, newSurvey.getOrigin());
                             newSurvey.connect(newSurvey.getOrigin(), currentSurvey, joinPoint);
                             setSurvey(newSurvey);
                             try {
-                                Saver.save(currentSurvey);
-                                Saver.save(newSurvey);
+                                Saver.save(SexyTopoActivity.this, currentSurvey);
+                                Saver.save(SexyTopoActivity.this, newSurvey);
                             } catch (Exception exception) {
                                 showSimpleToast("Couldn't save new connection");
                             }
@@ -444,12 +446,12 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     private void unlinkSurveyConnection(Survey from, Station stationFrom,
                                         Survey to, Station stationTo) throws Exception {
         from.disconnect(stationFrom, to);
-        Saver.save(from);
+        Saver.save(this, from);
         SurveyManager.getInstance(this).broadcastSurveyUpdated();
 
         try {
             to.disconnect(stationTo, from);
-            Saver.save(to);
+            Saver.save(this, to);
         } catch (Exception exception) {
             // don't do anything; the other survey may have been modified so not much we can do
         }
@@ -471,7 +473,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         try {
                             String surveyName = getSurvey().getName();
-                            Util.deleteSurvey(surveyName);
+                            Util.deleteSurvey(SexyTopoActivity.this, surveyName);
                             startNewSurvey();
                         } catch (Exception e) {
                             showSimpleToast(R.string.errorDeletingSurvey);
@@ -488,7 +490,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     public void openSurvey() {  // public due to stupid Reflection requirements
 
-        File[] surveyDirectories = Util.getSurveyDirectories();
+        File[] surveyDirectories = Util.getSurveyDirectories(this);
 
         if (surveyDirectories.length == 0) {
             showSimpleToast(getString(R.string.no_surveys));
@@ -523,7 +525,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         String surveyName = arrayAdapter.getItem(which);
                         try {
-                            Survey survey = Loader.loadSurvey(surveyName);
+                            Survey survey = Loader.loadSurvey(SexyTopoActivity.this, surveyName);
                             SurveyManager.getInstance(SexyTopoActivity.this).setCurrentSurvey(survey);
                             updateRememberedSurvey();
                             showSimpleToast(getString(R.string.loaded) + " " + surveyName);
@@ -538,7 +540,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     public void importSurvey() { // public due to stupid Reflection requirements
 
-        File[] importFiles = Util.getImportFiles();
+        File[] importFiles = Util.getImportFiles(this);
         if (importFiles.length == 0) {
             showSimpleToast(getString(R.string.no_imports));
             return;
@@ -574,7 +576,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                         try {
                             Survey survey = ImportManager.toSurvey(file);
 
-                            if (Util.doesSurveyExist(survey.getName())) {
+                            if (Util.doesSurveyExist(SexyTopoActivity.this, survey.getName())) {
                                 confirmToProceed(
                                         R.string.continue_question,
                                         R.string.survey_already_exists,
@@ -595,8 +597,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     public void saveImportedSurvey(Survey survey, File file) throws Exception {
         survey.checkActiveStation();
-        Saver.save(survey);
-        ImportManager.saveACopyOfSourceInput(survey, file);
+        Saver.save(this, survey);
+        ImportManager.saveACopyOfSourceInput(this, survey, file);
         SurveyManager.getInstance(SexyTopoActivity.this).setCurrentSurvey(survey);
         showSimpleToast("Imported " + survey.getName());
     }

@@ -30,20 +30,20 @@ public class TherionExporter extends Exporter {
 
     private List<String> th2Files = new ArrayList<>();
 
-    public void export(Survey survey) throws IOException {
+    public void export(Context context, Survey survey) throws IOException {
 
         th2Files.clear();
-        readOriginalFilesIfPresent(survey);
+        readOriginalFilesIfPresent(context, survey);
 
         String thconfigContent = ThconfigExporter.getContent(survey);
-        saveToExportDirectory(survey, "thconfig", thconfigContent);
+        saveToExportDirectory(context, survey, "thconfig", thconfigContent);
 
         String name = survey.getName();
 
-        handleProjection(
-                survey, Projection2D.PLAN, PLAN_SUFFIX, originalTh2PlanFileContent);
-        handleProjection(
-                survey, Projection2D.EXTENDED_ELEVATION, EE_SUFFIX, originalTh2EeFileContent);
+        handleProjection(context, survey, Projection2D.PLAN, PLAN_SUFFIX,
+                originalTh2PlanFileContent);
+        handleProjection(context, survey, Projection2D.EXTENDED_ELEVATION, EE_SUFFIX,
+                originalTh2EeFileContent);
 
         String thContent = null;
         if (originalThFileContent == null) {
@@ -51,13 +51,17 @@ public class TherionExporter extends Exporter {
         } else {
             thContent = ThExporter.updateOriginalContent(survey, originalThFileContent, th2Files);
         }
-        saveToExportDirectory(survey, name + ".th", thContent);
+        saveToExportDirectory(context, survey, name + ".th", thContent);
 
     }
 
 
     private void handleProjection(
-            Survey survey, Projection2D projection, String suffix, String originalFileContent)
+            Context context,
+            Survey survey,
+            Projection2D projection,
+            String suffix,
+            String originalFileContent)
             throws IOException {
 
         double scale = getScale();
@@ -73,10 +77,10 @@ public class TherionExporter extends Exporter {
             content = Th2Exporter.updateOriginalContent(
                     survey, scale, baseFilename, space, originalFileContent);
         }
-        saveToExportDirectory(survey, th2Filename, content);
+        saveToExportDirectory(context, survey, th2Filename, content);
 
         String xviPlanContent = XviExporter.getContent(survey.getPlanSketch(), space, scale);
-        saveToExportDirectory(survey, baseFilename + ".xvi", xviPlanContent);
+        saveToExportDirectory(context, survey, baseFilename + ".xvi", xviPlanContent);
 
         th2Files.add(th2Filename);
     }
@@ -107,9 +111,9 @@ public class TherionExporter extends Exporter {
     }
 
 
-    private void readOriginalFilesIfPresent(Survey survey) {
-        if (Util.wasSurveyImported(survey)) {
-            File directory = Util.getFileSurveyWasImportedFrom(survey);
+    private void readOriginalFilesIfPresent(Context context, Survey survey) {
+        if (Util.wasSurveyImported(context, survey)) {
+            File directory = Util.getFileSurveyWasImportedFrom(context, survey);
             if (new TherionImporter().canHandleFile(directory)) {
                 File[] files = directory.listFiles();
                 for (File file : files) {

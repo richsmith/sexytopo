@@ -12,17 +12,19 @@ import java.io.IOException;
 
 public abstract class Exporter {
 
-    public abstract void export(Survey survey) throws IOException;
+    public abstract void export(Context context, Survey survey) throws IOException;
 
     public abstract String getExportTypeName(Context context);
 
     public abstract String getExportDirectoryName();
 
 
-    protected void saveToExportDirectory(Survey survey, String filename, String content)
+    protected void saveToExportDirectory(
+            Context context, Survey survey, String filename, String content)
             throws IOException {
 
-        String directoryPath = Util.getExportDirectoryPath(getExportDirectoryName(), survey.getName());
+        String directoryPath = Util.getExportDirectoryPath(
+                context, getExportDirectoryName(), survey.getName());
         Util.ensureDirectoriesInPathExist(directoryPath);
 
         String path = directoryPath + File.separator + filename;

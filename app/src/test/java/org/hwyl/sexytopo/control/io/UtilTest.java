@@ -16,9 +16,9 @@ public class UtilTest {
         String name = "foo";
 
         PowerMockito.spy(Util.class);
-        PowerMockito.doReturn(false).when(Util.class, "doesSurveyExist", name + "-2");
+        PowerMockito.doReturn(false).when(Util.class, "doesSurveyExist", null, name + "-2");
 
-        String next = Util.getNextAvailableName(name);
+        String next = Util.getNextAvailableName(null, name);
         Assert.assertEquals("foo-2", next);
     }
 
@@ -27,10 +27,10 @@ public class UtilTest {
         String name = "foo";
 
         PowerMockito.spy(Util.class);
-        PowerMockito.doReturn(true).when(Util.class, "doesSurveyExist", name + "-2");
-        PowerMockito.doReturn(false).when(Util.class, "doesSurveyExist", name + "-3");
+        PowerMockito.doReturn(true).when(Util.class, "doesSurveyExist", null, name + "-2");
+        PowerMockito.doReturn(false).when(Util.class, "doesSurveyExist", null, name + "-3");
 
-        String next = Util.getNextAvailableName(name);
+        String next = Util.getNextAvailableName(null, name);
         Assert.assertEquals("foo-3", next);
     }
 
@@ -39,9 +39,9 @@ public class UtilTest {
         String name = "foo19";
 
         PowerMockito.spy(Util.class);
-        PowerMockito.doReturn(false).when(Util.class, "doesSurveyExist", "foo20");
+        PowerMockito.doReturn(false).when(Util.class, "doesSurveyExist", null, "foo20");
 
-        String next = Util.getNextAvailableName(name);
+        String next = Util.getNextAvailableName(null, name);
         Assert.assertEquals("foo20", next);
     }
 

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.ColorFilter;
-import android.graphics.LightingColorFilter;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
@@ -303,14 +302,13 @@ public abstract class GraphActivity extends SexyTopoActivity
                 continue; // some tools are not linked to a toolbar button
             }
 
-            ColorFilter filter = null;
             if (sketchTool == toSelect) {
                 button.setHovered(true);
                 button.setHapticFeedbackEnabled(true);
-                filter = new LightingColorFilter(0xFFFFFFFF, 0xFF440000);
+                button.getBackground().setColorFilter(0xe0f47521, PorterDuff.Mode.SRC_ATOP);
+            } else {
+                button.getBackground().clearColorFilter();
             }
-
-            button.getBackground().setColorFilter(filter);
         }
     }
 

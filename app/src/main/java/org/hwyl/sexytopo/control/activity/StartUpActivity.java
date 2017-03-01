@@ -12,6 +12,9 @@ import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.model.survey.Survey;
 
+import static org.hwyl.sexytopo.SexyTopo.context;
+
+
 public class StartUpActivity extends SexyTopoActivity {
 
     @Override
@@ -20,7 +23,7 @@ public class StartUpActivity extends SexyTopoActivity {
         setContentView(R.layout.activity_start_up);
 
 
-        Util.ensureDataDirectoriesExist();
+        Util.ensureDataDirectoriesExist(this);
 
         /*
         // If there are paired devices
@@ -65,7 +68,7 @@ public class StartUpActivity extends SexyTopoActivity {
 
         Survey survey;
         try {
-            survey = Loader.loadSurvey(activeSurveyName);
+            survey = Loader.loadSurvey(context, activeSurveyName);
         } catch (Exception e) {
             survey = createNewActiveSurvey();
             Toast.makeText(getApplicationContext(),

@@ -1,5 +1,7 @@
 package org.hwyl.sexytopo.control.io.basic;
 
+import android.content.Context;
+
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -27,16 +29,21 @@ public class MetadataTranslater {
     }
 
 
-    public static void translateAndUpdate(Survey survey, String string) throws Exception {
+    public static void translateAndUpdate(Context context, Survey survey, String string)
+            throws Exception {
         Set<String> surveyNamesNotToLoad = new HashSet<>();
-        translateAndUpdate(survey, string, surveyNamesNotToLoad);
+        translateAndUpdate(context, survey, string, surveyNamesNotToLoad);
     }
 
 
     public static void translateAndUpdate(
-            Survey survey, String string, Set<String> surveyNamesNotToLoad) throws Exception {
+            Context context,
+            Survey survey,
+            String string,
+            Set<String> surveyNamesNotToLoad)
+            throws Exception {
         JSONObject json = new JSONObject(string);
-        translateAndUpdate(survey, json, surveyNamesNotToLoad);
+        translateAndUpdate(context, survey, json, surveyNamesNotToLoad);
     }
 
 
@@ -81,9 +88,11 @@ public class MetadataTranslater {
     }
 
 
-    private static void translateAndUpdate(Survey survey, JSONObject json, Set<String> surveyNamesNotToLoad) throws Exception {
+    private static void translateAndUpdate(
+            Context context, Survey survey, JSONObject json, Set<String> surveyNamesNotToLoad)
+            throws Exception {
         translateAndUpdateActiveStation(survey, json);
-        translateAndUpdateConnections(survey, json, surveyNamesNotToLoad);
+        translateAndUpdateConnections(context, survey, json, surveyNamesNotToLoad);
     }
 
     private static void translateAndUpdateActiveStation(Survey survey, JSONObject json)
@@ -100,7 +109,11 @@ public class MetadataTranslater {
 
 
     private static void translateAndUpdateConnections(
-            Survey survey, JSONObject json, Set<String> surveyNamesNotToLoad) throws Exception {
+            Context context,
+            Survey survey,
+            JSONObject json,
+            Set<String> surveyNamesNotToLoad)
+            throws Exception {
 
        try {
            JSONObject connectionsObject = json.getJSONObject(CONNECTIONS_TAG);
@@ -128,8 +141,8 @@ public class MetadataTranslater {
                        surveyNamesNotToLoad.add(connectedSurveyName);
 
                        try {
-                           Survey connectedSurvey =
-                                   Loader.loadSurvey(connectedSurveyName, surveyNamesNotToLoad);
+                           Survey connectedSurvey = Loader.loadSurvey(
+                                   context, connectedSurveyName, surveyNamesNotToLoad);
                            Station connectionPoint =
                                    connectedSurvey.getStationByName(connectionPointName);
                            if (connectionPoint == null) {

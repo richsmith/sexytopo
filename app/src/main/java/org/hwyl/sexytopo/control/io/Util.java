@@ -1,6 +1,7 @@
 package org.hwyl.sexytopo.control.io;
 
 import android.content.Context;
+import android.os.Environment;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
@@ -12,6 +13,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static org.hwyl.sexytopo.SexyTopo.APP_DIR;
+import static org.hwyl.sexytopo.SexyTopo.EXPORT_DIR;
+import static org.hwyl.sexytopo.SexyTopo.IMPORT_DIR;
+import static org.hwyl.sexytopo.SexyTopo.SURVEY_DIR;
 
 
 public class Util {
@@ -29,36 +35,36 @@ public class Util {
         }
     }
 
-    public static void ensureDataDirectoriesExist() {
-        ensureDirectoryExists(SexyTopo.getExternalSurveyDirectory());
-        ensureDirectoryExists(SexyTopo.getExternalImportDirectory());
-        ensureDirectoryExists(SexyTopo.getExternalExportDirectory());
+    public static void ensureDataDirectoriesExist(Context context) {
+        ensureDirectoryExists(getSurveyDirectory(context));
+        ensureDirectoryExists(getImportDirectory(context));
+        ensureDirectoryExists(getExportDirectory(context));
     }
 
 
-    public static File[] getSurveyDirectories() {
-        ensureDirectoryExists(SexyTopo.getExternalSurveyDirectory());
-        File surveyDirectory = new File(SexyTopo.getExternalSurveyDirectory());
+    public static File[] getSurveyDirectories(Context context) {
+        ensureDirectoryExists(getSurveyDirectory(context));
+        File surveyDirectory = new File(getSurveyDirectory(context));
         File surveyDirectories[] = surveyDirectory.listFiles();
         return surveyDirectories;
     }
 
-    public static File[] getImportFiles() {
-        ensureDirectoryExists(SexyTopo.getExternalImportDirectory());
-        File importDirectory = new File(SexyTopo.getExternalImportDirectory());
+    public static File[] getImportFiles(Context context) {
+        ensureDirectoryExists(getImportDirectory(context));
+        File importDirectory = new File(getImportDirectory(context));
         File importFiles[] = importDirectory.listFiles();
         return importFiles;
     }
 
     public static String getNextDefaultSurveyName(Context context) {
         String defaultNameBase = context.getString(R.string.default_survey_name);
-        return getNextDefaultSurveyName(defaultNameBase);
+        return getNextDefaultSurveyName(context, defaultNameBase);
     }
 
 
-    public static String getNextDefaultSurveyName(String defaultName) {
+    public static String getNextDefaultSurveyName(Context context, String defaultName) {
 
-        Set<String> existingSurveyNames = getExistingSurveyNames();
+        Set<String> existingSurveyNames = getExistingSurveyNames(context);
 
         if (!existingSurveyNames.contains(defaultName)) {
             return defaultName;
@@ -81,11 +87,11 @@ public class Util {
     }
 
 
-    public static String getNextAvailableName(String basename) {
+    public static String getNextAvailableName(Context context, String basename) {
         String name = basename;
         do {
             name = getNextName(name);
-        } while (doesSurveyExist(name));
+        } while (doesSurveyExist(context, name));
         return  name;
     }
 
@@ -102,19 +108,19 @@ public class Util {
     }
 
 
-    public static boolean doesSurveyExist(String name) {
-        return getExistingSurveyNames().contains(name);
+    public static boolean doesSurveyExist(Context context, String name) {
+        return getExistingSurveyNames(context).contains(name);
     }
 
 
-    public static boolean isSurveyNameUnique(String name) {
-        return !getExistingSurveyNames().contains(name);
+    public static boolean isSurveyNameUnique(Context context, String name) {
+        return !getExistingSurveyNames(context).contains(name);
     }
 
 
-    private static Set<String> getExistingSurveyNames() {
-        File[] surveyDirectories = getSurveyDirectories();
-        Set<String> existingSurveyNames = new HashSet<String>();
+    private static Set<String> getExistingSurveyNames(Context context) {
+        File[] surveyDirectories = getSurveyDirectories(context);
+        Set<String> existingSurveyNames = new HashSet<>();
         for (File surveyDirectory : surveyDirectories) {
             existingSurveyNames.add(surveyDirectory.getName());
         }
@@ -122,22 +128,22 @@ public class Util {
     }
 
 
-    public static String getDirectoryPathForSurvey(String name) {
-        return SexyTopo.getExternalSurveyDirectory() + File.separator + name;
+    public static String getDirectoryPathForSurvey(Context context, String name) {
+        return getSurveyDirectory(context) + File.separator + name;
     }
 
-    public static String getPathForSurveyFile(String name, String extension) {
-        String directory = getDirectoryPathForSurvey(name);
+    public static String getPathForSurveyFile(Context context, String name, String extension) {
+        String directory = getDirectoryPathForSurvey(context, name);
         return directory + File.separator + name + "." + extension;
     }
 
-    public static String getExportDirectoryPath(String exportFormat, String name) {
-        return TextTools.joinAll(File.separator, SexyTopo.getExternalExportDirectory(), exportFormat, name);
+    public static String getExportDirectoryPath(Context context, String exportFormat, String name) {
+        return TextTools.joinAll(File.separator, getExportDirectory(context), exportFormat, name);
     }
 
 
-    public static void deleteSurvey(String name) throws Exception {
-        File surveyDirectory = new File(getDirectoryPathForSurvey(name));
+    public static void deleteSurvey(Context context, String name) throws Exception {
+        File surveyDirectory = new File(getDirectoryPathForSurvey(context, name));
         deleteFileAndAnyContents(surveyDirectory);
     }
 
@@ -157,21 +163,49 @@ public class Util {
         return filename.exists();
     }
 
-    public static String getImportSourceDirectoryPath(Survey survey) {
-        String surveyDirectory = getDirectoryPathForSurvey(survey.getName());
+    public static String getImportSourceDirectoryPath(Context context, Survey survey) {
+        String surveyDirectory = getDirectoryPathForSurvey(context, survey.getName());
         String path = surveyDirectory + File.separator + SexyTopo.IMPORT_SOURCE_DIR;
         return path;
     }
 
-    public static boolean wasSurveyImported(Survey survey) {
-        String path = getImportSourceDirectoryPath(survey);
+    public static boolean wasSurveyImported(Context context, Survey survey) {
+        String path = getImportSourceDirectoryPath(context, survey);
         File file = new File(path);
         return (file.exists() && file.listFiles().length > 0);
     }
 
-    public static File getFileSurveyWasImportedFrom(Survey survey) {
-        String path = getImportSourceDirectoryPath(survey);
+    public static File getFileSurveyWasImportedFrom(Context context, Survey survey) {
+        String path = getImportSourceDirectoryPath(context, survey);
         return new File(path).listFiles()[0];
     }
+
+    public static boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        return (Environment.MEDIA_MOUNTED.equals(state));
+    }
+
+    public static boolean isExternalStorageReadable() {
+        String state = Environment.getExternalStorageState();
+        return (Environment.MEDIA_MOUNTED.equals(state) ||
+                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state));
+    }
+
+    public static File getExternalRoot(Context context) {
+        return context.getExternalFilesDir(null);
+    }
+
+    public static String getSurveyDirectory(Context context) {
+        return TextTools.joinAll(File.separator, getExternalRoot(context), APP_DIR, SURVEY_DIR);
+    }
+
+    public static String getImportDirectory(Context context) {
+        return TextTools.joinAll(File.separator, getExternalRoot(context), APP_DIR, IMPORT_DIR);
+    }
+
+    public static String getExportDirectory(Context context) {
+        return TextTools.joinAll(File.separator, getExternalRoot(context), APP_DIR, EXPORT_DIR);
+    }
+
 
 }

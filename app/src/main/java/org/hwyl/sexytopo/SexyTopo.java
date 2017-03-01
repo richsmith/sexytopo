@@ -1,7 +1,6 @@
 package org.hwyl.sexytopo;
 
 import android.content.Context;
-import android.os.Environment;
 
 import org.hwyl.sexytopo.control.util.TextTools;
 
@@ -47,19 +46,6 @@ public class SexyTopo {
     // to pass one around
     public static Context context;
 
-    public static String getExternalRoot() {
-        return Environment.getExternalStorageDirectory().toString();
-    }
 
-    public static String getExternalSurveyDirectory() {
-        return TextTools.joinAll(File.separator, getExternalRoot(), APP_DIR, SURVEY_DIR);
-    }
 
-    public static String getExternalImportDirectory() {
-        return TextTools.joinAll(File.separator, getExternalRoot(), APP_DIR, SURVEY_DIR);
-    }
-
-    public static String getExternalExportDirectory() {
-        return TextTools.joinAll(File.separator, getExternalRoot(), APP_DIR, SURVEY_DIR);
-    }
 }
