@@ -9,9 +9,7 @@ import org.hwyl.sexytopo.model.table.LRUD;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Created by rls on 29/07/14.
- */
+
 public class TestSurveyCreator {
 
     private static Random random = new Random();
@@ -35,13 +33,9 @@ public class TestSurveyCreator {
     }
 
 
-
     public static void createBranch(Survey survey, int numStations) {
 
-
-
         for (int i = 0; i < numStations; i++) {
-
 
             double distance = 5 + random.nextInt(10);
             double azimuth = 40 + random.nextInt(100);
