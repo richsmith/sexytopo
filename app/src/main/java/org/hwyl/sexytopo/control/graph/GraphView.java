@@ -166,7 +166,7 @@ public class GraphView extends View {
         stationPaint.setTextSize(STATION_LABEL_SIZE);
 
         highlightPaint.setStyle(Paint.Style.STROKE);
-        highlightPaint.setStrokeWidth(STATION_STROKE_WIDTH + HIGHLIGHT_OUTLINE);
+        highlightPaint.setStrokeWidth(HIGHLIGHT_OUTLINE);
         highlightPaint.setColor(HIGHLIGHT_COLOUR.intValue);
 
         legPaint.setARGB(127, 255, 0, 0);
@@ -556,22 +556,22 @@ public class GraphView extends View {
             drawGrid(canvas);
         }
 
-        drawSurvey(canvas, survey, projection, 255);
-
         if (getDisplayPreference(GraphActivity.DisplayPreference.SHOW_CONNECTIONS)) {
             drawConnectedSurveys(canvas, projection, 50);
         }
+
+        drawSurvey(canvas, survey, projection, 255);
 
         drawLegend(canvas, survey);
     }
 
     private void drawSurvey(Canvas canvas, Survey survey, Space<Coord2D> projection, int alpha) {
 
-        drawSurveyData(survey, canvas, projection, alpha);
+        drawSketch(canvas, activity.getSketch(survey), alpha);
 
         drawCrossSections(canvas, sketch.getCrossSectionDetails(), alpha);
 
-        drawSketch(canvas, activity.getSketch(survey), alpha);
+        drawSurveyData(survey, canvas, projection, alpha);
     }
 
 
@@ -746,11 +746,10 @@ public class GraphView extends View {
             int x = (int)(translatedStation.getX());
             int y = (int)(translatedStation.getY());
 
+            drawStation(canvas, stationPaint, x, y, crossDiameter, alpha);
+
             if (station == survey.getActiveStation()) {
-                drawStation(canvas, highlightPaint, x, y, crossDiameter + HIGHLIGHT_OUTLINE, alpha);
-                drawStation(canvas, stationPaint, x, y, crossDiameter, alpha);
-            } else {
-                drawStation(canvas, stationPaint, x, y, crossDiameter, alpha);
+                highlightActiveStation(canvas, x, y);
             }
 
             if (getDisplayPreference(GraphActivity.DisplayPreference.SHOW_STATION_LABELS)) {
@@ -766,6 +765,36 @@ public class GraphView extends View {
 
         }
     }
+
+
+    private void highlightActiveStation(Canvas canvas, float x, float y) {
+
+        int diameter = 22;
+        int gap = 6;
+        float topY = y - (diameter / 2);
+        float bottomY = y + (diameter / 2);
+        float leftX = x - (diameter / 2);
+        float rightX = x + (diameter / 2);
+
+        float innerLeft = leftX + ((diameter - gap) / 2);
+        float innerRight = innerLeft + gap;
+        float innerTop = topY + ((diameter - gap) / 2);
+        float innerBottom = innerTop + gap;
+
+        // top lines
+        canvas.drawLine(leftX, topY, innerLeft, topY, highlightPaint);
+        canvas.drawLine(innerRight, topY, rightX, topY, highlightPaint);
+        // bottom lines
+        canvas.drawLine(leftX, bottomY, innerLeft, bottomY, highlightPaint);
+        canvas.drawLine(innerRight, bottomY, rightX, bottomY, highlightPaint);
+        // left lines
+        canvas.drawLine(leftX, topY, leftX, innerTop, highlightPaint);
+        canvas.drawLine(leftX, innerBottom, leftX, bottomY, highlightPaint);
+        // right lines
+        canvas.drawLine(rightX, topY, rightX, innerTop, highlightPaint);
+        canvas.drawLine(rightX, innerBottom, rightX, bottomY, highlightPaint);
+    }
+
 
     private void drawStation(Canvas canvas, Paint paint, float x, float y, int crossDiameter, int alpha) {
         paint.setAlpha(alpha);
