@@ -39,8 +39,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.hwyl.sexytopo.SexyTopo.context;
-
 
 /**
  * Base class for all activities that use the action bar.
@@ -58,14 +56,14 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        context = this;
+        SexyTopo.context = this;
         setOrientation();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        context = this;
+        SexyTopo.context = this;
         setOrientation();
     }
 

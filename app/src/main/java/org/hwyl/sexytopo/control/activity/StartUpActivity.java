@@ -12,8 +12,6 @@ import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.model.survey.Survey;
 
-import static org.hwyl.sexytopo.SexyTopo.context;
-
 
 public class StartUpActivity extends SexyTopoActivity {
 
@@ -62,13 +60,18 @@ public class StartUpActivity extends SexyTopoActivity {
 
         String activeSurveyName = getPreferences().getString(SexyTopo.ACTIVE_SURVEY_NAME, "Error");
 
+        if (!Util.doesSurveyExist(this, activeSurveyName)) {
+            startNewSurvey();
+            return createNewActiveSurvey();
+        }
+
         Toast.makeText(getApplicationContext(),
                 getString(R.string.loading_survey) + " " + activeSurveyName,
                 Toast.LENGTH_SHORT).show();
 
         Survey survey;
         try {
-            survey = Loader.loadSurvey(context, activeSurveyName);
+            survey = Loader.loadSurvey(this, activeSurveyName);
         } catch (Exception e) {
             survey = createNewActiveSurvey();
             Toast.makeText(getApplicationContext(),

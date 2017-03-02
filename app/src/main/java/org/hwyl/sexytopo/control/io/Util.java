@@ -191,8 +191,10 @@ public class Util {
                 Environment.MEDIA_MOUNTED_READ_ONLY.equals(state));
     }
 
-    public static File getExternalRoot(Context context) {
-        return context.getExternalFilesDir(null);
+    public static String getExternalRoot(Context context) {
+        String ext = context.getExternalFilesDir(null).getAbsolutePath();
+        return ext;
+        //return context.getExternalFilesDir(null);
     }
 
     public static String getSurveyDirectory(Context context) {
