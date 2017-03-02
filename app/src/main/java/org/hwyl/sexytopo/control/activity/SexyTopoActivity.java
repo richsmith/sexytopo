@@ -222,8 +222,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                         selectedExporter.export(SexyTopoActivity.this, survey);
                         showSimpleToast(survey.getName() + " " +
                                 getString(R.string.export_successful));
-                    } catch (Exception e) {
-                        showSimpleToast(getString(R.string.error_prefix) + e.getMessage());
+                    } catch (Exception exception) {
+                        showException(exception);
                     }
                 }
             });
@@ -243,9 +243,9 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         try {
             Saver.save(this, getSurvey());
             updateRememberedSurvey();
-        } catch (Exception e) {
-            Log.d(SexyTopo.TAG, "Error saving survey: " + e);
+        } catch (Exception exception) {
             showSimpleToast(getString(R.string.errorSavingSurvey));
+            showException(exception);
         }
     }
 
@@ -284,10 +284,10 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                             setSurvey(new Survey(Util.getNextDefaultSurveyName(SexyTopoActivity.this)));
                             Saver.save(SexyTopoActivity.this, survey);
                             updateRememberedSurvey();
-                        } catch (Exception e) {
+                        } catch (Exception exception) {
                             survey.setName(oldName);
                             showSimpleToast(R.string.errorSavingSurvey);
-                            Log.d(SexyTopo.TAG, "Error saving survey: " + e);
+                            showException(exception);
                         }
                     }
                 }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
@@ -357,6 +357,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                                 Saver.save(SexyTopoActivity.this, newSurvey);
                             } catch (Exception exception) {
                                 showSimpleToast("Couldn't save new connection");
+                                showException(exception);
                             }
                         } else {
                             showSimpleToast(R.string.dialog_new_survey_name_must_be_unique);
@@ -387,6 +388,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             }
         } catch (Exception exception) {
             showSimpleToast("Error unlinking survey: " + exception.getMessage());
+            showException(exception);
         }
     }
 
@@ -434,8 +436,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                             }
                             throw new Exception("couldn't find linked survey");
 
-                        } catch (Exception e) {
-                            showSimpleToast(getString(R.string.error_prefix) + e.getMessage());
+                        } catch (Exception exception) {
+                            showException(exception);
                         }
                     }
                 });
@@ -529,8 +531,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                             SurveyManager.getInstance(SexyTopoActivity.this).setCurrentSurvey(survey);
                             updateRememberedSurvey();
                             showSimpleToast(getString(R.string.loaded) + " " + surveyName);
-                        } catch (Exception e) {
-                            showSimpleToast(getString(R.string.error_prefix) + e.getMessage());
+                        } catch (Exception exception) {
+                            showException(exception);
                         }
                     }
                 });
@@ -587,8 +589,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                                 saveImportedSurvey(survey, file);
                             }
 
-                        } catch (Exception e) {
-                            showSimpleToast(getString(R.string.error_prefix) + e.getMessage());
+                        } catch (Exception exception) {
+                            showException(exception);
                         }
                     }
                 });
@@ -647,8 +649,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             Method method = getClass().getMethod(name, classes.toArray(new Class[]{}));
             method.invoke(this, args);
 
-        } catch (Exception e) {
-            showSimpleToast("Programming error: " + e);
+        } catch (Exception exception) {
+            showException(exception);
         }
     }
 
@@ -673,14 +675,20 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 .setCancelable(false)
                 .setPositiveButton("Replace", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        Survey currentSurvey = TestSurveyCreator.create(10, 5);
-                        setSurvey(currentSurvey);
+                        try {
+                            Survey currentSurvey = TestSurveyCreator.create(10, 5);
+                            setSurvey(currentSurvey);
+                        } catch (Exception exception) {
+                            showException(exception);
+                        }
                     }
                 })
                 .setNegativeButton(getString(R.string.cancel), null)
                 .show();
 
     }
+
+
 
 
     protected Survey getSurvey() {
@@ -700,6 +708,12 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     public void showSimpleToast(int id) {
         showSimpleToast(getString(id));
+    }
+
+
+    private void showException(Exception exception) {
+        Log.d(SexyTopo.TAG, "Error: " + exception);
+        showSimpleToast(getString(R.string.error_prefix) + " " + exception.getMessage());
     }
 
     protected boolean getBooleanPreference(String name) {
