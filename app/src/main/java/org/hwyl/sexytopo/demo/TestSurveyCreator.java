@@ -41,12 +41,8 @@ public class TestSurveyCreator {
             double azimuth = 40 + random.nextInt(100);
             double inclination = -20 + random.nextInt(40);
 
-            Leg leg0 = new Leg(distance, azimuth, inclination);
-            SurveyUpdater.update(survey, leg0);
-            Leg leg1 = new Leg(distance, azimuth, inclination);
-            SurveyUpdater.update(survey, leg1);
-            Leg leg2 = new Leg(distance, azimuth, inclination);
-            SurveyUpdater.update(survey, leg2);
+            Leg leg = new Leg(distance, azimuth, inclination);
+            SurveyUpdater.updateWithNewStation(survey, leg);
 
             Station newStation = survey.getMostRecentLeg().getDestination();
             createLruds(survey, newStation);
