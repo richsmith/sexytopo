@@ -216,6 +216,9 @@ public abstract class GraphActivity extends SexyTopoActivity
         for (GraphView.BrushColour brushColour: GraphView.BrushColour.values()) {
             if (brushColour.getId() == id) {
                 selectBrushColour(brushColour);
+                if (!graphView.getSketchTool().usesColour()) {
+                    selectSketchTool(GraphView.SketchTool.DRAW);
+                }
                 return true;
             }
         }
@@ -305,7 +308,7 @@ public abstract class GraphActivity extends SexyTopoActivity
             if (sketchTool == toSelect) {
                 button.setHovered(true);
                 button.setHapticFeedbackEnabled(true);
-                button.getBackground().setColorFilter(0xe0f47521, PorterDuff.Mode.SRC_ATOP);
+                button.getBackground().setColorFilter(0xffffffff, PorterDuff.Mode.SRC_ATOP);
             } else {
                 button.getBackground().clearColorFilter();
             }
@@ -342,7 +345,7 @@ public abstract class GraphActivity extends SexyTopoActivity
             View button = findViewById(brushColour.getId());
             ColorFilter filter = null;
             if (brushColour == toSelect) {
-                button.getBackground().setColorFilter(0xe0f47521, PorterDuff.Mode.SRC_ATOP);
+                button.getBackground().setColorFilter(0xffffffff, PorterDuff.Mode.SRC_ATOP);
                 button.invalidate();
             } else {
                 button.getBackground().clearColorFilter();

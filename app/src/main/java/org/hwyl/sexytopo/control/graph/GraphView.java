@@ -120,19 +120,30 @@ public class GraphView extends View {
 
     public enum SketchTool {
         MOVE(R.id.buttonMove),
-        DRAW(R.id.buttonDraw),
+        DRAW(R.id.buttonDraw, true),
         ERASE(R.id.buttonErase),
-        TEXT(R.id.buttonText),
+        TEXT(R.id.buttonText, true),
         SELECT(R.id.buttonSelect),
         POSITION_CROSS_SECTION(R.id.graph_station_new_cross_section);
 
         private int id;
+        private boolean usesColour = false;
+
         SketchTool(int id) {
             this.id = id;
         }
 
+        SketchTool(int id, boolean usesColour) {
+            this.id = id;
+            this.usesColour = usesColour;
+        }
+
         public int getId() {
             return id;
+        }
+
+        public boolean usesColour() {
+            return usesColour;
         }
     }
     public SketchTool currentSketchTool = SketchTool.MOVE;
@@ -942,6 +953,11 @@ public class GraphView extends View {
 
     public void setSketchTool(SketchTool sketchTool) {
         this.currentSketchTool = sketchTool;
+    }
+
+
+    public SketchTool getSketchTool() {
+        return currentSketchTool;
     }
 
 
