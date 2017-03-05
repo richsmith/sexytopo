@@ -37,12 +37,13 @@ public class Saver {
         survey.setSaved(true);
     }
 
-    public static void autosave(Context context, Survey survey) throws IOException, JSONException {
-        saveSurveyData(context, survey, "svx" + "." + AUTOSAVE_EXTENSION);
+    public static void autosave(Context context, Survey survey) throws Exception {
+        saveMetadata(context, survey, SexyTopo.METADATA_EXTENSION + AUTOSAVE_EXTENSION);
+        saveSurveyData(context, survey, "svx" + AUTOSAVE_EXTENSION);
         saveSketch(context, survey, survey.getPlanSketch(),
-                SexyTopo.PLAN_SKETCH_EXTENSION + "." + AUTOSAVE_EXTENSION);
+                SexyTopo.PLAN_SKETCH_EXTENSION + AUTOSAVE_EXTENSION);
         saveSketch(context, survey, survey.getElevationSketch(),
-                SexyTopo.EXT_ELEVATION_SKETCH_EXTENSION + "." + AUTOSAVE_EXTENSION);
+                SexyTopo.EXT_ELEVATION_SKETCH_EXTENSION + AUTOSAVE_EXTENSION);
     }
 
 
