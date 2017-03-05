@@ -209,5 +209,9 @@ public class Util {
         return TextTools.joinAll(File.separator, getExternalRoot(context), APP_DIR, EXPORT_DIR);
     }
 
+    public static String getAutosaveName(String filename) {
+        return filename + "." + SexyTopo.AUTOSAVE_EXTENSION;
+    }
+
 
 }

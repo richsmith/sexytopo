@@ -19,10 +19,8 @@ import java.io.IOException;
  */
 public class Saver {
 
-    public static final String AUTOSAVE_EXTENSION = ".autosave";
 
-
-    public static void save(Context context, Survey survey) throws IOException, JSONException, Exception {
+    public static void save(Context context, Survey survey) throws Exception {
 
         if (survey.getName().equals("")) {
             throw new IllegalArgumentException("Not saved; survey name cannot be empty");
@@ -33,17 +31,19 @@ public class Saver {
         saveMetadata(context, survey, SexyTopo.METADATA_EXTENSION);
         saveSurveyData(context, survey, "svx");
         saveSketch(context, survey, survey.getPlanSketch(), SexyTopo.PLAN_SKETCH_EXTENSION);
-        saveSketch(context, survey, survey.getElevationSketch(), SexyTopo.EXT_ELEVATION_SKETCH_EXTENSION);
+        saveSketch(context, survey, survey.getElevationSketch(),
+                SexyTopo.EXT_ELEVATION_SKETCH_EXTENSION);
         survey.setSaved(true);
     }
 
     public static void autosave(Context context, Survey survey) throws Exception {
-        saveMetadata(context, survey, SexyTopo.METADATA_EXTENSION + AUTOSAVE_EXTENSION);
-        saveSurveyData(context, survey, "svx" + AUTOSAVE_EXTENSION);
+        saveMetadata(context, survey,
+                SexyTopo.METADATA_EXTENSION + "." + SexyTopo.AUTOSAVE_EXTENSION);
+        saveSurveyData(context, survey, "svx" + "." + SexyTopo.AUTOSAVE_EXTENSION);
         saveSketch(context, survey, survey.getPlanSketch(),
-                SexyTopo.PLAN_SKETCH_EXTENSION + AUTOSAVE_EXTENSION);
+                SexyTopo.PLAN_SKETCH_EXTENSION + "." + SexyTopo.AUTOSAVE_EXTENSION);
         saveSketch(context, survey, survey.getElevationSketch(),
-                SexyTopo.EXT_ELEVATION_SKETCH_EXTENSION + AUTOSAVE_EXTENSION);
+                SexyTopo.EXT_ELEVATION_SKETCH_EXTENSION + "." + SexyTopo.AUTOSAVE_EXTENSION);
     }
 
 

@@ -142,7 +142,7 @@ public class MetadataTranslater {
 
                        try {
                            Survey connectedSurvey = Loader.loadSurvey(
-                                   context, connectedSurveyName, surveyNamesNotToLoad);
+                                   context, connectedSurveyName, surveyNamesNotToLoad, false);
                            Station connectionPoint =
                                    connectedSurvey.getStationByName(connectionPointName);
                            if (connectionPoint == null) {

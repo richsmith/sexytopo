@@ -88,6 +88,9 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
         switch (item.getItemId()) {
 
+            case R.id.action_save:
+                saveSurvey();
+                return true;
             case R.id.action_device:
                 startActivity(DeviceActivity.class);
                 return true;
@@ -136,6 +139,9 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 return true;
             case R.id.action_file_export:
                 confirmToProceedIfNotSaved("exportSurvey");
+                return true;
+            case R.id.action_file_restore_autosave:
+                restoreAutosave();
                 return true;
 
 
@@ -241,8 +247,9 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         try {
             Saver.save(this, getSurvey());
             updateRememberedSurvey();
+            showSimpleToast(R.string.survey_saved);
         } catch (Exception exception) {
-            showSimpleToast(getString(R.string.errorSavingSurvey));
+            showSimpleToast(getString(R.string.error_saving_survey));
             showException(exception);
         }
     }
@@ -284,7 +291,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                             updateRememberedSurvey();
                         } catch (Exception exception) {
                             survey.setName(oldName);
-                            showSimpleToast(R.string.errorSavingSurvey);
+                            showSimpleToast(R.string.error_saving_survey);
                             showException(exception);
                         }
                     }
@@ -329,7 +336,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         final Survey currentSurvey = getSurvey();
 
         if (!currentSurvey.isSaved()) {
-            showSimpleToast(R.string.cannotExtendUnsavedSurvey);
+            showSimpleToast(R.string.cannot_extend_unsaved_survey);
             return;
         }
 
@@ -462,7 +469,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     private void deleteSurvey() {
 
         if (!getSurvey().isSaved()) {
-            showSimpleToast(getString(R.string.cannotDeleteUnsavedSurvey));
+            showSimpleToast(getString(R.string.cannot_delete_unsaved_survey));
             return;
         }
 
@@ -476,7 +483,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                             Util.deleteSurvey(SexyTopoActivity.this, surveyName);
                             startNewSurvey();
                         } catch (Exception e) {
-                            showSimpleToast(R.string.errorDeletingSurvey);
+                            showSimpleToast(R.string.error_deleting_survey);
                                     Log.d(SexyTopo.TAG, "Error deleting survey: " + e);
                         }
                     }
@@ -535,6 +542,17 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                     }
                 });
         builderSingle.show();
+    }
+
+
+    private void restoreAutosave() {
+        try {
+            Survey survey = Loader.loadSurvey(SexyTopoActivity.this, getSurvey().getName());
+            SurveyManager.getInstance(SexyTopoActivity.this).setCurrentSurvey(survey);
+            showSimpleToast(getString(R.string.restored));
+        } catch (Exception exception) {
+            showException(exception);
+        }
     }
 
 

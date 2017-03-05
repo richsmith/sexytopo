@@ -22,26 +22,41 @@ import java.util.Set;
 
 public class Loader {
 
+
     public static Survey loadSurvey(Context context, String name) throws Exception {
-        Set<String> surveyNamesNotToLoad = new HashSet<>();
-        return loadSurvey(context, name, surveyNamesNotToLoad);
+        return loadSurvey(context, name, false);
     }
 
-    public static Survey loadSurvey(Context context, String name, Set<String> surveyNamesNotToLoad)
+
+    public static Survey restoreAutosave(Context context, String name) throws Exception {
+        return loadSurvey(context, name, true);
+    }
+
+
+    private static Survey loadSurvey(Context context, String name, boolean restoreAutosave)
+            throws Exception {
+        Set<String> surveyNamesNotToLoad = new HashSet<>();
+        return loadSurvey(context, name, surveyNamesNotToLoad, restoreAutosave);
+    }
+
+
+    public static Survey loadSurvey(Context context, String name,
+                                     Set<String> surveyNamesNotToLoad, boolean restoreAutosave)
             throws Exception {
         Survey survey = new Survey(name);
-        loadSurveyData(context, name, survey);
-        loadSketches(context, survey);
+        loadSurveyData(context, name, survey, restoreAutosave);
+        loadSketches(context, survey, restoreAutosave);
         surveyNamesNotToLoad.add(name);
-        loadMetadata(context, survey, surveyNamesNotToLoad);
+        loadMetadata(context, survey, surveyNamesNotToLoad, restoreAutosave);
         survey.setSaved(true);
         return survey;
     }
 
-    private static void loadMetadata(Context context, Survey survey, Set<String> surveyNamesNotToLoad)
+    private static void loadMetadata(Context context, Survey survey,
+                                     Set<String> surveyNamesNotToLoad, boolean restoreAutosave)
             throws Exception {
-        String metadataPath = Util.getPathForSurveyFile(
-                context, survey.getName(), SexyTopo.METADATA_EXTENSION);
+        String metadataPath = Util.getPathForSurveyFile(context, survey.getName(),
+                getExtension(SexyTopo.METADATA_EXTENSION, restoreAutosave));
         if (Util.doesFileExist(metadataPath)) {
             String metadataText = slurpFile(metadataPath);
             MetadataTranslater.translateAndUpdate(
@@ -50,24 +65,28 @@ public class Loader {
     }
 
 
-    private static void loadSurveyData(Context context, String name, Survey survey) {
-        String path = Util.getPathForSurveyFile(context, name, "svx");
+    private static void loadSurveyData(Context context, String name, Survey survey,
+                                       boolean restoreAutosave) {
+        String path = Util.getPathForSurveyFile(context, name,
+                getExtension("svx", restoreAutosave));
         String text = slurpFile(path);
         parse(text, survey);
     }
 
 
-    private static void loadSketches(Context context, Survey survey) throws JSONException {
-        String planPath = Util.getPathForSurveyFile(
-                context, survey.getName(), SexyTopo.PLAN_SKETCH_EXTENSION);
+    private static void loadSketches(Context context, Survey survey, boolean restoreAutosave)
+            throws JSONException {
+
+        String planPath = Util.getPathForSurveyFile(context, survey.getName(),
+                getExtension(SexyTopo.PLAN_SKETCH_EXTENSION, restoreAutosave));
         if (Util.doesFileExist(planPath)) {
             String planText = slurpFile(planPath);
             Sketch plan = SketchJsonTranslater.translate(survey, planText);
             survey.setPlanSketch(plan);
         }
 
-        String elevationPath = Util.getPathForSurveyFile(
-                context, survey.getName(), SexyTopo.EXT_ELEVATION_SKETCH_EXTENSION);
+        String elevationPath = Util.getPathForSurveyFile(context, survey.getName(),
+                getExtension(SexyTopo.EXT_ELEVATION_SKETCH_EXTENSION, restoreAutosave));
         if (Util.doesFileExist(elevationPath)) {
             String elevationText = slurpFile(elevationPath);
             Sketch elevation = SketchJsonTranslater.translate(survey, elevationText);
@@ -148,6 +167,14 @@ public class Loader {
             Station station = new Station(name);
             nameToStation.put(name, station);
             return station;
+        }
+    }
+
+    private static String getExtension(String baseExtention, boolean isAutosave) {
+        if (isAutosave) {
+            return baseExtention + "." + SexyTopo.AUTOSAVE_EXTENSION;
+        } else {
+            return baseExtention;
         }
     }
 

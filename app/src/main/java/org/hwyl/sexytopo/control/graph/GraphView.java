@@ -491,7 +491,7 @@ public class GraphView extends View {
                         break;
                     case R.id.graph_station_start_new_survey:
                         if (!survey.isSaved()) {
-                            activity.showSimpleToast(R.string.cannotExtendUnsavedSurvey);
+                            activity.showSimpleToast(R.string.cannot_extend_unsaved_survey);
                         }
                         activity.continueSurvey(station);
                         break;

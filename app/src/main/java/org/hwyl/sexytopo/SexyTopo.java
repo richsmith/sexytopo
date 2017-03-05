@@ -2,9 +2,6 @@ package org.hwyl.sexytopo;
 
 import android.content.Context;
 
-import org.hwyl.sexytopo.control.util.TextTools;
-
-import java.io.File;
 import java.util.UUID;
 
 
@@ -39,6 +36,7 @@ public class SexyTopo {
     public static final String PLAN_SKETCH_EXTENSION = "plan.json";
     public static final String EXT_ELEVATION_SKETCH_EXTENSION = "ext-elevation.json";
     public static final String METADATA_EXTENSION = "metadata.json";
+    public static final String AUTOSAVE_EXTENSION = "autosave";
 
     public static final double ALLOWED_DOUBLE_DELTA_FOR_TESTS = 0.0001;
 
