@@ -32,7 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class DeviceActivity extends SexyTopoActivity/* implements BroadcastReceiver*/ {
+public class DeviceActivity extends SexyTopoActivity {
 
 
     public static final String DISTO_X_PREFIX = "DistoX";
@@ -42,9 +42,12 @@ public class DeviceActivity extends SexyTopoActivity/* implements BroadcastRecei
     private static final BluetoothAdapter BLUETOOTH_ADAPTER = BluetoothAdapter.getDefaultAdapter();
 
     private DeviceLogUpdateReceiver logUpdateReceiver;
-    private StateChangeReceiver csr;
+    private StateChangeReceiver stateChangeReceiver = new StateChangeReceiver();
 
     private boolean doConnection = false;
+
+    private IntentFilter pairFilter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
+    private IntentFilter bluetoothFilter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,12 +62,10 @@ public class DeviceActivity extends SexyTopoActivity/* implements BroadcastRecei
 
         updateStatuses();
 
-        csr = new StateChangeReceiver();
+        stateChangeReceiver = new StateChangeReceiver();
 
-        IntentFilter pairFilter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
-        registerReceiver(csr, pairFilter);
-        IntentFilter bluetoothFilter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
-        registerReceiver(csr, bluetoothFilter);
+        registerReceiver(stateChangeReceiver, pairFilter);
+        registerReceiver(stateChangeReceiver, bluetoothFilter);
     }
 
 
@@ -74,6 +75,12 @@ public class DeviceActivity extends SexyTopoActivity/* implements BroadcastRecei
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(stateChangeReceiver);
+    }
+
 
     @Override
     protected void onResume() {
@@ -81,6 +88,8 @@ public class DeviceActivity extends SexyTopoActivity/* implements BroadcastRecei
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         logUpdateReceiver.update();
         updateStatuses();
+        registerReceiver(stateChangeReceiver, pairFilter);
+        registerReceiver(stateChangeReceiver, bluetoothFilter);
     }
 
     private void updateStatuses() {
@@ -121,8 +130,6 @@ public class DeviceActivity extends SexyTopoActivity/* implements BroadcastRecei
 
 
     public void startConnection() {
-
-
 
         if (comms != null) {
             stopConnection();
@@ -228,15 +235,14 @@ public class DeviceActivity extends SexyTopoActivity/* implements BroadcastRecei
                         pair(device);
                     } else {
                         String name = device.getName();
-                        Log.device("Device \"" + name + "\"detected but it is not a DistoX");
+                        Log.device("Device \"" + name + "\"detected but it may not be a DistoX");
                     }
                 }
             }
         };
 
-        // Register the BroadcastReceiver
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        registerReceiver(broadcastReceiver, filter); // Don't forget to unregister during onDestroy
+        registerReceiver(broadcastReceiver, filter);
         BLUETOOTH_ADAPTER.startDiscovery();
     }
 
@@ -373,6 +379,12 @@ public class DeviceActivity extends SexyTopoActivity/* implements BroadcastRecei
     }
 
 
+    @Override
+    public void onDestroy() {
+        unregisterReceiver(stateChangeReceiver);
+    }
+
+
     private class DeviceLogUpdateReceiver extends BroadcastReceiver {
 
         private final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("HH:mm");
@@ -407,6 +419,7 @@ public class DeviceActivity extends SexyTopoActivity/* implements BroadcastRecei
         }
 
     }
+
 
     private class StateChangeReceiver extends BroadcastReceiver {
 
