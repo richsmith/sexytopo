@@ -72,6 +72,13 @@
             android:defaultValue="22"
             android:summary="Font size of station labels"
             android:title="Station Label Size"/>
+        <EditTextPreference
+            android:key="pref_survey_text_font_size"
+            android:inputType="number"
+            android:numeric="integer"
+            android:defaultValue="32"
+            android:summary="Font size of freestyle survey text"
+            android:title="Survey Text Size"/>
     </PreferenceCategory>
 
     <PreferenceCategory

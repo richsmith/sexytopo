@@ -80,9 +80,7 @@ public class GraphView extends View {
     public static final int STATION_DIAMETER = 8;
     public static final int CROSS_DIAMETER = 16;
     public static final int STATION_STROKE_WIDTH = 5;
-
     public static final int HIGHLIGHT_OUTLINE = 4;
-    public static final int STATION_LABEL_SIZE = 20;
 
     public static final int LEGEND_SIZE = 18;
     public static final Colour LEGEND_COLOUR = Colour.BLACK;
@@ -174,7 +172,8 @@ public class GraphView extends View {
 
         stationPaint.setColor(STATION_COLOUR);
         stationPaint.setStrokeWidth(STATION_STROKE_WIDTH);
-        stationPaint.setTextSize(STATION_LABEL_SIZE);
+        int labelSize = PreferenceAccess.getInt(getContext(), "pref_station_label_font_size", 22);
+        stationPaint.setTextSize(labelSize);
 
         highlightPaint.setStyle(Paint.Style.STROKE);
         highlightPaint.setStrokeWidth(HIGHLIGHT_OUTLINE);
@@ -197,7 +196,7 @@ public class GraphView extends View {
         legendPaint.setTextSize(LEGEND_SIZE);
 
         labelPaint.setColor(STATION_COLOUR);
-        int textSize = PreferenceAccess.getInt(getContext(), "pref_station_label_font_size", 3);
+        int textSize = PreferenceAccess.getInt(getContext(), "pref_survey_text_font_size", 32);
         labelPaint.setTextSize(textSize);
     }
 

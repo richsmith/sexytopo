@@ -143,6 +143,7 @@ public abstract class GraphActivity extends SexyTopoActivity
 
     private void syncGraphWithSurvey() {
         Survey survey = getSurvey();
+        graphView.initialise();
         graphView.setProjection(getProjection(survey));
         graphView.setSurvey(survey);
         graphView.setSketch(getSketch(survey));
