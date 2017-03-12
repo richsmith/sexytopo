@@ -24,6 +24,7 @@
     <string name="action_tools">Tools ▶</string>
     <string name="action_undo_last_leg">Undo last leg</string>
     <string name="action_do_back_measurements">Back Measurements</string>
+    <string name="action_link_to_existing_survey">Link to an Existing Survey</string>
     <string name="action_generate_test_survey">Generate Test Survey</string>
     <string name="loaded">Loaded</string>
     <string name="restored">Restored</string>
@@ -63,6 +64,8 @@
     <string name="title_activity_survey">Stats</string>
     <string name="field_survey_name">Survey Name</string>
     <string name="open_survey">Open Survey</string>
+    <string name="link_survey">Link Survey</string>
+    <string name="link_survey_station">Choose station to link active station to</string>
     <string name="unlink_survey">Unlink Survey</string>
     <string name="no_surveys">No surveys found to open</string>
     <string name="select_export_type">Select export format</string>
@@ -100,7 +103,8 @@
     <string name="bluetooth_off">Off</string>
     <string name="disto_connection_instructions">To pair: turn on the DistoX, click \'Pair…\', wait, and enter \'0000\' if a code is requested.</string>
     <string name="device_log_connection_requested">Connection requested</string>
-    <string name="device_log_connected">Connected</string>
+    <string name="device_log_connected">Connected :)</string>
+    <string name="device_log_not_connected">Not connected :(</string>
     <string name="device_log_connecting">Connecting&#8230;</string>
     <string name="device_log_waiting">Waiting for data&#8230;</string>
     <string name="device_log_received">Received measurement</string>
