@@ -78,7 +78,11 @@ public class DeviceActivity extends SexyTopoActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(stateChangeReceiver);
+        try {
+            unregisterReceiver(stateChangeReceiver);
+        } catch (Exception exception) { // this shouldn't ever happen
+            Log.e("Error unregistering receiver: " + exception.getMessage());
+        }
     }
 
 
@@ -376,12 +380,6 @@ public class DeviceActivity extends SexyTopoActivity {
         }
 
         return distoXes.toArray(new BluetoothDevice[]{})[0];
-    }
-
-
-    @Override
-    public void onDestroy() {
-        unregisterReceiver(stateChangeReceiver);
     }
 
 
