@@ -73,15 +73,6 @@ public class DistoXPoller extends Thread {
         disconnect();
     }
 
-    private void setupConnection() {
-        try {
-            // socket = bluetoothDevice.createRfcommSocketToServiceRecord(SexyTopo.DISTO_X_UUID);
-            socket = bluetoothDevice.createInsecureRfcommSocketToServiceRecord(SexyTopo.DISTO_X_UUID);
-        } catch (IOException e) {
-            Log.device("Error setting up connection: " + e.getMessage());
-        }
-
-    }
 
     private boolean ensureConnection() {
 
@@ -94,7 +85,7 @@ public class DistoXPoller extends Thread {
             } catch(Exception exception) {
                 if (exception.getMessage().contains("socket might closed or timeout")) {
                     try {
-                        Log.device("Failed to create socket; trying fallback socket");
+                        Log.device(context.getString(R.string.device_trying_fallback));
                         socket = createFallbackSocket();
                         socket.connect();
                     } catch (Exception e) {
