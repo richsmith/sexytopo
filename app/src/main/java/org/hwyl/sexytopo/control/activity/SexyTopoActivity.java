@@ -151,6 +151,9 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             case R.id.action_back_measurements:
                 setReverseMeasurementsPreference(item);
                 return true;
+            case R.id.action_link_survey:
+                confirmToProceedIfNotSaved("linkExistingSurvey");
+                return true;
             case R.id.action_generate_test_survey:
                 generateTestSurvey();
                 return true;
@@ -231,6 +234,105 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                     }
                 }
             });
+        builderSingle.show();
+    }
+
+
+    public void linkExistingSurvey() {  // public due to stupid Reflection requirements
+
+            File[] surveyDirectories = Util.getSurveyDirectories(this);
+
+            if (surveyDirectories.length == 0) {
+                showSimpleToast(getString(R.string.no_surveys));
+                return;
+            }
+
+            AlertDialog.Builder builderSingle = new AlertDialog.Builder(this);
+
+            builderSingle.setTitle(getString(R.string.link_survey));
+            final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
+                    this,
+                    android.R.layout.select_dialog_item);
+
+            for (File file : surveyDirectories) {
+                arrayAdapter.add(file.getName());
+            }
+
+            builderSingle.setNegativeButton(getString(R.string.cancel),
+                    new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+
+            builderSingle.setAdapter(arrayAdapter,
+                    new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String surveyName = arrayAdapter.getItem(which);
+                            try {
+                                Survey surveyToLink =
+                                        Loader.loadSurvey(SexyTopoActivity.this, surveyName);
+                                linkToStationInSurvey(surveyToLink);
+                            } catch (Exception exception) {
+                                showException(exception);
+                            }
+                        }
+                    });
+            builderSingle.show();
+    }
+
+
+    private void linkToStationInSurvey(final Survey surveyToLink) {
+
+        final Station[] stations = surveyToLink.getAllStations().toArray(new Station[]{});
+
+        AlertDialog.Builder builderSingle = new AlertDialog.Builder(this);
+
+        builderSingle.setTitle(getString(R.string.link_survey_station));
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.select_dialog_item);
+
+        for (Station station : stations) {
+            arrayAdapter.add(station.getName());
+        }
+
+        builderSingle.setNegativeButton(getString(R.string.cancel),
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        builderSingle.setAdapter(arrayAdapter,
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String stationName = arrayAdapter.getItem(which);
+                        try {
+                            Station selectedStation = Survey.NULL_STATION;
+                            for (Station station : stations) {
+                                if (station.getName().equals(stationName)) {
+                                    selectedStation = station;
+                                    break;
+                                }
+                            }
+
+                            Survey current = getSurvey();
+                            joinSurveys(current, current.getActiveStation(), surveyToLink, selectedStation);
+
+                        } catch (Exception exception) {
+                            showException(exception);
+                        }
+                    }
+                });
         builderSingle.show();
     }
 
@@ -354,6 +456,9 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                         String name = value.toString();
                         if (Util.isSurveyNameUnique(SexyTopoActivity.this, name)) {
                             Survey newSurvey = new Survey(name);
+                            joinSurveys(currentSurvey, joinPoint, newSurvey, newSurvey.getOrigin());
+                            setSurvey(newSurvey);
+                            /*
                             currentSurvey.connect(joinPoint, newSurvey, newSurvey.getOrigin());
                             newSurvey.connect(newSurvey.getOrigin(), currentSurvey, joinPoint);
                             setSurvey(newSurvey);
@@ -363,7 +468,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                             } catch (Exception exception) {
                                 showSimpleToast("Couldn't save new connection");
                                 showException(exception);
-                            }
+                            }*/
                         } else {
                             showSimpleToast(R.string.dialog_new_survey_name_must_be_unique);
                         }
@@ -373,6 +478,20 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 // Do nothing.
             }
         }).show();
+    }
+
+    private void joinSurveys(Survey currentSurvey, Station currentJoinPoint,
+                             Survey newSurvey, Station newJoinPoint) {
+        currentSurvey.connect(currentJoinPoint, newSurvey, newJoinPoint);
+        newSurvey.connect(newJoinPoint, currentSurvey, currentJoinPoint);
+
+        try {
+            Saver.save(SexyTopoActivity.this, currentSurvey);
+            Saver.save(SexyTopoActivity.this, newSurvey);
+        } catch (Exception exception) {
+            showSimpleToast("Couldn't save new connection");
+            showException(exception);
+        }
     }
 
 
@@ -692,7 +811,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 .setPositiveButton("Replace", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         try {
-                            Survey currentSurvey = TestSurveyCreator.create(10, 5);
+                            Survey currentSurvey =
+                                    TestSurveyCreator.create(getSurvey().getName(), 10, 5);
                             setSurvey(currentSurvey);
                         } catch (Exception exception) {
                             showException(exception);

@@ -53,6 +53,8 @@
             <item android:id="@+id/action_back_measurements"
                 android:title="@string/action_do_back_measurements"
                 android:checkable="true"/>
+            <item android:id="@+id/action_link_survey"
+                  android:title="@string/action_link_to_existing_survey"/>
             <item android:id="@+id/action_generate_test_survey"
                 android:title="@string/action_generate_test_survey" />
         </menu>
