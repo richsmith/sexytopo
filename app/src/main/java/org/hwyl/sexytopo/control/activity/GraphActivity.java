@@ -143,7 +143,7 @@ public abstract class GraphActivity extends SexyTopoActivity
 
     private void syncGraphWithSurvey() {
         Survey survey = getSurvey();
-        graphView.initialise();
+        graphView.initialisePaint();
         graphView.setProjection(getProjection(survey));
         graphView.setSurvey(survey);
         graphView.setSketch(getSketch(survey));
@@ -226,11 +226,11 @@ public abstract class GraphActivity extends SexyTopoActivity
 
         switch(id) {
             case R.id.buttonZoomIn:
-                graphView.zoom(ZOOM_INCREMENT);
+                graphView.adjustZoomBy(ZOOM_INCREMENT);
                 graphView.invalidate();
                 break;
             case R.id.buttonZoomOut:
-                graphView.zoom(-ZOOM_INCREMENT);
+                graphView.adjustZoomBy(-ZOOM_INCREMENT);
                 graphView.invalidate();
                 break;
             case R.id.buttonUndo:

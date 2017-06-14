@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -48,6 +49,10 @@ import java.util.Set;
 
 public class GraphView extends View {
 
+    public static boolean DEBUG = false;
+
+    private ScaleGestureDetector scaleGestureDetector;
+
     // The offset of the viewing window (what can be seen on the screen) from the whole survey
     private Coord2D viewpointOffset = Coord2D.ORIGIN;
 
@@ -56,9 +61,10 @@ public class GraphView extends View {
     private Coord2D actionDownViewpointOffset = Coord2D.ORIGIN;
 
     // ratio of metres on the survey to pixels on the view
-    // zoom in increases this, zooming out decreases it
-    private double surveyToViewScale = 60.0; // 10 pixels is one metre
+    // zooming in increases this, zooming out decreases it
+    private double surveyToViewScale = 60.0;
 
+    public static final double MIN_ZOOM = 0.1;
     public static final double MAX_ZOOM = 120.0;
 
     private GraphActivity activity;
@@ -122,7 +128,8 @@ public class GraphView extends View {
         ERASE(R.id.buttonErase),
         TEXT(R.id.buttonText, true),
         SELECT(R.id.buttonSelect),
-        POSITION_CROSS_SECTION(R.id.graph_station_new_cross_section);
+        POSITION_CROSS_SECTION(R.id.graph_station_new_cross_section),
+        PINCH_TO_ZOOM(-1);
 
         private int id;
         private boolean usesColour = false;
@@ -157,18 +164,14 @@ public class GraphView extends View {
     private Paint gridPaint = new Paint();
 
 
-
-    public GraphView(Context context) {
-        super(context);
-        initialise();
-    }
-
     public GraphView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        initialise();
-    }
+        scaleGestureDetector = new ScaleGestureDetector(context, new ScaleListener());
+        initialisePaint();
+     }
 
-    public void initialise() {
+
+    public void initialisePaint() {
 
         stationPaint.setColor(STATION_COLOUR);
         stationPaint.setStrokeWidth(STATION_STROKE_WIDTH);
@@ -231,6 +234,20 @@ public class GraphView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+
+        scaleGestureDetector.onTouchEvent(event);
+        if (scaleGestureDetector.isInProgress()) {
+            return true;
+        } else {
+
+        }
+
+        if (currentSketchTool == SketchTool.PINCH_TO_ZOOM) {
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                setSketchTool(previousSketchTool);
+            }
+            return true;
+        }
 
         switch (currentSketchTool) {
             case MOVE:
@@ -573,6 +590,10 @@ public class GraphView extends View {
         drawSurvey(canvas, survey, projection, 255);
 
         drawLegend(canvas, survey);
+
+        if (DEBUG) {
+            drawDebuggingInfo(canvas);
+        }
     }
 
     private void drawSurvey(Canvas canvas, Survey survey, Space<Coord2D> projection, int alpha) {
@@ -619,18 +640,19 @@ public class GraphView extends View {
     private void drawGrid(Canvas canvas) {
 
         // FIXME need a better tick size function when we sort out zooming
-        //scale           <-zoom out 1  10   20    zoom in->
+        //scale           <-adjustZoomBy out 1  10   20    adjustZoomBy in->
         //inverted                   1  0.1  0.05
-        // tick size in m <-zoom out 10 1    1     zoom in->
-        int tickSizeInMetres = (1 / (int)roundDown(surveyToViewScale, 10)) * 10;
-        tickSizeInMetres = Math.max(1, tickSizeInMetres);
+        // tick size in m <-adjustZoomBy out 10 1    1     adjustZoomBy in->
+
+        int tickSizeInMetres = getMinorGridBoxSize();
+        double boxSize = 10;
 
         int numberTicksJustBeforeViewpointOffsetX = (int)(viewpointOffset.getX() / tickSizeInMetres);
 
         for (int n = numberTicksJustBeforeViewpointOffsetX; true; n++) {
             double xSurvey = n * tickSizeInMetres;
             int xView = (int)((xSurvey - viewpointOffset.getX()) * surveyToViewScale);
-            gridPaint.setStrokeWidth(n % 10 == 0 ? 3 : 1);
+            gridPaint.setStrokeWidth(n % boxSize == 0 ? 3 : 1);
             canvas.drawLine(xView, 0, xView, getHeight(), gridPaint);
             if (xView >= getWidth()) {
                 break;
@@ -642,7 +664,7 @@ public class GraphView extends View {
         for (int n = numberTicksJustBeforeViewpointOffsetY; true; n++) {
             double ySurvey = n * tickSizeInMetres;
             int yView = (int)((ySurvey - viewpointOffset.getY()) * surveyToViewScale);
-            gridPaint.setStrokeWidth(n % 10 == 0 ? 3 : 1);
+            gridPaint.setStrokeWidth(n % boxSize == 0 ? 3 : 1);
             canvas.drawLine(0, yView, getWidth(), yView, gridPaint);
             if (yView >= getHeight()) {
                 break;
@@ -652,18 +674,17 @@ public class GraphView extends View {
 
     }
 
-    private static double roundDown(double value, double factor) {
-        // FIXME, this is crazy code
-        double total = 1;
-        for (int i = 0; true; i++) {
+    public int getMinorGridBoxSize() {
 
-            if ((total * factor) > value) {
-                return total;
-            } else {
-                total *= factor;
-            }
+        if (surveyToViewScale > 15) {
+            return 1;
+        } else if (surveyToViewScale > 2) {
+            return 10;
+        } else {
+            return 100;
         }
     }
+
 
     private void drawSurveyData(Survey survey, Canvas canvas, Space<Coord2D> space, int alpha) {
 
@@ -870,14 +891,30 @@ public class GraphView extends View {
         float offsetY = getHeight() - LEGEND_SIZE * 2;
         canvas.drawText(surveyLabel, offsetX, offsetY, legendPaint);
 
-        float scaleWidth = (float)surveyToViewScale * 1;
+        int minorGridSize = getMinorGridBoxSize();
+        float scaleWidth = (float)surveyToViewScale * minorGridSize;
         float scaleOffsetY = getHeight() - (LEGEND_SIZE * 4);
         canvas.drawLine(offsetX, scaleOffsetY, offsetX + scaleWidth, scaleOffsetY, legendPaint);
         final float TICK_SIZE = 5;
         canvas.drawLine(offsetX, scaleOffsetY, offsetX, scaleOffsetY - TICK_SIZE, legendPaint);
         canvas.drawLine(offsetX + scaleWidth, scaleOffsetY, offsetX + scaleWidth, scaleOffsetY - TICK_SIZE, legendPaint);
-        canvas.drawText("1m", offsetX + scaleWidth + 5, scaleOffsetY, legendPaint);
+        String scaleLabel = minorGridSize + "m";
+        canvas.drawText(scaleLabel, offsetX + scaleWidth + 5, scaleOffsetY, legendPaint);
 
+    }
+
+    private void drawDebuggingInfo(Canvas canvas) {
+        float offsetX = getWidth() * 0.03f;
+        float offsetY = LEGEND_SIZE * 2;
+        String label = "x=" + offsetX + " y=" + offsetY +
+                " s2v=" + TextTools.formatTo2dp(surveyToViewScale) +
+                " 1/s2v=" + TextTools.formatTo2dp(1 / surveyToViewScale) +
+                //" 1/log=" + TextTools.formatTo2dp(1 / Math.log(surveyToViewScale)) +
+                //" 1/log10=" + TextTools.formatTo2dp(1 / Math.log10(surveyToViewScale)) +
+                "\n log (1/s2v) =" + TextTools.formatTo2dp(Math.log(1 /surveyToViewScale)) +
+                "\n log10 (1/s2v) =" + TextTools.formatTo2dp(Math.log10(1 /surveyToViewScale));
+
+        canvas.drawText(label, offsetX, offsetY, legendPaint);
     }
 
 
@@ -914,22 +951,31 @@ public class GraphView extends View {
     }
 
 
-    public void zoom(double delta) {
-
+    public void adjustZoomBy(double delta) {
         double newZoom = surveyToViewScale + delta;
+        setZoom(newZoom);
+    }
 
-        if (0 >= newZoom || newZoom >= MAX_ZOOM) {
+    public void setZoom(double newZoom) {
+        Coord2D centre = new Coord2D((double) getWidth() / 2, (double) getHeight() / 2);
+        setZoom(newZoom, centre);
+    }
+
+    public void setZoom(double newZoom, Coord2D focusOnScreen) {
+
+        if (MIN_ZOOM >= newZoom || newZoom >= MAX_ZOOM) {
             return;
         }
 
-        // first record where we are
-        Coord2D centre = new Coord2D((double) getWidth() / 2, (double) getHeight() / 2);
-        Coord2D centreInSurveyCoords = viewCoordsToSurveyCoords(centre);
 
-        // then perform the actual zoom
+        Coord2D focusInSurveyCoords = viewCoordsToSurveyCoords(focusOnScreen);
+
+        Coord2D delta = focusInSurveyCoords.minus(viewpointOffset);
+
+        Coord2D scaledDelta = delta.scale(surveyToViewScale / newZoom);
+        viewpointOffset = focusInSurveyCoords.minus(scaledDelta);
+
         surveyToViewScale = newZoom;
-
-        centreViewOnSurveyPoint(centreInSurveyCoords);
     }
 
 
@@ -951,7 +997,10 @@ public class GraphView extends View {
 
 
     public void setSketchTool(SketchTool sketchTool) {
-        this.currentSketchTool = sketchTool;
+        if (previousSketchTool != currentSketchTool) {
+            previousSketchTool = currentSketchTool;
+        }
+        currentSketchTool = sketchTool;
     }
 
 
@@ -959,5 +1008,27 @@ public class GraphView extends View {
         return currentSketchTool;
     }
 
+
+
+
+    private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+        @Override
+        public boolean onScale(ScaleGestureDetector detector) {
+
+            if (currentSketchTool != SketchTool.PINCH_TO_ZOOM) {
+                setSketchTool(SketchTool.PINCH_TO_ZOOM);
+            }
+
+            double x = detector.getFocusX();
+            double y = detector.getFocusY();
+            Coord2D focus = new Coord2D(x, y);
+
+            double scaleFactor = detector.getScaleFactor();
+            setZoom(surveyToViewScale * scaleFactor, focus);
+
+            invalidate();
+            return true;
+        }
+    }
 
 }
