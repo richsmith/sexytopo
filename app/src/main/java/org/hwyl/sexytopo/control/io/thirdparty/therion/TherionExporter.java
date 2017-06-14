@@ -11,6 +11,7 @@ import org.hwyl.sexytopo.control.io.translation.Exporter;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
+import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.io.File;
@@ -40,10 +41,10 @@ public class TherionExporter extends Exporter {
 
         String name = survey.getName();
 
-        handleProjection(context, survey, Projection2D.PLAN, PLAN_SUFFIX,
-                originalTh2PlanFileContent);
-        handleProjection(context, survey, Projection2D.EXTENDED_ELEVATION, EE_SUFFIX,
-                originalTh2EeFileContent);
+        handleProjection(context, survey, Projection2D.PLAN, survey.getPlanSketch(),
+                PLAN_SUFFIX, originalTh2PlanFileContent);
+        handleProjection(context, survey, Projection2D.EXTENDED_ELEVATION, survey.getElevationSketch(),
+                EE_SUFFIX, originalTh2EeFileContent);
 
         String thContent = null;
         if (originalThFileContent == null) {
@@ -60,6 +61,7 @@ public class TherionExporter extends Exporter {
             Context context,
             Survey survey,
             Projection2D projection,
+            Sketch sketch,
             String suffix,
             String originalFileContent)
             throws IOException {
@@ -79,7 +81,7 @@ public class TherionExporter extends Exporter {
         }
         saveToExportDirectory(context, survey, th2Filename, content);
 
-        String xviPlanContent = XviExporter.getContent(survey.getPlanSketch(), space, scale);
+        String xviPlanContent = XviExporter.getContent(sketch, space, scale);
         saveToExportDirectory(context, survey, baseFilename + ".xvi", xviPlanContent);
 
         th2Files.add(th2Filename);
