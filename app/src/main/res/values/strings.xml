@@ -28,6 +28,7 @@
     <string name="action_generate_test_survey">Generate Test Survey</string>
     <string name="loaded">Loaded</string>
     <string name="restored">Restored</string>
+    <string name="external_storage_unwriteable">WARNING: Can\'t write to external storage (will use internal storage instead)</string>
     <string name="table_head_from">From</string>
     <string name="table_head_to">To</string>
     <string name="table_head_distance">Dist</string>

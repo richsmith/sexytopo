@@ -28,7 +28,7 @@ public abstract class Exporter {
         Util.ensureDirectoriesInPathExist(directoryPath);
 
         String path = directoryPath + File.separator + filename;
-        Saver.saveFile(path, content);
+        Saver.saveFile(context, path, content);
     }
 
 }

@@ -2,9 +2,7 @@ package org.hwyl.sexytopo.model.survey;
 
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 
-/**
- * Created by rls on 16/07/14.
- */
+
 public class Leg extends SurveyComponent{
 
     public static final int MIN_DISTANCE = 0;
@@ -18,17 +16,33 @@ public class Leg extends SurveyComponent{
     private final double azimuth;
     private final double inclination;
     private final Station destination;
+    private final boolean wasShotBackwards;
 
     public Leg(double distance,
                double azimuth,
                double inclination) {
-        this(distance, azimuth, inclination, Survey.NULL_STATION);
+        this(distance, azimuth, inclination, false);
+    }
+
+    public Leg(double distance,
+               double azimuth,
+               double inclination,
+               boolean wasShotBackwards) {
+        this(distance, azimuth, inclination, Survey.NULL_STATION, wasShotBackwards);
     }
 
     public Leg(double distance,
                double azimuth,
                double inclination,
                Station destination) {
+        this(distance, azimuth, inclination, destination, false);
+    }
+
+    public Leg(double distance,
+               double azimuth,
+               double inclination,
+               Station destination,
+               boolean wasShotBackwards) {
 
         if (destination == null) {
             throw new IllegalArgumentException("Destination of leg should not be null");
@@ -52,18 +66,28 @@ public class Leg extends SurveyComponent{
         this.azimuth = azimuth;
         this.inclination = inclination;
         this.destination = destination;
+        this.wasShotBackwards = wasShotBackwards;
+
     }
 
     public Leg(Leg leg, Station destination) {
-        this(leg.distance, leg.azimuth, leg.inclination, destination);
+        this(leg.distance, leg.azimuth, leg.inclination, destination, leg.wasShotBackwards);
     }
 
     public static Leg upgradeSplayToConnectedLeg(Leg splay, Station destination) {
-        return new Leg(splay.distance, splay.azimuth, splay.inclination, destination);
+        return new Leg(
+                splay.distance, splay.azimuth, splay.inclination,
+                destination, splay.wasShotBackwards);
     }
 
     public Leg reverse() {
-        return rotate(180.0);
+        double adjustedAzimuth = Space2DUtils.adjustAngle(getAzimuth(), 180);
+        if (hasDestination()) {
+            return new Leg(
+                    distance, adjustedAzimuth, -1 * inclination, destination, !wasShotBackwards);
+        } else {
+            return new Leg(distance, adjustedAzimuth, -1 * inclination, !wasShotBackwards);
+        }
     }
 
     public Leg rotate(double delta) {
@@ -102,6 +126,10 @@ public class Leg extends SurveyComponent{
 
     public boolean hasDestination() {
         return destination != Survey.NULL_STATION;
+    }
+
+    public boolean wasShotBackwards() {
+        return wasShotBackwards;
     }
 
     public static boolean isDistanceLegal(double distance) {

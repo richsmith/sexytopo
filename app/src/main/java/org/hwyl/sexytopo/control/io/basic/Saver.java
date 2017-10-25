@@ -2,7 +2,6 @@ package org.hwyl.sexytopo.control.io.basic;
 
 import android.content.Context;
 
-import org.apache.commons.io.FileUtils;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexExporter;
@@ -11,7 +10,9 @@ import org.hwyl.sexytopo.model.survey.Survey;
 import org.json.JSONException;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 
 
 /**
@@ -51,7 +52,7 @@ public class Saver {
             throws IOException {
         String path = Util.getPathForSurveyFile(context, survey.getName(), extension);
         String surveyText = new SurvexExporter().getContent(survey);
-        saveFile(path, surveyText);
+        saveFile(context, path, surveyText);
     }
 
 
@@ -59,24 +60,30 @@ public class Saver {
             throws IOException, JSONException {
         String path = Util.getPathForSurveyFile(context, survey.getName(), extension);
         String planText = SketchJsonTranslater.translate(sketch);
-        saveFile(path, planText);
+        saveFile(context, path, planText);
     }
 
 
     private static void saveMetadata(Context context, Survey survey, String extension) throws Exception {
         String path = Util.getPathForSurveyFile(context, survey.getName(), extension);
         String metadataText = MetadataTranslater.translate(survey);
-        saveFile(path, metadataText);
+        saveFile(context, path, metadataText);
     }
 
-    public static void saveFile(String path, String contents) throws IOException {
+    public static void saveFile(Context context, String path, String contents) throws IOException {
 
-        File filePath = new File(path);
-        String location = filePath.getParentFile().getPath();
+        File file = new File(path);
+        String location = file.getParentFile().getPath();
         Util.ensureDirectoriesInPathExist(location);
 
+        file.createNewFile();
+        FileOutputStream fileOutputStream = new FileOutputStream(file);
+        OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
+        outputStreamWriter.append(contents);
+        outputStreamWriter.close();
+        fileOutputStream.flush();
+        fileOutputStream.close();
 
-        FileUtils.writeStringToFile(filePath, contents);
 
     }
 

@@ -14,7 +14,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.hwyl.sexytopo.SexyTopo.APP_DIR;
 import static org.hwyl.sexytopo.SexyTopo.EXPORT_DIR;
 import static org.hwyl.sexytopo.SexyTopo.IMPORT_DIR;
 import static org.hwyl.sexytopo.SexyTopo.SURVEY_DIR;
@@ -28,30 +27,29 @@ public class Util {
     }
 
 
-    private static void ensureDirectoryExists(String path) {
-        File surveyDirectory = new File(path);
-        if (!surveyDirectory.exists()) {
-            surveyDirectory.mkdirs();
+    private static void ensureDirectoryExists(File directory) {
+        if (!directory.exists()) {
+            directory.mkdirs();
         }
     }
 
     public static void ensureDataDirectoriesExist(Context context) {
         ensureDirectoryExists(getSurveyDirectory(context));
-        ensureDirectoryExists(getImportDirectory(context));
+        ensureDirectoryExists(getImportDir(context));
         ensureDirectoryExists(getExportDirectory(context));
     }
 
 
     public static File[] getSurveyDirectories(Context context) {
         ensureDirectoryExists(getSurveyDirectory(context));
-        File surveyDirectory = new File(getSurveyDirectory(context));
+        File surveyDirectory = getSurveyDirectory(context);
         File surveyDirectories[] = surveyDirectory.listFiles();
         return surveyDirectories;
     }
 
     public static File[] getImportFiles(Context context) {
-        ensureDirectoryExists(getImportDirectory(context));
-        File importDirectory = new File(getImportDirectory(context));
+        ensureDirectoryExists(getImportDir(context));
+        File importDirectory = getImportDir(context);
         File importFiles[] = importDirectory.listFiles();
         return importFiles;
     }
@@ -180,7 +178,7 @@ public class Util {
         return new File(path).listFiles()[0];
     }
 
-    public static boolean isExternalStorageWritable() {
+    public static boolean isExternalStorageWriteable() {
         String state = Environment.getExternalStorageState();
         return (Environment.MEDIA_MOUNTED.equals(state));
     }
@@ -191,22 +189,56 @@ public class Util {
                 Environment.MEDIA_MOUNTED_READ_ONLY.equals(state));
     }
 
-    public static String getExternalRoot(Context context) {
-        String ext = context.getExternalFilesDir(null).getAbsolutePath();
-        return ext;
-        //return context.getExternalFilesDir(null);
+    public static File getDocumentRoot(Context context) {
+
+        if (isExternalStorageWriteable()) {
+            try {
+                return getExternalDirectory();
+            } catch (Throwable exception) {
+                return getInternalDirectory(context);
+            }
+        } else {
+            return getInternalDirectory(context);
+        }
     }
 
-    public static String getSurveyDirectory(Context context) {
-        return TextTools.joinAll(File.separator, getExternalRoot(context), APP_DIR, SURVEY_DIR);
+    public static File getInternalDirectory(Context context) {
+        return context.getFilesDir();
     }
 
-    public static String getImportDirectory(Context context) {
-        return TextTools.joinAll(File.separator, getExternalRoot(context), APP_DIR, IMPORT_DIR);
+    public static File getExternalDirectory() {
+
+        File directory = null;
+
+        try {
+            directory = new File(Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DOCUMENTS), "SexyTopo");
+
+        } catch (Throwable exception) { //old version of Android?
+            directory = new File(Environment.getExternalStorageDirectory() + "/Documents/SexyTopo");
+
+        } finally {
+            if (!directory.exists() && !directory.mkdirs()) {
+                throw new IllegalStateException(
+                        "Could not create survey master directory " + directory);
+            }
+
+            return directory;
+        }
     }
 
-    public static String getExportDirectory(Context context) {
-        return TextTools.joinAll(File.separator, getExternalRoot(context), APP_DIR, EXPORT_DIR);
+
+    public static File getSurveyDirectory(Context context) {
+        return new File(getDocumentRoot(context), SURVEY_DIR);
+    }
+
+
+    public static File getImportDir(Context context) {
+        return new File(getDocumentRoot(context), IMPORT_DIR);
+    }
+
+    public static File getExportDirectory(Context context) {
+        return new File(getDocumentRoot(context), EXPORT_DIR);
     }
 
     public static String getAutosaveName(String filename) {

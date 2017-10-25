@@ -327,7 +327,6 @@ public class SurveyUpdater {
                         }
                     }
                 });
-
         survey.setSaved(false);
     }
 

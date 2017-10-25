@@ -1,7 +1,11 @@
 package org.hwyl.sexytopo.control.activity;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
 import org.hwyl.sexytopo.R;
@@ -21,7 +25,6 @@ public class StartUpActivity extends SexyTopoActivity {
         setContentView(R.layout.activity_start_up);
 
 
-        Util.ensureDataDirectoriesExist(this);
 
         /*
         // If there are paired devices
@@ -42,13 +45,32 @@ public class StartUpActivity extends SexyTopoActivity {
         return name;*/
 
 
-        Survey survey = isThereAnActiveSurvey()? loadActiveSurvey() : createNewActiveSurvey();
+        if (! Util.isExternalStorageWriteable()) {
+            ActivityCompat.requestPermissions(
+                    this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+        }
+
+        if (! Util.isExternalStorageWriteable()) {
+            showSimpleToast(R.string.external_storage_unwriteable);
+        }
+
+        Util.ensureDataDirectoriesExist(this);
+
+        Survey survey = isThereAnActiveSurvey() ? loadActiveSurvey() : createNewActiveSurvey();
         SurveyManager.getInstance(this).setCurrentSurvey(survey);
 
         Log.setContext(this);
 
         Intent intent = new Intent(this, DeviceActivity.class);
         startActivity(intent);
+    }
+
+    private boolean isExternalStorageWriteable() {
+        int permissionCheck = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        return (permissionCheck == PackageManager.PERMISSION_GRANTED);
+
     }
 
     private boolean isThereAnActiveSurvey() {
