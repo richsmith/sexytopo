@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -66,7 +67,9 @@ public class Loader {
 
 
     private static void loadSurveyData(Context context, String name, Survey survey,
-                                       boolean restoreAutosave) {
+                                       boolean restoreAutosave)
+            throws Exception {
+
         String path = Util.getPathForSurveyFile(context, name,
                 getExtension("svx", restoreAutosave));
         String text = slurpFile(path);
@@ -119,7 +122,7 @@ public class Loader {
         return text.toString();
     }
 
-    private static void parse(String text, Survey survey) {
+    public static void parse(String text, Survey survey) throws Exception {
 
         Map<String, Station> nameToStation = new HashMap<>();
 
@@ -128,7 +131,8 @@ public class Loader {
 
         String[] lines = text.split("\n");
         for (String line : lines) {
-            if (line.trim().equals("")) {
+            line = line.trim();
+            if (line.equals("") || line.startsWith("*")) {
                 continue;
             }
             String[] fields = line.trim().split("\t");
@@ -137,7 +141,8 @@ public class Loader {
     }
 
     private static void addLegToSurvey(Survey survey,
-            Map<String, Station> nameToStation, String[] fields) {
+            Map<String, Station> nameToStation, String[] fields)
+            throws Exception {
 
         Station from = retrieveOrCreateStation(nameToStation, fields[0]);
         Station to = retrieveOrCreateStation(nameToStation, fields[1]);
@@ -146,13 +151,25 @@ public class Loader {
         double azimuth = Double.parseDouble(fields[3]);
         double inclination = Double.parseDouble(fields[4]);
 
-        Leg leg = (to == Survey.NULL_STATION)?
-            new Leg(distance, azimuth, inclination) :
-            new Leg(distance, azimuth, inclination, to);
+        List<Station> stationsSoFar = survey.getAllStations();
 
-        from.addOnwardLeg(leg);
+        if (!stationsSoFar.contains(from) && !stationsSoFar.contains(to)) {
+            throw new Exception("Stations are out of order in file");
+        } else if (stationsSoFar.contains(from) && stationsSoFar.contains(to)) {
+            throw new Exception("Duplicate leg encountered");
+        } else if (stationsSoFar.contains(from)) { // forward leg
+            Leg leg = (to == Survey.NULL_STATION)?
+                    new Leg(distance, azimuth, inclination) :
+                    new Leg(distance, azimuth, inclination, to);
+            from.addOnwardLeg(leg);
+        } else if (stationsSoFar.contains(to)) { // backwards leg
+            Leg leg = (from == Survey.NULL_STATION)?
+                    new Leg(distance, azimuth, inclination) :
+                    new Leg(distance, azimuth, inclination, from);
+            to.addOnwardLeg(leg.reverse());
+        }
 
-        // FIXME: bit of a hack; hopefully the last station processed will be the active one
+        // Bit of a hack; hopefully the last station processed will be the active one
         // (should probably record the active station in the file somewhere)
         survey.setActiveStation(from);
     }
