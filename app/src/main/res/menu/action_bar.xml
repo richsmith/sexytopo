@@ -26,22 +26,28 @@
         <menu xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools">
-            <item android:id="@+id/action_file_new"
-                android:title="@string/action_file_new"/>
-            <item android:id="@+id/action_file_open"
-                android:title="@string/action_file_open"/>
-            <item android:id="@+id/action_file_save"
-                android:title="@string/action_file_save"/>
-            <item android:id="@+id/action_file_save_as"
-                android:title="@string/action_file_save_as"/>
-            <item android:id="@+id/action_file_import"
-                android:title="@string/action_file_import"/>
-            <item android:id="@+id/action_file_export"
-                android:title="@string/action_file_export"/>
-            <item android:id="@+id/action_file_delete"
-                android:title="@string/action_file_delete"/>
-            <item android:id="@+id/action_file_restore_autosave"
-                  android:title="@string/action_file_restore_autosave"/>
+            <item android:id="@+id/action_file_new" android:title="@string/action_file_new"/>
+            <item android:id="@+id/action_file_open" android:title="@string/action_file_open"/>
+            <item android:id="@+id/action_file_save" android:title="@string/action_file_save"/>
+            <item android:id="@+id/action_file_save_as" android:title="@string/action_file_save_as"/>
+            <item android:id="@+id/action_file_import" android:title="@string/action_file_import"/>
+            <item android:id="@+id/action_file_export" android:title="@string/action_file_export"/>
+            <item android:id="@+id/action_file_delete" android:title="@string/action_file_delete"/>
+            <item android:id="@+id/action_file_restore_autosave" android:title="@string/action_file_restore_autosave"/>
+        </menu>
+    </item>
+    <item android:id="@+id/action_input"
+          android:title="@string/action_input"
+          app:showAsAction="never">
+        <menu>
+            <group android:id="@+id/input_mode_group" android:checkableBehavior="single">
+                <item android:id="@+id/action_input_mode_forward"
+                      android:title="@string/action_input_mode_forward"/>
+                <item android:id="@+id/action_input_mode_backward"
+                      android:title="@string/action_input_mode_backward"/>
+                <item android:id="@+id/action_input_mode_combo"
+                      android:title="@string/action_input_mode_combo"/>
+            </group>
         </menu>
     </item>
     <item android:id="@+id/action_tools"
@@ -50,9 +56,6 @@
         <menu>
             <item android:id="@+id/action_undo_last_leg"
                 android:title="@string/action_undo_last_leg" />
-            <item android:id="@+id/action_back_measurements"
-                android:title="@string/action_do_back_measurements"
-                android:checkable="true"/>
             <item android:id="@+id/action_link_survey"
                   android:title="@string/action_link_to_existing_survey"/>
             <item android:id="@+id/action_generate_test_survey"

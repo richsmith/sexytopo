@@ -2,7 +2,6 @@ package org.hwyl.sexytopo.control.activity;
 
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -74,7 +73,7 @@ public class TableActivity extends SexyTopoActivity
 
         BroadcastReceiver receiver = new BroadcastReceiver() {
             @Override
-            public void onReceive(Context context, Intent intent) {
+            public void onReceive(android.content.Context context, Intent intent) {
                 syncTableWithSurvey();
             }
         };

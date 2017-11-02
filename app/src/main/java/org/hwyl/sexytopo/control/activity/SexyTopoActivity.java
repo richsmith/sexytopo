@@ -1,7 +1,6 @@
 package org.hwyl.sexytopo.control.activity;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,7 +16,6 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.io.Util;
@@ -26,6 +24,8 @@ import org.hwyl.sexytopo.control.io.basic.Saver;
 import org.hwyl.sexytopo.control.io.translation.Exporter;
 import org.hwyl.sexytopo.control.io.translation.ImportManager;
 import org.hwyl.sexytopo.control.io.translation.SelectableExporters;
+import org.hwyl.sexytopo.control.util.InputMode;
+import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.demo.TestSurveyCreator;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -72,12 +72,9 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
         getMenuInflater().inflate(R.menu.action_bar, menu);
 
-        MenuItem menuItem = menu.findItem(R.id.action_back_measurements);
-        SharedPreferences preferences =
-                getSharedPreferences(SexyTopo.GENERAL_PREFS, Context.MODE_PRIVATE);
-        boolean isSelected =
-                preferences.getBoolean(SexyTopo.REVERSE_MEASUREMENTS_PREFERENCE, false);
-        menuItem.setChecked(isSelected);
+        InputMode inputMode = SurveyManager.getInstance(this).getInputMode();
+        MenuItem inputModeMenuItem = menu.findItem(inputMode.getMenuId());
+        inputModeMenuItem.setChecked(true);
 
         return true;
     }
@@ -119,6 +116,12 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 openAboutDialog();
                 return true;
 
+            case R.id.action_input_mode_forward:
+            case R.id.action_input_mode_backward:
+            case R.id.action_input_mode_combo:
+                setInputModePreference(item);
+                return true;
+
             case R.id.action_file_new:
                 confirmToProceedIfNotSaved("startNewSurvey");
                 return true;
@@ -147,9 +150,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
             case R.id.action_undo_last_leg:
                 undoLastLeg();
-                return true;
-            case R.id.action_back_measurements:
-                setReverseMeasurementsPreference(item);
                 return true;
             case R.id.action_link_survey:
                 confirmToProceedIfNotSaved("linkExistingSurvey");
@@ -795,12 +795,17 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     }
 
-    private void setReverseMeasurementsPreference(MenuItem item) {
+
+
+    private void setInputModePreference(MenuItem item) {
         item.setChecked(!item.isChecked());
-        SharedPreferences preferences = getSharedPreferences(SexyTopo.GENERAL_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences preferences =
+                getSharedPreferences(SexyTopo.GENERAL_PREFS, android.content.Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean(SexyTopo.REVERSE_MEASUREMENTS_PREFERENCE, item.isChecked());
-        editor.commit();
+        int id = item.getItemId();
+        InputMode inputMode = InputMode.byMenuId(id);
+        editor.putString(SexyTopo.INPUT_MODE_PREFERENCE, inputMode.name());
+        editor.apply();
     }
 
     private void generateTestSurvey() {

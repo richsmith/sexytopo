@@ -4,7 +4,7 @@ import android.os.Bundle;
 
 import org.hwyl.sexytopo.R;
 
-public class CalibrationActivity extends SexyTopoActivity{
+public class CalibrationActivity extends SexyTopoActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

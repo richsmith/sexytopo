@@ -23,10 +23,10 @@ public class SurveyUpdater {
     private static final float DEFAULT_MAX_ANGLE_DELTA = 1.0f;
 
 
-    public static boolean update(Survey survey, List<Leg> legs, boolean considerBacksightPromotion) {
+    public static boolean update(Survey survey, List<Leg> legs, InputMode inputMode) {
         boolean anyStationsAdded = false;
         for (Leg leg : legs) {
-            anyStationsAdded = anyStationsAdded || update(survey, leg, considerBacksightPromotion);
+            anyStationsAdded = anyStationsAdded || update(survey, leg, inputMode);
         }
         return anyStationsAdded;
     }
@@ -41,26 +41,29 @@ public class SurveyUpdater {
     }
 
     public static boolean update(Survey survey, Leg leg) {
-        return update(survey, leg, false);
+        return update(survey, leg, InputMode.FORWARD);
     }
 
-    public static boolean update(Survey survey, Leg leg, boolean considerBacksightPromotion) {
-        boolean createdNewStation = false;
+    public static boolean update(Survey survey, Leg leg, InputMode inputMode) {
         Station activeStation = survey.getActiveStation();
         activeStation.getOnwardLegs().add(leg);
         survey.setSaved(false);
         survey.addUndoEntry(activeStation, leg);
 
-        if (considerBacksightPromotion) {
-            createdNewStation = createNewStationIfBacksight(survey);
-            if (!createdNewStation) {
-                createdNewStation = createNewStationIfTripleShot(survey);
-            }
-        } else {
-            createdNewStation = createNewStationIfTripleShot(survey);
+        boolean justCreatedNewStation = false;
+        switch(inputMode) {
+            case FORWARD:
+                justCreatedNewStation = createNewStationIfTripleShot(survey, false);
+                break;
+            case BACKWARD:
+                justCreatedNewStation = createNewStationIfTripleShot(survey, true);
+                break;
+            case COMBO:
+                justCreatedNewStation = createNewStationIfBacksight(survey) ||
+                        createNewStationIfTripleShot(survey, false);
         }
 
-        return createdNewStation;
+        return justCreatedNewStation;
     }
 
 
@@ -91,7 +94,7 @@ public class SurveyUpdater {
         return StationNamer.generateNextStationName(survey, survey.getActiveStation());
     }
 
-    private static boolean createNewStationIfTripleShot(Survey survey) {
+    private static boolean createNewStationIfTripleShot(Survey survey, boolean backsightMode) {
 
         Station activeStation = survey.getActiveStation();
         if (activeStation.getOnwardLegs().size() >= SexyTopo.NUM_OF_REPEATS_FOR_NEW_STATION) {
@@ -103,6 +106,10 @@ public class SurveyUpdater {
 
                 Leg newLeg = averageLegs(legs);
                 newLeg = Leg.upgradeSplayToConnectedLeg(newLeg, newStation);
+
+                if (backsightMode) {
+                    newLeg = newLeg.reverse();
+                }
 
                 activeStation.getOnwardLegs().removeAll(legs);
                 activeStation.getOnwardLegs().add(newLeg);

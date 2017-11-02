@@ -4,9 +4,7 @@ import org.hwyl.sexytopo.R;
 
 import java.util.Locale;
 
-/**
- * Created by rls on 04/08/14.
- */
+
 public enum TableCol {
 
     FROM(R.id.tableRowFrom, "From", "%s"),
@@ -19,7 +17,7 @@ public enum TableCol {
     final String name;
     final String format;
 
-    private TableCol(int id, String name, String format) {
+    TableCol(int id, String name, String format) {
         this.id = id;
         this.name = name;
         this.format = format;

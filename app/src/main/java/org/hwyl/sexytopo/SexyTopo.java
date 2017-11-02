@@ -31,7 +31,7 @@ public class SexyTopo {
     public static final String BLANK_STATION_NAME = "-";
 
     public static final String GENERAL_PREFS = "generalPrefs";
-    public static final String REVERSE_MEASUREMENTS_PREFERENCE = "reverseMeasurements";
+    public static final String INPUT_MODE_PREFERENCE = "inputMode";
 
     public static final String PLAN_SKETCH_EXTENSION = "plan.json";
     public static final String EXT_ELEVATION_SKETCH_EXTENSION = "ext-elevation.json";

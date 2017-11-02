@@ -9,12 +9,11 @@ import android.widget.Toast;
 
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.io.basic.Saver;
-import org.hwyl.sexytopo.control.util.PreferenceAccess;
+import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Survey;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -35,27 +34,18 @@ public class SurveyManager {
     // This should be created or loaded on startup
     private static Survey currentSurvey = new Survey("ERROR");
 
-    public SurveyManager(Context context) {
-        this.context = context;
+    public SurveyManager(Context Context) {
+        this.context = Context;
     }
 
     public void updateSurvey(List<Leg> legs) {
 
+
+
         if (legs.size() > 0) {
 
-            SharedPreferences preferences =
-                    context.getSharedPreferences(SexyTopo.GENERAL_PREFS, 0);
-            boolean reverseLegs =
-                    preferences.getBoolean(SexyTopo.REVERSE_MEASUREMENTS_PREFERENCE, false);
-            if (reverseLegs) {
-                legs = reverseLegs(legs);
-            }
-
-            boolean automaticBacksightPromotion = PreferenceAccess.getBoolean(
-                    context, "pref_backsight_promotion", false);
-
-            boolean stationAdded =
-                    SurveyUpdater.update(currentSurvey, legs, automaticBacksightPromotion);
+            InputMode inputMode = getInputMode();
+            boolean stationAdded = SurveyUpdater.update(currentSurvey, legs, inputMode);
 
             if (stationAdded) {
                 broadcastNewStationCreated();
@@ -73,12 +63,14 @@ public class SurveyManager {
         broadcastSurveyUpdated();
     }
 
-    private List<Leg> reverseLegs(List<Leg> legs) {
-        List<Leg> reversed = new ArrayList<Leg>();
-        for (Leg leg : legs) {
-            reversed.add(leg.reverse());
-        }
-        return reversed;
+
+    public InputMode getInputMode() {
+        SharedPreferences preferences = context.getSharedPreferences(
+                SexyTopo.GENERAL_PREFS, android.content.Context.MODE_PRIVATE);
+        String modeName = preferences.getString(
+                SexyTopo.INPUT_MODE_PREFERENCE, InputMode.FORWARD.name());
+        InputMode inputMode = InputMode.valueOf(modeName);
+        return inputMode;
     }
 
     public void broadcastSurveyUpdated() {

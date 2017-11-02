@@ -11,7 +11,7 @@ public class LoaderTest {
         String text = "";
         Survey survey = new Survey("TestSurvey");
         Loader.parse(text, survey);
-        assert survey.getAllStations().size() == 0;
+        assert survey.getAllStations().size() == 1;
     }
 
     @Test
@@ -19,7 +19,7 @@ public class LoaderTest {
         String text = "1\t2\t9.11\t121\t-23\n";
         Survey survey = new Survey("TestSurvey");
         Loader.parse(text, survey);
-        assert survey.getAllStations().size() == 1;
+        assert survey.getAllStations().size() == 2;
         assert survey.getOrigin().getConnectedOnwardLegs().get(0)
                 .getDestination().getName().equals("2");
 
@@ -32,7 +32,7 @@ public class LoaderTest {
                 "1\t2\t9.11\t121\t-23\n";
         Survey survey = new Survey("TestSurvey");
         Loader.parse(text, survey);
-        assert survey.getAllStations().size() == 1;
+        assert survey.getAllStations().size() == 2;
     }
 
     @Test
@@ -40,7 +40,7 @@ public class LoaderTest {
         String text = "2\t1\t9.11\t121\t-23\n";
         Survey survey = new Survey("TestSurvey");
         Loader.parse(text, survey);
-        assert survey.getAllStations().size() == 1;
+        assert survey.getAllStations().size() == 2;
         assert survey.getOrigin().getConnectedOnwardLegs().get(0)
                 .getDestination().getName().equals("2");
         assert survey.getOrigin().getConnectedOnwardLegs().get(0)
