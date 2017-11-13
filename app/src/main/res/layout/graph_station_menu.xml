@@ -11,15 +11,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/panelBackground"
-        android:text="Station"
+        android:text="@string/sketch_menu_show_connect"
         android:padding="10dp" />
 
     <Button
-        android:id="@+id/graph_station_delete"
+        android:id="@+id/graph_station_comment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/abc_cab_background_internal_bg"
-        android:text="Delete"
+        android:text="@string/menu_comment"
         android:padding="10dp"/>
 
     <!--
@@ -35,7 +35,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/abc_cab_background_internal_bg"
-        android:text="Reverse"
+        android:text="@string/menu_reverse"
         android:padding="10dp"/>
     <!--<Button
         android:id="@+id/button4"
@@ -49,7 +49,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/abc_cab_background_internal_bg"
-        android:text="New Cross-Section"
+        android:text="@string/menu_new_cross_section"
         android:padding="10dp"/>
 
 
@@ -70,5 +70,12 @@
         android:padding="10dp"
         android:enabled="false"/>
 
+    <Button
+        android:id="@+id/graph_station_delete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/abc_cab_background_internal_bg"
+        android:text="@string/menu_delete_station"
+        android:padding="10dp"/>
 
 </LinearLayout>

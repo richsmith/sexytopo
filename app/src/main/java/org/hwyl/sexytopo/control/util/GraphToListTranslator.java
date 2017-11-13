@@ -70,6 +70,10 @@ public class GraphToListTranslator {
         map.put(TableCol.AZIMUTH, leg.getAzimuth());
         map.put(TableCol.INCLINATION, leg.getInclination());
 
+        if (leg.hasDestination() && leg.getDestination().hasComment()) {
+            map.put(TableCol.COMMENT, leg.getDestination().getComment());
+        }
+
         return map;
     }
 

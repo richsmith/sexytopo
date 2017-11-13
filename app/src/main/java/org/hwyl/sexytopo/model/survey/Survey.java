@@ -193,6 +193,10 @@ public class Survey {
         return stationsToSurveyConnections;
     }
 
+    public boolean hasLinkedSurveys(Station station) {
+        return stationsToSurveyConnections.containsKey(station);
+    }
+
     public void checkActiveStation() {
         List<Station> stations = getAllStations();
         if (!stations.contains(activeStation)) {

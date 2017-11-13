@@ -4,8 +4,11 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -42,6 +45,7 @@ import org.hwyl.sexytopo.model.survey.SurveyConnection;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -98,6 +102,8 @@ public class GraphView extends View {
 
 
     public static final int STATION_LABEL_OFFSET = 10;
+
+    private Bitmap commentIcon, linkIcon;
 
 
 
@@ -201,6 +207,9 @@ public class GraphView extends View {
         labelPaint.setColor(STATION_COLOUR);
         int textSize = PreferenceAccess.getInt(getContext(), "pref_survey_text_font_size", 32);
         labelPaint.setTextSize(textSize);
+
+        commentIcon = BitmapFactory.decodeResource(getResources(), R.drawable.speech_bubble);
+        linkIcon = BitmapFactory.decodeResource(getResources(), R.drawable.link);
     }
 
 
@@ -492,6 +501,9 @@ public class GraphView extends View {
             @Override
             public void onClick(View view) {
                 switch(view.getId()) {
+                    case R.id.graph_station_comment:
+                        openCommentDialog(station);
+                        break;
                     case R.id.graph_station_reverse:
                         SurveyUpdater.reverseLeg(survey, station);
                         SurveyManager.getInstance(getContext()).broadcastSurveyUpdated();
@@ -521,12 +533,37 @@ public class GraphView extends View {
         PopupWindow menu = StationContextMenu.getFakeStationContextMenu(
                 getContext(), station, listener);
 
-        boolean hasLinkedSurveys = survey.getConnectedSurveys().containsKey(station);
         View unlinkSurveyButton = menu.getContentView().findViewById(R.id.graph_station_unlink_survey);
-        unlinkSurveyButton.setEnabled(hasLinkedSurveys);
+        unlinkSurveyButton.setEnabled(survey.hasLinkedSurveys(station));
 
         menu.showAtLocation(this, Gravity.LEFT | Gravity.TOP,
                 (int) (event.getX()), (int) (event.getY()));
+    }
+
+
+    private void openCommentDialog(final Station station) {
+        final EditText input = new EditText(getContext());
+        input.setLines(8);
+        input.setText(station.getComment());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setView(input)
+                .setTitle(station.getName())
+                .setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        station.setComment(input.getText().toString());
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // do nothing
+                    }
+                });
+        AlertDialog dialog = builder.create();
+        dialog.getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        dialog.show();
     }
 
 
@@ -783,17 +820,35 @@ public class GraphView extends View {
                 highlightActiveStation(canvas, x, y);
             }
 
+            int spacing = crossDiameter / 2;
+            int nextX = x + crossDiameter;
+
+
             if (getDisplayPreference(GraphActivity.DisplayPreference.SHOW_STATION_LABELS)) {
                 String name = station.getName();
                 if (station == survey.getOrigin()) {
                     name = name + " (" + survey.getName() + ")";
                 }
                 canvas.drawText(name,
-                        x + STATION_LABEL_OFFSET,
+                        nextX,
                         y + STATION_LABEL_OFFSET,
                         stationPaint);
+                nextX += stationPaint.measureText(name) + spacing;
             }
 
+            List<Bitmap> icons = new LinkedList<>();
+            if (station.hasComment()) {
+                icons.add(commentIcon);
+            }
+            if (survey.hasLinkedSurveys(station)) {
+                icons.add(linkIcon);
+            }
+
+            for (Bitmap icon : icons) {int yTop = y - crossDiameter / 2;
+                Rect rect = new Rect(nextX, yTop, nextX + crossDiameter, yTop + crossDiameter);
+                canvas.drawBitmap(icon, null, rect, stationPaint);
+                nextX += crossDiameter + spacing;
+            }
         }
     }
 

@@ -32,6 +32,7 @@ public class StationContextMenu {
         fakeMenu.setContentView(view);
 
         int[] ids = new int[] {
+                R.id.graph_station_comment,
                 R.id.graph_station_delete,
                 R.id.graph_station_reverse,
                 R.id.graph_station_new_cross_section,

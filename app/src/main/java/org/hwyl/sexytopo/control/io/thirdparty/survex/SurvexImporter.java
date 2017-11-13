@@ -34,16 +34,22 @@ public class SurvexImporter extends Importer {
             if (line.trim().equals("")) {
                 continue;
             }
+
+            String comment = null;
+            if (line.contains("; ")) {
+                comment = line.substring(line.indexOf("; "));
+            }
+
             String[] fields = line.trim().split("\t");
-            addLegToSurvey(survey, nameToStation, fields);
+            addLegToSurvey(survey, nameToStation, fields, comment);
         }
     }
 
-    private static void addLegToSurvey(Survey survey,
-                                       Map<String, Station> nameToStation, String[] fields) {
+    private static void addLegToSurvey(
+            Survey survey, Map<String, Station> nameToStation, String[] fields, String comment) {
 
-        Station from = retrieveOrCreateStation(nameToStation, fields[0]);
-        Station to = retrieveOrCreateStation(nameToStation, fields[1]);
+        Station from = retrieveOrCreateStation(nameToStation, fields[0], comment);
+        Station to = retrieveOrCreateStation(nameToStation, fields[1], comment);
 
         double distance = Double.parseDouble(fields[2]);
         double azimuth = Double.parseDouble(fields[3]);
@@ -61,13 +67,13 @@ public class SurvexImporter extends Importer {
     }
 
     private static Station retrieveOrCreateStation(Map<String, Station> nameToStation,
-                                                   String name) {
+                                                   String name, String comment) {
         if (name.equals(SexyTopo.BLANK_STATION_NAME)) {
             return Survey.NULL_STATION;
         } else if (nameToStation.containsKey(name)) {
             return nameToStation.get(name);
         } else {
-            Station station = new Station(name);
+            Station station = new Station(name, comment);
             nameToStation.put(name, station);
             return station;
         }

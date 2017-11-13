@@ -29,6 +29,11 @@ public class SurvexExporter extends SingleFileExporter {
             text += getEntry(TableCol.DISTANCE, map);
             text += getEntry(TableCol.AZIMUTH, map);
             text += getEntry(TableCol.INCLINATION, map);
+            if (map.containsKey(TableCol.COMMENT)) {
+                String comment = getEntry(TableCol.COMMENT, map);
+                comment = comment.replaceAll("(\\r|\\n|\\r\\n)+", "\\\\n");
+                text += "; " + comment;
+            }
             text += "\n";
         }
 

@@ -7,7 +7,7 @@ import org.junit.Test;
 public class LoaderTest {
 
     @Test
-    public void testEmptySurveyResultsIn0Stations() throws Exception {
+    public void testEmptySurveyResultsIn1Station() throws Exception {
         String text = "";
         Survey survey = new Survey("TestSurvey");
         Loader.parse(text, survey);

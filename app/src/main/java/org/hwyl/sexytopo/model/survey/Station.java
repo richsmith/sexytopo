@@ -3,21 +3,26 @@ package org.hwyl.sexytopo.model.survey;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by rls on 16/07/14.
- */
+
 public class Station extends SurveyComponent {
 
     private final String name;
     private List<Leg> onwardLegs = new ArrayList<>();
+    private String comment = "";
 
     public Station(String name) {
         this.name = name;
     }
 
+    public Station(String name, String comment) {
+        this.name = name;
+        this.comment = comment;
+    }
+
     public Station(Station station, String name) {
         this.name = name;
         this.onwardLegs = station.onwardLegs;
+        this.comment = station.comment;
     }
 
     public String getName() {
@@ -50,6 +55,18 @@ public class Station extends SurveyComponent {
             }
         }
         return connectedOnwardLegs;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public boolean hasComment() {
+        return comment.length() > 0;
     }
 
     public String toString() {

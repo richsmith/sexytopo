@@ -119,6 +119,10 @@ public class TableActivity extends SexyTopoActivity
 
             for (TableCol col : TableCol.values()) {
 
+                if (col == TableCol.COMMENT) {
+                    continue;
+                }
+
                 String display = map.containsKey(col) ? col.format(map.get(col)) : "?";
                 int id = TABLE_COL_BY_ANDROID_ID.get(col);
                 TextView textView = (TextView) tableRow.findViewById(id);
