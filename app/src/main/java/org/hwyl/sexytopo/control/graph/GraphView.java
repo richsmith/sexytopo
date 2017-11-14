@@ -544,6 +544,7 @@ public class GraphView extends View {
     private void openCommentDialog(final Station station) {
         final EditText input = new EditText(getContext());
         input.setLines(8);
+        input.setGravity(Gravity.LEFT | Gravity.TOP);
         input.setText(station.getComment());
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setView(input)
@@ -735,7 +736,7 @@ public class GraphView extends View {
         for (CrossSectionDetail sectionDetail : crossSectionDetails) {
             Coord2D centreOnSurvey = sectionDetail.getPosition();
             Coord2D centreOnView = surveyCoordsToViewCoords(centreOnSurvey);
-            drawStation(canvas, stationPaint,
+            drawStationCross(canvas, stationPaint,
                     (float) centreOnView.getX(), (float) centreOnView.getY(),
                     STATION_DIAMETER, alpha);
 
@@ -814,7 +815,7 @@ public class GraphView extends View {
             int x = (int)(translatedStation.getX());
             int y = (int)(translatedStation.getY());
 
-            drawStation(canvas, stationPaint, x, y, crossDiameter, alpha);
+            drawStationCross(canvas, stationPaint, x, y, crossDiameter, alpha);
 
             if (station == survey.getActiveStation()) {
                 highlightActiveStation(canvas, x, y);
@@ -822,7 +823,6 @@ public class GraphView extends View {
 
             int spacing = crossDiameter / 2;
             int nextX = x + crossDiameter;
-
 
             if (getDisplayPreference(GraphActivity.DisplayPreference.SHOW_STATION_LABELS)) {
                 String name = station.getName();
@@ -882,7 +882,7 @@ public class GraphView extends View {
     }
 
 
-    private void drawStation(Canvas canvas, Paint paint, float x, float y, int crossDiameter, int alpha) {
+    private void drawStationCross(Canvas canvas, Paint paint, float x, float y, int crossDiameter, int alpha) {
         paint.setAlpha(alpha);
         canvas.drawLine(x , y - crossDiameter / 2, x, y + crossDiameter / 2, paint);
         canvas.drawLine(x - crossDiameter / 2, y, x + crossDiameter / 2, y, paint);
