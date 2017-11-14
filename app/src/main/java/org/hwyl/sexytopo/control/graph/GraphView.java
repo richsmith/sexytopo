@@ -536,6 +536,9 @@ public class GraphView extends View {
         View unlinkSurveyButton = menu.getContentView().findViewById(R.id.graph_station_unlink_survey);
         unlinkSurveyButton.setEnabled(survey.hasLinkedSurveys(station));
 
+        View commentButton = menu.getContentView().findViewById(R.id.graph_station_comment);
+        commentButton.setEnabled(station != survey.getOrigin());
+
         menu.showAtLocation(this, Gravity.LEFT | Gravity.TOP,
                 (int) (event.getX()), (int) (event.getY()));
     }

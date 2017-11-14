@@ -58,6 +58,10 @@ public class GraphToListTranslator {
 
         Map<TableCol, Object> map = new HashMap<>();
 
+        if (leg.hasDestination() && leg.getDestination().hasComment()) {
+            map.put(TableCol.COMMENT, leg.getDestination().getComment());
+        }
+
         if (leg.wasShotBackwards()) {
             map.put(TableCol.FROM, leg.getDestination());
             map.put(TableCol.TO, from);
@@ -69,10 +73,6 @@ public class GraphToListTranslator {
         map.put(TableCol.DISTANCE, leg.getDistance());
         map.put(TableCol.AZIMUTH, leg.getAzimuth());
         map.put(TableCol.INCLINATION, leg.getInclination());
-
-        if (leg.hasDestination() && leg.getDestination().hasComment()) {
-            map.put(TableCol.COMMENT, leg.getDestination().getComment());
-        }
 
         return map;
     }
