@@ -212,7 +212,11 @@ public class TableActivity extends SexyTopoActivity
                 return true;
             case R.id.renameStation:
                 Station toRename = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
-                ManualEntry.renameStation(this, getSurvey(), toRename);
+                if (toRename == Survey.NULL_STATION) {
+                    showSimpleToast("Can't rename a splay end");
+                } else {
+                    ManualEntry.renameStation(this, getSurvey(), toRename);
+                }
                 return true;
             case R.id.editLeg:
                 Leg toEdit = surveyEntry.getLeg();

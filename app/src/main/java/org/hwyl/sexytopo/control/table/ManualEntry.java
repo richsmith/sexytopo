@@ -230,6 +230,8 @@ public class ManualEntry {
                 // only check for non-null or max length
                 if (currentText.isEmpty()) {
                     renameField.setError("Cannot be blank");
+                } else if (currentText.equals("-")) {
+                    renameField.setError("Station cannot be named \"-\"");
                 } else if (!currentText.equals(currentName) && (survey.getStationByName(currentText) != null)) {
                     renameField.setError("Station name must be unique");
                 } else {
