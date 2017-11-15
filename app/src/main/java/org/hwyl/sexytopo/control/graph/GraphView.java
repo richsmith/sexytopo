@@ -7,7 +7,9 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.DashPathEffect;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.Gravity;
@@ -30,6 +32,7 @@ import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
+import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
@@ -73,6 +76,7 @@ public class GraphView extends View {
 
     private GraphActivity activity;
 
+    private Projection2D projectionType;
     private Survey survey;
     private Space<Coord2D> projection;
     private Sketch sketch;
@@ -226,6 +230,9 @@ public class GraphView extends View {
         }
     }
 
+    public void setProjectionType(Projection2D projectionType) {
+        this.projectionType = projectionType;
+    }
 
     public void setProjection(Space<Coord2D> projection) {
         // We're going to flip the projection vertically because we want North at the top and
@@ -787,17 +794,21 @@ public class GraphView extends View {
 
             legPaint.setAlpha(alpha);
 
-            boolean legIsHorizontalish = -45 < leg.getInclination() && leg.getInclination() < 45;
-			if (legIsHorizontalish) {
-				drawPaint.setStyle(Paint.Style.STROKE);
+			if (projectionType.isLegInPlane(leg)) {
+				legPaint.setStyle(Paint.Style.STROKE);
+                canvas.drawLine(
+                        (float)(start.getX()), (float)(start.getY()),
+                        (float)(end.getX()), (float)(end.getY()),
+                        legPaint);
 			} else {
-				//drawPaint.setStyle(Paint.Style.DOTTED);
+                legPaint.setPathEffect(new DashPathEffect(new float[]{3, 2}, 0));
+                Path path = new Path();
+                path.moveTo((float)(start.getX()), (float)(start.getY()));
+                path.lineTo((float)(end.getX()), (float)(end.getY()));
+                canvas.drawPath(path, legPaint);
+
 			}
 
-            canvas.drawLine(
-                (float)(start.getX()), (float)(start.getY()),
-                (float)(end.getX()), (float)(end.getY()),
-                legPaint);
 
         }
 

@@ -20,6 +20,7 @@ import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.graph.GraphView;
 import org.hwyl.sexytopo.model.graph.Coord2D;
+import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -144,6 +145,7 @@ public abstract class GraphActivity extends SexyTopoActivity
     private void syncGraphWithSurvey() {
         Survey survey = getSurvey();
         graphView.initialisePaint();
+        graphView.setProjectionType(getProjectionType());
         graphView.setProjection(getProjection(survey));
         graphView.setSurvey(survey);
         graphView.setSketch(getSketch(survey));
@@ -152,7 +154,11 @@ public abstract class GraphActivity extends SexyTopoActivity
 
     public abstract Sketch getSketch(Survey survey);
 
-    public abstract Space<Coord2D> getProjection(Survey survey);
+    public Space<Coord2D> getProjection(Survey survey) {
+        return getProjectionType().project(survey);
+    }
+
+    public abstract Projection2D getProjectionType();
 
 
     @Override

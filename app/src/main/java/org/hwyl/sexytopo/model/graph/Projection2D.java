@@ -8,29 +8,43 @@ import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.util.Map;
 
-/**
- * Created by rls on 26/07/14.
- */
+
 public enum Projection2D {
 
     PLAN {
         public Coord2D project(Coord3D coord3D) {
             return new Coord2D(coord3D.getX(), coord3D.getY());
         }
+
+        public boolean isLegInPlane(Leg leg) {
+            return -45 < leg.getInclination() && leg.getInclination() < 45;
+        }
     },
     ELEVATION_NS {
         public Coord2D project(Coord3D coord3D) {
             return new Coord2D(coord3D.getY(), coord3D.getZ());
+        }
+
+        public boolean isLegInPlane(Leg leg) {
+            return true;
         }
     },
     ELEVATION_EW {
         public Coord2D project(Coord3D coord3D) {
             return new Coord2D(coord3D.getX(), coord3D.getZ());
         }
+
+        public boolean isLegInPlane(Leg leg) {
+            return true;
+        }
     },
     EXTENDED_ELEVATION {
         public Coord2D project(Coord3D coord3D) {
             return ELEVATION_NS.project(coord3D);
+        }
+
+        public boolean isLegInPlane(Leg leg) {
+            return true;
         }
     };
 
@@ -48,6 +62,7 @@ public enum Projection2D {
     }
 
     public abstract Coord2D project(Coord3D coord3D);
+    public abstract boolean isLegInPlane(Leg leg);
 
     public Space<Coord2D> project(Survey survey) {
 
