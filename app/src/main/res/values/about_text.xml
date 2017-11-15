@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 <string name="aboutText">
-SexyTopo is written and maintained by Rich Smith (rls@hwyl.org), copyright 2015.\n\n
+SexyTopo is written and maintained by Rich Smith (rls@hwyl.org), copyright 2017.\n\n
 
 <b>Thanks To</b>\n
 Ruth &quot;Rufus&quot; Allan for love and support\n
-Hellie Brooke for extensive use of her Disto-X\n
 Andrew Atkinson for the initial idea and input\n
+Madphil for testing and ideas\n
+Hellie Brooke for extensive use of her Disto-X\n
+
 \n\n
 
 <b>Licence</b>\n
