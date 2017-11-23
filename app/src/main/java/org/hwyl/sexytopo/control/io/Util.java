@@ -1,7 +1,10 @@
 package org.hwyl.sexytopo.control.io;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Environment;
+import android.support.v4.content.ContextCompat;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
@@ -178,9 +181,21 @@ public class Util {
         return new File(path).listFiles()[0];
     }
 
-    public static boolean isExternalStorageWriteable() {
+    public static boolean doWeHavePermissionToWriteToExternalStorage(Context context) {
+        return (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            == PackageManager.PERMISSION_GRANTED);
+    }
+
+    public static boolean isExternalStorageMounted() {
         String state = Environment.getExternalStorageState();
-        return (Environment.MEDIA_MOUNTED.equals(state));
+        boolean isMounted = (Environment.MEDIA_MOUNTED.equals(state));
+        return isMounted;
+    }
+
+    public static boolean isExternalStorageWriteable(Context context) {
+        boolean havePermission = doWeHavePermissionToWriteToExternalStorage(context);
+        boolean isMounted = isExternalStorageMounted();
+        return havePermission && isMounted;
     }
 
     public static boolean isExternalStorageReadable() {
@@ -191,7 +206,7 @@ public class Util {
 
     public static File getDocumentRoot(Context context) {
 
-        if (isExternalStorageWriteable()) {
+        if (isExternalStorageWriteable(context)) {
             try {
                 return getExternalDirectory();
             } catch (Throwable exception) {

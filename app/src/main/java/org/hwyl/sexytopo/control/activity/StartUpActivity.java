@@ -45,12 +45,12 @@ public class StartUpActivity extends SexyTopoActivity {
         return name;*/
 
 
-        if (! Util.isExternalStorageWriteable()) {
+        if (! Util.isExternalStorageWriteable(this)) {
             ActivityCompat.requestPermissions(
                     this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
         }
 
-        if (! Util.isExternalStorageWriteable()) {
+        if (! Util.isExternalStorageWriteable(this)) {
             showSimpleToast(R.string.external_storage_unwriteable);
         }
 
