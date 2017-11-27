@@ -12,6 +12,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -59,6 +60,7 @@ public class GraphView extends View {
     public static boolean DEBUG = false;
 
     private ScaleGestureDetector scaleGestureDetector;
+    private GestureDetector longPressDetector;
 
     // The offset of the viewing window (what can be seen on the screen) from the whole survey
     private Coord2D viewpointOffset = Coord2D.ORIGIN;
@@ -72,7 +74,7 @@ public class GraphView extends View {
     private double surveyToViewScale = 60.0;
 
     public static final double MIN_ZOOM = 0.1;
-    public static final double MAX_ZOOM = 120.0;
+    public static final double MAX_ZOOM = 180.0;
 
     private GraphActivity activity;
 
@@ -177,6 +179,7 @@ public class GraphView extends View {
     public GraphView(Context context, AttributeSet attrs) {
         super(context, attrs);
         scaleGestureDetector = new ScaleGestureDetector(context, new ScaleListener());
+        longPressDetector = new GestureDetector(context, new LongPressListener());
         initialisePaint();
      }
 
@@ -252,6 +255,8 @@ public class GraphView extends View {
     public boolean onTouchEvent(MotionEvent event) {
 
         scaleGestureDetector.onTouchEvent(event);
+        longPressDetector.onTouchEvent(event);
+
         if (scaleGestureDetector.isInProgress()) {
             return true;
         } else {
@@ -462,7 +467,7 @@ public class GraphView extends View {
                         touchPointOnSurvey, selectionTolerance);
 
                 if (newSelectedStation == null) {
-                    return true;
+                    return false;
 
                 } else if (newSelectedStation != survey.getActiveStation()) {
                     survey.setActiveStation(newSelectedStation);
@@ -1099,5 +1104,18 @@ public class GraphView extends View {
             return true;
         }
     }
+
+    private class LongPressListener extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public void onLongPress(MotionEvent motionEvent) {
+            setSketchTool(SketchTool.SELECT);
+            boolean wasSelectionMade = handleSelect(motionEvent);
+            if (wasSelectionMade) {
+                setSketchTool(SketchTool.SELECT);
+            }
+        }
+    }
+
+
 
 }

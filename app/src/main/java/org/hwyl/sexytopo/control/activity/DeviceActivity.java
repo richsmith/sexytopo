@@ -234,6 +234,11 @@ public class DeviceActivity extends SexyTopoActivity {
                 if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                     BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
+                    if (device == null) {
+                        Log.device("Error detecting DistoX; please try again");
+                        return;
+                    }
+
                     if (isDistoX(device)) {
                         Log.device("DistoX detected");
                         pair(device);
@@ -349,6 +354,9 @@ public class DeviceActivity extends SexyTopoActivity {
 
 
     private static boolean isDistoX(BluetoothDevice device) {
+        if (device == null) {
+            return false;
+        }
         String name = device.getName();
         return name.toLowerCase().contains(DISTO_X_PREFIX.toLowerCase());
     }
