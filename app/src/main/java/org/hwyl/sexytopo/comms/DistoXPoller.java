@@ -151,7 +151,7 @@ public class DistoXPoller extends Thread {
 
                 byte[] acknowledgePacket = DistoXProtocol.createAcknowledgementPacket(packet);
                 outStream.write(acknowledgePacket, 0, acknowledgePacket.length);
-                Log.d(SexyTopo.TAG, "Sent Ack: " + DistoXProtocol.describeAcknowledgementPacket(acknowledgePacket));
+                Log.d("Sent Ack: " + DistoXProtocol.describeAcknowledgementPacket(acknowledgePacket));
 
 
                 if ((packet[0] & 0x03) == 0) {
@@ -178,7 +178,7 @@ public class DistoXPoller extends Thread {
 
         } catch (IOException e) {
             if (e.getMessage().toLowerCase().contains("bt socket closed")) {
-                //Log.device("Connection closed"); not sure if we need to bother the user with this..
+                Log.d("Connection closed");
                 disconnect();
             } else {
                 Log.device("Communication error: " + e.getMessage());

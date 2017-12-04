@@ -354,10 +354,16 @@ public class DeviceActivity extends SexyTopoActivity {
 
 
     private static boolean isDistoX(BluetoothDevice device) {
+
         if (device == null) {
             return false;
         }
+
         String name = device.getName();
+        if (name == null) {
+            return false;
+        }
+
         return name.toLowerCase().contains(DISTO_X_PREFIX.toLowerCase());
     }
 
