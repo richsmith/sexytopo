@@ -1,11 +1,17 @@
 package org.hwyl.sexytopo.control.activity;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.util.Log;
@@ -16,6 +22,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.io.Util;
@@ -25,7 +32,6 @@ import org.hwyl.sexytopo.control.io.translation.Exporter;
 import org.hwyl.sexytopo.control.io.translation.ImportManager;
 import org.hwyl.sexytopo.control.io.translation.SelectableExporters;
 import org.hwyl.sexytopo.control.util.InputMode;
-import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.demo.TestSurveyCreator;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -33,6 +39,8 @@ import org.hwyl.sexytopo.model.survey.SurveyConnection;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -58,6 +66,10 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         super.onStart();
         SexyTopo.context = this;
         setOrientation();
+
+        // this causes the request to happen twice because it is called by StartupActivity, then
+        // immediately when the activity is started... something to fix sometime
+        requestPermissionsIfRequired();
     }
 
     @Override
@@ -166,19 +178,58 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        if (! Util.isExternalStorageWriteable(this)) {
+            showSimpleToast(R.string.external_storage_unwriteable);
+        }
+    }
+
+
+    private void requestPermissionsIfRequired() {
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return; // no need to request permissions for earlier Android versions
+        }
+        String[] desiredPermissions = new String[]{
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+        };
+
+        List<String> notYetGotPermissions = new ArrayList<>(Arrays.asList(desiredPermissions));
+        for (String permission : desiredPermissions) {
+            int permissionCheck = ContextCompat.checkSelfPermission(this, permission);
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                notYetGotPermissions.add(permission);
+            }
+
+        }
+
+        if (!notYetGotPermissions.isEmpty()) {
+            ActivityCompat.requestPermissions(
+                    this,
+                    notYetGotPermissions.toArray(new String[]{}),
+                    0);
+        }
+
+    }
+
+
     private void openAboutDialog() {
-        // Inflate the about message contents
         View messageView = getLayoutInflater().inflate(R.layout.about_dialog, null, false);
 
-        // When linking text, force to always use default color. This works
-        // around a pressed color state bug.
-        //TextView textView = (TextView) messageView.findViewById(R.id.about_credits);
-        //int defaultColor = textView.getTextColors().getDefaultColor();
-        //textView.setTextColor(defaultColor);
+        String version;
+        try {
+            PackageInfo pInfo = this.getPackageManager().getPackageInfo(getPackageName(), 0);
+            version = pInfo.versionName;
+        } catch (Exception exception) {
+            version = "Unknown";
+        }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setIcon(R.drawable.laser_icon_small)
-                .setTitle(getText(R.string.app_name) + " v" + SexyTopo.VERSION)
+                .setTitle(getText(R.string.app_name) + " v" + version)
                 .setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

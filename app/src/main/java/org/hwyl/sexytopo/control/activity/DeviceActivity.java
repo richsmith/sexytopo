@@ -43,6 +43,7 @@ public class DeviceActivity extends SexyTopoActivity {
 
     private DeviceLogUpdateReceiver logUpdateReceiver;
     private StateChangeReceiver stateChangeReceiver = new StateChangeReceiver();
+    private ScanReceiver pairReceiver = new ScanReceiver();
 
     private boolean doConnection = false;
 
@@ -64,8 +65,21 @@ public class DeviceActivity extends SexyTopoActivity {
 
         stateChangeReceiver = new StateChangeReceiver();
 
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BluetoothDevice.ACTION_FOUND);
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        registerReceiver(pairReceiver, filter);
+
         registerReceiver(stateChangeReceiver, pairFilter);
         registerReceiver(stateChangeReceiver, bluetoothFilter);
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(pairReceiver);
+        unregisterReceiver(stateChangeReceiver);
     }
 
 
@@ -224,35 +238,18 @@ public class DeviceActivity extends SexyTopoActivity {
 
     public void requestPair(View view) {
 
-        Log.device("Pairing requested (please wait)");
+        if (BLUETOOTH_ADAPTER.isDiscovering()) {
+            Log.device("Cancelling...");
+            BLUETOOTH_ADAPTER.cancelDiscovery();
 
-        final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-
-            public void onReceive(Context context, Intent intent) {
-
-                String action = intent.getAction();
-                if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                    BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-
-                    if (device == null) {
-                        Log.device("Error detecting DistoX; please try again");
-                        return;
-                    }
-
-                    if (isDistoX(device)) {
-                        Log.device("DistoX detected");
-                        pair(device);
-                    } else {
-                        String name = device.getName();
-                        Log.device("Device \"" + name + "\"detected but it may not be a DistoX");
-                    }
-                }
+        } else {
+            boolean started = BLUETOOTH_ADAPTER.startDiscovery();
+            if (started) {
+                Log.device("Scanning...");
+            } else {
+                Log.device("Unable to scan (busy?)");
             }
-        };
-
-        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        registerReceiver(broadcastReceiver, filter);
-        BLUETOOTH_ADAPTER.startDiscovery();
+        }
     }
 
 
@@ -335,7 +332,7 @@ public class DeviceActivity extends SexyTopoActivity {
     }
 
 
-    private void pair(BluetoothDevice device) {
+    private static void pair(BluetoothDevice device) {
         try {
             Log.device("Pairing with " + device.getName());
             Method m = device.getClass().getMethod("createBond", (Class[]) null);
@@ -440,4 +437,33 @@ public class DeviceActivity extends SexyTopoActivity {
             updateStatuses();
         }
     }
+
+    private class ScanReceiver extends BroadcastReceiver {
+
+        public void onReceive(Context context, Intent intent) {
+
+            String action = intent.getAction();
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+
+                if (device == null) {
+                    Log.device("Error detecting DistoX; please try again");
+                    return;
+                }
+
+                if (isDistoX(device)) {
+                    Log.device("DistoX detected");
+                    pair(device);
+                } else {
+                    String name = device.getName();
+                    Log.device("Device \"" + name + "\"detected (doesn't look like a DistoX)");
+                }
+            } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+                Log.device("Scan finished");
+            } else {
+                Log.device("action");
+                Log.device(action.toString());
+            }
+        }
+    };
 }
