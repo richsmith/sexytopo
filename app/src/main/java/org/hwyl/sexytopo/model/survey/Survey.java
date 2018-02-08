@@ -50,6 +50,11 @@ public class Survey {
     }
 
     public Station getActiveStation() {
+
+        if (activeStation == null) { // this shouldn't happen, but just in case...
+            setActiveStation(origin);
+        }
+
         return activeStation;
     }
 

@@ -1007,6 +1007,12 @@ public class GraphView extends View {
             public void run() {
                 Coord2D activeStationCoord =
                         projection.getStationMap().get(survey.getActiveStation());
+
+                // not sure how this could be null, but at least one null pointer has been reported
+                if (activeStationCoord == null) {
+                    activeStationCoord = Coord2D.ORIGIN;
+                }
+
                 centreViewOnSurveyPoint(activeStationCoord);
             }
         });
