@@ -78,7 +78,7 @@ public class PocketTopoTxtImporter extends Importer {
                 SurveyUpdater.update(survey, leg);
             } else {
                 Station toStation = new Station(toStationName);
-                Leg leg = new Leg(distance, azimuth, inclination, toStation);
+                Leg leg = new Leg(distance, azimuth, inclination, toStation, new Leg[]{});
                 SurveyUpdater.updateWithNewStation(survey, leg);
             }
         }

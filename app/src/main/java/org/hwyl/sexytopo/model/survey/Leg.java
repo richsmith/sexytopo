@@ -16,7 +16,10 @@ public class Leg extends SurveyComponent{
     private final double azimuth;
     private final double inclination;
     private final Station destination;
+    private final Leg[] promotedFrom;
     private final boolean wasShotBackwards;
+
+    private final static Leg[] NO_LEGS = new Leg[]{};
 
     public Leg(double distance,
                double azimuth,
@@ -28,20 +31,22 @@ public class Leg extends SurveyComponent{
                double azimuth,
                double inclination,
                boolean wasShotBackwards) {
-        this(distance, azimuth, inclination, Survey.NULL_STATION, wasShotBackwards);
-    }
-
-    public Leg(double distance,
-               double azimuth,
-               double inclination,
-               Station destination) {
-        this(distance, azimuth, inclination, destination, false);
+        this(distance, azimuth, inclination, Survey.NULL_STATION, NO_LEGS, wasShotBackwards);
     }
 
     public Leg(double distance,
                double azimuth,
                double inclination,
                Station destination,
+               Leg[] promotedFrom) {
+        this(distance, azimuth, inclination, destination, NO_LEGS, false);
+    }
+
+    public Leg(double distance,
+               double azimuth,
+               double inclination,
+               Station destination,
+               Leg[] promotedFrom,
                boolean wasShotBackwards) {
 
         if (destination == null) {
@@ -66,25 +71,33 @@ public class Leg extends SurveyComponent{
         this.azimuth = azimuth;
         this.inclination = inclination;
         this.destination = destination;
+        this.promotedFrom = promotedFrom;
         this.wasShotBackwards = wasShotBackwards;
 
     }
 
     public Leg(Leg leg, Station destination) {
-        this(leg.distance, leg.azimuth, leg.inclination, destination, leg.wasShotBackwards);
+        this(leg.distance, leg.azimuth, leg.inclination, destination,
+                leg.promotedFrom, leg.wasShotBackwards);
     }
 
     public static Leg upgradeSplayToConnectedLeg(Leg splay, Station destination) {
+        return upgradeSplayToConnectedLeg(splay, destination, NO_LEGS);
+    }
+
+    public static Leg upgradeSplayToConnectedLeg(
+            Leg splay, Station destination, Leg[] promotedFrom) {
         return new Leg(
                 splay.distance, splay.azimuth, splay.inclination,
-                destination, splay.wasShotBackwards);
+                destination, promotedFrom, splay.wasShotBackwards);
     }
 
     public Leg reverse() {
         double adjustedAzimuth = Space2DUtils.adjustAngle(getAzimuth(), 180);
         if (hasDestination()) {
             return new Leg(
-                    distance, adjustedAzimuth, -1 * inclination, destination, !wasShotBackwards);
+                    distance, adjustedAzimuth, -1 * inclination, destination,
+                    promotedFrom, !wasShotBackwards);
         } else {
             return new Leg(distance, adjustedAzimuth, -1 * inclination, !wasShotBackwards);
         }
@@ -93,7 +106,8 @@ public class Leg extends SurveyComponent{
     public Leg rotate(double delta) {
         double adjustedAzimuth = Space2DUtils.adjustAngle(getAzimuth(), delta);
         if (hasDestination()) {
-            return new Leg(getDistance(), adjustedAzimuth, getInclination(), getDestination());
+            return new Leg(getDistance(), adjustedAzimuth, getInclination(),
+                     getDestination(), getPromotedFrom());
         } else {
             return new Leg(getDistance(), adjustedAzimuth, getInclination());
         }
@@ -101,7 +115,8 @@ public class Leg extends SurveyComponent{
 
     public Leg asBacksight(Station destination) {
         double backAzimuth = Space2DUtils.adjustAngle(getAzimuth(), 180.0);
-        return new Leg(getDistance(), backAzimuth, -1 * getInclination(), destination);
+        return new Leg(getDistance(), backAzimuth, -1 * getInclination(),
+                destination, getPromotedFrom());
     }
 
     public Leg asBacksight() {
@@ -126,6 +141,10 @@ public class Leg extends SurveyComponent{
 
     public boolean hasDestination() {
         return destination != Survey.NULL_STATION;
+    }
+
+    public Leg[] getPromotedFrom() {
+        return promotedFrom;
     }
 
     public boolean wasShotBackwards() {

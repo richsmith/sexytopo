@@ -168,12 +168,12 @@ public class Loader {
         } else if (stationsSoFar.contains(from)) { // forward leg
             Leg leg = (to == Survey.NULL_STATION)?
                     new Leg(distance, azimuth, inclination) :
-                    new Leg(distance, azimuth, inclination, to);
+                    new Leg(distance, azimuth, inclination, to, new Leg[]{});
             from.addOnwardLeg(leg);
         } else if (stationsSoFar.contains(to)) { // backwards leg
             Leg leg = (from == Survey.NULL_STATION)?
                     new Leg(distance, azimuth, inclination) :
-                    new Leg(distance, azimuth, inclination, from);
+                    new Leg(distance, azimuth, inclination, from, new Leg[]{});
             to.addOnwardLeg(leg.reverse());
         }
 

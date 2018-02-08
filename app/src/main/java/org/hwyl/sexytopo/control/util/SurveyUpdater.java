@@ -105,7 +105,8 @@ public class SurveyUpdater {
                 Station newStation = new Station(getNextStationName(survey));
 
                 Leg newLeg = averageLegs(legs);
-                newLeg = Leg.upgradeSplayToConnectedLeg(newLeg, newStation);
+                newLeg = Leg.upgradeSplayToConnectedLeg(
+                        newLeg, newStation, legs.toArray(new Leg[]{}));
 
                 if (backsightMode) {
                     newLeg = newLeg.reverse();

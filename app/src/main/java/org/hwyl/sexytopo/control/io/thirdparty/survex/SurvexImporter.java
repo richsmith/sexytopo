@@ -57,7 +57,7 @@ public class SurvexImporter extends Importer {
 
         Leg leg = (to == Survey.NULL_STATION)?
                 new Leg(distance, azimuth, inclination) :
-                new Leg(distance, azimuth, inclination, to);
+                new Leg(distance, azimuth, inclination, to, new Leg[]{});
 
         from.addOnwardLeg(leg);
 

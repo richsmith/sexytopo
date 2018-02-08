@@ -77,7 +77,8 @@ public class ManualEntry {
                                     edited.getDistance(),
                                     edited.getAzimuth(),
                                     edited.getInclination(),
-                                    toEdit.getDestination());
+                                    toEdit.getDestination(),
+                                    new Leg[]{});
                         }
                         SurveyUpdater.editLeg(survey, toEdit, edited);
                         SurveyManager.getInstance(tableActivity).broadcastSurveyUpdated();
