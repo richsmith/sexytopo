@@ -8,11 +8,18 @@ import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class SurvexImporter extends Importer {
+
+    public static final Pattern COMMENT_INSTRUCTION_REGEX = Pattern.compile("(\\{.*?\\})");
+
 
     @Override
     public Survey toSurvey(File file) throws Exception {
@@ -35,9 +42,9 @@ public class SurvexImporter extends Importer {
                 continue;
             }
 
-            String comment = null;
-            if (line.contains("; ")) {
-                comment = line.substring(line.indexOf("; "));
+            String comment = "";
+            if (line.contains(";")) {
+                comment = line.substring(line.indexOf(";") + 1).trim();
             }
 
             String[] fields = line.trim().split("\t");
@@ -48,16 +55,22 @@ public class SurvexImporter extends Importer {
     private static void addLegToSurvey(
             Survey survey, Map<String, Station> nameToStation, String[] fields, String comment) {
 
-        Station from = retrieveOrCreateStation(nameToStation, fields[0], comment);
+        String commentInstructions = extractCommentInstructions(comment);
+        if (commentInstructions != null) {
+            comment = comment.replace(commentInstructions, "").trim();
+        }
+
+        Station from = retrieveOrCreateStation(nameToStation, fields[0], "");
         Station to = retrieveOrCreateStation(nameToStation, fields[1], comment);
 
         double distance = Double.parseDouble(fields[2]);
         double azimuth = Double.parseDouble(fields[3]);
         double inclination = Double.parseDouble(fields[4]);
 
+        Leg[] promotedFrom = parseAnyPromotedLegs(commentInstructions);
         Leg leg = (to == Survey.NULL_STATION)?
                 new Leg(distance, azimuth, inclination) :
-                new Leg(distance, azimuth, inclination, to, new Leg[]{});
+                new Leg(distance, azimuth, inclination, to, promotedFrom);
 
         from.addOnwardLeg(leg);
 
@@ -76,6 +89,44 @@ public class SurvexImporter extends Importer {
             Station station = new Station(name, comment);
             nameToStation.put(name, station);
             return station;
+        }
+    }
+
+    private static String extractCommentInstructions(String comment) {
+        Matcher matcher = COMMENT_INSTRUCTION_REGEX.matcher(comment);
+        String instructions = null;
+        if (matcher.find()) {
+            instructions = matcher.group(1);
+        }
+        return instructions;
+    }
+
+    public static Leg[] parseAnyPromotedLegs(String instructions) {
+        try {
+            List<Leg> legs = new ArrayList<>();
+
+            instructions = instructions.replace("{", "");
+            instructions = instructions.replace("}", "");
+            if (instructions.contains("from:")) {
+                instructions = instructions.replace("from:", "");
+            } else {
+                throw new Exception("Not an instruction we understand");
+            }
+
+            String[] legStrings = instructions.split(",");
+
+            for (String legString : legStrings) {
+                legString = legString.trim();
+                String[] fieldStrings = legString.split(" ");
+                double distance = Double.parseDouble(fieldStrings[0].trim());
+                double azimuth = Double.parseDouble(fieldStrings[1].trim());
+                double inclination = Double.parseDouble(fieldStrings[2].trim());
+                legs.add(new Leg(distance, azimuth, inclination));
+            }
+
+            return legs.toArray(new Leg[]{});
+        } catch (Exception exception) {
+            return new Leg[]{}; // seems to be corrupted... feature not mission-critical so bail
         }
     }
 

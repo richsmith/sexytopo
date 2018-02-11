@@ -1,0 +1,58 @@
+package org.hwyl.sexytopo.control.io.thirdparty.survex;
+
+import junit.framework.Assert;
+
+import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.Station;
+import org.hwyl.sexytopo.model.survey.Survey;
+import org.junit.Test;
+
+
+public class SurvexImporterTest {
+
+
+    @Test
+    public void testBasicImport() {
+        final String testContent =
+                "1\t2\t5.0\t0.0\t0.0";
+        Survey survey = new Survey("Test");
+        SurvexImporter.parse(testContent, survey);
+        Assert.assertEquals(survey.getAllStations().size(), 2);
+    }
+
+    @Test
+    public void testBasicImportRecordsPromotions() {
+        final String testContent =
+                "1\t2\t5.0\t0.0\t0.0\t; {from: 5.0 0.0 0.0, 5.0 0.0 0.0, 5.0 0.0 0.0}";
+        Survey survey = new Survey("Test");
+        SurvexImporter.parse(testContent, survey);
+        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Assert.assertEquals(3, leg.getPromotedFrom().length);
+    }
+
+    @Test
+    public void testBasicImportHandlesComments() {
+        final String testContent =
+                "1\t2\t5.0\t0.0\t0.0\t; {from: 5.0 0.0 0.0, 5.0 0.0 0.0, 5.0 0.0 0.0} testComment";
+        Survey survey = new Survey("Test");
+        SurvexImporter.parse(testContent, survey);
+        Station created = survey.getStationByName("2");
+        Assert.assertEquals(created.getComment(), "testComment");
+    }
+
+
+    @Test
+    public void testCommentInstructionParsing() {
+        Leg[] legs = SurvexImporter.parseAnyPromotedLegs(
+                "{from: 1 0 0, 1.0 0.0 0.0, 1.0 0.0 0.0}");
+        Assert.assertEquals(3, legs.length);
+        for (Leg leg : legs) {
+            Assert.assertEquals(leg.getDistance(), 1.0);
+            Assert.assertEquals(leg.getAzimuth(), 0.0);
+            Assert.assertEquals(leg.getInclination(), 0.0);
+        }
+    }
+}
+
+
+

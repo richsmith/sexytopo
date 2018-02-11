@@ -7,6 +7,17 @@ import org.hwyl.sexytopo.model.survey.Survey;
 
 public class BasicTestSurveyCreator {
 
+    public static Survey createStraightNorthThroughRepeats() {
+        Survey survey = new Survey("Test Straight Survey North");
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                Leg leg = new Leg(5, 0, 0);
+                SurveyUpdater.update(survey, leg);
+            }
+        }
+        return survey;
+    }
+
     public static Survey createStraightNorth() {
         Survey survey = new Survey("Test Straight Survey North");
 

@@ -39,7 +39,7 @@ public class Leg extends SurveyComponent{
                double inclination,
                Station destination,
                Leg[] promotedFrom) {
-        this(distance, azimuth, inclination, destination, NO_LEGS, false);
+        this(distance, azimuth, inclination, destination, promotedFrom, false);
     }
 
     public Leg(double distance,
@@ -145,6 +145,10 @@ public class Leg extends SurveyComponent{
 
     public Leg[] getPromotedFrom() {
         return promotedFrom;
+    }
+
+    public boolean wasPromoted() {
+        return promotedFrom.length > 0;
     }
 
     public boolean wasShotBackwards() {
