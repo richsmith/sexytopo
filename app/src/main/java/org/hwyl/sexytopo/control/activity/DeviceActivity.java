@@ -337,6 +337,7 @@ public class DeviceActivity extends SexyTopoActivity {
             Log.device("Pairing with " + device.getName());
             Method m = device.getClass().getMethod("createBond", (Class[]) null);
             m.invoke(device, (Object[])null);
+            Log.device("Pairing successful");
         } catch (Exception e) {
             Log.device("Error pairing: " + e.getMessage());
         }
@@ -456,7 +457,7 @@ public class DeviceActivity extends SexyTopoActivity {
                     pair(device);
                 } else {
                     String name = device.getName();
-                    Log.device("Device \"" + name + "\"detected (doesn't look like a DistoX)");
+                    Log.device("Device \"" + name + "\" detected (doesn't look like a DistoX)");
                 }
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 Log.device("Scan finished");
