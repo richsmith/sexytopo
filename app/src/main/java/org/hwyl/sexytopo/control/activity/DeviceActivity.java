@@ -41,14 +41,15 @@ public class DeviceActivity extends SexyTopoActivity {
 
     private static final BluetoothAdapter BLUETOOTH_ADAPTER = BluetoothAdapter.getDefaultAdapter();
 
+    private IntentFilter logFilter;
+    private IntentFilter statusFilter;
+    private IntentFilter scanFilter;
     private DeviceLogUpdateReceiver logUpdateReceiver;
-    private StateChangeReceiver stateChangeReceiver = new StateChangeReceiver();
-    private ScanReceiver pairReceiver = new ScanReceiver();
+    private StateChangeReceiver stateChangeReceiver;
+    private ScanReceiver scanReceiver;
 
     private boolean doConnection = false;
 
-    private IntentFilter pairFilter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
-    private IntentFilter bluetoothFilter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,40 +64,18 @@ public class DeviceActivity extends SexyTopoActivity {
 
         updateStatuses();
 
+        scanFilter = new IntentFilter();
+        scanFilter.addAction(BluetoothDevice.ACTION_FOUND);
+        scanFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        scanReceiver = new ScanReceiver();
+        registerReceiver(scanReceiver, scanFilter);
+
+        statusFilter = new IntentFilter();
+        statusFilter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
+        statusFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         stateChangeReceiver = new StateChangeReceiver();
+        registerReceiver(stateChangeReceiver, statusFilter);
 
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(BluetoothDevice.ACTION_FOUND);
-        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        registerReceiver(pairReceiver, filter);
-
-        registerReceiver(stateChangeReceiver, pairFilter);
-        registerReceiver(stateChangeReceiver, bluetoothFilter);
-    }
-
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(pairReceiver);
-        unregisterReceiver(stateChangeReceiver);
-    }
-
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        try {
-            unregisterReceiver(stateChangeReceiver);
-        } catch (Exception exception) { // this shouldn't ever happen
-            Log.e("Error unregistering receiver: " + exception.getMessage());
-        }
     }
 
 
@@ -104,11 +83,24 @@ public class DeviceActivity extends SexyTopoActivity {
     protected void onResume() {
         super.onResume();
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         logUpdateReceiver.update();
         updateStatuses();
-        registerReceiver(stateChangeReceiver, pairFilter);
-        registerReceiver(stateChangeReceiver, bluetoothFilter);
+
     }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try {
+            unregisterReceiver(stateChangeReceiver);
+            unregisterReceiver(scanReceiver);
+        } catch (Exception exception) { // this shouldn't ever happen
+            Log.e("Error unregistering receiver: " + exception.getMessage());
+        }
+    }
+
 
     private void updateStatuses() {
         updateBluetooth();
@@ -122,9 +114,11 @@ public class DeviceActivity extends SexyTopoActivity {
             ScrollView scrollView = (ScrollView)findViewById(R.id.scrollView);
             logUpdateReceiver = new DeviceLogUpdateReceiver(scrollView, logView);
 
-            IntentFilter filter = new IntentFilter(SexyTopo.DEVICE_LOG_UPDATED_EVENT);
             LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
-            broadcastManager.registerReceiver(logUpdateReceiver, filter);
+            logFilter = new IntentFilter();
+            logFilter.addAction(SexyTopo.DEVICE_LOG_UPDATED_EVENT);
+            broadcastManager.registerReceiver(logUpdateReceiver, logFilter);
+
         }
     }
 
