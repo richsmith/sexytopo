@@ -35,14 +35,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/abc_cab_background_internal_bg"
-        android:text="Switch Direction" />
-
-    <!--<Button
-        android:id="@+id/button4"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/abc_item_background_holo_light"
-        android:text="Set Entrance" />-->
+        android:text="Switch Direction"
+        android:visibility="gone"/>
 
 
 

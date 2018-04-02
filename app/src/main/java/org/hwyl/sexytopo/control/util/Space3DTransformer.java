@@ -27,7 +27,7 @@ public class Space3DTransformer {
     }
 
 
-    private void update(Space<Coord3D> space, Station station, Coord3D coord3D) {
+    protected void update(Space<Coord3D> space, Station station, Coord3D coord3D) {
         space.addStation(station, coord3D);
         for (Leg leg : station.getOnwardLegs()) {
             update(space, leg, coord3D);
@@ -35,7 +35,7 @@ public class Space3DTransformer {
     }
 
 
-    private void update(Space<Coord3D> space, Leg leg, Coord3D start) {
+    protected void update(Space<Coord3D> space, Leg leg, Coord3D start) {
         Coord3D end = transform(start, leg);
         Line<Coord3D> line = new Line<>(start, end);
         space.addLeg(leg, line);
@@ -46,22 +46,7 @@ public class Space3DTransformer {
 
 
     public Coord3D transform(Coord3D start, Leg leg) {
-        double r = leg.getDistance();
-        double phi = leg.getAzimuth();
-        double theta = leg.getInclination();
-
-        phi = Math.toRadians(phi);
-        theta = Math.toRadians(theta);
-
-        double y = r * Math.cos(theta) * Math.cos(phi);
-        double x = r * Math.cos(theta) * Math.sin(phi);
-        double z = r * Math.sin(theta);
-
-        x += start.getX();
-        y += start.getY();
-        z += start.getZ();
-
-        return new Coord3D(x, y, z);
+        return Space3DUtils.toCartesian(start, leg);
     }
 
 }

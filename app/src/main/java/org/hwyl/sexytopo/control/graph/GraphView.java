@@ -513,6 +513,11 @@ public class GraphView extends View {
             @Override
             public void onClick(View view) {
                 switch(view.getId()) {
+                    case R.id.graph_station_toggle_left_right:
+                        station.switchDirection();
+                        SurveyManager.getInstance(getContext()).broadcastSurveyUpdated();
+                        invalidate();
+                        break;
                     case R.id.graph_station_comment:
                         openCommentDialog(station);
                         break;
@@ -542,8 +547,7 @@ public class GraphView extends View {
             }
         };
 
-        PopupWindow menu = StationContextMenu.getFakeStationContextMenu(
-                getContext(), station, listener);
+        PopupWindow menu = activity.getContextMenu(station, listener);
 
         View unlinkSurveyButton = menu.getContentView().findViewById(R.id.graph_station_unlink_survey);
         unlinkSurveyButton.setEnabled(survey.hasLinkedSurveys(station));

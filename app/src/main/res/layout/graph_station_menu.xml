@@ -22,13 +22,14 @@
         android:text="@string/menu_comment"
         android:padding="10dp"/>
 
-    <!--
     <Button
-        android:id="@+id/graph_station_switchback"
+        android:id="@+id/graph_station_toggle_left_right"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/abc_cab_background_internal_bg"
-        android:text="Switchback" />-->
+        android:text="@string/menu_toggle_left_right"
+        android:padding="10dp"
+        android:visibility="gone"/>
 
     <Button
         android:id="@+id/graph_station_reverse"
@@ -37,12 +38,6 @@
         android:background="@drawable/abc_cab_background_internal_bg"
         android:text="@string/menu_reverse"
         android:padding="10dp"/>
-    <!--<Button
-        android:id="@+id/button4"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/abc_item_background_holo_light"
-        android:text="Set Entrance" />-->
 
     <Button
         android:id="@+id/graph_station_new_cross_section"

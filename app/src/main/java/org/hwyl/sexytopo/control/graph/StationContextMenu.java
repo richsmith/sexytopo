@@ -16,13 +16,15 @@ import org.hwyl.sexytopo.model.survey.Station;
 public class StationContextMenu {
 
 
-    public static PopupWindow getFakeStationContextMenu(Context context, Station station,
+    public PopupWindow getFakeStationContextMenu(Context context, Station station,
             final View.OnClickListener listener) {
         final PopupWindow fakeMenu = new PopupWindow(context);
 
         LayoutInflater inflater = (LayoutInflater)
                 (context.getSystemService(Context.LAYOUT_INFLATER_SERVICE));
         View view = inflater.inflate(R.layout.graph_station_menu, null);
+
+        postCreationHook(view);
 
         Button title = (Button)(view.findViewById(R.id.graph_station_title));
         title.setText(station.getName());
@@ -32,6 +34,7 @@ public class StationContextMenu {
         fakeMenu.setContentView(view);
 
         int[] ids = new int[] {
+                R.id.graph_station_toggle_left_right,
                 R.id.graph_station_comment,
                 R.id.graph_station_delete,
                 R.id.graph_station_reverse,
@@ -55,5 +58,9 @@ public class StationContextMenu {
         fakeMenu.setOutsideTouchable(true);
 
         return fakeMenu;
+    }
+
+    protected void postCreationHook(View view) {
+        // Does nothing - provided to allow subclasses to override
     }
 }

@@ -5,7 +5,7 @@ import org.hwyl.sexytopo.model.survey.Survey;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.hwyl.sexytopo.SexyTopo.ALLOWED_DOUBLE_DELTA_FOR_TESTS;
+import static org.hwyl.sexytopo.SexyTopo.ALLOWED_DOUBLE_DELTA;
 
 
 public class SurveyUpdaterTest {
@@ -41,7 +41,7 @@ public class SurveyUpdaterTest {
 
         Assert.assertEquals(survey.getAllLegs().size(), 1);
         Assert.assertEquals(survey.getAllLegs().get(0).getDistance(), 6,
-                ALLOWED_DOUBLE_DELTA_FOR_TESTS);
+                ALLOWED_DOUBLE_DELTA);
     }
 
     @Test
@@ -55,7 +55,7 @@ public class SurveyUpdaterTest {
 
         Assert.assertEquals(survey.getAllLegs().size(), 1);
         Assert.assertEquals(survey.getAllLegs().get(0).getDistance(), 6,
-                ALLOWED_DOUBLE_DELTA_FOR_TESTS);
+                ALLOWED_DOUBLE_DELTA);
     }
 
 }

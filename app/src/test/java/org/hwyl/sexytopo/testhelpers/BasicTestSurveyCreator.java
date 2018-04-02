@@ -64,4 +64,28 @@ public class BasicTestSurveyCreator {
         return survey;
 
     }
+
+    public static Survey create5MDown() {
+        Survey survey = new Survey("Test Survey 1m Down");
+
+        Leg leg0 = new Leg(5, 0, -90);
+        SurveyUpdater.updateWithNewStation(survey, leg0);
+
+        return survey;
+    }
+
+    public static Survey create5MEast() {
+        Survey survey = new Survey("Test Survey 5m east");
+
+        Leg leg0 = new Leg(5, 90, 0);
+        SurveyUpdater.updateWithNewStation(survey, leg0);
+
+        Leg splay0Left = new Leg(1, 0, 0);
+        SurveyUpdater.update(survey, splay0Left);
+        Leg splay0Right = new Leg(1, 180, 0);
+        SurveyUpdater.update(survey, splay0Right);
+
+        return survey;
+    }
+
 }

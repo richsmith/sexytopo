@@ -81,7 +81,7 @@ public class Leg extends SurveyComponent{
                 leg.promotedFrom, leg.wasShotBackwards);
     }
 
-    public static Leg upgradeSplayToConnectedLeg(Leg splay, Station destination) {
+    public static Leg manuallyUpgradeSplayToConnectedLeg(Leg splay, Station destination) {
         return upgradeSplayToConnectedLeg(splay, destination, NO_LEGS);
     }
 
@@ -105,11 +105,15 @@ public class Leg extends SurveyComponent{
 
     public Leg rotate(double delta) {
         double adjustedAzimuth = Space2DUtils.adjustAngle(getAzimuth(), delta);
+        return adjustAzimuth(adjustedAzimuth);
+    }
+
+    public Leg adjustAzimuth(double newAzimuth) {
         if (hasDestination()) {
-            return new Leg(getDistance(), adjustedAzimuth, getInclination(),
-                     getDestination(), getPromotedFrom());
+            return new Leg(getDistance(), newAzimuth, getInclination(),
+                    getDestination(), getPromotedFrom());
         } else {
-            return new Leg(getDistance(), adjustedAzimuth, getInclination());
+            return new Leg(getDistance(), newAzimuth, getInclination());
         }
     }
 

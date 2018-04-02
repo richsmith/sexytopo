@@ -73,7 +73,7 @@ public class SurveyUpdater {
         if (!leg.hasDestination()) {
             Station newStation =
                     new Station(StationNamer.generateNextStationName(survey, activeStation));
-            leg = Leg.upgradeSplayToConnectedLeg(leg, newStation);
+            leg = Leg.manuallyUpgradeSplayToConnectedLeg(leg, newStation);
         }
 
         // FIXME; could the below be moved into Survey? And from elsewhere in this file?
@@ -85,7 +85,7 @@ public class SurveyUpdater {
 
     public static void upgradeSplayToConnectedLeg(Survey survey, Leg leg) {
         Station newStation = new Station(getNextStationName(survey));
-        Leg newLeg = Leg.upgradeSplayToConnectedLeg(leg, newStation);
+        Leg newLeg = Leg.manuallyUpgradeSplayToConnectedLeg(leg, newStation);
         editLeg(survey, leg, newLeg);
         survey.setActiveStation(newStation);
     }
@@ -102,7 +102,10 @@ public class SurveyUpdater {
             List<Leg> legs = getLatestNLegs(activeStation, SexyTopo.NUM_OF_REPEATS_FOR_NEW_STATION);
 
             if (areLegsAboutTheSame(legs)) {
+
                 Station newStation = new Station(getNextStationName(survey));
+                newStation.setExtendedElevationDirection(
+                        activeStation.getExtendedElevationDirection());
 
                 Leg newLeg = averageLegs(legs);
                 newLeg = Leg.upgradeSplayToConnectedLeg(
@@ -140,9 +143,11 @@ public class SurveyUpdater {
 
             if (areLegsBacksights(fore, back)) {
                 Station newStation = new Station(getNextStationName(survey));
+                newStation.setExtendedElevationDirection(
+                        activeStation.getExtendedElevationDirection());
 
                 Leg newLeg = averageBacksights(fore, back);
-                newLeg = Leg.upgradeSplayToConnectedLeg(newLeg, newStation);
+                newLeg = Leg.manuallyUpgradeSplayToConnectedLeg(newLeg, newStation);
 
                 activeStation.getOnwardLegs().removeAll(legs);
                 activeStation.getOnwardLegs().add(newLeg);

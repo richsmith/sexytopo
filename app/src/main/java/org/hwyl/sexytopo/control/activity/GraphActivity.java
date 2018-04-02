@@ -15,14 +15,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.PopupMenu;
+import android.widget.PopupWindow;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.graph.GraphView;
+import org.hwyl.sexytopo.control.graph.StationContextMenu;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.Sketch;
+import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 
@@ -358,6 +361,10 @@ public abstract class GraphActivity extends SexyTopoActivity
                 button.getBackground().clearColorFilter();
             }
         }
+    }
+
+    public PopupWindow getContextMenu(Station station, View.OnClickListener listener) {
+        return new StationContextMenu().getFakeStationContextMenu(this, station, listener);
     }
 
 }

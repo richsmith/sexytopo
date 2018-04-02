@@ -37,7 +37,7 @@ public class SexyTopo {
     public static final String METADATA_EXTENSION = "metadata.json";
     public static final String AUTOSAVE_EXTENSION = "autosave";
 
-    public static final double ALLOWED_DOUBLE_DELTA_FOR_TESTS = 0.0001;
+    public static final double ALLOWED_DOUBLE_DELTA = 0.0001;
 
     // This is extremely hacky but quite useful for getting a context when it's not sensible
     // to pass one around

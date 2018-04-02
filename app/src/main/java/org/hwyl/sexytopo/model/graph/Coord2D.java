@@ -1,6 +1,9 @@
 package org.hwyl.sexytopo.model.graph;
 
 
+import org.hwyl.sexytopo.control.util.NumberTools;
+
+
 public class Coord2D extends Coord {
 
     public static final Coord2D ORIGIN = new Coord2D(0, 0);
@@ -50,8 +53,8 @@ public class Coord2D extends Coord {
             return false;
         } else {
             Coord2D coord2D = (Coord2D)object;
-
-            return (coord2D.x == x) && (coord2D.y == y);
+            return NumberTools.isWithinDelta(coord2D.x, x) &&
+                    NumberTools.isWithinDelta(coord2D.y, y);
         }
     }
 

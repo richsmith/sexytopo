@@ -15,9 +15,9 @@ public class SurvexExporterTest {
         SurvexExporter survexExporter = new SurvexExporter();
         Survey oneNorth = BasicTestSurveyCreator.createStraightNorth();
         String content = survexExporter.getContent(oneNorth);
-        Assert.assertTrue(content.contains("1\t2\t5.0\t0.0\t0.0"));
-        Assert.assertTrue(content.contains("2\t3\t5.0\t0.0\t0.0"));
-        Assert.assertTrue(content.contains("3\t4\t5.0\t0.0\t0.0"));
+        Assert.assertTrue(content.contains("1\t2\t5.00\t0.00\t0.00"));
+        Assert.assertTrue(content.contains("2\t3\t5.00\t0.00\t0.00"));
+        Assert.assertTrue(content.contains("3\t4\t5.00\t0.00\t0.00"));
 
     }
 
@@ -26,9 +26,9 @@ public class SurvexExporterTest {
         SurvexExporter survexExporter = new SurvexExporter();
         Survey oneNorth = BasicTestSurveyCreator.createStraightNorthThroughRepeats();
         String content = survexExporter.getContent(oneNorth);
-        Assert.assertTrue(content.contains("1\t2\t5.0\t0.0\t0.0"));
+        Assert.assertTrue(content.contains("1\t2\t5.00\t0.00\t0.00"));
         Assert.assertTrue(content.contains(
-                "{from: 5.0 0.0 0.0, 5.0 0.0 0.0, 5.0 0.0 0.0}"));
+                "{from: 5.00 0.00 0.00, 5.00 0.00 0.00, 5.00 0.00 0.00}"));
 
     }
 

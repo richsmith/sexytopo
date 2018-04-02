@@ -66,7 +66,7 @@ public class ConnectedSurveysTest {
         Survey translatedSurvey = getNamedSurvey(translated, "joined");
         Space<Coord2D> projection = translated.get(translatedSurvey);
         Coord2D newStationPoint = getStationPosition(projection, "2");
-        Assert.assertEquals(-2.0, newStationPoint.getY(), SexyTopo.ALLOWED_DOUBLE_DELTA_FOR_TESTS);
+        Assert.assertEquals(-2.0, newStationPoint.getY(), SexyTopo.ALLOWED_DOUBLE_DELTA);
     }
 
 
@@ -95,7 +95,7 @@ public class ConnectedSurveysTest {
         Space<Coord2D> projection = translated.get(translatedSurvey);
 
         Coord2D newStationPoint = getStationPosition(projection, "2");
-        Assert.assertEquals(-3.0, newStationPoint.getY(), SexyTopo.ALLOWED_DOUBLE_DELTA_FOR_TESTS);
+        Assert.assertEquals(-3.0, newStationPoint.getY(), SexyTopo.ALLOWED_DOUBLE_DELTA);
     }
 
     private Survey getNamedSurvey(Map<Survey, Space<Coord2D>> map, String name) throws Exception {
