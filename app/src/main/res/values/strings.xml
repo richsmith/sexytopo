@@ -9,6 +9,7 @@
     <string name="action_file">File</string>
     <string name="action_survey">Stats</string>
     <string name="action_settings">Settings</string>
+    <string name="action_dev">Dev</string>
     <string name="action_device">DistoX</string>
     <string name="action_calibration">Calibration</string>
     <string name="action_help">Help</string>
@@ -28,6 +29,7 @@
     <string name="action_tools">Tools</string>
     <string name="action_undo_last_leg">Undo last reading</string>
     <string name="action_link_to_existing_survey">Link to an Existing Survey</string>
+    <string name="action_system_log">System Log</string>
     <string name="action_generate_test_survey">Generate Test Survey</string>
     <string name="loaded">Loaded</string>
     <string name="restored">Restored</string>
@@ -41,6 +43,7 @@
     <string name="title_activity_plan">Plan</string>
     <string name="title_activity_elevation">Elevation</string>
     <string name="title_activity_device">DistoX</string>
+    <string name="title_activity_system_log">System Log</string>
     <string name="menu_context_title">Station</string>
     <string name="menu_set_active_station">Set Active Station</string>
     <string name="menu_rename_station">Rename Station</string>

@@ -40,8 +40,10 @@ public class StartUpActivity extends SexyTopoActivity {
     public Survey loadActiveSurvey() {
 
         String activeSurveyName = getPreferences().getString(SexyTopo.ACTIVE_SURVEY_NAME, "Error");
+        Log.d("Loading active survey " + activeSurveyName);
 
         if (!Util.doesSurveyExist(this, activeSurveyName)) {
+            Log.e("Survey " + activeSurveyName + " does not exist");
             startNewSurvey();
             return createNewActiveSurvey();
         }

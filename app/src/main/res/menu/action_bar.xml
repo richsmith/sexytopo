@@ -58,8 +58,6 @@
                 android:title="@string/action_undo_last_leg" />
             <item android:id="@+id/action_link_survey"
                   android:title="@string/action_link_to_existing_survey"/>
-            <item android:id="@+id/action_generate_test_survey"
-                android:title="@string/action_generate_test_survey" />
         </menu>
     </item>
     <item android:id="@+id/action_survey"
@@ -75,6 +73,18 @@
         android:orderInCategory="100"
         android:visible="false"
         app:showAsAction="never" />
+    <item android:id="@+id/dev_settings"
+          android:title="@string/action_dev"
+          android:visible="true"
+          android:orderInCategory="100"
+          app:showAsAction="never">
+        <menu>
+            <item android:id="@+id/action_system_log"
+                  android:title="@string/action_system_log" />
+            <item android:id="@+id/action_generate_test_survey"
+                  android:title="@string/action_generate_test_survey" />
+        </menu>
+    </item>
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
         android:visible="true"

@@ -93,6 +93,10 @@ public abstract class GraphActivity extends SexyTopoActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (true) {
+            throw new RuntimeException("FooBar");
+        }
+
         BroadcastReceiver updatedReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {

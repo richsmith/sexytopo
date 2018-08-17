@@ -872,6 +872,28 @@ public class GraphView extends View {
                 canvas.drawBitmap(icon, null, rect, stationPaint);
                 nextX += crossDiameter + spacing;
             }
+
+            CrossSection crossSection = sketch.getCrossSection(station);
+            if (crossSection != null) {
+                canvas.drawText("a" + crossSection.getAngle(), x + 100, y, stationPaint);
+                float angle = (float)(crossSection.getAngle());
+                float width = 50;
+                float startX = x - ((width / 2) * (float)Math.cos(angle));
+                float startY = y - ((width / 2) * (float)Math.sin(angle));
+                float endX = x + ((width / 2) * (float)Math.cos(angle));
+                float endY = y + ((width / 2) * (float)Math.sin(angle));
+
+                canvas.drawLine(startX, startY, endX, endY, stationPaint);
+
+
+                float tickAngle = (float)Space2DUtils.adjustAngle(angle, 90);
+                float endTickOneX = startX + (20 * (float)Math.cos(tickAngle));
+                float endTickOneY = startY + (20 * (float)Math.sin(tickAngle));
+
+                canvas.drawLine(startX, startY, endTickOneX, endTickOneY, stationPaint);
+
+
+            }
         }
     }
 

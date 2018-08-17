@@ -24,9 +24,9 @@ import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.comms.DistoXPoller;
 import org.hwyl.sexytopo.control.Log;
+import org.hwyl.sexytopo.control.util.LogUpdateReceiver;
 
 import java.lang.reflect.Method;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -44,7 +44,7 @@ public class DeviceActivity extends SexyTopoActivity {
     private IntentFilter logFilter;
     private IntentFilter statusFilter;
     private IntentFilter scanFilter;
-    private DeviceLogUpdateReceiver logUpdateReceiver;
+    private LogUpdateReceiver logUpdateReceiver;
     private StateChangeReceiver stateChangeReceiver;
     private ScanReceiver scanReceiver;
 
@@ -112,7 +112,7 @@ public class DeviceActivity extends SexyTopoActivity {
         if (logUpdateReceiver == null) {
             TextView logView = (TextView)findViewById(R.id.deviceLog);
             ScrollView scrollView = (ScrollView)findViewById(R.id.scrollView);
-            logUpdateReceiver = new DeviceLogUpdateReceiver(scrollView, logView);
+            logUpdateReceiver = new LogUpdateReceiver(scrollView, logView, Log.LogType.DEVICE);
 
             LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
             logFilter = new IntentFilter();
@@ -386,42 +386,6 @@ public class DeviceActivity extends SexyTopoActivity {
         }
 
         return distoXes.toArray(new BluetoothDevice[]{})[0];
-    }
-
-
-    private class DeviceLogUpdateReceiver extends BroadcastReceiver {
-
-        private final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("HH:mm");
-
-        private ScrollView scrollView;
-        private TextView logView;
-
-        private DeviceLogUpdateReceiver(ScrollView scrollView, TextView logView) {
-            this.scrollView = scrollView;
-            this.logView = logView;
-        }
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            update();
-        }
-
-        private void update() {
-
-            StringBuilder logText = new StringBuilder();
-
-            for (Log.Message message : Log.getDeviceLog()) {
-                String timestamp = TIMESTAMP_FORMAT.format(message.getTimestamp());
-                logText.append("\n" + timestamp + " " + message.getText());
-            }
-
-            logView.setText(logText);
-            scrollView.fullScroll(ScrollView.FOCUS_DOWN);
-
-            scrollView.invalidate();
-
-        }
-
     }
 
 

@@ -2,6 +2,7 @@ package org.hwyl.sexytopo.model.sketch;
 
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.graph.Coord2D;
+import org.hwyl.sexytopo.model.survey.Station;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -190,6 +191,18 @@ public class Sketch {
 
     public void setCrossSectionDetails(Set<CrossSectionDetail> crossSectionDetails) {
         this.crossSectionDetails = crossSectionDetails;
+    }
+
+    public CrossSection getCrossSection(Station station) {
+        // this is a bit inefficient... not sure if it's worth caching this in a map though since
+        // there'll probably be max a couple of dozen x-sections per survey chunk
+        for (CrossSectionDetail detail : crossSectionDetails) {
+            CrossSection crossSection = detail.getCrossSection();
+            if (crossSection.getStation() == station) {
+                return crossSection;
+            }
+        }
+        return null;
     }
 
     public Sketch getTranslatedCopy(Coord2D point) {

@@ -14,7 +14,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,6 +23,7 @@ import android.widget.Toast;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.control.io.basic.Loader;
@@ -165,6 +165,11 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 return true;
             case R.id.action_link_survey:
                 confirmToProceedIfNotSaved("linkExistingSurvey");
+                return true;
+
+
+            case R.id.action_system_log:
+                startActivity(SystemLogActivity.class);
                 return true;
             case R.id.action_generate_test_survey:
                 generateTestSurvey();
@@ -458,6 +463,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     public void startNewSurvey() {  // public due to stupid Reflection requirements
 
+        Log.d("Starting new survey");
+
         final EditText input = new EditText(this);
         String defaultName = Util.getNextDefaultSurveyName(this);
         input.setText(defaultName);
@@ -609,7 +616,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                                     return;
                                 }
                             }
-                            throw new Exception("couldn't find linked survey");
+                            throw new Exception("Couldn't find linked survey");
 
                         } catch (Exception exception) {
                             showException(exception);
@@ -654,7 +661,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                             startNewSurvey();
                         } catch (Exception e) {
                             showSimpleToast(R.string.error_deleting_survey);
-                                    Log.d(SexyTopo.TAG, "Error deleting survey: " + e);
+                            Log.d("Error deleting survey: " + e);
                         }
                     }
                 }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
@@ -896,6 +903,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     public void showSimpleToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+        Log.d("Toast: " + message);
     }
 
     public void showSimpleToast(int id) {
@@ -904,7 +912,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
 
     private void showException(Exception exception) {
-        Log.d(SexyTopo.TAG, "Error: " + exception);
+        Log.e(exception.getMessage());
+        Log.e(android.util.Log.getStackTraceString(exception));
         showSimpleToast(getString(R.string.error_prefix) + " " + exception.getMessage());
     }
 
