@@ -13,12 +13,6 @@ import java.util.List;
 
 public class SurveyUpdater {
 
-    static {
-        //MediaPlayer mediaPlayer = MediaPlayer.create(context, R.raw.sound_file_1);
-        //mediaPlayer.start(); // no need to call prepare(); create() does that for you
-    }
-
-
     private static final float DEFAULT_MAX_DISTANCE_DELTA = 0.2f;
     private static final float DEFAULT_MAX_ANGLE_DELTA = 1.0f;
 
@@ -61,6 +55,10 @@ public class SurveyUpdater {
             case COMBO:
                 justCreatedNewStation = createNewStationIfBacksight(survey) ||
                         createNewStationIfTripleShot(survey, false);
+        }
+
+        if (justCreatedNewStation) {
+            Log.d("Created new station " + survey.getActiveStation().getName());
         }
 
         return justCreatedNewStation;
@@ -174,6 +172,7 @@ public class SurveyUpdater {
                         if (leg == toEdit) {
                             origin.getOnwardLegs().remove(toEdit);
                             origin.getOnwardLegs().add(edited);
+                            Log.d("Edited leg " + toEdit + " -> " + edited);
                             return true;
                         } else {
                             return false;
@@ -211,6 +210,7 @@ public class SurveyUpdater {
     public static void renameStation(Survey survey, Station station, String name) {
         Station renamed = new Station(station, name);
         editStation(survey, station, renamed);
+        Log.d("Renamed station " + station.getName() + " -> " + renamed.getName());
     }
 
 
@@ -315,7 +315,7 @@ public class SurveyUpdater {
         }
         boolean splitOverZero = max - min > 180;
         double[] correctedAzms = new double[azimuths.length];
-        for (int i=0; i < azimuths.length; i++) {
+        for (int i = 0; i < azimuths.length; i++) {
             correctedAzms[i] = (splitOverZero && azimuths[i] < 180) ? azimuths[i] + 360: azimuths[i];
             sum += correctedAzms[i];
         }
@@ -324,7 +324,7 @@ public class SurveyUpdater {
 
 
     public static void reverseLeg(Survey survey, final Station toReverse) {
-        Log.d("reversing " + toReverse.getName());
+        Log.d("Reversing leg to " + toReverse.getName());
         SurveyTools.traverseLegs(
                 survey,
                 new SurveyTools.SurveyLegTraversalCallback() {
@@ -332,6 +332,8 @@ public class SurveyUpdater {
                     public boolean call(Station origin, Leg leg) {
                         if (leg.hasDestination() && leg.getDestination() == toReverse) {
                             Leg reversed = leg.reverse();
+                            Log.d("Reversed direction of leg " + leg + " [to station " +
+                                    toReverse.getName() + "] -> " + reversed);
                             origin.getOnwardLegs().remove(leg);
                             origin.addOnwardLeg(reversed);
                             return true;

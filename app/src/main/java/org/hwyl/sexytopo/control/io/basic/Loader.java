@@ -1,9 +1,9 @@
 package org.hwyl.sexytopo.control.io.basic;
 
 import android.content.Context;
-import android.util.Log;
 
 import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Leg;
@@ -117,7 +117,7 @@ public class Loader {
             }
 
         } catch (Exception e) {
-            Log.d(SexyTopo.TAG, "Error trying to read " + filename + ": " + e.getMessage());
+            Log.e("Error trying to read " + filename + ": " + e.getMessage());
         }
         return text.toString();
     }

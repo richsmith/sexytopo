@@ -145,13 +145,13 @@ public class DistoXPoller extends Thread {
                 byte[] packet = new byte[8];
                 inStream.readFully(packet, 0, 8);
 
-                Log.d("Received data: " + DistoXProtocol.describeDataPacket(packet));
+                //Log.d("Received data: " + DistoXProtocol.describeDataPacket(packet));
 
                 byte type = (byte) (packet[0] & 0x3f);
 
                 byte[] acknowledgePacket = DistoXProtocol.createAcknowledgementPacket(packet);
                 outStream.write(acknowledgePacket, 0, acknowledgePacket.length);
-                Log.d("Sent Ack: " + DistoXProtocol.describeAcknowledgementPacket(acknowledgePacket));
+                //Log.d("Sent Ack: " + DistoXProtocol.describeAcknowledgementPacket(acknowledgePacket));
 
 
                 if ((packet[0] & 0x03) == 0) {
@@ -178,7 +178,7 @@ public class DistoXPoller extends Thread {
 
         } catch (IOException e) {
             if (e.getMessage().toLowerCase().contains("bt socket closed")) {
-                Log.d("Connection closed");
+                //Log.d("Connection closed");
                 disconnect();
             } else {
                 Log.device("Communication error: " + e.getMessage());

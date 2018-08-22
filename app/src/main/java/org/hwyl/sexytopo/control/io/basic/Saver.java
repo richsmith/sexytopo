@@ -3,6 +3,7 @@ package org.hwyl.sexytopo.control.io.basic;
 import android.content.Context;
 
 import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexExporter;
 import org.hwyl.sexytopo.model.sketch.Sketch;
@@ -35,6 +36,8 @@ public class Saver {
         saveSketch(context, survey, survey.getElevationSketch(),
                 SexyTopo.EXT_ELEVATION_SKETCH_EXTENSION);
         survey.setSaved(true);
+
+        Log.d("Saved survey " + survey.getName());
     }
 
     public static void autosave(Context context, Survey survey) throws Exception {

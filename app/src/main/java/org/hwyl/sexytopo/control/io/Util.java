@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 
 import static org.hwyl.sexytopo.SexyTopo.EXPORT_DIR;
 import static org.hwyl.sexytopo.SexyTopo.IMPORT_DIR;
+import static org.hwyl.sexytopo.SexyTopo.LOG_DIR;
 import static org.hwyl.sexytopo.SexyTopo.SURVEY_DIR;
 
 
@@ -254,6 +255,10 @@ public class Util {
 
     public static File getExportDirectory(Context context) {
         return new File(getDocumentRoot(context), EXPORT_DIR);
+    }
+
+    public static File getLogDirectory(Context context) {
+        return new File(getDocumentRoot(context), LOG_DIR);
     }
 
     public static String getAutosaveName(String filename) {

@@ -2,14 +2,11 @@ package org.hwyl.sexytopo.control.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.Log;
-import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.io.Util;
-import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 
@@ -20,12 +17,18 @@ public class StartUpActivity extends SexyTopoActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_up);
 
+        Log.setContext(this);
+        Log.load(Log.LogType.SYSTEM);
+        Log.d("--------------------");
+        Log.d("Starting up");
+
         Util.ensureDataDirectoriesExist(this);
 
-        Survey survey = isThereAnActiveSurvey() ? loadActiveSurvey() : createNewActiveSurvey();
-        SurveyManager.getInstance(this).setCurrentSurvey(survey);
-
-        Log.setContext(this);
+        if (isThereAnActiveSurvey()) {
+            loadActiveSurvey();
+        } else {
+            createNewActiveSurvey();
+        }
 
         Intent intent = new Intent(this, DeviceActivity.class);
         startActivity(intent);
@@ -37,41 +40,27 @@ public class StartUpActivity extends SexyTopoActivity {
     }
 
 
-    public Survey loadActiveSurvey() {
+    public void loadActiveSurvey() {
 
         String activeSurveyName = getPreferences().getString(SexyTopo.ACTIVE_SURVEY_NAME, "Error");
-        Log.d("Loading active survey " + activeSurveyName);
+        Log.d("Active survey is <i>" + activeSurveyName + "</i>");
 
         if (!Util.doesSurveyExist(this, activeSurveyName)) {
             Log.e("Survey " + activeSurveyName + " does not exist");
             startNewSurvey();
-            return createNewActiveSurvey();
+            createNewActiveSurvey();
+            return;
         }
 
-        Toast.makeText(getApplicationContext(),
-                getString(R.string.loading_survey) + " " + activeSurveyName,
-                Toast.LENGTH_SHORT).show();
-
-        Survey survey;
-        try {
-            survey = Loader.loadSurvey(this, activeSurveyName);
-        } catch (Exception e) {
-            survey = createNewActiveSurvey();
-            Toast.makeText(getApplicationContext(),
-                    getString(R.string.loading_survey_error),
-                    Toast.LENGTH_SHORT).show();
-        }
-
-        return survey;
+        loadSurvey(activeSurveyName);
     }
 
 
-    private Survey createNewActiveSurvey() {
+    private void createNewActiveSurvey() {
         String defaultName = Util.getNextDefaultSurveyName(this);
         Survey survey = new Survey(defaultName);
-        return survey;
+        setSurvey(survey);
     }
-
 
 
 }

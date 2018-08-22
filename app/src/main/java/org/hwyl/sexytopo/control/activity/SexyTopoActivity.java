@@ -661,7 +661,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                             startNewSurvey();
                         } catch (Exception e) {
                             showSimpleToast(R.string.error_deleting_survey);
-                            Log.d("Error deleting survey: " + e);
+                            Log.e("Error deleting survey: " + e);
                         }
                     }
                 }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
@@ -708,17 +708,25 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String surveyName = arrayAdapter.getItem(which);
-                        try {
-                            Survey survey = Loader.loadSurvey(SexyTopoActivity.this, surveyName);
-                            SurveyManager.getInstance(SexyTopoActivity.this).setCurrentSurvey(survey);
-                            updateRememberedSurvey();
-                            showSimpleToast(getString(R.string.loaded) + " " + surveyName);
-                        } catch (Exception exception) {
-                            showException(exception);
-                        }
+                        loadSurvey(surveyName);
                     }
                 });
         builderSingle.show();
+    }
+
+
+    protected void loadSurvey(String surveyName) {
+        try {
+            Log.d("Loading survey <i>" + surveyName + "</i>...");
+            Survey survey = Loader.loadSurvey(SexyTopoActivity.this, surveyName);
+            SurveyManager.getInstance(SexyTopoActivity.this).setCurrentSurvey(survey);
+            updateRememberedSurvey();
+            Log.d("Loaded");
+            showSimpleToast(getString(R.string.loaded) + " " + surveyName);
+        } catch (Exception exception) {
+            showException(exception);
+        }
+
     }
 
 
@@ -897,13 +905,12 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     protected void setSurvey(Survey survey) {
         SurveyManager.getInstance(this).setCurrentSurvey(survey);
-
     }
 
 
     public void showSimpleToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-        Log.d("Toast: " + message);
+        Log.d("Shown: " + message);
     }
 
     public void showSimpleToast(int id) {
@@ -912,8 +919,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
 
     private void showException(Exception exception) {
-        Log.e(exception.getMessage());
-        Log.e(android.util.Log.getStackTraceString(exception));
+        Log.e(exception);
         showSimpleToast(getString(R.string.error_prefix) + " " + exception.getMessage());
     }
 

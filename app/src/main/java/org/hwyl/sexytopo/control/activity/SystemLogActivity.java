@@ -29,8 +29,9 @@ public class SystemLogActivity extends SexyTopoActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d("Resumed");
-        Log.e("Test\n\n\n");
+        if (logUpdateReceiver != null) {
+            logUpdateReceiver.update();
+        }
     }
 
     private void setupLogView() {
@@ -43,9 +44,7 @@ public class SystemLogActivity extends SexyTopoActivity {
             IntentFilter logFilter = new IntentFilter();
             logFilter.addAction(SexyTopo.SYSTEM_LOG_UPDATED_EVENT);
             broadcastManager.registerReceiver(logUpdateReceiver, logFilter);
-
-            Log.d("system log started");
-
+            //Log.broadcast(SexyTopo.SYSTEM_LOG_UPDATED_EVENT);
         }
     }
 }

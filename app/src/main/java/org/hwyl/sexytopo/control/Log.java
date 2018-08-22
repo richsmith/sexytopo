@@ -5,7 +5,14 @@ import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 
 import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.control.io.Util;
+import org.hwyl.sexytopo.control.io.basic.Loader;
+import org.hwyl.sexytopo.control.io.basic.Saver;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -28,7 +35,7 @@ public class Log {
     private static final int MAX_DEVICE_LOG_SIZE = 100;
     private static Queue<Message> deviceLog = new LinkedList<>();
 
-    private static final int MAX_SYSTEM_LOG_SIZE = 500;
+    private static final int MAX_SYSTEM_LOG_SIZE = 1000;
     private static Queue<Message> systemLog = new LinkedList<>();
 
     public enum LogType {
@@ -49,15 +56,17 @@ public class Log {
         deviceLog.add(new Message(message));
         broadcast(SexyTopo.DEVICE_LOG_UPDATED_EVENT);
         android.util.Log.i(SexyTopo.TAG, message);
+        save(LogType.DEVICE);
     }
 
     public static synchronized void systemLog(String message, boolean isError) {
 
-        if (systemLog.size() >= MAX_SYSTEM_LOG_SIZE) {
+        while (systemLog.size() >= MAX_SYSTEM_LOG_SIZE) {
             systemLog.remove();
         }
         systemLog.add(new Message(message, isError));
         broadcast(SexyTopo.SYSTEM_LOG_UPDATED_EVENT);
+        save(LogType.SYSTEM);
     }
 
     public static void d(String message) {
@@ -73,6 +82,7 @@ public class Log {
 
     public static void e(Throwable throwable) {
         e(throwable.getMessage());
+        e(android.util.Log.getStackTraceString(throwable));
     }
 
 
@@ -89,6 +99,7 @@ public class Log {
         broadcastManager.sendBroadcast(intent);
 
     }
+
 
     public static synchronized List<Message> getLog(LogType logType) {
         try {
@@ -112,26 +123,70 @@ public class Log {
         broadcast(SexyTopo.DEVICE_LOG_UPDATED_EVENT);
     }
 
-    public List<Map<String, String>> marshal(LogType logType) {
-        List<Map<String, String>> marshalled = new LinkedList<>();
+
+    public static void save(LogType logType) {
+
+        if (context == null) {
+            return;
+        }
+
+        try {
+            JSONArray marshalled = marshal(logType);
+            String content = marshalled.toString(4);
+            String path = getFilePath(logType);
+            Saver.saveFile(context, path, content);
+        } catch (Exception exception) {
+            android.util.Log.e(SexyTopo.TAG, exception.toString());
+        }
+    }
+
+    public static void load(LogType logType) {
+        try {
+            String path = getFilePath(logType);
+            String content = Loader.slurpFile(path);
+            unmarshal(logType, content);
+        } catch (Exception exception) {
+            Log.e("Error loading " + logType + ": " + exception.toString());
+        }
+    }
+
+
+    public static String getFilePath(LogType logType) {
+        String dir = Util.getLogDirectory(context).getPath();
+        return dir + File.separator + logType.toString().toLowerCase() + ".json";
+    }
+
+
+    public static JSONArray marshal(LogType logType) {
+        JSONArray marshalled = new JSONArray();
         List<Message> messages = getLog(logType);
         for (Message message : messages) {
-            marshalled.add(message.marshal());
+            marshalled.put(message.marshal());
         }
         return marshalled;
     }
 
-    public void unmarshal(LogType logType, List<Map<String, String>> data) {
+
+    public static void unmarshal(LogType logType, String text) throws ParseException, JSONException {
+        JSONArray array = new JSONArray(text);
         Queue<Message> log = new LinkedList<>();
-        for (Map<String, String> entry : data) {
-            //log.add(Message.unmarshal(entry));
+
+        for (int i = 0; i < array.length(); i++) {
+            log.add(Message.unmarshal(array.getJSONObject(i)));
         }
 
+        setLog(logType, log);
+
+    }
+
+    private static void setLog(LogType logType, Queue<Message> log) {
         switch(logType) {
             case SYSTEM:
                 systemLog = log;
+                break;
             case DEVICE:
                 deviceLog = log;
+                break;
         }
     }
 
@@ -172,18 +227,18 @@ public class Log {
             return isError;
         }
 
-        public Map<String, String> marshal() {
+        public JSONObject marshal() {
             Map<String, String> map = new HashMap<>();
-            map.put("timestamp", timestamp.toString());
+            map.put("timestamp", FORMAT.format(timestamp));
             map.put("isError", Boolean.toString(isError));
             map.put("text", text);
-            return map;
+            return new JSONObject(map);
         }
 
-        public static Message unmarshal(Map<String, String> map) throws ParseException{
-            Date timestamp = FORMAT.parse(map.get("timestamp"));
-            boolean isError = Boolean.valueOf(map.get("isError"));
-            String text = map.get("text");
+        public static Message unmarshal(JSONObject object) throws ParseException, JSONException {
+            Date timestamp = FORMAT.parse(object.getString("timestamp"));
+            boolean isError = Boolean.valueOf(object.getString("isError"));
+            String text = object.getString("text");
             return new Message(timestamp, text, isError);
         }
     }

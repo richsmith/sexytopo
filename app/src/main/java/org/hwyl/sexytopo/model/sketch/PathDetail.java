@@ -59,7 +59,7 @@ public final class PathDetail extends SketchDetail {
                 minDistance = Math.min(minDistance,
                         Space2DUtils.getDistanceFromLine(point, line.get(i), line.get(j)));
             } catch (Exception e) {
-                Log.d("Error calculating minimum distance: " + e);
+                Log.e("Error calculating minimum distance: " + e);
             }
         }
         return minDistance;

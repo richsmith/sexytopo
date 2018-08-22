@@ -10,7 +10,6 @@ import android.widget.TextView;
 import org.hwyl.sexytopo.control.Log;
 
 import java.text.SimpleDateFormat;
-import java.util.List;
 
 
 public class LogUpdateReceiver extends BroadcastReceiver {
@@ -33,17 +32,15 @@ public class LogUpdateReceiver extends BroadcastReceiver {
     }
 
     public void update() {
-        List<Log.Message> messages = Log.getLog(this.logType);
-        String text = buildLogText(messages);
+        String text = buildLogText();
         logView.setText(Html.fromHtml(text));
         scrollView.fullScroll(ScrollView.FOCUS_DOWN);
         scrollView.invalidate();
-
     }
 
-    private String buildLogText(List<Log.Message> messages) {
+    private String buildLogText() {
         StringBuilder logText = new StringBuilder();
-        for (Log.Message message : Log.getLog(logType)) {
+        for (Log.Message message : Log.getLog(this.logType)) {
             String timestamp = TIMESTAMP_FORMAT.format(message.getTimestamp());
             String row = timestamp + " " + message.getText();
             if (message.isError()) {
