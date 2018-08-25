@@ -47,6 +47,10 @@ public class SurveyManager {
             InputMode inputMode = getInputMode();
             boolean stationAdded = SurveyUpdater.update(currentSurvey, legs, inputMode);
 
+            // survey update event should be generated first so the survey can be synced before
+            // dealing with any special station created events
+            broadcastSurveyUpdated();
+
             if (stationAdded) {
                 broadcastNewStationCreated();
             }
@@ -60,7 +64,6 @@ public class SurveyManager {
             }
         }
 
-        broadcastSurveyUpdated();
     }
 
 

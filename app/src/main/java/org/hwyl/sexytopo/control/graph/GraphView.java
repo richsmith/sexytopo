@@ -181,7 +181,7 @@ public class GraphView extends View {
         scaleGestureDetector = new ScaleGestureDetector(context, new ScaleListener());
         longPressDetector = new GestureDetector(context, new LongPressListener());
         initialisePaint();
-     }
+    }
 
 
     public void initialisePaint() {
@@ -934,7 +934,7 @@ public class GraphView extends View {
     }
 
 
-    private boolean getDisplayPreference(GraphActivity.DisplayPreference preference) {
+    public boolean getDisplayPreference(GraphActivity.DisplayPreference preference) {
         SharedPreferences preferences =
             getContext().getSharedPreferences("display", Context.MODE_PRIVATE);
         boolean isSelected =
@@ -1026,22 +1026,17 @@ public class GraphView extends View {
 
 
     public void centreViewOnActiveStation() {
-        // call this in a post thread so we can ask for the view to be centred even before the
-        // view is fully drawn
-        post(new Runnable() {
-            @Override
-            public void run() {
-                Coord2D activeStationCoord =
-                        projection.getStationMap().get(survey.getActiveStation());
 
-                // not sure how this could be null, but at least one null pointer has been reported
-                if (activeStationCoord == null) {
-                    activeStationCoord = Coord2D.ORIGIN;
-                }
+        Coord2D activeStationCoord =
+                projection.getStationMap().get(survey.getActiveStation());
 
-                centreViewOnSurveyPoint(activeStationCoord);
-            }
-        });
+        // not sure how this could be null, but at least one null pointer has been reported
+        if (activeStationCoord == null) {
+            activeStationCoord = Coord2D.ORIGIN;
+        }
+
+        centreViewOnSurveyPoint(activeStationCoord);
+
     }
 
 

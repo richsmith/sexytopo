@@ -717,7 +717,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     protected void loadSurvey(String surveyName) {
         try {
-            Log.d("Loading survey <i>" + surveyName + "</i>...");
+            Log.d("Loading <i>" + surveyName + "</i>...");
             Survey survey = Loader.loadSurvey(SexyTopoActivity.this, surveyName);
             SurveyManager.getInstance(SexyTopoActivity.this).setCurrentSurvey(survey);
             updateRememberedSurvey();

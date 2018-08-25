@@ -120,17 +120,22 @@ public abstract class GraphActivity extends SexyTopoActivity
             button.setOnClickListener(this);
         }
 
-        graphView = (GraphView)(findViewById(R.id.graphView));
+        graphView = (GraphView) (findViewById(R.id.graphView));
         graphView.setActivity(this);
 
         preferences = getSharedPreferences("display", Context.MODE_PRIVATE);
 
-        graphView.centreViewOnActiveStation();
+        graphView.post(new Runnable() {
+            @Override // Needs to be threaded so it is only run once we know height and width
+            public void run() {
+                graphView.centreViewOnActiveStation();
+            }
+        });
     }
 
 
     private void handleAutoRecentre() {
-        if (preferences.getBoolean(DisplayPreference.AUTO_RECENTRE.toString(), false)) {
+        if (graphView.getDisplayPreference(DisplayPreference.AUTO_RECENTRE)) {
             graphView.centreViewOnActiveStation();
         }
     }
