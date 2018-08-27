@@ -91,6 +91,8 @@ public class GraphView extends View {
     public static final Colour LATEST_LEG_COLOUR = Colour.MAGENTA;
     public static final Colour HIGHLIGHT_COLOUR = Colour.GOLD;
     public static final Colour DEFAULT_SKETCH_COLOUR = Colour.BLACK;
+    public static final Colour CROSS_SECTION_CONNECTION_COLOUR = Colour.SILVER;
+
 
     public static final int STATION_COLOUR = Colour.DARK_RED.intValue;
     public static final int STATION_DIAMETER = 8;
@@ -174,6 +176,8 @@ public class GraphView extends View {
     private Paint highlightPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint legendPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint gridPaint = new Paint();
+    private Paint crossSectionConnectorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
 
 
     public GraphView(Context context, AttributeSet attrs) {
@@ -214,6 +218,11 @@ public class GraphView extends View {
         labelPaint.setColor(STATION_COLOUR);
         int textSize = PreferenceAccess.getInt(getContext(), "pref_survey_text_font_size", 32);
         labelPaint.setTextSize(textSize);
+
+        crossSectionConnectorPaint.setColor(CROSS_SECTION_CONNECTION_COLOUR.intValue);
+        crossSectionConnectorPaint.setStrokeWidth(3);
+        crossSectionConnectorPaint.setStyle(Paint.Style.STROKE);
+        crossSectionConnectorPaint.setPathEffect(new DashPathEffect(new float[]{3, 2}, 0));
 
         commentIcon = BitmapFactory.decodeResource(getResources(), R.drawable.speech_bubble);
         linkIcon = BitmapFactory.decodeResource(getResources(), R.drawable.link);
@@ -760,7 +769,7 @@ public class GraphView extends View {
                     STATION_DIAMETER, alpha);
 
             String description =
-                    sectionDetail.getCrossSection().getStation().getName() + " X-section";
+                    sectionDetail.getCrossSection().getStation().getName() + " X";
             if (getDisplayPreference(GraphActivity.DisplayPreference.SHOW_STATION_LABELS)) {
                 stationPaint.setAlpha(alpha);
                 canvas.drawText(description,
@@ -771,8 +780,13 @@ public class GraphView extends View {
 
             Space<Coord2D> projection = sectionDetail.getProjection();
 
-
             drawLegs(canvas, projection, alpha);
+
+            Station station = sectionDetail.getCrossSection().getStation();
+            Coord2D surveyStationLocation = this.projection.getStationMap().get(station);
+            Coord2D viewStationLocation = surveyCoordsToViewCoords(surveyStationLocation);
+            drawLineAsPath(
+                    canvas, viewStationLocation, centreOnView, crossSectionConnectorPaint, alpha);
         }
     }
 
@@ -801,23 +815,13 @@ public class GraphView extends View {
 				legPaint.setColor(LEG_COLOUR.intValue);
 			}
 
-            legPaint.setAlpha(alpha);
-
 			if (projectionType.isLegInPlane(leg)) {
-				legPaint.setStyle(Paint.Style.STROKE);
-                canvas.drawLine(
-                        (float)(start.getX()), (float)(start.getY()),
-                        (float)(end.getX()), (float)(end.getY()),
-                        legPaint);
+                legPaint.setStyle(Paint.Style.STROKE);
+                drawLine(canvas, start, end, legPaint, alpha);
 			} else {
                 legPaint.setPathEffect(new DashPathEffect(new float[]{3, 2}, 0));
-                Path path = new Path();
-                path.moveTo((float)(start.getX()), (float)(start.getY()));
-                path.lineTo((float)(end.getX()), (float)(end.getY()));
-                canvas.drawPath(path, legPaint);
-
+                drawLineAsPath(canvas, start, end, legPaint, alpha);
 			}
-
 
         }
 
@@ -875,6 +879,7 @@ public class GraphView extends View {
 
             CrossSection crossSection = sketch.getCrossSection(station);
             if (crossSection != null) {
+                /*
                 canvas.drawText("a" + crossSection.getAngle(), x + 100, y, stationPaint);
                 float angle = (float)(crossSection.getAngle());
                 float width = 50;
@@ -891,7 +896,7 @@ public class GraphView extends View {
                 float endTickOneY = startY + (20 * (float)Math.sin(tickAngle));
 
                 canvas.drawLine(startX, startY, endTickOneX, endTickOneY, stationPaint);
-
+                */
 
             }
         }
@@ -1049,6 +1054,27 @@ public class GraphView extends View {
         double y = point.getY() - yDeltaInMetres;
 
         viewpointOffset = new Coord2D(x, y);
+    }
+
+
+    private void drawLine(Canvas canvas, Coord2D start, Coord2D end, Paint paint, int alpha) {
+        paint.setAlpha(alpha);
+        canvas.drawLine(
+                (float)(start.getX()), (float)(start.getY()),
+                (float)(end.getX()), (float)(end.getY()),
+                paint);
+    }
+
+
+    /**
+     * Drawing as a path is useful in order to apply path effects (buggy when drawing lines)
+     */
+    private void drawLineAsPath(Canvas canvas, Coord2D start, Coord2D end, Paint paint, int alpha) {
+        paint.setAlpha(alpha);
+        Path path = new Path();
+        path.moveTo((float)(start.getX()), (float)(start.getY()));
+        path.lineTo((float)(end.getX()), (float)(end.getY()));
+        canvas.drawPath(path, paint);
     }
 
 

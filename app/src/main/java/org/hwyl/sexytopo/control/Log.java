@@ -143,8 +143,10 @@ public class Log {
     public static void load(LogType logType) {
         try {
             String path = getFilePath(logType);
-            String content = Loader.slurpFile(path);
-            unmarshal(logType, content);
+            if (new File(path).exists()) {
+                String content = Loader.slurpFile(path);
+                unmarshal(logType, content);
+            }
         } catch (Exception exception) {
             Log.e("Error loading " + logType + ": " + exception.toString());
         }
