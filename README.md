@@ -9,6 +9,8 @@ https://play.google.com/store/apps/details?id=org.hwyl.sexytopo
 ## I'm interested in giving SexyTopo a go. What do I do?
 You need an Android phone. The easiest way is to install SexyTopo via the Google Play app store. Just search for "SexyTopo" and click install. It's a very small download.
 
+If you can't access Google Play for some reason (e.g. you're in China) then you should be able to get the APK from here: https://github.com/richsmith/sexytopo/tree/master/app/release
+
 ## I'm interested in the SexyTopo project; can I help?
 Great! Please get in touch. I'm interested in programmers, testers, ideas, etc.!
 
