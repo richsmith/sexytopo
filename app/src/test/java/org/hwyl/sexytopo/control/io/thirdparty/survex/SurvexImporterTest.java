@@ -12,7 +12,7 @@ public class SurvexImporterTest {
 
 
     @Test
-    public void testBasicImport() {
+    public void testBasicImport() throws Exception {
         final String testContent =
                 "1\t2\t5.0\t0.0\t0.0";
         Survey survey = new Survey("Test");
@@ -21,7 +21,7 @@ public class SurvexImporterTest {
     }
 
     @Test
-    public void testBasicImportRecordsPromotions() {
+    public void testBasicImportRecordsPromotions() throws Exception {
         final String testContent =
                 "1\t2\t5.0\t0.0\t0.0\t; {from: 5.0 0.0 0.0, 5.0 0.0 0.0, 5.0 0.0 0.0}";
         Survey survey = new Survey("Test");
@@ -31,7 +31,7 @@ public class SurvexImporterTest {
     }
 
     @Test
-    public void testBasicImportHandlesComments() {
+    public void testBasicImportHandlesComments() throws Exception {
         final String testContent =
                 "1\t2\t5.0\t0.0\t0.0\t; {from: 5.0 0.0 0.0, 5.0 0.0 0.0, 5.0 0.0 0.0} testComment";
         Survey survey = new Survey("Test");

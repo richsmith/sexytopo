@@ -5,7 +5,6 @@ import android.content.Context;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.io.Util;
-import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexExporter;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.json.JSONException;
@@ -31,7 +30,7 @@ public class Saver {
         }
 
         saveMetadata(context, survey, SexyTopo.METADATA_EXTENSION);
-        saveSurveyData(context, survey, "svx");
+        saveSurveyData(context, survey, SexyTopo.DATA_EXTENSION);
         saveSketch(context, survey, survey.getPlanSketch(), SexyTopo.PLAN_SKETCH_EXTENSION);
         saveSketch(context, survey, survey.getElevationSketch(),
                 SexyTopo.EXT_ELEVATION_SKETCH_EXTENSION);
@@ -43,7 +42,7 @@ public class Saver {
     public static void autosave(Context context, Survey survey) throws Exception {
         saveMetadata(context, survey,
                 SexyTopo.METADATA_EXTENSION + "." + SexyTopo.AUTOSAVE_EXTENSION);
-        saveSurveyData(context, survey, "svx" + "." + SexyTopo.AUTOSAVE_EXTENSION);
+        saveSurveyData(context, survey, SexyTopo.DATA_EXTENSION + "." + SexyTopo.AUTOSAVE_EXTENSION);
         saveSketch(context, survey, survey.getPlanSketch(),
                 SexyTopo.PLAN_SKETCH_EXTENSION + "." + SexyTopo.AUTOSAVE_EXTENSION);
         saveSketch(context, survey, survey.getElevationSketch(),
@@ -52,9 +51,9 @@ public class Saver {
 
 
     private static void saveSurveyData(Context context, Survey survey, String extension)
-            throws IOException {
+            throws IOException,JSONException {
         String path = Util.getPathForSurveyFile(context, survey.getName(), extension);
-        String surveyText = new SurvexExporter().getContent(survey);
+        String surveyText = SurveyJsonTranslater.toText(survey);
         saveFile(context, path, surveyText);
     }
 

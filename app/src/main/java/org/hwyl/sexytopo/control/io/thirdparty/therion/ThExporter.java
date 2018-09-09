@@ -2,6 +2,9 @@ package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
 import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexExporter;
 import org.hwyl.sexytopo.control.util.TextTools;
+import org.hwyl.sexytopo.model.graph.Direction;
+import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.util.ArrayList;
@@ -64,12 +67,18 @@ public class ThExporter {
         String centrelineText =
             "\ncentreline\n" +
             indent(getCentreline(survey)) + "\n\n" +
+            indent(getExtendedElevationExtensions(survey)) + "\n\n" +
             "endcentreline\n";
         return centrelineText;
     }
 
     public static String indent(String text) {
         String indented = "";
+
+        if (text.trim().equals("")) {
+            return "";
+        }
+
         String[] lines = text.split("\n");
         for (String line : lines) {
             indented += "\t" + line + "\n";
@@ -82,5 +91,31 @@ public class ThExporter {
             new SurvexExporter().getContent(survey);
     }
 
+
+    private static String getExtendedElevationExtensions(Survey survey) {
+        StringBuilder builder = new StringBuilder();
+        generateExtendCommandsFromStation(builder, survey.getOrigin(), null);
+        return builder.toString();
+    }
+
+    private static void generateExtendCommandsFromStation(
+            StringBuilder builder, Station station, Direction lastDirection) {
+
+        Direction currentDirection = station.getExtendedElevationDirection();
+        if (lastDirection == null) {
+            builder.append(getExtendCommand(station, "start"));
+        } else if (currentDirection != lastDirection) {
+            builder.append(getExtendCommand(station, currentDirection.name().toLowerCase()));
+        }
+
+        for (Leg leg : station.getConnectedOnwardLegs()) {
+            generateExtendCommandsFromStation(
+                    builder, leg.getDestination(), station.getExtendedElevationDirection());
+        }
+    }
+
+    private static String getExtendCommand(Station station, String direction) {
+        return "extend " + direction + " " + station.getName();
+    }
 
 }

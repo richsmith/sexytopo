@@ -174,9 +174,12 @@ public class Leg extends SurveyComponent{
 
     public String toString() {
         return
-            "(D" + TableCol.DISTANCE.format(distance) +
+            "(" + (wasShotBackwards? "< ": "") +
+            "D" + TableCol.DISTANCE.format(distance) +
             " A" + TableCol.AZIMUTH.format(azimuth) +
-            " I" + TableCol.INCLINATION.format(inclination) + ")";
+            " I" + TableCol.INCLINATION.format(inclination) +
+            (hasDestination()? (" -> " + destination.getName()) : "") +
+            ")";
     }
 
 }

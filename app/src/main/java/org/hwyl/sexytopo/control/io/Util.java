@@ -10,9 +10,17 @@ import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.survey.Survey;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -266,4 +274,23 @@ public class Util {
     }
 
 
+    public static Map<String, JSONArray> toMap(JSONObject object) throws JSONException {
+        Map<String, JSONArray> map = new HashMap<>();
+        Iterator iterator = object.keys();
+        while (iterator.hasNext()) {
+            String key = (String)iterator.next();
+            JSONArray value = object.getJSONArray(key);
+            map.put(key, value);
+        }
+        return map;
+    }
+
+
+    public static List<JSONObject> toList(JSONArray array) throws JSONException {
+        List<JSONObject> list = new ArrayList<>();
+        for (int i = 0; i < array.length(); i++) {
+            list.add(array.getJSONObject(i));
+        }
+        return list;
+    }
 }

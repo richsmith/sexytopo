@@ -1,6 +1,7 @@
 package org.hwyl.sexytopo.control.io.thirdparty.survex;
 
 import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.control.io.translation.Importer;
 import org.hwyl.sexytopo.model.survey.Leg;
@@ -29,43 +30,58 @@ public class SurvexImporter extends Importer {
         return survey;
     }
 
-    public static void parse(String text, Survey survey) {
+    public static void parse(String text, Survey survey) throws Exception {
 
         Map<String, Station> nameToStation = new HashMap<>();
 
-        Station origin = survey.getOrigin();
-        nameToStation.put(origin.getName(), origin);
+        //Station origin = survey.getOrigin();
+        //nameToStation.put(origin.getName(), origin);
 
         String[] lines = text.split("\n");
         for (String line : lines) {
-            if (line.trim().equals("")) {
+
+            String trimmed = line.trim();
+            if (trimmed.equals("") || trimmed.startsWith(";") || trimmed.startsWith("*")) {
                 continue;
             }
 
-            String comment = "";
-            if (line.contains(";")) {
-                comment = line.substring(line.indexOf(";") + 1).trim();
-            }
+            try {
+                String comment = "";
+                if (line.contains(";")) {
+                    comment = line.substring(line.indexOf(";") + 1).trim();
+                }
 
-            String[] fields = line.trim().split("\t");
-            addLegToSurvey(survey, nameToStation, fields, comment);
+                String[] fields = line.trim().split("\\s+");
+                addLegToSurvey(survey, nameToStation, fields, comment);
+
+            } catch (Exception exception) {
+                throw new Exception("Error importing this line: " + line);
+            }
         }
     }
 
     private static void addLegToSurvey(
             Survey survey, Map<String, Station> nameToStation, String[] fields, String comment) {
 
+        String fromName = fields[0];
+        String toName = fields[1];
+        double distance = Double.parseDouble(fields[2]);
+        double azimuth = Double.parseDouble(fields[3]);
+        double inclination = Double.parseDouble(fields[4]);
+
+        if (nameToStation.size() == 0) {
+            Station origin = new Station(fromName);
+            survey.setOrigin(origin);
+            nameToStation.put(origin.getName(), origin);
+        }
+
         String commentInstructions = extractCommentInstructions(comment);
         if (commentInstructions != null) {
             comment = comment.replace(commentInstructions, "").trim();
         }
 
-        Station from = retrieveOrCreateStation(nameToStation, fields[0], "");
-        Station to = retrieveOrCreateStation(nameToStation, fields[1], comment);
-
-        double distance = Double.parseDouble(fields[2]);
-        double azimuth = Double.parseDouble(fields[3]);
-        double inclination = Double.parseDouble(fields[4]);
+        Station from = retrieveOrCreateStation(nameToStation, fromName, "");
+        Station to = retrieveOrCreateStation(nameToStation, toName, comment);
 
         Leg[] promotedFrom = parseAnyPromotedLegs(commentInstructions);
         Leg leg = (to == Survey.NULL_STATION)?
@@ -126,6 +142,7 @@ public class SurvexImporter extends Importer {
 
             return legs.toArray(new Leg[]{});
         } catch (Exception exception) {
+            Log.e("Error parsing promoted leg (ignoring and carrying on): " + exception);
             return new Leg[]{}; // seems to be corrupted... feature not mission-critical so bail
         }
     }

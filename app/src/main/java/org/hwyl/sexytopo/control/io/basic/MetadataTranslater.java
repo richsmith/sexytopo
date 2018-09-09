@@ -3,6 +3,7 @@ package org.hwyl.sexytopo.control.io.basic;
 import android.content.Context;
 
 import org.hwyl.sexytopo.control.Log;
+import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.SurveyConnection;
@@ -11,9 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,6 +22,7 @@ public class MetadataTranslater {
 
     public static final String CONNECTIONS_TAG = "connections";
     public static final String ACTIVE_STATION_TAG = "active-station";
+
 
     public static String translate(Survey survey) throws Exception {
         return toJson(survey).toString();
@@ -62,6 +62,7 @@ public class MetadataTranslater {
         return json;
     }
 
+
     private static JSONObject toJson(Map<Station, Set<SurveyConnection>> connectedSurveys)
             throws JSONException {
 
@@ -80,6 +81,7 @@ public class MetadataTranslater {
         return connectionMap;
     }
 
+
     private static JSONArray toJson(SurveyConnection connection) throws JSONException {
         JSONArray pair = new JSONArray();
         pair.put(connection.otherSurvey.getName());
@@ -94,6 +96,7 @@ public class MetadataTranslater {
         translateAndUpdateActiveStation(survey, json);
         translateAndUpdateConnections(context, survey, json, surveyNamesNotToLoad);
     }
+
 
     private static void translateAndUpdateActiveStation(Survey survey, JSONObject json)
             throws Exception {
@@ -115,59 +118,58 @@ public class MetadataTranslater {
             Set<String> surveyNamesNotToLoad)
             throws Exception {
 
-       try {
-           JSONObject connectionsObject = json.getJSONObject(CONNECTIONS_TAG);
-           Map<String, JSONArray> outerMap = toMap(connectionsObject);
+        try {
+            JSONObject connectionsObject = json.getJSONObject(CONNECTIONS_TAG);
+            Map<String, JSONArray> outerMap = Util.toMap(connectionsObject);
 
-           for (String stationName : outerMap.keySet()) {
+            for (String stationName : outerMap.keySet()) {
 
-               Station station = survey.getStationByName(stationName);
+                Station station = survey.getStationByName(stationName);
 
-               JSONArray setArray = outerMap.get(stationName);
+                JSONArray setArray = outerMap.get(stationName);
 
-               for (JSONArray connectionPair : toList(setArray)) {
+                for (JSONArray connectionPair : toListOfArrays(setArray)) {
 
-                   assert connectionPair.length() == 2;
-                   String connectedSurveyName = connectionPair.get(0).toString();
-                   String connectionPointName = connectionPair.get(1).toString();
+                    assert connectionPair.length() == 2;
+                    String connectedSurveyName = connectionPair.get(0).toString();
+                    String connectionPointName = connectionPair.get(1).toString();
 
-                   if (surveyNamesNotToLoad.contains(connectedSurveyName)) {
-                       // if this survey is already loaded, don't do the whole infinite loop thing
-                       continue;
+                    if (surveyNamesNotToLoad.contains(connectedSurveyName)) {
+                        // if this survey is already loaded, don't do the whole infinite loop thing
+                        continue;
 
-                   } else {
-                       // we *really* want to avoid infinite loops :)
-                       // this should be added on load, but just as a precaution..
-                       surveyNamesNotToLoad.add(connectedSurveyName);
+                    } else {
+                        // we *really* want to avoid infinite loops :)
+                        // this should be added on load, but just as a precaution..
+                        surveyNamesNotToLoad.add(connectedSurveyName);
 
-                       try {
-                           Survey connectedSurvey = Loader.loadSurvey(
-                                   context, connectedSurveyName, surveyNamesNotToLoad, false);
-                           Station connectionPoint =
-                                   connectedSurvey.getStationByName(connectionPointName);
-                           if (connectionPoint == null) {
-                               Log.e("Connection point not found: " + connectionPoint.getName());
-                               throw new Exception("Connection point not found");
-                           }
-                           survey.connect(station, connectedSurvey, connectionPoint);
-                       } catch (Exception exception) {
-                           // the linked survey or connecting station has probably been deleted;
-                           // not much we can do...
-                           Log.e("Could not load connected survey " + connectedSurveyName);
-                           continue;
-                       }
-                   }
-               }
-           }
+                        try {
+                            Survey connectedSurvey = Loader.loadSurvey(
+                                    context, connectedSurveyName, surveyNamesNotToLoad, false);
+                            Station connectionPoint =
+                                    connectedSurvey.getStationByName(connectionPointName);
+                            if (connectionPoint == null) {
+                                Log.e("Connection point not found: " + connectionPoint.getName());
+                                throw new Exception("Connection point not found");
+                            }
+                            survey.connect(station, connectedSurvey, connectionPoint);
+                        } catch (Exception exception) {
+                            // the linked survey or connecting station has probably been deleted;
+                            // not much we can do...
+                            Log.e("Could not load connected survey " + connectedSurveyName);
+                            continue;
+                        }
+                    }
+                }
+            }
 
-       } catch (JSONException exception) {
-           Log.e(exception.toString());
-           throw new Exception("Error loading connected surveys");
-       }
+        } catch (JSONException exception) {
+            Log.e(exception.toString());
+            throw new Exception("Error loading connected surveys");
+        }
     }
 
-
-    private static List<JSONArray> toList(JSONArray array) throws JSONException {
+    public static List<JSONArray> toListOfArrays(JSONArray array) throws JSONException {
         List<JSONArray> list = new ArrayList<>();
         for (int i = 0; i < array.length(); i++) {
             list.add(array.getJSONArray(i));
@@ -175,15 +177,5 @@ public class MetadataTranslater {
         return list;
     }
 
-
-    private static Map<String, JSONArray> toMap(JSONObject object) throws JSONException {
-        Map<String, JSONArray> map = new HashMap<>();
-        Iterator iterator = object.keys();
-        while (iterator.hasNext()) {
-            String key = (String)iterator.next();
-            JSONArray value = object.getJSONArray(key);
-            map.put(key, value);
-        }
-        return map;
-    }
 }
+

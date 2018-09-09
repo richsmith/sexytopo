@@ -15,7 +15,7 @@ import java.util.List;
 
 public class SurvexExporter extends SingleFileExporter {
 
-    private static GraphToListTranslator graphToListTranslator = new GraphToListTranslator();
+    protected static GraphToListTranslator graphToListTranslator = new GraphToListTranslator();
 
     public String getContent(Survey survey) {
 
@@ -33,7 +33,7 @@ public class SurvexExporter extends SingleFileExporter {
     }
 
 
-    private static void formatEntry(StringBuilder builder,
+    protected static void formatEntry(StringBuilder builder,
                                     GraphToListTranslator.SurveyListEntry entry) {
 
         Station from = entry.getFrom();

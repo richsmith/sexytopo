@@ -1,6 +1,7 @@
 package org.hwyl.sexytopo.control.io.basic;
 
 import org.hwyl.sexytopo.control.Log;
+import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
@@ -78,7 +79,7 @@ public class SketchJsonTranslater {
         try {
             JSONArray pathsArray = json.getJSONArray(PATHS_TAG);
             Set<PathDetail> pathDetails = new HashSet<>();
-            for (JSONObject object : toList(pathsArray)) {
+            for (JSONObject object : Util.toList(pathsArray)) {
                 pathDetails.add(toPathDetail(object));
             }
             sketch.setPathDetails(pathDetails);
@@ -89,7 +90,7 @@ public class SketchJsonTranslater {
         try {
             JSONArray labelsArray = json.getJSONArray(LABELS_TAG);
             Set<TextDetail> textDetails = new HashSet<>();
-            for (JSONObject object : toList(labelsArray)) {
+            for (JSONObject object : Util.toList(labelsArray)) {
                 textDetails.add(toTextDetail(object));
             }
             sketch.setTextDetails(textDetails);
@@ -100,7 +101,7 @@ public class SketchJsonTranslater {
         try {
             JSONArray crossSectionsArray = json.getJSONArray(CROSS_SECTIONS_TAG);
             Set<CrossSectionDetail> crossSectionDetails = new HashSet<>();
-            for (JSONObject object : toList(crossSectionsArray)) {
+            for (JSONObject object : Util.toList(crossSectionsArray)) {
                 crossSectionDetails.add(toCrossSectionDetail(survey, object));
             }
             sketch.setCrossSectionDetails(crossSectionDetails);
@@ -133,7 +134,7 @@ public class SketchJsonTranslater {
 
         JSONArray array = json.getJSONArray(POINTS_TAG);
         List<Coord2D> path = new ArrayList<>();
-        for (JSONObject object : toList(array)) {
+        for (JSONObject object : Util.toList(array)) {
             path.add(toCoord2D(object));
         }
 
@@ -203,11 +204,4 @@ public class SketchJsonTranslater {
     }
 
 
-    public static List<JSONObject> toList(JSONArray array) throws JSONException {
-        List<JSONObject> list = new ArrayList<>();
-        for (int i = 0; i < array.length(); i++) {
-            list.add(array.getJSONObject(i));
-        }
-        return list;
-    }
 }

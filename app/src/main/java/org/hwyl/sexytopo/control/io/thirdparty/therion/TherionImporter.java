@@ -1,12 +1,16 @@
 package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
 import org.apache.commons.io.FilenameUtils;
+import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexImporter;
 import org.hwyl.sexytopo.control.io.thirdparty.xvi.XviImporter;
 import org.hwyl.sexytopo.control.io.translation.Importer;
+import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.control.util.TextTools;
+import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.sketch.Sketch;
+import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.io.File;
@@ -81,22 +85,61 @@ public class TherionImporter extends Importer {
 
     public static void updateCentreline(List<String> lines, Survey survey) throws Exception {
         List<String> block = getContentsOfBeginEndBlock(lines, "centreline");
-        List<String> sanitised = new LinkedList<>();
+        List<String> sanitisedCentrelineData = new LinkedList<>();
+        List<String> sanitisedElevationDirectionData = new LinkedList<>();
 
+
+        boolean inDataBlock = false;
         for (String line: block) {
             String trimmed = line.trim();
             if (trimmed.equals("")) {
                 continue;
-            } else if (trimmed.startsWith("data")) {
+            }
+
+            if (trimmed.startsWith("data")) {
+                inDataBlock = true;
                 continue;
+            } else if (!inDataBlock) {
+                continue;
+            }
+
+            if (trimmed.startsWith("extend")) {
+                sanitisedElevationDirectionData.add(trimmed);
             } else {
-                sanitised.add(trimmed);
+                sanitisedCentrelineData.add(trimmed);
             }
         }
 
-        String centrelineText = TextTools.join("\n", sanitised);
+        String centrelineText = TextTools.join("\n", sanitisedCentrelineData);
         SurvexImporter.parse(centrelineText, survey);
+        handleElevationDirectionData(sanitisedElevationDirectionData, survey);
+    }
 
+
+    private static void handleElevationDirectionData(List<String> lines, Survey survey) {
+        try {
+            for (String line : lines) {
+                final String EXTEND_PREFIX = "extend ";
+                assert line.startsWith(EXTEND_PREFIX);
+                String rest = line.substring(EXTEND_PREFIX.length());
+                String[] tokens = rest.split(" ");
+                assert tokens.length == 2;
+
+                String directionName = tokens[0];
+                if (directionName.equals("start")) {
+                    continue;
+                }
+                Direction direction = Direction.valueOf(directionName.toUpperCase());
+
+                String stationName = tokens[1];
+                Station station = survey.getStationByName(stationName);
+
+                SurveyUpdater.setDirectionOfSubtree(survey, station, direction);
+            }
+
+        } catch (Exception exception) {
+            Log.e("corrupted survey extended elevation directions: " + exception);
+        }
     }
 
 

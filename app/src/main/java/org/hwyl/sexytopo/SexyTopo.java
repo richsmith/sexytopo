@@ -35,6 +35,7 @@ public class SexyTopo {
     public static final String GENERAL_PREFS = "generalPrefs";
     public static final String INPUT_MODE_PREFERENCE = "inputMode";
 
+    public static final String DATA_EXTENSION = "data.json";
     public static final String PLAN_SKETCH_EXTENSION = "plan.json";
     public static final String EXT_ELEVATION_SKETCH_EXTENSION = "ext-elevation.json";
     public static final String METADATA_EXTENSION = "metadata.json";

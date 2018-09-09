@@ -2,6 +2,7 @@ package org.hwyl.sexytopo.control.util;
 
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.Log;
+import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -345,5 +346,13 @@ public class SurveyUpdater {
         survey.setSaved(false);
     }
 
+
+    public static void setDirectionOfSubtree(Survey survey, Station station, Direction direction) {
+        station.setExtendedElevationDirection(direction);
+        for (Leg leg : station.getConnectedOnwardLegs()) {
+            Station destination = leg.getDestination();
+            setDirectionOfSubtree(survey, destination, direction);
+        }
+    }
 
 }

@@ -32,6 +32,7 @@ import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Coord2D;
+import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
@@ -523,7 +524,8 @@ public class GraphView extends View {
             public void onClick(View view) {
                 switch(view.getId()) {
                     case R.id.graph_station_toggle_left_right:
-                        station.switchDirection();
+                        Direction newDirection = station.getExtendedElevationDirection().opposite();
+                        SurveyUpdater.setDirectionOfSubtree(survey, station,newDirection);
                         SurveyManager.getInstance(getContext()).broadcastSurveyUpdated();
                         invalidate();
                         break;

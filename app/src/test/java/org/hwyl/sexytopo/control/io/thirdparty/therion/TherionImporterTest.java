@@ -2,6 +2,9 @@ package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
 import junit.framework.Assert;
 
+import org.hwyl.sexytopo.model.graph.Direction;
+import org.hwyl.sexytopo.model.survey.Station;
+import org.hwyl.sexytopo.model.survey.Survey;
 import org.junit.Test;
 
 import java.io.File;
@@ -11,7 +14,7 @@ import java.util.List;
 
 public class TherionImporterTest {
 
-    String FAKE_TEXT =
+    private static final String FAKE_POCKETTOPO_TEXT =
         "encoding  utf-8\n" +
         "\n" +
         "\n" +
@@ -56,7 +59,7 @@ public class TherionImporterTest {
         "  team \"Rich Smith\" notes\n" +
         "  team \"Paul Fairman\" dog\n" +
         "  data normal from to compass clino tape\n" +
-        "  extend right\n" +
+        //"  extend right\n" +
         "  1.0 - 193.78 0.41 9.118\n" +
         "  1.0 - 328.51 14.60 4.709\n" +
         "  1.0 - 204.27 -77.67 1.572\n" +
@@ -167,6 +170,11 @@ public class TherionImporterTest {
         "  1.14 - 17.81 -70.03 0.594\n" +
         "  1.14 1.15 71.42 44.40 12.181\n" +
         "  1.15 - 110.83 66.65 6.896\n" +
+        "\n" +
+        "extend start 1.0" +
+        "extend right 1.1" +
+        "extend left 1.3" +
+        "\n" +
         "endcentreline\n" +
         "\n" +
         "\n" +
@@ -174,11 +182,104 @@ public class TherionImporterTest {
         "endsurvey\n" +
         "\n";
 
-    List<String> lines = Arrays.asList(FAKE_TEXT.split("\n"));
+
+    private static String FAKE_TEXT =
+        "survey smugglers-hole -title \"Smugglers' Hole\"\n" +
+        "\n" +
+        "# input \"smugglers-hole plan.th2\"\n" +
+        "input \"smugglers-hole ee.th2\"\n" +
+        "  \n" +
+        "  centreline\n" +
+        "    data normal from to length compass clino\n" +
+        "    \n" +
+        "    1  -  0.90  333.27  -3.40  \n" +
+        "    1  -  1.28  309.47  -6.84  \n" +
+        "    1  -  0.95  340.82  -8.40  \n" +
+        "    1  -  0.89  332.08  -6.55  \n" +
+        "    1  -  0.85  290.91  -78.44  \n" +
+        "    1  2  1.70  299.59  -12.32\n" +
+        "    2  -  1.54  132.83  12.75  \n" +
+        "    2  -  0.76  201.87  6.60  \n" +
+        "    2  -  1.14  236.60  1.67  \n" +
+        "    2  -  2.26  254.26  9.05  \n" +
+        "    2  -  0.44  247.32  89.40  \n" +
+        "    2  -  0.64  191.39  -79.58  \n" +
+        "    2  -  2.38  183.69  77.33  \n" +
+        "    2  -  2.12  280.87  61.80  \n" +
+        "    2  -  0.86  182.97  -0.15  \n" +
+        "    2  -  1.05  233.93  -7.68  \n" +
+        "    2  -  0.91  183.60  -0.33  \n" +
+        "    2  -  2.02  239.87  76.25  \n" +
+        "    2  -  0.69  198.06  -70.74  \n" +
+        "    2  -  1.24  288.54  6.03  \n" +
+        "    2  3  2.10  281.21  6.51\n" +
+        "    3  -  0.48  175.69  -2.37  \n" +
+        "    3  -  0.22  165.14  78.18  \n" +
+        "    3  -  0.41  161.39  -79.26  \n" +
+        "    3  -  0.51  218.78  22.73  \n" +
+        "    3  -  1.76  260.17  19.51  \n" +
+        "    3  -  1.28  257.87  15.47  \n" +
+        "    3  -  1.29  257.14  14.16  \n" +
+        "    3  -  1.29  257.13  14.12  \n" +
+        "    3  4  1.48  256.11  10.60\n" +
+        "    4  -  1.43  256.72  9.84  \n" +
+        "    4  -  0.81  123.11  82.83  \n" +
+        "    4  -  0.55  140.91  1.97  \n" +
+        "    4  -  0.90  329.39  56.78  \n" +
+        "    4  -  0.40  174.32  -78.69  \n" +
+        "    4  -  0.47  201.60  12.61  \n" +
+        "    4  5  1.38  197.69  0.30\n" +
+        "    5  -  0.55  24.52  83.92  \n" +
+        "    5  -  0.65  80.13  5.97  \n" +
+        "    5  -  1.08  213.87  44.98  \n" +
+        "    5  -  1.07  317.24  28.64  \n" +
+        "    5  -  0.56  71.08  86.56  \n" +
+        "    5  -  1.44  248.19  20.60  \n" +
+        "    5  -  1.58  268.63  21.24  \n" +
+        "    5  6  2.42  266.72  16.53\n" +
+        "    6  -  0.93  266.48  11.46  \n" +
+        "    6  -  1.26  249.11  27.41  \n" +
+        "    6  -  1.73  219.30  30.65  \n" +
+        "    6  -  0.26  181.95  -60.24  \n" +
+        "    6  -  0.17  157.31  -11.93  \n" +
+        "    6  -  0.55  322.15  -8.35  \n" +
+        "    6  -  1.64  234.29  30.10  \n" +
+        "    6  -  1.68  235.48  31.16  \n" +
+        "    6  -  1.68  235.34  30.92  \n" +
+        "    6  -  1.56  233.10  28.80  \n" +
+        "    6  7  1.66  235.67  31.07\n" +
+        "    7  -  0.55  85.86  78.23  \n" +
+        "    7  -  1.07  127.95  30.26  \n" +
+        "    7  -  0.87  115.55  16.09  \n" +
+        "    7  -  0.49  36.27  75.47  \n" +
+        "    7  -  0.24  327.39  34.69  \n" +
+        "    7  -  2.37  212.58  55.12  \n" +
+        "    7  -  2.37  212.08  55.19  \n" +
+        "    7  -  2.36  210.50  55.58  \n" +
+        "    7  8  2.14  206.07  52.31\n" +
+        "    8  -  0.80  41.03  57.92  \n" +
+        "    8  -  1.46  34.58  -0.41  \n" +
+        "    8  -  2.35  54.48  -42.81  \n" +
+        "    8  -  1.23  28.41  -42.45  \n" +
+        "    8  -  1.00  45.99  -84.13  \n" +
+        "    8  -  0.99  27.89  59.91  \n" +
+        "    8  -  0.60  102.38  1.53  \n" +
+        "    8  -  0.85  80.11  -4.15  \n" +
+        "    8  -  1.02  359.09  5.27  \n" +
+        "    8  -  1.61  39.42  -44.30  \n" +
+        "    \n" +
+        "    extend start 1\n" +
+        "    extend left 2\n" +
+        "    extend right 5\n" +
+        "  \n" +
+        "  endcentreline\n" +
+        "endsurvey\n";
+
+    private static final List<String> LINES = Arrays.asList(FAKE_TEXT.split("\n"));
 
     @Test
     public void testBasicBlockExtraction() throws Exception {
-        List<String> LINES = Arrays.asList(new String[]{"block", "content", "endblock"});
+        List<String> LINES = Arrays.asList("block", "content", "endblock");
         List<String> output = TherionImporter.getContentsOfBeginEndBlock(LINES, "block");
         Assert.assertEquals(output.size(), 1);
         Assert.assertEquals(output.get(0), "content");
@@ -186,14 +287,14 @@ public class TherionImporterTest {
 
     @Test(expected=Exception.class)
     public void testBlockExtractionFailsIfNoClosingTag() throws Exception {
-        List<String> LINES = Arrays.asList(new String[]{"block", "content", "blah"});
-        List<String> output = TherionImporter.getContentsOfBeginEndBlock(LINES, "block");
+        List<String> LINES = Arrays.asList("block", "content", "blah");
+        TherionImporter.getContentsOfBeginEndBlock(LINES, "block");
     }
 
     @Test(expected=Exception.class)
     public void testBlockExtractionFailsIfTwoOpeningTags() throws Exception {
-        List<String> LINES = Arrays.asList(new String[]{"block", "blah", "block", "blah", "endblock"});
-        List<String> output = TherionImporter.getContentsOfBeginEndBlock(LINES, "block");
+        List<String> LINES = Arrays.asList("block", "blah", "block", "blah", "endblock");
+        TherionImporter.getContentsOfBeginEndBlock(LINES, "block");
     }
 
     @Test
@@ -201,6 +302,23 @@ public class TherionImporterTest {
         String actual = TherionImporter.getSurveyName(new File("White Lightning"));
         String expected = "White Lightning";
         Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testElevationDirectionExtraction() throws Exception {
+        Survey survey = new Survey("Test");
+        TherionImporter.updateCentreline(LINES, survey);
+
+        Station stationTwo = survey.getStationByName("2");
+        Direction stationTwoDirection = stationTwo.getExtendedElevationDirection();
+        Assert.assertEquals(Direction.LEFT, stationTwoDirection);
+        Station stationThree = survey.getStationByName("3");
+        Direction stationThreeDirection = stationThree.getExtendedElevationDirection();
+        Assert.assertEquals(Direction.LEFT, stationThreeDirection);
+
+        Station stationFive = survey.getStationByName("5");
+        Direction stationFiveDirection = stationFive.getExtendedElevationDirection();
+        Assert.assertEquals(Direction.RIGHT, stationFiveDirection);
     }
 
 }
