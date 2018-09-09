@@ -34,9 +34,6 @@ public class SurvexImporter extends Importer {
 
         Map<String, Station> nameToStation = new HashMap<>();
 
-        //Station origin = survey.getOrigin();
-        //nameToStation.put(origin.getName(), origin);
-
         String[] lines = text.split("\n");
         for (String line : lines) {
 
