@@ -11,6 +11,6 @@ public class ExtendedElevationContextMenu extends StationContextMenu {
     @Override
     protected void postCreationHook(View view) {
         Button switchbackButton = (Button)(view.findViewById(R.id.graph_station_toggle_left_right));
-        switchbackButton.setVisibility(View.VISIBLE); // FIXME when saving works for toggling LR
+        switchbackButton.setVisibility(View.VISIBLE);
     }
 }
