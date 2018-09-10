@@ -155,5 +155,33 @@
     <string name="third_party_pocket_topo_txt">PocketTopo .txt</string>
     <string name="third_party_survex">Survex</string>
     <string name="third_party_compass">Compass</string>
-
+    <string name="calibration_index">Reading number</string>
+    <string name="calibration_start">Start Calibration</string>
+    <string name="calibration_next_step">Next (suggested)</string>
+    <string name="calibration_stop">Cancel Calibration</string>
+    <string name="calibration_complete">Complete Calibration</string>
+    <string name="calibration_direction">Direction</string>
+    <string name="calibration_orientation">Orientation</string>
+    <string name="calibration_not_enough">Not enough readings taken</string>
+    <string name="calibration_assessment">Calibration Assessment</string>
+    <string name="calibration_update">Use</string>
+    <string name="calibration_error_updating_device">Failed: could not update calibration</string>
+    <string name="direction_forward">Forward</string>
+    <string name="direction_right">Right</string>
+    <string name="direction_back">Back</string>
+    <string name="direction_left">Left</string>
+    <string name="direction_up">Up</string>
+    <string name="direction_down">Down</string>
+    <string name="direction_forward_left_up">Forward Left Up</string>
+    <string name="direction_forward_left_down">Forward Left Down</string>
+    <string name="direction_forward_right_up">Forward Right Up</string>
+    <string name="direction_forward_right_down">Forward Right Down</string>
+    <string name="direction_back_right_up">Back Right Up</string>
+    <string name="direction_back_right_down">Back Right Down</string>
+    <string name="direction_back_left_up">Back Left Up</string>
+    <string name="direction_back_left_down">Back Left Down</string>
+    <string name="orientation_face_up">Face Up</string>
+    <string name="orientation_face_right">Face Right</string>
+    <string name="orientation_face_down">Face Down</string>
+    <string name="orientation_face_left">Face Left</string>
 </resources>
