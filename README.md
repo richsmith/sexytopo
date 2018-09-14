@@ -1,3 +1,7 @@
+<h1 align=center>
+<img src="Logo/horizontal.png" width=60%>
+</h1>
+
 The SexyTopo cave surveying app for Android. Next-gen cave surveying with a sexy interface :)
 
 This project is still under development but is available on the Google Play Store for experimenting:
