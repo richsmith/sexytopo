@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.comms.DistoXCommunicator;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.io.Util;
@@ -55,9 +56,13 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     protected SurveyManager dataManager;
 
+    protected DistoXCommunicator comms;
+
     public SexyTopoActivity() {
         super();
+        SexyTopo.context = this;
         dataManager = SurveyManager.getInstance(this);
+        comms = DistoXCommunicator.getInstance(this, dataManager);
     }
 
 
@@ -75,7 +80,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        SexyTopo.context = this;
         setOrientation();
     }
 
@@ -233,7 +237,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                .setIcon(R.drawable.laser_icon_small)
+                .setIcon(R.drawable.ic_launcher)
                 .setTitle(getText(R.string.app_name) + " v" + version)
                 .setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
@@ -907,6 +911,13 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         SurveyManager.getInstance(this).setCurrentSurvey(survey);
     }
 
+    protected SurveyManager getDataManager() {
+        return SurveyManager.getInstance(this);
+    }
+
+    protected DistoXCommunicator getComms() {
+        return DistoXCommunicator.getInstance(this, getDataManager());
+    }
 
     public void showSimpleToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();

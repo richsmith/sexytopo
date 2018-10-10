@@ -71,7 +71,7 @@
     <item android:id="@+id/action_calibration"
         android:title="@string/action_calibration"
         android:orderInCategory="100"
-        android:visible="false"
+        android:visible="true"
         app:showAsAction="never" />
     <item android:id="@+id/dev_settings"
           android:title="@string/action_dev"

@@ -18,7 +18,9 @@ public class SexyTopo {
     public static final String NEW_STATION_CREATED_EVENT = "newStationCreatedEvent";
     public static final String SYSTEM_LOG_UPDATED_EVENT = "systemLogUpdatedEvent";
     public static final String DEVICE_LOG_UPDATED_EVENT = "deviceLogUpdatedEvent";
-    
+    public static final String CALIBRATION_UPDATED_EVENT = "calibrationUpdatedEvent";
+
+
     public static final String APP_DIR = APP_NAME;
     public static final String SURVEY_DIR = "Surveys";
     public static final String IMPORT_DIR = "To Import";

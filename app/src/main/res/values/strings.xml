@@ -98,6 +98,7 @@
     <string name="delete">Delete</string>
     <string name="save">Save</string>
     <string name="replace">Replace</string>
+    <string name="not_applicable">N/A</string>
     <string name="title_activity_help">Help</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_guide">Guide</string>
@@ -118,7 +119,7 @@
     <string name="device_log_connected">Connected :)</string>
     <string name="device_log_not_connected">Not connected :(</string>
     <string name="device_log_connecting">Connecting&#8230;</string>
-    <string name="device_log_waiting">Waiting for data&#8230;</string>
+    <string name="device_log_ready_for_measurements">Ready to receive data</string>
     <string name="device_log_received">Received measurement</string>
     <string name="device_log_connection_stop_requested">Connection close requested</string>
     <string name="device_log_stopping">Closing connection&#8230;</string>

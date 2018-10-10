@@ -11,9 +11,12 @@ import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.io.basic.Saver;
 import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
+import org.hwyl.sexytopo.model.calibration.CalibrationReading;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Survey;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -32,15 +35,23 @@ public class SurveyManager {
     private LocalBroadcastManager broadcastManager;
 
     // This should be created or loaded on startup
-    private static Survey currentSurvey = new Survey("ERROR");
+    private static Survey currentSurvey = new Survey("Unset");
+
+    private List<CalibrationReading> calibrationReadings =
+            new ArrayList<CalibrationReading>();
+
 
     public SurveyManager(Context Context) {
         this.context = Context;
     }
 
+
+    public void updateSurvey(Leg leg) {
+        updateSurvey(Arrays.asList(new Leg[]{leg}));
+    }
+
+
     public void updateSurvey(List<Leg> legs) {
-
-
 
         if (legs.size() > 0) {
 
@@ -84,6 +95,10 @@ public class SurveyManager {
         broadcast(new Intent(SexyTopo.NEW_STATION_CREATED_EVENT));
     }
 
+    public void broadcastCalibrationUpdated() {
+        broadcast(new Intent(SexyTopo.CALIBRATION_UPDATED_EVENT));
+    }
+
     private void broadcast(Intent intent) {
         if (broadcastManager == null) {
             broadcastManager = LocalBroadcastManager.getInstance(context);
@@ -98,6 +113,19 @@ public class SurveyManager {
     public void setCurrentSurvey(Survey currentSurvey) {
         this.currentSurvey = currentSurvey;
         broadcastSurveyUpdated();
+    }
+
+    public void addCalibrationReading(CalibrationReading calibrationReading) {
+        this.calibrationReadings.add(calibrationReading);
+        broadcastCalibrationUpdated();
+    }
+
+    public List<CalibrationReading> getCalibrationReadings() {
+        return calibrationReadings;
+    }
+
+    public void clearCalibrationReadings() {
+        this.calibrationReadings.clear();
     }
 
 }
