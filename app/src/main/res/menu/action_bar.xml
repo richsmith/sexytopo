@@ -67,11 +67,12 @@
     <item android:id="@+id/action_device"
         android:title="@string/action_device"
         android:orderInCategory="100"
+        android:visible="false"
         app:showAsAction="never" />
     <item android:id="@+id/action_calibration"
         android:title="@string/action_calibration"
         android:orderInCategory="100"
-        android:visible="true"
+        android:visible="false"
         app:showAsAction="never" />
     <item android:id="@+id/dev_settings"
           android:title="@string/action_dev"

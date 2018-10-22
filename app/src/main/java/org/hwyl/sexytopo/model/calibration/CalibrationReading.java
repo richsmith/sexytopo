@@ -8,10 +8,15 @@ public class CalibrationReading {
         COMPLETE
     }
 
-    private State state = State.UPDATE_ACCELERATION;
+    private State state;
 
     private int gx, gy, gz;
     private int mx, my, mz;
+
+
+    public CalibrationReading() {
+        state = State.UPDATE_ACCELERATION;
+    }
 
 
     public void updateAccelerationValues(int gx, int gy, int gz) {

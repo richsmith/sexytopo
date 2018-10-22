@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.comms;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
@@ -35,15 +36,43 @@ public abstract class DistoXProtocol extends Thread {
         }
     }
 
+    protected enum PacketType {
+        MEASUREMENT(0b00000001),
+        CALIBRATION_ACCELERATION(0b0000010),
+        CALIBRATION_MAGNETIC(0b0000011),
+        READ_REPLY(0b00111000),
+        UNKNOWN(0b0);
+
+        static int PACKET_TYPE_MASK = 0b00111111;
+        private int signature;
+        PacketType(int signature) {
+            this.signature = signature;
+        }
+
+        static PacketType getType(byte[] packet) {
+            int signature = packet[ADMIN] & PACKET_TYPE_MASK;
+
+            for (PacketType packetType : values()) {
+                if (packetType.signature == signature) {
+                    return packetType;
+                }
+            }
+
+            return UNKNOWN;
+        }
+    }
+
     protected volatile State state = State.IDLE;
 
 
-    private static final int INTER_PACKET_DELAY = 1 * 12; // ms; DISTO repeats every 25 ms
+    private static final int INTER_PACKET_DELAY = 100; // ms; (DISTO repeats every 25 ms for ref)
+    private static final int WAIT_BETWEEN_CONNECTION_ATTEMPTS_MS = 5 * 1000;
 
 
     public static final int ADMIN = 0;
-    public static final int SEQUENCE_BIT_MASK = 0b00000001; //0x80;
-    public static final int ACKNOWLEDGEMENT_PACKET_BASE = 0b10101010; //0x55;
+
+    public static final int SEQUENCE_BIT_MASK = 0b10000000;
+    public static final int ACKNOWLEDGEMENT_PACKET_BASE = 0b01010101;
 
     protected Context context;
     private BluetoothDevice bluetoothDevice;
@@ -72,12 +101,9 @@ public abstract class DistoXProtocol extends Thread {
      * same as the sequence bit of the packet being acknowledged.
      */
     public static byte[] createAcknowledgementPacket(byte[] packet) {
-        byte sequenceBit = (byte)(packet[ADMIN] & SEQUENCE_BIT_MASK);
         byte[] acknowledgePacket = new byte[1];
-        acknowledgePacket[0] = (byte)(sequenceBit | ACKNOWLEDGEMENT_PACKET_BASE);
-        //acknowledgePacket[1] = (byte)0xfe;
-        //acknowledgePacket[2] = (byte)0xff;
-        System.out.print("ack packet is " + sequenceBit);
+        acknowledgePacket[0] = (byte)
+                ((packet[ADMIN] & SEQUENCE_BIT_MASK) | ACKNOWLEDGEMENT_PACKET_BASE);
 
         return acknowledgePacket;
     }
@@ -85,7 +111,8 @@ public abstract class DistoXProtocol extends Thread {
     protected void acknowledge(DataOutputStream outStream, byte[] packet) throws IOException {
         byte[] acknowledgePacket = createAcknowledgementPacket(packet);
         outStream.write(acknowledgePacket, 0, acknowledgePacket.length);
-        Log.d("Sent Ack: " + describeAcknowledgementPacket(acknowledgePacket));
+        outStream.flush();
+        Log.d("Ac'd Packet: " + describeAcknowledgementPacket(acknowledgePacket));
     }
 
 
@@ -94,7 +121,6 @@ public abstract class DistoXProtocol extends Thread {
         for (int i = 0; i < ATTEMPTS; i++) {
             tryToConnectIfNotConnected();
             if (!isConnected()) {
-                sleep(100);
                 continue;
             }
             DataOutputStream outStream = new DataOutputStream(socket.getOutputStream());
@@ -108,10 +134,7 @@ public abstract class DistoXProtocol extends Thread {
 
     protected static int readByte(byte[] packet, int index) {
         byte signed = packet[index];
-        int unsigned = signed & 0xff; //
-        /*if (data < 0) {
-            data += 2^8;
-        }*/
+        int unsigned = signed & 0xff;
         return unsigned;
     }
 
@@ -119,7 +142,7 @@ public abstract class DistoXProtocol extends Thread {
     protected static int readDoubleByte(byte[] packet, int lowByteIndex, int highByteIndex) {
         int low = readByte(packet, lowByteIndex);
         int high = readByte(packet, highByteIndex);
-        return (high * 2^8) + low;
+        return (high * 256) + low;
     }
 
 
@@ -136,7 +159,7 @@ public abstract class DistoXProtocol extends Thread {
                 tryToConnectIfNotConnected();
 
                 if (!isConnected()) {
-                    // FIXME sleep?
+                    sleep(WAIT_BETWEEN_CONNECTION_ATTEMPTS_MS);
                     continue;
                 }
 
@@ -181,8 +204,15 @@ public abstract class DistoXProtocol extends Thread {
 
 
     public void stopDoingStuff() {
-        state = State.STOP_REQUESTED;
-        interrupt();
+        try {
+            if (state == State.STOP_REQUESTED) {
+                interrupt();
+            } else {
+                state = State.STOP_REQUESTED;
+            }
+        } finally {
+            disconnect();
+        }
     }
 
     protected boolean keepAlive() {
@@ -197,33 +227,34 @@ public abstract class DistoXProtocol extends Thread {
 
     public void tryToConnectIfNotConnected() {
 
-        if (!isConnected()) {
+        if (isConnected()) {
+            return;
+        }
 
-            try {
-                Log.device(context.getString(R.string.device_log_connecting));
-                socket = bluetoothDevice.createInsecureRfcommSocketToServiceRecord(
-                        SexyTopo.DISTO_X_UUID);
-                socket.connect(); // blocks until connection is complete or fails with an exception
+        try {
+            Log.device(context.getString(R.string.device_log_connecting));
+            socket = bluetoothDevice.createInsecureRfcommSocketToServiceRecord(
+                    SexyTopo.DISTO_X_UUID);
+            socket.connect(); // blocks until connection is complete or fails with an exception
 
-            } catch(Exception exception) {
-                if (exception.getMessage().contains("socket might closed or timeout")) {
-                    try {
-                        Log.device(context.getString(R.string.device_trying_fallback));
-                        socket = createFallbackSocket();
-                        socket.connect();
-                    } catch (Exception e) {
-                        Log.device("Failed to create fallback socket: " + e.getMessage());
-                    }
-                } else {
-                    Log.device("Error connecting: " + exception.getMessage());
+        } catch(Exception exception) {
+            if (exception.getMessage().contains("socket might closed or timeout")) {
+                try {
+                    Log.device(context.getString(R.string.device_trying_fallback));
+                    socket = createFallbackSocket();
+                    socket.connect();
+                } catch (Exception e) {
+                    Log.device("Failed to create fallback socket: " + e.getMessage());
                 }
+            } else {
+                Log.device("Error connecting: " + exception.getMessage());
+            }
 
-            } finally {
-                if (socket.isConnected()) {
-                    Log.device(context.getString(R.string.device_log_connected));
-                } else {
-                    Log.device(context.getString(R.string.device_log_not_connected));
-                }
+        } finally {
+            if (socket.isConnected()) {
+                Log.device(context.getString(R.string.device_log_connected));
+            } else {
+                Log.device(context.getString(R.string.device_log_not_connected));
             }
         }
     }
@@ -253,7 +284,7 @@ public abstract class DistoXProtocol extends Thread {
     protected byte[] readPacket(DataInputStream inStream) throws IOException {
         byte[] packet = new byte[8];
         inStream.readFully(packet, 0, 8);
-        Log.d("Read packet: " + describeAcknowledgementPacket(packet));
+        Log.d("Read packet: " + describePacket(packet));
 
         return packet;
     }
@@ -279,26 +310,35 @@ public abstract class DistoXProtocol extends Thread {
     }
 
     protected static boolean isDataPacket(byte[] packet) {
-        return (packet[0] & 0x3F) == 1;
+        return PacketType.getType(packet) == PacketType.MEASUREMENT;
     }
 
 
+    @SuppressLint("all")
     public static String describePacket(byte[] packet) {
         String description = "[";
         for (int i = 0; i < packet.length; i++) {
             if (i == ADMIN) {
-                description += Integer.toBinaryString(packet[i] & 0xFF);
+                description += asBinaryString(packet[i] & 0xFF);
             } else {
-                description += ", " + packet[i];
+                description += ",\t" + packet[i];
             }
         }
         description += "]";
+
+        PacketType type = PacketType.getType(packet);
+        description += " (" + type + ")";
+
         return description;
+    }
+
+    public static String asBinaryString(int theByte) {
+        return String.format("%8s", Integer.toBinaryString(theByte)).replace(' ', '0');
     }
 
 
     public static String describeAcknowledgementPacket(byte[] acknowledgementPacket) {
-        return "[" + Integer.toBinaryString(acknowledgementPacket[0] & 0xFF) + "]";
+        return "[" + asBinaryString(acknowledgementPacket[0] & 0xFF) + "]";
     }
 
 

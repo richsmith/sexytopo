@@ -1,13 +1,19 @@
 package org.hwyl.sexytopo.testhelpers;
 
+import junit.framework.Assert;
+
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 
 public class SurveyChecker {
+
+    public static final DecimalFormat FORMAT_2DP = new DecimalFormat("#.00");
+    public static final DecimalFormat FORMAT_3DP = new DecimalFormat("#.000");
 
     public static boolean areEqual(Survey one, Survey two) {
 
@@ -52,4 +58,5 @@ public class SurveyChecker {
 
         return true;
     }
+
 }

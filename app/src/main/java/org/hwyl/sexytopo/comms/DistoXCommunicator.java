@@ -89,13 +89,14 @@ public class DistoXCommunicator {
             } else {
                 Log.device("Please wait while existing calibration thread stops");
                 currentStrategy.stopDoingStuff();
+                return;
             }
-        } else if (currentStrategy instanceof MeasurementProtocol) {
+
+        } else if (currentStrategy instanceof MeasurementProtocol && currentStrategy.isAlive()) {
             Log.device("Please wait while standard mode stops");
             currentStrategy.stopDoingStuff();
             return;
         }
-
 
         Log.device("Entering calibration mode");
 

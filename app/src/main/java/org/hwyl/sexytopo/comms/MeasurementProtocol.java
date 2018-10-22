@@ -23,6 +23,9 @@ public class MeasurementProtocol extends DistoXProtocol {
     private static final int INCLINATION_HIGH_BYTE = 6;
     private static final int ROLL_ANGLE_HIGH_BYTE = 7;
 
+    public static final int DISTANCE_BIT_MASK = 0b01000000;
+
+
     protected byte[] previousPacket = new byte[]{};
 
 
@@ -35,7 +38,7 @@ public class MeasurementProtocol extends DistoXProtocol {
 
     public static Leg parseDataPacket(byte[] packet) {
 
-        int d0 = packet[ADMIN] & 0x40;
+        int d0 = packet[ADMIN] & DISTANCE_BIT_MASK;
         int d1 = readByte(packet, DISTANCE_LOW_BYTE);
         int d2 = readByte(packet, DISTANCE_HIGH_BYTE);
         double distance = (d0 * 1024 + d2 * 256 + d1) / 1000.0;
@@ -51,8 +54,7 @@ public class MeasurementProtocol extends DistoXProtocol {
             inclination = (65536 - inclinationReading) * -90.0 / 16384.0;
         }
 
-        Leg leg = new Leg(distance, azimuth, inclination);
-        return leg;
+        return new Leg(distance, azimuth, inclination);
     }
 
 
@@ -73,6 +75,8 @@ public class MeasurementProtocol extends DistoXProtocol {
     public void readMeasurements(DataInputStream inStream, DataOutputStream outStream)
             throws IOException, InterruptedException {
 
+        int duplicateCount = 0;
+
         while (keepAlive()) {
 
             if (!isConnected()) {
@@ -80,11 +84,13 @@ public class MeasurementProtocol extends DistoXProtocol {
             }
 
             byte[] packet = readPacket(inStream);
-            sleep(100);
             acknowledge(outStream, packet);
 
             if (isDataPacket(packet)) {
-                if (!arePacketsTheSame(packet, previousPacket)) {
+                if (arePacketsTheSame(packet, previousPacket)) {
+                    Log.d("(Duplicated measurement #" + ++duplicateCount + ")");
+                } else {
+                    duplicateCount = 0;
                     Log.device(context.getString(R.string.device_log_received));
                     Leg leg = parseDataPacket(packet);
                     dataManager.updateSurvey(leg);
@@ -93,10 +99,9 @@ public class MeasurementProtocol extends DistoXProtocol {
 
             previousPacket = packet;
 
-            sleep(100);
+            pauseForDistoXToCatchUp(); // seems to help with coordination
         }
 
     }
-
 
 }
