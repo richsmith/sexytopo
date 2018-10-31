@@ -134,7 +134,7 @@ public class Log {
             JSONArray marshalled = marshal(logType);
             String content = marshalled.toString(4);
             String path = getFilePath(logType);
-            Saver.saveFile(context, path, content);
+            Saver.saveFile(path, content);
         } catch (Exception exception) {
             android.util.Log.e(SexyTopo.TAG, exception.toString());
         }

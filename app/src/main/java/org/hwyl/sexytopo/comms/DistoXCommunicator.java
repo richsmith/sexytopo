@@ -26,7 +26,7 @@ public class DistoXCommunicator {
     private static DistoXCommunicator instance = null;
 
 
-    private DistoXProtocol currentStrategy = new NullProtocol();
+    private DistoXProtocol currentStrategy = NullProtocol.INSTANCE;
 
 
     private DistoXCommunicator(Context context, SurveyManager dataManager) {
@@ -40,6 +40,13 @@ public class DistoXCommunicator {
             instance = new DistoXCommunicator(context, dataManager);
         }
         return instance;
+    }
+
+
+    private void update() {
+        if (currentStrategy.isStopped()) {
+            currentStrategy = NullProtocol.INSTANCE;
+        }
     }
 
 
@@ -118,7 +125,7 @@ public class DistoXCommunicator {
 
     public void stopCalibration() throws Exception {
         if (currentStrategy instanceof CalibrationProtocol) {
-            ((CalibrationProtocol)currentStrategy).cancelCalibration();
+            ((CalibrationProtocol)currentStrategy).stopCalibration();
             currentStrategy.stopDoingStuff();
         }
     }
@@ -156,6 +163,12 @@ public class DistoXCommunicator {
         }
     }
 
+
+    public boolean isMeasuring() {
+        update();
+        return currentStrategy instanceof MeasurementProtocol;
+    }
+
     public void kill() {
         if (currentStrategy.isAlive()) {
             Log.device("Killing process " + currentStrategy.getClass().getName());
@@ -163,4 +176,15 @@ public class DistoXCommunicator {
         }
     }
 
+    public void completeCalibration(byte[] coefficients) throws Exception {
+        if (! (currentStrategy instanceof CalibrationProtocol)) {
+            Log.device("Please ensure device is in calibration mode");
+        } else {
+            ((CalibrationProtocol)currentStrategy).writeCalibration(coefficients);
+        }
+    }
+
+    public boolean isConnected() {
+        return currentStrategy.isConnected();
+    }
 }

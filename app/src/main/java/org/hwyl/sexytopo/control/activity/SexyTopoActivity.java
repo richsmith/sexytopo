@@ -178,6 +178,9 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             case R.id.action_generate_test_survey:
                 generateTestSurvey();
                 return true;
+            case R.id.action_kill_connection:
+                killConnection();
+                return true;
 
 
             default:
@@ -900,6 +903,9 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
 
+    private void killConnection() {
+        DistoXCommunicator.getInstance(this, dataManager).kill();
+    }
 
 
     protected Survey getSurvey() {
@@ -929,7 +935,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
 
-    private void showException(Exception exception) {
+    protected void showException(Exception exception) {
         Log.e(exception);
         showSimpleToast(getString(R.string.error_prefix) + " " + exception.getMessage());
     }

@@ -8,7 +8,9 @@ import java.io.DataOutputStream;
 
 public class NullProtocol extends DistoXProtocol {
 
-    public NullProtocol() {
+    public static NullProtocol INSTANCE = new NullProtocol();
+
+    private NullProtocol() {
         super(null, null, null);
     }
 

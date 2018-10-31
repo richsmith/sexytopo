@@ -31,6 +31,7 @@
     <string name="action_link_to_existing_survey">Link to an Existing Survey</string>
     <string name="action_system_log">System Log</string>
     <string name="action_generate_test_survey">Generate Test Survey</string>
+    <string name="action_kill_connection">Kill comms process</string>
     <string name="loaded">Loaded</string>
     <string name="restored">Restored</string>
     <string name="external_storage_unwriteable">WARNING: Can\'t write to external storage (will use internal storage instead)</string>
@@ -98,6 +99,7 @@
     <string name="delete">Delete</string>
     <string name="save">Save</string>
     <string name="replace">Replace</string>
+    <string name="clear">Clear</string>
     <string name="not_applicable">N/A</string>
     <string name="title_activity_help">Help</string>
     <string name="hello_world">Hello world!</string>
@@ -158,15 +160,19 @@
     <string name="third_party_compass">Compass</string>
     <string name="calibration_index">Reading number</string>
     <string name="calibration_start">Start Calibration</string>
+    <string name="calibration_stop">Stop Calibration</string>
     <string name="calibration_next_step">Next (suggested)</string>
-    <string name="calibration_stop">Cancel Calibration</string>
     <string name="calibration_complete">Complete Calibration</string>
+    <string name="calibration_load">Load</string>
+    <string name="calibration_save">Save</string>
     <string name="calibration_direction">Direction</string>
     <string name="calibration_orientation">Orientation</string>
     <string name="calibration_not_enough">Not enough readings taken</string>
     <string name="calibration_assessment">Calibration Assessment</string>
     <string name="calibration_update">Use</string>
     <string name="calibration_error_updating_device">Failed: could not update calibration</string>
+    <string name="calibration_no_files">No saved calibrations found to open</string>
+    <string name="calibration_default_filename">calibration</string>
     <string name="direction_forward">Forward</string>
     <string name="direction_right">Right</string>
     <string name="direction_back">Back</string>

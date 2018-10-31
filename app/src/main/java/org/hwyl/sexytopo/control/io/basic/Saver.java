@@ -54,7 +54,7 @@ public class Saver {
             throws IOException,JSONException {
         String path = Util.getPathForSurveyFile(context, survey.getName(), extension);
         String surveyText = SurveyJsonTranslater.toText(survey);
-        saveFile(context, path, surveyText);
+        saveFile(path, surveyText);
     }
 
 
@@ -62,17 +62,18 @@ public class Saver {
             throws IOException, JSONException {
         String path = Util.getPathForSurveyFile(context, survey.getName(), extension);
         String planText = SketchJsonTranslater.translate(sketch);
-        saveFile(context, path, planText);
+        saveFile(path, planText);
     }
 
 
     private static void saveMetadata(Context context, Survey survey, String extension) throws Exception {
         String path = Util.getPathForSurveyFile(context, survey.getName(), extension);
         String metadataText = MetadataTranslater.translate(survey);
-        saveFile(context, path, metadataText);
+        saveFile(path, metadataText);
     }
 
-    public static void saveFile(Context context, String path, String contents) throws IOException {
+
+    public static void saveFile(String path, String contents) throws IOException {
 
         File file = new File(path);
         String location = file.getParentFile().getPath();

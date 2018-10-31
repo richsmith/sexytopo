@@ -26,6 +26,8 @@ public class SexyTopo {
     public static final String IMPORT_DIR = "To Import";
     public static final String EXPORT_DIR = "Exported";
     public static final String LOG_DIR = "Logs";
+    public static final String CALIBRATION_DIR = "Calibrations";
+
 
 
     public static final String IMPORT_SOURCE_DIR = "Import Source";

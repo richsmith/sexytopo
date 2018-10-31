@@ -124,6 +124,11 @@ public class SurveyManager {
         return calibrationReadings;
     }
 
+
+    public void setCalibrationReadings(List<CalibrationReading> calibrationReadings) {
+        this.calibrationReadings = calibrationReadings;
+    }
+
     public void clearCalibrationReadings() {
         this.calibrationReadings.clear();
     }

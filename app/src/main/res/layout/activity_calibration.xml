@@ -2,23 +2,69 @@
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:paddingLeft="@dimen/activity_horizontal_margin"
               android:orientation="vertical"
+
+              android:paddingLeft="@dimen/activity_horizontal_margin"
               android:paddingRight="@dimen/activity_horizontal_margin"
               android:paddingTop="@dimen/activity_vertical_margin"
               android:paddingBottom="@dimen/activity_vertical_margin"
               tools:context="org.hwyl.sexytopo.control.activity.CalibrationActivity">
 
-    <Button
-        android:id="@+id/calibration_start"
-        android:layout_height="wrap_content"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:textAlignment="gravity"
-        android:gravity="center"
-        android:text="@string/calibration_start"
-        android:enabled="true"
-        android:onClick="requestStartCalibration"
-        />
+        android:padding="0dp"
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/calibration_start"
+            android:layout_marginLeft="0dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:textAlignment="gravity"
+            android:gravity="center"
+            android:text="@string/calibration_start"
+            android:enabled="true"
+            android:onClick="requestStartCalibration"
+            />
+        <Button
+            android:id="@+id/calibration_load"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:textAlignment="gravity"
+            android:gravity="center"
+            android:text="@string/calibration_load"
+            android:enabled="true"
+            android:onClick="requestLoadCalibration"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/calibration_stop"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:textAlignment="gravity"
+            android:gravity="center"
+            android:text="@string/calibration_stop"
+            android:enabled="true"
+            android:onClick="requestStopCalibration"
+            />
+        <Button
+            android:id="@+id/calibration_clear"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textAlignment="gravity"
+            android:gravity="center"
+            android:text="@string/clear"
+            android:enabled="true"
+            android:onClick="requestClearCalibration"
+            />
+    </LinearLayout>
 
     <TableLayout
         android:layout_width="match_parent"
@@ -40,7 +86,6 @@
                 android:gravity="end"/>
         </TableRow>
     </TableLayout>
-
 
 
     <TableLayout
@@ -172,29 +217,31 @@
         </TableRow>
     </TableLayout>
 
-    <Button
-        android:id="@+id/calibration_complete"
-        android:layout_height="wrap_content"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:textAlignment="gravity"
-        android:gravity="center"
-        android:text="@string/calibration_complete"
-        android:onClick="completeCalibration"
-        />
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/calibration_complete"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:textAlignment="gravity"
+            android:gravity="center"
+            android:text="@string/calibration_complete"
+            android:onClick="requestCompleteCalibration"
+            />
+        <Button
+            android:id="@+id/calibration_save"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textAlignment="gravity"
+            android:gravity="center"
+            android:text="@string/calibration_save"
+            android:enabled="true"
+            android:onClick="requestSaveCalibration"
+            />
+    </LinearLayout>
 
-    <Button
-        android:id="@+id/calibration_stop"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:textAlignment="gravity"
-        android:gravity="center"
-        android:text="@string/calibration_stop"
-        android:enabled="true"
-        android:onClick="requestStopCalibration"
-        />
 
 </LinearLayout>

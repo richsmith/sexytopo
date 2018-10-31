@@ -65,6 +65,7 @@ public abstract class DistoXProtocol extends Thread {
     protected volatile State state = State.IDLE;
 
 
+    // Disto reads every
     private static final int INTER_PACKET_DELAY = 100; // ms; (DISTO repeats every 25 ms for ref)
     private static final int WAIT_BETWEEN_CONNECTION_ATTEMPTS_MS = 5 * 1000;
 
@@ -81,7 +82,7 @@ public abstract class DistoXProtocol extends Thread {
 
 
 
-    private BluetoothSocket socket;
+    protected BluetoothSocket socket;
 
     protected DistoXProtocol(
             Context context, BluetoothDevice bluetoothDevice, SurveyManager dataManager) {
@@ -116,21 +117,30 @@ public abstract class DistoXProtocol extends Thread {
     }
 
 
-    protected void writeCommandPacket(byte[] packet) throws IOException, Exception {
+    protected void writeCommandPacket(byte[] packet) throws Exception {
+        oneOffConnect();
+        DataOutputStream outStream = new DataOutputStream(socket.getOutputStream());
+
+        try {
+            outStream.write(packet, 0, packet.length);
+            return;
+        } finally {
+            outStream.close();
+        }
+
+    }
+
+
+    protected void oneOffConnect() throws Exception {
         final int ATTEMPTS = 3;
         for (int i = 0; i < ATTEMPTS; i++) {
             tryToConnectIfNotConnected();
-            if (!isConnected()) {
-                continue;
+            if (isConnected()) {
+                return;
             }
-            DataOutputStream outStream = new DataOutputStream(socket.getOutputStream());
-            outStream.write(packet, 0, packet.length);
-            return;
         }
-
         throw new Exception("Couldn't send command");
     }
-
 
     protected static int readByte(byte[] packet, int index) {
         byte signed = packet[index];
@@ -197,6 +207,11 @@ public abstract class DistoXProtocol extends Thread {
         disconnect();
 
         state = State.STOPPED;
+    }
+
+
+    public boolean isStopped() {
+        return state == State.STOPPED;
     }
 
 

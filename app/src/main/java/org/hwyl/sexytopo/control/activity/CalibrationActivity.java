@@ -9,9 +9,12 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.Editable;
 import android.util.Pair;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import org.hwyl.sexytopo.R;
@@ -20,8 +23,15 @@ import org.hwyl.sexytopo.comms.DistoXCommunicator;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.calibration.CalibrationCalculator;
+import org.hwyl.sexytopo.control.io.Util;
+import org.hwyl.sexytopo.control.io.basic.CalibrationJsonTranslater;
+import org.hwyl.sexytopo.control.io.basic.Loader;
+import org.hwyl.sexytopo.control.io.basic.Saver;
 import org.hwyl.sexytopo.model.calibration.CalibrationReading;
+import org.json.JSONException;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,6 +79,7 @@ public class CalibrationActivity extends SexyTopoActivity {
     private static final List<Pair<CalibrationDirection, Orientation>> positions;
 
     private enum State {
+        NOT_READY,
         READY,
         CALIBRATING,
         CALIBRATED
@@ -154,36 +165,56 @@ public class CalibrationActivity extends SexyTopoActivity {
             setInfoField(R.id.calibration_next_direction, getString(R.string.not_applicable));
             setInfoField(R.id.calibration_next_orientation, getString(R.string.not_applicable));
 
-            double assessment = CalibrationCalculator.calculate(calibrationReadings);
+            final CalibrationCalculator calibrationCalculator = new CalibrationCalculator();
+            calibrationCalculator.calculate(calibrationReadings);
+            double calibrationAssessment = calibrationCalculator.getMaxError();
 
             TextView assessmentField = (TextView)(findViewById(R.id.calibrationFieldAssessment));
-            if (assessment < 0.5) {
+            if (calibrationAssessment < 0.5) {
                 assessmentField.setTextColor(Color.RED);
             } else {
                 assessmentField.setTextColor(Color.BLACK);
             }
-            setInfoField(R.id.calibrationFieldAssessment, assessment);
+            setInfoField(R.id.calibrationFieldAssessment, calibrationAssessment);
         }
     }
 
 
     private void updateState() {
 
+        if (comms.isMeasuring()) {
+            state = State.NOT_READY;
+        }
+
+
+
         if (calibrationReadings.size() >= positions.size()) {
             state = State.CALIBRATED;
+        }
+
+        if (calibrationReadings.size() < 1) {
+            setButtonEnabled(R.id.calibration_save, false);
+            setButtonEnabled(R.id.calibration_clear, false);
+
+        } else {
+            setButtonEnabled(R.id.calibration_save, true);
+            setButtonEnabled(R.id.calibration_clear, true);
+
         }
 
         switch(state) {
             case READY:
                 setButtonEnabled(R.id.calibration_start, true);
+                //setButtonEnabled(R.id.calibration_stop, false);
                 setButtonEnabled(R.id.calibration_complete, false);
                 break;
             case CALIBRATING:
                 setButtonEnabled(R.id.calibration_start, false);
+                //setButtonEnabled(R.id.calibration_stop, true);
                 setButtonEnabled(R.id.calibration_complete, false);
                 break;
             case CALIBRATED:
-                setButtonEnabled(R.id.calibration_start, false);
+                //setButtonEnabled(R.id.calibration_start, false);
                 setButtonEnabled(R.id.calibration_complete, true);
                 break;
         }
@@ -206,17 +237,18 @@ public class CalibrationActivity extends SexyTopoActivity {
     }
 
 
-
     public void requestStartCalibration(View view) {
         Log.device("Start calibration requested");
 
         try {
             comms.startCalibration();
             state = State.CALIBRATING;
-            updateState();
         } catch (Exception exception) {
+            state = State.READY;
             Log.e(exception);
             showSimpleToast("Error starting calibration: " + exception);
+        } finally {
+            updateState();
         }
     }
 
@@ -229,38 +261,153 @@ public class CalibrationActivity extends SexyTopoActivity {
     }
 
 
-    public void completeCalibration(View view) {
+    public void requestCompleteCalibration(View view) {
         if (calibrationReadings.size() < positions.size()) {
             showSimpleToast(R.string.calibration_not_enough);
             return;
         }
 
-        double calibrationAssessment = CalibrationCalculator.calculate(calibrationReadings);
+        final CalibrationCalculator calibrationCalculator = new CalibrationCalculator();
+        calibrationCalculator.calculate(calibrationReadings);
+        double calibrationAssessment = calibrationCalculator.getMaxError();
         String message = "Calibration assessment (should be under " + MAX_ERROR + "): " +
-                calibrationAssessment;
+            calibrationAssessment;
 
         new AlertDialog.Builder(this)
-                .setTitle(getString(R.string.calibration_assessment))
-                .setMessage(message)
-                .setPositiveButton(getString(R.string.calibration_update), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
+            .setTitle(getString(R.string.calibration_assessment))
+            .setMessage(message)
+            .setPositiveButton(getString(R.string.calibration_update), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    try {
+                        byte[] coefficients = calibrationCalculator.getCoefficients();
+                        comms.completeCalibration(coefficients);
+                        updateState();
+                    } catch (Exception exception) {
+                        Log.e(exception);
+                        showSimpleToast(R.string.calibration_error_updating_device);
+                        Log.e(exception);
+                    }
+                }
+            }).setNegativeButton(getString(R.string.cancel),
+            new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    // Do nothing.
+                }
+            }).show();
+
+
+    }
+
+
+    public void requestClearCalibration(View view) {
+        new AlertDialog.Builder(this)
+            .setTitle(getString(R.string.dialog_save_as_title))
+            .setMessage(R.string.calibration_assessment)
+            .setPositiveButton(getString(R.string.clear), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    dataManager.clearCalibrationReadings();
+                    syncWithReadings();
+                }
+            }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    // Do nothing.
+                }
+        }).show();
+    }
+
+
+    public void requestSaveCalibration(View view) {
+
+        final EditText input = new EditText(this);
+        input.setText(R.string.calibration_default_filename);
+
+        new AlertDialog.Builder(this)
+            .setTitle(getString(R.string.dialog_save_as_title))
+            .setView(input)
+            .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    Editable value = input.getText();
+                    String name = value.toString();
+                    try {
+                        saveCalibration(name);
+                    } catch (Exception exception) {
+                        showException(exception);
+                    }
+                }
+            }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+        public void onClick(DialogInterface dialog, int whichButton) {
+            // Do nothing.
+            }
+        }).show();
+    }
+
+
+    private void saveCalibration(String filename) throws JSONException, IOException {
+        String contents = CalibrationJsonTranslater.toText(calibrationReadings);
+        String path = getFilePath(filename);
+        Saver.saveFile(path, contents);
+    }
+
+
+    public void requestLoadCalibration(View view) {
+
+        File[] calibrationFiles = Util.getCalibrationFiles(this);
+
+        if (calibrationFiles.length == 0) {
+            showSimpleToast(R.string.calibration_no_files);
+            return;
+        }
+
+        AlertDialog.Builder builderSingle = new AlertDialog.Builder(
+                this);
+
+        builderSingle.setTitle(getString(R.string.open_survey));
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.select_dialog_item);
+
+        for (File file : calibrationFiles) {
+            arrayAdapter.add(file.getName());
+        }
+
+        builderSingle.setNegativeButton(getString(R.string.cancel),
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        builderSingle.setAdapter(arrayAdapter,
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
                         try {
-                            //comms.update()
-                            updateState();
+                            String filename = arrayAdapter.getItem(which);
+                            loadCalibration(filename);
                         } catch (Exception exception) {
-                            Log.e(exception);
-                            showSimpleToast(R.string.calibration_error_updating_device);
-                            Log.e(exception);
+                            showException(exception);
                         }
                     }
-                }).setNegativeButton(getString(R.string.cancel),
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        // Do nothing.
-                    }
-                }).show();
+                });
+        builderSingle.show();
+    }
 
+    private void loadCalibration(String filename) throws JSONException {
+        String path = getFilePath(filename);
+        String content = Loader.slurpFile(new File(path));
+        List<CalibrationReading> calibrationReadings =
+                CalibrationJsonTranslater.toCalibrationReadings(content);
+        dataManager.setCalibrationReadings(calibrationReadings);
+        syncWithReadings();
+    }
 
+    private String getFilePath(String filename) {
+        File directory = Util.getCalibrationDirectory(this);
+        String path = Util.getPath(directory, filename);
+        return path;
     }
 
 }

@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.hwyl.sexytopo.SexyTopo.CALIBRATION_DIR;
 import static org.hwyl.sexytopo.SexyTopo.EXPORT_DIR;
 import static org.hwyl.sexytopo.SexyTopo.IMPORT_DIR;
 import static org.hwyl.sexytopo.SexyTopo.LOG_DIR;
@@ -49,6 +50,8 @@ public class Util {
         ensureDirectoryExists(getSurveyDirectory(context));
         ensureDirectoryExists(getImportDir(context));
         ensureDirectoryExists(getExportDirectory(context));
+        ensureDirectoryExists(getCalibrationDirectory(context));
+
     }
 
 
@@ -57,6 +60,14 @@ public class Util {
         File surveyDirectory = getSurveyDirectory(context);
         File surveyDirectories[] = surveyDirectory.listFiles();
         return surveyDirectories;
+    }
+
+
+    public static File[] getCalibrationFiles(Context context) {
+        ensureDataDirectoriesExist(context);
+        File calibrationDirectory = getCalibrationDirectory(context);
+        File[] calibrationFiles = calibrationDirectory.listFiles();
+        return calibrationFiles;
     }
 
     public static File[] getImportFiles(Context context) {
@@ -269,6 +280,10 @@ public class Util {
         return new File(getDocumentRoot(context), LOG_DIR);
     }
 
+    public static File getCalibrationDirectory(Context context) {
+        return new File(getDocumentRoot(context), CALIBRATION_DIR);
+    }
+
     public static String getAutosaveName(String filename) {
         return filename + "." + SexyTopo.AUTOSAVE_EXTENSION;
     }
@@ -292,5 +307,10 @@ public class Util {
             list.add(array.getJSONObject(i));
         }
         return list;
+    }
+
+
+    public static String getPath(File directory, String filename) {
+        return directory.getPath() + File.separator + filename;
     }
 }

@@ -72,7 +72,7 @@
     <item android:id="@+id/action_calibration"
         android:title="@string/action_calibration"
         android:orderInCategory="100"
-        android:visible="false"
+        android:visible="true"
         app:showAsAction="never" />
     <item android:id="@+id/dev_settings"
           android:title="@string/action_dev"
@@ -84,6 +84,8 @@
                   android:title="@string/action_system_log" />
             <item android:id="@+id/action_generate_test_survey"
                   android:title="@string/action_generate_test_survey" />
+            <item android:id="@+id/action_kill_connection"
+                  android:title="@string/action_kill_connection" />
         </menu>
     </item>
     <item android:id="@+id/action_settings"

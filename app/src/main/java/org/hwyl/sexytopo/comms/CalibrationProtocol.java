@@ -5,6 +5,7 @@ import android.content.Context;
 
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
+import org.hwyl.sexytopo.control.calibration.topodroid.CalibrationWriter;
 import org.hwyl.sexytopo.model.calibration.CalibrationReading;
 
 import java.io.DataInputStream;
@@ -40,7 +41,6 @@ public class CalibrationProtocol extends DistoXProtocol {
             Context context, BluetoothDevice bluetoothDevice, SurveyManager dataManager) {
         super(context, bluetoothDevice, dataManager);
     }
-
 
 
     @Override
@@ -109,13 +109,11 @@ public class CalibrationProtocol extends DistoXProtocol {
 
 
     public void startNewCalibration() throws Exception {
-        dataManager.clearCalibrationReadings();
         writeCommandPacket(getStartCalibrationPacket());
     }
 
 
-    public void cancelCalibration() throws Exception {
-        dataManager.clearCalibrationReadings();
+    public void stopCalibration() throws Exception {
         writeCommandPacket(getStopCalibrationPacket());
     }
 
@@ -130,19 +128,44 @@ public class CalibrationProtocol extends DistoXProtocol {
     }
 
 
-    public static void updateAccelerationSensorReading(byte[] packet, CalibrationReading reading)
-            throws Exception {
+    public static void updateAccelerationSensorReading(byte[] packet, CalibrationReading reading) {
         int gx = readDoubleByte(packet, ACCELERATION_GX_LOW_BYTE, ACCELERATION_GX_HIGH_BYTE);
         int gy = readDoubleByte(packet, ACCELERATION_GY_LOW_BYTE, ACCELERATION_GY_HIGH_BYTE);
         int gz = readDoubleByte(packet, ACCELERATION_GZ_LOW_BYTE, ACCELERATION_GZ_HIGH_BYTE);
         reading.updateAccelerationValues(gx, gy, gz);
     }
 
+
     public static void updateMagneticSensorReading(byte[] packet, CalibrationReading reading) {
         int mx = readDoubleByte(packet, MAGNETIC_MX_LOW_BYTE, MAGNETIC_MX_HIGH_BYTE);
         int my = readDoubleByte(packet, MAGNETIC_MY_LOW_BYTE, MAGNETIC_MY_HIGH_BYTE);
         int mz = readDoubleByte(packet, MAGNETIC_MZ_LOW_BYTE, MAGNETIC_MZ_HIGH_BYTE);
         reading.updateMagneticValues(mx, my, mz);
+    }
+
+
+    public boolean writeCalibration(byte[] coefficients) throws Exception {
+
+        // "called by GMActivity and by CalibCoeffDialog"
+        //  GMActivity gets coeff from CalibAlgo
+        //    TopoDroidApp.uploadCalibCoeff
+        //   -    > DistoXComm.writeCoeff
+        //            -> DistoXProtocol.writeCalibration
+
+        oneOffConnect();
+
+        DataInputStream inStream = new DataInputStream(socket.getInputStream());
+        DataOutputStream outStream = new DataOutputStream(socket.getOutputStream());
+
+        try {
+            CalibrationWriter calibrationWriter = new CalibrationWriter();
+            return calibrationWriter.writeCalibration(coefficients, inStream, outStream);
+        } finally {
+            inStream.close();
+            outStream.close();
+        }
+
+
     }
 
 }

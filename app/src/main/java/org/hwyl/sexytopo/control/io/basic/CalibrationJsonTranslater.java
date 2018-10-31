@@ -19,7 +19,7 @@ public class CalibrationJsonTranslater {
         public static final String MX_TAG = "mx";
         public static final String MY_TAG = "my";
         public static final String MZ_TAG = "mz";
-        
+
 
         public static String toText(List<CalibrationReading> calibrationReadings)
                 throws JSONException {
