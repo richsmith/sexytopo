@@ -952,6 +952,10 @@ public class GraphView extends View {
 
     private void drawSketch(Canvas canvas, Sketch sketch, int alpha) {
 
+        if (!getDisplayPreference(GraphActivity.DisplayPreference.SHOW_SKETCH)) {
+            return;
+        }
+
         for (PathDetail pathDetail : sketch.getPathDetails()) {
 
             if (!couldBeOnScreen(pathDetail)) {

@@ -14,9 +14,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.PopupWindow;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.graph.GraphView;
@@ -45,31 +47,37 @@ public abstract class GraphActivity extends SexyTopoActivity
     private static final String BRUSH_COLOUR_PREFERENCE_KEY = "BRUSH_COLOUR";
 
 
-    private static final int[] BUTTON_IDS = new int[] {
-        R.id.buttonDraw,
-        R.id.buttonMove,
-        R.id.buttonText,
-        R.id.buttonErase,
-        R.id.buttonSelect,
-        R.id.buttonZoomIn,
-        R.id.buttonZoomOut,
-        R.id.buttonUndo,
-        R.id.buttonRedo,
-        R.id.buttonMenu,
-        R.id.buttonBlack,
-        R.id.buttonBrown,
-        R.id.buttonOrange,
-        R.id.buttonBlue,
-        R.id.buttonGreen,
-        R.id.buttonPurple
+    private static final int[] SKETCH_BUTTON_IDS = new int[] {
+            R.id.buttonDraw,
+            R.id.buttonText,
+            R.id.buttonErase,
+            R.id.buttonUndo,
+            R.id.buttonRedo,
+            R.id.buttonBlack,
+            R.id.buttonBrown,
+            R.id.buttonOrange,
+            R.id.buttonBlue,
+            R.id.buttonGreen,
+            R.id.buttonPurple
     };
 
+    private static final int[] CONTROL_BUTTON_IDS = new int[] {
+            R.id.buttonMove,
+            R.id.buttonSelect,
+            R.id.buttonZoomIn,
+            R.id.buttonZoomOut,
+            R.id.buttonMenu
+    };
+
+    private static final int[] BUTTON_IDS =
+            ArrayUtils.addAll(SKETCH_BUTTON_IDS, CONTROL_BUTTON_IDS);
 
     public enum DisplayPreference {
         AUTO_RECENTRE(R.id.buttonAutoRecentre, true),
         SNAP_TO_LINES(R.id.buttonSnapToLines, true),
         SHOW_GRID(R.id.buttonShowGrid, true),
         SHOW_SPLAYS(R.id.buttonShowSplays, true),
+        SHOW_SKETCH(R.id.buttonShowSketch, true),
         SHOW_STATION_LABELS(R.id.buttonShowStationLabels, true),
         SHOW_CONNECTIONS(R.id.buttonShowConnections, true);
 
@@ -147,6 +155,7 @@ public abstract class GraphActivity extends SexyTopoActivity
         syncGraphWithSurvey();
         initialiseSketchTool();
         initialiseBrushColour();
+        setSketchButtonsStatus();
     }
 
 
@@ -191,6 +200,11 @@ public abstract class GraphActivity extends SexyTopoActivity
                 setDisplayPreference(DisplayPreference.SHOW_SPLAYS, !item.isChecked());
                 graphView.invalidate();
                 return true;
+            case R.id.buttonShowSketch:
+                setDisplayPreference(DisplayPreference.SHOW_SKETCH, !item.isChecked());
+                setSketchButtonsStatus();
+                graphView.invalidate();
+                return true;
             case R.id.buttonShowStationLabels:
                 setDisplayPreference(DisplayPreference.SHOW_STATION_LABELS, !item.isChecked());
                 graphView.invalidate();
@@ -209,6 +223,20 @@ public abstract class GraphActivity extends SexyTopoActivity
 
     }
 
+
+    private void setSketchButtonsStatus() {
+       boolean isEnabled = graphView.getDisplayPreference(DisplayPreference.SHOW_SKETCH);
+        for (int id : SKETCH_BUTTON_IDS) {
+            ImageButton button = findViewById(id);
+            button.setEnabled(isEnabled);
+        }
+
+        if (!isEnabled) {
+            graphView.setSketchTool(GraphView.SketchTool.MOVE);
+        }
+    }
+
+
     private void setDisplayPreference(DisplayPreference preference, boolean value) {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean(preference.toString(), value);
@@ -218,7 +246,7 @@ public abstract class GraphActivity extends SexyTopoActivity
 
     public boolean handleAction(int id) {
 
-        GraphView graphView = (GraphView)(findViewById(R.id.graphView));
+        GraphView graphView = findViewById(R.id.graphView);
         graphView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
 
         for (GraphView.SketchTool sketchTool: GraphView.SketchTool.values()) {

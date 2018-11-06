@@ -8,8 +8,8 @@ android {
         applicationId "org.hwyl.sexytopo"
         minSdkVersion 18
         targetSdkVersion 27
-        versionCode 26
-        versionName "1.1.1"
+        versionCode 27
+        versionName "1.1.2"
     }
     buildTypes {
         release {
@@ -24,21 +24,21 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:design:27.1.1'
-    implementation "commons-io:commons-io:2.6"
-
+    implementation 'commons-io:commons-io:2.6'
     testImplementation 'junit:junit:4.12'
-    testImplementation ('org.powermock:powermock-api-mockito:1.6.2') {
+    testImplementation('org.powermock:powermock-api-mockito:1.6.2') {
         exclude module: 'hamcrest-core'
         exclude module: 'objenesis'
     }
-    testImplementation ('org.powermock:powermock-module-junit4:1.6.2') {
+    testImplementation('org.powermock:powermock-module-junit4:1.6.2') {
         exclude module: 'hamcrest-core'
         exclude module: 'objenesis'
     }
-    testImplementation "org.json:json:20140107"
+    testImplementation 'org.json:json:20140107'
+    implementation 'org.apache.commons:commons-lang3:3.8.1'
 }
 
 repositories {

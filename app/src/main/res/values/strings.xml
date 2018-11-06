@@ -66,6 +66,7 @@
     <string name="sketch_menu_snap_to_lines">Snap to Lines</string>
     <string name="sketch_menu_show_station_labels">Station Labels</string>
     <string name="sketch_menu_show_splays">Show Splays</string>
+    <string name="sketch_menu_show_sketch">Show Sketch</string>
     <string name="sketch_menu_show_connect">Linked Surveys</string>
     <string name="sketch_menu_back_measurements">Reverse Legs</string>
     <string name="title_activity_start_up">StartUpActivity</string>
