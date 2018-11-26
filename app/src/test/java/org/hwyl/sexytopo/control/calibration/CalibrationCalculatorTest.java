@@ -74,8 +74,9 @@ public class CalibrationCalculatorTest {
         List<CalibrationReading> calibrationReadings = toCalibrationReadings(testCalibrations);
 
         CalibrationCalculator calibrationCalculator = new CalibrationCalculator();
-        calibrationCalculator.calculate(calibrationReadings);
-        Assert.assertEquals(0.6, calibrationCalculator.getMaxError());
+        int x = calibrationCalculator.calculate(calibrationReadings);
+        Assert.assertEquals(0.62, calibrationCalculator.getMaxError());
+
     }
 
 

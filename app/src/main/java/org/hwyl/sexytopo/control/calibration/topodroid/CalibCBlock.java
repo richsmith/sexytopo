@@ -30,8 +30,8 @@ public class CalibCBlock
     long my;
     long mz;
     long  mGroup;
-    float mBearing;  // computed compass
-    float mClino;    // computed clino
+    public float mBearing;  // computed compass
+    public float mClino;    // computed clino
     float mRoll;     // computed roll
     float mError;    // error in the calibration algo associated to this data
     long mStatus;
@@ -60,7 +60,7 @@ public class CalibCBlock
         mError = 0.0f;
     }
 
-    boolean isFarFrom( float b0, float c0, float thr )
+    public boolean isFarFrom( float b0, float c0, float thr )
     {
         computeBearingAndClino();
         float c = c0 * TDMath.DEG2RAD;
@@ -83,9 +83,9 @@ public class CalibCBlock
         mCalibId = cid;
     }
     // FIXME ZERO-DATA
-    void setGroupIfNonZero( long g ) { mGroup = isGZero() ? 0 : g; }
+    public void setGroupIfNonZero( long g ) { mGroup = isGZero() ? 0 : g; }
 
-    void setGroup( long g ) { mGroup = g; }
+    public void setGroup( long g ) { mGroup = g; }
     void setError( float err ) { mError = err; }
 
     /*
