@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.widget.Toast;
 
 import org.hwyl.sexytopo.SexyTopo;
@@ -63,13 +62,16 @@ public class SurveyManager {
             broadcastSurveyUpdated();
 
             if (stationAdded) {
+                Log.d("New station added");
                 broadcastNewStationCreated();
             }
 
             try {
+                Log.d("Autosaving...");
                 Saver.autosave(context, currentSurvey);
+                Log.d("Autosaved");
             } catch (Exception e) {
-                Log.e(SexyTopo.TAG, "Error autosaving survey: " + e);
+                Log.e("Error autosaving survey: " + e);
                 Toast.makeText(context, "Error autosaving survey: " + e.getMessage(),
                         Toast.LENGTH_SHORT).show();
             }

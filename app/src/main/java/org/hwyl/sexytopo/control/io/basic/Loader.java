@@ -29,7 +29,7 @@ public class Loader {
     }
 
 
-    private static Survey loadSurvey(Context context, String name, boolean restoreAutosave)
+    public static Survey loadSurvey(Context context, String name, boolean restoreAutosave)
             throws Exception {
         Set<String> surveyNamesNotToLoad = new HashSet<>();
         return loadSurvey(context, name, surveyNamesNotToLoad, restoreAutosave);

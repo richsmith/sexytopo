@@ -215,6 +215,10 @@ public class SurveyUpdater {
     }
 
 
+    public void moveLeg(Leg leg, Station newSource) {
+        //SurveyTools.
+    }
+
     public static void deleteLeg(Survey survey, final Leg toDelete) {
         survey.undoLeg(toDelete);
     }

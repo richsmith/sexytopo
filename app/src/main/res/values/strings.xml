@@ -22,6 +22,7 @@
     <string name="action_file_import">Import…</string>
     <string name="action_file_export">Export…</string>
     <string name="action_file_restore_autosave">Restore Autosave</string>
+    <string name="action_file_exit">Exit</string>
     <string name="action_input">Input Mode</string>
     <string name="action_input_mode_forward">Forward</string>
     <string name="action_input_mode_backward">Backsights</string>
@@ -142,6 +143,7 @@
     <string name="replace_question">Survey with that name already exists. Replace?</string>
     <string name="continue_question">Continue?</string>
     <string name="delete_question">Delete?</string>
+    <string name="exit_question">Exit?</string>
     <string name="no_data">No Data</string>
     <string name="delete_row_question">Delete Row?</string>
     <string name="stats_length">Length (m)</string>

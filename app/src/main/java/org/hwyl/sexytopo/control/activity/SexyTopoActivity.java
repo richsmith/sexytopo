@@ -162,6 +162,9 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             case R.id.action_file_restore_autosave:
                 restoreAutosave();
                 return true;
+            case R.id.action_file_exit:
+                confirmToProceedIfNotSaved(R.string.exit_question, "exit");
+                return true;
 
 
             case R.id.action_undo_last_leg:
@@ -734,14 +737,26 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
 
-    private void restoreAutosave() {
+    protected void restoreAutosave(String name) {
         try {
-            Survey survey = Loader.loadSurvey(SexyTopoActivity.this, getSurvey().getName());
+            Survey survey = Loader.restoreAutosave(SexyTopoActivity.this, name);
             SurveyManager.getInstance(SexyTopoActivity.this).setCurrentSurvey(survey);
             showSimpleToast(getString(R.string.restored));
         } catch (Exception exception) {
             showException(exception);
         }
+    }
+
+
+    private void restoreAutosave() {
+        String name = getSurvey().getName();
+        restoreAutosave(name);
+    }
+
+
+    public void exit() {
+        finishAffinity();
+        System.exit(0);
     }
 
 
@@ -832,13 +847,23 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
 
     protected void confirmToProceedIfNotSaved(final String methodToCallIfProceeding) {
+        confirmToProceedIfNotSaved(R.string.continue_question, methodToCallIfProceeding);
+    }
+
+
+    protected void confirmToProceedIfNotSaved(
+            int continueMessageId,
+            String methodToCallIfProceeding) {
+
+
+
         if (getSurvey().isSaved()) {
             invokeMethod(methodToCallIfProceeding);
             return;
         }
 
         confirmToProceed(
-                R.string.continue_question,
+                continueMessageId,
                 R.string.warning_survey_not_saved,
                 R.string.carry_on,
                 R.string.cancel,
