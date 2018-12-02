@@ -268,6 +268,26 @@ public class Survey {
     }
 
 
+    public Station getOriginatingStation(final Leg leg) {
+        final Wrapper wrapper = new Wrapper();
+        SurveyTools.traverseStations(
+                this,
+                new SurveyTools.SurveyStationTraversalCallback() {
+                    @Override
+                    public boolean call(Station station) {
+                        if (station.getOnwardLegs().contains(leg)) {
+                            wrapper.value = station;
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                });
+
+        return (Station)(wrapper.value);
+    }
+
+
     public void undoLeg(final Leg toDelete) {
         SurveyTools.traverseLegs(
                 this,

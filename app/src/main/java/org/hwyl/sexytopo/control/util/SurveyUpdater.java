@@ -215,9 +215,13 @@ public class SurveyUpdater {
     }
 
 
-    public void moveLeg(Leg leg, Station newSource) {
-        //SurveyTools.
+    public static void moveLeg(Survey survey, Leg leg, Station newSource) {
+        Station originating = survey.getOriginatingStation(leg);
+        originating.getOnwardLegs().remove(leg);
+        newSource.addOnwardLeg(leg);
+        survey.setSaved(false);
     }
+
 
     public static void deleteLeg(Survey survey, final Leg toDelete) {
         survey.undoLeg(toDelete);

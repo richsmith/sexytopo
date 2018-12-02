@@ -10,4 +10,7 @@
     <item
         android:id="@+id/deleteRow"
         android:title="@string/menu_delete_row"/>
+    <item
+        android:id="@+id/moveRow"
+        android:title="@string/menu_move_row"/>
 </menu>

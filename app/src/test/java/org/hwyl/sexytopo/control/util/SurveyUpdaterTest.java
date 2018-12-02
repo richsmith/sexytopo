@@ -1,7 +1,9 @@
 package org.hwyl.sexytopo.control.util;
 
 import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
+import org.hwyl.sexytopo.testhelpers.BasicTestSurveyCreator;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -56,6 +58,18 @@ public class SurveyUpdaterTest {
         Assert.assertEquals(survey.getAllLegs().size(), 1);
         Assert.assertEquals(survey.getAllLegs().get(0).getDistance(), 6,
                 ALLOWED_DOUBLE_DELTA);
+    }
+
+    @Test
+    public void testMoveLegWorks() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Leg toMove = survey.getStationByName("2").getOnwardLegs().get(0);
+        Station originatingStation = survey.getOriginatingStation(toMove);
+        Station destinationStation = survey.getStationByName("1");
+        Assert.assertNotEquals(originatingStation, destinationStation);
+        SurveyUpdater.moveLeg(survey, toMove, destinationStation);
+        Assert.assertTrue(destinationStation.getOnwardLegs().contains(toMove));
+        Assert.assertFalse(originatingStation.getOnwardLegs().contains(toMove));
     }
 
 }

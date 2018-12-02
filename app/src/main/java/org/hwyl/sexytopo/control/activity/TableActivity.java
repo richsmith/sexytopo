@@ -14,8 +14,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnLongClickListener;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.PopupMenu;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -34,6 +36,7 @@ import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.table.TableCol;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -125,7 +128,7 @@ public class TableActivity extends SexyTopoActivity
 
                 String display = map.containsKey(col) ? col.format(map.get(col)) : "?";
                 int id = TABLE_COL_BY_ANDROID_ID.get(col);
-                TextView textView = (TextView) tableRow.findViewById(id);
+                TextView textView = tableRow.findViewById(id);
                 textView.setText(display);
 
                 if (isActiveStation(map.get(col))) {
@@ -210,6 +213,7 @@ public class TableActivity extends SexyTopoActivity
                 getSurvey().setActiveStation(newActive);
                 syncTableWithSurvey();
                 return true;
+
             case R.id.renameStation:
                 Station toRename = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
                 if (toRename == Survey.NULL_STATION) {
@@ -218,16 +222,54 @@ public class TableActivity extends SexyTopoActivity
                     ManualEntry.renameStation(this, getSurvey(), toRename);
                 }
                 return true;
+
             case R.id.editLeg:
                 Leg toEdit = surveyEntry.getLeg();
                 ManualEntry.editLeg(this, getSurvey(), toEdit);
                 return true;
+
+            case R.id.moveRow:
+                final Leg toMove = surveyEntry.getLeg();
+                View stationView = getLayoutInflater().inflate(R.layout.select_station_dialog, null);
+
+                List<String> spinnerArray =  new ArrayList<>();
+                List<Station> stations = getSurvey().getAllStations();
+                for (Station station : stations) {
+                    spinnerArray.add(station.getName());
+                }
+                //Collections.sort(spinnerArray);
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                        this, android.R.layout.simple_spinner_item, spinnerArray);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                final Spinner spinner = stationView.findViewById(R.id.stationSpinner);
+                spinner.setAdapter(adapter);
+
+                new AlertDialog.Builder(this)
+                    .setMessage(R.string.move_leg_select_station_title)
+                    .setView(stationView)
+                    .setPositiveButton(R.string.move, new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String selectedName = spinner.getSelectedItem().toString();
+                            Station newStation = getSurvey().getStationByName(selectedName);
+
+                            SurveyUpdater.moveLeg(getSurvey(), toMove, newStation);
+                            syncTableWithSurvey();
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel, null)
+                    .show();
+                return true;
+
             case R.id.upgradeRow:
                 Leg toUpgrade = surveyEntry.getLeg();
                 SurveyUpdater.upgradeSplayToConnectedLeg(getSurvey(), toUpgrade);
                 syncTableWithSurvey();
                 return true;
+
             case R.id.deleteRow:
+
                 int legsToBeDeleted = SurveyStats.calcNumberSubLegs(surveyEntry.getFrom());
                 int stationsToBeDeleted = SurveyStats.calcNumberSubStations(surveyEntry.getFrom());
                 String detailMessage = "This will delete\n" +
