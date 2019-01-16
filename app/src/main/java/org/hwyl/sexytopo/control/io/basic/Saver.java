@@ -72,7 +72,8 @@ public class Saver {
         saveFile(context, path, metadataText);
     }
 
-    public static void saveFile(Context context, String path, String contents) throws IOException {
+    public static void saveFile(Context context, String path, String contents)
+            throws IOException {
 
         File file = new File(path);
         String location = file.getParentFile().getPath();

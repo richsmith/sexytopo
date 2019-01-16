@@ -90,6 +90,12 @@
             android:summary="Show fields for entering LRUDs (Left-Right-Up-Down) for each new station"
             android:title="LRUD entries"
             android:defaultValue="false"/>
+
+        <CheckBoxPreference
+            android:key="pref_key_deg_mins_secs"
+            android:summary="Enter azimuth values in deg/mins/secs (as opposed to the default of decimal)"
+            android:title="Azimuth as degrees/minutes/seconds"
+            android:defaultValue="false"/>
     </PreferenceCategory>
 
 </PreferenceScreen>

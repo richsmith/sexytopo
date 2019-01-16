@@ -139,6 +139,7 @@
     <string name="manual_edit_leg_title">Edit Leg</string>
     <string name="manual_edit_distance">Distance (m)</string>
     <string name="manual_edit_azimuth">Azimuth (&#176;)</string>
+    <string name="manual_edit_azimuth_deg_mins_secs">Azimuth (&#176; \' \")</string>
     <string name="manual_edit_inclination">Inclination (&#176;)</string>
     <string name="manual_edit_left">Left (m)</string>
     <string name="manual_edit_right">Right (m)</string>

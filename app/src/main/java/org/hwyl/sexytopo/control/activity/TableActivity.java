@@ -230,36 +230,7 @@ public class TableActivity extends SexyTopoActivity
 
             case R.id.moveRow:
                 final Leg toMove = surveyEntry.getLeg();
-                View stationView = getLayoutInflater().inflate(R.layout.select_station_dialog, null);
-
-                List<String> spinnerArray =  new ArrayList<>();
-                List<Station> stations = getSurvey().getAllStations();
-                for (Station station : stations) {
-                    spinnerArray.add(station.getName());
-                }
-                //Collections.sort(spinnerArray);
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                        this, android.R.layout.simple_spinner_item, spinnerArray);
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                final Spinner spinner = stationView.findViewById(R.id.stationSpinner);
-                spinner.setAdapter(adapter);
-
-                new AlertDialog.Builder(this)
-                    .setMessage(R.string.move_leg_select_station_title)
-                    .setView(stationView)
-                    .setPositiveButton(R.string.move, new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            String selectedName = spinner.getSelectedItem().toString();
-                            Station newStation = getSurvey().getStationByName(selectedName);
-
-                            SurveyUpdater.moveLeg(getSurvey(), toMove, newStation);
-                            syncTableWithSurvey();
-                        }
-                    })
-                    .setNegativeButton(R.string.cancel, null)
-                    .show();
+                requestMoveLeg(toMove);
                 return true;
 
             case R.id.upgradeRow:
@@ -323,5 +294,36 @@ public class TableActivity extends SexyTopoActivity
         syncTableWithSurvey();
     }
 
+    private void requestMoveLeg(final Leg toMove) {
+        View stationView = getLayoutInflater().inflate(R.layout.select_station_dialog, null);
+
+        List<String> spinnerArray =  new ArrayList<>();
+        List<Station> stations = getSurvey().getAllStations();
+        for (Station station : stations) {
+            spinnerArray.add(station.getName());
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this, android.R.layout.simple_spinner_item, spinnerArray);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        final Spinner spinner = stationView.findViewById(R.id.stationSpinner);
+        spinner.setAdapter(adapter);
+
+        new AlertDialog.Builder(this)
+                .setMessage(R.string.move_leg_select_station_title)
+                .setView(stationView)
+                .setPositiveButton(R.string.move, new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String selectedName = spinner.getSelectedItem().toString();
+                        Station newStation = getSurvey().getStationByName(selectedName);
+
+                        SurveyUpdater.moveLeg(getSurvey(), toMove, newStation);
+                        syncTableWithSurvey();
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
 
 }

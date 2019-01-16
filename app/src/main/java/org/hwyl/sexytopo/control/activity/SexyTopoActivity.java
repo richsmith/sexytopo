@@ -959,7 +959,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         showSimpleToast(getString(R.string.error_prefix) + " " + exception.getMessage());
     }
 
-    protected boolean getBooleanPreference(String name) {
+    public boolean getBooleanPreference(String name) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         return preferences.getBoolean(name, false);
     }
