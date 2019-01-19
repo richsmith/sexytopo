@@ -21,7 +21,7 @@ import java.io.OutputStreamWriter;
 public class Saver {
 
 
-    public static void save(Context context, Survey survey) throws Exception {
+    public static synchronized void save(Context context, Survey survey) throws Exception {
 
         if (survey.getName().equals("")) {
             throw new IllegalArgumentException("Not saved; survey name cannot be empty");
@@ -39,7 +39,7 @@ public class Saver {
         Log.d("Saved survey " + survey.getName());
     }
 
-    public static void autosave(Context context, Survey survey) throws Exception {
+    public static synchronized void autosave(Context context, Survey survey) throws Exception {
         saveMetadata(context, survey,
                 SexyTopo.METADATA_EXTENSION + "." + SexyTopo.AUTOSAVE_EXTENSION);
         saveSurveyData(context, survey, SexyTopo.DATA_EXTENSION + "." + SexyTopo.AUTOSAVE_EXTENSION);

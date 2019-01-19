@@ -3,6 +3,10 @@ package org.hwyl.sexytopo.control.util;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 
 public class StationNamer {
 
@@ -25,20 +29,32 @@ public class StationNamer {
     }
 
     public static String generateNextBranch(Survey survey, String originatingName) {
-        for (int i = 1; ; i++) {
-            String candidateName = i + ".1";
-            if (survey.getStationByName(candidateName) == null) {
-                return candidateName;
-            }
-        }
+        String candidateName = originatingName + ".1";
+        String uniqueName = advanceNumberIfNotUnique(survey, candidateName);
+        return uniqueName;
     }
 
     public static String generateNextStationInLine(Survey survey, String originatingName) {
         String candidateName = TextTools.advanceLastNumber(originatingName);
-        while (survey.getStationByName(candidateName) != null) {
-            candidateName = TextTools.advanceLastNumber(originatingName);
+        String uniqueName = advanceNumberIfNotUnique(survey, candidateName);
+        return uniqueName;
+    }
+
+    public static String advanceNumberIfNotUnique(Survey survey, String candidateName) {
+        Set<String> allNames = getAllStationNames(survey);
+        while (allNames.contains(candidateName)) {
+            candidateName = TextTools.advanceLastNumber(candidateName);
         }
         return candidateName;
+    }
+
+    public static Set<String> getAllStationNames(Survey survey) {
+        List<Station> stations = survey.getAllStations();
+        Set<String> allNames = new HashSet<>();
+        for (Station station : stations) {
+            allNames.add(station.getName());
+        }
+        return allNames;
     }
 
 }
