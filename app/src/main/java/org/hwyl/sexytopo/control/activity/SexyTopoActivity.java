@@ -451,7 +451,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                         String oldName = survey.getName();
                         try {
                             survey.setName(newName);
-                            setSurvey(new Survey(Util.getNextDefaultSurveyName(SexyTopoActivity.this)));
                             Saver.save(SexyTopoActivity.this, survey);
                             updateRememberedSurvey();
                         } catch (Exception exception) {

@@ -14,32 +14,36 @@ public class StationNamerTest {
         Survey testSurvey = BasicTestSurveyCreator.createStraightNorth();
         String newName = StationNamer.generateNextStationName(
                 testSurvey, testSurvey.getActiveStation());
-        Assert.assertEquals("5", newName);
+        int numberOfStations = testSurvey.getAllStations().size();
+        Assert.assertEquals(Integer.toString(numberOfStations + 1), newName);
     }
 
 
     @Test
-    public void testNameAddsDotSomethingOnBranch() {
+    public void testNameAdvancesNumberOnPotentialBranch() {
         Survey testSurvey = BasicTestSurveyCreator.createStraightNorth();
         String newName =
                 StationNamer.generateNextStationName(testSurvey, testSurvey.getStationByName("1"));
-        Assert.assertEquals("1.1", newName);
+        int numberOfStations = testSurvey.getAllStations().size();
+        Assert.assertEquals(Integer.toString(numberOfStations + 1), newName);
     }
 
 
     @Test
-    public void testNameAdvancesDigitInBranch() {
+    public void testNameAdvancesNumberOnEstablishedBranch() {
         Survey testSurvey = BasicTestSurveyCreator.createStraightNorthWith1EBranch();
         String newName = StationNamer.generateNextStationName(
-                testSurvey, testSurvey.getStationByName("1.1"));
-        Assert.assertEquals("1.2", newName);
+                testSurvey, testSurvey.getStationByName("5"));
+        int numberOfStations = testSurvey.getAllStations().size();
+        Assert.assertEquals(Integer.toString(numberOfStations + 1), newName);
     }
 
     @Test
-    public void testNameAddsDotSomethingOnBranchOffBranch() {
+    public void testNameAdvancesNumberFromMiddleOfBranch() {
         Survey testSurvey = BasicTestSurveyCreator.createStraightNorthWith2EBranch();
         String newName = StationNamer.generateNextStationName(
-                testSurvey, testSurvey.getStationByName("1.1"));
-        Assert.assertEquals("1.1.1", newName);
+                testSurvey, testSurvey.getStationByName("5"));
+        int numberOfStations = testSurvey.getAllStations().size();
+        Assert.assertEquals(Integer.toString(numberOfStations + 1), newName);
     }
 }

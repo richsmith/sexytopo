@@ -98,11 +98,18 @@ public class TextTools {
         if (lastDigitChar == -1) {
             return originatingName + "1";
         } else {
-            int value = Integer.parseInt(originatingName.substring(firstDigitChar, lastDigitChar + 1));
-            value++;
+            String oldDigitString = originatingName.substring(firstDigitChar, lastDigitChar + 1);
+            Integer oldValue = Integer.parseInt(oldDigitString);
+            Integer newValue = oldValue + 1;
+            String newDigitString = newValue.toString();
+            int lengthDifference = oldDigitString.length() - newDigitString.length();
+            if (lengthDifference > 0) {
+                String zeroPadding = new String(new char[lengthDifference]).replace("\0", "0");
+                newDigitString = zeroPadding + newDigitString;
+            }
             String firstPart = originatingName.substring(0, firstDigitChar);
             String lastPart = originatingName.substring(lastDigitChar + 1);
-            return firstPart + value + lastPart;
+            return firstPart + newDigitString + lastPart;
         }
     }
 

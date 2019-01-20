@@ -1,9 +1,5 @@
 package org.hwyl.sexytopo.control.util;
 
-import android.test.AndroidTestCase;
-
-
-import org.hwyl.sexytopo.control.util.TextTools;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -38,5 +34,17 @@ public class TextToolsTest {
     public void testAdvanceLastNumber5() {
         String advanced = TextTools.advanceLastNumber("a99f");
         Assert.assertEquals("a100f", advanced);
+    }
+
+    @Test
+    public void testAdvanceLastNumberWithZeroPadding1() {
+        String advanced = TextTools.advanceLastNumber("a01f");
+        Assert.assertEquals("a02f", advanced);
+    }
+
+    @Test
+    public void testAdvanceLastNumberWithZeroPadding2() {
+        String advanced = TextTools.advanceLastNumber("a09f");
+        Assert.assertEquals("a10f", advanced);
     }
 }
