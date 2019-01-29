@@ -22,6 +22,7 @@
     <string name="action_file_import">Import…</string>
     <string name="action_file_export">Export…</string>
     <string name="action_file_restore_autosave">Restore Autosave</string>
+    <string name="action_file_exit">Exit</string>
     <string name="action_input">Input Mode</string>
     <string name="action_input_mode_forward">Forward</string>
     <string name="action_input_mode_backward">Backsights</string>
@@ -39,6 +40,7 @@
     <string name="table_head_to">To</string>
     <string name="table_head_distance">Dist</string>
     <string name="table_head_azimuth">Azm</string>
+    <string name="move_leg_select_station_title">Select station to move to</string>
     <string name="table_head_elevation">Incl</string>
     <string name="title_activity_table">Table</string>
     <string name="title_activity_plan">Plan</string>
@@ -51,6 +53,7 @@
     <string name="menu_edit_leg">Edit Row</string>
     <string name="menu_upgrade_row">Force New Station</string>
     <string name="menu_delete_row">Delete Row</string>
+    <string name="menu_move_row">Move to Different Station</string>
     <string name="menu_station_label">Station</string>
     <string name="menu_new_cross_section">New Cross-Section</string>
     <string name="menu_delete_station">Delete</string>
@@ -99,8 +102,10 @@
     <string name="carry_on">Continue</string>
     <string name="delete">Delete</string>
     <string name="save">Save</string>
+    <string name="move">Move</string>
     <string name="replace">Replace</string>
     <string name="clear">Clear</string>
+    <string name="station">Station</string>
     <string name="not_applicable">N/A</string>
     <string name="title_activity_help">Help</string>
     <string name="hello_world">Hello world!</string>
@@ -136,6 +141,7 @@
     <string name="manual_edit_leg_title">Edit Leg</string>
     <string name="manual_edit_distance">Distance (m)</string>
     <string name="manual_edit_azimuth">Azimuth (&#176;)</string>
+    <string name="manual_edit_azimuth_deg_mins_secs">Azimuth (&#176; \' \")</string>
     <string name="manual_edit_inclination">Inclination (&#176;)</string>
     <string name="manual_edit_left">Left (m)</string>
     <string name="manual_edit_right">Right (m)</string>
@@ -144,6 +150,7 @@
     <string name="replace_question">Survey with that name already exists. Replace?</string>
     <string name="continue_question">Continue?</string>
     <string name="delete_question">Delete?</string>
+    <string name="exit_question">Exit?</string>
     <string name="no_data">No Data</string>
     <string name="delete_row_question">Delete Row?</string>
     <string name="stats_length">Length (m)</string>

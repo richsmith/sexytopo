@@ -22,8 +22,11 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/azimuth_standard"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        >
         <TextView
             android:layout_width="100dp"
             android:layout_height="wrap_content"
@@ -34,6 +37,33 @@
             android:layout_width="100dp"
             android:layout_height="50dp"
             android:inputType="number|numberDecimal"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/azimuth_deg_mins_secs"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="@string/manual_edit_azimuth_deg_mins_secs"
+            />
+        <EditText
+            android:id="@+id/editAzimuthDegrees"
+            android:layout_width="40dp"
+            android:layout_height="50dp"
+            android:inputType="number"/>
+        <EditText
+            android:id="@+id/editAzimuthMinutes"
+            android:layout_width="40dp"
+            android:layout_height="50dp"
+            android:inputType="number"/>
+        <EditText
+            android:id="@+id/editAzimuthSeconds"
+            android:layout_width="40dp"
+            android:layout_height="50dp"
+            android:inputType="number"/>
     </LinearLayout>
 
     <LinearLayout

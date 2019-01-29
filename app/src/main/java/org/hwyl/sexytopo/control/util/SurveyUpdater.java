@@ -39,7 +39,7 @@ public class SurveyUpdater {
         return update(survey, leg, InputMode.FORWARD);
     }
 
-    public static boolean update(Survey survey, Leg leg, InputMode inputMode) {
+    public static synchronized boolean update(Survey survey, Leg leg, InputMode inputMode) {
         Station activeStation = survey.getActiveStation();
         activeStation.getOnwardLegs().add(leg);
         survey.setSaved(false);
@@ -89,7 +89,7 @@ public class SurveyUpdater {
         survey.setActiveStation(newStation);
     }
 
-    private static String getNextStationName(Survey survey) {
+    private static synchronized String getNextStationName(Survey survey) {
         return StationNamer.generateNextStationName(survey, survey.getActiveStation());
     }
 
@@ -164,7 +164,7 @@ public class SurveyUpdater {
     }
 
 
-    public static void editLeg(Survey survey, final Leg toEdit, final Leg edited) {
+    public static synchronized void editLeg(Survey survey, final Leg toEdit, final Leg edited) {
         SurveyTools.traverseLegs(
                 survey,
                 new SurveyTools.SurveyLegTraversalCallback() {
@@ -183,7 +183,7 @@ public class SurveyUpdater {
         survey.setSaved(false);
     }
 
-    public static void editStation(Survey survey, Station toEdit, Station edited) {
+    public static synchronized void editStation(Survey survey, Station toEdit, Station edited) {
 
         boolean weAreRenamingAStation = ! edited.getName().equals(toEdit);
         if (weAreRenamingAStation) {
@@ -212,6 +212,14 @@ public class SurveyUpdater {
         Station renamed = new Station(station, name);
         editStation(survey, station, renamed);
         Log.d("Renamed station " + station.getName() + " -> " + renamed.getName());
+    }
+
+
+    public static void moveLeg(Survey survey, Leg leg, Station newSource) {
+        Station originating = survey.getOriginatingStation(leg);
+        originating.getOnwardLegs().remove(leg);
+        newSource.addOnwardLeg(leg);
+        survey.setSaved(false);
     }
 
 

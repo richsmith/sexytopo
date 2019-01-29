@@ -49,16 +49,11 @@ public class StationRenameTest {
         Assert.assertEquals("ShinyNewName", shinyNewStation.getName());
     }
 
-    //@Test(expected= IllegalArgumentException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void testRenamingToExistingNameFails() {
-        try {
-            Survey testSurvey = BasicTestSurveyCreator.createStraightNorth();
-            Station s2 = testSurvey.getStationByName("2");
-            SurveyUpdater.renameStation(testSurvey, s2, "1");
-            Assert.fail();
-        } catch(IllegalArgumentException e) {
-            Assert.assertTrue(true);
-        }
+        Survey testSurvey = BasicTestSurveyCreator.createStraightNorth();
+        Station s2 = testSurvey.getStationByName("2");
+        SurveyUpdater.renameStation(testSurvey, s2, "1");
     }
 
     @Test

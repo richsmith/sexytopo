@@ -115,7 +115,7 @@ public class ThExporter {
     }
 
     private static String getExtendCommand(Station station, String direction) {
-        return "extend " + direction + " " + station.getName();
+        return "extend " + direction + " " + station.getName() + "\n";
     }
 
 }

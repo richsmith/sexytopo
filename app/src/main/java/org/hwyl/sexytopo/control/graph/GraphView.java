@@ -75,7 +75,7 @@ public class GraphView extends View {
     private double surveyToViewScale = 60.0;
 
     public static final double MIN_ZOOM = 0.1;
-    public static final double MAX_ZOOM = 180.0;
+    public static final double MAX_ZOOM = 500.0;
 
     private GraphActivity activity;
 

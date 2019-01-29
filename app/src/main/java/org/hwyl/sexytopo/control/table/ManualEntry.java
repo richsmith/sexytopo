@@ -134,7 +134,7 @@ public class ManualEntry {
 
     private static Double getFieldValue(Dialog dialog, int id) {
         try {
-            TextView field = (TextView) (dialog.findViewById(id));
+            TextView field = dialog.findViewById(id);
             return Double.parseDouble(field.getText().toString());
         } catch (Exception e) {
             return null;
@@ -150,6 +150,11 @@ public class ManualEntry {
 
         LayoutInflater inflater = tableActivity.getLayoutInflater();
         final View dialogView = inflater.inflate(layoutId, null);
+
+        if (tableActivity.getBooleanPreference("pref_key_deg_mins_secs")) {
+            dialogView.findViewById(R.id.azimuth_standard).setVisibility(View.GONE);
+            dialogView.findViewById(R.id.azimuth_deg_mins_secs).setVisibility(View.VISIBLE);
+        }
         builder
             .setView(dialogView)
             .setTitle(R.string.manual_add_station_title)
@@ -179,19 +184,35 @@ public class ManualEntry {
             public void onClick(DialogInterface dialogInterface, int buttonId) {
 
                 Double distance = getFieldValue(dialog, R.id.editDistance);
-                Double azimuth = getFieldValue(dialog, R.id.editAzimuth);
                 Double inclination = getFieldValue(dialog, R.id.editInclination);
 
+                Double azimuth;
+                if (tableActivity.getBooleanPreference("pref_key_deg_mins_secs")) {
+                    Double degrees = getFieldValue(dialog, R.id.editAzimuthDegrees);
+                    Double minutes = getFieldValue(dialog, R.id.editAzimuthMinutes);
+                    Double seconds = getFieldValue(dialog, R.id.editAzimuthSeconds);
+                    if (degrees == null || minutes == null || seconds == null) {
+                        azimuth = null;
+                    } else {
+                        azimuth =
+                            degrees +
+                            (minutes * (1.0 / 60.0)) +
+                            (seconds * (1.0 / 60.0) * (1.0 / 60.0));
+                    }
+                } else {
+                    azimuth = getFieldValue(dialog, R.id.editAzimuth);
+                }
+
                 if (distance == null || !Leg.isDistanceLegal(distance)) {
-                    TextView editDistance = ((TextView) dialogView.findViewById(R.id.editDistance));
+                    TextView editDistance = dialogView.findViewById(R.id.editDistance);
                     editDistance.setError("Bad distance");
                     tableActivity.showSimpleToast("Bad distance");
                 } else if (azimuth == null || !Leg.isAzimuthLegal(azimuth)) {
-                    TextView editAzimuth = ((TextView)(dialogView.findViewById(R.id.editAzimuth)));
+                    TextView editAzimuth = dialogView.findViewById(R.id.editAzimuth);
                     tableActivity.showSimpleToast("Bad azimuth");
                     editAzimuth.setError("Bad azimuth");
                 } else if (inclination == null || !Leg.isInclinationLegal(inclination)) {
-                    TextView editInclination = ((TextView)(dialogView.findViewById(R.id.editInclination)));
+                    TextView editInclination = dialogView.findViewById(R.id.editInclination);
                     editInclination.setError("Bad inclination");
                     tableActivity.showSimpleToast("Bad inclination " + inclination);
                 } else {

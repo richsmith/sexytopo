@@ -7,6 +7,7 @@ import org.hwyl.sexytopo.model.survey.Survey;
 
 public class BasicTestSurveyCreator {
 
+
     public static Survey createStraightNorthThroughRepeats() {
         Survey survey = new Survey("Test Straight Survey North");
         for (int i = 0; i < 3; i++) {
@@ -17,6 +18,7 @@ public class BasicTestSurveyCreator {
         }
         return survey;
     }
+
 
     public static Survey createStraightNorth() {
         Survey survey = new Survey("Test Straight Survey North");
@@ -33,8 +35,9 @@ public class BasicTestSurveyCreator {
         return survey;
     }
 
+
     public static Survey createStraightSouth() {
-        Survey survey = new Survey("Test Straight Survey North");
+        Survey survey = new Survey("Test Straight Survey South");
 
         Leg leg0 = new Leg(5, 180, 0);
         SurveyUpdater.updateWithNewStation(survey, leg0);
@@ -48,6 +51,7 @@ public class BasicTestSurveyCreator {
         return survey;
 
     }
+
 
     public static Survey createRightRight() {
         Survey survey = new Survey("Test n-shaped Survey");
@@ -65,6 +69,7 @@ public class BasicTestSurveyCreator {
 
     }
 
+
     public static Survey create5MDown() {
         Survey survey = new Survey("Test Survey 1m Down");
 
@@ -73,6 +78,7 @@ public class BasicTestSurveyCreator {
 
         return survey;
     }
+
 
     public static Survey create5MEast() {
         Survey survey = new Survey("Test Survey 5m east");
@@ -88,4 +94,46 @@ public class BasicTestSurveyCreator {
         return survey;
     }
 
+
+    public static Survey createStraightNorthWith1EBranch() {
+        Survey survey = new Survey("Test Straight Survey North With 1E Branch");
+
+        Leg leg0 = new Leg(5, 0, 0);
+        SurveyUpdater.updateWithNewStation(survey, leg0);
+
+        Leg leg1 = new Leg(5, 0, 0);
+        SurveyUpdater.updateWithNewStation(survey, leg1);
+
+        Leg leg2 = new Leg(5, 0, 0);
+        SurveyUpdater.updateWithNewStation(survey, leg2);
+
+        survey.setActiveStation(survey.getStationByName("1"));
+        Leg legBranch = new Leg(5, 90, 0);
+        SurveyUpdater.updateWithNewStation(survey, legBranch);
+
+        return survey;
+    }
+
+
+    public static Survey createStraightNorthWith2EBranch() {
+        Survey survey = new Survey("Test Straight Survey North With 2E Branch");
+
+        Leg leg0 = new Leg(5, 0, 0);
+        SurveyUpdater.updateWithNewStation(survey, leg0);
+
+        Leg leg1 = new Leg(5, 0, 0);
+        SurveyUpdater.updateWithNewStation(survey, leg1);
+
+        Leg leg2 = new Leg(5, 0, 0);
+        SurveyUpdater.updateWithNewStation(survey, leg2);
+
+        survey.setActiveStation(survey.getStationByName("1"));
+        Leg legBranch = new Leg(5, 90, 0);
+        SurveyUpdater.updateWithNewStation(survey, legBranch);
+
+        Leg legBranch2 = new Leg(5, 90, 0);
+        SurveyUpdater.updateWithNewStation(survey, legBranch2);
+
+        return survey;
+    }
 }

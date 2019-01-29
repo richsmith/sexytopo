@@ -34,6 +34,8 @@
             <item android:id="@+id/action_file_export" android:title="@string/action_file_export"/>
             <item android:id="@+id/action_file_delete" android:title="@string/action_file_delete"/>
             <item android:id="@+id/action_file_restore_autosave" android:title="@string/action_file_restore_autosave"/>
+            <item android:id="@+id/action_file_exit" android:title="@string/action_file_exit"/>
+
         </menu>
     </item>
     <item android:id="@+id/action_input"

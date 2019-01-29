@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.control.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -8,6 +9,8 @@ import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.model.survey.Survey;
+
+import java.io.File;
 
 
 public class StartUpActivity extends SexyTopoActivity {
@@ -24,10 +27,14 @@ public class StartUpActivity extends SexyTopoActivity {
 
         Util.ensureDataDirectoriesExist(this);
 
-        if (isThereAnActiveSurvey()) {
-            loadActiveSurvey();
-        } else {
-            createNewActiveSurvey();
+        try {
+            if (isThereAnActiveSurvey()) {
+                loadActiveSurvey();
+            } else {
+                createNewActiveSurvey();
+            }
+        } catch (Exception exception) {
+            helpThereSeemsToBeNoSurveyDoSomething();
         }
 
         Intent intent = new Intent(this, DeviceActivity.class);
@@ -40,19 +47,57 @@ public class StartUpActivity extends SexyTopoActivity {
     }
 
 
-    public void loadActiveSurvey() {
+    public void loadActiveSurvey() throws Exception {
 
         String activeSurveyName = getPreferences().getString(SexyTopo.ACTIVE_SURVEY_NAME, "Error");
         Log.d("Active survey is <i>" + activeSurveyName + "</i>");
 
         if (!Util.doesSurveyExist(this, activeSurveyName)) {
             Log.e("Survey " + activeSurveyName + " does not exist");
-            startNewSurvey();
-            createNewActiveSurvey();
-            return;
+            helpThereSeemsToBeNoSurveyDoSomething();
+
+        } else if (isAutosaveNewerThanProperSave(this, activeSurveyName)) {
+            restoreAutosave(activeSurveyName);
+        } else {
+            loadSurvey(activeSurveyName);
+        }
+    }
+
+
+    private boolean isAutosaveNewerThanProperSave(Context context, String name) {
+
+        String dataPath = Util.getPathForSurveyFile(context, name, SexyTopo.DATA_EXTENSION);
+        File dataFile = new File(dataPath);
+
+        String autosavePath = Util.getPathForSurveyFile(context, name,
+        SexyTopo.DATA_EXTENSION + "." + SexyTopo.AUTOSAVE_EXTENSION);
+        File autosaveFile = new File(autosavePath);
+
+
+        if (!autosaveFile.exists()) {
+            return false;
+        } else {
+            Log.d("Noticed an autosave file");
         }
 
-        loadSurvey(activeSurveyName);
+        if (!dataFile.exists()) {
+            Log.d("Data file seems to be missing!?");
+            return true;
+
+        } else if (autosaveFile.lastModified() > dataFile.lastModified()) {
+            Log.d("Autosave file is newer than data file");
+            return true;
+        }
+
+        return false;
+    }
+
+
+    private void helpThereSeemsToBeNoSurveyDoSomething() {
+        Log.d("Can't find the survey; falling back to a new one");
+        startNewSurvey();
+        createNewActiveSurvey();
+        return;
     }
 
 
