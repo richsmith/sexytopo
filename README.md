@@ -1,6 +1,7 @@
-<h1 align=center>
-<img src="Logo/horizontal.png" width=60%>
-</h1>
+
+# SexyTopo
+
+<img src="app/src/main/res/drawable-hdpi/laser_icon.png" width=10%><br> 
 
 The SexyTopo cave surveying app for Android. Next-gen cave surveying with a sexy interface :)
 
