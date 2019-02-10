@@ -165,12 +165,12 @@ public class CalibrationActivity extends SexyTopoActivity {
             setInfoField(R.id.calibration_next_direction, getString(R.string.not_applicable));
             setInfoField(R.id.calibration_next_orientation, getString(R.string.not_applicable));
 
-            final CalibrationCalculator calibrationCalculator = new CalibrationCalculator();
+            final CalibrationCalculator calibrationCalculator = new CalibrationCalculator(true);
             calibrationCalculator.calculate(calibrationReadings);
-            double calibrationAssessment = calibrationCalculator.getMaxError();
+            double calibrationAssessment = calibrationCalculator.getDelta();
 
-            TextView assessmentField = (TextView)(findViewById(R.id.calibrationFieldAssessment));
-            if (calibrationAssessment < 0.5) {
+            TextView assessmentField = findViewById(R.id.calibrationFieldAssessment);
+            if (calibrationAssessment <= 0.5) {
                 assessmentField.setTextColor(Color.RED);
             } else {
                 assessmentField.setTextColor(Color.BLACK);
@@ -267,9 +267,9 @@ public class CalibrationActivity extends SexyTopoActivity {
             return;
         }
 
-        final CalibrationCalculator calibrationCalculator = new CalibrationCalculator();
+        final CalibrationCalculator calibrationCalculator = new CalibrationCalculator(true);
         calibrationCalculator.calculate(calibrationReadings);
-        double calibrationAssessment = calibrationCalculator.getMaxError();
+        double calibrationAssessment = calibrationCalculator.getDelta();
         String message = "Calibration assessment (should be under " + MAX_ERROR + "): " +
             calibrationAssessment;
 

@@ -5,7 +5,6 @@ import android.content.Context;
 
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
-import org.hwyl.sexytopo.control.calibration.topodroid.CalibrationWriter;
 import org.hwyl.sexytopo.model.calibration.CalibrationReading;
 
 import java.io.DataInputStream;
@@ -144,13 +143,9 @@ public class CalibrationProtocol extends DistoXProtocol {
     }
 
 
-    public boolean writeCalibration(byte[] coefficients) throws Exception {
+    public boolean writeCalibration(byte[] coeff) throws Exception {
 
-        // "called by GMActivity and by CalibCoeffDialog"
-        //  GMActivity gets coeff from CalibAlgo
-        //    TopoDroidApp.uploadCalibCoeff
-        //   -    > DistoXComm.writeCoeff
-        //            -> DistoXProtocol.writeCalibration
+        Log.device("Attempting to write calibration data");
 
         oneOffConnect();
 
@@ -158,14 +153,47 @@ public class CalibrationProtocol extends DistoXProtocol {
         DataOutputStream outStream = new DataOutputStream(socket.getOutputStream());
 
         try {
-            CalibrationWriter calibrationWriter = new CalibrationWriter();
-            return calibrationWriter.writeCalibration(coefficients, inStream, outStream);
+            int address = 0x8010;
+            for (int i = 0; i < coeff.length; i += 4) {
+                byte[] command = new byte[7];
+                command[0] = 0x39;
+                command[1] = (byte) address;
+                command[2] = (byte) (address >> 8);
+                command[3] = coeff[i];
+                command[4] = coeff[i + 1];
+                command[5] = coeff[i + 2];
+                command[6] = coeff[i + 3];
+                // send command and check reply
+                Log.device("Writing calibration coefficient #" + i + "/" + coeff.length);
+                outStream.write(command, 0, 7);
+
+                byte[] reply = new byte[8];
+                inStream.readFully(reply, 0, 8);
+                checkCalibrationReply(address, reply);
+
+                address += 4;
+            }
+
+            Log.device("Calibration writing successful");
+            return true;
+
+        } catch (Exception exception) {
+            Log.device("Error writing calibration: " + exception.getMessage());
+            return false;
+
         } finally {
             inStream.close();
             outStream.close();
         }
+    }
 
 
+    private void checkCalibrationReply(int address, byte[] reply) throws Exception {
+        if (reply[0] != 0x38 ||
+            (reply[1] != (byte)(address & 0xff)) ||
+            (reply[2] != (byte)((address>>8) & 0xff))) {
+            throw new Exception("Disto not happy with calibration writing attempt");
+        }
     }
 
 }
