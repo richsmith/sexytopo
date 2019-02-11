@@ -27,6 +27,7 @@ import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.control.io.basic.CalibrationJsonTranslater;
 import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.control.io.basic.Saver;
+import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.calibration.CalibrationReading;
 import org.json.JSONException;
 
@@ -175,7 +176,8 @@ public class CalibrationActivity extends SexyTopoActivity {
             } else {
                 assessmentField.setTextColor(Color.BLACK);
             }
-            setInfoField(R.id.calibrationFieldAssessment, calibrationAssessment);
+            setInfoField(
+                    R.id.calibrationFieldAssessment,TextTools.formatTo2dp(calibrationAssessment));
         }
     }
 
@@ -185,8 +187,6 @@ public class CalibrationActivity extends SexyTopoActivity {
         if (comms.isMeasuring()) {
             state = State.NOT_READY;
         }
-
-
 
         if (calibrationReadings.size() >= positions.size()) {
             state = State.CALIBRATED;
@@ -271,7 +271,7 @@ public class CalibrationActivity extends SexyTopoActivity {
         calibrationCalculator.calculate(calibrationReadings);
         double calibrationAssessment = calibrationCalculator.getDelta();
         String message = "Calibration assessment (should be under " + MAX_ERROR + "): " +
-            calibrationAssessment;
+            TextTools.formatTo2dp(calibrationAssessment);
 
         new AlertDialog.Builder(this)
             .setTitle(getString(R.string.calibration_assessment))
@@ -280,12 +280,15 @@ public class CalibrationActivity extends SexyTopoActivity {
                 public void onClick(DialogInterface dialog, int whichButton) {
                     try {
                         byte[] coefficients = calibrationCalculator.getCoefficients();
-                        comms.completeCalibration(coefficients);
-                        updateState();
+                        boolean success = comms.completeCalibration(coefficients);
+                        if (!success) {
+                            throw new Exception(getString(R.string.calibration_error_updating_device));
+                        }
+                        showSimpleToast(R.string.calibration_success);
                     } catch (Exception exception) {
-                        Log.e(exception);
-                        showSimpleToast(R.string.calibration_error_updating_device);
-                        Log.e(exception);
+                        showException(exception);
+                    } finally {
+                        updateState();
                     }
                 }
             }).setNegativeButton(getString(R.string.cancel),

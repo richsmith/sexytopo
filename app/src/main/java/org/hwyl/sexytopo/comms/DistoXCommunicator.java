@@ -176,11 +176,12 @@ public class DistoXCommunicator {
         }
     }
 
-    public void completeCalibration(byte[] coefficients) throws Exception {
+    public boolean completeCalibration(byte[] coefficients) throws Exception {
         if (! (currentStrategy instanceof CalibrationProtocol)) {
             Log.device("Please ensure device is in calibration mode");
+            return false;
         } else {
-            ((CalibrationProtocol)currentStrategy).writeCalibration(coefficients);
+            return ((CalibrationProtocol)currentStrategy).writeCalibration(coefficients);
         }
     }
 
