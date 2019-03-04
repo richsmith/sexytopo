@@ -161,7 +161,7 @@ public class CalibrationActivity extends SexyTopoActivity {
             setInfoField(R.id.calibrationFieldMz, "");
         }
 
-        String label = calibrationReadings.size() + "/" + positions.size() + "+";
+        String label = calibrationReadings.size() + "/" + positions.size();
         setInfoField(R.id.calibration_index, label);
 
         if (calibrationReadings.size() < positions.size()) {
