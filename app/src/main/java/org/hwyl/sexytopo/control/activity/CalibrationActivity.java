@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Editable;
@@ -17,9 +18,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.comms.DistoXCommunicator;
+import org.hwyl.sexytopo.comms.WriteCalibrationProtocol;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.calibration.CalibrationCalculator;
@@ -104,7 +107,7 @@ public class CalibrationActivity extends SexyTopoActivity {
         }
     }
 
-    private DistoXCommunicator comms = getComms();
+    //private DistoXCommunicator comms = getComms();
 
 
     @Override
@@ -130,7 +133,6 @@ public class CalibrationActivity extends SexyTopoActivity {
     protected void onResume() {
         super.onResume();
         syncWithReadings();
-        comms = DistoXCommunicator.getInstance(this, dataManager);
     }
 
     private void syncWithReadings() {
@@ -140,6 +142,7 @@ public class CalibrationActivity extends SexyTopoActivity {
     }
 
     private void updateFields() {
+
         if (calibrationReadings.size() > 0) {
             CalibrationReading lastReading =
                     calibrationReadings.get(calibrationReadings.size() - 1);
@@ -149,6 +152,13 @@ public class CalibrationActivity extends SexyTopoActivity {
             setInfoField(R.id.calibrationFieldMx, lastReading.getMx());
             setInfoField(R.id.calibrationFieldMy, lastReading.getMy());
             setInfoField(R.id.calibrationFieldMz, lastReading.getMz());
+        } else {
+            setInfoField(R.id.calibrationFieldGx, "");
+            setInfoField(R.id.calibrationFieldGy, "");
+            setInfoField(R.id.calibrationFieldGz, "");
+            setInfoField(R.id.calibrationFieldMx, "");
+            setInfoField(R.id.calibrationFieldMy, "");
+            setInfoField(R.id.calibrationFieldMz, "");
         }
 
         String label = calibrationReadings.size() + "/" + positions.size() + "+";
@@ -183,10 +193,6 @@ public class CalibrationActivity extends SexyTopoActivity {
 
 
     private void updateState() {
-
-        if (comms.isMeasuring()) {
-            state = State.NOT_READY;
-        }
 
         if (calibrationReadings.size() >= positions.size()) {
             state = State.CALIBRATED;
@@ -241,7 +247,9 @@ public class CalibrationActivity extends SexyTopoActivity {
         Log.device("Start calibration requested");
 
         try {
-            comms.startCalibration();
+            //comms = requestComms();
+            requestComms().startCalibration();
+
             state = State.CALIBRATING;
         } catch (Exception exception) {
             state = State.READY;
@@ -253,9 +261,9 @@ public class CalibrationActivity extends SexyTopoActivity {
     }
 
 
-    public void requestStopCalibration(View view) throws Exception {
+    public void requestStopCalibration(View view) {
         Log.device("Stop calibration requested");
-        comms.stopCalibration();
+        requestComms().stopCalibration();
         state = State.READY;
         updateState();
     }
@@ -279,12 +287,9 @@ public class CalibrationActivity extends SexyTopoActivity {
             .setPositiveButton(getString(R.string.calibration_update), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
                     try {
-                        byte[] coefficients = calibrationCalculator.getCoefficients();
-                        boolean success = comms.completeCalibration(coefficients);
-                        if (!success) {
-                            throw new Exception(getString(R.string.calibration_error_updating_device));
-                        }
-                        showSimpleToast(R.string.calibration_success);
+                        byte[] coeffs = calibrationCalculator.getCoefficients();
+                        Byte[] coefficients = ArrayUtils.toObject(coeffs);
+                        new WriteCalibrationTask().execute(coefficients);
                     } catch (Exception exception) {
                         showException(exception);
                     } finally {
@@ -302,10 +307,17 @@ public class CalibrationActivity extends SexyTopoActivity {
     }
 
 
+    public void requestDeleteLast(View view) {
+        if (calibrationReadings.size() > 0) {
+            calibrationReadings.remove(calibrationReadings.size() - 1);
+            updateFields();
+        }
+    }
+
+
     public void requestClearCalibration(View view) {
         new AlertDialog.Builder(this)
-            .setTitle(getString(R.string.dialog_save_as_title))
-            .setMessage(R.string.calibration_assessment)
+            .setTitle(getString(R.string.dialog_confirm_clear_title))
             .setPositiveButton(getString(R.string.clear), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
                     dataManager.clearCalibrationReadings();
@@ -413,4 +425,48 @@ public class CalibrationActivity extends SexyTopoActivity {
         return path;
     }
 
+
+    private class WriteCalibrationTask extends AsyncTask<Byte, Void, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(Byte... coefficients) {
+
+            Byte[] byteObject = new Byte[0];
+            byte[] coeffs = ArrayUtils.toPrimitive(byteObject);
+
+            DistoXCommunicator comms = requestComms();
+            WriteCalibrationProtocol writeCalibrationProtocol = comms.writeCalibration(coeffs);
+
+            waitForEnd(writeCalibrationProtocol, 30);
+            if (!writeCalibrationProtocol.isFinished()) {
+                comms.disconnect(); // force it to stop what it's doing
+                waitForEnd(writeCalibrationProtocol, 30);
+            }
+
+            return writeCalibrationProtocol.wasSuccessful();
+        }
+
+        private void waitForEnd(WriteCalibrationProtocol writeCalibrationProtocol, int attempts) {
+            for (int i = 0; i < attempts; i++) {
+                try {
+                    if (writeCalibrationProtocol.isFinished()) {
+                        return;
+                    }
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    return;
+                }
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean wasSuccessful) {
+            if (wasSuccessful) {
+                showSimpleToast(R.string.calibration_success);
+            } else {
+                showSimpleToast(R.string.calibration_error_updating_device);
+            }
+            updateState();
+        }
+    }
 }

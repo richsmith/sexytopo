@@ -105,6 +105,7 @@
     <string name="move">Move</string>
     <string name="replace">Replace</string>
     <string name="clear">Clear</string>
+    <string name="dialog_confirm_clear_title">Clear Calibration Readings?</string>
     <string name="station">Station</string>
     <string name="not_applicable">N/A</string>
     <string name="title_activity_help">Help</string>

@@ -1,16 +1,15 @@
 package org.hwyl.sexytopo.comms;
 
 import android.bluetooth.BluetoothDevice;
-import android.content.Context;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
+import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
 import org.hwyl.sexytopo.model.survey.Leg;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.IOException;
 
 
 public class MeasurementProtocol extends DistoXProtocol {
@@ -28,11 +27,11 @@ public class MeasurementProtocol extends DistoXProtocol {
 
     protected byte[] previousPacket = new byte[]{};
 
-
+    protected int duplicateCount = 0;
 
     public MeasurementProtocol(
-            Context context, BluetoothDevice bluetoothDevice, SurveyManager dataManager) {
-        super(context, bluetoothDevice, dataManager);
+            SexyTopoActivity activity, BluetoothDevice bluetoothDevice, SurveyManager dataManager) {
+        super(activity, bluetoothDevice, dataManager);
     }
 
 
@@ -60,48 +59,25 @@ public class MeasurementProtocol extends DistoXProtocol {
 
     public void go(DataInputStream inStream, DataOutputStream outStream) throws Exception {
 
-        Log.device(context.getString(R.string.device_log_ready_for_measurements));
+        Log.device(activity.getString(R.string.device_log_ready_for_measurements));
 
-        while(keepAlive()) {
-            // at some point this may get expanded to consider other requests, such as turn on laser
-            // but for now we just have one strategy
-            readMeasurements(inStream, outStream);
-            pauseForDistoXToCatchUp();
+        byte[] packet = readPacket(inStream);
+        acknowledge(outStream, packet);
+
+        if (isDataPacket(packet)) {
+            if (arePacketsTheSame(packet, previousPacket)) {
+                Log.d("(Duplicated measurement #" + ++duplicateCount + ")");
+            } else {
+                duplicateCount = 0;
+                Log.device(activity.getString(R.string.device_log_received));
+                Leg leg = parseDataPacket(packet);
+                dataManager.updateSurvey(leg);
+            }
         }
+
+        previousPacket = packet;
 
     }
 
-
-    public void readMeasurements(DataInputStream inStream, DataOutputStream outStream)
-            throws IOException, InterruptedException {
-
-        int duplicateCount = 0;
-
-        while (keepAlive()) {
-
-            if (!isConnected()) {
-                break;
-            }
-
-            byte[] packet = readPacket(inStream);
-            acknowledge(outStream, packet);
-
-            if (isDataPacket(packet)) {
-                if (arePacketsTheSame(packet, previousPacket)) {
-                    Log.d("(Duplicated measurement #" + ++duplicateCount + ")");
-                } else {
-                    duplicateCount = 0;
-                    Log.device(context.getString(R.string.device_log_received));
-                    Leg leg = parseDataPacket(packet);
-                    dataManager.updateSurvey(leg);
-                }
-            }
-
-            previousPacket = packet;
-
-            pauseForDistoXToCatchUp(); // seems to help with coordination
-        }
-
-    }
 
 }

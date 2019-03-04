@@ -2,39 +2,19 @@ package org.hwyl.sexytopo.comms;
 
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
-import android.content.Context;
 
-import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
+import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
 
-public abstract class DistoXProtocol extends Thread {
+public abstract class DistoXProtocol {
 
 
-    private enum State {
-        IDLE(false),
-        RUNNING(true),
-        STOP_REQUESTED(false),
-        STOPPED(false);
-
-
-        boolean active;
-
-        State(boolean active) {
-            this.active = active;
-        }
-
-        boolean isActive() {
-            return active;
-        }
-    }
 
     protected enum PacketType {
         MEASUREMENT(0b00000001),
@@ -62,12 +42,10 @@ public abstract class DistoXProtocol extends Thread {
         }
     }
 
-    protected volatile State state = State.IDLE;
-
 
     // Disto reads every
-    private static final int INTER_PACKET_DELAY = 100; // ms; (DISTO repeats every 25 ms for ref)
-    private static final int WAIT_BETWEEN_CONNECTION_ATTEMPTS_MS = 5 * 1000;
+    public static final int INTER_PACKET_DELAY = 100; // ms; (DISTO repeats every 25 ms for ref)
+    public static final int WAIT_BETWEEN_CONNECTION_ATTEMPTS_MS = 5 * 1000;
 
 
     public static final int ADMIN = 0;
@@ -75,27 +53,16 @@ public abstract class DistoXProtocol extends Thread {
     public static final int SEQUENCE_BIT_MASK = 0b10000000;
     public static final int ACKNOWLEDGEMENT_PACKET_BASE = 0b01010101;
 
-    protected Context context;
-    private BluetoothDevice bluetoothDevice;
-
+    protected SexyTopoActivity activity;
     protected SurveyManager dataManager;
-
-
-
-    protected BluetoothSocket socket;
+    protected BluetoothDevice bluetoothDevice;
 
     protected DistoXProtocol(
-            Context context, BluetoothDevice bluetoothDevice, SurveyManager dataManager) {
-        this.context = context;
+            SexyTopoActivity activity, BluetoothDevice bluetoothDevice, SurveyManager dataManager) {
+        this.activity = activity;
         this.bluetoothDevice = bluetoothDevice;
         this.dataManager = dataManager;
     }
-
-
-    protected void pauseForDistoXToCatchUp() throws InterruptedException {
-        sleep(INTER_PACKET_DELAY);
-    }
-
 
     /**
      * An acknowledgement packet consists of a single byte; bits 0-7 are 1010101 and bit 7 is the
@@ -117,10 +84,7 @@ public abstract class DistoXProtocol extends Thread {
     }
 
 
-    protected void writeCommandPacket(byte[] packet) throws Exception {
-        oneOffConnect();
-        DataOutputStream outStream = new DataOutputStream(socket.getOutputStream());
-
+    protected void writeCommandPacket(DataOutputStream outStream, byte[] packet) throws Exception {
         try {
             outStream.write(packet, 0, packet.length);
             return;
@@ -128,18 +92,6 @@ public abstract class DistoXProtocol extends Thread {
             outStream.close();
         }
 
-    }
-
-
-    protected void oneOffConnect() throws Exception {
-        final int ATTEMPTS = 3;
-        for (int i = 0; i < ATTEMPTS; i++) {
-            tryToConnectIfNotConnected();
-            if (isConnected()) {
-                return;
-            }
-        }
-        throw new Exception("Couldn't send command");
     }
 
     protected static int readByte(byte[] packet, int index) {
@@ -156,144 +108,9 @@ public abstract class DistoXProtocol extends Thread {
     }
 
 
-    public void run() {
-
-        state = State.RUNNING;
-        Log.device("Started communication thread");
-
-        DataInputStream inStream = null;
-        DataOutputStream outStream = null;
-
-        while(keepAlive()) {
-            try {
-                tryToConnectIfNotConnected();
-
-                if (!isConnected()) {
-                    sleep(WAIT_BETWEEN_CONNECTION_ATTEMPTS_MS);
-                    continue;
-                }
-
-
-                inStream = new DataInputStream(socket.getInputStream());
-                outStream = new DataOutputStream(socket.getOutputStream());
-
-                // pass control to subclass
-                // (should only exit this state if requested by user or exception etc.)
-                go(inStream, outStream);
-
-            } catch(IOException e){
-                if (e.getMessage().toLowerCase().contains("bt socket closed")) {
-                    // this is common; probably don't need to bother the user with this..
-                    disconnect();
-                } else {
-                    Log.device("Communication error: " + e.getMessage());
-                    disconnect();
-                }
-
-            } catch(Exception exception){
-                Log.device("General error: " + exception);
-                disconnect();
-
-            } finally {
-                try {
-                    inStream.close();
-                    outStream.close();
-                } catch (Exception e) {
-                    // ignore any errors; they are expected if the socket has been closed
-                }
-            }
-        }
-
-        disconnect();
-
-        state = State.STOPPED;
-    }
-
-
-    public boolean isStopped() {
-        return state == State.STOPPED;
-    }
-
 
     public abstract void go(DataInputStream inStream, DataOutputStream outStream) throws Exception;
 
-
-    public void stopDoingStuff() {
-        try {
-            if (state == State.STOP_REQUESTED) {
-                interrupt();
-            } else {
-                state = State.STOP_REQUESTED;
-            }
-        } finally {
-            disconnect();
-        }
-    }
-
-    protected boolean keepAlive() {
-        return state.isActive();
-    }
-
-
-    protected boolean isConnected() {
-        return (socket != null) && socket.isConnected();
-    }
-
-
-    public void tryToConnectIfNotConnected() {
-
-        if (isConnected()) {
-            return;
-        }
-
-        try {
-            Log.device(context.getString(R.string.device_log_connecting));
-            socket = bluetoothDevice.createInsecureRfcommSocketToServiceRecord(
-                    SexyTopo.DISTO_X_UUID);
-            socket.connect(); // blocks until connection is complete or fails with an exception
-
-        } catch(Exception exception) {
-            if (exception.getMessage().contains("socket might closed or timeout")) {
-                try {
-                    Log.device(context.getString(R.string.device_trying_fallback));
-                    socket = createFallbackSocket();
-                    socket.connect();
-                } catch (Exception e) {
-                    Log.device("Failed to create fallback socket: " + e.getMessage());
-                }
-            } else {
-                Log.device("Error connecting: " + exception.getMessage());
-            }
-
-        } finally {
-            if (socket.isConnected()) {
-                Log.device(context.getString(R.string.device_log_connected));
-            } else {
-                Log.device(context.getString(R.string.device_log_not_connected));
-            }
-        }
-    }
-
-
-    private BluetoothSocket createFallbackSocket() throws Exception {
-        BluetoothSocket socket = (BluetoothSocket)
-                bluetoothDevice.getClass()
-                        .getMethod("createRfcommSocket", new Class[]{int.class})
-                        .invoke(bluetoothDevice, 1);
-        return socket;
-    }
-
-
-    private void disconnect() {
-        try {
-            if (socket != null && socket.isConnected()) {
-                socket.close();
-                Log.device(context.getString(R.string.device_log_stopped));
-            }
-        } catch (Exception e) {
-            Log.device("Error disconnecting: " + e.getMessage());
-        }
-    }
 
 
     protected byte[] readPacket(DataInputStream inStream) throws IOException {

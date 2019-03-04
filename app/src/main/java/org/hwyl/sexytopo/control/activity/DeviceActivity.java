@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.comms.DistoXCommunicator;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.util.LogUpdateReceiver;
 
@@ -139,17 +140,8 @@ public class DeviceActivity extends SexyTopoActivity {
 
 
     public void startConnection() {
-
-        if (comms.doingSomething()) {
-            comms.stopDoingStuff();
-        }
-
         try {
-            //assert comms == null;
-            /*BluetoothDevice bluetoothDevice = getDistoX();
-            comms = new DistoXPoller(this, bluetoothDevice, dataManager);
-            comms.start();*/
-            comms.startMeasuring();
+            requestComms().requestStart(DistoXCommunicator.Protocol.MEASUREMENT);
         } catch (Exception e) {
             Log.device("Error starting thread:\n" + e.getMessage());
         }
@@ -168,7 +160,7 @@ public class DeviceActivity extends SexyTopoActivity {
 /*            comms.kill();
             comms.join();
             comms = null;*/
-            comms.stopDoingStuff();
+            requestComms().requestStop();
         } catch (Exception e) {
             Log.device("Error stopping thread:\n" + e.getMessage());
         }

@@ -54,15 +54,14 @@ import java.util.Set;
  */
 public abstract class SexyTopoActivity extends AppCompatActivity {
 
-    protected SurveyManager dataManager;
+    protected static SurveyManager dataManager;
 
-    protected DistoXCommunicator comms;
+    private static DistoXCommunicator comms;
 
     public SexyTopoActivity() {
         super();
         SexyTopo.context = this;
         dataManager = SurveyManager.getInstance(this);
-        comms = DistoXCommunicator.getInstance(this, dataManager);
     }
 
 
@@ -230,6 +229,27 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     }
 
+
+    protected DistoXCommunicator requestComms() {
+        return requestComms(DistoXCommunicator.Protocol.NULL);
+    }
+
+
+    protected DistoXCommunicator requestComms(DistoXCommunicator.Protocol protocol) {
+
+        if (comms == null || comms.getState() == Thread.State.TERMINATED) {
+            comms = new DistoXCommunicator(this, dataManager);
+        }
+
+        Thread.State commsState = comms.getState();
+        if (commsState == Thread.State.NEW) {
+           comms.requestStart(protocol);
+       } else {
+           comms.setProtocol(protocol);
+       }
+
+       return comms;
+    }
 
     private void openAboutDialog() {
         View messageView = getLayoutInflater().inflate(R.layout.about_dialog, null, false);
@@ -928,7 +948,11 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
 
     private void killConnection() {
-        DistoXCommunicator.getInstance(this, dataManager).kill();
+        try {
+            comms.stop();
+        } catch (Exception e) {
+            Log.e("problem when trying to kill connection: " + e);
+        };
     }
 
 
@@ -945,9 +969,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         return SurveyManager.getInstance(this);
     }
 
-    protected DistoXCommunicator getComms() {
-        return DistoXCommunicator.getInstance(this, getDataManager());
-    }
 
     public void showSimpleToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();

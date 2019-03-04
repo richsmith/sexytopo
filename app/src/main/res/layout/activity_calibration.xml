@@ -161,6 +161,35 @@
     </TableLayout>
 
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="0px">
+        <Button
+            android:id="@+id/fake_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:textAlignment="gravity"
+            android:gravity="center"
+            android:text=""
+            android:enabled="true"
+            android:onClick="requestStopCalibration"
+            android:visibility="invisible"
+            />
+        <Button
+            android:id="@+id/calibration_clearx"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textAlignment="gravity"
+            android:gravity="center"
+            android:text="@string/delete"
+            android:enabled="true"
+            android:onClick="requestDeleteLast"
+            />
+    </LinearLayout>
+
     <TableLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
