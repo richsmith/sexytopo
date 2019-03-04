@@ -177,17 +177,18 @@
             android:onClick="requestStopCalibration"
             android:visibility="invisible"
             />
+
         <Button
-            android:id="@+id/calibration_clearx"
+            android:id="@+id/calibration_delete_last"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textAlignment="gravity"
-            android:gravity="center"
-            android:text="@string/delete"
             android:enabled="true"
+            android:gravity="center"
             android:onClick="requestDeleteLast"
-            />
+            android:padding="0dp"
+            android:text="@string/delete"
+            android:textAlignment="gravity"/>
     </LinearLayout>
 
     <TableLayout

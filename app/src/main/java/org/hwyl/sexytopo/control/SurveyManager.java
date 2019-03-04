@@ -135,4 +135,10 @@ public class SurveyManager {
         this.calibrationReadings.clear();
     }
 
+    public void deleteLastCalibrationReading() {
+        if (calibrationReadings.size() > 0) {
+            calibrationReadings.remove(calibrationReadings.size() - 1);
+        }
+    }
+
 }

@@ -308,10 +308,8 @@ public class CalibrationActivity extends SexyTopoActivity {
 
 
     public void requestDeleteLast(View view) {
-        if (calibrationReadings.size() > 0) {
-            calibrationReadings.remove(calibrationReadings.size() - 1);
-            updateFields();
-        }
+        dataManager.deleteLastCalibrationReading();
+        syncWithReadings();
     }
 
 
