@@ -18,6 +18,8 @@ public class Survey {
 
     public static final Station NULL_STATION = new Station("-");
 
+    public static final char[] FORBIDDEN_CHARS = new char[]{':', '.', '\n', '\r'};
+
     private String name;
 
     private Sketch planSketch = new Sketch();
@@ -34,7 +36,7 @@ public class Survey {
     private Stack<UndoEntry> undoStack = new Stack<>();
 
     public Survey(String name) {
-        this.name = name;
+        setName(name);
     }
 
     public String getName() {
@@ -42,6 +44,9 @@ public class Survey {
     }
 
     public void setName(String name) {
+        for (char c : FORBIDDEN_CHARS) {
+            name = (String) name.replace(Character.toString(c), "");
+        }
         this.name = name;
     }
 

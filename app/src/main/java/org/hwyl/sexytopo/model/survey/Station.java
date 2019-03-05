@@ -13,13 +13,23 @@ public class Station extends SurveyComponent {
     private String comment = "";
     private Direction extendedElevationDirection = Direction.RIGHT;
 
+    public static final char[] FORBIDDEN_CHARS = new char[]{'\n', '\r'};
+
+
     public Station(String name) {
-        this.name = name;
+        this.name = sanitiseName(name);
     }
 
     public Station(String name, String comment) {
-        this.name = name;
+        this.name = sanitiseName(name);
         this.comment = comment;
+    }
+
+    private static String sanitiseName(String name) {
+        for (char c : FORBIDDEN_CHARS) {
+            name = name.replace(Character.toString(c), "");
+        }
+        return name;
     }
 
     public Station(Station station, String name) {
