@@ -45,7 +45,7 @@ public class Survey {
 
     public void setName(String name) {
         for (char c : FORBIDDEN_CHARS) {
-            name = (String) name.replace(Character.toString(c), "");
+            name = name.replace(Character.toString(c), "");
         }
         this.name = name;
     }
