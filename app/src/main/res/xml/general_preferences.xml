@@ -43,6 +43,20 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:title="Calibration"
+        android:key="pref_calibration">
+
+        <ListPreference
+            android:key="pref_calibration_algorithm"
+            android:title="Algorithm"
+            android:summary="Override DistoX calibration algorithm choice"
+            android:dialogTitle="Select Calibration Algorithm"
+            android:entries="@array/pref_calibration_algorithm_options"
+            android:entryValues="@array/pref_calibration_algorithm_options"
+            android:defaultValue="auto" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:title="Sketch Display"
         android:key="pref_sketch_display">
 

@@ -15,7 +15,6 @@ import java.io.IOException;
 public abstract class DistoXProtocol {
 
 
-
     protected enum PacketType {
         MEASUREMENT(0b00000001),
         CALIBRATION_ACCELERATION(0b0000010),
@@ -42,8 +41,6 @@ public abstract class DistoXProtocol {
         }
     }
 
-
-    // Disto reads every
     public static final int INTER_PACKET_DELAY = 100; // ms; (DISTO repeats every 25 ms for ref)
     public static final int WAIT_BETWEEN_CONNECTION_ATTEMPTS_MS = 5 * 1000;
 

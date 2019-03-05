@@ -107,8 +107,6 @@ public class CalibrationActivity extends SexyTopoActivity {
         }
     }
 
-    //private DistoXCommunicator comms = getComms();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,7 +174,9 @@ public class CalibrationActivity extends SexyTopoActivity {
             setInfoField(R.id.calibration_next_direction, getString(R.string.not_applicable));
             setInfoField(R.id.calibration_next_orientation, getString(R.string.not_applicable));
 
-            final CalibrationCalculator calibrationCalculator = new CalibrationCalculator(true);
+            boolean useNonLinearity = useNonLinearAlgorithm();
+            final CalibrationCalculator calibrationCalculator =
+                    new CalibrationCalculator(useNonLinearity);
             calibrationCalculator.calculate(calibrationReadings);
             double calibrationAssessment = calibrationCalculator.getDelta();
 
@@ -275,11 +275,14 @@ public class CalibrationActivity extends SexyTopoActivity {
             return;
         }
 
-        final CalibrationCalculator calibrationCalculator = new CalibrationCalculator(true);
+        boolean useNonLinearity = useNonLinearAlgorithm();
+        final CalibrationCalculator calibrationCalculator =
+                new CalibrationCalculator(useNonLinearity);
         calibrationCalculator.calculate(calibrationReadings);
         double calibrationAssessment = calibrationCalculator.getDelta();
         String message = "Calibration assessment (should be under " + MAX_ERROR + "): " +
-            TextTools.formatTo2dp(calibrationAssessment);
+            TextTools.formatTo2dp(calibrationAssessment) +
+                "\n\nCalibration algorithm: " + (useNonLinearity? "Non-Linear" : "Linear");
 
         new AlertDialog.Builder(this)
             .setTitle(getString(R.string.calibration_assessment))
@@ -374,7 +377,7 @@ public class CalibrationActivity extends SexyTopoActivity {
         AlertDialog.Builder builderSingle = new AlertDialog.Builder(
                 this);
 
-        builderSingle.setTitle(getString(R.string.open_survey));
+        builderSingle.setTitle(getString(R.string.calibration_load));
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.select_dialog_item);
@@ -408,6 +411,7 @@ public class CalibrationActivity extends SexyTopoActivity {
         builderSingle.show();
     }
 
+
     private void loadCalibration(String filename) throws JSONException {
         String path = getFilePath(filename);
         String content = Loader.slurpFile(new File(path));
@@ -417,10 +421,28 @@ public class CalibrationActivity extends SexyTopoActivity {
         syncWithReadings();
     }
 
+
     private String getFilePath(String filename) {
         File directory = Util.getCalibrationDirectory(this);
         String path = Util.getPath(directory, filename);
         return path;
+    }
+
+
+    private boolean useNonLinearAlgorithm() {
+
+        String pref = getStringPreference("pref_calibration_algorithm");
+
+        switch(pref) {
+            case "Auto":
+                return requestComms().doesCurrentDistoPreferNonLinearCalibration();
+            case "Non-Linear":
+                return true;
+            case "Linear":
+                return false;
+            default: // shouldn't get here but linear is safer as default?
+                return false;
+        }
     }
 
 

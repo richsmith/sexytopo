@@ -178,7 +178,7 @@
     <string name="calibration_orientation">Orientation</string>
     <string name="calibration_not_enough">Not enough readings taken</string>
     <string name="calibration_assessment">Calibration Assessment</string>
-    <string name="calibration_update">Use</string>
+    <string name="calibration_update">Write</string>
     <string name="calibration_error_updating_device">could not write calibration</string>
     <string name="calibration_no_files">No saved calibrations found to open</string>
     <string name="calibration_default_filename">calibration</string>

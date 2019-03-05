@@ -23,18 +23,21 @@ import static org.hwyl.sexytopo.control.activity.DeviceActivity.DISTO_X_PREFIX;
 
 public class DistoXCommunicator extends Thread {
 
-    private CalibrationProtocol calibrationProtocol;
-
     public enum Protocol {
         NULL,
         MEASUREMENT,
         CALIBRATION
     }
 
-    private enum ProtocolState {
-        NOTHING,
-        RUNNING_STANDARD,
-        RUNNING_ONE_OFF
+    public enum DistoXType {
+        A3(false),
+        X310(true);
+
+        public final boolean preferNonLinearCalibration;
+
+        DistoXType(boolean preferNonLinearCalibration) {
+            this.preferNonLinearCalibration = preferNonLinearCalibration;
+        }
     }
 
     private DistoXProtocol currentProtocol = NullProtocol.INSTANCE;
@@ -48,15 +51,11 @@ public class DistoXCommunicator extends Thread {
     DataInputStream inStream = null;
     DataOutputStream outStream = null;
 
-
     private SurveyManager dataManager;
     private SexyTopoActivity activity;
 
-
-    private static DistoXCommunicator instance = null;
-
-
     private boolean keepAlive;
+
 
     public DistoXCommunicator(SexyTopoActivity activity, SurveyManager dataManager) {
         this.activity = activity;
@@ -325,6 +324,18 @@ public class DistoXCommunicator extends Thread {
     private static boolean isDistoX(BluetoothDevice device) {
         String name = device.getName();
         return name.toLowerCase().contains(DISTO_X_PREFIX.toLowerCase());
+    }
+
+
+    public boolean doesCurrentDistoPreferNonLinearCalibration() {
+        String name = bluetoothDevice.getName();
+        if (name.startsWith("DistoX-")) {
+            return DistoXType.X310.preferNonLinearCalibration;
+        } else if (name.startsWith("DistoX")) {
+            return DistoXType.A3.preferNonLinearCalibration;
+        } else {
+            return false; // shouldn't get here but linear is safer as default?
+        }
     }
 
 

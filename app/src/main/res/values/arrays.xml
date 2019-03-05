@@ -5,6 +5,11 @@
         <item name="portrait">Force Portrait</item>
         <item name="landscape">Force Landscape</item>
     </string-array>
+    <string-array name="pref_calibration_algorithm_options">
+        <item name="auto">Auto</item>
+        <item name="linear">Linear</item>
+        <item name="nonlinear">Non-Linear</item>
+    </string-array>
     <string-array name="pref_station_labels">
         <item name="disc">Disc</item>
         <item name="cross">Cross</item>
