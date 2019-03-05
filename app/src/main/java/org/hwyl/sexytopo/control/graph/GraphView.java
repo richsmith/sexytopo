@@ -465,16 +465,10 @@ public class GraphView extends View {
     private boolean handleSelect(MotionEvent event) {
 
         Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
-        Coord2D touchPointOnSurvey = viewCoordsToSurveyCoords(touchPointOnView);
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-
-                double selectionTolerance =
-                        SELECTION_SENSITIVITY_IN_PIXELS / surveyToViewScale;
-
-                Station newSelectedStation = findNearestStationWithinDelta(projection,
-                        touchPointOnSurvey, selectionTolerance);
+                Station newSelectedStation = checkForStation(touchPointOnView);
 
                 if (newSelectedStation == null) {
                     return false;
@@ -497,6 +491,20 @@ public class GraphView extends View {
         }
 
         return true;
+    }
+
+
+    private Station checkForStation(Coord2D touchPointOnView) {
+
+        double selectionTolerance =
+                SELECTION_SENSITIVITY_IN_PIXELS / surveyToViewScale;
+
+        Coord2D touchPointOnSurvey = viewCoordsToSurveyCoords(touchPointOnView);
+
+        Station newSelectedStation = findNearestStationWithinDelta(projection,
+                touchPointOnSurvey, selectionTolerance);
+
+        return newSelectedStation; // this could be null if nothing is near
     }
 
 
@@ -523,6 +531,10 @@ public class GraphView extends View {
             @Override
             public void onClick(View view) {
                 switch(view.getId()) {
+                    case R.id.graph_station_select:
+                        survey.setActiveStation(station);
+                        invalidate();
+                        break;
                     case R.id.graph_station_toggle_left_right:
                         Direction newDirection = station.getExtendedElevationDirection().opposite();
                         SurveyUpdater.setDirectionOfSubtree(survey, station,newDirection);
@@ -1142,8 +1154,6 @@ public class GraphView extends View {
     }
 
 
-
-
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
@@ -1167,10 +1177,10 @@ public class GraphView extends View {
     private class LongPressListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public void onLongPress(MotionEvent motionEvent) {
-            setSketchTool(SketchTool.SELECT);
-            boolean wasSelectionMade = handleSelect(motionEvent);
-            if (wasSelectionMade) {
-                setSketchTool(SketchTool.SELECT);
+            Coord2D touchPointOnView = new Coord2D(motionEvent.getX(), motionEvent.getY());
+            Station newSelectedStation = checkForStation(touchPointOnView);
+            if (newSelectedStation != null) {
+                showContextMenu(motionEvent, newSelectedStation);
             }
         }
     }

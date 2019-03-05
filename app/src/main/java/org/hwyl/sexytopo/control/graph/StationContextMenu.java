@@ -26,7 +26,7 @@ public class StationContextMenu {
 
         postCreationHook(view);
 
-        Button title = (Button)(view.findViewById(R.id.graph_station_title));
+        Button title = view.findViewById(R.id.graph_station_title);
         title.setText(station.getName());
 
         fakeMenu.setWidth(WindowManager.LayoutParams.WRAP_CONTENT);
@@ -34,6 +34,7 @@ public class StationContextMenu {
         fakeMenu.setContentView(view);
 
         int[] ids = new int[] {
+                R.id.graph_station_select,
                 R.id.graph_station_toggle_left_right,
                 R.id.graph_station_comment,
                 R.id.graph_station_delete,
@@ -43,7 +44,7 @@ public class StationContextMenu {
                 R.id.graph_station_unlink_survey
         };
         for (int id : ids) {
-            ((Button)(view.findViewById(id))).setOnClickListener(new View.OnClickListener() {
+            view.findViewById(id).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     fakeMenu.dismiss();
