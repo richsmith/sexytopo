@@ -1,6 +1,11 @@
 package org.hwyl.sexytopo.control.calibration;
 
 
+/**
+ * Calibration algorithm by Beat Heeb as written for PocketTopo.
+ * Translated into Java from C#. Any mistakes are probably mine.
+ * Kindly made available for use in SexyTopo by Beat Heeb.
+ */
 public class CalibAlgorithm {
 
     private static final float FV = 24000;
@@ -201,10 +206,6 @@ public class CalibAlgorithm {
                 invG = Matrix.Inverse(sumG2.minus(sumG.outerProduct(avG)));
             }
             it++;
-            float ignore = Math.max(Matrix.MaxDiff(aG, aG0), Matrix.MaxDiff(aM, aM0));
-            if (ignore > 10000000) {
-                System.out.print("foo");
-            }
         } while (it < MAX_IT && Math.max(Matrix.MaxDiff(aG, aG0), Matrix.MaxDiff(aM, aM0)) > EPS);
         Object[] overflow = CheckOverflow(aG, bG);
         aG = (Matrix)overflow[0]; bG = (Vector)overflow[1];
