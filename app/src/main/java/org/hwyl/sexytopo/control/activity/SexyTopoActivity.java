@@ -54,9 +54,11 @@ import java.util.Set;
  */
 public abstract class SexyTopoActivity extends AppCompatActivity {
 
+
     protected static SurveyManager dataManager;
 
     private static DistoXCommunicator comms;
+
 
     public SexyTopoActivity() {
         super();
@@ -949,6 +951,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     private void killConnection() {
         try {
+            showSimpleToast(R.string.killing_comms_process);
             comms.stop();
         } catch (Exception e) {
             Log.e("problem when trying to kill connection: " + e);

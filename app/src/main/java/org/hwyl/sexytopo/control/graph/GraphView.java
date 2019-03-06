@@ -986,9 +986,9 @@ public class GraphView extends View {
                     drawPaint.setAlpha(alpha);
 
                     canvas.drawLine(
-                            (float) from.getX(), (float) from.getY(),
-                            (float) to.getX(), (float) to.getY(),
-                            drawPaint);
+                        (float) from.getX(), (float) from.getY(),
+                        (float) to.getX(), (float) to.getY(),
+                        drawPaint);
                     from = to;
                 }
             }

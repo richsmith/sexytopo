@@ -202,4 +202,5 @@
     <string name="orientation_face_right">Face Right</string>
     <string name="orientation_face_down">Face Down</string>
     <string name="orientation_face_left">Face Left</string>
+    <string name="killing_comms_process">Killing comms process</string>
 </resources>
