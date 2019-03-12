@@ -22,12 +22,14 @@ public class Survey {
 
     private String name;
 
+    private Station origin = new Station(StationNamer.generateOriginName());
+    private Station activeStation = origin;
+
     private Sketch planSketch = new Sketch();
     private Sketch elevationSketch = new Sketch();
 
-
-    private Station origin = new Station(StationNamer.generateOriginName());
-    private Station activeStation = origin;
+    private List<Trip> tripHistory = new ArrayList<>();
+    private Trip currentTrip = null;
 
     private Map<Station, Set<SurveyConnection>> stationsToSurveyConnections = new HashMap<>();
 
@@ -361,6 +363,17 @@ public class Survey {
             this.station = station;
             this.leg = leg;
         }
+    }
+
+
+    public Trip getCurrentTrip() {
+        return currentTrip;
+    }
+
+
+    public void setCurrentTrip(Trip trip) {
+        tripHistory.add(trip);
+        this.currentTrip = trip;
     }
 
 

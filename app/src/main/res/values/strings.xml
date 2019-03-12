@@ -12,6 +12,7 @@
     <string name="action_dev">Dev</string>
     <string name="action_device">DistoX</string>
     <string name="action_calibration">Calibration</string>
+    <string name="action_trip">New Trip</string>
     <string name="action_help">Help</string>
     <string name="action_about">About</string>
     <string name="action_file_new">New</string>
@@ -106,6 +107,8 @@
     <string name="move">Move</string>
     <string name="replace">Replace</string>
     <string name="clear">Clear</string>
+    <string name="add">Add</string>
+    <string name="edit">Edit</string>
     <string name="dialog_confirm_clear_title">Clear Calibration Readings?</string>
     <string name="station">Station</string>
     <string name="not_applicable">N/A</string>
@@ -203,4 +206,13 @@
     <string name="orientation_face_down">Face Down</string>
     <string name="orientation_face_left">Face Left</string>
     <string name="killing_comms_process">Killing comms process</string>
+    <string name="trip">Trip</string>
+    <string name="team">Team</string>
+    <string name="dialog_title_add_to_team">Add to Team</string>
+    <string name="dialog_add_to_team_name_hint">Name</string>
+    <string name="dialog_confirm_clear_trip">Clear Trip Data?</string>
+    <string name="comments">Comments</string>
+    <string name="start_trip">Start Trip</string>
+
+
 </resources>

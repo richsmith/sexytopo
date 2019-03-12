@@ -76,6 +76,11 @@
         android:orderInCategory="100"
         android:visible="true"
         app:showAsAction="never" />
+    <item android:id="@+id/action_trip"
+          android:title="@string/action_trip"
+          android:orderInCategory="100"
+          android:visible="true"
+          app:showAsAction="never" />
     <item android:id="@+id/dev_settings"
           android:title="@string/action_dev"
           android:visible="true"

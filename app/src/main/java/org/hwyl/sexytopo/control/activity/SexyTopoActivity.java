@@ -123,6 +123,9 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             case R.id.action_calibration:
                 startActivity(CalibrationActivity.class);
                 return true;
+            case R.id.action_trip:
+                startActivity(TripActivity.class);
+                return true;
             case R.id.action_settings:
                 startActivity(SettingsActivity.class);
                 return true;
@@ -265,7 +268,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                .setIcon(R.drawable.ic_launcher)
+                .setIcon(R.drawable.laser_icon)
                 .setTitle(getText(R.string.app_name) + " v" + version)
                 .setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
@@ -1009,6 +1012,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
         }
     }
+
 
     /*
     private class ImportTask extends AsyncTask<File, Void, Survey> {

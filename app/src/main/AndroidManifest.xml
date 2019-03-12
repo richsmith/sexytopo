@@ -51,7 +51,6 @@
             android:label="@string/app_name" >
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
-
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
@@ -63,18 +62,19 @@
             android:name=".control.activity.GuideActivity"
             android:label="@string/title_activity_guide">
         </activity>
-
         <service
             android:name=".control.AudioService"
             android:enabled="true"
             android:exported="true" >
         </service>
-
         <activity
             android:name=".control.activity.CalibrationActivity"
             android:label="@string/title_activity_calibration">
         </activity>
-
+        <activity
+            android:name=".control.activity.TripActivity"
+            android:label="@string/action_trip">
+        </activity>
     </application>
 
 </manifest>
