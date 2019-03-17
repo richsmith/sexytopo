@@ -65,7 +65,11 @@ public class SurvexExporter extends SingleFileExporter {
 
 
     private static void formatField(StringBuilder builder, Object value) {
-        builder.append(value.toString());
+        String sValue = value.toString();
+        if( value instanceof Number ) {
+            sValue = sValue.replace(',', '.');  //use always decimal coma to dot, this is necessary for some localizations
+        }
+        builder.append(sValue);
         builder.append("\t");
     }
 
