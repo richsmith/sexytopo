@@ -118,6 +118,10 @@ public class CalibrationProtocol extends DistoXProtocol {
     }
 
 
-
+    public static int readDoubleByte(byte[] packet, int lowByteIndex, int highByteIndex) {
+        int low = packet[lowByteIndex];
+        int high = packet[highByteIndex];
+        return (high * 256) + low;
+    }
 
 }
