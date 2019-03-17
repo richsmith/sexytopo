@@ -80,6 +80,7 @@ public class Leg extends SurveyComponent{
     public Leg(Leg leg, Station destination) {
         this(leg.distance, leg.azimuth, leg.inclination, destination,
                 leg.promotedFrom, leg.wasShotBackwards);
+        this.setTrip(leg.getTrip());
     }
 
     public static Leg manuallyUpgradeSplayToConnectedLeg(Leg splay, Station destination) {
@@ -88,17 +89,22 @@ public class Leg extends SurveyComponent{
 
     public static Leg upgradeSplayToConnectedLeg(
             Leg splay, Station destination, Leg[] promotedFrom) {
-        return new Leg(
+        Leg leg = new Leg(
                 splay.distance, splay.azimuth, splay.inclination,
                 destination, promotedFrom, splay.wasShotBackwards);
+        leg.setTrip(splay.getTrip());
+        return leg;
+
     }
 
     public Leg reverse() {
         double adjustedAzimuth = Space2DUtils.adjustAngle(getAzimuth(), 180);
         if (hasDestination()) {
-            return new Leg(
+            Leg leg = new Leg(
                     distance, adjustedAzimuth, -1 * inclination, destination,
                     promotedFrom, !wasShotBackwards);
+            leg.setTrip(getTrip());
+            return leg;
         } else {
             return new Leg(distance, adjustedAzimuth, -1 * inclination, !wasShotBackwards);
         }
@@ -120,8 +126,10 @@ public class Leg extends SurveyComponent{
 
     public Leg asBacksight(Station destination) {
         double backAzimuth = Space2DUtils.adjustAngle(getAzimuth(), 180.0);
-        return new Leg(getDistance(), backAzimuth, -1 * getInclination(),
+        Leg leg = new Leg(getDistance(), backAzimuth, -1 * getInclination(),
                 destination, getPromotedFrom());
+        leg.setTrip(getTrip());
+        return leg;
     }
 
     public Leg asBacksight() {

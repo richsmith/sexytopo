@@ -27,6 +27,7 @@
             xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools">
             <item android:id="@+id/action_file_new" android:title="@string/action_file_new"/>
+            <item android:id="@+id/action_trip" android:title="@string/action_trip"/>
             <item android:id="@+id/action_file_open" android:title="@string/action_file_open"/>
             <item android:id="@+id/action_file_save" android:title="@string/action_file_save"/>
             <item android:id="@+id/action_file_save_as" android:title="@string/action_file_save_as"/>
@@ -76,11 +77,6 @@
         android:orderInCategory="100"
         android:visible="true"
         app:showAsAction="never" />
-    <item android:id="@+id/action_trip"
-          android:title="@string/action_trip"
-          android:orderInCategory="100"
-          android:visible="true"
-          app:showAsAction="never" />
     <item android:id="@+id/dev_settings"
           android:title="@string/action_dev"
           android:visible="true"

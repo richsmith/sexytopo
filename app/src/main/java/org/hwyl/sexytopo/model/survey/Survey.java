@@ -29,7 +29,6 @@ public class Survey {
     private Sketch elevationSketch = new Sketch();
 
     private List<Trip> tripHistory = new ArrayList<>();
-    private Trip currentTrip = null;
 
     private Map<Station, Set<SurveyConnection>> stationsToSurveyConnections = new HashMap<>();
 
@@ -367,13 +366,23 @@ public class Survey {
 
 
     public Trip getCurrentTrip() {
-        return currentTrip;
+        if (tripHistory.size() < 1) {
+            return null;
+        } else {
+            return tripHistory.get(tripHistory.size() - 1);
+        }
     }
 
 
-    public void setCurrentTrip(Trip trip) {
+    public List<Trip> getTripHistory() {
+        return tripHistory;
+    }
+
+
+    public void startNewTrip(List<Trip.TeamEntry> team, String comments) {
+        int nextId = tripHistory.size();
+        Trip trip = new Trip(nextId);
         tripHistory.add(trip);
-        this.currentTrip = trip;
     }
 
 

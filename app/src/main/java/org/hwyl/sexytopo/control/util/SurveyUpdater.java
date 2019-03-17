@@ -72,6 +72,7 @@ public class SurveyUpdater {
         if (!leg.hasDestination()) {
             Station newStation =
                     new Station(StationNamer.generateNextStationName(survey, activeStation));
+            newStation.setTrip(survey.getCurrentTrip());
             leg = Leg.manuallyUpgradeSplayToConnectedLeg(leg, newStation);
         }
 
@@ -84,6 +85,8 @@ public class SurveyUpdater {
 
     public static void upgradeSplayToConnectedLeg(Survey survey, Leg leg) {
         Station newStation = new Station(getNextStationName(survey));
+        newStation.setTrip(survey.getCurrentTrip());
+
         Leg newLeg = Leg.manuallyUpgradeSplayToConnectedLeg(leg, newStation);
         editLeg(survey, leg, newLeg);
         survey.setActiveStation(newStation);
@@ -105,6 +108,7 @@ public class SurveyUpdater {
                 Station newStation = new Station(getNextStationName(survey));
                 newStation.setExtendedElevationDirection(
                         activeStation.getExtendedElevationDirection());
+                newStation.setTrip(survey.getCurrentTrip());
 
                 Leg newLeg = averageLegs(legs);
                 newLeg = Leg.upgradeSplayToConnectedLeg(
@@ -144,6 +148,7 @@ public class SurveyUpdater {
                 Station newStation = new Station(getNextStationName(survey));
                 newStation.setExtendedElevationDirection(
                         activeStation.getExtendedElevationDirection());
+                newStation.setTrip(survey.getCurrentTrip());
 
                 Leg newLeg = averageBacksights(fore, back);
                 newLeg = Leg.manuallyUpgradeSplayToConnectedLeg(newLeg, newStation);
@@ -363,4 +368,12 @@ public class SurveyUpdater {
         }
     }
 
+
+    /*
+    public static setTrip(Survey survey, SurveyComponent surveyComponent) {
+        Trip trip = ;
+        if (trip != null) {
+            surveyComponent.setTrip(survey.getCurrentTrip());
+        }
+    }*/
 }

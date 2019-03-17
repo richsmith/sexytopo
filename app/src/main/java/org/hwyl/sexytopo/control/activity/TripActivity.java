@@ -176,14 +176,12 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
     }
 
     public void requestStartTrip(View view) {
-        Trip trip = new Trip();
-
-        trip.setTeam(team);
-
         EditText commentsField = findViewById(R.id.trip_comments);
-        trip.setComments(commentsField.getText().toString());
+        String comments = commentsField.getText().toString();
 
-        getSurvey().setCurrentTrip(trip);
+        getSurvey().startNewTrip(team, comments);
+
+        startActivity(PlanActivity.class);
     }
 
 

@@ -428,7 +428,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
 
-    private void startActivity(Class clazz) {
+    protected void startActivity(Class clazz) {
         if (! clazz.isInstance(this)) {
             Intent intent = new Intent(this, clazz);
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);

@@ -7,6 +7,7 @@ import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
+import org.hwyl.sexytopo.model.survey.Trip;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,6 +38,12 @@ public class SurveyJsonTranslater {
 
     public static final String ACTIVE_STATION_TAG = "activeStation";
 
+    public static final String ACTIVE_TRIP_TAG = "activeTrip";
+    public static final String TRIP_HISTORY_TAG = "tripHistory";
+    public static final String TRIP_ID_TAG = "tripId";
+    public static final String TEAM_TAG = "team";
+    public static final String TEAM_MEMBER_NAME_TAG = "name";
+    public static final String TEAM_MEMBER_ROLE_TAG = "role";
 
     public static String toText(Survey survey) throws JSONException {
         return toJson(survey).toString();
@@ -61,8 +68,12 @@ public class SurveyJsonTranslater {
         }
         json.put(STATIONS_TAG, stationArray);
 
+        JSONArray tripHistoryArray = toJson(survey.getTripHistory());
+        json.put(TRIP_HISTORY_TAG, tripHistoryArray);
+
         return json;
     }
+
 
     public static void toSurvey(Survey survey, JSONObject json) throws JSONException {
 
@@ -143,6 +154,41 @@ public class SurveyJsonTranslater {
     }
 
 
+    public static JSONArray toJson(List<Trip> tripHistory) throws JSONException {
+        JSONArray tripHistoryArray = new JSONArray();
+        for (Trip trip : tripHistory) {
+            JSONObject tripJson = toJson(trip);
+            tripHistoryArray.put(tripJson);
+        }
+        return tripHistoryArray;
+    }
+
+
+    public static JSONObject toJson(Trip trip) throws JSONException {
+
+        JSONObject json = new JSONObject();
+
+        json.put(TRIP_ID_TAG, trip.getId());
+        json.put(COMMENT_TAG, trip.getComments());
+
+        JSONArray teamArray = new JSONArray();
+
+        for (Trip.TeamEntry teamEntry: trip.getTeam()) {
+            JSONObject teamEntryJson = new JSONObject();
+            teamEntryJson.put(TEAM_MEMBER_NAME_TAG, teamEntry.name);
+            JSONArray rolesJson = new JSONArray();
+            for (Trip.Role role : teamEntry.roles) {
+                rolesJson.put(role.toString());
+            }
+            teamEntryJson.put(TEAM_MEMBER_ROLE_TAG, rolesJson);
+            teamArray.put(teamEntryJson);
+        }
+
+        json.put(TEAM_TAG, teamArray);
+        return json;
+    }
+
+
     public static Station toStation(Map<String, Station> namesToStations,
                                     JSONObject json) throws JSONException {
 
@@ -212,5 +258,39 @@ public class SurveyJsonTranslater {
         return leg;
     }
 
+
+    public static List<Trip> getTripHistory(JSONArray json) throws JSONException {
+        List<Trip> trips = new ArrayList<>();
+        for (JSONObject tripJson : Util.toList(json)) {
+            Trip trip = toTrip(tripJson);
+            trips.add(trip);
+        }
+        return trips;
+    }
+
+
+    public static Trip toTrip(JSONObject json) throws JSONException {
+        int id = json.getInt(TRIP_ID_TAG);
+        String comments = json.getString(COMMENT_TAG);
+
+        JSONArray teamArray = json.getJSONArray(TEAM_TAG);
+        List<Trip.TeamEntry> team = new ArrayList<>();
+        for (JSONObject teamEntryJson : Util.toList(teamArray)) {
+            String name = teamEntryJson.getString(TEAM_MEMBER_NAME_TAG);
+            JSONArray rolesArray = teamEntryJson.getJSONArray(TEAM_MEMBER_ROLE_TAG);
+            List<Trip.Role> roles = new ArrayList<>();
+            for (Object roleString : Util.toList(rolesArray)) {
+                Trip.Role role = Trip.Role.valueOf(roleString.toString());
+                roles.add(role);
+            }
+            Trip.TeamEntry teamEntry = new Trip.TeamEntry(name, roles);
+            team.add(teamEntry);
+        }
+
+        Trip trip = new Trip(id);
+        trip.setTeam(team);
+        trip.setComments(comments);
+        return trip;
+    }
 
 }
