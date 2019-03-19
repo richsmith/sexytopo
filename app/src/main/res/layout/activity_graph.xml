@@ -14,8 +14,9 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_marginBottom="0dp"
         android:padding="0px"
-        android:weightSum="1.6"
+        android:weightSum="1.8"
         android:background="@color/panelBackground">
 
         <ImageButton
@@ -33,6 +34,22 @@
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonBrown"
+            />
+        <ImageButton
+            android:layout_weight="0.2"
+            android:src="@drawable/grey"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:scaleType="fitCenter"
+            android:id="@+id/buttonGrey"
+            />
+        <ImageButton
+            android:layout_weight="0.2"
+            android:src="@drawable/red"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:scaleType="fitCenter"
+            android:id="@+id/buttonRed"
             />
         <ImageButton
             android:layout_weight="0.2"
@@ -68,14 +85,6 @@
             />
         <ImageButton
             android:layout_weight="0.2"
-            android:src="@drawable/zoom_out"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/toolbar_button_height"
-            android:scaleType="fitCenter"
-            android:id="@+id/buttonZoomOut"
-            />
-        <ImageButton
-            android:layout_weight="0.2"
             android:src="@drawable/zoom_in"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/toolbar_button_height"
@@ -90,7 +99,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="1px"
-        android:weightSum="1.6"
+        android:weightSum="1.8"
         android:background="@color/panelBackground">
 
         <ImageButton
@@ -156,6 +165,14 @@
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonRedo"
+            />
+        <ImageButton
+            android:layout_weight="0.2"
+            android:src="@drawable/zoom_out"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:scaleType="fitCenter"
+            android:id="@+id/buttonZoomOut"
             />
     </LinearLayout>
 

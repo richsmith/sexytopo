@@ -55,6 +55,8 @@ public abstract class GraphActivity extends SexyTopoActivity
             R.id.buttonRedo,
             R.id.buttonBlack,
             R.id.buttonBrown,
+            R.id.buttonGrey,
+            R.id.buttonRed,
             R.id.buttonOrange,
             R.id.buttonBlue,
             R.id.buttonGreen,

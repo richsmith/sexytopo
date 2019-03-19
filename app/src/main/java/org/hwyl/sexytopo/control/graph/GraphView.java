@@ -120,6 +120,8 @@ public class GraphView extends View {
 
         BLACK(R.id.buttonBlack, Colour.BLACK),
         BROWN(R.id.buttonBrown, Colour.BROWN),
+        GREY(R.id.buttonGrey, Colour.GREY),
+        RED(R.id.buttonRed, Colour.RED),
         ORANGE(R.id.buttonOrange, Colour.ORANGE),
         GREEN(R.id.buttonGreen, Colour.GREEN),
         BLUE(R.id.buttonBlue, Colour.BLUE),
