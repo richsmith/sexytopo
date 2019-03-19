@@ -1,10 +1,9 @@
 package org.hwyl.sexytopo.testhelpers;
 
-import junit.framework.Assert;
-
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
+import org.hwyl.sexytopo.model.survey.Trip;
 
 import java.text.DecimalFormat;
 import java.util.List;
@@ -30,6 +29,18 @@ public class SurveyChecker {
                 return false;
             }
         }
+
+        List<Trip> oneTrips = one.getTrips();
+        List<Trip> twoTrips = two.getTrips();
+        if (oneTrips.size() != twoTrips.size()) {
+            return false;
+        }
+        for (int i = 0; i < oneTrips.size(); i++) {
+            if (! oneTrips.get(i).equalsTripData(twoTrips.get(i))) {
+                return false;
+            }
+        }
+
 
         return true;
     }

@@ -30,6 +30,39 @@ public class Trip {
             this.name = name;
             this.roles = roles;
         }
+
+        @Override
+        public boolean equals(Object other) {
+            if (!(other instanceof TeamEntry)) {
+                return false;
+            }
+            TeamEntry otherEntry = (TeamEntry)other;
+            if (! otherEntry.name.equals(name)) {
+                return false;
+            }
+
+            if (otherEntry.roles.size() != roles.size()) {
+                return false;
+            }
+
+            for (int i = 0; i < roles.size(); i++) {
+                if (otherEntry.roles.get(i) != roles.get(i)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = 17;
+            result = 31 * result + name.hashCode();
+            for (Role role : roles) {
+                result = 31 * result + role.hashCode();
+            }
+            return result;
+        }
     }
 
     private int id;
@@ -70,6 +103,35 @@ public class Trip {
     public Date getDate() {
         return date;
     }
-    
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public boolean equalsTripData(Trip trip) {
+        // Note, not "equals" method because the trips could have same data but not the same ID
+
+        if (! trip.date.equals(date)) {
+            return false;
+        }
+
+        if (! trip.comments.equals(comments)) {
+            return false;
+        }
+
+        if (trip.team.size() != team.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < team.size(); i++) {
+            TeamEntry otherEntry = trip.team.get(i);
+            TeamEntry thisEntry = team.get(i);
+            if (! thisEntry.equals(otherEntry)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
 }

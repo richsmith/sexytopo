@@ -4,6 +4,7 @@ import android.content.Context;
 
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.Log;
+import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
 import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -53,7 +54,9 @@ public class Saver {
     private static void saveSurveyData(Context context, Survey survey, String extension)
             throws IOException,JSONException {
         String path = Util.getPathForSurveyFile(context, survey.getName(), extension);
-        String surveyText = SurveyJsonTranslater.toText(survey);
+        String versionName = SexyTopoActivity.getVersionName(context);
+        int versionCode = SexyTopoActivity.getVersionCode(context);
+        String surveyText = SurveyJsonTranslater.toText(survey, versionName, versionCode);
         saveFile(path, surveyText);
     }
 

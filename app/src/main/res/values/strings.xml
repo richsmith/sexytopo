@@ -33,7 +33,7 @@
     <string name="action_link_to_existing_survey">Link to an Existing Survey</string>
     <string name="action_system_log">System Log</string>
     <string name="action_generate_test_survey">Generate Test Survey</string>
-    <string name="action_kill_connection">Kill comms process</string>
+    <string name="action_kill_connection">Kill comms thread (danger!)</string>
     <string name="loaded">Loaded</string>
     <string name="restored">Restored</string>
     <string name="external_storage_unwriteable">WARNING: Can\'t write to external storage (will use internal storage instead)</string>

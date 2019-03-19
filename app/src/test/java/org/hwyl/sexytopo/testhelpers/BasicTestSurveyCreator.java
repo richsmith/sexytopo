@@ -3,6 +3,11 @@ package org.hwyl.sexytopo.testhelpers;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Survey;
+import org.hwyl.sexytopo.model.survey.Trip;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 public class BasicTestSurveyCreator {
@@ -133,6 +138,34 @@ public class BasicTestSurveyCreator {
 
         Leg legBranch2 = new Leg(5, 90, 0);
         SurveyUpdater.updateWithNewStation(survey, legBranch2);
+
+        return survey;
+    }
+
+
+    public static Survey createStraightNorthWithTrips() {
+        Survey survey = new Survey("Test Straight Survey North");
+
+        List<Trip.TeamEntry> team = new ArrayList<>();
+        team.add(new Trip.TeamEntry("Alice",
+                Arrays.asList(Trip.Role.BOOK)));
+        survey.startNewTrip(team, "Hi, I'm a test :P just Alice solo for now!");
+
+        Leg leg0 = new Leg(5, 0, 0);
+        SurveyUpdater.updateWithNewStation(survey, leg0);
+
+        Leg leg1 = new Leg(5, 0, 0);
+        SurveyUpdater.updateWithNewStation(survey, leg1);
+
+        List<Trip.TeamEntry> team2 = new ArrayList<>();
+        team2.add(new Trip.TeamEntry("Alice",
+                Arrays.asList(Trip.Role.BOOK)));
+        team2.add(new Trip.TeamEntry("Bob",
+                Arrays.asList(Trip.Role.INSTRUMENTS, Trip.Role.DOG)));
+        survey.startNewTrip(team2, "Now Bob is on board!");
+
+        Leg leg2 = new Leg(5, 0, 0);
+        SurveyUpdater.updateWithNewStation(survey, leg2);
 
         return survey;
     }
