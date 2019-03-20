@@ -57,7 +57,7 @@ public class SurveyJsonTranslaterTest {
 
     @Test
     public void testSurveyWithTripsAreParsed() throws Exception {
-        Survey survey = BasicTestSurveyCreator.createStraightNorthWithTrips();
+        Survey survey = BasicTestSurveyCreator.createStraightNorthWithTrip();
         String text = SurveyJsonTranslater.toText(survey, "test", 0);
 
         Survey newSurvey = new Survey(TEST_SURVEY_NAME);

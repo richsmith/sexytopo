@@ -72,16 +72,24 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
     @Override
     protected void onResume() {
         super.onResume();
-        Trip trip = getSurvey().getCurrentTrip();
-        if (trip != null && team.size() == 0) {
-            team = new ArrayList<>(trip.getTeam());
+        Trip trip = getSurvey().getTrip();
+        if (trip == null) {
+            trip = new Trip();
         }
 
-        Date date = new Date();
+        team = new ArrayList<>(trip.getTeam());
+
+        String comments = trip.getComments();
+        TextView commentsField = findViewById(R.id.trip_comments);
+        commentsField.setText(comments);
+
+        Date date = trip.getDate();
         String formatted = DATE_FORMAT.format(date);
         TextView dateField = findViewById(R.id.trip_date);
         dateField.setText(
             getText(R.string.trip) + " " + formatted + ". " + getText(R.string.team) + ":");
+
+        syncListWithTeam();
         updateButtonStatus();
     }
 
@@ -175,11 +183,17 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
         syncListWithTeam();
     }
 
-    public void requestStartTrip(View view) {
+    public void requestSaveTrip(View view) {
         EditText commentsField = findViewById(R.id.trip_comments);
         String comments = commentsField.getText().toString();
 
-        getSurvey().startNewTrip(team, comments);
+        Trip trip = getSurvey().getTrip();
+        if (trip == null) {
+            trip = new Trip();
+        }
+        trip.setTeam(team);
+        trip.setComments(comments);
+        getSurvey().setTrip(trip);
 
         startActivity(PlanActivity.class);
     }

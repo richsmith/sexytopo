@@ -556,6 +556,7 @@ public class GraphView extends View {
                         invalidate();
                         break;
                     case R.id.graph_station_new_cross_section:
+                        survey.setActiveStation(station);
                         setSketchTool(SketchTool.POSITION_CROSS_SECTION);
                         activity.showSimpleToast(R.string.position_cross_section_instruction);
                         break;

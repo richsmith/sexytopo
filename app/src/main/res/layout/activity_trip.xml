@@ -71,9 +71,9 @@
             android:layout_weight="1"
             android:textAlignment="gravity"
             android:gravity="center"
-            android:text="@string/start_trip"
+            android:text="@string/save_trip"
             android:enabled="true"
-            android:onClick="requestStartTrip"
+            android:onClick="requestSaveTrip"
             />
         <Button
             android:id="@+id/clear_trip"

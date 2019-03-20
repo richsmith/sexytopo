@@ -1,17 +1,27 @@
 package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
-import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexExporter;
+import android.text.TextUtils;
+
+import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
+import org.hwyl.sexytopo.control.util.GraphToListTranslator;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
+import org.hwyl.sexytopo.model.survey.Trip;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
 public class ThExporter {
+
+    public static final String DATE_PATTERN = "yyyy.MM.dd";
+
 
     public static String getContent(Survey survey, List<String> th2Files) {
 
@@ -87,10 +97,86 @@ public class ThExporter {
     }
 
     private static String getCentreline(Survey survey) {
-        return "data normal from to length compass clino\n\n" +
-            new SurvexExporter().getContent(survey);
+
+        GraphToListTranslator graphToListTranslator = new GraphToListTranslator();
+
+        StringBuilder builder = new StringBuilder();
+
+        Trip trip = survey.getTrip();
+        if (trip != null) {
+            builder.append(formatTrip(trip));
+        }
+
+        builder.append("data normal from to length compass clino\n\n");
+
+        List<GraphToListTranslator.SurveyListEntry> list =
+                graphToListTranslator.toListOfSurveyListEntries(survey);
+
+        for (GraphToListTranslator.SurveyListEntry entry : list) {
+            SurvexTherionUtil.formatEntry(builder, entry);
+            builder.append("\n");
+        }
+
+        return builder.toString();
     }
 
+
+    private static String formatTrip(Trip trip) {
+
+        StringBuilder builder = new StringBuilder();
+
+        if (trip.getComments().length() > 0) {
+            builder.append(commentMultiline(trip.getComments()) + "\n\n");
+        }
+
+        builder.append(formatDate(trip.getDate()) + "\n\n");
+
+        for (Trip.TeamEntry entry : trip.getTeam()) {
+            builder.append(formatMember(entry) + "\n");
+        }
+        return builder.toString();
+    }
+
+    private static String formatMember(Trip.TeamEntry member) {
+        List<String> fields = new ArrayList();
+        fields.add("team");
+        fields.add("\"" + member.name + "\"");
+        for (Trip.Role role : member.roles) {
+            fields.add(getRoleDescription(role));
+        }
+        return TextUtils.join(" ", fields);
+    }
+
+    private static String getRoleDescription(Trip.Role role) {
+        switch(role) {
+            case BOOK:
+                return "book";
+            case INSTRUMENTS:
+                return "instruments";
+            case DOG:
+                return "assistant";
+            case EXPLORATION:
+            default:
+                return "explo-team";
+        }
+    }
+
+    private static String commentMultiline(String raw) {
+        StringBuilder builder = new StringBuilder();
+        String[] lines = raw.split("\n");
+        for (String line : lines) {
+            builder.append("# " + line + "\n");
+        }
+        return builder.toString();
+    }
+
+
+    private static String formatDate(Date date) {
+
+        DateFormat dateFormat = new SimpleDateFormat(DATE_PATTERN);
+        String dateString = dateFormat.format(date);
+        return "date " + dateString;
+    }
 
     private static String getExtendedElevationExtensions(Survey survey) {
         StringBuilder builder = new StringBuilder();

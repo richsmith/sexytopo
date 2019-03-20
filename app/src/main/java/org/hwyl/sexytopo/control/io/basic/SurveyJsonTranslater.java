@@ -7,7 +7,6 @@ import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
-import org.hwyl.sexytopo.model.survey.SurveyComponent;
 import org.hwyl.sexytopo.model.survey.Trip;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,8 +47,7 @@ public class SurveyJsonTranslater {
 
     public static final String ACTIVE_STATION_TAG = "activeStation";
 
-    public static final String TRIPS_TAG = "tripHistory";
-    public static final String TRIP_ID_TAG = "tripId";
+    public static final String TRIP_TAG = "trip";
     public static final String TRIP_DATE_TAG = "tripDate";
     public static final String TEAM_TAG = "team";
     public static final String TEAM_MEMBER_NAME_TAG = "name";
@@ -82,8 +80,10 @@ public class SurveyJsonTranslater {
         }
         json.put(STATIONS_TAG, stationArray);
 
-        JSONArray tripArray = toJson(survey.getTrips());
-        json.put(TRIPS_TAG, tripArray);
+        if (survey.getTrip() != null) {
+            JSONObject trip = toJson(survey.getTrip());
+            json.put(TRIP_TAG, trip);
+        }
 
         return json;
     }
@@ -98,19 +98,18 @@ public class SurveyJsonTranslater {
                 "Assuming filename is the correct name.");
         }
 
-        List<Trip> trips = new ArrayList<>();
         try { // have to parse trips before stations etc. so trips can be referenced by them
-            JSONArray tripsArray = json.getJSONArray(TRIPS_TAG);
-            trips = toTrips(tripsArray);
-            survey.setTrips(trips);
+            JSONObject tripObject = json.getJSONObject(TRIP_TAG);
+            Trip trip = toTrip(tripObject);
+            survey.setTrip(trip);
         } catch (JSONException exception) {
-            Log.e("Failed to load trips: " + exception);
+            Log.e("Failed to load trip: " + exception);
             // carry on... unfortunate, but not *that* important
         }
 
         try {
             JSONArray stationsArray = json.getJSONArray(STATIONS_TAG);
-            Station origin = toTree(trips, stationsArray);
+            Station origin = toTree(stationsArray);
             survey.setOrigin(origin);
         } catch (JSONException exception) {
             Log.e("Failed to load stations: " + exception);
@@ -133,11 +132,6 @@ public class SurveyJsonTranslater {
         json.put(DIRECTION_TAG, station.getExtendedElevationDirection().toString().toLowerCase());
         json.put(COMMENT_TAG, station.getComment());
 
-        Trip trip = station.getTrip();
-        if (trip != null) {
-            json.put(TRIP_ID_TAG, trip.getId());
-        }
-
         JSONArray onwardLegsArray = new JSONArray();
         for (Leg leg : station.getOnwardLegs()) {
             onwardLegsArray.put(toJson(leg));
@@ -148,7 +142,7 @@ public class SurveyJsonTranslater {
     }
 
 
-    public static Station toTree(List<Trip> trips, JSONArray json) throws JSONException {
+    public static Station toTree(JSONArray json) throws JSONException {
 
         Map<String, Station> namesToStations = new HashMap<>();
 
@@ -156,7 +150,7 @@ public class SurveyJsonTranslater {
         List<JSONObject> stationData = Util.toList(json);
         Collections.reverse(stationData);
         for (JSONObject object : stationData) {
-            Station station = toStation(trips, namesToStations, object);
+            Station station = toStation(namesToStations, object);
             namesToStations.put(station.getName(), station);
             latest = station;
         }
@@ -173,11 +167,6 @@ public class SurveyJsonTranslater {
         json.put(DESTINATION_TAG, leg.getDestination().getName());
         json.put(WAS_SHOT_BACKWARDS_TAG, leg.wasShotBackwards());
 
-        Trip trip = leg.getTrip();
-        if (trip != null) {
-            json.put(TRIP_ID_TAG, trip.getId());
-        }
-
         JSONArray promotedFromArray = new JSONArray();
         for (Leg promotedLeg : leg.getPromotedFrom()) {
             promotedFromArray.put(toJson(promotedLeg));
@@ -188,16 +177,6 @@ public class SurveyJsonTranslater {
     }
 
 
-    public static JSONArray toJson(List<Trip> trips) throws JSONException {
-        JSONArray tripArray = new JSONArray();
-        for (Trip trip : trips) {
-            JSONObject tripJson = toJson(trip);
-            tripArray.put(tripJson);
-        }
-        return tripArray;
-    }
-
-
     public static JSONObject toJson(Trip trip) throws JSONException {
 
         JSONObject json = new JSONObject();
@@ -205,8 +184,6 @@ public class SurveyJsonTranslater {
         DateFormat dateFormat = new SimpleDateFormat(DATE_PATTERN);
         String date = dateFormat.format(trip.getDate());
         json.put(TRIP_DATE_TAG, date);
-
-        json.put(TRIP_ID_TAG, trip.getId());
         json.put(COMMENT_TAG, trip.getComments());
 
         JSONArray teamArray = new JSONArray();
@@ -227,8 +204,7 @@ public class SurveyJsonTranslater {
     }
 
 
-    public static Station toStation(List<Trip> trips,
-                                    Map<String, Station> namesToStations,
+    public static Station toStation(Map<String, Station> namesToStations,
                                     JSONObject json) throws JSONException {
 
         String name = json.getString(STATION_NAME_TAG);
@@ -253,18 +229,9 @@ public class SurveyJsonTranslater {
             // not ideal but not the end of the world; we'd probably prefer to have our data
         }
 
-        try {
-            if (json.has(TRIP_ID_TAG)) {
-                int tripId = json.getInt(TRIP_ID_TAG);
-                setTrip(trips, station, tripId);
-            }
-        } catch (Exception ignore) {
-            // not ideal but not the end of the world; we'd probably prefer to have our data
-        }
-
         JSONArray array = json.getJSONArray(ONWARD_LEGS_TAG);
         for (JSONObject object : Util.toList(array)) {
-            Leg leg = toLeg(trips, namesToStations, object);
+            Leg leg = toLeg(namesToStations, object);
             station.addOnwardLeg(leg);
         }
 
@@ -273,7 +240,6 @@ public class SurveyJsonTranslater {
 
 
     public static Leg toLeg(
-            List<Trip> trips,
             Map<String, Station> namesToStations,
             JSONObject json) throws JSONException {
 
@@ -298,7 +264,7 @@ public class SurveyJsonTranslater {
             try {
                 JSONArray array = json.getJSONArray(PROMOTED_FROM_TAG);
                 for (JSONObject object : Util.toList(array)) {
-                    Leg promotedFrom = toLeg(trips, namesToStations, object);
+                    Leg promotedFrom = toLeg(namesToStations, object);
                     promotedFromList.add(promotedFrom);
                 }
             } catch (Exception ignore) {
@@ -311,42 +277,11 @@ public class SurveyJsonTranslater {
                     destination, promotedFrom, wasShotBackwards);
         }
 
-        try {
-            if (json.has(TRIP_ID_TAG)) {
-                int tripId = json.getInt(TRIP_ID_TAG);
-                setTrip(trips, leg, tripId);
-            }
-        } catch (Exception ignore) {
-            // not ideal but not the end of the world; we'd probably prefer to have our data
-        }
-
         return leg;
     }
 
 
-    public static void setTrip(List<Trip> trips, SurveyComponent surveyComponent, int tripId) {
-        for (Trip trip : trips) {
-            if (trip.getId() == tripId) {
-                surveyComponent.setTrip(trip);
-            }
-        }
-        // if we can't find the trip for some reason, leave it as null :/
-    }
-
-
-    public static List<Trip> toTrips(JSONArray json) throws JSONException, ParseException {
-        List<Trip> trips = new ArrayList<>();
-        for (JSONObject tripJson : Util.toList(json)) {
-            Trip trip = toTrip(tripJson);
-            trips.add(trip);
-        }
-        return trips;
-    }
-
-
     public static Trip toTrip(JSONObject json) throws JSONException, ParseException {
-
-        int id = json.getInt(TRIP_ID_TAG);
 
         DateFormat dateFormat = new SimpleDateFormat(DATE_PATTERN);
         String dateString = json.getString(TRIP_DATE_TAG);
@@ -369,7 +304,7 @@ public class SurveyJsonTranslater {
             team.add(teamEntry);
         }
 
-        Trip trip = new Trip(id);
+        Trip trip = new Trip();
         trip.setDate(date);
         trip.setTeam(team);
         trip.setComments(comments);

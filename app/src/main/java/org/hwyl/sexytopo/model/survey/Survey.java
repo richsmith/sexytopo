@@ -28,7 +28,7 @@ public class Survey {
     private Sketch planSketch = new Sketch();
     private Sketch elevationSketch = new Sketch();
 
-    private List<Trip> trips = new ArrayList<>();
+    private Trip trip = null;
 
     private Map<Station, Set<SurveyConnection>> stationsToSurveyConnections = new HashMap<>();
 
@@ -355,6 +355,21 @@ public class Survey {
     }
 
 
+    public Trip getTrip() {
+        return trip;
+    }
+
+
+    public void setTrip(Trip trip) {
+        this.trip = trip;
+    }
+
+
+    public String toString() {
+        return "[Survey " + getName() + "]";
+    }
+
+
     private class UndoEntry {
         private Station station;
         private Leg leg;
@@ -362,38 +377,6 @@ public class Survey {
             this.station = station;
             this.leg = leg;
         }
-    }
-
-
-    public Trip getCurrentTrip() {
-        if (trips.size() < 1) {
-            return null;
-        } else {
-            return trips.get(trips.size() - 1);
-        }
-    }
-
-
-    public List<Trip> getTrips() {
-        return trips;
-    }
-
-
-    public void startNewTrip(List<Trip.TeamEntry> team, String comments) {
-        int nextId = trips.size();
-        Trip trip = new Trip(nextId);
-        trip.setTeam(team);
-        trip.setComments(comments);
-        trips.add(trip);
-    }
-
-    public void setTrips(List<Trip> trips) {
-        this.trips = trips;
-    }
-
-
-    public String toString() {
-        return "[Survey " + getName() + "]";
     }
 
 

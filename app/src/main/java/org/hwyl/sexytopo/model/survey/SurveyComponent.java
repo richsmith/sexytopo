@@ -5,16 +5,4 @@ package org.hwyl.sexytopo.model.survey;
  * to refer to components generically.
  */
 public abstract class SurveyComponent {
-
-    private Trip trip;
-
-
-    public Trip getTrip() {
-        return trip;
-    }
-
-
-    public void setTrip(Trip trip) {
-        this.trip = trip;
-    }
 }

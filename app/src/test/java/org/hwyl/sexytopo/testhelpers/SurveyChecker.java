@@ -30,17 +30,17 @@ public class SurveyChecker {
             }
         }
 
-        List<Trip> oneTrips = one.getTrips();
-        List<Trip> twoTrips = two.getTrips();
-        if (oneTrips.size() != twoTrips.size()) {
+        Trip oneTrip = one.getTrip();
+        Trip twoTrip = two.getTrip();
+        if ((oneTrip == null) ^ (twoTrip == null)) {
             return false;
         }
-        for (int i = 0; i < oneTrips.size(); i++) {
-            if (! oneTrips.get(i).equalsTripData(twoTrips.get(i))) {
+
+        if (oneTrip != null) {
+            if (!oneTrip.equalsTripData(twoTrip)) {
                 return false;
             }
         }
-
 
         return true;
     }

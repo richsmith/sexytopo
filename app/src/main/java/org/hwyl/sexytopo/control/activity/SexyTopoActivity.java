@@ -775,6 +775,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             Survey survey = Loader.loadSurvey(SexyTopoActivity.this, surveyName);
             SurveyManager.getInstance(SexyTopoActivity.this).setCurrentSurvey(survey);
             updateRememberedSurvey();
+            startActivity(PlanActivity.class);
             Log.d("Loaded");
             showSimpleToast(getString(R.string.loaded) + " " + surveyName);
         } catch (Exception exception) {
@@ -1051,7 +1052,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
         protected void onPostExecute(Survey survey) {
 
-            if (Util.doesSurveyExist(survey.getName())) {
+            if (SurvexTherionUtil.doesSurveyExist(survey.getName())) {
                 confirmToProceed(
                         R.string.continue_question,
                         R.string.survey_already_exists,

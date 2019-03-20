@@ -10,7 +10,7 @@ public class Trip {
     public enum Role {
         BOOK("Book (drawing)"),
         INSTRUMENTS("Instruments"),
-        DOG("Dog"),
+        DOG("Dog (assistant)"),
         EXPLORATION("Exploration Team");
 
         public String description;
@@ -65,22 +65,14 @@ public class Trip {
         }
     }
 
-    private int id;
     private Date date;
     private List<TeamEntry> team = new ArrayList<>();
     private String comments;
 
 
-    public Trip(int id) {
-        this.id = id;
+    public Trip() {
         this.date = new Date();
     }
-
-
-    public int getId() {
-        return id;
-    }
-
 
     public List<TeamEntry> getTeam() {
         return team;

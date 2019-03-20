@@ -27,7 +27,6 @@
             xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools">
             <item android:id="@+id/action_file_new" android:title="@string/action_file_new"/>
-            <item android:id="@+id/action_trip" android:title="@string/action_trip"/>
             <item android:id="@+id/action_file_open" android:title="@string/action_file_open"/>
             <item android:id="@+id/action_file_save" android:title="@string/action_file_save"/>
             <item android:id="@+id/action_file_save_as" android:title="@string/action_file_save_as"/>
@@ -63,6 +62,9 @@
                   android:title="@string/action_link_to_existing_survey"/>
         </menu>
     </item>
+    <item android:id="@+id/action_trip"
+          android:title="@string/action_trip"
+          app:showAsAction="never"/>
     <item android:id="@+id/action_survey"
         android:title="@string/action_survey"
         android:orderInCategory="100"
