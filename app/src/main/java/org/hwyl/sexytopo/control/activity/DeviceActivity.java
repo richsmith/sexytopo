@@ -13,7 +13,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.ScrollView;
 import android.widget.Switch;
@@ -54,7 +53,6 @@ public class DeviceActivity extends SexyTopoActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         setupSwitchListeners();
 

@@ -62,6 +62,9 @@
                   android:title="@string/action_link_to_existing_survey"/>
         </menu>
     </item>
+    <item android:id="@+id/action_trip"
+          android:title="@string/action_trip"
+          app:showAsAction="never"/>
     <item android:id="@+id/action_survey"
         android:title="@string/action_survey"
         android:orderInCategory="100"

@@ -7,18 +7,28 @@ import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
+import org.hwyl.sexytopo.model.survey.Trip;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
 public class SurveyJsonTranslater {
+
+    public static final String DATE_PATTERN = "yyyy-MM-dd";
+
+    public static final String VERSION_NAME_TAG = "sexyTopoVersionName";
+    public static final String VERSION_CODE_TAG = "sexyTopoVersionCode";
 
     public static final String SURVEY_NAME_TAG = "name";
 
@@ -37,22 +47,31 @@ public class SurveyJsonTranslater {
 
     public static final String ACTIVE_STATION_TAG = "activeStation";
 
+    public static final String TRIP_TAG = "trip";
+    public static final String TRIP_DATE_TAG = "tripDate";
+    public static final String TEAM_TAG = "team";
+    public static final String TEAM_MEMBER_NAME_TAG = "name";
+    public static final String TEAM_MEMBER_ROLE_TAG = "role";
 
-    public static String toText(Survey survey) throws JSONException {
-        return toJson(survey).toString();
+    public static String toText(Survey survey, String versionName, int versionCode)
+            throws JSONException {
+        return toJson(survey, versionName, versionCode).toString();
     }
 
 
-    public static void populateSurvey(Survey survey, String string) throws JSONException {
+    public static void populateSurvey(Survey survey, String string)
+            throws JSONException, ParseException {
         JSONObject json = new JSONObject(string);
         toSurvey(survey, json);
     }
 
 
-    public static JSONObject toJson(Survey survey) throws JSONException {
+    public static JSONObject toJson(Survey survey, String versionName, int versionCode)
+            throws JSONException {
 
         JSONObject json = new JSONObject();
-
+        json.put(VERSION_NAME_TAG, versionName);
+        json.put(VERSION_CODE_TAG, versionCode);
         json.put(SURVEY_NAME_TAG, survey.getName());
 
         JSONArray stationArray = new JSONArray();
@@ -61,11 +80,17 @@ public class SurveyJsonTranslater {
         }
         json.put(STATIONS_TAG, stationArray);
 
+        if (survey.getTrip() != null) {
+            JSONObject trip = toJson(survey.getTrip());
+            json.put(TRIP_TAG, trip);
+        }
+
         return json;
     }
 
-    public static void toSurvey(Survey survey, JSONObject json) throws JSONException {
 
+    public static void toSurvey(Survey survey, JSONObject json)
+            throws JSONException, ParseException {
 
         String name = json.getString(SURVEY_NAME_TAG);
         if (!survey.getName().equals(name)) {
@@ -73,12 +98,21 @@ public class SurveyJsonTranslater {
                 "Assuming filename is the correct name.");
         }
 
+        try { // have to parse trips before stations etc. so trips can be referenced by them
+            JSONObject tripObject = json.getJSONObject(TRIP_TAG);
+            Trip trip = toTrip(tripObject);
+            survey.setTrip(trip);
+        } catch (JSONException exception) {
+            Log.e("Failed to load trip: " + exception);
+            // carry on... unfortunate, but not *that* important
+        }
+
         try {
             JSONArray stationsArray = json.getJSONArray(STATIONS_TAG);
             Station origin = toTree(stationsArray);
             survey.setOrigin(origin);
-        } catch (JSONException e) {
-            Log.e("Failed to load stations: " + e);
+        } catch (JSONException exception) {
+            Log.e("Failed to load stations: " + exception);
         }
 
         try {
@@ -143,6 +177,33 @@ public class SurveyJsonTranslater {
     }
 
 
+    public static JSONObject toJson(Trip trip) throws JSONException {
+
+        JSONObject json = new JSONObject();
+
+        DateFormat dateFormat = new SimpleDateFormat(DATE_PATTERN);
+        String date = dateFormat.format(trip.getDate());
+        json.put(TRIP_DATE_TAG, date);
+        json.put(COMMENT_TAG, trip.getComments());
+
+        JSONArray teamArray = new JSONArray();
+
+        for (Trip.TeamEntry teamEntry: trip.getTeam()) {
+            JSONObject teamEntryJson = new JSONObject();
+            teamEntryJson.put(TEAM_MEMBER_NAME_TAG, teamEntry.name);
+            JSONArray rolesJson = new JSONArray();
+            for (Trip.Role role : teamEntry.roles) {
+                rolesJson.put(role.toString());
+            }
+            teamEntryJson.put(TEAM_MEMBER_ROLE_TAG, rolesJson);
+            teamArray.put(teamEntryJson);
+        }
+
+        json.put(TEAM_TAG, teamArray);
+        return json;
+    }
+
+
     public static Station toStation(Map<String, Station> namesToStations,
                                     JSONObject json) throws JSONException {
 
@@ -152,6 +213,12 @@ public class SurveyJsonTranslater {
         try {
             String comment = json.getString(COMMENT_TAG);
             station.setComment(comment);
+        } catch (Exception ignore) {
+            // not ideal but not the end of the world; we'd probably prefer to have our data
+        }
+        try {
+            Direction direction = Direction.valueOf(json.getString(DIRECTION_TAG).toUpperCase());
+            station.setExtendedElevationDirection(direction);
         } catch (Exception ignore) {
             // not ideal but not the end of the world; we'd probably prefer to have our data
         }
@@ -172,8 +239,9 @@ public class SurveyJsonTranslater {
     }
 
 
-    public static Leg toLeg(Map<String, Station> namesToStations,
-                            JSONObject json) throws JSONException {
+    public static Leg toLeg(
+            Map<String, Station> namesToStations,
+            JSONObject json) throws JSONException {
 
         double distance = json.getDouble(DISTANCE_TAG);
         double azimuth = json.getDouble(AZIMUTH_TAG);
@@ -182,7 +250,7 @@ public class SurveyJsonTranslater {
 
         String destinationName = json.getString(DESTINATION_TAG);
 
-        Leg leg = null;
+        Leg leg;
         if (destinationName.equals(SexyTopo.BLANK_STATION_NAME)) {
             leg = new Leg(distance, azimuth, inclination, wasShotBackwards);
 
@@ -212,5 +280,35 @@ public class SurveyJsonTranslater {
         return leg;
     }
 
+
+    public static Trip toTrip(JSONObject json) throws JSONException, ParseException {
+
+        DateFormat dateFormat = new SimpleDateFormat(DATE_PATTERN);
+        String dateString = json.getString(TRIP_DATE_TAG);
+        Date date = dateFormat.parse(dateString);
+        json.put(TRIP_DATE_TAG, date);
+
+        String comments = json.getString(COMMENT_TAG);
+
+        JSONArray teamArray = json.getJSONArray(TEAM_TAG);
+        List<Trip.TeamEntry> team = new ArrayList<>();
+        for (JSONObject teamEntryJson : Util.toList(teamArray)) {
+            String name = teamEntryJson.getString(TEAM_MEMBER_NAME_TAG);
+            JSONArray rolesArray = teamEntryJson.getJSONArray(TEAM_MEMBER_ROLE_TAG);
+            List<Trip.Role> roles = new ArrayList<>();
+            for (Object roleString : Util.toList(rolesArray)) {
+                Trip.Role role = Trip.Role.valueOf(roleString.toString());
+                roles.add(role);
+            }
+            Trip.TeamEntry teamEntry = new Trip.TeamEntry(name, roles);
+            team.add(teamEntry);
+        }
+
+        Trip trip = new Trip();
+        trip.setDate(date);
+        trip.setTeam(team);
+        trip.setComments(comments);
+        return trip;
+    }
 
 }

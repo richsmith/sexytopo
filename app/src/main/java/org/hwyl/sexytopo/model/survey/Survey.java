@@ -22,12 +22,13 @@ public class Survey {
 
     private String name;
 
+    private Station origin = new Station(StationNamer.generateOriginName());
+    private Station activeStation = origin;
+
     private Sketch planSketch = new Sketch();
     private Sketch elevationSketch = new Sketch();
 
-
-    private Station origin = new Station(StationNamer.generateOriginName());
-    private Station activeStation = origin;
+    private Trip trip = null;
 
     private Map<Station, Set<SurveyConnection>> stationsToSurveyConnections = new HashMap<>();
 
@@ -354,6 +355,21 @@ public class Survey {
     }
 
 
+    public Trip getTrip() {
+        return trip;
+    }
+
+
+    public void setTrip(Trip trip) {
+        this.trip = trip;
+    }
+
+
+    public String toString() {
+        return "[Survey " + getName() + "]";
+    }
+
+
     private class UndoEntry {
         private Station station;
         private Leg leg;
@@ -361,11 +377,6 @@ public class Survey {
             this.station = station;
             this.leg = leg;
         }
-    }
-
-
-    public String toString() {
-        return "[Survey " + getName() + "]";
     }
 
 

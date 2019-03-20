@@ -2,6 +2,7 @@ package org.hwyl.sexytopo.control.activity;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -122,6 +123,9 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 return true;
             case R.id.action_calibration:
                 startActivity(CalibrationActivity.class);
+                return true;
+            case R.id.action_trip:
+                startActivity(TripActivity.class);
                 return true;
             case R.id.action_settings:
                 startActivity(SettingsActivity.class);
@@ -256,16 +260,10 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     private void openAboutDialog() {
         View messageView = getLayoutInflater().inflate(R.layout.about_dialog, null, false);
 
-        String version;
-        try {
-            PackageInfo pInfo = this.getPackageManager().getPackageInfo(getPackageName(), 0);
-            version = pInfo.versionName;
-        } catch (Exception exception) {
-            version = "Unknown";
-        }
+        String version = getVersionName(this);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                .setIcon(R.drawable.ic_launcher)
+                .setIcon(R.drawable.laser_icon)
                 .setTitle(getText(R.string.app_name) + " v" + version)
                 .setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
@@ -325,6 +323,31 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         builderSingle.show();
     }
 
+
+    public static String getVersionName(Context context) {
+        String version;
+        try {
+            PackageInfo pInfo =
+                    context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            version = pInfo.versionName;
+        } catch (Exception exception) {
+            version = "Unknown";
+        }
+        return version;
+    }
+
+
+    public static int getVersionCode(Context context) {
+        int version;
+        try {
+            PackageInfo pInfo =
+                    context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            version = pInfo.versionCode;
+        } catch (Exception exception) {
+            version = -1;
+        }
+        return version;
+    }
 
     public void linkExistingSurvey() {  // public due to stupid Reflection requirements
 
@@ -425,7 +448,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
 
-    private void startActivity(Class clazz) {
+    protected void startActivity(Class clazz) {
         if (! clazz.isInstance(this)) {
             Intent intent = new Intent(this, clazz);
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
@@ -752,6 +775,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             Survey survey = Loader.loadSurvey(SexyTopoActivity.this, surveyName);
             SurveyManager.getInstance(SexyTopoActivity.this).setCurrentSurvey(survey);
             updateRememberedSurvey();
+            startActivity(PlanActivity.class);
             Log.d("Loaded");
             showSimpleToast(getString(R.string.loaded) + " " + surveyName);
         } catch (Exception exception) {
@@ -1010,6 +1034,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         }
     }
 
+
     /*
     private class ImportTask extends AsyncTask<File, Void, Survey> {
 
@@ -1027,7 +1052,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
         protected void onPostExecute(Survey survey) {
 
-            if (Util.doesSurveyExist(survey.getName())) {
+            if (SurvexTherionUtil.doesSurveyExist(survey.getName())) {
                 confirmToProceed(
                         R.string.continue_question,
                         R.string.survey_already_exists,
