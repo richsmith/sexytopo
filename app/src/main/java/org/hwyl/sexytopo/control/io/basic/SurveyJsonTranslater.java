@@ -99,9 +99,11 @@ public class SurveyJsonTranslater {
         }
 
         try { // have to parse trips before stations etc. so trips can be referenced by them
-            JSONObject tripObject = json.getJSONObject(TRIP_TAG);
-            Trip trip = toTrip(tripObject);
-            survey.setTrip(trip);
+            if (json.has(TRIP_TAG)) {
+                JSONObject tripObject = json.getJSONObject(TRIP_TAG);
+                Trip trip = toTrip(tripObject);
+                survey.setTrip(trip);
+            }
         } catch (JSONException exception) {
             Log.e("Failed to load trip: " + exception);
             // carry on... unfortunate, but not *that* important
@@ -193,7 +195,7 @@ public class SurveyJsonTranslater {
             teamEntryJson.put(TEAM_MEMBER_NAME_TAG, teamEntry.name);
             JSONArray rolesJson = new JSONArray();
             for (Trip.Role role : teamEntry.roles) {
-                rolesJson.put(role.toString());
+                rolesJson.put(role.name());
             }
             teamEntryJson.put(TEAM_MEMBER_ROLE_TAG, rolesJson);
             teamArray.put(teamEntryJson);
@@ -296,8 +298,8 @@ public class SurveyJsonTranslater {
             String name = teamEntryJson.getString(TEAM_MEMBER_NAME_TAG);
             JSONArray rolesArray = teamEntryJson.getJSONArray(TEAM_MEMBER_ROLE_TAG);
             List<Trip.Role> roles = new ArrayList<>();
-            for (Object roleString : Util.toList(rolesArray)) {
-                Trip.Role role = Trip.Role.valueOf(roleString.toString());
+            for (String roleString : Util.toListOfStrings(rolesArray)) {
+                Trip.Role role = Trip.Role.valueOf(roleString);
                 roles.add(role);
             }
             Trip.TeamEntry teamEntry = new Trip.TeamEntry(name, roles);

@@ -309,6 +309,14 @@ public class Util {
         return list;
     }
 
+    public static List<String> toListOfStrings(JSONArray array) throws JSONException {
+        List<String> list = new ArrayList<>();
+        for (int i = 0; i < array.length(); i++) {
+            list.add(array.getString(i));
+        }
+        return list;
+    }
+
 
     public static String getPath(File directory, String filename) {
         return directory.getPath() + File.separator + filename;
