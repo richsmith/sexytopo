@@ -5,10 +5,12 @@ import android.app.Application;
 
 public class SexyTopo extends Application {
 
+    private Thread.UncaughtExceptionHandler defaultHandler;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        defaultHandler = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler (new Thread.UncaughtExceptionHandler() {
             @Override
             public void uncaughtException (Thread thread, Throwable e)
@@ -22,6 +24,6 @@ public class SexyTopo extends Application {
     public void handleUncaughtException (Thread thread, Throwable e) {
         Log.setContext(this);
         Log.e(e);
-        throw new RuntimeException(e);
+        defaultHandler.uncaughtException(thread, e);
     }
 }
