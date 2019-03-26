@@ -47,7 +47,7 @@ public class StartUpActivity extends SexyTopoActivity {
     }
 
 
-    public void loadActiveSurvey() throws Exception {
+    public void loadActiveSurvey() {
 
         String activeSurveyName = getPreferences().getString(SexyTopo.ACTIVE_SURVEY_NAME, "Error");
         Log.d("Active survey is <i>" + activeSurveyName + "</i>");
