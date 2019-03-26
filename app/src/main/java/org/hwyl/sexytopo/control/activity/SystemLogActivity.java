@@ -36,15 +36,14 @@ public class SystemLogActivity extends SexyTopoActivity {
 
     private void setupLogView() {
         if (logUpdateReceiver == null) {
-            TextView logView = (TextView)findViewById(R.id.debugLog);
-            ScrollView scrollView = (ScrollView)findViewById(R.id.scrollView);
+            TextView logView = findViewById(R.id.debugLog);
+            ScrollView scrollView = findViewById(R.id.scrollView);
             logUpdateReceiver = new LogUpdateReceiver(scrollView, logView, Log.LogType.SYSTEM);
 
             LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
             IntentFilter logFilter = new IntentFilter();
             logFilter.addAction(SexyTopo.SYSTEM_LOG_UPDATED_EVENT);
             broadcastManager.registerReceiver(logUpdateReceiver, logFilter);
-            //Log.broadcast(SexyTopo.SYSTEM_LOG_UPDATED_EVENT);
         }
     }
 }

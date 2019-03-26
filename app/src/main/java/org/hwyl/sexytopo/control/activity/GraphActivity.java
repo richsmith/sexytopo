@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.ColorFilter;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
@@ -130,7 +129,7 @@ public abstract class GraphActivity extends SexyTopoActivity
             button.setOnClickListener(this);
         }
 
-        graphView = (GraphView) (findViewById(R.id.graphView));
+        graphView = findViewById(R.id.graphView);
         graphView.setActivity(this);
 
         preferences = getSharedPreferences("display", Context.MODE_PRIVATE);
@@ -242,7 +241,7 @@ public abstract class GraphActivity extends SexyTopoActivity
     private void setDisplayPreference(DisplayPreference preference, boolean value) {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean(preference.toString(), value);
-        editor.commit();
+        editor.apply();
     }
 
 
@@ -339,7 +338,7 @@ public abstract class GraphActivity extends SexyTopoActivity
                 getSharedPreferences(DISPLAY_PREFERENCES_KEY, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(SKETCH_TOOL_PREFERENCE_KEY, toSelect.toString());
-        editor.commit();
+        editor.apply();
 
         graphView.setSketchTool(toSelect);
 
@@ -381,14 +380,13 @@ public abstract class GraphActivity extends SexyTopoActivity
                 getSharedPreferences(DISPLAY_PREFERENCES_KEY, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(BRUSH_COLOUR_PREFERENCE_KEY, toSelect.toString());
-        editor.commit();
+        editor.apply();
 
         graphView.setBrushColour(toSelect);
 
         for (GraphView.BrushColour brushColour : GraphView.BrushColour.values()) {
 
             View button = findViewById(brushColour.getId());
-            ColorFilter filter = null;
             if (brushColour == toSelect) {
                 button.getBackground().setColorFilter(0xffffffff, PorterDuff.Mode.SRC_ATOP);
                 button.invalidate();
