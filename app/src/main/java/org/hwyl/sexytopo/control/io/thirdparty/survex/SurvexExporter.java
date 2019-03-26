@@ -13,6 +13,7 @@ import java.util.List;
 
 public class SurvexExporter extends SingleFileExporter {
 
+    public static final char COMMENT_CHAR = ';';
     protected static GraphToListTranslator graphToListTranslator = new GraphToListTranslator();
 
     public String getContent(Survey survey) {
@@ -23,7 +24,7 @@ public class SurvexExporter extends SingleFileExporter {
                 graphToListTranslator.toListOfSurveyListEntries(survey);
 
         for (GraphToListTranslator.SurveyListEntry entry : list) {
-            SurvexTherionUtil.formatEntry(builder, entry);
+            SurvexTherionUtil.formatEntry(builder, entry, COMMENT_CHAR);
             builder.append("\n");
         }
 

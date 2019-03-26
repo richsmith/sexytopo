@@ -9,8 +9,10 @@ import org.hwyl.sexytopo.model.table.TableCol;
 public class SurvexTherionUtil {
 
 
-    public static void formatEntry(StringBuilder builder,
-                                   GraphToListTranslator.SurveyListEntry entry) {
+    public static void formatEntry(
+            StringBuilder builder,
+            GraphToListTranslator.SurveyListEntry entry,
+            char commentChar) {
 
         Station from = entry.getFrom();
         Leg leg = entry.getLeg();
@@ -23,7 +25,7 @@ public class SurvexTherionUtil {
         formatField(builder, TableCol.INCLINATION.format(leg.getInclination()));
 
         if (leg.wasPromoted() || to.hasComment()) {
-            builder.append("\t; ");
+            builder.append("\t" + commentChar + " ");
             if (leg.wasPromoted()) {
                 builder.append(" ");
                 formatPromotedFrom(builder, leg.getPromotedFrom());

@@ -20,6 +20,7 @@ import java.util.List;
 
 public class ThExporter {
 
+    public static final char COMMENT_CHAR = '#';
     public static final String DATE_PATTERN = "yyyy.MM.dd";
 
 
@@ -113,7 +114,7 @@ public class ThExporter {
                 graphToListTranslator.toListOfSurveyListEntries(survey);
 
         for (GraphToListTranslator.SurveyListEntry entry : list) {
-            SurvexTherionUtil.formatEntry(builder, entry);
+            SurvexTherionUtil.formatEntry(builder, entry, COMMENT_CHAR);
             builder.append("\n");
         }
 
@@ -138,7 +139,7 @@ public class ThExporter {
     }
 
     private static String formatMember(Trip.TeamEntry member) {
-        List<String> fields = new ArrayList();
+        List<String> fields = new ArrayList<>();
         fields.add("team");
         fields.add("\"" + member.name + "\"");
         for (Trip.Role role : member.roles) {
