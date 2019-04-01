@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/abc_cab_background_internal_bg"
-        android:text="@string/menu_select"
+        android:text="@string/menu_set_active_station"
         android:padding="10dp" />
 
     <Button
