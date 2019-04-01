@@ -91,6 +91,9 @@
                   android:title="@string/action_generate_test_survey" />
             <item android:id="@+id/action_kill_connection"
                   android:title="@string/action_kill_connection" />
+            <item android:id="@+id/action_force_crash"
+                  android:title="@string/action_force_crash"
+                  android:visible="false"/>
         </menu>
     </item>
     <item android:id="@+id/action_settings"
