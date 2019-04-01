@@ -1,6 +1,7 @@
 package org.hwyl.sexytopo.control.activity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,7 +10,9 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -60,11 +63,24 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     private static DistoXCommunicator comms;
 
+    protected static boolean hasStarted = false;
 
     public SexyTopoActivity() {
         super();
         SexyTopo.context = this;
         dataManager = SurveyManager.getInstance(this);
+    }
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // if Android restarts the activity after a crash, force it to go through the startup
+        // process!
+        if (!hasStarted && !(this instanceof StartUpActivity)) {
+            startActivity(StartUpActivity.class);
+        }
     }
 
 
@@ -189,6 +205,10 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             case R.id.action_kill_connection:
                 killConnection();
                 return true;
+            case R.id.action_force_crash:
+                forceCrash();
+                return true;
+
 
 
             default:
@@ -457,14 +477,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
     private void saveSurvey() {
-        try {
-            Saver.save(this, getSurvey());
-            updateRememberedSurvey();
-            showSimpleToast(R.string.survey_saved);
-        } catch (Exception exception) {
-            showSimpleToast(getString(R.string.error_saving_survey));
-            showException(exception);
-        }
+        new SaveTask().execute(this);
     }
 
     /**
@@ -474,7 +487,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         SharedPreferences preferences = getPreferences();
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(SexyTopo.ACTIVE_SURVEY_NAME, getSurvey().getName());
-        editor.commit();
+        editor.apply();
     }
 
     protected SharedPreferences getPreferences() {
@@ -726,6 +739,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
 
+    @SuppressLint("UnusedDeclaration")
     public void openSurvey() {  // public due to stupid Reflection requirements
 
         File[] surveyDirectories = Util.getSurveyDirectories(this);
@@ -973,13 +987,19 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
 
+    @SuppressLint("deprecated")
     private void killConnection() {
         try {
             showSimpleToast(R.string.killing_comms_process);
             comms.stop();
         } catch (Exception e) {
             Log.e("problem when trying to kill connection: " + e);
-        };
+        }
+    }
+
+
+    private void forceCrash() {
+        throw new RuntimeException("Boom! Forced crash requested(!)");
     }
 
 
@@ -1069,5 +1089,31 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
         }
     }*/
+
+    private class SaveTask extends AsyncTask<Context, Void, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(Context... contexts) {
+            try {
+                Context context = contexts[0];
+                Saver.save(context, getSurvey());
+                return true;
+            } catch (Exception exception) {
+                Log.e(exception);
+                return false;
+            }
+        }
+
+
+        @Override
+        protected void onPostExecute(Boolean wasSuccessful) {
+            if (wasSuccessful) {
+                updateRememberedSurvey();
+                showSimpleToast(R.string.survey_saved);
+            } else {
+                showSimpleToast(getString(R.string.error_saving_survey));
+            }
+        }
+    }
 
 }
