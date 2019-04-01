@@ -2,6 +2,10 @@ package org.hwyl.sexytopo.control;
 
 import android.app.Application;
 
+import com.crashlytics.android.Crashlytics;
+
+import io.fabric.sdk.android.Fabric;
+
 
 public class SexyTopo extends Application {
 
@@ -18,6 +22,8 @@ public class SexyTopo extends Application {
                 handleUncaughtException (thread, e);
             }
         });
+
+        Fabric.with(this, new Crashlytics());
     }
 
 
