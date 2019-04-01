@@ -9,8 +9,8 @@ android {
         applicationId "org.hwyl.sexytopo"
         minSdkVersion 18
         targetSdkVersion 27
-        versionCode 35
-        versionName "1.2.3"
+        versionCode 36
+        versionName "1.2.4"
     }
     buildTypes {
         release {
