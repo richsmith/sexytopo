@@ -263,7 +263,11 @@ public class CalibrationActivity extends SexyTopoActivity {
 
     public void requestStopCalibration(View view) {
         Log.device("Stop calibration requested");
-        requestComms().stopCalibration();
+        try {
+            requestComms().stopCalibration();
+        } catch (Exception exception) {
+            showException(exception);
+        }
         state = State.READY;
         updateState();
     }

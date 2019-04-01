@@ -339,7 +339,12 @@ public class GraphView extends View {
                 break;
 
             case MotionEvent.ACTION_MOVE:
-                sketch.getActivePath().lineTo(surveyCoords);
+                if (sketch.getActivePath() == null) {
+                    // shouldn't be null, but just in case...
+                    sketch.startNewPath(surveyCoords);
+                } else {
+                    sketch.getActivePath().lineTo(surveyCoords);
+                }
                 invalidate();
                 break;
 
