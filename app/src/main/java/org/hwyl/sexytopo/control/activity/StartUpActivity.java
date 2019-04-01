@@ -18,6 +18,9 @@ public class StartUpActivity extends SexyTopoActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        hasStarted = true;
+
         setContentView(R.layout.activity_start_up);
 
         Log.setContext(this);
