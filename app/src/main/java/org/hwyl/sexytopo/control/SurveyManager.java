@@ -3,6 +3,7 @@ package org.hwyl.sexytopo.control;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.support.v4.content.LocalBroadcastManager;
 import android.widget.Toast;
 
@@ -66,15 +67,7 @@ public class SurveyManager {
                 broadcastNewStationCreated();
             }
 
-            try {
-                Log.d("Autosaving...");
-                Saver.autosave(context, currentSurvey);
-                Log.d("Autosaved");
-            } catch (Exception e) {
-                Log.e("Error autosaving survey: " + e);
-                Toast.makeText(context, "Error autosaving survey: " + e.getMessage(),
-                        Toast.LENGTH_SHORT).show();
-            }
+            new AutosaveTask().execute(context);
         }
 
     }
@@ -138,6 +131,25 @@ public class SurveyManager {
     public void deleteLastCalibrationReading() {
         if (calibrationReadings.size() > 0) {
             calibrationReadings.remove(calibrationReadings.size() - 1);
+        }
+    }
+
+
+    private class AutosaveTask extends AsyncTask<Context, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Context... contexts) {
+            try {
+                Log.d("Autosaving...");
+                Saver.autosave(context, currentSurvey);
+                Log.d("Autosaved");
+            } catch (Exception e) {
+                Log.e("Error autosaving survey: " + e);
+                Toast.makeText(context, "Error autosaving survey: " + e.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+            } finally {
+                return null;
+            }
         }
     }
 
