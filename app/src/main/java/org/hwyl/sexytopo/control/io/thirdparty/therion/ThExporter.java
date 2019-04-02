@@ -2,6 +2,7 @@ package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
 import android.text.TextUtils;
 
+import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
 import org.hwyl.sexytopo.control.util.TextTools;
@@ -59,10 +60,11 @@ public class ThExporter {
     private static String getSurveyText(Survey survey, List<String> th2Files) {
 
         String surveyText =
+            COMMENT_CHAR + " created with " + SexyTopo.APP_NAME + "\n\n" +
             "survey " + survey.getName() + "\n\n" +
             getInputText(th2Files) + "\n\n" +
-            indent(getCentrelineText(survey)) +
-            "\n\nendsurvey";
+            indent(getCentrelineText(survey)) + "\n\n" +
+            "endsurvey";
         return surveyText;
     }
 
@@ -76,7 +78,7 @@ public class ThExporter {
 
     private static String getCentrelineText(Survey survey) {
         String centrelineText =
-            "\ncentreline\n" +
+            "\ncentreline\n\n" +
             indent(getCentreline(survey)) + "\n\n" +
             indent(getExtendedElevationExtensions(survey)) + "\n\n" +
             "endcentreline\n";
@@ -127,14 +129,18 @@ public class ThExporter {
         StringBuilder builder = new StringBuilder();
 
         if (trip.getComments().length() > 0) {
-            builder.append(commentMultiline(trip.getComments()) + "\n\n");
+            builder.append(commentMultiline(trip.getComments()));
+            builder.append("\n");
         }
 
-        builder.append(formatDate(trip.getDate()) + "\n\n");
+        builder.append(formatDate(trip.getDate()));
+        builder.append("\n");
 
         for (Trip.TeamEntry entry : trip.getTeam()) {
-            builder.append(formatMember(entry) + "\n");
+            builder.append(formatMember(entry));
+            builder.append("\n");
         }
+        builder.append("\n");
         return builder.toString();
     }
 
