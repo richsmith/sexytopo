@@ -14,11 +14,14 @@ import java.util.List;
 public class SurvexExporter extends SingleFileExporter {
 
     public static final char COMMENT_CHAR = ';';
+
     protected static GraphToListTranslator graphToListTranslator = new GraphToListTranslator();
 
     public String getContent(Survey survey) {
 
         StringBuilder builder = new StringBuilder();
+
+        builder.append("*alias station - ..");
 
         List<GraphToListTranslator.SurveyListEntry> list =
                 graphToListTranslator.toListOfSurveyListEntries(survey);
