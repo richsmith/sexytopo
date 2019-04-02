@@ -151,14 +151,13 @@ public class ThExporter {
     private static String getRoleDescription(Trip.Role role) {
         switch(role) {
             case BOOK:
-                return "book";
+                return "notes";
             case INSTRUMENTS:
                 return "instruments";
             case DOG:
-                return "assistant";
-            case EXPLORATION:
+            case EXPLORATION: // FIXME Therion actually handles explo-team differently
             default:
-                return "explo-team";
+                return "assistant";
         }
     }
 
