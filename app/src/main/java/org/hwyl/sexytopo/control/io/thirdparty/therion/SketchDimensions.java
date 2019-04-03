@@ -42,6 +42,20 @@ public class SketchDimensions {
                 }
             }
         }
+
+        if (minX == null) {
+            minX = 0.0;
+        }
+        if (maxX == null) {
+            maxX = 20.0;
+        }
+        if (minY == null) {
+            minY = 0.0;
+        }
+        if (maxY == null) {
+            maxY = 20.0;
+        }
+
         return new SketchDimensions(minX, maxX, minY, maxY);
 
     }

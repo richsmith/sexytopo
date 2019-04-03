@@ -75,13 +75,13 @@ public class Log {
     }
 
     public static void e(String message) {
-        android.util.Log.e(SexyTopo.TAG, message);
+        android.util.Log.e(SexyTopo.TAG, "" + message);
         systemLog(message, true);
     }
 
 
     public static void e(Throwable throwable) {
-        e(throwable.getMessage());
+        e("" + throwable.getMessage());
         e(android.util.Log.getStackTraceString(throwable));
     }
 
