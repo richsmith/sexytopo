@@ -53,7 +53,7 @@
             android:dialogTitle="Select Calibration Algorithm"
             android:entries="@array/pref_calibration_algorithm_options"
             android:entryValues="@array/pref_calibration_algorithm_options"
-            android:defaultValue="auto" />
+            android:defaultValue="Auto" />
     </PreferenceCategory>
 
     <PreferenceCategory
