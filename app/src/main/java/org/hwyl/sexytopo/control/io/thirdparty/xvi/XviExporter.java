@@ -5,6 +5,7 @@ import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Space;
+import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -13,6 +14,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.GRIDS_COMMAND;
 import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.GRID_COMMAND;
@@ -26,9 +28,12 @@ public class XviExporter {
     public static String getContent(Sketch sketch, Space<Coord2D> space, double scale) {
 
         String text = field(GRIDS_COMMAND, "1 m");
-        text += multilineField(STATIONS_COMMAND, getStationsText(space, scale));
+        text += multilineField(STATIONS_COMMAND,
+                getStationsText(space, scale) + getCrossSectionText(sketch, scale));
         text += multilineField(SHOT_COMMAND, getLegsText(space, scale));
-        text += multilineField(SKETCHLINE_COMMAND, getSketchLinesText(sketch, scale));
+        text += multilineField(SKETCHLINE_COMMAND,
+                getSketchLinesText(sketch, scale) +
+                        getCrossSectionConnectionsText(sketch, space, scale));
         text += field(GRID_COMMAND, getGridText(space, scale));
         return text;
     }
@@ -37,6 +42,18 @@ public class XviExporter {
         StringBuilder builder = new StringBuilder();
         for (Map.Entry<Station, Coord2D> entry: space.getStationMap().entrySet()) {
             builder.append(getStationText(entry.getKey(), entry.getValue(), scale));
+        }
+        return builder.toString();
+    }
+
+    private static String getCrossSectionText(Sketch sketch, double scale) {
+        StringBuilder builder = new StringBuilder();
+        Set<CrossSectionDetail> crossSectionDetails = sketch.getCrossSectionDetails();
+        for (CrossSectionDetail crossSectionDetail : crossSectionDetails) {
+            Station station = crossSectionDetail.getCrossSection().getStation();
+            Coord2D coords = crossSectionDetail.getPosition();
+            String text = getStationText(station, coords, scale);
+            builder.append(text);
         }
         return builder.toString();
     }
@@ -68,21 +85,50 @@ public class XviExporter {
     private static String getSketchLinesText(Sketch sketch, double scale) {
         StringBuilder builder = new StringBuilder();
         for (PathDetail pathDetail : sketch.getPathDetails()) {
-            builder.append(getSketchLineText(pathDetail, scale));
+            builder.append(getSketchLineText(pathDetail, scale, pathDetail.getColour().toString()));
         }
         return builder.toString();
     }
 
-    private static String getSketchLineText(PathDetail pathDetail, double scale) {
+    private static String getCrossSectionConnectionsText(
+            Sketch sketch, Space<Coord2D> space, double scale) {
+        StringBuilder builder = new StringBuilder();
+        Set<CrossSectionDetail> crossSectionDetails = sketch.getCrossSectionDetails();
+        for (CrossSectionDetail crossSectionDetail : crossSectionDetails) {
+            builder.append(getCrossSectionConnectionText(crossSectionDetail, space, scale));
+        }
+        return builder.toString();
+
+    }
+
+    private static String getCrossSectionConnectionText(
+            CrossSectionDetail crossSectionDetail, Space<Coord2D> space, double scale) {
         List<Object> fields = new LinkedList<>();
-        fields.add(pathDetail.getColour().toString());
+        Station station = crossSectionDetail.getCrossSection().getStation();
+        Coord2D xSectionCoords = crossSectionDetail.getPosition();
+        Coord2D stationCoords = space.getStationMap().get(station);
+        fields.add("CONNECT");
+        fields.addAll(getPointText(xSectionCoords, scale));
+        fields.addAll(getPointText(stationCoords, scale));
+        return field("\t", TextTools.join(" ", fields));
+    }
+
+    private static String getSketchLineText(PathDetail pathDetail, double scale, String colour) {
+        List<Object> fields = new LinkedList<>();
+        fields.add(colour);
         for (Coord2D coord2D : pathDetail.getPath()) {
-            String x = TextTools.formatTo2dp(coord2D.getX() * scale);
-            String y = TextTools.formatTo2dp((-coord2D.getY() + 0.0) * scale); // +0.0 to avoid -0.0
-            fields.add(x);
-            fields.add(y);
+            fields.addAll(getPointText(coord2D, scale));
         }
         return field("\t", TextTools.join(" ", fields));
+    }
+
+    private static List<String> getPointText(Coord2D coord2D, double scale) {
+        List<String> fields = new LinkedList<>();
+        String x = TextTools.formatTo2dp(coord2D.getX() * scale);
+        String y = TextTools.formatTo2dp((-coord2D.getY() + 0.0) * scale); // +0.0 to avoid -0.0
+        fields.add(x);
+        fields.add(y);
+        return fields;
     }
 
     private static String getGridText(Space<Coord2D> space, double scale) {
@@ -95,8 +141,8 @@ public class XviExporter {
             0.0,
             0.0,
             scale,
-            dimensions.getWidth() + 2,
-            dimensions.getHeight() + 2
+            Math.ceil(dimensions.getWidth()) + 2,
+            Math.ceil(dimensions.getHeight()) + 2
         };
 
         return TextTools.join(" ", Arrays.asList(values));
