@@ -14,26 +14,26 @@ import java.io.IOException;
 
 public class CalibrationProtocol extends DistoXProtocol {
 
-    private static final int ACCELERATION_ADMIN = 0;
-    private static final int ACCELERATION_GX_LOW_BYTE = 1;
-    private static final int ACCELERATION_GX_HIGH_BYTE = 2;
-    private static final int ACCELERATION_GY_LOW_BYTE = 3;
-    private static final int ACCELERATION_GY_HIGH_BYTE = 4;
-    private static final int ACCELERATION_GZ_LOW_BYTE = 5;
-    private static final int ACCELERATION_GZ_HIGH_BYTE = 6;
-    private static final int ACCELERATION_NOT_USED = 7;
+    public static final int ACCELERATION_ADMIN = 0;
+    public static final int ACCELERATION_GX_LOW_BYTE = 1;
+    public static final int ACCELERATION_GX_HIGH_BYTE = 2;
+    public static final int ACCELERATION_GY_LOW_BYTE = 3;
+    public static final int ACCELERATION_GY_HIGH_BYTE = 4;
+    public static final int ACCELERATION_GZ_LOW_BYTE = 5;
+    public static final int ACCELERATION_GZ_HIGH_BYTE = 6;
+    public static final int ACCELERATION_NOT_USED = 7;
 
-    private static final int MAGNETIC_ADMIN = 0;
-    private static final int MAGNETIC_MX_LOW_BYTE = 1;
-    private static final int MAGNETIC_MX_HIGH_BYTE = 2;
-    private static final int MAGNETIC_MY_LOW_BYTE = 3;
-    private static final int MAGNETIC_MY_HIGH_BYTE = 4;
-    private static final int MAGNETIC_MZ_LOW_BYTE = 5;
-    private static final int MAGNETIC_MZ_HIGH_BYTE = 6;
-    private static final int MAGNETIC_NOT_USED = 7;
+    public static final int MAGNETIC_ADMIN = 0;
+    public static final int MAGNETIC_MX_LOW_BYTE = 1;
+    public static final int MAGNETIC_MX_HIGH_BYTE = 2;
+    public static final int MAGNETIC_MY_LOW_BYTE = 3;
+    public static final int MAGNETIC_MY_HIGH_BYTE = 4;
+    public static final int MAGNETIC_MZ_LOW_BYTE = 5;
+    public static final int MAGNETIC_MZ_HIGH_BYTE = 6;
+    public static final int MAGNETIC_NOT_USED = 7;
 
     private CalibrationReading calibrationReading = null;
-    int accelerationDuplicated = 0, magneticDuplicated = 0;
+    private int accelerationDuplicated = 0, magneticDuplicated = 0;
 
 
     public CalibrationProtocol(
@@ -102,7 +102,7 @@ public class CalibrationProtocol extends DistoXProtocol {
     }
 
 
-    public static void updateAccelerationSensorReading(byte[] packet, CalibrationReading reading) {
+    private static void updateAccelerationSensorReading(byte[] packet, CalibrationReading reading) {
         int gx = readDoubleByte(packet, ACCELERATION_GX_LOW_BYTE, ACCELERATION_GX_HIGH_BYTE);
         int gy = readDoubleByte(packet, ACCELERATION_GY_LOW_BYTE, ACCELERATION_GY_HIGH_BYTE);
         int gz = readDoubleByte(packet, ACCELERATION_GZ_LOW_BYTE, ACCELERATION_GZ_HIGH_BYTE);
@@ -110,7 +110,7 @@ public class CalibrationProtocol extends DistoXProtocol {
     }
 
 
-    public static void updateMagneticSensorReading(byte[] packet, CalibrationReading reading) {
+    private static void updateMagneticSensorReading(byte[] packet, CalibrationReading reading) {
         int mx = readDoubleByte(packet, MAGNETIC_MX_LOW_BYTE, MAGNETIC_MX_HIGH_BYTE);
         int my = readDoubleByte(packet, MAGNETIC_MY_LOW_BYTE, MAGNETIC_MY_HIGH_BYTE);
         int mz = readDoubleByte(packet, MAGNETIC_MZ_LOW_BYTE, MAGNETIC_MZ_HIGH_BYTE);
@@ -119,9 +119,14 @@ public class CalibrationProtocol extends DistoXProtocol {
 
 
     public static int readDoubleByte(byte[] packet, int lowByteIndex, int highByteIndex) {
-        int low = packet[lowByteIndex];
-        int high = packet[highByteIndex];
-        return (high * 256) + low;
+        int low = packet[lowByteIndex] & 0xff;
+        int high = packet[highByteIndex] & 0xff;
+        int combined = (high * 256) + low;
+
+        if (combined > 32768)
+            combined -= 65536;
+
+        return combined;
     }
 
 }
