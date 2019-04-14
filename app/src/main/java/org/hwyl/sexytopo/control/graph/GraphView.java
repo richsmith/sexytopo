@@ -22,6 +22,7 @@ import android.widget.EditText;
 import android.widget.PopupWindow;
 
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.GraphActivity;
 import org.hwyl.sexytopo.control.util.CrossSectioner;
@@ -697,14 +698,28 @@ public class GraphView extends View {
     private void drawConnectedSurveys(Canvas canvas, Space<Coord2D> projection, int alpha) {
 
         if (doTranslatedConnectedSurveysNeedUpdating()) {
-            this.translatedConnectedSurveys =
-                    ConnectedSurveys.getTranslatedConnectedSurveys(activity, survey, projection);
+            try {
+                this.translatedConnectedSurveys =
+                        ConnectedSurveys.getTranslatedConnectedSurveys(activity, survey, projection);
+            } catch (Exception exception) {
+                Log.e("Error getting translated connected surveys");
+                Log.e(exception);
+                return;
+            }
         }
 
         for (Survey translatedConnectedSurvey : translatedConnectedSurveys.keySet()) {
-            Space<Coord2D> connectedProjection =
+            try {
+                Space<Coord2D> connectedProjection =
                         translatedConnectedSurveys.get(translatedConnectedSurvey);
-            drawSurvey(canvas, translatedConnectedSurvey, connectedProjection, alpha);
+                drawSurvey(canvas, translatedConnectedSurvey, connectedProjection, alpha);
+            } catch (Exception exception) {
+                String name =  translatedConnectedSurvey.getName();
+                Log.e("Error drawing connected survey " + name);
+                Log.e(exception);
+                Log.e("Sorry, having to unlink connected survey " + name);
+                translatedConnectedSurveys.remove(translatedConnectedSurvey);
+            }
         }
     }
 
