@@ -16,7 +16,10 @@
         android:allowBackup="true"
         android:icon="@drawable/laser_icon"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme"
+        android:largeHeap="true"
+        >
+
         <activity
             android:name=".control.activity.TableActivity"
             android:label="@string/title_activity_table" >
