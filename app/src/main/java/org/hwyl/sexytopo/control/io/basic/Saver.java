@@ -41,6 +41,11 @@ public class Saver {
     }
 
     public static synchronized void autosave(Context context, Survey survey) throws Exception {
+
+        if (survey.isAutosaved()) {
+            return;
+        }
+        
         saveMetadata(context, survey,
                 SexyTopo.METADATA_EXTENSION + "." + SexyTopo.AUTOSAVE_EXTENSION);
         saveSurveyData(context, survey, SexyTopo.DATA_EXTENSION + "." + SexyTopo.AUTOSAVE_EXTENSION);

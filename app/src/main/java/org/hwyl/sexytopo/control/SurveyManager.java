@@ -141,18 +141,19 @@ public class SurveyManager {
         protected Void doInBackground(Context... contexts) {
             Context context = contexts[0];
             try {
-                if (currentSurvey.isAutosaved()) {
-                    return null;
+                if (!currentSurvey.isAutosaved()) {
+                    Log.d("Autosaving...");
+                    Saver.autosave(context, currentSurvey);
+                    currentSurvey.setAutosaved(true);
+                    Log.d("Autosaved");
                 }
-                Log.d("Autosaving...");
-                Saver.autosave(context, currentSurvey);
-                currentSurvey.setAutosaved(true);
-                Log.d("Autosaved");
             } catch (Exception e) {
                 Log.e("Error autosaving survey");
                 Log.e(e);
                 Toast.makeText(context, "Error autosaving survey: " + e.getMessage(),
                         Toast.LENGTH_SHORT).show();
+            } finally {
+                return null;
             }
         }
     }

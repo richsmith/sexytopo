@@ -48,8 +48,8 @@ public class DistoXCommunicator extends Thread {
     private BluetoothDevice bluetoothDevice;
     private BluetoothSocket socket;
 
-    DataInputStream inStream = null;
-    DataOutputStream outStream = null;
+    private DataInputStream inStream = null;
+    private DataOutputStream outStream = null;
 
     private SurveyManager dataManager;
     private SexyTopoActivity activity;
