@@ -43,7 +43,6 @@ public class SurveyUpdater {
         Station activeStation = survey.getActiveStation();
         activeStation.getOnwardLegs().add(leg);
         survey.setSaved(false);
-        survey.setAutosaved(false);
         survey.addUndoEntry(activeStation, leg);
 
         boolean justCreatedNewStation = false;

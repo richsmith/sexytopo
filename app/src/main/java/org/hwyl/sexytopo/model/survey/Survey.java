@@ -70,6 +70,10 @@ public class Survey {
         planSketch.setSaved(isSaved);
         elevationSketch.setSaved(isSaved);
 
+        if (!isSaved) {
+            // saving doesn't mean it's autosaved, but unsaved data means autosave required
+            setAutosaved(false);
+        }
     }
 
     public boolean isSaved() {
