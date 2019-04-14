@@ -243,7 +243,7 @@ public class DistoXCommunicator extends Thread {
 
         } catch(Exception exception) {
             String message = exception.getMessage();
-            if (message != null & message.contains("socket might closed or timeout")) {
+            if (message != null && message.contains("socket might closed or timeout")) {
                 try {
                     Log.device(activity.getString(R.string.device_trying_fallback));
                     socket = createFallbackSocket();
