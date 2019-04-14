@@ -144,7 +144,8 @@ public class SurveyManager {
                 Saver.autosave(context, currentSurvey);
                 Log.d("Autosaved");
             } catch (Exception e) {
-                Log.e("Error autosaving survey: " + e);
+                Log.e("Error autosaving survey");
+                Log.e(e);
                 Toast.makeText(context, "Error autosaving survey: " + e.getMessage(),
                         Toast.LENGTH_SHORT).show();
             } finally {

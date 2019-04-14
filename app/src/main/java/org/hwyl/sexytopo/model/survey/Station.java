@@ -34,6 +34,7 @@ public class Station extends SurveyComponent {
 
     public Station(Station station, String name) {
         this.name = name;
+
         this.onwardLegs = station.onwardLegs;
         this.comment = station.comment;
         this.extendedElevationDirection = station.extendedElevationDirection;
