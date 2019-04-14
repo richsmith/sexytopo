@@ -13,6 +13,12 @@
             android:entries="@array/pref_orientation_options"
             android:entryValues="@array/pref_orientation_options"
             android:defaultValue="auto" />
+
+        <CheckBoxPreference
+            android:key="pref_vibrate_on_new_station"
+            android:summary="Vibrate when new station is created"
+            android:title="Vibrate on new station"
+            android:defaultValue="true"/>
     </PreferenceCategory>
 
     <PreferenceCategory

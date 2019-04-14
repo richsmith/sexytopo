@@ -68,7 +68,7 @@
             android:label="@string/title_activity_guide">
         </activity>
         <service
-            android:name=".control.AudioService"
+            android:name=".control.NewStationNotificationService"
             android:enabled="true"
             android:exported="true" >
         </service>

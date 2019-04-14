@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.control.NewStationNotificationService;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -39,6 +40,10 @@ public class StartUpActivity extends SexyTopoActivity {
         } catch (Exception exception) {
             helpThereSeemsToBeNoSurveyDoSomething();
         }
+
+        Intent serviceIntent = new Intent(this, NewStationNotificationService.class);
+        startService(serviceIntent);
+
 
         Intent intent = new Intent(this, DeviceActivity.class);
         startActivity(intent);
