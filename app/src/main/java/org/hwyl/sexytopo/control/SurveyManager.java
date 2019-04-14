@@ -135,21 +135,24 @@ public class SurveyManager {
     }
 
 
-    private class AutosaveTask extends AsyncTask<Context, Void, Void> {
+    private static class AutosaveTask extends AsyncTask<Context, Void, Void> {
 
         @Override
         protected Void doInBackground(Context... contexts) {
+            Context context = contexts[0];
             try {
+                if (currentSurvey.isAutosaved()) {
+                    return null;
+                }
                 Log.d("Autosaving...");
                 Saver.autosave(context, currentSurvey);
+                currentSurvey.setAutosaved(true);
                 Log.d("Autosaved");
             } catch (Exception e) {
                 Log.e("Error autosaving survey");
                 Log.e(e);
                 Toast.makeText(context, "Error autosaving survey: " + e.getMessage(),
                         Toast.LENGTH_SHORT).show();
-            } finally {
-                return null;
             }
         }
     }

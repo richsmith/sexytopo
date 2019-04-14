@@ -43,6 +43,7 @@ public class SurveyUpdater {
         Station activeStation = survey.getActiveStation();
         activeStation.getOnwardLegs().add(leg);
         survey.setSaved(false);
+        survey.setAutosaved(false);
         survey.addUndoEntry(activeStation, leg);
 
         boolean justCreatedNewStation = false;
@@ -185,8 +186,8 @@ public class SurveyUpdater {
 
     public static synchronized void editStation(Survey survey, Station toEdit, Station edited) {
 
-        boolean weAreRenamingAStation = ! edited.getName().equals(toEdit);
-        if (weAreRenamingAStation) {
+        boolean isNameChange = ! edited.getName().equals(toEdit.getName());
+        if (isNameChange) {
             Station existing = survey.getStationByName(edited.getName());
             if (existing != null) {
                 throw new IllegalArgumentException("New station name is not unique");

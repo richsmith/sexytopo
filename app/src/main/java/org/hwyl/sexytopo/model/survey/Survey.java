@@ -33,6 +33,7 @@ public class Survey {
     private Map<Station, Set<SurveyConnection>> stationsToSurveyConnections = new HashMap<>();
 
     private boolean isSaved = true;
+    private boolean isAutosaved = true;
 
     private Stack<UndoEntry> undoStack = new Stack<>();
 
@@ -73,6 +74,14 @@ public class Survey {
 
     public boolean isSaved() {
         return isSaved && planSketch.isSaved() && elevationSketch.isSaved();
+    }
+
+    public void setAutosaved(boolean isAutosaved) {
+        this.isAutosaved = isAutosaved;
+    }
+
+    public boolean isAutosaved() {
+        return isAutosaved;
     }
 
     public Leg getMostRecentLeg() {
