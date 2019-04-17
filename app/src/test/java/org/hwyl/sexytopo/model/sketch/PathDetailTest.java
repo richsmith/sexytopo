@@ -10,20 +10,31 @@ public class PathDetailTest {
     @Test
     public void testIntersectsRectangleReturnsTrueForIntersectingRectangle() {
         PathDetail pathDetail = new PathDetail(Coord2D.ORIGIN, Colour.BLACK);
-        Assert.assertTrue(pathDetail.intersectsRectangle(new Coord2D(0, 0), new Coord2D(1, 1)));
+        Assert.assertTrue(
+                pathDetail.intersectsRectangle(new Coord2D(0, 0), new Coord2D(1, 1)));
     }
 
     @Test
     public void testIntersectsRectangleReturnsFalseForNonIntersectingRectangle() {
         PathDetail pathDetail = new PathDetail(Coord2D.ORIGIN, Colour.BLACK);
-        Assert.assertFalse(pathDetail.intersectsRectangle(new Coord2D(1, 1), new Coord2D(2, 2)));
+        Assert.assertFalse(
+                pathDetail.intersectsRectangle(new Coord2D(1, 1), new Coord2D(2, 2)));
     }
 
     @Test
     public void testIntersectsRectangleReturnsTrueForRectangleThatEntersBoundingBox() {
         PathDetail pathDetail = new PathDetail(Coord2D.ORIGIN, Colour.BLACK);
         pathDetail.lineTo(new Coord2D(1.5, 1.5));
-        Assert.assertTrue(pathDetail.intersectsRectangle(new Coord2D(1, 1), new Coord2D(2, 2)));
+        Assert.assertTrue(
+                pathDetail.intersectsRectangle(new Coord2D(1, 1), new Coord2D(2, 2)));
+    }
+
+    @Test
+    public void testIntersectsRectangleReturnsFalseForRectangleOutsideBoundingBox() {
+        PathDetail pathDetail = new PathDetail(Coord2D.ORIGIN, Colour.BLACK);
+        pathDetail.lineTo(new Coord2D(1.5, 1.5));
+        Assert.assertFalse(
+                pathDetail.intersectsRectangle(new Coord2D(2, 2), new Coord2D(3, 3)));
     }
 
 }

@@ -93,6 +93,9 @@ public class Sketch {
                 textDetails.remove(toUndo);
             } else if (toUndo instanceof CrossSectionDetail) {
                 crossSectionDetails.remove(toUndo);
+            } else if (toUndo instanceof DeletedDetail) {
+                SketchDetail sketchDetail = ((DeletedDetail)toUndo).getSketchDetail();
+                addDetailToSketch(sketchDetail);
             }
 
             undoneHistory.add(toUndo);
@@ -101,7 +104,6 @@ public class Sketch {
 
 
     public void redo() {
-
         if (!undoneHistory.isEmpty()) {
             SketchDetail toRedo = undoneHistory.remove(undoneHistory.size() - 1);
 
@@ -111,19 +113,42 @@ public class Sketch {
                 textDetails.add((TextDetail) toRedo);
             } else if (toRedo instanceof CrossSectionDetail) {
                 crossSectionDetails.add((CrossSectionDetail) toRedo);
+            } else if (toRedo instanceof DeletedDetail) {
+                removeDetailFromSketch(((DeletedDetail)toRedo).getSketchDetail());
             }
 
             sketchHistory.add(toRedo);
         }
     }
 
+
     public void deleteDetail(SketchDetail sketchDetail) {
+        DeletedDetail deletedDetail = new DeletedDetail(sketchDetail);
+        addSketchDetail(deletedDetail);
+        removeDetailFromSketch(sketchDetail);
+    }
+
+
+    private void removeDetailFromSketch(SketchDetail sketchDetail) {
+        // this is a separate function to deleteDetail because former is user-called and handles
+        // undo history etc. whereas this actually removes the data
         if (sketchDetail instanceof PathDetail) {
             pathDetails.remove(sketchDetail);
         } else if (sketchDetail instanceof TextDetail) {
             textDetails.remove(sketchDetail);
         } else if (sketchDetail instanceof CrossSectionDetail) {
             crossSectionDetails.remove(sketchDetail);
+        }
+    }
+
+
+    public void addDetailToSketch(SketchDetail sketchDetail) {
+        if (sketchDetail instanceof PathDetail) {
+            pathDetails.add((PathDetail)sketchDetail);
+        } else if (sketchDetail instanceof TextDetail) {
+            textDetails.add((TextDetail) sketchDetail);
+        } else if (sketchDetail instanceof CrossSectionDetail) {
+            crossSectionDetails.add((CrossSectionDetail)sketchDetail);
         }
     }
 

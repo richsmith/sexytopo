@@ -415,9 +415,6 @@ public class GraphView extends View {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                /*SketchDetail closestDetail =
-                        sketch.findNearestPathWithin(sketch.getPathDetails(),
-                                touchPointOnSurvey, DELETE_PATHS_WITHIN_N_PIXELS);*/
                 SketchDetail closestDetail = sketch.findNearestDetailWithin(
                         touchPointOnSurvey, DELETE_PATHS_WITHIN_N_PIXELS);
                 if (closestDetail != null) {
@@ -1021,6 +1018,7 @@ public class GraphView extends View {
             Coord2D location = surveyCoordsToViewCoords(textDetail.getPosition());
             String text = textDetail.getText();
             labelPaint.setColor(textDetail.getColour().intValue);
+            labelPaint.setAlpha(alpha);
             canvas.drawText(text, (float)location.getX(), (float)location.getY(), labelPaint);
         }
     }
