@@ -794,7 +794,8 @@ public class GraphView extends View {
     }
 
 
-    private void drawCrossSections(Canvas canvas, Set<CrossSectionDetail> crossSectionDetails, int alpha) {
+    private void drawCrossSections(
+            Canvas canvas, Set<CrossSectionDetail> crossSectionDetails, int alpha) {
         for (CrossSectionDetail sectionDetail : crossSectionDetails) {
             Coord2D centreOnSurvey = sectionDetail.getPosition();
             Coord2D centreOnView = surveyCoordsToViewCoords(centreOnSurvey);
@@ -840,6 +841,10 @@ public class GraphView extends View {
             Coord2D start = surveyCoordsToViewCoords(line.getStart());
             Coord2D end = surveyCoordsToViewCoords(line.getEnd());
 
+            if (!isLineOnCanvas(canvas, start, end)) {
+                continue;
+            }
+
             if (PreferenceAccess.getBoolean(getContext(), "pref_key_highlight_latest_leg", true)
                     && survey.getMostRecentLeg() == leg) {
                 legPaint.setColor(LATEST_LEG_COLOUR.intValue);
@@ -859,6 +864,18 @@ public class GraphView extends View {
 
         }
 
+    }
+
+    private boolean isLineOnCanvas(Canvas canvas, Coord2D start, Coord2D end) {
+        return isPointOnCanvas(canvas, start) || isPointOnCanvas(canvas, end);
+    }
+
+    private boolean isPointOnCanvas(Canvas canvas, Coord2D point) {
+        double x = point.getX();
+        double y = point.getY();
+        int height = canvas.getHeight();
+        int width = canvas.getWidth();
+        return (x >= 0 && x <= width) && (y >= 0 && y <= height);
     }
 
 
