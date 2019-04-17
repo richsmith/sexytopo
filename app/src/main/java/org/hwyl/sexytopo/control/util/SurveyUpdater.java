@@ -209,9 +209,12 @@ public class SurveyUpdater {
     }
 
     public static void renameStation(Survey survey, Station station, String name) {
-        Station renamed = new Station(station, name);
-        editStation(survey, station, renamed);
-        Log.d("Renamed station " + station.getName() + " -> " + renamed.getName());
+        Station existing = survey.getStationByName(name);
+        if (existing != null) {
+            throw new IllegalArgumentException("New station name is not unique");
+        }
+        station.setName(name);
+        Log.d("Renamed station " + station.getName() + " -> " + name);
     }
 
 

@@ -8,7 +8,7 @@ import java.util.List;
 
 public class Station extends SurveyComponent {
 
-    private final String name;
+    private String name;
     private List<Leg> onwardLegs = new ArrayList<>();
     private String comment = "";
     private Direction extendedElevationDirection = Direction.RIGHT;
@@ -42,6 +42,10 @@ public class Station extends SurveyComponent {
 
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public List<Leg> getOnwardLegs() {
