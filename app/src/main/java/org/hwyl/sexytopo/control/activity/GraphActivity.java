@@ -74,8 +74,8 @@ public abstract class GraphActivity extends SexyTopoActivity
             ArrayUtils.addAll(SKETCH_BUTTON_IDS, CONTROL_BUTTON_IDS);
 
     public enum DisplayPreference {
-        AUTO_RECENTRE(R.id.buttonAutoRecentre, true),
-        SNAP_TO_LINES(R.id.buttonSnapToLines, true),
+        AUTO_RECENTRE(R.id.buttonAutoRecentre, false),
+        SNAP_TO_LINES(R.id.buttonSnapToLines, false),
         SHOW_GRID(R.id.buttonShowGrid, true),
         SHOW_SPLAYS(R.id.buttonShowSplays, true),
         SHOW_SKETCH(R.id.buttonShowSketch, true),
