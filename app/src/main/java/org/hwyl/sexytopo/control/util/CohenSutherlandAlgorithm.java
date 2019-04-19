@@ -1,8 +1,7 @@
 package org.hwyl.sexytopo.control.util;
 
 /*
- * $Id: CohenSutherland.java,v 1.4 2000/12/11 18:28:01 aqua Exp $
- *
+ * (Adapted from)
  * Devin Carraway <ssu-cs360@devin.com>
  * CS360, Final Project
  *
@@ -11,7 +10,7 @@ package org.hwyl.sexytopo.control.util;
  *
  */
 
-/* CohenSutherland: implements the Cohen-Sutherland line clipping
+/* CohenSutherlandAlgorithm: implements the Cohen-Sutherland line clipping
  *   algorithm, excluding vertex replacement.
  *
  *   Because speed is important in clipping, static methods are the
@@ -20,7 +19,7 @@ package org.hwyl.sexytopo.control.util;
 
 import android.graphics.Point;
 
-public class CohenSutherland
+public class CohenSutherlandAlgorithm
 {
     /* Convention: p1,p2 are the vertices of the clipped edge.
      * cp1, cp2 are the vertices giving the clipping region

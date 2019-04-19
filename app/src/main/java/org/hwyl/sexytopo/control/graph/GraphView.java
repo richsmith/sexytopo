@@ -10,6 +10,7 @@ import android.graphics.Canvas;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
@@ -25,6 +26,7 @@ import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.GraphActivity;
+import org.hwyl.sexytopo.control.util.CohenSutherlandAlgorithm;
 import org.hwyl.sexytopo.control.util.CrossSectioner;
 import org.hwyl.sexytopo.control.util.PreferenceAccess;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
@@ -925,15 +927,14 @@ public class GraphView extends View {
     }
 
     private boolean isLineOnCanvas(Canvas canvas, Coord2D start, Coord2D end) {
-        return isPointOnCanvas(canvas, start) || isPointOnCanvas(canvas, end);
-    }
+        Point point0 = new Point((int)start.getX(), (int)start.getY());
+        Point point1 = new Point((int)end.getX(), (int)end.getY());
 
-    private boolean isPointOnCanvas(Canvas canvas, Coord2D point) {
-        double x = point.getX();
-        double y = point.getY();
-        int height = canvas.getHeight();
-        int width = canvas.getWidth();
-        return (x >= 0 && x <= width) && (y >= 0 && y <= height);
+        Point rectangleTopLeft = new Point(0, 0);
+        Point rectangleBottomRight = new Point(canvas.getWidth(), canvas.getHeight());
+
+        return !CohenSutherlandAlgorithm.whollyOutside(
+                point0, point1, rectangleTopLeft, rectangleBottomRight);
     }
 
 
