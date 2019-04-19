@@ -8,17 +8,23 @@
         <ListPreference
             android:key="pref_orientation"
             android:title="Orientation"
-            android:summary="Override device orientation on the Table and Graph views"
             android:dialogTitle="Select Orientation"
+            android:summary="Override device orientation on the Table and Graph views"
             android:entries="@array/pref_orientation_options"
             android:entryValues="@array/pref_orientation_options"
             android:defaultValue="auto" />
 
         <CheckBoxPreference
             android:key="pref_vibrate_on_new_station"
-            android:summary="Vibrate when new station is created"
             android:title="Vibrate on new station"
+            android:summary="Vibrate when new station is created"
             android:defaultValue="true"/>
+
+        <CheckBoxPreference
+            android:key="pref_hot_corners"
+            android:title="Hot corners"
+            android:summary="Drag from the corners of the sketch to move the view in drawing modes"
+            android:defaultValue="false"/>
     </PreferenceCategory>
 
     <PreferenceCategory

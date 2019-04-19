@@ -109,7 +109,7 @@ public class GraphView extends View {
     public static final double DELETE_PATHS_WITHIN_N_PIXELS = 5.0;
     public static final double SELECTION_SENSITIVITY_IN_PIXELS = 25.0;
     public static final double SNAP_TO_LINE_SENSITIVITY_IN_PIXELS = 25.0;
-
+    public static final double HOT_CORNER_DISTANCE_PROPORTION = 0.05;
 
     public static final int STATION_LABEL_OFFSET = 10;
 
@@ -141,24 +141,23 @@ public class GraphView extends View {
     }
 
     public enum SketchTool {
-        MOVE(R.id.buttonMove),
-        DRAW(R.id.buttonDraw, true),
-        ERASE(R.id.buttonErase),
-        TEXT(R.id.buttonText, true),
-        SELECT(R.id.buttonSelect),
-        POSITION_CROSS_SECTION(R.id.graph_station_new_cross_section),
-        PINCH_TO_ZOOM(-1);
+        MOVE(R.id.buttonMove, false, false),
+        DRAW(R.id.buttonDraw, true, false),
+        ERASE(R.id.buttonErase, false, false),
+        TEXT(R.id.buttonText, true, false),
+        SELECT(R.id.buttonSelect, false, false),
+        POSITION_CROSS_SECTION(R.id.graph_station_new_cross_section, false, false),
+        PINCH_TO_ZOOM(-1, false, true),
+        MODAL_MOVE(-1, false, true);
 
         private int id;
         private boolean usesColour = false;
+        private boolean isModal = false;
 
-        SketchTool(int id) {
-            this.id = id;
-        }
-
-        SketchTool(int id, boolean usesColour) {
+        SketchTool(int id, boolean usesColour, boolean isModal) {
             this.id = id;
             this.usesColour = usesColour;
+            this.isModal = isModal;
         }
 
         public int getId() {
@@ -167,6 +166,10 @@ public class GraphView extends View {
 
         public boolean usesColour() {
             return usesColour;
+        }
+
+        public boolean isModal() {
+            return isModal;
         }
     }
     public SketchTool currentSketchTool = SketchTool.MOVE;
@@ -272,19 +275,18 @@ public class GraphView extends View {
 
         if (scaleGestureDetector.isInProgress()) {
             return true;
-        } else {
-
         }
 
-        if (currentSketchTool == SketchTool.PINCH_TO_ZOOM) {
-            if (event.getAction() == MotionEvent.ACTION_UP) {
-                setSketchTool(previousSketchTool);
-            }
+        if (currentSketchTool.isModal() && event.getAction() == MotionEvent.ACTION_UP) {
+            setSketchTool(previousSketchTool);
             return true;
         }
 
+        considerModalMoveSelection(event);
+
         switch (currentSketchTool) {
             case MOVE:
+            case MODAL_MOVE:
                 return handleMove(event);
             case DRAW:
                 return handleDraw(event);
@@ -298,6 +300,37 @@ public class GraphView extends View {
                 return handlePositionCrossSection(event);
         }
         return false;
+    }
+
+    private void considerModalMoveSelection(MotionEvent event) {
+
+        if (currentSketchTool == SketchTool.MOVE || currentSketchTool == SketchTool.MODAL_MOVE) {
+            return;
+        }
+
+        if (!activity.getBooleanPreference("pref_hot_corners")) {
+            return;
+        }
+
+        float x = event.getX();
+        float y = event.getY();
+        int height = getHeight();
+        int width = getWidth();
+
+        double corner_delta = Math.min(height, width) * HOT_CORNER_DISTANCE_PROPORTION;
+
+        boolean hitLeftEdge = x < corner_delta;
+        boolean hitRightEdge = x > width - corner_delta;
+        boolean hitTopEdge = y < corner_delta;
+        boolean hitBottomEdge = y > height - corner_delta;
+
+        boolean hitCorner =
+                (hitLeftEdge && (hitBottomEdge || hitTopEdge)) ||
+                (hitRightEdge && (hitBottomEdge || hitTopEdge));
+
+        if (hitCorner) {
+            setSketchTool(SketchTool.MODAL_MOVE);
+        }
     }
 
 
@@ -384,6 +417,31 @@ public class GraphView extends View {
 
 
     private boolean handleMove(MotionEvent event) {
+
+        Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
+
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                actionDownPointOnView = touchPointOnView;
+                actionDownViewpointOffset = viewpointOffset;
+                break;
+            case MotionEvent.ACTION_MOVE:
+                Coord2D surveyDelta =
+                        touchPointOnView.minus(actionDownPointOnView).scale(1 / surveyToViewScale);
+                viewpointOffset = actionDownViewpointOffset.minus(surveyDelta);
+                invalidate();
+                // fall through
+            case MotionEvent.ACTION_UP:
+                break;
+            default:
+                return false;
+        }
+
+        return true;
+    }
+
+
+    private boolean handleTemporaryMove(MotionEvent event) {
 
         Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
 
@@ -1180,7 +1238,7 @@ public class GraphView extends View {
 
 
     public void setSketchTool(SketchTool sketchTool) {
-        if (previousSketchTool != currentSketchTool) {
+        if (previousSketchTool != currentSketchTool && !currentSketchTool.isModal()) {
             previousSketchTool = currentSketchTool;
         }
         currentSketchTool = sketchTool;
