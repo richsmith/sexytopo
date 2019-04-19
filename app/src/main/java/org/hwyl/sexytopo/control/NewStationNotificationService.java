@@ -26,8 +26,16 @@ public class NewStationNotificationService extends Service {
                 update();
             }
         };
-        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
-        broadcastManager.registerReceiver(receiver, new IntentFilter(SexyTopo.NEW_STATION_CREATED_EVENT));
+
+        try {
+            LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
+            broadcastManager.registerReceiver(
+                    receiver, new IntentFilter(SexyTopo.NEW_STATION_CREATED_EVENT));
+        } catch (Exception exception) {
+            // Not sure why this sometimes gets a NPE... not mission-critical though so just
+            // log the error for now :/ TODO see if there's any way to avoid this error
+            Log.e(exception);
+        }
     }
 
 
