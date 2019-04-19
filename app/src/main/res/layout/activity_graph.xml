@@ -104,19 +104,19 @@
 
         <ImageButton
             android:layout_weight="0.2"
-            android:src="@drawable/move"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/toolbar_button_height"
-            android:scaleType="fitCenter"
-            android:id="@+id/buttonMove"
-            />
-        <ImageButton
-            android:layout_weight="0.2"
             android:src="@drawable/pencil"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonDraw"
+            />
+        <ImageButton
+            android:layout_weight="0.2"
+            android:src="@drawable/move"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:scaleType="fitCenter"
+            android:id="@+id/buttonMove"
             />
         <ImageButton
             android:layout_weight="0.2"
