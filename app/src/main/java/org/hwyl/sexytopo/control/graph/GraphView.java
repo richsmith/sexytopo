@@ -443,31 +443,6 @@ public class GraphView extends View {
     }
 
 
-    private boolean handleTemporaryMove(MotionEvent event) {
-
-        Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
-
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                actionDownPointOnView = touchPointOnView;
-                actionDownViewpointOffset = viewpointOffset;
-                break;
-            case MotionEvent.ACTION_MOVE:
-                Coord2D surveyDelta =
-                        touchPointOnView.minus(actionDownPointOnView).scale(1 / surveyToViewScale);
-                viewpointOffset = actionDownViewpointOffset.minus(surveyDelta);
-                invalidate();
-                // fall through
-            case MotionEvent.ACTION_UP:
-                break;
-            default:
-                return false;
-        }
-
-        return true;
-    }
-
-
     private boolean handleErase(MotionEvent event) {
 
         Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
@@ -524,7 +499,6 @@ public class GraphView extends View {
                 return false;
         }
     }
-
 
 
     private boolean handleSelect(MotionEvent event) {
