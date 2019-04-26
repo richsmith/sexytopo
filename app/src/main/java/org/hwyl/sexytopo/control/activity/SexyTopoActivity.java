@@ -581,19 +581,9 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                         String name = value.toString();
                         if (Util.isSurveyNameUnique(SexyTopoActivity.this, name)) {
                             Survey newSurvey = new Survey(name);
+                            newSurvey.getOrigin().setName(joinPoint.getName());
                             joinSurveys(currentSurvey, joinPoint, newSurvey, newSurvey.getOrigin());
                             setSurvey(newSurvey);
-                            /*
-                            currentSurvey.connect(joinPoint, newSurvey, newSurvey.getOrigin());
-                            newSurvey.connect(newSurvey.getOrigin(), currentSurvey, joinPoint);
-                            setSurvey(newSurvey);
-                            try {
-                                Saver.save(SexyTopoActivity.this, currentSurvey);
-                                Saver.save(SexyTopoActivity.this, newSurvey);
-                            } catch (Exception exception) {
-                                showSimpleToast("Couldn't save new connection");
-                                showException(exception);
-                            }*/
                         } else {
                             showSimpleToast(R.string.dialog_new_survey_name_must_be_unique);
                         }
