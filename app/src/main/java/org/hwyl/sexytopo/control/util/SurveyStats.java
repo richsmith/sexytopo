@@ -9,9 +9,7 @@ import org.hwyl.sexytopo.model.survey.Survey;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by rls on 04/12/14.
- */
+
 public class SurveyStats {
 
     // This would all be so much easier with Java 8: lambdas, streaming API...
@@ -86,8 +84,8 @@ public class SurveyStats {
 
         double min = Double.MAX_VALUE, max = Double.MIN_VALUE;
         for (Coord3D point : space.getStationMap().values()) {
-            max = Math.max(max, point.getZ());
-            min = Math.min(min, point.getZ());
+            max = Math.max(max, point.z);
+            min = Math.min(min, point.z);
         }
 
         return max - min;

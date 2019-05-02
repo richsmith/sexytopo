@@ -9,9 +9,6 @@ import org.hwyl.sexytopo.model.survey.Station;
 import java.util.Map;
 
 
-/**
- * Created by rls on 16/02/15.
- */
 public class Space2DUtils {
 
 
@@ -20,12 +17,12 @@ public class Space2DUtils {
         // Adapted from a post on StackExchange by Joshua
         // http://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
 
-        double x = point.getX();
-        double y = point.getY();
-        double x1 = lineStart.getX();
-        double y1 = lineStart.getY();
-        double x2 = lineEnd.getX();
-        double y2 = lineEnd.getY();
+        double x = point.x;
+        double y = point.y;
+        double x1 = lineStart.x;
+        double y1 = lineStart.y;
+        double x2 = lineEnd.x;
+        double y2 = lineEnd.y;
 
         double a = x - x1;
         double b = y - y1;
@@ -60,7 +57,7 @@ public class Space2DUtils {
 
 
     public static double getDistance(Coord2D a, Coord2D b) {
-        return Math.sqrt(Math.pow((a.getX() - b.getX()), 2) + Math.pow((a.getY() - b.getY()), 2));
+        return Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2));
     }
 
     public static double adjustAngle(double angle, double delta) {
@@ -95,6 +92,6 @@ public class Space2DUtils {
     public static Line<Coord2D> transformLine(Line<Coord2D> line, Coord2D point) {
         Coord2D start = line.getStart();
         Coord2D end = line.getEnd();
-        return new Line<Coord2D>(start.plus(point), end.plus(point));
+        return new Line<>(start.plus(point), end.plus(point));
     }
 }

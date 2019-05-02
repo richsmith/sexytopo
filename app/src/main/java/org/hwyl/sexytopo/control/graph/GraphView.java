@@ -340,8 +340,8 @@ public class GraphView extends View {
         // The more elegant way to do this is:
         // return coords.scale(1 / surveyToViewScale).plus(viewpointOffset);
         // ...but this method gets hit hard (profiled) so let's avoid creating intermediate objects:
-        return new Coord2D(((coords.getX() * (1 / surveyToViewScale)) + viewpointOffset.getX()),
-                ((coords.getY() * (1 / surveyToViewScale)) + viewpointOffset.getY()));
+        return new Coord2D(((coords.x * (1 / surveyToViewScale)) + viewpointOffset.x),
+                ((coords.y * (1 / surveyToViewScale)) + viewpointOffset.y));
     }
 
 
@@ -349,8 +349,8 @@ public class GraphView extends View {
         // The more elegant way to do this is:
         // return coords.minus(viewpointOffset).scale(surveyToViewScale);
         // ...but this method gets hit hard (profiled) so let's avoid creating intermediate objects:
-        return new Coord2D(((coords.getX() - viewpointOffset.getX()) * surveyToViewScale),
-                ((coords.getY() - viewpointOffset.getY()) * surveyToViewScale));
+        return new Coord2D(((coords.x - viewpointOffset.x) * surveyToViewScale),
+                ((coords.y - viewpointOffset.y) * surveyToViewScale));
     }
 
 
@@ -781,11 +781,11 @@ public class GraphView extends View {
         int tickSizeInMetres = getMinorGridBoxSize();
         double boxSize = 10;
 
-        int numberTicksJustBeforeViewpointOffsetX = (int)(viewpointOffset.getX() / tickSizeInMetres);
+        int numberTicksJustBeforeViewpointOffsetX = (int)(viewpointOffset.x / tickSizeInMetres);
 
         for (int n = numberTicksJustBeforeViewpointOffsetX; true; n++) {
             double xSurvey = n * tickSizeInMetres;
-            int xView = (int)((xSurvey - viewpointOffset.getX()) * surveyToViewScale);
+            int xView = (int)((xSurvey - viewpointOffset.x) * surveyToViewScale);
             gridPaint.setStrokeWidth(n % boxSize == 0 ? 3 : 1);
             canvas.drawLine(xView, 0, xView, getHeight(), gridPaint);
             if (xView >= getWidth()) {
@@ -793,11 +793,11 @@ public class GraphView extends View {
             }
         }
 
-        int numberTicksJustBeforeViewpointOffsetY = (int)(viewpointOffset.getY() / tickSizeInMetres);
+        int numberTicksJustBeforeViewpointOffsetY = (int)(viewpointOffset.y / tickSizeInMetres);
 
         for (int n = numberTicksJustBeforeViewpointOffsetY; true; n++) {
             double ySurvey = n * tickSizeInMetres;
-            int yView = (int)((ySurvey - viewpointOffset.getY()) * surveyToViewScale);
+            int yView = (int)((ySurvey - viewpointOffset.y) * surveyToViewScale);
             gridPaint.setStrokeWidth(n % boxSize == 0 ? 3 : 1);
             canvas.drawLine(0, yView, getWidth(), yView, gridPaint);
             if (yView >= getHeight()) {
@@ -834,7 +834,7 @@ public class GraphView extends View {
             Coord2D centreOnSurvey = sectionDetail.getPosition();
             Coord2D centreOnView = surveyCoordsToViewCoords(centreOnSurvey);
             drawStationCross(canvas, stationPaint,
-                    (float) centreOnView.getX(), (float) centreOnView.getY(),
+                    (float) centreOnView.x, (float) centreOnView.y,
                     STATION_DIAMETER, alpha);
 
             String description =
@@ -842,8 +842,8 @@ public class GraphView extends View {
             if (getDisplayPreference(GraphActivity.DisplayPreference.SHOW_STATION_LABELS)) {
                 stationPaint.setAlpha(alpha);
                 canvas.drawText(description,
-                        (float) centreOnView.getX(),
-                        (float) centreOnView.getY(),
+                        (float) centreOnView.x,
+                        (float) centreOnView.y,
                         stationPaint);
             }
 
@@ -901,8 +901,8 @@ public class GraphView extends View {
     }
 
     private boolean isLineOnCanvas(Canvas canvas, Coord2D start, Coord2D end) {
-        Point point0 = new Point((int)start.getX(), (int)start.getY());
-        Point point1 = new Point((int)end.getX(), (int)end.getY());
+        Point point0 = new Point((int)start.x, (int)start.y);
+        Point point1 = new Point((int)end.x, (int)end.y);
 
         Point rectangleTopLeft = new Point(0, 0);
         Point rectangleBottomRight = new Point(canvas.getWidth(), canvas.getHeight());
@@ -923,8 +923,8 @@ public class GraphView extends View {
             Station station = entry.getKey();
             Coord2D translatedStation = surveyCoordsToViewCoords(entry.getValue());
 
-            int x = (int)(translatedStation.getX());
-            int y = (int)(translatedStation.getY());
+            int x = (int)(translatedStation.x);
+            int y = (int)(translatedStation.y);
 
             drawStationCross(canvas, stationPaint, x, y, crossDiameter, alpha);
 
@@ -1056,8 +1056,8 @@ public class GraphView extends View {
                     drawPaint.setAlpha(alpha);
 
                     canvas.drawLine(
-                        (float) from.getX(), (float) from.getY(),
-                        (float) to.getX(), (float) to.getY(),
+                        (float) from.x, (float) from.y,
+                        (float) to.x, (float) to.y,
                         drawPaint);
                     from = to;
                 }
@@ -1069,7 +1069,7 @@ public class GraphView extends View {
             String text = textDetail.getText();
             labelPaint.setColor(textDetail.getColour().intValue);
             labelPaint.setAlpha(alpha);
-            canvas.drawText(text, (float)location.getX(), (float)location.getY(), labelPaint);
+            canvas.drawText(text, (float)location.x, (float)location.y, labelPaint);
         }
     }
 
@@ -1139,8 +1139,8 @@ public class GraphView extends View {
         double xDeltaInMetres = ((double)getWidth() / 2) / surveyToViewScale;
         double yDeltaInMetres = ((double)getHeight() / 2) / surveyToViewScale;
 
-        double x = point.getX() - xDeltaInMetres;
-        double y = point.getY() - yDeltaInMetres;
+        double x = point.x - xDeltaInMetres;
+        double y = point.y - yDeltaInMetres;
 
         viewpointOffset = new Coord2D(x, y);
     }
@@ -1149,8 +1149,8 @@ public class GraphView extends View {
     private void drawLine(Canvas canvas, Coord2D start, Coord2D end, Paint paint, int alpha) {
         paint.setAlpha(alpha);
         canvas.drawLine(
-                (float)(start.getX()), (float)(start.getY()),
-                (float)(end.getX()), (float)(end.getY()),
+                (float)(start.x), (float)(start.y),
+                (float)(end.x), (float)(end.y),
                 paint);
     }
 
@@ -1161,8 +1161,8 @@ public class GraphView extends View {
     private void drawLineAsPath(Canvas canvas, Coord2D start, Coord2D end, Paint paint, int alpha) {
         paint.setAlpha(alpha);
         Path path = new Path();
-        path.moveTo((float)(start.getX()), (float)(start.getY()));
-        path.lineTo((float)(end.getX()), (float)(end.getY()));
+        path.moveTo((float)(start.x), (float)(start.y));
+        path.lineTo((float)(end.x), (float)(end.y));
         canvas.drawPath(path, paint);
     }
 

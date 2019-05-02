@@ -69,7 +69,7 @@ public class PocketTopoTxtExporter extends SingleFileExporter {
         for (PathDetail pathDetail : sketch.getPathDetails()) {
             lines.add("POLYLINE " + pathDetail.getColour().toString());
             for (Coord2D coords : pathDetail.getPath()) {
-                lines.add(coords.getX() + "\t" + -coords.getY());
+                lines.add(coords.x + "\t" + -coords.y);
             }
 
         }
@@ -84,7 +84,7 @@ public class PocketTopoTxtExporter extends SingleFileExporter {
         for (Map.Entry<Station, Coord2D> entry : space.getStationMap().entrySet()) {
             Coord2D coords = entry.getValue();
             Station station = entry.getKey();
-            lines.add(coords.getX() + "\t" + coords.getY() + "\t" + station.getName());
+            lines.add(coords.x + "\t" + coords.y + "\t" + station.getName());
         }
 
         lines.add("SHOTS");
@@ -92,7 +92,7 @@ public class PocketTopoTxtExporter extends SingleFileExporter {
         for (Line<Coord2D> line : space.getLegMap().values()) {
             Coord2D start = line.getStart();
             Coord2D end = line.getEnd();
-            lines.add(start.getX() + "\t" + start.getY() + "\t" + end.getX() + "\t" + end.getY());
+            lines.add(start.x + "\t" + start.y + "\t" + end.x + "\t" + end.y);
         }
 
         return TextTools.join("\n", lines);

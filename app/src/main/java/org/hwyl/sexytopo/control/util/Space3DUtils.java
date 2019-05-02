@@ -18,9 +18,9 @@ public class Space3DUtils {
         double x = r * Math.cos(theta) * Math.sin(phi);
         double z = r * Math.sin(theta);
 
-        x += start.getX();
-        y += start.getY();
-        z += start.getZ();
+        x += start.x;
+        y += start.y;
+        z += start.z;
 
         return new Coord3D(x, y, z);
     }

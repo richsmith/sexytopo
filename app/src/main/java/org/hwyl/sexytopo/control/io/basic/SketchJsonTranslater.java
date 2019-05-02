@@ -193,8 +193,8 @@ public class SketchJsonTranslater {
 
     public static JSONObject toJson(Coord2D coord) throws JSONException {
         JSONObject json = new JSONObject();
-        json.put(X_TAG, coord.getX());
-        json.put(Y_TAG, coord.getY());
+        json.put(X_TAG, coord.x);
+        json.put(Y_TAG, coord.y);
         return json;
     }
 

@@ -13,7 +13,7 @@ public enum Projection2D {
 
     PLAN {
         public Coord2D project(Coord3D coord3D) {
-            return new Coord2D(coord3D.getX(), coord3D.getY());
+            return new Coord2D(coord3D.x, coord3D.y);
         }
 
         public boolean isLegInPlane(Leg leg) {
@@ -22,7 +22,7 @@ public enum Projection2D {
     },
     ELEVATION_NS {
         public Coord2D project(Coord3D coord3D) {
-            return new Coord2D(coord3D.getY(), coord3D.getZ());
+            return new Coord2D(coord3D.y, coord3D.z);
         }
 
         public boolean isLegInPlane(Leg leg) {
@@ -31,7 +31,7 @@ public enum Projection2D {
     },
     ELEVATION_EW {
         public Coord2D project(Coord3D coord3D) {
-            return new Coord2D(coord3D.getX(), coord3D.getZ());
+            return new Coord2D(coord3D.x, coord3D.z);
         }
 
         public boolean isLegInPlane(Leg leg) {
@@ -60,7 +60,7 @@ public enum Projection2D {
             return space3DTransformer.transformTo3D(survey);
         }
     }
-
+    
     public abstract Coord2D project(Coord3D coord3D);
     public abstract boolean isLegInPlane(Leg leg);
 

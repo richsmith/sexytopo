@@ -26,19 +26,19 @@ public abstract class SketchDetail {
 
     public boolean intersectsRectangle(Coord2D rectangleTopLeft, Coord2D rectangleBottomRight) {
 
-        double left1 = rectangleTopLeft.getX();
-        double top1 = rectangleTopLeft.getY();
-        double right1 = rectangleBottomRight.getX();
-        double bottom1 = rectangleBottomRight.getY();
+        double left1 = rectangleTopLeft.x;
+        double top1 = rectangleTopLeft.y;
+        double right1 = rectangleBottomRight.x;
+        double bottom1 = rectangleBottomRight.y;
 
         return (right >= left1 && left <= right1) && (top <= bottom1 && bottom >= top1);
     }
 
     protected void updateBoundingBox(Coord2D point) {
-        left = Math.min(left, point.getX());
-        right = Math.max(right, point.getX());
-        top = Math.min(top, point.getY());
-        bottom = Math.max(bottom, point.getY());
+        left = Math.min(left, point.x);
+        right = Math.max(right, point.x);
+        top = Math.min(top, point.y);
+        bottom = Math.max(bottom, point.y);
 
     }
 }

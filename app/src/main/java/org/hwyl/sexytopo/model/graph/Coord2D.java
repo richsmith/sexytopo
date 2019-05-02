@@ -4,27 +4,19 @@ package org.hwyl.sexytopo.model.graph;
 import org.hwyl.sexytopo.control.util.NumberTools;
 
 
-public class Coord2D extends Coord {
+public final class Coord2D extends Coord {
 
     public static final Coord2D ORIGIN = new Coord2D(0, 0);
 
-    private final double x, y;
+    public final double x, y;
 
     public Coord2D(double x, double y) {
         this.x = x;
         this.y = y;
     }
 
-    public double getX() {
-        return x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
     public Coord2D add(double x, double y) {
-        return new Coord2D(getX() + x, getY() + y);
+        return new Coord2D(this.x + x, this.y + y);
     }
 
     public Coord2D plus(Coord2D coord2D) {

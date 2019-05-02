@@ -28,17 +28,17 @@ public class SketchDimensions {
         Double minX = null, maxX = null, minY = null, maxY = null;
         for (Line<Coord2D> line : space.getLegMap().values()) {
             for (Coord2D point : new Coord2D[]{line.getStart(), line.getEnd()}) {
-                if (minX == null || point.getX() < minX) {
-                    minX = point.getX();
+                if (minX == null || point.x < minX) {
+                    minX = point.x;
                 }
-                if (maxX == null || point.getX() > maxX) {
-                    maxX = point.getX();
+                if (maxX == null || point.x > maxX) {
+                    maxX = point.x;
                 }
-                if (minY == null || point.getY() < minY) {
-                    minY = point.getY();
+                if (minY == null || point.y < minY) {
+                    minY = point.y;
                 }
-                if (maxY == null || point.getY() > maxY) {
-                    maxY = point.getY();
+                if (maxY == null || point.y > maxY) {
+                    maxY = point.y;
                 }
             }
         }

@@ -7,21 +7,19 @@ import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
-/**
- * Created by rls on 26/07/14.
- */
+
 public class Space3DTransformer {
 
     // These were originally static methods but because we want to override one it has
     // to be OO. Thanks Java for your stupid inability to override static methods :/
 
-    public Space transformTo3D(Survey survey) {
+    public Space<Coord3D> transformTo3D(Survey survey) {
         return transformTo3D(survey.getOrigin());
     }
 
 
-    public Space transformTo3D(Station root) {
-        Space space = new Space();
+    public Space<Coord3D> transformTo3D(Station root) {
+        Space<Coord3D> space = new Space<>();
         update(space, root, Coord3D.ORIGIN);
         return space;
     }

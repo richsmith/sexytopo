@@ -42,8 +42,8 @@ public class XviExporter {
     }
 
     private static String getStationText(Station station, Coord2D coords, double scale) {
-        String x = TextTools.formatTo2dp(coords.getX() * scale);
-        String y = TextTools.formatTo2dp(coords.getY() * scale);
+        String x = TextTools.formatTo2dp(coords.x * scale);
+        String y = TextTools.formatTo2dp(coords.y * scale);
         return field("\t", TextTools.joinAll(" ", x, y, station.getName()));
     }
 
@@ -57,11 +57,11 @@ public class XviExporter {
 
     private static String getLegText(Line<Coord2D> line, double scale) {
         Coord2D start = line.getStart();
-        String startX = TextTools.formatTo2dp(start.getX() * scale);
-        String startY = TextTools.formatTo2dp(start.getY() * scale);
+        String startX = TextTools.formatTo2dp(start.x * scale);
+        String startY = TextTools.formatTo2dp(start.y * scale);
         Coord2D end = line.getEnd();
-        String endX = TextTools.formatTo2dp(end.getX() * scale);
-        String endY = TextTools.formatTo2dp(end.getY() * scale);
+        String endX = TextTools.formatTo2dp(end.x * scale);
+        String endY = TextTools.formatTo2dp(end.y * scale);
         return field("\t", TextTools.joinAll(" ", startX, startY, endX, endY));
     }
 
@@ -77,8 +77,8 @@ public class XviExporter {
         List<Object> fields = new LinkedList<>();
         fields.add(pathDetail.getColour().toString());
         for (Coord2D coord2D : pathDetail.getPath()) {
-            String x = TextTools.formatTo2dp(coord2D.getX() * scale);
-            String y = TextTools.formatTo2dp((-coord2D.getY() + 0.0) * scale); // +0.0 to avoid -0.0
+            String x = TextTools.formatTo2dp(coord2D.x * scale);
+            String y = TextTools.formatTo2dp((-coord2D.y + 0.0) * scale); // +0.0 to avoid -0.0
             fields.add(x);
             fields.add(y);
         }
