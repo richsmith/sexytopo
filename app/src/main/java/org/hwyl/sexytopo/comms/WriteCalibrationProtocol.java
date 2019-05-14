@@ -43,7 +43,8 @@ public class WriteCalibrationProtocol extends DistoXProtocol {
                 command[5] = coeff[i + 2];
                 command[6] = coeff[i + 3];
                 // send command and check reply
-                Log.device("Writing calibration coefficient #" + i + "/" + coeff.length);
+                Log.device("Writing calibration coefficients #" + (i + 1) + "-" + (i + 4) +
+                        "/" + coeff.length);
                 outStream.write(command, 0, 7);
 
                 byte[] reply = new byte[8];

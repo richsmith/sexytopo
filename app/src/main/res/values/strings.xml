@@ -176,7 +176,7 @@
     <string name="calibration_start">Start Calibration</string>
     <string name="calibration_stop">Stop Calibration</string>
     <string name="calibration_next_step">Next (suggested)</string>
-    <string name="calibration_complete">Complete Calibration</string>
+    <string name="calibration_complete">Upload Calibration</string>
     <string name="calibration_load">Load</string>
     <string name="calibration_save">Save</string>
     <string name="calibration_direction">Direction</string>
@@ -184,9 +184,10 @@
     <string name="calibration_not_enough">Not enough readings taken</string>
     <string name="calibration_assessment">Calibration Assessment</string>
     <string name="calibration_update">Write</string>
-    <string name="calibration_error_updating_device">could not write calibration</string>
+    <string name="calibration_error_updating_device">Could not write calibration</string>
     <string name="calibration_no_files">No saved calibrations found to open</string>
     <string name="calibration_default_filename">calibration</string>
+    <string name="calibration_writing">Writing calibration data</string>
     <string name="calibration_success">Successfully wrote calibration data</string>
     <string name="direction_forward">Forward</string>
     <string name="direction_right">Right</string>

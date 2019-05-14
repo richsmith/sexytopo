@@ -1,6 +1,7 @@
 package org.hwyl.sexytopo.control.activity;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -32,6 +33,7 @@ import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.control.io.basic.Saver;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.calibration.CalibrationReading;
+import org.hwyl.sexytopo.model.sketch.Colour;
 import org.json.JSONException;
 
 import java.io.File;
@@ -169,6 +171,8 @@ public class CalibrationActivity extends SexyTopoActivity {
                     getString(suggestedNext.first.stringId));
             setInfoField(R.id.calibration_next_orientation,
                     getString(suggestedNext.second.stringId));
+            TextView assessmentField = findViewById(R.id.calibrationFieldAssessment);
+            assessmentField.setTextColor(Color.BLACK);
             setInfoField(R.id.calibrationFieldAssessment, getString(R.string.not_applicable));
         } else {
             setInfoField(R.id.calibration_next_direction, getString(R.string.not_applicable));
@@ -182,9 +186,9 @@ public class CalibrationActivity extends SexyTopoActivity {
 
             TextView assessmentField = findViewById(R.id.calibrationFieldAssessment);
             if (calibrationAssessment <= 0.5) {
-                assessmentField.setTextColor(Color.RED);
+                assessmentField.setTextColor(Colour.SEA_GREEN.intValue);
             } else {
-                assessmentField.setTextColor(Color.BLACK);
+                assessmentField.setTextColor(Colour.RED.intValue);
             }
             setInfoField(
                     R.id.calibrationFieldAssessment,TextTools.formatTo2dp(calibrationAssessment));
@@ -247,7 +251,6 @@ public class CalibrationActivity extends SexyTopoActivity {
         Log.device("Start calibration requested");
 
         try {
-            //comms = requestComms();
             requestComms().startCalibration();
 
             state = State.CALIBRATING;
@@ -273,7 +276,7 @@ public class CalibrationActivity extends SexyTopoActivity {
     }
 
 
-    public void requestCompleteCalibration(View view) {
+    public void requestCompleteCalibration(final View view) {
         if (calibrationReadings.size() < positions.size()) {
             showSimpleToast(R.string.calibration_not_enough);
             return;
@@ -296,7 +299,7 @@ public class CalibrationActivity extends SexyTopoActivity {
                     try {
                         byte[] coeffs = calibrationCalculator.getCoefficients();
                         Byte[] coefficients = ArrayUtils.toObject(coeffs);
-                        new WriteCalibrationTask().execute(coefficients);
+                        new WriteCalibrationTask(view).execute(coefficients);
                     } catch (Exception exception) {
                         showException(exception);
                     } finally {
@@ -452,21 +455,29 @@ public class CalibrationActivity extends SexyTopoActivity {
 
     private class WriteCalibrationTask extends AsyncTask<Byte, Void, Boolean> {
 
+        private ProgressDialog progressDialog;
+
+        private WriteCalibrationTask(View view) {
+            progressDialog = new ProgressDialog(view.getContext(), ProgressDialog.STYLE_SPINNER);
+        }
+
+        protected void onPreExecute() {
+            progressDialog.setMessage(getString(R.string.calibration_writing));
+            progressDialog.show();
+        }
+
         @Override
         protected Boolean doInBackground(Byte... coefficients) {
 
-            Byte[] byteObject = new Byte[0];
-            byte[] coeffs = ArrayUtils.toPrimitive(byteObject);
-
+            byte[] coeffs = ArrayUtils.toPrimitive(coefficients);
             DistoXCommunicator comms = requestComms();
             WriteCalibrationProtocol writeCalibrationProtocol = comms.writeCalibration(coeffs);
-
-            waitForEnd(writeCalibrationProtocol, 30);
+            waitForEnd(writeCalibrationProtocol, 60);
             if (!writeCalibrationProtocol.isFinished()) {
+                Log.device("Disto busy; forcing disconnect to write calibration");
                 comms.disconnect(); // force it to stop what it's doing
-                waitForEnd(writeCalibrationProtocol, 30);
+                waitForEnd(writeCalibrationProtocol, 80);
             }
-
             return writeCalibrationProtocol.wasSuccessful();
         }
 
@@ -485,6 +496,7 @@ public class CalibrationActivity extends SexyTopoActivity {
 
         @Override
         protected void onPostExecute(Boolean wasSuccessful) {
+            progressDialog.dismiss();
             if (wasSuccessful) {
                 showSimpleToast(R.string.calibration_success);
             } else {
