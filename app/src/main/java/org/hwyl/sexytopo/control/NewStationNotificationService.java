@@ -6,11 +6,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.media.MediaPlayer;
 import android.os.IBinder;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
-import android.os.Vibrator;
+
+import com.crashlytics.android.Crashlytics;
 
 import org.hwyl.sexytopo.SexyTopo;
 
@@ -34,6 +35,7 @@ public class NewStationNotificationService extends Service {
         } catch (Exception exception) {
             // Not sure why this sometimes gets a NPE... not mission-critical though so just
             // log the error for now :/ TODO see if there's any way to avoid this error
+            Crashlytics.logException(exception);
             Log.e(exception);
         }
     }
