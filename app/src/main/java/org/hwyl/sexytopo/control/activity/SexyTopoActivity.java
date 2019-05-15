@@ -25,6 +25,8 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
+
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.comms.DistoXCommunicator;
@@ -1089,6 +1091,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 Saver.save(context, getSurvey());
                 return true;
             } catch (Exception exception) {
+                Crashlytics.logException(exception);
                 Log.e(exception);
                 return false;
             }
