@@ -12,6 +12,7 @@ public class SexyTopo {
     public static final String TAG = APP_NAME; // for writing debug log
 
     public static final UUID DISTO_X_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    public static final UUID SHETLAND_UUID = UUID.fromString("49535343-8841-43f4-a8d4-ecbe34729bb3");
     public static final int NUM_OF_REPEATS_FOR_NEW_STATION = 3;
 
     public static final String SURVEY_UPDATED_EVENT = "surveyUpdatedEvent";
