@@ -16,7 +16,7 @@ import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -47,7 +47,7 @@ public class SurveyManager {
 
 
     public void updateSurvey(Leg leg) {
-        updateSurvey(Arrays.asList(new Leg[]{leg}));
+        updateSurvey(Collections.singletonList(leg));
     }
 
 
