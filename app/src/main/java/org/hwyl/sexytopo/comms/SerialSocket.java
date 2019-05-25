@@ -18,6 +18,7 @@ public class SerialSocket {
     private BluetoothDevice bluetoothDevice;
     private BluetoothSocket classicSocket;
     private BLESocket bleSocket;
+    private BLEListener bleListener;
     private InputStream inputStream;
     private OutputStream outputStream;
 
@@ -25,8 +26,15 @@ public class SerialSocket {
         bluetoothDevice = device;
         if (isBLE()) {
             BLEConnect();
-            inputStream = bleSocket.getInputStream();
-            outputStream = bleSocket.getOutputStream();
+            inputStream = bleListener.getInputStream();
+            outputStream = new OutputStream() {
+                @Override
+                public void write(int i) throws IOException {
+                    byte[] data = {(byte) i};
+                    bleSocket.write(data);
+                }
+            };
+            Log.d("BLE connection finished, streams are: " + inputStream + ", " + outputStream);
         } else {
             classicConnect();
             inputStream = classicSocket.getInputStream();
@@ -68,9 +76,14 @@ public class SerialSocket {
 
 
     protected void BLEConnect() throws Exception {
-        bleSocket = new BLESocket(bluetoothDevice);
+        Log.d("BLEConnect1");
+        bleListener = new BLEListener();
+        Log.d("BLEConnect2");
+        bleSocket = new BLESocket();
+        Log.d("BLEConnect3");
+        bleSocket.connect(SexyTopo.context, bleListener, bluetoothDevice);
         long startTime = System.currentTimeMillis();
-        while (System.currentTimeMillis() < startTime+4000) {
+        while (System.currentTimeMillis() < startTime+8000) {
             if (bleSocket.isConnected()) return;
         }
         throw new Exception("BLE Connection timed out");
@@ -78,9 +91,9 @@ public class SerialSocket {
 
     public boolean isConnected() {
         if (isBLE()) {
-            return bleSocket.isConnected();
+            return ((bleSocket != null) && bleSocket.isConnected());
         } else {
-            return classicSocket.isConnected();
+            return ((classicSocket != null) && classicSocket.isConnected());
         }
     }
 

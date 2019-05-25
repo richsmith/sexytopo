@@ -238,24 +238,18 @@ public class DistoXCommunicator extends Thread {
 
         try {
             socket = new SerialSocket(bluetoothDevice);
+            inStream = new DataInputStream(socket.getInputStream());
+            outStream = new DataOutputStream(socket.getOutputStream());
         } catch(Exception e) {
                 Log.device("Failed to create socket: " + e.getMessage());
         } finally {
-            if (socket.isConnected()) {
+            if (isConnected()) {
                 Log.device(activity.getString(R.string.device_log_connected));
             } else {
                 Log.device(activity.getString(R.string.device_log_not_connected));
             }
         }
 
-        try {
-            inStream = new DataInputStream(socket.getInputStream());
-            outStream = new DataOutputStream(socket.getOutputStream());
-        } catch (IOException exception) {
-            Log.device("Failed to create data streams :(");
-            disconnect();
-            return;
-        }
     }
 
 
