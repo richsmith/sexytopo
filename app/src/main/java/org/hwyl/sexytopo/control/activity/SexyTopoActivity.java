@@ -1010,8 +1010,10 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
 
     public void showSimpleToast(String message) {
-        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-        Log.d("Shown: " + message);
+        if (!isFinishing()) {
+            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+            Log.d("Shown: " + message);
+        }
     }
 
     public void showSimpleToast(int id) {
