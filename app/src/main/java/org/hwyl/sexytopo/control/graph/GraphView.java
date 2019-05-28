@@ -830,6 +830,9 @@ public class GraphView extends View {
 
     private void drawCrossSections(
             Canvas canvas, Set<CrossSectionDetail> crossSectionDetails, int alpha) {
+
+        List<CrossSectionDetail> badXSections = new LinkedList<>();
+
         for (CrossSectionDetail sectionDetail : crossSectionDetails) {
             Coord2D centreOnSurvey = sectionDetail.getPosition();
             Coord2D centreOnView = surveyCoordsToViewCoords(centreOnSurvey);
@@ -853,9 +856,18 @@ public class GraphView extends View {
 
             Station station = sectionDetail.getCrossSection().getStation();
             Coord2D surveyStationLocation = this.projection.getStationMap().get(station);
+            if (surveyStationLocation == null) {
+                badXSections.add(sectionDetail);
+            }
             Coord2D viewStationLocation = surveyCoordsToViewCoords(surveyStationLocation);
             drawLineAsPath(
                     canvas, viewStationLocation, centreOnView, crossSectionConnectorPaint, alpha);
+        }
+
+        for (CrossSectionDetail crossSectionDetail : badXSections) {
+            String name = crossSectionDetail.getCrossSection().getStation().getName();
+            Log.e("Missing station details for cross section on station " + name + "; removing");
+            crossSectionDetails.remove(crossSectionDetail);
         }
     }
 
