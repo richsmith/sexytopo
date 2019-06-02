@@ -8,11 +8,8 @@ public class Space3DUtils {
 
     public static Coord3D toCartesian(Coord3D start, Leg leg) {
         double r = leg.getDistance();
-        double phi = leg.getAzimuth();
-        double theta = leg.getInclination();
-
-        phi = Math.toRadians(phi);
-        theta = Math.toRadians(theta);
+        double phi = Math.toRadians(leg.getAzimuth());
+        double theta = Math.toRadians(leg.getInclination());
 
         double y = r * Math.cos(theta) * Math.cos(phi);
         double x = r * Math.cos(theta) * Math.sin(phi);
