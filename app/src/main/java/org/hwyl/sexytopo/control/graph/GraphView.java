@@ -30,7 +30,6 @@ import org.hwyl.sexytopo.control.util.CohenSutherlandAlgorithm;
 import org.hwyl.sexytopo.control.util.CrossSectioner;
 import org.hwyl.sexytopo.control.util.PreferenceAccess;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
-import org.hwyl.sexytopo.control.util.SpaceFlipper;
 import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.control.util.TextTools;
@@ -153,8 +152,8 @@ public class GraphView extends View {
         MODAL_MOVE(-1, false, true);
 
         private int id;
-        private boolean usesColour = false;
-        private boolean isModal = false;
+        private boolean usesColour;
+        private boolean isModal;
 
         SketchTool(int id, boolean usesColour, boolean isModal) {
             this.id = id;
@@ -186,6 +185,8 @@ public class GraphView extends View {
     private Paint legendPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint gridPaint = new Paint();
     private Paint crossSectionConnectorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Paint crossSectionIndicatorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
 
 
 
@@ -233,6 +234,10 @@ public class GraphView extends View {
         crossSectionConnectorPaint.setStyle(Paint.Style.STROKE);
         crossSectionConnectorPaint.setPathEffect(new DashPathEffect(new float[]{3, 2}, 0));
 
+        crossSectionIndicatorPaint.setColor(STATION_COLOUR);
+        crossSectionIndicatorPaint.setStrokeWidth(2);
+        crossSectionIndicatorPaint.setStyle(Paint.Style.FILL);
+
         commentIcon = BitmapFactory.decodeResource(getResources(), R.drawable.speech_bubble);
         linkIcon = BitmapFactory.decodeResource(getResources(), R.drawable.link);
     }
@@ -256,11 +261,7 @@ public class GraphView extends View {
     }
 
     public void setProjection(Space<Coord2D> projection) {
-        // We're going to flip the projection vertically because we want North at the top and
-        // the survey is recorded assuming that that is the +ve axis. However, on the
-        // screen this is reversed: DOWN is the +ve access. I think this makes sense...
-        // we just have to remember to reverse the flip when exporting the sketch :)
-        this.projection = SpaceFlipper.flipVertically(projection);
+        this.projection = projection;
     }
 
 
@@ -618,7 +619,7 @@ public class GraphView extends View {
         View commentButton = menu.getContentView().findViewById(R.id.graph_station_comment);
         commentButton.setEnabled(station != survey.getOrigin());
 
-        menu.showAtLocation(this, Gravity.LEFT | Gravity.TOP,
+        menu.showAtLocation(this, Gravity.START | Gravity.TOP,
                 (int) (event.getX()), (int) (event.getY()));
     }
 
@@ -626,7 +627,7 @@ public class GraphView extends View {
     private void openCommentDialog(final Station station) {
         final EditText input = new EditText(getContext());
         input.setLines(8);
-        input.setGravity(Gravity.LEFT | Gravity.TOP);
+        input.setGravity(Gravity.START | Gravity.TOP);
         input.setText(station.getComment());
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setView(input)
@@ -834,6 +835,11 @@ public class GraphView extends View {
         List<CrossSectionDetail> badXSections = new LinkedList<>();
 
         for (CrossSectionDetail sectionDetail : crossSectionDetails) {
+
+            if (!couldBeOnScreen(sectionDetail)) {
+                continue;
+            }
+
             Coord2D centreOnSurvey = sectionDetail.getPosition();
             Coord2D centreOnView = surveyCoordsToViewCoords(centreOnSurvey);
             drawStationCross(canvas, stationPaint,
@@ -973,35 +979,55 @@ public class GraphView extends View {
                 nextX += crossDiameter + spacing;
             }
 
-            CrossSection crossSection = sketch.getCrossSection(station);
-            if (crossSection != null) {
-                /*
-                canvas.drawText("a" + crossSection.getAngle(), x + 100, y, stationPaint);
-                float angle = (float)(crossSection.getAngle());
-                float width = 50;
-                float startX = x - ((width / 2) * (float)Math.cos(angle));
-                float startY = y - ((width / 2) * (float)Math.sin(angle));
-                float endX = x + ((width / 2) * (float)Math.cos(angle));
-                float endY = y + ((width / 2) * (float)Math.sin(angle));
-
-                canvas.drawLine(startX, startY, endX, endY, stationPaint);
-
-
-                float tickAngle = (float)Space2DUtils.adjustAngle(angle, 90);
-                float endTickOneX = startX + (20 * (float)Math.cos(tickAngle));
-                float endTickOneY = startY + (20 * (float)Math.sin(tickAngle));
-
-                canvas.drawLine(startX, startY, endTickOneX, endTickOneY, stationPaint);
-                */
-
+            CrossSectionDetail crossSectionDetail = sketch.getCrossSectionDetail(station);
+            if (crossSectionDetail != null) {
+                drawCrossSectionIndicator(canvas, crossSectionDetail, x, y, alpha);
             }
         }
     }
 
 
+    private void drawCrossSectionIndicator(
+            Canvas canvas, CrossSectionDetail crossSectionDetail, float x, float y, int alpha) {
+
+        crossSectionIndicatorPaint.setAlpha(alpha / 2);
+        CrossSection crossSection = crossSectionDetail.getCrossSection();
+
+        float angle = (float)Math.toRadians(crossSection.getAngle());
+        float indicatorWidth = (float)(1 * surveyToViewScale);
+        float startX = x - ((indicatorWidth / 2) * (float)Math.cos(angle));
+        float startY = y - ((indicatorWidth / 2) * (float)Math.sin(angle));
+        float endX = x + ((indicatorWidth / 2) * (float)Math.cos(angle));
+        float endY = y + ((indicatorWidth / 2) * (float)Math.sin(angle));
+
+        canvas.drawLine(startX, startY, endX, endY, crossSectionIndicatorPaint);
+
+        float lineLength = (float)Space2DUtils.getDistance(
+                new Coord2D(startX, startY), new Coord2D(endX, endY));
+        float arrowLength = lineLength * 0.4f;
+        float arrowOuterCornerX = startX;
+        float arrowOuterCornerY = startY;
+        float arrowInnerCornerX = startX + ((lineLength * 0.05f) * (float)Math.cos(angle));
+        float arrowInnerCornerY = startY + ((lineLength * 0.05f) * (float)Math.sin(angle));
+        float arrowAngle = (float)Math.toRadians(Space2DUtils.adjustAngle(
+                crossSection.getAngle(), -90));
+        float arrowTipX = startX + (arrowLength * (float)Math.cos(arrowAngle));
+        float arrowTipY = startY + (arrowLength * (float)Math.sin(arrowAngle));
+
+
+        Path path = new Path();
+        path.moveTo(arrowInnerCornerX, arrowInnerCornerY);
+        path.lineTo(arrowOuterCornerX, arrowOuterCornerY);
+        path.lineTo(arrowTipX, arrowTipY);
+        path.lineTo(arrowInnerCornerX, arrowInnerCornerY);
+
+        canvas.drawPath(path, crossSectionIndicatorPaint);
+    }
+
+
     private void highlightActiveStation(Canvas canvas, float x, float y) {
 
-        int diameter = 22;
+        float diameter = 22;
         int gap = 6;
         float topY = y - (diameter / 2);
         float bottomY = y + (diameter / 2);

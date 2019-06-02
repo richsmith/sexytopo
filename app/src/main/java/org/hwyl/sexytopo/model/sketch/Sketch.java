@@ -218,13 +218,13 @@ public class Sketch {
         this.crossSectionDetails = crossSectionDetails;
     }
 
-    public CrossSection getCrossSection(Station station) {
+    public CrossSectionDetail getCrossSectionDetail(Station station) {
         // this is a bit inefficient... not sure if it's worth caching this in a map though since
         // there'll probably be max a couple of dozen x-sections per survey chunk
         for (CrossSectionDetail detail : crossSectionDetails) {
             CrossSection crossSection = detail.getCrossSection();
             if (crossSection.getStation() == station) {
-                return crossSection;
+                return detail;
             }
         }
         return null;
