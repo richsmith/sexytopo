@@ -652,11 +652,34 @@ public class GraphView extends View {
 
 
     private void askAboutDeletingStation(final Station station) {
-        int legsToBeDeleted = SurveyStats.calcNumberSubLegs(station);
-        int stationsToBeDeleted = SurveyStats.calcNumberSubStations(station);
-        String message = "This will delete\n" +
-                TextTools.pluralise(legsToBeDeleted, "leg") +
-                " and " + TextTools.pluralise(stationsToBeDeleted, "station");
+        List<Leg> legsToBeDeleted = Survey.getAllLegs(station);
+        int numFullLegsToBeDeleted = 0;
+        int numSplaysToBeDeleted = 0;
+        for (Leg leg : legsToBeDeleted) {
+            if (leg.hasDestination()) {
+                numFullLegsToBeDeleted++;
+            } else {
+                numSplaysToBeDeleted++;
+            }
+        }
+        int numStationsToBeDeleted = SurveyStats.calcNumberSubStations(station);
+
+        Context context = getContext();
+        String message = context.getString(R.string.this_will_delete);
+
+        if (numStationsToBeDeleted > 0) {
+            String noun = context.getString(R.string.station).toLowerCase();
+            message += "\n" + TextTools.pluralise(numStationsToBeDeleted, noun);
+        }
+        if (numFullLegsToBeDeleted > 0) {
+            String noun = context.getString(R.string.leg).toLowerCase();
+            message += "\n" + TextTools.pluralise(numFullLegsToBeDeleted, noun);
+        }
+        if (numSplaysToBeDeleted > 0) {
+            String noun = context.getString(R.string.splay).toLowerCase();
+            message += "\n" + TextTools.pluralise(numSplaysToBeDeleted, noun);
+        }
+
         new AlertDialog.Builder(getContext())
                 .setMessage(message)
                 .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {

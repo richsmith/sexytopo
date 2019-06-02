@@ -72,12 +72,12 @@ public class Space3DUtilsTest {
 
     private void assertEquals(Coord3D zero, Coord3D one) {
 
-        double x0 = zero.getX();
-        double y0 = zero.getY();
-        double z0 = zero.getZ();
-        double x1 = one.getX();
-        double y1 = one.getY();
-        double z1 = one.getZ();
+        double x0 = zero.x;
+        double y0 = zero.y;
+        double z0 = zero.z;
+        double x1 = one.x;
+        double y1 = one.y;
+        double z1 = one.z;
 
         double delta = 0.0001;
         Assert.assertEquals(x0, x1, delta);

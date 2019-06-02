@@ -69,8 +69,8 @@ public class PocketTopoTxtImporterTest {
             }
         }
 
-        Assert.assertEquals(4.980, brownPath.getPath().get(0).getX(), 0.01);
-        Assert.assertEquals(55.180, brownPath.getPath().get(0).getY(), 0.01);
+        Assert.assertEquals(4.980, brownPath.getPath().get(0).x, 0.01);
+        Assert.assertEquals(55.180, brownPath.getPath().get(0).y, 0.01);
 
     }
 }

@@ -61,7 +61,7 @@ public class ExtendedElevationProjectionTest {
         Station two = survey.getStationByName("2");
         Coord2D twoCoord = stationMap.get(two);
 
-        Coord2D expected = new Coord2D(0, -5);
+        Coord2D expected = new Coord2D(0, 5);
         Assert.assertEquals(expected, twoCoord);
     }
 

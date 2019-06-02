@@ -3,7 +3,6 @@ package org.hwyl.sexytopo.control.graph;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.activity.GraphActivity;
 import org.hwyl.sexytopo.control.activity.PlanActivity;
-import org.hwyl.sexytopo.control.util.SpaceFlipper;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Projection2D;
@@ -56,8 +55,7 @@ public class ConnectedSurveysTest {
 
         GraphActivity activity = new PlanActivity();
 
-        Space<Coord2D> planProjection =
-                SpaceFlipper.flipVertically(Projection2D.PLAN.project(currentSurvey));
+        Space<Coord2D> planProjection = Projection2D.PLAN.project(currentSurvey);
         Map<Survey, Space<Coord2D>> translated =
                 ConnectedSurveys.getTranslatedConnectedSurveys(
                         activity, currentSurvey, planProjection);
@@ -66,7 +64,7 @@ public class ConnectedSurveysTest {
         Survey translatedSurvey = getNamedSurvey(translated, "joined");
         Space<Coord2D> projection = translated.get(translatedSurvey);
         Coord2D newStationPoint = getStationPosition(projection, "2");
-        Assert.assertEquals(-2.0, newStationPoint.getY(), SexyTopo.ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(-2.0, newStationPoint.y, SexyTopo.ALLOWED_DOUBLE_DELTA);
     }
 
 
@@ -83,8 +81,7 @@ public class ConnectedSurveysTest {
 
         GraphActivity activity = new PlanActivity();
 
-        Space<Coord2D> planProjection =
-                SpaceFlipper.flipVertically(Projection2D.PLAN.project(currentSurvey));
+        Space<Coord2D> planProjection = Projection2D.PLAN.project(currentSurvey);
         Map<Survey, Space<Coord2D>> translated =
                 ConnectedSurveys.getTranslatedConnectedSurveys(
                         activity, currentSurvey, planProjection);
@@ -95,7 +92,7 @@ public class ConnectedSurveysTest {
         Space<Coord2D> projection = translated.get(translatedSurvey);
 
         Coord2D newStationPoint = getStationPosition(projection, "2");
-        Assert.assertEquals(-3.0, newStationPoint.getY(), SexyTopo.ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(-3.0, newStationPoint.y, SexyTopo.ALLOWED_DOUBLE_DELTA);
     }
 
     private Survey getNamedSurvey(Map<Survey, Space<Coord2D>> map, String name) throws Exception {

@@ -143,6 +143,29 @@ public class BasicTestSurveyCreator {
     }
 
 
+    public static Survey createStraightNorthWith2EBranchFromS2() {
+        Survey survey = new Survey("Test Straight Survey North With 2E Branch");
+
+        Leg leg0 = new Leg(5, 0, 0);
+        SurveyUpdater.updateWithNewStation(survey, leg0);
+
+        Leg leg1 = new Leg(5, 0, 0);
+        SurveyUpdater.updateWithNewStation(survey, leg1);
+
+        Leg leg2 = new Leg(5, 0, 0);
+        SurveyUpdater.updateWithNewStation(survey, leg2);
+
+        survey.setActiveStation(survey.getStationByName("2"));
+        Leg legBranch = new Leg(5, 90, 0);
+        SurveyUpdater.updateWithNewStation(survey, legBranch);
+
+        Leg legBranch2 = new Leg(5, 90, 0);
+        SurveyUpdater.updateWithNewStation(survey, legBranch2);
+
+        return survey;
+    }
+
+
     public static Survey createStraightNorthWithTrip() {
         Survey survey = new Survey("Test Straight Survey North");
 

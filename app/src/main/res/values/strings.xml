@@ -110,8 +110,11 @@
     <string name="clear">Clear</string>
     <string name="add">Add</string>
     <string name="edit">Edit</string>
+    <string name="this_will_delete">This will delete:</string>
     <string name="dialog_confirm_clear_title">Clear Calibration Readings?</string>
     <string name="station">Station</string>
+    <string name="leg">Leg</string>
+    <string name="splay">Splay</string>
     <string name="not_applicable">N/A</string>
     <string name="title_activity_help">Help</string>
     <string name="hello_world">Hello world!</string>
