@@ -2,7 +2,6 @@ package org.hwyl.sexytopo.control.graph;
 
 import org.hwyl.sexytopo.control.activity.GraphActivity;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
-import org.hwyl.sexytopo.control.util.SpaceFlipper;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.Sketch;
@@ -50,7 +49,7 @@ public class ConnectedSurveys {
                 Survey lightweightSurveyCopy = new Survey(otherSurvey.getName());
                 lightweightSurveyCopy.setOrigin(otherSurvey.getOrigin());
 
-                Space<Coord2D> otherProjection = SpaceFlipper.flipVertically(activity.getProjection(connection.otherSurvey));
+                Space<Coord2D> otherProjection = activity.getProjection(connection.otherSurvey);
                 Coord2D otherConnectingStationLocation = otherProjection.getStationMap().get(otherConnectingStation);
                 Coord2D transformation = connectingStationLocation.minus(otherConnectingStationLocation);
 

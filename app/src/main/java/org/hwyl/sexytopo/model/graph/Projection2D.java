@@ -11,9 +11,15 @@ import java.util.Map;
 
 public enum Projection2D {
 
+    // The projections flip the space vertically (inverts the y-axis) because mathematically
+    // we consider the bottom left to be 0,0 but on the screen we consider the top left to be 0,0
+    // I think it makes sense to do it here (might reduce calculations a tiny bit compared to doing
+    // it in the GraphView)...
+    // We just have to remember to reverse the flip when exporting the sketch :)
+
     PLAN {
         public Coord2D project(Coord3D coord3D) {
-            return new Coord2D(coord3D.x, coord3D.y);
+            return new Coord2D(coord3D.x, -coord3D.y);
         }
 
         public boolean isLegInPlane(Leg leg) {
@@ -22,7 +28,7 @@ public enum Projection2D {
     },
     ELEVATION_NS {
         public Coord2D project(Coord3D coord3D) {
-            return new Coord2D(coord3D.y, coord3D.z);
+            return new Coord2D(coord3D.y, -coord3D.z);
         }
 
         public boolean isLegInPlane(Leg leg) {
@@ -31,7 +37,7 @@ public enum Projection2D {
     },
     ELEVATION_EW {
         public Coord2D project(Coord3D coord3D) {
-            return new Coord2D(coord3D.x, coord3D.z);
+            return new Coord2D(coord3D.x, -coord3D.z);
         }
 
         public boolean isLegInPlane(Leg leg) {

@@ -30,7 +30,7 @@ public class CrossSection {
             // first of all normalise to match the angle of the cross section
             Leg rotated = leg.rotate(-angle);
             Coord3D coord3D = Space3DUtils.toCartesian(Coord3D.ORIGIN, rotated);
-            Coord2D coord2D = new Coord2D(coord3D.x, coord3D.z);
+            Coord2D coord2D = new Coord2D(coord3D.x, -coord3D.z);
             Line<Coord2D> line = new Line<>(Coord2D.ORIGIN, coord2D);
             projection.addLeg(rotated, line);
         }
