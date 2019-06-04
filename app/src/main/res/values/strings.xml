@@ -166,6 +166,8 @@
     <string name="stats_length">Length (m)</string>
     <string name="stats_vertical_range">Vertical Range (m)</string>
     <string name="stats_number_stations">Number of Stations</string>
+    <string name="stats_number_legs">Number of Legs</string>
+    <string name="stats_number_splays">Number of Splays</string>
     <string name="stats_longest_leg">Longest Leg (m)</string>
     <string name="stats_shortest_leg">Shortest Leg (m)</string>
     <string name="pref_station_symbol">Station symbol</string>

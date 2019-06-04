@@ -9,27 +9,6 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="org.hwyl.sexytopo.control.activity.SurveyActivity">
 
-    <!--
-    <TextView
-        android:text="@string/field_survey_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <EditText
-    android:id="@+id/survey_name"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:inputType="text" />
-
-    <Button
-        android:src="@drawable/move"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Save Survey"
-        android:id="@+id/buttonSaveSurvey"
-        />
-        -->
-
     <TableLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -64,6 +43,28 @@
                 />
             <TextView
                 android:id="@+id/statsFieldNumberStations"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:gravity="end"/>
+        </TableRow>
+        <TableRow>
+            <TextView
+                android:text="@string/stats_number_legs"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:gravity="start"
+                />
+            <TextView
+                android:id="@+id/statsFieldNumberLegs"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:gravity="end"/>
+        </TableRow>
+        <TableRow>
+            <TextView
+                android:text="@string/stats_number_splays"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:gravity="start"
+                />
+            <TextView
+                android:id="@+id/statsFieldNumberSplays"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:gravity="end"/>
         </TableRow>
