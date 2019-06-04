@@ -26,13 +26,25 @@ public class SystemLogActivity extends SexyTopoActivity {
         setupLogView();
     }
 
+
     @Override
     protected void onResume() {
+
         super.onResume();
+
         if (logUpdateReceiver != null) {
             logUpdateReceiver.update();
         }
+
+        final ScrollView scrollView = findViewById(R.id.scrollView);
+        scrollView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+            }
+        },1000);
     }
+
 
     private void setupLogView() {
         if (logUpdateReceiver == null) {
