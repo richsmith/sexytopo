@@ -23,9 +23,7 @@
     <item android:id="@+id/action_file"
         android:title="@string/action_file"
         app:showAsAction="never">
-        <menu xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools">
+        <menu>
             <item android:id="@+id/action_file_new" android:title="@string/action_file_new"/>
             <item android:id="@+id/action_file_open" android:title="@string/action_file_open"/>
             <item android:id="@+id/action_file_save" android:title="@string/action_file_save"/>
@@ -60,6 +58,10 @@
                 android:title="@string/action_undo_last_leg" />
             <item android:id="@+id/action_link_survey"
                   android:title="@string/action_link_to_existing_survey"/>
+            <item android:id="@+id/action_system_log"
+                  android:title="@string/action_system_log" />
+            <item android:id="@+id/action_generate_test_survey"
+                  android:title="@string/action_generate_test_survey" />
         </menu>
     </item>
     <item android:id="@+id/action_trip"
@@ -79,16 +81,12 @@
         android:orderInCategory="100"
         android:visible="true"
         app:showAsAction="never" />
-    <item android:id="@+id/dev_settings"
+    <item android:id="@+id/dev_menu"
           android:title="@string/action_dev"
           android:visible="true"
           android:orderInCategory="100"
           app:showAsAction="never">
         <menu>
-            <item android:id="@+id/action_system_log"
-                  android:title="@string/action_system_log" />
-            <item android:id="@+id/action_generate_test_survey"
-                  android:title="@string/action_generate_test_survey" />
             <item android:id="@+id/action_kill_connection"
                   android:title="@string/action_kill_connection" />
             <item android:id="@+id/action_force_crash"
@@ -101,13 +99,21 @@
         android:visible="true"
         android:orderInCategory="100"
         app:showAsAction="never" />
-    <item android:id="@+id/action_help"
+    <item android:id="@+id/help_menu"
         android:title="@string/action_help"
         android:orderInCategory="100"
-        app:showAsAction="never" />
-    <item android:id="@+id/action_about"
-        android:title="@string/action_about"
-        android:orderInCategory="100"
-        app:showAsAction="never" />
+        app:showAsAction="never">
+        <menu>
+            <item android:id="@+id/action_help"
+                  android:title="@string/action_guide"
+                  android:orderInCategory="100"
+                  app:showAsAction="never"/>
+            <item android:id="@+id/action_about"
+                  android:title="@string/action_about"
+                  android:orderInCategory="100"
+                  app:showAsAction="never" />
+        </menu>
+    </item>
+
 
 </menu>
