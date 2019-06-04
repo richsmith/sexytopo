@@ -35,6 +35,7 @@ public class DeviceActivity extends SexyTopoActivity {
 
 
     public static final String DISTO_X_PREFIX = "DistoX";
+    public static final String SHETLAND_PREFIX = "Shetland";
 
     private static final BluetoothAdapter BLUETOOTH_ADAPTER = BluetoothAdapter.getDefaultAdapter();
 
@@ -344,7 +345,15 @@ public class DeviceActivity extends SexyTopoActivity {
             return false;
         }
 
-        return name.toLowerCase().contains(DISTO_X_PREFIX.toLowerCase());
+        if (name.toLowerCase().contains(DISTO_X_PREFIX.toLowerCase())) {
+            return true;
+        }
+
+        if (name.toLowerCase().contains(SHETLAND_PREFIX.toLowerCase())) {
+            return true;
+        }
+
+        return false;
     }
 
 

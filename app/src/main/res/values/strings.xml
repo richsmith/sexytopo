@@ -134,6 +134,7 @@
     <string name="disto_connection_instructions">To pair: turn on the DistoX, click \'Pair…\', wait, and enter \'0000\' if a code is requested.</string>
     <string name="device_log_connection_requested">Connection requested</string>
     <string name="device_trying_fallback">Failed to create socket; trying fallback socket</string>
+    <string name="pairing_request">PAIRING requested\n-> Perform pairing steps. Connect again</string>
     <string name="device_log_connected">Connected :)</string>
     <string name="device_log_not_connected">Not connected :(</string>
     <string name="device_log_connecting">Connecting&#8230;</string>

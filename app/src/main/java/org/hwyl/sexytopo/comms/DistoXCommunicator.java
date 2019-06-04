@@ -19,6 +19,7 @@ import java.util.Set;
 
 import static org.hwyl.sexytopo.comms.DistoXProtocol.WAIT_BETWEEN_CONNECTION_ATTEMPTS_MS;
 import static org.hwyl.sexytopo.control.activity.DeviceActivity.DISTO_X_PREFIX;
+import static org.hwyl.sexytopo.control.activity.DeviceActivity.SHETLAND_PREFIX;
 
 
 public class DistoXCommunicator extends Thread {
@@ -46,7 +47,7 @@ public class DistoXCommunicator extends Thread {
 
     private static final BluetoothAdapter BLUETOOTH_ADAPTER = BluetoothAdapter.getDefaultAdapter();
     private BluetoothDevice bluetoothDevice;
-    private BluetoothSocket socket;
+    private SerialSocket socket;
 
     private DataInputStream inStream = null;
     private DataOutputStream outStream = null;
@@ -236,49 +237,19 @@ public class DistoXCommunicator extends Thread {
         }
 
         try {
-            Log.device(activity.getString(R.string.device_log_connecting));
-            socket = bluetoothDevice.createInsecureRfcommSocketToServiceRecord(
-                    SexyTopo.DISTO_X_UUID);
-            socket.connect(); // blocks until connection is complete or fails with an exception
-
-        } catch(Exception exception) {
-            String message = exception.getMessage();
-            if (message != null && message.contains("socket might closed or timeout")) {
-                try {
-                    Log.device(activity.getString(R.string.device_trying_fallback));
-                    socket = createFallbackSocket();
-                    socket.connect();
-                } catch (Exception e) {
-                    Log.device("Failed to create fallback socket: " + e.getMessage());
-                }
-            } else {
-                Log.device("Error connecting: " + exception.getMessage());
-            }
-
+            socket = new SerialSocket(bluetoothDevice);
+            inStream = new DataInputStream(socket.getInputStream());
+            outStream = new DataOutputStream(socket.getOutputStream());
+        } catch(Exception e) {
+                Log.device("Failed to create socket: " + e.getMessage());
         } finally {
-            if (socket.isConnected()) {
+            if (isConnected()) {
                 Log.device(activity.getString(R.string.device_log_connected));
             } else {
                 Log.device(activity.getString(R.string.device_log_not_connected));
             }
         }
 
-        try {
-            inStream = new DataInputStream(socket.getInputStream());
-            outStream = new DataOutputStream(socket.getOutputStream());
-        } catch (IOException exception) {
-            Log.device("Failed to create data streams :(");
-            disconnect();
-            return;
-        }
-    }
-
-    private BluetoothSocket createFallbackSocket() throws Exception {
-        BluetoothSocket socket = (BluetoothSocket)
-                bluetoothDevice.getClass()
-                        .getMethod("createRfcommSocket", new Class[]{int.class})
-                        .invoke(bluetoothDevice, 1);
-        return socket;
     }
 
 
@@ -314,7 +285,7 @@ public class DistoXCommunicator extends Thread {
         Set<BluetoothDevice> pairedDistoXes = new HashSet<>();
         Set<BluetoothDevice> pairedDevices = BLUETOOTH_ADAPTER.getBondedDevices();
         for (BluetoothDevice device : pairedDevices) {
-            if (isDistoX(device)) {
+            if (isDistoX(device) || isShetland(device)) {
                 pairedDistoXes.add(device);
             }
         }
@@ -325,6 +296,11 @@ public class DistoXCommunicator extends Thread {
     private static boolean isDistoX(BluetoothDevice device) {
         String name = device.getName();
         return name.toLowerCase().contains(DISTO_X_PREFIX.toLowerCase());
+    }
+
+    private static boolean isShetland(BluetoothDevice device) {
+        String name = device.getName();
+        return name.toLowerCase().contains(SHETLAND_PREFIX.toLowerCase());
     }
 
 
