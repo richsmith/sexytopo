@@ -130,8 +130,8 @@ public class ConnectedSurveysTest {
         PathDetail translatedPathDetail =
                 translatedSketch.getPathDetails().toArray(new PathDetail[] {})[0];
         List<Coord2D> coords = translatedPathDetail.getPath();
-        Assert.assertEquals(new Coord2D(0, 1), coords.get(0));
-        Assert.assertEquals(new Coord2D(0, 2), coords.get(1));
+        Assert.assertEquals(new Coord2D(0, -1), coords.get(0));
+        Assert.assertEquals(new Coord2D(0, 0), coords.get(1));
     }
 
 
