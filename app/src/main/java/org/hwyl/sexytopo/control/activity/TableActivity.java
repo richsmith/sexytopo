@@ -2,6 +2,7 @@ package org.hwyl.sexytopo.control.activity;
 
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -25,6 +26,7 @@ import android.widget.Toast;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.graph.GraphView;
 import org.hwyl.sexytopo.control.table.ManualEntry;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
@@ -240,26 +242,39 @@ public class TableActivity extends SexyTopoActivity
                 return true;
 
             case R.id.deleteRow:
+                final Station station = surveyEntry.getFrom();
+                int numStationsToBeDeleted = SurveyStats.calcNumberSubStations(station);
+                int numFullLegsToBeDeleted = SurveyStats.calcNumberSubFullLegs(station);
+                int numSplaysToBeDeleted = SurveyStats.calcNumberSubSplays(station);
 
-                int legsToBeDeleted = SurveyStats.calcNumberSubLegs(surveyEntry.getFrom());
-                int stationsToBeDeleted = SurveyStats.calcNumberSubStations(surveyEntry.getFrom());
-                String detailMessage = "This will delete\n" +
-                        TextTools.pluralise(legsToBeDeleted, "leg") +
-                        " and " + TextTools.pluralise(stationsToBeDeleted, "station");
-                String message = (legsToBeDeleted > 1 || stationsToBeDeleted > 1)?
-                        detailMessage : getString(R.string.delete_row_question);
-                new AlertDialog.Builder(this)
-                    .setMessage(message)
-                    .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+                Context context = this;
+                String message = context.getString(R.string.this_will_delete);
 
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            SurveyUpdater.deleteLeg(getSurvey(), surveyEntry.getLeg());
-                            syncTableWithSurvey();
-                        }
-                    })
-                    .setNegativeButton(R.string.cancel, null)
-                    .show();
+                if (numStationsToBeDeleted > 0) {
+                    String noun = context.getString(R.string.station).toLowerCase();
+                    message += "\n" + TextTools.pluralise(numStationsToBeDeleted, noun);
+                }
+                if (numFullLegsToBeDeleted > 0) {
+                    String noun = context.getString(R.string.leg).toLowerCase();
+                    message += "\n" + TextTools.pluralise(numFullLegsToBeDeleted, noun);
+                }
+                if (numSplaysToBeDeleted > 0) {
+                    String noun = context.getString(R.string.splay).toLowerCase();
+                    message += "\n" + TextTools.pluralise(numSplaysToBeDeleted, noun);
+                }
+
+                new AlertDialog.Builder(context)
+                        .setMessage(message)
+                        .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                getSurvey().deleteStation(station);
+                                SurveyManager.getInstance(TableActivity.this).broadcastSurveyUpdated();
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, null)
+                        .show();
                 return true;
             default:
                 return false;

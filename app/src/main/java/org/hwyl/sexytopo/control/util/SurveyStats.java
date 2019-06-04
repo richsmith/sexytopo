@@ -64,7 +64,29 @@ public class SurveyStats {
         return Survey.getAllStations(origin).size();
     }
 
-    public static int calcNumberLegs(Survey survey) {
+    public static int calcNumberSubFullLegs(Station station) {
+        List<Leg> legs = Survey.getAllLegs(station);
+        int numFullLegs = 0;
+        for (Leg leg : legs) {
+            if (leg.hasDestination()) {
+                numFullLegs++;
+            }
+        }
+        return numFullLegs;
+    }
+
+    public static int calcNumberSubSplays(Station station) {
+        List<Leg> legs = Survey.getAllLegs(station);
+        int numSplays = 0;
+        for (Leg leg : legs) {
+            if (!leg.hasDestination()) {
+                numSplays++;
+            }
+        }
+        return numSplays;
+    }
+
+    public static int calcNumberSplays(Survey survey) {
         return survey.getAllLegs().size();
     }
 

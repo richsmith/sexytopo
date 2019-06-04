@@ -652,17 +652,10 @@ public class GraphView extends View {
 
 
     private void askAboutDeletingStation(final Station station) {
-        List<Leg> legsToBeDeleted = Survey.getAllLegs(station);
-        int numFullLegsToBeDeleted = 0;
-        int numSplaysToBeDeleted = 0;
-        for (Leg leg : legsToBeDeleted) {
-            if (leg.hasDestination()) {
-                numFullLegsToBeDeleted++;
-            } else {
-                numSplaysToBeDeleted++;
-            }
-        }
+
         int numStationsToBeDeleted = SurveyStats.calcNumberSubStations(station);
+        int numFullLegsToBeDeleted = SurveyStats.calcNumberSubFullLegs(station);
+        int numSplaysToBeDeleted = SurveyStats.calcNumberSubSplays(station);
 
         Context context = getContext();
         String message = context.getString(R.string.this_will_delete);
