@@ -21,15 +21,11 @@ public class SexyTopo {
     public static final String DEVICE_LOG_UPDATED_EVENT = "deviceLogUpdatedEvent";
     public static final String CALIBRATION_UPDATED_EVENT = "calibrationUpdatedEvent";
 
-
-    public static final String APP_DIR = APP_NAME;
     public static final String SURVEY_DIR = "Surveys";
     public static final String IMPORT_DIR = "To Import";
     public static final String EXPORT_DIR = "Exported";
     public static final String LOG_DIR = "Logs";
     public static final String CALIBRATION_DIR = "Calibrations";
-
-
 
     public static final String IMPORT_SOURCE_DIR = "Import Source";
 
@@ -45,6 +41,9 @@ public class SexyTopo {
     public static final String EXT_ELEVATION_SKETCH_EXTENSION = "ext-elevation.json";
     public static final String METADATA_EXTENSION = "metadata.json";
     public static final String AUTOSAVE_EXTENSION = "autosave";
+
+    public static final String PLAN_SUFFIX = "plan";
+    public static final String EE_SUFFIX = "ee";
 
     public static final double ALLOWED_DOUBLE_DELTA = 0.0001;
 

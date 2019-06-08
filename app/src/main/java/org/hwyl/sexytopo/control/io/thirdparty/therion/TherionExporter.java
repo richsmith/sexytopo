@@ -4,10 +4,12 @@ import android.content.Context;
 
 import org.apache.commons.io.FilenameUtils;
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.control.io.thirdparty.xvi.XviExporter;
 import org.hwyl.sexytopo.control.io.translation.Exporter;
+import org.hwyl.sexytopo.control.util.SpaceFlipper;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
@@ -21,9 +23,6 @@ import java.util.List;
 
 
 public class TherionExporter extends Exporter {
-
-    public static final String PLAN_SUFFIX = "plan";
-    public static final String EE_SUFFIX = "ee";
 
     private String originalThFileContent = null;
     private String originalTh2PlanFileContent = null;
@@ -42,9 +41,9 @@ public class TherionExporter extends Exporter {
         String name = survey.getName();
 
         handleProjection(context, survey, Projection2D.PLAN, survey.getPlanSketch(),
-                PLAN_SUFFIX, originalTh2PlanFileContent);
+                SexyTopo.PLAN_SUFFIX, originalTh2PlanFileContent);
         handleProjection(context, survey, Projection2D.EXTENDED_ELEVATION, survey.getElevationSketch(),
-                EE_SUFFIX, originalTh2EeFileContent);
+                SexyTopo.EE_SUFFIX, originalTh2EeFileContent);
 
         String thContent = null;
         if (originalThFileContent == null) {
@@ -69,6 +68,7 @@ public class TherionExporter extends Exporter {
         double scale = getScale();
 
         Space<Coord2D> space = projection.project(survey);
+        space = SpaceFlipper.flipVertically(space);
         String baseFilename = survey.getName() + " " + suffix;
         String th2Filename = baseFilename + ".th2";
         String content = null;
@@ -121,9 +121,9 @@ public class TherionExporter extends Exporter {
                 for (File file : files) {
                     if (FilenameUtils.getExtension(file.getName()).equals("th")) {
                         originalThFileContent = Loader.slurpFile(file);
-                    } else if (file.getName().endsWith(PLAN_SUFFIX + ".th2")) {
+                    } else if (file.getName().endsWith(SexyTopo.PLAN_SUFFIX + ".th2")) {
                         originalTh2PlanFileContent = Loader.slurpFile(file);
-                    } else if (file.getName().endsWith(PLAN_SUFFIX + ".th2")) {
+                    } else if (file.getName().endsWith(SexyTopo.PLAN_SUFFIX + ".th2")) {
                         originalTh2EeFileContent = Loader.slurpFile(file);
                     }
 

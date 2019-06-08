@@ -1,6 +1,7 @@
 package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
 import org.apache.commons.io.FilenameUtils;
+import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexImporter;
@@ -33,10 +34,10 @@ public class TherionImporter extends Importer {
 
             } else if (file.getName().endsWith("xvi")) {
                 String filenameNoExtension = FilenameUtils.removeExtension(file.getName());
-                if (filenameNoExtension.endsWith(TherionExporter.PLAN_SUFFIX)) {
+                if (filenameNoExtension.endsWith(SexyTopo.PLAN_SUFFIX)) {
                     Sketch sketch = XviImporter.getSketch(file);
                     survey.setPlanSketch(sketch);
-                } else if (filenameNoExtension.endsWith(TherionExporter.EE_SUFFIX)) {
+                } else if (filenameNoExtension.endsWith(SexyTopo.EE_SUFFIX)) {
                     Sketch sketch = XviImporter.getSketch(file);
                     survey.setElevationSketch(sketch);
                 }
