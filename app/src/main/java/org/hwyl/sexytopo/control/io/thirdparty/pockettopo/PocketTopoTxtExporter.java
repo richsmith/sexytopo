@@ -14,8 +14,10 @@ import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
+import org.hwyl.sexytopo.model.survey.Trip;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -25,8 +27,20 @@ public class PocketTopoTxtExporter extends SingleFileExporter {
 
     public String getContent(Survey survey) {
 
+
+
         String text = "TRIP\n";
-        text += "DATE 1970-01-01\n";
+
+        text += "DATE ";
+        if (survey.getTrip() != null) {
+            Trip trip = survey.getTrip();
+            Date date = trip.getDate();
+            text += TextTools.toIsoDate(date);
+        } else {
+            text += "1970-01-01\n";
+        }
+        text += "\n";
+
         text += "DECLINATION\t0.00\n";
 
         text += exportData(survey) + "\n";
