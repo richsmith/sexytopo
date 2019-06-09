@@ -481,6 +481,7 @@ public class CalibrationActivity extends SexyTopoActivity {
             return writeCalibrationProtocol.wasSuccessful();
         }
 
+
         private void waitForEnd(WriteCalibrationProtocol writeCalibrationProtocol, int attempts) {
             for (int i = 0; i < attempts; i++) {
                 try {
@@ -494,8 +495,14 @@ public class CalibrationActivity extends SexyTopoActivity {
             }
         }
 
+
         @Override
         protected void onPostExecute(Boolean wasSuccessful) {
+
+            if (isFinishing()) {
+                return;
+            }
+
             progressDialog.dismiss();
             if (wasSuccessful) {
                 showSimpleToast(R.string.calibration_success);
