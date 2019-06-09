@@ -179,6 +179,7 @@
     <string name="third_party_pocket_topo_txt">PocketTopo .txt</string>
     <string name="third_party_survex">Survex</string>
     <string name="third_party_compass">Compass</string>
+    <string name="third_party_svg">SVG</string>
     <string name="calibration_index">Reading number</string>
     <string name="calibration_start">Start Calibration</string>
     <string name="calibration_stop">Stop Calibration</string>

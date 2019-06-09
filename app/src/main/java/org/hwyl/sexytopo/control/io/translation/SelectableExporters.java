@@ -3,6 +3,7 @@ package org.hwyl.sexytopo.control.io.translation;
 import org.hwyl.sexytopo.control.io.thirdparty.compass.CompassExporter;
 import org.hwyl.sexytopo.control.io.thirdparty.pockettopo.PocketTopoTxtExporter;
 import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexExporter;
+import org.hwyl.sexytopo.control.io.thirdparty.svg.SvgExporter;
 import org.hwyl.sexytopo.control.io.thirdparty.therion.TherionExporter;
 
 import java.util.Arrays;
@@ -15,7 +16,8 @@ public class SelectableExporters {
         new TherionExporter(),
         new SurvexExporter(),
         new PocketTopoTxtExporter(),
-        new CompassExporter()
+        new CompassExporter(),
+        new SvgExporter()
     );
 
 }

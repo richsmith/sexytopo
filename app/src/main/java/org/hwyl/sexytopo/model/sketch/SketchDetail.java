@@ -7,13 +7,14 @@ public abstract class SketchDetail {
 
     private final Colour colour;
 
-    private double left = Double.POSITIVE_INFINITY;
-    private double right = Double.NEGATIVE_INFINITY;
-    private double top = Double.POSITIVE_INFINITY;
-    private double bottom = Double.NEGATIVE_INFINITY;
+    private double left;
+    private double right;
+    private double top;
+    private double bottom;
 
     protected SketchDetail(Colour colour) {
         this.colour = colour;
+        resetBoundingBox();
     }
 
     public Colour getColour() {
@@ -40,5 +41,49 @@ public abstract class SketchDetail {
         top = Math.min(top, point.y);
         bottom = Math.max(bottom, point.y);
 
+    }
+
+
+    protected void resetBoundingBox() {
+        left = Double.POSITIVE_INFINITY;
+        right = Double.NEGATIVE_INFINITY;
+        top = Double.POSITIVE_INFINITY;
+        bottom = Double.NEGATIVE_INFINITY;
+    }
+
+
+    public double getWidth() {
+        if (left == Double.POSITIVE_INFINITY || right == Double.NEGATIVE_INFINITY) {
+            return 0;
+        } else {
+            return right - left;
+        }
+    }
+
+
+    public double getHeight() {
+        if (top == Double.POSITIVE_INFINITY || bottom == Double.NEGATIVE_INFINITY) {
+            return 0;
+        } else {
+            return bottom - top;
+        }
+    }
+
+
+    public Coord2D getTopLeft() {
+        if (top == Double.POSITIVE_INFINITY || left == Double.POSITIVE_INFINITY) {
+            return new Coord2D(0, 0);
+        } else {
+            return new Coord2D(left, top);
+        }
+    }
+
+
+    public Coord2D getBottomRight() {
+        if (bottom == Double.NEGATIVE_INFINITY || right == Double.NEGATIVE_INFINITY) {
+            return new Coord2D(0, 0);
+        } else {
+            return new Coord2D(right, bottom);
+        }
     }
 }

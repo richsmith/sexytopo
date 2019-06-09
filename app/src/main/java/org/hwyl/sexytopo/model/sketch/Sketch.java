@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.model.sketch;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 
-public class Sketch {
+public class Sketch extends SketchDetail {
 
     private Set<PathDetail> pathDetails = new HashSet<>();
     private Set<TextDetail> textDetails = new HashSet<>();
@@ -34,10 +35,12 @@ public class Sketch {
 
     public void setPathDetails(Set<PathDetail> pathDetails) {
         this.pathDetails = pathDetails;
+        recalculateBoundingBox();
     }
 
     public void setTextDetails(Set<TextDetail> textDetails) {
         this.textDetails = textDetails;
+        recalculateBoundingBox();
     }
 
 
@@ -48,6 +51,11 @@ public class Sketch {
 
     public PathDetail getActivePath() {
         return activePath;
+    }
+
+
+    public Sketch() {
+        super(Colour.NONE);
     }
 
 
@@ -62,6 +70,7 @@ public class Sketch {
         setSaved(false);
         sketchHistory.add(sketchDetail);
         undoneHistory.clear();
+        updateBoundingBox(sketchDetail);
     }
 
     public void finishPath() {
@@ -87,15 +96,10 @@ public class Sketch {
         if (!sketchHistory.isEmpty()) {
             SketchDetail toUndo = sketchHistory.remove(sketchHistory.size() - 1);
 
-            if (toUndo instanceof PathDetail) {
-                pathDetails.remove(toUndo);
-            } else if (toUndo instanceof TextDetail) {
-                textDetails.remove(toUndo);
-            } else if (toUndo instanceof CrossSectionDetail) {
-                crossSectionDetails.remove(toUndo);
-            } else if (toUndo instanceof DeletedDetail) {
-                SketchDetail sketchDetail = ((DeletedDetail)toUndo).getSketchDetail();
-                addDetailToSketch(sketchDetail);
+            if (toUndo instanceof DeletedDetail) {
+                restoreDetailToSketch(((DeletedDetail)toUndo).getSketchDetail());
+            } else {
+                removeDetailFromSketch(toUndo);
             }
 
             undoneHistory.add(toUndo);
@@ -107,14 +111,10 @@ public class Sketch {
         if (!undoneHistory.isEmpty()) {
             SketchDetail toRedo = undoneHistory.remove(undoneHistory.size() - 1);
 
-            if (toRedo instanceof PathDetail) {
-                pathDetails.add((PathDetail) toRedo);
-            } else if (toRedo instanceof TextDetail) {
-                textDetails.add((TextDetail) toRedo);
-            } else if (toRedo instanceof CrossSectionDetail) {
-                crossSectionDetails.add((CrossSectionDetail) toRedo);
-            } else if (toRedo instanceof DeletedDetail) {
+            if (toRedo instanceof DeletedDetail) {
                 removeDetailFromSketch(((DeletedDetail)toRedo).getSketchDetail());
+            } else {
+                restoreDetailToSketch(toRedo);
             }
 
             sketchHistory.add(toRedo);
@@ -139,10 +139,12 @@ public class Sketch {
         } else if (sketchDetail instanceof CrossSectionDetail) {
             crossSectionDetails.remove(sketchDetail);
         }
+
+        recalculateBoundingBox();
     }
 
 
-    public void addDetailToSketch(SketchDetail sketchDetail) {
+    public void restoreDetailToSketch(SketchDetail sketchDetail) {
         if (sketchDetail instanceof PathDetail) {
             pathDetails.add((PathDetail)sketchDetail);
         } else if (sketchDetail instanceof TextDetail) {
@@ -150,6 +152,8 @@ public class Sketch {
         } else if (sketchDetail instanceof CrossSectionDetail) {
             crossSectionDetails.add((CrossSectionDetail)sketchDetail);
         }
+
+        updateBoundingBox(sketchDetail);
     }
 
 
@@ -254,4 +258,28 @@ public class Sketch {
         return sketch;
     }
 
+
+    public void recalculateBoundingBox() {
+        resetBoundingBox();
+        for (SketchDetail sketchDetail : allSketchDetails()) {
+            updateBoundingBox(sketchDetail);
+        }
+    }
+
+    public void updateBoundingBox(SketchDetail sketchDetail) {
+        updateBoundingBox(sketchDetail.getTopLeft());
+        updateBoundingBox(sketchDetail.getBottomRight());
+    }
+
+
+    @Override
+    public double getDistanceFrom(Coord2D point) {
+        throw new NotImplementedException("Not yet implemented");
+    }
+
+
+    @Override
+    public SketchDetail translate(Coord2D point) {
+        throw new NotImplementedException("Not yet implemented");
+    }
 }
