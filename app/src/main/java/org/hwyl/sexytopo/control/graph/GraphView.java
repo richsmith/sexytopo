@@ -1222,7 +1222,7 @@ public class GraphView extends View {
 
 
     public void adjustZoomBy(double delta) {
-        double newZoom = surveyToViewScale + delta;
+        double newZoom = surveyToViewScale * delta;
         setZoom(newZoom);
     }
 

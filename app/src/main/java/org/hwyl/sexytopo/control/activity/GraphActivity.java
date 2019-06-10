@@ -33,7 +33,9 @@ import org.hwyl.sexytopo.model.survey.Survey;
 public abstract class GraphActivity extends SexyTopoActivity
         implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
 
-    private static final double ZOOM_INCREMENT = 4.0;
+    private static final double ZOOM_INCREMENT = 1.1;
+    private static final double ZOOM_DECREMENT = 0.9;
+
 
     private static final GraphView.SketchTool DEFAULT_SKETCH_TOOL_SELECTION =
             GraphView.SketchTool.MOVE;
@@ -273,7 +275,7 @@ public abstract class GraphActivity extends SexyTopoActivity
                 graphView.invalidate();
                 break;
             case R.id.buttonZoomOut:
-                graphView.adjustZoomBy(-ZOOM_INCREMENT);
+                graphView.adjustZoomBy(ZOOM_DECREMENT);
                 graphView.invalidate();
                 break;
             case R.id.buttonUndo:
