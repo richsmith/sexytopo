@@ -3,7 +3,7 @@
 
 <img src="app/src/main/res/drawable-hdpi/laser_icon.png" width=10%><br> 
 
-The SexyTopo cave and underground surveying app for Android. Next-gen surveying with a sexy interface :)
+The SexyTopo cave and underground surveying app for Android. Next-gen surveying with a sexy interface.
 
 This app is experimental software made available for free with no guarantee it is fit for anything in particular. I'm not responsible if it loses your data or leads you into some horrific adventure. Caving is a potentially dangerous activity etc. etc. - you know the score :)
 
@@ -11,7 +11,7 @@ This app is experimental software made available for free with no guarantee it i
 # FAQ
 
 ## I'm interested in giving SexyTopo a go. What do I do?
-You need an Android phone. The easiest way is to install SexyTopo via the Google Play app store. Just search for "SexyTopo" and click install. It's a very small download.
+You need an Android phone or tablet. The easiest way is to install SexyTopo via the Google Play app store. Just search for "SexyTopo" and click install. It's a very small download.
 https://play.google.com/store/apps/details?id=org.hwyl.sexytopo
 
 If you can't access Google Play for some reason (e.g. you're in China) then you should be able to get the APK from here: https://github.com/richsmith/sexytopo/tree/master/app/release
