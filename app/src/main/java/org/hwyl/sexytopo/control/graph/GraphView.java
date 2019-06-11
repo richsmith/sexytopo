@@ -88,6 +88,10 @@ public class GraphView extends View {
 
     private Map<Survey, Space<Coord2D>> translatedConnectedSurveys = new HashMap<>();
 
+    // cached for performance
+    private Coord2D viewpointTopLeftOnSurvey;
+    private Coord2D viewpointBottomRightOnSurvey;
+
 
     public static final Colour LEG_COLOUR = Colour.RED;
 	public static final Colour SPLAY_COLOUR = Colour.PINK;
@@ -337,7 +341,7 @@ public class GraphView extends View {
     }
 
 
-    private Coord2D viewCoordsToSurveyCoords(Coord2D coords) {
+    private Coord2D viewCoordsToSurveyCoords(final Coord2D coords) {
         // The more elegant way to do this is:
         // return coords.scale(1 / surveyToViewScale).plus(viewpointOffset);
         // ...but this method gets hit hard (profiled) so let's avoid creating intermediate objects:
@@ -346,7 +350,7 @@ public class GraphView extends View {
     }
 
 
-    private Coord2D surveyCoordsToViewCoords(Coord2D coords) {
+    private Coord2D surveyCoordsToViewCoords(final Coord2D coords) {
         // The more elegant way to do this is:
         // return coords.minus(viewpointOffset).scale(surveyToViewScale);
         // ...but this method gets hit hard (profiled) so let's avoid creating intermediate objects:
@@ -715,6 +719,9 @@ public class GraphView extends View {
     protected void onDraw(Canvas canvas) {
 
         super.onDraw(canvas);
+
+        viewpointTopLeftOnSurvey = viewCoordsToSurveyCoords(Coord2D.ORIGIN);
+        viewpointBottomRightOnSurvey = viewCoordsToSurveyCoords(new Coord2D(getWidth(), getHeight()));
 
         if (getDisplayPreference(GraphActivity.DisplayPreference.SHOW_GRID)) {
             drawGrid(canvas);
@@ -1098,17 +1105,16 @@ public class GraphView extends View {
                 continue;
             }
 
+            drawPaint.setColor(pathDetail.getColour().intValue);
+            drawPaint.setAlpha(alpha);
+
             List<Coord2D> path = pathDetail.getPath();
             Coord2D from = null;
             for (Coord2D point : path) {
                 if (from == null) {
                     from = surveyCoordsToViewCoords(point);
-                    continue;
                 } else {
                     Coord2D to = surveyCoordsToViewCoords(point);
-                    drawPaint.setColor(pathDetail.getColour().intValue);
-                    drawPaint.setAlpha(alpha);
-
                     canvas.drawLine(
                         (float) from.x, (float) from.y,
                         (float) to.x, (float) to.y,
@@ -1167,9 +1173,8 @@ public class GraphView extends View {
 
 
     private boolean couldBeOnScreen(SketchDetail sketchDetail) {
-        Coord2D topLeft = viewCoordsToSurveyCoords(Coord2D.ORIGIN);
-        Coord2D bottomRight = viewCoordsToSurveyCoords(new Coord2D(getWidth(), getHeight()));
-        return sketchDetail.intersectsRectangle(topLeft, bottomRight);
+        return sketchDetail.intersectsRectangle(
+                viewpointTopLeftOnSurvey, viewpointBottomRightOnSurvey);
     }
 
 

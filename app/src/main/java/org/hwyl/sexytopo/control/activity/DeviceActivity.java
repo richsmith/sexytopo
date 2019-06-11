@@ -107,8 +107,8 @@ public class DeviceActivity extends SexyTopoActivity {
 
     private void setupLogView() {
         if (logUpdateReceiver == null) {
-            TextView logView = (TextView)findViewById(R.id.deviceLog);
-            ScrollView scrollView = (ScrollView)findViewById(R.id.scrollView);
+            TextView logView = findViewById(R.id.deviceLog);
+            ScrollView scrollView = findViewById(R.id.scrollView);
             logUpdateReceiver = new LogUpdateReceiver(scrollView, logView, Log.LogType.DEVICE);
 
             LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
@@ -120,7 +120,7 @@ public class DeviceActivity extends SexyTopoActivity {
     }
 
     private void setupSwitchListeners() {
-        Switch bluetoothSwitch = (Switch)(findViewById(R.id.bluetoothSwitch));
+        Switch bluetoothSwitch = findViewById(R.id.bluetoothSwitch);
         bluetoothSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -128,7 +128,7 @@ public class DeviceActivity extends SexyTopoActivity {
             }
         });
 
-        Switch connectionSwitch = (Switch)(findViewById(R.id.connectionSwitch));
+        Switch connectionSwitch = findViewById(R.id.connectionSwitch);
         connectionSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -148,17 +148,9 @@ public class DeviceActivity extends SexyTopoActivity {
 
 
     public void stopConnection() {
-
-/*        if (comms == null || !comms.isAlive()) {
-            return;
-        }*/
-
         Log.device(getString(R.string.device_log_stopping));
 
         try {
-/*            comms.kill();
-            comms.join();
-            comms = null;*/
             requestComms().requestStop();
         } catch (Exception e) {
             Log.device("Error stopping thread:\n" + e.getMessage());
@@ -173,7 +165,7 @@ public class DeviceActivity extends SexyTopoActivity {
                     Toast.LENGTH_SHORT).show();
         }
 
-        Switch bluetoothSwitch = (Switch)(findViewById(R.id.bluetoothSwitch));
+        Switch bluetoothSwitch = findViewById(R.id.bluetoothSwitch);
 
         if (BLUETOOTH_ADAPTER == null) {
             bluetoothSwitch.setChecked(false);
@@ -240,15 +232,14 @@ public class DeviceActivity extends SexyTopoActivity {
 
         Set<BluetoothDevice> distos = getPairedDistos();
 
-        Switch bluetoothSwitch = (Switch)(findViewById(R.id.bluetoothSwitch));
+        Switch bluetoothSwitch = findViewById(R.id.bluetoothSwitch);
 
-        TextView deviceList = (TextView)(findViewById(R.id.deviceList));
+        TextView deviceList = findViewById(R.id.deviceList);
         deviceList.setTextColor(distos.size() == 1? Color.BLACK : Color.RED);
         deviceList.setText(describeNDevices(distos.size()));
 
-
         // Allow connections iff we have one connected DistoX
-        Switch connectionSwitch = (Switch)(findViewById(R.id.connectionSwitch));
+        Switch connectionSwitch = findViewById(R.id.connectionSwitch);
         if (distos.size() == 1 && bluetoothSwitch.isChecked()) {
             connectionSwitch.setEnabled(true);
         } else {
@@ -259,7 +250,7 @@ public class DeviceActivity extends SexyTopoActivity {
     }
 
     private void updateConnectionStatus() {
-        Switch connectionSwitch = (Switch)(findViewById(R.id.connectionSwitch));
+        Switch connectionSwitch = findViewById(R.id.connectionSwitch);
         connectionSwitch.setChecked(doConnection);
     }
 
