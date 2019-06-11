@@ -3,9 +3,7 @@ package org.hwyl.sexytopo.model.survey;
 import org.hwyl.sexytopo.control.util.StationNamer;
 import org.hwyl.sexytopo.control.util.SurveyTools;
 import org.hwyl.sexytopo.control.util.Wrapper;
-import org.hwyl.sexytopo.model.graph.Coord;
 import org.hwyl.sexytopo.model.graph.Coord2D;
-import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 
@@ -147,8 +145,7 @@ public class Survey {
     }
 
     public static List<Leg> getAllLegs(Station root) {
-        List<Leg> legs = new ArrayList<>();
-        legs.addAll(root.getOnwardLegs());
+        List<Leg> legs = new ArrayList<>(root.getOnwardLegs());
         for (Leg leg : root.getConnectedOnwardLegs()) {
             legs.addAll(getAllLegs(leg.getDestination()));
         }
@@ -194,8 +191,6 @@ public class Survey {
 
     public void disconnect(Station joinInThisSurvey, Survey otherSurvey) throws Exception {
         Set<SurveyConnection> connections = stationsToSurveyConnections.get(joinInThisSurvey);
-
-        SurveyConnection foundConnection = null;
 
         for (SurveyConnection connection : connections) {
             if (connection.otherSurvey == otherSurvey) {
