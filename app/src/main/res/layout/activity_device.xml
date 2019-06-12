@@ -16,8 +16,7 @@
         android:layout_gravity="end"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:id="@+id/bluetoothSwitch" />
-
-
+    
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="wrap_content"
@@ -99,17 +98,6 @@
         android:padding="5dp"
         android:layout_height="match_parent">
 
-        <!--
-        <Button
-            android:width="100dp"
-            android:layout_margin="10dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/clear_log"
-            android:textSize="8dp"
-            android:id="@+id/clearLogButton"
-            android:onClick="clearLog"/>-->
-
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -128,15 +116,6 @@
         </ScrollView>
 
     </LinearLayout>
-
-    <!--
-    <Button
-        android:src="@drawable/move"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Calibrate"
-        android:id="@+id/buttonCalibrate"
-        />-->
 
 
 </LinearLayout>
