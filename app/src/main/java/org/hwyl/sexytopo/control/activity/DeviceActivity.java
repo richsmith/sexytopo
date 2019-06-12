@@ -42,7 +42,7 @@ public class DeviceActivity extends SexyTopoActivity {
     private IntentFilter logFilter;
     private IntentFilter statusFilter;
     private IntentFilter scanFilter;
-    private LogUpdateReceiver logUpdateReceiver;
+    private DeviceLogUpdateReceiver logUpdateReceiver;
     private StateChangeReceiver stateChangeReceiver;
     private ScanReceiver scanReceiver;
 
@@ -56,23 +56,23 @@ public class DeviceActivity extends SexyTopoActivity {
         setContentView(R.layout.activity_device);
 
         setupSwitchListeners();
-
-        setupLogView();
-
         updateStatuses();
 
         scanFilter = new IntentFilter();
         scanFilter.addAction(BluetoothDevice.ACTION_FOUND);
         scanFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         scanReceiver = new ScanReceiver();
-        registerReceiver(scanReceiver, scanFilter);
 
         statusFilter = new IntentFilter();
         statusFilter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
         statusFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         stateChangeReceiver = new StateChangeReceiver();
-        registerReceiver(stateChangeReceiver, statusFilter);
 
+        logFilter = new IntentFilter();
+        logFilter.addAction(SexyTopo.DEVICE_LOG_UPDATED_EVENT);
+
+
+        logUpdateReceiver = new DeviceLogUpdateReceiver();
     }
 
 
@@ -84,15 +84,23 @@ public class DeviceActivity extends SexyTopoActivity {
         logUpdateReceiver.update();
         updateStatuses();
 
+        registerReceiver(scanReceiver, scanFilter);
+        registerReceiver(stateChangeReceiver, statusFilter);
+
+        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
+        broadcastManager.registerReceiver(logUpdateReceiver, logFilter);
+
     }
 
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onPause() {
+        super.onPause();
         try {
             unregisterReceiver(stateChangeReceiver);
             unregisterReceiver(scanReceiver);
+            LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
+            broadcastManager.unregisterReceiver(logUpdateReceiver);
         } catch (Exception exception) { // this shouldn't ever happen
             Log.e("Error unregistering receiver: " + exception.getMessage());
         }
@@ -103,20 +111,6 @@ public class DeviceActivity extends SexyTopoActivity {
         updateBluetooth();
         updatePairedStatus();
         updateConnectionStatus();
-    }
-
-    private void setupLogView() {
-        if (logUpdateReceiver == null) {
-            TextView logView = findViewById(R.id.deviceLog);
-            ScrollView scrollView = findViewById(R.id.scrollView);
-            logUpdateReceiver = new LogUpdateReceiver(scrollView, logView, Log.LogType.DEVICE);
-
-            LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
-            logFilter = new IntentFilter();
-            logFilter.addAction(SexyTopo.DEVICE_LOG_UPDATED_EVENT);
-            broadcastManager.registerReceiver(logUpdateReceiver, logFilter);
-
-        }
     }
 
     private void setupSwitchListeners() {
@@ -409,8 +403,28 @@ public class DeviceActivity extends SexyTopoActivity {
                 Log.device("Scan finished");
             } else {
                 Log.device("action");
-                Log.device(action.toString());
+                org.hwyl.sexytopo.control.Log.device(action.toString());
             }
         }
-    };
+    }
+
+
+    private class DeviceLogUpdateReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            update();
+        }
+
+        public void update() {
+            TextView logView = findViewById(R.id.deviceLog);
+            final ScrollView scrollView = findViewById(R.id.scrollView);
+            LogUpdateReceiver.update(Log.LogType.DEVICE, scrollView, logView);
+            scrollView.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+                }
+            },1000);
+        }
+    }
 }

@@ -16,7 +16,7 @@
         android:layout_gravity="end"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:id="@+id/bluetoothSwitch" />
-    
+
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="wrap_content"

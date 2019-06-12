@@ -2,6 +2,7 @@ package org.hwyl.sexytopo.comms;
 
 import android.bluetooth.BluetoothDevice;
 
+import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
 
@@ -20,6 +21,7 @@ public class StopCalibrationProtocol extends DistoXProtocol {
 
     @Override
     public void go(DataInputStream inStream, DataOutputStream outStream) throws Exception {
+        Log.device("Writing stop calibration command packet");
         byte[] commandPacket = new byte[] {STOP_CALIBRATION};
         writeCommandPacket(outStream, commandPacket);
     }

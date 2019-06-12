@@ -62,7 +62,7 @@ public class CalibrationProtocol extends DistoXProtocol {
                     updateAccelerationSensorReading(packet, calibrationReading);
                     accelerationDuplicated = 0;
                 } else {
-                    Log.d("(Duplication " + ++accelerationDuplicated + ")");
+                    Log.device("(Duplication " + ++accelerationDuplicated + ")");
                     checkExcessiveDuplication(accelerationDuplicated, inStream, outStream);
                 }
                 break;
@@ -73,18 +73,18 @@ public class CalibrationProtocol extends DistoXProtocol {
                     updateMagneticSensorReading(packet, calibrationReading);
                     magneticDuplicated = 0;
                 } else {
-                    Log.d("(Duplication " + ++magneticDuplicated + ")");
+                    Log.device("(Duplication " + ++magneticDuplicated + ")");
                     checkExcessiveDuplication(magneticDuplicated, inStream, outStream);
                 }
                 break;
 
             default:
-                Log.d("(Not sure what this packet is)");
+                Log.device("(Not sure what this packet is)");
                 break;
         }
 
         if (calibrationReading.getState() == CalibrationReading.State.COMPLETE) {
-            Log.d("Completed cal reading :)");
+            Log.device("Completed cal reading :)");
             dataManager.addCalibrationReading(calibrationReading);
             calibrationReading = null;
         }

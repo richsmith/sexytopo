@@ -41,6 +41,8 @@ public class SurveyUpdater {
 
     public static synchronized boolean update(Survey survey, Leg leg, InputMode inputMode) {
         Station activeStation = survey.getActiveStation();
+
+        Log.d("Adding leg " + leg);
         activeStation.getOnwardLegs().add(leg);
         survey.setSaved(false);
         survey.addUndoEntry(activeStation, leg);

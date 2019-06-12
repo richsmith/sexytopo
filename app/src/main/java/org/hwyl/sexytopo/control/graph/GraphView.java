@@ -91,6 +91,8 @@ public class GraphView extends View {
     // cached for performance
     private Coord2D viewpointTopLeftOnSurvey;
     private Coord2D viewpointBottomRightOnSurvey;
+    private double surveyLength = 0;
+    private double surveyHeight = 0;
 
 
     public static final Colour LEG_COLOUR = Colour.RED;
@@ -733,7 +735,7 @@ public class GraphView extends View {
 
         drawSurvey(canvas, survey, projection, 255);
 
-        drawLegend(canvas, survey);
+        drawLegend(canvas);
 
         if (DEBUG) {
             drawDebuggingInfo(canvas);
@@ -1099,6 +1101,8 @@ public class GraphView extends View {
             return;
         }
 
+        drawPaint.setAlpha(alpha);
+
         for (PathDetail pathDetail : sketch.getPathDetails()) {
 
             if (!couldBeOnScreen(pathDetail)) {
@@ -1106,7 +1110,6 @@ public class GraphView extends View {
             }
 
             drawPaint.setColor(pathDetail.getColour().intValue);
-            drawPaint.setAlpha(alpha);
 
             List<Coord2D> path = pathDetail.getPath();
             Coord2D from = null;
@@ -1124,22 +1127,22 @@ public class GraphView extends View {
             }
         }
 
+        labelPaint.setAlpha(alpha);
         for (TextDetail textDetail : sketch.getTextDetails()) {
             Coord2D location = surveyCoordsToViewCoords(textDetail.getPosition());
             String text = textDetail.getText();
             labelPaint.setColor(textDetail.getColour().intValue);
-            labelPaint.setAlpha(alpha);
             canvas.drawText(text, (float)location.x, (float)location.y, labelPaint);
         }
     }
 
 
-    private void drawLegend(Canvas canvas, Survey survey) {
+    private void drawLegend(Canvas canvas) {
 
         String surveyLabel =
             survey.getName() +
-            " L" + TextTools.formatTo0dpWithComma(SurveyStats.calcTotalLength(survey)) +
-            " H" + TextTools.formatTo0dpWithComma(SurveyStats.calcHeightRange(survey));
+            " L" + TextTools.formatTo0dpWithComma(surveyLength) +
+            " H" + TextTools.formatTo0dpWithComma(surveyHeight);
 
         float offsetX = getWidth() * 0.03f;
         float offsetY = getHeight() - LEGEND_SIZE * 2;
@@ -1276,6 +1279,12 @@ public class GraphView extends View {
             previousSketchTool = currentSketchTool;
         }
         currentSketchTool = sketchTool;
+    }
+
+
+    public void setCachedStats(double surveyLength, double surveyHeight) {
+        this.surveyLength = surveyLength;
+        this.surveyHeight = surveyHeight;
     }
 
 

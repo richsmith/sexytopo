@@ -137,6 +137,8 @@ public class SurveyManager {
 
     private static class AutosaveTask extends AsyncTask<Context, Void, Void> {
 
+        private static boolean isRunning = false;
+
         @Override
         protected Void doInBackground(Context... contexts) {
             Context context = contexts[0];

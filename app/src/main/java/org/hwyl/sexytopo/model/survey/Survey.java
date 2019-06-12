@@ -3,8 +3,6 @@ package org.hwyl.sexytopo.model.survey;
 import org.hwyl.sexytopo.control.util.StationNamer;
 import org.hwyl.sexytopo.control.util.SurveyTools;
 import org.hwyl.sexytopo.control.util.Wrapper;
-import org.hwyl.sexytopo.model.graph.Coord2D;
-import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 
 import java.util.ArrayList;
@@ -28,9 +26,7 @@ public class Survey {
     private Station activeStation = origin;
 
     private Sketch planSketch = new Sketch();
-    private Space<Coord2D> planProjection = new Space<>();
     private Sketch elevationSketch = new Sketch();
-    private Space<Coord2D> elevationProjection = new Space<>();
 
     private Trip trip = null;
 
@@ -110,22 +106,6 @@ public class Survey {
 
     public Sketch getElevationSketch() {
         return elevationSketch;
-    }
-
-    public Space<Coord2D> getPlanProjection() {
-        return planProjection;
-    }
-
-    public void setPlanProjection(Space<Coord2D> planProjection) {
-        this.planProjection = planProjection;
-    }
-
-    public Space<Coord2D> getElevationProjection() {
-        return elevationProjection;
-    }
-
-    public void setElevationProjection(Space<Coord2D> elevationProjection) {
-        this.elevationProjection = elevationProjection;
     }
 
     public Station getOrigin() {

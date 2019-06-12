@@ -67,16 +67,13 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     protected static boolean hasStarted = false;
 
-    public SexyTopoActivity() {
-        super();
-        SexyTopo.context = this;
-        dataManager = SurveyManager.getInstance(this);
-    }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        SexyTopo.context = this;
+        dataManager = SurveyManager.getInstance(this);
 
         // if Android restarts the activity after a crash, force it to go through the startup
         // process!

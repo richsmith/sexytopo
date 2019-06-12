@@ -77,7 +77,7 @@ public abstract class DistoXProtocol {
         byte[] acknowledgePacket = createAcknowledgementPacket(packet);
         outStream.write(acknowledgePacket, 0, acknowledgePacket.length);
         outStream.flush();
-        Log.d("Ac'd Packet: " + describeAcknowledgementPacket(acknowledgePacket));
+        Log.device("Ac'd Packet: " + describeAcknowledgementPacket(acknowledgePacket));
     }
 
 
@@ -113,7 +113,7 @@ public abstract class DistoXProtocol {
     protected byte[] readPacket(DataInputStream inStream) throws IOException {
         byte[] packet = new byte[8];
         inStream.readFully(packet, 0, 8);
-        Log.d("Read packet: " + describePacket(packet));
+        Log.device("Read packet: " + describePacket(packet));
 
         return packet;
     }

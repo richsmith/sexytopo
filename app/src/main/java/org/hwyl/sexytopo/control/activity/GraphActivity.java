@@ -22,6 +22,7 @@ import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.graph.GraphView;
 import org.hwyl.sexytopo.control.graph.StationContextMenu;
+import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
@@ -169,6 +170,11 @@ public abstract class GraphActivity extends SexyTopoActivity
         graphView.setProjection(getProjection(survey));
         graphView.setSurvey(survey);
         graphView.setSketch(getSketch(survey));
+
+        double surveyLength = SurveyStats.calcTotalLength(survey);
+        double surveyHeight = SurveyStats.calcHeightRange(survey);
+        graphView.setCachedStats(surveyLength, surveyHeight);
+
         graphView.invalidate();
     }
 

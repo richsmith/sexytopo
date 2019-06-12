@@ -2,7 +2,10 @@ package org.hwyl.sexytopo.control;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v4.content.LocalBroadcastManager;
+
+import com.crashlytics.android.Crashlytics;
 
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.io.Util;
@@ -56,7 +59,6 @@ public class Log {
         deviceLog.add(new Message(message));
         broadcast(SexyTopo.DEVICE_LOG_UPDATED_EVENT);
         android.util.Log.i(SexyTopo.TAG, message);
-        save(LogType.DEVICE);
     }
 
     public static synchronized void systemLog(String message, boolean isError) {
@@ -126,18 +128,9 @@ public class Log {
 
     public static void save(LogType logType) {
 
-        if (context == null) {
-            return;
-        }
 
-        try {
-            JSONArray marshalled = marshal(logType);
-            String content = marshalled.toString(4);
-            String path = getFilePath(logType);
-            Saver.saveFile(path, content);
-        } catch (Exception exception) {
-            android.util.Log.e(SexyTopo.TAG, exception.toString());
-        }
+        new SaveLogTask().execute(logType);
+
     }
 
     public static void load(LogType logType) {
@@ -244,5 +237,23 @@ public class Log {
             return new Message(timestamp, text, isError);
         }
     }
+
+    private static class SaveLogTask extends AsyncTask<LogType, Void, Void> {
+
+        @Override
+        protected Void doInBackground(LogType... logTypes) {
+            try {
+                LogType logType = logTypes[0];
+                JSONArray marshalled = marshal(logType);
+                String content = marshalled.toString(4);
+                String path = getFilePath(logType);
+                Saver.saveFile(path, content);
+            } catch (Exception exception) {
+                Crashlytics.logException(exception);
+            }
+            return null;
+        }
+    }
+
 
 }

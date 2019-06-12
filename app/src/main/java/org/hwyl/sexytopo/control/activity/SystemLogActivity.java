@@ -1,5 +1,8 @@
 package org.hwyl.sexytopo.control.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
@@ -14,7 +17,7 @@ import org.hwyl.sexytopo.control.util.LogUpdateReceiver;
 
 public class SystemLogActivity extends SexyTopoActivity {
 
-    private LogUpdateReceiver logUpdateReceiver;
+    private SystemLogUpdateReceiver logUpdateReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +26,7 @@ public class SystemLogActivity extends SexyTopoActivity {
 
         setContentView(R.layout.activity_debug_log);
 
-        setupLogView();
+        logUpdateReceiver = new SystemLogUpdateReceiver();
     }
 
 
@@ -32,30 +35,39 @@ public class SystemLogActivity extends SexyTopoActivity {
 
         super.onResume();
 
-        if (logUpdateReceiver != null) {
-            logUpdateReceiver.update();
-        }
-
-        final ScrollView scrollView = findViewById(R.id.scrollView);
-        scrollView.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                scrollView.fullScroll(ScrollView.FOCUS_DOWN);
-            }
-        },1000);
+        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
+        IntentFilter logFilter = new IntentFilter();
+        logFilter.addAction(SexyTopo.SYSTEM_LOG_UPDATED_EVENT);
+        broadcastManager.registerReceiver(logUpdateReceiver, logFilter);
+        logUpdateReceiver.update();
     }
 
 
-    private void setupLogView() {
-        if (logUpdateReceiver == null) {
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
+        broadcastManager.unregisterReceiver(logUpdateReceiver);
+    }
+
+
+    private class SystemLogUpdateReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            update();
+        }
+
+        public void update() {
             TextView logView = findViewById(R.id.debugLog);
-            ScrollView scrollView = findViewById(R.id.scrollView);
-            logUpdateReceiver = new LogUpdateReceiver(scrollView, logView, Log.LogType.SYSTEM);
-
-            LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
-            IntentFilter logFilter = new IntentFilter();
-            logFilter.addAction(SexyTopo.SYSTEM_LOG_UPDATED_EVENT);
-            broadcastManager.registerReceiver(logUpdateReceiver, logFilter);
+            final ScrollView scrollView = findViewById(R.id.scrollView);
+            LogUpdateReceiver.update(Log.LogType.SYSTEM, scrollView, logView);
+            scrollView.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+                }
+            },1000);
         }
     }
+
 }

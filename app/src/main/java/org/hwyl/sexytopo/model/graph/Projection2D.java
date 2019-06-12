@@ -59,7 +59,7 @@ public enum Projection2D {
     private static Space3DTransformerForElevation space3DTransformerForElevation =
             new Space3DTransformerForElevation();
 
-    private Space<Coord3D> transform(Survey survey) {
+    public Space<Coord3D> transform(Survey survey) {
         if (this == EXTENDED_ELEVATION) {
             return space3DTransformerForElevation.transformTo3D(survey);
         } else {
