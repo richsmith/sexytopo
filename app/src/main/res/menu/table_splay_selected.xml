@@ -2,14 +2,18 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:id="@+id/splayTitle"
+        android:title="@string/splay"
+        android:enabled="false"/>
+    <item
         android:id="@+id/editLeg"
         android:title="@string/menu_edit_leg"/>
     <item
         android:id="@+id/upgradeRow"
         android:title="@string/menu_upgrade_row"/>
     <item
-        android:id="@+id/deleteRow"
-        android:title="@string/menu_delete_row"/>
+        android:id="@+id/deleteSplay"
+        android:title="@string/menu_delete_splay"/>
     <item
         android:id="@+id/moveRow"
         android:title="@string/menu_move_row"/>

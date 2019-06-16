@@ -55,7 +55,9 @@
     <string name="menu_rename_station">Rename Station</string>
     <string name="menu_edit_leg">Edit Row</string>
     <string name="menu_upgrade_row">Force New Station</string>
-    <string name="menu_delete_row">Delete Row</string>
+    <string name="menu_delete_leg">Delete Leg</string>
+    <string name="menu_delete_splay">Delete Splay</string>
+
     <string name="menu_move_row">Move to Different Station</string>
     <string name="menu_station_label">Station</string>
     <string name="menu_select">Select</string>

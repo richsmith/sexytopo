@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.control.activity;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -114,7 +115,7 @@ public class TableActivity extends SexyTopoActivity
                     Toast.LENGTH_SHORT).show();
         }
 
-        TableLayout tableLayout = (TableLayout)(findViewById(R.id.BodyTable));
+        TableLayout tableLayout = findViewById(R.id.BodyTable);
         tableLayout.removeAllViews();
 
         for (GraphToListTranslator.SurveyListEntry entry : tableEntries) {
@@ -155,13 +156,13 @@ public class TableActivity extends SexyTopoActivity
 
         tableLayout.requestLayout();
 
-        ScrollView scrollView = (ScrollView)(findViewById(R.id.BodyTableScrollView));
+        ScrollView scrollView = findViewById(R.id.BodyTableScrollView);
         scrollView.fullScroll(View.FOCUS_DOWN);
     }
 
     private boolean isActiveStation(Object object) {
         return (object instanceof Station) &&
-                ((Station)object) == getSurvey().getActiveStation();
+            object == getSurvey().getActiveStation();
     }
 
     @Override
@@ -187,6 +188,7 @@ public class TableActivity extends SexyTopoActivity
     }
 
 
+    @SuppressWarnings("UnusedParameters")
     private void showPopup(View view, int id, PopupMenu.OnMenuItemClickListener listener) {
 
         TextView selectedCell = (TextView)view;
@@ -207,6 +209,9 @@ public class TableActivity extends SexyTopoActivity
         final TableCol col = fieldToTableCol.get(cellBeingClicked);
         final GraphToListTranslator.SurveyListEntry surveyEntry =
                 fieldToSurveyEntry.get(cellBeingClicked);
+
+
+        Context context = this;
 
         switch (menuItem.getItemId()) {
 
@@ -241,45 +246,85 @@ public class TableActivity extends SexyTopoActivity
                 syncTableWithSurvey();
                 return true;
 
-            case R.id.deleteRow:
-                final Station station = surveyEntry.getFrom();
-                int numStationsToBeDeleted = SurveyStats.calcNumberSubStations(station);
-                int numFullLegsToBeDeleted = SurveyStats.calcNumberSubFullLegs(station);
-                int numSplaysToBeDeleted = SurveyStats.calcNumberSubSplays(station);
-
-                Context context = this;
-                String message = context.getString(R.string.this_will_delete);
-
-                if (numStationsToBeDeleted > 0) {
-                    String noun = context.getString(R.string.station).toLowerCase();
-                    message += "\n" + TextTools.pluralise(numStationsToBeDeleted, noun);
-                }
-                if (numFullLegsToBeDeleted > 0) {
-                    String noun = context.getString(R.string.leg).toLowerCase();
-                    message += "\n" + TextTools.pluralise(numFullLegsToBeDeleted, noun);
-                }
-                if (numSplaysToBeDeleted > 0) {
-                    String noun = context.getString(R.string.splay).toLowerCase();
-                    message += "\n" + TextTools.pluralise(numSplaysToBeDeleted, noun);
-                }
-
-                new AlertDialog.Builder(context)
-                        .setMessage(message)
-                        .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
-
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                getSurvey().deleteStation(station);
-                                SurveyManager.getInstance(TableActivity.this).broadcastSurveyUpdated();
-                            }
-                        })
-                        .setNegativeButton(R.string.cancel, null)
-                        .show();
+            case R.id.deleteStation:
+                Station toDelete = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
+                askAboutDeleting(context, toDelete, null);
                 return true;
+
+            case R.id.deleteLeg:
+                askAboutDeleting(context, surveyEntry.getFrom(), surveyEntry.getLeg());
+                return true;
+
+            case R.id.deleteSplay:
+                askAboutDeleting(context, surveyEntry.getFrom(), surveyEntry.getLeg());
+                return true;
+
             default:
                 return false;
         }
 
+    }
+
+
+
+    /*
+        This method is a bit convoluted but reflects the UI choices.
+
+        We are either deleting a splay or a leg (if we are deleting a station,
+        we still have to delete the source leg). If the latter, we are also deleting any
+        onward survey from the station.
+
+        If leg is null, we are deleting the station
+        If leg is not null, we are only deleting the leg from the specified station
+     */
+    public void askAboutDeleting(Context context, final Station station, final Leg leg) {
+
+        int numFullLegsToBeDeleted = 0;
+        int numSplaysToBeDeleted = 0;
+
+        final boolean deletingLeg = leg != null;
+        boolean deletingSplay = (deletingLeg && !leg.hasDestination());
+
+        if (deletingSplay) {
+            numSplaysToBeDeleted += 1;
+
+        } else {
+            numFullLegsToBeDeleted++;
+            Station root = deletingLeg? leg.getDestination() : station;
+            numFullLegsToBeDeleted += SurveyStats.calcNumberSubFullLegs(root);
+            numSplaysToBeDeleted += SurveyStats.calcNumberSubSplays(root);
+        }
+
+        String message = context.getString(R.string.this_will_delete);
+
+        if (numFullLegsToBeDeleted > 0) {
+            String noun = context.getString(R.string.leg).toLowerCase();
+            message += "\n" + TextTools.pluralise(numFullLegsToBeDeleted, noun);
+            noun = context.getString(R.string.station).toLowerCase();
+            message += " (" + TextTools.pluralise(numFullLegsToBeDeleted, noun) + ")";
+        }
+        if (numSplaysToBeDeleted > 0) {
+            String noun = context.getString(R.string.splay).toLowerCase();
+            message += "\n" + TextTools.pluralise(numSplaysToBeDeleted, noun);
+        }
+
+        new AlertDialog.Builder(context)
+                .setMessage(message)
+                .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Survey survey = getSurvey();
+                        if (deletingLeg) {
+                            survey.deleteSplay(station, leg);
+                        } else {
+                            getSurvey().deleteStation(station);
+                        }
+                        SurveyManager.getInstance(TableActivity.this).broadcastSurveyUpdated();
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
     }
 
 
@@ -309,6 +354,8 @@ public class TableActivity extends SexyTopoActivity
         syncTableWithSurvey();
     }
 
+
+    @SuppressLint("InflateParams")
     private void requestMoveLeg(final Leg toMove) {
         View stationView = getLayoutInflater().inflate(R.layout.select_station_dialog, null);
 

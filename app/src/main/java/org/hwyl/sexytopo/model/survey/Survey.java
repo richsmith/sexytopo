@@ -260,6 +260,12 @@ public class Survey {
         setSaved(false);
     }
 
+
+    public void deleteSplay(Station station, Leg splay) {
+        station.getOnwardLegs().remove(splay);
+        setSaved(false);
+    }
+
     public Leg getReferringLeg(final Station station) {
 
         if (station == getOrigin()) {

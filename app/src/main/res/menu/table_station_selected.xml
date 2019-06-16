@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
+    <item
+        android:id="@+id/legTitle"
+        android:title="@string/station"
+        android:enabled="false"/>
     <item
         android:id="@+id/setActiveStation"
         android:title="@string/menu_set_active_station"/>
@@ -12,6 +15,6 @@
         android:id="@+id/editLeg"
         android:title="@string/menu_edit_leg"/>
     <item
-        android:id="@+id/deleteRow"
-        android:title="@string/menu_delete_row"/>
+        android:id="@+id/deleteStation"
+        android:title="@string/menu_delete_station"/>
 </menu>

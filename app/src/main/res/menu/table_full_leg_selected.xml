@@ -2,11 +2,15 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:id="@+id/legTitle"
+        android:title="@string/leg"
+        android:enabled="false"/>
+    <item
         android:id="@+id/editLeg"
         android:title="@string/menu_edit_leg"/>
     <item
-        android:id="@+id/deleteRow"
-        android:title="@string/menu_delete_row"/>
+        android:id="@+id/deleteLeg"
+        android:title="@string/menu_delete_leg"/>
     <item
         android:id="@+id/moveRow"
         android:title="@string/menu_move_row"/>
