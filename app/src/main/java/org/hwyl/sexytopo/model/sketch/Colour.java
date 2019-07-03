@@ -148,9 +148,12 @@ public enum Colour {
     BLACK(0x000000);
 
     public final int intValue;
+    public final int baseValue;
+
     private static final int SOLID = 0xFF000000;
 
-    Colour(int intValue) {
-        this.intValue = SOLID + intValue;
+    Colour(int baseValue) {
+        this.baseValue = baseValue;
+        this.intValue = SOLID + baseValue;
     }
 }

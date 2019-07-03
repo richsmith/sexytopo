@@ -102,6 +102,9 @@ public class GraphView extends View {
     public static final Colour DEFAULT_SKETCH_COLOUR = Colour.BLACK;
     public static final Colour CROSS_SECTION_CONNECTION_COLOUR = Colour.SILVER;
 
+    public static final int SOLID_ALPHA = 0xff;
+    public static final int CONNECTED_SURVEY_ALPHA = 0xff / 5;
+
 
     public static final int STATION_COLOUR = Colour.DARK_RED.intValue;
     public static final int STATION_DIAMETER = 8;
@@ -727,10 +730,10 @@ public class GraphView extends View {
         }
 
         if (getDisplayPreference(GraphActivity.DisplayPreference.SHOW_CONNECTIONS)) {
-            drawConnectedSurveys(canvas, projection, 50);
+            drawConnectedSurveys(canvas, projection, CONNECTED_SURVEY_ALPHA);
         }
 
-        drawSurvey(canvas, survey, projection, 255);
+        drawSurvey(canvas, survey, projection, SOLID_ALPHA);
 
         drawLegend(canvas);
 
@@ -854,11 +857,32 @@ public class GraphView extends View {
     private void drawCrossSections(
             Canvas canvas, Set<CrossSectionDetail> crossSectionDetails, int alpha) {
 
+        boolean showStationLabels =
+                getDisplayPreference(GraphActivity.DisplayPreference.SHOW_STATION_LABELS);
+
         List<CrossSectionDetail> badXSections = new LinkedList<>();
 
         for (CrossSectionDetail sectionDetail : crossSectionDetails) {
 
             if (!couldBeOnScreen(sectionDetail)) {
+                continue;
+            }
+
+            CrossSection crossSection = sectionDetail.getCrossSection();
+            if (crossSection == null) {
+                badXSections.add(sectionDetail);
+                continue;
+            }
+
+            Station station = crossSection.getStation();
+            if (station == null) {
+                badXSections.add(sectionDetail);
+                continue;
+            }
+
+            Coord2D surveyStationLocation = this.projection.getStationMap().get(station);
+            if (surveyStationLocation == null) {
+                badXSections.add(sectionDetail);
                 continue;
             }
 
@@ -870,7 +894,7 @@ public class GraphView extends View {
 
             String description =
                     sectionDetail.getCrossSection().getStation().getName() + " X";
-            if (getDisplayPreference(GraphActivity.DisplayPreference.SHOW_STATION_LABELS)) {
+            if (showStationLabels) {
                 stationPaint.setAlpha(alpha);
                 canvas.drawText(description,
                         (float) centreOnView.x,
@@ -882,11 +906,6 @@ public class GraphView extends View {
 
             drawLegs(canvas, projection, alpha);
 
-            Station station = sectionDetail.getCrossSection().getStation();
-            Coord2D surveyStationLocation = this.projection.getStationMap().get(station);
-            if (surveyStationLocation == null) {
-                badXSections.add(sectionDetail);
-            }
             Coord2D viewStationLocation = surveyCoordsToViewCoords(surveyStationLocation);
             drawLineAsPath(
                     canvas, viewStationLocation, centreOnView, crossSectionConnectorPaint, alpha);
@@ -902,12 +921,16 @@ public class GraphView extends View {
 
     private void drawLegs(Canvas canvas, Space<Coord2D> space, int alpha) {
 
+        boolean showSplays = getDisplayPreference(GraphActivity.DisplayPreference.SHOW_SPLAYS);
+        boolean highlightLatestLeg =
+                PreferenceAccess.getBoolean(
+                        getContext(), "pref_key_highlight_latest_leg", true);
+
         Map<Leg, Line<Coord2D>> legMap = space.getLegMap();
 
         for (Leg leg : legMap.keySet()) {
 
-            if (!getDisplayPreference(GraphActivity.DisplayPreference.SHOW_SPLAYS) &&
-                    !leg.hasDestination()) {
+            if (!showSplays && !leg.hasDestination()) {
                 continue;
             }
             Line<Coord2D> line = legMap.get(leg);
@@ -919,8 +942,7 @@ public class GraphView extends View {
                 continue;
             }
 
-            if (PreferenceAccess.getBoolean(getContext(), "pref_key_highlight_latest_leg", true)
-                    && survey.getMostRecentLeg() == leg) {
+            if (highlightLatestLeg && survey.getMostRecentLeg() == leg) {
                 legPaint.setColor(LATEST_LEG_COLOUR.intValue);
             } else if (!leg.hasDestination()) {
 				legPaint.setColor(SPLAY_COLOUR.intValue);
@@ -956,6 +978,9 @@ public class GraphView extends View {
 
         stationPaint.setAlpha(alpha);
 
+        boolean showStationLabels =
+                getDisplayPreference(GraphActivity.DisplayPreference.SHOW_STATION_LABELS);
+
         int crossDiameter =
                 PreferenceAccess.getInt(this.getContext(), "pref_station_diameter", CROSS_DIAMETER);
 
@@ -975,7 +1000,7 @@ public class GraphView extends View {
             int spacing = crossDiameter / 2;
             int nextX = x + crossDiameter;
 
-            if (getDisplayPreference(GraphActivity.DisplayPreference.SHOW_STATION_LABELS)) {
+            if (showStationLabels) {
                 String name = station.getName();
                 if (station == survey.getOrigin()) {
                     name = name + " (" + survey.getName() + ")";
@@ -1098,8 +1123,6 @@ public class GraphView extends View {
             return;
         }
 
-        drawPaint.setAlpha(alpha);
-
         for (PathDetail pathDetail : sketch.getPathDetails()) {
 
             if (!couldBeOnScreen(pathDetail)) {
@@ -1107,6 +1130,7 @@ public class GraphView extends View {
             }
 
             drawPaint.setColor(pathDetail.getColour().intValue);
+            drawPaint.setAlpha(alpha);
 
             List<Coord2D> path = pathDetail.getPath();
             Coord2D from = null;
