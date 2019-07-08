@@ -93,6 +93,9 @@ public class GraphView extends View {
     private Coord2D viewpointBottomRightOnSurvey;
     private double surveyLength = 0;
     private double surveyHeight = 0;
+    private Rect topLeftCorner;
+    private Rect topRightCorner;
+    private Rect bottomRightCorner;
 
 
     public static final Colour LEG_COLOUR = Colour.RED;
@@ -195,7 +198,7 @@ public class GraphView extends View {
     private Paint gridPaint = new Paint();
     private Paint crossSectionConnectorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint crossSectionIndicatorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-
+    private Paint hotCornersPaint = new Paint();
 
 
 
@@ -247,6 +250,9 @@ public class GraphView extends View {
         crossSectionIndicatorPaint.setStrokeWidth(2);
         crossSectionIndicatorPaint.setStyle(Paint.Style.FILL);
 
+        hotCornersPaint.setColor(Colour.GREY.intValue);
+        hotCornersPaint.setAlpha(CONNECTED_SURVEY_ALPHA);
+
         commentIcon = BitmapFactory.decodeResource(getResources(), R.drawable.speech_bubble);
         linkIcon = BitmapFactory.decodeResource(getResources(), R.drawable.link);
     }
@@ -290,7 +296,12 @@ public class GraphView extends View {
         }
 
         if (currentSketchTool.isModal() && event.getAction() == MotionEvent.ACTION_UP) {
-            setSketchTool(previousSketchTool);
+            if (previousSketchTool != currentSketchTool) {
+                setSketchTool(previousSketchTool);
+            } else {
+                setSketchTool(SketchTool.MOVE);
+            }
+            invalidate();
             return true;
         }
 
@@ -316,7 +327,7 @@ public class GraphView extends View {
 
     private void considerModalMoveSelection(MotionEvent event) {
 
-        if (currentSketchTool == SketchTool.MOVE || currentSketchTool == SketchTool.MODAL_MOVE) {
+        if (currentSketchTool == SketchTool.MODAL_MOVE) {
             return;
         }
 
@@ -736,6 +747,7 @@ public class GraphView extends View {
         drawSurvey(canvas, survey, projection, SOLID_ALPHA);
 
         drawLegend(canvas);
+        drawHotCorners(canvas);
 
         if (DEBUG) {
             drawDebuggingInfo(canvas);
@@ -1183,6 +1195,39 @@ public class GraphView extends View {
         canvas.drawLine(offsetX + scaleWidth, scaleOffsetY, offsetX + scaleWidth, scaleOffsetY - TICK_SIZE, legendPaint);
         String scaleLabel = minorGridSize + "m";
         canvas.drawText(scaleLabel, offsetX + scaleWidth + 5, scaleOffsetY, legendPaint);
+
+    }
+
+
+    private void drawHotCorners(Canvas canvas) {
+
+        if (!activity.getBooleanPreference("pref_hot_corners")) {
+            return;
+        }
+
+        if (currentSketchTool == SketchTool.MODAL_MOVE) {
+            hotCornersPaint.setColor(Colour.YELLOW.intValue);
+            hotCornersPaint.setAlpha(CONNECTED_SURVEY_ALPHA);
+        }
+
+        if (topLeftCorner == null || topRightCorner == null || bottomRightCorner == null) {
+            final int side = (int) (HOT_CORNER_DISTANCE_PROPORTION * getWidth());
+            topLeftCorner =
+                new Rect(0, 0, side, side);
+            topRightCorner =
+                new Rect(getWidth() - side, 0, getWidth(), side);
+            bottomRightCorner =
+                new Rect(getWidth() - side, getHeight() - side, getWidth(), getHeight());
+        }
+
+        canvas.drawRect(topLeftCorner, hotCornersPaint);
+        canvas.drawRect(topRightCorner, hotCornersPaint);
+        canvas.drawRect(bottomRightCorner, hotCornersPaint);
+
+        if (currentSketchTool == SketchTool.MODAL_MOVE) {
+            hotCornersPaint.setColor(Colour.GREY.intValue);
+            hotCornersPaint.setAlpha(CONNECTED_SURVEY_ALPHA);
+        }
 
     }
 
