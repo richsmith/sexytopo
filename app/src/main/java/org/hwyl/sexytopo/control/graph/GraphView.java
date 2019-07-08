@@ -1151,9 +1151,14 @@ public class GraphView extends View {
         labelPaint.setAlpha(alpha);
         for (TextDetail textDetail : sketch.getTextDetails()) {
             Coord2D location = surveyCoordsToViewCoords(textDetail.getPosition());
+            float x = (float)location.x;
+            float y = (float)location.y;
             String text = textDetail.getText();
             labelPaint.setColor(textDetail.getColour().intValue);
-            canvas.drawText(text, (float)location.x, (float)location.y, labelPaint);
+            for (String line : text.split("\n")) {
+                canvas.drawText(line, x, y, labelPaint);
+                y += labelPaint.descent() - labelPaint.ascent();
+            }
         }
     }
 
