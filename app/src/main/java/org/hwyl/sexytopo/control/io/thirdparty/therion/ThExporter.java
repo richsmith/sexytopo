@@ -128,13 +128,14 @@ public class ThExporter {
 
         StringBuilder builder = new StringBuilder();
 
-        if (trip.getComments().length() > 0) {
-            builder.append(commentMultiline(trip.getComments()));
-            builder.append("\n");
-        }
+
 
         builder.append(formatDate(trip.getDate()));
         builder.append("\n");
+
+        if (trip.getComments().length() > 0) {
+            builder.append(commentMultiline(trip.getComments()));
+        }
 
         for (Trip.TeamEntry entry : trip.getTeam()) {
             builder.append(formatMember(entry));
