@@ -151,6 +151,10 @@ public class GraphView extends View {
         public int getId() {
             return id;
         }
+
+        public Colour getColour() {
+            return colour;
+        }
     }
 
     public enum SketchTool {

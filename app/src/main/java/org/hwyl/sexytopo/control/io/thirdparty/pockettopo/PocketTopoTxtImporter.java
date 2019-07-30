@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.control.io.thirdparty.pockettopo;
 
+import org.hwyl.sexytopo.control.graph.GraphView;
 import org.hwyl.sexytopo.control.io.translation.Importer;
 import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
@@ -36,10 +37,10 @@ public class PocketTopoTxtImporter extends Importer {
 
         parseDataAndUpdateSurvey(survey, text);
 
-        Sketch elevation = getElevation(text);
+        Sketch elevation = getElevation(survey, text);
         survey.setElevationSketch(elevation);
 
-        Sketch plan = getPlan(text);
+        Sketch plan = getPlan(survey, text);
         survey.setPlanSketch(plan);
 
         survey.setSaved(true);
@@ -54,7 +55,10 @@ public class PocketTopoTxtImporter extends Importer {
 
 
     private static void parseDataAndUpdateSurvey(Survey survey, String fullText) {
+
         String text = getSection(fullText, "DATA");
+
+        boolean firstStation = true;
         for (String line : TextTools.toArrayOfLines(text)) {
             String[] fields = line.split("\\t");
             String fromStationName = fields[0];
@@ -64,12 +68,12 @@ public class PocketTopoTxtImporter extends Importer {
             double inclination = Double.parseDouble(fields[3]);
             double distance = Double.parseDouble(fields[4]);
 
-            if (fromStationName.equals("1.1")) {
-                int ignore = 0;
+            if (firstStation) {
+                survey.getOrigin().setName(fromStationName);
+                firstStation = false;
             }
 
-            Station fromStation = fromStationName.equals("1.0")?
-                    survey.getOrigin() : survey.getStationByName(fromStationName);
+            Station fromStation = survey.getStationByName(fromStationName);
 
             survey.setActiveStation(fromStation);
 
@@ -82,30 +86,30 @@ public class PocketTopoTxtImporter extends Importer {
                 SurveyUpdater.updateWithNewStation(survey, leg);
             }
         }
-
     }
 
-    private static Sketch getPlan(String fullText) {
+    private static Sketch getPlan(Survey survey, String fullText) {
         String text = getSection(fullText, "PLAN");
-        Sketch plan = parseSketch(text);
+        Sketch plan = parseSketch(survey, text);
         return plan;
     }
 
-    private static Sketch getElevation(String fullText) {
+    private static Sketch getElevation(Survey survey, String fullText) {
         String text = getSection(fullText, "ELEVATION");
-        Sketch elevation = parseSketch(text);
+        Sketch elevation = parseSketch(survey, text);
         return elevation;
     }
 
-    private static Sketch parseSketch(String text) {
+    private static Sketch parseSketch(Survey survey, String text) {
         Sketch sketch = new Sketch();
-        Set<PathDetail> pathDetails = parsePolylines(text);
+        Coord2D offset = extractOffset(survey, text);
+        Set<PathDetail> pathDetails = parsePolylines(text, offset);
         sketch.setPathDetails(pathDetails);
         return sketch;
     }
 
     public static String getSection(String text, String header) {
-        // a section in .txt formatWithComma appears to be made up of a header, followed by the content,
+        // a section in the file format appears to be made up of a header, followed by the content,
         // followed by a blank line. There are no intermediate blank lines.
 
         text = text + "\n\n"; // hack (ensure last section is terminated by newline)
@@ -120,13 +124,52 @@ public class PocketTopoTxtImporter extends Importer {
         return matcher.group(1);
     }
 
+
+    public static Coord2D extractOffset(Survey survey, String text) {
+        String stationsSection = getNamedSubSection(text, "STATIONS");
+        String[] lines = TextTools.toArrayOfLines(stationsSection);
+
+        Station guessedAnchorStation = survey.getOrigin();
+        Coord2D offset = getOffsetForNamedStation(lines, guessedAnchorStation);
+
+        if (offset == null) {
+            if (guessedAnchorStation.getConnectedOnwardLegs().size() > 0) {
+                Leg onward = guessedAnchorStation.getConnectedOnwardLegs().get(0);
+                guessedAnchorStation = onward.getDestination();
+                offset = getOffsetForNamedStation(lines, guessedAnchorStation);
+            }
+        }
+
+        if (offset == null) { // ¯\_(ツ)_/¯
+            offset = Coord2D.ORIGIN;
+        }
+
+        return offset;
+    }
+
+    public static Coord2D getOffsetForNamedStation(String[] lines, Station station) {
+        for (String line : lines) {
+            String[] tokens = line.split("\t");
+            String stationName = tokens[2];
+            if (stationName.equals(station.getName())) {
+                double x = Double.parseDouble(tokens[0]);
+                double y = Double.parseDouble(tokens[1]);
+                return new Coord2D(x, y);
+            }
+        }
+
+        return null;
+    }
+
+
     public static String getNamedSubSection(String text, String header, String sectionHeader) {
         String section = getSection(text, sectionHeader);
         return getNamedSubSection(section, header);
     }
 
+
     public static String getNamedSubSection(String text, String header) {
-        // a section in .txt formatWithComma appears to be made up of a header, followed by the content,
+        // a section in the file format appears to be made up of a header, followed by the content,
         // followed by either another header (one line of uppercase text) or end of text
 
         List<String> subSection = new LinkedList<>();
@@ -147,7 +190,7 @@ public class PocketTopoTxtImporter extends Importer {
         return TextTools.join("\n", subSection);
     }
 
-    public static Set<PathDetail> parsePolylines(String text) {
+    public static Set<PathDetail> parsePolylines(String text, Coord2D offset) {
         Set<PathDetail> paths = new HashSet<>();
         boolean inPolyline = false;
         Colour currentPathColour = null;
@@ -159,10 +202,7 @@ public class PocketTopoTxtImporter extends Importer {
                     currentPathDetail = null;
                 }
                 String colourText = line.substring("POLYLINE ".length());
-                if (colourText.equals("RED")) {
-                    colourText = "PURPLE";
-                }
-                currentPathColour = Colour.valueOf(colourText);
+                currentPathColour = interpretColour(colourText);
                 inPolyline = true;
                 continue;
             }
@@ -171,8 +211,8 @@ public class PocketTopoTxtImporter extends Importer {
             }
 
             String[] coords = line.split("\t");
-            double x = Double.parseDouble(coords[0]);
-            double y = Double.parseDouble(coords[1]);
+            double x = Double.parseDouble(coords[0]) - offset.x;
+            double y = Double.parseDouble(coords[1]) - offset.y;
             Coord2D coord = new Coord2D(x, -y);
 
             if (currentPathDetail == null) {
@@ -190,5 +230,17 @@ public class PocketTopoTxtImporter extends Importer {
 
     }
 
+    public static Colour interpretColour(String colourText) {
+        if (colourText.equals("GRAY")) {
+            colourText = "GREY";
+        }
+        try {
+            GraphView.BrushColour brushColour = GraphView.BrushColour.valueOf(colourText);
+            return brushColour.getColour();
+
+        } catch(IllegalArgumentException exception) {
+            return Colour.BLACK;
+        }
+    }
 
 }
