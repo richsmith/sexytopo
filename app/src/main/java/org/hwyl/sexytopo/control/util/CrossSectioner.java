@@ -44,7 +44,11 @@ public class CrossSectioner {
     }
 
     private static double getIncomingAzimuth(Survey survey, Station station) {
-        return survey.getReferringLeg(station).getAzimuth();
+        try {
+            return survey.getReferringLeg(station).getAzimuth();
+        } catch (NullPointerException exception) {
+            return 0; // not sure how this can happen, but has been reported
+        }
     }
 
     private static double getOutgoingAzimuth(Station station) {
