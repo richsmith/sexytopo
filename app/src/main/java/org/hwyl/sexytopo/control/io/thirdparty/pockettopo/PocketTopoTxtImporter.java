@@ -6,6 +6,8 @@ import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Coord2D;
+import org.hwyl.sexytopo.model.graph.Projection2D;
+import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
@@ -61,6 +63,11 @@ public class PocketTopoTxtImporter extends Importer {
         boolean firstStation = true;
         for (String line : TextTools.toArrayOfLines(text)) {
             String[] fields = line.split("\\t");
+
+            if (fields.length < 3) {
+                continue;
+            }
+
             String fromStationName = fields[0];
             String toStationName = fields[1];
 
@@ -90,19 +97,21 @@ public class PocketTopoTxtImporter extends Importer {
 
     private static Sketch getPlan(Survey survey, String fullText) {
         String text = getSection(fullText, "PLAN");
-        Sketch plan = parseSketch(survey, text);
+        Space<Coord2D> projection = Projection2D.PLAN.project(survey);
+        Sketch plan = parseSketch(survey, text, projection);
         return plan;
     }
 
     private static Sketch getElevation(Survey survey, String fullText) {
         String text = getSection(fullText, "ELEVATION");
-        Sketch elevation = parseSketch(survey, text);
+        Space<Coord2D> projection = Projection2D.EXTENDED_ELEVATION.project(survey);
+        Sketch elevation = parseSketch(survey, text, projection);
         return elevation;
     }
 
-    private static Sketch parseSketch(Survey survey, String text) {
+    private static Sketch parseSketch(Survey survey, String text, Space<Coord2D> projection) {
         Sketch sketch = new Sketch();
-        Coord2D offset = extractOffset(survey, text);
+        Coord2D offset = extractOffset(survey, text, projection);
         Set<PathDetail> pathDetails = parsePolylines(text, offset);
         sketch.setPathDetails(pathDetails);
         return sketch;
@@ -125,7 +134,9 @@ public class PocketTopoTxtImporter extends Importer {
     }
 
 
-    public static Coord2D extractOffset(Survey survey, String text) {
+    public static Coord2D extractOffset(
+            Survey survey, String text, Space<Coord2D> projection) {
+
         String stationsSection = getNamedSubSection(text, "STATIONS");
         String[] lines = TextTools.toArrayOfLines(stationsSection);
 
@@ -137,6 +148,8 @@ public class PocketTopoTxtImporter extends Importer {
                 Leg onward = guessedAnchorStation.getConnectedOnwardLegs().get(0);
                 guessedAnchorStation = onward.getDestination();
                 offset = getOffsetForNamedStation(lines, guessedAnchorStation);
+                Coord2D position = projection.getStationMap().get(guessedAnchorStation);
+                offset = offset.minus(position.flipVertically());
             }
         }
 
