@@ -16,6 +16,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -59,6 +60,7 @@ public class Util {
         ensureDirectoryExists(getSurveyDirectory(context));
         File surveyDirectory = getSurveyDirectory(context);
         File surveyDirectories[] = surveyDirectory.listFiles();
+        Arrays.sort(surveyDirectories);
         return surveyDirectories;
     }
 
@@ -67,6 +69,7 @@ public class Util {
         ensureDataDirectoriesExist(context);
         File calibrationDirectory = getCalibrationDirectory(context);
         File[] calibrationFiles = calibrationDirectory.listFiles();
+        Arrays.sort(calibrationFiles);
         return calibrationFiles;
     }
 
@@ -74,6 +77,7 @@ public class Util {
         ensureDirectoryExists(getImportDir(context));
         File importDirectory = getImportDir(context);
         File importFiles[] = importDirectory.listFiles();
+        Arrays.sort(importFiles);
         return importFiles;
     }
 
