@@ -23,6 +23,14 @@
         android:padding="10dp" />
 
     <Button
+        android:id="@+id/graph_station_jump_to_table"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/abc_cab_background_internal_bg"
+        android:text="@string/menu_jump_to_station_in_table"
+        android:padding="10dp"/>
+
+    <Button
         android:id="@+id/graph_station_comment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -54,7 +62,6 @@
         android:background="@drawable/abc_cab_background_internal_bg"
         android:text="@string/menu_new_cross_section"
         android:padding="10dp"/>
-
 
     <Button
         android:id="@+id/graph_station_start_new_survey"

@@ -140,7 +140,7 @@ public abstract class GraphActivity extends SexyTopoActivity
         graphView.post(new Runnable() {
             @Override // Needs to be threaded so it is only run once we know height and width
             public void run() {
-                graphView.centreViewOnActiveStation();
+                setViewLocation();
             }
         });
     }
@@ -160,6 +160,18 @@ public abstract class GraphActivity extends SexyTopoActivity
         initialiseSketchTool();
         initialiseBrushColour();
         setSketchButtonsStatus();
+        setViewLocation();
+    }
+
+    private void setViewLocation() {
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null && bundle.getString(SexyTopo.JUMP_TO_STATION) != null) {
+            String requestedStationName = bundle.getString(SexyTopo.JUMP_TO_STATION);
+            Station requestedStation = getSurvey().getStationByName(requestedStationName);
+            graphView.centreViewOnStation(requestedStation);
+        } else {
+            graphView.centreViewOnActiveStation();
+        }
     }
 
 

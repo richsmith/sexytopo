@@ -57,11 +57,14 @@
     <string name="menu_upgrade_row">Force New Station</string>
     <string name="menu_delete_leg">Delete Leg</string>
     <string name="menu_delete_splay">Delete Splay</string>
-
     <string name="menu_move_row">Move to Different Station</string>
+    <string name="menu_jump_to">Jump</string>
+    <string name="menu_jump_to_station_in_plan">→ Plan</string>
+    <string name="menu_jump_to_station_in_elevation">→ Elevation</string>
     <string name="menu_station_label">Station</string>
     <string name="menu_select">Select</string>
     <string name="menu_new_cross_section">New Cross-Section</string>
+    <string name="menu_jump_to_station_in_table">→ Data Table</string>
     <string name="menu_delete_station">Delete</string>
     <string name="menu_reverse">Reverse</string>
     <string name="menu_start_new_survey">Start New Survey Here</string>

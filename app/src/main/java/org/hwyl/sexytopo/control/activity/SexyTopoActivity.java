@@ -1046,6 +1046,14 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
 
+    public void jumpToStation(Station station, Class clazz) {
+        Intent intent = new Intent(this, clazz);
+        Bundle bundle = new Bundle();
+        bundle.putString(SexyTopo.JUMP_TO_STATION, station.getName());
+        intent.putExtras(bundle);
+        startActivity(intent);
+    }
+
     /*
     private class ImportTask extends AsyncTask<File, Void, Survey> {
 

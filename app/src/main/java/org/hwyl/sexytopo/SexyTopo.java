@@ -21,6 +21,8 @@ public class SexyTopo {
     public static final String DEVICE_LOG_UPDATED_EVENT = "deviceLogUpdatedEvent";
     public static final String CALIBRATION_UPDATED_EVENT = "calibrationUpdatedEvent";
 
+    public static final String JUMP_TO_STATION = "jumpToStation";
+
     public static final String SURVEY_DIR = "Surveys";
     public static final String IMPORT_DIR = "To Import";
     public static final String EXPORT_DIR = "Exported";

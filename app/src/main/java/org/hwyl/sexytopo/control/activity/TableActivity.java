@@ -45,6 +45,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 public class TableActivity extends SexyTopoActivity
         implements
             PopupMenu.OnMenuItemClickListener,
@@ -55,7 +56,7 @@ public class TableActivity extends SexyTopoActivity
 
     private Map<TextView, GraphToListTranslator.SurveyListEntry> fieldToSurveyEntry = new HashMap<>();
     private Map<TextView, TableCol> fieldToTableCol = new HashMap<>();
-
+    private static Map<Station, Integer> stationsToTableIndex = new HashMap<>();
     private TextView cellBeingClicked;
 
 
@@ -85,13 +86,6 @@ public class TableActivity extends SexyTopoActivity
         };
         LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
         broadcastManager.registerReceiver(receiver, new IntentFilter(SexyTopo.SURVEY_UPDATED_EVENT));
-
-    }
-
-
-    @Override
-    protected void onStart() {
-        super.onStart();
         syncTableWithSurvey();
     }
 
@@ -99,13 +93,43 @@ public class TableActivity extends SexyTopoActivity
     @Override
     protected void onResume() {
         super.onResume();
-        syncTableWithSurvey();
+
+        //final TableLayout tableLayout = findViewById(R.id.BodyTable);
+
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null && bundle.getString(SexyTopo.JUMP_TO_STATION) != null) {
+            String requestedStationName = bundle.getString(SexyTopo.JUMP_TO_STATION);
+            Station requestedStation = getSurvey().getStationByName(requestedStationName);
+            jumpToStation(requestedStation);
+        } else {
+            final ScrollView scrollView = findViewById(R.id.BodyTableScrollView);
+            scrollView.fullScroll(View.FOCUS_DOWN);
+        }
+    }
+
+
+    private void jumpToStation(Station station) {
+        final TableLayout tableLayout = findViewById(R.id.BodyTable);
+        int requestedIndex = stationsToTableIndex.get(station);
+        final View requestedRow = tableLayout.getChildAt(requestedIndex);
+        final ScrollView scrollView = findViewById(R.id.BodyTableScrollView);
+        //scrollView.scrollTo(0, requestedRow.getTop());
+        //requestedRow.requestFocus();
+
+        scrollView.post(new Runnable() {
+            @Override
+            public void run() {
+                scrollView.smoothScrollTo(0, requestedRow.getTop());
+            }
+        });
     }
 
 
     public void syncTableWithSurvey() {
 
         Survey survey = getSurvey();
+
+        stationsToTableIndex = new HashMap<>();
 
         List<GraphToListTranslator.SurveyListEntry> tableEntries =
                 graphToListTranslator.toListOfSurveyListEntries(survey);
@@ -115,7 +139,7 @@ public class TableActivity extends SexyTopoActivity
                     Toast.LENGTH_SHORT).show();
         }
 
-        TableLayout tableLayout = findViewById(R.id.BodyTable);
+        final TableLayout tableLayout = findViewById(R.id.BodyTable);
         tableLayout.removeAllViews();
 
         for (GraphToListTranslator.SurveyListEntry entry : tableEntries) {
@@ -150,14 +174,18 @@ public class TableActivity extends SexyTopoActivity
                 textView.setOnLongClickListener(this);
             }
 
-            int numRows = tableLayout.getChildCount();
-            tableLayout.addView(tableRow, numRows);
+            int rowCount = tableLayout.getChildCount();
+            tableLayout.addView(tableRow, rowCount);
+
+            if (entry.getLeg().hasDestination()) {
+                Station to = entry.getLeg().getDestination();
+                stationsToTableIndex.put(to, rowCount);
+            }
         }
 
         tableLayout.requestLayout();
 
-        ScrollView scrollView = findViewById(R.id.BodyTableScrollView);
-        scrollView.fullScroll(View.FOCUS_DOWN);
+
     }
 
     private boolean isActiveStation(Object object) {
@@ -219,6 +247,16 @@ public class TableActivity extends SexyTopoActivity
                 Station newActive = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
                 getSurvey().setActiveStation(newActive);
                 syncTableWithSurvey();
+                return true;
+
+            case R.id.graph_station_jump_to_plan:
+                Station planStation = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
+                jumpToStation(planStation, PlanActivity.class);
+                return true;
+
+            case R.id.graph_station_jump_to_ee:
+                Station eeStation = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
+                jumpToStation(eeStation, ExtendedElevationActivity.class);
                 return true;
 
             case R.id.renameStation:
@@ -387,5 +425,6 @@ public class TableActivity extends SexyTopoActivity
                 .setNegativeButton(R.string.cancel, null)
                 .show();
     }
+
 
 }

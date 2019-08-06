@@ -8,6 +8,17 @@
     <item
         android:id="@+id/setActiveStation"
         android:title="@string/menu_set_active_station"/>
+    <item android:id="@+id/action_jump"
+          android:title="@string/menu_jump_to">
+        <menu>
+            <item
+                android:id="@+id/graph_station_jump_to_plan"
+                android:title="@string/menu_jump_to_station_in_plan"/>
+            <item
+                android:id="@+id/graph_station_jump_to_ee"
+                android:title="@string/menu_jump_to_station_in_elevation"/>
+        </menu>
+    </item>
     <item
         android:id="@+id/renameStation"
         android:title="@string/menu_rename_station"/>

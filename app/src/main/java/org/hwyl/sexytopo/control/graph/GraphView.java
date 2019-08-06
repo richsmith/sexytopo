@@ -25,7 +25,10 @@ import android.widget.PopupWindow;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
+import org.hwyl.sexytopo.control.activity.ExtendedElevationActivity;
 import org.hwyl.sexytopo.control.activity.GraphActivity;
+import org.hwyl.sexytopo.control.activity.PlanActivity;
+import org.hwyl.sexytopo.control.activity.TableActivity;
 import org.hwyl.sexytopo.control.util.CohenSutherlandAlgorithm;
 import org.hwyl.sexytopo.control.util.CrossSectioner;
 import org.hwyl.sexytopo.control.util.PreferenceAccess;
@@ -270,8 +273,6 @@ public class GraphView extends View {
     public void setSurvey(Survey survey) {
         if (survey != this.survey) {
             this.survey = survey;
-            centreViewOnActiveStation();
-
         }
     }
 
@@ -621,6 +622,15 @@ public class GraphView extends View {
                         survey.setActiveStation(station);
                         setSketchTool(SketchTool.POSITION_CROSS_SECTION);
                         activity.showSimpleToast(R.string.position_cross_section_instruction);
+                        break;
+                    case R.id.graph_station_jump_to_table:
+                        activity.jumpToStation(station, TableActivity.class);
+                        break;
+                    case R.id.graph_station_jump_to_plan:
+                        activity.jumpToStation(station, PlanActivity.class);
+                        break;
+                    case R.id.graph_station_jump_to_ee:
+                        activity.jumpToStation(station, ExtendedElevationActivity.class);
                         break;
                     case R.id.graph_station_start_new_survey:
                         if (!survey.isSaved()) {
@@ -1257,9 +1267,12 @@ public class GraphView extends View {
 
 
     public void centreViewOnActiveStation() {
+        centreViewOnStation(survey.getActiveStation());
+    }
 
+    public void centreViewOnStation(Station station) {
         Coord2D activeStationCoord =
-                projection.getStationMap().get(survey.getActiveStation());
+                projection.getStationMap().get(station);
 
         // not sure how this could be null, but at least one null pointer has been reported
         if (activeStationCoord == null) {
@@ -1267,7 +1280,6 @@ public class GraphView extends View {
         }
 
         centreViewOnSurveyPoint(activeStationCoord);
-
     }
 
 
