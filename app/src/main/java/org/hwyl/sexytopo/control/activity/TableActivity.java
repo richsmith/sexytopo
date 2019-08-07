@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.graph.GraphView;
 import org.hwyl.sexytopo.control.table.ManualEntry;
@@ -94,8 +95,6 @@ public class TableActivity extends SexyTopoActivity
     protected void onResume() {
         super.onResume();
 
-        //final TableLayout tableLayout = findViewById(R.id.BodyTable);
-
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && bundle.getString(SexyTopo.JUMP_TO_STATION) != null) {
             String requestedStationName = bundle.getString(SexyTopo.JUMP_TO_STATION);
@@ -109,19 +108,23 @@ public class TableActivity extends SexyTopoActivity
 
 
     private void jumpToStation(Station station) {
-        final TableLayout tableLayout = findViewById(R.id.BodyTable);
-        int requestedIndex = stationsToTableIndex.get(station);
-        final View requestedRow = tableLayout.getChildAt(requestedIndex);
-        final ScrollView scrollView = findViewById(R.id.BodyTableScrollView);
-        //scrollView.scrollTo(0, requestedRow.getTop());
-        //requestedRow.requestFocus();
+        try {
+            final TableLayout tableLayout = findViewById(R.id.BodyTable);
+            int requestedIndex = stationsToTableIndex.get(station);
+            final View requestedRow = tableLayout.getChildAt(requestedIndex);
+            final ScrollView scrollView = findViewById(R.id.BodyTableScrollView);
 
-        scrollView.post(new Runnable() {
-            @Override
-            public void run() {
-                scrollView.smoothScrollTo(0, requestedRow.getTop());
-            }
-        });
+            scrollView.post(new Runnable() {
+                @Override
+                public void run() {
+                    scrollView.smoothScrollTo(0, requestedRow.getTop());
+                }
+            });
+
+        } catch (Exception exception) {
+            Log.e("Could not jump to station " + station.getName());
+            Log.e(exception);
+        }
     }
 
 
@@ -129,7 +132,7 @@ public class TableActivity extends SexyTopoActivity
 
         Survey survey = getSurvey();
 
-        stationsToTableIndex = new HashMap<>();
+        stationsToTableIndex.clear();
 
         List<GraphToListTranslator.SurveyListEntry> tableEntries =
                 graphToListTranslator.toListOfSurveyListEntries(survey);
