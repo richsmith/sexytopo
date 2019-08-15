@@ -5,6 +5,8 @@ import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.table.TableCol;
 
+import java.util.Locale;
+
 
 public class SurvexTherionUtil {
 
@@ -20,9 +22,9 @@ public class SurvexTherionUtil {
 
         formatField(builder, from.getName());
         formatField(builder, to.getName());
-        formatField(builder, TableCol.DISTANCE.format(leg.getDistance()));
-        formatField(builder, TableCol.AZIMUTH.format(leg.getAzimuth()));
-        formatField(builder, TableCol.INCLINATION.format(leg.getInclination()));
+        formatField(builder, TableCol.DISTANCE.format(leg.getDistance(), Locale.UK));
+        formatField(builder, TableCol.AZIMUTH.format(leg.getAzimuth(), Locale.UK));
+        formatField(builder, TableCol.INCLINATION.format(leg.getInclination(), Locale.UK));
 
         if (leg.wasPromoted() || to.hasComment()) {
             builder.append("\t" + commentChar + " ");
@@ -49,11 +51,11 @@ public class SurvexTherionUtil {
             } else {
                 builder.append(", ");
             }
-            builder.append(TableCol.DISTANCE.format(precursor.getDistance()));
+            builder.append(TableCol.DISTANCE.format(precursor.getDistance(), Locale.UK));
             builder.append(" ");
-            builder.append(TableCol.AZIMUTH.format(precursor.getAzimuth()));
+            builder.append(TableCol.AZIMUTH.format(precursor.getAzimuth(), Locale.UK));
             builder.append(" ");
-            builder.append(TableCol.INCLINATION.format(precursor.getInclination()));
+            builder.append(TableCol.INCLINATION.format(precursor.getInclination(), Locale.UK));
         }
         builder.append("}");
     }
