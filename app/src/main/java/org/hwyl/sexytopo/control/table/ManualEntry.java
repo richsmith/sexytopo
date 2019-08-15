@@ -237,11 +237,11 @@ public class ManualEntry {
 
         renameField.addTextChangedListener(new TextWatcher() {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // TODO - nothing
+                // nothing
             }
 
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // TODO - nothing
+                // nothing
             }
 
             public void afterTextChanged(Editable s) {
@@ -262,9 +262,7 @@ public class ManualEntry {
             }
         });
 
-
-
-        new AlertDialog.Builder(activity)
+        AlertDialog dialog = new AlertDialog.Builder(activity)
                 .setTitle("Edit name")
                 .setView(renameField)
                 .setPositiveButton("Rename", new DialogInterface.OnClickListener() {
@@ -282,8 +280,11 @@ public class ManualEntry {
                     public void onClick(DialogInterface dialog, int buttonId) {
                         // do nothing
                     }
-                })
-                .show();
+                }).create();
+
+        dialog.getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        dialog.show();
     }
 
     public interface EditCallback {
