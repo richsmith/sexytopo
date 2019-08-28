@@ -2,21 +2,22 @@ package org.hwyl.sexytopo.control.util;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
-/**
- * Created by rls on 08/06/15.
- */
+
 public class TextTools {
 
     final static DecimalFormat dp0WithCommaFormatter = new DecimalFormat("#,##0");
     final static DecimalFormat dp2WithCommaFormatter = new DecimalFormat("#,##0.00");
     final static DecimalFormat dp2WithoutCommaFormatter = new DecimalFormat("##0.00");
-
+    final static DecimalFormat dp2WithoutCommaFormatterUk =
+        new DecimalFormat("##0.00", new DecimalFormatSymbols(Locale.UK));
 
     public final static DateFormat ISO_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -75,6 +76,10 @@ public class TextTools {
 
     public static String formatTo2dp(Number number) {
         return dp2WithoutCommaFormatter.format(number);
+    }
+
+    public static String formatTo2dpWithDot(Number number) {
+        return dp2WithoutCommaFormatterUk.format(number);
     }
 
     public static String formatTo0dpWithComma(Number number) {
