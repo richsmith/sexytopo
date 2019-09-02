@@ -41,7 +41,7 @@
             android:key="pref_max_distance_delta"
             android:inputType="numberDecimal"
             android:numeric="decimal"
-            android:defaultValue="0.2"
+            android:defaultValue="0.05"
             android:summary="How much error tolerated when deciding whether to create a new station"
             android:title="Max distance delta (m)"/>
 
@@ -49,7 +49,7 @@
             android:key="pref_max_angle_delta"
             android:inputType="numberDecimal"
             android:numeric="decimal"
-            android:defaultValue="1"
+            android:defaultValue="1.7"
             android:summary="How much error tolerated when deciding whether to create a new station"
             android:title="Max angle delta (degrees)"/>
     </PreferenceCategory>

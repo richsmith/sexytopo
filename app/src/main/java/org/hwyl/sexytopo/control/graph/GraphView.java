@@ -539,7 +539,7 @@ public class GraphView extends View {
                     return false;
 
                 } else if (newSelectedStation != survey.getActiveStation()) {
-                    survey.setActiveStation(newSelectedStation);
+                    setActiveStation(newSelectedStation);
                     invalidate();
                     return true;
 
@@ -597,7 +597,7 @@ public class GraphView extends View {
             public void onClick(View view) {
                 switch(view.getId()) {
                     case R.id.graph_station_select:
-                        survey.setActiveStation(station);
+                        setActiveStation(station);
                         invalidate();
                         break;
                     case R.id.graph_station_toggle_left_right:
@@ -619,7 +619,7 @@ public class GraphView extends View {
                         invalidate();
                         break;
                     case R.id.graph_station_new_cross_section:
-                        survey.setActiveStation(station);
+                        setActiveStation(station);
                         setSketchTool(SketchTool.POSITION_CROSS_SECTION);
                         activity.showSimpleToast(R.string.position_cross_section_instruction);
                         break;
@@ -739,6 +739,11 @@ public class GraphView extends View {
 
         return best;
 
+    }
+
+    private void setActiveStation(Station station) {
+        survey.setActiveStation(station);
+        SurveyManager.getInstance(getContext()).broadcastSurveyUpdated();
     }
 
 
@@ -938,7 +943,8 @@ public class GraphView extends View {
         }
 
         for (CrossSectionDetail crossSectionDetail : badXSections) {
-            String name = crossSectionDetail.getCrossSection().getStation().getName();
+            Station station = crossSectionDetail.getCrossSection().getStation();
+            String name = station == null? "Unknown" : station.getName();
             Log.e("Missing station details for cross section on station " + name + "; removing");
             crossSectionDetails.remove(crossSectionDetail);
         }

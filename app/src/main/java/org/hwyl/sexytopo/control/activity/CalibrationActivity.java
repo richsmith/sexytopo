@@ -48,19 +48,20 @@ public class CalibrationActivity extends SexyTopoActivity {
 
     private enum CalibrationDirection {
         FORWARD(R.string.direction_forward),
-        RIGHT(R.string.direction_right),
         BACK(R.string.direction_back),
         LEFT(R.string.direction_left),
+        RIGHT(R.string.direction_right),
         UP(R.string.direction_up),
         DOWN(R.string.direction_down),
         FORWARD_LEFT_UP(R.string.direction_forward_left_up),
         FORWARD_LEFT_DOWN(R.string.direction_forward_left_down),
         FORWARD_RIGHT_UP(R.string.direction_forward_right_up),
         FORWARD_RIGHT_DOWN(R.string.direction_forward_right_down),
-        BACK_RIGHT_UP(R.string.direction_back_right_up),
-        BACK_RIGHT_DOWN(R.string.direction_back_right_down),
         BACK_LEFT_UP(R.string.direction_back_left_up),
-        BACK_LEFT_DOWN(R.string.direction_back_left_down);
+        BACK_LEFT_DOWN(R.string.direction_back_left_down),
+        BACK_RIGHT_UP(R.string.direction_back_right_up),
+        BACK_RIGHT_DOWN(R.string.direction_back_right_down);
+
 
         int stringId;
 

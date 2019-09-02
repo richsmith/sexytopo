@@ -155,6 +155,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             case R.id.action_input_mode_forward:
             case R.id.action_input_mode_backward:
             case R.id.action_input_mode_combo:
+            case R.id.action_input_mode_cal_check:
                 setInputModePreference(item);
                 return true;
 

@@ -47,6 +47,8 @@
                       android:title="@string/action_input_mode_backward"/>
                 <item android:id="@+id/action_input_mode_combo"
                       android:title="@string/action_input_mode_combo"/>
+                <item android:id="@+id/action_input_mode_cal_check"
+                      android:title="@string/action_input_mode_cal_check"/>
             </group>
         </menu>
     </item>

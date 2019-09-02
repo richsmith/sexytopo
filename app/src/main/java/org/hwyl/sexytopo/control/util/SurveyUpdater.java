@@ -14,8 +14,8 @@ import java.util.List;
 
 public class SurveyUpdater {
 
-    private static final float DEFAULT_MAX_DISTANCE_DELTA = 0.2f;
-    private static final float DEFAULT_MAX_ANGLE_DELTA = 1.0f;
+    private static final float DEFAULT_MAX_DISTANCE_DELTA = 0.05f;
+    private static final float DEFAULT_MAX_ANGLE_DELTA = 1.7f;
 
 
     public static boolean update(Survey survey, List<Leg> legs, InputMode inputMode) {
@@ -58,6 +58,8 @@ public class SurveyUpdater {
             case COMBO:
                 justCreatedNewStation = createNewStationIfBacksight(survey) ||
                         createNewStationIfTripleShot(survey, false);
+            case CALIBRATION_CHECK:
+                break; // do nothing :)
         }
 
         if (justCreatedNewStation) {

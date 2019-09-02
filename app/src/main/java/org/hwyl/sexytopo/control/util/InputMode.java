@@ -7,7 +7,8 @@ public enum InputMode {
 
     FORWARD(R.id.action_input_mode_forward),
     BACKWARD(R.id.action_input_mode_backward),
-    COMBO(R.id.action_input_mode_combo);
+    COMBO(R.id.action_input_mode_combo),
+    CALIBRATION_CHECK(R.id.action_input_mode_cal_check);
 
     private int menuId;
     InputMode(int menuId) {

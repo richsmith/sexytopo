@@ -122,7 +122,8 @@ public class TableActivity extends SexyTopoActivity
             });
 
         } catch (Exception exception) {
-            Log.e("Could not jump to station " + station.getName());
+            String name = station == null? "Unknown" : station.getName();
+            Log.e("Could not jump to station " + name);
             Log.e(exception);
         }
     }
