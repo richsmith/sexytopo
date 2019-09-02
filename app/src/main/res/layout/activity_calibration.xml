@@ -13,12 +13,13 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:padding="0dp"
-        android:layout_height="wrap_content">
+        android:layout_height="0dp"
+        android:layout_weight="0.02">
         <Button
             android:id="@+id/calibration_start"
             android:layout_marginLeft="0dp"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="2"
             android:textAlignment="gravity"
             android:gravity="center"
@@ -28,7 +29,7 @@
             />
         <Button
             android:id="@+id/calibration_load"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:textAlignment="gravity"
@@ -41,11 +42,13 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:padding="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="0.02">
         <Button
             android:id="@+id/calibration_stop"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="2"
             android:textAlignment="gravity"
             android:gravity="center"
@@ -56,7 +59,7 @@
         <Button
             android:id="@+id/calibration_clear"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:textAlignment="gravity"
             android:gravity="center"
@@ -68,7 +71,8 @@
 
     <TableLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="0.02"
         android:stretchColumns="1"
         android:padding="5dp"
         android:layout_marginTop="10dp"
@@ -90,67 +94,68 @@
 
     <TableLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="0.06"
         android:stretchColumns="1">
         <TableRow>
             <TextView
                 android:text="Gx"
-                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="16sp"
                 android:gravity="start"
                 />
             <TextView
                 android:id="@+id/calibrationFieldGx"
-                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:gravity="end"/>
         </TableRow>
         <TableRow>
             <TextView
                 android:text="Gy"
-                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="16sp"
                 android:gravity="start"
                 />
             <TextView
                 android:id="@+id/calibrationFieldGy"
-                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="16sp"
                 android:gravity="end"/>
         </TableRow>
         <TableRow>
             <TextView
                 android:text="Gz"
-                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="16sp"
                 android:gravity="start"
                 />
             <TextView
                 android:id="@+id/calibrationFieldGz"
-                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="16sp"
                 android:gravity="end"/>
         </TableRow>
         <TableRow>
             <TextView
                 android:text="Mx"
-                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="16sp"
                 android:gravity="start"
                 />
             <TextView
                 android:id="@+id/calibrationFieldMx"
-                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="16sp"
                 android:gravity="end"/>
         </TableRow>
         <TableRow>
             <TextView
                 android:text="My"
-                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="16sp"
                 android:gravity="start"
                 />
             <TextView
                 android:id="@+id/calibrationFieldMy"
-                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="16sp"
                 android:gravity="end"/>
         </TableRow>
         <TableRow>
             <TextView
                 android:text="Mz"
-                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="16sp"
                 android:gravity="start"
                 />
             <TextView
@@ -163,7 +168,8 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="0.02"
         android:padding="0px">
         <Button
             android:id="@+id/fake_button"
@@ -193,7 +199,8 @@
 
     <TableLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="0.04"
         android:stretchColumns="1"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
@@ -232,7 +239,8 @@
 
     <TableLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="0.02"
         android:stretchColumns="1">
         <TableRow>
             <TextView
@@ -249,7 +257,8 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="0dp"
+        android:layout_weight="0.02">
         <Button
             android:id="@+id/calibration_complete"
             android:layout_width="0dp"
