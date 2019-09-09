@@ -944,7 +944,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
     private void undoLastLeg() {
-        getSurvey().undoLeg();
+        getSurvey().undoAddLeg();
         SurveyManager.getInstance(this).broadcastSurveyUpdated();
 
     }

@@ -35,7 +35,8 @@ public class Survey {
     private boolean isSaved = true;
     private boolean isAutosaved = true;
 
-    private Stack<UndoEntry> undoStack = new Stack<>();
+    private Stack<Leg> legsInChronoOrder = new Stack<>();
+    //private Stack<UndoEntry> undoStack = new Stack<>();
 
     public Survey(String name) {
         setName(name);
@@ -92,7 +93,7 @@ public class Survey {
     }
 
     public Leg getMostRecentLeg() {
-        return undoStack.empty()? null : undoStack.peek().leg;
+        return legsInChronoOrder.empty()? null : legsInChronoOrder.peek();
     }
 
     public void setPlanSketch(Sketch planSketch) {
@@ -133,6 +134,17 @@ public class Survey {
             legs.addAll(getAllLegs(leg.getDestination()));
         }
         return legs;
+    }
+
+    public List<Leg> getLastNLegs(int n) {
+        int numberOfLegs = legsInChronoOrder.size();
+        int start = Math.max(0, numberOfLegs - n);
+        return legsInChronoOrder.subList(start, numberOfLegs);
+
+    }
+
+    public List<Leg> getAllLegsInChronoOrder() {
+        return legsInChronoOrder;
     }
 
 
@@ -229,16 +241,18 @@ public class Survey {
     }
 
     private Station findNewActiveStation() {
-        if (!undoStack.isEmpty()) {
-            return undoStack.peek().station;
-        } else {
-            return origin;
+        for (int i = legsInChronoOrder.size() - 1; i >= 0; i--) {
+            Leg leg = legsInChronoOrder.elementAt(i);
+            if (leg.hasDestination()) {
+                return leg.getDestination();
+            }
         }
+        return origin;
     }
 
 
-    public void addUndoEntry(Station station, Leg leg) {
-        undoStack.push(new UndoEntry(station, leg));
+    public void addLegRecord(Leg leg) {
+        legsInChronoOrder.push(leg);
     }
 
 
@@ -313,45 +327,30 @@ public class Survey {
     }
 
 
-    public void undoLeg(final Leg toDelete) {
+    public void undoAddLeg() {
+
+        if (legsInChronoOrder.size() < 1) {
+            return;
+        }
+
+        final Leg toDelete = legsInChronoOrder.pop();
         SurveyTools.traverseLegs(
-                this,
-                new SurveyTools.SurveyLegTraversalCallback() {
-                    @Override
-                    public boolean call(Station origin, Leg leg) {
-                        if (leg == toDelete) {
-                            origin.getOnwardLegs().remove(toDelete);
-                            return true;
-                        } else {
-                            return false;
-                        }
+            this,
+            new SurveyTools.SurveyLegTraversalCallback() {
+                @Override
+                public boolean call(Station origin, Leg leg) {
+                    if (leg == toDelete) {
+                        origin.getOnwardLegs().remove(toDelete);
+                        return true;
+                    } else {
+                        return false;
                     }
-                });
-
-        List<Station> stations = getAllStations();
-        List<Leg> legs = getAllLegs();
-        List<UndoEntry> invalidEntries = new ArrayList<>();
-        for (UndoEntry entry : undoStack) {
-            if (!stations.contains(entry.station) || !legs.contains(entry.leg)) {
-                invalidEntries.add(entry);
+                }
             }
-        }
-        undoStack.removeAll(invalidEntries);
+        );
 
-        checkActiveStation();
-    }
-
-
-    public void undoLeg() {
-        // FIXME; can we consolidate the two undoLeg methods?
-        if (!undoStack.isEmpty()) {
-            UndoEntry entry = undoStack.pop();
-            entry.station.getOnwardLegs().remove(entry.leg);
-            if (entry.leg.hasDestination() && entry.leg.getDestination() == activeStation) {
-                checkActiveStation();
-            }
-        }
         setSaved(false);
+        checkActiveStation();
     }
 
     public Station getStationByName(final String name) {

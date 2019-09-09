@@ -113,7 +113,7 @@ public class ThExporter {
         builder.append("data normal from to length compass clino\n\n");
 
         List<GraphToListTranslator.SurveyListEntry> list =
-                graphToListTranslator.toListOfSurveyListEntries(survey);
+                graphToListTranslator.toChronoListOfSurveyListEntries(survey);
 
         for (GraphToListTranslator.SurveyListEntry entry : list) {
             SurvexTherionUtil.formatEntry(builder, entry, COMMENT_CHAR);

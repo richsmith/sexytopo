@@ -35,7 +35,8 @@ public class CompassExporter extends SingleFileExporter {
      * @return
      */
     public String getContent(Survey survey) {
-        List<GraphToListTranslator.SurveyListEntry> data = graphToListTranslator.toListOfSurveyListEntries(survey);
+        List<GraphToListTranslator.SurveyListEntry> data =
+                graphToListTranslator.toChronoListOfSurveyListEntries(survey);
         String surveyDate = dateFormat.format(Calendar.getInstance().getTime());
 
         StringBuilder sb = new StringBuilder(1024);

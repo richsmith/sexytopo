@@ -8,6 +8,13 @@ import org.junit.Test;
 public class SurveyTest {
 
     @Test
+    public void testAddedLegCanBeUndone() {
+        Survey baseSurvey = BasicTestSurveyCreator.createStraightNorth();
+        baseSurvey.undoAddLeg();
+        Assert.assertEquals(2, baseSurvey.getAllLegs().size());
+    }
+
+    @Test
     public void testSurveyCanBeConnected() {
         Survey baseSurvey = BasicTestSurveyCreator.createStraightNorth();
         Survey otherSurvey = BasicTestSurveyCreator.createRightRight();

@@ -135,8 +135,11 @@ public class TableActivity extends SexyTopoActivity
 
         stationsToTableIndex.clear();
 
+        /*List<GraphToListTranslator.SurveyListEntry> tableEntries =
+                graphToListTranslator.toListOfSurveyListEntries(survey);*/
+
         List<GraphToListTranslator.SurveyListEntry> tableEntries =
-                graphToListTranslator.toListOfSurveyListEntries(survey);
+                graphToListTranslator.toChronoListOfSurveyListEntries(survey);
 
         if (tableEntries.size() == 0) {
             Toast.makeText(getApplicationContext(), R.string.no_data,
@@ -392,7 +395,7 @@ public class TableActivity extends SexyTopoActivity
     }
 
     public void deleteLastLeg(View view) {
-        getSurvey().undoLeg();
+        getSurvey().undoAddLeg();
         syncTableWithSurvey();
     }
 

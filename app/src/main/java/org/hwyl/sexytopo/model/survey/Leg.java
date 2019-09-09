@@ -4,7 +4,7 @@ import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.table.TableCol;
 
 
-public class Leg extends SurveyComponent{
+public class Leg extends SurveyComponent {
 
     public static final int MIN_DISTANCE = 0;
     public static final int MIN_AZIMUTH = 0;
@@ -13,6 +13,7 @@ public class Leg extends SurveyComponent{
     public static final int MAX_INCLINATION = 90;
 
 
+    private final int index;
     private final double distance; // in metres
     private final double azimuth;
     private final double inclination;
@@ -68,6 +69,7 @@ public class Leg extends SurveyComponent{
                     "Inclination should be up to +-90; actual=" + inclination);
         }
 
+        this.index = 0;
         this.distance = distance;
         this.azimuth = azimuth;
         this.inclination = inclination;

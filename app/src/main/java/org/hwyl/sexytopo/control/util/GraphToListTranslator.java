@@ -6,18 +6,31 @@ import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.table.TableCol;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by rls on 24/07/14.
- */
+
 public class GraphToListTranslator {
 
 
     public List<SurveyListEntry> toListOfSurveyListEntries(Survey survey) {
         return createListOfEntriesFromStation(survey.getOrigin());
+    }
+
+
+    public List<SurveyListEntry> toChronoListOfSurveyListEntries(Survey survey) {
+        final List<Leg> chronoLegs = survey.getAllLegsInChronoOrder();
+        List<SurveyListEntry> entries = toListOfSurveyListEntries(survey);
+        Collections.sort(entries, new Comparator<SurveyListEntry>() {
+            @Override
+            public int compare(SurveyListEntry e0, SurveyListEntry e1) {
+                return chronoLegs.indexOf(e0.leg) - chronoLegs.indexOf(e1.leg);
+            }
+        });
+        return entries;
     }
 
 
@@ -79,8 +92,8 @@ public class GraphToListTranslator {
 
 
     public class SurveyListEntry {
-        private Station from;
-        private Leg leg;
+        private final Station from;
+        private final Leg leg;
 
         public SurveyListEntry(Station from, Leg leg) {
             this.from = from;

@@ -27,8 +27,6 @@ public class PocketTopoTxtExporter extends SingleFileExporter {
 
     public String getContent(Survey survey) {
 
-
-
         String text = "TRIP\n";
 
         text += "DATE ";

@@ -310,7 +310,7 @@ public abstract class GraphActivity extends SexyTopoActivity
                 graphView.invalidate();
                 break;
             case R.id.buttonDeleteLastLeg:
-                getSurvey().undoLeg();
+                getSurvey().undoAddLeg();
                 syncGraphWithSurvey();
                 break;
         }

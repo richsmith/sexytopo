@@ -24,7 +24,7 @@ public class SurvexExporter extends SingleFileExporter {
         builder.append("*alias station - ..");
 
         List<GraphToListTranslator.SurveyListEntry> list =
-                graphToListTranslator.toListOfSurveyListEntries(survey);
+                graphToListTranslator.toChronoListOfSurveyListEntries(survey);
 
         for (GraphToListTranslator.SurveyListEntry entry : list) {
             SurvexTherionUtil.formatEntry(builder, entry, COMMENT_CHAR);

@@ -7,7 +7,6 @@ import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -45,7 +44,7 @@ public class SurveyUpdater {
         Log.d("Adding leg " + leg);
         activeStation.getOnwardLegs().add(leg);
         survey.setSaved(false);
-        survey.addUndoEntry(activeStation, leg);
+        survey.addLegRecord(leg);
 
         boolean justCreatedNewStation = false;
         switch(inputMode) {
@@ -82,7 +81,7 @@ public class SurveyUpdater {
         // FIXME; could the below be moved into Survey? And from elsewhere in this file?
         activeStation.getOnwardLegs().add(leg);
         survey.setSaved(false);
-        survey.addUndoEntry(activeStation, leg);
+        survey.addLegRecord(leg);
         survey.setActiveStation(leg.getDestination());
     }
 
@@ -99,37 +98,51 @@ public class SurveyUpdater {
 
     private static boolean createNewStationIfTripleShot(Survey survey, boolean backsightMode) {
 
+        int requiredNumber = SexyTopo.NUM_OF_REPEATS_FOR_NEW_STATION;
+
         Station activeStation = survey.getActiveStation();
-        if (activeStation.getOnwardLegs().size() >= SexyTopo.NUM_OF_REPEATS_FOR_NEW_STATION) {
+        List<Leg> activeLegs = activeStation.getOnwardLegs();
+        if (activeLegs.size() < requiredNumber) {
+            return false;
+        }
 
-            List<Leg> legs = getLatestNLegs(activeStation, SexyTopo.NUM_OF_REPEATS_FOR_NEW_STATION);
+        List<Leg> lastNLegs = survey.getLastNLegs(requiredNumber);
+        if (lastNLegs.size() < requiredNumber) {
+            return false;
+        }
 
-            if (areLegsAboutTheSame(legs)) {
-
-                Station newStation = new Station(getNextStationName(survey));
-                newStation.setExtendedElevationDirection(
-                        activeStation.getExtendedElevationDirection());
-
-                Leg newLeg = averageLegs(legs);
-                newLeg = Leg.upgradeSplayToConnectedLeg(
-                        newLeg, newStation, legs.toArray(new Leg[]{}));
-
-                if (backsightMode) {
-                    newLeg = newLeg.reverse();
-                }
-
-                activeStation.getOnwardLegs().removeAll(legs);
-                activeStation.getOnwardLegs().add(newLeg);
-
-                for (Leg leg : legs) {
-                    survey.undoLeg();
-                }
-                survey.addUndoEntry(activeStation, newLeg);
-
-                survey.setActiveStation(newStation);
-                return true;
+        // check all the last legs are from the active station
+        for (Leg leg : lastNLegs) {
+            if (!activeLegs.contains(leg)) {
+                return false;
             }
         }
+
+        if (areLegsAboutTheSame(lastNLegs)) {
+
+            Station newStation = new Station(getNextStationName(survey));
+            newStation.setExtendedElevationDirection(
+                    activeStation.getExtendedElevationDirection());
+
+            Leg newLeg = averageLegs(lastNLegs);
+            newLeg = Leg.upgradeSplayToConnectedLeg(
+                    newLeg, newStation, lastNLegs.toArray(new Leg[]{}));
+
+            if (backsightMode) {
+                newLeg = newLeg.reverse();
+            }
+
+            for (int i = 0; i < requiredNumber; i++) {
+                survey.undoAddLeg();
+            }
+
+            activeStation.getOnwardLegs().add(newLeg);
+            survey.addLegRecord(newLeg);
+            survey.setActiveStation(newStation);
+
+            return true;
+        }
+
         return false;
     }
 
@@ -137,33 +150,47 @@ public class SurveyUpdater {
     private static boolean createNewStationIfBacksight(Survey survey) {
         // Examine splays of the current active station to determine if the previous two were a
         // foreward and backsight; if so, promote to a new named station
+
         Station activeStation = survey.getActiveStation();
-        if (activeStation.getOnwardLegs().size() >= 2) {
+        List<Leg> activeLegs = activeStation.getOnwardLegs();
+        if (activeLegs.size() < 2) {
+            return false;
+        }
 
-            List<Leg> legs = getLatestNLegs(activeStation, 2);
-            Leg fore = legs.get(legs.size() - 2);
-            Leg back = legs.get(legs.size() - 1);  // TODO: check for "reverse mode" to see if backsight comes first?
+        List<Leg> lastPair = survey.getLastNLegs(2);
 
-            if (areLegsBacksights(fore, back)) {
-                Station newStation = new Station(getNextStationName(survey));
-                newStation.setExtendedElevationDirection(
-                        activeStation.getExtendedElevationDirection());
+        if (lastPair.size() < 2) {
+            return false;
+        }
 
-                Leg newLeg = averageBacksights(fore, back);
-                newLeg = Leg.manuallyUpgradeSplayToConnectedLeg(newLeg, newStation);
-
-                activeStation.getOnwardLegs().removeAll(legs);
-                activeStation.getOnwardLegs().add(newLeg);
-
-                for (Leg leg : legs) {
-                    survey.undoLeg();
-                }
-                survey.addUndoEntry(activeStation, newLeg);
-
-                survey.setActiveStation(newStation);
-                return true;
+        for (Leg leg : lastPair) {
+            if (!activeLegs.contains(leg)) {
+                return false;
             }
         }
+
+
+        Leg fore = lastPair.get(lastPair.size() - 2);
+        Leg back = lastPair.get(lastPair.size() - 1);  // TODO: check for "reverse mode" to see if backsight comes first?
+
+        if (areLegsBacksights(fore, back)) {
+            Station newStation = new Station(getNextStationName(survey));
+            newStation.setExtendedElevationDirection(
+                    activeStation.getExtendedElevationDirection());
+
+            Leg newLeg = averageBacksights(fore, back);
+            newLeg = Leg.manuallyUpgradeSplayToConnectedLeg(newLeg, newStation);
+
+            survey.undoAddLeg();
+            survey.undoAddLeg();
+
+            activeStation.getOnwardLegs().add(newLeg);
+            survey.addLegRecord(newLeg);
+
+            survey.setActiveStation(newStation);
+            return true;
+        }
+
         return false;
     }
 
@@ -230,19 +257,14 @@ public class SurveyUpdater {
     }
 
 
-    public static void deleteLeg(Survey survey, final Leg toDelete) {
-        survey.undoLeg(toDelete);
-    }
-
-
-    private static List<Leg> getLatestNLegs(Station station, int n) {
-        List<Leg> legs = station.getOnwardLegs();
-        List<Leg> lastNLegs = new ArrayList<>(legs.subList(legs.size() - n, legs.size()));
-        return lastNLegs;
-    }
-
-
     private static boolean areLegsAboutTheSame(List<Leg> legs) {
+
+        for (Leg leg : legs) { // full legs must be unique by definition
+            if (leg.hasDestination()) {
+                return false;
+            }
+        }
+
         double minDistance = Double.POSITIVE_INFINITY, maxDistance = Double.NEGATIVE_INFINITY;
         double minAzimuth = Double.POSITIVE_INFINITY, maxAzimuth = Double.NEGATIVE_INFINITY;
         double minInclination = Double.POSITIVE_INFINITY, maxInclination = Double.NEGATIVE_INFINITY;
