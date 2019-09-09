@@ -18,7 +18,7 @@ public class Survey {
 
     public static final Station NULL_STATION = new Station("-");
 
-    public static final char[] FORBIDDEN_CHARS = new char[]{':', '.', '\n', '\r'};
+    public static final char[] FORBIDDEN_CHARS = new char[]{':', '.', '\n', '\r', '/', '\\'};
 
     private String name;
 
@@ -48,6 +48,9 @@ public class Survey {
     public void setName(String name) {
         for (char c : FORBIDDEN_CHARS) {
             name = name.replace(Character.toString(c), "");
+        }
+        if (name.equals("")) {
+            name = "blank";
         }
         this.name = name;
     }

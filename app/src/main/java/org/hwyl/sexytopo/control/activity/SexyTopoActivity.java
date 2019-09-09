@@ -510,8 +510,15 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                         String newName = value.toString();
                         Survey survey = getSurvey();
                         String oldName = survey.getName();
+                        if (oldName.equals(newName)) {
+                            return;
+                        }
                         try {
                             survey.setName(newName);
+                            if (!Util.isSurveyNameUnique(
+                                    SexyTopoActivity.this, survey.getName()))  {
+                                throw new Exception("Survey already exists");
+                            }
                             Saver.save(SexyTopoActivity.this, survey);
                             updateRememberedSurvey();
                         } catch (Exception exception) {
@@ -543,8 +550,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         Editable value = input.getText();
                         String name = value.toString();
+                        Survey survey = new Survey(name);
                         if (Util.isSurveyNameUnique(SexyTopoActivity.this, name)) {
-                            Survey survey = new Survey(name);
                             setSurvey(survey);
                         } else {
                             showSimpleToast(R.string.dialog_new_survey_name_must_be_unique);
