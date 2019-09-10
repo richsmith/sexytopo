@@ -1,8 +1,10 @@
 package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
+import android.content.Context;
 import android.text.TextUtils;
 
 import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
 import org.hwyl.sexytopo.control.util.TextTools;
@@ -25,11 +27,11 @@ public class ThExporter {
     public static final String DATE_PATTERN = "yyyy.MM.dd";
 
 
-    public static String getContent(Survey survey, List<String> th2Files) {
+    public static String getContent(Context context, Survey survey, List<String> th2Files) {
 
         String text =
             TherionExporter.getEncodingText() + "\n" +
-            getSurveyText(survey, th2Files) + "\n";
+            getSurveyText(context, survey, th2Files) + "\n";
 
         return text;
     }
@@ -57,10 +59,13 @@ public class ThExporter {
         return newContent;
     }
 
-    private static String getSurveyText(Survey survey, List<String> th2Files) {
+    private static String getSurveyText(Context context, Survey survey, List<String> th2Files) {
+
+        String attribution = "created with " +
+                SexyTopo.APP_NAME + " " + SexyTopoActivity.getVersionName(context);
 
         String surveyText =
-            COMMENT_CHAR + " created with " + SexyTopo.APP_NAME + "\n\n" +
+            COMMENT_CHAR + " " + attribution + "\n\n" +
             "survey " + survey.getName() + "\n\n" +
             getInputText(th2Files) + "\n\n" +
             indent(getCentrelineText(survey)) + "\n\n" +

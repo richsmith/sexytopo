@@ -47,7 +47,7 @@ public class TherionExporter extends Exporter {
 
         String thContent = null;
         if (originalThFileContent == null) {
-            thContent = ThExporter.getContent(survey, th2Files);
+            thContent = ThExporter.getContent(context, survey, th2Files);
         } else {
             thContent = ThExporter.updateOriginalContent(survey, originalThFileContent, th2Files);
         }
