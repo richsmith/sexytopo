@@ -387,15 +387,4 @@ public class Survey {
         return "[Survey " + getName() + "]";
     }
 
-
-    private class UndoEntry {
-        private Station station;
-        private Leg leg;
-        private UndoEntry(Station station, Leg leg) {
-            this.station = station;
-            this.leg = leg;
-        }
-    }
-
-
 }
