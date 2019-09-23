@@ -16,9 +16,9 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +44,7 @@ public class SurveyJsonTranslater {
     public static final String PROMOTED_FROM_TAG = "promotedFrom";
     public static final String DESTINATION_TAG = "destination";
     public static final String WAS_SHOT_BACKWARDS_TAG = "wasShotBackwards";
+    public static final String INDEX_TAG = "index";
 
     public static final String ACTIVE_STATION_TAG = "activeStation";
 
@@ -75,8 +76,15 @@ public class SurveyJsonTranslater {
         json.put(SURVEY_NAME_TAG, survey.getName());
 
         JSONArray stationArray = new JSONArray();
-        for (Station station : survey.getAllStations()) {
-            stationArray.put(toJson(station));
+
+        List<Leg> chronoList = survey.getAllLegsInChronoOrder();
+
+        stationArray.put(toJson(survey.getOrigin(), chronoList));
+
+        for (Leg leg : chronoList) {
+            if (leg.hasDestination()) {
+                stationArray.put(toJson(leg.getDestination(), chronoList));
+            }
         }
         json.put(STATIONS_TAG, stationArray);
 
@@ -111,8 +119,7 @@ public class SurveyJsonTranslater {
 
         try {
             JSONArray stationsArray = json.getJSONArray(STATIONS_TAG);
-            Station origin = toTree(stationsArray);
-            survey.setOrigin(origin);
+            loadSurveyData(survey, stationsArray);
         } catch (JSONException exception) {
             Log.e("Failed to load stations: " + exception);
         }
@@ -127,7 +134,7 @@ public class SurveyJsonTranslater {
     }
 
 
-    public static JSONObject toJson(Station station) throws JSONException {
+    public static JSONObject toJson(Station station, List<Leg> chronoList) throws JSONException {
 
         JSONObject json = new JSONObject();
         json.put(STATION_NAME_TAG, station.getName());
@@ -136,7 +143,8 @@ public class SurveyJsonTranslater {
 
         JSONArray onwardLegsArray = new JSONArray();
         for (Leg leg : station.getOnwardLegs()) {
-            onwardLegsArray.put(toJson(leg));
+            int index = chronoList.indexOf(leg);
+            onwardLegsArray.put(toJson(leg, index));
         }
         json.put(ONWARD_LEGS_TAG, onwardLegsArray);
 
@@ -144,34 +152,78 @@ public class SurveyJsonTranslater {
     }
 
 
-    public static Station toTree(JSONArray json) throws JSONException {
+    public static void loadSurveyData(Survey survey, JSONArray json) throws JSONException {
 
         Map<String, Station> namesToStations = new HashMap<>();
 
-        Station latest = null;
         List<JSONObject> stationData = Util.toList(json);
-        Collections.reverse(stationData);
-        for (JSONObject object : stationData) {
-            Station station = toStation(namesToStations, object);
+
+        // first pass: add all the stations in case there's some weird data order
+        boolean first = true;
+        for (JSONObject stationObject : stationData) {
+            Station station = toStation(stationObject);
             namesToStations.put(station.getName(), station);
-            latest = station;
+
+            if (first) {
+                first = false;
+                survey.setOrigin(station);
+            }
         }
 
-        return latest; // this *ought* to be the first in the file, i.e. the origin
+        // second pass: add the legs
+        Map<Integer, Leg> indexToLegs = new HashMap<>();
+        List<Leg> unindexedLegs = new LinkedList<>();
+
+        for (JSONObject stationObject : stationData) {
+            String name = stationObject.getString(STATION_NAME_TAG);
+            Station station = namesToStations.get(name);
+
+            JSONArray legArray = stationObject.getJSONArray(ONWARD_LEGS_TAG);
+            for (JSONObject legObject : Util.toList(legArray)) {
+                Leg leg = toLeg(namesToStations, legObject);
+
+                if (legObject.has(INDEX_TAG)) {
+                    int index = legObject.getInt(INDEX_TAG);
+                    indexToLegs.put(index, leg);
+                } else {
+                    unindexedLegs.add(leg);
+                }
+                station.addOnwardLeg(leg);
+            }
+        }
+
+        for (Leg leg : unindexedLegs) {
+            survey.addLegRecord(leg);
+        }
+
+        int max = indexToLegs.size();
+        for (int i = 0; i < max; i++) {
+            if (!indexToLegs.containsKey(i)) {
+                max++;
+                continue;
+            }
+            Leg leg = indexToLegs.get(i);
+            survey.addLegRecord(leg);
+        }
+
+        survey.checkActiveStation();
     }
 
 
-    public static JSONObject toJson(Leg leg) throws JSONException {
+    public static JSONObject toJson(Leg leg, Integer index) throws JSONException {
         JSONObject json = new JSONObject();
         json.put(DISTANCE_TAG, leg.getDistance());
         json.put(AZIMUTH_TAG, leg.getAzimuth());
         json.put(INCLINATION_TAG, leg.getInclination());
         json.put(DESTINATION_TAG, leg.getDestination().getName());
         json.put(WAS_SHOT_BACKWARDS_TAG, leg.wasShotBackwards());
+        if (index != null) {
+            json.put(INDEX_TAG, index);
+        }
 
         JSONArray promotedFromArray = new JSONArray();
         for (Leg promotedLeg : leg.getPromotedFrom()) {
-            promotedFromArray.put(toJson(promotedLeg));
+            promotedFromArray.put(toJson(promotedLeg, null));
         }
         json.put(PROMOTED_FROM_TAG, promotedFromArray);
 
@@ -206,8 +258,7 @@ public class SurveyJsonTranslater {
     }
 
 
-    public static Station toStation(Map<String, Station> namesToStations,
-                                    JSONObject json) throws JSONException {
+    public static Station toStation(JSONObject json) throws JSONException {
 
         String name = json.getString(STATION_NAME_TAG);
         Station station = new Station(name);
@@ -224,20 +275,19 @@ public class SurveyJsonTranslater {
         } catch (Exception ignore) {
             // not ideal but not the end of the world; we'd probably prefer to have our data
         }
-        try {
-            Direction direction = Direction.valueOf(json.getString(DIRECTION_TAG).toUpperCase());
-            station.setExtendedElevationDirection(direction);
-        } catch (Exception ignore) {
-            // not ideal but not the end of the world; we'd probably prefer to have our data
-        }
 
+        return station;
+    }
+
+    public static void createLegs(Map<String, Station> namesToStations, JSONObject json)
+            throws JSONException {
+        String fromStationName = json.getString(STATION_NAME_TAG);
+        Station station = namesToStations.get(fromStationName);
         JSONArray array = json.getJSONArray(ONWARD_LEGS_TAG);
         for (JSONObject object : Util.toList(array)) {
             Leg leg = toLeg(namesToStations, object);
             station.addOnwardLeg(leg);
         }
-
-        return station;
     }
 
 
