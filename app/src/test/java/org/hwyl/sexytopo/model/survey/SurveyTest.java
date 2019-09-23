@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.model.survey;
 
+import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.testhelpers.BasicTestSurveyCreator;
 import org.junit.Assert;
 import org.junit.Test;
@@ -12,6 +13,14 @@ public class SurveyTest {
         Survey baseSurvey = BasicTestSurveyCreator.createStraightNorth();
         baseSurvey.undoAddLeg();
         Assert.assertEquals(2, baseSurvey.getAllLegs().size());
+    }
+
+    @Test
+    public void testAddedSplayCanBeUndone() {
+        Survey baseSurvey = BasicTestSurveyCreator.createStraightNorth();
+        SurveyUpdater.update(baseSurvey, new Leg(5, 0, 0));
+        baseSurvey.undoAddLeg();
+        Assert.assertEquals(3, baseSurvey.getAllLegs().size());
     }
 
     @Test
