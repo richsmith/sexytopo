@@ -392,12 +392,4 @@ public class SurveyUpdater {
         }
     }
 
-
-    /*
-    public static setTrip(Survey survey, SurveyComponent surveyComponent) {
-        Trip trip = ;
-        if (trip != null) {
-            surveyComponent.setTrip(survey.getCurrentTrip());
-        }
-    }*/
 }
