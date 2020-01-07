@@ -135,9 +135,6 @@ public class TableActivity extends SexyTopoActivity
 
         stationsToTableIndex.clear();
 
-        /*List<GraphToListTranslator.SurveyListEntry> tableEntries =
-                graphToListTranslator.toListOfSurveyListEntries(survey);*/
-
         List<GraphToListTranslator.SurveyListEntry> tableEntries =
                 graphToListTranslator.toChronoListOfSurveyListEntries(survey);
 

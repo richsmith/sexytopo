@@ -36,7 +36,6 @@ public class Survey {
     private boolean isAutosaved = true;
 
     private Stack<Leg> legsInChronoOrder = new Stack<>();
-    //private Stack<UndoEntry> undoStack = new Stack<>();
 
     public Survey(String name) {
         setName(name);

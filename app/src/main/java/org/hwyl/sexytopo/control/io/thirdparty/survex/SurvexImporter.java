@@ -87,8 +87,7 @@ public class SurvexImporter extends Importer {
 
         from.addOnwardLeg(leg);
 
-        // FIXME: bit of a hack; hopefully the last station processed will be the active one
-        // (should probably record the active station in the file somewhere)
+        // bit of a hack; hopefully the last station processed will be the active one
         survey.setActiveStation(from);
     }
 
