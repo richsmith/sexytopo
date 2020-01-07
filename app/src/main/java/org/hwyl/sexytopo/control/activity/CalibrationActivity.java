@@ -14,6 +14,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.Editable;
 import android.util.Pair;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -114,7 +115,9 @@ public class CalibrationActivity extends SexyTopoActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_calibration);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         BroadcastReceiver updatedCalibrationReceiver = new BroadcastReceiver() {
             @Override

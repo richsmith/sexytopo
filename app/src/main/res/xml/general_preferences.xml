@@ -40,7 +40,6 @@
         <EditTextPreference
             android:key="pref_max_distance_delta"
             android:inputType="numberDecimal"
-            android:numeric="decimal"
             android:defaultValue="0.05"
             android:summary="How much error tolerated when deciding whether to create a new station"
             android:title="Max distance delta (m)"/>
@@ -48,7 +47,6 @@
         <EditTextPreference
             android:key="pref_max_angle_delta"
             android:inputType="numberDecimal"
-            android:numeric="decimal"
             android:defaultValue="1.7"
             android:summary="How much error tolerated when deciding whether to create a new station"
             android:title="Max angle delta (degrees)"/>
@@ -80,28 +78,24 @@
         <EditTextPreference
             android:key="pref_leg_width"
             android:inputType="number"
-            android:numeric="integer"
             android:defaultValue="3"
             android:summary="How wide to draw legs"
-            android:title="Sketch line thickness"/>
+            android:title="Data line thickness"/>
         <EditTextPreference
             android:key="pref_station_diameter"
             android:inputType="number"
-            android:numeric="integer"
             android:defaultValue="16"
             android:summary="How big to draw station symbols"
             android:title="Station Diameter"/>
         <EditTextPreference
             android:key="pref_station_label_font_size"
             android:inputType="number"
-            android:numeric="integer"
             android:defaultValue="22"
             android:summary="Font size of station labels"
             android:title="Station Label Size"/>
         <EditTextPreference
             android:key="pref_survey_text_font_size"
             android:inputType="number"
-            android:numeric="integer"
             android:defaultValue="32"
             android:summary="Font size of freestyle survey text"
             android:title="Survey Text Size"/>

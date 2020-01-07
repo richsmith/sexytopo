@@ -187,8 +187,9 @@
     <string name="third_party_compass">Compass</string>
     <string name="third_party_svg">SVG</string>
     <string name="calibration_index">Reading number</string>
-    <string name="calibration_start">Start Calibration</string>
-    <string name="calibration_stop">Stop Calibration</string>
+    <string name="calibration_start">Start Cal Mode</string>
+    <string name="calibration_stop">Stop Cal Mode</string>
+    <string name="calibration_delete_last">Delete Last</string>
     <string name="calibration_next_step">Next (suggested)</string>
     <string name="calibration_complete">Upload Calibration</string>
     <string name="calibration_load">Load</string>

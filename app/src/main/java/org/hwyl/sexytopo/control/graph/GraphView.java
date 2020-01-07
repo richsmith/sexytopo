@@ -548,7 +548,6 @@ public class GraphView extends View {
                 }
 
             case MotionEvent.ACTION_MOVE:
-                break;
             case MotionEvent.ACTION_UP:
                 break;
             default:
