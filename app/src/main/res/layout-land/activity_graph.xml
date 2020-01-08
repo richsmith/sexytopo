@@ -16,6 +16,7 @@
         <ImageButton
             android:layout_weight="0.2"
             android:src="@drawable/pencil"
+            android:tooltipText="@string/sketch_toolbar_draw"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
@@ -25,6 +26,7 @@
         <ImageButton
             android:layout_weight="0.2"
             android:src="@drawable/move"
+            android:tooltipText="@string/sketch_toolbar_move"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
@@ -34,6 +36,7 @@
         <ImageButton
             android:layout_weight="0.2"
             android:src="@drawable/eraser"
+            android:tooltipText="@string/sketch_toolbar_eraser"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
@@ -43,6 +46,7 @@
         <ImageButton
             android:layout_weight="0.2"
             android:src="@drawable/text"
+            android:tooltipText="@string/sketch_toolbar_text"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
@@ -52,6 +56,7 @@
         <ImageButton
             android:layout_weight="0.2"
             android:src="@drawable/select"
+            android:tooltipText="@string/sketch_toolbar_selector"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
@@ -61,6 +66,7 @@
         <ImageButton
             android:layout_weight="0.2"
             android:src="@drawable/settings"
+            android:tooltipText="@string/sketch_toolbar_settings"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
@@ -70,6 +76,7 @@
         <ImageButton
             android:layout_weight="0.2"
             android:src="@drawable/undo"
+            android:tooltipText="@string/sketch_toolbar_undo"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
@@ -79,6 +86,7 @@
         <ImageButton
             android:layout_weight="0.2"
             android:src="@drawable/redo"
+            android:tooltipText="@string/sketch_toolbar_redo"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
@@ -88,6 +96,7 @@
         <ImageButton
             android:layout_weight="0.2"
             android:src="@drawable/zoom_out"
+            android:tooltipText="@string/sketch_toolbar_zoom_out"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
