@@ -102,15 +102,13 @@ public class GraphView extends View {
 
 
     public static final Colour LEG_COLOUR = Colour.RED;
-	public static final Colour SPLAY_COLOUR = Colour.PINK;
     public static final Colour LATEST_LEG_COLOUR = Colour.MAGENTA;
     public static final Colour HIGHLIGHT_COLOUR = Colour.GOLD;
     public static final Colour DEFAULT_SKETCH_COLOUR = Colour.BLACK;
     public static final Colour CROSS_SECTION_CONNECTION_COLOUR = Colour.SILVER;
 
     public static final int SOLID_ALPHA = 0xff;
-    public static final int CONNECTED_SURVEY_ALPHA = 0xff / 5;
-
+    public static final int FADED_ALPHA = 0xff / 5;
 
     public static final int STATION_COLOUR = Colour.DARK_RED.intValue;
     public static final int STATION_DIAMETER = 8;
@@ -258,7 +256,7 @@ public class GraphView extends View {
         crossSectionIndicatorPaint.setStyle(Paint.Style.FILL);
 
         hotCornersPaint.setColor(Colour.GREY.intValue);
-        hotCornersPaint.setAlpha(CONNECTED_SURVEY_ALPHA);
+        hotCornersPaint.setAlpha(FADED_ALPHA);
 
         commentIcon = BitmapFactory.decodeResource(getResources(), R.drawable.speech_bubble);
         linkIcon = BitmapFactory.decodeResource(getResources(), R.drawable.link);
@@ -759,7 +757,7 @@ public class GraphView extends View {
         }
 
         if (getDisplayPreference(GraphActivity.DisplayPreference.SHOW_CONNECTIONS)) {
-            drawConnectedSurveys(canvas, projection, CONNECTED_SURVEY_ALPHA);
+            drawConnectedSurveys(canvas, projection, FADED_ALPHA);
         }
 
         drawSurvey(canvas, survey, projection, SOLID_ALPHA);
@@ -861,7 +859,6 @@ public class GraphView extends View {
             }
         }
 
-
     }
 
     public int getMinorGridBoxSize() {
@@ -950,12 +947,19 @@ public class GraphView extends View {
     }
 
 
-    private void drawLegs(Canvas canvas, Space<Coord2D> space, int alpha) {
+    private void drawLegs(Canvas canvas, Space<Coord2D> space, int baseAlpha) {
+
+        int legWidth = PreferenceAccess.getInt(getContext(), "pref_leg_width", 3);
+        int splayWidth = PreferenceAccess.getInt(getContext(), "pref_splay_width", 1);
+
 
         boolean showSplays = getDisplayPreference(GraphActivity.DisplayPreference.SHOW_SPLAYS);
         boolean highlightLatestLeg =
                 PreferenceAccess.getBoolean(
                         getContext(), "pref_key_highlight_latest_leg", true);
+
+        boolean fadingNonActive =
+                getDisplayPreference(GraphActivity.DisplayPreference.FADE_NON_ACTIVE);
 
         Map<Leg, Line<Coord2D>> legMap = space.getLegMap();
 
@@ -975,13 +979,19 @@ public class GraphView extends View {
 
             if (highlightLatestLeg && survey.getMostRecentLeg() == leg) {
                 legPaint.setColor(LATEST_LEG_COLOUR.intValue);
-            } else if (!leg.hasDestination()) {
-				legPaint.setColor(SPLAY_COLOUR.intValue);
+            } else {
+                legPaint.setColor(LEG_COLOUR.intValue);
+            }
+
+            if (leg.hasDestination()) {
+				legPaint.setStrokeWidth(legWidth);
 			} else {
-				legPaint.setColor(LEG_COLOUR.intValue);
+                legPaint.setStrokeWidth(splayWidth);
 			}
 
-			if (projectionType.isLegInPlane(leg)) {
+            int alpha = fadingNonActive && !isAttachedToActive(leg)? FADED_ALPHA : baseAlpha;
+
+            if (projectionType.isLegInPlane(leg)) {
                 legPaint.setStyle(Paint.Style.STROKE);
                 drawLine(canvas, start, end, legPaint, alpha);
 			} else {
@@ -991,6 +1001,10 @@ public class GraphView extends View {
 
         }
 
+    }
+
+    private boolean isAttachedToActive(Leg leg) {
+        return survey.getActiveStation().getOnwardLegs().contains(leg);
     }
 
     private boolean isLineOnCanvas(Canvas canvas, Coord2D start, Coord2D end) {
@@ -1005,8 +1019,16 @@ public class GraphView extends View {
     }
 
 
-    private void drawStations(Survey survey, Canvas canvas, Space<Coord2D> space, int alpha) {
+    private void drawStations(Survey survey, Canvas canvas, Space<Coord2D> space, int baseAlpha) {
 
+        boolean fadingNonActive =
+                getDisplayPreference(GraphActivity.DisplayPreference.FADE_NON_ACTIVE);
+
+        if (fadingNonActive) {
+            baseAlpha = FADED_ALPHA;
+        }
+
+        int alpha = baseAlpha;
         stationPaint.setAlpha(alpha);
 
         boolean showStationLabels =
@@ -1017,6 +1039,14 @@ public class GraphView extends View {
 
         for (Map.Entry<Station, Coord2D> entry : space.getStationMap().entrySet()) {
             Station station = entry.getKey();
+
+            if (fadingNonActive && (station == survey.getActiveStation())) {
+                alpha = SOLID_ALPHA;
+                // setting alpha is measured as a relatively expensive call, so we change this as
+                // little as possible
+                stationPaint.setAlpha(alpha);
+            }
+
             Coord2D translatedStation = surveyCoordsToViewCoords(entry.getValue());
 
             int x = (int)(translatedStation.x);
@@ -1060,6 +1090,11 @@ public class GraphView extends View {
             CrossSectionDetail crossSectionDetail = sketch.getCrossSectionDetail(station);
             if (crossSectionDetail != null) {
                 drawCrossSectionIndicator(canvas, crossSectionDetail, x, y, alpha);
+            }
+
+            if (fadingNonActive && (station == survey.getActiveStation())) {
+                alpha = baseAlpha;
+                stationPaint.setAlpha(alpha);
             }
         }
     }
@@ -1226,7 +1261,7 @@ public class GraphView extends View {
 
         if (currentSketchTool == SketchTool.MODAL_MOVE) {
             hotCornersPaint.setColor(Colour.YELLOW.intValue);
-            hotCornersPaint.setAlpha(CONNECTED_SURVEY_ALPHA);
+            hotCornersPaint.setAlpha(FADED_ALPHA);
         }
 
         if (topLeftCorner == null || topRightCorner == null || bottomRightCorner == null) {
@@ -1245,7 +1280,7 @@ public class GraphView extends View {
 
         if (currentSketchTool == SketchTool.MODAL_MOVE) {
             hotCornersPaint.setColor(Colour.GREY.intValue);
-            hotCornersPaint.setAlpha(CONNECTED_SURVEY_ALPHA);
+            hotCornersPaint.setAlpha(FADED_ALPHA);
         }
 
     }

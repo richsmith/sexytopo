@@ -79,20 +79,26 @@
             android:key="pref_leg_width"
             android:inputType="number"
             android:defaultValue="3"
-            android:summary="How wide to draw legs"
-            android:title="Data line thickness"/>
+            android:summary="How wide to draw leg lines"
+            android:title="Leg line thickness"/>
+        <EditTextPreference
+            android:key="pref_splay_width"
+            android:inputType="number"
+            android:defaultValue="1"
+            android:summary="How wide to draw splay lines"
+            android:title="Splay line thickness"/>
         <EditTextPreference
             android:key="pref_station_diameter"
             android:inputType="number"
             android:defaultValue="16"
             android:summary="How big to draw station symbols"
-            android:title="Station Diameter"/>
+            android:title="Station diameter"/>
         <EditTextPreference
             android:key="pref_station_label_font_size"
             android:inputType="number"
             android:defaultValue="22"
             android:summary="Font size of station labels"
-            android:title="Station Label Size"/>
+            android:title="Station label size"/>
         <EditTextPreference
             android:key="pref_survey_text_font_size"
             android:inputType="number"

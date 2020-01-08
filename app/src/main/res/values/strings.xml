@@ -87,6 +87,7 @@
     <string name="sketch_menu_auto_recentre">Auto-Recentre</string>
     <string name="sketch_menu_show_grid">Graph Paper</string>
     <string name="sketch_menu_snap_to_lines">Snap to Lines</string>
+    <string name="sketch_menu_fade_non_active">Fade Non-Active</string>
     <string name="sketch_menu_show_station_labels">Station Labels</string>
     <string name="sketch_menu_show_splays">Show Splays</string>
     <string name="sketch_menu_show_sketch">Show Sketch</string>

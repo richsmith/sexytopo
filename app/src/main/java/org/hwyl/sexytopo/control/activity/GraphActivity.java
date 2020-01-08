@@ -79,6 +79,7 @@ public abstract class GraphActivity extends SexyTopoActivity
     public enum DisplayPreference {
         AUTO_RECENTRE(R.id.buttonAutoRecentre, false),
         SNAP_TO_LINES(R.id.buttonSnapToLines, false),
+        FADE_NON_ACTIVE(R.id.buttonFadeNonActive, false),
         SHOW_GRID(R.id.buttonShowGrid, true),
         SHOW_SPLAYS(R.id.buttonShowSplays, true),
         SHOW_SKETCH(R.id.buttonShowSketch, true),
@@ -215,6 +216,10 @@ public abstract class GraphActivity extends SexyTopoActivity
                 return true;
             case R.id.buttonShowGrid:
                 setDisplayPreference(DisplayPreference.SHOW_GRID, !item.isChecked());
+                graphView.invalidate();
+                return true;
+            case R.id.buttonFadeNonActive:
+                setDisplayPreference(DisplayPreference.FADE_NON_ACTIVE, !item.isChecked());
                 graphView.invalidate();
                 return true;
             case R.id.buttonShowSplays:

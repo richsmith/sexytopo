@@ -18,6 +18,11 @@
         android:icon="@android:drawable/ic_menu_preferences"
         android:checkable="true"/>
     <item
+        android:id="@+id/buttonFadeNonActive"
+        android:title="@string/sketch_menu_fade_non_active"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:checkable="true"/>
+    <item
         android:id="@+id/buttonShowSplays"
         android:title="@string/sketch_menu_show_splays"
         android:icon="@android:drawable/ic_menu_preferences"
