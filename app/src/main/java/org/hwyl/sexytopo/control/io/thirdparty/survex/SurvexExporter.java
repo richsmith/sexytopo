@@ -21,7 +21,7 @@ public class SurvexExporter extends SingleFileExporter {
 
         StringBuilder builder = new StringBuilder();
 
-        builder.append("*alias station - ..");
+        builder.append("*alias station - ..\n\n");
 
         List<GraphToListTranslator.SurveyListEntry> list =
                 graphToListTranslator.toChronoListOfSurveyListEntries(survey);
