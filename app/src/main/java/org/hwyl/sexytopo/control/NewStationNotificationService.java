@@ -19,8 +19,10 @@ public class NewStationNotificationService extends Service {
 
     public static final int VIBRATE_FOR_MS = 200;
 
+    BroadcastReceiver receiver;
 
-    public NewStationNotificationService() {
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
         BroadcastReceiver receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -33,17 +35,23 @@ public class NewStationNotificationService extends Service {
             broadcastManager.registerReceiver(
                     receiver, new IntentFilter(SexyTopo.NEW_STATION_CREATED_EVENT));
         } catch (Exception exception) {
-            // Not sure why this sometimes gets a NPE... not mission-critical though so just
-            // log the error for now :/ TODO see if there's any way to avoid this error
             Crashlytics.logException(exception);
             Log.e(exception);
         }
-    }
 
+        return START_REDELIVER_INTENT;
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
+        broadcastManager.unregisterReceiver(receiver);
     }
 
 
@@ -54,7 +62,9 @@ public class NewStationNotificationService extends Service {
 
         if (vibrateOnNewStation) {
             Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-            vibrator.vibrate(VIBRATE_FOR_MS);
+            if (vibrator != null) {
+                vibrator.vibrate(VIBRATE_FOR_MS);
+            }
         }
     }
 
