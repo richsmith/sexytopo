@@ -47,7 +47,7 @@ public class SketchJsonTranslater {
     }
 
 
-    public static JSONObject toJson(Sketch sketch) throws JSONException {
+    public static synchronized JSONObject toJson(Sketch sketch) throws JSONException {
 
         JSONObject json = new JSONObject();
 
