@@ -70,7 +70,7 @@
         <service
             android:name=".control.NewStationNotificationService"
             android:enabled="true"
-            android:exported="true" >
+            android:exported="false" >
         </service>
         <activity
             android:name=".control.activity.CalibrationActivity"
