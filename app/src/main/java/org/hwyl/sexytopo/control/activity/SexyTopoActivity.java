@@ -72,7 +72,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        SexyTopo.context = this;
+        SexyTopo.context = this.getApplicationContext();
         dataManager = SurveyManager.getInstance(this);
 
         // if Android restarts the activity after a crash, force it to go through the startup
@@ -86,7 +86,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        SexyTopo.context = this;
+        SexyTopo.context = this.getApplicationContext();
         setOrientation();
 
         // this causes the request to happen twice because it is called by StartupActivity, then

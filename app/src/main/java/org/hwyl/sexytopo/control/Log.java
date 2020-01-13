@@ -48,7 +48,7 @@ public class Log {
 
 
     public static void setContext(Context context) {
-        Log.context = context;
+        Log.context = context.getApplicationContext();
     }
 
     public static synchronized void device(String message) {
@@ -242,6 +242,11 @@ public class Log {
 
         @Override
         protected Void doInBackground(LogType... logTypes) {
+
+            if (context == null) {
+                return null;
+            }
+
             try {
                 LogType logType = logTypes[0];
                 JSONArray marshalled = marshal(logType);
