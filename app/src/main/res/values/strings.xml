@@ -45,6 +45,7 @@
     <string name="table_head_distance">Dist</string>
     <string name="table_head_azimuth">Azm</string>
     <string name="move_leg_select_station_title">Select station to move to</string>
+    <string name="move_leg_no_valid_move">Nowhere valid to move this leg</string>
     <string name="table_head_elevation">Incl</string>
     <string name="title_activity_table">Table</string>
     <string name="title_activity_plan">Plan</string>

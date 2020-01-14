@@ -32,6 +32,7 @@ import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.graph.GraphView;
 import org.hwyl.sexytopo.control.table.ManualEntry;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
+import org.hwyl.sexytopo.control.util.LegMover;
 import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.control.util.TextTools;
@@ -402,7 +403,13 @@ public class TableActivity extends SexyTopoActivity
         View stationView = getLayoutInflater().inflate(R.layout.select_station_dialog, null);
 
         List<String> spinnerArray =  new ArrayList<>();
-        List<Station> stations = getSurvey().getAllStations();
+        List<Station> stations = LegMover.getValidDestinations(getSurvey(), toMove);
+
+        if (stations.isEmpty()) {
+            showSimpleToast(R.string.move_leg_no_valid_move);
+            return;
+        }
+
         for (Station station : stations) {
             spinnerArray.add(station.getName());
         }
