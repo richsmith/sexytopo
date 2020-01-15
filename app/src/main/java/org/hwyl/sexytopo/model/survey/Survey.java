@@ -228,6 +228,26 @@ public class Survey {
         return stationsToSurveyConnections;
     }
 
+
+    public Set<Survey> getRecursiveConnectedSurveys() {
+        Set<Survey> allSurveys = new HashSet<>();
+        getRecursiveConnectedSurveys(allSurveys, this);
+        return allSurveys;
+    }
+
+    private void getRecursiveConnectedSurveys(Set<Survey> allSurveys, Survey survey) {
+        for (Set<SurveyConnection> set : stationsToSurveyConnections.values()) {
+            for (SurveyConnection connection : set) {
+                Survey other = connection.otherSurvey;
+                if (!allSurveys.contains(other)) {
+                    allSurveys.add(other);
+                    getRecursiveConnectedSurveys(allSurveys, other);
+                }
+            }
+        }
+    }
+
+
     public boolean hasLinkedSurveys(Station station) {
         return stationsToSurveyConnections.containsKey(station);
     }
@@ -382,8 +402,32 @@ public class Survey {
     }
 
 
+    @Override
+    public boolean equals(Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (!(object instanceof Survey)) {
+            return false;
+        }
+
+        Survey other = (Survey)object;
+
+        // name is enforced to be unique
+        return name.equals(other.name);
+
+    }
+
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
     public String toString() {
         return "[Survey " + getName() + "]";
     }
+
+
 
 }

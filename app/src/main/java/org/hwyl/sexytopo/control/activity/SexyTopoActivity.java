@@ -134,7 +134,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 startActivity(ExtendedElevationActivity.class);
                 return true;
             case R.id.action_survey:
-                startActivity(SurveyActivity.class);
+                startActivity(StatsActivity.class);
                 return true;
             case R.id.action_calibration:
                 startActivity(CalibrationActivity.class);

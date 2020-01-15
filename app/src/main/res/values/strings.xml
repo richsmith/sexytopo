@@ -182,6 +182,9 @@
     <string name="exit_question">Exit?</string>
     <string name="no_data">No Data</string>
     <string name="delete_row_question">Delete Row?</string>
+    <string name="stats_title_this_survey">Current Survey</string>
+    <string name="stats_title_linked_surveys">All Linked Surveys</string>
+    <string name="stats_number_linked_surveys">Number of Surveys</string>
     <string name="stats_length">Length (m)</string>
     <string name="stats_vertical_range">Vertical Range (m)</string>
     <string name="stats_number_stations">Number of Stations</string>

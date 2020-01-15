@@ -60,7 +60,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".control.activity.SurveyActivity"
+            android:name=".control.activity.StatsActivity"
             android:label="@string/title_activity_survey" >
         </activity>
         <activity

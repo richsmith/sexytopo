@@ -95,12 +95,18 @@ public class SurveyStats {
     }
 
     public static double calcHeightRange(Survey survey) {
+        double[] rangeArray = calcHeightRangeArray(survey);
+        return rangeArray[1] - rangeArray[0];
+    }
+
+
+    public static double[] calcHeightRangeArray(Survey survey) {
         Space3DTransformer transformer = new Space3DTransformer();
         Space<Coord3D> space = transformer.transformTo3D(survey);
         Map<Station, Coord3D> stationsToCoords = space.getStationMap();
 
         if (stationsToCoords.size() <= 1) {
-            return 0;
+            return new double[]{0, 0};
         }
 
         double min = Double.MAX_VALUE, max = Double.MIN_VALUE;
@@ -109,9 +115,8 @@ public class SurveyStats {
             min = Math.min(min, point.z);
         }
 
-        return max - min;
+        return new double[]{min, max};
     }
-
 
 
 }
