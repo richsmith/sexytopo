@@ -23,8 +23,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.hwyl.sexytopo.SexyTopo.CALIBRATION_DIR;
 import static org.hwyl.sexytopo.SexyTopo.EXPORT_DIR;
@@ -59,7 +57,7 @@ public class Util {
     public static File[] getSurveyDirectories(Context context) {
         ensureDirectoryExists(getSurveyDirectory(context));
         File surveyDirectory = getSurveyDirectory(context);
-        File surveyDirectories[] = surveyDirectory.listFiles();
+        File[] surveyDirectories = surveyDirectory.listFiles();
         Arrays.sort(surveyDirectories);
         return surveyDirectories;
     }
@@ -76,7 +74,7 @@ public class Util {
     public static File[] getImportFiles(Context context) {
         ensureDirectoryExists(getImportDir(context));
         File importDirectory = getImportDir(context);
-        File importFiles[] = importDirectory.listFiles();
+        File[] importFiles = importDirectory.listFiles();
         Arrays.sort(importFiles);
         return importFiles;
     }
@@ -95,20 +93,14 @@ public class Util {
             return defaultName;
         }
 
-        for (String name : existingSurveyNames) {
-            Pattern pattern = Pattern.compile("(.+-)(\\d+)\\z");
-            Matcher matcher = pattern.matcher(name);
-            boolean foundMatch = matcher.find();
-            if (!foundMatch) {
-                continue;
-            } else {
-                String withoutSuffix = matcher.group(1);
-                int numberSuffix = Integer.parseInt(matcher.group(2));
-                return withoutSuffix + (++numberSuffix);
+        for (int i = 1; i < 1000; i++) {
+            String candidateName = defaultName + "-" + i;
+            if (!existingSurveyNames.contains(candidateName)) {
+                return candidateName;
             }
         }
 
-        return defaultName + "-2";
+        return defaultName;
     }
 
 
