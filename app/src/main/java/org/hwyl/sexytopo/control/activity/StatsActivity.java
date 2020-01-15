@@ -1,6 +1,8 @@
 package org.hwyl.sexytopo.control.activity;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.TableLayout;
 import android.widget.TextView;
 
 import org.hwyl.sexytopo.R;
@@ -53,6 +55,15 @@ public class StatsActivity extends SexyTopoActivity {
         Set<Survey> surveys = getSurvey().getRecursiveConnectedSurveys();
         surveys.add(getSurvey());
 
+        int numberSurveys = surveys.size();
+
+        TableLayout tableLayout = findViewById(R.id.statsAllLinkedSurveys);
+        if (numberSurveys <= 1) {
+            tableLayout.setVisibility(View.GONE);
+        } else {
+            tableLayout.setVisibility(View.VISIBLE);
+        }
+
         double length = 0;
         double lowestHeight = Double.POSITIVE_INFINITY;
         double highestHeight = Double.NEGATIVE_INFINITY;
@@ -83,7 +94,7 @@ public class StatsActivity extends SexyTopoActivity {
             shortestLeg = 0;
         }
 
-        setStatsField(R.id.statsFieldNumberLinkedSurveys, TextTools.formatWithComma(surveys.size()));
+        setStatsField(R.id.statsFieldNumberLinkedSurveys, TextTools.formatWithComma(numberSurveys));
         setStatsField(R.id.statsFieldLinkedLength, TextTools.formatTo2dpWithComma(length));
         setStatsField(R.id.statsFieldLinkedDepth, TextTools.formatTo2dpWithComma(heightRange));
         setStatsField(R.id.statsFieldLinkedNumberStations, TextTools.formatWithComma(numberOfStations));
