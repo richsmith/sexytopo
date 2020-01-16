@@ -12,8 +12,6 @@ public class Leg extends SurveyComponent {
     public static final int MIN_INCLINATION = -90;
     public static final int MAX_INCLINATION = 90;
 
-
-    private final int index;
     private final double distance; // in metres
     private final double azimuth;
     private final double inclination;
@@ -69,7 +67,6 @@ public class Leg extends SurveyComponent {
                     "Inclination should be up to +-90; actual=" + inclination);
         }
 
-        this.index = 0;
         this.distance = distance;
         this.azimuth = azimuth;
         this.inclination = inclination;
@@ -180,10 +177,10 @@ public class Leg extends SurveyComponent {
 
     public String toString() {
         return
-            "(" + (wasShotBackwards? "< ": "") +
-            "D" + TableCol.DISTANCE.format(distance) +
+            "(D" + TableCol.DISTANCE.format(distance) +
             " A" + TableCol.AZIMUTH.format(azimuth) +
             " I" + TableCol.INCLINATION.format(inclination) +
+            (wasShotBackwards? "< ": "") +
             (hasDestination()? (" -> " + destination.getName()) : "") +
             ")";
     }

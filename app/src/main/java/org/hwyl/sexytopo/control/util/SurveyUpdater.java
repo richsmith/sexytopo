@@ -195,7 +195,8 @@ public class SurveyUpdater {
     }
 
 
-    public static synchronized void editLeg(Survey survey, final Leg toEdit, final Leg edited) {
+    public static synchronized void editLeg(
+            final Survey survey, final Leg toEdit, final Leg edited) {
         SurveyTools.traverseLegs(
                 survey,
                 new SurveyTools.SurveyLegTraversalCallback() {
@@ -204,6 +205,7 @@ public class SurveyUpdater {
                         if (leg == toEdit) {
                             origin.getOnwardLegs().remove(toEdit);
                             origin.getOnwardLegs().add(edited);
+                            survey.replaceLegInRecord(toEdit, edited);
                             Log.d("Edited leg " + toEdit + " -> " + edited);
                             return true;
                         } else {
@@ -214,30 +216,6 @@ public class SurveyUpdater {
         survey.setSaved(false);
     }
 
-    public static synchronized void editStation(Survey survey, Station toEdit, Station edited) {
-
-        boolean isNameChange = ! edited.getName().equals(toEdit.getName());
-        if (isNameChange) {
-            Station existing = survey.getStationByName(edited.getName());
-            if (existing != null) {
-                throw new IllegalArgumentException("New station name is not unique");
-            }
-        }
-
-        if (toEdit == survey.getOrigin()) {
-            survey.setOrigin(edited);
-        } else {
-            Leg referringLeg = survey.getReferringLeg(toEdit);
-            Leg editedLeg = new Leg(referringLeg, edited);
-            editLeg(survey, referringLeg, editedLeg);
-        }
-
-        if (survey.getActiveStation() == toEdit) {
-            survey.setActiveStation(edited);
-        }
-
-        survey.setSaved(false);
-    }
 
     public static void renameStation(Survey survey, Station station, String name) {
         Station existing = survey.getStationByName(name);
@@ -361,7 +339,7 @@ public class SurveyUpdater {
     }
 
 
-    public static void reverseLeg(Survey survey, final Station toReverse) {
+    public static void reverseLeg(final Survey survey, final Station toReverse) {
         Log.d("Reversing leg to " + toReverse.getName());
         SurveyTools.traverseLegs(
                 survey,
@@ -370,10 +348,10 @@ public class SurveyUpdater {
                     public boolean call(Station origin, Leg leg) {
                         if (leg.hasDestination() && leg.getDestination() == toReverse) {
                             Leg reversed = leg.reverse();
-                            Log.d("Reversed direction of leg " + leg + " [to station " +
-                                    toReverse.getName() + "] -> " + reversed);
+                            Log.d("Reversed direction of leg " + leg + " to " + reversed);
                             origin.getOnwardLegs().remove(leg);
                             origin.addOnwardLeg(reversed);
+                            survey.replaceLegInRecord(leg, reversed);
                             return true;
                         } else {
                             return false;

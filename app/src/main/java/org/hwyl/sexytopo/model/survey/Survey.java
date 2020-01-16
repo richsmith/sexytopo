@@ -274,6 +274,12 @@ public class Survey {
         legsInChronoOrder.push(leg);
     }
 
+    public void replaceLegInRecord(Leg oldLeg, Leg newLeg) {
+        int oldIndex = legsInChronoOrder.indexOf(oldLeg);
+        legsInChronoOrder.insertElementAt(newLeg, oldIndex + 1);
+        legsInChronoOrder.remove(oldIndex);
+    }
+
 
     public void deleteStation(final Station toDelete) {
         if (toDelete == getOrigin()) {
