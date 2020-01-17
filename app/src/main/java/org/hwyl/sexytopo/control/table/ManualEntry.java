@@ -85,7 +85,7 @@ public class ManualEntry {
                         tableActivity.syncTableWithSurvey();
                     }
                 });
-        dialog.setTitle("Edit Leg");
+        dialog.setTitle(R.string.manual_edit_leg_title);
 
         ((TextView) (dialog.findViewById(R.id.editDistance)))
                 .setText("" + toEdit.getDistance());
@@ -142,10 +142,11 @@ public class ManualEntry {
     }
 
 
-    private static AlertDialog createDialog(int layoutId, final TableActivity tableActivity,
-                            final EditCallback editCallback) {
-
-
+    private static AlertDialog createDialog(
+            int layoutId,
+            final TableActivity tableActivity,
+            final EditCallback editCallback) {
+        
         AlertDialog.Builder builder = new AlertDialog.Builder(tableActivity);
 
         LayoutInflater inflater = tableActivity.getLayoutInflater();
