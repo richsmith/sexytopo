@@ -17,11 +17,20 @@ public class SurvexTherionUtil {
             char commentChar) {
 
         Station from = entry.getFrom();
+        String fromName = from.getName();
+
         Leg leg = entry.getLeg();
         Station to = leg.getDestination();
+        String toName = to.getName();
 
-        formatField(builder, from.getName());
-        formatField(builder, to.getName());
+        if (leg.wasShotBackwards()) {
+            leg = leg.reverse();
+            fromName = to.getName();
+            toName = from.getName();
+        }
+
+        formatField(builder, fromName);
+        formatField(builder, toName);
         formatField(builder, TableCol.DISTANCE.format(leg.getDistance(), Locale.UK));
         formatField(builder, TableCol.AZIMUTH.format(leg.getAzimuth(), Locale.UK));
         formatField(builder, TableCol.INCLINATION.format(leg.getInclination(), Locale.UK));

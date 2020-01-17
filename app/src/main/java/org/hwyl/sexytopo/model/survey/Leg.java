@@ -180,8 +180,8 @@ public class Leg extends SurveyComponent {
             "(D" + TableCol.DISTANCE.format(distance) +
             " A" + TableCol.AZIMUTH.format(azimuth) +
             " I" + TableCol.INCLINATION.format(inclination) +
-            (wasShotBackwards? "< ": "") +
             (hasDestination()? (" -> " + destination.getName()) : "") +
+            (wasShotBackwards? "< ": "") +
             ")";
     }
 
