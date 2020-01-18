@@ -29,21 +29,18 @@ public class ManualEntry {
 
 
     public static void addStation(final TableActivity tableActivity, final Survey survey) {
-
-
-
         AlertDialog dialog = createDialog(R.layout.leg_edit_dialog,
-                tableActivity,
-                new EditCallback() {
-                    @Override
-                    public void submit(Leg leg, Dialog dialog) {
-                        SurveyUpdater.updateWithNewStation(survey, leg);
-                        SurveyManager manager = SurveyManager.getInstance(tableActivity);
-                        manager.broadcastSurveyUpdated();
-                        manager.broadcastNewStationCreated();
-                        tableActivity.syncTableWithSurvey();
-                    }
-                });
+            tableActivity,
+            new EditCallback() {
+                @Override
+                public void submit(Leg leg, Dialog dialog) {
+                SurveyUpdater.updateWithNewStation(survey, leg);
+                SurveyManager manager = SurveyManager.getInstance(tableActivity);
+                manager.broadcastSurveyUpdated();
+                manager.broadcastNewStationCreated();
+                tableActivity.syncTableWithSurvey();
+            }
+        });
         dialog.setTitle(R.string.manual_add_station_title);
     }
 
@@ -51,15 +48,15 @@ public class ManualEntry {
 
     public static void addSplay(final TableActivity tableActivity, final Survey survey) {
         AlertDialog dialog = createDialog(R.layout.leg_edit_dialog,
-                tableActivity,
-                new EditCallback() {
-                    @Override
-                    public void submit(Leg leg, Dialog dialog) {
-                        SurveyUpdater.update(survey, leg);
-                        SurveyManager.getInstance(tableActivity).broadcastSurveyUpdated();
-                        tableActivity.syncTableWithSurvey();
-                    }
-                });
+            tableActivity,
+            new EditCallback() {
+                @Override
+                public void submit(Leg leg, Dialog dialog) {
+                SurveyUpdater.update(survey, leg);
+                SurveyManager.getInstance(tableActivity).broadcastSurveyUpdated();
+                tableActivity.syncTableWithSurvey();
+                }
+            });
         dialog.setTitle(R.string.manual_add_splay_title);
     }
 
@@ -69,30 +66,35 @@ public class ManualEntry {
                                final Leg toEdit) {
 
         AlertDialog dialog = createDialog(R.layout.leg_edit_dialog,
-                tableActivity,
-                new EditCallback() {
-                    public void submit(Leg edited, Dialog dialog) {
-                        if (toEdit.hasDestination()) {
-                            edited = new Leg(
-                                    edited.getDistance(),
-                                    edited.getAzimuth(),
-                                    edited.getInclination(),
-                                    toEdit.getDestination(),
-                                    new Leg[]{});
-                        }
-                        SurveyUpdater.editLeg(survey, toEdit, edited);
-                        SurveyManager.getInstance(tableActivity).broadcastSurveyUpdated();
-                        tableActivity.syncTableWithSurvey();
+            tableActivity,
+            new EditCallback() {
+                public void submit(Leg edited, Dialog dialog) {
+                    if (toEdit.hasDestination()) {
+                        edited = new Leg(
+                            edited.getDistance(),
+                            edited.getAzimuth(),
+                            edited.getInclination(),
+                            toEdit.getDestination(),
+                            new Leg[]{});
                     }
-                });
+                    if (toEdit.wasShotBackwards()) {
+                        edited = edited.reverse();
+                    }
+                    SurveyUpdater.editLeg(survey, toEdit, edited);
+                    SurveyManager.getInstance(tableActivity).broadcastSurveyUpdated();
+                    tableActivity.syncTableWithSurvey();
+                }
+            });
+
         dialog.setTitle(R.string.manual_edit_leg_title);
 
+        Leg editData = toEdit.wasShotBackwards()? toEdit.reverse() : toEdit;
         ((TextView) (dialog.findViewById(R.id.editDistance)))
-                .setText("" + toEdit.getDistance());
+                .setText("" + editData.getDistance());
         ((TextView) (dialog.findViewById(R.id.editAzimuth)))
-                .setText("" + toEdit.getAzimuth());
+                .setText("" + editData.getAzimuth());
         ((TextView) (dialog.findViewById(R.id.editInclination)))
-                .setText("" + toEdit.getInclination());
+                .setText("" + editData.getInclination());
     }
 
 
@@ -146,7 +148,7 @@ public class ManualEntry {
             int layoutId,
             final TableActivity tableActivity,
             final EditCallback editCallback) {
-        
+
         AlertDialog.Builder builder = new AlertDialog.Builder(tableActivity);
 
         LayoutInflater inflater = tableActivity.getLayoutInflater();
