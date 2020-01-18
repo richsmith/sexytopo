@@ -472,11 +472,28 @@ public class GraphView extends View {
         Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
         Coord2D touchPointOnSurvey = viewCoordsToSurveyCoords(touchPointOnView);
 
+        boolean deleteLineFragments = PreferenceAccess.getBoolean(
+            getContext(), "pref_delete_path_fragments", true);
+
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 SketchDetail closestDetail = sketch.findNearestDetailWithin(
                         touchPointOnSurvey, DELETE_PATHS_WITHIN_N_PIXELS);
-                if (closestDetail != null) {
+
+                // you missed, try again :P
+                if (closestDetail == null) {
+                    return true;
+
+                // you got part of the line
+                } else if (deleteLineFragments && closestDetail instanceof PathDetail) {
+                    List<SketchDetail> fragments =
+                            ((PathDetail)closestDetail).getPathFragmentsOutsideRadius(
+                                    touchPointOnSurvey, DELETE_PATHS_WITHIN_N_PIXELS / 4);
+                    sketch.deleteDetail(closestDetail, fragments);
+                    invalidate();
+
+                // bullseye!
+                } else {
                     sketch.deleteDetail(closestDetail);
                     invalidate();
                 }

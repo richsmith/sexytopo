@@ -67,9 +67,14 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="Sketch Display"
+        android:title="Sketching"
         android:key="pref_sketch_display">
 
+        <CheckBoxPreference
+            android:key="pref_delete_path_fragments"
+            android:summary="Delete only the nearest parts of a sketch line in delete mode (if off, deletes the whole line)"
+            android:title="Delete line fragments"
+            android:defaultValue="true"/>
         <CheckBoxPreference
             android:key="pref_key_highlight_latest_leg"
             android:summary="Show most recent measurement in purple"

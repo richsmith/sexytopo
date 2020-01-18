@@ -7,6 +7,7 @@ import org.hwyl.sexytopo.model.survey.Station;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -97,7 +98,11 @@ public class Sketch extends SketchDetail {
             SketchDetail toUndo = sketchHistory.remove(sketchHistory.size() - 1);
 
             if (toUndo instanceof DeletedDetail) {
-                restoreDetailToSketch(((DeletedDetail)toUndo).getSketchDetail());
+                DeletedDetail deletedDetail = (DeletedDetail)toUndo;
+                restoreDetailToSketch(deletedDetail.getDeletedDetail());
+                for (SketchDetail sketchDetail : deletedDetail.getReplacementDetails()) {
+                    removeDetailFromSketch(sketchDetail);
+                }
             } else {
                 removeDetailFromSketch(toUndo);
             }
@@ -112,7 +117,11 @@ public class Sketch extends SketchDetail {
             SketchDetail toRedo = undoneHistory.remove(undoneHistory.size() - 1);
 
             if (toRedo instanceof DeletedDetail) {
-                removeDetailFromSketch(((DeletedDetail)toRedo).getSketchDetail());
+                DeletedDetail deletedDetail = (DeletedDetail)toRedo;
+                removeDetailFromSketch(deletedDetail.getDeletedDetail());
+                for (SketchDetail sketchDetail : deletedDetail.getReplacementDetails()) {
+                    restoreDetailToSketch(sketchDetail);
+                }
             } else {
                 restoreDetailToSketch(toRedo);
             }
@@ -123,9 +132,18 @@ public class Sketch extends SketchDetail {
 
 
     public void deleteDetail(SketchDetail sketchDetail) {
-        DeletedDetail deletedDetail = new DeletedDetail(sketchDetail);
+        deleteDetail(sketchDetail, new LinkedList<SketchDetail>());
+    }
+
+
+    public void deleteDetail(
+            SketchDetail sketchDetail, List<SketchDetail> replacementDetails) {
+        DeletedDetail deletedDetail = new DeletedDetail(sketchDetail, replacementDetails);
         addSketchDetail(deletedDetail);
         removeDetailFromSketch(sketchDetail);
+        for (SketchDetail replacementDetail : replacementDetails) {
+            restoreDetailToSketch(replacementDetail);
+        }
     }
 
 

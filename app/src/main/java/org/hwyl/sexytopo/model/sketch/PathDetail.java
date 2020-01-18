@@ -52,6 +52,42 @@ public final class PathDetail extends SketchDetail {
     }
 
 
+    public List<SketchDetail> getPathFragmentsOutsideRadius(Coord2D targetPoint, double radius) {
+        List<SketchDetail> fragments = new LinkedList<>();
+
+        List<Coord2D> currentLine = new LinkedList<>();
+        for (Coord2D currentPoint : path) {
+
+            if (currentLine.size() == 0) {
+                currentLine.add(currentPoint);
+                continue;
+            }
+
+            Coord2D lastPoint = currentLine.get(currentLine.size() - 1);
+
+            double distance = Space2DUtils.getDistanceFromLine(targetPoint, lastPoint, currentPoint);
+            if (distance < radius) {
+                if (currentLine.size() > 1) {
+                    PathDetail fragment = new PathDetail(currentLine, getColour());
+                    fragments.add(fragment);
+                }
+                currentLine = new LinkedList<>();
+                currentLine.add(currentPoint);
+
+            } else {
+                currentLine.add(currentPoint);
+            }
+        }
+
+        if (currentLine.size() > 1) {
+            PathDetail fragment = new PathDetail(currentLine, getColour());
+            fragments.add(fragment);
+        }
+
+        return fragments;
+    }
+
+
     private static double getClosestDistance(Coord2D point, List<Coord2D> line) {
         double minDistance = Double.MAX_VALUE;
         for (int i = 0, j = 1; i < (line.size() - 1); i++, j++) {
