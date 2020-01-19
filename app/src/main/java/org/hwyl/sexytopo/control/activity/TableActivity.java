@@ -28,7 +28,6 @@ import android.widget.Toast;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.Log;
-import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.graph.GraphView;
 import org.hwyl.sexytopo.control.table.ManualEntry;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
@@ -363,7 +362,7 @@ public class TableActivity extends SexyTopoActivity
                         } else {
                             getSurvey().deleteStation(station);
                         }
-                        SurveyManager.getInstance(TableActivity.this).broadcastSurveyUpdated();
+                        getSurveyManager().broadcastSurveyUpdated();
                     }
                 })
                 .setNegativeButton(R.string.cancel, null)

@@ -73,7 +73,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         SexyTopo.context = this.getApplicationContext();
-        dataManager = SurveyManager.getInstance(this);
+        dataManager = SurveyManager.getInstance(this.getApplicationContext());
 
         // if Android restarts the activity after a crash, force it to go through the startup
         // process!
@@ -105,7 +105,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
         getMenuInflater().inflate(R.menu.action_bar, menu);
 
-        InputMode inputMode = SurveyManager.getInstance(this).getInputMode();
+        InputMode inputMode = getInputMode();
         MenuItem inputModeMenuItem = menu.findItem(inputMode.getMenuId());
         inputModeMenuItem.setChecked(true);
 
@@ -695,7 +695,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                                         Survey to, Station stationTo) throws Exception {
         from.disconnect(stationFrom, to);
         Saver.save(this, from);
-        SurveyManager.getInstance(this).broadcastSurveyUpdated();
+        getSurveyManager().broadcastSurveyUpdated();
 
         try {
             to.disconnect(stationTo, from);
@@ -784,7 +784,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         try {
             Log.d("Loading <i>" + surveyName + "</i>...");
             Survey survey = Loader.loadSurvey(SexyTopoActivity.this, surveyName);
-            SurveyManager.getInstance(SexyTopoActivity.this).setCurrentSurvey(survey);
+            getSurveyManager().setCurrentSurvey(survey);
             updateRememberedSurvey();
             startActivity(PlanActivity.class);
             Log.d("Loaded");
@@ -799,7 +799,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     protected void restoreAutosave(String name) {
         try {
             Survey survey = Loader.restoreAutosave(SexyTopoActivity.this, name);
-            SurveyManager.getInstance(SexyTopoActivity.this).setCurrentSurvey(survey);
+            getSurveyManager().setCurrentSurvey(survey);
             showSimpleToast(getString(R.string.restored));
         } catch (Exception exception) {
             showException(exception);
@@ -880,7 +880,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         survey.checkActiveStation();
         Saver.save(this, survey);
         ImportManager.saveACopyOfSourceInput(this, survey, file);
-        SurveyManager.getInstance(SexyTopoActivity.this).setCurrentSurvey(survey);
+        getSurveyManager().setCurrentSurvey(survey);
         showSimpleToast("Imported " + survey.getName());
     }
 
@@ -945,7 +945,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     private void undoLastLeg() {
         getSurvey().undoAddLeg();
-        SurveyManager.getInstance(this).broadcastSurveyUpdated();
+        getSurveyManager().broadcastSurveyUpdated();
 
     }
 
@@ -1001,16 +1001,21 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
 
     protected Survey getSurvey() {
-        return SurveyManager.getInstance(this).getCurrentSurvey();
+        return getSurveyManager().getCurrentSurvey();
     }
 
 
     protected void setSurvey(Survey survey) {
-        SurveyManager.getInstance(this).setCurrentSurvey(survey);
+        getSurveyManager().setCurrentSurvey(survey);
     }
 
-    protected SurveyManager getDataManager() {
-        return SurveyManager.getInstance(this);
+    public SurveyManager getSurveyManager() {
+        return SurveyManager.getInstance(this.getApplicationContext());
+    }
+
+
+    protected InputMode getInputMode() {
+        return getSurveyManager().getInputMode();
     }
 
 

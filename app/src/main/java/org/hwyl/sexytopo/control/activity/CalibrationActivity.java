@@ -130,7 +130,7 @@ public class CalibrationActivity extends SexyTopoActivity {
         broadcastManager.registerReceiver(updatedCalibrationReceiver,
                 new IntentFilter(SexyTopo.CALIBRATION_UPDATED_EVENT));
 
-        dataManager = SurveyManager.getInstance(this);
+        dataManager = SurveyManager.getInstance(this.getApplicationContext());
     }
 
     @Override

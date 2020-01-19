@@ -617,7 +617,7 @@ public class GraphView extends View {
                     case R.id.graph_station_toggle_left_right:
                         Direction newDirection = station.getExtendedElevationDirection().opposite();
                         SurveyUpdater.setDirectionOfSubtree(survey, station,newDirection);
-                        SurveyManager.getInstance(getContext()).broadcastSurveyUpdated();
+                        broadcastSurveyUpdated();
                         invalidate();
                         break;
                     case R.id.graph_station_comment:
@@ -625,7 +625,7 @@ public class GraphView extends View {
                         break;
                     case R.id.graph_station_reverse:
                         SurveyUpdater.reverseLeg(survey, station);
-                        SurveyManager.getInstance(getContext()).broadcastSurveyUpdated();
+                        broadcastSurveyUpdated();
                         invalidate();
                         break;
                     case R.id.graph_station_delete:
@@ -725,7 +725,7 @@ public class GraphView extends View {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         survey.deleteStation(station);
-                        SurveyManager.getInstance(getContext()).broadcastSurveyUpdated();
+                        broadcastSurveyUpdated();
                     }
                 })
                 .setNegativeButton(R.string.cancel, null)
@@ -757,7 +757,11 @@ public class GraphView extends View {
 
     private void setActiveStation(Station station) {
         survey.setActiveStation(station);
-        SurveyManager.getInstance(getContext()).broadcastSurveyUpdated();
+        broadcastSurveyUpdated();
+    }
+
+    private void broadcastSurveyUpdated() {
+        SurveyManager.getInstance(getContext().getApplicationContext()).broadcastSurveyUpdated();
     }
 
 
