@@ -236,7 +236,7 @@ public class Survey {
     }
 
     private void getRecursiveConnectedSurveys(Set<Survey> allSurveys, Survey survey) {
-        for (Set<SurveyConnection> set : stationsToSurveyConnections.values()) {
+        for (Set<SurveyConnection> set : survey.stationsToSurveyConnections.values()) {
             for (SurveyConnection connection : set) {
                 Survey other = connection.otherSurvey;
                 if (!allSurveys.contains(other)) {
