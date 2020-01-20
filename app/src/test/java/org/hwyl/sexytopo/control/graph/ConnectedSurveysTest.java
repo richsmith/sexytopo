@@ -3,6 +3,7 @@ package org.hwyl.sexytopo.control.graph;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.activity.GraphActivity;
 import org.hwyl.sexytopo.control.activity.PlanActivity;
+import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Projection2D;
@@ -139,7 +140,7 @@ public class ConnectedSurveysTest {
         Survey basicSurvey = new Survey(name);
         Leg l0 = new Leg(1.0, 0.0, 0.0);
         SurveyUpdater.update(basicSurvey, l0);
-        SurveyUpdater.upgradeSplayToConnectedLeg(basicSurvey, l0);
+        SurveyUpdater.upgradeSplayToConnectedLeg(basicSurvey, l0, InputMode.FORWARD);
         return basicSurvey;
     }
 

@@ -85,9 +85,15 @@ public class SurveyUpdater {
         survey.setActiveStation(leg.getDestination());
     }
 
-    public static void upgradeSplayToConnectedLeg(Survey survey, Leg leg) {
+    public static void upgradeSplayToConnectedLeg(Survey survey, Leg leg, InputMode inputMode) {
         Station newStation = new Station(getNextStationName(survey));
+
         Leg newLeg = Leg.manuallyUpgradeSplayToConnectedLeg(leg, newStation);
+
+        if (inputMode == InputMode.BACKWARD) {
+            newLeg = newLeg.reverse();
+        }
+
         editLeg(survey, leg, newLeg);
         survey.setActiveStation(newStation);
     }

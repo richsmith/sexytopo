@@ -284,7 +284,7 @@ public class TableActivity extends SexyTopoActivity
 
             case R.id.upgradeRow:
                 Leg toUpgrade = surveyEntry.getLeg();
-                SurveyUpdater.upgradeSplayToConnectedLeg(getSurvey(), toUpgrade);
+                SurveyUpdater.upgradeSplayToConnectedLeg(getSurvey(), toUpgrade, getInputMode());
                 syncTableWithSurvey();
                 return true;
 
