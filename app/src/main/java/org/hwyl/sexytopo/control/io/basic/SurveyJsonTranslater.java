@@ -218,7 +218,9 @@ public class SurveyJsonTranslater {
 
                     if (leg.hasDestination()) {
                         if (connectedDestinations.contains(leg.getDestination())) {
-                            Log.e("Duplicate connection found; skipping leg");
+                            Log.e("Duplicate connection found for "
+                                    + leg.getDestination().getName() + "; skipping leg");
+                            errors = true;
                             continue;
                         } else {
                             connectedDestinations.add(leg.getDestination());

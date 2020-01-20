@@ -24,7 +24,9 @@ public class StartUpActivity extends SexyTopoActivity {
 
         setContentView(R.layout.activity_start_up);
 
-        Log.setContext(this);
+        SexyTopo.context = this.getApplicationContext();
+
+        Log.setContext(this.getApplicationContext());
         Log.load(Log.LogType.SYSTEM);
         Log.d("--------------------");
         Log.d("Starting up");
