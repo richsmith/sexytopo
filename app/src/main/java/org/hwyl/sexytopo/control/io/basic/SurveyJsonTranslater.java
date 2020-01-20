@@ -1,5 +1,7 @@
 package org.hwyl.sexytopo.control.io.basic;
 
+import android.widget.Toast;
+
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.io.Util;
@@ -21,6 +23,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 
 public class SurveyJsonTranslater {
@@ -53,6 +56,8 @@ public class SurveyJsonTranslater {
     public static final String TEAM_TAG = "team";
     public static final String TEAM_MEMBER_NAME_TAG = "name";
     public static final String TEAM_MEMBER_ROLE_TAG = "role";
+
+    private static boolean errors; // whether any partial errors were encountered
 
     public static String toText(Survey survey, String versionName, int versionCode)
             throws JSONException {
@@ -100,6 +105,8 @@ public class SurveyJsonTranslater {
     public static void toSurvey(Survey survey, JSONObject json)
             throws JSONException, ParseException {
 
+        errors = false;
+
         String name = json.getString(SURVEY_NAME_TAG);
         if (!survey.getName().equals(name)) {
             Log.e("This is weird; the survey name in the file is different to the filename. " +
@@ -131,6 +138,11 @@ public class SurveyJsonTranslater {
         } catch (Exception ignore) {
             // ah, never mind... not mission-critical
         }
+
+        if (errors) {
+            String message = "Partial errors encountered; survey load was incomplete";
+            Toast.makeText(SexyTopo.context, message, Toast.LENGTH_SHORT).show();
+        }
     }
 
 
@@ -161,7 +173,25 @@ public class SurveyJsonTranslater {
         // first pass: add all the stations in case there's some weird data order
         boolean first = true;
         for (JSONObject stationObject : stationData) {
-            Station station = toStation(stationObject);
+
+            Station station = null;
+            try {
+                station = toStation(stationObject);
+            } catch (Exception exception) {
+                Log.e("Error loading a station; skipping. Exception was: " + exception +
+                        "; text was: " + stationObject);
+                errors = true;
+                continue;
+            }
+
+            String name = station.getName();
+
+            if (namesToStations.containsKey(station.getName())) {
+                Log.e("Found duplicate station " + name + "; skipping");
+                errors = true;
+                continue;
+            }
+
             namesToStations.put(station.getName(), station);
 
             if (first) {
@@ -173,6 +203,7 @@ public class SurveyJsonTranslater {
         // second pass: add the legs
         Map<Integer, Leg> indexToLegs = new HashMap<>();
         List<Leg> unindexedLegs = new LinkedList<>();
+        List<Station> connectedDestinations = new LinkedList<>();
 
         for (JSONObject stationObject : stationData) {
             String name = stationObject.getString(STATION_NAME_TAG);
@@ -180,7 +211,29 @@ public class SurveyJsonTranslater {
 
             JSONArray legArray = stationObject.getJSONArray(ONWARD_LEGS_TAG);
             for (JSONObject legObject : Util.toList(legArray)) {
-                Leg leg = toLeg(namesToStations, legObject);
+
+                Leg leg = null;
+                try {
+                    leg = toLeg(namesToStations, legObject);
+
+                    if (leg.hasDestination()) {
+                        if (connectedDestinations.contains(leg.getDestination())) {
+                            Log.e("Duplicate connection found; skipping leg");
+                            continue;
+                        } else {
+                            connectedDestinations.add(leg.getDestination());
+                        }
+                    }
+
+                    if (leg.hasDestination() && leg.getDestination() == survey.getOrigin()) {
+                        survey.setOrigin(station);
+                    }
+                } catch (Exception exception) {
+                    Log.e("Error loading a leg. Exception was " + exception +
+                            "; text was " + legObject);
+                    errors = true;
+                    continue;
+                }
 
                 if (legObject.has(INDEX_TAG)) {
                     int index = legObject.getInt(INDEX_TAG);
@@ -196,12 +249,8 @@ public class SurveyJsonTranslater {
             survey.addLegRecord(leg);
         }
 
-        int max = indexToLegs.size();
-        for (int i = 0; i < max; i++) {
-            if (!indexToLegs.containsKey(i)) {
-                max++;
-                continue;
-            }
+        TreeSet<Integer> indices = new TreeSet<>(indexToLegs.keySet());
+        for (int i: indices) {
             Leg leg = indexToLegs.get(i);
             survey.addLegRecord(leg);
         }
