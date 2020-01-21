@@ -358,9 +358,9 @@ public class TableActivity extends SexyTopoActivity
                     public void onClick(DialogInterface dialog, int which) {
                         Survey survey = getSurvey();
                         if (deletingLeg) {
-                            survey.deleteSplay(station, leg);
+                            SurveyUpdater.deleteSplay(survey, station, leg);
                         } else {
-                            getSurvey().deleteStation(station);
+                            SurveyUpdater.deleteStation(survey, station);
                         }
                         getSurveyManager().broadcastSurveyUpdated();
                     }

@@ -281,31 +281,10 @@ public class Survey {
     }
 
 
-    public void deleteStation(final Station toDelete) {
-        if (toDelete == getOrigin()) {
-            return;
+    public void removeLegRecord(Leg leg) {
+        if (legsInChronoOrder.contains(leg)) {
+            legsInChronoOrder.remove(leg);
         }
-
-        SurveyTools.traverseLegs(this, new SurveyTools.SurveyLegTraversalCallback() {
-            @Override
-            public boolean call(Station origin, Leg leg) {
-                if (leg.hasDestination() && leg.getDestination() == toDelete) {
-                    origin.getOnwardLegs().remove(leg);
-                    checkActiveStation();
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        });
-
-        setSaved(false);
-    }
-
-
-    public void deleteSplay(Station station, Leg splay) {
-        station.getOnwardLegs().remove(splay);
-        setSaved(false);
     }
 
     public Leg getReferringLeg(final Station station) {

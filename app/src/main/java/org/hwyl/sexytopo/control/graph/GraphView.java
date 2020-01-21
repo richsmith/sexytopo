@@ -724,7 +724,7 @@ public class GraphView extends View {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        survey.deleteStation(station);
+                        SurveyUpdater.deleteStation(survey, station);
                         broadcastSurveyUpdated();
                     }
                 })

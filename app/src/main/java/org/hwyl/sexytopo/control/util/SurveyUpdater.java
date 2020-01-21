@@ -241,6 +241,38 @@ public class SurveyUpdater {
     }
 
 
+    public static void deleteStation(final Survey survey, final Station toDelete) {
+        if (toDelete == survey.getOrigin()) {
+            return;
+        }
+
+        Leg leg = survey.getReferringLeg(toDelete);
+        survey.removeLegRecord(leg);
+
+        SurveyTools.traverseLegs(survey, new SurveyTools.SurveyLegTraversalCallback() {
+            @Override
+            public boolean call(Station origin, Leg leg) {
+            if (leg.hasDestination() && leg.getDestination() == toDelete) {
+                origin.getOnwardLegs().remove(leg);
+                survey.checkActiveStation();
+                return true;
+            } else {
+                return false;
+            }
+            }
+        });
+
+        survey.setSaved(false);
+    }
+
+
+    public static void deleteSplay(Survey survey, Station station, Leg splay) {
+        survey.removeLegRecord(splay);
+        station.getOnwardLegs().remove(splay);
+        survey.setSaved(false);
+    }
+
+
     private static boolean areLegsAboutTheSame(List<Leg> legs) {
 
         for (Leg leg : legs) { // full legs must be unique by definition
