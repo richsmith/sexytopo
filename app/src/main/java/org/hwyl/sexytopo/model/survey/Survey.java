@@ -8,6 +8,7 @@ import org.hwyl.sexytopo.model.sketch.Sketch;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -149,7 +150,7 @@ public class Survey {
 
     public static List<Station> getAllStations(Station root) {
 
-        List<Station> stations = new ArrayList<>();
+        List<Station> stations = new LinkedList<>();
         stations.add(root);
 
         for (Leg leg : root.getConnectedOnwardLegs()) {
@@ -252,10 +253,30 @@ public class Survey {
         return stationsToSurveyConnections.containsKey(station);
     }
 
-    public void checkActiveStation() {
-        List<Station> stations = getAllStations();
-        if (!stations.contains(activeStation)) {
+    public void checkSurveyIntegrity() {
+
+        List<Station> reachableStations = getAllStations();
+
+        List<Leg> badLegs = new LinkedList<>();
+        for (Leg leg : legsInChronoOrder) {
+            if (! leg.hasDestination() && reachableStations.contains(leg.getDestination())) {
+                badLegs.add(leg);
+            }
+        }
+        legsInChronoOrder.removeAll(badLegs);
+
+        if (!reachableStations.contains(activeStation)) {
             activeStation = findNewActiveStation();
+        }
+
+        List<Station> unreachableStations = new LinkedList<>();
+        for (Station station : stationsToSurveyConnections.keySet()) {
+            if (!reachableStations.contains(station)) {
+                unreachableStations.add(station);
+            }
+        }
+        for (Station station : unreachableStations) {
+            stationsToSurveyConnections.remove(station);
         }
     }
 
@@ -278,6 +299,7 @@ public class Survey {
         int oldIndex = legsInChronoOrder.indexOf(oldLeg);
         legsInChronoOrder.insertElementAt(newLeg, oldIndex + 1);
         legsInChronoOrder.remove(oldIndex);
+        checkSurveyIntegrity();
     }
 
 
@@ -353,8 +375,11 @@ public class Survey {
             }
         );
 
+        if (toDelete.hasDestination()) {
+            checkSurveyIntegrity();
+        }
+
         setSaved(false);
-        checkActiveStation();
     }
 
     public Station getStationByName(final String name) {

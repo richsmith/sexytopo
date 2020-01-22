@@ -257,7 +257,7 @@ public class SurveyJsonTranslater {
             survey.addLegRecord(leg);
         }
 
-        survey.checkActiveStation();
+        survey.checkSurveyIntegrity();
     }
 
 

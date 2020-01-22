@@ -254,7 +254,7 @@ public class SurveyUpdater {
             public boolean call(Station origin, Leg leg) {
             if (leg.hasDestination() && leg.getDestination() == toDelete) {
                 origin.getOnwardLegs().remove(leg);
-                survey.checkActiveStation();
+                survey.checkSurveyIntegrity();
                 return true;
             } else {
                 return false;

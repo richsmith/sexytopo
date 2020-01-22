@@ -25,7 +25,7 @@ public class Space3DTransformer {
     }
 
 
-    protected void update(Space<Coord3D> space, Station station, Coord3D coord3D) {
+    protected synchronized void update(Space<Coord3D> space, Station station, Coord3D coord3D) {
         space.addStation(station, coord3D);
         for (Leg leg : station.getOnwardLegs()) {
             update(space, leg, coord3D);
@@ -33,7 +33,7 @@ public class Space3DTransformer {
     }
 
 
-    protected void update(Space<Coord3D> space, Leg leg, Coord3D start) {
+    protected synchronized void update(Space<Coord3D> space, Leg leg, Coord3D start) {
         Coord3D end = transform(start, leg);
         Line<Coord3D> line = new Line<>(start, end);
         space.addLeg(leg, line);

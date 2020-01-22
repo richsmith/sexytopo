@@ -877,7 +877,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
     public void saveImportedSurvey(Survey survey, File file) throws Exception {
-        survey.checkActiveStation();
+        survey.checkSurveyIntegrity();
         Saver.save(this, survey);
         ImportManager.saveACopyOfSourceInput(this, survey, file);
         getSurveyManager().setCurrentSurvey(survey);
