@@ -138,7 +138,7 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:gravity="end"/>
         </TableRow>
-        <TableRow>
+        <TableRow android:visibility="gone">
             <TextView
                 android:text="@string/stats_vertical_range"
                 android:textAppearance="?android:attr/textAppearanceLarge"
