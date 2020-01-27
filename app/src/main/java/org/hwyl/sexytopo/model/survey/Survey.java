@@ -259,7 +259,7 @@ public class Survey {
 
         List<Leg> badLegs = new LinkedList<>();
         for (Leg leg : legsInChronoOrder) {
-            if (! leg.hasDestination() && reachableStations.contains(leg.getDestination())) {
+            if (leg.hasDestination() && (!reachableStations.contains(leg.getDestination()))) {
                 badLegs.add(leg);
             }
         }
