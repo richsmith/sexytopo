@@ -15,6 +15,7 @@ import java.util.Set;
 public class Sketch extends SketchDetail {
 
     private Set<PathDetail> pathDetails = new HashSet<>();
+    private Set<SymbolDetail> symbolDetails = new HashSet<>();
     private Set<TextDetail> textDetails = new HashSet<>();
     private Set<CrossSectionDetail> crossSectionDetails = new HashSet<>();
 
@@ -36,6 +37,11 @@ public class Sketch extends SketchDetail {
 
     public void setPathDetails(Set<PathDetail> pathDetails) {
         this.pathDetails = pathDetails;
+        recalculateBoundingBox();
+    }
+
+    public void setSymbolDetails(Set<SymbolDetail> symbolDetails) {
+        this.symbolDetails = symbolDetails;
         recalculateBoundingBox();
     }
 
@@ -82,6 +88,16 @@ public class Sketch extends SketchDetail {
         TextDetail textDetail = new TextDetail(location, text, activeColour);
         textDetails.add(textDetail);
         addSketchDetail(textDetail);
+    }
+
+    public Set<SymbolDetail> getSymbolDetails() {
+        return symbolDetails;
+    }
+
+    public void addSymbolDetail(Coord2D location, Symbol symbol) {
+        SymbolDetail symbolDetail = new SymbolDetail(location, symbol, activeColour);
+        symbolDetails.add(symbolDetail);
+        addSketchDetail(symbolDetail);
     }
 
     public Set<TextDetail> getTextDetails() {
@@ -152,6 +168,8 @@ public class Sketch extends SketchDetail {
         // undo history etc. whereas this actually removes the data
         if (sketchDetail instanceof PathDetail) {
             pathDetails.remove(sketchDetail);
+        } else if (sketchDetail instanceof SymbolDetail) {
+            symbolDetails.remove(sketchDetail);
         } else if (sketchDetail instanceof TextDetail) {
             textDetails.remove(sketchDetail);
         } else if (sketchDetail instanceof CrossSectionDetail) {
@@ -165,6 +183,8 @@ public class Sketch extends SketchDetail {
     public void restoreDetailToSketch(SketchDetail sketchDetail) {
         if (sketchDetail instanceof PathDetail) {
             pathDetails.add((PathDetail)sketchDetail);
+        } else if (sketchDetail instanceof SymbolDetail) {
+            symbolDetails.add((SymbolDetail) sketchDetail);
         } else if (sketchDetail instanceof TextDetail) {
             textDetails.add((TextDetail) sketchDetail);
         } else if (sketchDetail instanceof CrossSectionDetail) {
@@ -201,7 +221,8 @@ public class Sketch extends SketchDetail {
 
 
     private Set<SketchDetail> allSketchDetails() {
-        Set[] allSketchDetailSets = new Set[] {pathDetails, textDetails, crossSectionDetails};
+        Set[] allSketchDetailSets = new Set[] {
+                pathDetails, symbolDetails, textDetails, crossSectionDetails};
         Set<SketchDetail> all = new HashSet<>();
         for (Set set : allSketchDetailSets) {
             all.addAll(set);
@@ -260,6 +281,12 @@ public class Sketch extends SketchDetail {
             newPathDetails.add(pathDetail.translate(point));
         }
         sketch.setPathDetails(newPathDetails);
+
+        Set<SymbolDetail> newSymbolDetails = new HashSet<>();
+        for (SymbolDetail symbolDetail : symbolDetails) {
+            newSymbolDetails.add(symbolDetail.translate(point));
+        }
+        sketch.setSymbolDetails(newSymbolDetails);
 
         Set<TextDetail> newTextDetails = new HashSet<>();
         for (TextDetail textDetail : textDetails) {

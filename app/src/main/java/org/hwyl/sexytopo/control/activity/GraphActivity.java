@@ -9,9 +9,11 @@ import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.HapticFeedbackConstants;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
@@ -26,7 +28,10 @@ import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
+import org.hwyl.sexytopo.model.sketch.BrushColour;
 import org.hwyl.sexytopo.model.sketch.Sketch;
+import org.hwyl.sexytopo.model.sketch.SketchTool;
+import org.hwyl.sexytopo.model.sketch.Symbol;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
@@ -38,23 +43,20 @@ public abstract class GraphActivity extends SexyTopoActivity
     private static final double ZOOM_DECREMENT = 0.9;
 
 
-    private static final GraphView.SketchTool DEFAULT_SKETCH_TOOL_SELECTION =
-            GraphView.SketchTool.MOVE;
-    private static final GraphView.BrushColour DEFAULT_BRUSH_COLOUR_SELECTION =
-            GraphView.BrushColour.BLACK;
-
+    private static final SketchTool DEFAULT_SKETCH_TOOL_SELECTION = SketchTool.MOVE;
+    private static final BrushColour DEFAULT_BRUSH_COLOUR_SELECTION = BrushColour.BLACK;
 
     public static final String DISPLAY_PREFERENCES_KEY = "display";
     private static final String SKETCH_TOOL_PREFERENCE_KEY = "SKETCH_TOOL";
     private static final String BRUSH_COLOUR_PREFERENCE_KEY = "BRUSH_COLOUR";
-
+    private static final String SYMBOL_PREFERENCE_KEY = "SYMBOL";
 
     private static final int[] SKETCH_BUTTON_IDS = new int[] {
             R.id.buttonDraw,
-            R.id.buttonText,
             R.id.buttonErase,
+            R.id.buttonText,
+            R.id.buttonSymbol,
             R.id.buttonUndo,
-            R.id.buttonRedo,
             R.id.buttonBlack,
             R.id.buttonBrown,
             R.id.buttonGrey,
@@ -133,6 +135,9 @@ public abstract class GraphActivity extends SexyTopoActivity
             button.setOnClickListener(this);
         }
 
+        View button = findViewById(R.id.buttonSymbolToolbarClose);
+        button.setOnClickListener(this);
+
         graphView = findViewById(R.id.graphView);
         graphView.setActivity(this);
 
@@ -160,6 +165,8 @@ public abstract class GraphActivity extends SexyTopoActivity
         syncGraphWithSurvey();
         initialiseSketchTool();
         initialiseBrushColour();
+        initialiseSymbolTool();
+        initialiseSymbolToolbar();
         setSketchButtonsStatus();
         setViewLocation();
     }
@@ -258,7 +265,7 @@ public abstract class GraphActivity extends SexyTopoActivity
         }
 
         if (!isEnabled) {
-            graphView.setSketchTool(GraphView.SketchTool.MOVE);
+            graphView.setSketchTool(SketchTool.MOVE);
         }
     }
 
@@ -275,21 +282,36 @@ public abstract class GraphActivity extends SexyTopoActivity
         GraphView graphView = findViewById(R.id.graphView);
         graphView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
 
-        for (GraphView.SketchTool sketchTool: GraphView.SketchTool.values()) {
-            if (sketchTool.getId() == id) {
-                selectSketchTool(sketchTool);
+        for (BrushColour brushColour: BrushColour.values()) {
+            if (brushColour.getId() == id) {
+                selectBrushColour(brushColour);
+                if (!graphView.getSketchTool().usesColour()) {
+                    selectSketchTool(SketchTool.DRAW);
+                }
                 return true;
             }
         }
 
-        for (GraphView.BrushColour brushColour: GraphView.BrushColour.values()) {
-            if (brushColour.getId() == id) {
-                selectBrushColour(brushColour);
-                if (!graphView.getSketchTool().usesColour()) {
-                    selectSketchTool(GraphView.SketchTool.DRAW);
+        SketchTool alreadySelectedTool = graphView.getSketchTool();
+        for (SketchTool sketchTool: SketchTool.values()) {
+            if (sketchTool.getId() == id) {
+                if (alreadySelectedTool == SketchTool.SYMBOL && sketchTool == SketchTool.SYMBOL) {
+                    toggleSymbolToolbar();
+                } else {
+                    selectSketchTool(sketchTool);
                 }
                 return true;
             }
+        }
+
+        for (Symbol symbol : Symbol.values()) {
+            if (id == symbol.getBitmapId()) {
+                selectSketchTool(SketchTool.SYMBOL);
+                selectSymbol(symbol);
+            }
+        }
+        if (id == R.id.buttonSymbolToolbarClose) {
+            setSymbolToolbarOpen(false);
         }
 
         switch(id) {
@@ -344,20 +366,70 @@ public abstract class GraphActivity extends SexyTopoActivity
     }
 
 
+    private void initialiseSymbolToolbar() {
+        ViewGroup buttonPanel = findViewById(R.id.symbolToolbarButtonPanel);
+
+        buttonPanel.removeAllViews();
+
+        for (Symbol symbol : Symbol.values()) {
+            LayoutInflater inflater = LayoutInflater.from(this);
+            ImageButton imageButton = (ImageButton)
+                    (inflater.inflate(R.layout.tool_button, null));
+            imageButton.setId(symbol.getBitmapId()); // bit hacky :P
+            imageButton.setImageBitmap(symbol.getBitmap());
+            imageButton.setOnClickListener(this);
+            buttonPanel.addView(imageButton);
+        }
+    }
+
+    private void toggleSymbolToolbar() {
+        View toolbar = findViewById(R.id.symbolToolbar);
+        boolean isVisible = toolbar.getVisibility() == View.VISIBLE;
+        setSymbolToolbarOpen(!isVisible);
+    }
+
+    private void setSymbolToolbarOpen(boolean setOpen) {
+        View toolbar = findViewById(R.id.symbolToolbar);
+        toolbar.setVisibility(setOpen? View.VISIBLE : View.GONE);
+    }
+
+
+    private void initialiseSymbolTool() {
+        Symbol.setResources(getResources());
+        String selected = preferences.getString(SYMBOL_PREFERENCE_KEY, null);
+
+        Symbol selectedSymbol = (selected == null)?
+            Symbol.getDefault() : Symbol.valueOf(selected);
+        selectSymbol(selectedSymbol);
+    }
+
+    private void selectSymbol(Symbol symbol) {
+        SharedPreferences preferences =
+                getSharedPreferences(SYMBOL_PREFERENCE_KEY, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(SYMBOL_PREFERENCE_KEY, symbol.toString());
+        editor.apply();
+
+        ImageButton symbolButton = findViewById(R.id.buttonSymbol);
+        symbolButton.setImageBitmap(symbol.getBitmap());
+
+        graphView.setCurrentSymbol(symbol);
+    }
+
+
     private void initialiseSketchTool() {
         SharedPreferences preferences =
                 getSharedPreferences(DISPLAY_PREFERENCES_KEY, Context.MODE_PRIVATE);
         String selected = preferences.getString(SKETCH_TOOL_PREFERENCE_KEY, null);
 
-        GraphView.SketchTool sketchTool = (selected == null)?
-                DEFAULT_SKETCH_TOOL_SELECTION :
-                GraphView.SketchTool.valueOf(selected);
+        SketchTool sketchTool = (selected == null)?
+                DEFAULT_SKETCH_TOOL_SELECTION : SketchTool.valueOf(selected);
 
         selectSketchTool(sketchTool);
     }
 
 
-    private void selectSketchTool(GraphView.SketchTool toSelect) {
+    private void selectSketchTool(SketchTool toSelect) {
 
         SharedPreferences preferences =
                 getSharedPreferences(DISPLAY_PREFERENCES_KEY, Context.MODE_PRIVATE);
@@ -367,7 +439,7 @@ public abstract class GraphActivity extends SexyTopoActivity
 
         graphView.setSketchTool(toSelect);
 
-        for (GraphView.SketchTool sketchTool : GraphView.SketchTool.values()) {
+        for (SketchTool sketchTool : SketchTool.values()) {
 
             View button = findViewById(sketchTool.getId());
             if (button == null) {
@@ -391,15 +463,13 @@ public abstract class GraphActivity extends SexyTopoActivity
                 getSharedPreferences(DISPLAY_PREFERENCES_KEY, Context.MODE_PRIVATE);
         String selected = preferences.getString(BRUSH_COLOUR_PREFERENCE_KEY, null);
 
-        GraphView.BrushColour brushColour = (selected == null)?
-                DEFAULT_BRUSH_COLOUR_SELECTION :
-                GraphView.BrushColour.valueOf(selected);
+        BrushColour brushColour = (selected == null)?
+                DEFAULT_BRUSH_COLOUR_SELECTION : BrushColour.valueOf(selected);
 
         selectBrushColour(brushColour);
     }
 
-    private void selectBrushColour(GraphView.BrushColour toSelect) {
-
+    private void selectBrushColour(BrushColour toSelect) {
 
         SharedPreferences preferences =
                 getSharedPreferences(DISPLAY_PREFERENCES_KEY, Context.MODE_PRIVATE);
@@ -409,7 +479,7 @@ public abstract class GraphActivity extends SexyTopoActivity
 
         graphView.setBrushColour(toSelect);
 
-        for (GraphView.BrushColour brushColour : GraphView.BrushColour.values()) {
+        for (BrushColour brushColour : BrushColour.values()) {
 
             View button = findViewById(brushColour.getId());
             if (brushColour == toSelect) {

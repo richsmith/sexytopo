@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.control.graph;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -41,12 +42,16 @@ import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
+import org.hwyl.sexytopo.model.sketch.BrushColour;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchDetail;
+import org.hwyl.sexytopo.model.sketch.SketchTool;
+import org.hwyl.sexytopo.model.sketch.Symbol;
+import org.hwyl.sexytopo.model.sketch.SymbolDetail;
 import org.hwyl.sexytopo.model.sketch.TextDetail;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -129,70 +134,10 @@ public class GraphView extends View {
 
     private Bitmap commentIcon, linkIcon;
 
-
-
-    public enum BrushColour {
-
-        BLACK(R.id.buttonBlack, Colour.BLACK),
-        BROWN(R.id.buttonBrown, Colour.BROWN),
-        GREY(R.id.buttonGrey, Colour.GREY),
-        RED(R.id.buttonRed, Colour.RED),
-        ORANGE(R.id.buttonOrange, Colour.ORANGE),
-        GREEN(R.id.buttonGreen, Colour.GREEN),
-        BLUE(R.id.buttonBlue, Colour.BLUE),
-        PURPLE(R.id.buttonPurple, Colour.PURPLE);
-
-        private final int id;
-        private final Colour colour;
-        BrushColour(int id, Colour colour) {
-            this.id = id;
-            this.colour = colour;
-        }
-
-        public int getId() {
-            return id;
-        }
-
-        public Colour getColour() {
-            return colour;
-        }
-    }
-
-    public enum SketchTool {
-        MOVE(R.id.buttonMove, false, false),
-        DRAW(R.id.buttonDraw, true, false),
-        ERASE(R.id.buttonErase, false, false),
-        TEXT(R.id.buttonText, true, false),
-        SELECT(R.id.buttonSelect, false, false),
-        POSITION_CROSS_SECTION(R.id.graph_station_new_cross_section, false, false),
-        PINCH_TO_ZOOM(-1, false, true),
-        MODAL_MOVE(-1, false, true);
-
-        private int id;
-        private boolean usesColour;
-        private boolean isModal;
-
-        SketchTool(int id, boolean usesColour, boolean isModal) {
-            this.id = id;
-            this.usesColour = usesColour;
-            this.isModal = isModal;
-        }
-
-        public int getId() {
-            return id;
-        }
-
-        public boolean usesColour() {
-            return usesColour;
-        }
-
-        public boolean isModal() {
-            return isModal;
-        }
-    }
     public SketchTool currentSketchTool = SketchTool.MOVE;
     // used to jump back to the previous tool when using one-use tools
     private SketchTool previousSketchTool = SketchTool.SELECT;
+    private Symbol currentSymbol = Symbol.getDefault();
 
     private Paint stationPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint legPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -318,6 +263,8 @@ public class GraphView extends View {
                 return handleDraw(event);
             case ERASE:
                 return handleErase(event);
+            case SYMBOL:
+                return handleSymbol(event);
             case TEXT:
                 return handleText(event);
             case SELECT:
@@ -506,6 +453,22 @@ public class GraphView extends View {
         }
 
         return true;
+    }
+
+
+    private boolean handleSymbol(MotionEvent event) {
+
+        final Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
+        final Coord2D touchPointOnSurvey = viewCoordsToSurveyCoords(touchPointOnView);
+
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                sketch.addSymbolDetail(touchPointOnSurvey, currentSymbol);
+                invalidate();
+                return true;
+            default:
+                return false;
+        }
     }
 
 
@@ -733,7 +696,9 @@ public class GraphView extends View {
     }
 
 
-    private static Station findNearestStationWithinDelta(Space<Coord2D> space, Coord2D target, double delta) {
+    private static Station findNearestStationWithinDelta(
+            Space<Coord2D> space, Coord2D target, double delta) {
+
         double shortest = Double.MAX_VALUE;
         Station best = null;
 
@@ -765,6 +730,7 @@ public class GraphView extends View {
     }
 
 
+    @SuppressLint("DrawAllocation")
     @Override
     protected void onDraw(Canvas canvas) {
 
@@ -1247,6 +1213,14 @@ public class GraphView extends View {
                 y += labelPaint.descent() - labelPaint.ascent();
             }
         }
+
+        for (SymbolDetail symbolDetail : sketch.getSymbolDetails()) {
+            Coord2D location = surveyCoordsToViewCoords(symbolDetail.getPosition());
+            Bitmap bitmap = symbolDetail.getSymbol().getBitmap();
+            float x = (float)location.x;
+            float y = (float)location.y;
+            canvas.drawBitmap(bitmap, x, y, labelPaint);
+        }
     }
 
 
@@ -1418,7 +1392,11 @@ public class GraphView extends View {
 
 
     public void setBrushColour(BrushColour brushColour) {
-        sketch.setActiveColour(brushColour.colour);
+        sketch.setActiveColour(brushColour.getColour());
+    }
+
+    public void setCurrentSymbol(Symbol symbol) {
+        currentSymbol = symbol;
     }
 
 

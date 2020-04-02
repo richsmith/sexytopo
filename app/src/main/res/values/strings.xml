@@ -77,6 +77,7 @@
     <string name="sketch_toolbar_move">Move mode</string>
     <string name="sketch_toolbar_eraser">Eraser</string>
     <string name="sketch_toolbar_text">Text tool</string>
+    <string name="sketch_toolbar_symbol">Symbol tool</string>
     <string name="sketch_toolbar_selector">Selector</string>
     <string name="sketch_toolbar_settings">Quick settings</string>
     <string name="sketch_toolbar_undo">Undo</string>

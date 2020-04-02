@@ -1,13 +1,13 @@
 package org.hwyl.sexytopo.control.io.thirdparty.pockettopo;
 
-import org.hwyl.sexytopo.control.graph.GraphView;
-import org.hwyl.sexytopo.control.io.translation.Importer;
 import org.hwyl.sexytopo.control.io.basic.Loader;
+import org.hwyl.sexytopo.control.io.translation.Importer;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
+import org.hwyl.sexytopo.model.sketch.BrushColour;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
@@ -248,7 +248,7 @@ public class PocketTopoTxtImporter extends Importer {
             colourText = "GREY";
         }
         try {
-            GraphView.BrushColour brushColour = GraphView.BrushColour.valueOf(colourText);
+            BrushColour brushColour = BrushColour.valueOf(colourText);
             return brushColour.getColour();
 
         } catch(IllegalArgumentException exception) {

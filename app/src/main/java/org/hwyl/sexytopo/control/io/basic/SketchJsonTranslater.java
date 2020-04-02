@@ -8,6 +8,8 @@ import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
+import org.hwyl.sexytopo.model.sketch.Symbol;
+import org.hwyl.sexytopo.model.sketch.SymbolDetail;
 import org.hwyl.sexytopo.model.sketch.TextDetail;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -26,8 +28,10 @@ public class SketchJsonTranslater {
     public static final String PATHS_TAG = "paths";
     public static final String POINTS_TAG = "points";
     public static final String COLOUR_TAG = "colour";
+    public static final String SYMBOLS_TAG = "symbols";
     public static final String LABELS_TAG = "labels";
     public static final String CROSS_SECTIONS_TAG = "x-sections";
+    public static final String SYMBOL_ID_TAG = "symbol-id";
     public static final String TEXT_TAG = "text";
     public static final String STATION_ID_TAG = "station-id";
     public static final String POSITION_TAG = "location";
@@ -63,6 +67,12 @@ public class SketchJsonTranslater {
         }
         json.put(LABELS_TAG, textDetailArray);
 
+        JSONArray symbolDetailArray = new JSONArray();
+        for (SymbolDetail symbolDetail : sketch.getSymbolDetails()) {
+            symbolDetailArray.put(toJson(symbolDetail));
+        }
+        json.put(SYMBOLS_TAG, symbolDetailArray);
+
         JSONArray crossSectionDetailArray = new JSONArray();
         for (CrossSectionDetail crossSectionDetail : sketch.getCrossSectionDetails()) {
             crossSectionDetailArray.put(toJson(crossSectionDetail));
@@ -88,6 +98,17 @@ public class SketchJsonTranslater {
         }
 
         try {
+            JSONArray symbolsArray = json.getJSONArray(SYMBOLS_TAG);
+            Set<SymbolDetail> symbolDetails = new HashSet<>();
+            for (JSONObject object : Util.toList(symbolsArray)) {
+                symbolDetails.add(toSymbolDetail(object));
+            }
+            sketch.setSymbolDetails(symbolDetails);
+        } catch (JSONException e) {
+            Log.e("Failed to load symbols: " + e);
+        }
+
+        try {
             JSONArray labelsArray = json.getJSONArray(LABELS_TAG);
             Set<TextDetail> textDetails = new HashSet<>();
             for (JSONObject object : Util.toList(labelsArray)) {
@@ -106,7 +127,7 @@ public class SketchJsonTranslater {
             }
             sketch.setCrossSectionDetails(crossSectionDetails);
         } catch (JSONException e) {
-            Log.e("Failed to load sketch labels: " + e);
+            Log.e("Failed to load cross-sections: " + e);
         }
 
         return sketch;
@@ -140,6 +161,28 @@ public class SketchJsonTranslater {
 
         PathDetail pathDetail = new PathDetail(path, colour);
         return pathDetail;
+    }
+
+
+    public static JSONObject toJson(SymbolDetail symbolDetail) throws JSONException {
+
+        JSONObject json = new JSONObject();
+        json.put(POSITION_TAG, toJson(symbolDetail.getPosition()));
+        json.put(SYMBOL_ID_TAG, symbolDetail.getSymbol().toString());
+        json.put(COLOUR_TAG, symbolDetail.getColour().toString());
+
+        return json;
+    }
+
+
+    public static SymbolDetail toSymbolDetail(JSONObject json) throws JSONException {
+
+        Colour colour = Colour.valueOf(json.getString(COLOUR_TAG));
+        Coord2D location = toCoord2D(json.getJSONObject(POSITION_TAG));
+        Symbol symbol = Symbol.valueOf(json.getString(SYMBOL_ID_TAG));
+
+        SymbolDetail symbolDetail = new SymbolDetail(location, symbol, colour);
+        return symbolDetail;
     }
 
 

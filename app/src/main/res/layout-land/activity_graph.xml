@@ -45,6 +45,16 @@
             />
         <ImageButton
             android:layout_weight="0.2"
+            android:src="@drawable/redo"
+            android:tooltipText="@string/sketch_toolbar_symbol"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:scaleType="fitCenter"
+            android:id="@+id/buttonRedo"
+            android:hapticFeedbackEnabled="true"
+            />
+        <ImageButton
+            android:layout_weight="0.2"
             android:src="@drawable/text"
             android:tooltipText="@string/sketch_toolbar_text"
             android:layout_width="wrap_content"
@@ -81,16 +91,6 @@
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonUndo"
-            android:hapticFeedbackEnabled="true"
-            />
-        <ImageButton
-            android:layout_weight="0.2"
-            android:src="@drawable/redo"
-            android:tooltipText="@string/sketch_toolbar_redo"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/toolbar_button_height"
-            android:scaleType="fitCenter"
-            android:id="@+id/buttonRedo"
             android:hapticFeedbackEnabled="true"
             />
         <ImageButton

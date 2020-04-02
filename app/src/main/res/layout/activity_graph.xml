@@ -4,6 +4,39 @@
     android:layout_height="fill_parent"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <RelativeLayout
+        android:id="@+id/symbolToolbar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/panelBackground" >
+
+        <LinearLayout
+            android:id="@+id/symbolToolbarButtonPanel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:id="@+id/buttonAddStation"
+                android:layout_width="@dimen/toolbar_button_height"
+                android:layout_height="@dimen/toolbar_button_height"
+                android:src="@drawable/add"
+                android:scaleType="fitCenter"
+                android:onClick="manuallyAddStation"/>
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/buttonSymbolToolbarClose"
+            android:layout_width="@dimen/toolbar_button_height"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:scaleType="fitCenter"
+            android:src="@drawable/close"
+            android:backgroundTint="#DD4444"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:contentDescription="Close symbol toolbar" />
+
+    </RelativeLayout>
+
     <org.hwyl.sexytopo.control.graph.GraphView
         android:id="@+id/graphView" android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -132,6 +165,15 @@
             />
         <ImageButton
             android:layout_weight="0.2"
+            android:src="@drawable/stalactite"
+            android:tooltipText="@string/sketch_toolbar_symbol"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:scaleType="fitCenter"
+            android:id="@+id/buttonSymbol"
+            />
+        <ImageButton
+            android:layout_weight="0.2"
             android:src="@drawable/text"
             android:tooltipText="@string/sketch_toolbar_text"
             android:layout_width="wrap_content"
@@ -165,15 +207,6 @@
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonUndo"
-            />
-        <ImageButton
-            android:layout_weight="0.2"
-            android:src="@drawable/redo"
-            android:tooltipText="@string/sketch_toolbar_redo"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/toolbar_button_height"
-            android:scaleType="fitCenter"
-            android:id="@+id/buttonRedo"
             />
         <ImageButton
             android:layout_weight="0.2"
