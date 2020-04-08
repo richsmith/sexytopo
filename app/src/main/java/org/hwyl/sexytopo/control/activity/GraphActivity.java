@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
@@ -13,9 +14,10 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.PopupWindow;
 
@@ -165,8 +167,9 @@ public abstract class GraphActivity extends SexyTopoActivity
         syncGraphWithSurvey();
         initialiseSketchTool();
         initialiseBrushColour();
-        initialiseSymbolTool();
         initialiseSymbolToolbar();
+        initialiseSymbolTool();
+
         setSketchButtonsStatus();
         setViewLocation();
     }
@@ -367,20 +370,24 @@ public abstract class GraphActivity extends SexyTopoActivity
 
 
     private void initialiseSymbolToolbar() {
-        ViewGroup buttonPanel = findViewById(R.id.symbolToolbarButtonPanel);
+        Symbol.setResources(getResources());
 
+        LinearLayout buttonPanel = findViewById(R.id.symbolToolbarButtonPanel);
         buttonPanel.removeAllViews();
 
         for (Symbol symbol : Symbol.values()) {
             LayoutInflater inflater = LayoutInflater.from(this);
-            ImageButton imageButton = (ImageButton)
-                    (inflater.inflate(R.layout.tool_button, null));
+            LinearLayout linearLayout = (LinearLayout)
+                (inflater.inflate(R.layout.tool_button, null));
+            ImageButton imageButton = (ImageButton)linearLayout.getChildAt(0);
             imageButton.setId(symbol.getBitmapId()); // bit hacky :P
-            imageButton.setImageBitmap(symbol.getBitmap());
+            imageButton.setImageBitmap(symbol.getButtonBitmap());
             imageButton.setOnClickListener(this);
-            buttonPanel.addView(imageButton);
+            buttonPanel.addView(linearLayout);
         }
+        buttonPanel.invalidate();
     }
+
 
     private void toggleSymbolToolbar() {
         View toolbar = findViewById(R.id.symbolToolbar);
@@ -403,6 +410,7 @@ public abstract class GraphActivity extends SexyTopoActivity
         selectSymbol(selectedSymbol);
     }
 
+
     private void selectSymbol(Symbol symbol) {
         SharedPreferences preferences =
                 getSharedPreferences(SYMBOL_PREFERENCE_KEY, Context.MODE_PRIVATE);
@@ -410,10 +418,18 @@ public abstract class GraphActivity extends SexyTopoActivity
         editor.putString(SYMBOL_PREFERENCE_KEY, symbol.toString());
         editor.apply();
 
+        ImageButton selectedSymbolButton = findViewById(symbol.getBitmapId());
+        selectedSymbolButton.getBackground().setColorFilter(0xffffffff, PorterDuff.Mode.SRC_ATOP);
+
         ImageButton symbolButton = findViewById(R.id.buttonSymbol);
-        symbolButton.setImageBitmap(symbol.getBitmap());
+        symbolButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
+
+        Symbol.setResources(this.getResources());
+        Bitmap buttonBitmap = symbol.getButtonBitmap();
+        symbolButton.setImageBitmap(buttonBitmap);
 
         graphView.setCurrentSymbol(symbol);
+
     }
 
 
@@ -447,8 +463,6 @@ public abstract class GraphActivity extends SexyTopoActivity
             }
 
             if (sketchTool == toSelect) {
-                button.setHovered(true);
-                button.setHapticFeedbackEnabled(true);
                 button.getBackground().setColorFilter(0xffffffff, PorterDuff.Mode.SRC_ATOP);
             } else {
                 button.getBackground().clearColorFilter();

@@ -11,17 +11,11 @@
         android:background="@color/panelBackground" >
 
         <LinearLayout
+            android:orientation="horizontal"
             android:id="@+id/symbolToolbarButtonPanel"
+            android:weightSum="1"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <ImageButton
-                android:id="@+id/buttonAddStation"
-                android:layout_width="@dimen/toolbar_button_height"
-                android:layout_height="@dimen/toolbar_button_height"
-                android:src="@drawable/add"
-                android:scaleType="fitCenter"
-                android:onClick="manuallyAddStation"/>
+            android:layout_height="@dimen/toolbar_button_height">
         </LinearLayout>
 
         <ImageButton
@@ -31,14 +25,14 @@
             android:scaleType="fitCenter"
             android:src="@drawable/close"
             android:backgroundTint="#DD4444"
-            android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:contentDescription="Close symbol toolbar" />
 
     </RelativeLayout>
 
     <org.hwyl.sexytopo.control.graph.GraphView
-        android:id="@+id/graphView" android:layout_width="match_parent"
+        android:id="@+id/graphView"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"/>
 

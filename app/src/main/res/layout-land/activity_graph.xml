@@ -45,13 +45,12 @@
             />
         <ImageButton
             android:layout_weight="0.2"
-            android:src="@drawable/redo"
+            android:src="@drawable/stalactite"
             android:tooltipText="@string/sketch_toolbar_symbol"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
-            android:id="@+id/buttonRedo"
-            android:hapticFeedbackEnabled="true"
+            android:id="@+id/buttonSymbol"
             />
         <ImageButton
             android:layout_weight="0.2"
@@ -198,9 +197,37 @@
 
 
     <org.hwyl.sexytopo.control.graph.GraphView
-        android:id="@+id/graphView" android:layout_width="match_parent"
+        android:id="@+id/graphView"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"/>
+
+    <RelativeLayout
+        android:id="@+id/symbolToolbar"
+        android:orientation="vertical"
+        android:layout_width="@dimen/toolbar_button_height"
+        android:layout_height="fill_parent"
+        android:background="@color/panelBackground" >
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:id="@+id/symbolToolbarButtonPanel"
+            android:weightSum="1"
+            android:layout_width="@dimen/toolbar_button_height"
+            android:layout_height="wrap_content">
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/buttonSymbolToolbarClose"
+            android:layout_width="@dimen/toolbar_button_height"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:scaleType="fitCenter"
+            android:src="@drawable/close"
+            android:backgroundTint="#DD4444"
+            android:layout_alignParentBottom="true"
+            android:contentDescription="Close symbol toolbar" />
+
+    </RelativeLayout>
     
 
 </LinearLayout>

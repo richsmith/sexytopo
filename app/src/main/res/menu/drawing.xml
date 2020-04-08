@@ -8,6 +8,9 @@
         android:id="@+id/buttonCentreView"
         android:title="@string/sketch_menu_centre_view"/>
     <item
+        android:id="@+id/buttonRedo"
+        android:title="@string/sketch_menu_redo"/>
+    <item
         android:id="@+id/buttonAutoRecentre"
         android:title="@string/sketch_menu_auto_recentre"
         android:icon="@android:drawable/ic_menu_preferences"
