@@ -5,6 +5,7 @@ import org.hwyl.sexytopo.model.graph.Coord2D;
 
 
 public abstract class SinglePositionDetail extends SketchDetail {
+
     protected final Coord2D position;
 
     protected SinglePositionDetail(Colour colour, Coord2D position) {

@@ -33,6 +33,7 @@ public class SketchJsonTranslater {
     public static final String CROSS_SECTIONS_TAG = "x-sections";
     public static final String SYMBOL_ID_TAG = "symbol-id";
     public static final String TEXT_TAG = "text";
+    public static final String SIZE_TAG = "size";
     public static final String STATION_ID_TAG = "station-id";
     public static final String POSITION_TAG = "location";
     public static final String ANGLE_TAG = "angle";
@@ -82,7 +83,7 @@ public class SketchJsonTranslater {
         return json;
     }
 
-    public static Sketch toSketch(Survey survey, JSONObject json) throws JSONException {
+    public static Sketch toSketch(Survey survey, JSONObject json) {
 
         Sketch sketch = new Sketch();
 
@@ -170,6 +171,7 @@ public class SketchJsonTranslater {
         json.put(POSITION_TAG, toJson(symbolDetail.getPosition()));
         json.put(SYMBOL_ID_TAG, symbolDetail.getSymbol().toString());
         json.put(COLOUR_TAG, symbolDetail.getColour().toString());
+        json.put(SIZE_TAG, symbolDetail.getSize());
 
         return json;
     }
@@ -181,7 +183,9 @@ public class SketchJsonTranslater {
         Coord2D location = toCoord2D(json.getJSONObject(POSITION_TAG));
         Symbol symbol = Symbol.valueOf(json.getString(SYMBOL_ID_TAG));
 
-        SymbolDetail symbolDetail = new SymbolDetail(location, symbol, colour);
+        float size = (float)(json.has(SIZE_TAG)? json.getDouble(SIZE_TAG) : 1);
+
+        SymbolDetail symbolDetail = new SymbolDetail(location, symbol, colour, size);
         return symbolDetail;
     }
 
@@ -192,18 +196,18 @@ public class SketchJsonTranslater {
         json.put(POSITION_TAG, toJson(textDetail.getPosition()));
         json.put(TEXT_TAG, textDetail.getText());
         json.put(COLOUR_TAG, textDetail.getColour().toString());
+        json.put(SIZE_TAG, textDetail.getSize());
 
         return json;
     }
 
 
     public static TextDetail toTextDetail(JSONObject json) throws JSONException {
-
         Colour colour = Colour.valueOf(json.getString(COLOUR_TAG));
         Coord2D location = toCoord2D(json.getJSONObject(POSITION_TAG));
         String text = json.getString(TEXT_TAG);
-
-        TextDetail textDetail = new TextDetail(location, text, colour);
+        float scale = (float)(json.has(SIZE_TAG)? json.getDouble(SIZE_TAG) : 0);
+        TextDetail textDetail = new TextDetail(location, text, colour, scale);
         return textDetail;
     }
 

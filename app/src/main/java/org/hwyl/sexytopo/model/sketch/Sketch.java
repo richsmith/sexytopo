@@ -84,8 +84,8 @@ public class Sketch extends SketchDetail {
         activePath = null;
     }
 
-    public void addTextDetail(Coord2D location, String text) {
-        TextDetail textDetail = new TextDetail(location, text, activeColour);
+    public void addTextDetail(Coord2D location, String text, float size) {
+        TextDetail textDetail = new TextDetail(location, text, activeColour, size);
         textDetails.add(textDetail);
         addSketchDetail(textDetail);
     }
@@ -94,8 +94,8 @@ public class Sketch extends SketchDetail {
         return symbolDetails;
     }
 
-    public void addSymbolDetail(Coord2D location, Symbol symbol) {
-        SymbolDetail symbolDetail = new SymbolDetail(location, symbol, activeColour);
+    public void addSymbolDetail(Coord2D location, Symbol symbol, float size) {
+        SymbolDetail symbolDetail = new SymbolDetail(location, symbol, activeColour, size);
         symbolDetails.add(symbolDetail);
         addSketchDetail(symbolDetail);
     }

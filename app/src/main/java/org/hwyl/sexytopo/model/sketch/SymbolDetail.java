@@ -5,11 +5,13 @@ import org.hwyl.sexytopo.model.graph.Coord2D;
 
 public class SymbolDetail extends SinglePositionDetail {
 
-    private Symbol symbol;
+    private final Symbol symbol;
+    private final float size;
 
-    public SymbolDetail(Coord2D location, Symbol symbol, Colour colour) {
+    public SymbolDetail(Coord2D location, Symbol symbol, Colour colour, float size) {
         super(colour, location);
         this.symbol = symbol;
+        this.size = size;
     }
 
 
@@ -17,10 +19,13 @@ public class SymbolDetail extends SinglePositionDetail {
         return symbol;
     }
 
+    public float getSize() {
+        return size;
+    }
 
     @Override
     public SymbolDetail translate(Coord2D point) {
-        return new SymbolDetail(getPosition().plus(point), getSymbol(), getColour());
+        return new SymbolDetail(getPosition().plus(point), getSymbol(), getColour(), getSize());
     }
 
 }

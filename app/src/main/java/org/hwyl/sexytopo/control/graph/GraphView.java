@@ -151,7 +151,6 @@ public class GraphView extends View {
     private Paint hotCornersPaint = new Paint();
 
 
-
     public GraphView(Context context, AttributeSet attrs) {
         super(context, attrs);
         scaleGestureDetector = new ScaleGestureDetector(context, new ScaleListener());
@@ -463,7 +462,10 @@ public class GraphView extends View {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                sketch.addSymbolDetail(touchPointOnSurvey, currentSymbol);
+                int startingSize = PreferenceAccess.getInt(getContext(),
+                        "pref_survey_symbol_size", 35);
+                float size = startingSize / (float)surveyToViewScale;
+                sketch.addSymbolDetail(touchPointOnSurvey, currentSymbol, size);
                 invalidate();
                 return true;
             default:
@@ -485,7 +487,11 @@ public class GraphView extends View {
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                sketch.addTextDetail(touchPointOnSurvey, input.getText().toString());
+                                String text = input.getText().toString();
+                                int startingSize = PreferenceAccess.getInt(getContext(),
+                                        "pref_survey_text_tool_font_size", 50);
+                                float size = startingSize / (float)surveyToViewScale;
+                                sketch.addTextDetail(touchPointOnSurvey, text, size);
                             }
                         })
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -1208,6 +1214,7 @@ public class GraphView extends View {
             float y = (float)location.y;
             String text = textDetail.getText();
             labelPaint.setColor(textDetail.getColour().intValue);
+            labelPaint.setTextSize((float)(textDetail.getSize() * surveyToViewScale));
             for (String line : text.split("\n")) {
                 canvas.drawText(line, x, y, labelPaint);
                 y += labelPaint.descent() - labelPaint.ascent();
@@ -1215,8 +1222,18 @@ public class GraphView extends View {
         }
 
         for (SymbolDetail symbolDetail : sketch.getSymbolDetails()) {
+            if (!couldBeOnScreen(symbolDetail)) {
+                continue;
+            }
             Coord2D location = surveyCoordsToViewCoords(symbolDetail.getPosition());
             Bitmap bitmap = symbolDetail.getSymbol().getBitmap();
+
+            int size = (int)(symbolDetail.getSize() * surveyToViewScale);
+            if (size == 0) {
+                continue;
+            }
+
+            bitmap = Bitmap.createScaledBitmap(bitmap, size, size, true);
             float x = (float)location.x;
             float y = (float)location.y;
             canvas.drawBitmap(bitmap, x, y, labelPaint);
