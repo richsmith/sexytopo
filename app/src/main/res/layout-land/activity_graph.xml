@@ -45,7 +45,7 @@
             />
         <ImageButton
             android:layout_weight="0.2"
-            android:src="@drawable/stalactite"
+            android:src="@drawable/ic_stalactite"
             android:tooltipText="@string/sketch_toolbar_symbol"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/toolbar_button_height"
@@ -222,7 +222,7 @@
             android:layout_width="@dimen/toolbar_button_height"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
-            android:src="@drawable/close"
+            android:src="@drawable/ic_close"
             android:backgroundTint="#DD4444"
             android:layout_alignParentBottom="true"
             android:contentDescription="Close symbol toolbar" />

@@ -10,8 +10,12 @@ import org.hwyl.sexytopo.R;
 
 public enum Symbol {
 
-    STALAGMITE(R.drawable.stalagmite),
-    STALACTITE(R.drawable.stalactite);
+    STALAGMITE(R.drawable.ic_stalagmite),
+    STALACTITE(R.drawable.ic_stalactite),
+    COLUMN(R.drawable.ic_column),
+    STRAWS(R.drawable.ic_straws),
+    HELICTITE(R.drawable.ic_helictite),
+    CRYSTAL(R.drawable.ic_crystal);
 
     private static Resources resources;
 
