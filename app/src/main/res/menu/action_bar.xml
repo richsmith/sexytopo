@@ -92,7 +92,7 @@
                   android:title="@string/action_kill_connection" />
             <item android:id="@+id/action_force_crash"
                   android:title="@string/action_force_crash"
-                  android:visible="false"/>
+                  android:visible="true"/>
         </menu>
     </item>
     <item android:id="@+id/action_settings"

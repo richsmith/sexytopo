@@ -2,9 +2,7 @@ package org.hwyl.sexytopo.control;
 
 import android.app.Application;
 
-import com.crashlytics.android.Crashlytics;
-
-import io.fabric.sdk.android.Fabric;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 
 public class SexyTopo extends Application {
@@ -22,13 +20,13 @@ public class SexyTopo extends Application {
                 handleUncaughtException (thread, e);
             }
         });
-
-        Fabric.with(this, new Crashlytics());
     }
 
 
     public void handleUncaughtException (Thread thread, Throwable e) {
         Log.setContext(this);
+        FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+        crashlytics.recordException(e);
         Log.e(e);
         defaultHandler.uncaughtException(thread, e);
     }
