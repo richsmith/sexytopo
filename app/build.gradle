@@ -32,11 +32,10 @@ repositories {
 }
 
 dependencies {
+    testImplementation 'junit:junit:4.13.2'
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.2.0'
-    //implementation 'com.android.support:design:27.1.1'
     implementation 'commons-io:commons-io:2.6'
-    testImplementation 'junit:junit:4.13.2'
     testImplementation('org.powermock:powermock-api-mockito:1.6.2') {
         exclude module: 'hamcrest-core'
         exclude module: 'objenesis'
