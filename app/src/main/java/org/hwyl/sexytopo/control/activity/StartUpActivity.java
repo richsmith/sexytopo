@@ -43,8 +43,15 @@ public class StartUpActivity extends SexyTopoActivity {
             helpThereSeemsToBeNoSurveyDoSomething();
         }
 
-        Intent serviceIntent = new Intent(this, NewStationNotificationService.class);
-        startService(serviceIntent);
+        try {
+            Intent serviceIntent = new Intent(this, NewStationNotificationService.class);
+            startService(serviceIntent);
+        } catch (Exception exception) {
+            // Not mission-critical, so carry on if this doesn't work
+            // (some users seem to have had problems according to the log)
+            Log.e("Unable to start new station notification intent");
+            Log.e(exception);
+        }
 
 
         Intent intent = new Intent(this, DeviceActivity.class);

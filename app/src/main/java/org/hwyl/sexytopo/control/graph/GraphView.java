@@ -522,7 +522,11 @@ public class GraphView extends View {
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                sketch.addTextDetail(touchPointOnSurvey, input.getText().toString());
+                                String text = input.getText().toString();
+                                int startingSize = PreferenceAccess.getInt(getContext(),
+                                                "pref_survey_text_tool_font_size", 50);
+                                float size = startingSize / (float)surveyToViewScale;
+                                sketch.addTextDetail(touchPointOnSurvey, text, size);
                             }
                         })
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -1242,6 +1246,7 @@ public class GraphView extends View {
             float y = (float)location.y;
             String text = textDetail.getText();
             labelPaint.setColor(textDetail.getColour().intValue);
+            labelPaint.setTextSize((float)(textDetail.getSize() * surveyToViewScale));
             for (String line : text.split("\n")) {
                 canvas.drawText(line, x, y, labelPaint);
                 y += labelPaint.descent() - labelPaint.ascent();

@@ -29,6 +29,7 @@ public class SketchJsonTranslater {
     public static final String LABELS_TAG = "labels";
     public static final String CROSS_SECTIONS_TAG = "x-sections";
     public static final String TEXT_TAG = "text";
+    public static final String SIZE_TAG = "size";
     public static final String STATION_ID_TAG = "station-id";
     public static final String POSITION_TAG = "location";
     public static final String ANGLE_TAG = "angle";
@@ -149,6 +150,7 @@ public class SketchJsonTranslater {
         json.put(POSITION_TAG, toJson(textDetail.getPosition()));
         json.put(TEXT_TAG, textDetail.getText());
         json.put(COLOUR_TAG, textDetail.getColour().toString());
+        json.put(SIZE_TAG, textDetail.getSize());
 
         return json;
     }
@@ -159,8 +161,9 @@ public class SketchJsonTranslater {
         Colour colour = Colour.valueOf(json.getString(COLOUR_TAG));
         Coord2D location = toCoord2D(json.getJSONObject(POSITION_TAG));
         String text = json.getString(TEXT_TAG);
+        float scale = (float)(json.has(SIZE_TAG)? json.getDouble(SIZE_TAG) : 0);
+        TextDetail textDetail = new TextDetail(location, text, colour, scale);
 
-        TextDetail textDetail = new TextDetail(location, text, colour);
         return textDetail;
     }
 

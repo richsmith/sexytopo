@@ -81,6 +81,12 @@
             android:title="Highlight latest leg"
             android:defaultValue="true"/>
         <EditTextPreference
+            android:key="pref_survey_text_tool_font_size"
+            android:inputType="number"
+            android:defaultValue="50"
+            android:summary="How big to initially draw manually-placed text (pixels)"
+            android:title="Text tool label size"/>
+        <EditTextPreference
             android:key="pref_leg_width"
             android:inputType="number"
             android:defaultValue="3"
@@ -104,12 +110,6 @@
             android:defaultValue="22"
             android:summary="Font size of station labels"
             android:title="Station label size"/>
-        <EditTextPreference
-            android:key="pref_survey_text_font_size"
-            android:inputType="number"
-            android:defaultValue="32"
-            android:summary="Font size of freestyle survey text"
-            android:title="Survey Text Size"/>
     </PreferenceCategory>
 
     <PreferenceCategory
