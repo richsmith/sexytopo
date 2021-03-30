@@ -61,7 +61,9 @@ class BLESocket extends BluetoothGattCallback {
         writeBuffer = new ArrayList<>();
         pairingIntentFilter = new IntentFilter();
         pairingIntentFilter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
-        pairingIntentFilter.addAction(BluetoothDevice.ACTION_PAIRING_REQUEST);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            pairingIntentFilter.addAction(BluetoothDevice.ACTION_PAIRING_REQUEST);
+        }
         pairingBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -124,10 +126,10 @@ class BLESocket extends BluetoothGattCallback {
         context.registerReceiver(pairingBroadcastReceiver, pairingIntentFilter);
         if (Build.VERSION.SDK_INT < 23) {
             Log.d(TAG, "connectGatt");
-            gatt = device.connectGatt(context, false, this);
+            gatt = device.connectGatt(context, true, this);
         } else {
             Log.d(TAG, "connectGatt,LE");
-            gatt = device.connectGatt(context, false, this, BluetoothDevice.TRANSPORT_LE);
+            gatt = device.connectGatt(context, true, this, BluetoothDevice.TRANSPORT_LE);
         }
         if (gatt == null)
             throw new IOException("connectGatt failed");
@@ -140,21 +142,31 @@ class BLESocket extends BluetoothGattCallback {
         BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
         if(device==null || !device.equals(this.device))
             return;
-        switch (intent.getAction()) {
-            case BluetoothDevice.ACTION_PAIRING_REQUEST:
-                final int pairingVariant = intent.getIntExtra(BluetoothDevice.EXTRA_PAIRING_VARIANT, -1);
-                Log.d(TAG, "pairing request " + pairingVariant);
-                onSerialConnectError(new IOException(context.getString(R.string.pairing_request)));
-                // pairing dialog brings app to background (onPause), but it is still partly visible (no onStop), so there is no automatic disconnect()
-                break;
-            case BluetoothDevice.ACTION_BOND_STATE_CHANGED:
-                final int bondState = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, -1);
-                final int previousBondState = intent.getIntExtra(BluetoothDevice.EXTRA_PREVIOUS_BOND_STATE, -1);
-                Log.d(TAG, "bond state " + previousBondState + "->" + bondState);
-                break;
-            default:
-                Log.d(TAG, "unknown broadcast " + intent.getAction());
-                break;
+        String action = intent.getAction();
+        if (action==null) {
+            Log.d(TAG, "null action provided");
+        } else {
+            switch (action) {
+                case BluetoothDevice.ACTION_PAIRING_REQUEST:
+                    final int pairingVariant;
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+                        pairingVariant = intent.getIntExtra(BluetoothDevice.EXTRA_PAIRING_VARIANT, -1);
+                        Log.d(TAG, "pairing request " + pairingVariant);
+                    } else {
+                        Log.d(TAG, "pairing request ");
+                    }
+                    onSerialConnectError(new IOException(context.getString(R.string.pairing_request)));
+                    // pairing dialog brings app to background (onPause), but it is still partly visible (no onStop), so there is no automatic disconnect()
+                    break;
+                case BluetoothDevice.ACTION_BOND_STATE_CHANGED:
+                    final int bondState = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, -1);
+                    final int previousBondState = intent.getIntExtra(BluetoothDevice.EXTRA_PREVIOUS_BOND_STATE, -1);
+                    Log.d(TAG, "bond state " + previousBondState + "->" + bondState);
+                    break;
+                default:
+                    Log.d(TAG, "unknown broadcast " + action);
+                    break;
+            }
         }
     }
 
@@ -167,7 +179,8 @@ class BLESocket extends BluetoothGattCallback {
                 onSerialConnectError(new IOException("discoverServices failed"));
         } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
             if (connected)
-                onSerialIoError     (new IOException("gatt status " + status));
+                // lost connection; don't raise an error so we can reconnect later
+                connected = false;
             else
                 onSerialConnectError(new IOException("gatt status " + status));
         } else {

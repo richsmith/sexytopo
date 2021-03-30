@@ -14,9 +14,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,7 +22,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
@@ -53,6 +50,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 
 /**
@@ -1111,8 +1112,14 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 Saver.save(context, getSurvey());
                 return true;
             } catch (Exception exception) {
-                Crashlytics.logException(exception);
                 Log.e(exception);
+                try {
+                    FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+                    crashlytics.recordException(exception);
+                    Log.e(exception);
+                } catch (Exception inner) {
+                    Log.e(inner);
+                }
                 return false;
             }
         }

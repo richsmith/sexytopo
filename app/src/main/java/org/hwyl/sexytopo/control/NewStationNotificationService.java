@@ -9,11 +9,12 @@ import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
-import android.support.v4.content.LocalBroadcastManager;
 
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.hwyl.sexytopo.SexyTopo;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 public class NewStationNotificationService extends Service {
 
@@ -35,7 +36,8 @@ public class NewStationNotificationService extends Service {
             broadcastManager.registerReceiver(
                     receiver, new IntentFilter(SexyTopo.NEW_STATION_CREATED_EVENT));
         } catch (Exception exception) {
-            Crashlytics.logException(exception);
+            FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+            crashlytics.recordException(exception);
             Log.e(exception);
         }
 

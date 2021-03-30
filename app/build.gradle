@@ -1,16 +1,17 @@
 apply plugin: 'com.android.application'
-apply plugin: 'io.fabric'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
 
 android {
-    compileSdkVersion 27
-    buildToolsVersion '28.0.3'
+    compileSdkVersion 29
+    buildToolsVersion '29.0.2'
 
     defaultConfig {
         applicationId "org.hwyl.sexytopo"
         minSdkVersion 18
-        targetSdkVersion 28
-        versionCode 60
-        versionName "1.4.6"
+        targetSdkVersion 29
+        versionCode 61
+        versionName "1.4.7"
     }
     buildTypes {
         release {
@@ -24,10 +25,16 @@ android {
     }
 }
 
+
+repositories {
+    mavenCentral()
+    google()
+}
+
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support:design:27.1.1'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    //implementation 'com.android.support:design:27.1.1'
     implementation 'commons-io:commons-io:2.6'
     testImplementation 'junit:junit:4.12'
     testImplementation('org.powermock:powermock-api-mockito:1.6.2') {
@@ -38,24 +45,8 @@ dependencies {
         exclude module: 'hamcrest-core'
         exclude module: 'objenesis'
     }
-    testImplementation 'org.json:json:20140107'
+    testImplementation 'org.json:json:20180813'
     implementation 'org.apache.commons:commons-lang3:3.8.1'
-    implementation('com.crashlytics.sdk.android:crashlytics:2.9.9@aar') {
-        transitive = true;
-    }
-}
-
-repositories {
-    mavenCentral()
-    maven { url 'https://maven.fabric.io/public' }
-}
-
-buildscript {
-    repositories {
-        maven { url 'https://maven.fabric.io/public' }
-    }
-
-    dependencies {
-        classpath 'io.fabric.tools:gradle:1.28.1'
-    }
+    implementation 'com.google.firebase:firebase-analytics:18.0.0'
+    implementation 'com.google.firebase:firebase-crashlytics:17.2.2'
 }

@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "120699822935",
+    "firebase_url": "https://sexytopo.firebaseio.com",
+    "project_id": "sexytopo",
+    "storage_bucket": "sexytopo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:120699822935:android:75256d180922d6053fd412",
+        "android_client_info": {
+          "package_name": "org.hwyl.sexytopo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "120699822935-8sthqfescuc7k6lltht03cjcqnbvnce4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAl73t4uE8HyGXlkbGKKWLHNjWnTHWb9nY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "120699822935-8sthqfescuc7k6lltht03cjcqnbvnce4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

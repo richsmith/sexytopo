@@ -3,9 +3,8 @@ package org.hwyl.sexytopo.control;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v4.content.LocalBroadcastManager;
 
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.io.Util;
@@ -25,6 +24,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 /**
  * SexyTopo's Logger. This is a kind of proxy for the standard Android Log so we can
@@ -232,7 +233,7 @@ public class Log {
 
         public static Message unmarshal(JSONObject object) throws ParseException, JSONException {
             Date timestamp = FORMAT.parse(object.getString("timestamp"));
-            boolean isError = Boolean.valueOf(object.getString("isError"));
+            boolean isError = Boolean.parseBoolean(object.getString("isError"));
             String text = object.getString("text");
             return new Message(timestamp, text, isError);
         }
@@ -254,7 +255,7 @@ public class Log {
                 String path = getFilePath(logType);
                 Saver.saveFile(path, content);
             } catch (Exception exception) {
-                Crashlytics.logException(exception);
+                FirebaseCrashlytics.getInstance().recordException(exception);
             }
             return null;
         }

@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v7.widget.AppCompatCheckBox;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -14,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -328,7 +328,7 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
             TextView roleField = rowView.findViewById(R.id.role_field);
             String roles = TextTools.join(", ", teamEntry.roles);
             roleField.setText(roles);
-            final AppCompatCheckBox checkBox = rowView.findViewById(R.id.settings_notification_checkbox);
+            final CheckBox checkBox = rowView.findViewById(R.id.settings_notification_checkbox);
             checkBox.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
