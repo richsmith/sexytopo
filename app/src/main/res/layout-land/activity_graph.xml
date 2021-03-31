@@ -51,6 +51,7 @@
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonSymbol"
+            android:visibility="gone"
             />
         <ImageButton
             android:layout_weight="0.2"
@@ -90,6 +91,16 @@
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonUndo"
+            android:hapticFeedbackEnabled="true"
+            />
+        <ImageButton
+            android:layout_weight="0.2"
+            android:src="@drawable/redo"
+            android:tooltipText="@string/sketch_toolbar_redo"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:scaleType="fitCenter"
+            android:id="@+id/buttonRedo"
             android:hapticFeedbackEnabled="true"
             />
         <ImageButton
@@ -207,7 +218,8 @@
         android:orientation="vertical"
         android:layout_width="@dimen/toolbar_button_height"
         android:layout_height="fill_parent"
-        android:background="@color/panelBackground" >
+        android:background="@color/panelBackground"
+        android:visibility="gone">
 
         <LinearLayout
             android:orientation="vertical"

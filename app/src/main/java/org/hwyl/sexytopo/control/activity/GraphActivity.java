@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -37,6 +36,8 @@ import org.hwyl.sexytopo.model.sketch.Symbol;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 
 public abstract class GraphActivity extends SexyTopoActivity
         implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
@@ -59,6 +60,7 @@ public abstract class GraphActivity extends SexyTopoActivity
             R.id.buttonText,
             R.id.buttonSymbol,
             R.id.buttonUndo,
+            R.id.buttonRedo,
             R.id.buttonBlack,
             R.id.buttonBrown,
             R.id.buttonGrey,
