@@ -2,7 +2,7 @@
 <resources>
 <string name="aboutText">
 <b>Authors</b>\n
-• SexyTopo is written and maintained by Rich Smith (rls@hwyl.org), copyright 2019\n
+• SexyTopo is written and maintained by Rich Smith (rls@hwyl.org), copyright 2021\n
 \n\n
 
 <b>Thanks To</b>\n
@@ -13,6 +13,8 @@
 • "CaverBruce" for testing and ideas\n
 • Tom Foord for testing and ideas\n
 • Hellie Brooke / David Powlesland / Andrew Atkinson for loan of equipment\n
+• Phil Underwood for contributing Shetland Attack Pony code\n
+• Kris Fausnight for providing a BRIC4\n
 
 \n\n
 

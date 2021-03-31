@@ -208,6 +208,7 @@ public class SketchJsonTranslater {
         String text = json.getString(TEXT_TAG);
         float scale = (float)(json.has(SIZE_TAG)? json.getDouble(SIZE_TAG) : 0);
         TextDetail textDetail = new TextDetail(location, text, colour, scale);
+
         return textDetail;
     }
 
