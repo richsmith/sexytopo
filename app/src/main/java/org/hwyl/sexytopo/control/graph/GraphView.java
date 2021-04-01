@@ -305,22 +305,34 @@ public class GraphView extends View {
         }
     }
 
+    private double viewXToSurveyX(double x) {
+        return (x * (1 / surveyToViewScale)) + viewpointOffset.x;
+    }
+
+    private double viewYoSurveyY(double y) {
+        return (y * (1 / surveyToViewScale)) + viewpointOffset.y;
+    }
 
     private Coord2D viewCoordsToSurveyCoords(final Coord2D coords) {
         // The more elegant way to do this is:
         // return coords.scale(1 / surveyToViewScale).plus(viewpointOffset);
         // ...but this method gets hit hard (profiled) so let's avoid creating intermediate objects:
-        return new Coord2D(((coords.x * (1 / surveyToViewScale)) + viewpointOffset.x),
-                ((coords.y * (1 / surveyToViewScale)) + viewpointOffset.y));
+        return new Coord2D(viewXToSurveyX(coords.x), viewYoSurveyY(coords.y));
     }
 
+    private double surveyXToViewX(double x) {
+        return (x - viewpointOffset.x) * surveyToViewScale;
+    }
+
+    private double surveyYToViewY(double y) {
+        return (y - viewpointOffset.y) * surveyToViewScale;
+    }
 
     private Coord2D surveyCoordsToViewCoords(final Coord2D coords) {
         // The more elegant way to do this is:
         // return coords.minus(viewpointOffset).scale(surveyToViewScale);
         // ...but this method gets hit hard (profiled) so let's avoid creating intermediate objects:
-        return new Coord2D(((coords.x - viewpointOffset.x) * surveyToViewScale),
-                ((coords.y - viewpointOffset.y) * surveyToViewScale));
+        return new Coord2D(surveyXToViewX(coords.x), surveyYToViewY(coords.y));
     }
 
 
