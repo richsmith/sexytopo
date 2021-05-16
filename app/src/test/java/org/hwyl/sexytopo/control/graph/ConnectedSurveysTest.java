@@ -35,8 +35,9 @@ public class ConnectedSurveysTest {
 
         Survey currentSurvey = getBasicSurvey("not-connected");
 
-        Sketch fakeSketch = new Sketch();
-        when(mockActivity.getSketch(currentSurvey)).thenReturn(fakeSketch);
+        // As of v2 of Mockito the following emits an 'UnnecessaryStubbingException'
+        //Sketch fakeSketch = new Sketch();
+        //when(mockActivity.getSketch(currentSurvey)).thenReturn(fakeSketch);
 
         Map<Survey, Space<Coord2D>> translated =
                 ConnectedSurveys.getTranslatedConnectedSurveys(
