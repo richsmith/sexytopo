@@ -169,8 +169,8 @@ public abstract class GraphActivity extends SexyTopoActivity
         syncGraphWithSurvey();
         initialiseSketchTool();
         initialiseBrushColour();
-        // initialiseSymbolToolbar();
-        // initialiseSymbolTool();
+        initialiseSymbolToolbar();
+        initialiseSymbolTool();
 
         setSketchButtonsStatus();
         setViewLocation();

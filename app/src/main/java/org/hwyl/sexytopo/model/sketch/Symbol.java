@@ -51,8 +51,13 @@ public enum Symbol {
         }
 
         if (buttonBitmap == null) {
+            Bitmap bitmap = getBitmap();
+            if (bitmap == null) {
+                return null;
+            }
+
             int dimen = (int)resources.getDimension(R.dimen.toolbar_button_height);
-            buttonBitmap = Bitmap.createScaledBitmap(getBitmap(), dimen, dimen, true);
+            buttonBitmap = Bitmap.createScaledBitmap(bitmap, dimen, dimen, true);
         }
 
         return buttonBitmap;
