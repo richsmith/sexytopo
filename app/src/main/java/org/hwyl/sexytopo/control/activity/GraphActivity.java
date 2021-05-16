@@ -173,7 +173,6 @@ public abstract class GraphActivity extends SexyTopoActivity
         // initialiseSymbolTool();
 
         setSketchButtonsStatus();
-        setViewLocation();
     }
 
     private void setViewLocation() {
