@@ -1192,19 +1192,27 @@ public class GraphView extends View {
             drawPaint.setAlpha(alpha);
 
             List<Coord2D> path = pathDetail.getPath();
+
             Coord2D from = null;
+            int lineIndex = 0;
+            float[] lines = new float[path.size() * 4];
+
             for (Coord2D point : path) {
                 if (from == null) {
                     from = surveyCoordsToViewCoords(point);
                 } else {
                     Coord2D to = surveyCoordsToViewCoords(point);
-                    canvas.drawLine(
-                        (float) from.x, (float) from.y,
-                        (float) to.x, (float) to.y,
-                        drawPaint);
+
+                    lines[lineIndex++] = (float)from.x;
+                    lines[lineIndex++] = (float)from.y;
+                    lines[lineIndex++] = (float)to.x;
+                    lines[lineIndex++] = (float)to.y;
+
                     from = to;
                 }
             }
+
+            canvas.drawLines(lines, drawPaint);
         }
 
         labelPaint.setAlpha(alpha);
