@@ -140,7 +140,17 @@ public class GraphView extends View {
     private Symbol currentSymbol = Symbol.getDefault();
 
     private Paint stationPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
     private Paint legPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Paint latestLegPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Paint splayPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Paint latestSplayPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+    private Paint fadedLegPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Paint fadedLatestLegPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Paint fadedSplayPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Paint fadedLatestSplayPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
     private Paint drawPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint labelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint highlightPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -170,10 +180,37 @@ public class GraphView extends View {
         highlightPaint.setStrokeWidth(HIGHLIGHT_OUTLINE);
         highlightPaint.setColor(HIGHLIGHT_COLOUR.intValue);
 
-        legPaint.setARGB(127, 255, 0, 0);
+        // active legs/splays
         int legStrokeWidth = PreferenceAccess.getInt(getContext(), "pref_leg_width", 3);
         legPaint.setStrokeWidth(legStrokeWidth);
         legPaint.setColor(LEG_COLOUR.intValue);
+
+        latestLegPaint.setStrokeWidth(legStrokeWidth);
+        latestLegPaint.setColor(LATEST_LEG_COLOUR.intValue);
+
+        int splayStrokeWidth = PreferenceAccess.getInt(getContext(), "pref_splay_width", 1);
+        splayPaint.setStrokeWidth(splayStrokeWidth);
+        splayPaint.setColor(LEG_COLOUR.intValue);
+
+        latestSplayPaint.setStrokeWidth(splayStrokeWidth);
+        latestSplayPaint.setColor(LATEST_LEG_COLOUR.intValue);
+
+        // faded legs/splays
+        fadedLegPaint.setStrokeWidth(legStrokeWidth);
+        fadedLegPaint.setColor(LEG_COLOUR.intValue);
+        fadedLegPaint.setAlpha(FADED_ALPHA);
+
+        fadedLatestLegPaint.setStrokeWidth(legStrokeWidth);
+        fadedLatestLegPaint.setColor(LATEST_LEG_COLOUR.intValue);
+        fadedLatestLegPaint.setAlpha(FADED_ALPHA);
+
+        fadedSplayPaint.setStrokeWidth(splayStrokeWidth);
+        fadedSplayPaint.setColor(LEG_COLOUR.intValue);
+        fadedSplayPaint.setAlpha(FADED_ALPHA);
+
+        fadedLatestSplayPaint.setStrokeWidth(splayStrokeWidth);
+        fadedLatestSplayPaint.setColor(LATEST_LEG_COLOUR.intValue);
+        fadedLatestSplayPaint.setAlpha(FADED_ALPHA);
 
         gridPaint.setColor(GRID_COLOUR.intValue);
 
@@ -942,10 +979,6 @@ public class GraphView extends View {
 
     private void drawLegs(Canvas canvas, Space<Coord2D> space, int baseAlpha) {
 
-        int legWidth = PreferenceAccess.getInt(getContext(), "pref_leg_width", 3);
-        int splayWidth = PreferenceAccess.getInt(getContext(), "pref_splay_width", 1);
-
-
         boolean showSplays = getDisplayPreference(GraphActivity.DisplayPreference.SHOW_SPLAYS);
         boolean highlightLatestLeg =
                 PreferenceAccess.getBoolean(
@@ -954,6 +987,8 @@ public class GraphView extends View {
         boolean fadingNonActive =
                 getDisplayPreference(GraphActivity.DisplayPreference.FADE_NON_ACTIVE);
 
+        DashPathEffect dashPathEffect = new DashPathEffect(new float[]{3, 2}, 0);
+
         Map<Leg, Line<Coord2D>> legMap = space.getLegMap();
 
         for (Leg leg : legMap.keySet()) {
@@ -961,6 +996,7 @@ public class GraphView extends View {
             if (!showSplays && !leg.hasDestination()) {
                 continue;
             }
+
             Line<Coord2D> line = legMap.get(leg);
 
             Coord2D start = surveyCoordsToViewCoords(line.getStart());
@@ -970,30 +1006,29 @@ public class GraphView extends View {
                 continue;
             }
 
-            if (highlightLatestLeg && survey.getMostRecentLeg() == leg) {
-                legPaint.setColor(LATEST_LEG_COLOUR.intValue);
+            boolean fade = fadingNonActive && !isAttachedToActive(leg);
+
+            Paint paint;
+            if (!leg.hasDestination()) {
+                paint = fade ? fadedSplayPaint : splayPaint;
+            } else if (highlightLatestLeg && survey.getMostRecentLeg() == leg) {
+                paint = fade ? fadedLatestLegPaint : latestLegPaint;
             } else {
-                legPaint.setColor(LEG_COLOUR.intValue);
+                paint = fade ? fadedLegPaint : legPaint;
             }
 
-            if (leg.hasDestination()) {
-				legPaint.setStrokeWidth(legWidth);
-			} else {
-                legPaint.setStrokeWidth(splayWidth);
-			}
-
-            int alpha = fadingNonActive && !isAttachedToActive(leg)? FADED_ALPHA : baseAlpha;
-
             if (projectionType.isLegInPlane(leg)) {
-                legPaint.setStyle(Paint.Style.STROKE);
-                drawLine(canvas, start, end, legPaint, alpha);
+                // TODO(djw): Change to drawLines()
+                canvas.drawLine((float)start.x, (float)start.y, (float)end.x, (float)end.y, paint);
 			} else {
-                legPaint.setPathEffect(new DashPathEffect(new float[]{3, 2}, 0));
-                drawLineAsPath(canvas, start, end, legPaint, alpha);
+                // TODO(djw): Create proper paint for dashed path
+                // TODO(djw): No need to pass and set alpha
+                int alpha = fade ? FADED_ALPHA : baseAlpha;
+                paint.setPathEffect(dashPathEffect);
+                drawLineAsPath(canvas, start, end, paint, alpha);
+                paint.setStyle(Paint.Style.STROKE);
 			}
-
         }
-
     }
 
     private boolean isAttachedToActive(Leg leg) {
