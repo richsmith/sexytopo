@@ -1185,13 +1185,20 @@ public class GraphView extends View {
 
         drawPaint.setAlpha(alpha);
 
+        int lastColour = -1;
         for (PathDetail pathDetail : sketch.getPathDetails()) {
 
             if (!couldBeOnScreen(pathDetail)) {
                 continue;
             }
 
-            drawPaint.setColor(pathDetail.getColour().intValue);
+            // Avoiding constantly updating the paint colour saves approx. 10% of sketch draw time.
+            // Ideally getPathDetails() would return the paths in colour order but HashSets
+            // are unordered collections
+            if (pathDetail.getColour().intValue != lastColour) {
+                lastColour = pathDetail.getColour().intValue;
+                drawPaint.setColor(lastColour);
+            }
 
             List<Coord2D> path = pathDetail.getPath();
 
@@ -1200,9 +1207,8 @@ public class GraphView extends View {
             float[] lines = new float[path.size() * 4];
 
             // This loop is the slowest part of the draw phase. Pulling out the calculations from
-            // within surveyCoordsToViewCoords saves a considerable amount of time by not
-            // constructing many thousands of Coord2D objects
-
+            // within surveyCoordsToViewCoords saves a not insignificant amount of time by not
+            // constructing many thousands of Coord2D objects (approx. 10% of sketch draw time)
             for (Coord2D point : path) {
                 if (fromX == -1) {
                     //from = surveyCoordsToViewCoords(point);
