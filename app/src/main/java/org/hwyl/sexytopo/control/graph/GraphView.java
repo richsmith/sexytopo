@@ -105,7 +105,6 @@ public class GraphView extends View {
     private Rect topRightCorner;
     private Rect bottomRightCorner;
 
-
     public static final Colour LEG_COLOUR = Colour.RED;
     public static final Colour LATEST_LEG_COLOUR = Colour.MAGENTA;
     public static final Colour HIGHLIGHT_COLOUR = Colour.GOLD;
@@ -139,27 +138,28 @@ public class GraphView extends View {
     private SketchTool previousSketchTool = SketchTool.SELECT;
     private Symbol currentSymbol = Symbol.getDefault();
 
-    private Paint stationPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final DashPathEffect dashPathEffect = new DashPathEffect(new float[]{5, 5}, 0);
 
-    private Paint legPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private Paint latestLegPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private Paint splayPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private Paint latestSplayPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint stationPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
-    private Paint fadedLegPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private Paint fadedLatestLegPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private Paint fadedSplayPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private Paint fadedLatestSplayPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint legPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint latestLegPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint splayPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
-    private Paint drawPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private Paint labelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private Paint highlightPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private Paint legendPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private Paint gridPaint = new Paint();
-    private Paint crossSectionConnectorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private Paint crossSectionIndicatorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private Paint hotCornersPaint = new Paint();
+    private final Paint fadedLegPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint fadedLatestLegPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint fadedSplayPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
+    private final Paint drawPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint labelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint highlightPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint legendPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint gridPaint = new Paint();
+    private final Paint crossSectionConnectorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint crossSectionIndicatorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint hotCornersPaint = new Paint();
+
+    private final Path dashedPath = new Path();
 
     public GraphView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -192,9 +192,6 @@ public class GraphView extends View {
         splayPaint.setStrokeWidth(splayStrokeWidth);
         splayPaint.setColor(LEG_COLOUR.intValue);
 
-        latestSplayPaint.setStrokeWidth(splayStrokeWidth);
-        latestSplayPaint.setColor(LATEST_LEG_COLOUR.intValue);
-
         // faded legs/splays
         fadedLegPaint.setStrokeWidth(legStrokeWidth);
         fadedLegPaint.setColor(LEG_COLOUR.intValue);
@@ -207,10 +204,6 @@ public class GraphView extends View {
         fadedSplayPaint.setStrokeWidth(splayStrokeWidth);
         fadedSplayPaint.setColor(LEG_COLOUR.intValue);
         fadedSplayPaint.setAlpha(FADED_ALPHA);
-
-        fadedLatestSplayPaint.setStrokeWidth(splayStrokeWidth);
-        fadedLatestSplayPaint.setColor(LATEST_LEG_COLOUR.intValue);
-        fadedLatestSplayPaint.setAlpha(FADED_ALPHA);
 
         gridPaint.setColor(GRID_COLOUR.intValue);
 
@@ -230,7 +223,7 @@ public class GraphView extends View {
         crossSectionConnectorPaint.setColor(CROSS_SECTION_CONNECTION_COLOUR.intValue);
         crossSectionConnectorPaint.setStrokeWidth(3);
         crossSectionConnectorPaint.setStyle(Paint.Style.STROKE);
-        crossSectionConnectorPaint.setPathEffect(new DashPathEffect(new float[]{3, 2}, 0));
+        crossSectionConnectorPaint.setPathEffect(dashPathEffect);
 
         crossSectionIndicatorPaint.setColor(STATION_COLOUR);
         crossSectionIndicatorPaint.setStrokeWidth(2);
@@ -801,14 +794,10 @@ public class GraphView extends View {
     }
 
     private void drawSurvey(Canvas canvas, Survey survey, Space<Coord2D> projection, int alpha) {
-
         drawSketch(canvas, activity.getSketch(survey), alpha);
-
         drawCrossSections(canvas, sketch.getCrossSectionDetails(), alpha);
-
         drawSurveyData(survey, canvas, projection, alpha);
     }
-
 
     private void drawConnectedSurveys(Canvas canvas, Space<Coord2D> projection, int alpha) {
 
@@ -902,20 +891,18 @@ public class GraphView extends View {
         }
     }
 
-
     private void drawSurveyData(Survey survey, Canvas canvas, Space<Coord2D> space, int alpha) {
-
         drawLegs(canvas, space, alpha);
-
         drawStations(survey, canvas, space, alpha);
     }
-
 
     private void drawCrossSections(
             Canvas canvas, Set<CrossSectionDetail> crossSectionDetails, int alpha) {
 
         boolean showStationLabels =
                 getDisplayPreference(GraphActivity.DisplayPreference.SHOW_STATION_LABELS);
+
+        crossSectionConnectorPaint.setAlpha(alpha);
 
         List<CrossSectionDetail> badXSections = new LinkedList<>();
 
@@ -965,7 +952,7 @@ public class GraphView extends View {
 
             Coord2D viewStationLocation = surveyCoordsToViewCoords(surveyStationLocation);
             drawLineAsPath(
-                    canvas, viewStationLocation, centreOnView, crossSectionConnectorPaint, alpha);
+                    canvas, viewStationLocation, centreOnView, crossSectionConnectorPaint);
         }
 
         for (CrossSectionDetail crossSectionDetail : badXSections) {
@@ -987,8 +974,6 @@ public class GraphView extends View {
         boolean fadingNonActive =
                 getDisplayPreference(GraphActivity.DisplayPreference.FADE_NON_ACTIVE);
 
-        DashPathEffect dashPathEffect = new DashPathEffect(new float[]{3, 2}, 0);
-
         Map<Leg, Line<Coord2D>> legMap = space.getLegMap();
 
         for (Leg leg : legMap.keySet()) {
@@ -1006,7 +991,7 @@ public class GraphView extends View {
                 continue;
             }
 
-            boolean fade = fadingNonActive && !isAttachedToActive(leg);
+            boolean fade = baseAlpha == FADED_ALPHA || (fadingNonActive && !isAttachedToActive(leg));
 
             Paint paint;
             if (!leg.hasDestination()) {
@@ -1018,14 +1003,10 @@ public class GraphView extends View {
             }
 
             if (projectionType.isLegInPlane(leg)) {
-                // TODO(djw): Change to drawLines()
                 canvas.drawLine((float)start.x, (float)start.y, (float)end.x, (float)end.y, paint);
 			} else {
-                // TODO(djw): Create proper paint for dashed path
-                // TODO(djw): No need to pass and set alpha
-                int alpha = fade ? FADED_ALPHA : baseAlpha;
                 paint.setPathEffect(dashPathEffect);
-                drawLineAsPath(canvas, start, end, paint, alpha);
+                drawLineAsPath(canvas, start, end, paint);
                 paint.setStyle(Paint.Style.STROKE);
 			}
         }
@@ -1402,12 +1383,11 @@ public class GraphView extends View {
     /**
      * Drawing as a path is useful in order to apply path effects (buggy when drawing lines)
      */
-    private void drawLineAsPath(Canvas canvas, Coord2D start, Coord2D end, Paint paint, int alpha) {
-        paint.setAlpha(alpha);
-        Path path = new Path();
-        path.moveTo((float)(start.x), (float)(start.y));
-        path.lineTo((float)(end.x), (float)(end.y));
-        canvas.drawPath(path, paint);
+    private void drawLineAsPath(Canvas canvas, Coord2D start, Coord2D end, Paint paint) {
+        dashedPath.reset();
+        dashedPath.moveTo((float)(start.x), (float)(start.y));
+        dashedPath.lineTo((float)(end.x), (float)(end.y));
+        canvas.drawPath(dashedPath, paint);
     }
 
 
