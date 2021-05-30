@@ -97,6 +97,7 @@ public class GraphView extends View {
     private Map<Survey, Space<Coord2D>> translatedConnectedSurveys = new HashMap<>();
 
     // cached for performance
+    private Coord2D canvasBottomRight;
     private Coord2D viewpointTopLeftOnSurvey;
     private Coord2D viewpointBottomRightOnSurvey;
     private double surveyLength = 0;
@@ -742,8 +743,10 @@ public class GraphView extends View {
 
         super.onDraw(canvas);
 
+        canvasBottomRight = new Coord2D(getWidth(), getHeight());
+
         viewpointTopLeftOnSurvey = viewCoordsToSurveyCoords(Coord2D.ORIGIN);
-        viewpointBottomRightOnSurvey = viewCoordsToSurveyCoords(new Coord2D(getWidth(), getHeight()));
+        viewpointBottomRightOnSurvey = viewCoordsToSurveyCoords(canvasBottomRight);
 
         if (getDisplayPreference(GraphActivity.DisplayPreference.SHOW_GRID)) {
             drawGrid(canvas);
@@ -966,7 +969,7 @@ public class GraphView extends View {
             Coord2D start = surveyCoordsToViewCoords(line.getStart());
             Coord2D end = surveyCoordsToViewCoords(line.getEnd());
 
-            if (!isLineOnCanvas(canvas, start, end)) {
+            if (!isLineOnCanvas(start, end)) {
                 continue;
             }
 
@@ -1000,15 +1003,9 @@ public class GraphView extends View {
         return survey.getActiveStation().getOnwardLegs().contains(leg);
     }
 
-    private boolean isLineOnCanvas(Canvas canvas, Coord2D start, Coord2D end) {
-        Point point0 = new Point((int)start.x, (int)start.y);
-        Point point1 = new Point((int)end.x, (int)end.y);
-
-        Point rectangleTopLeft = new Point(0, 0);
-        Point rectangleBottomRight = new Point(canvas.getWidth(), canvas.getHeight());
-
+    private boolean isLineOnCanvas(Coord2D start, Coord2D end) {
         return !CohenSutherlandAlgorithm.whollyOutside(
-                point0, point1, rectangleTopLeft, rectangleBottomRight);
+                start, end, Coord2D.ORIGIN, canvasBottomRight);
     }
 
 

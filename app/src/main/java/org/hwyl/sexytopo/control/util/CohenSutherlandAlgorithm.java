@@ -17,7 +17,7 @@ package org.hwyl.sexytopo.control.util;
  *   only ones actually used here.
  */
 
-import android.graphics.Point;
+import org.hwyl.sexytopo.model.graph.Coord2D;
 
 public class CohenSutherlandAlgorithm
 {
@@ -27,14 +27,14 @@ public class CohenSutherlandAlgorithm
 
 
     /* Determines if line(p1,p2) lies entirely inside rect(cp1,cp2) */
-    public static boolean whollyInside(Point p1, Point p2, Point cp1, Point cp2)
+    public static boolean whollyInside(Coord2D p1, Coord2D p2, Coord2D cp1, Coord2D cp2)
     {
         return ((bitcode(cp1, cp2, p1) | bitcode(cp1, cp2, p2)) == 0);
     }
 
     /* Determines if line(p1,p2) is entirely outside rect(cp1,cp2) */
-    public static boolean whollyOutside(Point p1, Point p2, Point cp1,
-                                        Point cp2)
+    public static boolean whollyOutside(Coord2D p1, Coord2D p2, Coord2D cp1,
+                                        Coord2D cp2)
     {
         int p1code, p2code, icode;
         p1code = bitcode(cp1, cp2, p1);
@@ -55,7 +55,7 @@ public class CohenSutherlandAlgorithm
      * nonzero2) == nonzero3), or if it crosses the clipping rectangle (any
      * other possibility).
      */
-    public static boolean clips(Point p1, Point p2, Point cp1, Point cp2)
+    public static boolean clips(Coord2D p1, Coord2D p2, Coord2D cp1, Coord2D cp2)
     {
         int p1code, p2code, icode;
         boolean r;
@@ -76,14 +76,14 @@ public class CohenSutherlandAlgorithm
     /* Computes the 4-bit code for a point p with respect
      * to line(p1,p2)
      */
-    public static int bitcode(Point p1, Point p2, Point p)
+    public static int bitcode(Coord2D p1, Coord2D p2, Coord2D p)
     {
         return (above(p1, p2, p) | below(p1, p2, p) |
                 left(p1, p2, p) | right(p1, p2, p));
     }
 
     /* Gives the 2**3 bit (point above line(p1,p2)) */
-    public static int above(Point p1, Point p2, Point p)
+    public static int above(Coord2D p1, Coord2D p2, Coord2D p)
     {
         if (p.y < Math.min(p1.y, p2.y))
             return 0x8;
@@ -91,7 +91,7 @@ public class CohenSutherlandAlgorithm
     }
 
     /* Gives the 2**2 bit (point below line(p1,p2)) */
-    public static int below(Point p1, Point p2, Point p)
+    public static int below(Coord2D p1, Coord2D p2, Coord2D p)
     {
         if (p.y > Math.max(p1.y, p2.y))
         {
@@ -101,7 +101,7 @@ public class CohenSutherlandAlgorithm
     }
 
     /* Gives the 2**1 bit (point right of line(p1,p2)) */
-    public static int right(Point p1, Point p2, Point p)
+    public static int right(Coord2D p1, Coord2D p2, Coord2D p)
     {
         if (p.x > Math.max(p1.x, p2.x))
             return 0x2;
@@ -109,7 +109,7 @@ public class CohenSutherlandAlgorithm
     }
 
     /* Gives the 2**0 bit (point left of line(p1,p2)) */
-    public static int left(Point p1, Point p2, Point p)
+    public static int left(Coord2D p1, Coord2D p2, Coord2D p)
     {
         if (p.x < Math.min(p1.x, p2.x))
             return 0x1;
