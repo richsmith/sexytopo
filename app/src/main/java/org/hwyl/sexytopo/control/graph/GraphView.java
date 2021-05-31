@@ -1183,9 +1183,11 @@ public class GraphView extends View {
             return;
         }
 
+        Colour lastColour = Colour.BLACK;
+
+        drawPaint.setColor(lastColour.intValue);
         drawPaint.setAlpha(alpha);
 
-        int lastColour = -1;
         for (PathDetail pathDetail : sketch.getPathDetails()) {
 
             if (!couldBeOnScreen(pathDetail)) {
@@ -1195,9 +1197,9 @@ public class GraphView extends View {
             // Avoiding constantly updating the paint colour saves approx. 10% of sketch draw time.
             // Ideally getPathDetails() would return the paths in colour order but HashSets
             // are unordered collections
-            if (pathDetail.getColour().intValue != lastColour) {
-                lastColour = pathDetail.getColour().intValue;
-                drawPaint.setColor(lastColour);
+            if (pathDetail.getColour() != lastColour) {
+                lastColour = pathDetail.getColour();
+                drawPaint.setColor(lastColour.intValue);
             }
 
             List<Coord2D> path = pathDetail.getPath();
