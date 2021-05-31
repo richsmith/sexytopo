@@ -342,16 +342,17 @@ public class GraphView extends View {
         // return coords.scale(1 / surveyToViewScale).plus(viewpointOffset);
         // ...but this method gets hit hard (profiled) so let's avoid creating intermediate objects:
         return new Coord2D(((coords.x * (1 / surveyToViewScale)) + viewpointOffset.x),
-                ((coords.y * (1 / surveyToViewScale)) + viewpointOffset.y));
+                           ((coords.y * (1 / surveyToViewScale)) + viewpointOffset.y));
     }
 
-
+    // Warning: In tight loops during the draw phase we duplicate this logic to avoid
+    //          creating too many Coord2D objects - be sure to mirror any updates in those places
     private Coord2D surveyCoordsToViewCoords(final Coord2D coords) {
         // The more elegant way to do this is:
         // return coords.minus(viewpointOffset).scale(surveyToViewScale);
         // ...but this method gets hit hard (profiled) so let's avoid creating intermediate objects:
         return new Coord2D(((coords.x - viewpointOffset.x) * surveyToViewScale),
-                ((coords.y - viewpointOffset.y) * surveyToViewScale));
+                           ((coords.y - viewpointOffset.y) * surveyToViewScale));
     }
 
 
@@ -1195,33 +1196,51 @@ public class GraphView extends View {
             return;
         }
 
+        Colour lastColour = Colour.BLACK;
+
+        drawPaint.setColor(lastColour.intValue);
+        drawPaint.setAlpha(alpha);
+
         for (PathDetail pathDetail : sketch.getPathDetails()) {
 
             if (!couldBeOnScreen(pathDetail)) {
                 continue;
             }
 
-            drawPaint.setColor(pathDetail.getColour().intValue);
-            drawPaint.setAlpha(alpha);
+            // Avoiding constantly updating the paint colour saves approx. 10% of sketch draw time.
+            // Ideally getPathDetails() would return the paths in colour order but HashSets
+            // are unordered collections
+            if (pathDetail.getColour() != lastColour) {
+                lastColour = pathDetail.getColour();
+                drawPaint.setColor(lastColour.intValue);
+            }
 
             List<Coord2D> path = pathDetail.getPath();
 
-            Coord2D from = null;
             int lineIndex = 0;
+            float fromX = -1, fromY = -1;
             float[] lines = new float[path.size() * 4];
 
+            // This loop is the slowest part of the draw phase. Pulling out the calculations from
+            // within surveyCoordsToViewCoords saves a not insignificant amount of time by not
+            // constructing many thousands of Coord2D objects (approx. 10% of sketch draw time)
             for (Coord2D point : path) {
-                if (from == null) {
-                    from = surveyCoordsToViewCoords(point);
+                if (fromX == -1) {
+                    //from = surveyCoordsToViewCoords(point);
+                    fromX = (float)((point.x - viewpointOffset.x) * surveyToViewScale);
+                    fromY = (float)((point.y - viewpointOffset.y) * surveyToViewScale);
                 } else {
-                    Coord2D to = surveyCoordsToViewCoords(point);
+                    //Coord2D to = surveyCoordsToViewCoords(point);
+                    float toX = (float)((point.x - viewpointOffset.x) * surveyToViewScale);
+                    float toY = (float)((point.y - viewpointOffset.y) * surveyToViewScale);
 
-                    lines[lineIndex++] = (float)from.x;
-                    lines[lineIndex++] = (float)from.y;
-                    lines[lineIndex++] = (float)to.x;
-                    lines[lineIndex++] = (float)to.y;
+                    lines[lineIndex++] = fromX;
+                    lines[lineIndex++] = fromY;
+                    lines[lineIndex++] = toX;
+                    lines[lineIndex++] = toY;
 
-                    from = to;
+                    fromX = toX;
+                    fromY = toY;
                 }
             }
 
@@ -1229,6 +1248,7 @@ public class GraphView extends View {
         }
 
         labelPaint.setAlpha(alpha);
+
         for (TextDetail textDetail : sketch.getTextDetails()) {
             Coord2D location = surveyCoordsToViewCoords(textDetail.getPosition());
             float x = (float)location.x;
