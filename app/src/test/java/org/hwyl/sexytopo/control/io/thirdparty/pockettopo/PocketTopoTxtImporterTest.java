@@ -6,6 +6,7 @@ import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -60,7 +61,7 @@ public class PocketTopoTxtImporterTest {
     @Test
     public void testParsePolylines() {
         String section = PocketTopoTxtImporter.getSection(FAKE_TEXT, "PLAN");
-        Set<PathDetail> paths = PocketTopoTxtImporter.parsePolylines(section, Coord2D.ORIGIN);
+        List<PathDetail> paths = PocketTopoTxtImporter.parsePolylines(section, Coord2D.ORIGIN);
 
         PathDetail brownPath = null;
         for (PathDetail path : paths) {
