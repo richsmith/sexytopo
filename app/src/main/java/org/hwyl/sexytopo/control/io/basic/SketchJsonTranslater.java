@@ -89,7 +89,7 @@ public class SketchJsonTranslater {
 
         try {
             JSONArray pathsArray = json.getJSONArray(PATHS_TAG);
-            Set<PathDetail> pathDetails = new HashSet<>();
+            List<PathDetail> pathDetails = new ArrayList<>();
             for (JSONObject object : Util.toList(pathsArray)) {
                 pathDetails.add(toPathDetail(object));
             }
@@ -100,7 +100,7 @@ public class SketchJsonTranslater {
 
         try {
             JSONArray symbolsArray = json.getJSONArray(SYMBOLS_TAG);
-            Set<SymbolDetail> symbolDetails = new HashSet<>();
+            List<SymbolDetail> symbolDetails = new ArrayList<>();
             for (JSONObject object : Util.toList(symbolsArray)) {
                 symbolDetails.add(toSymbolDetail(object));
             }
@@ -111,7 +111,7 @@ public class SketchJsonTranslater {
 
         try {
             JSONArray labelsArray = json.getJSONArray(LABELS_TAG);
-            Set<TextDetail> textDetails = new HashSet<>();
+            List<TextDetail> textDetails = new ArrayList<>();
             for (JSONObject object : Util.toList(labelsArray)) {
                 textDetails.add(toTextDetail(object));
             }
@@ -122,7 +122,7 @@ public class SketchJsonTranslater {
 
         try {
             JSONArray crossSectionsArray = json.getJSONArray(CROSS_SECTIONS_TAG);
-            Set<CrossSectionDetail> crossSectionDetails = new HashSet<>();
+            List<CrossSectionDetail> crossSectionDetails = new ArrayList<>();
             for (JSONObject object : Util.toList(crossSectionsArray)) {
                 crossSectionDetails.add(toCrossSectionDetail(survey, object));
             }

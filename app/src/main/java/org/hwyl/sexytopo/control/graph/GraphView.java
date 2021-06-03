@@ -11,7 +11,6 @@ import android.graphics.Canvas;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
@@ -901,7 +900,7 @@ public class GraphView extends View {
     }
 
     private void drawCrossSections(
-            Canvas canvas, Set<CrossSectionDetail> crossSectionDetails, int alpha) {
+            Canvas canvas, List<CrossSectionDetail> crossSectionDetails, int alpha) {
 
         boolean showStationLabels =
                 getDisplayPreference(GraphActivity.DisplayPreference.SHOW_STATION_LABELS);
