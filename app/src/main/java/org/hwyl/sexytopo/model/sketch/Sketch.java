@@ -14,13 +14,13 @@ import java.util.Set;
 
 public class Sketch extends SketchDetail {
 
-    private Set<PathDetail> pathDetails = new HashSet<>();
-    private Set<SymbolDetail> symbolDetails = new HashSet<>();
-    private Set<TextDetail> textDetails = new HashSet<>();
-    private Set<CrossSectionDetail> crossSectionDetails = new HashSet<>();
+    private List<PathDetail> pathDetails = new ArrayList<>();
+    private List<SymbolDetail> symbolDetails = new ArrayList<>();
+    private List<TextDetail> textDetails = new ArrayList<>();
+    private List<CrossSectionDetail> crossSectionDetails = new ArrayList<>();
 
-    private List<SketchDetail> sketchHistory = new ArrayList<>();
-    private List<SketchDetail> undoneHistory = new ArrayList<>();
+    private final List<SketchDetail> sketchHistory = new ArrayList<>();
+    private final List<SketchDetail> undoneHistory = new ArrayList<>();
 
     private PathDetail activePath;
     private Colour activeColour = Colour.BLACK;
@@ -35,23 +35,23 @@ public class Sketch extends SketchDetail {
         this.isSaved = isSaved;
     }
 
-    public void setPathDetails(Set<PathDetail> pathDetails) {
+    public void setPathDetails(List<PathDetail> pathDetails) {
         this.pathDetails = pathDetails;
         recalculateBoundingBox();
     }
 
-    public void setSymbolDetails(Set<SymbolDetail> symbolDetails) {
+    public void setSymbolDetails(List<SymbolDetail> symbolDetails) {
         this.symbolDetails = symbolDetails;
         recalculateBoundingBox();
     }
 
-    public void setTextDetails(Set<TextDetail> textDetails) {
+    public void setTextDetails(List<TextDetail> textDetails) {
         this.textDetails = textDetails;
         recalculateBoundingBox();
     }
 
 
-    public Set<PathDetail> getPathDetails() {
+    public List<PathDetail> getPathDetails() {
         return pathDetails;
     }
 
@@ -90,7 +90,7 @@ public class Sketch extends SketchDetail {
         addSketchDetail(textDetail);
     }
 
-    public Set<SymbolDetail> getSymbolDetails() {
+    public List<SymbolDetail> getSymbolDetails() {
         return symbolDetails;
     }
 
@@ -100,7 +100,7 @@ public class Sketch extends SketchDetail {
         addSketchDetail(symbolDetail);
     }
 
-    public Set<TextDetail> getTextDetails() {
+    public List<TextDetail> getTextDetails() {
         return textDetails;
     }
 
@@ -220,13 +220,12 @@ public class Sketch extends SketchDetail {
     }
 
 
-    private Set<SketchDetail> allSketchDetails() {
-        Set[] allSketchDetailSets = new Set[] {
-                pathDetails, symbolDetails, textDetails, crossSectionDetails};
-        Set<SketchDetail> all = new HashSet<>();
-        for (Set set : allSketchDetailSets) {
-            all.addAll(set);
-        }
+    private List<SketchDetail> allSketchDetails() {
+        List<SketchDetail> all = new ArrayList<>();
+        all.addAll(pathDetails);
+        all.addAll(symbolDetails);
+        all.addAll(textDetails);
+        all.addAll(crossSectionDetails);
         return all;
     }
 
@@ -253,11 +252,11 @@ public class Sketch extends SketchDetail {
         addSketchDetail(sectionDetail);
     }
 
-    public Set<CrossSectionDetail> getCrossSectionDetails() {
+    public List<CrossSectionDetail> getCrossSectionDetails() {
         return crossSectionDetails;
     }
 
-    public void setCrossSectionDetails(Set<CrossSectionDetail> crossSectionDetails) {
+    public void setCrossSectionDetails(List<CrossSectionDetail> crossSectionDetails) {
         this.crossSectionDetails = crossSectionDetails;
     }
 
@@ -276,25 +275,25 @@ public class Sketch extends SketchDetail {
     public Sketch getTranslatedCopy(Coord2D point) {
         Sketch sketch = new Sketch();
 
-        Set<PathDetail> newPathDetails = new HashSet<>();
+        List<PathDetail> newPathDetails = new ArrayList<>();
         for (PathDetail pathDetail : pathDetails) {
             newPathDetails.add(pathDetail.translate(point));
         }
         sketch.setPathDetails(newPathDetails);
 
-        Set<SymbolDetail> newSymbolDetails = new HashSet<>();
+        List<SymbolDetail> newSymbolDetails = new ArrayList<>();
         for (SymbolDetail symbolDetail : symbolDetails) {
             newSymbolDetails.add(symbolDetail.translate(point));
         }
         sketch.setSymbolDetails(newSymbolDetails);
 
-        Set<TextDetail> newTextDetails = new HashSet<>();
+        List<TextDetail> newTextDetails = new ArrayList<>();
         for (TextDetail textDetail : textDetails) {
             newTextDetails.add(textDetail.translate(point));
         }
         sketch.setTextDetails(newTextDetails);
 
-        Set<CrossSectionDetail> newCrossSectionDetails = new HashSet<>();
+        List<CrossSectionDetail> newCrossSectionDetails = new ArrayList<>();
         for (CrossSectionDetail crossSectionDetail : crossSectionDetails) {
             newCrossSectionDetails.add(crossSectionDetail.translate(point));
         }

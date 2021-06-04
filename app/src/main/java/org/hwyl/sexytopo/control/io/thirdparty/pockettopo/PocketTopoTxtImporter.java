@@ -16,6 +16,7 @@ import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -112,7 +113,7 @@ public class PocketTopoTxtImporter extends Importer {
     private static Sketch parseSketch(Survey survey, String text, Space<Coord2D> projection) {
         Sketch sketch = new Sketch();
         Coord2D offset = extractOffset(survey, text, projection);
-        Set<PathDetail> pathDetails = parsePolylines(text, offset);
+        List<PathDetail> pathDetails = parsePolylines(text, offset);
         sketch.setPathDetails(pathDetails);
         return sketch;
     }
@@ -203,8 +204,8 @@ public class PocketTopoTxtImporter extends Importer {
         return TextTools.join("\n", subSection);
     }
 
-    public static Set<PathDetail> parsePolylines(String text, Coord2D offset) {
-        Set<PathDetail> paths = new HashSet<>();
+    public static List<PathDetail> parsePolylines(String text, Coord2D offset) {
+        List<PathDetail> paths = new ArrayList<>();
         boolean inPolyline = false;
         Colour currentPathColour = null;
         PathDetail currentPathDetail = null;

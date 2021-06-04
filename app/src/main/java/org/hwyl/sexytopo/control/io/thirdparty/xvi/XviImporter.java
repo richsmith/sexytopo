@@ -41,7 +41,7 @@ public class XviImporter extends Importer {
         Grid grid = instance.parseGrid(contents);
         double scale = grid.dy;
 
-        Set<PathDetail> pathDetails = parseSketchlineBlock(scale, contents);
+        List<PathDetail> pathDetails = parseSketchlineBlock(scale, contents);
         sketch.setPathDetails(pathDetails);
 
         return sketch;
@@ -70,10 +70,10 @@ public class XviImporter extends Importer {
     }
 
 
-    public static Set<PathDetail> parseSketchlineBlock(double scale, String contents) throws Exception {
+    public static List<PathDetail> parseSketchlineBlock(double scale, String contents) throws Exception {
         String sketchBlock = getBlockContents(contents, SKETCHLINE_COMMAND);
         List<String> entries = parseBlockEntries(sketchBlock);
-        Set<PathDetail> pathDetails = new HashSet<>();
+        List<PathDetail> pathDetails = new ArrayList<>();
         for (String entry : entries) {
             PathDetail pathDetail = parseSketchEntry(scale, entry);
             pathDetails.add(pathDetail);
