@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.comms;
 
+import org.hwyl.sexytopo.comms.distox.MeasurementProtocol;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.junit.Assert;
 import org.junit.Test;

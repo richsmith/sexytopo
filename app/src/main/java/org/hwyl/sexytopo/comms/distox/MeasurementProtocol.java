@@ -1,11 +1,11 @@
-package org.hwyl.sexytopo.comms;
+package org.hwyl.sexytopo.comms.distox;
 
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
-import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
 import org.hwyl.sexytopo.model.survey.Leg;
 
 import java.io.DataInputStream;
@@ -20,7 +20,7 @@ public class MeasurementProtocol extends DistoXProtocol {
     private static final int AZIMUTH_HIGH_BYTE = 4;
     private static final int INCLINATION_LOW_BYTE = 5;
     private static final int INCLINATION_HIGH_BYTE = 6;
-    private static final int ROLL_ANGLE_HIGH_BYTE = 7;
+    // private static final int ROLL_ANGLE_HIGH_BYTE = 7; // currently not used
 
     public static final int DISTANCE_BIT_MASK = 0b01000000;
 
@@ -30,8 +30,8 @@ public class MeasurementProtocol extends DistoXProtocol {
     protected int duplicateCount = 0;
 
     public MeasurementProtocol(
-            SexyTopoActivity activity, BluetoothDevice bluetoothDevice, SurveyManager dataManager) {
-        super(activity, bluetoothDevice, dataManager);
+            Context context, BluetoothDevice bluetoothDevice, SurveyManager dataManager) {
+        super(context, bluetoothDevice, dataManager);
     }
 
 
@@ -59,7 +59,7 @@ public class MeasurementProtocol extends DistoXProtocol {
 
     public void go(DataInputStream inStream, DataOutputStream outStream) throws Exception {
 
-        Log.device(activity.getString(R.string.device_log_ready_for_measurements));
+        Log.device(context.getString(R.string.device_log_ready_for_measurements));
 
         byte[] packet = readPacket(inStream);
         acknowledge(outStream, packet);
@@ -69,7 +69,7 @@ public class MeasurementProtocol extends DistoXProtocol {
                 Log.device("(Duplicated measurement #" + ++duplicateCount + ")");
             } else {
                 duplicateCount = 0;
-                Log.device(activity.getString(R.string.device_log_received));
+                Log.device(context.getString(R.string.device_log_received));
                 Leg leg = parseDataPacket(packet);
                 dataManager.updateSurvey(leg);
             }

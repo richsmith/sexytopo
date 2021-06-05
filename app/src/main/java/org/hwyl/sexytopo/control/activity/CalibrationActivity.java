@@ -4,13 +4,11 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.text.Editable;
 import android.util.Pair;
 import android.view.View;
@@ -23,10 +21,10 @@ import android.widget.TextView;
 import org.apache.commons.lang3.ArrayUtils;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
-import org.hwyl.sexytopo.comms.DistoXCommunicator;
-import org.hwyl.sexytopo.comms.WriteCalibrationProtocol;
+import org.hwyl.sexytopo.comms.Communicator;
+import org.hwyl.sexytopo.comms.distox.DistoXCommunicator;
+import org.hwyl.sexytopo.comms.distox.WriteCalibrationProtocol;
 import org.hwyl.sexytopo.control.Log;
-import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.calibration.CalibrationCalculator;
 import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.control.io.basic.CalibrationJsonTranslater;
@@ -41,6 +39,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 
 public class CalibrationActivity extends SexyTopoActivity {
@@ -129,8 +129,6 @@ public class CalibrationActivity extends SexyTopoActivity {
         LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
         broadcastManager.registerReceiver(updatedCalibrationReceiver,
                 new IntentFilter(SexyTopo.CALIBRATION_UPDATED_EVENT));
-
-        dataManager = SurveyManager.getInstance(this.getApplicationContext());
     }
 
     @Override
@@ -140,7 +138,7 @@ public class CalibrationActivity extends SexyTopoActivity {
     }
 
     private void syncWithReadings() {
-        calibrationReadings = dataManager.getCalibrationReadings();
+        calibrationReadings = getSurveyManager().getCalibrationReadings();
         updateFields();
         updateState();
     }
@@ -255,8 +253,7 @@ public class CalibrationActivity extends SexyTopoActivity {
         Log.device("Start calibration requested");
 
         try {
-            requestComms().startCalibration();
-
+            getComms().startCalibration();
             state = State.CALIBRATING;
         } catch (Exception exception) {
             state = State.READY;
@@ -271,7 +268,7 @@ public class CalibrationActivity extends SexyTopoActivity {
     public void requestStopCalibration(View view) {
         Log.device("Stop calibration requested");
         try {
-            requestComms().stopCalibration();
+            getComms().stopCalibration();
         } catch (Exception exception) {
             showException(exception);
         }
@@ -298,31 +295,27 @@ public class CalibrationActivity extends SexyTopoActivity {
         new AlertDialog.Builder(this)
             .setTitle(getString(R.string.calibration_assessment))
             .setMessage(message)
-            .setPositiveButton(getString(R.string.calibration_update), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    try {
-                        byte[] coeffs = calibrationCalculator.getCoefficients();
-                        Byte[] coefficients = ArrayUtils.toObject(coeffs);
-                        new WriteCalibrationTask(view).execute(coefficients);
-                    } catch (Exception exception) {
-                        showException(exception);
-                    } finally {
-                        updateState();
-                    }
+            .setPositiveButton(getString(R.string.calibration_update), (dialog, whichButton) -> {
+                try {
+                    byte[] coeffs = calibrationCalculator.getCoefficients();
+                    Byte[] coefficients = ArrayUtils.toObject(coeffs);
+                    new WriteCalibrationTask(view).execute(coefficients);
+                } catch (Exception exception) {
+                    showException(exception);
+                } finally {
+                    updateState();
                 }
             }).setNegativeButton(getString(R.string.cancel),
-            new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
+                (dialog, whichButton) -> {
                     // Do nothing.
-                }
-            }).show();
+                }).show();
 
 
     }
 
 
     public void requestDeleteLast(View view) {
-        dataManager.deleteLastCalibrationReading();
+        getSurveyManager().deleteLastCalibrationReading();
         syncWithReadings();
     }
 
@@ -330,16 +323,12 @@ public class CalibrationActivity extends SexyTopoActivity {
     public void requestClearCalibration(View view) {
         new AlertDialog.Builder(this)
             .setTitle(getString(R.string.dialog_confirm_clear_title))
-            .setPositiveButton(getString(R.string.clear), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    dataManager.clearCalibrationReadings();
-                    syncWithReadings();
-                }
-            }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    // Do nothing.
-                }
-        }).show();
+            .setPositiveButton(getString(R.string.clear), (dialog, whichButton) -> {
+                getSurveyManager().clearCalibrationReadings();
+                syncWithReadings();
+            }).setNegativeButton(getString(R.string.cancel), (dialog, whichButton) -> {
+                // Do nothing.
+            }).show();
     }
 
 
@@ -351,21 +340,17 @@ public class CalibrationActivity extends SexyTopoActivity {
         new AlertDialog.Builder(this)
             .setTitle(getString(R.string.dialog_save_as_title))
             .setView(input)
-            .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    Editable value = input.getText();
-                    String name = value.toString();
-                    try {
-                        saveCalibration(name);
-                    } catch (Exception exception) {
-                        showException(exception);
-                    }
+            .setPositiveButton(getString(R.string.ok), (dialog, whichButton) -> {
+                Editable value = input.getText();
+                String name = value.toString();
+                try {
+                    saveCalibration(name);
+                } catch (Exception exception) {
+                    showException(exception);
                 }
-            }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-        public void onClick(DialogInterface dialog, int whichButton) {
-            // Do nothing.
-            }
-        }).show();
+            }).setNegativeButton(getString(R.string.cancel), (dialog, whichButton) -> {
+                // Do nothing.
+                }).show();
     }
 
 
@@ -398,25 +383,15 @@ public class CalibrationActivity extends SexyTopoActivity {
         }
 
         builderSingle.setNegativeButton(getString(R.string.cancel),
-                new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+                (dialog, which) -> dialog.dismiss());
 
         builderSingle.setAdapter(arrayAdapter,
-                new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        try {
-                            String filename = arrayAdapter.getItem(which);
-                            loadCalibration(filename);
-                        } catch (Exception exception) {
-                            showException(exception);
-                        }
+                (dialog, which) -> {
+                    try {
+                        String filename = arrayAdapter.getItem(which);
+                        loadCalibration(filename);
+                    } catch (Exception exception) {
+                        showException(exception);
                     }
                 });
         builderSingle.show();
@@ -428,7 +403,7 @@ public class CalibrationActivity extends SexyTopoActivity {
         String content = Loader.slurpFile(new File(path));
         List<CalibrationReading> calibrationReadings =
                 CalibrationJsonTranslater.toCalibrationReadings(content);
-        dataManager.setCalibrationReadings(calibrationReadings);
+        getSurveyManager().setCalibrationReadings(calibrationReadings);
         syncWithReadings();
     }
 
@@ -444,22 +419,39 @@ public class CalibrationActivity extends SexyTopoActivity {
 
         String pref = getStringPreference("pref_calibration_algorithm");
 
-        switch(pref) {
-            case "Auto":
-                return requestComms().doesCurrentDistoPreferNonLinearCalibration();
-            case "Non-Linear":
-                return true;
-            case "Linear":
-                return false;
-            default: // shouldn't get here but linear is safer as default?
-                return false;
+        boolean useNonLinear = false; // linear probably safer as default
+
+        try {
+            switch (pref) {
+                case "Auto":
+                    useNonLinear = getComms().doesCurrentDistoPreferNonLinearCalibration();
+                    break;
+                case "Non-Linear":
+                    useNonLinear = true;
+                    break;
+                case "Linear":
+                    useNonLinear = false;
+            }
+        } catch (Exception exception) {
+            // e.g. if disto not connected - just return false and deal with issues elsewhere
+        }
+
+        return useNonLinear;
+    }
+
+    private DistoXCommunicator getComms() throws NotConnectedToDistoException {
+        Communicator communicator = requestComms();
+        if (communicator instanceof DistoXCommunicator) {
+            return (DistoXCommunicator) communicator;
+        } else {
+            throw new NotConnectedToDistoException();
         }
     }
 
 
     private class WriteCalibrationTask extends AsyncTask<Byte, Void, Boolean> {
 
-        private ProgressDialog progressDialog;
+        private final ProgressDialog progressDialog;
 
         private WriteCalibrationTask(View view) {
             progressDialog = new ProgressDialog(view.getContext(), ProgressDialog.STYLE_SPINNER);
@@ -473,16 +465,22 @@ public class CalibrationActivity extends SexyTopoActivity {
         @Override
         protected Boolean doInBackground(Byte... coefficients) {
 
-            byte[] coeffs = ArrayUtils.toPrimitive(coefficients);
-            DistoXCommunicator comms = requestComms();
-            WriteCalibrationProtocol writeCalibrationProtocol = comms.writeCalibration(coeffs);
-            waitForEnd(writeCalibrationProtocol, 60);
-            if (!writeCalibrationProtocol.isFinished()) {
-                Log.device("Disto busy; forcing disconnect to write calibration");
-                comms.disconnect(); // force it to stop what it's doing
-                waitForEnd(writeCalibrationProtocol, 80);
+            try {
+                byte[] coeffs = ArrayUtils.toPrimitive(coefficients);
+                DistoXCommunicator comms = getComms();
+                WriteCalibrationProtocol writeCalibrationProtocol = comms.writeCalibration(coeffs);
+                waitForEnd(writeCalibrationProtocol, 60);
+                if (!writeCalibrationProtocol.isFinished()) {
+                    Log.device("Disto busy; forcing disconnect to write calibration");
+                    comms.requestDisconnect(); // force it to stop what it's doing
+                    waitForEnd(writeCalibrationProtocol, 80);
+                }
+                return writeCalibrationProtocol.wasSuccessful();
+
+            } catch (NotConnectedToDistoException exception) {
+                showException(exception);
+                return false;
             }
-            return writeCalibrationProtocol.wasSuccessful();
         }
 
 
@@ -515,5 +513,9 @@ public class CalibrationActivity extends SexyTopoActivity {
             }
             updateState();
         }
+    }
+
+    public class NotConnectedToDistoException extends Exception {
+
     }
 }

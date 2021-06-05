@@ -17,6 +17,7 @@ import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -26,7 +27,9 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
-import org.hwyl.sexytopo.comms.DistoXCommunicator;
+import org.hwyl.sexytopo.comms.Communicator;
+import org.hwyl.sexytopo.comms.Instrument;
+import org.hwyl.sexytopo.comms.missing.NullCommunicator;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.io.Util;
@@ -51,6 +54,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -62,9 +66,11 @@ import androidx.core.content.ContextCompat;
 public abstract class SexyTopoActivity extends AppCompatActivity {
 
 
+    @SuppressLint("StaticFieldLeak")
     protected static SurveyManager dataManager;
 
-    private static DistoXCommunicator comms;
+    private static Instrument instrument = Instrument.OTHER;
+    private static Communicator comms = NullCommunicator.getInstance();
 
     protected static boolean hasStarted = false;
 
@@ -99,6 +105,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         setOrientation();
+
     }
 
     @Override
@@ -113,16 +120,39 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+
+        // update Instruments menu with any additional options
+        // //provided by the connected Instrument's Communicator
+        MenuItem item = menu.findItem(R.id.action_device_menu);
+        SubMenu subMenu = item.getSubMenu();
+        MenuItem connections = menu.findItem(R.id.action_device_connect);
+        subMenu.clear();
+        subMenu.add(Menu.NONE, R.id.action_device_connect,
+                0, getString(R.string.action_device_connect));
+        Map<Integer, String> commands = requestComms().getCustomCommands();
+        for (Map.Entry<Integer, String> entry: commands.entrySet()) {
+            int id = entry.getKey();
+            String name = entry.getValue();
+            subMenu.add(Menu.NONE, id, 0, name);
+        }
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()) {
+        int itemId = item.getItemId();
+
+        switch (itemId) {
 
             case R.id.action_save:
                 saveSurvey();
                 return true;
-            case R.id.action_device:
+            case R.id.action_device_connect:
                 startActivity(DeviceActivity.class);
                 return true;
             case R.id.action_table:
@@ -136,9 +166,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 return true;
             case R.id.action_survey:
                 startActivity(StatsActivity.class);
-                return true;
-            case R.id.action_calibration:
-                startActivity(CalibrationActivity.class);
                 return true;
             case R.id.action_trip:
                 startActivity(TripActivity.class);
@@ -203,17 +230,17 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             case R.id.action_generate_test_survey:
                 generateTestSurvey();
                 return true;
-            case R.id.action_kill_connection:
-                killConnection();
-                return true;
             case R.id.action_force_crash:
                 forceCrash();
                 return true;
 
-
-
             default:
-                return super.onOptionsItemSelected(item);
+                boolean handled = requestComms().handleCustomCommand(itemId);
+                if (handled) {
+                    return true;
+                } else {
+                    return super.onOptionsItemSelected(item);
+                }
         }
 
     }
@@ -221,7 +248,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         if (! Util.isExternalStorageWriteable(this)) {
             showSimpleToast(R.string.external_storage_unwriteable);
         }
@@ -257,12 +285,27 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
 
-    protected DistoXCommunicator requestComms() {
-        return requestComms(DistoXCommunicator.Protocol.NULL);
+    protected Instrument getInstrument() {
+        return instrument;
+    }
+
+    protected void setInstrument(Instrument instrument) {
+        SexyTopoActivity.instrument = instrument;
     }
 
 
-    protected DistoXCommunicator requestComms(DistoXCommunicator.Protocol protocol) {
+    protected Communicator requestComms() {
+        //return requestComms(DistoXCommunicator.Protocol.NULL);
+        return comms;
+    }
+
+    protected void setComms(Communicator communicator) {
+        SexyTopoActivity.comms = communicator;
+    }
+
+
+    /*
+    protected Communicator requestComms(DistoXCommunicator.Protocol protocol) {
 
         if (comms == null || comms.getState() == Thread.State.TERMINATED) {
             comms = new DistoXCommunicator(this, dataManager);
@@ -276,7 +319,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
        }
 
        return comms;
-    }
+    }*/
 
     private void openAboutDialog() {
         View messageView = getLayoutInflater().inflate(R.layout.about_dialog, null, false);
@@ -624,7 +667,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             Survey survey = getSurvey();
 
             Set<SurveyConnection> linked = survey.getConnectedSurveys().get(station);
-            if (linked.size() < 1) {
+            if (linked == null || linked.size() < 1) {
                 throw new Exception("Can't find any surveys to unlink");
             } else if (linked.size() == 1) {
                 SurveyConnection onlyConnection = linked.iterator().next();
@@ -984,18 +1027,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     }
 
-
-    @SuppressLint("deprecated")
-    private void killConnection() {
-        try {
-            showSimpleToast(R.string.killing_comms_process);
-            comms.stop();
-        } catch (Exception e) {
-            Log.e("problem when trying to kill connection: " + e);
-        }
-    }
-
-
     private void forceCrash() {
         throw new RuntimeException("Boom! Forced crash requested(!)");
     }
@@ -1047,6 +1078,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         return preferences.getString(name, "");
     }
 
+    @SuppressLint("SourceLockedOrientationActivity")
     private void setOrientation() {
         String orientationPreference = getStringPreference("pref_orientation");
 
@@ -1060,7 +1092,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
 
-    public void jumpToStation(Station station, Class clazz) {
+    public void jumpToStation(Station station, Class<? extends SexyTopoActivity> clazz) {
         Intent intent = new Intent(this, clazz);
         Bundle bundle = new Bundle();
         bundle.putString(SexyTopo.JUMP_TO_STATION, station.getName());

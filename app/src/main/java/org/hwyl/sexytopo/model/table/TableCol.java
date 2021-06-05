@@ -9,7 +9,7 @@ public enum TableCol {
 
     FROM(R.id.tableRowFrom, "From", "%s"),
     TO(R.id.tableRowTo, "To", "%s"),
-    DISTANCE(R.id.tableRowDistance, "Distance", "%.3f"),
+    DISTANCE(R.id.tableRowDistance, "Distance", "%.2f"),
     AZIMUTH(R.id.tableRowAzimuth, "Azimuth", "%.2f"),
     INCLINATION(R.id.tableRowInclination, "Inclination", "%.2f"),
     COMMENT(-1, "Comment", "%s");

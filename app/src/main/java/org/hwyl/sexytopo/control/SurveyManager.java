@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.widget.Toast;
 
 import org.hwyl.sexytopo.SexyTopo;
@@ -18,6 +17,8 @@ import org.hwyl.sexytopo.model.survey.Survey;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 
 public class SurveyManager {
@@ -63,7 +64,7 @@ public class SurveyManager {
             broadcastSurveyUpdated();
 
             if (stationAdded) {
-                Log.d("New station added");
+                Log.i("New station added");
                 broadcastNewStationCreated();
             }
 

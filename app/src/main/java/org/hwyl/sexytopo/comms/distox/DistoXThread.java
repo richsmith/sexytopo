@@ -1,12 +1,11 @@
 
-package org.hwyl.sexytopo.comms;
+package org.hwyl.sexytopo.comms.distox;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.comms.SerialSocket;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
@@ -17,12 +16,12 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.hwyl.sexytopo.comms.DistoXProtocol.WAIT_BETWEEN_CONNECTION_ATTEMPTS_MS;
+import static org.hwyl.sexytopo.comms.distox.DistoXProtocol.WAIT_BETWEEN_CONNECTION_ATTEMPTS_MS;
 import static org.hwyl.sexytopo.control.activity.DeviceActivity.DISTO_X_PREFIX;
 import static org.hwyl.sexytopo.control.activity.DeviceActivity.SHETLAND_PREFIX;
 
 
-public class DistoXCommunicator extends Thread {
+public class DistoXThread extends Thread {
 
     public enum Protocol {
         NULL,
@@ -30,16 +29,6 @@ public class DistoXCommunicator extends Thread {
         CALIBRATION
     }
 
-    public enum DistoXType {
-        A3(false),
-        X310(true);
-
-        public final boolean preferNonLinearCalibration;
-
-        DistoXType(boolean preferNonLinearCalibration) {
-            this.preferNonLinearCalibration = preferNonLinearCalibration;
-        }
-    }
 
     private DistoXProtocol currentProtocol = NullProtocol.INSTANCE;
     private DistoXProtocol requestedProtocol = null;
@@ -52,15 +41,15 @@ public class DistoXCommunicator extends Thread {
     private DataInputStream inStream = null;
     private DataOutputStream outStream = null;
 
-    private SurveyManager dataManager;
-    private SexyTopoActivity activity;
+    private final SurveyManager dataManager;
+    private final SexyTopoActivity activity;
 
     private boolean keepAlive;
 
 
-    public DistoXCommunicator(SexyTopoActivity activity, SurveyManager dataManager) {
+    public DistoXThread(SexyTopoActivity activity) {
         this.activity = activity;
-        this.dataManager = dataManager;
+        this.dataManager = activity.getSurveyManager();
     }
 
 
@@ -91,7 +80,7 @@ public class DistoXCommunicator extends Thread {
 
     public void startCalibration() {
         setProtocol(Protocol.NULL);
-        disconnect(); // need to interrupt any reads in progress or we'll be waiting forever
+        requestDisconnect(); // need to interrupt any reads in progress or we'll be waiting forever
         DistoXProtocol startCalibration =
                 new StartCalibrationProtocol(activity, bluetoothDevice, dataManager);
         oneOff(startCalibration);
@@ -101,7 +90,7 @@ public class DistoXCommunicator extends Thread {
 
     public void stopCalibration() {
         setProtocol(Protocol.NULL);
-        disconnect(); // need to interrupt any reads in progress or we'll be waiting forever
+        requestDisconnect(); // need to interrupt any reads in progress or we'll be waiting forever
         DistoXProtocol stopCalibration =
                 new StopCalibrationProtocol(activity, bluetoothDevice, dataManager);
         oneOff(stopCalibration);
@@ -111,7 +100,7 @@ public class DistoXCommunicator extends Thread {
 
     public WriteCalibrationProtocol writeCalibration(byte[] coeff) {
         setProtocol(Protocol.NULL);
-        disconnect(); // need to interrupt any reads in progress or we'll be waiting forever
+        requestDisconnect(); // need to interrupt any reads in progress or we'll be waiting forever
         WriteCalibrationProtocol writeCalibration =
                 new WriteCalibrationProtocol(activity, bluetoothDevice, dataManager);
         writeCalibration.setCoeffToWrite(coeff);
@@ -120,11 +109,6 @@ public class DistoXCommunicator extends Thread {
         return writeCalibration;
     }
 
-
-    @Override
-    public void start() {
-        super.start();
-    }
 
 
     public void requestStart(Protocol protocol) {
@@ -180,7 +164,7 @@ public class DistoXCommunicator extends Thread {
             // ignore any errors; they are expected if the socket has been closed
         }
 
-        disconnect();
+        requestDisconnect();
     }
 
 
@@ -194,16 +178,16 @@ public class DistoXCommunicator extends Thread {
         } catch(IOException e){
             if (e.getMessage().toLowerCase().contains("bt socket closed")) {
                 // this is common; probably don't need to bother the user with this..
-                disconnect();
+                requestDisconnect();
             } else {
                 Log.device("Communication error: " + e.getMessage());
-                disconnect();
+                requestDisconnect();
             }
 
         } catch(Exception exception){
             Log.e(exception);
             Log.device("General device error: " + exception);
-            disconnect();
+            requestDisconnect();
         }
     }
 
@@ -224,7 +208,6 @@ public class DistoXCommunicator extends Thread {
                 } catch (InterruptedException exception) {
                     break;
                 }
-                continue;
             }
         }
 
@@ -253,7 +236,7 @@ public class DistoXCommunicator extends Thread {
     }
 
 
-    public void disconnect() {
+    public void requestDisconnect() {
         try {
             if (socket != null && socket.isConnected()) {
                 socket.close();
@@ -301,18 +284,6 @@ public class DistoXCommunicator extends Thread {
     private static boolean isShetland(BluetoothDevice device) {
         String name = device.getName();
         return name.toLowerCase().contains(SHETLAND_PREFIX.toLowerCase());
-    }
-
-
-    public boolean doesCurrentDistoPreferNonLinearCalibration() {
-        String name = bluetoothDevice.getName();
-        if (name.startsWith("DistoX-")) {
-            return DistoXType.X310.preferNonLinearCalibration;
-        } else if (name.startsWith("DistoX")) {
-            return DistoXType.A3.preferNonLinearCalibration;
-        } else {
-            return false; // shouldn't get here but linear is safer as default?
-        }
     }
 
 

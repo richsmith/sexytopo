@@ -36,6 +36,14 @@
 
         </menu>
     </item>
+    <item android:id="@+id/action_device_menu"
+        android:title="@string/action_device"
+        app:showAsAction="never">
+        <menu>
+            <item android:id="@+id/action_device_connect"
+                android:title="@string/action_device_connect"/>
+        </menu>
+    </item>
     <item android:id="@+id/action_input"
           android:title="@string/action_input"
           app:showAsAction="never">
@@ -72,19 +80,9 @@
     <item android:id="@+id/action_trip"
           android:title="@string/action_trip"
           app:showAsAction="never"/>
-    <item android:id="@+id/action_device"
-        android:title="@string/action_device"
-        android:orderInCategory="100"
-        android:visible="true"
-        app:showAsAction="never" />
-    <item android:id="@+id/action_calibration"
-        android:title="@string/action_calibration"
-        android:orderInCategory="100"
-        android:visible="true"
-        app:showAsAction="never" />
     <item android:id="@+id/dev_menu"
           android:title="@string/action_dev"
-          android:visible="true"
+          android:visible="false"
           android:orderInCategory="100"
           app:showAsAction="never">
         <menu>

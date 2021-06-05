@@ -21,6 +21,8 @@ public class Leg extends SurveyComponent {
 
     private final static Leg[] NO_LEGS = new Leg[]{};
 
+    public final static Leg EMPTY_LEG = new Leg(0, 0, 0);
+
     public Leg(double distance,
                double azimuth,
                double inclination) {

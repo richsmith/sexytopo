@@ -20,6 +20,11 @@ android {
         }
     }
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     testOptions {
         unitTests.returnDefaultValues = true
     }
@@ -44,5 +49,6 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.8.1'
     implementation 'com.google.firebase:firebase-analytics:19.0.0'
     implementation 'com.google.firebase:firebase-crashlytics:18.0.0'
+    implementation 'no.nordicsemi.android:ble:2.2.4'
 }
 
