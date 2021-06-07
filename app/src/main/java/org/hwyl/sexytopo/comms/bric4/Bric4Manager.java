@@ -27,6 +27,34 @@ import no.nordicsemi.android.ble.data.Data;
  */
 public class Bric4Manager extends BleManager {
 
+    public enum CustomCommand {
+        SCAN("scan"),
+        TAKE_SHOT("shot"),
+        LASER_TOGGLE("laser"),
+        POWER_OFF("power off"),
+        CLEAR_MEMORY("clear memory");
+
+        private final String commandString;
+
+        CustomCommand(String commandString) {
+            this.commandString = commandString;
+        }
+
+        public String getCommandString() {
+            return commandString;
+        }
+
+    }
+
+    public void sendCustomCommand(CustomCommand command) {
+        String commandString = command.getCommandString();
+        byte[] bytes = commandString.getBytes(); // { (byte)0x6c, (byte)0x61, (byte)0x73, (byte)0x65, (byte)0x72 };
+        writeCharacteristic(deviceControlCharacteristic, bytes)
+                .done(device -> Log.device("Command sent: " + commandString))
+                .enqueue();
+    }
+
+
     final static UUID DEVICE_INFORMATION_SERVICE_UUID =
             UUID.fromString("0000180A-0000-1000-8000-00805f9b34fb");
 
@@ -41,14 +69,21 @@ public class Bric4Manager extends BleManager {
             UUID.fromString("000058d2-0000-1000-8000-00805f9b34fb");
     final static UUID MEASUREMENT_ERRORS_CHARACTERISTIC_UUID =
             UUID.fromString("000058d3-0000-1000-8000-00805f9b34fb");
+    final static UUID LAST_TIME_CHARACTERISTIC_UUID =
+            UUID.fromString("000058d3-0000-1000-8000-00805f9b34fb");
 
     final static UUID DEVICE_CONTROL_SERVICE_UUID =
-            UUID.fromString("000058E0-0000-1000-8000-00805f9b34fb");
+            UUID.fromString("000058e0-0000-1000-8000-00805f9b34fb");
+    final static UUID DEVICE_CONTROL_CHARACTERISTIC_UUID =
+            UUID.fromString("000058e1-0000-1000-8000-00805f9b34fb");
 
     // Client characteristics
     private BluetoothGattCharacteristic measurementPrimaryCharacteristic;
     private BluetoothGattCharacteristic measurementMetadataCharacteristic;
     private BluetoothGattCharacteristic measurementErrorsCharacteristic;
+    private BluetoothGattCharacteristic lastTimeCharacteristic;
+    private BluetoothGattCharacteristic deviceControlCharacteristic;
+
 
     private final SurveyManager dataManager;
 
@@ -75,14 +110,24 @@ public class Bric4Manager extends BleManager {
         // Return true if all required services are found, false otherwise.
         @Override
         public boolean isRequiredServiceSupported(@NonNull final BluetoothGatt gatt) {
-            final BluetoothGattService service = gatt.getService(MEASUREMENT_SYNC_SERVICE_UUID);
-            if (service != null) {
-                measurementPrimaryCharacteristic = service.getCharacteristic(
+            final BluetoothGattService measurementService =
+                    gatt.getService(MEASUREMENT_SYNC_SERVICE_UUID);
+            if (measurementService != null) {
+                measurementPrimaryCharacteristic = measurementService.getCharacteristic(
                         MEASUREMENT_PRIMARY_CHARACTERISTIC_UUID);
-                measurementMetadataCharacteristic = service.getCharacteristic(
+                measurementMetadataCharacteristic = measurementService.getCharacteristic(
                         MEASUREMENT_METADATA_CHARACTERISTIC_UUID);
-                measurementErrorsCharacteristic = service.getCharacteristic(
+                measurementErrorsCharacteristic = measurementService.getCharacteristic(
                         MEASUREMENT_ERRORS_CHARACTERISTIC_UUID);
+                lastTimeCharacteristic = measurementService.getCharacteristic(
+                        LAST_TIME_CHARACTERISTIC_UUID);
+            }
+
+            final BluetoothGattService controlService =
+                    gatt.getService(DEVICE_CONTROL_SERVICE_UUID);
+            if (controlService != null) {
+                deviceControlCharacteristic = controlService.getCharacteristic(
+                        DEVICE_CONTROL_CHARACTERISTIC_UUID);
             }
 
             /*
@@ -268,9 +313,6 @@ public class Bric4Manager extends BleManager {
 
             Log.device("invalid data received from " + device.getName() + ": " + data);
         }
-
-
-
 
     }
 }

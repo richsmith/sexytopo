@@ -1,10 +1,10 @@
 package org.hwyl.sexytopo.comms.distox;
 
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
-import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
 import org.hwyl.sexytopo.model.calibration.CalibrationReading;
 
 import java.io.DataInputStream;
@@ -14,31 +14,31 @@ import java.io.IOException;
 
 public class CalibrationProtocol extends DistoXProtocol {
 
-    public static final int ACCELERATION_ADMIN = 0;
+    // public static final int ACCELERATION_ADMIN = 0;
     public static final int ACCELERATION_GX_LOW_BYTE = 1;
     public static final int ACCELERATION_GX_HIGH_BYTE = 2;
     public static final int ACCELERATION_GY_LOW_BYTE = 3;
     public static final int ACCELERATION_GY_HIGH_BYTE = 4;
     public static final int ACCELERATION_GZ_LOW_BYTE = 5;
     public static final int ACCELERATION_GZ_HIGH_BYTE = 6;
-    public static final int ACCELERATION_NOT_USED = 7;
+    // public static final int ACCELERATION_NOT_USED = 7;
 
-    public static final int MAGNETIC_ADMIN = 0;
+    // public static final int MAGNETIC_ADMIN = 0;
     public static final int MAGNETIC_MX_LOW_BYTE = 1;
     public static final int MAGNETIC_MX_HIGH_BYTE = 2;
     public static final int MAGNETIC_MY_LOW_BYTE = 3;
     public static final int MAGNETIC_MY_HIGH_BYTE = 4;
     public static final int MAGNETIC_MZ_LOW_BYTE = 5;
     public static final int MAGNETIC_MZ_HIGH_BYTE = 6;
-    public static final int MAGNETIC_NOT_USED = 7;
+    // public static final int MAGNETIC_NOT_USED = 7;
 
     private CalibrationReading calibrationReading = null;
     private int accelerationDuplicated = 0, magneticDuplicated = 0;
 
 
     public CalibrationProtocol(
-            SexyTopoActivity activity, BluetoothDevice bluetoothDevice, SurveyManager dataManager) {
-        super(activity, bluetoothDevice, dataManager);
+            Context context, BluetoothDevice bluetoothDevice, SurveyManager dataManager) {
+        super(context, bluetoothDevice, dataManager);
     }
 
 

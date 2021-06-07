@@ -8,7 +8,6 @@ import android.view.View;
 import org.hwyl.sexytopo.comms.Communicator;
 import org.hwyl.sexytopo.control.activity.CalibrationActivity;
 import org.hwyl.sexytopo.control.activity.DeviceActivity;
-import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +15,7 @@ import java.util.Map;
 
 public class DistoXCommunicator extends Communicator {
 
-    private final SexyTopoActivity activity;
+    private final DeviceActivity activity;
     private final BluetoothDevice bluetoothDevice;
 
     public static final int CALIBRATION_ID = View.generateViewId();
@@ -24,7 +23,7 @@ public class DistoXCommunicator extends Communicator {
     private static final Map<Integer, String> CUSTOM_COMMANDS = new HashMap<>();
 
     static {
-        CUSTOM_COMMANDS.put(CALIBRATION_ID, "Calibration");
+        CUSTOM_COMMANDS.put(CALIBRATION_ID, "Calibration…");
     }
 
     public enum DistoXType {
@@ -56,7 +55,7 @@ public class DistoXCommunicator extends Communicator {
     public void requestConnect() {
 
         if (thread == null || thread.getState() == Thread.State.TERMINATED) {
-            thread = new DistoXThread(activity);
+            thread = new DistoXThread(activity, activity.getSurveyManager());
         }
 
         Thread.State commsState = thread.getState();

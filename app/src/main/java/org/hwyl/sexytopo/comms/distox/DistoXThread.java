@@ -3,12 +3,12 @@ package org.hwyl.sexytopo.comms.distox;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.comms.SerialSocket;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
-import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -42,14 +42,14 @@ public class DistoXThread extends Thread {
     private DataOutputStream outStream = null;
 
     private final SurveyManager dataManager;
-    private final SexyTopoActivity activity;
+    private final Context context;
 
     private boolean keepAlive;
 
 
-    public DistoXThread(SexyTopoActivity activity) {
-        this.activity = activity;
-        this.dataManager = activity.getSurveyManager();
+    public DistoXThread(Context context, SurveyManager dataManager) {
+        this.context = context;
+        this.dataManager = dataManager;
     }
 
 
@@ -66,11 +66,11 @@ public class DistoXThread extends Thread {
                 break;
             case MEASUREMENT:
                 requestedProtocol =
-                        new MeasurementProtocol(activity, bluetoothDevice, dataManager);
+                        new MeasurementProtocol(context, bluetoothDevice, dataManager);
                 break;
             case CALIBRATION:
                 requestedProtocol =
-                        new CalibrationProtocol(activity, bluetoothDevice, dataManager);
+                        new CalibrationProtocol(context, bluetoothDevice, dataManager);
                 break;
             default:
                 Log.e("Unexpected protocol requested");
@@ -82,7 +82,7 @@ public class DistoXThread extends Thread {
         setProtocol(Protocol.NULL);
         requestDisconnect(); // need to interrupt any reads in progress or we'll be waiting forever
         DistoXProtocol startCalibration =
-                new StartCalibrationProtocol(activity, bluetoothDevice, dataManager);
+                new StartCalibrationProtocol(context, bluetoothDevice, dataManager);
         oneOff(startCalibration);
         setProtocol(Protocol.CALIBRATION);
     }
@@ -92,7 +92,7 @@ public class DistoXThread extends Thread {
         setProtocol(Protocol.NULL);
         requestDisconnect(); // need to interrupt any reads in progress or we'll be waiting forever
         DistoXProtocol stopCalibration =
-                new StopCalibrationProtocol(activity, bluetoothDevice, dataManager);
+                new StopCalibrationProtocol(context, bluetoothDevice, dataManager);
         oneOff(stopCalibration);
         setProtocol(Protocol.MEASUREMENT);
     }
@@ -102,7 +102,7 @@ public class DistoXThread extends Thread {
         setProtocol(Protocol.NULL);
         requestDisconnect(); // need to interrupt any reads in progress or we'll be waiting forever
         WriteCalibrationProtocol writeCalibration =
-                new WriteCalibrationProtocol(activity, bluetoothDevice, dataManager);
+                new WriteCalibrationProtocol(context, bluetoothDevice, dataManager);
         writeCalibration.setCoeffToWrite(coeff);
         oneOff(writeCalibration);
         setProtocol(Protocol.MEASUREMENT);
@@ -175,12 +175,17 @@ public class DistoXThread extends Thread {
             // (this is where all the work is done)
             protocol.go(inStream, outStream);
 
-        } catch(IOException e){
-            if (e.getMessage().toLowerCase().contains("bt socket closed")) {
+        } catch(IOException e) {
+            String message = e.getMessage();
+            if (message == null) {
+                message = "unknown";
+            }
+
+            if (message.toLowerCase().contains("bt socket closed")) {
                 // this is common; probably don't need to bother the user with this..
                 requestDisconnect();
             } else {
-                Log.device("Communication error: " + e.getMessage());
+                Log.device("Communication error: " + message);
                 requestDisconnect();
             }
 
@@ -227,9 +232,9 @@ public class DistoXThread extends Thread {
                 Log.device("Failed to create socket: " + e.getMessage());
         } finally {
             if (isConnected()) {
-                Log.device(activity.getString(R.string.device_log_connected));
+                Log.device(context.getString(R.string.device_log_connected));
             } else {
-                Log.device(activity.getString(R.string.device_log_not_connected));
+                Log.device(context.getString(R.string.device_log_not_connected));
             }
         }
 
@@ -240,7 +245,7 @@ public class DistoXThread extends Thread {
         try {
             if (socket != null && socket.isConnected()) {
                 socket.close();
-                Log.device(activity.getString(R.string.device_log_stopped));
+                Log.device(context.getString(R.string.device_log_stopped));
             }
         } catch (Exception e) {
             Log.device("Error disconnecting: " + e.getMessage());

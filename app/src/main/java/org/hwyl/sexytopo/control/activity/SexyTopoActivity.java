@@ -388,7 +388,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
 
-    public static String getVersionName(Context context) {
+    public static String getVersionName(android.content.Context context) {
         String version;
         try {
             PackageInfo pInfo =
@@ -401,7 +401,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
 
-    public static int getVersionCode(Context context) {
+    public static int getVersionCode(android.content.Context context) {
         int version;
         try {
             PackageInfo pInfo =
@@ -1135,12 +1135,12 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         }
     }*/
 
-    private class SaveTask extends AsyncTask<Context, Void, Boolean> {
+    private class SaveTask extends AsyncTask<android.content.Context, Void, Boolean> {
 
         @Override
         protected Boolean doInBackground(Context... contexts) {
             try {
-                Context context = contexts[0];
+                android.content.Context context = contexts[0];
                 Saver.save(context, getSurvey());
                 return true;
             } catch (Exception exception) {
