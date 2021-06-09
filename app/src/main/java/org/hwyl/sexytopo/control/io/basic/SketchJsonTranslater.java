@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.control.io.basic;
 
+import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.model.graph.Coord2D;
@@ -18,9 +19,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 public class SketchJsonTranslater {
@@ -42,7 +41,7 @@ public class SketchJsonTranslater {
 
 
     public static String translate(Sketch sketch) throws JSONException {
-        return toJson(sketch).toString();
+        return toJson(sketch).toString(SexyTopo.JSON_INDENT);
     }
 
 
