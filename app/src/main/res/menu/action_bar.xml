@@ -88,6 +88,8 @@
           android:orderInCategory="100"
           app:showAsAction="never">
         <menu>
+            <item android:id="@+id/action_debug_mode"
+                android:title="@string/action_debug_mode" />
             <item android:id="@+id/action_kill_connection"
                   android:title="@string/action_kill_connection" />
             <item android:id="@+id/action_force_crash"

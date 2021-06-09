@@ -62,11 +62,12 @@ import androidx.core.content.ContextCompat;
 public abstract class SexyTopoActivity extends AppCompatActivity {
 
 
-    protected static SurveyManager dataManager;
+    protected SurveyManager dataManager;
 
     private static DistoXCommunicator comms;
 
     protected static boolean hasStarted = false;
+    private static boolean debugMode = false;
 
 
     @Override
@@ -187,21 +188,20 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             case R.id.action_file_exit:
                 confirmToProceedIfNotSaved(R.string.exit_question, "exit");
                 return true;
-
-
             case R.id.action_undo_last_leg:
                 undoLastLeg();
                 return true;
             case R.id.action_link_survey:
                 confirmToProceedIfNotSaved("linkExistingSurvey");
                 return true;
-
-
             case R.id.action_system_log:
                 startActivity(SystemLogActivity.class);
                 return true;
             case R.id.action_generate_test_survey:
                 generateTestSurvey();
+                return true;
+            case R.id.action_debug_mode:
+                toggleDebugMode();
                 return true;
             case R.id.action_kill_connection:
                 killConnection();
@@ -209,8 +209,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             case R.id.action_force_crash:
                 forceCrash();
                 return true;
-
-
 
             default:
                 return super.onOptionsItemSelected(item);
@@ -984,6 +982,15 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     }
 
+
+    private void toggleDebugMode() {
+        debugMode = !debugMode;
+        dataManager.broadcastSurveyUpdated();
+    }
+
+    public boolean isDebugMode() {
+        return debugMode;
+    }
 
     @SuppressLint("deprecated")
     private void killConnection() {
