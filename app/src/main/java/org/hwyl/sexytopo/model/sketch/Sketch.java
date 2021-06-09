@@ -1,15 +1,14 @@
 package org.hwyl.sexytopo.model.sketch;
 
 import org.apache.commons.lang3.NotImplementedException;
+import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.survey.Station;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 
 public class Sketch extends SketchDetail {
@@ -81,6 +80,9 @@ public class Sketch extends SketchDetail {
     }
 
     public void finishPath() {
+        double epsilon = Space2DUtils.SketchEpsilon(activePath);
+        Log.d("Sketch epsilon = " + epsilon);
+        activePath.setPath(Space2DUtils.Simplify(activePath.getPath(), epsilon));
         activePath = null;
     }
 

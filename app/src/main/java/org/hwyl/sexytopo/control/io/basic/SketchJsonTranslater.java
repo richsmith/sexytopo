@@ -2,6 +2,7 @@ package org.hwyl.sexytopo.control.io.basic;
 
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.io.Util;
+import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
@@ -18,9 +19,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 public class SketchJsonTranslater {
@@ -161,6 +160,11 @@ public class SketchJsonTranslater {
         }
 
         PathDetail pathDetail = new PathDetail(path, colour);
+
+        double epsilon = Space2DUtils.SketchEpsilon(pathDetail);
+        List<Coord2D> simplifiedPath = Space2DUtils.Simplify(path, epsilon);
+        pathDetail.setPath(simplifiedPath);
+
         return pathDetail;
     }
 
