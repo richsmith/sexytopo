@@ -116,8 +116,8 @@ public class Space2DUtils {
 
         // If max distance is greater than epsilon, recursively simplify
         if (distMax > epsilon) {
-            List<Coord2D> results1 = Simplify(path.subList(0, indexMax + 1), epsilon);
-            List<Coord2D> results2 = Simplify(path.subList(indexMax, pathSize), epsilon);
+            List<Coord2D> results1 = DouglasPeukerIteration(path.subList(0, indexMax + 1), epsilon);
+            List<Coord2D> results2 = DouglasPeukerIteration(path.subList(indexMax, pathSize), epsilon);
 
             simplifiedPath = new ArrayList<>(results1);
             simplifiedPath.addAll(results2.subList(1, results2.size()));
