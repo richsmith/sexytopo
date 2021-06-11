@@ -97,7 +97,7 @@ public class Space2DUtils {
         return new Line<>(start.plus(point), end.plus(point));
     }
 
-    private static List<Coord2D> DouglasPeukerIteration(List<Coord2D> path, double epsilon) {
+    private static List<Coord2D> douglasPeukerIteration(List<Coord2D> path, double epsilon) {
 
         // Find the point with the maximum distance
         int pathSize = path.size();
@@ -116,8 +116,8 @@ public class Space2DUtils {
 
         // If max distance is greater than epsilon, recursively simplify
         if (distMax > epsilon) {
-            List<Coord2D> results1 = DouglasPeukerIteration(path.subList(0, indexMax + 1), epsilon);
-            List<Coord2D> results2 = DouglasPeukerIteration(path.subList(indexMax, pathSize), epsilon);
+            List<Coord2D> results1 = douglasPeukerIteration(path.subList(0, indexMax + 1), epsilon);
+            List<Coord2D> results2 = douglasPeukerIteration(path.subList(indexMax, pathSize), epsilon);
 
             simplifiedPath = new ArrayList<>(results1);
             simplifiedPath.addAll(results2.subList(1, results2.size()));
@@ -130,23 +130,23 @@ public class Space2DUtils {
         return simplifiedPath;
     }
 
-    public static double SketchEpsilon(double width, double height) {
+    public static double simplificationEpsilon(double width, double height) {
 
         // TODO: this is a pretty crude simplification factor but we can revisit after more testing
         double maxDim = Math.max(width, height);
         return Math.max(maxDim / 500, 0.001);
     }
 
-    public static double SketchEpsilon(PathDetail pathDetail) {
-        return SketchEpsilon(pathDetail.getWidth(), pathDetail.getHeight());
+    public static double simplificationEpsilon(PathDetail pathDetail) {
+        return simplificationEpsilon(pathDetail.getWidth(), pathDetail.getHeight());
     }
 
-    public static List<Coord2D> Simplify(List<Coord2D> path, double epsilon) {
+    public static List<Coord2D> simplify(List<Coord2D> path, double epsilon) {
 
         if (path.isEmpty() || epsilon <= 0)
             return path;
 
-        return DouglasPeukerIteration(path, epsilon);
+        return douglasPeukerIteration(path, epsilon);
     }
 
 }

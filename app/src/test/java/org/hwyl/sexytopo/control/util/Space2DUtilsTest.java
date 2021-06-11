@@ -13,7 +13,7 @@ public class Space2DUtilsTest {
     public void testSimplifyEmpty() {
 
         ArrayList<Coord2D> path = new ArrayList<>();
-        List<Coord2D> simplifiedPath = Space2DUtils.Simplify(path, 1);
+        List<Coord2D> simplifiedPath = Space2DUtils.simplify(path, 1);
         Assert.assertEquals(path, simplifiedPath);
     }
 
@@ -23,7 +23,7 @@ public class Space2DUtilsTest {
         ArrayList<Coord2D> path = new ArrayList<>();
         path.add(new Coord2D(0,0));
 
-        List<Coord2D> simplifiedPath = Space2DUtils.Simplify(path, 1);
+        List<Coord2D> simplifiedPath = Space2DUtils.simplify(path, 1);
 
         // a single point gets converted to a line with coincident points
         ArrayList<Coord2D> expectedPath = new ArrayList<>();
@@ -40,7 +40,7 @@ public class Space2DUtilsTest {
         path.add(new Coord2D(0,0));
         path.add(new Coord2D(10,0));
 
-        List<Coord2D> simplifiedPath = Space2DUtils.Simplify(path, 0.01);
+        List<Coord2D> simplifiedPath = Space2DUtils.simplify(path, 0.01);
 
         Assert.assertEquals(path, simplifiedPath);
     }
@@ -56,8 +56,8 @@ public class Space2DUtilsTest {
         path.add(new Coord2D(40,0));
         path.add(new Coord2D(50,0));
 
-        double epsilon = Space2DUtils.SketchEpsilon(50, 50);
-        List<Coord2D> simplifiedPath = Space2DUtils.Simplify(path, epsilon);
+        double epsilon = Space2DUtils.simplificationEpsilon(50, 50);
+        List<Coord2D> simplifiedPath = Space2DUtils.simplify(path, epsilon);
 
         ArrayList<Coord2D> expectedPath = new ArrayList<>();
         expectedPath.add(new Coord2D(0,0));
@@ -76,8 +76,8 @@ public class Space2DUtilsTest {
         path.add(new Coord2D(10,5));
         path.add(new Coord2D(10,10));
 
-        double epsilon = Space2DUtils.SketchEpsilon(10, 10);
-        List<Coord2D> simplifiedPath = Space2DUtils.Simplify(path, epsilon);
+        double epsilon = Space2DUtils.simplificationEpsilon(10, 10);
+        List<Coord2D> simplifiedPath = Space2DUtils.simplify(path, epsilon);
 
         ArrayList<Coord2D> expectedPath = new ArrayList<>();
         expectedPath.add(new Coord2D(0,0));
@@ -106,8 +106,8 @@ public class Space2DUtilsTest {
         path.add(path.get(0));
 
         {
-            double epsilon = Space2DUtils.SketchEpsilon(10, 10);
-            List<Coord2D> simplifiedPath = Space2DUtils.Simplify(path, epsilon);
+            double epsilon = Space2DUtils.simplificationEpsilon(10, 10);
+            List<Coord2D> simplifiedPath = Space2DUtils.simplify(path, epsilon);
 
             // Remains unchanged
             Assert.assertEquals(path, simplifiedPath);
@@ -115,15 +115,15 @@ public class Space2DUtilsTest {
 
         {
             double epsilon = 4;
-            List<Coord2D> simplifiedPath = Space2DUtils.Simplify(path, epsilon);
+            List<Coord2D> simplifiedPath = Space2DUtils.simplify(path, epsilon);
 
             // Aggressive epsilon simplifies to a diamond
             ArrayList<Coord2D> expectedPath = new ArrayList<>();
-            expectedPath.add(new Coord2D(15,10));
-            expectedPath.add(new Coord2D(10, 5));
-            expectedPath.add(new Coord2D( 5,10));
-            expectedPath.add(new Coord2D(10,15));
-            expectedPath.add(new Coord2D(15,10));
+            expectedPath.add(new Coord2D(15, 10));
+            expectedPath.add(new Coord2D(10,  5));
+            expectedPath.add(new Coord2D( 5, 10));
+            expectedPath.add(new Coord2D(10, 15));
+            expectedPath.add(new Coord2D(15, 10));
 
             Assert.assertEquals(expectedPath, simplifiedPath);
         }

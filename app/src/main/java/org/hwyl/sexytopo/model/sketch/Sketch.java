@@ -80,9 +80,9 @@ public class Sketch extends SketchDetail {
     }
 
     public void finishPath() {
-        double epsilon = Space2DUtils.SketchEpsilon(activePath);
+        double epsilon = Space2DUtils.simplificationEpsilon(activePath);
         Log.d("Sketch epsilon = " + epsilon);
-        activePath.setPath(Space2DUtils.Simplify(activePath.getPath(), epsilon));
+        activePath.setPath(Space2DUtils.simplify(activePath.getPath(), epsilon));
         activePath = null;
     }
 

@@ -161,8 +161,8 @@ public class SketchJsonTranslater {
 
         PathDetail pathDetail = new PathDetail(path, colour);
 
-        double epsilon = Space2DUtils.SketchEpsilon(pathDetail);
-        List<Coord2D> simplifiedPath = Space2DUtils.Simplify(path, epsilon);
+        double epsilon = Space2DUtils.simplificationEpsilon(pathDetail);
+        List<Coord2D> simplifiedPath = Space2DUtils.simplify(path, epsilon);
         pathDetail.setPath(simplifiedPath);
 
         return pathDetail;
