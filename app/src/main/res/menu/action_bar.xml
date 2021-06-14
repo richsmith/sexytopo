@@ -80,7 +80,7 @@
     <item android:id="@+id/action_trip"
           android:title="@string/action_trip"
           app:showAsAction="never"/>
-    <item android:id="@+id/dev_menu"
+    <item android:id="@+id/action_dev_menu"
           android:title="@string/action_dev"
           android:visible="false"
           android:orderInCategory="100"

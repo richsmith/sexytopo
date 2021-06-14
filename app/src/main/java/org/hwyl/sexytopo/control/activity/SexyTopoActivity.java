@@ -125,8 +125,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
         // update Instruments menu with any additional options
         // //provided by the connected Instrument's Communicator
-        MenuItem item = menu.findItem(R.id.action_device_menu);
-        SubMenu subMenu = item.getSubMenu();
+        MenuItem deviceMenu = menu.findItem(R.id.action_device_menu);
+        SubMenu subMenu = deviceMenu.getSubMenu();
         MenuItem connections = menu.findItem(R.id.action_device_connect);
         subMenu.clear();
         subMenu.add(Menu.NONE, R.id.action_device_connect,
@@ -137,6 +137,10 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             String name = entry.getValue();
             subMenu.add(Menu.NONE, id, 0, name);
         }
+
+        boolean isDevMenuVisible = getBooleanPreference("pref_key_developer_mode");
+        MenuItem devMenu = menu.findItem(R.id.action_dev_menu);
+        devMenu.setVisible(isDevMenuVisible);
 
         return super.onPrepareOptionsMenu(menu);
     }
