@@ -66,8 +66,7 @@ import androidx.core.content.ContextCompat;
 public abstract class SexyTopoActivity extends AppCompatActivity {
 
 
-    @SuppressLint("StaticFieldLeak")
-    protected static SurveyManager dataManager;
+    protected SurveyManager dataManager;
 
     private static Instrument instrument = Instrument.OTHER;
     private static Communicator comms = NullCommunicator.getInstance();
