@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
+import android.os.Build;
 import android.widget.Toast;
 
 import org.hwyl.sexytopo.control.Log;
@@ -12,10 +13,12 @@ import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.util.NumberTools;
 import org.hwyl.sexytopo.model.survey.Leg;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import no.nordicsemi.android.ble.BleManager;
 import no.nordicsemi.android.ble.callback.profile.ProfileDataCallback;
 import no.nordicsemi.android.ble.data.Data;
@@ -130,24 +133,9 @@ public class Bric4Manager extends BleManager {
                         DEVICE_CONTROL_CHARACTERISTIC_UUID);
             }
 
-            /*
-            // Validate properties
-            boolean notify = false;
-            if (measurementPrimaryCharacteristic != null) {
-                final int properties = dataCharacteristic.getProperties();
-                notify = (properties & BluetoothGattCharacteristic.PROPERTY_NOTIFY) != 0;
-            }
-            boolean writeRequest = false;
-            if (measurementMetadataCharacteristic != null) {
-                final int properties = controlPointCharacteristic.getProperties();
-                writeRequest = (properties & BluetoothGattCharacteristic.PROPERTY_WRITE) != 0;
-                measurementMetadataCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-            }
-            // Return true if all required services have been found
-            return measurementPrimaryCharacteristic != null && measurementMetadataCharacteristic != null
-                    && notify && writeRequest;
-                    */
-            return true;
+            return measurementPrimaryCharacteristic != null &&
+                    measurementMetadataCharacteristic != null &&
+                    measurementErrorsCharacteristic != null;
         }
 
         // If you have any optional services, allocate them here. Return true only if
@@ -163,8 +151,7 @@ public class Bric4Manager extends BleManager {
         protected void initialize() {
             // You may enqueue multiple operations. A queue ensures that all operations are
             // performed one after another, but it is not required.
-            XHandler handler = new XHandler();
-            //setNotificationCallback(measurementMetadataCharacteristic).with(new XHandler());
+            DataHandler handler = new DataHandler();
             setIndicationCallback(measurementPrimaryCharacteristic).with(handler);
             setIndicationCallback(measurementMetadataCharacteristic).with(handler);
             setIndicationCallback(measurementErrorsCharacteristic).with(handler);
@@ -196,13 +183,14 @@ public class Bric4Manager extends BleManager {
         }
     }
 
-    private class XHandler implements ProfileDataCallback {
+    private class DataHandler implements ProfileDataCallback {
 
         State state = State.MEASUREMENT;
 
         String currentRef = "?";
         Leg current = Leg.EMPTY_LEG;
 
+        @RequiresApi(api = Build.VERSION_CODES.O)
         @Override
         public void onDataReceived(@NonNull BluetoothDevice device, @NonNull Data data) {
 
@@ -228,7 +216,9 @@ public class Bric4Manager extends BleManager {
                     int hour = NumberTools.getUint8(bytes, 4);
                     int minute = NumberTools.getUint8(bytes, 5);
                     int seconds = NumberTools.getUint8(bytes, 6);
-                    int centiSeconds = NumberTools.getUint8(bytes, 7);
+                    // int centiSeconds = NumberTools.getUint8(bytes, 7);
+                    LocalDateTime timestamp =
+                            LocalDateTime.of(year, month, day, hour, minute, seconds);
 
                     float distance = NumberTools.getFloat(bytes, 8);
                     float azimuth = NumberTools.getFloat(bytes, 12);
@@ -250,6 +240,8 @@ public class Bric4Manager extends BleManager {
                     }
 
                     currentRef = Integer.toString(NumberTools.getUint32(bytes, 0));
+
+                    // currently unused:
                     // float dip = NumberTools.getFloat(bytes, 4);
                     // float roll = NumberTools.getFloat(bytes, 8);
                     // float tempDegC = NumberTools.getFloat(bytes, 12);

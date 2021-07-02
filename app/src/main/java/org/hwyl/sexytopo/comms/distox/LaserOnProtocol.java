@@ -6,14 +6,13 @@ import android.content.Context;
 import org.hwyl.sexytopo.control.SurveyManager;
 
 
-public class StartCalibrationProtocol extends CommandProtocol {
+public class LaserOnProtocol extends CommandProtocol {
 
+    private static final byte LASER_ON = 0x36;
 
-    private static final byte START_CALIBRATION = 0b00110001;
-
-    public StartCalibrationProtocol(
+    public LaserOnProtocol(
             Context context, BluetoothDevice bluetoothDevice, SurveyManager dataManager) {
-        super(context, bluetoothDevice, dataManager, START_CALIBRATION);
+        super(context, bluetoothDevice, dataManager, LASER_ON);
     }
 
 }

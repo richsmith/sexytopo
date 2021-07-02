@@ -62,6 +62,11 @@ public class MeasurementProtocol extends DistoXProtocol {
         Log.device(context.getString(R.string.device_log_ready_for_measurements));
 
         byte[] packet = readPacket(inStream);
+
+        if (packet == null) {
+            return;
+        }
+
         acknowledge(outStream, packet);
 
         if (isDataPacket(packet)) {

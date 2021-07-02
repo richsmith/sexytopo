@@ -50,6 +50,11 @@ public class CalibrationProtocol extends DistoXProtocol {
         }
 
         byte[] packet = readPacket(inStream);
+
+        if (packet == null) {
+            return;
+        }
+
         acknowledge(outStream, packet);
 
 

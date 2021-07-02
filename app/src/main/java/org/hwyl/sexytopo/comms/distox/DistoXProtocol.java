@@ -109,6 +109,9 @@ public abstract class DistoXProtocol {
 
 
     protected byte[] readPacket(DataInputStream inStream) throws IOException {
+        //if (inStream.available() < 1){
+        //    return null;
+        //}
         byte[] packet = new byte[8];
         inStream.readFully(packet, 0, 8);
         Log.device("Read packet: " + describePacket(packet));
@@ -136,7 +139,7 @@ public abstract class DistoXProtocol {
         return true;
     }
 
-    protected static boolean isDataPacket(byte[] packet) {
+    public static boolean isDataPacket(byte[] packet) {
         return PacketType.getType(packet) == PacketType.MEASUREMENT;
     }
 
