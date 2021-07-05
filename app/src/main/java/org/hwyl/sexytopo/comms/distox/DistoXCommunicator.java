@@ -86,6 +86,12 @@ public class DistoXCommunicator extends Communicator {
     }
 
     @Override
+    public void forceStop() {
+        //noinspection deprecation
+        thread.stop();
+    }
+
+    @Override
     public Map<Integer, String> getCustomCommands() {
         return CUSTOM_COMMANDS;
     }
