@@ -124,7 +124,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
 
         // update Instruments menu with any additional options
-        // //provided by the connected Instrument's Communicator
+        // provided by the connected Instrument's Communicator
         MenuItem deviceMenu = menu.findItem(R.id.action_device_menu);
         SubMenu subMenu = deviceMenu.getSubMenu();
         MenuItem connections = menu.findItem(R.id.action_device_connect);
@@ -301,7 +301,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
 
     protected Communicator requestComms() {
-        //return requestComms(DistoXCommunicator.Protocol.NULL);
         return comms;
     }
 
@@ -309,23 +308,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         SexyTopoActivity.comms = communicator;
     }
 
-
-    /*
-    protected Communicator requestComms(DistoXCommunicator.Protocol protocol) {
-
-        if (comms == null || comms.getState() == Thread.State.TERMINATED) {
-            comms = new DistoXCommunicator(this, dataManager);
-        }
-
-        Thread.State commsState = comms.getState();
-        if (commsState == Thread.State.NEW) {
-           comms.requestStart(protocol);
-       } else {
-           comms.setProtocol(protocol);
-       }
-
-       return comms;
-    }*/
 
     private void openAboutDialog() {
         View messageView = getLayoutInflater().inflate(R.layout.about_dialog, null, false);
