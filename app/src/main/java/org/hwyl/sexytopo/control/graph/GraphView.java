@@ -67,8 +67,6 @@ import java.util.Set;
 
 public class GraphView extends View {
 
-    public static boolean DEBUG = false;
-
     private ScaleGestureDetector scaleGestureDetector;
     private GestureDetector longPressDetector;
 
@@ -791,7 +789,7 @@ public class GraphView extends View {
         drawLegend(canvas);
         drawHotCorners(canvas);
 
-        if (DEBUG) {
+        if (activity.isDebugMode()) {
             drawDebuggingInfo(canvas);
         }
     }
@@ -1200,6 +1198,8 @@ public class GraphView extends View {
         drawPaint.setColor(lastColour.intValue);
         drawPaint.setAlpha(alpha);
 
+        boolean isDebugMode = activity.isDebugMode();
+
         for (PathDetail pathDetail : sketch.getPathDetails()) {
 
             if (!couldBeOnScreen(pathDetail)) {
@@ -1228,6 +1228,10 @@ public class GraphView extends View {
                     //from = surveyCoordsToViewCoords(point);
                     fromX = (float)((point.x - viewpointOffset.x) * surveyToViewScale);
                     fromY = (float)((point.y - viewpointOffset.y) * surveyToViewScale);
+
+                    if (isDebugMode) {
+                        canvas.drawCircle(fromX, fromY, 3, drawPaint);
+                    }
                 } else {
                     //Coord2D to = surveyCoordsToViewCoords(point);
                     float toX = (float)((point.x - viewpointOffset.x) * surveyToViewScale);
@@ -1237,6 +1241,10 @@ public class GraphView extends View {
                     lines[lineIndex++] = fromY;
                     lines[lineIndex++] = toX;
                     lines[lineIndex++] = toY;
+
+                    if (isDebugMode) {
+                        canvas.drawCircle(toX, toY, 3, drawPaint);
+                    }
 
                     fromX = toX;
                     fromY = toY;

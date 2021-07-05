@@ -36,6 +36,7 @@
     <string name="action_link_to_existing_survey">Link to an Existing Survey</string>
     <string name="action_system_log">System Log</string>
     <string name="action_generate_test_survey">Generate Test Survey</string>
+    <string name="action_debug_mode">Debug mode</string>
     <string name="action_kill_connection">Kill comms thread (danger!)</string>
     <string name="action_force_crash">Force crash (danger!)</string>
     <string name="loaded">Loaded</string>

@@ -72,6 +72,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     private static Communicator comms = NullCommunicator.getInstance();
 
     protected static boolean hasStarted = false;
+    private static boolean debugMode = false;
 
 
     @Override
@@ -217,21 +218,23 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             case R.id.action_file_exit:
                 confirmToProceedIfNotSaved(R.string.exit_question, "exit");
                 return true;
-
-
             case R.id.action_undo_last_leg:
                 undoLastLeg();
                 return true;
             case R.id.action_link_survey:
                 confirmToProceedIfNotSaved("linkExistingSurvey");
                 return true;
-
-
             case R.id.action_system_log:
                 startActivity(SystemLogActivity.class);
                 return true;
             case R.id.action_generate_test_survey:
                 generateTestSurvey();
+                return true;
+            case R.id.action_debug_mode:
+                toggleDebugMode();
+                return true;
+            case R.id.action_kill_connection:
+                killConnection();
                 return true;
             case R.id.action_force_crash:
                 forceCrash();
@@ -1029,6 +1032,26 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 .show();
 
     }
+
+    private void toggleDebugMode() {
+        debugMode = !debugMode;
+        dataManager.broadcastSurveyUpdated();
+    }
+
+    public boolean isDebugMode() {
+        return debugMode;
+    }
+
+    @SuppressLint("deprecated")
+    private void killConnection() {
+        try {
+            showSimpleToast(R.string.killing_comms_process);
+            comms.forceStop();
+        } catch (Exception e) {
+            Log.e("problem when trying to kill connection: " + e);
+        }
+    }
+
 
     private void forceCrash() {
         throw new RuntimeException("Boom! Forced crash requested(!)");

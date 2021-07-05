@@ -39,4 +39,10 @@ public class Sap5Communicator extends Communicator {
         }
     }
 
+    @Override
+    public void forceStop() {
+        //noinspection deprecation
+        oldDistoXCommunicator.stop();
+    }
+
 }

@@ -22,6 +22,10 @@ public abstract class Communicator {
         return false;
     }
 
+    public void forceStop() {
+        // Do nothing unless implemented
+    }
+
 }
 
 

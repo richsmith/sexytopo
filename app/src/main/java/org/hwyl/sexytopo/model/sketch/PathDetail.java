@@ -10,7 +10,7 @@ import java.util.List;
 public final class PathDetail extends SketchDetail {
 
 
-    private final List<Coord2D> path;
+    private List<Coord2D> path;
 
     public PathDetail(Coord2D start, Colour colour) {
         super(colour);
@@ -34,6 +34,10 @@ public final class PathDetail extends SketchDetail {
 
     public List<Coord2D> getPath() {
         return path;
+    }
+
+    public void setPath(List<Coord2D> path) {
+        this.path = path;
     }
 
     @Override
