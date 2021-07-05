@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
@@ -136,8 +135,6 @@ public class GraphView extends View {
     private SketchTool previousSketchTool = SketchTool.SELECT;
     private Symbol currentSymbol = Symbol.getDefault();
 
-    private final DashPathEffect dashPathEffect = new DashPathEffect(new float[]{5, 5}, 0);
-
     private final Paint stationPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private final Paint legPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -156,8 +153,6 @@ public class GraphView extends View {
     private final Paint crossSectionConnectorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint crossSectionIndicatorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint hotCornersPaint = new Paint();
-
-    private final Path dashedPath = new Path();
 
     public GraphView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -221,7 +216,6 @@ public class GraphView extends View {
         crossSectionConnectorPaint.setColor(CROSS_SECTION_CONNECTION_COLOUR.intValue);
         crossSectionConnectorPaint.setStrokeWidth(3);
         crossSectionConnectorPaint.setStyle(Paint.Style.STROKE);
-        crossSectionConnectorPaint.setPathEffect(dashPathEffect);
 
         crossSectionIndicatorPaint.setColor(STATION_COLOUR);
         crossSectionIndicatorPaint.setStrokeWidth(2);
@@ -952,8 +946,8 @@ public class GraphView extends View {
             drawLegs(canvas, projection, alpha);
 
             Coord2D viewStationLocation = surveyCoordsToViewCoords(surveyStationLocation);
-            drawLineAsPath(
-                    canvas, viewStationLocation, centreOnView, crossSectionConnectorPaint);
+            drawDashedLine(
+                    canvas, viewStationLocation, centreOnView, 5, crossSectionConnectorPaint);
         }
 
         for (CrossSectionDetail crossSectionDetail : badXSections) {
@@ -1003,13 +997,11 @@ public class GraphView extends View {
                 paint = fade ? fadedLegPaint : legPaint;
             }
 
-            if (projectionType.isLegInPlane(leg)) {
-                canvas.drawLine((float)start.x, (float)start.y, (float)end.x, (float)end.y, paint);
+            if (leg.hasDestination() && !projectionType.isLegInPlane(leg)) {
+                drawDashedLine(canvas, start, end, 5, paint);
 			} else {
-                paint.setPathEffect(dashPathEffect);
-                drawLineAsPath(canvas, start, end, paint);
-                paint.setStyle(Paint.Style.STROKE);
-			}
+                canvas.drawLine((float)start.x, (float)start.y, (float)end.x, (float)end.y, paint);
+            }
         }
     }
 
@@ -1394,26 +1386,39 @@ public class GraphView extends View {
         viewpointOffset = new Coord2D(x, y);
     }
 
+    private void drawDashedLine(Canvas canvas,
+                                Coord2D start, Coord2D end,
+                                float dashLength,
+                                Paint paint) {
 
-    private void drawLine(Canvas canvas, Coord2D start, Coord2D end, Paint paint, int alpha) {
-        paint.setAlpha(alpha);
-        canvas.drawLine(
-                (float)(start.x), (float)(start.y),
-                (float)(end.x), (float)(end.y),
-                paint);
+        double lineLength = Space2DUtils.getDistance(start, end);
+        int dashes = (int)(lineLength / dashLength);
+
+        if (dashes < 1)
+            return;
+
+        Coord2D direction = end.minus(start).normalize();
+        Coord2D dashStep = direction.scale(dashLength);
+
+        float stepX = (float)dashStep.x;
+        float stepY = (float)dashStep.y;
+
+        float[] lines = new float[dashes * 2 + 2];
+        int lineIndex = 0;
+
+        lines[lineIndex++] = (float)start.x;
+        lines[lineIndex++] = (float)start.y;
+
+        for (int i = 0; i != dashes; ++i) {
+            float lastX = lines[lineIndex - 2];
+            float lastY = lines[lineIndex - 1];
+
+            lines[lineIndex++] = lastX + stepX;
+            lines[lineIndex++] = lastY + stepY;
+        }
+
+        canvas.drawLines(lines, paint);
     }
-
-
-    /**
-     * Drawing as a path is useful in order to apply path effects (buggy when drawing lines)
-     */
-    private void drawLineAsPath(Canvas canvas, Coord2D start, Coord2D end, Paint paint) {
-        dashedPath.reset();
-        dashedPath.moveTo((float)(start.x), (float)(start.y));
-        dashedPath.lineTo((float)(end.x), (float)(end.y));
-        canvas.drawPath(dashedPath, paint);
-    }
-
 
     public void adjustZoomBy(double delta) {
         double newZoom = surveyToViewScale * delta;
