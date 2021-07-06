@@ -34,7 +34,7 @@ public class TableActivityTest {
 
 
     @Test
-    public void graphViewVisible() {
+    public void tableHeaderVisible() {
         onView(withId(R.id.action_table)).perform(click());
         onView(withId(R.id.HeaderTable)).check(matches(isDisplayed()));
     }
