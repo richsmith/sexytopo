@@ -1397,7 +1397,7 @@ public class GraphView extends View {
         double lineLength = Space2DUtils.getDistance(start, end);
         int dashes = (int)(lineLength / dashLength);
 
-        Coord2D direction = end.minus(start).normalize();
+        Coord2D direction = end.minus(start).normalise();
         Coord2D dashStep = direction.scale(dashLength);
 
         float stepX = (float)dashStep.x;

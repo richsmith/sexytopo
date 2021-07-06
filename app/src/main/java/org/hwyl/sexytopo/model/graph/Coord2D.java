@@ -43,7 +43,7 @@ public final class Coord2D extends Coord {
         return Math.sqrt(this.x * this.x + this.y * this.y);
     }
 
-    public Coord2D normalize() {
+    public Coord2D normalise() {
         double mag = this.mag();
         if (mag > 0) {
             return this.div(mag);
