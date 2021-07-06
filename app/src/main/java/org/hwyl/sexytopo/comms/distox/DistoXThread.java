@@ -256,8 +256,6 @@ public class DistoXThread extends Thread {
 
     public void requestInterrupt() {
         try {
-            //closeSocket(); // bit crude but seems to be only way to interrupt blocking read methods
-            //tryToConnectUntilConnected();
             inStream.close();
             inStream = new DataInputStream(socket.getInputStream());
         } catch (Exception e) {
