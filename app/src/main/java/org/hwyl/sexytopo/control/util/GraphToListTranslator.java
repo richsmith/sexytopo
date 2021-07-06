@@ -7,7 +7,6 @@ import org.hwyl.sexytopo.model.table.TableCol;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,24 +23,9 @@ public class GraphToListTranslator {
     public List<SurveyListEntry> toChronoListOfSurveyListEntries(Survey survey) {
         final List<Leg> chronoLegs = survey.getAllLegsInChronoOrder();
         List<SurveyListEntry> entries = toListOfSurveyListEntries(survey);
-        Collections.sort(entries, new Comparator<SurveyListEntry>() {
-            @Override
-            public int compare(SurveyListEntry e0, SurveyListEntry e1) {
-                return chronoLegs.indexOf(e0.leg) - chronoLegs.indexOf(e1.leg);
-            }
-        });
+        Collections.sort(entries, (e0, e1) ->
+                chronoLegs.indexOf(e0.leg) - chronoLegs.indexOf(e1.leg));
         return entries;
-    }
-
-
-    public List<Map<TableCol, Object>> toListOfColMaps(Survey survey) {
-        List<SurveyListEntry> surveyListEntries = toListOfSurveyListEntries(survey);
-        List<Map<TableCol, Object>> newList = new ArrayList<>(surveyListEntries.size());
-        for (GraphToListTranslator.SurveyListEntry entry : surveyListEntries) {
-            Map<TableCol, Object> map = createMap(entry);
-            newList.add(map);
-        }
-        return newList;
     }
 
 
@@ -91,7 +75,7 @@ public class GraphToListTranslator {
     }
 
 
-    public class SurveyListEntry {
+    public static class SurveyListEntry {
         private final Station from;
         private final Leg leg;
 

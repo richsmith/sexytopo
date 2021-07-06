@@ -92,8 +92,8 @@ public abstract class GraphActivity extends SexyTopoActivity
         SHOW_STATION_LABELS(R.id.buttonShowStationLabels, true),
         SHOW_CONNECTIONS(R.id.buttonShowConnections, true);
 
-        private int controlId;
-        private boolean defaultValue;
+        private final int controlId;
+        private final boolean defaultValue;
 
         DisplayPreference(int id, boolean defaultValue) {
             this.controlId = id;
@@ -108,28 +108,26 @@ public abstract class GraphActivity extends SexyTopoActivity
     private GraphView graphView;
     private SharedPreferences preferences;
 
+    private BroadcastReceiver updatedReceiver;
+    private BroadcastReceiver createdReceiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        BroadcastReceiver updatedReceiver = new BroadcastReceiver() {
+        updatedReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 syncGraphWithSurvey();
             }
         };
-        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
-        broadcastManager.registerReceiver(updatedReceiver,
-                new IntentFilter(SexyTopo.SURVEY_UPDATED_EVENT));
 
-        BroadcastReceiver createdReceiver = new BroadcastReceiver() {
+        createdReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 handleAutoRecentre();
             }
         };
-        broadcastManager.registerReceiver(createdReceiver,
-                new IntentFilter(SexyTopo.NEW_STATION_CREATED_EVENT));
 
         setContentView(R.layout.activity_graph);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -147,12 +145,8 @@ public abstract class GraphActivity extends SexyTopoActivity
 
         preferences = getSharedPreferences("display", Context.MODE_PRIVATE);
 
-        graphView.post(new Runnable() {
-            @Override // Needs to be threaded so it is only run once we know height and width
-            public void run() {
-                setViewLocation();
-            }
-        });
+        // Needs to be threaded so it is only run once we know height and width
+        graphView.post(this::setViewLocation);
     }
 
 
@@ -166,13 +160,37 @@ public abstract class GraphActivity extends SexyTopoActivity
     @Override
     protected void onResume() {
         super.onResume();
+
+        registerReceivers();
         syncGraphWithSurvey();
+
+        initialiseGraphView();
         initialiseSketchTool();
         initialiseBrushColour();
         initialiseSymbolToolbar();
         initialiseSymbolTool();
 
         setSketchButtonsStatus();
+    }
+
+    public void onPause() {
+        super.onPause();
+        unregisterReceivers();
+    }
+
+
+    private void registerReceivers() {
+        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
+        broadcastManager.registerReceiver(updatedReceiver,
+                new IntentFilter(SexyTopo.SURVEY_UPDATED_EVENT));
+        broadcastManager.registerReceiver(createdReceiver,
+                new IntentFilter(SexyTopo.NEW_STATION_CREATED_EVENT));
+    }
+
+    private void unregisterReceivers() {
+        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
+        broadcastManager.unregisterReceiver(updatedReceiver);
+        broadcastManager.unregisterReceiver(createdReceiver);
     }
 
     private void setViewLocation() {
@@ -186,19 +204,22 @@ public abstract class GraphActivity extends SexyTopoActivity
         }
     }
 
-
-    private void syncGraphWithSurvey() {
+    private void initialiseGraphView() {
         Survey survey = getSurvey();
         graphView.initialisePaint();
         graphView.setProjectionType(getProjectionType());
-        graphView.setProjection(getProjection(survey));
         graphView.setSurvey(survey);
         graphView.setSketch(getSketch(survey));
+    }
 
+
+    private void syncGraphWithSurvey() {
+        Survey survey = getSurvey();
+        graphView.setSurvey(survey);
+        graphView.setProjection(getProjection(survey));
         double surveyLength = SurveyStats.calcTotalLength(survey);
         double surveyHeight = SurveyStats.calcHeightRange(survey);
         graphView.setCachedStats(surveyLength, surveyHeight);
-
         graphView.invalidate();
     }
 
@@ -379,7 +400,7 @@ public abstract class GraphActivity extends SexyTopoActivity
         for (Symbol symbol : Symbol.values()) {
             LayoutInflater inflater = LayoutInflater.from(this);
             LinearLayout linearLayout = (LinearLayout)
-                (inflater.inflate(R.layout.tool_button, null));
+                (inflater.inflate(R.layout.tool_button, buttonPanel, false));
             ImageButton imageButton = (ImageButton)linearLayout.getChildAt(0);
             imageButton.setId(symbol.getBitmapId()); // bit hacky :P
             imageButton.setImageBitmap(symbol.getButtonBitmap());
