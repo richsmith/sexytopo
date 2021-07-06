@@ -1000,10 +1000,10 @@ public class GraphView extends View {
                 paint = fade ? fadedLegPaint : legPaint;
             }
 
-            if (leg.hasDestination() && !projectionType.isLegInPlane(leg)) {
-                drawDashedLine(canvas, start, end, dashedLineInterval, paint);
-			} else {
+            if (projectionType.isLegInPlane(leg)) {
                 canvas.drawLine((float)start.x, (float)start.y, (float)end.x, (float)end.y, paint);
+			} else {
+                drawDashedLine(canvas, start, end, dashedLineInterval, paint);
             }
         }
     }
