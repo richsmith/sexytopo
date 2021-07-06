@@ -400,7 +400,7 @@ public abstract class GraphActivity extends SexyTopoActivity
         for (Symbol symbol : Symbol.values()) {
             LayoutInflater inflater = LayoutInflater.from(this);
             LinearLayout linearLayout = (LinearLayout)
-                (inflater.inflate(R.layout.tool_button, null));
+                (inflater.inflate(R.layout.tool_button, buttonPanel, false));
             ImageButton imageButton = (ImageButton)linearLayout.getChildAt(0);
             imageButton.setId(symbol.getBitmapId()); // bit hacky :P
             imageButton.setImageBitmap(symbol.getButtonBitmap());

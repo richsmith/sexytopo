@@ -4,7 +4,6 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -46,7 +45,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -54,7 +52,6 @@ import java.util.Set;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.Lifecycle;
 
 
 /**
@@ -79,7 +76,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         dataManager = SurveyManager.getInstance(this.getApplicationContext());
 
         // if Android restarts the activity after a crash, force it to go through the startup
-        // process!
+        // process :/
         if (!hasStarted && !(this instanceof StartUpActivity)) {
             startActivity(StartUpActivity.class);
         }
@@ -218,15 +215,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        if (! Util.isExternalStorageWriteable(this)) {
-            showSimpleToast(R.string.external_storage_unwriteable);
-        }
-    }
-
-
     private void requestPermissionsIfRequired() {
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
@@ -248,9 +236,9 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
         if (!notYetGotPermissions.isEmpty()) {
             ActivityCompat.requestPermissions(
-                    this,
-                    notYetGotPermissions.toArray(new String[]{}),
-                    0);
+                this,
+                notYetGotPermissions.toArray(new String[]{}),
+                0);
         }
 
     }
@@ -285,17 +273,14 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setIcon(R.drawable.laser_icon)
                 .setTitle(getText(R.string.app_name) + " v" + version)
-                .setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // do nothing
-                    }
-                })
+                .setNeutralButton(R.string.ok, (dialog, which) -> { /* do nothing */ })
                 .setView(messageView);
         builder.create().show();
 
     }
 
+
+    @SuppressLint("UnusedDeclaration")
     public void exportSurvey() {  // public due to stupid Reflection requirements
 
         final Survey survey = getSurvey();
@@ -317,18 +302,10 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         }
 
         builderSingle.setNegativeButton(getString(R.string.cancel),
-                new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+                (dialog, which) -> dialog.dismiss());
 
         builderSingle.setAdapter(arrayAdapter,
-            new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
+                (dialog, which) -> {
                     String name = arrayAdapter.getItem(which);
                     Exporter selectedExporter = nameToExporter.get(name);
                     try {
@@ -338,8 +315,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                     } catch (Exception exception) {
                         showException(exception);
                     }
-                }
-            });
+                });
         builderSingle.show();
     }
 
@@ -369,6 +345,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         return version;
     }
 
+
+    @SuppressLint("UnusedDeclaration")
     public void linkExistingSurvey() {  // public due to stupid Reflection requirements
 
             File[] surveyDirectories = Util.getSurveyDirectories(this);
@@ -390,27 +368,17 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             }
 
             builderSingle.setNegativeButton(getString(R.string.cancel),
-                    new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
+                    (dialog, which) -> dialog.dismiss());
 
             builderSingle.setAdapter(arrayAdapter,
-                    new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            String surveyName = arrayAdapter.getItem(which);
-                            try {
-                                Survey surveyToLink =
-                                        Loader.loadSurvey(SexyTopoActivity.this, surveyName);
-                                linkToStationInSurvey(surveyToLink);
-                            } catch (Exception exception) {
-                                showException(exception);
-                            }
+                    (dialog, which) -> {
+                        String surveyName = arrayAdapter.getItem(which);
+                        try {
+                            Survey surveyToLink =
+                                    Loader.loadSurvey(SexyTopoActivity.this, surveyName);
+                            linkToStationInSurvey(surveyToLink);
+                        } catch (Exception exception) {
+                            showException(exception);
                         }
                     });
             builderSingle.show();
@@ -433,42 +401,32 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         }
 
         builderSingle.setNegativeButton(getString(R.string.cancel),
-                new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+                (dialog, which) -> dialog.dismiss());
 
         builderSingle.setAdapter(arrayAdapter,
-                new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String stationName = arrayAdapter.getItem(which);
-                        try {
-                            Station selectedStation = Survey.NULL_STATION;
-                            for (Station station : stations) {
-                                if (station.getName().equals(stationName)) {
-                                    selectedStation = station;
-                                    break;
-                                }
+                (dialog, which) -> {
+                    String stationName = arrayAdapter.getItem(which);
+                    try {
+                        Station selectedStation = Survey.NULL_STATION;
+                        for (Station station : stations) {
+                            if (station.getName().equals(stationName)) {
+                                selectedStation = station;
+                                break;
                             }
-
-                            Survey current = getSurvey();
-                            joinSurveys(current, current.getActiveStation(), surveyToLink, selectedStation);
-
-                        } catch (Exception exception) {
-                            showException(exception);
                         }
+
+                        Survey current = getSurvey();
+                        joinSurveys(current, current.getActiveStation(), surveyToLink, selectedStation);
+
+                    } catch (Exception exception) {
+                        showException(exception);
                     }
                 });
         builderSingle.show();
     }
 
 
-    protected void startActivity(Class clazz) {
+    protected void startActivity(Class<? extends SexyTopoActivity> clazz) {
         if (! clazz.isInstance(this)) {
             Intent intent = new Intent(this, clazz);
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
@@ -502,36 +460,34 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         input.setContentDescription("Enter new name");
 
         new AlertDialog.Builder(this)
-                .setTitle(getString(R.string.dialog_save_as_title))
-                .setView(input)
-                .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        Editable value = input.getText();
-                        String newName = value.toString();
-                        Survey survey = getSurvey();
-                        String oldName = survey.getName();
-                        if (oldName.equals(newName)) {
-                            return;
-                        }
-                        try {
-                            survey.setName(newName);
-                            if (!Util.isSurveyNameUnique(
-                                    SexyTopoActivity.this, survey.getName()))  {
-                                throw new Exception("Survey already exists");
-                            }
-                            Saver.save(SexyTopoActivity.this, survey);
-                            updateRememberedSurvey();
-                        } catch (Exception exception) {
-                            survey.setName(oldName);
-                            showSimpleToast(R.string.error_saving_survey);
-                            showException(exception);
-                        }
+            .setTitle(getString(R.string.dialog_save_as_title))
+            .setView(input)
+            .setPositiveButton(getString(R.string.ok),
+                (dialog, whichButton) -> {
+                    Editable value = input.getText();
+                    String newName = value.toString();
+                    Survey survey = getSurvey();
+                    String oldName = survey.getName();
+                    if (oldName.equals(newName)) {
+                        return;
                     }
-                }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                // Do nothing.
-            }
-        }).show();
+                    try {
+                        survey.setName(newName);
+                        if (!Util.isSurveyNameUnique(
+                                SexyTopoActivity.this, survey.getName()))  {
+                            throw new Exception("Survey already exists");
+                        }
+                        Saver.save(SexyTopoActivity.this, survey);
+                        updateRememberedSurvey();
+                    } catch (Exception exception) {
+                        survey.setName(oldName);
+                        showSimpleToast(R.string.error_saving_survey);
+                        showException(exception);
+                    }
+                })
+            .setNegativeButton(getString(R.string.cancel),
+                (dialog, whichButton) -> { /* Do nothing */ })
+            .show();
     }
 
 
@@ -544,24 +500,22 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         input.setText(defaultName);
 
         new AlertDialog.Builder(this)
-                .setTitle(getString(R.string.dialog_new_survey_title))
-                .setView(input)
-                .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        Editable value = input.getText();
-                        String name = value.toString();
-                        Survey survey = new Survey(name);
-                        if (Util.isSurveyNameUnique(SexyTopoActivity.this, name)) {
-                            setSurvey(survey);
-                        } else {
-                            showSimpleToast(R.string.dialog_new_survey_name_must_be_unique);
-                        }
+            .setTitle(getString(R.string.dialog_new_survey_title))
+            .setView(input)
+            .setPositiveButton(getString(R.string.ok),
+                (dialog, whichButton) -> {
+                    Editable value = input.getText();
+                    String name = value.toString();
+                    Survey survey = new Survey(name);
+                    if (Util.isSurveyNameUnique(SexyTopoActivity.this, name)) {
+                        setSurvey(survey);
+                    } else {
+                        showSimpleToast(R.string.dialog_new_survey_name_must_be_unique);
                     }
-                }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                // Do nothing.
-            }
-        }).show();
+                })
+            .setNegativeButton(getString(R.string.cancel),
+                (dialog, whichButton) -> { /* Do nothing. */ })
+            .show();
     }
 
 
@@ -580,26 +534,22 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         input.setText(defaultName);
 
         new AlertDialog.Builder(this)
-                .setTitle(getString(R.string.dialog_new_survey_title))
-                .setView(input)
-                .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        Editable value = input.getText();
-                        String name = value.toString();
-                        if (Util.isSurveyNameUnique(SexyTopoActivity.this, name)) {
-                            Survey newSurvey = new Survey(name);
-                            newSurvey.getOrigin().setName(joinPoint.getName());
-                            joinSurveys(currentSurvey, joinPoint, newSurvey, newSurvey.getOrigin());
-                            setSurvey(newSurvey);
-                        } else {
-                            showSimpleToast(R.string.dialog_new_survey_name_must_be_unique);
-                        }
-                    }
-                }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                // Do nothing.
-            }
-        }).show();
+            .setTitle(getString(R.string.dialog_new_survey_title))
+            .setView(input)
+            .setPositiveButton(getString(R.string.ok), (dialog, whichButton) -> {
+                Editable value = input.getText();
+                String name = value.toString();
+                if (Util.isSurveyNameUnique(SexyTopoActivity.this, name)) {
+                    Survey newSurvey = new Survey(name);
+                    newSurvey.getOrigin().setName(joinPoint.getName());
+                    joinSurveys(currentSurvey, joinPoint, newSurvey, newSurvey.getOrigin());
+                    setSurvey(newSurvey);
+                } else {
+                    showSimpleToast(R.string.dialog_new_survey_name_must_be_unique);
+                }
+            }).setNegativeButton(getString(R.string.cancel),
+                (dialog, whichButton) -> { /* Do nothing. */ })
+            .show();
     }
 
     private void joinSurveys(Survey currentSurvey, Station currentJoinPoint,
@@ -623,7 +573,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             Survey survey = getSurvey();
 
             Set<SurveyConnection> linked = survey.getConnectedSurveys().get(station);
-            if (linked.size() < 1) {
+            if (linked == null || linked.size() < 1) {
                 throw new Exception("Can't find any surveys to unlink");
             } else if (linked.size() == 1) {
                 SurveyConnection onlyConnection = linked.iterator().next();
@@ -656,35 +606,25 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         }
 
         builderSingle.setNegativeButton(getString(R.string.cancel),
-                new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+                (dialog, which) -> dialog.dismiss());
 
         builderSingle.setAdapter(arrayAdapter,
-                new DialogInterface.OnClickListener() {
+                (dialog, which) -> {
+                    String surveyName = arrayAdapter.getItem(which);
+                    try {
+                        for (SurveyConnection connection : connections) {
+                            if (connection.otherSurvey.getName().equals(surveyName)) {
+                                Survey to = connection.otherSurvey;
+                                Station stationTo = connection.stationInOtherSurvey;
+                                unlinkSurveyConnection(survey, station, to, stationTo);
 
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String surveyName = arrayAdapter.getItem(which);
-                        try {
-                            for (SurveyConnection connection : connections) {
-                                if (connection.otherSurvey.getName().equals(surveyName)) {
-                                    Survey to = connection.otherSurvey;
-                                    Station stationTo = connection.stationInOtherSurvey;
-                                    unlinkSurveyConnection(survey, station, to, stationTo);
-
-                                    return;
-                                }
+                                return;
                             }
-                            throw new Exception("Couldn't find linked survey");
-
-                        } catch (Exception exception) {
-                            showException(exception);
                         }
+                        throw new Exception("Couldn't find linked survey");
+
+                    } catch (Exception exception) {
+                        showException(exception);
                     }
                 });
         builderSingle.show();
@@ -715,24 +655,21 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         }
 
         new AlertDialog.Builder(this)
-                .setTitle(getString(R.string.dialog_delete_survey_title))
-                .setMessage(getString(R.string.dialog_delete_survey_content))
-                .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        try {
-                            String surveyName = getSurvey().getName();
-                            Util.deleteSurvey(SexyTopoActivity.this, surveyName);
-                            startNewSurvey();
-                        } catch (Exception e) {
-                            showSimpleToast(R.string.error_deleting_survey);
-                            Log.e("Error deleting survey: " + e);
-                        }
+            .setTitle(getString(R.string.dialog_delete_survey_title))
+            .setMessage(getString(R.string.dialog_delete_survey_content))
+            .setPositiveButton(R.string.delete,
+                (dialog, whichButton) -> {
+                    try {
+                        String surveyName = getSurvey().getName();
+                        Util.deleteSurvey(SexyTopoActivity.this, surveyName);
+                        startNewSurvey();
+                    } catch (Exception e) {
+                        showSimpleToast(R.string.error_deleting_survey);
+                        Log.e("Error deleting survey: " + e);
                     }
-                }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                // Do nothing.
-            }
-        }).show();
+            }).setNegativeButton(getString(R.string.cancel),
+                (dialog, whichButton) -> { /* Do nothing */ })
+            .show();
     }
 
 
@@ -759,22 +696,12 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         }
 
         builderSingle.setNegativeButton(getString(R.string.cancel),
-                new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+                (dialog, which) -> dialog.dismiss());
 
         builderSingle.setAdapter(arrayAdapter,
-                new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String surveyName = arrayAdapter.getItem(which);
-                        loadSurvey(surveyName);
-                    }
+                (dialog, which) -> {
+                    String surveyName = arrayAdapter.getItem(which);
+                    loadSurvey(surveyName);
                 });
         builderSingle.show();
     }
@@ -819,6 +746,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
 
+    @SuppressLint("UnusedDeclaration")
     public void importSurvey() { // public due to stupid Reflection requirements
 
         File[] importFiles = Util.getImportFiles(this);
@@ -840,37 +768,27 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         arrayAdapter.addAll(nameToFiles.keySet());
 
         builderSingle.setNegativeButton(getString(R.string.cancel),
-                new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+                (dialog, which) -> dialog.dismiss());
 
         builderSingle.setAdapter(arrayAdapter,
-                new DialogInterface.OnClickListener() {
+                (dialog, which) -> {
+                    File file = nameToFiles.get(arrayAdapter.getItem(which));
+                    try {
+                        Survey survey = ImportManager.toSurvey(file);
 
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        File file = nameToFiles.get(arrayAdapter.getItem(which));
-                        try {
-                            Survey survey = ImportManager.toSurvey(file);
-
-                            if (Util.doesSurveyExist(SexyTopoActivity.this, survey.getName())) {
-                                confirmToProceed(
-                                        R.string.continue_question,
-                                        R.string.survey_already_exists,
-                                        R.string.replace,
-                                        R.string.cancel,
-                                        "saveImportedSurvey", survey, file);
-                            } else {
-                                saveImportedSurvey(survey, file);
-                            }
-
-                        } catch (Exception exception) {
-                            showException(exception);
+                        if (Util.doesSurveyExist(SexyTopoActivity.this, survey.getName())) {
+                            confirmToProceed(
+                                    R.string.continue_question,
+                                    R.string.survey_already_exists,
+                                    R.string.replace,
+                                    R.string.cancel,
+                                    "saveImportedSurvey", survey, file);
+                        } else {
+                            saveImportedSurvey(survey, file);
                         }
+
+                    } catch (Exception exception) {
+                        showException(exception);
                     }
                 });
         builderSingle.show();
@@ -893,15 +811,11 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         new AlertDialog.Builder(this)
                 .setTitle(getString(titleId))
                 .setMessage(getString(messageId))
-                .setPositiveButton(confirmId, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        invokeMethod(methodToCallIfProceeding, args);
-                    }
-                }).setNegativeButton(getString(cancelId), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                // Do nothing.
-            }
-        }).show();
+                .setPositiveButton(confirmId,
+                        (dialog, whichButton) -> invokeMethod(methodToCallIfProceeding, args))
+                .setNegativeButton(getString(cancelId),
+                        (dialog, whichButton) -> { /* Do nothing */ })
+                .show();
     }
 
 
@@ -931,7 +845,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     protected void invokeMethod(String name, Object... args) {
         try {
-            List<Class> classes = new LinkedList<>();
+            List<Class> classes = new ArrayList<>();
             for (Object arg : args) {
                 classes.add(arg.getClass());
             }
@@ -967,15 +881,13 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 .setTitle("Generate Test Data")
                 .setMessage("Replace the existing survey with randomly-generated data?")
                 .setCancelable(false)
-                .setPositiveButton("Replace", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        try {
-                            Survey currentSurvey =
-                                    TestSurveyCreator.create(getSurvey().getName(), 10, 5);
-                            setSurvey(currentSurvey);
-                        } catch (Exception exception) {
-                            showException(exception);
-                        }
+                .setPositiveButton("Replace", (dialog, id) -> {
+                    try {
+                        Survey currentSurvey =
+                                TestSurveyCreator.create(getSurvey().getName(), 10, 5);
+                        setSurvey(currentSurvey);
+                    } catch (Exception exception) {
+                        showException(exception);
                     }
                 })
                 .setNegativeButton(getString(R.string.cancel), null)
@@ -1028,12 +940,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
 
-    protected boolean isInForeground() {
-        boolean isAtLeastResumed =
-                getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED);
-        return isAtLeastResumed;
-    }
-
     public void showSimpleToast(String message) {
         if (!isFinishing()) {
             Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
@@ -1061,6 +967,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         return preferences.getString(name, "");
     }
 
+    @SuppressLint("SourceLockedOrientationActivity")
     private void setOrientation() {
         String orientationPreference = getStringPreference("pref_orientation");
 
@@ -1074,7 +981,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
 
-    public void jumpToStation(Station station, Class clazz) {
+    public void jumpToStation(Station station, Class<? extends SexyTopoActivity> clazz) {
         Intent intent = new Intent(this, clazz);
         Bundle bundle = new Bundle();
         bundle.putString(SexyTopo.JUMP_TO_STATION, station.getName());
@@ -1082,40 +989,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    /*
-    private class ImportTask extends AsyncTask<File, Void, Survey> {
-
-        private File file;
-
-        protected Survey doInBackground(File... files) {
-            this.file = files[0];
-
-            try {
-                return ImportManager.toSurvey(file);
-            } catch (Exception exception) {
-
-            }
-        }
-
-        protected void onPostExecute(Survey survey) {
-
-            if (SurvexTherionUtil.doesSurveyExist(survey.getName())) {
-                confirmToProceed(
-                        R.string.continue_question,
-                        R.string.survey_already_exists,
-                        R.string.replace,
-                        R.string.cancel,
-                        "saveImportedSurvey", survey, file);
-            } else {
-                try {
-                saveImportedSurvey(survey, file);
-                } catch (Exception exception) {
-
-                }
-            }
-
-        }
-    }*/
 
     private class SaveTask extends AsyncTask<Context, Void, Boolean> {
 
