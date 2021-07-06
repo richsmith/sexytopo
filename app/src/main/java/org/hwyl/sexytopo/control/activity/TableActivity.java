@@ -60,6 +60,7 @@ public class TableActivity extends SexyTopoActivity
             = new HashMap<>();
     private final Map<TextView, TableCol> fieldToTableCol = new HashMap<>();
     private final static Map<Station, Integer> stationsToTableIndex = new HashMap<>();
+    private BroadcastReceiver receiver;
     private TextView cellBeingClicked;
 
 
@@ -81,22 +82,21 @@ public class TableActivity extends SexyTopoActivity
         setContentView(R.layout.activity_table);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        BroadcastReceiver receiver = new BroadcastReceiver() {
+        receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(android.content.Context context, Intent intent) {
-                if (isInForeground()) {
-                    syncTableWithSurvey();
-                }
+                syncTableWithSurvey();
             }
         };
-        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
-        broadcastManager.registerReceiver(receiver, new IntentFilter(SexyTopo.SURVEY_UPDATED_EVENT));
     }
 
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
+        broadcastManager.registerReceiver(receiver, new IntentFilter(SexyTopo.SURVEY_UPDATED_EVENT));
 
         syncTableWithSurvey();
 
@@ -109,6 +109,13 @@ public class TableActivity extends SexyTopoActivity
             final ScrollView scrollView = findViewById(R.id.BodyTableScrollView);
             scrollView.fullScroll(View.FOCUS_DOWN);
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
+        broadcastManager.unregisterReceiver(receiver);
     }
 
 
