@@ -92,8 +92,8 @@ public abstract class GraphActivity extends SexyTopoActivity
         SHOW_STATION_LABELS(R.id.buttonShowStationLabels, true),
         SHOW_CONNECTIONS(R.id.buttonShowConnections, true);
 
-        private int controlId;
-        private boolean defaultValue;
+        private final int controlId;
+        private final boolean defaultValue;
 
         DisplayPreference(int id, boolean defaultValue) {
             this.controlId = id;
@@ -147,12 +147,8 @@ public abstract class GraphActivity extends SexyTopoActivity
 
         preferences = getSharedPreferences("display", Context.MODE_PRIVATE);
 
-        graphView.post(new Runnable() {
-            @Override // Needs to be threaded so it is only run once we know height and width
-            public void run() {
-                setViewLocation();
-            }
-        });
+        // Needs to be threaded so it is only run once we know height and width
+        graphView.post(this::setViewLocation);
     }
 
 
@@ -188,6 +184,11 @@ public abstract class GraphActivity extends SexyTopoActivity
 
 
     private void syncGraphWithSurvey() {
+
+        if (!isInForeground()) {
+            return;
+        }
+
         Survey survey = getSurvey();
         graphView.initialisePaint();
         graphView.setProjectionType(getProjectionType());

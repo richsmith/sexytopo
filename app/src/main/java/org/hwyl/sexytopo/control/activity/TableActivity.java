@@ -10,7 +10,6 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -46,6 +45,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 
 public class TableActivity extends SexyTopoActivity
         implements
@@ -53,11 +54,12 @@ public class TableActivity extends SexyTopoActivity
             PopupMenu.OnDismissListener,
             OnLongClickListener {
 
-    private GraphToListTranslator graphToListTranslator = new GraphToListTranslator();
+    private final GraphToListTranslator graphToListTranslator = new GraphToListTranslator();
 
-    private Map<TextView, GraphToListTranslator.SurveyListEntry> fieldToSurveyEntry = new HashMap<>();
-    private Map<TextView, TableCol> fieldToTableCol = new HashMap<>();
-    private static Map<Station, Integer> stationsToTableIndex = new HashMap<>();
+    private final Map<TextView, GraphToListTranslator.SurveyListEntry> fieldToSurveyEntry
+            = new HashMap<>();
+    private final Map<TextView, TableCol> fieldToTableCol = new HashMap<>();
+    private final static Map<Station, Integer> stationsToTableIndex = new HashMap<>();
     private TextView cellBeingClicked;
 
 
@@ -87,13 +89,14 @@ public class TableActivity extends SexyTopoActivity
         };
         LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
         broadcastManager.registerReceiver(receiver, new IntentFilter(SexyTopo.SURVEY_UPDATED_EVENT));
-        syncTableWithSurvey();
     }
 
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        syncTableWithSurvey();
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && bundle.getString(SexyTopo.JUMP_TO_STATION) != null) {
@@ -131,6 +134,10 @@ public class TableActivity extends SexyTopoActivity
 
     public void syncTableWithSurvey() {
 
+        if (!isInForeground()) {
+            return;
+        }
+
         Survey survey = getSurvey();
 
         stationsToTableIndex.clear();
@@ -149,7 +156,7 @@ public class TableActivity extends SexyTopoActivity
         for (GraphToListTranslator.SurveyListEntry entry : tableEntries) {
 
             TableRow tableRow = (TableRow)LayoutInflater.from(this).inflate(R.layout.table_row, null);
-            final Map map = GraphToListTranslator.createMap(entry);
+            final Map<TableCol, Object> map = GraphToListTranslator.createMap(entry);
 
             for (TableCol col : TableCol.values()) {
 

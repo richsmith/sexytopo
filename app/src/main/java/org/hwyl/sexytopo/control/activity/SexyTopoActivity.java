@@ -54,6 +54,7 @@ import java.util.Set;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Lifecycle;
 
 
 /**
@@ -1026,6 +1027,12 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         return getSurveyManager().getInputMode();
     }
 
+
+    protected boolean isInForeground() {
+        boolean isAtLeastResumed =
+                getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED);
+        return isAtLeastResumed;
+    }
 
     public void showSimpleToast(String message) {
         if (!isFinishing()) {
