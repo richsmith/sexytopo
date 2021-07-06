@@ -40,7 +40,10 @@ public final class Coord2D extends Coord {
     }
 
     public Coord2D normalise() {
-        return this.scale(1/this.mag());
+        double mag = this.mag();
+        if (mag > 0)
+            return this.scale(1/mag);
+        return this;
     }
 
     public String toString() {
