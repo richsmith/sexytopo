@@ -135,6 +135,8 @@ public class GraphView extends View {
     private SketchTool previousSketchTool = SketchTool.SELECT;
     private Symbol currentSymbol = Symbol.getDefault();
 
+    private final float dashedLineInterval = 5;
+
     private final Paint stationPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private final Paint legPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -947,7 +949,8 @@ public class GraphView extends View {
 
             Coord2D viewStationLocation = surveyCoordsToViewCoords(surveyStationLocation);
             drawDashedLine(
-                    canvas, viewStationLocation, centreOnView, 5, crossSectionConnectorPaint);
+                    canvas, viewStationLocation, centreOnView,
+                    dashedLineInterval, crossSectionConnectorPaint);
         }
 
         for (CrossSectionDetail crossSectionDetail : badXSections) {
@@ -998,7 +1001,7 @@ public class GraphView extends View {
             }
 
             if (leg.hasDestination() && !projectionType.isLegInPlane(leg)) {
-                drawDashedLine(canvas, start, end, 5, paint);
+                drawDashedLine(canvas, start, end, dashedLineInterval, paint);
 			} else {
                 canvas.drawLine((float)start.x, (float)start.y, (float)end.x, (float)end.y, paint);
             }
