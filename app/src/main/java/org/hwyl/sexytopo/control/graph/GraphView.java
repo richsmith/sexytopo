@@ -1394,16 +1394,13 @@ public class GraphView extends View {
         double lineLength = Space2DUtils.getDistance(start, end);
         int dashes = (int)(lineLength / dashLength);
 
-        if (dashes < 1)
-            return;
-
         Coord2D direction = end.minus(start).normalize();
         Coord2D dashStep = direction.scale(dashLength);
 
         float stepX = (float)dashStep.x;
         float stepY = (float)dashStep.y;
 
-        float[] lines = new float[dashes * 2 + 2];
+        float[] lines = new float[dashes * 2 + 4];
         int lineIndex = 0;
 
         lines[lineIndex++] = (float)start.x;
@@ -1416,6 +1413,9 @@ public class GraphView extends View {
             lines[lineIndex++] = lastX + stepX;
             lines[lineIndex++] = lastY + stepY;
         }
+
+        lines[lineIndex++] = (float)end.x;
+        lines[lineIndex]   = (float)end.y;
 
         canvas.drawLines(lines, paint);
     }
