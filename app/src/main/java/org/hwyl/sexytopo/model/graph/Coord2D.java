@@ -27,8 +27,23 @@ public final class Coord2D extends Coord {
         return new Coord2D(this.x - coord2D.x, this.y - coord2D.y);
     }
 
+    public Coord2D multiply(Coord2D coord2D) {
+        return new Coord2D(this.x * coord2D.x, this.y * coord2D.y);
+    }
+
     public Coord2D scale(double scale) {
         return new Coord2D(x * scale, y * scale);
+    }
+
+    public double mag() {
+        return Math.sqrt(this.x * this.x + this.y * this.y);
+    }
+
+    public Coord2D normalise() {
+        double mag = this.mag();
+        if (mag > 0)
+            return this.scale(1/mag);
+        return this;
     }
 
     public String toString() {
