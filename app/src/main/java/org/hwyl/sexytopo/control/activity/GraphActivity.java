@@ -108,28 +108,26 @@ public abstract class GraphActivity extends SexyTopoActivity
     private GraphView graphView;
     private SharedPreferences preferences;
 
+    private BroadcastReceiver updatedReceiver;
+    private BroadcastReceiver createdReceiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        BroadcastReceiver updatedReceiver = new BroadcastReceiver() {
+        updatedReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 syncGraphWithSurvey();
             }
         };
-        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
-        broadcastManager.registerReceiver(updatedReceiver,
-                new IntentFilter(SexyTopo.SURVEY_UPDATED_EVENT));
 
-        BroadcastReceiver createdReceiver = new BroadcastReceiver() {
+        createdReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 handleAutoRecentre();
             }
         };
-        broadcastManager.registerReceiver(createdReceiver,
-                new IntentFilter(SexyTopo.NEW_STATION_CREATED_EVENT));
 
         setContentView(R.layout.activity_graph);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -162,13 +160,37 @@ public abstract class GraphActivity extends SexyTopoActivity
     @Override
     protected void onResume() {
         super.onResume();
+
+        registerReceivers();
         syncGraphWithSurvey();
+
+        initialiseGraphView();
         initialiseSketchTool();
         initialiseBrushColour();
         initialiseSymbolToolbar();
         initialiseSymbolTool();
 
         setSketchButtonsStatus();
+    }
+
+    public void onPause() {
+        super.onPause();
+        unregisterReceivers();
+    }
+
+
+    private void registerReceivers() {
+        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
+        broadcastManager.registerReceiver(updatedReceiver,
+                new IntentFilter(SexyTopo.SURVEY_UPDATED_EVENT));
+        broadcastManager.registerReceiver(createdReceiver,
+                new IntentFilter(SexyTopo.NEW_STATION_CREATED_EVENT));
+    }
+
+    private void unregisterReceivers() {
+        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
+        broadcastManager.unregisterReceiver(updatedReceiver);
+        broadcastManager.unregisterReceiver(createdReceiver);
     }
 
     private void setViewLocation() {
@@ -182,24 +204,22 @@ public abstract class GraphActivity extends SexyTopoActivity
         }
     }
 
-
-    private void syncGraphWithSurvey() {
-
-        if (!isInForeground()) {
-            return;
-        }
-
+    private void initialiseGraphView() {
         Survey survey = getSurvey();
         graphView.initialisePaint();
         graphView.setProjectionType(getProjectionType());
         graphView.setProjection(getProjection(survey));
         graphView.setSurvey(survey);
         graphView.setSketch(getSketch(survey));
+    }
 
+
+    private void syncGraphWithSurvey() {
+        Survey survey = getSurvey();
+        graphView.setSurvey(survey);
         double surveyLength = SurveyStats.calcTotalLength(survey);
         double surveyHeight = SurveyStats.calcHeightRange(survey);
         graphView.setCachedStats(surveyLength, surveyHeight);
-
         graphView.invalidate();
     }
 

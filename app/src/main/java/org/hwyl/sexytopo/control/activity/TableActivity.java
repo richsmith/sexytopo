@@ -84,7 +84,9 @@ public class TableActivity extends SexyTopoActivity
         BroadcastReceiver receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(android.content.Context context, Intent intent) {
-                syncTableWithSurvey();
+                if (isInForeground()) {
+                    syncTableWithSurvey();
+                }
             }
         };
         LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
@@ -133,10 +135,6 @@ public class TableActivity extends SexyTopoActivity
 
 
     public void syncTableWithSurvey() {
-
-        if (!isInForeground()) {
-            return;
-        }
 
         Survey survey = getSurvey();
 

@@ -1019,7 +1019,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
     public SurveyManager getSurveyManager() {
-        return SurveyManager.getInstance(this.getApplicationContext());
+        return dataManager;
     }
 
 

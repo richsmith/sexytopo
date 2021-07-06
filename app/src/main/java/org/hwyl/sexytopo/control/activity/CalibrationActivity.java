@@ -10,7 +10,6 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.text.Editable;
 import android.util.Pair;
 import android.view.View;
@@ -26,7 +25,6 @@ import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.comms.DistoXCommunicator;
 import org.hwyl.sexytopo.comms.WriteCalibrationProtocol;
 import org.hwyl.sexytopo.control.Log;
-import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.calibration.CalibrationCalculator;
 import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.control.io.basic.CalibrationJsonTranslater;
@@ -41,6 +39,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 
 public class CalibrationActivity extends SexyTopoActivity {
@@ -129,8 +129,6 @@ public class CalibrationActivity extends SexyTopoActivity {
         LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
         broadcastManager.registerReceiver(updatedCalibrationReceiver,
                 new IntentFilter(SexyTopo.CALIBRATION_UPDATED_EVENT));
-
-        dataManager = SurveyManager.getInstance(this.getApplicationContext());
     }
 
     @Override
@@ -140,7 +138,7 @@ public class CalibrationActivity extends SexyTopoActivity {
     }
 
     private void syncWithReadings() {
-        calibrationReadings = dataManager.getCalibrationReadings();
+        calibrationReadings = getSurveyManager().getCalibrationReadings();
         updateFields();
         updateState();
     }
