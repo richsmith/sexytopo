@@ -10,6 +10,9 @@ This app is experimental software made available for free with no guarantee it i
 
 # FAQ
 
+## How does SexyTopo work?
+SexyTopo is an app that runs on Android and talks to a laser measuring device over Bluetooth. SexyTopo builds up a skeleton of the cave using laser measurements and provides sketching tools to fill in the details. It does other things too.
+
 ## I'm interested in giving SexyTopo a go. What do I do?
 You need an Android phone or tablet. The easiest way is to install SexyTopo via the Google Play app store. Just search for "SexyTopo" and click install. It's a very small download.
 https://play.google.com/store/apps/details?id=org.hwyl.sexytopo
@@ -17,7 +20,16 @@ https://play.google.com/store/apps/details?id=org.hwyl.sexytopo
 If you can't access Google Play for some reason (e.g. you're in China) then you should be able to get the APK from here: https://github.com/richsmith/sexytopo/tree/master/app/release
 
 ## What Android device is best to use with SexyTopo?
-I'm interested in opinions about best options here, but a secondhand Galaxy Note (e.g. 3 or 4) seems to work pretty well. A stylus in particular makes surveying a lot better.
+A large phone or "phablet" (as oppposed to a full-size tablet or small phone) seems to be the best form factor.
+A Galaxy Note is a good choice. Apart from being about the right size, a proper stylus helps greatly in surveying. Consider buying second hand to get an affordable device for taking underground.
+
+## What measuring instruments does SexyTopo work with?
+Currently three:
+* The [DistoX2](https://paperless.bheeb.ch/)
+* The [Shetland Attack Pony 5](https://www.shetlandattackpony.co.uk/)
+* The [Bric4](https://www.caveexploration.org/gear/bric4)
+
+You can also use it in manual mode and input data from old-fashioned analogue instruments if you really have to.
 
 ## I'm interested in the SexyTopo project; can I help?
 Great! Please get in touch. I'm interested in programmers, testers, ideas, etc.! There's also a Facebook group for updates about SexyTopo.
