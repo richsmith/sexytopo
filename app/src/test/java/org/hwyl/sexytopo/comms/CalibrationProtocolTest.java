@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.comms;
 
+import org.hwyl.sexytopo.comms.distox.CalibrationProtocol;
 import org.junit.Assert;
 import org.junit.Test;
 

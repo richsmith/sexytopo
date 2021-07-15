@@ -135,4 +135,16 @@
             android:defaultValue="false"/>
     </PreferenceCategory>
 
+    <PreferenceCategory
+        android:title="Developer"
+        android:key="pref_developer">
+
+        <CheckBoxPreference
+            android:key="pref_key_developer_mode"
+            android:summary="Show debugging menu entries"
+            android:title="Developer mode"
+            android:defaultValue="false"/>
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

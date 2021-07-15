@@ -1,4 +1,4 @@
-package org.hwyl.sexytopo.comms;
+package org.hwyl.sexytopo.comms.sap5;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;

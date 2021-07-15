@@ -13,14 +13,13 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;
 
-
-@RunWith(PowerMockRunner.class)
 @PrepareForTest(Loader.class)
+@RunWith(PowerMockRunner.class)
 public class MetadataTranslaterTest {
 
 
@@ -28,7 +27,8 @@ public class MetadataTranslaterTest {
     public void testActiveStationIsTranslatedToJson() throws Exception {
         Survey survey = new Survey("test");
         String translated = MetadataTranslater.translate(survey);
-        Assert.assertEquals("{\"active-station\":\"1\",\"connections\":{}}", translated);
+        String expected = "{\"active-station\":\"1\",\"connections\":{}}";
+        Assert.assertEquals(expected, translated.replaceAll("\\s", ""));
     }
 
 
@@ -49,7 +49,7 @@ public class MetadataTranslaterTest {
         String translated = MetadataTranslater.translate(survey);
         Assert.assertEquals(
                 "{\"active-station\":\"1\",\"connections\":{\"1\":[[\"connected\",\"1\"]]}}",
-                translated);
+                translated.replaceAll("\\s", ""));
     }
 
     @Test
@@ -65,7 +65,6 @@ public class MetadataTranslaterTest {
 
     }
 
-
     @Test
     public void testConnectedSurveyJsonIsTranslatedToConnectedSurvey() throws Exception {
         String json = "{\"active-station\":\"1\",\"connections\":{\"1\":[[\"connected\",\"1\"]]}}";
@@ -75,7 +74,7 @@ public class MetadataTranslaterTest {
 
         PowerMockito.mockStatic(Loader.class);
         Mockito.when(
-                Loader.loadSurvey((Context)anyObject(), anyString(), anySet(), anyBoolean()))
+                Loader.loadSurvey((Context)any(), anyString(), anySet(), anyBoolean()))
                 .thenReturn(connected);
 
         MetadataTranslater.translateAndUpdate(null, survey, json);

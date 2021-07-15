@@ -1,9 +1,8 @@
-package org.hwyl.sexytopo.comms;
+package org.hwyl.sexytopo.comms.sap5;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 
-import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.Log;
 
@@ -11,8 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import static org.hwyl.sexytopo.control.activity.DeviceActivity.DISTO_X_PREFIX;
-import static org.hwyl.sexytopo.control.activity.DeviceActivity.SHETLAND_PREFIX;
 
 public class SerialSocket {
     private BluetoothDevice bluetoothDevice;

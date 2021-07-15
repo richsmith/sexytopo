@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.control;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -33,6 +34,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
  */
 public class Log {
 
+    @SuppressLint("StaticFieldLeak") // only use ApplicationContext to avoid memory leak
     private static Context context;
     private static LocalBroadcastManager broadcastManager;
 
@@ -50,6 +52,13 @@ public class Log {
 
     public static void setContext(Context context) {
         Log.context = context.getApplicationContext();
+    }
+
+    public static synchronized void device(String message, boolean andToSystemLog) {
+        device(message);
+        if (andToSystemLog) {
+            systemLog(message, false);
+        }
     }
 
     public static synchronized void device(String message) {
@@ -86,6 +95,11 @@ public class Log {
     public static void e(Throwable throwable) {
         e("" + throwable.getMessage());
         e(android.util.Log.getStackTraceString(throwable));
+    }
+
+    public static void i(String message) {
+        android.util.Log.i(SexyTopo.TAG, message);
+        systemLog(message, false);
     }
 
 
@@ -189,6 +203,7 @@ public class Log {
 
     public final static class Message {
 
+        @SuppressLint("SimpleDateFormat")
         private static final SimpleDateFormat FORMAT =
                 new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 

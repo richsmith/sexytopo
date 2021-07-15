@@ -1,4 +1,4 @@
-package org.hwyl.sexytopo.comms;
+package org.hwyl.sexytopo.comms.distox;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

@@ -16,6 +16,7 @@ import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -25,7 +26,9 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
-import org.hwyl.sexytopo.comms.DistoXCommunicator;
+import org.hwyl.sexytopo.comms.Communicator;
+import org.hwyl.sexytopo.comms.Instrument;
+import org.hwyl.sexytopo.comms.missing.NullCommunicator;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.io.Util;
@@ -62,7 +65,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     protected SurveyManager dataManager;
 
-    private static DistoXCommunicator comms;
+    private static Instrument instrument = Instrument.OTHER;
+    private static Communicator comms = NullCommunicator.getInstance();
 
     protected static boolean hasStarted = false;
     private static boolean debugMode = false;
@@ -98,6 +102,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         setOrientation();
+
     }
 
     @Override
@@ -112,16 +117,43 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+
+        // update Instruments menu with any additional options
+        // provided by the connected Instrument's Communicator
+        MenuItem deviceMenu = menu.findItem(R.id.action_device_menu);
+        SubMenu subMenu = deviceMenu.getSubMenu();
+        MenuItem connections = menu.findItem(R.id.action_device_connect);
+        subMenu.clear();
+        subMenu.add(Menu.NONE, R.id.action_device_connect,
+                0, getString(R.string.action_device_connect));
+        Map<Integer, String> commands = requestComms().getCustomCommands();
+        for (Map.Entry<Integer, String> entry: commands.entrySet()) {
+            int id = entry.getKey();
+            String name = entry.getValue();
+            subMenu.add(Menu.NONE, id, 0, name);
+        }
+
+        boolean isDevMenuVisible = getBooleanPreference("pref_key_developer_mode");
+        MenuItem devMenu = menu.findItem(R.id.action_dev_menu);
+        devMenu.setVisible(isDevMenuVisible);
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()) {
+        int itemId = item.getItemId();
+
+        switch (itemId) {
 
             case R.id.action_save:
                 saveSurvey();
                 return true;
-            case R.id.action_device:
+            case R.id.action_device_connect:
                 startActivity(DeviceActivity.class);
                 return true;
             case R.id.action_table:
@@ -135,9 +167,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 return true;
             case R.id.action_survey:
                 startActivity(StatsActivity.class);
-                return true;
-            case R.id.action_calibration:
-                startActivity(CalibrationActivity.class);
                 return true;
             case R.id.action_trip:
                 startActivity(TripActivity.class);
@@ -209,7 +238,12 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 return true;
 
             default:
-                return super.onOptionsItemSelected(item);
+                boolean handled = requestComms().handleCustomCommand(itemId);
+                if (handled) {
+                    return true;
+                } else {
+                    return super.onOptionsItemSelected(item);
+                }
         }
 
     }
@@ -244,26 +278,23 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
 
-    protected DistoXCommunicator requestComms() {
-        return requestComms(DistoXCommunicator.Protocol.NULL);
+    protected Instrument getInstrument() {
+        return instrument;
+    }
+
+    protected void setInstrument(Instrument instrument) {
+        SexyTopoActivity.instrument = instrument;
     }
 
 
-    protected DistoXCommunicator requestComms(DistoXCommunicator.Protocol protocol) {
-
-        if (comms == null || comms.getState() == Thread.State.TERMINATED) {
-            comms = new DistoXCommunicator(this, dataManager);
-        }
-
-        Thread.State commsState = comms.getState();
-        if (commsState == Thread.State.NEW) {
-           comms.requestStart(protocol);
-       } else {
-           comms.setProtocol(protocol);
-       }
-
-       return comms;
+    protected Communicator requestComms() {
+        return comms;
     }
+
+    protected void setComms(Communicator communicator) {
+        SexyTopoActivity.comms = communicator;
+    }
+
 
     private void openAboutDialog() {
         View messageView = getLayoutInflater().inflate(R.layout.about_dialog, null, false);
@@ -320,7 +351,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
 
-    public static String getVersionName(Context context) {
+    public static String getVersionName(android.content.Context context) {
         String version;
         try {
             PackageInfo pInfo =
@@ -333,7 +364,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
 
-    public static int getVersionCode(Context context) {
+    public static int getVersionCode(android.content.Context context) {
         int version;
         try {
             PackageInfo pInfo =
@@ -895,7 +926,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     }
 
-
     private void toggleDebugMode() {
         debugMode = !debugMode;
         dataManager.broadcastSurveyUpdated();
@@ -909,7 +939,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     private void killConnection() {
         try {
             showSimpleToast(R.string.killing_comms_process);
-            comms.stop();
+            comms.forceStop();
         } catch (Exception e) {
             Log.e("problem when trying to kill connection: " + e);
         }
@@ -990,12 +1020,12 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
 
-    private class SaveTask extends AsyncTask<Context, Void, Boolean> {
+    private class SaveTask extends AsyncTask<android.content.Context, Void, Boolean> {
 
         @Override
         protected Boolean doInBackground(Context... contexts) {
             try {
-                Context context = contexts[0];
+                android.content.Context context = contexts[0];
                 Saver.save(context, getSurvey());
                 return true;
             } catch (Exception exception) {

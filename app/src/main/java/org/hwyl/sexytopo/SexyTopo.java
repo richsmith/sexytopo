@@ -47,6 +47,8 @@ public class SexyTopo {
     public static final String PLAN_SUFFIX = "plan";
     public static final String EE_SUFFIX = "ee";
 
+    public static final int JSON_INDENT = 2;
+
     public static final double ALLOWED_DOUBLE_DELTA = 0.0001;
 
     // This is extremely hacky but quite useful for getting a context when it's not sensible

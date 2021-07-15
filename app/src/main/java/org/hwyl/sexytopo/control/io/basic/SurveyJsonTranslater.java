@@ -61,7 +61,7 @@ public class SurveyJsonTranslater {
 
     public static String toText(Survey survey, String versionName, int versionCode)
             throws JSONException {
-        return toJson(survey, versionName, versionCode).toString();
+        return toJson(survey, versionName, versionCode).toString(SexyTopo.JSON_INDENT);
     }
 
 

@@ -65,7 +65,7 @@ public class SurveyManager {
             broadcastSurveyUpdated();
 
             if (stationAdded) {
-                Log.d("New station added");
+                Log.i("New station added");
                 broadcastNewStationCreated();
             }
 

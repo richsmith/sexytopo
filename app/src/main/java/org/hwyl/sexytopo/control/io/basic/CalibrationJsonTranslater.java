@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.control.io.basic;
 
+import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.model.calibration.CalibrationReading;
 import org.json.JSONArray;
@@ -23,7 +24,7 @@ public class CalibrationJsonTranslater {
 
         public static String toText(List<CalibrationReading> calibrationReadings)
                 throws JSONException {
-            return toJson(calibrationReadings).toString();
+            return toJson(calibrationReadings).toString(SexyTopo.JSON_INDENT);
         }
 
 

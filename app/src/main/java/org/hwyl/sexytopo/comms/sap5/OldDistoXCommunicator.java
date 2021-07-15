@@ -1,12 +1,17 @@
 
-package org.hwyl.sexytopo.comms;
+package org.hwyl.sexytopo.comms.sap5;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.comms.distox.CalibrationProtocol;
+import org.hwyl.sexytopo.comms.distox.DistoXProtocol;
+import org.hwyl.sexytopo.comms.distox.MeasurementProtocol;
+import org.hwyl.sexytopo.comms.distox.NullProtocol;
+import org.hwyl.sexytopo.comms.distox.StartCalibrationProtocol;
+import org.hwyl.sexytopo.comms.distox.StopCalibrationProtocol;
+import org.hwyl.sexytopo.comms.distox.WriteCalibrationProtocol;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
@@ -17,12 +22,17 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.hwyl.sexytopo.comms.DistoXProtocol.WAIT_BETWEEN_CONNECTION_ATTEMPTS_MS;
+import static org.hwyl.sexytopo.comms.distox.DistoXProtocol.WAIT_BETWEEN_CONNECTION_ATTEMPTS_MS;
 import static org.hwyl.sexytopo.control.activity.DeviceActivity.DISTO_X_PREFIX;
 import static org.hwyl.sexytopo.control.activity.DeviceActivity.SHETLAND_PREFIX;
 
 
-public class DistoXCommunicator extends Thread {
+/**
+ * Most of this class is now outdated - replaced by DistoXCommunicator and DistoXThread in the
+ * comms.distox package. A copy of the previous version is provided here to work with the existing
+ * SAP5 code.
+ */
+public class OldDistoXCommunicator extends Thread {
 
     public enum Protocol {
         NULL,
@@ -58,7 +68,7 @@ public class DistoXCommunicator extends Thread {
     private boolean keepAlive;
 
 
-    public DistoXCommunicator(SexyTopoActivity activity, SurveyManager dataManager) {
+    public OldDistoXCommunicator(SexyTopoActivity activity, SurveyManager dataManager) {
         this.activity = activity;
         this.dataManager = dataManager;
     }
@@ -241,7 +251,7 @@ public class DistoXCommunicator extends Thread {
             inStream = new DataInputStream(socket.getInputStream());
             outStream = new DataOutputStream(socket.getOutputStream());
         } catch(Exception e) {
-                Log.device("Failed to create socket: " + e.getMessage());
+            Log.device("Failed to create socket: " + e.getMessage());
         } finally {
             if (isConnected()) {
                 Log.device(activity.getString(R.string.device_log_connected));

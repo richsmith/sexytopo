@@ -1,11 +1,10 @@
-package org.hwyl.sexytopo.comms;
+package org.hwyl.sexytopo.comms.distox;
 
-import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
-import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -23,7 +22,7 @@ public abstract class DistoXProtocol {
         UNKNOWN(0b0);
 
         static int PACKET_TYPE_MASK = 0b00111111;
-        private int signature;
+        private final int signature;
         PacketType(int signature) {
             this.signature = signature;
         }
@@ -50,13 +49,13 @@ public abstract class DistoXProtocol {
     public static final int SEQUENCE_BIT_MASK = 0b10000000;
     public static final int ACKNOWLEDGEMENT_PACKET_BASE = 0b01010101;
 
-    protected SexyTopoActivity activity;
+    protected Context context;
     protected SurveyManager dataManager;
     protected BluetoothDevice bluetoothDevice;
 
     protected DistoXProtocol(
-            SexyTopoActivity activity, BluetoothDevice bluetoothDevice, SurveyManager dataManager) {
-        this.activity = activity;
+            Context context, BluetoothDevice bluetoothDevice, SurveyManager dataManager) {
+        this.context = context;
         this.bluetoothDevice = bluetoothDevice;
         this.dataManager = dataManager;
     }
@@ -77,14 +76,13 @@ public abstract class DistoXProtocol {
         byte[] acknowledgePacket = createAcknowledgementPacket(packet);
         outStream.write(acknowledgePacket, 0, acknowledgePacket.length);
         outStream.flush();
-        Log.device("Ac'd Packet: " + describeAcknowledgementPacket(acknowledgePacket));
+        Log.device("Ack'd Packet: " + describeAcknowledgementPacket(acknowledgePacket));
     }
 
 
     protected void writeCommandPacket(DataOutputStream outStream, byte[] packet) throws Exception {
         try {
             outStream.write(packet, 0, packet.length);
-            return;
         } finally {
             outStream.close();
         }
@@ -111,6 +109,9 @@ public abstract class DistoXProtocol {
 
 
     protected byte[] readPacket(DataInputStream inStream) throws IOException {
+        //if (inStream.available() < 1){
+        //    return null;
+        //}
         byte[] packet = new byte[8];
         inStream.readFully(packet, 0, 8);
         Log.device("Read packet: " + describePacket(packet));
@@ -138,27 +139,25 @@ public abstract class DistoXProtocol {
         return true;
     }
 
-    protected static boolean isDataPacket(byte[] packet) {
+    public static boolean isDataPacket(byte[] packet) {
         return PacketType.getType(packet) == PacketType.MEASUREMENT;
     }
 
-
-    @SuppressLint("all")
     public static String describePacket(byte[] packet) {
-        String description = "[";
+        StringBuilder description = new StringBuilder("[");
         for (int i = 0; i < packet.length; i++) {
             if (i == ADMIN) {
-                description += asBinaryString(packet[i] & 0xFF);
+                description.append(asBinaryString(packet[i] & 0xFF));
             } else {
-                description += ",\t" + packet[i];
+                description.append(",\t").append(packet[i]);
             }
         }
-        description += "]";
+        description.append("]");
 
         PacketType type = PacketType.getType(packet);
-        description += " (" + type + ")";
+        description.append(" (").append(type).append(")");
 
-        return description;
+        return description.toString();
     }
 
     public static String asBinaryString(int theByte) {

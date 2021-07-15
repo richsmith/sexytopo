@@ -2,6 +2,7 @@ package org.hwyl.sexytopo.control.io.basic;
 
 import android.content.Context;
 
+import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -25,7 +26,7 @@ public class MetadataTranslater {
 
 
     public static String translate(Survey survey) throws Exception {
-        return toJson(survey).toString();
+        return toJson(survey).toString(SexyTopo.JSON_INDENT);
     }
 
 
