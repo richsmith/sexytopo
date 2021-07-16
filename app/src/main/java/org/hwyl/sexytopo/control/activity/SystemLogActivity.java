@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -13,6 +12,8 @@ import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.util.LogUpdateReceiver;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 
 public class SystemLogActivity extends SexyTopoActivity {
@@ -61,12 +62,7 @@ public class SystemLogActivity extends SexyTopoActivity {
             TextView logView = findViewById(R.id.debugLog);
             final ScrollView scrollView = findViewById(R.id.scrollView);
             LogUpdateReceiver.update(Log.LogType.SYSTEM, scrollView, logView);
-            scrollView.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    scrollView.fullScroll(ScrollView.FOCUS_DOWN);
-                }
-            },1000);
+            scrollView.postDelayed(() -> scrollView.fullScroll(ScrollView.FOCUS_DOWN),1000);
         }
     }
 

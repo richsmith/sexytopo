@@ -19,6 +19,7 @@ package org.hwyl.sexytopo.control.util;
 
 import org.hwyl.sexytopo.model.graph.Coord2D;
 
+@SuppressWarnings({"RedundantIfStatement", "unused"})
 public class CohenSutherlandAlgorithm
 {
     /* Convention: p1,p2 are the vertices of the clipped edge.

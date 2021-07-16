@@ -83,7 +83,7 @@ public class MetadataTranslater {
     }
 
 
-    private static JSONArray toJson(SurveyConnection connection) throws JSONException {
+    private static JSONArray toJson(SurveyConnection connection) {
         JSONArray pair = new JSONArray();
         pair.put(connection.otherSurvey.getName());
         pair.put(connection.stationInOtherSurvey.getName());
@@ -112,6 +112,7 @@ public class MetadataTranslater {
     }
 
 
+    @SuppressWarnings("UnnecessaryContinue")
     private static void translateAndUpdateConnections(
             Context context,
             Survey survey,

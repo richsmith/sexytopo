@@ -12,6 +12,7 @@ public class NullCommunicator extends Communicator {
 
     private final static NullCommunicator INSTANCE = new NullCommunicator(null, null);
 
+    @SuppressWarnings("unused")
     public NullCommunicator(DeviceActivity activity, BluetoothDevice bluetoothDevice) {
         // do nothing
     }

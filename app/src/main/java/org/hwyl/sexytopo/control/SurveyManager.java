@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.control;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -21,8 +22,10 @@ import java.util.List;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 
+@SuppressWarnings("UnnecessaryLocalVariable")
 public class SurveyManager {
 
+    @SuppressLint("StaticFieldLeak") // should be OK - only ref to ApplicationContext kept
     private static SurveyManager instance;
 
     public static SurveyManager getInstance(Context context) {
@@ -39,8 +42,7 @@ public class SurveyManager {
     // This should be created or loaded on startup
     private static Survey currentSurvey = new Survey("Unset");
 
-    private List<CalibrationReading> calibrationReadings =
-            new ArrayList<CalibrationReading>();
+    private List<CalibrationReading> calibrationReadings = new ArrayList<>();
 
 
     public SurveyManager(Context Context) {
@@ -108,7 +110,7 @@ public class SurveyManager {
     }
 
     public void setCurrentSurvey(Survey currentSurvey) {
-        this.currentSurvey = currentSurvey;
+        SurveyManager.currentSurvey = currentSurvey;
         broadcastSurveyUpdated();
     }
 
@@ -138,8 +140,6 @@ public class SurveyManager {
 
 
     private static class AutosaveTask extends AsyncTask<Context, Void, Void> {
-
-        private static boolean isRunning = false;
 
         @Override
         protected Void doInBackground(Context... contexts) {

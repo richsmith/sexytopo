@@ -3,8 +3,8 @@ package org.hwyl.sexytopo.control.io;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Environment;
-import androidx.core.content.ContextCompat;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import androidx.core.content.ContextCompat;
+
 import static org.hwyl.sexytopo.SexyTopo.CALIBRATION_DIR;
 import static org.hwyl.sexytopo.SexyTopo.EXPORT_DIR;
 import static org.hwyl.sexytopo.SexyTopo.IMPORT_DIR;
@@ -31,6 +33,7 @@ import static org.hwyl.sexytopo.SexyTopo.LOG_DIR;
 import static org.hwyl.sexytopo.SexyTopo.SURVEY_DIR;
 
 
+@SuppressWarnings("UnnecessaryLocalVariable")
 public class Util {
 
 
@@ -159,7 +162,7 @@ public class Util {
     }
 
 
-    public static void deleteSurvey(Context context, String name) throws Exception {
+    public static void deleteSurvey(Context context, String name) {
         File surveyDirectory = new File(getDirectoryPathForSurvey(context, name));
         deleteFileAndAnyContents(surveyDirectory);
     }
@@ -239,23 +242,33 @@ public class Util {
 
     public static File getExternalDirectory() {
 
-        File directory = null;
+        File directory;
 
         try {
-            directory = new File(Environment.getExternalStoragePublicDirectory(
-                    Environment.DIRECTORY_DOCUMENTS), "SexyTopo");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                directory = new File(Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_DOCUMENTS), "SexyTopo");
+            } else {
+                directory = new File(
+                        Environment.getExternalStorageDirectory() + "/Documents/SexyTopo");
+            }
 
         } catch (Throwable exception) { //old version of Android?
-            directory = new File(Environment.getExternalStorageDirectory() + "/Documents/SexyTopo");
+            directory = new File(
+                    Environment.getExternalStorageDirectory() + "/Documents/SexyTopo");
 
-        } finally {
-            if (!directory.exists() && !directory.mkdirs()) {
+        }
+
+        if (!directory.exists()) {
+            boolean success = directory.mkdirs();
+
+            if (!success) {
                 throw new IllegalStateException(
                         "Could not create survey master directory " + directory);
             }
-
-            return directory;
         }
+
+        return directory;
     }
 
 

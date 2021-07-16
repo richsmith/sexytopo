@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.control.util;
 
+import android.annotation.SuppressLint;
 import android.text.Html;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -11,6 +12,7 @@ import java.text.SimpleDateFormat;
 
 public class LogUpdateReceiver {
 
+    @SuppressLint("SimpleDateFormat")
     private static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("HH:mm");
 
     public static void update(Log.LogType logType, ScrollView scrollView, TextView logView) {

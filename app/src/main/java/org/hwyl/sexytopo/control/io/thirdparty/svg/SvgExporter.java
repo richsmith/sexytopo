@@ -14,10 +14,11 @@ import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 
+@SuppressWarnings({"UnnecessaryLocalVariable", "SameParameterValue"})
 public class SvgExporter extends DoubleSketchFileExporter {
 
     public static final int SCALE = 10;
@@ -71,7 +72,7 @@ public class SvgExporter extends DoubleSketchFileExporter {
 
     private static void writePathDetail(
             XmlSerializer xmlSerializer, PathDetail pathDetail, int scale)  throws IOException {
-        List<String> coordStrings = new LinkedList<>();
+        List<String> coordStrings = new ArrayList<>();
         for (Coord2D coord2D : pathDetail.getPath()) {
             coordStrings.add(toXmlText(coord2D, scale));
         }

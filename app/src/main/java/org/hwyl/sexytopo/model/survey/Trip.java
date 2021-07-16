@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+
 
 public class Trip {
 
@@ -13,11 +15,12 @@ public class Trip {
         DOG("Dog (assistant)"),
         EXPLORATION("Exploration Team");
 
-        public String description;
+        public final String description;
         Role(String description) {
             this.description = description;
         }
 
+        @NonNull
         public String toString() {
             return description;
         }

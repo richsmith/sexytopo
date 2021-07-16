@@ -1,12 +1,12 @@
 package org.hwyl.sexytopo.control.calibration;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.model.calibration.CalibrationReading;
 import org.junit.Test;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -206,7 +206,7 @@ public class CalibrationCalculatorTest {
 
 
     private static List<CalibrationReading> toCalibrationReadings(int[][] values) {
-        List<CalibrationReading> calibrationReadings = new LinkedList<>();
+        List<CalibrationReading> calibrationReadings = new ArrayList<>();
         for (int[] line : values) {
             CalibrationReading calibrationReading = new CalibrationReading();
             calibrationReading.updateAccelerationValues(line[0], line[1], line[2]);

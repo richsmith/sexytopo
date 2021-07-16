@@ -154,6 +154,7 @@ public class DeviceActivity extends SexyTopoActivity {
     }
 
 
+    @SuppressWarnings("RedundantIfStatement")
     private void updateBluetooth() {
 
         if (BLUETOOTH_ADAPTER == null) {

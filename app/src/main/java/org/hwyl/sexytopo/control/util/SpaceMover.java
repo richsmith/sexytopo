@@ -8,12 +8,12 @@ import org.hwyl.sexytopo.model.survey.Station;
 
 import java.util.Map;
 
-/**
- * Created by rls on 09/09/15.
- */
+
 public class SpaceMover {
+
+    @SuppressWarnings("ConstantConditions")
     public static Space<Coord2D> move(Space<Coord2D> space, Coord2D delta) {
-        Space moved = new Space<Coord2D>();
+        Space<Coord2D> moved = new Space<>();
 
         Map<Station, Coord2D> stationMap = space.getStationMap();
         for (Station station : stationMap.keySet()) {

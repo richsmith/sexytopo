@@ -45,7 +45,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 public class CalibrationActivity extends SexyTopoActivity {
 
-    public static double MAX_ERROR = 0.5;
+    public static final double MAX_ERROR = 0.5;
 
     private enum CalibrationDirection {
         FORWARD(R.string.direction_forward),
@@ -64,7 +64,7 @@ public class CalibrationActivity extends SexyTopoActivity {
         BACK_RIGHT_DOWN(R.string.direction_back_right_down);
 
 
-        int stringId;
+        final int stringId;
 
         CalibrationDirection(int stringId) {
             this.stringId = stringId;
@@ -77,7 +77,7 @@ public class CalibrationActivity extends SexyTopoActivity {
         FACE_DOWN(R.string.orientation_face_down),
         FACE_LEFT(R.string.orientation_face_left);
 
-        int stringId;
+        final int stringId;
 
         Orientation(int stringId) {
             this.stringId = stringId;
@@ -408,6 +408,7 @@ public class CalibrationActivity extends SexyTopoActivity {
     }
 
 
+    @SuppressWarnings("UnnecessaryLocalVariable")
     private String getFilePath(String filename) {
         File directory = Util.getCalibrationDirectory(this);
         String path = Util.getPath(directory, filename);
@@ -515,7 +516,7 @@ public class CalibrationActivity extends SexyTopoActivity {
         }
     }
 
-    public class NotConnectedToDistoException extends Exception {
+    public static class NotConnectedToDistoException extends Exception {
 
     }
 }

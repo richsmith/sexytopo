@@ -19,7 +19,7 @@ public enum Symbol {
 
     private static Resources resources;
 
-    private int bitmapId;
+    private final int bitmapId;
     private Bitmap bitmap;
     private Bitmap buttonBitmap;
 

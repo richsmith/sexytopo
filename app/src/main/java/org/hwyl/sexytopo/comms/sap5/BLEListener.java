@@ -7,14 +7,12 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 
 public class BLEListener {
-    private PipedInputStream readStream;
-    private PipedOutputStream readStreamSource;
+    private final PipedInputStream readStream;
+    private final PipedOutputStream readStreamSource;
 
     public BLEListener() throws IOException {
-        Log.d("BLEListener: readStream  = " + readStream);
         readStream = new PipedInputStream();
         readStreamSource = new PipedOutputStream(readStream);
-        Log.d("BLEListener2: readStream  = " + readStream);
     }
 
     void onSerialConnect      () {

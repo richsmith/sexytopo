@@ -3,7 +3,10 @@ package org.hwyl.sexytopo.model.survey;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.table.TableCol;
 
+import androidx.annotation.NonNull;
 
+
+@SuppressWarnings("UnnecessaryLocalVariable")
 public class Leg extends SurveyComponent {
 
     public static final int MIN_DISTANCE = 0;
@@ -177,6 +180,7 @@ public class Leg extends SurveyComponent {
         return MIN_INCLINATION <= inclination && inclination <= MAX_INCLINATION;
     }
 
+    @NonNull
     public String toString() {
         return
             "(D" + TableCol.DISTANCE.format(distance) +

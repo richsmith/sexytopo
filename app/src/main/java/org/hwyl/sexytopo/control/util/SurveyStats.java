@@ -86,10 +86,6 @@ public class SurveyStats {
         return numSplays;
     }
 
-    public static int calcNumberSplays(Survey survey) {
-        return survey.getAllLegs().size();
-    }
-
     public static int calcNumberSubLegs(Station origin) {
         return Survey.getAllLegs(origin).size();
     }

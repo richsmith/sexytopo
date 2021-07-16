@@ -166,6 +166,7 @@ public class BasicTestSurveyCreator {
     }
 
 
+    @SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
     public static Survey createStraightNorthWithTrip() {
         Survey survey = new Survey("Test Straight Survey North");
 
@@ -175,6 +176,7 @@ public class BasicTestSurveyCreator {
         team.add(new Trip.TeamEntry("Bob",
                 Arrays.asList(Trip.Role.INSTRUMENTS, Trip.Role.DOG)));
         Trip trip = new Trip();
+        trip.setTeam(team);
         survey.setTrip(trip);
 
         Leg leg0 = new Leg(5, 0, 0);

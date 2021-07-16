@@ -8,6 +8,7 @@ import org.hwyl.sexytopo.model.survey.Survey;
  * Essentially works out the angle required for a cross-section using some heuristics and the best
  * info available.
  */
+@SuppressWarnings("UnnecessaryLocalVariable")
 public class CrossSectioner {
 
 

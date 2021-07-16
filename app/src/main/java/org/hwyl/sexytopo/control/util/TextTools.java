@@ -1,5 +1,7 @@
 package org.hwyl.sexytopo.control.util;
 
+import android.annotation.SuppressLint;
+
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -19,6 +21,7 @@ public class TextTools {
     final static DecimalFormat dp2WithoutCommaFormatterUk =
         new DecimalFormat("##0.00", new DecimalFormatSymbols(Locale.UK));
 
+    @SuppressLint("SimpleDateFormat")
     public final static DateFormat ISO_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
 
@@ -89,7 +92,6 @@ public class TextTools {
 
     public static String advanceLastNumber(String originatingName) {
 
-
         if (originatingName.length() == 0) {
             return "1";
         }
@@ -99,7 +101,6 @@ public class TextTools {
 
         for (int i = originatingName.length() - 1; i >= 0; i--) {
             char c = originatingName.charAt(i);
-
 
             if (lastDigitChar == -1 && Character.isDigit(c)) {
                 lastDigitChar = i;
@@ -118,9 +119,9 @@ public class TextTools {
             return originatingName + "1";
         } else {
             String oldDigitString = originatingName.substring(firstDigitChar, lastDigitChar + 1);
-            Integer oldValue = Integer.parseInt(oldDigitString);
-            Integer newValue = oldValue + 1;
-            String newDigitString = newValue.toString();
+            int oldValue = Integer.parseInt(oldDigitString);
+            int newValue = oldValue + 1;
+            String newDigitString = Integer.toString(newValue);
             int lengthDifference = oldDigitString.length() - newDigitString.length();
             if (lengthDifference > 0) {
                 String zeroPadding = new String(new char[lengthDifference]).replace("\0", "0");

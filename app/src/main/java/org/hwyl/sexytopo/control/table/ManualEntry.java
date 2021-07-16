@@ -31,16 +31,13 @@ public class ManualEntry {
     public static void addStation(final TableActivity tableActivity, final Survey survey) {
         AlertDialog dialog = createDialog(R.layout.leg_edit_dialog,
             tableActivity,
-            new EditCallback() {
-                @Override
-                public void submit(Leg leg, Dialog dialog) {
+            (leg, ignore) -> {
                 SurveyUpdater.updateWithNewStation(survey, leg);
                 SurveyManager manager = tableActivity.getSurveyManager();
                 manager.broadcastSurveyUpdated();
                 manager.broadcastNewStationCreated();
                 tableActivity.syncTableWithSurvey();
-            }
-        });
+            });
         dialog.setTitle(R.string.manual_add_station_title);
     }
 
@@ -49,13 +46,10 @@ public class ManualEntry {
     public static void addSplay(final TableActivity tableActivity, final Survey survey) {
         AlertDialog dialog = createDialog(R.layout.leg_edit_dialog,
             tableActivity,
-            new EditCallback() {
-                @Override
-                public void submit(Leg leg, Dialog dialog) {
+            (leg, ignore) -> {
                 SurveyUpdater.update(survey, leg);
                 tableActivity.getSurveyManager().broadcastSurveyUpdated();
                 tableActivity.syncTableWithSurvey();
-                }
             });
         dialog.setTitle(R.string.manual_add_splay_title);
     }
@@ -67,8 +61,7 @@ public class ManualEntry {
 
         AlertDialog dialog = createDialog(R.layout.leg_edit_dialog,
             tableActivity,
-            new EditCallback() {
-                public void submit(Leg edited, Dialog dialog) {
+            (edited, ignore) -> {
                     if (toEdit.hasDestination()) {
                         edited = new Leg(
                             edited.getDistance(),
@@ -83,18 +76,17 @@ public class ManualEntry {
                     SurveyUpdater.editLeg(survey, toEdit, edited);
                     tableActivity.getSurveyManager().broadcastSurveyUpdated();
                     tableActivity.syncTableWithSurvey();
-                }
             });
 
         dialog.setTitle(R.string.manual_edit_leg_title);
 
         Leg editData = toEdit.wasShotBackwards()? toEdit.reverse() : toEdit;
         ((TextView) (dialog.findViewById(R.id.editDistance)))
-                .setText("" + editData.getDistance());
+                .setText(Double.toString(editData.getDistance()));
         ((TextView) (dialog.findViewById(R.id.editAzimuth)))
-                .setText("" + editData.getAzimuth());
+                .setText(Double.toString(editData.getAzimuth()));
         ((TextView) (dialog.findViewById(R.id.editInclination)))
-                .setText("" + editData.getInclination());
+                .setText(Double.toString(editData.getInclination()));
     }
 
 
@@ -102,21 +94,18 @@ public class ManualEntry {
 
         AlertDialog dialog = createDialog(R.layout.leg_edit_dialog_with_lruds,
                 tableActivity,
-                new EditCallback() {
-                    @Override
-                    public void submit(Leg leg, Dialog dialog) {
-                        Station station = survey.getActiveStation();
-                        SurveyUpdater.updateWithNewStation(survey, leg);
-                        Station newActiveStation = survey.getActiveStation();
-                        survey.setActiveStation(station);
-                        createLrudIfPresent(survey, station, dialog, R.id.editDistanceLeft, LRUD.LEFT);
-                        createLrudIfPresent(survey, station, dialog, R.id.editDistanceRight, LRUD.RIGHT);
-                        createLrudIfPresent(survey, station, dialog, R.id.editDistanceUp, LRUD.UP);
-                        createLrudIfPresent(survey, station, dialog, R.id.editDistanceDown, LRUD.DOWN);
-                        survey.setActiveStation(newActiveStation);
-                        tableActivity.getSurveyManager().broadcastSurveyUpdated();
-                        tableActivity.syncTableWithSurvey();
-                    }
+                (leg, theDialog) -> {
+                    Station station = survey.getActiveStation();
+                    SurveyUpdater.updateWithNewStation(survey, leg);
+                    Station newActiveStation = survey.getActiveStation();
+                    survey.setActiveStation(station);
+                    createLrudIfPresent(survey, station, theDialog, R.id.editDistanceLeft, LRUD.LEFT);
+                    createLrudIfPresent(survey, station, theDialog, R.id.editDistanceRight, LRUD.RIGHT);
+                    createLrudIfPresent(survey, station, theDialog, R.id.editDistanceUp, LRUD.UP);
+                    createLrudIfPresent(survey, station, theDialog, R.id.editDistanceDown, LRUD.DOWN);
+                    survey.setActiveStation(newActiveStation);
+                    tableActivity.getSurveyManager().broadcastSurveyUpdated();
+                    tableActivity.syncTableWithSurvey();
                 });
         dialog.setTitle(R.string.manual_add_station_title);
     }
@@ -161,19 +150,8 @@ public class ManualEntry {
         builder
             .setView(dialogView)
             .setTitle(R.string.manual_add_station_title)
-            .setPositiveButton("Save", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int buttonId) {
-                    // do nothing
-                }
-            })
-            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int buttonId) {
-                    // do nothing
-                }
-            });
-
+            .setPositiveButton("Save", (dialog, buttonId) -> { /* Do nothing */ })
+            .setNegativeButton("Cancel", (dialog, buttonId) -> { /* Do nothing */ });
 
         final AlertDialog dialog = builder.create();
 
@@ -181,51 +159,47 @@ public class ManualEntry {
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         dialog.show();
 
-        dialog.setButton(DialogInterface.BUTTON_POSITIVE, "Save", new DialogInterface.OnClickListener() {
+        dialog.setButton(DialogInterface.BUTTON_POSITIVE, "Save",
+                (dialogInterface, buttonId) -> {
 
-            @Override
-            public void onClick(DialogInterface dialogInterface, int buttonId) {
+                    Double distance = getFieldValue(dialog, R.id.editDistance);
+                    Double inclination = getFieldValue(dialog, R.id.editInclination);
 
-                Double distance = getFieldValue(dialog, R.id.editDistance);
-                Double inclination = getFieldValue(dialog, R.id.editInclination);
-
-                Double azimuth;
-                if (tableActivity.getBooleanPreference("pref_key_deg_mins_secs")) {
-                    Double degrees = getFieldValue(dialog, R.id.editAzimuthDegrees);
-                    Double minutes = getFieldValue(dialog, R.id.editAzimuthMinutes);
-                    Double seconds = getFieldValue(dialog, R.id.editAzimuthSeconds);
-                    if (degrees == null || minutes == null || seconds == null) {
-                        azimuth = null;
+                    Double azimuth;
+                    if (tableActivity.getBooleanPreference("pref_key_deg_mins_secs")) {
+                        Double degrees = getFieldValue(dialog, R.id.editAzimuthDegrees);
+                        Double minutes = getFieldValue(dialog, R.id.editAzimuthMinutes);
+                        Double seconds = getFieldValue(dialog, R.id.editAzimuthSeconds);
+                        if (degrees == null || minutes == null || seconds == null) {
+                            azimuth = null;
+                        } else {
+                            azimuth =
+                                degrees +
+                                (minutes * (1.0 / 60.0)) +
+                                (seconds * (1.0 / 60.0) * (1.0 / 60.0));
+                        }
                     } else {
-                        azimuth =
-                            degrees +
-                            (minutes * (1.0 / 60.0)) +
-                            (seconds * (1.0 / 60.0) * (1.0 / 60.0));
+                        azimuth = getFieldValue(dialog, R.id.editAzimuth);
                     }
-                } else {
-                    azimuth = getFieldValue(dialog, R.id.editAzimuth);
-                }
 
-                if (distance == null || !Leg.isDistanceLegal(distance)) {
-                    TextView editDistance = dialogView.findViewById(R.id.editDistance);
-                    editDistance.setError("Bad distance");
-                    tableActivity.showSimpleToast("Bad distance");
-                } else if (azimuth == null || !Leg.isAzimuthLegal(azimuth)) {
-                    TextView editAzimuth = dialogView.findViewById(R.id.editAzimuth);
-                    tableActivity.showSimpleToast("Bad azimuth");
-                    editAzimuth.setError("Bad azimuth");
-                } else if (inclination == null || !Leg.isInclinationLegal(inclination)) {
-                    TextView editInclination = dialogView.findViewById(R.id.editInclination);
-                    editInclination.setError("Bad inclination");
-                    tableActivity.showSimpleToast("Bad inclination " + inclination);
-                } else {
-                    dialogInterface.dismiss();
-                    Leg leg = new Leg(distance, azimuth, inclination);
-                    editCallback.submit(leg, dialog);
-                }
-            }
-
-        });
+                    if (distance == null || !Leg.isDistanceLegal(distance)) {
+                        TextView editDistance = dialogView.findViewById(R.id.editDistance);
+                        editDistance.setError("Bad distance");
+                        tableActivity.showSimpleToast("Bad distance");
+                    } else if (azimuth == null || !Leg.isAzimuthLegal(azimuth)) {
+                        TextView editAzimuth = dialogView.findViewById(R.id.editAzimuth);
+                        tableActivity.showSimpleToast("Bad azimuth");
+                        editAzimuth.setError("Bad azimuth");
+                    } else if (inclination == null || !Leg.isInclinationLegal(inclination)) {
+                        TextView editInclination = dialogView.findViewById(R.id.editInclination);
+                        editInclination.setError("Bad inclination");
+                        tableActivity.showSimpleToast("Bad inclination " + inclination);
+                    } else {
+                        dialogInterface.dismiss();
+                        Leg leg = new Leg(distance, azimuth, inclination);
+                        editCallback.submit(leg, dialog);
+                    }
+                });
 
         return dialog;
 
@@ -268,22 +242,17 @@ public class ManualEntry {
         AlertDialog dialog = new AlertDialog.Builder(activity)
                 .setTitle("Edit name")
                 .setView(renameField)
-                .setPositiveButton("Rename", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int buttonId) {
-                        String newName = renameField.getText().toString();
-                        try {
-                            SurveyUpdater.renameStation(survey, toRename, newName);
-                            activity.syncTableWithSurvey();
-                        } catch (Exception e) {
-                            activity.showSimpleToast("Rename failed");
-                        }
+                .setPositiveButton("Rename", (ignore, buttonId) -> {
+                    String newName = renameField.getText().toString();
+                    try {
+                        SurveyUpdater.renameStation(survey, toRename, newName);
+                        activity.syncTableWithSurvey();
+                    } catch (Exception e) {
+                        activity.showSimpleToast("Rename failed");
                     }
                 })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int buttonId) {
-                        // do nothing
-                    }
-                }).create();
+                .setNegativeButton("Cancel", (ignore, buttonId) -> { /* Do nothing */ })
+                .create();
 
         dialog.getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);

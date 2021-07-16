@@ -5,6 +5,8 @@ import org.hwyl.sexytopo.model.graph.Direction;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+
 
 public class Station extends SurveyComponent {
 
@@ -104,6 +106,7 @@ public class Station extends SurveyComponent {
         }
     }
 
+    @NonNull
     public String toString() {
         return name;
     }

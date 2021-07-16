@@ -12,7 +12,7 @@ import android.widget.TableRow;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopo;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 // see http://blog.stylingandroid.com/archives/432
@@ -47,10 +47,10 @@ public class ScrollingTable extends LinearLayout
 
         super.onLayout(changed, l, t, r, b);
 
-        List<Integer> colWidths = new LinkedList<Integer>();
+        List<Integer> colWidths = new ArrayList<>();
 
-        TableLayout header = (TableLayout) findViewById( R.id.HeaderTable );
-        TableLayout body = (TableLayout) findViewById( R.id.BodyTable );
+        TableLayout header = findViewById( R.id.HeaderTable );
+        TableLayout body = findViewById( R.id.BodyTable );
 
 
 

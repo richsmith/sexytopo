@@ -70,6 +70,7 @@ public class Space2DUtils {
          return newAngle % 360;
     }
 
+    @SuppressWarnings("ConstantConditions")
     public static Space<Coord2D> transform(Space<Coord2D> space, Coord2D point) {
 
         Space<Coord2D> newSpace = new Space<>();

@@ -9,8 +9,8 @@ import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Station;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -74,7 +74,7 @@ public class XviExporter {
     }
 
     private static String getSketchLineText(PathDetail pathDetail, double scale) {
-        List<Object> fields = new LinkedList<>();
+        List<Object> fields = new ArrayList<>();
         fields.add(pathDetail.getColour().toString());
         for (Coord2D coord2D : pathDetail.getPath()) {
             String x = TextTools.formatTo2dpWithDot(coord2D.x * scale);

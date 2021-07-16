@@ -5,7 +5,7 @@ import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.survey.Survey;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -13,7 +13,7 @@ public class Th2Exporter {
 
     public static String getContent(
             Survey survey, double scale, String filename, Space<Coord2D> projection) {
-        List<String> lines = new LinkedList<>();
+        List<String> lines = new ArrayList<>();
         lines.add(TherionExporter.getEncodingText());
         lines.add(getXviBlock(survey, scale, filename, projection));
         return TextTools.join("\n\n", lines);
@@ -36,7 +36,7 @@ public class Th2Exporter {
     public static String getXviBlock(
             Survey survey, double scale, String filename, Space<Coord2D> projection) {
 
-        List<String> lines = new LinkedList<>();
+        List<String> lines = new ArrayList<>();
 
         SketchDimensions dimensions = SketchDimensions.getDimensions(projection);
         double width = dimensions.getWidth();
@@ -67,7 +67,7 @@ public class Th2Exporter {
 
 
     private static String getXviLine(String command, Object... values) {
-        List<String> fields = new LinkedList<>();
+        List<String> fields = new ArrayList<>();
         fields.add("##XTHERION##");
         fields.add(command);
         for (Object value : values) {

@@ -6,6 +6,7 @@ package org.hwyl.sexytopo.control.calibration;
  * Translated into Java from C#. Any mistakes are probably mine.
  * Kindly made available for use in SexyTopo by Beat Heeb.
  */
+@SuppressWarnings("SuspiciousNameCombination")
 public class CalibAlgorithm {
 
     private static final float FV = 24000;
@@ -225,7 +226,7 @@ public class CalibAlgorithm {
 
 
     private static void PutCoeff(byte[] data, int index, float value) {
-        int coeff = (int)Math.round(value);
+        int coeff = Math.round(value);
         data[index] = (byte)coeff;
         data[index + 1] = (byte)(coeff >> 8);
     }

@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
@@ -256,67 +255,55 @@ public class TableActivity extends SexyTopoActivity
 
 
         Context context = this;
+        int itemId = menuItem.getItemId();
 
-        switch (menuItem.getItemId()) {
-
-            case R.id.setActiveStation:
-                Station newActive = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
-                getSurvey().setActiveStation(newActive);
-                syncTableWithSurvey();
-                return true;
-
-            case R.id.graph_station_jump_to_plan:
-                Station planStation = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
-                jumpToStation(planStation, PlanActivity.class);
-                return true;
-
-            case R.id.graph_station_jump_to_ee:
-                Station eeStation = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
-                jumpToStation(eeStation, ExtendedElevationActivity.class);
-                return true;
-
-            case R.id.renameStation:
-                Station toRename = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
-                if (toRename == Survey.NULL_STATION) {
-                    showSimpleToast("Can't rename a splay end");
-                } else {
-                    ManualEntry.renameStation(this, getSurvey(), toRename);
-                }
-                return true;
-
-            case R.id.editLeg:
-                Leg toEdit = surveyEntry.getLeg();
-                ManualEntry.editLeg(this, getSurvey(), toEdit);
-                return true;
-
-            case R.id.moveRow:
-                final Leg toMove = surveyEntry.getLeg();
-                requestMoveLeg(toMove);
-                return true;
-
-            case R.id.upgradeRow:
-                Leg toUpgrade = surveyEntry.getLeg();
-                SurveyUpdater.upgradeSplayToConnectedLeg(getSurvey(), toUpgrade, getInputMode());
-                syncTableWithSurvey();
-                return true;
-
-            case R.id.deleteStation:
-                Station toDelete = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
-                askAboutDeleting(context, toDelete, null);
-                return true;
-
-            case R.id.deleteLeg:
-                askAboutDeleting(context, surveyEntry.getFrom(), surveyEntry.getLeg());
-                return true;
-
-            case R.id.deleteSplay:
-                askAboutDeleting(context, surveyEntry.getFrom(), surveyEntry.getLeg());
-                return true;
-
-            default:
-                return false;
+        if (itemId == R.id.setActiveStation) {
+            Station newActive = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
+            getSurvey().setActiveStation(newActive);
+            syncTableWithSurvey();
+            return true;
+        } else if (itemId == R.id.graph_station_jump_to_plan) {
+            Station planStation = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
+            jumpToStation(planStation, PlanActivity.class);
+            return true;
+        } else if (itemId == R.id.graph_station_jump_to_ee) {
+            Station eeStation = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
+            jumpToStation(eeStation, ExtendedElevationActivity.class);
+            return true;
+        } else if (itemId == R.id.renameStation) {
+            Station toRename = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
+            if (toRename == Survey.NULL_STATION) {
+                showSimpleToast("Can't rename a splay end");
+            } else {
+                ManualEntry.renameStation(this, getSurvey(), toRename);
+            }
+            return true;
+        } else if (itemId == R.id.editLeg) {
+            Leg toEdit = surveyEntry.getLeg();
+            ManualEntry.editLeg(this, getSurvey(), toEdit);
+            return true;
+        } else if (itemId == R.id.moveRow) {
+            final Leg toMove = surveyEntry.getLeg();
+            requestMoveLeg(toMove);
+            return true;
+        } else if (itemId == R.id.upgradeRow) {
+            Leg toUpgrade = surveyEntry.getLeg();
+            SurveyUpdater.upgradeSplayToConnectedLeg(getSurvey(), toUpgrade, getInputMode());
+            syncTableWithSurvey();
+            return true;
+        } else if (itemId == R.id.deleteStation) {
+            Station toDelete = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
+            askAboutDeleting(context, toDelete, null);
+            return true;
+        } else if (itemId == R.id.deleteLeg) {
+            askAboutDeleting(context, surveyEntry.getFrom(), surveyEntry.getLeg());
+            return true;
+        } else if (itemId == R.id.deleteSplay) {
+            askAboutDeleting(context, surveyEntry.getFrom(), surveyEntry.getLeg());
+            return true;
+        } else {
+            return false;
         }
-
     }
 
 
@@ -364,18 +351,14 @@ public class TableActivity extends SexyTopoActivity
 
         new AlertDialog.Builder(context)
                 .setMessage(message)
-                .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Survey survey = getSurvey();
-                        if (deletingLeg) {
-                            SurveyUpdater.deleteSplay(survey, station, leg);
-                        } else {
-                            SurveyUpdater.deleteStation(survey, station);
-                        }
-                        getSurveyManager().broadcastSurveyUpdated();
+                .setPositiveButton(R.string.delete, (dialog, which) -> {
+                    Survey survey = getSurvey();
+                    if (deletingLeg) {
+                        SurveyUpdater.deleteSplay(survey, station, leg);
+                    } else {
+                        SurveyUpdater.deleteStation(survey, station);
                     }
+                    getSurveyManager().broadcastSurveyUpdated();
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show();
@@ -433,16 +416,12 @@ public class TableActivity extends SexyTopoActivity
         new AlertDialog.Builder(this)
                 .setMessage(R.string.move_leg_select_station_title)
                 .setView(stationView)
-                .setPositiveButton(R.string.move, new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.move, (dialog, which) -> {
+                    String selectedName = spinner.getSelectedItem().toString();
+                    Station newStation = getSurvey().getStationByName(selectedName);
 
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String selectedName = spinner.getSelectedItem().toString();
-                        Station newStation = getSurvey().getStationByName(selectedName);
-
-                        SurveyUpdater.moveLeg(getSurvey(), toMove, newStation);
-                        syncTableWithSurvey();
-                    }
+                    SurveyUpdater.moveLeg(getSurvey(), toMove, newStation);
+                    syncTableWithSurvey();
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show();

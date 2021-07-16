@@ -22,8 +22,8 @@ import java.util.List;
  */
 public class CompassExporter extends SingleFileExporter {
 
-    private static DateFormat dateFormat = new SimpleDateFormat("MM dd yyyy");
-    private static GraphToListTranslator graphToListTranslator = new GraphToListTranslator();
+    private static final DateFormat dateFormat = new SimpleDateFormat("MM dd yyyy");
+    private static final GraphToListTranslator graphToListTranslator = new GraphToListTranslator();
     private Station currentFrom;
     private int splayCount;
 

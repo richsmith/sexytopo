@@ -47,7 +47,7 @@ public class Log {
     public enum LogType {
         SYSTEM,
         DEVICE
-    };
+    }
 
 
     public static void setContext(Context context) {

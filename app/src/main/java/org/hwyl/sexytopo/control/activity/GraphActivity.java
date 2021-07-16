@@ -240,43 +240,44 @@ public abstract class GraphActivity extends SexyTopoActivity
 
 
     public boolean onMenuItemClick(MenuItem item) {
-        int id = item.getItemId();
+        int itemId = item.getItemId();
 
-        switch(id) {
-            case R.id.buttonSnapToLines:
-                setDisplayPreference(DisplayPreference.SNAP_TO_LINES, !item.isChecked());
-                return true;
-            case R.id.buttonShowGrid:
-                setDisplayPreference(DisplayPreference.SHOW_GRID, !item.isChecked());
-                graphView.invalidate();
-                return true;
-            case R.id.buttonFadeNonActive:
-                setDisplayPreference(DisplayPreference.FADE_NON_ACTIVE, !item.isChecked());
-                graphView.invalidate();
-                return true;
-            case R.id.buttonShowSplays:
-                setDisplayPreference(DisplayPreference.SHOW_SPLAYS, !item.isChecked());
-                graphView.invalidate();
-                return true;
-            case R.id.buttonShowSketch:
-                setDisplayPreference(DisplayPreference.SHOW_SKETCH, !item.isChecked());
-                setSketchButtonsStatus();
-                graphView.invalidate();
-                return true;
-            case R.id.buttonShowStationLabels:
-                setDisplayPreference(DisplayPreference.SHOW_STATION_LABELS, !item.isChecked());
-                graphView.invalidate();
-                return true;
-            case R.id.buttonShowConnections:
-                setDisplayPreference(DisplayPreference.SHOW_CONNECTIONS, !item.isChecked());
-                graphView.invalidate();
-                return true;
-            case R.id.buttonAutoRecentre:
-                setDisplayPreference(DisplayPreference.AUTO_RECENTRE, !item.isChecked());
-                graphView.invalidate();
-                return true;
-            default:
-                return handleAction(id);
+        // this has to be a big hairy if-else chain instead of a switch statement
+        // (itemId is no longer a constant in later Android versions)
+        if (itemId == R.id.buttonSnapToLines) {
+            setDisplayPreference(DisplayPreference.SNAP_TO_LINES, !item.isChecked());
+            return true;
+        } else if (itemId == R.id.buttonShowGrid) {
+            setDisplayPreference(DisplayPreference.SHOW_GRID, !item.isChecked());
+            graphView.invalidate();
+            return true;
+        } else if (itemId == R.id.buttonFadeNonActive) {
+            setDisplayPreference(DisplayPreference.FADE_NON_ACTIVE, !item.isChecked());
+            graphView.invalidate();
+            return true;
+        } else if (itemId == R.id.buttonShowSplays) {
+            setDisplayPreference(DisplayPreference.SHOW_SPLAYS, !item.isChecked());
+            graphView.invalidate();
+            return true;
+        } else if (itemId == R.id.buttonShowSketch) {
+            setDisplayPreference(DisplayPreference.SHOW_SKETCH, !item.isChecked());
+            setSketchButtonsStatus();
+            graphView.invalidate();
+            return true;
+        } else if (itemId == R.id.buttonShowStationLabels) {
+            setDisplayPreference(DisplayPreference.SHOW_STATION_LABELS, !item.isChecked());
+            graphView.invalidate();
+            return true;
+        } else if (itemId == R.id.buttonShowConnections) {
+            setDisplayPreference(DisplayPreference.SHOW_CONNECTIONS, !item.isChecked());
+            graphView.invalidate();
+            return true;
+        } else if (itemId == R.id.buttonAutoRecentre) {
+            setDisplayPreference(DisplayPreference.AUTO_RECENTRE, !item.isChecked());
+            graphView.invalidate();
+            return true;
+        } else {
+            return handleAction(itemId);
         }
 
     }
@@ -302,13 +303,13 @@ public abstract class GraphActivity extends SexyTopoActivity
     }
 
 
-    public boolean handleAction(int id) {
+    public boolean handleAction(int itemId) {
 
         GraphView graphView = findViewById(R.id.graphView);
         graphView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
 
         for (BrushColour brushColour: BrushColour.values()) {
-            if (brushColour.getId() == id) {
+            if (brushColour.getId() == itemId) {
                 selectBrushColour(brushColour);
                 if (!graphView.getSketchTool().usesColour()) {
                     selectSketchTool(SketchTool.DRAW);
@@ -319,7 +320,7 @@ public abstract class GraphActivity extends SexyTopoActivity
 
         SketchTool alreadySelectedTool = graphView.getSketchTool();
         for (SketchTool sketchTool: SketchTool.values()) {
-            if (sketchTool.getId() == id) {
+            if (sketchTool.getId() == itemId) {
                 if (alreadySelectedTool == SketchTool.SYMBOL && sketchTool == SketchTool.SYMBOL) {
                     toggleSymbolToolbar();
                 } else {
@@ -330,43 +331,44 @@ public abstract class GraphActivity extends SexyTopoActivity
         }
 
         for (Symbol symbol : Symbol.values()) {
-            if (id == symbol.getBitmapId()) {
+            if (itemId == symbol.getBitmapId()) {
                 selectSketchTool(SketchTool.SYMBOL);
                 selectSymbol(symbol);
+                return true;
             }
         }
-        if (id == R.id.buttonSymbolToolbarClose) {
+
+        if (itemId == R.id.buttonSymbolToolbarClose) {
             setSymbolToolbarOpen(false);
+            return true;
+        } else if (itemId == R.id.buttonZoomIn) {
+            graphView.adjustZoomBy(ZOOM_INCREMENT);
+            graphView.invalidate();
+            return true;
+        } else if (itemId == R.id.buttonZoomOut) {
+            graphView.adjustZoomBy(ZOOM_DECREMENT);
+            graphView.invalidate();
+            return true;
+        } else if (itemId == R.id.buttonUndo) {
+            graphView.undo();
+            return true;
+        } else if (itemId == R.id.buttonRedo) {
+            graphView.redo();
+            return true;
+        } else if (itemId == R.id.buttonMenu) {
+            openDisplayMenu();
+            return true;
+        } else if (itemId == R.id.buttonCentreView) {
+            graphView.centreViewOnActiveStation();
+            graphView.invalidate();
+            return true;
+        } else if (itemId == R.id.buttonDeleteLastLeg) {
+            getSurvey().undoAddLeg();
+            syncGraphWithSurvey();
+            return true;
         }
 
-        switch(id) {
-            case R.id.buttonZoomIn:
-                graphView.adjustZoomBy(ZOOM_INCREMENT);
-                graphView.invalidate();
-                break;
-            case R.id.buttonZoomOut:
-                graphView.adjustZoomBy(ZOOM_DECREMENT);
-                graphView.invalidate();
-                break;
-            case R.id.buttonUndo:
-                graphView.undo();
-                break;
-            case R.id.buttonRedo:
-                graphView.redo();
-                break;
-            case R.id.buttonMenu:
-                openDisplayMenu();
-                break;
-            case R.id.buttonCentreView:
-                graphView.centreViewOnActiveStation();
-                graphView.invalidate();
-                break;
-            case R.id.buttonDeleteLastLeg:
-                getSurvey().undoAddLeg();
-                syncGraphWithSurvey();
-                break;
-        }
-        return true;
+        return false;
     }
 
 

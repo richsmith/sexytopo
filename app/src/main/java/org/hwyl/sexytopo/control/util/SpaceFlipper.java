@@ -8,11 +8,10 @@ import org.hwyl.sexytopo.model.survey.Station;
 
 import java.util.Map;
 
-/**
- * Created by rls on 18/02/15.
- */
+
 public class SpaceFlipper {
 
+    @SuppressWarnings("ConstantConditions")
     public static Space<Coord2D> flipVertically(Space<Coord2D> space) {
 
         Space<Coord2D> flippedSpace = new Space<>();
@@ -28,7 +27,7 @@ public class SpaceFlipper {
             Line<Coord2D> line = legMap.get(leg);
             Coord2D start = line.getStart();
             Coord2D end = line.getEnd();
-            Line flippedLine = new Line(start.flipVertically(), end.flipVertically());
+            Line<Coord2D> flippedLine = new Line<>(start.flipVertically(), end.flipVertically());
             flippedSpace.addLeg(leg, flippedLine);
         }
 

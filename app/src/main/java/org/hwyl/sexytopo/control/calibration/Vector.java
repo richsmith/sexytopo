@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.control.calibration;
 
+@SuppressWarnings("unused")
 public class Vector {
     public float x, y, z;
 

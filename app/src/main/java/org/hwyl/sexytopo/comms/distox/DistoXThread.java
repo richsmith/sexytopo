@@ -206,6 +206,7 @@ public class DistoXThread extends Thread {
     }
 
 
+    @SuppressWarnings("BusyWait")
     public void tryToConnectUntilConnected() {
 
         while(keepAlive && !isConnected()) {

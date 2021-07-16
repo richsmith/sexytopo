@@ -97,14 +97,12 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
     public void requestClear(View view) {
         new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.dialog_confirm_clear_trip))
-                .setPositiveButton(R.string.clear, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        EditText comments = findViewById(R.id.trip_comments);
-                        comments.setText("");
-                        team.clear();
-                        syncListWithTeam();
-                        updateButtonStatus();
-                    }
+                .setPositiveButton(R.string.clear, (dialog, whichButton) -> {
+                    EditText comments = findViewById(R.id.trip_comments);
+                    comments.setText("");
+                    team.clear();
+                    syncListWithTeam();
+                    updateButtonStatus();
                 }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 // Do nothing.
@@ -137,9 +135,7 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
             .setTitle(getString(R.string.dialog_title_add_to_team))
             .setView(layout)
             .setPositiveButton(getString(R.string.add),
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                    (dialog, which) -> {
                         String name = nameField.getText().toString();
                         SparseBooleanArray checked = roleList.getCheckedItemPositions();
                         List<Trip.Role> selectedRoles = new ArrayList<>();
@@ -150,16 +146,9 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
                         }
                         addTeamMember(name, selectedRoles);
                         dialog.dismiss();
-                    }
-            })
+                    })
             .setNegativeButton(getString(R.string.cancel),
-                new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+                    (dialog, which) -> dialog.dismiss());
 
         builderSingle.show();
     }
@@ -208,6 +197,7 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
 
 
 
+    @SuppressWarnings("UnnecessaryLocalVariable")
     public void requestDeleteSelected(View view) {
         TeamListArrayAdapter adapter = getTeamListArrayAdapter();
         List<Trip.TeamEntry> toKeep = adapter.getUnchecked();
@@ -275,29 +265,20 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
                         .setTitle(getString(R.string.edit))
                         .setView(layout)
                         .setPositiveButton(getString(R.string.save),
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        String name = nameField.getText().toString();
-                                        SparseBooleanArray checked = roleList.getCheckedItemPositions();
-                                        List<Trip.Role> selectedRoles = new ArrayList<>();
-                                        for (int i = 0; i < Trip.Role.values().length; i++) {
-                                            if (checked.get(i)) {
-                                                selectedRoles.add(Trip.Role.values()[i]);
-                                            }
+                                (dialog, which) -> {
+                                    String name = nameField.getText().toString();
+                                    SparseBooleanArray checked = roleList.getCheckedItemPositions();
+                                    List<Trip.Role> selectedRoles = new ArrayList<>();
+                                    for (int i = 0; i < Trip.Role.values().length; i++) {
+                                        if (checked.get(i)) {
+                                            selectedRoles.add(Trip.Role.values()[i]);
                                         }
-                                        setTeamMember(position, name, selectedRoles);
-                                        dialog.dismiss();
                                     }
+                                    setTeamMember(position, name, selectedRoles);
+                                    dialog.dismiss();
                                 })
                         .setNegativeButton(getString(R.string.cancel),
-                                new DialogInterface.OnClickListener() {
-
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                });
+                                (dialog, which) -> dialog.dismiss());
 
         builderSingle.show();
     }
@@ -306,11 +287,14 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
     public class TeamListArrayAdapter extends ArrayAdapter<Trip.TeamEntry> {
 
         private final Context context;
-        private boolean[] checked;
-        private List<Trip.TeamEntry> team;
+        private final boolean[] checked;
+        private final List<Trip.TeamEntry> team;
 
         public TeamListArrayAdapter(Context context, List<Trip.TeamEntry> team) {
-            super(context, android.R.layout.simple_list_item_multiple_choice, team.toArray(new Trip.TeamEntry[]{}));
+            super(
+                context,
+                android.R.layout.simple_list_item_multiple_choice,
+                team.toArray(new Trip.TeamEntry[]{}));
             this.context = context;
             this.team = team;
             this.checked = new boolean[team.size()];
@@ -329,12 +313,9 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
             String roles = TextTools.join(", ", teamEntry.roles);
             roleField.setText(roles);
             final CheckBox checkBox = rowView.findViewById(R.id.settings_notification_checkbox);
-            checkBox.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    checked[position] = checkBox.isChecked();
-                    updateButtonStatus();
-                }
+            checkBox.setOnClickListener(view -> {
+                checked[position] = checkBox.isChecked();
+                updateButtonStatus();
             });
             rowView.setOnClickListener(TripActivity.this);
             return rowView;

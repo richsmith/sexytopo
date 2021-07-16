@@ -17,16 +17,14 @@ import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * Basic import for the .txt file that is exported by PocketTopo.
  */
+@SuppressWarnings("UnnecessaryLocalVariable")
 public class PocketTopoTxtImporter extends Importer {
 
 
@@ -186,7 +184,7 @@ public class PocketTopoTxtImporter extends Importer {
         // a section in the file format appears to be made up of a header, followed by the content,
         // followed by either another header (one line of uppercase text) or end of text
 
-        List<String> subSection = new LinkedList<>();
+        List<String> subSection = new ArrayList<>();
         boolean inSubSection = false;
         for (String line : TextTools.toArrayOfLines(text)) {
             if (line.trim().equals(header)) {

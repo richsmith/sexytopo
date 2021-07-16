@@ -46,6 +46,7 @@ public class DistoXSocket {
         }
     }
 
+    @SuppressWarnings("UnnecessaryLocalVariable")
     private BluetoothSocket createFallbackSocket() throws Exception {
         BluetoothSocket socket = (BluetoothSocket)
                 bluetoothDevice.getClass()

@@ -14,9 +14,9 @@ public enum SketchTool {
     PINCH_TO_ZOOM(-1, false, true),
     MODAL_MOVE(-1, false, true);
 
-    private int id;
-    private boolean usesColour;
-    private boolean isModal;
+    private final int id;
+    private final boolean usesColour;
+    private final boolean isModal;
 
     SketchTool(int id, boolean usesColour, boolean isModal) {
         this.id = id;

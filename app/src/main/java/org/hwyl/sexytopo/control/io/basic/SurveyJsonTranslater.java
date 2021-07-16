@@ -20,7 +20,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
@@ -174,7 +173,7 @@ public class SurveyJsonTranslater {
         boolean first = true;
         for (JSONObject stationObject : stationData) {
 
-            Station station = null;
+            Station station;
             try {
                 station = toStation(stationObject);
             } catch (Exception exception) {
@@ -202,8 +201,8 @@ public class SurveyJsonTranslater {
 
         // second pass: add the legs
         Map<Integer, Leg> indexToLegs = new HashMap<>();
-        List<Leg> unindexedLegs = new LinkedList<>();
-        List<Station> connectedDestinations = new LinkedList<>();
+        List<Leg> unindexedLegs = new ArrayList<>();
+        List<Station> connectedDestinations = new ArrayList<>();
 
         for (JSONObject stationObject : stationData) {
             String name = stationObject.getString(STATION_NAME_TAG);
@@ -212,7 +211,7 @@ public class SurveyJsonTranslater {
             JSONArray legArray = stationObject.getJSONArray(ONWARD_LEGS_TAG);
             for (JSONObject legObject : Util.toList(legArray)) {
 
-                Leg leg = null;
+                Leg leg;
                 try {
                     leg = toLeg(namesToStations, legObject);
 

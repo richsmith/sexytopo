@@ -8,7 +8,7 @@ import java.util.List;
 
 public class DeletedDetail extends SketchDetail {
 
-    private SketchDetail deletedDetail;
+    private final SketchDetail deletedDetail;
     private List<SketchDetail> replacementDetails;
 
     public DeletedDetail(SketchDetail sketchDetail) {

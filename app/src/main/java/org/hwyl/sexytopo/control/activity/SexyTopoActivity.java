@@ -60,6 +60,7 @@ import androidx.core.content.ContextCompat;
 /**
  * Base class for all activities that use the action bar.
  */
+@SuppressWarnings("SameParameterValue")
 public abstract class SexyTopoActivity extends AppCompatActivity {
 
 
@@ -148,102 +149,100 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
         int itemId = item.getItemId();
 
-        switch (itemId) {
-
-            case R.id.action_save:
-                saveSurvey();
+        // this has to be a big hairy if-else chain instead of a switch statement
+        // (itemId is no longer a constant in later Android versions)
+        if (itemId == R.id.action_save) {
+            saveSurvey();
+            return true;
+        } else if (itemId == R.id.action_device_connect) {
+            startActivity(DeviceActivity.class);
+            return true;
+        } else if (itemId == R.id.action_table) {
+            startActivity(TableActivity.class);
+            return true;
+        } else if (itemId == R.id.action_plan) {
+            startActivity(PlanActivity.class);
+            return true;
+        } else if (itemId == R.id.action_elevation) {
+            startActivity(ExtendedElevationActivity.class);
+            return true;
+        } else if (itemId == R.id.action_survey) {
+            startActivity(StatsActivity.class);
+            return true;
+        } else if (itemId == R.id.action_trip) {
+            startActivity(TripActivity.class);
+            return true;
+        } else if (itemId == R.id.action_settings) {
+            startActivity(SettingsActivity.class);
+            return true;
+        } else if (itemId == R.id.action_help) {
+            startActivity(GuideActivity.class);
+            return true;
+        } else if (itemId == R.id.action_about) {
+            openAboutDialog();
+            return true;
+        } else if (
+                itemId == R.id.action_input_mode_forward ||
+                itemId == R.id.action_input_mode_backward ||
+                itemId == R.id.action_input_mode_combo ||
+                itemId == R.id.action_input_mode_cal_check) {
+            setInputModePreference(item);
+            return true;
+        } else if (itemId == R.id.action_file_new) {
+            confirmToProceedIfNotSaved("startNewSurvey");
+            return true;
+        } else if (itemId == R.id.action_file_open) {
+            confirmToProceedIfNotSaved("openSurvey");
+            return true;
+        } else if (itemId == R.id.action_file_delete) {
+            deleteSurvey();
+            return true;
+        } else if (itemId == R.id.action_file_save) {
+            saveSurvey();
+            return true;
+        } else if (itemId == R.id.action_file_save_as) {
+            saveSurveyAsName();
+            return true;
+        } else if (itemId == R.id.action_file_import) {
+            confirmToProceedIfNotSaved("importSurvey");
+            return true;
+        } else if (itemId == R.id.action_file_export) {
+            confirmToProceedIfNotSaved("exportSurvey");
+            return true;
+        } else if (itemId == R.id.action_file_restore_autosave) {
+            restoreAutosave();
+            return true;
+        } else if (itemId == R.id.action_file_exit) {
+            confirmToProceedIfNotSaved(R.string.exit_question, "exit");
+            return true;
+        } else if (itemId == R.id.action_undo_last_leg) {
+            undoLastLeg();
+            return true;
+        } else if (itemId == R.id.action_link_survey) {
+            confirmToProceedIfNotSaved("linkExistingSurvey");
+            return true;
+        } else if (itemId == R.id.action_system_log) {
+            startActivity(SystemLogActivity.class);
+            return true;
+        } else if (itemId == R.id.action_generate_test_survey) {
+            generateTestSurvey();
+            return true;
+        } else if (itemId == R.id.action_debug_mode) {
+            toggleDebugMode();
+            return true;
+        } else if (itemId == R.id.action_kill_connection) {
+            killConnection();
+            return true;
+        } else if (itemId == R.id.action_force_crash) {
+            forceCrash();
+            return true;
+        } else {
+            boolean handled = requestComms().handleCustomCommand(itemId);
+            if (handled) {
                 return true;
-            case R.id.action_device_connect:
-                startActivity(DeviceActivity.class);
-                return true;
-            case R.id.action_table:
-                startActivity(TableActivity.class);
-                return true;
-            case R.id.action_plan:
-                startActivity(PlanActivity.class);
-                return true;
-            case R.id.action_elevation:
-                startActivity(ExtendedElevationActivity.class);
-                return true;
-            case R.id.action_survey:
-                startActivity(StatsActivity.class);
-                return true;
-            case R.id.action_trip:
-                startActivity(TripActivity.class);
-                return true;
-            case R.id.action_settings:
-                startActivity(SettingsActivity.class);
-                return true;
-            case R.id.action_help:
-                startActivity(GuideActivity.class);
-                return true;
-            case R.id.action_about:
-                openAboutDialog();
-                return true;
-
-            case R.id.action_input_mode_forward:
-            case R.id.action_input_mode_backward:
-            case R.id.action_input_mode_combo:
-            case R.id.action_input_mode_cal_check:
-                setInputModePreference(item);
-                return true;
-
-            case R.id.action_file_new:
-                confirmToProceedIfNotSaved("startNewSurvey");
-                return true;
-            case R.id.action_file_open:
-                confirmToProceedIfNotSaved("openSurvey");
-                return true;
-            case R.id.action_file_delete:
-                deleteSurvey();
-                return true;
-            case R.id.action_file_save:
-                saveSurvey();
-                return true;
-            case R.id.action_file_save_as:
-                saveSurveyAsName();
-                return true;
-            case R.id.action_file_import:
-                confirmToProceedIfNotSaved("importSurvey");
-                return true;
-            case R.id.action_file_export:
-                confirmToProceedIfNotSaved("exportSurvey");
-                return true;
-            case R.id.action_file_restore_autosave:
-                restoreAutosave();
-                return true;
-            case R.id.action_file_exit:
-                confirmToProceedIfNotSaved(R.string.exit_question, "exit");
-                return true;
-            case R.id.action_undo_last_leg:
-                undoLastLeg();
-                return true;
-            case R.id.action_link_survey:
-                confirmToProceedIfNotSaved("linkExistingSurvey");
-                return true;
-            case R.id.action_system_log:
-                startActivity(SystemLogActivity.class);
-                return true;
-            case R.id.action_generate_test_survey:
-                generateTestSurvey();
-                return true;
-            case R.id.action_debug_mode:
-                toggleDebugMode();
-                return true;
-            case R.id.action_kill_connection:
-                killConnection();
-                return true;
-            case R.id.action_force_crash:
-                forceCrash();
-                return true;
-
-            default:
-                boolean handled = requestComms().handleCustomCommand(itemId);
-                if (handled) {
-                    return true;
-                } else {
-                    return super.onOptionsItemSelected(item);
-                }
+            } else {
+                return super.onOptionsItemSelected(item);
+            }
         }
 
     }
@@ -340,6 +339,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                     String name = arrayAdapter.getItem(which);
                     Exporter selectedExporter = nameToExporter.get(name);
                     try {
+                        assert selectedExporter != null;
                         selectedExporter.export(SexyTopoActivity.this, survey);
                         showSimpleToast(survey.getName() + " " +
                                 getString(R.string.export_successful));
@@ -630,8 +630,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 this,
                 android.R.layout.select_dialog_item);
 
-        final Set<SurveyConnection> connections = survey.getConnectedSurveys().get(station);
-
+        final Set<SurveyConnection> connections = survey.getSurveysConnectedTo(station);
         for (SurveyConnection connection : connections) {
             arrayAdapter.add(connection.otherSurvey.getName());
         }
@@ -660,6 +659,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 });
         builderSingle.show();
     }
+
 
 
     private void unlinkSurveyConnection(Survey from, Station stationFrom,
@@ -834,6 +834,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
 
+
     protected void confirmToProceed(
             int titleId, int messageId, int confirmId, int cancelId,
             final String methodToCallIfProceeding,
@@ -876,7 +877,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     protected void invokeMethod(String name, Object... args) {
         try {
-            List<Class> classes = new ArrayList<>();
+            List<Class<?>> classes = new ArrayList<>();
             for (Object arg : args) {
                 classes.add(arg.getClass());
             }

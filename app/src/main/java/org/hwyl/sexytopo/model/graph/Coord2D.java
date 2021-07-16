@@ -1,6 +1,8 @@
 package org.hwyl.sexytopo.model.graph;
 
 
+import android.annotation.SuppressLint;
+
 import org.hwyl.sexytopo.control.util.NumberTools;
 
 
@@ -46,6 +48,7 @@ public final class Coord2D extends Coord {
         return this;
     }
 
+    @SuppressLint("DefaultLocale")
     public String toString() {
         return String.format("(%.2f, %.2f)", x, y);
     }

@@ -4,7 +4,7 @@ import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public final class PathDetail extends SketchDetail {
@@ -14,7 +14,7 @@ public final class PathDetail extends SketchDetail {
 
     public PathDetail(Coord2D start, Colour colour) {
         super(colour);
-        this.path = new LinkedList<>();
+        this.path = new ArrayList<>();
         path.add(start);
         updateBoundingBox(start);
     }
@@ -48,7 +48,7 @@ public final class PathDetail extends SketchDetail {
 
     @Override
     public PathDetail translate(Coord2D point) {
-        List<Coord2D> newPath = new LinkedList<>();
+        List<Coord2D> newPath = new ArrayList<>();
         for (Coord2D step : path) {
             newPath.add(step.plus(point));
         }
@@ -57,9 +57,9 @@ public final class PathDetail extends SketchDetail {
 
 
     public List<SketchDetail> getPathFragmentsOutsideRadius(Coord2D targetPoint, double radius) {
-        List<SketchDetail> fragments = new LinkedList<>();
+        List<SketchDetail> fragments = new ArrayList<>();
 
-        List<Coord2D> currentLine = new LinkedList<>();
+        List<Coord2D> currentLine = new ArrayList<>();
         for (Coord2D currentPoint : path) {
 
             if (currentLine.size() == 0) {
@@ -69,18 +69,17 @@ public final class PathDetail extends SketchDetail {
 
             Coord2D lastPoint = currentLine.get(currentLine.size() - 1);
 
-            double distance = Space2DUtils.getDistanceFromLine(targetPoint, lastPoint, currentPoint);
+            double distance = Space2DUtils.getDistanceFromLine(
+                    targetPoint, lastPoint, currentPoint);
             if (distance < radius) {
                 if (currentLine.size() > 1) {
                     PathDetail fragment = new PathDetail(currentLine, getColour());
                     fragments.add(fragment);
                 }
-                currentLine = new LinkedList<>();
-                currentLine.add(currentPoint);
-
-            } else {
-                currentLine.add(currentPoint);
+                currentLine = new ArrayList<>();
             }
+
+            currentLine.add(currentPoint);
         }
 
         if (currentLine.size() > 1) {

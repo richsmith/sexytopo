@@ -28,7 +28,7 @@ public class TherionExporter extends Exporter {
     private String originalTh2PlanFileContent = null;
     private String originalTh2EeFileContent = null;
 
-    private List<String> th2Files = new ArrayList<>();
+    private final List<String> th2Files = new ArrayList<>();
 
     public void export(Context context, Survey survey) throws IOException {
 
@@ -45,7 +45,7 @@ public class TherionExporter extends Exporter {
         handleProjection(context, survey, Projection2D.EXTENDED_ELEVATION, survey.getElevationSketch(),
                 SexyTopo.EE_SUFFIX, originalTh2EeFileContent);
 
-        String thContent = null;
+        String thContent;
         if (originalThFileContent == null) {
             thContent = ThExporter.getContent(context, survey, th2Files);
         } else {
@@ -71,7 +71,7 @@ public class TherionExporter extends Exporter {
         space = SpaceFlipper.flipVertically(space);
         String baseFilename = survey.getName() + " " + suffix;
         String th2Filename = baseFilename + ".th2";
-        String content = null;
+        String content;
         if (originalFileContent == null) {
             content = Th2Exporter.getContent(
                     survey, scale, baseFilename, space);
@@ -104,6 +104,7 @@ public class TherionExporter extends Exporter {
         return "encoding utf-8";
     }
 
+    @SuppressWarnings("UnnecessaryLocalVariable")
     public static double getScale() {
         final double PLAN_DPI = 200;
         final double PLAN_SCALE = 100;
@@ -114,10 +115,16 @@ public class TherionExporter extends Exporter {
 
 
     private void readOriginalFilesIfPresent(Context context, Survey survey) {
+
         if (Util.wasSurveyImported(context, survey)) {
             File directory = Util.getFileSurveyWasImportedFrom(context, survey);
+
             if (new TherionImporter().canHandleFile(directory)) {
                 File[] files = directory.listFiles();
+                if (files == null) {
+                    files = new File[] {};
+                }
+
                 for (File file : files) {
                     if (FilenameUtils.getExtension(file.getName()).equals("th")) {
                         originalThFileContent = Loader.slurpFile(file);
@@ -126,7 +133,6 @@ public class TherionExporter extends Exporter {
                     } else if (file.getName().endsWith(SexyTopo.PLAN_SUFFIX + ".th2")) {
                         originalTh2EeFileContent = Loader.slurpFile(file);
                     }
-
                 }
             }
         }

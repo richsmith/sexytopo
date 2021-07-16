@@ -3,7 +3,6 @@ package org.hwyl.sexytopo.control.graph;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -56,18 +55,19 @@ import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.SurveyConnection;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 
+@SuppressWarnings({"SameParameterValue", "UnnecessaryLocalVariable"})
 public class GraphView extends View {
 
-    private ScaleGestureDetector scaleGestureDetector;
-    private GestureDetector longPressDetector;
+    private final ScaleGestureDetector scaleGestureDetector;
+    private final GestureDetector longPressDetector;
 
     // The offset of the viewing window (what can be seen on the screen) from the whole survey
     private Coord2D viewpointOffset = Coord2D.ORIGIN;
@@ -83,24 +83,7 @@ public class GraphView extends View {
     public static final double MIN_ZOOM = 0.1;
     public static final double MAX_ZOOM = 500.0;
 
-    private GraphActivity activity;
-
-    private Projection2D projectionType;
-    private Survey survey;
-    private Space<Coord2D> projection;
-    private Sketch sketch;
-
-    private Map<Survey, Space<Coord2D>> translatedConnectedSurveys = new HashMap<>();
-
-    // cached for performance
-    private Coord2D canvasBottomRight;
-    private Coord2D viewpointTopLeftOnSurvey;
-    private Coord2D viewpointBottomRightOnSurvey;
-    private double surveyLength = 0;
-    private double surveyHeight = 0;
-    private Rect topLeftCorner;
-    private Rect topRightCorner;
-    private Rect bottomRightCorner;
+    private static final int BOX_SIZE = 10; // every grid box is 10 units square
 
     public static final Colour LEG_COLOUR = Colour.RED;
     public static final Colour LATEST_LEG_COLOUR = Colour.MAGENTA;
@@ -127,6 +110,25 @@ public class GraphView extends View {
     public static final double HOT_CORNER_DISTANCE_PROPORTION = 0.05;
 
     public static final int STATION_LABEL_OFFSET = 10;
+
+    private GraphActivity activity;
+
+    private Projection2D projectionType;
+    private Survey survey;
+    private Space<Coord2D> projection;
+    private Sketch sketch;
+
+    private Map<Survey, Space<Coord2D>> translatedConnectedSurveys = new HashMap<>();
+
+    // cached for performance
+    private Coord2D canvasBottomRight;
+    private Coord2D viewpointTopLeftOnSurvey;
+    private Coord2D viewpointBottomRightOnSurvey;
+    private double surveyLength = 0;
+    private double surveyHeight = 0;
+    private Rect topLeftCorner;
+    private Rect topRightCorner;
+    private Rect bottomRightCorner;
 
     private Bitmap commentIcon, linkIcon;
 
@@ -155,6 +157,7 @@ public class GraphView extends View {
     private final Paint crossSectionConnectorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint crossSectionIndicatorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint hotCornersPaint = new Paint();
+
 
     public GraphView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -256,6 +259,7 @@ public class GraphView extends View {
     }
 
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
@@ -399,17 +403,10 @@ public class GraphView extends View {
          return true;
     }
 
-
     private Coord2D considerSnapToSketchLine(Coord2D pointTouched) {
-
         double deltaInMetres = SNAP_TO_LINE_SENSITIVITY_IN_PIXELS / surveyToViewScale;
-
         Coord2D closestPathEnd = sketch.findEligibleSnapPointWithin(pointTouched, deltaInMetres);
-        if (closestPathEnd != null) {
-            return closestPathEnd;
-        } else {
-            return null;
-        }
+        return closestPathEnd; // null if nothing close found
     }
 
 
@@ -469,9 +466,9 @@ public class GraphView extends View {
                     invalidate();
                 }
             case MotionEvent.ACTION_MOVE:
-                break;
             case MotionEvent.ACTION_UP:
                 break;
+
             default:
                 return false;
         }
@@ -479,7 +476,7 @@ public class GraphView extends View {
         return true;
     }
 
-
+    @SuppressWarnings("SwitchStatementWithTooFewBranches")
     private boolean handleSymbol(MotionEvent event) {
 
         final Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
@@ -499,6 +496,7 @@ public class GraphView extends View {
     }
 
 
+    @SuppressWarnings("SwitchStatementWithTooFewBranches")
     private boolean handleText(MotionEvent event) {
 
         final Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
@@ -509,21 +507,15 @@ public class GraphView extends View {
                 final EditText input = new EditText(getContext());
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setView(input)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                String text = input.getText().toString();
-                                int startingSize = PreferenceAccess.getInt(getContext(),
-                                        "pref_survey_text_tool_font_size", 50);
-                                float size = startingSize / (float)surveyToViewScale;
-                                sketch.addTextDetail(touchPointOnSurvey, text, size);
-                            }
+                        .setPositiveButton("OK", (dialog, which) -> {
+                            String text = input.getText().toString();
+                            int startingSize = PreferenceAccess.getInt(getContext(),
+                                    "pref_survey_text_tool_font_size", 50);
+                            float size = startingSize / (float)surveyToViewScale;
+                            sketch.addTextDetail(touchPointOnSurvey, text, size);
                         })
-                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                // do nothing
-                            }
+                        .setNegativeButton("Cancel", (dialog, which) -> {
+                            // do nothing
                         });
                 AlertDialog dialog = builder.create();
                 dialog.getWindow().setSoftInputMode(
@@ -568,15 +560,12 @@ public class GraphView extends View {
 
 
     private Station checkForStation(Coord2D touchPointOnView) {
-
         double selectionTolerance =
                 SELECTION_SENSITIVITY_IN_PIXELS / surveyToViewScale;
-
         Coord2D touchPointOnSurvey = viewCoordsToSurveyCoords(touchPointOnView);
 
         Station newSelectedStation = findNearestStationWithinDelta(projection,
                 touchPointOnSurvey, selectionTolerance);
-
         return newSelectedStation; // this could be null if nothing is near
     }
 
@@ -600,56 +589,45 @@ public class GraphView extends View {
 
     private void showContextMenu(MotionEvent event, final Station station) {
 
-        OnClickListener listener = new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                switch(view.getId()) {
-                    case R.id.graph_station_select:
-                        setActiveStation(station);
-                        invalidate();
-                        break;
-                    case R.id.graph_station_toggle_left_right:
-                        Direction newDirection = station.getExtendedElevationDirection().opposite();
-                        SurveyUpdater.setDirectionOfSubtree(survey, station,newDirection);
-                        broadcastSurveyUpdated();
-                        invalidate();
-                        break;
-                    case R.id.graph_station_comment:
-                        openCommentDialog(station);
-                        break;
-                    case R.id.graph_station_reverse:
-                        SurveyUpdater.reverseLeg(survey, station);
-                        broadcastSurveyUpdated();
-                        invalidate();
-                        break;
-                    case R.id.graph_station_delete:
-                        askAboutDeletingStation(station);
-                        invalidate();
-                        break;
-                    case R.id.graph_station_new_cross_section:
-                        setActiveStation(station);
-                        setSketchTool(SketchTool.POSITION_CROSS_SECTION);
-                        activity.showSimpleToast(R.string.position_cross_section_instruction);
-                        break;
-                    case R.id.graph_station_jump_to_table:
-                        activity.jumpToStation(station, TableActivity.class);
-                        break;
-                    case R.id.graph_station_jump_to_plan:
-                        activity.jumpToStation(station, PlanActivity.class);
-                        break;
-                    case R.id.graph_station_jump_to_ee:
-                        activity.jumpToStation(station, ExtendedElevationActivity.class);
-                        break;
-                    case R.id.graph_station_start_new_survey:
-                        if (!survey.isSaved()) {
-                            activity.showSimpleToast(R.string.cannot_extend_unsaved_survey);
-                        }
-                        activity.continueSurvey(station);
-                        break;
-                    case R.id.graph_station_unlink_survey:
-                        activity.unlinkSurvey(station);
-                        break;
+        OnClickListener listener = view -> {
+            int id = view.getId();
+
+            // this has to be a big if-else chain rather than a switch statement
+            // because IDs are no longer final
+            if (id == R.id.graph_station_select) {
+                setActiveStation(station);
+                invalidate();
+            } else if (id == R.id.graph_station_toggle_left_right) {
+                Direction newDirection = station.getExtendedElevationDirection().opposite();
+                SurveyUpdater.setDirectionOfSubtree(station,newDirection);
+                broadcastSurveyUpdated();
+                invalidate();
+            } else if (id == R.id.graph_station_comment) {
+                openCommentDialog(station);
+            } else if (id == R.id.graph_station_reverse) {
+                SurveyUpdater.reverseLeg(survey, station);
+                broadcastSurveyUpdated();
+                invalidate();
+            } else if (id == R.id.graph_station_delete) {
+                askAboutDeletingStation(station);
+                invalidate();
+            } else if (id == R.id.graph_station_new_cross_section) {
+                setActiveStation(station);
+                setSketchTool(SketchTool.POSITION_CROSS_SECTION);
+                activity.showSimpleToast(R.string.position_cross_section_instruction);
+            } else if (id == R.id.graph_station_jump_to_table) {
+                activity.jumpToStation(station, TableActivity.class);
+            } else if (id == R.id.graph_station_jump_to_plan) {
+                activity.jumpToStation(station, PlanActivity.class);
+            } else if (id == R.id.graph_station_jump_to_ee) {
+                activity.jumpToStation(station, ExtendedElevationActivity.class);
+            } else if (id == R.id.graph_station_start_new_survey) {
+                if (!survey.isSaved()) {
+                    activity.showSimpleToast(R.string.cannot_extend_unsaved_survey);
                 }
+                activity.continueSurvey(station);
+            } else if (id == R.id.graph_station_unlink_survey) {
+                activity.unlinkSurvey(station);
             }
         };
 
@@ -674,18 +652,10 @@ public class GraphView extends View {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setView(input)
                 .setTitle(station.getName())
-                .setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        station.setComment(input.getText().toString());
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // do nothing
-                    }
-                });
+                .setPositiveButton(R.string.save,
+                        (dialog, which) -> station.setComment(input.getText().toString()))
+                .setNegativeButton("Cancel",
+                        (dialog, which) -> { /* Do nothing */ });
         AlertDialog dialog = builder.create();
         dialog.getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
@@ -714,13 +684,9 @@ public class GraphView extends View {
 
         new AlertDialog.Builder(getContext())
                 .setMessage(message)
-                .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        SurveyUpdater.deleteStation(survey, station);
-                        broadcastSurveyUpdated();
-                    }
+                .setPositiveButton(R.string.delete, (dialog, which) -> {
+                    SurveyUpdater.deleteStation(survey, station);
+                    broadcastSurveyUpdated();
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show();
@@ -735,6 +701,7 @@ public class GraphView extends View {
 
         for (Station station : space.getStationMap().keySet()) {
             Coord2D point = space.getStationMap().get(station);
+            //noinspection ConstantConditions
             double distance = Space2DUtils.getDistance(point, target);
 
             if (distance > delta) {
@@ -796,6 +763,7 @@ public class GraphView extends View {
         drawSurveyData(survey, canvas, projection, alpha);
     }
 
+
     private void drawConnectedSurveys(Canvas canvas, Space<Coord2D> projection, int alpha) {
 
         if (doTranslatedConnectedSurveysNeedUpdating()) {
@@ -842,21 +810,13 @@ public class GraphView extends View {
 
 
     private void drawGrid(Canvas canvas) {
-
-        // FIXME need a better tick size function when we sort out zooming
-        //scale           <-adjustZoomBy out 1  10   20    adjustZoomBy in->
-        //inverted                   1  0.1  0.05
-        // tick size in m <-adjustZoomBy out 10 1    1     adjustZoomBy in->
-
         int tickSizeInMetres = getMinorGridBoxSize();
-        double boxSize = 10;
-
         int numberTicksJustBeforeViewpointOffsetX = (int)(viewpointOffset.x / tickSizeInMetres);
 
         for (int n = numberTicksJustBeforeViewpointOffsetX; true; n++) {
             double xSurvey = n * tickSizeInMetres;
             int xView = (int)((xSurvey - viewpointOffset.x) * surveyToViewScale);
-            gridPaint.setStrokeWidth(n % boxSize == 0 ? 3 : 1);
+            gridPaint.setStrokeWidth(n % BOX_SIZE == 0 ? 3 : 1);
             canvas.drawLine(xView, 0, xView, getHeight(), gridPaint);
             if (xView >= getWidth()) {
                 break;
@@ -868,7 +828,7 @@ public class GraphView extends View {
         for (int n = numberTicksJustBeforeViewpointOffsetY; true; n++) {
             double ySurvey = n * tickSizeInMetres;
             int yView = (int)((ySurvey - viewpointOffset.y) * surveyToViewScale);
-            gridPaint.setStrokeWidth(n % boxSize == 0 ? 3 : 1);
+            gridPaint.setStrokeWidth(n % BOX_SIZE == 0 ? 3 : 1);
             canvas.drawLine(0, yView, getWidth(), yView, gridPaint);
             if (yView >= getHeight()) {
                 break;
@@ -901,7 +861,7 @@ public class GraphView extends View {
 
         crossSectionConnectorPaint.setAlpha(alpha);
 
-        List<CrossSectionDetail> badXSections = new LinkedList<>();
+        List<CrossSectionDetail> badXSections = new ArrayList<>();
 
         for (CrossSectionDetail sectionDetail : crossSectionDetails) {
 
@@ -982,6 +942,7 @@ public class GraphView extends View {
 
             Line<Coord2D> line = legMap.get(leg);
 
+            //noinspection ConstantConditions
             Coord2D start = surveyCoordsToViewCoords(line.getStart());
             Coord2D end = surveyCoordsToViewCoords(line.getEnd());
 
@@ -1072,7 +1033,7 @@ public class GraphView extends View {
                 nextX += stationPaint.measureText(name) + spacing;
             }
 
-            List<Bitmap> icons = new LinkedList<>();
+            List<Bitmap> icons = new ArrayList<>();
             if (station.hasComment()) {
                 icons.add(commentIcon);
             }
@@ -1168,8 +1129,9 @@ public class GraphView extends View {
 
     private void drawStationCross(Canvas canvas, Paint paint, float x, float y, int crossDiameter, int alpha) {
         paint.setAlpha(alpha);
-        canvas.drawLine(x , y - crossDiameter / 2, x, y + crossDiameter / 2, paint);
-        canvas.drawLine(x - crossDiameter / 2, y, x + crossDiameter / 2, y, paint);
+        float halfCross = crossDiameter / 2f;
+        canvas.drawLine(x , y - halfCross, x, y + halfCross, paint);
+        canvas.drawLine(x - halfCross, y, x + halfCross, y, paint);
     }
 
 

@@ -13,15 +13,8 @@ public class SexyTopo extends Application {
     public void onCreate() {
         super.onCreate();
         defaultHandler = Thread.getDefaultUncaughtExceptionHandler();
-        Thread.setDefaultUncaughtExceptionHandler (new Thread.UncaughtExceptionHandler() {
-            @Override
-            public void uncaughtException (Thread thread, Throwable e)
-            {
-                handleUncaughtException (thread, e);
-            }
-        });
+        Thread.setDefaultUncaughtExceptionHandler (this::handleUncaughtException);
     }
-
 
     public void handleUncaughtException (Thread thread, Throwable e) {
         Log.setContext(this);

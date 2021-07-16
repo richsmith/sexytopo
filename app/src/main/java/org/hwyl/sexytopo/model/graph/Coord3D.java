@@ -1,6 +1,9 @@
 package org.hwyl.sexytopo.model.graph;
 
 
+import android.annotation.SuppressLint;
+
+
 public final class Coord3D extends Coord {
 
 
@@ -34,6 +37,7 @@ public final class Coord3D extends Coord {
     }
 
 
+    @SuppressLint("DefaultLocale")
     @Override
     public String toString() {
         return String.format("(%f, %f, %f)", x, y, z);

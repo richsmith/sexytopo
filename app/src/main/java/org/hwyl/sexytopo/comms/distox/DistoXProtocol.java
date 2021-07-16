@@ -21,8 +21,9 @@ public abstract class DistoXProtocol {
         READ_REPLY(0b00111000),
         UNKNOWN(0b0);
 
-        static int PACKET_TYPE_MASK = 0b00111111;
+        static final int PACKET_TYPE_MASK = 0b00111111;
         private final int signature;
+
         PacketType(int signature) {
             this.signature = signature;
         }
@@ -49,9 +50,9 @@ public abstract class DistoXProtocol {
     public static final int SEQUENCE_BIT_MASK = 0b10000000;
     public static final int ACKNOWLEDGEMENT_PACKET_BASE = 0b01010101;
 
-    protected Context context;
-    protected SurveyManager dataManager;
-    protected BluetoothDevice bluetoothDevice;
+    protected final Context context;
+    protected final SurveyManager dataManager;
+    protected final BluetoothDevice bluetoothDevice;
 
     protected DistoXProtocol(
             Context context, BluetoothDevice bluetoothDevice, SurveyManager dataManager) {
@@ -89,6 +90,7 @@ public abstract class DistoXProtocol {
 
     }
 
+    @SuppressWarnings("UnnecessaryLocalVariable")
     protected static int readByte(byte[] packet, int index) {
         byte signed = packet[index];
         int unsigned = signed & 0xff;

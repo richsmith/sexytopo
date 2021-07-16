@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+@SuppressWarnings("UnnecessaryLocalVariable")
 public class SketchJsonTranslater {
 
     public static final String PATHS_TAG = "paths";

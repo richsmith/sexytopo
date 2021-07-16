@@ -7,14 +7,15 @@ import java.util.List;
 
 public class CalibrationCalculator {
 
-    private boolean useNonLinearity;
-    private  MutableFloat delta = new MutableFloat(0);
+    private final boolean useNonLinearity;
+    private final MutableFloat delta = new MutableFloat(0);
 
     public CalibrationCalculator(boolean useNonLinearity) {
         this.useNonLinearity = useNonLinearity;
     }
 
 
+    @SuppressWarnings("UnnecessaryLocalVariable")
     public int calculate(List<CalibrationReading> calibrationReadings) {
 
         Vector[] g = new Vector[56];

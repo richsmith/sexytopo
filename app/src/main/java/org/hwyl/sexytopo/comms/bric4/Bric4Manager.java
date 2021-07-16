@@ -200,7 +200,7 @@ public class Bric4Manager extends BleManager {
             // There is a potential here for ST to get out of sync - hopefully this is
             // unlikely, but perhaps we could figure out a way to check the data is correct?
 
-            byte[] bytes = new byte[] {};
+            byte[] bytes;
 
             switch(state) {
 

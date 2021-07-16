@@ -6,15 +6,14 @@ import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.util.Iterator;
 
-/**
- * Created by rls on 05/06/15.
- */
+
 public class SurveyTools {
 
     public static void traverseLegs(Survey survey, SurveyLegTraversalCallback callback) {
         traverseLegs(survey.getOrigin(), callback);
     }
 
+    @SuppressWarnings("WhileLoopReplaceableByForEach")
     public static boolean traverseIterator(Station station, SurveyLegTraversalCallback callback) {
 
         // use an iterator because the callback might mutate the list of legs

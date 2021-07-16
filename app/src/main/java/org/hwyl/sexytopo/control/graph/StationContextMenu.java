@@ -45,13 +45,9 @@ public class StationContextMenu {
                 R.id.graph_station_unlink_survey
         };
         for (int id : ids) {
-            view.findViewById(id).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    fakeMenu.dismiss();
-                    listener.onClick(view);
-                }
-
+            view.findViewById(id).setOnClickListener(view1 -> {
+                fakeMenu.dismiss();
+                listener.onClick(view1);
             });
         }
 

@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 
 public class SurvexImporter extends Importer {
 
-    public static final Pattern COMMENT_INSTRUCTION_REGEX = Pattern.compile("(\\{.*?\\})");
+    public static final Pattern COMMENT_INSTRUCTION_REGEX = Pattern.compile("(\\{.*?})");
 
 
     @Override

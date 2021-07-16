@@ -8,8 +8,8 @@ import java.util.Map;
 
 
 public class Space<T extends Coord> {
-    private Map<Station, T> stations = new HashMap<>();
-    private Map<Leg, Line<T>> legs = new HashMap<>();
+    private final Map<Station, T> stations = new HashMap<>();
+    private final Map<Leg, Line<T>> legs = new HashMap<>();
 
     public Map<Station, T> getStationMap() {
         return stations;

@@ -11,9 +11,7 @@ import org.hwyl.sexytopo.model.survey.Survey;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,9 +19,10 @@ import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.GRID_COMM
 import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.SKETCHLINE_COMMAND;
 
 
+@SuppressWarnings("UnnecessaryLocalVariable")
 public class XviImporter extends Importer {
 
-    private static XviImporter instance = new XviImporter();
+    private static final XviImporter instance = new XviImporter();
 
     public Survey toSurvey(File file) throws Exception {
         Survey survey = new Survey(file.getName());
@@ -84,7 +83,7 @@ public class XviImporter extends Importer {
 
     public static List<String> parseBlockEntries(String content) {
         List<String> entries = new ArrayList<>();
-        Pattern pattern = Pattern.compile("\\{(.*?)\\}");
+        Pattern pattern = Pattern.compile("\\{(.*?)}");
         Matcher matcher = pattern.matcher(content);
         while (matcher.find()) {
             entries.add(matcher.group(1));
@@ -134,6 +133,7 @@ public class XviImporter extends Importer {
     }
 
 
+    @SuppressWarnings("UnnecessaryLabelOnContinueStatement")
     public static String getBlockContents(String text, String command) throws Exception {
 
         outer:
@@ -188,8 +188,8 @@ public class XviImporter extends Importer {
         throw new Exception("Could not match command in text");
     }
 
-    class Grid {
-        double x, y, dx, dy, nx, ny;
+    static class Grid {
+        final double x, y, dx, dy, nx, ny;
         Grid(double x, double y, double dx, double dy, double nx, double ny) {
             this.x = x;
             this.y = y;

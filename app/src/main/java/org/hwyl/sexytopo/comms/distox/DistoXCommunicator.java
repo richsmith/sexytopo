@@ -133,6 +133,7 @@ public class DistoXCommunicator extends Communicator {
         thread.stopCalibration();
     }
 
+    @SuppressWarnings("UnnecessaryLocalVariable")
     public WriteCalibrationProtocol writeCalibration(byte[] coeffs) {
         WriteCalibrationProtocol writeCalibrationProtocol = thread.writeCalibration(coeffs);
         return writeCalibrationProtocol;

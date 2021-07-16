@@ -10,7 +10,8 @@ public enum InputMode {
     COMBO(R.id.action_input_mode_combo),
     CALIBRATION_CHECK(R.id.action_input_mode_cal_check);
 
-    private int menuId;
+    private final int menuId;
+
     InputMode(int menuId) {
         this.menuId = menuId;
     }

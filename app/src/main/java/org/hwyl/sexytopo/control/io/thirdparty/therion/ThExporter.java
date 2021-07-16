@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.text.TextUtils;
 
@@ -21,6 +22,7 @@ import java.util.Date;
 import java.util.List;
 
 
+@SuppressWarnings("UnnecessaryLocalVariable")
 public class ThExporter {
 
     public static final char COMMENT_CHAR = '#';
@@ -91,7 +93,7 @@ public class ThExporter {
     }
 
     public static String indent(String text) {
-        String indented = "";
+        StringBuilder indented = new StringBuilder();
 
         if (text.trim().equals("")) {
             return "";
@@ -99,9 +101,9 @@ public class ThExporter {
 
         String[] lines = text.split("\n");
         for (String line : lines) {
-            indented += "\t" + line + "\n";
+            indented.append("\t").append(line).append("\n");
         }
-        return indented;
+        return indented.toString();
     }
 
     private static String getCentreline(Survey survey) {
@@ -177,12 +179,12 @@ public class ThExporter {
         StringBuilder builder = new StringBuilder();
         String[] lines = raw.split("\n");
         for (String line : lines) {
-            builder.append("# " + line + "\n");
+            builder.append("# ").append(line).append("\n");
         }
         return builder.toString();
     }
 
-
+    @SuppressLint("SimpleDateFormat")
     private static String formatDate(Date date) {
 
         DateFormat dateFormat = new SimpleDateFormat(DATE_PATTERN);

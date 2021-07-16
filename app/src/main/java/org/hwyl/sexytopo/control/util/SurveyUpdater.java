@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 
+@SuppressWarnings("UnnecessaryLocalVariable")
 public class SurveyUpdater {
 
     private static final float DEFAULT_MAX_DISTANCE_DELTA = 0.05f;
@@ -205,18 +206,15 @@ public class SurveyUpdater {
             final Survey survey, final Leg toEdit, final Leg edited) {
         SurveyTools.traverseLegs(
                 survey,
-                new SurveyTools.SurveyLegTraversalCallback() {
-                    @Override
-                    public boolean call(Station origin, Leg leg) {
-                        if (leg == toEdit) {
-                            origin.getOnwardLegs().remove(toEdit);
-                            origin.getOnwardLegs().add(edited);
-                            survey.replaceLegInRecord(toEdit, edited);
-                            Log.d("Edited leg " + toEdit + " -> " + edited);
-                            return true;
-                        } else {
-                            return false;
-                        }
+                (origin, leg) -> {
+                    if (leg == toEdit) {
+                        origin.getOnwardLegs().remove(toEdit);
+                        origin.getOnwardLegs().add(edited);
+                        survey.replaceLegInRecord(toEdit, edited);
+                        Log.d("Edited leg " + toEdit + " -> " + edited);
+                        return true;
+                    } else {
+                        return false;
                     }
                 });
         survey.setSaved(false);
@@ -246,19 +244,16 @@ public class SurveyUpdater {
             return;
         }
 
-        Leg leg = survey.getReferringLeg(toDelete);
-        survey.removeLegRecord(leg);
+        Leg referringLeg = survey.getReferringLeg(toDelete);
+        survey.removeLegRecord(referringLeg);
 
-        SurveyTools.traverseLegs(survey, new SurveyTools.SurveyLegTraversalCallback() {
-            @Override
-            public boolean call(Station origin, Leg leg) {
+        SurveyTools.traverseLegs(survey, (origin, leg) -> {
             if (leg.hasDestination() && leg.getDestination() == toDelete) {
                 origin.getOnwardLegs().remove(leg);
                 survey.checkSurveyIntegrity();
                 return true;
             } else {
                 return false;
-            }
             }
         });
 
@@ -363,14 +358,19 @@ public class SurveyUpdater {
         // values {359, 1} average to 0 rather than the incorrect value 180
         double sum = 0.0;
         double min = Leg.MAX_AZIMUTH, max = Leg.MIN_AZIMUTH;
-        for (int i = 0; i < azimuths.length; i++) {
-            if (azimuths[i] < min) min = azimuths[i];
-            if (azimuths[i] > max) max = azimuths[i];
+        for (double azimuth : azimuths) {
+            if (azimuth < min) {
+                min = azimuth;
+            }
+            if (azimuth > max) {
+                max = azimuth;
+            }
         }
         boolean splitOverZero = max - min > 180;
         double[] correctedAzms = new double[azimuths.length];
         for (int i = 0; i < azimuths.length; i++) {
-            correctedAzms[i] = (splitOverZero && azimuths[i] < 180) ? azimuths[i] + 360: azimuths[i];
+            correctedAzms[i] =
+                    (splitOverZero && azimuths[i] < 180) ? azimuths[i] + 360: azimuths[i];
             sum += correctedAzms[i];
         }
         return (sum / correctedAzms.length) % 360;
@@ -381,30 +381,27 @@ public class SurveyUpdater {
         Log.d("Reversing leg to " + toReverse.getName());
         SurveyTools.traverseLegs(
                 survey,
-                new SurveyTools.SurveyLegTraversalCallback() {
-                    @Override
-                    public boolean call(Station origin, Leg leg) {
-                        if (leg.hasDestination() && leg.getDestination() == toReverse) {
-                            Leg reversed = leg.reverse();
-                            Log.d("Reversed direction of leg " + leg + " to " + reversed);
-                            origin.getOnwardLegs().remove(leg);
-                            origin.addOnwardLeg(reversed);
-                            survey.replaceLegInRecord(leg, reversed);
-                            return true;
-                        } else {
-                            return false;
-                        }
+                (origin, leg) -> {
+                    if (leg.hasDestination() && leg.getDestination() == toReverse) {
+                        Leg reversed = leg.reverse();
+                        Log.d("Reversed direction of leg " + leg + " to " + reversed);
+                        origin.getOnwardLegs().remove(leg);
+                        origin.addOnwardLeg(reversed);
+                        survey.replaceLegInRecord(leg, reversed);
+                        return true;
+                    } else {
+                        return false;
                     }
                 });
         survey.setSaved(false);
     }
 
 
-    public static void setDirectionOfSubtree(Survey survey, Station station, Direction direction) {
+    public static void setDirectionOfSubtree(Station station, Direction direction) {
         station.setExtendedElevationDirection(direction);
         for (Leg leg : station.getConnectedOnwardLegs()) {
             Station destination = leg.getDestination();
-            setDirectionOfSubtree(survey, destination, direction);
+            setDirectionOfSubtree(destination, direction);
         }
     }
 

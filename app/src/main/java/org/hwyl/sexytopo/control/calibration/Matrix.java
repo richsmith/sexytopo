@@ -2,7 +2,7 @@ package org.hwyl.sexytopo.control.calibration;
 
 public class Matrix {
 
-    public Vector x, y, z;
+    public final Vector x, y, z;
 
     public static Matrix getZero() {
         return new Matrix(
@@ -72,6 +72,7 @@ public class Matrix {
         return new Matrix(b.times(a.x), b.times(a.y), b.times(a.z));
     }
 
+    @SuppressWarnings("SuspiciousNameCombination")
     public static Matrix Transposed(Matrix m) {
         m = new Matrix(m);
         float t;

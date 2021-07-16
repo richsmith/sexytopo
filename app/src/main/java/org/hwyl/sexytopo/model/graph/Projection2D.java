@@ -9,6 +9,7 @@ import org.hwyl.sexytopo.model.survey.Survey;
 import java.util.Map;
 
 
+@SuppressWarnings("SuspiciousNameCombination")
 public enum Projection2D {
 
     // The projections flip the space vertically (inverts the y-axis) because mathematically
@@ -54,9 +55,9 @@ public enum Projection2D {
         }
     };
 
-    private static Space3DTransformer space3DTransformer =
+    private static final Space3DTransformer space3DTransformer =
             new Space3DTransformer();
-    private static Space3DTransformerForElevation space3DTransformerForElevation =
+    private static final Space3DTransformerForElevation space3DTransformerForElevation =
             new Space3DTransformerForElevation();
 
     public Space<Coord3D> transform(Survey survey) {

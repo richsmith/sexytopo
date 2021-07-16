@@ -17,7 +17,6 @@ import org.hwyl.sexytopo.model.survey.Survey;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 
@@ -86,8 +85,8 @@ public class TherionImporter extends Importer {
 
     public static void updateCentreline(List<String> lines, Survey survey) throws Exception {
         List<String> block = getContentsOfBeginEndBlock(lines, "centreline");
-        List<String> sanitisedCentrelineData = new LinkedList<>();
-        List<String> sanitisedElevationDirectionData = new LinkedList<>();
+        List<String> sanitisedCentrelineData = new ArrayList<>();
+        List<String> sanitisedElevationDirectionData = new ArrayList<>();
 
 
         boolean inDataBlock = false;
@@ -135,7 +134,7 @@ public class TherionImporter extends Importer {
                 String stationName = tokens[1];
                 Station station = survey.getStationByName(stationName);
 
-                SurveyUpdater.setDirectionOfSubtree(survey, station, direction);
+                SurveyUpdater.setDirectionOfSubtree(station, direction);
             }
 
         } catch (Exception exception) {

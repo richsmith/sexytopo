@@ -7,7 +7,6 @@ import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.survey.Station;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 
@@ -150,7 +149,7 @@ public class Sketch extends SketchDetail {
 
 
     public void deleteDetail(SketchDetail sketchDetail) {
-        deleteDetail(sketchDetail, new LinkedList<SketchDetail>());
+        deleteDetail(sketchDetail, new ArrayList<>());
     }
 
 

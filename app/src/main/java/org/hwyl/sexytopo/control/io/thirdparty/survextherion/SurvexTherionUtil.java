@@ -36,7 +36,7 @@ public class SurvexTherionUtil {
         formatField(builder, TableCol.INCLINATION.format(leg.getInclination(), Locale.UK));
 
         if (leg.wasPromoted() || to.hasComment()) {
-            builder.append("\t" + commentChar + " ");
+            builder.append("\t").append(commentChar).append(" ");
             if (leg.wasPromoted()) {
                 builder.append(" ");
                 formatPromotedFrom(builder, leg.getPromotedFrom());

@@ -12,7 +12,7 @@ public class GuideActivity extends SexyTopoActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_guide);
 
-        WebView webView = (WebView)(findViewById(R.id.guideWebView));
+        WebView webView = findViewById(R.id.guideWebView);
         webView.loadUrl("file:///android_asset/guide/index.html");
     }
 

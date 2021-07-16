@@ -114,7 +114,6 @@ public class StartUpActivity extends SexyTopoActivity {
         Log.d("Can't find the survey; falling back to a new one");
         startNewSurvey();
         createNewActiveSurvey();
-        return;
     }
 
 
