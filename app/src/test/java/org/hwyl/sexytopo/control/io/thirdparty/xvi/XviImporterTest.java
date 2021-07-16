@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.control.io.thirdparty.xvi;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.sketch.Colour;

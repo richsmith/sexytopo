@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.survey.Station;

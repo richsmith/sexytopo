@@ -1,7 +1,7 @@
 package org.hwyl.sexytopo.control.util;
 
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.hwyl.sexytopo.testhelpers.BasicTestSurveyCreator;
 import org.hwyl.sexytopo.model.survey.Leg;

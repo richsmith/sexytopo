@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.model.graph;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Test;
 

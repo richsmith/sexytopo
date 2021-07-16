@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.model.table;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.hwyl.sexytopo.testhelpers.BasicTestSurveyCreator;
 import org.hwyl.sexytopo.control.util.CrossSectioner;

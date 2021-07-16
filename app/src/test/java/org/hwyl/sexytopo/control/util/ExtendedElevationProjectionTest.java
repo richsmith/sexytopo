@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.control.util;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
@@ -81,15 +81,16 @@ public class ExtendedElevationProjectionTest {
         Assert.assertEquals(expected, twoCoord);
 
         Leg splayLeft = two.getUnconnectedOnwardLegs().get(0);
-        Line splayLeftLine = legMap.get(splayLeft);
+        Line<Coord2D> splayLeftLine = legMap.get(splayLeft);
         expected = new Coord2D(5, 0);
+        assert splayLeftLine != null;
         Assert.assertEquals(expected, splayLeftLine.getEnd());
 
         Leg splayRight = two.getUnconnectedOnwardLegs().get(1);
-        Line splayRightLine = legMap.get(splayRight);
+        Line<Coord2D> splayRightLine = legMap.get(splayRight);
         expected = new Coord2D(5, 0);
+        assert splayRightLine != null;
         Assert.assertEquals(expected, splayRightLine.getEnd());
-
     }
 
 }

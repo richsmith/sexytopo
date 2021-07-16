@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.demo;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Test;
 
