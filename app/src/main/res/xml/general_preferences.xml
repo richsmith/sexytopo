@@ -116,6 +116,11 @@
             android:defaultValue="22"
             android:summary="Font size of station labels"
             android:title="Station label size"/>
+        <CheckBoxPreference
+            android:key="pref_key_anti_alias"
+            android:summary="Apply antialising to sketch lines etc. (improves visual display at the cost of some perfomance)"
+            android:title="Anti-alias sketch lines"
+            android:defaultValue="false"/>
     </PreferenceCategory>
 
     <PreferenceCategory

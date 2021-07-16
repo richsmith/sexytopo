@@ -139,24 +139,31 @@ public class GraphView extends View {
 
     private final float dashedLineInterval = 5;
 
-    private final Paint stationPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint stationPaint = new Paint();
 
-    private final Paint legPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint latestLegPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint splayPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint legPaint = new Paint();
+    private final Paint latestLegPaint = new Paint();
+    private final Paint splayPaint = new Paint();
 
-    private final Paint fadedLegPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint fadedLatestLegPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint fadedSplayPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint fadedLegPaint = new Paint();
+    private final Paint fadedLatestLegPaint = new Paint();
+    private final Paint fadedSplayPaint = new Paint();
 
-    private final Paint drawPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint labelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint highlightPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint legendPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint drawPaint = new Paint();
+    private final Paint labelPaint = new Paint();
+    private final Paint highlightPaint = new Paint();
+    private final Paint legendPaint = new Paint();
     private final Paint gridPaint = new Paint();
-    private final Paint crossSectionConnectorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint crossSectionIndicatorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint crossSectionConnectorPaint = new Paint();
+    private final Paint crossSectionIndicatorPaint = new Paint();
     private final Paint hotCornersPaint = new Paint();
+
+    private final Paint[] ANTI_ALIAS_PAINTS = new Paint[] {
+            stationPaint, legendPaint, latestLegPaint, splayPaint,
+            fadedLegPaint, fadedLatestLegPaint, fadedSplayPaint,
+            drawPaint, labelPaint, legendPaint,
+            crossSectionConnectorPaint, crossSectionIndicatorPaint
+    };
 
 
     public GraphView(Context context, AttributeSet attrs) {
@@ -169,9 +176,18 @@ public class GraphView extends View {
 
     public void initialisePaint() {
 
+        boolean applyAntiAlias = PreferenceAccess.getBoolean(
+                getContext(), "pref_key_anti_alias", false);
+        for (Paint paint: ANTI_ALIAS_PAINTS) {
+            if (paint.isAntiAlias() != applyAntiAlias) {
+                paint.setAntiAlias(applyAntiAlias);
+            }
+        }
+
         stationPaint.setColor(STATION_COLOUR);
         stationPaint.setStrokeWidth(STATION_STROKE_WIDTH);
-        int labelSize = PreferenceAccess.getInt(getContext(), "pref_station_label_font_size", 22);
+        int labelSize = PreferenceAccess.getInt(
+                getContext(), "pref_station_label_font_size", 22);
         stationPaint.setTextSize(labelSize);
 
         highlightPaint.setStyle(Paint.Style.STROKE);
