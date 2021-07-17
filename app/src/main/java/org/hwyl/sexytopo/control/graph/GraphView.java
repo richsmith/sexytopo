@@ -1367,13 +1367,20 @@ public class GraphView extends View {
         viewpointOffset = new Coord2D(x, y);
     }
 
+
     private void drawDashedLine(Canvas canvas,
                                 Coord2D start, Coord2D end,
                                 float dashLength,
                                 Paint paint) {
 
+        // this switcheroo is so we start from the end of the line and draw backwards
+        // (we prefer the end of the line to line up with a dash rather than the start)
+        Coord2D swap = end;
+        end = start;
+        start = swap;
+
         double lineLength = Space2DUtils.getDistance(start, end);
-        int dashes = (int)(lineLength / dashLength);
+        int dashes = (int)(lineLength / dashLength / 2f);
 
         Coord2D direction = end.minus(start).normalise();
         Coord2D dashStep = direction.scale(dashLength);
@@ -1381,22 +1388,33 @@ public class GraphView extends View {
         float stepX = (float)dashStep.x;
         float stepY = (float)dashStep.y;
 
-        float[] lines = new float[dashes * 2 + 4];
+        float[] lines = new float[dashes * 4]; // xy coords for start and end of dashes == 4
+
         int lineIndex = 0;
+        float startX, startY, endX, endY;
+        float previousX = 0, previousY = 0;
 
-        lines[lineIndex++] = (float)start.x;
-        lines[lineIndex++] = (float)start.y;
+        for (int dashIndex = 0; dashIndex < dashes; dashIndex++) {
 
-        for (int i = 0; i != dashes; ++i) {
-            float lastX = lines[lineIndex - 2];
-            float lastY = lines[lineIndex - 1];
+            if (dashIndex == 0) {
+                startX = (float)start.x;
+                startY = (float)start.y;
+            } else {
+                startX = previousX + stepX;
+                startY = previousY + stepY;
+            }
 
-            lines[lineIndex++] = lastX + stepX;
-            lines[lineIndex++] = lastY + stepY;
+            endX = startX + stepX;
+            endY = startY + stepY;
+
+            lines[lineIndex++] = startX;
+            lines[lineIndex++] = startY;
+            lines[lineIndex++] = endX;
+            lines[lineIndex++] = endY;
+
+            previousX = endX;
+            previousY = endY;
         }
-
-        lines[lineIndex++] = (float)end.x;
-        lines[lineIndex]   = (float)end.y;
 
         canvas.drawLines(lines, paint);
     }
