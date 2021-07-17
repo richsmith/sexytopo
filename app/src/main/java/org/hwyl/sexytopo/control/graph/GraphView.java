@@ -99,6 +99,7 @@ public class GraphView extends View {
     public static final int CROSS_DIAMETER = 16;
     public static final int STATION_STROKE_WIDTH = 5;
     public static final int HIGHLIGHT_OUTLINE = 4;
+    private final float DASHED_LINE_INTERVAL = 5;
 
     public static final int LEGEND_SIZE = 18;
     public final float LEGEND_TICK_SIZE = 5;
@@ -137,8 +138,6 @@ public class GraphView extends View {
     // used to jump back to the previous tool when using one-use tools
     private SketchTool previousSketchTool = SketchTool.SELECT;
     private Symbol currentSymbol = Symbol.getDefault();
-
-    private final float dashedLineInterval = 5;
 
     private final Paint stationPaint = new Paint();
 
@@ -923,7 +922,7 @@ public class GraphView extends View {
             Coord2D viewStationLocation = surveyCoordsToViewCoords(surveyStationLocation);
             drawDashedLine(
                     canvas, viewStationLocation, centreOnView,
-                    dashedLineInterval, crossSectionConnectorPaint);
+                    DASHED_LINE_INTERVAL, crossSectionConnectorPaint);
         }
 
         for (CrossSectionDetail crossSectionDetail : badXSections) {
@@ -977,7 +976,7 @@ public class GraphView extends View {
             if (projectionType.isLegInPlane(leg)) {
                 canvas.drawLine(start.x, start.y, end.x, end.y, paint);
 			} else {
-                drawDashedLine(canvas, start, end, dashedLineInterval, paint);
+                drawDashedLine(canvas, start, end, DASHED_LINE_INTERVAL, paint);
             }
         }
     }
