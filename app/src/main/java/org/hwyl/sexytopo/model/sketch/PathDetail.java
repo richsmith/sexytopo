@@ -41,7 +41,7 @@ public final class PathDetail extends SketchDetail {
     }
 
     @Override
-    public double getDistanceFrom(Coord2D point) {
+    public float getDistanceFrom(Coord2D point) {
         return getClosestDistance(point, getPath());
     }
 
@@ -91,8 +91,8 @@ public final class PathDetail extends SketchDetail {
     }
 
 
-    private static double getClosestDistance(Coord2D point, List<Coord2D> line) {
-        double minDistance = Double.MAX_VALUE;
+    private static float getClosestDistance(Coord2D point, List<Coord2D> line) {
+        float minDistance = Float.MAX_VALUE;
         for (int i = 0, j = 1; i < (line.size() - 1); i++, j++) {
             try {
                 minDistance = Math.min(minDistance,

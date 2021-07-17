@@ -7,10 +7,10 @@ public abstract class SketchDetail {
 
     private final Colour colour;
 
-    private double left;
-    private double right;
-    private double top;
-    private double bottom;
+    private float left;
+    private float right;
+    private float top;
+    private float bottom;
 
     protected SketchDetail(Colour colour) {
         this.colour = colour;
@@ -21,16 +21,16 @@ public abstract class SketchDetail {
         return colour;
     }
 
-    public abstract double getDistanceFrom(Coord2D point);
+    public abstract float getDistanceFrom(Coord2D point);
 
     public abstract SketchDetail translate(Coord2D point);
 
     public boolean intersectsRectangle(Coord2D rectangleTopLeft, Coord2D rectangleBottomRight) {
 
-        double left1 = rectangleTopLeft.x;
-        double top1 = rectangleTopLeft.y;
-        double right1 = rectangleBottomRight.x;
-        double bottom1 = rectangleBottomRight.y;
+        float left1 = rectangleTopLeft.x;
+        float top1 = rectangleTopLeft.y;
+        float right1 = rectangleBottomRight.x;
+        float bottom1 = rectangleBottomRight.y;
 
         return (right >= left1 && left <= right1) && (top <= bottom1 && bottom >= top1);
     }
@@ -45,15 +45,15 @@ public abstract class SketchDetail {
 
 
     protected void resetBoundingBox() {
-        left = Double.POSITIVE_INFINITY;
-        right = Double.NEGATIVE_INFINITY;
-        top = Double.POSITIVE_INFINITY;
-        bottom = Double.NEGATIVE_INFINITY;
+        left = Float.POSITIVE_INFINITY;
+        right = Float.NEGATIVE_INFINITY;
+        top = Float.POSITIVE_INFINITY;
+        bottom = Float.NEGATIVE_INFINITY;
     }
 
 
-    public double getWidth() {
-        if (left == Double.POSITIVE_INFINITY || right == Double.NEGATIVE_INFINITY) {
+    public float getWidth() {
+        if (left == Float.POSITIVE_INFINITY || right == Float.NEGATIVE_INFINITY) {
             return 0;
         } else {
             return right - left;
@@ -61,8 +61,8 @@ public abstract class SketchDetail {
     }
 
 
-    public double getHeight() {
-        if (top == Double.POSITIVE_INFINITY || bottom == Double.NEGATIVE_INFINITY) {
+    public float getHeight() {
+        if (top == Float.POSITIVE_INFINITY || bottom == Float.NEGATIVE_INFINITY) {
             return 0;
         } else {
             return bottom - top;
@@ -71,7 +71,7 @@ public abstract class SketchDetail {
 
 
     public Coord2D getTopLeft() {
-        if (top == Double.POSITIVE_INFINITY || left == Double.POSITIVE_INFINITY) {
+        if (top == Float.POSITIVE_INFINITY || left == Float.POSITIVE_INFINITY) {
             return new Coord2D(0, 0);
         } else {
             return new Coord2D(left, top);
@@ -80,7 +80,7 @@ public abstract class SketchDetail {
 
 
     public Coord2D getBottomRight() {
-        if (bottom == Double.NEGATIVE_INFINITY || right == Double.NEGATIVE_INFINITY) {
+        if (bottom == Float.NEGATIVE_INFINITY || right == Float.NEGATIVE_INFINITY) {
             return new Coord2D(0, 0);
         } else {
             return new Coord2D(right, bottom);

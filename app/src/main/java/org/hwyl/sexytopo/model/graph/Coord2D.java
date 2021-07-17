@@ -6,18 +6,19 @@ import android.annotation.SuppressLint;
 import org.hwyl.sexytopo.control.util.NumberTools;
 
 
+@SuppressWarnings("unused")
 public final class Coord2D extends Coord {
 
     public static final Coord2D ORIGIN = new Coord2D(0, 0);
 
-    public final double x, y;
+    public final float x, y;
 
-    public Coord2D(double x, double y) {
+    public Coord2D(float x, float y) {
         this.x = x;
         this.y = y;
     }
 
-    public Coord2D add(double x, double y) {
+    public Coord2D add(float x, float y) {
         return new Coord2D(this.x + x, this.y + y);
     }
 
@@ -33,16 +34,16 @@ public final class Coord2D extends Coord {
         return new Coord2D(this.x * coord2D.x, this.y * coord2D.y);
     }
 
-    public Coord2D scale(double scale) {
+    public Coord2D scale(float scale) {
         return new Coord2D(x * scale, y * scale);
     }
 
-    public double mag() {
-        return Math.sqrt(this.x * this.x + this.y * this.y);
+    public float mag() {
+        return (float) Math.sqrt(this.x * this.x + this.y * this.y);
     }
 
     public Coord2D normalise() {
-        double mag = this.mag();
+        float mag = this.mag();
         if (mag > 0)
             return this.scale(1/mag);
         return this;
@@ -70,7 +71,7 @@ public final class Coord2D extends Coord {
 
     @Override
     public int hashCode() {
-        double result = x;
+        float result = x;
         result = 31 * result + y;
         return (int)result;
     }

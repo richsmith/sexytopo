@@ -7,25 +7,25 @@ import org.hwyl.sexytopo.model.graph.Space;
 
 public class SketchDimensions {
 
-    final public double minX, maxX, minY, maxY;
+    final public float minX, maxX, minY, maxY;
 
-    private SketchDimensions(double minX, double maxX, double minY, double maxY) {
+    private SketchDimensions(float minX, float maxX, float minY, float maxY) {
         this.minX = minX;
         this.maxX = maxX;
         this.minY = minY;
         this.maxY = maxY;
     }
 
-    public double getWidth() {
+    public float getWidth() {
         return Math.abs(maxX - minX);
     }
 
-    public double getHeight() {
+    public float getHeight() {
         return Math.abs(maxY - minY);
     }
 
     public static SketchDimensions getDimensions(Space<Coord2D> space) {
-        Double minX = null, maxX = null, minY = null, maxY = null;
+        Float minX = null, maxX = null, minY = null, maxY = null;
         for (Line<Coord2D> line : space.getLegMap().values()) {
             for (Coord2D point : new Coord2D[]{line.getStart(), line.getEnd()}) {
                 if (minX == null || point.x < minX) {
@@ -44,16 +44,16 @@ public class SketchDimensions {
         }
 
         if (minX == null) {
-            minX = 0.0;
+            minX = 0.0f;
         }
         if (maxX == null) {
-            maxX = 20.0;
+            maxX = 20.0f;
         }
         if (minY == null) {
-            minY = 0.0;
+            minY = 0.0f;
         }
         if (maxY == null) {
-            maxY = 20.0;
+            maxY = 20.0f;
         }
 
         return new SketchDimensions(minX, maxX, minY, maxY);

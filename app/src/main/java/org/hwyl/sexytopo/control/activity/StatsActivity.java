@@ -33,9 +33,9 @@ public class StatsActivity extends SexyTopoActivity {
 
         Survey survey = getSurvey();
 
-        double length = SurveyStats.calcTotalLength(survey);
+        float length = SurveyStats.calcTotalLength(survey);
         setStatsField(R.id.statsFieldLength, TextTools.formatTo2dpWithComma(length));
-        double heightRange = SurveyStats.calcHeightRange(survey);
+        float heightRange = SurveyStats.calcHeightRange(survey);
         setStatsField(R.id.statsFieldDepth, TextTools.formatTo2dpWithComma(heightRange));
         int numberOfStations = SurveyStats.calcNumberStations(survey);
         setStatsField(R.id.statsFieldNumberStations, TextTools.formatWithComma(numberOfStations));
@@ -43,9 +43,9 @@ public class StatsActivity extends SexyTopoActivity {
         setStatsField(R.id.statsFieldNumberLegs, TextTools.formatWithComma(numberOfLegs));
         int numberOfSplays = SurveyStats.calcNumberSubSplays(survey.getOrigin());
         setStatsField(R.id.statsFieldNumberSplays, TextTools.formatWithComma(numberOfSplays));
-        double shortestLeg = SurveyStats.calcShortestLeg(survey);
+        float shortestLeg = SurveyStats.calcShortestLeg(survey);
         setStatsField(R.id.statsFieldShortestLeg, TextTools.formatTo2dpWithComma(shortestLeg));
-        double longestLeg = SurveyStats.calcLongestLeg(survey);
+        float longestLeg = SurveyStats.calcLongestLeg(survey);
         setStatsField(R.id.statsFieldLongestLeg, TextTools.formatTo2dpWithComma(longestLeg));
     }
 
@@ -64,18 +64,18 @@ public class StatsActivity extends SexyTopoActivity {
             tableLayout.setVisibility(View.VISIBLE);
         }
 
-        double length = 0;
-        double lowestHeight = Double.POSITIVE_INFINITY;
-        double highestHeight = Double.NEGATIVE_INFINITY;
+        float length = 0;
+        float lowestHeight = Float.POSITIVE_INFINITY;
+        float highestHeight = Float.NEGATIVE_INFINITY;
         int numberOfStations = 0;
         int numberOfLegs = 0;
         int numberOfSplays = 0;
-        double shortestLeg = Double.POSITIVE_INFINITY;
-        double longestLeg = 0;
+        float shortestLeg = Float.POSITIVE_INFINITY;
+        float longestLeg = 0;
 
         for (Survey survey : surveys) {
             length += SurveyStats.calcTotalLength(survey);
-            double[] heightRange = SurveyStats.calcHeightRangeArray(survey);
+            float[] heightRange = SurveyStats.calcHeightRangeArray(survey);
             lowestHeight = Math.min(heightRange[0], lowestHeight);
             highestHeight = Math.max(heightRange[1], highestHeight);
             numberOfStations += SurveyStats.calcNumberStations(survey);
@@ -85,12 +85,12 @@ public class StatsActivity extends SexyTopoActivity {
             shortestLeg = Math.min(shortestLeg, SurveyStats.calcShortestLeg(survey));
         }
 
-        double heightRange = highestHeight - lowestHeight;
-        if (Double.isInfinite(heightRange)) {
+        float heightRange = highestHeight - lowestHeight;
+        if (Float.isInfinite(heightRange)) {
             heightRange = 0;
         }
 
-        if (Double.isInfinite(shortestLeg)) {
+        if (Float.isInfinite(shortestLeg)) {
             shortestLeg = 0;
         }
 

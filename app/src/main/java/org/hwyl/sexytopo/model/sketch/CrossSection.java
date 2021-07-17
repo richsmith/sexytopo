@@ -14,9 +14,9 @@ import org.hwyl.sexytopo.model.survey.Station;
 public class CrossSection {
 
     private final Station station;
-    private final double angle;
+    private final float angle;
 
-    public CrossSection(Station station, double angle) {
+    public CrossSection(Station station, float angle) {
         this.station = station;
         this.angle = angle;
     }
@@ -42,7 +42,7 @@ public class CrossSection {
         return station;
     }
 
-    public double getAngle() {
+    public float getAngle() {
         return angle;
     }
 }

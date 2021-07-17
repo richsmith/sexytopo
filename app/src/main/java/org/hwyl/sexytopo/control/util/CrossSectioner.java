@@ -13,28 +13,28 @@ public class CrossSectioner {
 
 
     public static CrossSection section(Survey survey, final Station station) {
-        double angle = getAngleOfSection(survey, station);
+        float angle = getAngleOfSection(survey, station);
         CrossSection crossSection = new CrossSection(station, angle);
         return crossSection;
     }
 
-    public static double getAngleOfSection(Survey survey, Station station) {
+    public static float getAngleOfSection(Survey survey, Station station) {
 
         int numIncomingLegs = station == survey.getOrigin()? 0 : 1;
         int numOutgoingLegs = station.getConnectedOnwardLegs().size();
 
-        double angle;
+        float angle;
         if (numIncomingLegs == 1 && numOutgoingLegs == 1) {
-            double incomingAzimuth = getIncomingAzimuth(survey, station);
-            double outgoingAzimuth = getOutgoingAzimuth(station);
+            float incomingAzimuth = getIncomingAzimuth(survey, station);
+            float outgoingAzimuth = getOutgoingAzimuth(station);
             angle = (incomingAzimuth + outgoingAzimuth) / 2;
         } else if (numIncomingLegs == 1) {
             // just consider the incoming leg (end of a passage or, lots of ways on)
-            double incomingAzimuth = getIncomingAzimuth(survey, station);
+            float incomingAzimuth = getIncomingAzimuth(survey, station);
             angle = incomingAzimuth;
         } else if (numOutgoingLegs == 1) {
             // just consider the outgoing leg (must be doing X-section at the origin)
-            double outgoingAzimuth = getOutgoingAzimuth(station);
+            float outgoingAzimuth = getOutgoingAzimuth(station);
             angle = outgoingAzimuth;
         } else {
             // at the origin with no or lots of outgoing legs?? No idea....
@@ -44,7 +44,7 @@ public class CrossSectioner {
         return angle;
     }
 
-    private static double getIncomingAzimuth(Survey survey, Station station) {
+    private static float getIncomingAzimuth(Survey survey, Station station) {
         try {
             return survey.getReferringLeg(station).getAzimuth();
         } catch (NullPointerException exception) {
@@ -52,7 +52,7 @@ public class CrossSectioner {
         }
     }
 
-    private static double getOutgoingAzimuth(Station station) {
+    private static float getOutgoingAzimuth(Station station) {
         return station.getConnectedOnwardLegs().get(0).getAzimuth();
     }
 

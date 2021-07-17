@@ -82,11 +82,11 @@ public class ManualEntry {
 
         Leg editData = toEdit.wasShotBackwards()? toEdit.reverse() : toEdit;
         ((TextView) (dialog.findViewById(R.id.editDistance)))
-                .setText(Double.toString(editData.getDistance()));
+                .setText(Float.toString(editData.getDistance()));
         ((TextView) (dialog.findViewById(R.id.editAzimuth)))
-                .setText(Double.toString(editData.getAzimuth()));
+                .setText(Float.toString(editData.getAzimuth()));
         ((TextView) (dialog.findViewById(R.id.editInclination)))
-                .setText(Double.toString(editData.getInclination()));
+                .setText(Float.toString(editData.getInclination()));
     }
 
 
@@ -114,7 +114,7 @@ public class ManualEntry {
     private static void createLrudIfPresent(Survey survey, Station station,
                                             Dialog dialog, int fieldId,
                                             LRUD direction) {
-        Double value = getFieldValue(dialog, fieldId);
+        Float value = getFieldValue(dialog, fieldId);
         if (value != null) {
             Leg leg = direction.createSplay(survey, station, value);
             SurveyUpdater.update(survey, leg);
@@ -123,10 +123,10 @@ public class ManualEntry {
     }
 
 
-    private static Double getFieldValue(Dialog dialog, int id) {
+    private static Float getFieldValue(Dialog dialog, int id) {
         try {
             TextView field = dialog.findViewById(id);
-            return Double.parseDouble(field.getText().toString());
+            return Float.parseFloat(field.getText().toString());
         } catch (Exception e) {
             return null;
         }
@@ -162,21 +162,21 @@ public class ManualEntry {
         dialog.setButton(DialogInterface.BUTTON_POSITIVE, "Save",
                 (dialogInterface, buttonId) -> {
 
-                    Double distance = getFieldValue(dialog, R.id.editDistance);
-                    Double inclination = getFieldValue(dialog, R.id.editInclination);
+                    Float distance = getFieldValue(dialog, R.id.editDistance);
+                    Float inclination = getFieldValue(dialog, R.id.editInclination);
 
-                    Double azimuth;
+                    Float azimuth;
                     if (tableActivity.getBooleanPreference("pref_key_deg_mins_secs")) {
-                        Double degrees = getFieldValue(dialog, R.id.editAzimuthDegrees);
-                        Double minutes = getFieldValue(dialog, R.id.editAzimuthMinutes);
-                        Double seconds = getFieldValue(dialog, R.id.editAzimuthSeconds);
+                        Float degrees = getFieldValue(dialog, R.id.editAzimuthDegrees);
+                        Float minutes = getFieldValue(dialog, R.id.editAzimuthMinutes);
+                        Float seconds = getFieldValue(dialog, R.id.editAzimuthSeconds);
                         if (degrees == null || minutes == null || seconds == null) {
                             azimuth = null;
                         } else {
                             azimuth =
                                 degrees +
-                                (minutes * (1.0 / 60.0)) +
-                                (seconds * (1.0 / 60.0) * (1.0 / 60.0));
+                                (minutes * (1.0f / 60.0f)) +
+                                (seconds * (1.0f / 60.0f) * (1.0f / 60.0f));
                         }
                     } else {
                         azimuth = getFieldValue(dialog, R.id.editAzimuth);

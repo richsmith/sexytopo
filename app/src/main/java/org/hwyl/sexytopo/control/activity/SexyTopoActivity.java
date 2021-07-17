@@ -125,10 +125,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         // provided by the connected Instrument's Communicator
         MenuItem deviceMenu = menu.findItem(R.id.action_device_menu);
         SubMenu subMenu = deviceMenu.getSubMenu();
-        MenuItem connections = menu.findItem(R.id.action_device_connect);
         subMenu.clear();
-        subMenu.add(Menu.NONE, R.id.action_device_connect,
-                0, getString(R.string.action_device_connect));
+        subMenu.add(Menu.NONE, R.id.action_device_connect, 0, getString(R.string.action_device_connect));
         Map<Integer, String> commands = requestComms().getCustomCommands();
         for (Map.Entry<Integer, String> entry: commands.entrySet()) {
             int id = entry.getKey();

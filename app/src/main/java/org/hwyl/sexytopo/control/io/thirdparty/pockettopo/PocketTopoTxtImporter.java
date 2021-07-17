@@ -70,9 +70,9 @@ public class PocketTopoTxtImporter extends Importer {
             String fromStationName = fields[0];
             String toStationName = fields[1];
 
-            double azimuth = Double.parseDouble(fields[2]);
-            double inclination = Double.parseDouble(fields[3]);
-            double distance = Double.parseDouble(fields[4]);
+            float azimuth = Float.parseFloat(fields[2]);
+            float inclination = Float.parseFloat(fields[3]);
+            float distance = Float.parseFloat(fields[4]);
 
             if (firstStation) {
                 survey.getOrigin().setName(fromStationName);
@@ -164,8 +164,8 @@ public class PocketTopoTxtImporter extends Importer {
             String[] tokens = line.split("\t");
             String stationName = tokens[2];
             if (stationName.equals(station.getName())) {
-                double x = Double.parseDouble(tokens[0]);
-                double y = Double.parseDouble(tokens[1]);
+                float x = Float.parseFloat(tokens[0]);
+                float y = Float.parseFloat(tokens[1]);
                 return new Coord2D(x, y);
             }
         }
@@ -223,8 +223,8 @@ public class PocketTopoTxtImporter extends Importer {
             }
 
             String[] coords = line.split("\t");
-            double x = Double.parseDouble(coords[0]) - offset.x;
-            double y = Double.parseDouble(coords[1]) - offset.y;
+            float x = Float.parseFloat(coords[0]) - offset.x;
+            float y = Float.parseFloat(coords[1]) - offset.y;
             Coord2D coord = new Coord2D(x, -y);
 
             if (currentPathDetail == null) {

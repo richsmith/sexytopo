@@ -345,9 +345,9 @@ public class SurveyJsonTranslater {
             Map<String, Station> namesToStations,
             JSONObject json) throws JSONException {
 
-        double distance = json.getDouble(DISTANCE_TAG);
-        double azimuth = json.getDouble(AZIMUTH_TAG);
-        double inclination = json.getDouble(INCLINATION_TAG);
+        float distance = (float) json.getDouble(DISTANCE_TAG);
+        float azimuth = (float) json.getDouble(AZIMUTH_TAG);
+        float inclination = (float) json.getDouble(INCLINATION_TAG);
         boolean wasShotBackwards = json.getBoolean(WAS_SHOT_BACKWARDS_TAG);
 
         String destinationName = json.getString(DESTINATION_TAG);

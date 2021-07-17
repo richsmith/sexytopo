@@ -62,9 +62,9 @@ public class SurvexImporter extends Importer {
 
         String fromName = fields[0];
         String toName = fields[1];
-        double distance = Double.parseDouble(fields[2]);
-        double azimuth = Double.parseDouble(fields[3]);
-        double inclination = Double.parseDouble(fields[4]);
+        float distance = Float.parseFloat(fields[2]);
+        float azimuth = Float.parseFloat(fields[3]);
+        float inclination = Float.parseFloat(fields[4]);
 
         if (nameToStation.size() == 0) {
             Station origin = new Station(fromName);
@@ -130,9 +130,9 @@ public class SurvexImporter extends Importer {
             for (String legString : legStrings) {
                 legString = legString.trim();
                 String[] fieldStrings = legString.split(" ");
-                double distance = Double.parseDouble(fieldStrings[0].trim());
-                double azimuth = Double.parseDouble(fieldStrings[1].trim());
-                double inclination = Double.parseDouble(fieldStrings[2].trim());
+                float distance = Float.parseFloat(fieldStrings[0].trim());
+                float azimuth = Float.parseFloat(fieldStrings[1].trim());
+                float inclination = Float.parseFloat(fieldStrings[2].trim());
                 legs.add(new Leg(distance, azimuth, inclination));
             }
 

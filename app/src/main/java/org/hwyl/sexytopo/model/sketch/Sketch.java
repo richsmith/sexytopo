@@ -79,7 +79,7 @@ public class Sketch extends SketchDetail {
     }
 
     public void finishPath() {
-        double epsilon = Space2DUtils.simplificationEpsilon(activePath);
+        float epsilon = Space2DUtils.simplificationEpsilon(activePath);
         Log.d("Sketch epsilon = " + epsilon);
         activePath.setPath(Space2DUtils.simplify(activePath.getPath(), epsilon));
         activePath = null;
@@ -196,10 +196,10 @@ public class Sketch extends SketchDetail {
     }
 
 
-    public Coord2D findEligibleSnapPointWithin(Coord2D point, double delta) {
+    public Coord2D findEligibleSnapPointWithin(Coord2D point, float delta) {
 
         Coord2D closest = null;
-        double minDistance = Double.MAX_VALUE;
+        float minDistance = Float.MAX_VALUE;
 
         for (PathDetail path : pathDetails) {
 
@@ -210,7 +210,7 @@ public class Sketch extends SketchDetail {
             Coord2D start = path.getPath().get(0);
             Coord2D end = path.getPath().get(path.getPath().size() - 1);
             for (Coord2D coord2D : new Coord2D[]{start, end}) {
-                double distance = Space2DUtils.getDistance(point, coord2D);
+                float distance = Space2DUtils.getDistance(point, coord2D);
                 if (distance < delta && distance < minDistance) {
                     closest = coord2D;
                     minDistance = distance;
@@ -230,13 +230,13 @@ public class Sketch extends SketchDetail {
         return all;
     }
 
-    public SketchDetail findNearestDetailWithin(Coord2D point, double delta) {
+    public SketchDetail findNearestDetailWithin(Coord2D point, float delta) {
 
         SketchDetail closest = null;
-        double minDistance = Double.MAX_VALUE;
+        float minDistance = Float.MAX_VALUE;
 
         for (SketchDetail detail : allSketchDetails()) {
-            double distance = detail.getDistanceFrom(point);
+            float distance = detail.getDistanceFrom(point);
             if (distance < delta && distance < minDistance) {
                 closest = detail;
                 minDistance = distance;
@@ -318,7 +318,7 @@ public class Sketch extends SketchDetail {
 
 
     @Override
-    public double getDistanceFrom(Coord2D point) {
+    public float getDistanceFrom(Coord2D point) {
         throw new NotImplementedException("Not yet implemented");
     }
 

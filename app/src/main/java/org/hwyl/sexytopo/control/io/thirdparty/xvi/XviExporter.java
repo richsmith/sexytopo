@@ -23,7 +23,7 @@ import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.STATIONS_
 
 public class XviExporter {
 
-    public static String getContent(Sketch sketch, Space<Coord2D> space, double scale) {
+    public static String getContent(Sketch sketch, Space<Coord2D> space, float scale) {
 
         String text = field(GRIDS_COMMAND, "1 m");
         text += multilineField(STATIONS_COMMAND, getStationsText(space, scale));
@@ -85,15 +85,15 @@ public class XviExporter {
         return field("\t", TextTools.join(" ", fields));
     }
 
-    private static String getGridText(Space<Coord2D> space, double scale) {
+    private static String getGridText(Space<Coord2D> space, float scale) {
         SketchDimensions dimensions = SketchDimensions.getDimensions(space);
 
-        Double[] values = new Double[] {
+        Float[] values = new Float[] {
             (dimensions.minX - 1) * scale,
             (dimensions.minY - 1) * scale,
             scale,
-            0.0,
-            0.0,
+            0.0f,
+            0.0f,
             scale,
             dimensions.getWidth() + 2,
             dimensions.getHeight() + 2

@@ -114,8 +114,8 @@ public class XviImporter extends Importer {
 
         List<Coord2D> points = new ArrayList<>(tokens.size() - 1);
         for (int i = 1; i < tokens.size();) {
-            double x = Double.parseDouble(tokens.get(i++));
-            double y = Double.parseDouble(tokens.get(i++));
+            float x = Float.parseFloat(tokens.get(i++));
+            float y = Float.parseFloat(tokens.get(i++));
 
             x /= scale;
             y /= scale;

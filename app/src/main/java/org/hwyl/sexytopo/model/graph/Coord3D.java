@@ -9,9 +9,9 @@ public final class Coord3D extends Coord {
 
     public static final Coord3D ORIGIN = new Coord3D(0, 0, 0);
 
-    public final double x, y, z;
+    public final float x, y, z;
 
-    public Coord3D(double x, double y, double z) {
+    public Coord3D(float x, float y, float z) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -30,7 +30,7 @@ public final class Coord3D extends Coord {
 
     @Override
     public int hashCode() {
-        double result = x;
+        float result = x;
         result = 31 * result + y;
         result = 31 * result + z;
         return (int)result;

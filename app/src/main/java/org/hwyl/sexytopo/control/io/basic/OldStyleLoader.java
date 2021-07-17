@@ -46,9 +46,9 @@ public class OldStyleLoader {
         Station from = retrieveOrCreateStation(nameToStation, fields[0], comment);
         Station to = retrieveOrCreateStation(nameToStation, fields[1], comment);
 
-        double distance = Double.parseDouble(fields[2]);
-        double azimuth = Double.parseDouble(fields[3]);
-        double inclination = Double.parseDouble(fields[4]);
+        float distance = Float.parseFloat(fields[2]);
+        float azimuth = Float.parseFloat(fields[3]);
+        float inclination = Float.parseFloat(fields[4]);
 
         List<Station> stationsSoFar = survey.getAllStations();
 

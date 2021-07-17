@@ -29,7 +29,7 @@ public class DeletedDetail extends SketchDetail {
     }
 
     @Override
-    public double getDistanceFrom(Coord2D point) {
+    public float getDistanceFrom(Coord2D point) {
         return deletedDetail.getDistanceFrom(point);
     }
 

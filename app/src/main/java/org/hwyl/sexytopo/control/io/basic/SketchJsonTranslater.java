@@ -163,7 +163,7 @@ public class SketchJsonTranslater {
 
         PathDetail pathDetail = new PathDetail(path, colour);
 
-        double epsilon = Space2DUtils.simplificationEpsilon(pathDetail);
+        float epsilon = Space2DUtils.simplificationEpsilon(pathDetail);
         List<Coord2D> simplifiedPath = Space2DUtils.simplify(path, epsilon);
         pathDetail.setPath(simplifiedPath);
 
@@ -230,10 +230,11 @@ public class SketchJsonTranslater {
     }
 
 
-    public static CrossSectionDetail toCrossSectionDetail(Survey survey, JSONObject json) throws JSONException {
+    public static CrossSectionDetail toCrossSectionDetail(Survey survey, JSONObject json)
+            throws JSONException {
 
         Coord2D position = toCoord2D(json.getJSONObject(POSITION_TAG));
-        double angle = json.getDouble(ANGLE_TAG);
+        float angle = (float) json.getDouble(ANGLE_TAG);
 
         String stationdId = json.getString(STATION_ID_TAG);
         Station station = survey.getStationByName(stationdId);
@@ -254,7 +255,7 @@ public class SketchJsonTranslater {
 
 
     public static Coord2D toCoord2D(JSONObject json) throws JSONException {
-        return new Coord2D(json.getDouble(X_TAG), json.getDouble(Y_TAG));
+        return new Coord2D((float)json.getDouble(X_TAG), (float)json.getDouble(Y_TAG));
     }
 
 

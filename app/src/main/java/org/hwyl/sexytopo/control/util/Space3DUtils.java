@@ -7,13 +7,13 @@ import org.hwyl.sexytopo.model.survey.Leg;
 public class Space3DUtils {
 
     public static Coord3D toCartesian(Coord3D start, Leg leg) {
-        double r = leg.getDistance();
-        double phi = Math.toRadians(leg.getAzimuth());
-        double theta = Math.toRadians(leg.getInclination());
+        float r = leg.getDistance();
+        float phi = (float) Math.toRadians(leg.getAzimuth());
+        float theta = (float) Math.toRadians(leg.getInclination());
 
-        double y = r * Math.cos(theta) * Math.cos(phi);
-        double x = r * Math.cos(theta) * Math.sin(phi);
-        double z = r * Math.sin(theta);
+        float y = (float) (r * Math.cos(theta) * Math.cos(phi));
+        float x = (float) (r * Math.cos(theta) * Math.sin(phi));
+        float z = (float) (r * Math.sin(theta));
 
         x += start.x;
         y += start.y;

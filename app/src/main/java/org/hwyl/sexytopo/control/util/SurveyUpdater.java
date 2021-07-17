@@ -276,9 +276,9 @@ public class SurveyUpdater {
             }
         }
 
-        double minDistance = Double.POSITIVE_INFINITY, maxDistance = Double.NEGATIVE_INFINITY;
-        double minAzimuth = Double.POSITIVE_INFINITY, maxAzimuth = Double.NEGATIVE_INFINITY;
-        double minInclination = Double.POSITIVE_INFINITY, maxInclination = Double.NEGATIVE_INFINITY;
+        float minDistance = Float.POSITIVE_INFINITY, maxDistance = Float.NEGATIVE_INFINITY;
+        float minAzimuth = Float.POSITIVE_INFINITY, maxAzimuth = Float.NEGATIVE_INFINITY;
+        float minInclination = Float.POSITIVE_INFINITY, maxInclination = Float.NEGATIVE_INFINITY;
 
         for (Leg leg : legs) {
             minDistance = Math.min(leg.getDistance(), minDistance);
@@ -289,12 +289,12 @@ public class SurveyUpdater {
             maxInclination = Math.max(leg.getInclination(), maxInclination);
         }
 
-        double distanceDiff = maxDistance - minDistance;
-        double azimuthDiff = maxAzimuth - minAzimuth;
-        double inclinationDiff = maxInclination - minInclination;
+        float distanceDiff = maxDistance - minDistance;
+        float azimuthDiff = maxAzimuth - minAzimuth;
+        float inclinationDiff = maxInclination - minInclination;
 
-        double maxDistanceDelta = getMaxDistanceDelta();
-        double maxAngleDelta = getMaxAngleDelta();
+        float maxDistanceDelta = getMaxDistanceDelta();
+        float maxAngleDelta = getMaxAngleDelta();
 
         return distanceDiff <= maxDistanceDelta &&
                azimuthDiff <= maxAngleDelta &&
@@ -332,8 +332,8 @@ public class SurveyUpdater {
 
     public static Leg averageLegs(List<Leg> repeats) {
         int count = repeats.size();
-        double distance = 0.0, inclination = 0.0;
-        double[] azimuths = new double[count];
+        float distance = 0.0f, inclination = 0.0f;
+        float[] azimuths = new float[count];
         for (int i=0; i < count; i++) {
             Leg leg = repeats.get(i);
             distance += leg.getDistance();
@@ -353,12 +353,12 @@ public class SurveyUpdater {
 
 
     /** Average some azimuth values together, even if they span the 360/0 boundary */
-    private static double averageAzimuths(double[] azimuths) {
+    private static float averageAzimuths(float[] azimuths) {
         // Azimuth values jump at the 360/0 boundary, so we must be careful to ensure that
         // values {359, 1} average to 0 rather than the incorrect value 180
-        double sum = 0.0;
-        double min = Leg.MAX_AZIMUTH, max = Leg.MIN_AZIMUTH;
-        for (double azimuth : azimuths) {
+        float sum = 0.0f;
+        float min = Leg.MAX_AZIMUTH, max = Leg.MIN_AZIMUTH;
+        for (float azimuth : azimuths) {
             if (azimuth < min) {
                 min = azimuth;
             }
@@ -367,7 +367,7 @@ public class SurveyUpdater {
             }
         }
         boolean splitOverZero = max - min > 180;
-        double[] correctedAzms = new double[azimuths.length];
+        float[] correctedAzms = new float[azimuths.length];
         for (int i = 0; i < azimuths.length; i++) {
             correctedAzms[i] =
                     (splitOverZero && azimuths[i] < 180) ? azimuths[i] + 360: azimuths[i];

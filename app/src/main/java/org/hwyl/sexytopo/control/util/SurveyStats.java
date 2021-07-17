@@ -15,10 +15,10 @@ public class SurveyStats {
     // This would all be so much easier with Java 8: lambdas, streaming API...
     // TODO: rewrite when Android moves to Java 8
 
-    public static double calcTotalLength(Survey survey) {
+    public static float calcTotalLength(Survey survey) {
         List<Leg> legs = survey.getAllLegs();
 
-        double total = 0.0;
+        float total = 0.0f;
         for (Leg leg : legs) {
             if (leg.hasDestination()) {
                 total += leg.getDistance();
@@ -28,13 +28,13 @@ public class SurveyStats {
         return total;
     }
 
-    public static double calcLongestLeg(Survey survey) {
+    public static float calcLongestLeg(Survey survey) {
         List<Leg> legs = survey.getAllLegs();
         if (legs.isEmpty()) {
             return 0;
         }
 
-        double max = 0.0;
+        float max = 0.0f;
         for (Leg leg : legs) {
             max = Math.max(leg.getDistance(), max);
         }
@@ -42,13 +42,13 @@ public class SurveyStats {
         return max;
     }
 
-    public static double calcShortestLeg(Survey survey) {
+    public static float calcShortestLeg(Survey survey) {
         List<Leg> legs = survey.getAllLegs();
         if (legs.isEmpty()) {
             return 0;
         }
 
-        double min = Double.POSITIVE_INFINITY;
+        float min = Float.POSITIVE_INFINITY;
         for (Leg leg : legs) {
             min = Math.min(leg.getDistance(), min);
         }
@@ -90,28 +90,28 @@ public class SurveyStats {
         return Survey.getAllLegs(origin).size();
     }
 
-    public static double calcHeightRange(Survey survey) {
-        double[] rangeArray = calcHeightRangeArray(survey);
+    public static float calcHeightRange(Survey survey) {
+        float[] rangeArray = calcHeightRangeArray(survey);
         return rangeArray[1] - rangeArray[0];
     }
 
 
-    public static double[] calcHeightRangeArray(Survey survey) {
+    public static float[] calcHeightRangeArray(Survey survey) {
         Space3DTransformer transformer = new Space3DTransformer();
         Space<Coord3D> space = transformer.transformTo3D(survey);
         Map<Station, Coord3D> stationsToCoords = space.getStationMap();
 
         if (stationsToCoords.size() <= 1) {
-            return new double[]{0, 0};
+            return new float[]{0, 0};
         }
 
-        double min = Double.MAX_VALUE, max = Double.MIN_VALUE;
+        float min = Float.MAX_VALUE, max = Float.MIN_VALUE;
         for (Coord3D point : space.getStationMap().values()) {
             max = Math.max(max, point.z);
             min = Math.min(min, point.z);
         }
 
-        return new double[]{min, max};
+        return new float[]{min, max};
     }
 
 

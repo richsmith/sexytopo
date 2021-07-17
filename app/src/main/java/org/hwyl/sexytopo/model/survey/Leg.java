@@ -15,9 +15,9 @@ public class Leg extends SurveyComponent {
     public static final int MIN_INCLINATION = -90;
     public static final int MAX_INCLINATION = 90;
 
-    private final double distance; // in metres
-    private final double azimuth;
-    private final double inclination;
+    private final float distance; // in metres
+    private final float azimuth;
+    private final float inclination;
     private final Station destination;
     private final Leg[] promotedFrom;
     private final boolean wasShotBackwards;
@@ -26,30 +26,30 @@ public class Leg extends SurveyComponent {
 
     public final static Leg EMPTY_LEG = new Leg(0, 0, 0);
 
-    public Leg(double distance,
-               double azimuth,
-               double inclination) {
+    public Leg(float distance,
+               float azimuth,
+               float inclination) {
         this(distance, azimuth, inclination, false);
     }
 
-    public Leg(double distance,
-               double azimuth,
-               double inclination,
+    public Leg(float distance,
+               float azimuth,
+               float inclination,
                boolean wasShotBackwards) {
         this(distance, azimuth, inclination, Survey.NULL_STATION, NO_LEGS, wasShotBackwards);
     }
 
-    public Leg(double distance,
-               double azimuth,
-               double inclination,
+    public Leg(float distance,
+               float azimuth,
+               float inclination,
                Station destination,
                Leg[] promotedFrom) {
         this(distance, azimuth, inclination, destination, promotedFrom, false);
     }
 
-    public Leg(double distance,
-               double azimuth,
-               double inclination,
+    public Leg(float distance,
+               float azimuth,
+               float inclination,
                Station destination,
                Leg[] promotedFrom,
                boolean wasShotBackwards) {
@@ -100,7 +100,7 @@ public class Leg extends SurveyComponent {
     }
 
     public Leg reverse() {
-        double adjustedAzimuth = Space2DUtils.adjustAngle(getAzimuth(), 180);
+        float adjustedAzimuth = Space2DUtils.adjustAngle(getAzimuth(), 180);
         if (hasDestination()) {
             Leg leg = new Leg(
                     distance, adjustedAzimuth, -1 * inclination, destination,
@@ -111,12 +111,12 @@ public class Leg extends SurveyComponent {
         }
     }
 
-    public Leg rotate(double delta) {
-        double adjustedAzimuth = Space2DUtils.adjustAngle(getAzimuth(), delta);
+    public Leg rotate(float delta) {
+        float adjustedAzimuth = Space2DUtils.adjustAngle(getAzimuth(), delta);
         return adjustAzimuth(adjustedAzimuth);
     }
 
-    public Leg adjustAzimuth(double newAzimuth) {
+    public Leg adjustAzimuth(float newAzimuth) {
         if (hasDestination()) {
             return new Leg(getDistance(), newAzimuth, getInclination(),
                     getDestination(), getPromotedFrom());
@@ -126,7 +126,7 @@ public class Leg extends SurveyComponent {
     }
 
     public Leg asBacksight(Station destination) {
-        double backAzimuth = Space2DUtils.adjustAngle(getAzimuth(), 180.0);
+        float backAzimuth = Space2DUtils.adjustAngle(getAzimuth(), 180.0f);
         Leg leg = new Leg(getDistance(), backAzimuth, -1 * getInclination(),
                 destination, getPromotedFrom());
         return leg;
@@ -136,15 +136,15 @@ public class Leg extends SurveyComponent {
         return asBacksight(Survey.NULL_STATION);
     }
 
-    public double getDistance() {
+    public float getDistance() {
         return distance;
     }
 
-    public double getAzimuth() {
+    public float getAzimuth() {
         return azimuth;
     }
 
-    public double getInclination() {
+    public float getInclination() {
         return inclination;
     }
 
@@ -168,15 +168,15 @@ public class Leg extends SurveyComponent {
         return wasShotBackwards;
     }
 
-    public static boolean isDistanceLegal(double distance) {
+    public static boolean isDistanceLegal(float distance) {
         return distance >= MIN_DISTANCE;
     }
 
-    public static boolean isAzimuthLegal(double azimuth) {
+    public static boolean isAzimuthLegal(float azimuth) {
         return MIN_AZIMUTH <= azimuth && azimuth < MAX_AZIMUTH;
     }
 
-    public static boolean isInclinationLegal(double inclination) {
+    public static boolean isInclinationLegal(float inclination) {
         return MIN_INCLINATION <= inclination && inclination <= MAX_INCLINATION;
     }
 

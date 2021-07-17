@@ -37,9 +37,9 @@ public class TestSurveyCreator {
 
         for (int i = 0; i < numStations; i++) {
 
-            double distance = 5 + random.nextInt(10);
-            double azimuth = 40 + random.nextInt(100);
-            double inclination = -20 + random.nextInt(40);
+            float distance = 5 + random.nextInt(10);
+            float azimuth = 40 + random.nextInt(100);
+            float inclination = -20 + random.nextInt(40);
 
             Leg leg = new Leg(distance, azimuth, inclination);
             SurveyUpdater.updateWithNewStation(survey, leg);

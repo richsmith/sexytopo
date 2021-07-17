@@ -65,7 +65,7 @@ public class TherionExporter extends Exporter {
             String originalFileContent)
             throws IOException {
 
-        double scale = getScale();
+        float scale = getScale();
 
         Space<Coord2D> space = projection.project(survey);
         space = SpaceFlipper.flipVertically(space);
@@ -105,11 +105,11 @@ public class TherionExporter extends Exporter {
     }
 
     @SuppressWarnings("UnnecessaryLocalVariable")
-    public static double getScale() {
-        final double PLAN_DPI = 200;
-        final double PLAN_SCALE = 100;
-        final double CENTIMETRES_PER_METRE = 2.54;
-        final double scale = 100 * PLAN_DPI / (CENTIMETRES_PER_METRE * PLAN_SCALE);
+    public static float getScale() {
+        final float PLAN_DPI = 200;
+        final float PLAN_SCALE = 100;
+        final float CENTIMETRES_PER_METRE = 2.54f;
+        final float scale = 100 * PLAN_DPI / (CENTIMETRES_PER_METRE * PLAN_SCALE);
         return scale;
     }
 

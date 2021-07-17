@@ -40,17 +40,17 @@ public class MeasurementProtocol extends DistoXProtocol {
         int d0 = packet[ADMIN] & DISTANCE_BIT_MASK;
         int d1 = readByte(packet, DISTANCE_LOW_BYTE);
         int d2 = readByte(packet, DISTANCE_HIGH_BYTE);
-        double distance = (d0 * 1024 + d2 * 256 + d1) / 1000.0;
+        float distance = (d0 * 1024 + d2 * 256 + d1) / 1000.0f;
 
-        double azimuth_reading =
+        float azimuth_reading =
                 readDoubleByte(packet, AZIMUTH_LOW_BYTE, AZIMUTH_HIGH_BYTE);
-        double azimuth = azimuth_reading * 180.0 / 32768.0;
+        float azimuth = azimuth_reading * 180.0f / 32768.0f;
 
-        double inclinationReading =
+        float inclinationReading =
                 readDoubleByte(packet, INCLINATION_LOW_BYTE, INCLINATION_HIGH_BYTE);
-        double inclination = inclinationReading * 90.0 / 16384.0;
+        float inclination = inclinationReading * 90.0f / 16384.0f;
         if (inclinationReading >= 32768) {
-            inclination = (65536 - inclinationReading) * -90.0 / 16384.0;
+            inclination = (65536 - inclinationReading) * -90.0f / 16384.0f;
         }
 
         return new Leg(distance, azimuth, inclination);

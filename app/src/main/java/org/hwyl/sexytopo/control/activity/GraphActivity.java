@@ -42,8 +42,8 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 public abstract class GraphActivity extends SexyTopoActivity
         implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
 
-    private static final double ZOOM_INCREMENT = 1.1;
-    private static final double ZOOM_DECREMENT = 0.9;
+    private static final float ZOOM_INCREMENT = 1.1f;
+    private static final float ZOOM_DECREMENT = 0.9f;
 
 
     private static final SketchTool DEFAULT_SKETCH_TOOL_SELECTION = SketchTool.MOVE;
@@ -217,8 +217,8 @@ public abstract class GraphActivity extends SexyTopoActivity
         Survey survey = getSurvey();
         graphView.setSurvey(survey);
         graphView.setProjection(getProjection(survey));
-        double surveyLength = SurveyStats.calcTotalLength(survey);
-        double surveyHeight = SurveyStats.calcHeightRange(survey);
+        float surveyLength = SurveyStats.calcTotalLength(survey);
+        float surveyHeight = SurveyStats.calcHeightRange(survey);
         graphView.setCachedStats(surveyLength, surveyHeight);
         graphView.invalidate();
     }

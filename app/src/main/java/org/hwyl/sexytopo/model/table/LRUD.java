@@ -12,31 +12,31 @@ import org.hwyl.sexytopo.model.survey.Survey;
  */
 public enum LRUD {
     LEFT {
-        public Leg createSplay(Survey survey, Station station, double distance) {
-            double angle = Space2DUtils.adjustAngle(
+        public Leg createSplay(Survey survey, Station station, float distance) {
+            float angle = Space2DUtils.adjustAngle(
                     CrossSectioner.getAngleOfSection(survey, station),
-                    -90.0);
+                    -90.0f);
             return new Leg(distance, angle, 0);
         }
     },
     RIGHT {
-        public Leg createSplay(Survey survey, Station station, double distance) {
-            double angle = Space2DUtils.adjustAngle(
+        public Leg createSplay(Survey survey, Station station, float distance) {
+            float angle = Space2DUtils.adjustAngle(
                     CrossSectioner.getAngleOfSection(survey, station),
-                    90.0);
+                    90.0f);
             return new Leg(distance, angle, 0);
         }
     },
     UP {
-        public Leg createSplay(Survey survey, Station station, double distance) {
-            return new Leg(distance, 0, 90.0);
+        public Leg createSplay(Survey survey, Station station, float distance) {
+            return new Leg(distance, 0, 90.0f);
         }
     },
     DOWN {
-        public Leg createSplay(Survey survey, Station station, double distance) {
-            return new Leg(distance, 0, -90.0);
+        public Leg createSplay(Survey survey, Station station, float distance) {
+            return new Leg(distance, 0, -90.0f);
         }
     };
 
-    public abstract Leg createSplay(Survey survey, Station station, double distance);
+    public abstract Leg createSplay(Survey survey, Station station, float distance);
 }

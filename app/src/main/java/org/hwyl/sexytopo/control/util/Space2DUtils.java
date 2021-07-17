@@ -14,32 +14,32 @@ import java.util.Map;
 
 public class Space2DUtils {
 
-    public static double getDistanceFromLine(Coord2D point, Coord2D lineStart, Coord2D lineEnd) {
+    public static float getDistanceFromLine(Coord2D point, Coord2D lineStart, Coord2D lineEnd) {
 
         // Adapted from a post on StackExchange by Joshua
         // http://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
 
-        double x = point.x;
-        double y = point.y;
-        double x1 = lineStart.x;
-        double y1 = lineStart.y;
-        double x2 = lineEnd.x;
-        double y2 = lineEnd.y;
+        float x = point.x;
+        float y = point.y;
+        float x1 = lineStart.x;
+        float y1 = lineStart.y;
+        float x2 = lineEnd.x;
+        float y2 = lineEnd.y;
 
-        double a = x - x1;
-        double b = y - y1;
-        double c = x2 - x1;
-        double d = y2 - y1;
+        float a = x - x1;
+        float b = y - y1;
+        float c = x2 - x1;
+        float d = y2 - y1;
 
-        double dot = a * c + b * d;
-        double lenSq = c * c + d * d;
-        double param = -1;
+        float dot = a * c + b * d;
+        float lenSq = c * c + d * d;
+        float param = -1;
 
         if (lenSq != 0) {
             param = dot / lenSq;
         }
 
-        double xx, yy;
+        float xx, yy;
 
         if (param < 0) {
             xx = x1;
@@ -52,18 +52,18 @@ public class Space2DUtils {
             yy = y1 + param * d;
         }
 
-        double dx = x - xx;
-        double dy = y - yy;
-        return Math.sqrt(dx * dx + dy * dy);
+        float dx = x - xx;
+        float dy = y - yy;
+        return (float) Math.sqrt(dx * dx + dy * dy);
     }
 
 
-    public static double getDistance(Coord2D a, Coord2D b) {
-        return Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2));
+    public static float getDistance(Coord2D a, Coord2D b) {
+        return (float) Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2));
     }
 
-    public static double adjustAngle(double angle, double delta) {
-        double newAngle = angle + delta;
+    public static float adjustAngle(float angle, float delta) {
+        float newAngle = angle + delta;
         while (newAngle < 0) {
             newAngle += 360;
         }
@@ -98,15 +98,15 @@ public class Space2DUtils {
         return new Line<>(start.plus(point), end.plus(point));
     }
 
-    private static List<Coord2D> douglasPeukerIteration(List<Coord2D> path, double epsilon) {
+    private static List<Coord2D> douglasPeukerIteration(List<Coord2D> path, float epsilon) {
 
         // Find the point with the maximum distance
         int pathSize = path.size();
         int indexMax = 0;
-        double distMax = 0;
+        float distMax = 0;
 
         for (int i = 1; i != pathSize; ++i) {
-            double dist = getDistanceFromLine(path.get(i), path.get(0), path.get(pathSize - 1));
+            float dist = getDistanceFromLine(path.get(i), path.get(0), path.get(pathSize - 1));
             if (dist > distMax) {
                 distMax = dist;
                 indexMax = i;
@@ -131,18 +131,18 @@ public class Space2DUtils {
         return simplifiedPath;
     }
 
-    public static double simplificationEpsilon(double width, double height) {
+    public static float simplificationEpsilon(float width, float height) {
 
         // TODO: this is a pretty crude simplification factor but we can revisit after more testing
-        double maxDim = Math.max(width, height);
-        return Math.max(maxDim / 500, 0.001);
+        float maxDim = Math.max(width, height);
+        return Math.max(maxDim / 500, 0.001f);
     }
 
-    public static double simplificationEpsilon(PathDetail pathDetail) {
+    public static float simplificationEpsilon(PathDetail pathDetail) {
         return simplificationEpsilon(pathDetail.getWidth(), pathDetail.getHeight());
     }
 
-    public static List<Coord2D> simplify(List<Coord2D> path, double epsilon) {
+    public static List<Coord2D> simplify(List<Coord2D> path, float epsilon) {
 
         if (path.isEmpty() || epsilon <= 0)
             return path;

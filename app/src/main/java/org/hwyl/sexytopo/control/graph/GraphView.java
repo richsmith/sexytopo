@@ -78,10 +78,10 @@ public class GraphView extends View {
 
     // ratio of metres on the survey to pixels on the view
     // zooming in increases this, zooming out decreases it
-    private double surveyToViewScale = 60.0;
+    private float surveyToViewScale = 60.0f;
 
-    public static final double MIN_ZOOM = 0.1;
-    public static final double MAX_ZOOM = 500.0;
+    public static final float MIN_ZOOM = 0.1f;
+    public static final float MAX_ZOOM = 500.0f;
 
     private static final int BOX_SIZE = 10; // every grid box is 10 units square
 
@@ -101,13 +101,14 @@ public class GraphView extends View {
     public static final int HIGHLIGHT_OUTLINE = 4;
 
     public static final int LEGEND_SIZE = 18;
+    public final float LEGEND_TICK_SIZE = 5;
     public static final Colour LEGEND_COLOUR = Colour.BLACK;
     public static final Colour GRID_COLOUR = Colour.LIGHT_GREY;
 
-    public static final double DELETE_PATHS_WITHIN_N_PIXELS = 5.0;
-    public static final double SELECTION_SENSITIVITY_IN_PIXELS = 25.0;
-    public static final double SNAP_TO_LINE_SENSITIVITY_IN_PIXELS = 25.0;
-    public static final double HOT_CORNER_DISTANCE_PROPORTION = 0.05;
+    public static final float DELETE_PATHS_WITHIN_N_PIXELS = 5.0f;
+    public static final float SELECTION_SENSITIVITY_IN_PIXELS = 25.0f;
+    public static final float SNAP_TO_LINE_SENSITIVITY_IN_PIXELS = 25.0f;
+    public static final float HOT_CORNER_DISTANCE_PROPORTION = 0.05f;
 
     public static final int STATION_LABEL_OFFSET = 10;
 
@@ -124,8 +125,8 @@ public class GraphView extends View {
     private Coord2D canvasBottomRight;
     private Coord2D viewpointTopLeftOnSurvey;
     private Coord2D viewpointBottomRightOnSurvey;
-    private double surveyLength = 0;
-    private double surveyHeight = 0;
+    private float surveyLength = 0;
+    private float surveyHeight = 0;
     private Rect topLeftCorner;
     private Rect topRightCorner;
     private Rect bottomRightCorner;
@@ -333,7 +334,7 @@ public class GraphView extends View {
         int height = getHeight();
         int width = getWidth();
 
-        double corner_delta = Math.min(height, width) * HOT_CORNER_DISTANCE_PROPORTION;
+        float corner_delta = Math.min(height, width) * HOT_CORNER_DISTANCE_PROPORTION;
 
         boolean hitLeftEdge = x < corner_delta;
         boolean hitRightEdge = x > width - corner_delta;
@@ -420,7 +421,7 @@ public class GraphView extends View {
     }
 
     private Coord2D considerSnapToSketchLine(Coord2D pointTouched) {
-        double deltaInMetres = SNAP_TO_LINE_SENSITIVITY_IN_PIXELS / surveyToViewScale;
+        float deltaInMetres = SNAP_TO_LINE_SENSITIVITY_IN_PIXELS / surveyToViewScale;
         Coord2D closestPathEnd = sketch.findEligibleSnapPointWithin(pointTouched, deltaInMetres);
         return closestPathEnd; // null if nothing close found
     }
@@ -502,7 +503,7 @@ public class GraphView extends View {
             case MotionEvent.ACTION_DOWN:
                 int startingSize = PreferenceAccess.getInt(getContext(),
                         "pref_survey_symbol_size", 35);
-                float size = startingSize / (float)surveyToViewScale;
+                float size = startingSize / surveyToViewScale;
                 sketch.addSymbolDetail(touchPointOnSurvey, currentSymbol, size);
                 invalidate();
                 return true;
@@ -527,7 +528,7 @@ public class GraphView extends View {
                             String text = input.getText().toString();
                             int startingSize = PreferenceAccess.getInt(getContext(),
                                     "pref_survey_text_tool_font_size", 50);
-                            float size = startingSize / (float)surveyToViewScale;
+                            float size = startingSize / surveyToViewScale;
                             sketch.addTextDetail(touchPointOnSurvey, text, size);
                         })
                         .setNegativeButton("Cancel", (dialog, which) -> {
@@ -576,7 +577,7 @@ public class GraphView extends View {
 
 
     private Station checkForStation(Coord2D touchPointOnView) {
-        double selectionTolerance =
+        float selectionTolerance =
                 SELECTION_SENSITIVITY_IN_PIXELS / surveyToViewScale;
         Coord2D touchPointOnSurvey = viewCoordsToSurveyCoords(touchPointOnView);
 
@@ -710,15 +711,15 @@ public class GraphView extends View {
 
 
     private static Station findNearestStationWithinDelta(
-            Space<Coord2D> space, Coord2D target, double delta) {
+            Space<Coord2D> space, Coord2D target, float delta) {
 
-        double shortest = Double.MAX_VALUE;
+        float shortest = Float.MAX_VALUE;
         Station best = null;
 
         for (Station station : space.getStationMap().keySet()) {
             Coord2D point = space.getStationMap().get(station);
             //noinspection ConstantConditions
-            double distance = Space2DUtils.getDistance(point, target);
+            float distance = Space2DUtils.getDistance(point, target);
 
             if (distance > delta) {
                 continue;
@@ -830,7 +831,7 @@ public class GraphView extends View {
         int numberTicksJustBeforeViewpointOffsetX = (int)(viewpointOffset.x / tickSizeInMetres);
 
         for (int n = numberTicksJustBeforeViewpointOffsetX; true; n++) {
-            double xSurvey = n * tickSizeInMetres;
+            float xSurvey = n * tickSizeInMetres;
             int xView = (int)((xSurvey - viewpointOffset.x) * surveyToViewScale);
             gridPaint.setStrokeWidth(n % BOX_SIZE == 0 ? 3 : 1);
             canvas.drawLine(xView, 0, xView, getHeight(), gridPaint);
@@ -842,7 +843,7 @@ public class GraphView extends View {
         int numberTicksJustBeforeViewpointOffsetY = (int)(viewpointOffset.y / tickSizeInMetres);
 
         for (int n = numberTicksJustBeforeViewpointOffsetY; true; n++) {
-            double ySurvey = n * tickSizeInMetres;
+            float ySurvey = n * tickSizeInMetres;
             int yView = (int)((ySurvey - viewpointOffset.y) * surveyToViewScale);
             gridPaint.setStrokeWidth(n % BOX_SIZE == 0 ? 3 : 1);
             canvas.drawLine(0, yView, getWidth(), yView, gridPaint);
@@ -905,18 +906,14 @@ public class GraphView extends View {
 
             Coord2D centreOnSurvey = sectionDetail.getPosition();
             Coord2D centreOnView = surveyCoordsToViewCoords(centreOnSurvey);
-            drawStationCross(canvas, stationPaint,
-                    (float) centreOnView.x, (float) centreOnView.y,
-                    STATION_DIAMETER, alpha);
+            drawStationCross(
+                    canvas, stationPaint, centreOnView.x, centreOnView.y, STATION_DIAMETER, alpha);
 
             String description =
                     sectionDetail.getCrossSection().getStation().getName() + " X";
             if (showStationLabels) {
                 stationPaint.setAlpha(alpha);
-                canvas.drawText(description,
-                        (float) centreOnView.x,
-                        (float) centreOnView.y,
-                        stationPaint);
+                canvas.drawText(description, centreOnView.x, centreOnView.y, stationPaint);
             }
 
             Space<Coord2D> projection = sectionDetail.getProjection();
@@ -978,7 +975,7 @@ public class GraphView extends View {
             }
 
             if (projectionType.isLegInPlane(leg)) {
-                canvas.drawLine((float)start.x, (float)start.y, (float)end.x, (float)end.y, paint);
+                canvas.drawLine(start.x, start.y, end.x, end.y, paint);
 			} else {
                 drawDashedLine(canvas, start, end, dashedLineInterval, paint);
             }
@@ -1091,8 +1088,8 @@ public class GraphView extends View {
 
         canvas.drawLine(startX, startY, endX, endY, crossSectionIndicatorPaint);
 
-        float lineLength = (float)Space2DUtils.getDistance(
-                new Coord2D(startX, startY), new Coord2D(endX, endY));
+        float lineLength =
+                Space2DUtils.getDistance(new Coord2D(startX, startY), new Coord2D(endX, endY));
         float arrowLength = lineLength * 0.4f;
         float arrowOuterCornerX = startX;
         float arrowOuterCornerY = startY;
@@ -1143,7 +1140,8 @@ public class GraphView extends View {
     }
 
 
-    private void drawStationCross(Canvas canvas, Paint paint, float x, float y, int crossDiameter, int alpha) {
+    private void drawStationCross(
+            Canvas canvas, Paint paint, float x, float y, int crossDiameter, int alpha) {
         paint.setAlpha(alpha);
         float halfCross = crossDiameter / 2f;
         canvas.drawLine(x , y - halfCross, x, y + halfCross, paint);
@@ -1199,16 +1197,16 @@ public class GraphView extends View {
             for (Coord2D point : path) {
                 if (fromX == -1) {
                     //from = surveyCoordsToViewCoords(point);
-                    fromX = (float)((point.x - viewpointOffset.x) * surveyToViewScale);
-                    fromY = (float)((point.y - viewpointOffset.y) * surveyToViewScale);
+                    fromX = (point.x - viewpointOffset.x) * surveyToViewScale;
+                    fromY = (point.y - viewpointOffset.y) * surveyToViewScale;
 
                     if (isDebugMode) {
                         canvas.drawCircle(fromX, fromY, 3, drawPaint);
                     }
                 } else {
                     //Coord2D to = surveyCoordsToViewCoords(point);
-                    float toX = (float)((point.x - viewpointOffset.x) * surveyToViewScale);
-                    float toY = (float)((point.y - viewpointOffset.y) * surveyToViewScale);
+                    float toX = (point.x - viewpointOffset.x) * surveyToViewScale;
+                    float toY = (point.y - viewpointOffset.y) * surveyToViewScale;
 
                     lines[lineIndex++] = fromX;
                     lines[lineIndex++] = fromY;
@@ -1231,11 +1229,10 @@ public class GraphView extends View {
 
         for (TextDetail textDetail : sketch.getTextDetails()) {
             Coord2D location = surveyCoordsToViewCoords(textDetail.getPosition());
-            float x = (float)location.x;
-            float y = (float)location.y;
+            float x = location.x, y = location.y;
             String text = textDetail.getText();
             labelPaint.setColor(textDetail.getColour().intValue);
-            labelPaint.setTextSize((float)(textDetail.getSize() * surveyToViewScale));
+            labelPaint.setTextSize(textDetail.getSize() * surveyToViewScale);
             for (String line : text.split("\n")) {
                 canvas.drawText(line, x, y, labelPaint);
                 y += labelPaint.descent() - labelPaint.ascent();
@@ -1255,8 +1252,7 @@ public class GraphView extends View {
             }
 
             bitmap = Bitmap.createScaledBitmap(bitmap, size, size, true);
-            float x = (float)location.x;
-            float y = (float)location.y;
+            float x = location.x, y = location.y;
             canvas.drawBitmap(bitmap, x, y, labelPaint);
         }
     }
@@ -1274,12 +1270,14 @@ public class GraphView extends View {
         canvas.drawText(surveyLabel, offsetX, offsetY, legendPaint);
 
         int minorGridSize = getMinorGridBoxSize();
-        float scaleWidth = (float)surveyToViewScale * minorGridSize;
+        float scaleWidth = surveyToViewScale * minorGridSize;
         float scaleOffsetY = getHeight() - (LEGEND_SIZE * 4);
-        canvas.drawLine(offsetX, scaleOffsetY, offsetX + scaleWidth, scaleOffsetY, legendPaint);
-        final float TICK_SIZE = 5;
-        canvas.drawLine(offsetX, scaleOffsetY, offsetX, scaleOffsetY - TICK_SIZE, legendPaint);
-        canvas.drawLine(offsetX + scaleWidth, scaleOffsetY, offsetX + scaleWidth, scaleOffsetY - TICK_SIZE, legendPaint);
+        canvas.drawLine(
+                offsetX, scaleOffsetY, offsetX + scaleWidth, scaleOffsetY, legendPaint);
+        canvas.drawLine(
+                offsetX, scaleOffsetY, offsetX, scaleOffsetY - LEGEND_TICK_SIZE, legendPaint);
+        canvas.drawLine(offsetX + scaleWidth, scaleOffsetY,
+                offsetX + scaleWidth, scaleOffsetY - LEGEND_TICK_SIZE, legendPaint);
         String scaleLabel = minorGridSize + "m";
         canvas.drawText(scaleLabel, offsetX + scaleWidth + 5, scaleOffsetY, legendPaint);
 
@@ -1358,11 +1356,11 @@ public class GraphView extends View {
 
     public void centreViewOnSurveyPoint(Coord2D point) {
 
-        double xDeltaInMetres = ((double)getWidth() / 2) / surveyToViewScale;
-        double yDeltaInMetres = ((double)getHeight() / 2) / surveyToViewScale;
+        float xDeltaInMetres = (getWidth() / 2f) / surveyToViewScale;
+        float yDeltaInMetres = (getHeight() / 2f) / surveyToViewScale;
 
-        double x = point.x - xDeltaInMetres;
-        double y = point.y - yDeltaInMetres;
+        float x = point.x - xDeltaInMetres;
+        float y = point.y - yDeltaInMetres;
 
         viewpointOffset = new Coord2D(x, y);
     }
@@ -1379,14 +1377,14 @@ public class GraphView extends View {
         end = start;
         start = swap;
 
-        double lineLength = Space2DUtils.getDistance(start, end);
+        float lineLength = Space2DUtils.getDistance(start, end);
         int dashes = (int)(lineLength / dashLength / 2f);
 
         Coord2D direction = end.minus(start).normalise();
         Coord2D dashStep = direction.scale(dashLength);
 
-        float stepX = (float)dashStep.x;
-        float stepY = (float)dashStep.y;
+        float stepX = dashStep.x;
+        float stepY = dashStep.y;
 
         float[] lines = new float[dashes * 4]; // xy coords for start and end of dashes == 4
 
@@ -1397,8 +1395,8 @@ public class GraphView extends View {
         for (int dashIndex = 0; dashIndex < dashes; dashIndex++) {
 
             if (dashIndex == 0) {
-                startX = (float)start.x;
-                startY = (float)start.y;
+                startX = start.x;
+                startY = start.y;
             } else {
                 startX = previousX + stepX;
                 startY = previousY + stepY;
@@ -1419,17 +1417,17 @@ public class GraphView extends View {
         canvas.drawLines(lines, paint);
     }
 
-    public void adjustZoomBy(double delta) {
-        double newZoom = surveyToViewScale * delta;
+    public void adjustZoomBy(float delta) {
+        float newZoom = surveyToViewScale * delta;
         setZoom(newZoom);
     }
 
-    public void setZoom(double newZoom) {
-        Coord2D centre = new Coord2D((double) getWidth() / 2, (double) getHeight() / 2);
+    public void setZoom(float newZoom) {
+        Coord2D centre = new Coord2D(getWidth() / 2f, getHeight() / 2f);
         setZoom(newZoom, centre);
     }
 
-    public void setZoom(double newZoom, Coord2D focusOnScreen) {
+    public void setZoom(float newZoom, Coord2D focusOnScreen) {
 
         if (MIN_ZOOM >= newZoom || newZoom >= MAX_ZOOM) {
             return;
@@ -1476,7 +1474,7 @@ public class GraphView extends View {
     }
 
 
-    public void setCachedStats(double surveyLength, double surveyHeight) {
+    public void setCachedStats(float surveyLength, float surveyHeight) {
         this.surveyLength = surveyLength;
         this.surveyHeight = surveyHeight;
     }
@@ -1495,11 +1493,11 @@ public class GraphView extends View {
                 setSketchTool(SketchTool.PINCH_TO_ZOOM);
             }
 
-            double x = detector.getFocusX();
-            double y = detector.getFocusY();
+            float x = detector.getFocusX();
+            float y = detector.getFocusY();
             Coord2D focus = new Coord2D(x, y);
 
-            double scaleFactor = detector.getScaleFactor();
+            float scaleFactor = detector.getScaleFactor();
             setZoom(surveyToViewScale * scaleFactor, focus);
 
             invalidate();
