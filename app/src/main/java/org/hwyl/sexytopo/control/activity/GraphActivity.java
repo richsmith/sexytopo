@@ -204,18 +204,17 @@ public abstract class GraphActivity extends SexyTopoActivity
         }
     }
 
+
     private void initialiseGraphView() {
-        Survey survey = getSurvey();
         graphView.initialisePaint();
         graphView.setProjectionType(getProjectionType());
-        graphView.setSurvey(survey);
-        graphView.setSketch(getSketch(survey));
     }
 
 
     private void syncGraphWithSurvey() {
         Survey survey = getSurvey();
         graphView.setSurvey(survey);
+        graphView.setSketch(getSketch(survey));
         graphView.setProjection(getProjection(survey));
         graphView.checkForChangedSurvey();
         float surveyLength = SurveyStats.calcTotalLength(survey);
