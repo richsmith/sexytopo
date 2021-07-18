@@ -32,6 +32,7 @@ android {
 
     lintOptions {
         disable 'UnnecessaryLocalVariable', 'SameParameterValue'
+        abortOnError false
     }
 }
 

@@ -122,6 +122,8 @@ public class GraphView extends View {
 
     private Map<Survey, Space<Coord2D>> translatedConnectedSurveys = new HashMap<>();
 
+    boolean surveyChanged;
+
     // cached for performance
     private Coord2D canvasBottomRight;
     private Coord2D viewpointTopLeftOnSurvey;
@@ -258,6 +260,14 @@ public class GraphView extends View {
     public void setSurvey(Survey survey) {
         if (survey != this.survey) {
             this.survey = survey;
+            surveyChanged = true;
+        }
+    }
+
+    public void checkForChangedSurvey() {
+        if (surveyChanged) {
+            centreViewOnActiveStation();
+            surveyChanged = false;
         }
     }
 
@@ -965,10 +975,10 @@ public class GraphView extends View {
             boolean fade = baseAlpha == FADED_ALPHA || (fadingNonActive && !isAttachedToActive(leg));
 
             Paint paint;
-            if (!leg.hasDestination()) {
-                paint = fade ? fadedSplayPaint : splayPaint;
-            } else if (highlightLatestLeg && survey.getMostRecentLeg() == leg) {
+            if (highlightLatestLeg && survey.getMostRecentLeg() == leg) {
                 paint = fade ? fadedLatestLegPaint : latestLegPaint;
+            } else if (!leg.hasDestination()) {
+                paint = fade ? fadedSplayPaint : splayPaint;
             } else {
                 paint = fade ? fadedLegPaint : legPaint;
             }
