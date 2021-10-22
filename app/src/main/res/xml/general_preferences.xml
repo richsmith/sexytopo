@@ -1,154 +1,150 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory
-        android:title="General"
-        android:key="pref_general">
+    <PreferenceCategory android:title="General">
 
         <ListPreference
-            android:key="pref_orientation"
-            android:title="Orientation"
+            android:defaultValue="auto"
             android:dialogTitle="Select Orientation"
-            android:summary="Override device orientation on the Table and Graph views"
             android:entries="@array/pref_orientation_options"
             android:entryValues="@array/pref_orientation_options"
-            android:defaultValue="auto" />
+            android:key="pref_orientation"
+            android:summary="Override device orientation on the Table and Graph views"
+            android:title="Orientation" />
 
         <CheckBoxPreference
+            android:defaultValue="true"
             android:key="pref_vibrate_on_new_station"
-            android:title="Vibrate on new station"
             android:summary="Vibrate when new station is created"
-            android:defaultValue="true"/>
+            android:title="Vibrate on new station" />
 
         <CheckBoxPreference
+            android:defaultValue="false"
             android:key="pref_hot_corners"
-            android:title="Hot corners"
             android:summary="Drag from the corners of the sketch to move the view in drawing modes"
-            android:defaultValue="false"/>
+            android:title="Hot corners" />
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:title="Disto-X Communication"
-        android:key="pref_distox_communication">
+    <PreferenceCategory android:title="Disto-X Communication">
 
         <CheckBoxPreference
+            android:defaultValue="false"
             android:key="pref_backsight_promotion"
             android:summary="Replace pairs of inverted readings with a new station leg"
-            android:title="Automatic backsight promotion"
-            android:defaultValue="false"/>
+            android:title="Automatic backsight promotion" />
 
         <EditTextPreference
-            android:key="pref_max_distance_delta"
-            android:inputType="numberDecimal"
             android:defaultValue="0.05"
+            android:inputType="numberDecimal"
+            android:key="pref_max_distance_delta"
             android:summary="How much error tolerated when deciding whether to create a new station"
-            android:title="Max distance delta (m)"/>
+            android:title="Max distance delta (m)" />
 
         <EditTextPreference
-            android:key="pref_max_angle_delta"
-            android:inputType="numberDecimal"
             android:defaultValue="1.7"
+            android:inputType="numberDecimal"
+            android:key="pref_max_angle_delta"
             android:summary="How much error tolerated when deciding whether to create a new station"
-            android:title="Max angle delta (degrees)"/>
+            android:title="Max angle delta (degrees)" />
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:title="Calibration"
-        android:key="pref_calibration">
+    <PreferenceCategory android:title="Calibration">
 
         <ListPreference
-            android:key="pref_calibration_algorithm"
-            android:title="Algorithm"
-            android:summary="Override DistoX calibration algorithm choice"
+            android:defaultValue="Auto"
             android:dialogTitle="Select Calibration Algorithm"
             android:entries="@array/pref_calibration_algorithm_options"
             android:entryValues="@array/pref_calibration_algorithm_options"
-            android:defaultValue="Auto" />
+            android:key="pref_calibration_algorithm"
+            android:summary="Override DistoX calibration algorithm choice"
+            android:title="Algorithm" />
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:title="Sketching"
-        android:key="pref_sketch_display">
+    <PreferenceCategory android:title="Sketching">
 
         <CheckBoxPreference
+            android:defaultValue="true"
             android:key="pref_delete_path_fragments"
             android:summary="Delete only the nearest parts of a sketch line in delete mode (if off, deletes the whole line)"
-            android:title="Delete line fragments"
-            android:defaultValue="true"/>
+            android:title="Delete line fragments" />
+
         <CheckBoxPreference
+            android:defaultValue="true"
             android:key="pref_key_highlight_latest_leg"
             android:summary="Show most recent measurement in purple"
-            android:title="Highlight latest leg"
-            android:defaultValue="true"/>
+            android:title="Highlight latest leg" />
+
         <EditTextPreference
-            android:key="pref_survey_text_tool_font_size"
-            android:inputType="number"
             android:defaultValue="50"
+            android:inputType="number"
+            android:key="pref_survey_text_tool_font_size"
             android:summary="How big to initially draw manually-placed text (pixels)"
-            android:title="Text tool label size"/>
+            android:title="Text tool label size" />
+
         <EditTextPreference
-            android:key="pref_survey_symbol_size"
-            android:inputType="number"
             android:defaultValue="35"
+            android:inputType="number"
+            android:key="pref_survey_symbol_size"
             android:summary="How big to intially draw symbols (pixels)"
-            android:title="Survey symbol size"/>
+            android:title="Survey symbol size" />
+
         <EditTextPreference
-            android:key="pref_leg_width"
-            android:inputType="number"
             android:defaultValue="3"
+            android:inputType="number"
+            android:key="pref_leg_width"
             android:summary="How wide to draw leg lines"
-            android:title="Leg line thickness"/>
+            android:title="Leg line thickness" />
+
         <EditTextPreference
-            android:key="pref_splay_width"
-            android:inputType="number"
             android:defaultValue="1"
+            android:inputType="number"
+            android:key="pref_splay_width"
             android:summary="How wide to draw splay lines"
-            android:title="Splay line thickness"/>
+            android:title="Splay line thickness" />
+
         <EditTextPreference
-            android:key="pref_station_diameter"
-            android:inputType="number"
             android:defaultValue="16"
-            android:summary="How big to draw station symbols"
-            android:title="Station diameter"/>
-        <EditTextPreference
-            android:key="pref_station_label_font_size"
             android:inputType="number"
+            android:key="pref_station_diameter"
+            android:summary="How big to draw station symbols"
+            android:title="Station diameter" />
+
+        <EditTextPreference
             android:defaultValue="22"
+            android:inputType="number"
+            android:key="pref_station_label_font_size"
             android:summary="Font size of station labels"
-            android:title="Station label size"/>
+            android:title="Station label size" />
+
         <CheckBoxPreference
+            android:defaultValue="false"
             android:key="pref_key_anti_alias"
             android:summary="Apply antialising to sketch lines etc. (improves visual display at the cost of some perfomance)"
-            android:title="Anti-alias sketch lines"
-            android:defaultValue="false"/>
+            android:title="Anti-alias sketch lines" />
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:title="Manual Data Entry"
-        android:key="pref_manual_data_entry">
+    <PreferenceCategory android:title="Manual Data Entry">
 
         <CheckBoxPreference
+            android:defaultValue="false"
             android:key="pref_key_lrud_fields"
             android:summary="Show fields for entering LRUDs (Left-Right-Up-Down) for each new station"
-            android:title="LRUD entries"
-            android:defaultValue="false"/>
+            android:title="LRUD entries" />
 
         <CheckBoxPreference
+            android:defaultValue="false"
             android:key="pref_key_deg_mins_secs"
             android:summary="Enter azimuth values in deg/mins/secs (as opposed to the default of decimal)"
-            android:title="Azimuth as degrees/minutes/seconds"
-            android:defaultValue="false"/>
+            android:title="Azimuth as degrees/minutes/seconds" />
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:title="Developer"
-        android:key="pref_developer">
+    <PreferenceCategory android:title="Developer">
 
         <CheckBoxPreference
+            android:defaultValue="false"
             android:key="pref_key_developer_mode"
             android:summary="Show debugging menu entries"
-            android:title="Developer mode"
-            android:defaultValue="false"/>
+            android:title="Developer mode" />
 
     </PreferenceCategory>
 
