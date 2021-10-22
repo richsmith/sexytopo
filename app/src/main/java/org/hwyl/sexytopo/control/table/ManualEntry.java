@@ -7,7 +7,6 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
@@ -17,6 +16,7 @@ import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.TableActivity;
 import org.hwyl.sexytopo.control.util.PreferenceHelper;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
+import org.hwyl.sexytopo.databinding.DialogEditTextBinding;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -208,11 +208,11 @@ public class ManualEntry {
     public static void renameStation(final TableActivity activity,
                                      final Survey survey, final Station toRename) {
 
-        final EditText renameField = new EditText(activity);
-        renameField.setText(toRename.getName());
+        final DialogEditTextBinding binding
+                = DialogEditTextBinding.inflate(LayoutInflater.from(activity));
+        binding.dialogEditText.setText(toRename.getName());
 
-
-        renameField.addTextChangedListener(new TextWatcher() {
+        binding.dialogEditText.addTextChangedListener(new TextWatcher() {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 // nothing
             }
@@ -224,26 +224,26 @@ public class ManualEntry {
             public void afterTextChanged(Editable s) {
 
                 String currentName = toRename.getName();
-                String currentText = renameField.getText().toString();
+                String currentText = binding.dialogEditText.getText().toString();
 
                 // only check for non-null or max length
                 if (currentText.isEmpty()) {
-                    renameField.setError("Cannot be blank");
+                    binding.dialogEditText.setError("Cannot be blank");
                 } else if (currentText.equals("-")) {
-                    renameField.setError("Station cannot be named \"-\"");
+                    binding.dialogEditText.setError("Station cannot be named \"-\"");
                 } else if (!currentText.equals(currentName) && (survey.getStationByName(currentText) != null)) {
-                    renameField.setError("Station name must be unique");
+                    binding.dialogEditText.setError("Station name must be unique");
                 } else {
-                    renameField.setError(null);
+                    binding.dialogEditText.setError(null);
                 }
             }
         });
 
         final AlertDialog dialog = new AlertDialog.Builder(activity)
                 .setTitle("Edit name")
-                .setView(renameField)
+                .setView(binding.getRoot())
                 .setPositiveButton("Rename", (ignore, buttonId) -> {
-                    String newName = renameField.getText().toString();
+                    String newName = binding.dialogEditText.getText().toString();
                     try {
                         SurveyUpdater.renameStation(survey, toRename, newName);
                         activity.syncTableWithSurvey();

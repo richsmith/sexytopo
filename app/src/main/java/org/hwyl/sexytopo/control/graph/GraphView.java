@@ -12,11 +12,11 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.EditText;
 import android.widget.PopupWindow;
 
 import androidx.appcompat.app.AlertDialog;
@@ -35,6 +35,7 @@ import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.control.util.TextTools;
+import org.hwyl.sexytopo.databinding.DialogEditTextBinding;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.graph.Line;
@@ -525,12 +526,13 @@ public class GraphView extends View {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                final EditText input = new EditText(getContext());
+                final DialogEditTextBinding binding
+                        = DialogEditTextBinding.inflate(LayoutInflater.from(getContext()));
 
-                final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setView(input)
+                final AlertDialog.Builder builder = new AlertDialog.Builder(getContext())
+                        .setView(binding.getRoot())
                         .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                            String text = input.getText().toString();
+                            String text = binding.dialogEditText.getText().toString();
                             int startingSize = PreferenceHelper.textToolFontSize();
                             float size = startingSize / surveyToViewScale;
                             sketch.addTextDetail(touchPointOnSurvey, text, size);
@@ -664,16 +666,17 @@ public class GraphView extends View {
 
 
     private void openCommentDialog(final Station station) {
-        final EditText input = new EditText(getContext());
-        input.setLines(8);
-        input.setGravity(Gravity.START | Gravity.TOP);
-        input.setText(station.getComment());
+        final DialogEditTextBinding binding
+                = DialogEditTextBinding.inflate(LayoutInflater.from(getContext()));
+        binding.dialogEditText.setLines(8);
+        binding.dialogEditText.setGravity(Gravity.START | Gravity.TOP);
+        binding.dialogEditText.setText(station.getComment());
 
-        final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setView(input)
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getContext())
+                .setView(binding.getRoot())
                 .setTitle(station.getName())
                 .setPositiveButton(R.string.save, (dialog, which) ->
-                        station.setComment(input.getText().toString()))
+                        station.setComment(binding.dialogEditText.getText().toString()))
                 .setNegativeButton(android.R.string.cancel, null);
         final AlertDialog dialog = builder.create();
         dialog.getWindow().setSoftInputMode(

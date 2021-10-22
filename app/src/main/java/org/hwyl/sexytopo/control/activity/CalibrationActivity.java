@@ -31,6 +31,7 @@ import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.control.io.basic.Saver;
 import org.hwyl.sexytopo.control.util.PreferenceHelper;
 import org.hwyl.sexytopo.control.util.TextTools;
+import org.hwyl.sexytopo.databinding.DialogEditTextBinding;
 import org.hwyl.sexytopo.model.calibration.CalibrationReading;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.json.JSONException;
@@ -331,15 +332,14 @@ public class CalibrationActivity extends SexyTopoActivity {
 
 
     public void requestSaveCalibration(View view) {
-
-        final EditText input = new EditText(this);
-        input.setText(R.string.calibration_default_filename);
+        final DialogEditTextBinding binding = DialogEditTextBinding.inflate(getLayoutInflater());
+        binding.dialogEditText.setText(R.string.calibration_default_filename);
 
         new AlertDialog.Builder(this)
             .setTitle(R.string.dialog_save_as_title)
-            .setView(input)
+            .setView(binding.getRoot())
             .setPositiveButton(R.string.ok, (dialog, whichButton) -> {
-                Editable value = input.getText();
+                Editable value = binding.dialogEditText.getText();
                 String name = value.toString();
                 try {
                     saveCalibration(name);

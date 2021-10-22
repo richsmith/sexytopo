@@ -17,7 +17,6 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
@@ -37,6 +36,7 @@ import org.hwyl.sexytopo.control.io.translation.ImportManager;
 import org.hwyl.sexytopo.control.io.translation.SelectableExporters;
 import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.control.util.PreferenceHelper;
+import org.hwyl.sexytopo.databinding.DialogEditTextBinding;
 import org.hwyl.sexytopo.demo.TestSurveyCreator;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -455,16 +455,15 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
     private void saveSurveyAsName() {
-
-        final EditText input = new EditText(this);
-        input.setText(getSurvey().getName());
-        input.setContentDescription("Enter new name");
+        final DialogEditTextBinding binding = DialogEditTextBinding.inflate(getLayoutInflater());
+        binding.dialogEditText.setText(getSurvey().getName());
+        binding.dialogEditText.setContentDescription("Enter new name");
 
         new AlertDialog.Builder(this)
             .setTitle(R.string.dialog_save_as_title)
-            .setView(input)
+            .setView(binding.getRoot())
             .setPositiveButton(android.R.string.ok, (dialog, whichButton) -> {
-                    Editable value = input.getText();
+                    Editable value = binding.dialogEditText.getText();
                     String newName = value.toString();
                     Survey survey = getSurvey();
                     String oldName = survey.getName();
@@ -491,18 +490,17 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
 
     public void startNewSurvey() {  // public due to stupid Reflection requirements
-
         Log.d("Starting new survey");
 
-        final EditText input = new EditText(this);
+        final DialogEditTextBinding binding = DialogEditTextBinding.inflate(getLayoutInflater());
         String defaultName = Util.getNextDefaultSurveyName(this);
-        input.setText(defaultName);
+        binding.dialogEditText.setText(defaultName);
 
         new AlertDialog.Builder(this)
             .setTitle(R.string.dialog_new_survey_title)
-            .setView(input)
+            .setView(binding.getRoot())
             .setPositiveButton(android.R.string.ok, (dialog, whichButton) -> {
-                    Editable value = input.getText();
+                    Editable value = binding.dialogEditText.getText();
                     String name = value.toString();
                     Survey survey = new Survey(name);
                     if (Util.isSurveyNameUnique(SexyTopoActivity.this, name)) {
@@ -525,16 +523,15 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             return;
         }
 
-        final EditText input = new EditText(this);
-
+        final DialogEditTextBinding binding = DialogEditTextBinding.inflate(getLayoutInflater());
         String defaultName = Util.getNextAvailableName(this, currentSurvey.getName());
-        input.setText(defaultName);
+        binding.dialogEditText.setText(defaultName);
 
         new AlertDialog.Builder(this)
             .setTitle(R.string.dialog_new_survey_title)
-            .setView(input)
+            .setView(binding.getRoot())
             .setPositiveButton(android.R.string.ok, (dialog, whichButton) -> {
-                Editable value = input.getText();
+                Editable value = binding.dialogEditText.getText();
                 String name = value.toString();
                 if (Util.isSurveyNameUnique(SexyTopoActivity.this, name)) {
                     Survey newSurvey = new Survey(name);

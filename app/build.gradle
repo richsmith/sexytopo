@@ -35,6 +35,10 @@ android {
         disable 'UnnecessaryLocalVariable', 'SameParameterValue'
         abortOnError false
     }
+
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 dependencies {
