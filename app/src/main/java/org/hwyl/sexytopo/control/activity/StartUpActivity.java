@@ -9,6 +9,7 @@ import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.NewStationNotificationService;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.io.Util;
+import org.hwyl.sexytopo.control.util.PreferenceHelper;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.io.File;
@@ -34,7 +35,7 @@ public class StartUpActivity extends SexyTopoActivity {
         Util.ensureDataDirectoriesExist(this);
 
         try {
-            if (isThereAnActiveSurvey()) {
+            if (PreferenceHelper.isThereAnActiveSurvey()) {
                 loadActiveSurvey();
             } else {
                 createNewActiveSurvey();
@@ -58,15 +59,9 @@ public class StartUpActivity extends SexyTopoActivity {
         startActivity(intent);
     }
 
-
-    private boolean isThereAnActiveSurvey() {
-        return getPreferences().contains(SexyTopo.ACTIVE_SURVEY_NAME);
-    }
-
-
     public void loadActiveSurvey() {
 
-        String activeSurveyName = getPreferences().getString(SexyTopo.ACTIVE_SURVEY_NAME, "Error");
+        String activeSurveyName = PreferenceHelper.activeSurveyName();
         Log.d("Active survey is <i>" + activeSurveyName + "</i>");
 
         if (!Util.doesSurveyExist(this, activeSurveyName)) {

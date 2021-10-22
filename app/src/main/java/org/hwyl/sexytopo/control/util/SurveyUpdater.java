@@ -10,13 +10,7 @@ import org.hwyl.sexytopo.model.survey.Survey;
 import java.util.Arrays;
 import java.util.List;
 
-
-@SuppressWarnings("UnnecessaryLocalVariable")
 public class SurveyUpdater {
-
-    private static final float DEFAULT_MAX_DISTANCE_DELTA = 0.05f;
-    private static final float DEFAULT_MAX_ANGLE_DELTA = 1.7f;
-
 
     public static boolean update(Survey survey, List<Leg> legs, InputMode inputMode) {
         boolean anyStationsAdded = false;
@@ -293,36 +287,13 @@ public class SurveyUpdater {
         float azimuthDiff = maxAzimuth - minAzimuth;
         float inclinationDiff = maxInclination - minInclination;
 
-        float maxDistanceDelta = getMaxDistanceDelta();
-        float maxAngleDelta = getMaxAngleDelta();
+        float maxDistanceDelta = PreferenceHelper.maxDistanceDelta();
+        float maxAngleDelta = PreferenceHelper.maxAngleDelta();
 
         return distanceDiff <= maxDistanceDelta &&
                azimuthDiff <= maxAngleDelta &&
                inclinationDiff <= maxAngleDelta;
     }
-
-    private static float getMaxDistanceDelta() {
-        try {
-            float maxDistanceDiff = PreferenceAccess.getFloat(
-                    SexyTopo.context, "pref_max_distance_delta", DEFAULT_MAX_DISTANCE_DELTA);
-            return maxDistanceDiff;
-        } catch (Exception exception) {
-            // just in case the static Context trick doesn't work :)
-            return DEFAULT_MAX_DISTANCE_DELTA;
-        }
-    }
-
-    private static float getMaxAngleDelta() {
-        try {
-            float maxAngleDelta = PreferenceAccess.getFloat(
-                    SexyTopo.context, "pref_max_angle_delta", DEFAULT_MAX_ANGLE_DELTA);
-            return maxAngleDelta;
-        } catch (Exception exception) {
-            // just in case the static Context trick doesn't work :)
-            return DEFAULT_MAX_ANGLE_DELTA;
-        }
-    }
-
 
     public static boolean areLegsBacksights(Leg fore, Leg back) {
         // Given two legs, determine if they are in agreement as foresight and backsight.

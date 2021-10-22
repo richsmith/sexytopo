@@ -37,6 +37,7 @@ import org.hwyl.sexytopo.control.io.translation.Exporter;
 import org.hwyl.sexytopo.control.io.translation.ImportManager;
 import org.hwyl.sexytopo.control.io.translation.SelectableExporters;
 import org.hwyl.sexytopo.control.util.InputMode;
+import org.hwyl.sexytopo.control.util.PreferenceHelper;
 import org.hwyl.sexytopo.demo.TestSurveyCreator;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -54,7 +55,6 @@ import java.util.Set;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.preference.PreferenceManager;
 
 /**
  * Base class for all activities that use the action bar.
@@ -133,9 +133,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             subMenu.add(Menu.NONE, id, 0, name);
         }
 
-        boolean isDevMenuVisible = getBooleanPreference("pref_key_developer_mode");
         MenuItem devMenu = menu.findItem(R.id.action_dev_menu);
-        devMenu.setVisible(isDevMenuVisible);
+        devMenu.setVisible(PreferenceHelper.developerMode());
 
         return super.onPrepareOptionsMenu(menu);
     }
@@ -466,21 +465,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         new SaveTask().execute(this);
     }
 
-    /**
-     * This is used to set whether a survey will be reopened when opening SexyTopo
-     */
-    private void updateRememberedSurvey() {
-        SharedPreferences preferences = getPreferences();
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(SexyTopo.ACTIVE_SURVEY_NAME, getSurvey().getName());
-        editor.apply();
-    }
-
-    protected SharedPreferences getPreferences() {
-        return PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-    }
-
-
     private void saveSurveyAsName() {
 
         final EditText input = new EditText(this);
@@ -506,7 +490,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                             throw new Exception("Survey already exists");
                         }
                         Saver.save(SexyTopoActivity.this, survey);
-                        updateRememberedSurvey();
+                        PreferenceHelper.updateRememberedSurvey(getSurvey().getName());
                     } catch (Exception exception) {
                         survey.setName(oldName);
                         showSimpleToast(R.string.error_saving_survey);
@@ -740,7 +724,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             Log.d("Loading <i>" + surveyName + "</i>...");
             Survey survey = Loader.loadSurvey(SexyTopoActivity.this, surveyName);
             getSurveyManager().setCurrentSurvey(survey);
-            updateRememberedSurvey();
+            PreferenceHelper.updateRememberedSurvey(getSurvey().getName());
             startActivity(PlanActivity.class);
             Log.d("Loaded");
             showSimpleToast(getString(R.string.loaded) + " " + surveyName);
@@ -985,26 +969,20 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         showSimpleToast(getString(R.string.error_prefix) + " " + exception.getMessage());
     }
 
-    public boolean getBooleanPreference(String name) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        return preferences.getBoolean(name, false);
-    }
-
-    protected String getStringPreference(String name) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        return preferences.getString(name, "");
-    }
-
     @SuppressLint("SourceLockedOrientationActivity")
     private void setOrientation() {
-        String orientationPreference = getStringPreference("pref_orientation");
+        String orientationPreference = PreferenceHelper.orientation();
 
-        if (orientationPreference.equals("Force Portrait")) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        } else if (orientationPreference.equals("Force Landscape")) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        } else {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+        switch (orientationPreference) {
+            case "orientation_portrait":
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                break;
+            case "orientation_landscape":
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                break;
+            case "orientation_auto":
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+                break;
         }
     }
 
@@ -1043,7 +1021,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Boolean wasSuccessful) {
             if (wasSuccessful) {
-                updateRememberedSurvey();
+                PreferenceHelper.updateRememberedSurvey(getSurvey().getName());
                 showSimpleToast(R.string.survey_saved);
             } else {
                 showSimpleToast(getString(R.string.error_saving_survey));

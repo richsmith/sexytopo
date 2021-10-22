@@ -13,9 +13,9 @@ import android.os.Vibrator;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.control.util.PreferenceHelper;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.preference.PreferenceManager;
 
 public class NewStationNotificationService extends Service {
 
@@ -59,11 +59,7 @@ public class NewStationNotificationService extends Service {
 
 
     private void update() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean vibrateOnNewStation =
-                preferences.getBoolean("pref_vibrate_on_new_station", false);
-
-        if (vibrateOnNewStation) {
+        if (PreferenceHelper.vibrateOnNewStation()) {
             Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
             if (vibrator != null) {
                 vibrator.vibrate(VIBRATE_FOR_MS);

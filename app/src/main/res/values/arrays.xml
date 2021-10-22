@@ -1,14 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="pref_orientation_options">
-        <item name="auto">Auto (sensor or device default)</item>
-        <item name="portrait">Force Portrait</item>
-        <item name="landscape">Force Landscape</item>
+        <item>Auto (sensor or device default)</item>
+        <item>Force Portrait</item>
+        <item>Force Landscape</item>
+    </string-array>
+    <string-array name="pref_orientation_values">
+        <item>orientation_auto</item>
+        <item>orientation_portrait</item>
+        <item>orientation_landscape</item>
     </string-array>
     <string-array name="pref_calibration_algorithm_options">
-        <item name="auto">Auto</item>
-        <item name="linear">Linear</item>
-        <item name="nonlinear">Non-Linear</item>
+        <item>Auto</item>
+        <item>Linear</item>
+        <item>Non-Linear</item>
+    </string-array>
+    <string-array name="pref_calibration_algorithm_values">
+        <item>algo_auto</item>
+        <item>algo_linear</item>
+        <item>algo_nonlinear</item>
     </string-array>
     <string-array name="pref_station_labels">
         <item name="disc">Disc</item>

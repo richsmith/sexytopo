@@ -7,10 +7,10 @@
         app:iconSpaceReserved="false">
 
         <ListPreference
-            android:defaultValue="auto"
+            android:defaultValue="orientation_auto"
             android:dialogTitle="Select Orientation"
             android:entries="@array/pref_orientation_options"
-            android:entryValues="@array/pref_orientation_options"
+            android:entryValues="@array/pref_orientation_values"
             android:key="pref_orientation"
             android:summary="Override device orientation on the Table and Graph views"
             android:title="Orientation"
@@ -64,10 +64,10 @@
         app:iconSpaceReserved="false">
 
         <ListPreference
-            android:defaultValue="Auto"
+            android:defaultValue="algo_auto"
             android:dialogTitle="Select Calibration Algorithm"
             android:entries="@array/pref_calibration_algorithm_options"
-            android:entryValues="@array/pref_calibration_algorithm_options"
+            android:entryValues="@array/pref_calibration_algorithm_values"
             android:key="pref_calibration_algorithm"
             android:summary="Override DistoX calibration algorithm choice"
             android:title="Algorithm"

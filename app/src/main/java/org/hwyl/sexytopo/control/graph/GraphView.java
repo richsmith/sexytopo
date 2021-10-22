@@ -29,7 +29,7 @@ import org.hwyl.sexytopo.control.activity.PlanActivity;
 import org.hwyl.sexytopo.control.activity.TableActivity;
 import org.hwyl.sexytopo.control.util.CohenSutherlandAlgorithm;
 import org.hwyl.sexytopo.control.util.CrossSectioner;
-import org.hwyl.sexytopo.control.util.PreferenceAccess;
+import org.hwyl.sexytopo.control.util.PreferenceHelper;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
@@ -96,7 +96,6 @@ public class GraphView extends View {
 
     public static final int STATION_COLOUR = Colour.DARK_RED.intValue;
     public static final int STATION_DIAMETER = 8;
-    public static final int CROSS_DIAMETER = 16;
     public static final int STATION_STROKE_WIDTH = 5;
     public static final int HIGHLIGHT_OUTLINE = 4;
     private final float DASHED_LINE_INTERVAL = 5;
@@ -178,8 +177,7 @@ public class GraphView extends View {
 
     public void initialisePaint() {
 
-        boolean applyAntiAlias = PreferenceAccess.getBoolean(
-                getContext(), "pref_key_anti_alias", false);
+        boolean applyAntiAlias = PreferenceHelper.applyAntiAlias();
         for (Paint paint: ANTI_ALIAS_PAINTS) {
             if (paint.isAntiAlias() != applyAntiAlias) {
                 paint.setAntiAlias(applyAntiAlias);
@@ -188,23 +186,21 @@ public class GraphView extends View {
 
         stationPaint.setColor(STATION_COLOUR);
         stationPaint.setStrokeWidth(STATION_STROKE_WIDTH);
-        int labelSize = PreferenceAccess.getInt(
-                getContext(), "pref_station_label_font_size", 22);
-        stationPaint.setTextSize(labelSize);
+        stationPaint.setTextSize(PreferenceHelper.labelFontSize());
 
         highlightPaint.setStyle(Paint.Style.STROKE);
         highlightPaint.setStrokeWidth(HIGHLIGHT_OUTLINE);
         highlightPaint.setColor(HIGHLIGHT_COLOUR.intValue);
 
         // active legs/splays
-        int legStrokeWidth = PreferenceAccess.getInt(getContext(), "pref_leg_width", 3);
+        int legStrokeWidth = PreferenceHelper.legStrokeWidth();
         legPaint.setStrokeWidth(legStrokeWidth);
         legPaint.setColor(LEG_COLOUR.intValue);
 
         latestLegPaint.setStrokeWidth(legStrokeWidth);
         latestLegPaint.setColor(LATEST_LEG_COLOUR.intValue);
 
-        int splayStrokeWidth = PreferenceAccess.getInt(getContext(), "pref_splay_width", 1);
+        int splayStrokeWidth = PreferenceHelper.splayStrokeWidth();
         splayPaint.setStrokeWidth(splayStrokeWidth);
         splayPaint.setColor(LEG_COLOUR.intValue);
 
@@ -233,7 +229,7 @@ public class GraphView extends View {
         legendPaint.setTextSize(LEGEND_SIZE);
 
         labelPaint.setColor(STATION_COLOUR);
-        int textSize = PreferenceAccess.getInt(getContext(), "pref_survey_text_font_size", 32);
+        int textSize = PreferenceHelper.textFontSize();
         labelPaint.setTextSize(textSize);
 
         crossSectionConnectorPaint.setColor(CROSS_SECTION_CONNECTION_COLOUR.intValue);
@@ -334,7 +330,7 @@ public class GraphView extends View {
             return;
         }
 
-        if (!activity.getBooleanPreference("pref_hot_corners")) {
+        if (!PreferenceHelper.hotCorners()) {
             return;
         }
 
@@ -466,8 +462,7 @@ public class GraphView extends View {
         Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
         Coord2D touchPointOnSurvey = viewCoordsToSurveyCoords(touchPointOnView);
 
-        boolean deleteLineFragments = PreferenceAccess.getBoolean(
-            getContext(), "pref_delete_path_fragments", true);
+        boolean deleteLineFragments = PreferenceHelper.deleteLineFragments();
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -510,8 +505,7 @@ public class GraphView extends View {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                int startingSize = PreferenceAccess.getInt(getContext(),
-                        "pref_survey_symbol_size", 35);
+                int startingSize = PreferenceHelper.surveySymbolSize();
                 float size = startingSize / surveyToViewScale;
                 sketch.addSymbolDetail(touchPointOnSurvey, currentSymbol, size);
                 invalidate();
@@ -535,8 +529,7 @@ public class GraphView extends View {
                 builder.setView(input)
                         .setPositiveButton("OK", (dialog, which) -> {
                             String text = input.getText().toString();
-                            int startingSize = PreferenceAccess.getInt(getContext(),
-                                    "pref_survey_text_tool_font_size", 50);
+                            int startingSize = PreferenceHelper.textToolFontSize();
                             float size = startingSize / surveyToViewScale;
                             sketch.addTextDetail(touchPointOnSurvey, text, size);
                         })
@@ -947,9 +940,7 @@ public class GraphView extends View {
     private void drawLegs(Canvas canvas, Space<Coord2D> space, int baseAlpha) {
 
         boolean showSplays = getDisplayPreference(GraphActivity.DisplayPreference.SHOW_SPLAYS);
-        boolean highlightLatestLeg =
-                PreferenceAccess.getBoolean(
-                        getContext(), "pref_key_highlight_latest_leg", true);
+        boolean highlightLatestLeg = PreferenceHelper.highlightLatestLeg();
 
         boolean fadingNonActive =
                 getDisplayPreference(GraphActivity.DisplayPreference.FADE_NON_ACTIVE);
@@ -1016,8 +1007,7 @@ public class GraphView extends View {
         boolean showStationLabels =
                 getDisplayPreference(GraphActivity.DisplayPreference.SHOW_STATION_LABELS);
 
-        int crossDiameter =
-                PreferenceAccess.getInt(this.getContext(), "pref_station_diameter", CROSS_DIAMETER);
+        int crossDiameter = PreferenceHelper.stationDiameter();
 
         for (Map.Entry<Station, Coord2D> entry : space.getStationMap().entrySet()) {
             Station station = entry.getKey();
@@ -1295,7 +1285,7 @@ public class GraphView extends View {
 
     private void drawHotCorners(Canvas canvas) {
 
-        if (!activity.getBooleanPreference("pref_hot_corners")) {
+        if (!PreferenceHelper.hotCorners()) {
             return;
         }
 

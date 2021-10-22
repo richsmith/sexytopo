@@ -14,6 +14,7 @@ import android.widget.TextView;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.TableActivity;
+import org.hwyl.sexytopo.control.util.PreferenceHelper;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -143,7 +144,7 @@ public class ManualEntry {
         LayoutInflater inflater = tableActivity.getLayoutInflater();
         final View dialogView = inflater.inflate(layoutId, null);
 
-        if (tableActivity.getBooleanPreference("pref_key_deg_mins_secs")) {
+        if (PreferenceHelper.degreesMinutesSeconds()) {
             dialogView.findViewById(R.id.azimuth_standard).setVisibility(View.GONE);
             dialogView.findViewById(R.id.azimuth_deg_mins_secs).setVisibility(View.VISIBLE);
         }
@@ -166,7 +167,7 @@ public class ManualEntry {
                     Float inclination = getFieldValue(dialog, R.id.editInclination);
 
                     Float azimuth;
-                    if (tableActivity.getBooleanPreference("pref_key_deg_mins_secs")) {
+                    if (PreferenceHelper.degreesMinutesSeconds()) {
                         Float degrees = getFieldValue(dialog, R.id.editAzimuthDegrees);
                         Float minutes = getFieldValue(dialog, R.id.editAzimuthMinutes);
                         Float seconds = getFieldValue(dialog, R.id.editAzimuthSeconds);
