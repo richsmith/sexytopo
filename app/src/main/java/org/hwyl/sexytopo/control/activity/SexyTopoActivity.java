@@ -12,7 +12,6 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -55,7 +54,7 @@ import java.util.Set;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
+import androidx.preference.PreferenceManager;
 
 /**
  * Base class for all activities that use the action bar.

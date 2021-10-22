@@ -2,8 +2,8 @@ package org.hwyl.sexytopo.control.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
+import androidx.preference.PreferenceManager;
 
 public class PreferenceAccess {
 
