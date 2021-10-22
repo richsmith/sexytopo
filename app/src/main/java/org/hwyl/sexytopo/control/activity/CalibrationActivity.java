@@ -1,6 +1,5 @@
 package org.hwyl.sexytopo.control.activity;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -41,6 +40,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 
@@ -294,9 +294,9 @@ public class CalibrationActivity extends SexyTopoActivity {
                 "\n\nCalibration algorithm: " + (useNonLinearity? "Non-Linear" : "Linear");
 
         new AlertDialog.Builder(this)
-            .setTitle(getString(R.string.calibration_assessment))
+            .setTitle(R.string.calibration_assessment)
             .setMessage(message)
-            .setPositiveButton(getString(R.string.calibration_update), (dialog, whichButton) -> {
+            .setPositiveButton(R.string.calibration_update, (dialog, whichButton) -> {
                 try {
                     byte[] coeffs = calibrationCalculator.getCoefficients();
                     Byte[] coefficients = ArrayUtils.toObject(coeffs);
@@ -306,12 +306,9 @@ public class CalibrationActivity extends SexyTopoActivity {
                 } finally {
                     updateState();
                 }
-            }).setNegativeButton(getString(R.string.cancel),
-                (dialog, whichButton) -> {
-                    // Do nothing.
-                }).show();
-
-
+            })
+            .setNegativeButton(android.R.string.cancel, null)
+            .show();
     }
 
 
@@ -323,13 +320,13 @@ public class CalibrationActivity extends SexyTopoActivity {
 
     public void requestClearCalibration(View view) {
         new AlertDialog.Builder(this)
-            .setTitle(getString(R.string.dialog_confirm_clear_title))
-            .setPositiveButton(getString(R.string.clear), (dialog, whichButton) -> {
+            .setTitle(R.string.dialog_confirm_clear_title)
+            .setPositiveButton(R.string.clear, (dialog, whichButton) -> {
                 getSurveyManager().clearCalibrationReadings();
                 syncWithReadings();
-            }).setNegativeButton(getString(R.string.cancel), (dialog, whichButton) -> {
-                // Do nothing.
-            }).show();
+            })
+            .setNegativeButton(android.R.string.cancel, null)
+            .show();
     }
 
 
@@ -339,9 +336,9 @@ public class CalibrationActivity extends SexyTopoActivity {
         input.setText(R.string.calibration_default_filename);
 
         new AlertDialog.Builder(this)
-            .setTitle(getString(R.string.dialog_save_as_title))
+            .setTitle(R.string.dialog_save_as_title)
             .setView(input)
-            .setPositiveButton(getString(R.string.ok), (dialog, whichButton) -> {
+            .setPositiveButton(R.string.ok, (dialog, whichButton) -> {
                 Editable value = input.getText();
                 String name = value.toString();
                 try {
@@ -349,9 +346,9 @@ public class CalibrationActivity extends SexyTopoActivity {
                 } catch (Exception exception) {
                     showException(exception);
                 }
-            }).setNegativeButton(getString(R.string.cancel), (dialog, whichButton) -> {
-                // Do nothing.
-                }).show();
+            })
+            .setNegativeButton(android.R.string.cancel, null)
+            .show();
     }
 
 
@@ -371,10 +368,6 @@ public class CalibrationActivity extends SexyTopoActivity {
             return;
         }
 
-        AlertDialog.Builder builderSingle = new AlertDialog.Builder(
-                this);
-
-        builderSingle.setTitle(getString(R.string.calibration_load));
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.select_dialog_item);
@@ -383,19 +376,19 @@ public class CalibrationActivity extends SexyTopoActivity {
             arrayAdapter.add(file.getName());
         }
 
-        builderSingle.setNegativeButton(getString(R.string.cancel),
-                (dialog, which) -> dialog.dismiss());
-
-        builderSingle.setAdapter(arrayAdapter,
-                (dialog, which) -> {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.calibration_load)
+                .setNegativeButton(android.R.string.cancel, (dialog, which) ->
+                        dialog.dismiss())
+                .setAdapter(arrayAdapter, (dialog, which) -> {
                     try {
                         String filename = arrayAdapter.getItem(which);
                         loadCalibration(filename);
                     } catch (Exception exception) {
                         showException(exception);
                     }
-                });
-        builderSingle.show();
+                })
+                .show();
     }
 
 

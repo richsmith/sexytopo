@@ -1,7 +1,6 @@
 package org.hwyl.sexytopo.control.graph;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -19,6 +18,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.PopupWindow;
+
+import androidx.appcompat.app.AlertDialog;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.Log;
@@ -525,18 +526,17 @@ public class GraphView extends View {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 final EditText input = new EditText(getContext());
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
+                final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setView(input)
-                        .setPositiveButton("OK", (dialog, which) -> {
+                        .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                             String text = input.getText().toString();
                             int startingSize = PreferenceHelper.textToolFontSize();
                             float size = startingSize / surveyToViewScale;
                             sketch.addTextDetail(touchPointOnSurvey, text, size);
                         })
-                        .setNegativeButton("Cancel", (dialog, which) -> {
-                            // do nothing
-                        });
-                AlertDialog dialog = builder.create();
+                        .setNegativeButton(android.R.string.cancel, null);
+                final AlertDialog dialog = builder.create();
                 dialog.getWindow().setSoftInputMode(
                         WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
                 dialog.show();
@@ -668,14 +668,14 @@ public class GraphView extends View {
         input.setLines(8);
         input.setGravity(Gravity.START | Gravity.TOP);
         input.setText(station.getComment());
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setView(input)
                 .setTitle(station.getName())
-                .setPositiveButton(R.string.save,
-                        (dialog, which) -> station.setComment(input.getText().toString()))
-                .setNegativeButton("Cancel",
-                        (dialog, which) -> { /* Do nothing */ });
-        AlertDialog dialog = builder.create();
+                .setPositiveButton(R.string.save, (dialog, which) ->
+                        station.setComment(input.getText().toString()))
+                .setNegativeButton(android.R.string.cancel, null);
+        final AlertDialog dialog = builder.create();
         dialog.getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         dialog.show();

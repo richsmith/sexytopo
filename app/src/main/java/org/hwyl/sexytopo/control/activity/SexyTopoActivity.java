@@ -2,7 +2,6 @@ package org.hwyl.sexytopo.control.activity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -52,6 +51,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -296,13 +296,12 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
         String version = getVersionName(this);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+        new AlertDialog.Builder(this)
                 .setIcon(R.drawable.laser_icon)
                 .setTitle(getText(R.string.app_name) + " v" + version)
-                .setNeutralButton(R.string.ok, (dialog, which) -> { /* do nothing */ })
-                .setView(messageView);
-        builder.create().show();
-
+                .setNeutralButton(android.R.string.ok, null)
+                .setView(messageView)
+                .show();
     }
 
 
@@ -311,10 +310,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
         final Survey survey = getSurvey();
 
-        AlertDialog.Builder builderSingle = new AlertDialog.Builder(
-                this);
-
-        builderSingle.setTitle(getString(R.string.select_export_type));
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.select_dialog_item);
@@ -327,11 +322,11 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             nameToExporter.put(name, exporter);
         }
 
-        builderSingle.setNegativeButton(getString(R.string.cancel),
-                (dialog, which) -> dialog.dismiss());
-
-        builderSingle.setAdapter(arrayAdapter,
-                (dialog, which) -> {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.select_export_type)
+                .setNegativeButton(android.R.string.cancel, (dialog, which) ->
+                        dialog.dismiss())
+                .setAdapter(arrayAdapter, (dialog, which) -> {
                     String name = arrayAdapter.getItem(which);
                     Exporter selectedExporter = nameToExporter.get(name);
                     try {
@@ -342,8 +337,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                     } catch (Exception exception) {
                         showException(exception);
                     }
-                });
-        builderSingle.show();
+                })
+                .show();
     }
 
 
@@ -383,9 +378,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 return;
             }
 
-            AlertDialog.Builder builderSingle = new AlertDialog.Builder(this);
-
-            builderSingle.setTitle(getString(R.string.link_survey));
             final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                     this,
                     android.R.layout.select_dialog_item);
@@ -394,11 +386,11 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 arrayAdapter.add(file.getName());
             }
 
-            builderSingle.setNegativeButton(getString(R.string.cancel),
-                    (dialog, which) -> dialog.dismiss());
-
-            builderSingle.setAdapter(arrayAdapter,
-                    (dialog, which) -> {
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.link_survey)
+                    .setNegativeButton(android.R.string.cancel, (dialog, which) ->
+                            dialog.dismiss())
+                    .setAdapter(arrayAdapter, (dialog, which) -> {
                         String surveyName = arrayAdapter.getItem(which);
                         try {
                             Survey surveyToLink =
@@ -407,8 +399,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                         } catch (Exception exception) {
                             showException(exception);
                         }
-                    });
-            builderSingle.show();
+                    })
+                    .show();
     }
 
 
@@ -416,9 +408,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
         final Station[] stations = surveyToLink.getAllStations().toArray(new Station[]{});
 
-        AlertDialog.Builder builderSingle = new AlertDialog.Builder(this);
-
-        builderSingle.setTitle(getString(R.string.link_survey_station));
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.select_dialog_item);
@@ -427,11 +416,11 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             arrayAdapter.add(station.getName());
         }
 
-        builderSingle.setNegativeButton(getString(R.string.cancel),
-                (dialog, which) -> dialog.dismiss());
-
-        builderSingle.setAdapter(arrayAdapter,
-                (dialog, which) -> {
+        new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.link_survey_station))
+                .setNegativeButton(android.R.string.cancel, (dialog, which) ->
+                        dialog.dismiss())
+                .setAdapter(arrayAdapter, (dialog, which) -> {
                     String stationName = arrayAdapter.getItem(which);
                     try {
                         Station selectedStation = Survey.NULL_STATION;
@@ -448,8 +437,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                     } catch (Exception exception) {
                         showException(exception);
                     }
-                });
-        builderSingle.show();
+                })
+                .show();
     }
 
 
@@ -472,10 +461,9 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         input.setContentDescription("Enter new name");
 
         new AlertDialog.Builder(this)
-            .setTitle(getString(R.string.dialog_save_as_title))
+            .setTitle(R.string.dialog_save_as_title)
             .setView(input)
-            .setPositiveButton(getString(R.string.ok),
-                (dialog, whichButton) -> {
+            .setPositiveButton(android.R.string.ok, (dialog, whichButton) -> {
                     Editable value = input.getText();
                     String newName = value.toString();
                     Survey survey = getSurvey();
@@ -497,8 +485,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                         showException(exception);
                     }
                 })
-            .setNegativeButton(getString(R.string.cancel),
-                (dialog, whichButton) -> { /* Do nothing */ })
+            .setNegativeButton(android.R.string.cancel, null)
             .show();
     }
 
@@ -512,10 +499,9 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         input.setText(defaultName);
 
         new AlertDialog.Builder(this)
-            .setTitle(getString(R.string.dialog_new_survey_title))
+            .setTitle(R.string.dialog_new_survey_title)
             .setView(input)
-            .setPositiveButton(getString(R.string.ok),
-                (dialog, whichButton) -> {
+            .setPositiveButton(android.R.string.ok, (dialog, whichButton) -> {
                     Editable value = input.getText();
                     String name = value.toString();
                     Survey survey = new Survey(name);
@@ -525,8 +511,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                         showSimpleToast(R.string.dialog_new_survey_name_must_be_unique);
                     }
                 })
-            .setNegativeButton(getString(R.string.cancel),
-                (dialog, whichButton) -> { /* Do nothing. */ })
+            .setNegativeButton(android.R.string.cancel, null)
             .show();
     }
 
@@ -546,9 +531,9 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         input.setText(defaultName);
 
         new AlertDialog.Builder(this)
-            .setTitle(getString(R.string.dialog_new_survey_title))
+            .setTitle(R.string.dialog_new_survey_title)
             .setView(input)
-            .setPositiveButton(getString(R.string.ok), (dialog, whichButton) -> {
+            .setPositiveButton(android.R.string.ok, (dialog, whichButton) -> {
                 Editable value = input.getText();
                 String name = value.toString();
                 if (Util.isSurveyNameUnique(SexyTopoActivity.this, name)) {
@@ -559,8 +544,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 } else {
                     showSimpleToast(R.string.dialog_new_survey_name_must_be_unique);
                 }
-            }).setNegativeButton(getString(R.string.cancel),
-                (dialog, whichButton) -> { /* Do nothing. */ })
+            })
+            .setNegativeButton(android.R.string.cancel, null)
             .show();
     }
 
@@ -602,11 +587,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
 
     private void chooseSurveyToUnlink(final Survey survey, final Station station) {
-
-        AlertDialog.Builder builderSingle = new AlertDialog.Builder(
-                this);
-
-        builderSingle.setTitle(getString(R.string.unlink_survey));
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.select_dialog_item);
@@ -616,11 +596,11 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             arrayAdapter.add(connection.otherSurvey.getName());
         }
 
-        builderSingle.setNegativeButton(getString(R.string.cancel),
-                (dialog, which) -> dialog.dismiss());
-
-        builderSingle.setAdapter(arrayAdapter,
-                (dialog, which) -> {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.unlink_survey)
+                .setNegativeButton(android.R.string.cancel, (dialog, which) ->
+                        dialog.dismiss())
+                .setAdapter(arrayAdapter, (dialog, which) -> {
                     String surveyName = arrayAdapter.getItem(which);
                     try {
                         for (SurveyConnection connection : connections) {
@@ -637,8 +617,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                     } catch (Exception exception) {
                         showException(exception);
                     }
-                });
-        builderSingle.show();
+                })
+                .show();
     }
 
 
@@ -667,10 +647,9 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         }
 
         new AlertDialog.Builder(this)
-            .setTitle(getString(R.string.dialog_delete_survey_title))
-            .setMessage(getString(R.string.dialog_delete_survey_content))
-            .setPositiveButton(R.string.delete,
-                (dialog, whichButton) -> {
+            .setTitle(R.string.dialog_delete_survey_title)
+            .setMessage(R.string.dialog_delete_survey_content)
+            .setPositiveButton(R.string.delete, (dialog, whichButton) -> {
                     try {
                         String surveyName = getSurvey().getName();
                         Util.deleteSurvey(SexyTopoActivity.this, surveyName);
@@ -679,8 +658,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                         showSimpleToast(R.string.error_deleting_survey);
                         Log.e("Error deleting survey: " + e);
                     }
-            }).setNegativeButton(getString(R.string.cancel),
-                (dialog, whichButton) -> { /* Do nothing */ })
+            })
+            .setNegativeButton(android.R.string.cancel, null)
             .show();
     }
 
@@ -695,10 +674,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             return;
         }
 
-        AlertDialog.Builder builderSingle = new AlertDialog.Builder(
-                 this);
-
-        builderSingle.setTitle(getString(R.string.open_survey));
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.select_dialog_item);
@@ -707,15 +682,15 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             arrayAdapter.add(file.getName());
         }
 
-        builderSingle.setNegativeButton(getString(R.string.cancel),
-                (dialog, which) -> dialog.dismiss());
-
-        builderSingle.setAdapter(arrayAdapter,
-                (dialog, which) -> {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.open_survey)
+                .setNegativeButton(android.R.string.cancel, (dialog, which) ->
+                        dialog.dismiss())
+                .setAdapter(arrayAdapter, (dialog, which) -> {
                     String surveyName = arrayAdapter.getItem(which);
                     loadSurvey(surveyName);
-                });
-        builderSingle.show();
+                })
+                .show();
     }
 
 
@@ -772,18 +747,16 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             nameToFiles.put(file.getName(), file);
         }
 
-        AlertDialog.Builder builderSingle = new AlertDialog.Builder(this);
-        builderSingle.setTitle(R.string.import_survey);
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.select_dialog_item);
         arrayAdapter.addAll(nameToFiles.keySet());
 
-        builderSingle.setNegativeButton(getString(R.string.cancel),
-                (dialog, which) -> dialog.dismiss());
-
-        builderSingle.setAdapter(arrayAdapter,
-                (dialog, which) -> {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.import_survey)
+                .setNegativeButton(android.R.string.cancel, (dialog, which) ->
+                        dialog.dismiss())
+                .setAdapter(arrayAdapter, (dialog, which) -> {
                     File file = nameToFiles.get(arrayAdapter.getItem(which));
                     try {
                         Survey survey = ImportManager.toSurvey(file);
@@ -802,8 +775,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                     } catch (Exception exception) {
                         showException(exception);
                     }
-                });
-        builderSingle.show();
+                })
+                .show();
     }
 
     public void saveImportedSurvey(Survey survey, File file) throws Exception {
@@ -822,12 +795,11 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             final Object... args) {
 
         new AlertDialog.Builder(this)
-                .setTitle(getString(titleId))
-                .setMessage(getString(messageId))
-                .setPositiveButton(confirmId,
-                        (dialog, whichButton) -> invokeMethod(methodToCallIfProceeding, args))
-                .setNegativeButton(getString(cancelId),
-                        (dialog, whichButton) -> { /* Do nothing */ })
+                .setTitle(titleId)
+                .setMessage(messageId)
+                .setPositiveButton(confirmId, (dialog, whichButton) ->
+                        invokeMethod(methodToCallIfProceeding, args))
+                .setNegativeButton(cancelId, null)
                 .show();
     }
 
@@ -903,7 +875,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                         showException(exception);
                     }
                 })
-                .setNegativeButton(getString(R.string.cancel), null)
+                .setNegativeButton(android.R.string.cancel, null)
                 .show();
 
     }

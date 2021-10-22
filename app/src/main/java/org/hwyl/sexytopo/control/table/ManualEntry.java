@@ -1,6 +1,5 @@
 package org.hwyl.sexytopo.control.table;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.text.Editable;
@@ -10,6 +9,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AlertDialog;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.SurveyManager;
@@ -30,7 +31,7 @@ public class ManualEntry {
 
 
     public static void addStation(final TableActivity tableActivity, final Survey survey) {
-        AlertDialog dialog = createDialog(R.layout.leg_edit_dialog,
+        final AlertDialog dialog = createDialog(R.layout.leg_edit_dialog,
             tableActivity,
             (leg, ignore) -> {
                 SurveyUpdater.updateWithNewStation(survey, leg);
@@ -45,7 +46,7 @@ public class ManualEntry {
 
 
     public static void addSplay(final TableActivity tableActivity, final Survey survey) {
-        AlertDialog dialog = createDialog(R.layout.leg_edit_dialog,
+        final AlertDialog dialog = createDialog(R.layout.leg_edit_dialog,
             tableActivity,
             (leg, ignore) -> {
                 SurveyUpdater.update(survey, leg);
@@ -60,7 +61,7 @@ public class ManualEntry {
                                final Survey survey,
                                final Leg toEdit) {
 
-        AlertDialog dialog = createDialog(R.layout.leg_edit_dialog,
+        final AlertDialog dialog = createDialog(R.layout.leg_edit_dialog,
             tableActivity,
             (edited, ignore) -> {
                     if (toEdit.hasDestination()) {
@@ -93,7 +94,7 @@ public class ManualEntry {
 
     public static void addStationWithLruds(final TableActivity tableActivity, final Survey survey) {
 
-        AlertDialog dialog = createDialog(R.layout.leg_edit_dialog_with_lruds,
+        final AlertDialog dialog = createDialog(R.layout.leg_edit_dialog_with_lruds,
                 tableActivity,
                 (leg, theDialog) -> {
                     Station station = survey.getActiveStation();
@@ -139,8 +140,6 @@ public class ManualEntry {
             final TableActivity tableActivity,
             final EditCallback editCallback) {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(tableActivity);
-
         LayoutInflater inflater = tableActivity.getLayoutInflater();
         final View dialogView = inflater.inflate(layoutId, null);
 
@@ -148,11 +147,11 @@ public class ManualEntry {
             dialogView.findViewById(R.id.azimuth_standard).setVisibility(View.GONE);
             dialogView.findViewById(R.id.azimuth_deg_mins_secs).setVisibility(View.VISIBLE);
         }
-        builder
+        final AlertDialog.Builder builder = new AlertDialog.Builder(tableActivity)
             .setView(dialogView)
             .setTitle(R.string.manual_add_station_title)
-            .setPositiveButton("Save", (dialog, buttonId) -> { /* Do nothing */ })
-            .setNegativeButton("Cancel", (dialog, buttonId) -> { /* Do nothing */ });
+            .setPositiveButton(R.string.save, null)
+            .setNegativeButton(android.R.string.cancel, null);
 
         final AlertDialog dialog = builder.create();
 
@@ -240,7 +239,7 @@ public class ManualEntry {
             }
         });
 
-        AlertDialog dialog = new AlertDialog.Builder(activity)
+        final AlertDialog dialog = new AlertDialog.Builder(activity)
                 .setTitle("Edit name")
                 .setView(renameField)
                 .setPositiveButton("Rename", (ignore, buttonId) -> {
@@ -252,7 +251,7 @@ public class ManualEntry {
                         activity.showSimpleToast("Rename failed");
                     }
                 })
-                .setNegativeButton("Cancel", (ignore, buttonId) -> { /* Do nothing */ })
+                .setNegativeButton(android.R.string.cancel, null)
                 .create();
 
         dialog.getWindow().setSoftInputMode(

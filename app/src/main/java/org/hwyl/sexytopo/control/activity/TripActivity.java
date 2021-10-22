@@ -1,8 +1,6 @@
 package org.hwyl.sexytopo.control.activity;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -18,6 +16,8 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AlertDialog;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.util.TextTools;
@@ -96,18 +96,16 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
 
     public void requestClear(View view) {
         new AlertDialog.Builder(this)
-                .setTitle(getString(R.string.dialog_confirm_clear_trip))
+                .setTitle(R.string.dialog_confirm_clear_trip)
                 .setPositiveButton(R.string.clear, (dialog, whichButton) -> {
                     EditText comments = findViewById(R.id.trip_comments);
                     comments.setText("");
                     team.clear();
                     syncListWithTeam();
                     updateButtonStatus();
-                }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                // Do nothing.
-            }
-        }).show();
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
     }
 
 
@@ -130,12 +128,10 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
         roleList.setAdapter(arrayAdapter);
         layout.addView(roleList);
 
-        AlertDialog.Builder builderSingle =
-            new AlertDialog.Builder(this)
-            .setTitle(getString(R.string.dialog_title_add_to_team))
+        new AlertDialog.Builder(this)
+            .setTitle(R.string.dialog_title_add_to_team)
             .setView(layout)
-            .setPositiveButton(getString(R.string.add),
-                    (dialog, which) -> {
+            .setPositiveButton(R.string.add, (dialog, which) -> {
                         String name = nameField.getText().toString();
                         SparseBooleanArray checked = roleList.getCheckedItemPositions();
                         List<Trip.Role> selectedRoles = new ArrayList<>();
@@ -147,10 +143,9 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
                         addTeamMember(name, selectedRoles);
                         dialog.dismiss();
                     })
-            .setNegativeButton(getString(R.string.cancel),
-                    (dialog, which) -> dialog.dismiss());
-
-        builderSingle.show();
+            .setNegativeButton(android.R.string.cancel, (dialog, which) ->
+                    dialog.dismiss())
+            .show();
     }
 
     public void addTeamMember(String name, List<Trip.Role> roles) {
@@ -260,12 +255,10 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
 
         layout.addView(roleList);
 
-        AlertDialog.Builder builderSingle =
-                new AlertDialog.Builder(this)
-                        .setTitle(getString(R.string.edit))
+        new AlertDialog.Builder(this)
+                        .setTitle(R.string.edit)
                         .setView(layout)
-                        .setPositiveButton(getString(R.string.save),
-                                (dialog, which) -> {
+                        .setPositiveButton(R.string.save, (dialog, which) -> {
                                     String name = nameField.getText().toString();
                                     SparseBooleanArray checked = roleList.getCheckedItemPositions();
                                     List<Trip.Role> selectedRoles = new ArrayList<>();
@@ -277,10 +270,9 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
                                     setTeamMember(position, name, selectedRoles);
                                     dialog.dismiss();
                                 })
-                        .setNegativeButton(getString(R.string.cancel),
-                                (dialog, which) -> dialog.dismiss());
-
-        builderSingle.show();
+                        .setNegativeButton(android.R.string.cancel, (dialog, which) ->
+                                dialog.dismiss())
+                        .show();
     }
 
 
