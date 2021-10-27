@@ -35,10 +35,10 @@ public class TherionExporter extends Exporter {
         th2Files.clear();
         readOriginalFilesIfPresent(context, survey);
 
-        String thconfigContent = ThconfigExporter.getContent(survey);
-        saveToExportDirectory(context, survey, "thconfig", thconfigContent);
-
         String name = survey.getName();
+
+        String thconfigContent = ThconfigExporter.getContent(survey);
+        saveToExportDirectory(context, survey, name + ".thconfig", thconfigContent);
 
         handleProjection(context, survey, Projection2D.PLAN, survey.getPlanSketch(),
                 SexyTopo.PLAN_SUFFIX, originalTh2PlanFileContent);
