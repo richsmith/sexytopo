@@ -246,7 +246,7 @@ public class DeviceActivity extends SexyTopoActivity {
             pairButton.setEnabled(true);
             unpairButton.setEnabled(false);
             deviceList.setTextColor(Color.RED);
-            deviceList.setText(getResources().getQuantityString(R.plurals.instruments, 0, 0));
+            deviceList.setText(R.string.no_device);
         }
 
         // Allow connections iff we have one connected DistoX

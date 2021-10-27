@@ -148,8 +148,7 @@
     <string name="request_pair">Pair</string>
     <string name="request_unpair">Unpair</string>
     <string name="bluetooth_on">On</string>
-    <string name="device_singular">instrument</string>
-    <string name="device_plural">instruments</string>
+    <string name="no_device">no device</string>
     <string name="bluetooth_off">Off</string>
     <string name="disto_connection_instructions">To pair: turn on the instrument, click \'Pair…\', wait, and enter \'0000\' if a code is requested.</string>
     <string name="device_log_connection_requested">Connection requested</string>
