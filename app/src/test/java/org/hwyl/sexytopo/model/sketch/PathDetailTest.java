@@ -24,7 +24,7 @@ public class PathDetailTest {
     @Test
     public void testIntersectsRectangleReturnsTrueForRectangleThatEntersBoundingBox() {
         PathDetail pathDetail = new PathDetail(Coord2D.ORIGIN, Colour.BLACK);
-        pathDetail.lineTo(new Coord2D(1.5, 1.5));
+        pathDetail.lineTo(new Coord2D(1.5f, 1.5f));
         Assert.assertTrue(
                 pathDetail.intersectsRectangle(new Coord2D(1, 1), new Coord2D(2, 2)));
     }
@@ -32,7 +32,7 @@ public class PathDetailTest {
     @Test
     public void testIntersectsRectangleReturnsFalseForRectangleOutsideBoundingBox() {
         PathDetail pathDetail = new PathDetail(Coord2D.ORIGIN, Colour.BLACK);
-        pathDetail.lineTo(new Coord2D(1.5, 1.5));
+        pathDetail.lineTo(new Coord2D(1.5f, 1.5f));
         Assert.assertFalse(
                 pathDetail.intersectsRectangle(new Coord2D(2, 2), new Coord2D(3, 3)));
     }

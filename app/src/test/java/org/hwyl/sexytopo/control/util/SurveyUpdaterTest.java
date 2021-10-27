@@ -23,8 +23,8 @@ public class SurveyUpdaterTest {
     @Test
     public void testUpdateWithThreeSimilarLegsLeadsToNewStation() {
         Leg leg = new Leg(5, 0, 0);
-        Leg similarLeg = new Leg(5, 0.001, 0);
-        Leg anotherSimilarLeg = new Leg(5, 0, 0.001);
+        Leg similarLeg = new Leg(5, 0.001f, 0);
+        Leg anotherSimilarLeg = new Leg(5, 0, 0.001f);
         Survey survey = new Survey("Test Survey");
         SurveyUpdater.update(survey, leg);
         SurveyUpdater.update(survey, similarLeg);

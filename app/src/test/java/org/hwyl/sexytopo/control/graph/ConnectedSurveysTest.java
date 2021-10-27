@@ -22,8 +22,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.List;
 import java.util.Map;
 
-import static org.mockito.Mockito.when;
-
 @RunWith(MockitoJUnitRunner.class)
 public class ConnectedSurveysTest {
 
@@ -41,7 +39,7 @@ public class ConnectedSurveysTest {
 
         Map<Survey, Space<Coord2D>> translated =
                 ConnectedSurveys.getTranslatedConnectedSurveys(
-                        mockActivity, currentSurvey, new Space<Coord2D>());
+                        mockActivity, currentSurvey, new Space<>());
 
         Assert.assertEquals(translated.size(), 0);
     }
@@ -65,6 +63,7 @@ public class ConnectedSurveysTest {
         Assert.assertEquals(translated.size(), 1);
         Survey translatedSurvey = getNamedSurvey(translated, "joined");
         Space<Coord2D> projection = translated.get(translatedSurvey);
+        assert projection != null;
         Coord2D newStationPoint = getStationPosition(projection, "2");
         Assert.assertEquals(-2.0, newStationPoint.y, SexyTopo.ALLOWED_DOUBLE_DELTA);
     }
@@ -93,6 +92,7 @@ public class ConnectedSurveysTest {
         Survey translatedSurvey = getNamedSurvey(translated, "joined-1");
         Space<Coord2D> projection = translated.get(translatedSurvey);
 
+        assert projection != null;
         Coord2D newStationPoint = getStationPosition(projection, "2");
         Assert.assertEquals(-3.0, newStationPoint.y, SexyTopo.ALLOWED_DOUBLE_DELTA);
     }
@@ -139,7 +139,7 @@ public class ConnectedSurveysTest {
 
     private static Survey getBasicSurvey(String name) {
         Survey basicSurvey = new Survey(name);
-        Leg l0 = new Leg(1.0, 0.0, 0.0);
+        Leg l0 = new Leg(1.0f, 0.0f, 0.0f);
         SurveyUpdater.update(basicSurvey, l0);
         SurveyUpdater.upgradeSplayToConnectedLeg(basicSurvey, l0, InputMode.FORWARD);
         return basicSurvey;

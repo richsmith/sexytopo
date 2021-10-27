@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.model.table;
 
+import org.hwyl.sexytopo.SexyTopo;
 import org.junit.Assert;
 
 import org.hwyl.sexytopo.testhelpers.BasicTestSurveyCreator;
@@ -20,7 +21,7 @@ public class LrudTest {
         double angle = CrossSectioner.getAngleOfSection(testSurvey, s2);
         Leg splay = LRUD.LEFT.createSplay(testSurvey, s2, 5);
 
-        Assert.assertEquals(270.0, splay.getAzimuth());
+        Assert.assertEquals(270.0, splay.getAzimuth(), SexyTopo.ALLOWED_DOUBLE_DELTA);
     }
 
 
@@ -32,6 +33,6 @@ public class LrudTest {
         double angle = CrossSectioner.getAngleOfSection(testSurvey, s2);
         Leg splay = LRUD.RIGHT.createSplay(testSurvey, s2, 5);
 
-        Assert.assertEquals(90.0, splay.getAzimuth());
+        Assert.assertEquals(90.0, splay.getAzimuth(), SexyTopo.ALLOWED_DOUBLE_DELTA);
     }
 }

@@ -14,7 +14,7 @@ public class MeasurementProtocolTest {
         byte[] packet = new byte[]{1, -31, 7, -94, 50, 58, 3, -5};
         Assert.assertTrue(MeasurementProtocol.isDataPacket(packet));
         Leg actual = MeasurementProtocol.parseDataPacket(packet);
-        Leg expected = new Leg(2.017, 71.2, 4.5);
+        Leg expected = new Leg(2.017f, 71.2f, 4.5f);
         assertLegEquality(expected, actual);
     }
 
@@ -24,7 +24,7 @@ public class MeasurementProtocolTest {
         byte[] packet = new byte[]{1, 84, 3, 113, -87, -83, -54, -13};
         Assert.assertTrue(MeasurementProtocol.isDataPacket(packet));
         Leg actual = MeasurementProtocol.parseDataPacket(packet);
-        Leg expected = new Leg(0.852, 238.3, -75.0);
+        Leg expected = new Leg(0.852f, 238.3f, -75.0f);
         assertLegEquality(expected, actual);
     }
 

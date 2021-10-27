@@ -1,6 +1,7 @@
 package org.hwyl.sexytopo.control.util;
 
 
+import org.hwyl.sexytopo.SexyTopo;
 import org.junit.Assert;
 
 import org.hwyl.sexytopo.testhelpers.BasicTestSurveyCreator;
@@ -26,7 +27,7 @@ public class StationRenameTest {
     public void testGetStationByNameCanFail() {
         Survey testSurvey = BasicTestSurveyCreator.createStraightNorth();
         Station shouldBeNull = testSurvey.getStationByName("I DO NOT EXIST :P");
-        Assert.assertEquals(null, shouldBeNull);
+        Assert.assertNull(shouldBeNull);
     }
 
     @Test
@@ -62,9 +63,12 @@ public class StationRenameTest {
         Leg leg2 = new Leg(20,   1, +1);
         List<Leg> legs = new ArrayList<>(2); legs.add(leg1); legs.add(leg2);
         Leg avgLeg = SurveyUpdater.averageLegs(legs);
-        Assert.assertEquals("Dist", 15.0, avgLeg.getDistance());
-        Assert.assertEquals("Azm", 0.0, avgLeg.getAzimuth());
-        Assert.assertEquals("Inc", 0.0, avgLeg.getInclination());
+        Assert.assertEquals(
+                "Dist", 15.0, avgLeg.getDistance(), SexyTopo.ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(
+                "Azm", 0.0, avgLeg.getAzimuth(), SexyTopo.ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(
+                "Inc", 0.0, avgLeg.getInclination(), SexyTopo.ALLOWED_DOUBLE_DELTA);
     }
 
     @Test
