@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -209,6 +210,7 @@ public class ManualEntry {
                                      final Survey survey, final Station toRename) {
 
         final EditText renameField = new EditText(activity);
+        renameField.setInputType(InputType.TYPE_CLASS_TEXT);
         renameField.setText(toRename.getName());
 
 
