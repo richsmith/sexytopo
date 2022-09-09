@@ -213,6 +213,15 @@ public class ManualEntry {
         renameField.setInputType(InputType.TYPE_CLASS_TEXT);
         renameField.setText(toRename.getName());
 
+        Runnable renameAction = () -> {
+            String newName = renameField.getText().toString();
+            try {
+                SurveyUpdater.renameStation(survey, toRename, newName);
+                activity.syncTableWithSurvey();
+            } catch (Exception e) {
+                activity.showSimpleToast("Rename failed");
+            }
+        };
 
         renameField.addTextChangedListener(new TextWatcher() {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -244,17 +253,15 @@ public class ManualEntry {
         AlertDialog dialog = new AlertDialog.Builder(activity)
                 .setTitle("Rename Station")
                 .setView(renameField)
-                .setPositiveButton("Rename", (ignore, buttonId) -> {
-                    String newName = renameField.getText().toString();
-                    try {
-                        SurveyUpdater.renameStation(survey, toRename, newName);
-                        activity.syncTableWithSurvey();
-                    } catch (Exception e) {
-                        activity.showSimpleToast("Rename failed");
-                    }
-                })
+                .setPositiveButton("Rename", (ignore, buttonId) -> { renameAction.run(); })
                 .setNegativeButton("Cancel", (ignore, buttonId) -> { /* Do nothing */ })
                 .create();
+
+        renameField.setOnEditorActionListener((view, actionId, event) -> {
+            renameAction.run();
+            dialog.dismiss();
+            return true;
+        });
 
         dialog.getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
