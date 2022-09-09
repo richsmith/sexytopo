@@ -242,7 +242,7 @@ public class ManualEntry {
         });
 
         AlertDialog dialog = new AlertDialog.Builder(activity)
-                .setTitle("Edit name")
+                .setTitle("Rename Station")
                 .setView(renameField)
                 .setPositiveButton("Rename", (ignore, buttonId) -> {
                     String newName = renameField.getText().toString();
