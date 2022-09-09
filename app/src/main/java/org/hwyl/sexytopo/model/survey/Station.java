@@ -47,7 +47,7 @@ public class Station extends SurveyComponent {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = sanitiseName(name);
     }
 
     public List<Leg> getOnwardLegs() {
