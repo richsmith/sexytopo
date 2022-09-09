@@ -7,7 +7,8 @@ import android.os.AsyncTask;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
+
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.control.io.basic.Loader;
