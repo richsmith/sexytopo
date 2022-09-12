@@ -222,12 +222,16 @@ public class SurveyUpdater {
 
 
     public static void renameStation(Survey survey, Station station, String name) {
+        String previousName = station.getName();
+        Log.d("Renaming station from: " + Log.formatDebugString(previousName) + " to: " + Log.formatDebugString(name));
+
         Station existing = survey.getStationByName(name);
         if (existing != null) {
             throw new IllegalArgumentException("New station name is not unique");
         }
+
         station.setName(name);
-        Log.d("Renamed station " + station.getName() + " -> " + name);
+        Log.d("Renamed station from: " + Log.formatDebugString(previousName) + " to: " + Log.formatDebugString(station.getName()));
     }
 
 
