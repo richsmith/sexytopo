@@ -3,13 +3,9 @@ package org.hwyl.sexytopo.control.table;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.text.Editable;
-import android.text.InputType;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import org.hwyl.sexytopo.R;
@@ -208,13 +204,10 @@ public class ManualEntry {
 
     public static void renameStation(final TableActivity activity,
                                      final Survey survey, final Station toRename) {
-
-        final EditText renameField = new EditText(activity);
-        renameField.setInputType(InputType.TYPE_CLASS_TEXT);
-        renameField.setText(toRename.getName());
+        final RenameStationForm form = new RenameStationForm(activity, survey, toRename);
 
         Runnable renameAction = () -> {
-            String newName = renameField.getText().toString();
+            String newName = form.stationName.getText().toString();
             try {
                 SurveyUpdater.renameStation(survey, toRename, newName);
                 activity.syncTableWithSurvey();
@@ -223,41 +216,14 @@ public class ManualEntry {
             }
         };
 
-        renameField.addTextChangedListener(new TextWatcher() {
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // nothing
-            }
-
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // nothing
-            }
-
-            public void afterTextChanged(Editable s) {
-
-                String currentName = toRename.getName();
-                String currentText = renameField.getText().toString();
-
-                // only check for non-null or max length
-                if (currentText.isEmpty()) {
-                    renameField.setError("Cannot be blank");
-                } else if (currentText.equals("-")) {
-                    renameField.setError("Station cannot be named \"-\"");
-                } else if (!currentText.equals(currentName) && (survey.getStationByName(currentText) != null)) {
-                    renameField.setError("Station name must be unique");
-                } else {
-                    renameField.setError(null);
-                }
-            }
-        });
-
         AlertDialog dialog = new AlertDialog.Builder(activity)
                 .setTitle("Rename Station")
-                .setView(renameField)
-                .setPositiveButton("Rename", (ignore, buttonId) -> { renameAction.run(); })
+                .setView(form.stationName)
+                .setPositiveButton("Rename", (ignore, buttonId) -> renameAction.run())
                 .setNegativeButton("Cancel", (ignore, buttonId) -> { /* Do nothing */ })
                 .create();
 
-        renameField.setOnEditorActionListener((view, actionId, event) -> {
+        form.stationName.setOnEditorActionListener((view, actionId, event) -> {
             renameAction.run();
             dialog.dismiss();
             return true;
