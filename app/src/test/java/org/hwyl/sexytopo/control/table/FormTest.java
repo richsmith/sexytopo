@@ -4,6 +4,8 @@ import static org.mockito.Mockito.verify;
 
 import android.widget.EditText;
 
+import androidx.annotation.Nullable;
+
 import junit.framework.TestCase;
 
 import org.junit.Test;
@@ -39,6 +41,15 @@ public class FormTest extends TestCase {
             }
         }
     }
+
+    class MockValidateCallback implements Form.OnDidValidateCallback {
+        @Nullable Boolean value = null;
+
+        @Override
+        public void onDidValidate(Boolean valid) {
+            this.value = valid;
+        }
+    };
 
     private MockForm form = new MockForm();
 
@@ -76,5 +87,25 @@ public class FormTest extends TestCase {
 
         verify(form.name).setError(null);
         verify(form.phone).setError("invalid phone");
+    }
+
+    @Test
+    public void testCallsOnDidValidateCallbackWithValidForm() {
+        MockValidateCallback callback = new MockValidateCallback();
+        form.setOnDidValidateCallback(callback);
+        form.validate();
+
+        assert(callback.value);
+    }
+
+    @Test
+    public void testCallsOnDidValidateCallbackWithInvalidForm() {
+        MockValidateCallback callback = new MockValidateCallback();
+        form.setOnDidValidateCallback(callback);
+
+        form.validPhone = false;
+        form.validate();
+
+        assert(!callback.value);
     }
 }

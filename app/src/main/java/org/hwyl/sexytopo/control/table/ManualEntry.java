@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.TextView;
 
 import org.hwyl.sexytopo.R;
@@ -227,6 +228,11 @@ public class ManualEntry {
             renameAction.run();
             dialog.dismiss();
             return true;
+        });
+
+        form.setOnDidValidateCallback((valid) -> {
+            Button positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+            positiveButton.setEnabled(valid);
         });
 
         dialog.getWindow().setSoftInputMode(

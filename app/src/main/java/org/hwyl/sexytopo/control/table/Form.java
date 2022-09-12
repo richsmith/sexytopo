@@ -4,6 +4,8 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+
 abstract public class Form {
     static class TextViewValidationTrigger implements TextWatcher {
         private final Form form;
@@ -24,10 +26,20 @@ abstract public class Form {
         }
     }
 
+    interface OnDidValidateCallback {
+        void onDidValidate(Boolean valid);
+    }
+
     private boolean valid;
+    @Nullable private OnDidValidateCallback onDidValidateCallback;
 
     Form() {
         this.valid = true;
+        this.onDidValidateCallback = null;
+    }
+
+    void setOnDidValidateCallback(@Nullable OnDidValidateCallback callback) {
+        this.onDidValidateCallback = callback;
     }
 
     public Boolean isValid() {
@@ -37,6 +49,10 @@ abstract public class Form {
     public void validate() {
         this.valid = true;
         performValidation();
+
+        if(this.onDidValidateCallback != null) {
+            this.onDidValidateCallback.onDidValidate(this.valid);
+        }
     }
 
     abstract protected void performValidation();
