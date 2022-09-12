@@ -225,9 +225,15 @@ public class ManualEntry {
                 .create();
 
         form.stationName.setOnEditorActionListener((view, actionId, event) -> {
-            renameAction.run();
-            dialog.dismiss();
-            return true;
+            form.validate();
+
+            if(form.isValid()) {
+                renameAction.run();
+                dialog.dismiss();
+                return true;
+            } else {
+                return false;
+            }
         });
 
         form.setOnDidValidateCallback((valid) -> {
