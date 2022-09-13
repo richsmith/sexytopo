@@ -3,12 +3,10 @@ package org.hwyl.sexytopo.control.table;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.EditText;
+import android.widget.Button;
 import android.widget.TextView;
 
 import org.hwyl.sexytopo.R;
@@ -207,52 +205,41 @@ public class ManualEntry {
 
     public static void renameStation(final TableActivity activity,
                                      final Survey survey, final Station toRename) {
+        final RenameStationForm form = new RenameStationForm(activity, survey, toRename);
 
-        final EditText renameField = new EditText(activity);
-        renameField.setText(toRename.getName());
-
-
-        renameField.addTextChangedListener(new TextWatcher() {
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // nothing
+        Runnable renameAction = () -> {
+            String newName = form.stationName.getText().toString();
+            try {
+                SurveyUpdater.renameStation(survey, toRename, newName);
+                activity.syncTableWithSurvey();
+            } catch (Exception e) {
+                activity.showSimpleToast("Rename failed");
             }
+        };
 
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // nothing
-            }
+        AlertDialog dialog = new AlertDialog.Builder(activity)
+                .setTitle("Rename Station")
+                .setView(form.stationName)
+                .setPositiveButton("Rename", (ignore, buttonId) -> renameAction.run())
+                .setNegativeButton("Cancel", (ignore, buttonId) -> { /* Do nothing */ })
+                .create();
 
-            public void afterTextChanged(Editable s) {
+        form.stationName.setOnEditorActionListener((view, actionId, event) -> {
+            form.validate();
 
-                String currentName = toRename.getName();
-                String currentText = renameField.getText().toString();
-
-                // only check for non-null or max length
-                if (currentText.isEmpty()) {
-                    renameField.setError("Cannot be blank");
-                } else if (currentText.equals("-")) {
-                    renameField.setError("Station cannot be named \"-\"");
-                } else if (!currentText.equals(currentName) && (survey.getStationByName(currentText) != null)) {
-                    renameField.setError("Station name must be unique");
-                } else {
-                    renameField.setError(null);
-                }
+            if(form.isValid()) {
+                renameAction.run();
+                dialog.dismiss();
+                return true;
+            } else {
+                return false;
             }
         });
 
-        AlertDialog dialog = new AlertDialog.Builder(activity)
-                .setTitle("Edit name")
-                .setView(renameField)
-                .setPositiveButton("Rename", (ignore, buttonId) -> {
-                    String newName = renameField.getText().toString();
-                    try {
-                        SurveyUpdater.renameStation(survey, toRename, newName);
-                        activity.syncTableWithSurvey();
-                    } catch (Exception e) {
-                        activity.showSimpleToast("Rename failed");
-                    }
-                })
-                .setNegativeButton("Cancel", (ignore, buttonId) -> { /* Do nothing */ })
-                .create();
+        form.setOnDidValidateCallback((valid) -> {
+            Button positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+            positiveButton.setEnabled(valid);
+        });
 
         dialog.getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
