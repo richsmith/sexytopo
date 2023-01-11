@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.control.activity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -7,15 +8,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
-import android.text.Editable;
 import android.util.Pair;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -26,20 +26,20 @@ import org.hwyl.sexytopo.comms.distox.DistoXCommunicator;
 import org.hwyl.sexytopo.comms.distox.WriteCalibrationProtocol;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.calibration.CalibrationCalculator;
-import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.control.io.basic.CalibrationJsonTranslater;
 import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.control.io.basic.Saver;
+import org.hwyl.sexytopo.control.util.PreferenceAccess;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.calibration.CalibrationReading;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.json.JSONException;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.documentfile.provider.DocumentFile;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 
@@ -270,7 +270,7 @@ public class CalibrationActivity extends SexyTopoActivity {
         try {
             getComms().stopCalibration();
         } catch (Exception exception) {
-            showException(exception);
+            showExceptionAndLog(exception);
         }
         state = State.READY;
         updateState();
@@ -301,7 +301,7 @@ public class CalibrationActivity extends SexyTopoActivity {
                     Byte[] coefficients = ArrayUtils.toObject(coeffs);
                     new WriteCalibrationTask(view).execute(coefficients);
                 } catch (Exception exception) {
-                    showException(exception);
+                    showExceptionAndLog(exception);
                 } finally {
                     updateState();
                 }
@@ -333,7 +333,11 @@ public class CalibrationActivity extends SexyTopoActivity {
 
 
     public void requestSaveCalibration(View view) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            selectDocumentFile(SexyTopo.REQUEST_CODE_SAVE_CALIBRATION);
+        }
 
+        /*
         final EditText input = new EditText(this);
         input.setText(R.string.calibration_default_filename);
 
@@ -346,24 +350,30 @@ public class CalibrationActivity extends SexyTopoActivity {
                 try {
                     saveCalibration(name);
                 } catch (Exception exception) {
-                    showException(exception);
+                    showExceptionAndLog(exception);
                 }
             }).setNegativeButton(getString(R.string.cancel), (dialog, whichButton) -> {
                 // Do nothing.
                 }).show();
+         */
     }
 
 
-    private void saveCalibration(String filename) throws JSONException, IOException {
+    private void saveCalibration(Uri uri) throws JSONException, IOException {
+        DocumentFile file = DocumentFile.fromSingleUri(this, uri);
         String contents = CalibrationJsonTranslater.toText(calibrationReadings);
-        String path = getFilePath(filename);
-        Saver.saveFile(path, contents);
+        Saver.saveFile(this, file, contents);
     }
 
 
     public void requestLoadCalibration(View view) {
 
-        File[] calibrationFiles = Util.getCalibrationFiles(this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            selectDocumentFile(SexyTopo.REQUEST_CODE_OPEN_CALIBRATION);
+        }
+
+        /*
+        File[] calibrationFiles = IoUtils.getCalibrationFiles(this);
 
         if (calibrationFiles.length == 0) {
             showSimpleToast(R.string.calibration_no_files);
@@ -391,34 +401,31 @@ public class CalibrationActivity extends SexyTopoActivity {
                         String filename = arrayAdapter.getItem(which);
                         loadCalibration(filename);
                     } catch (Exception exception) {
-                        showException(exception);
+                        showExceptionAndLog(exception);
                     }
                 });
         builderSingle.show();
+         */
     }
 
 
-    private void loadCalibration(String filename) throws JSONException {
-        String path = getFilePath(filename);
-        String content = Loader.slurpFile(new File(path));
-        List<CalibrationReading> calibrationReadings =
-                CalibrationJsonTranslater.toCalibrationReadings(content);
-        getSurveyManager().setCalibrationReadings(calibrationReadings);
-        syncWithReadings();
+    private void loadCalibration(Uri uri) throws JSONException {
+        DocumentFile file = DocumentFile.fromSingleUri(this, uri);
+        try {
+            String content = Loader.slurpFile(this, file);
+            List<CalibrationReading> calibrationReadings =
+                    CalibrationJsonTranslater.toCalibrationReadings(content);
+            getSurveyManager().setCalibrationReadings(calibrationReadings);
+            syncWithReadings();
+        } catch (IOException exception) {
+            showExceptionAndLog("Error reading calibration file ", exception);
+        }
     }
-
-
-    @SuppressWarnings("UnnecessaryLocalVariable")
-    private String getFilePath(String filename) {
-        File directory = Util.getCalibrationDirectory(this);
-        String path = Util.getPath(directory, filename);
-        return path;
-    }
-
 
     private boolean useNonLinearAlgorithm() {
 
-        String pref = getStringPreference("pref_calibration_algorithm");
+        String pref = PreferenceAccess.getString(
+                this, "pref_calibration_algorithm", "Auto");
 
         boolean useNonLinear = false; // linear probably safer as default
 
@@ -450,7 +457,46 @@ public class CalibrationActivity extends SexyTopoActivity {
     }
 
 
-    private class WriteCalibrationTask extends AsyncTask<Byte, Void, Boolean> {
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode,
+                                 Intent resultData) {
+
+
+        if (resultData == null) {
+            return;
+        }
+
+        if (resultCode != Activity.RESULT_OK) {
+            Exception exception = new Exception(
+                    "Error code " + resultCode + " from request code " + requestCode);
+            showExceptionAndLog(exception);
+            return;
+        }
+
+        Uri uri = resultData.getData();
+
+        if (requestCode == SexyTopo.REQUEST_CODE_OPEN_CALIBRATION) {
+            try {
+                loadCalibration(uri);
+            } catch (Exception exception) {
+                showExceptionAndLog("Could not open calibration file", exception);
+            }
+
+        } else if (requestCode == SexyTopo.REQUEST_CODE_SAVE_CALIBRATION) {
+            try {
+                saveCalibration(uri);
+            } catch (Exception exception) {
+                showExceptionAndLog("Could not save calibration file", exception);
+            }
+        }
+
+
+        super.onActivityResult(requestCode, resultCode, resultData);
+    }
+
+
+            private class WriteCalibrationTask extends AsyncTask<Byte, Void, Boolean> {
 
         private final ProgressDialog progressDialog;
 
@@ -479,7 +525,7 @@ public class CalibrationActivity extends SexyTopoActivity {
                 return writeCalibrationProtocol.wasSuccessful();
 
             } catch (NotConnectedToDistoException exception) {
-                showException(exception);
+                showExceptionAndLog(exception);
                 return false;
             }
         }
@@ -517,6 +563,5 @@ public class CalibrationActivity extends SexyTopoActivity {
     }
 
     public static class NotConnectedToDistoException extends Exception {
-
     }
 }

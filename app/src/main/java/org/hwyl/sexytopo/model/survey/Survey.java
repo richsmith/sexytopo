@@ -1,5 +1,10 @@
 package org.hwyl.sexytopo.model.survey;
 
+import android.net.Uri;
+
+import androidx.annotation.NonNull;
+import androidx.documentfile.provider.DocumentFile;
+
 import org.hwyl.sexytopo.control.util.StationNamer;
 import org.hwyl.sexytopo.control.util.SurveyTools;
 import org.hwyl.sexytopo.control.util.Wrapper;
@@ -13,12 +18,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import androidx.annotation.NonNull;
-
 
 public class Survey {
 
     public static final Station NULL_STATION = new Station("-");
+    public static final String DEFAULT_NAME = "Unsaved Survey";
 
     public static final char[] FORBIDDEN_CHARS = new char[]{':', '.', '\n', '\r', '/', '\\'};
 
@@ -36,18 +40,19 @@ public class Survey {
 
     private boolean isSaved = true;
     private boolean isAutosaved = true;
+    private DocumentFile directory;
 
     private final Stack<Leg> legsInChronoOrder = new Stack<>();
 
-    public Survey(String name) {
-        setName(name);
+    public Survey() {
+        this.setName(DEFAULT_NAME);
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    private void setName(String name) {
         for (char c : FORBIDDEN_CHARS) {
             name = name.replace(Character.toString(c), "");
         }
@@ -55,6 +60,23 @@ public class Survey {
             name = "blank";
         }
         this.name = name;
+    }
+
+    public void setDirectory(DocumentFile directory) {
+        this.directory = directory;
+        this.setName(directory.getName());
+    }
+
+    public DocumentFile getDirectory() {
+        return this.directory;
+    }
+
+    public boolean hasHome() {
+        return getDirectory() != null;
+    }
+
+    public Uri getUri() {
+        return getDirectory().getUri();
     }
 
     public void setActiveStation(Station activeStation) {

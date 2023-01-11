@@ -2,19 +2,18 @@ package org.hwyl.sexytopo.control.io.translation;
 
 import android.content.Context;
 
-import org.apache.commons.io.FileUtils;
-import org.hwyl.sexytopo.SexyTopo;
-import org.hwyl.sexytopo.control.io.Util;
+import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.io.thirdparty.pockettopo.PocketTopoTxtImporter;
 import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexImporter;
 import org.hwyl.sexytopo.control.io.thirdparty.therion.TherionImporter;
 import org.hwyl.sexytopo.control.io.thirdparty.xvi.XviImporter;
 import org.hwyl.sexytopo.model.survey.Survey;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+
+import androidx.documentfile.provider.DocumentFile;
 
 
 @SuppressWarnings("UnnecessaryLocalVariable")
@@ -28,35 +27,20 @@ public class ImportManager {
         new PocketTopoTxtImporter()
     );
 
-
-    public static Survey toSurvey(File file) throws Exception {
+    public static Survey toSurvey(Context context, DocumentFile file) throws Exception {
         Importer importer = chooseImporter(file);
-        Survey survey = importer.toSurvey(file);
+        Survey survey = importer.toSurvey(context, file);
         return survey;
     }
 
-    public static void saveACopyOfSourceInput(Context context, Survey survey, File source)
+    public static void saveACopyOfSourceInput(Context context, Survey survey, DocumentFile source)
             throws IOException {
 
-        String surveyDirectory = Util.getDirectoryPathForSurvey(context, survey.getName());
-        String path = surveyDirectory + File.separator + SexyTopo.IMPORT_SOURCE_DIR;
-        Util.ensureDirectoriesInPathExist(path);
-
-        File destinationDirectory = new File(path);
-        FileUtils.cleanDirectory(destinationDirectory);
-
-        File destination = new File(path + File.separator + source.getName());
-
-        if (source.isDirectory()) {
-            FileUtils.copyDirectory(source, destination);
-        } else {
-            FileUtils.copyFile(source, destination);
-        }
+        DocumentFile destination = IoUtils.getImportSourceDirectory(context, survey);
+        IoUtils.copyFile(context, source, destination);
     }
 
-
-
-    private static Importer chooseImporter(File file) throws IllegalArgumentException {
+    private static Importer chooseImporter(DocumentFile file) throws IllegalArgumentException {
         for (Importer importer: IMPORTERS) {
             if (importer.canHandleFile(file)) {
                 return importer;

@@ -21,7 +21,7 @@ public abstract class DoubleSketchFileExporter extends Exporter {
     protected void saveSketchFile(Context context, Survey survey, String content, String suffix)
             throws IOException {
         String filename = survey.getName() + " " + suffix + "." + getFileExtension();
-        saveToExportDirectory(context, survey, filename, content);
+        saveToExportDirectory(context, survey, "application/json", filename, content);
     }
 
     public abstract String getContent(Sketch sketch) throws IOException;

@@ -8,7 +8,6 @@ import android.os.AsyncTask;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.hwyl.sexytopo.SexyTopo;
-import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.control.io.basic.Saver;
 import org.json.JSONArray;
@@ -26,17 +25,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+import androidx.documentfile.provider.DocumentFile;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 /**
  * SexyTopo's Logger. This is a kind of proxy for the standard Android Log so we can
  * capture some of the data for in-app reporting.
  */
+@SuppressWarnings("ALL")
 public class Log {
 
     @SuppressLint("StaticFieldLeak") // only use ApplicationContext to avoid memory leak
     private static Context context;
     private static LocalBroadcastManager broadcastManager;
+    private static boolean hasFilesystemAccess = false;
 
     private static final int MAX_DEVICE_LOG_SIZE = 100;
     private static Queue<Message> deviceLog = new LinkedList<>();
@@ -52,6 +54,10 @@ public class Log {
 
     public static void setContext(Context context) {
         Log.context = context.getApplicationContext();
+    }
+
+    public static void setHasFilesystemAccess(boolean hasFilesystemAccess) {
+        Log.hasFilesystemAccess = hasFilesystemAccess;
     }
 
     public static synchronized void device(String message, boolean andToSystemLog) {
@@ -142,28 +148,28 @@ public class Log {
 
 
     public static void save(LogType logType) {
-
-
-        new SaveLogTask().execute(logType);
-
+        if (hasFilesystemAccess) {
+            new SaveLogTask().execute(logType);
+        }
     }
 
     public static void load(LogType logType) {
         try {
-            String path = getFilePath(logType);
-            if (new File(path).exists()) {
-                String content = Loader.slurpFile(path);
+            DocumentFile logFile = getLogFile(logType);
+            if (logFile.exists()) {
+                String content = Loader.slurpFile(context, logFile);
                 unmarshal(logType, content);
             }
         } catch (Exception exception) {
-            Log.e("Error loading " + logType + ": " + exception.toString());
+            Log.e("Error loading " + logType + ": " + exception);
         }
     }
 
 
-    public static String getFilePath(LogType logType) {
-        String dir = Util.getLogDirectory(context).getPath();
-        return dir + File.separator + logType.toString().toLowerCase() + ".json";
+    public static DocumentFile getLogFile(LogType logType) {
+        String filename = logType.toString().toLowerCase() + ".log.json";
+        File logFile = new File(context.getFilesDir(), filename);
+        return DocumentFile.fromFile(logFile);
     }
 
 
@@ -267,8 +273,8 @@ public class Log {
                 LogType logType = logTypes[0];
                 JSONArray marshalled = marshal(logType);
                 String content = marshalled.toString(4);
-                String path = getFilePath(logType);
-                Saver.saveFile(path, content);
+                DocumentFile logFile = getLogFile(logType);
+                Saver.saveFile(context, logFile, content);
             } catch (Exception exception) {
                 FirebaseCrashlytics.getInstance().recordException(exception);
             }

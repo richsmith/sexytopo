@@ -1,5 +1,9 @@
 package org.hwyl.sexytopo.control.io.thirdparty.pockettopo;
 
+import android.content.Context;
+
+import androidx.documentfile.provider.DocumentFile;
+
 import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.control.io.translation.Importer;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
@@ -15,11 +19,12 @@ import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
-import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 
 /**
  * Basic import for the .txt file that is exported by PocketTopo.
@@ -28,14 +33,11 @@ import java.util.regex.Pattern;
 public class PocketTopoTxtImporter extends Importer {
 
 
-    public Survey toSurvey(File file) {
-
-        String text = Loader.slurpFile(file.getAbsolutePath());
+    public Survey toSurvey(Context context, DocumentFile file) throws IOException {
+        Survey survey = new Survey();
+        String text = Loader.slurpFile(context, file);
 
         // FIXME we're ignoring the metadata for now
-
-        Survey survey = new Survey(getDefaultName(file));
-
         parseDataAndUpdateSurvey(survey, text);
 
         Sketch elevation = getElevation(survey, text);
@@ -50,7 +52,7 @@ public class PocketTopoTxtImporter extends Importer {
     }
 
 
-    public boolean canHandleFile(File file) {
+    public boolean canHandleFile(DocumentFile file) {
         return file.getName().endsWith("txt");
     }
 

@@ -1,18 +1,20 @@
 package org.hwyl.sexytopo.control.io.translation;
 
+import android.content.Context;
+
 import org.apache.commons.io.FilenameUtils;
 import org.hwyl.sexytopo.model.survey.Survey;
 
-import java.io.File;
+import androidx.documentfile.provider.DocumentFile;
 
 
 public abstract class Importer {
 
-    public abstract Survey toSurvey(File file) throws Exception;
+    public abstract Survey toSurvey(Context context, DocumentFile file) throws Exception;
 
-    public abstract boolean canHandleFile(File file);
+    public abstract boolean canHandleFile(DocumentFile file);
 
-    public String getDefaultName(File file) {
+    public String getDefaultName(DocumentFile file) {
         return FilenameUtils.removeExtension(file.getName());
     }
 }

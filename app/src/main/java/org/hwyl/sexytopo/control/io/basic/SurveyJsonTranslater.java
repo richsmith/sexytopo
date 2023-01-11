@@ -4,7 +4,7 @@ import android.widget.Toast;
 
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.Log;
-import org.hwyl.sexytopo.control.io.Util;
+import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -101,16 +101,9 @@ public class SurveyJsonTranslater {
     }
 
 
-    public static void toSurvey(Survey survey, JSONObject json)
-            throws JSONException, ParseException {
+    public static void toSurvey(Survey survey, JSONObject json) throws ParseException {
 
         errors = false;
-
-        String name = json.getString(SURVEY_NAME_TAG);
-        if (!survey.getName().equals(name)) {
-            Log.e("This is weird; the survey name in the file is different to the filename. " +
-                "Assuming filename is the correct name.");
-        }
 
         try { // have to parse trips before stations etc. so trips can be referenced by them
             if (json.has(TRIP_TAG)) {
@@ -167,7 +160,7 @@ public class SurveyJsonTranslater {
 
         Map<String, Station> namesToStations = new HashMap<>();
 
-        List<JSONObject> stationData = Util.toList(json);
+        List<JSONObject> stationData = IoUtils.toList(json);
 
         // first pass: add all the stations in case there's some weird data order
         boolean first = true;
@@ -209,7 +202,7 @@ public class SurveyJsonTranslater {
             Station station = namesToStations.get(name);
 
             JSONArray legArray = stationObject.getJSONArray(ONWARD_LEGS_TAG);
-            for (JSONObject legObject : Util.toList(legArray)) {
+            for (JSONObject legObject : IoUtils.toList(legArray)) {
 
                 Leg leg;
                 try {
@@ -334,7 +327,7 @@ public class SurveyJsonTranslater {
         String fromStationName = json.getString(STATION_NAME_TAG);
         Station station = namesToStations.get(fromStationName);
         JSONArray array = json.getJSONArray(ONWARD_LEGS_TAG);
-        for (JSONObject object : Util.toList(array)) {
+        for (JSONObject object : IoUtils.toList(array)) {
             Leg leg = toLeg(namesToStations, object);
             station.addOnwardLeg(leg);
         }
@@ -365,7 +358,7 @@ public class SurveyJsonTranslater {
             List<Leg> promotedFromList = new ArrayList<>();
             try {
                 JSONArray array = json.getJSONArray(PROMOTED_FROM_TAG);
-                for (JSONObject object : Util.toList(array)) {
+                for (JSONObject object : IoUtils.toList(array)) {
                     Leg promotedFrom = toLeg(namesToStations, object);
                     promotedFromList.add(promotedFrom);
                 }
@@ -394,11 +387,11 @@ public class SurveyJsonTranslater {
 
         JSONArray teamArray = json.getJSONArray(TEAM_TAG);
         List<Trip.TeamEntry> team = new ArrayList<>();
-        for (JSONObject teamEntryJson : Util.toList(teamArray)) {
+        for (JSONObject teamEntryJson : IoUtils.toList(teamArray)) {
             String name = teamEntryJson.getString(TEAM_MEMBER_NAME_TAG);
             JSONArray rolesArray = teamEntryJson.getJSONArray(TEAM_MEMBER_ROLE_TAG);
             List<Trip.Role> roles = new ArrayList<>();
-            for (String roleString : Util.toListOfStrings(rolesArray)) {
+            for (String roleString : IoUtils.toListOfStrings(rolesArray)) {
                 Trip.Role role = Trip.Role.valueOf(roleString);
                 roles.add(role);
             }

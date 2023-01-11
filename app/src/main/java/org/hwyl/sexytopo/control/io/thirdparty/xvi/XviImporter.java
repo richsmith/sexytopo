@@ -1,5 +1,12 @@
 package org.hwyl.sexytopo.control.io.thirdparty.xvi;
 
+import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.GRID_COMMAND;
+import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.SKETCHLINE_COMMAND;
+
+import android.content.Context;
+
+import androidx.documentfile.provider.DocumentFile;
+
 import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.control.io.translation.Importer;
 import org.hwyl.sexytopo.model.graph.Coord2D;
@@ -8,15 +15,11 @@ import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Survey;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.GRID_COMMAND;
-import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.SKETCHLINE_COMMAND;
 
 
 @SuppressWarnings("UnnecessaryLocalVariable")
@@ -24,18 +27,18 @@ public class XviImporter extends Importer {
 
     private static final XviImporter instance = new XviImporter();
 
-    public Survey toSurvey(File file) throws Exception {
-        Survey survey = new Survey(file.getName());
-        Sketch sketch = getSketch(file);
+    public Survey toSurvey(Context context, DocumentFile file) throws Exception {
+        Survey survey = new Survey();
+        Sketch sketch = getSketch(context, file);
         survey.setPlanSketch(sketch);
         return survey;
     }
 
-    public static Sketch getSketch(File file) throws Exception {
+    public static Sketch getSketch(Context context, DocumentFile file) throws Exception {
 
         Sketch sketch = new Sketch();
 
-        String contents = Loader.slurpFile(file);
+        String contents = Loader.slurpFile(context, file);
 
         Grid grid = instance.parseGrid(contents);
         double scale = grid.dy;
@@ -47,7 +50,7 @@ public class XviImporter extends Importer {
     }
 
 
-    public boolean canHandleFile(File file) {
+    public boolean canHandleFile(DocumentFile file) {
         return file.getName().endsWith("xvi");
     }
 

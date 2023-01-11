@@ -2,7 +2,7 @@ package org.hwyl.sexytopo.control.io.basic;
 
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.Log;
-import org.hwyl.sexytopo.control.io.Util;
+import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.sketch.Colour;
@@ -91,7 +91,7 @@ public class SketchJsonTranslater {
         try {
             JSONArray pathsArray = json.getJSONArray(PATHS_TAG);
             List<PathDetail> pathDetails = new ArrayList<>();
-            for (JSONObject object : Util.toList(pathsArray)) {
+            for (JSONObject object : IoUtils.toList(pathsArray)) {
                 pathDetails.add(toPathDetail(object));
             }
             sketch.setPathDetails(pathDetails);
@@ -102,7 +102,7 @@ public class SketchJsonTranslater {
         try {
             JSONArray symbolsArray = json.getJSONArray(SYMBOLS_TAG);
             List<SymbolDetail> symbolDetails = new ArrayList<>();
-            for (JSONObject object : Util.toList(symbolsArray)) {
+            for (JSONObject object : IoUtils.toList(symbolsArray)) {
                 symbolDetails.add(toSymbolDetail(object));
             }
             sketch.setSymbolDetails(symbolDetails);
@@ -113,7 +113,7 @@ public class SketchJsonTranslater {
         try {
             JSONArray labelsArray = json.getJSONArray(LABELS_TAG);
             List<TextDetail> textDetails = new ArrayList<>();
-            for (JSONObject object : Util.toList(labelsArray)) {
+            for (JSONObject object : IoUtils.toList(labelsArray)) {
                 textDetails.add(toTextDetail(object));
             }
             sketch.setTextDetails(textDetails);
@@ -124,7 +124,7 @@ public class SketchJsonTranslater {
         try {
             JSONArray crossSectionsArray = json.getJSONArray(CROSS_SECTIONS_TAG);
             List<CrossSectionDetail> crossSectionDetails = new ArrayList<>();
-            for (JSONObject object : Util.toList(crossSectionsArray)) {
+            for (JSONObject object : IoUtils.toList(crossSectionsArray)) {
                 crossSectionDetails.add(toCrossSectionDetail(survey, object));
             }
             sketch.setCrossSectionDetails(crossSectionDetails);
@@ -157,7 +157,7 @@ public class SketchJsonTranslater {
 
         JSONArray array = json.getJSONArray(POINTS_TAG);
         List<Coord2D> path = new ArrayList<>();
-        for (JSONObject object : Util.toList(array)) {
+        for (JSONObject object : IoUtils.toList(array)) {
             path.add(toCoord2D(object));
         }
 

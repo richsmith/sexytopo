@@ -9,14 +9,12 @@ import org.junit.Test;
 
 public class SurveyJsonTranslaterTest {
 
-    public final static String TEST_SURVEY_NAME = "TestSurvey";
-
     @Test
     public void testEmptySurveyResultsIn1Station() throws Exception {
-        Survey survey = new Survey(TEST_SURVEY_NAME);
+        Survey survey = new Survey();
         String text = SurveyJsonTranslater.toText(survey, "test", 0);
 
-        Survey newSurvey = new Survey(TEST_SURVEY_NAME);
+        Survey newSurvey = new Survey();
         SurveyJsonTranslater.populateSurvey(survey, text);
         assert newSurvey.getAllStations().size() == 1;
     }
@@ -26,7 +24,7 @@ public class SurveyJsonTranslaterTest {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         String text = SurveyJsonTranslater.toText(survey, "test", 0);
 
-        Survey newSurvey = new Survey(TEST_SURVEY_NAME);
+        Survey newSurvey = new Survey();
         SurveyJsonTranslater.populateSurvey(survey, text);
 
         SurveyChecker.areEqual(survey, newSurvey);
@@ -38,7 +36,7 @@ public class SurveyJsonTranslaterTest {
         Survey survey = BasicTestSurveyCreator.createRightRight();
         String text = SurveyJsonTranslater.toText(survey, "test", 0);
 
-        Survey newSurvey = new Survey(TEST_SURVEY_NAME);
+        Survey newSurvey = new Survey();
         SurveyJsonTranslater.populateSurvey(survey, text);
 
         SurveyChecker.areEqual(survey, newSurvey);
@@ -46,10 +44,10 @@ public class SurveyJsonTranslaterTest {
 
     @Test
     public void testRandomSurveyIsParsed() throws Exception {
-        Survey survey = TestSurveyCreator.create(TEST_SURVEY_NAME, 10, 10);
+        Survey survey = TestSurveyCreator.create(10, 10);
         String text = SurveyJsonTranslater.toText(survey, "test", 0);
 
-        Survey newSurvey = new Survey(TEST_SURVEY_NAME);
+        Survey newSurvey = new Survey();
         SurveyJsonTranslater.populateSurvey(survey, text);
 
         SurveyChecker.areEqual(survey, newSurvey);
@@ -60,7 +58,7 @@ public class SurveyJsonTranslaterTest {
         Survey survey = BasicTestSurveyCreator.createStraightNorthWithTrip();
         String text = SurveyJsonTranslater.toText(survey, "test", 0);
 
-        Survey newSurvey = new Survey(TEST_SURVEY_NAME);
+        Survey newSurvey = new Survey();
         SurveyJsonTranslater.populateSurvey(survey, text);
 
         SurveyChecker.areEqual(survey, newSurvey);

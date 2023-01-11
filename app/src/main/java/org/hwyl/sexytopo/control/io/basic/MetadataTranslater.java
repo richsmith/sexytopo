@@ -4,7 +4,6 @@ import android.content.Context;
 
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.Log;
-import org.hwyl.sexytopo.control.io.Util;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.SurveyConnection;
@@ -119,10 +118,10 @@ public class MetadataTranslater {
             JSONObject json,
             Set<String> surveyNamesNotToLoad)
             throws Exception {
-
+        /*
         try {
             JSONObject connectionsObject = json.getJSONObject(CONNECTIONS_TAG);
-            Map<String, JSONArray> outerMap = Util.toMap(connectionsObject);
+            Map<String, JSONArray> outerMap = IoUtils.toMap(connectionsObject);
 
             for (String stationName : outerMap.keySet()) {
 
@@ -168,7 +167,7 @@ public class MetadataTranslater {
         } catch (JSONException exception) {
             Log.e(exception.toString());
             throw new Exception("Error loading connected surveys");
-        }
+        }*/
     }
 
     public static List<JSONArray> toListOfArrays(JSONArray array) throws JSONException {

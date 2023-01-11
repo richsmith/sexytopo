@@ -46,7 +46,8 @@ public class ConnectedSurveys {
 
                 // create a new copy of the survey so we can edit the associated sketch
                 // (this might seem a bit messy but it's reasonably elegant, honest!)
-                Survey lightweightSurveyCopy = new Survey(otherSurvey.getName());
+                Survey lightweightSurveyCopy = new Survey();
+                lightweightSurveyCopy.setDirectory(otherSurvey.getDirectory());
                 lightweightSurveyCopy.setOrigin(otherSurvey.getOrigin());
 
                 Space<Coord2D> otherProjection = activity.getProjection(connection.otherSurvey);

@@ -1,48 +1,56 @@
 package org.hwyl.sexytopo.control.io.basic;
 
+import android.content.ContentResolver;
 import android.content.Context;
 
-import org.hwyl.sexytopo.SexyTopo;
-import org.hwyl.sexytopo.control.Log;
-import org.hwyl.sexytopo.control.io.Util;
+import androidx.documentfile.provider.DocumentFile;
+
+import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.json.JSONException;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 
 
+@SuppressWarnings("UnnecessaryLocalVariable")
 public class Loader {
 
 
-    public static Survey loadSurvey(Context context, String name) throws Exception {
-        return loadSurvey(context, name, false);
+    public static Survey loadSurvey(Context context, DocumentFile directory) throws Exception {
+        return loadSurvey(context, directory, false);
     }
 
 
-    public static Survey restoreAutosave(Context context, String name) throws Exception {
-        return loadSurvey(context, name, true);
+    public static Survey restoreAutosave(Context context, DocumentFile directory) throws Exception {
+        return loadSurvey(context, directory, true);
     }
 
 
-    public static Survey loadSurvey(Context context, String name, boolean restoreAutosave)
+    public static Survey loadSurvey(Context context, DocumentFile directory, boolean restoreAutosave)
             throws Exception {
         Set<String> surveyNamesNotToLoad = new HashSet<>();
-        return loadSurvey(context, name, surveyNamesNotToLoad, restoreAutosave);
+        return loadSurvey(context, directory, surveyNamesNotToLoad, restoreAutosave);
     }
 
 
-    public static Survey loadSurvey(Context context, String name,
+    public static Survey loadSurvey(Context context, DocumentFile directory,
                                     Set<String> surveyNamesNotToLoad, boolean restoreAutosave)
             throws Exception {
-        Survey survey = new Survey(name);
-        loadSurveyData(context, name, survey, restoreAutosave);
+
+        if (!IoUtils.isSurveyDirectory(directory)) {
+            throw new Exception("Not a valid survey directory");
+        }
+
+        Survey survey = new Survey();
+        survey.setDirectory(directory);
+        loadSurveyData(context, survey, restoreAutosave);
         loadSketches(context, survey, restoreAutosave);
-        surveyNamesNotToLoad.add(name);
+        surveyNamesNotToLoad.add(survey.getName());
         loadMetadata(context, survey, surveyNamesNotToLoad, restoreAutosave);
         survey.setSaved(true);
         return survey;
@@ -51,90 +59,66 @@ public class Loader {
     private static void loadMetadata(Context context, Survey survey,
                                      Set<String> surveyNamesNotToLoad, boolean restoreAutosave)
             throws Exception {
-        String metadataPath = Util.getPathForSurveyFile(context, survey.getName(),
-                getExtension(SexyTopo.METADATA_EXTENSION, restoreAutosave));
-        if (Util.doesFileExist(metadataPath)) {
-            String metadataText = slurpFile(metadataPath);
+
+        DocumentFile file = IoUtils.getMetadataFile(context, survey);
+        if (file.exists()) {
+            String metadataText = slurpFile(context, file);
             MetadataTranslater.translateAndUpdate(
                     context, survey, metadataText, surveyNamesNotToLoad);
         }
     }
 
 
-    private static void loadSurveyData(Context context, String name, Survey survey,
+    private static void loadSurveyData(Context context, Survey survey,
                                        boolean restoreAutosave)
             throws Exception {
 
-        String path = Util.getPathForSurveyFile(context, name,
-                getExtension(SexyTopo.DATA_EXTENSION, restoreAutosave));
-
-        if (new File(path).exists()) {
-            String text = slurpFile(path);
-            SurveyJsonTranslater.populateSurvey(survey, text);
+        DocumentFile file;
+        if (restoreAutosave) {
+            file = IoUtils.getAutosaveDataFile(context, survey);
         } else {
-            // if there's no data file, we'll assume the survey was created with an older version
-            // of SexyTopo
-            String oldStylePath = Util.getPathForSurveyFile(context, name,
-                    getExtension("svx", restoreAutosave));
-            String text = slurpFile(oldStylePath);
-            OldStyleLoader.parse(text, survey);
+            file = IoUtils.getDataFile(context, survey);
         }
 
+        if (file.exists()) {
+            String text = slurpFile(context, file);
+            SurveyJsonTranslater.populateSurvey(survey, text);
+        }
     }
 
 
     private static void loadSketches(Context context, Survey survey, boolean restoreAutosave)
-            throws JSONException {
+            throws IOException, JSONException {
 
-        String planPath = Util.getPathForSurveyFile(context, survey.getName(),
-                getExtension(SexyTopo.PLAN_SKETCH_EXTENSION, restoreAutosave));
-        if (Util.doesFileExist(planPath)) {
-            String planText = slurpFile(planPath);
+        DocumentFile planFile = IoUtils.getPlanSketchFile(context, survey);
+        if (planFile.exists()) {
+            String planText = slurpFile(context, planFile);
             Sketch plan = SketchJsonTranslater.translate(survey, planText);
             survey.setPlanSketch(plan);
         }
 
-        String elevationPath = Util.getPathForSurveyFile(context, survey.getName(),
-                getExtension(SexyTopo.EXT_ELEVATION_SKETCH_EXTENSION, restoreAutosave));
-        if (Util.doesFileExist(elevationPath)) {
-            String elevationText = slurpFile(elevationPath);
+        DocumentFile elevationFile = IoUtils.getExtendedElevationSketchFile(context, survey);
+        if (elevationFile.exists()) {
+            String elevationText = slurpFile(context, elevationFile);
             Sketch elevation = SketchJsonTranslater.translate(survey, elevationText);
             survey.setElevationSketch(elevation);
         }
     }
 
+    public static String slurpFile(Context context, DocumentFile file)
+            throws IOException {
 
-    public static String slurpFile(File file) {
-        return slurpFile(file.getAbsolutePath());
-    }
+        ContentResolver contentResolver = context.getContentResolver();
 
-    public static String slurpFile(String filename) {
-
-        StringBuilder text = new StringBuilder();
-
-        try {
-            File file = new File(filename);
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            String line;
-
-            while ((line = br.readLine()) != null) {
-                text.append(line);
-                text.append('\n');
+        try (InputStream inputStream = contentResolver.openInputStream(file.getUri())) {
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            for (int length; (length = inputStream.read(buffer)) != -1; ) {
+                output.write(buffer, 0, length);
             }
 
-        } catch (Exception e) {
-            Log.e("Error trying to read " + filename + ": " + e.getMessage());
-        }
-        return text.toString();
-    }
-
-
-
-    private static String getExtension(String baseExtention, boolean isAutosave) {
-        if (isAutosave) {
-            return baseExtention + "." + SexyTopo.AUTOSAVE_EXTENSION;
-        } else {
-            return baseExtention;
+            String content = output.toString("UTF-8");
+            return content;
         }
     }
 

@@ -7,7 +7,7 @@ import android.preference.PreferenceManager;
 
 public class PreferenceAccess {
 
-    private static SharedPreferences getPreferences(Context context) {
+    public static SharedPreferences getPreferences(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context);
     }
 
@@ -26,5 +26,21 @@ public class PreferenceAccess {
         return getPreferences(context).getBoolean(id, defaultBoolean);
     }
 
+    public static String getString(Context context, String id, String defaultString) {
+        return getPreferences(context).getString(id, defaultString);
+    }
 
+    public static void setString(Context context, String id, String value) {
+        SharedPreferences preferences = getPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(id, value);
+        editor.apply();
+    }
+
+    public static void removeKey(Context context, String id) {
+        SharedPreferences preferences = getPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.remove(id);
+        editor.apply();
+    }
 }

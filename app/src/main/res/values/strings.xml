@@ -128,6 +128,7 @@
     <string name="carry_on">Continue</string>
     <string name="delete">Delete</string>
     <string name="save">Save</string>
+    <string name="overwrite">Overwrite</string>
     <string name="move">Move</string>
     <string name="replace">Replace</string>
     <string name="clear">Clear</string>
@@ -247,6 +248,7 @@
     <string name="dialog_confirm_clear_trip">Clear Trip Data?</string>
     <string name="comments">Comments</string>
     <string name="save_trip">Save Trip</string>
+    <string name="error_no_filesystem">Error: no access to filesystem. Can\'t save files.</string>
     <plurals name="instruments">
         <item quantity="one">%1$s instrument</item>
         <item quantity="other">%1$s instruments</item>

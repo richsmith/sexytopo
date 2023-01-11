@@ -2,14 +2,16 @@ package org.hwyl.sexytopo.control.io.translation;
 
 import android.content.Context;
 
-import org.hwyl.sexytopo.control.io.Util;
+import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.io.basic.Saver;
 import org.hwyl.sexytopo.model.survey.Survey;
 
-import java.io.File;
 import java.io.IOException;
 
+import androidx.documentfile.provider.DocumentFile;
 
+
+@SuppressWarnings("UnnecessaryLocalVariable")
 public abstract class Exporter {
 
     public abstract void export(Context context, Survey survey) throws IOException;
@@ -18,17 +20,24 @@ public abstract class Exporter {
 
     public abstract String getExportDirectoryName();
 
+    protected DocumentFile getOrCreateExportDirectory(Context context, Survey survey) {
+        DocumentFile baseExportDirectory = IoUtils.getExportDirectory(context, survey);
+        String exportDirectoryName = getExportDirectoryName();
+        DocumentFile exportDirectory =
+                IoUtils.getOrCreateDirectory(baseExportDirectory, exportDirectoryName);
+        return exportDirectory;
+    }
+
 
     protected void saveToExportDirectory(
-            Context context, Survey survey, String filename, String content)
+            Context context, Survey survey,
+            String mimeType, String filename,
+            String content)
             throws IOException {
 
-        String directoryPath = Util.getExportDirectoryPath(
-                context, getExportDirectoryName(), survey.getName());
-        Util.ensureDirectoriesInPathExist(directoryPath);
-
-        String path = directoryPath + File.separator + filename;
-        Saver.saveFile(path, content);
+        DocumentFile directory = getOrCreateExportDirectory(context, survey);
+        DocumentFile file = IoUtils.getOrCreateFile(directory, mimeType, filename);
+        Saver.saveFile(context, file, content);
     }
 
 }

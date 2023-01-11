@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 
 import java.util.UUID;
@@ -21,8 +22,19 @@ public class SexyTopo {
     public static final String DEVICE_LOG_UPDATED_EVENT = "deviceLogUpdatedEvent";
     public static final String CALIBRATION_UPDATED_EVENT = "calibrationUpdatedEvent";
 
+    public static final int REQUEST_CODE_NEW_SURVEY = 1000000;
+    public static final int REQUEST_CODE_SAVE_AS_SURVEY = 1000001;
+    public static final int REQUEST_CODE_MOVE_SURVEY = 1000002;
+    public static final int REQUEST_CODE_OPEN_SURVEY = 1000003;
+    public static final int REQUEST_CODE_IMPORT_SURVEY = 1000004;
+    public static final int REQUEST_CODE_SELECT_SURVEY_TO_LINK = 1000005;
+
+    public static final int REQUEST_CODE_OPEN_CALIBRATION = 1000010;
+    public static final int REQUEST_CODE_SAVE_CALIBRATION = 1000011;
+
     public static final String JUMP_TO_STATION = "jumpToStation";
 
+    public static final String DEFAULT_ROOT_DIR = "Documents";
     public static final String SURVEY_DIR = "Surveys";
     public static final String IMPORT_DIR = "To Import";
     public static final String EXPORT_DIR = "Exported";
@@ -31,7 +43,7 @@ public class SexyTopo {
 
     public static final String IMPORT_SOURCE_DIR = "Import Source";
 
-    public static final String ACTIVE_SURVEY_NAME = "activeSurveyName";
+    public static final String PREFERENCE_ACTIVE_SURVEY_URI = "activeSurveyUri";
 
     public static final String BLANK_STATION_NAME = "-";
 
@@ -53,6 +65,7 @@ public class SexyTopo {
 
     // This is extremely hacky but quite useful for getting a context when it's not sensible
     // to pass one around
+    @SuppressLint("StaticFieldLeak") // shouldn't be problem, because using ApplicationContext
     public static Context context;
 
 

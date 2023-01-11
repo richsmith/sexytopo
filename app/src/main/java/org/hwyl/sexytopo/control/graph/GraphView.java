@@ -334,7 +334,7 @@ public class GraphView extends View {
             return;
         }
 
-        if (!activity.getBooleanPreference("pref_hot_corners")) {
+        if (!PreferenceAccess.getBoolean(activity, "pref_hot_corners", false)) {
             return;
         }
 
@@ -1295,7 +1295,7 @@ public class GraphView extends View {
 
     private void drawHotCorners(Canvas canvas) {
 
-        if (!activity.getBooleanPreference("pref_hot_corners")) {
+        if (!PreferenceAccess.getBoolean(activity, "pref_hot_corners", false)) {
             return;
         }
 

@@ -15,9 +15,9 @@ public class TestSurveyCreator {
     private static final Random random = new Random();
 
 
-    public static Survey create(String name, int numStations, int numBranches) {
+    public static Survey create(int numStations, int numBranches) {
 
-        Survey survey = new Survey(name);
+        Survey survey = new Survey();
 
         createBranch(survey, numStations);
 

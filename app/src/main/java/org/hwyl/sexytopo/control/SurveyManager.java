@@ -7,6 +7,8 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.io.basic.Saver;
 import org.hwyl.sexytopo.control.util.InputMode;
@@ -18,8 +20,6 @@ import org.hwyl.sexytopo.model.survey.Survey;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 
 @SuppressWarnings("UnnecessaryLocalVariable")
@@ -40,7 +40,7 @@ public class SurveyManager {
     private LocalBroadcastManager broadcastManager;
 
     // This should be created or loaded on startup
-    private static Survey currentSurvey = new Survey("Unset");
+    private static Survey currentSurvey = new Survey();
 
     private List<CalibrationReading> calibrationReadings = new ArrayList<>();
 
@@ -151,12 +151,13 @@ public class SurveyManager {
                     currentSurvey.setAutosaved(true);
                     Log.d("Autosaved");
                 }
+                return null;
+
             } catch (Exception e) {
                 Log.e("Error autosaving survey");
                 Log.e(e);
                 Toast.makeText(context, "Error autosaving survey: " + e.getMessage(),
                         Toast.LENGTH_SHORT).show();
-            } finally {
                 return null;
             }
         }
