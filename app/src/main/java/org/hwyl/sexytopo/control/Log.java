@@ -5,11 +5,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 
+import androidx.documentfile.provider.DocumentFile;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.hwyl.sexytopo.SexyTopo;
-import org.hwyl.sexytopo.control.io.basic.Loader;
-import org.hwyl.sexytopo.control.io.basic.Saver;
+import org.hwyl.sexytopo.control.io.IoUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,9 +26,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-
-import androidx.documentfile.provider.DocumentFile;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 /**
  * SexyTopo's Logger. This is a kind of proxy for the standard Android Log so we can
@@ -157,7 +156,7 @@ public class Log {
         try {
             DocumentFile logFile = getLogFile(logType);
             if (logFile.exists()) {
-                String content = Loader.slurpFile(context, logFile);
+                String content = IoUtils.slurpFile(context, logFile);
                 unmarshal(logType, content);
             }
         } catch (Exception exception) {
@@ -274,7 +273,7 @@ public class Log {
                 JSONArray marshalled = marshal(logType);
                 String content = marshalled.toString(4);
                 DocumentFile logFile = getLogFile(logType);
-                Saver.saveFile(context, logFile, content);
+                IoUtils.saveToFile(context, logFile, content);
             } catch (Exception exception) {
                 FirebaseCrashlytics.getInstance().recordException(exception);
             }

@@ -7,7 +7,7 @@ import androidx.documentfile.provider.DocumentFile;
 import org.apache.commons.io.FilenameUtils;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.Log;
-import org.hwyl.sexytopo.control.io.basic.Loader;
+import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexImporter;
 import org.hwyl.sexytopo.control.io.thirdparty.xvi.XviImporter;
 import org.hwyl.sexytopo.control.io.translation.Importer;
@@ -52,7 +52,7 @@ public class TherionImporter extends Importer {
 
     private static Survey parseTh(Context context, DocumentFile file) throws Exception {
         Survey survey = new Survey();
-        String contents = Loader.slurpFile(context, file);
+        String contents = IoUtils.slurpFile(context, file);
         List<String> lines = Arrays.asList(contents.split("\n"));
         updateCentreline(lines, survey);
         return survey;

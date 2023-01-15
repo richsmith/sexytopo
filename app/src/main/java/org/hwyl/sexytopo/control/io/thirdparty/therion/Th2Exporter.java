@@ -58,7 +58,7 @@ public class Th2Exporter {
         lines.add(getXviLine("xth_me_image_insert",
             "{" + ((-1 * dimensions.minX + widthBorder / 2) * scale) + " 1 1.0}",
             "{" + ((-1 * dimensions.minY + heightBorder / 2) * scale) + " " + firstStation + "}",
-            "\"" + filename + ".xvi\"",
+            "\"" + filename + "\"",
             0,
             "{}"));
 

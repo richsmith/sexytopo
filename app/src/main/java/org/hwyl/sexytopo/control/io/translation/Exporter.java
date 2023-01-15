@@ -2,42 +2,46 @@ package org.hwyl.sexytopo.control.io.translation;
 
 import android.content.Context;
 
-import org.hwyl.sexytopo.control.io.IoUtils;
-import org.hwyl.sexytopo.control.io.basic.Saver;
+import org.hwyl.sexytopo.control.io.SurveyDirectory;
+import org.hwyl.sexytopo.control.io.SurveyFile;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.io.IOException;
-
-import androidx.documentfile.provider.DocumentFile;
 
 
 @SuppressWarnings("UnnecessaryLocalVariable")
 public abstract class Exporter {
 
-    public abstract void export(Context context, Survey survey) throws IOException;
+    private Survey survey;
+
+    public void export(Context context, Survey survey) throws IOException {
+        this.survey = survey;
+        run(context, survey);
+    }
+
+    public abstract void run(Context context, Survey survey) throws IOException;
 
     public abstract String getExportTypeName(Context context);
 
-    public abstract String getExportDirectoryName();
-
-    protected DocumentFile getOrCreateExportDirectory(Context context, Survey survey) {
-        DocumentFile baseExportDirectory = IoUtils.getExportDirectory(context, survey);
-        String exportDirectoryName = getExportDirectoryName();
-        DocumentFile exportDirectory =
-                IoUtils.getOrCreateDirectory(baseExportDirectory, exportDirectoryName);
+    public SurveyDirectory getParentExportDirectory() {
+        SurveyDirectory exportDirectory = SurveyDirectory.EXPORT.get(survey);
         return exportDirectory;
     }
 
+    public SurveyDirectory getExportDirectory(SurveyDirectory parentDirectory) {
+        String directoryName = getExportDirectoryName();
+        SurveyDirectory.SurveyDirectoryType directoryType =
+                new SurveyDirectory.SurveyDirectoryType(directoryName);
+        return directoryType.get(parentDirectory);
+    }
 
-    protected void saveToExportDirectory(
-            Context context, Survey survey,
-            String mimeType, String filename,
-            String content)
-            throws IOException {
+    protected abstract String getExportDirectoryName();
 
-        DocumentFile directory = getOrCreateExportDirectory(context, survey);
-        DocumentFile file = IoUtils.getOrCreateFile(directory, mimeType, filename);
-        Saver.saveFile(context, file, content);
+    protected SurveyFile getOutputFile(SurveyFile.SurveyFileType surveyFileType) {
+        SurveyDirectory parent = getParentExportDirectory();
+        SurveyDirectory directory = getExportDirectory(parent);
+        SurveyFile surveyFile = surveyFileType.get(directory);
+        return surveyFile;
     }
 
 }

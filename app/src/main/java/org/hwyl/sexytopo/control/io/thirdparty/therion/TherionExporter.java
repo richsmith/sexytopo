@@ -3,7 +3,7 @@ package org.hwyl.sexytopo.control.io.thirdparty.therion;
 import android.content.Context;
 
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.control.io.SurveyFile;
 import org.hwyl.sexytopo.control.io.thirdparty.xvi.XviExporter;
 import org.hwyl.sexytopo.control.io.translation.Exporter;
 import org.hwyl.sexytopo.control.util.SpaceFlipper;
@@ -20,26 +20,42 @@ import java.util.List;
 
 public class TherionExporter extends Exporter {
 
+    private static SurveyFile.SurveyFileType THCONFIG =
+            new SurveyFile.SurveyFileType("thconfig", "plain/text");
+    private static SurveyFile.SurveyFileType TH =
+            new SurveyFile.SurveyFileType("th", "plain/text");
+    private static SurveyFile.SurveyFileType TH2_PLAN =
+            new SurveyFile.SurveyFileType("plan.th2", "plain/text");
+    private static SurveyFile.SurveyFileType XVI_PLAN =
+            new SurveyFile.SurveyFileType("plan.xvi", "plain/text");
+    private static SurveyFile.SurveyFileType TH2_EE =
+            new SurveyFile.SurveyFileType("ee.th2", "plain/text");
+    private static SurveyFile.SurveyFileType XVI_EE =
+            new SurveyFile.SurveyFileType("plan.xvi", "plain/text");
+
     private String originalThFileContent = null;
     private String originalTh2PlanFileContent = null;
     private String originalTh2EeFileContent = null;
 
     private final List<String> th2Files = new ArrayList<>();
 
-    public void export(Context context, Survey survey) throws IOException {
-
+    public void run(Context context, Survey survey) throws IOException {
         th2Files.clear();
         readOriginalFilesIfPresent(context, survey);
 
-        String name = survey.getName();
-
         String thconfigContent = ThconfigExporter.getContent(survey);
-        saveToExportDirectory(context, survey, "plain/text", name + ".thconfig", thconfigContent);
+        SurveyFile thconfig = getOutputFile(THCONFIG);
+        thconfig.save(context, thconfigContent);
 
+        SurveyFile th2_plan_file = getOutputFile(TH2_PLAN);
+        SurveyFile xvi_plan_file = getOutputFile(XVI_PLAN);
         handleProjection(context, survey, Projection2D.PLAN, survey.getPlanSketch(),
-                SexyTopo.PLAN_SUFFIX, originalTh2PlanFileContent);
+                th2_plan_file, xvi_plan_file, originalTh2PlanFileContent);
+
+        SurveyFile th2_ee_file = getOutputFile(TH2_EE);
+        SurveyFile xvi_ee_file = getOutputFile(XVI_EE);
         handleProjection(context, survey, Projection2D.EXTENDED_ELEVATION, survey.getElevationSketch(),
-                SexyTopo.EE_SUFFIX, originalTh2EeFileContent);
+                th2_ee_file, xvi_ee_file, originalTh2EeFileContent);
 
         String thContent;
         if (originalThFileContent == null) {
@@ -47,8 +63,8 @@ public class TherionExporter extends Exporter {
         } else {
             thContent = ThExporter.updateOriginalContent(survey, originalThFileContent, th2Files);
         }
-        saveToExportDirectory(context, survey, "plain/text", name + ".th", thContent);
-
+        SurveyFile th = getOutputFile(TH);
+        th.save(context, thContent);
     }
 
 
@@ -57,7 +73,8 @@ public class TherionExporter extends Exporter {
             Survey survey,
             Projection2D projection,
             Sketch sketch,
-            String suffix,
+            SurveyFile th2File,
+            SurveyFile xviFile,
             String originalFileContent)
             throws IOException {
 
@@ -65,22 +82,21 @@ public class TherionExporter extends Exporter {
 
         Space<Coord2D> space = projection.project(survey);
         space = SpaceFlipper.flipVertically(space);
-        String baseFilename = survey.getName() + " " + suffix;
-        String th2Filename = baseFilename + ".th2";
+
         String content;
         if (originalFileContent == null) {
             content = Th2Exporter.getContent(
-                    survey, scale, baseFilename, space);
+                    survey, scale, xviFile.getFilename(), space);
         } else {
             content = Th2Exporter.updateOriginalContent(
-                    survey, scale, baseFilename, space, originalFileContent);
+                    survey, scale, xviFile.getFilename(), space, originalFileContent);
         }
-        saveToExportDirectory(context, survey, "plain/text", th2Filename, content);
+        th2File.save(context, content);
 
-        String xviPlanContent = XviExporter.getContent(sketch, space, scale);
-        saveToExportDirectory(context, survey, "plain/text", baseFilename + ".xvi", xviPlanContent);
+        String xviContent = XviExporter.getContent(sketch, space, scale);
+        xviFile.save(context, xviContent);
 
-        th2Files.add(th2Filename);
+        th2Files.add(th2File.getFilename());
     }
 
 
@@ -91,8 +107,8 @@ public class TherionExporter extends Exporter {
 
 
     @Override
-    public String getExportDirectoryName() {
-        return "Therion";
+    protected String getExportDirectoryName() {
+        return "therion";
     }
 
 
@@ -113,7 +129,7 @@ public class TherionExporter extends Exporter {
     private void readOriginalFilesIfPresent(Context context, Survey survey) {
 
         /*
-        This code sacrificed on the altar of trying to get SexyTopo working
+        This code currently sacrificed on the altar of trying to get SexyTopo working
         with scoped storage :/
 
         if (IoUtils.wasSurveyImported(context, survey)) {

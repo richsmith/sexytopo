@@ -6,7 +6,7 @@ import androidx.documentfile.provider.DocumentFile;
 
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.Log;
-import org.hwyl.sexytopo.control.io.basic.Loader;
+import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.io.translation.Importer;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -29,7 +29,7 @@ public class SurvexImporter extends Importer {
     @Override
     public Survey toSurvey(Context context, DocumentFile file) throws Exception {
         Survey survey = new Survey();
-        String text = Loader.slurpFile(context, file);
+        String text = IoUtils.slurpFile(context, file);
         parse(text, survey);
         return survey;
     }

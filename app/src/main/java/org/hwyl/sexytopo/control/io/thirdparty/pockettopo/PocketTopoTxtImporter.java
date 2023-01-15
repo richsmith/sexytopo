@@ -4,7 +4,7 @@ import android.content.Context;
 
 import androidx.documentfile.provider.DocumentFile;
 
-import org.hwyl.sexytopo.control.io.basic.Loader;
+import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.io.translation.Importer;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.control.util.TextTools;
@@ -35,7 +35,7 @@ public class PocketTopoTxtImporter extends Importer {
 
     public Survey toSurvey(Context context, DocumentFile file) throws IOException {
         Survey survey = new Survey();
-        String text = Loader.slurpFile(context, file);
+        String text = IoUtils.slurpFile(context, file);
 
         // FIXME we're ignoring the metadata for now
         parseDataAndUpdateSurvey(survey, text);

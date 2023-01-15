@@ -1,50 +1,36 @@
 package org.hwyl.sexytopo.control.io;
 
-import android.Manifest;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
+import android.os.ParcelFileDescriptor;
 import android.os.storage.StorageManager;
 
-import androidx.core.content.ContextCompat;
 import androidx.documentfile.provider.DocumentFile;
 
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.Log;
-import org.hwyl.sexytopo.control.io.basic.Loader;
-import org.hwyl.sexytopo.control.io.basic.Saver;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 
 @SuppressWarnings("UnnecessaryLocalVariable")
 public class IoUtils {
-
-
-    public static void ensureDirectoriesInPathExist(String path) {
-        new File(path).mkdirs();
-    }
-
-
-    private static void ensureDirectoryExists(File directory) {
-        if (!directory.exists()) {
-            boolean success = directory.mkdirs();
-        }
-    }
 
     public static boolean doesSurveyExist(Context context, Uri uri) {
         return DocumentFile.fromTreeUri(context, uri).isDirectory();
@@ -66,100 +52,6 @@ public class IoUtils {
         return false;
     }
 
-
-    public static DocumentFile getOrCreateFile(
-            DocumentFile directory, String mimeType, String filename) {
-        DocumentFile file = directory.findFile(filename);
-        if (file == null) {
-            file = directory.createFile(mimeType, filename);
-        }
-        return file;
-    }
-
-    public static DocumentFile getOrCreateDirectory(DocumentFile directory, String filename) {
-        DocumentFile file = directory.findFile(filename);
-        if (file == null) {
-            file = directory.createDirectory(filename);
-        }
-        return file;
-    }
-
-    public static String withExtension(String filename, String extension) {
-        return filename + "." + extension;
-    }
-
-    public static DocumentFile getOrCreateSurveyChildFile(
-            Context context, Survey survey, String extension) {
-        DocumentFile surveyDirectory = getSurveyDirectory(context, survey);
-        String filename = withExtension(survey.getName(), extension);
-        DocumentFile file = getOrCreateFile(
-                surveyDirectory, "application/json", filename);
-        return file;
-    }
-
-
-    public static DocumentFile getOrCreateSurveyChildDirectory(
-            Context context, Survey survey, String filename) {
-        DocumentFile surveyDirectory = getSurveyDirectory(context, survey);
-        DocumentFile file = getOrCreateDirectory(surveyDirectory, filename);
-        return file;
-    }
-
-
-    public static DocumentFile getDataFile(Context context, Survey survey) {
-        DocumentFile file = getOrCreateSurveyChildFile(
-                context, survey, SexyTopo.DATA_EXTENSION);
-        return file;
-    }
-
-    public static DocumentFile getAutosaveDataFile(Context context, Survey survey) {
-        String extension = withExtension(SexyTopo.DATA_EXTENSION, SexyTopo.AUTOSAVE_EXTENSION);
-        DocumentFile file = getOrCreateSurveyChildFile(context, survey, extension);
-        return file;
-    }
-
-    public static DocumentFile getMetadataFile(Context context, Survey survey) {
-        DocumentFile file = getOrCreateSurveyChildFile(
-                context, survey, SexyTopo.METADATA_EXTENSION);
-        return file;
-    }
-
-    public static DocumentFile getPlanSketchFile(Context context, Survey survey) {
-        DocumentFile file = getOrCreateSurveyChildFile(
-                context, survey, SexyTopo.PLAN_SKETCH_EXTENSION);
-        return file;
-    }
-
-    public static DocumentFile getExtendedElevationSketchFile(Context context, Survey survey) {
-        DocumentFile file = getOrCreateSurveyChildFile(
-                context, survey, SexyTopo.EXT_ELEVATION_SKETCH_EXTENSION);
-        return file;
-    }
-
-
-    public static DocumentFile getImportSourceDirectory(Context context, Survey survey) {
-        DocumentFile file = getOrCreateSurveyChildDirectory(
-                context, survey, SexyTopo.IMPORT_SOURCE_DIR);
-        return file;
-    }
-
-
-    public static DocumentFile getExportDirectory(Context context, Survey survey) {
-        DocumentFile file = getOrCreateSurveyChildDirectory(
-                context, survey, SexyTopo.EXPORT_DIR);
-        return file;
-    }
-
-    public static DocumentFile getSurveyDirectory(Context context, Survey survey) {
-        Uri uri = survey.getUri();
-        return getSurveyDirectory(context, uri);
-    }
-
-    public static DocumentFile getSurveyDirectory(Context context, Uri uri) {
-        DocumentFile directory = DocumentFile.fromTreeUri(context, uri);
-        return directory;
-    }
-
     public static void deleteSurvey(Context context, Survey survey) {
         DocumentFile surveyDirectory = DocumentFile.fromTreeUri(context, survey.getUri());
         boolean deleted = surveyDirectory.delete();
@@ -171,53 +63,14 @@ public class IoUtils {
 
     }
 
-    public static boolean doesFileExist(String path) {
-        File filename = new File(path);
-        return filename.exists();
-    }
-
     public static boolean wasSurveyImported(Context context, Survey survey) {
-        DocumentFile importSourceDirectory = getImportSourceDirectory(context, survey);
-        return importSourceDirectory.exists()
-                && importSourceDirectory.isDirectory();
+        SurveyDirectory importSourceDirectory = SurveyDirectory.IMPORT_SOURCE.get(survey);
+        return importSourceDirectory.exists(context);
     }
-
-    public static boolean doWeHavePermissionToWriteToExternalStorage(Context context) {
-        return (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            == PackageManager.PERMISSION_GRANTED);
-    }
-
-    public static boolean isExternalStorageMounted() {
-        String state = Environment.getExternalStorageState();
-        boolean isMounted = (Environment.MEDIA_MOUNTED.equals(state));
-        return isMounted;
-    }
-
-    public static boolean isExternalStorageWriteable(Context context) {
-        boolean havePermission = doWeHavePermissionToWriteToExternalStorage(context);
-        boolean isMounted = isExternalStorageMounted();
-        return havePermission && isMounted;
-    }
-
-    public static boolean isExternalStorageReadable() {
-        String state = Environment.getExternalStorageState();
-        return (Environment.MEDIA_MOUNTED.equals(state) ||
-                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state));
-    }
-
-
-    public static File getInternalDirectory(Context context) {
-        return context.getFilesDir();
-    }
-
-    public static String getAutosaveName(String filename) {
-        return filename + "." + SexyTopo.AUTOSAVE_EXTENSION;
-    }
-
 
     public static Map<String, JSONArray> toMap(JSONObject object) throws JSONException {
         Map<String, JSONArray> map = new HashMap<>();
-        Iterator iterator = object.keys();
+        Iterator<String> iterator = object.keys();
         while (iterator.hasNext()) {
             String key = (String)iterator.next();
             JSONArray value = object.getJSONArray(key);
@@ -251,6 +104,7 @@ public class IoUtils {
     public static void copyFile(
             Context context, DocumentFile source, DocumentFile destination) throws IOException {
 
+        /* FIXME
         if (source.isDirectory()) {
             DocumentFile childDirectory = destination.createDirectory(
                     Objects.requireNonNull(source.getName()));
@@ -262,7 +116,7 @@ public class IoUtils {
             String contents = Loader.slurpFile(context, source);
             DocumentFile file = destination.createFile(source.getType(), source.getName());
             Saver.saveFile(context, file, contents);
-        }
+        }*/
     }
 
 
@@ -293,6 +147,32 @@ public class IoUtils {
         }
 
         return uri;
+    }
+
+    public static String slurpFile(Context context, DocumentFile file) throws IOException{
+        ContentResolver contentResolver = context.getContentResolver();
+
+        try (InputStream inputStream = contentResolver.openInputStream(file.getUri())) {
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            for (int length; (length = inputStream.read(buffer)) != -1; ) {
+                output.write(buffer, 0, length);
+            }
+
+            String content = output.toString("UTF-8");
+            return content;
+        }
+    }
+
+    public static void saveToFile(Context context, DocumentFile documentFile, String contents)
+            throws IOException{
+        Uri uri = documentFile.getUri();
+        ParcelFileDescriptor pfd = context.getContentResolver().openFileDescriptor(uri, "w");
+        FileOutputStream fileOutputStream =
+                new FileOutputStream(pfd.getFileDescriptor());
+        fileOutputStream.write(contents.getBytes());
+        fileOutputStream.close();
+        pfd.close();
     }
 
 }

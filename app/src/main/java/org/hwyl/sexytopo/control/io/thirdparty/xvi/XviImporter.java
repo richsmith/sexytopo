@@ -7,7 +7,7 @@ import android.content.Context;
 
 import androidx.documentfile.provider.DocumentFile;
 
-import org.hwyl.sexytopo.control.io.basic.Loader;
+import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.io.translation.Importer;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.sketch.Colour;
@@ -38,7 +38,7 @@ public class XviImporter extends Importer {
 
         Sketch sketch = new Sketch();
 
-        String contents = Loader.slurpFile(context, file);
+        String contents = IoUtils.slurpFile(context, file);
 
         Grid grid = instance.parseGrid(contents);
         double scale = grid.dy;

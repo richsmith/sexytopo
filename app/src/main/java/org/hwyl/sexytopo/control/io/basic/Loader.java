@@ -1,23 +1,20 @@
 package org.hwyl.sexytopo.control.io.basic;
 
-import android.content.ContentResolver;
 import android.content.Context;
 
 import androidx.documentfile.provider.DocumentFile;
 
 import org.hwyl.sexytopo.control.io.IoUtils;
+import org.hwyl.sexytopo.control.io.SurveyFile;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.json.JSONException;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 
 
-@SuppressWarnings("UnnecessaryLocalVariable")
 public class Loader {
 
 
@@ -26,7 +23,7 @@ public class Loader {
     }
 
 
-    public static Survey restoreAutosave(Context context, DocumentFile directory) throws Exception {
+    public static Survey loadAutosave(Context context, DocumentFile directory) throws Exception {
         return loadSurvey(context, directory, true);
     }
 
@@ -60,28 +57,23 @@ public class Loader {
                                      Set<String> surveyNamesNotToLoad, boolean restoreAutosave)
             throws Exception {
 
-        DocumentFile file = IoUtils.getMetadataFile(context, survey);
-        if (file.exists()) {
-            String metadataText = slurpFile(context, file);
+        SurveyFile surveyFile = SurveyFile.METADATA.get(survey);
+        surveyFile = considerSwappingForAutosave(context, surveyFile, restoreAutosave);
+        if (surveyFile.exists(context)) {
+            String metadataText = surveyFile.slurp(context);
             MetadataTranslater.translateAndUpdate(
                     context, survey, metadataText, surveyNamesNotToLoad);
         }
     }
 
 
-    private static void loadSurveyData(Context context, Survey survey,
-                                       boolean restoreAutosave)
+    private static void loadSurveyData(
+            Context context, Survey survey, boolean restoreAutosave)
             throws Exception {
-
-        DocumentFile file;
-        if (restoreAutosave) {
-            file = IoUtils.getAutosaveDataFile(context, survey);
-        } else {
-            file = IoUtils.getDataFile(context, survey);
-        }
-
-        if (file.exists()) {
-            String text = slurpFile(context, file);
+        SurveyFile surveyFile = SurveyFile.DATA.get(survey);
+        surveyFile = considerSwappingForAutosave(context, surveyFile, restoreAutosave);
+        if (surveyFile.exists(context)) {
+            String text = surveyFile.slurp(context);
             SurveyJsonTranslater.populateSurvey(survey, text);
         }
     }
@@ -90,36 +82,30 @@ public class Loader {
     private static void loadSketches(Context context, Survey survey, boolean restoreAutosave)
             throws IOException, JSONException {
 
-        DocumentFile planFile = IoUtils.getPlanSketchFile(context, survey);
-        if (planFile.exists()) {
-            String planText = slurpFile(context, planFile);
+        SurveyFile planFile = SurveyFile.SKETCH_PLAN.get(survey);
+        planFile = considerSwappingForAutosave(context, planFile, restoreAutosave);
+        if (planFile.exists(context)) {
+            String planText = planFile.slurp(context);
             Sketch plan = SketchJsonTranslater.translate(survey, planText);
             survey.setPlanSketch(plan);
         }
 
-        DocumentFile elevationFile = IoUtils.getExtendedElevationSketchFile(context, survey);
-        if (elevationFile.exists()) {
-            String elevationText = slurpFile(context, elevationFile);
+        SurveyFile elevationFile = SurveyFile.SKETCH_EXT_ELEVATION.get(survey);
+        if (elevationFile.exists(context)) {
+            String elevationText = elevationFile.slurp(context);
             Sketch elevation = SketchJsonTranslater.translate(survey, elevationText);
             survey.setElevationSketch(elevation);
         }
     }
 
-    public static String slurpFile(Context context, DocumentFile file)
-            throws IOException {
-
-        ContentResolver contentResolver = context.getContentResolver();
-
-        try (InputStream inputStream = contentResolver.openInputStream(file.getUri())) {
-            ByteArrayOutputStream output = new ByteArrayOutputStream();
-            byte[] buffer = new byte[1024];
-            for (int length; (length = inputStream.read(buffer)) != -1; ) {
-                output.write(buffer, 0, length);
-            }
-
-            String content = output.toString("UTF-8");
-            return content;
+    private static SurveyFile considerSwappingForAutosave(
+            Context context, SurveyFile surveyFile, boolean restoreAutosave) {
+        if (restoreAutosave && surveyFile.exists(context)) {
+                return SurveyFile.DATA.AUTOSAVE.get(surveyFile.getSurvey());
+        } else {
+            return surveyFile;
         }
+
     }
 
 
