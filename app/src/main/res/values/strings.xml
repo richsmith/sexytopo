@@ -116,11 +116,13 @@
     <string name="survey_saved">Saved</string>
     <string name="error_saving_survey">Failed: survey not saved</string>
     <string name="restoring_autosave">Restoring autosave</string>
-    <string name="dialog_save_as_title">Save As</string>
+    <string name="intent_save_as_title">Create or select folder</string>
+    <string name="intent_open_title">Select survey folder</string>
+    <string name="intent_link_title">Select survey folder to link</string>
+    <string name="intent_import_title">Select folder to import</string>
     <string name="dialog_delete_survey_title">Delete Survey?</string>
     <string name="dialog_delete_survey_content">This will delete the current survey and any associated files (this cannot be undone).</string>
     <string name="error_deleting_survey">Failed: error deleting survey</string>
-    <string name="cannot_delete_unsaved_survey">Failed: cannot delete unsaved survey</string>
     <string name="cannot_extend_unsaved_survey">Failed: cannot extend unsaved survey</string>
     <string name="import_survey">Import Survey</string>
     <string name="no_imports">No import files found</string>

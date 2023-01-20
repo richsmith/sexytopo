@@ -9,7 +9,7 @@ public class OldStyleLoaderTest {
     @Test
     public void testEmptySurveyResultsIn1Station() throws Exception {
         String text = "";
-        Survey survey = new Survey("TestSurvey");
+        Survey survey = new Survey();
         OldStyleLoader.parse(text, survey);
         assert survey.getAllStations().size() == 1;
     }
@@ -17,7 +17,7 @@ public class OldStyleLoaderTest {
     @Test
     public void testSimpleSurveyIsParsed() throws Exception {
         String text = "1\t2\t9.11\t121\t-23\n";
-        Survey survey = new Survey("TestSurvey");
+        Survey survey = new Survey();
         OldStyleLoader.parse(text, survey);
         assert survey.getAllStations().size() == 2;
         assert survey.getOrigin().getConnectedOnwardLegs().get(0)
@@ -30,7 +30,7 @@ public class OldStyleLoaderTest {
         String text =
                 "*data normal from to length compass clino\n" +
                 "1\t2\t9.11\t121\t-23\n";
-        Survey survey = new Survey("TestSurvey");
+        Survey survey = new Survey();
         OldStyleLoader.parse(text, survey);
         assert survey.getAllStations().size() == 2;
     }
@@ -38,7 +38,7 @@ public class OldStyleLoaderTest {
     @Test
     public void testReversedLegIsParsed() throws Exception {
         String text = "2\t1\t9.11\t121\t-23\n";
-        Survey survey = new Survey("TestSurvey");
+        Survey survey = new Survey();
         OldStyleLoader.parse(text, survey);
         assert survey.getAllStations().size() == 2;
         assert survey.getOrigin().getConnectedOnwardLegs().get(0)

@@ -264,17 +264,17 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
 
     protected void requestSaveAs() {
-        selectDocumentTree(SexyTopo.REQUEST_CODE_SAVE_AS_SURVEY);
+        selectDocumentTree(SexyTopo.REQUEST_CODE_SAVE_AS_SURVEY, R.string.intent_save_as_title);
     }
 
     @SuppressLint("UnusedDeclaration") // called through Reflection
     public void requestOpenSurvey() {
-        selectDocumentTree(SexyTopo.REQUEST_CODE_OPEN_SURVEY);
+        selectDocumentTree(SexyTopo.REQUEST_CODE_OPEN_SURVEY, R.string.intent_open_title);
     }
 
     @SuppressLint("UnusedDeclaration")
     public void requestLinkExistingSurvey() {
-        selectDocumentTree(SexyTopo.REQUEST_CODE_SELECT_SURVEY_TO_LINK);
+        selectDocumentTree(SexyTopo.REQUEST_CODE_SELECT_SURVEY_TO_LINK, R.string.intent_link_title);
     }
 
     @SuppressLint("UnusedDeclaration") // called through Reflection
@@ -284,12 +284,15 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         restoreAutosave(directory);
     }
 
-    public void requestDeleteSurvey() {
-        if (!getSurvey().isSaved()) {
-            showSimpleToast(getString(R.string.cannot_delete_unsaved_survey));
-            return;
-        }
 
+    @SuppressLint("UnusedDeclaration")  // called through Reflection
+    public void requestImportSurvey() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            selectDocumentTree(SexyTopo.REQUEST_CODE_IMPORT_SURVEY, R.string.intent_import_title);
+        }
+    }
+
+    public void requestDeleteSurvey() {
         new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.dialog_delete_survey_title))
                 .setMessage(getString(R.string.dialog_delete_survey_content))
@@ -645,7 +648,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         startActivityForResult(intent, requestCode);
     }
 
-    protected void selectDocumentTree(int requestCode) {
+    protected void selectDocumentTree(int requestCode, Integer titleId) {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -655,6 +658,10 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             }
         }
 
+        if (titleId != null) {
+            String title = getString(titleId);
+            intent.putExtra(Intent.EXTRA_TITLE, getString(titleId));
+        }
         intent = Intent.createChooser(intent, "hello!");
         startActivityForResult(intent, requestCode);
     }
@@ -873,13 +880,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     public void exit() {
         finishAffinity();
         System.exit(0);
-    }
-
-    @SuppressLint("UnusedDeclaration")
-    public void requestImportSurvey() { // public due to stupid Reflection requirements
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            selectDocumentTree(SexyTopo.REQUEST_CODE_IMPORT_SURVEY);
-        }
     }
 
     protected void importSurvey(DocumentFile file) {

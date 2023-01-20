@@ -1,6 +1,7 @@
 package org.hwyl.sexytopo.control.io.basic;
 
 import android.content.Context;
+import android.net.Uri;
 
 import androidx.documentfile.provider.DocumentFile;
 
@@ -30,13 +31,13 @@ public class Loader {
 
     public static Survey loadSurvey(Context context, DocumentFile directory, boolean restoreAutosave)
             throws Exception {
-        Set<String> surveyNamesNotToLoad = new HashSet<>();
-        return loadSurvey(context, directory, surveyNamesNotToLoad, restoreAutosave);
+        Set<Uri> surveyUrisNotToLoad = new HashSet<>();
+        return loadSurvey(context, directory, surveyUrisNotToLoad, restoreAutosave);
     }
 
 
     public static Survey loadSurvey(Context context, DocumentFile directory,
-                                    Set<String> surveyNamesNotToLoad, boolean restoreAutosave)
+                                    Set<Uri> surveyUrisNotToLoad, boolean restoreAutosave)
             throws Exception {
 
         if (!IoUtils.isSurveyDirectory(directory)) {
@@ -47,14 +48,14 @@ public class Loader {
         survey.setDirectory(directory);
         loadSurveyData(context, survey, restoreAutosave);
         loadSketches(context, survey, restoreAutosave);
-        surveyNamesNotToLoad.add(survey.getName());
-        loadMetadata(context, survey, surveyNamesNotToLoad, restoreAutosave);
+        surveyUrisNotToLoad.add(survey.getUri());
+        loadMetadata(context, survey, surveyUrisNotToLoad, restoreAutosave);
         survey.setSaved(true);
         return survey;
     }
 
     private static void loadMetadata(Context context, Survey survey,
-                                     Set<String> surveyNamesNotToLoad, boolean restoreAutosave)
+                                     Set< Uri> surveyUrisNotToLoad, boolean restoreAutosave)
             throws Exception {
 
         SurveyFile surveyFile = SurveyFile.METADATA.get(survey);
@@ -62,7 +63,7 @@ public class Loader {
         if (surveyFile.exists(context)) {
             String metadataText = surveyFile.slurp(context);
             MetadataTranslater.translateAndUpdate(
-                    context, survey, metadataText, surveyNamesNotToLoad);
+                    context, survey, metadataText, surveyUrisNotToLoad);
         }
     }
 

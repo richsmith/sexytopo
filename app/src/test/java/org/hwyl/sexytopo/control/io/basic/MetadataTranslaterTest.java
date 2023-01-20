@@ -43,7 +43,9 @@ public class MetadataTranslaterTest {
     @Test
     public void testConnectedSurveyIsTranslatedToJson() throws Exception {
         Survey survey = new Survey();
+        BasicTestSurveyCreator.mockSurveyUri(survey, "basic");
         Survey connectedSurvey = new Survey();
+        BasicTestSurveyCreator.mockSurveyUri(connectedSurvey, "connected");
         connectTwoSurveys(survey, survey.getOrigin(), connectedSurvey, connectedSurvey.getOrigin());
         String translated = MetadataTranslater.translate(survey);
         Assert.assertEquals(

@@ -795,7 +795,8 @@ public class GraphView extends View {
         if (doTranslatedConnectedSurveysNeedUpdating()) {
             try {
                 this.translatedConnectedSurveys =
-                        ConnectedSurveys.getTranslatedConnectedSurveys(activity, survey, projection);
+                        ConnectedSurveys.getTranslatedConnectedSurveys(
+                                activity.getProjectionType(), survey, projection);
             } catch (Exception exception) {
                 Log.e("Error getting translated connected surveys");
                 Log.e(exception);

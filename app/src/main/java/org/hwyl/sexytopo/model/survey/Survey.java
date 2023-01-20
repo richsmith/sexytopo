@@ -76,7 +76,7 @@ public class Survey {
     }
 
     public Uri getUri() {
-        return getDirectory().getUri();
+        return directory == null? null : getDirectory().getUri();
     }
 
     public void setActiveStation(Station activeStation) {
@@ -187,7 +187,7 @@ public class Survey {
 
     public void connect(Station joinInThisSurvey, Survey survey, Station joinInOtherSurvey) {
 
-        if (survey.getName().equals(getName())) {
+        if (this.equals(survey)) {
             throw new IllegalArgumentException("Can't join a survey onto itself");
         } else if (isConnectedTo(survey)) {
             throw new IllegalArgumentException("Already connected to that survey");
@@ -239,7 +239,7 @@ public class Survey {
         if (stationsToSurveyConnections.containsKey(station)) {
             Set<SurveyConnection> connections = getSurveysConnectedTo(station);
             for (SurveyConnection connection : connections) {
-                if (connection.otherSurvey.getName().equals(surveyName)) {
+                if (connection.otherSurvey.equals(other)) {
                     return true;
                 }
             }
@@ -438,9 +438,12 @@ public class Survey {
         }
 
         Survey other = (Survey)object;
-
-        // name is enforced to be unique
-        return name.equals(other.name);
+        Uri uri = getUri();
+        Uri otherUri = other.getUri();
+        if (uri == null || otherUri == null) {
+            return false;
+        }
+        return uri.equals(otherUri);
 
     }
 

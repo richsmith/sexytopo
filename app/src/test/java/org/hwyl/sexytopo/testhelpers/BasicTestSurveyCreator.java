@@ -1,5 +1,12 @@
 package org.hwyl.sexytopo.testhelpers;
 
+import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.when;
+
+import android.net.Uri;
+
+import androidx.documentfile.provider.DocumentFile;
+
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -14,7 +21,7 @@ public class BasicTestSurveyCreator {
 
 
     public static Survey createStraightNorthThroughRepeats() {
-        Survey survey = new Survey("Test Straight Survey North");
+        Survey survey = new Survey();
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 Leg leg = new Leg(5, 0, 0);
@@ -26,7 +33,7 @@ public class BasicTestSurveyCreator {
 
 
     public static Survey createStraightNorth() {
-        Survey survey = new Survey("Test Straight Survey North");
+        Survey survey = new Survey();
 
         Leg leg0 = new Leg(5, 0, 0);
         SurveyUpdater.updateWithNewStation(survey, leg0);
@@ -42,7 +49,7 @@ public class BasicTestSurveyCreator {
 
 
     public static Survey createStraightSouth() {
-        Survey survey = new Survey("Test Straight Survey South");
+        Survey survey = new Survey();
 
         Leg leg0 = new Leg(5, 180, 0);
         SurveyUpdater.updateWithNewStation(survey, leg0);
@@ -59,7 +66,7 @@ public class BasicTestSurveyCreator {
 
 
     public static Survey createRightRight() {
-        Survey survey = new Survey("Test n-shaped Survey");
+        Survey survey = new Survey();
 
         Leg leg0 = new Leg(5, 0, 0);
         SurveyUpdater.updateWithNewStation(survey, leg0);
@@ -76,7 +83,7 @@ public class BasicTestSurveyCreator {
 
 
     public static Survey create5MDown() {
-        Survey survey = new Survey("Test Survey 1m Down");
+        Survey survey = new Survey();
 
         Leg leg0 = new Leg(5, 0, -90);
         SurveyUpdater.updateWithNewStation(survey, leg0);
@@ -86,7 +93,7 @@ public class BasicTestSurveyCreator {
 
 
     public static Survey create5MEast() {
-        Survey survey = new Survey("Test Survey 5m east");
+        Survey survey = new Survey();
 
         Leg leg0 = new Leg(5, 90, 0);
         SurveyUpdater.updateWithNewStation(survey, leg0);
@@ -101,7 +108,7 @@ public class BasicTestSurveyCreator {
 
 
     public static Survey createStraightNorthWith1EBranch() {
-        Survey survey = new Survey("Test Straight Survey North With 1E Branch");
+        Survey survey = new Survey();
 
         Leg leg0 = new Leg(5, 0, 0);
         SurveyUpdater.updateWithNewStation(survey, leg0);
@@ -121,7 +128,7 @@ public class BasicTestSurveyCreator {
 
 
     public static Survey createStraightNorthWith2EBranch() {
-        Survey survey = new Survey("Test Straight Survey North With 2E Branch");
+        Survey survey = new Survey();
 
         Leg leg0 = new Leg(5, 0, 0);
         SurveyUpdater.updateWithNewStation(survey, leg0);
@@ -144,7 +151,7 @@ public class BasicTestSurveyCreator {
 
 
     public static Survey createStraightNorthWith2EBranchFromS2() {
-        Survey survey = new Survey("Test Straight Survey North With 2E Branch");
+        Survey survey = new Survey();
 
         Leg leg0 = new Leg(5, 0, 0);
         SurveyUpdater.updateWithNewStation(survey, leg0);
@@ -168,7 +175,7 @@ public class BasicTestSurveyCreator {
 
     @SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
     public static Survey createStraightNorthWithTrip() {
-        Survey survey = new Survey("Test Straight Survey North");
+        Survey survey = new Survey();
 
         List<Trip.TeamEntry> team = new ArrayList<>();
         team.add(new Trip.TeamEntry(
@@ -189,5 +196,14 @@ public class BasicTestSurveyCreator {
         SurveyUpdater.updateWithNewStation(survey, leg2);
 
         return survey;
+    }
+
+    public static void mockSurveyUri(Survey survey, String uri) {
+        Uri mockUri = mock(Uri.class);
+        when(mockUri.toString()).thenReturn(uri);
+        DocumentFile mockDocumentFile = mock(DocumentFile.class);
+        when(mockDocumentFile.getUri()).thenReturn(mockUri);
+        when(mockDocumentFile.getName()).thenReturn(uri);
+        survey.setDirectory(mockDocumentFile);
     }
 }
