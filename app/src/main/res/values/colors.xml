@@ -2,15 +2,6 @@
 
 <resources>
     <color name="panelBackground">#7FAF7F</color>
-    <color name="headerBackground">#7FAF7F</color>
-
-    <color name="sketchBlack">#000000</color>
-    <color name="sketchBlue">#0000FF</color>
-    <color name="paintGreen">#00FF00</color>
-    <color name="sketchOrange">#FFA500</color>
-
-    <color name="error">#FF0000</color>
-    <color name="standard">#000000</color>
 
     <color name="tableBackground">#DFDFDF</color>
 
