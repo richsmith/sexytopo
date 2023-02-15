@@ -12,7 +12,6 @@
     <string name="action_dev">Dev</string>
     <string name="action_device">Instrument</string>
     <string name="action_device_connect">Connect…</string>
-    <string name="action_calibration">Calibration…</string>
     <string name="action_trip">Current Trip</string>
     <string name="action_help">Help</string>
     <string name="action_guide">Guide</string>
@@ -41,7 +40,6 @@
     <string name="action_force_crash">Force crash (danger!)</string>
     <string name="loaded">Loaded</string>
     <string name="restored">Restored</string>
-    <string name="external_storage_unwriteable">WARNING: Can\'t write to external storage (will use internal storage instead)</string>
     <string name="table_head_from">From</string>
     <string name="table_head_to">To</string>
     <string name="table_head_distance">Dist</string>
@@ -54,7 +52,6 @@
     <string name="title_activity_elevation">Elevation</string>
     <string name="title_activity_device">Connect</string>
     <string name="title_activity_system_log">System Log</string>
-    <string name="menu_context_title">Station</string>
     <string name="menu_set_active_station">Set Active Station</string>
     <string name="menu_rename_station">Rename Station</string>
     <string name="menu_edit_leg">Edit Row</string>
@@ -65,8 +62,6 @@
     <string name="menu_jump_to">Jump</string>
     <string name="menu_jump_to_station_in_plan">→ Plan</string>
     <string name="menu_jump_to_station_in_elevation">→ Elevation</string>
-    <string name="menu_station_label">Station</string>
-    <string name="menu_select">Select</string>
     <string name="menu_new_cross_section">New Cross-Section</string>
     <string name="menu_jump_to_station_in_table">→ Data Table</string>
     <string name="menu_delete_station">Delete</string>
@@ -97,13 +92,8 @@
     <string name="sketch_menu_show_splays">Show Splays</string>
     <string name="sketch_menu_show_sketch">Show Sketch</string>
     <string name="sketch_menu_show_connect">Linked Surveys</string>
-    <string name="sketch_menu_back_measurements">Reverse Legs</string>
-    <string name="title_activity_start_up">StartUpActivity</string>
     <string name="default_survey_name">NewSurvey</string>
-    <string name="loading_survey">Loading</string>
-    <string name="loading_survey_error">Failed; error loading survey</string>
     <string name="title_activity_survey">Stats</string>
-    <string name="field_survey_name">Survey Name</string>
     <string name="open_survey">Open Survey</string>
     <string name="link_survey">Link Survey</string>
     <string name="link_survey_station">Choose station to link active station to</string>
@@ -139,32 +129,24 @@
     <string name="leg">Leg</string>
     <string name="splay">Splay</string>
     <string name="not_applicable">N/A</string>
-    <string name="title_activity_help">Help</string>
     <string name="title_activity_guide">Guide</string>
     <string name="bluetooth_status">1. Bluetooth</string>
     <string name="connect_automatically">3. Connect</string>
-    <string name="bluetooth_none">No Bluetooth capabilities</string>
     <string name="paired_status">2. Paired With</string>
     <string name="request_pair">Pair</string>
     <string name="request_unpair">Unpair</string>
-    <string name="bluetooth_on">On</string>
     <string name="no_device">no device</string>
-    <string name="bluetooth_off">Off</string>
     <string name="disto_connection_instructions">To pair: turn on the instrument, click \'Pair…\', wait, and enter \'0000\' if a code is requested.</string>
     <string name="device_log_connection_requested">Connection requested</string>
-    <string name="device_trying_fallback">Failed to create socket; trying fallback socket</string>
     <string name="pairing_request">PAIRING requested\n-> Perform pairing steps. Connect again</string>
     <string name="device_log_connected">Connected :)</string>
     <string name="device_log_not_connected">Not connected :(</string>
-    <string name="device_log_connecting">Connecting&#8230;</string>
     <string name="device_log_ready_for_measurements">Ready to receive data</string>
     <string name="device_log_received">Received measurement</string>
     <string name="device_log_connection_stop_requested">Connection close requested</string>
     <string name="device_log_stopping">Closing connection&#8230;</string>
     <string name="device_log_stopped">Connection closed</string>
     <string name="title_activity_calibration">Calibration</string>
-    <string name="log">Log</string>
-    <string name="clear_log">Clear</string>
     <string name="error_prefix">Error:</string>
     <string name="manual_add_station_title">Add Station</string>
     <string name="manual_add_splay_title">Add Splay</string>
@@ -177,12 +159,9 @@
     <string name="manual_edit_right">Right (m)</string>
     <string name="manual_edit_up">Up (m)</string>
     <string name="manual_edit_down">Down (m)</string>
-    <string name="replace_question">Survey with that name already exists. Replace?</string>
     <string name="continue_question">Continue?</string>
-    <string name="delete_question">Delete?</string>
     <string name="exit_question">Exit?</string>
     <string name="no_data">No Data</string>
-    <string name="delete_row_question">Delete Row?</string>
     <string name="stats_title_this_survey">Current Survey</string>
     <string name="stats_title_linked_surveys">All Linked Surveys</string>
     <string name="stats_number_linked_surveys">Number of Surveys</string>
@@ -193,7 +172,6 @@
     <string name="stats_number_splays">Number of Splays</string>
     <string name="stats_longest_leg">Longest Leg (m)</string>
     <string name="stats_shortest_leg">Shortest Leg (m)</string>
-    <string name="pref_station_symbol">Station symbol</string>
     <string name="position_cross_section_instruction">Select where to draw cross-section</string>
     <string name="warning_survey_not_saved">Warning: current survey not saved</string>
     <string name="survey_already_exists">Warning: a survey with that name already exists</string>
@@ -202,7 +180,6 @@
     <string name="third_party_survex">Survex</string>
     <string name="third_party_compass">Compass</string>
     <string name="third_party_svg">SVG</string>
-    <string name="calibration_wrong_device">No connected DistoX</string>
     <string name="calibration_index">Reading number</string>
     <string name="calibration_start">Disto Cal Mode On</string>
     <string name="calibration_stop">Disto Cal Mode Off</string>
@@ -247,8 +224,4 @@
     <string name="dialog_confirm_clear_trip">Clear Trip Data?</string>
     <string name="comments">Comments</string>
     <string name="save_trip">Save Trip</string>
-    <plurals name="instruments">
-        <item quantity="one">%1$s instrument</item>
-        <item quantity="other">%1$s instruments</item>
-    </plurals>
 </resources>
