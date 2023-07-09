@@ -235,7 +235,6 @@ public class Survey {
     }
 
     private boolean isStationConnectedTo(Station station, Survey other) {
-        String surveyName = other.getName();
         if (stationsToSurveyConnections.containsKey(station)) {
             Set<SurveyConnection> connections = getSurveysConnectedTo(station);
             for (SurveyConnection connection : connections) {
@@ -450,7 +449,12 @@ public class Survey {
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        Uri uri = getUri();
+        if (uri != null) {
+            return uri.hashCode();
+        } else {
+            return getName().hashCode();
+        }
     }
 
     @NonNull

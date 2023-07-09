@@ -76,12 +76,12 @@ public class ConnectedSurveys {
     private static boolean haveWeAlreadyDoneThisSurvey(
             Map<Survey, Space<Coord2D>> translated, Survey survey, Survey original) {
 
-        if (original.getName().equals(survey.getName())) {
+        if (original.equals(survey)) {
             return true;
         }
 
         for (Survey doneSurvey : translated.keySet()) {
-            if (doneSurvey.getName().equals(survey.getName())) {
+            if (doneSurvey.getUri().equals(survey.getUri())) {
                 return true;
             }
         }
