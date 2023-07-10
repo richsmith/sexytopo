@@ -109,8 +109,6 @@
     <string name="link_survey_station">Choose station to link active station to</string>
     <string name="unlink_survey">Unlink Survey</string>
     <string name="no_surveys">No surveys found to open</string>
-    <string name="select_export_type">Select export format</string>
-    <string name="export_successful">export completed</string>
     <string name="dialog_new_survey_title">New Survey: Enter Name</string>
     <string name="dialog_new_survey_name_must_be_unique">Failed: survey name must be unique</string>
     <string name="survey_saved">Saved</string>
@@ -138,37 +136,12 @@
     <string name="add">Add</string>
     <string name="edit">Edit</string>
     <string name="this_will_delete">This will delete:</string>
-    <string name="dialog_confirm_clear_title">Clear Calibration Readings?</string>
     <string name="station">Station</string>
     <string name="leg">Leg</string>
     <string name="splay">Splay</string>
     <string name="not_applicable">N/A</string>
     <string name="title_activity_help">Help</string>
     <string name="title_activity_guide">Guide</string>
-    <string name="bluetooth_status">1. Bluetooth</string>
-    <string name="connect_automatically">3. Connect</string>
-    <string name="bluetooth_none">No Bluetooth capabilities</string>
-    <string name="paired_status">2. Paired With</string>
-    <string name="request_pair">Pair</string>
-    <string name="request_unpair">Unpair</string>
-    <string name="bluetooth_on">On</string>
-    <string name="no_device">no device</string>
-    <string name="bluetooth_off">Off</string>
-    <string name="disto_connection_instructions">To pair: turn on the instrument, click \'Pair…\', wait, and enter \'0000\' if a code is requested.</string>
-    <string name="device_log_connection_requested">Connection requested</string>
-    <string name="device_trying_fallback">Failed to create socket; trying fallback socket</string>
-    <string name="pairing_request">PAIRING requested\n-> Perform pairing steps. Connect again</string>
-    <string name="device_log_connected">Connected :)</string>
-    <string name="device_log_not_connected">Not connected :(</string>
-    <string name="device_log_connecting">Connecting&#8230;</string>
-    <string name="device_log_ready_for_measurements">Ready to receive data</string>
-    <string name="device_log_received">Received measurement</string>
-    <string name="device_log_connection_stop_requested">Connection close requested</string>
-    <string name="device_log_stopping">Closing connection&#8230;</string>
-    <string name="device_log_stopped">Connection closed</string>
-    <string name="title_activity_calibration">Calibration</string>
-    <string name="log">Log</string>
-    <string name="clear_log">Clear</string>
     <string name="error_prefix">Error:</string>
     <string name="manual_add_station_title">Add Station</string>
     <string name="manual_add_splay_title">Add Splay</string>
@@ -187,25 +160,37 @@
     <string name="exit_question">Exit?</string>
     <string name="no_data">No Data</string>
     <string name="delete_row_question">Delete Row?</string>
-    <string name="stats_title_this_survey">Current Survey</string>
-    <string name="stats_title_linked_surveys">All Linked Surveys</string>
-    <string name="stats_number_linked_surveys">Number of Surveys</string>
-    <string name="stats_length">Length (m)</string>
-    <string name="stats_vertical_range">Vertical Range (m)</string>
-    <string name="stats_number_stations">Number of Stations</string>
-    <string name="stats_number_legs">Number of Legs</string>
-    <string name="stats_number_splays">Number of Splays</string>
-    <string name="stats_longest_leg">Longest Leg (m)</string>
-    <string name="stats_shortest_leg">Shortest Leg (m)</string>
     <string name="pref_station_symbol">Station symbol</string>
     <string name="position_cross_section_instruction">Select where to draw cross-section</string>
     <string name="warning_survey_not_saved">Warning: current survey not saved</string>
     <string name="survey_already_exists">Warning: a survey with that name already exists</string>
+
+
+    <!-- Import / Export -->
+    <string name="export_select_type">Select export format</string>
+    <string name="export_select_destination">Select export folder</string>
+    <string name="export_successful">Export completed</string>
     <string name="third_party_therion">Therion</string>
     <string name="third_party_pocket_topo_txt">PocketTopo .txt</string>
     <string name="third_party_survex">Survex</string>
     <string name="third_party_compass">Compass</string>
     <string name="third_party_svg">SVG</string>
+
+    <!-- Calibration -->
+    <string name="title_activity_calibration">Calibration</string>
+    <string name="bluetooth_status">1. Bluetooth</string>
+    <string name="paired_status">2. Paired With</string>
+    <string name="connect_automatically">3. Connect</string>
+    <string name="bluetooth_none">No Bluetooth capabilities</string>
+    <string name="request_pair">Pair</string>
+    <string name="request_unpair">Unpair</string>
+    <string name="bluetooth_on">On</string>
+    <string name="no_device">no device</string>
+    <string name="bluetooth_off">Off</string>
+    <string name="disto_connection_instructions">To pair: turn on the instrument, click \'Pair…\', wait, and enter \'0000\' if a code is requested.</string>
+    <string name="device_log_connection_requested">Connection requested</string>
+    <string name="device_trying_fallback">Failed to create socket; trying fallback socket</string>
+    <string name="pairing_request">PAIRING requested\n-> Perform pairing steps. Connect again</string>
     <string name="calibration_wrong_device">No connected DistoX</string>
     <string name="calibration_index">Reading number</string>
     <string name="calibration_start">Disto Cal Mode On</string>
@@ -243,7 +228,13 @@
     <string name="orientation_face_right">Face Right</string>
     <string name="orientation_face_down">Face Down</string>
     <string name="orientation_face_left">Face Left</string>
-    <string name="killing_comms_process">Killing comms process</string>
+    <string name="dialog_confirm_clear_title">Clear Calibration Readings?</string>
+    <plurals name="instruments">
+        <item quantity="one">%1$s instrument</item>
+        <item quantity="other">%1$s instruments</item>
+    </plurals>
+
+    <!-- Trip -->
     <string name="trip">Trip</string>
     <string name="team">Team</string>
     <string name="dialog_title_add_to_team">Add to Team</string>
@@ -251,9 +242,33 @@
     <string name="dialog_confirm_clear_trip">Clear Trip Data?</string>
     <string name="comments">Comments</string>
     <string name="save_trip">Save Trip</string>
+
+    <!-- Stats -->
+    <string name="stats_title_this_survey">Current Survey</string>
+    <string name="stats_title_linked_surveys">All Linked Surveys</string>
+    <string name="stats_number_linked_surveys">Number of Surveys</string>
+    <string name="stats_length">Length (m)</string>
+    <string name="stats_vertical_range">Vertical Range (m)</string>
+    <string name="stats_number_stations">Number of Stations</string>
+    <string name="stats_number_legs">Number of Legs</string>
+    <string name="stats_number_splays">Number of Splays</string>
+    <string name="stats_longest_leg">Longest Leg (m)</string>
+    <string name="stats_shortest_leg">Shortest Leg (m)</string>
+
+    <!-- Logging -->
+    <string name="log">Log</string>
+    <string name="clear_log">Clear</string>
+    <string name="device_log_connected">Connected :)</string>
+    <string name="device_log_not_connected">Not connected :(</string>
+    <string name="device_log_connecting">Connecting&#8230;</string>
+    <string name="device_log_ready_for_measurements">Ready to receive data</string>
+    <string name="device_log_received">Received measurement</string>
+    <string name="device_log_connection_stop_requested">Connection close requested</string>
+    <string name="device_log_stopping">Closing connection&#8230;</string>
+    <string name="device_log_stopped">Connection closed</string>
+
+    <!-- Misc -->
+    <string name="killing_comms_process">Killing comms process</string>
     <string name="error_no_filesystem">Error: no access to filesystem. Can\'t save files.</string>
-    <plurals name="instruments">
-        <item quantity="one">%1$s instrument</item>
-        <item quantity="other">%1$s instruments</item>
-    </plurals>
+
 </resources>

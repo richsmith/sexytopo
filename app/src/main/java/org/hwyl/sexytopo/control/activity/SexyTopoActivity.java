@@ -287,9 +287,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     @SuppressLint("UnusedDeclaration")  // called through Reflection
     public void requestImportSurvey() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            selectDocumentTree(SexyTopo.REQUEST_CODE_IMPORT_SURVEY, R.string.intent_import_title);
-        }
+        selectDocumentTree(SexyTopo.REQUEST_CODE_IMPORT_SURVEY, R.string.intent_import_title);
     }
 
     public void requestDeleteSurvey() {
@@ -452,18 +450,10 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         AlertDialog.Builder builderSingle = new AlertDialog.Builder(
                 this);
 
-        builderSingle.setTitle(getString(R.string.select_export_type));
+        builderSingle.setTitle(getString(R.string.export_select_type));
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.select_dialog_item);
-
-        final Map<String, Exporter> nameToExporter = new HashMap<>();
-
-        for (Exporter exporter : SelectableExporters.EXPORTERS) {
-            String name = exporter.getExportTypeName(this);
-            arrayAdapter.add(name);
-            nameToExporter.put(name, exporter);
-        }
 
         builderSingle.setNegativeButton(getString(R.string.cancel),
                 (dialog, which) -> dialog.dismiss());
@@ -471,15 +461,9 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         builderSingle.setAdapter(arrayAdapter,
                 (dialog, which) -> {
                     String name = arrayAdapter.getItem(which);
-                    Exporter selectedExporter = nameToExporter.get(name);
-                    try {
-                        assert selectedExporter != null;
-                        selectedExporter.export(SexyTopoActivity.this, survey);
-                        showSimpleToast(survey.getName() + " " +
-                                getString(R.string.export_successful));
-                    } catch (Exception exception) {
-                        showExceptionAndLog(exception);
-                    }
+                    Exporter exporter = SelectableExporters.fromName(this, name);
+                    int requestCode = exporter.getRequestCode();
+                    selectDocumentTree(requestCode, R.string.export_select_destination);
                 });
         builderSingle.show();
     }
@@ -651,18 +635,18 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     protected void selectDocumentTree(int requestCode, Integer titleId) {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Uri uri = getInitialUri();
-            if (uri != null) {
-                intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, uri);
-            }
+        Uri uri = getInitialUri();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && uri != null) {
+            intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, uri);
         }
 
         if (titleId != null) {
             String title = getString(titleId);
-            intent.putExtra(Intent.EXTRA_TITLE, getString(titleId));
+            showSimpleToast(title);
+            intent.putExtra(Intent.EXTRA_TITLE, title);
+            intent = Intent.createChooser(intent, title);
         }
-        intent = Intent.createChooser(intent, "hello!");
+
         startActivityForResult(intent, requestCode);
     }
 
@@ -696,8 +680,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode,
-                                 Intent resultData) {
+    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
 
         if (resultData == null) {
             return;

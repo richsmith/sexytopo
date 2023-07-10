@@ -1,5 +1,7 @@
 package org.hwyl.sexytopo.control.io.translation;
 
+import android.content.Context;
+
 import org.hwyl.sexytopo.control.io.thirdparty.compass.CompassExporter;
 import org.hwyl.sexytopo.control.io.thirdparty.pockettopo.PocketTopoTxtExporter;
 import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexExporter;
@@ -19,5 +21,14 @@ public class SelectableExporters {
         new CompassExporter(),
         new SvgExporter()
     );
+
+    public static Exporter fromName(Context context, String name) {
+        for (Exporter exporter: EXPORTERS) {
+            if (exporter.getExportTypeName(context).equals(name)) {
+                return exporter;
+            }
+        }
+        return null;
+    }
 
 }
