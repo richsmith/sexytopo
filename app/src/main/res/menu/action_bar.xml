@@ -102,6 +102,8 @@
                 android:title="@string/action_debug_mode" />
             <item android:id="@+id/action_kill_connection"
                   android:title="@string/action_kill_connection" />
+            <item android:id="@+id/action_trigger_autosave"
+                  android:title="@string/action_trigger_autosave" />
             <item android:id="@+id/action_force_crash"
                   android:title="@string/action_force_crash"
                   android:visible="true"/>

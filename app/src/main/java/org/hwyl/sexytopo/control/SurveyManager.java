@@ -71,9 +71,13 @@ public class SurveyManager {
                 broadcastNewStationCreated();
             }
 
-            new AutosaveTask().execute(context);
+            autosave();
         }
 
+    }
+
+    public void autosave() {
+        new AutosaveTask().execute(context);
     }
 
 

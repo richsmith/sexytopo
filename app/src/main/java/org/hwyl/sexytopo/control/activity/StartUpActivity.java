@@ -24,7 +24,7 @@ public class StartUpActivity extends SexyTopoActivity {
         Log.setContext(this.getApplicationContext());
         Log.load(Log.LogType.SYSTEM);
         Log.i("--------------------");
-        Log.i("Starting up");
+        Log.i(R.string.log_starting_up);
 
         try {
             Intent serviceIntent = new Intent(this, NewStationNotificationService.class);
@@ -33,7 +33,7 @@ public class StartUpActivity extends SexyTopoActivity {
         } catch (Exception exception) {
             // Not mission-critical, so carry on if this doesn't work
             // (some users seem to have had problems according to the log)
-            Log.e("Unable to start new station notification intent");
+            Log.e(R.string.log_error_no_station_notification_intent);
             Log.e(exception);
         }
 

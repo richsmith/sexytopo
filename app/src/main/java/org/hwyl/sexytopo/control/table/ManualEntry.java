@@ -154,8 +154,8 @@ public class ManualEntry {
         builder
             .setView(dialogView)
             .setTitle(R.string.manual_add_station_title)
-            .setPositiveButton("Save", (dialog, buttonId) -> { /* Do nothing */ })
-            .setNegativeButton("Cancel", (dialog, buttonId) -> { /* Do nothing */ });
+            .setPositiveButton(R.string.save, null)
+            .setNegativeButton(R.string.cancel, null);
 
         final AlertDialog dialog = builder.create();
 
@@ -163,7 +163,7 @@ public class ManualEntry {
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         dialog.show();
 
-        dialog.setButton(DialogInterface.BUTTON_POSITIVE, "Save",
+        dialog.setButton(DialogInterface.BUTTON_POSITIVE, tableActivity.getString(R.string.save),
                 (dialogInterface, buttonId) -> {
 
                     Float distance = getFieldValue(dialog, R.id.editDistance);
