@@ -100,13 +100,18 @@ public class Loader {
     }
 
     private static SurveyFile considerSwappingForAutosave(
-            Context context, SurveyFile surveyFile, boolean restoreAutosave) {
-        if (restoreAutosave && surveyFile.exists(context)) {
-                return SurveyFile.DATA.AUTOSAVE.get(surveyFile.getSurvey());
-        } else {
-            return surveyFile;
+            Context context,
+            SurveyFile surveyFile,
+            boolean restoreAutosave) {
+
+        if (restoreAutosave) {
+            SurveyFile autosaveVersion = surveyFile.getAutosaveVersion();
+            if (autosaveVersion.exists(context)) {
+                return autosaveVersion;
+            }
         }
 
+        return surveyFile;
     }
 
 

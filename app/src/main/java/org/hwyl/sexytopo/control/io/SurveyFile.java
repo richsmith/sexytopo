@@ -96,6 +96,15 @@ public class SurveyFile extends AbstractSurveyFile {
         return documentFile;
     }
 
+    public SurveyFile getAutosaveVersion() {
+        SurveyFileType autosaveType = surveyFileType.AUTOSAVE;
+        if (autosaveType == null) {
+            return this;
+        } else {
+            return autosaveType.get(survey);
+        }
+    }
+
     public void save(Context context, String contents) throws IOException {
         parent.ensureExists(context);
         DocumentFile documentFile = getOrCreateDocumentFile(context);

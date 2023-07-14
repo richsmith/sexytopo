@@ -240,6 +240,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             toggleDebugMode();
             return true;
         } else if (itemId == R.id.action_trigger_autosave) {
+            getSurvey().setAutosaved(false);
             getSurveyManager().autosave();
             return true;
         }else if (itemId == R.id.action_kill_connection) {
