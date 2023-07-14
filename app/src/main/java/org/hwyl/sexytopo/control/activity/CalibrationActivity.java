@@ -292,9 +292,9 @@ public class CalibrationActivity extends SexyTopoActivity {
                 "\n\nCalibration algorithm: " + (useNonLinearity? "Non-Linear" : "Linear");
 
         new AlertDialog.Builder(this)
-            .setTitle(getString(R.string.calibration_assessment))
+            .setTitle(R.string.calibration_assessment)
             .setMessage(message)
-            .setPositiveButton(getString(R.string.calibration_update), (dialog, whichButton) -> {
+            .setPositiveButton(R.string.calibration_update, (dialog, whichButton) -> {
                 try {
                     byte[] coeffs = calibrationCalculator.getCoefficients();
                     Byte[] coefficients = ArrayUtils.toObject(coeffs);
@@ -304,10 +304,8 @@ public class CalibrationActivity extends SexyTopoActivity {
                 } finally {
                     updateState();
                 }
-            }).setNegativeButton(getString(R.string.cancel),
-                (dialog, whichButton) -> {
-                    // Do nothing.
-                }).show();
+            }).setNegativeButton(R.string.cancel, null)
+            .show();
 
 
     }
@@ -321,13 +319,12 @@ public class CalibrationActivity extends SexyTopoActivity {
 
     public void requestClearCalibration(View view) {
         new AlertDialog.Builder(this)
-            .setTitle(getString(R.string.dialog_confirm_clear_title))
+            .setTitle(R.string.dialog_confirm_clear_title)
             .setPositiveButton(getString(R.string.clear), (dialog, whichButton) -> {
                 getSurveyManager().clearCalibrationReadings();
                 syncWithReadings();
-            }).setNegativeButton(getString(R.string.cancel), (dialog, whichButton) -> {
-                // Do nothing.
-            }).show();
+            }).setNegativeButton(R.string.cancel, null)
+            .show();
     }
 
 
