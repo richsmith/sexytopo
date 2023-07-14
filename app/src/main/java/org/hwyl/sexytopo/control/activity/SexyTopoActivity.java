@@ -256,6 +256,15 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     }
 
+
+    // ***************  Top-level user-requested actions  ***************
+
+    @SuppressLint("UnusedDeclaration") // called through Reflection
+    public void requestStartNewSurvey() {
+        Log.d("Starting new survey");
+        startNewSurvey();
+    }
+
     public void requestSave() {
         Survey survey = getSurvey();
 
@@ -286,7 +295,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             R.string.intent_open_title);
     }
 
-    @SuppressLint("UnusedDeclaration")
+    @SuppressLint("UnusedDeclaration") // called through Reflection
     public void requestLinkExistingSurvey() {
         selectDirectory(
             SexyTopo.REQUEST_CODE_SELECT_SURVEY_TO_LINK,
@@ -648,6 +657,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         return PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
     }
 
+    @SuppressWarnings({"CommentedOutCode", "UnusedDeclaration"})
     protected void createDirectory(
             int requestCode, StartLocation startLocation, Integer stringId) {
         throw new UnsupportedOperationException(
@@ -655,7 +665,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
         // This "works", as in gets the user to create a directory, but results in
         // a URI that cannot be used to get a DocumentFile that is usable as a directory.
-        // Fuck you Google for this scoped storage shit.
+        // Fuck you Google for this half-arsed scoped storage shit.
+        // Maybe we'll figure out a workaround to use this...
         // Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         // intent.setType(DocumentsContract.Document.MIME_TYPE_DIR);
         // startFileOperation(intent, requestCode, startLocation, stringId);
@@ -731,12 +742,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, parentUri);
                 break;
         }
-    }
-
-
-    public void requestStartNewSurvey() {  // public due to stupid Reflection requirements
-        Log.d("Starting new survey");
-        startNewSurvey();
     }
 
     protected void startNewSurvey() {
@@ -989,11 +994,11 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             final Object... args) {
 
         new AlertDialog.Builder(this)
-            .setTitle(getString(titleId))
-            .setMessage(getString(messageId))
+            .setTitle(titleId)
+            .setMessage(messageId)
             .setPositiveButton(confirmId,
                     (dialog, whichButton) -> invokeMethod(methodToCallIfProceeding, args))
-            .setNegativeButton(getString(cancelId), null)
+            .setNegativeButton(cancelId, null)
             .show();
     }
 
@@ -1066,7 +1071,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                         showExceptionAndLog(exception);
                     }
                 })
-                .setNegativeButton(getString(R.string.cancel), null)
+                .setNegativeButton(R.string.cancel, null)
                 .show();
 
     }
@@ -1187,7 +1192,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             }
         }
 
-
         @Override
         protected void onPostExecute(Boolean wasSuccessful) {
             if (wasSuccessful) {
@@ -1195,7 +1199,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 SexyTopoActivity.this.redraw();
                 showSimpleToast(R.string.survey_saved);
             } else {
-                showSimpleToast(getString(R.string.error_saving_survey));
+                showSimpleToast(R.string.error_saving_survey);
             }
         }
     }
