@@ -255,7 +255,7 @@ public class ManualEntry {
                         activity.showSimpleToast("Rename failed");
                     }
                 })
-                .setNegativeButton("Cancel", (ignore, buttonId) -> { /* Do nothing */ })
+                .setNegativeButton(R.string.cancel, null)
                 .create();
 
         dialog.getWindow().setSoftInputMode(
