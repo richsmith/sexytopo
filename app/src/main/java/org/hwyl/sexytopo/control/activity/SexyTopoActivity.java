@@ -59,6 +59,7 @@ import org.hwyl.sexytopo.model.survey.SurveyConnection;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -289,7 +290,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     @SuppressLint("UnusedDeclaration")
     public void requestLinkExistingSurvey() {
         selectDirectory(
-            SexyTopo.REQUEST_CODE_SELECT_SURVEY_TO_LINK,
+                SexyTopo.REQUEST_CODE_SELECT_SURVEY_TO_LINK,
             StartLocation.SURVEY_PARENT,
                 R.string.intent_link_title);
     }
@@ -479,6 +480,14 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.select_dialog_item);
+
+        final Map<String, Exporter> nameToExporter = new HashMap<>();
+
+        for (Exporter exporter : SelectableExporters.EXPORTERS) {
+            String name = exporter.getExportTypeName(this);
+            arrayAdapter.add(name);
+            nameToExporter.put(name, exporter);
+        }
 
         builderSingle.setNegativeButton(getString(R.string.cancel),
                 (dialog, which) -> dialog.dismiss());
