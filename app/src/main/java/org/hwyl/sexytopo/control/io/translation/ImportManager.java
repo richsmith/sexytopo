@@ -38,7 +38,7 @@ public class ImportManager {
             }
         }
 
-        throw new IllegalArgumentException("Cannot import a file of that type");
+        throw new IllegalArgumentException("could not recognise that data");
     }
 
 }

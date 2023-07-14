@@ -51,7 +51,7 @@ public class XviImporter extends Importer {
 
 
     public boolean canHandleFile(DocumentFile file) {
-        return file.getName().endsWith("xvi");
+        return file.isFile() && !file.isDirectory() && file.getName().endsWith("xvi");
     }
 
 

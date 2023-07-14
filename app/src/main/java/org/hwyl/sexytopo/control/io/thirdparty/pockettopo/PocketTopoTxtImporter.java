@@ -53,7 +53,7 @@ public class PocketTopoTxtImporter extends Importer {
 
 
     public boolean canHandleFile(DocumentFile file) {
-        return file.getName().endsWith("txt");
+        return file.isFile() && !file.isDirectory() && file.getName().endsWith("txt");
     }
 
 

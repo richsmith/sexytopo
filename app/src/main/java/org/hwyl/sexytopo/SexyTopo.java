@@ -26,8 +26,10 @@ public class SexyTopo {
     public static final int REQUEST_CODE_SAVE_AS_SURVEY = 1000001;
     public static final int REQUEST_CODE_MOVE_SURVEY = 1000002;
     public static final int REQUEST_CODE_OPEN_SURVEY = 1000003;
-    public static final int REQUEST_CODE_IMPORT_SURVEY = 1000004;
-    public static final int REQUEST_CODE_SELECT_SURVEY_TO_LINK = 1000005;
+    public static final int REQUEST_CODE_IMPORT_SURVEY_FILE = 1000004;
+    public static final int REQUEST_CODE_IMPORT_SURVEY_DIRECTORY = 1000005;
+    public static final int REQUEST_CODE_SELECT_SURVEY_TO_LINK = 1000006;
+    public static final int REQUEST_CODE_DELETE_SURVEY_DIRECTORY = 1000007;
 
     public static final int REQUEST_CODE_OPEN_CALIBRATION = 1000010;
     public static final int REQUEST_CODE_SAVE_CALIBRATION = 1000011;

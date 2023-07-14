@@ -86,9 +86,16 @@ public class Log {
         save(LogType.SYSTEM);
     }
 
+    public static void d(int stringId) {
+        d(context.getString(stringId));
+    }
     public static void d(String message) {
         android.util.Log.d(SexyTopo.TAG, message);
         systemLog(message, false);
+    }
+
+    public static void e(int stringId) {
+        e(context.getString(stringId));
     }
 
     public static void e(String message) {
@@ -100,6 +107,10 @@ public class Log {
     public static void e(Throwable throwable) {
         e("" + throwable.getMessage());
         e(android.util.Log.getStackTraceString(throwable));
+    }
+
+    public static void i(int stringId) {
+        i(context.getString(stringId));
     }
 
     public static void i(String message) {

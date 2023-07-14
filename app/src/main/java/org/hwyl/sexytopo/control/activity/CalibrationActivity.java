@@ -29,6 +29,7 @@ import org.hwyl.sexytopo.comms.distox.WriteCalibrationProtocol;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.calibration.CalibrationCalculator;
 import org.hwyl.sexytopo.control.io.IoUtils;
+import org.hwyl.sexytopo.control.io.StartLocation;
 import org.hwyl.sexytopo.control.io.basic.CalibrationJsonTranslater;
 import org.hwyl.sexytopo.control.util.PreferenceAccess;
 import org.hwyl.sexytopo.control.util.TextTools;
@@ -331,31 +332,33 @@ public class CalibrationActivity extends SexyTopoActivity {
 
 
     public void requestSaveCalibration(View view) {
-            selectDocumentFile(SexyTopo.REQUEST_CODE_SAVE_CALIBRATION);
+        createFile(
+            SexyTopo.REQUEST_CODE_SAVE_CALIBRATION,
+            StartLocation.TOP_LEVEL,
+            "application/json",
+            null);
     }
 
 
     public void requestLoadCalibration(View view) {
-        selectDocumentFile(SexyTopo.REQUEST_CODE_OPEN_CALIBRATION);
+        selectFile(SexyTopo.REQUEST_CODE_OPEN_CALIBRATION, StartLocation.TOP_LEVEL, null);
     }
 
     private void saveCalibration(Uri uri) throws JSONException, IOException {
         DocumentFile file = DocumentFile.fromSingleUri(this, uri);
         String contents = CalibrationJsonTranslater.toText(calibrationReadings);
         IoUtils.saveToFile(this, file, contents);
+        Log.i(R.string.calibration_saved_to_file);
     }
 
-    private void loadCalibration(Uri uri) throws JSONException {
+    private void loadCalibration(Uri uri) throws JSONException, IOException {
         DocumentFile file = DocumentFile.fromSingleUri(this, uri);
-        try {
-            String content = IoUtils.slurpFile(this, file);
-            List<CalibrationReading> calibrationReadings =
-                    CalibrationJsonTranslater.toCalibrationReadings(content);
-            getSurveyManager().setCalibrationReadings(calibrationReadings);
-            syncWithReadings();
-        } catch (IOException exception) {
-            showExceptionAndLog("Error reading calibration file ", exception);
-        }
+        String content = IoUtils.slurpFile(this, file);
+        List<CalibrationReading> calibrationReadings =
+            CalibrationJsonTranslater.toCalibrationReadings(content);
+        getSurveyManager().setCalibrationReadings(calibrationReadings);
+        syncWithReadings();
+        Log.i(R.string.calibration_loaded_file);
     }
 
     private boolean useNonLinearAlgorithm() {
@@ -422,7 +425,7 @@ public class CalibrationActivity extends SexyTopoActivity {
             try {
                 saveCalibration(uri);
             } catch (Exception exception) {
-                showExceptionAndLog("Could not save calibration file", exception);
+                showExceptionAndLog(R.string.calibration_save_error, exception);
             }
         }
 

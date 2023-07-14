@@ -150,6 +150,6 @@ public class SurvexImporter extends Importer {
 
     @Override
     public boolean canHandleFile(DocumentFile file) {
-        return file.getName().endsWith("svx");
+        return file.isFile() && !file.isDirectory() && file.getName().endsWith("svx");
     }
 }
