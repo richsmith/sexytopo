@@ -2,7 +2,6 @@ package org.hwyl.sexytopo.control.activity;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -96,18 +95,15 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
 
     public void requestClear(View view) {
         new AlertDialog.Builder(this)
-                .setTitle(getString(R.string.dialog_confirm_clear_trip))
+                .setTitle(R.string.dialog_confirm_clear_trip)
                 .setPositiveButton(R.string.clear, (dialog, whichButton) -> {
                     EditText comments = findViewById(R.id.trip_comments);
                     comments.setText("");
                     team.clear();
                     syncListWithTeam();
                     updateButtonStatus();
-                }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                // Do nothing.
-            }
-        }).show();
+                }).setNegativeButton(R.string.cancel, null)
+                .show();
     }
 
 
@@ -132,9 +128,9 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
 
         AlertDialog.Builder builderSingle =
             new AlertDialog.Builder(this)
-            .setTitle(getString(R.string.dialog_title_add_to_team))
+            .setTitle(R.string.dialog_title_add_to_team)
             .setView(layout)
-            .setPositiveButton(getString(R.string.add),
+            .setPositiveButton(R.string.add,
                     (dialog, which) -> {
                         String name = nameField.getText().toString();
                         SparseBooleanArray checked = roleList.getCheckedItemPositions();
@@ -147,7 +143,7 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
                         addTeamMember(name, selectedRoles);
                         dialog.dismiss();
                     })
-            .setNegativeButton(getString(R.string.cancel),
+            .setNegativeButton(R.string.cancel,
                     (dialog, which) -> dialog.dismiss());
 
         builderSingle.show();
@@ -262,9 +258,9 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
 
         AlertDialog.Builder builderSingle =
                 new AlertDialog.Builder(this)
-                        .setTitle(getString(R.string.edit))
+                        .setTitle(R.string.edit)
                         .setView(layout)
-                        .setPositiveButton(getString(R.string.save),
+                        .setPositiveButton(R.string.save,
                                 (dialog, which) -> {
                                     String name = nameField.getText().toString();
                                     SparseBooleanArray checked = roleList.getCheckedItemPositions();
@@ -277,7 +273,7 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
                                     setTeamMember(position, name, selectedRoles);
                                     dialog.dismiss();
                                 })
-                        .setNegativeButton(getString(R.string.cancel),
+                        .setNegativeButton(R.string.cancel,
                                 (dialog, which) -> dialog.dismiss());
 
         builderSingle.show();
