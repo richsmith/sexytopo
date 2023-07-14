@@ -78,12 +78,12 @@
     <string name="action_force_crash">Force crash (danger!)</string>
 
     <!-- File handling -->
-    <string name="loading_survey">Loading</string>
     <string name="loading_survey_error">Error loading survey</string>
     <string name="link_survey_station">Choose station to link active station to</string>
-    <string name="unlink_survey">Unlink Survey</string>
+    <string name="link_survey_save_error">Error saving new connection</string>
+    <string name="file_unlink_survey_dialog_title">Unlink Survey</string>
     <string name="survey_saved">Saved</string>
-    <string name="error_saving_survey">Failed: survey not saved</string>
+    <string name="error_saving_survey">FAILED to save survey</string>
     <string name="restoring_autosave">Restoring autosave</string>
     <string name="intent_save_as_title">Create a folder to save survey in</string>
     <string name="intent_open_title">Select survey folder</string>
@@ -96,8 +96,9 @@
     <string name="delete_successful">Deletion of survey %1$s successful</string>
     <string name="error_deleting_survey">Error deleting survey</string>
     <string name="cannot_extend_unsaved_survey">Cannot extend unsaved survey</string>
-    <string name="loaded">Loaded</string>
+    <string name="loaded">Loaded  %1$s</string>
     <string name="restored">Restored</string>
+    <string name="file_restore_error">Error restoring autosave</string>
     <string name="warning_survey_not_saved">Warning: current survey not saved</string>
 
     <!-- Context menu(s) -->

@@ -8,6 +8,7 @@ import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexExporter;
 import org.hwyl.sexytopo.control.io.thirdparty.svg.SvgExporter;
 import org.hwyl.sexytopo.control.io.thirdparty.therion.TherionExporter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,4 +32,11 @@ public class SelectableExporters {
         return null;
     }
 
+    public static List<String> getExportTypeNames(Context context) {
+        List<String> names = new ArrayList<>();
+        for (Exporter exporter: EXPORTERS) {
+            names.add(exporter.getExportTypeName(context));
+        }
+        return names;
+    }
 }
