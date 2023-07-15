@@ -6,6 +6,7 @@ import org.hwyl.sexytopo.comms.bric4.Bric4Communicator;
 import org.hwyl.sexytopo.comms.distox.DistoXCommunicator;
 import org.hwyl.sexytopo.comms.missing.NullCommunicator;
 import org.hwyl.sexytopo.comms.sap5.Sap5Communicator;
+import org.hwyl.sexytopo.comms.sap6.SAP6Communicator;
 import org.hwyl.sexytopo.control.activity.DeviceActivity;
 
 import java.lang.reflect.InvocationTargetException;
@@ -16,6 +17,7 @@ public enum Instrument {
     DISTOX("DistoX", "DistoX", "DistoX", DistoXCommunicator.class),
     BRIC4("BRIC4", "BRIC4", "BRIC4_", Bric4Communicator.class),
     SAP5("Shetland Attack Pony 5", "SAP5", "Shetland", Sap5Communicator.class),
+    SAP6("Shetland Attack Pony 6", "SAP6", "SAP6", SAP6Communicator.class),
     OTHER("unknown device", "Unknown", "", NullCommunicator.class),
     NONE("missing device", "missing", "", NullCommunicator.class);
 
