@@ -1,13 +1,16 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="org.hwyl.sexytopo.control.activity.PlanActivity" >
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/action_save"
-          android:title="@string/action_file_save"
-          android:icon="@drawable/save"
-          app:showAsAction="always"/>
-    <item android:id="@+id/action_table"
+    <item
+        android:id="@+id/action_save"
+        android:title="@string/action_file_save"
+        android:icon="@drawable/save"
+        android:color="@color/actionBar"
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction"/>
+    <item
+        android:id="@+id/action_table"
         android:title="@string/action_table"
         android:icon="@drawable/table"
         app:showAsAction="always"/>

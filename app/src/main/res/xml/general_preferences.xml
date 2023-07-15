@@ -4,29 +4,36 @@
 
     <PreferenceCategory
         android:title="General"
-        android:key="pref_general"
-        app:iconSpaceReserved="false">
+        android:key="pref_general">
+
+        <ListPreference
+            app:key="pref_theme"
+            app:entries="@array/settings_theme_entries"
+            app:entryValues="@array/settings_theme_values"
+            android:title="@string/settings_theme_title"
+            android:summary="@string/settings_theme_summary"
+            android:defaultValue="auto"/>
 
         <ListPreference
             android:key="pref_orientation"
             android:title="Orientation"
             android:dialogTitle="Select Orientation"
             android:summary="Override device orientation on the Table and Graph views"
-            android:entries="@array/pref_orientation_options"
-            android:entryValues="@array/pref_orientation_options"
+            android:entries="@array/settings_orientation_values"
+            android:entryValues="@array/settings_orientation_entries"
             android:defaultValue="auto" />
 
         <CheckBoxPreference
             android:key="pref_vibrate_on_new_station"
-            android:title="Vibrate on new station"
-            android:summary="Vibrate when new station is created"
+            android:title="@string/settings_new_station_vibration_title"
+            android:summary="@string/settings_new_station_vibration_summary"
             android:defaultValue="true"/>
 
         <CheckBoxPreference
             android:key="pref_hot_corners"
-            android:title="Hot corners"
-            android:summary="Drag from the corners of the sketch to move the view in drawing modes"
-            android:defaultValue="false"/>
+            android:title="@string/settings_hot_corners_title"
+            android:summary="@string/settings_hot_corners_summary"
+            android:defaultValue="true"/>
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -63,9 +70,9 @@
             android:title="Algorithm"
             android:summary="Override DistoX calibration algorithm choice"
             android:dialogTitle="Select Calibration Algorithm"
-            android:entries="@array/pref_calibration_algorithm_options"
-            android:entryValues="@array/pref_calibration_algorithm_options"
-            android:defaultValue="Auto" />
+            android:entries="@array/settings_calibration_algorithm_options"
+            android:entryValues="@array/settings_calibration_algorithm_entries"
+            android:defaultValue="auto" />
     </PreferenceCategory>
 
     <PreferenceCategory

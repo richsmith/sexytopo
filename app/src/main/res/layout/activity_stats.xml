@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:stretchColumns="1">
         <TableRow
-            android:background="@color/tableBackground">
+            android:background="@color/innerPanelBackground">
             <TextView
                 android:text="@string/stats_title_this_survey"
                 android:textAppearance="?android:attr/textAppearanceLarge"

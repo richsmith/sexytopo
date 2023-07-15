@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+    <color name="grid">#000080</color>
+    <color name="innerPanelBackground">@color/darkGrey</color>
+    <color name="buttonHighlight">@color/darkGrey</color>
+
+
+</resources>
