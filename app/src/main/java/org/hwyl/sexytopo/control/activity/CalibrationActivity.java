@@ -30,6 +30,7 @@ import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.calibration.CalibrationCalculator;
 import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.io.StartLocation;
+import org.hwyl.sexytopo.control.io.SurveyFile;
 import org.hwyl.sexytopo.control.io.basic.CalibrationJsonTranslater;
 import org.hwyl.sexytopo.control.util.PreferenceAccess;
 import org.hwyl.sexytopo.control.util.TextTools;
@@ -332,7 +333,7 @@ public class CalibrationActivity extends SexyTopoActivity {
         createFile(
             SexyTopo.REQUEST_CODE_SAVE_CALIBRATION,
             StartLocation.TOP_LEVEL,
-            "application/json",
+            SurveyFile.SurveyFileType.DEFAULT_MIME_TYPE,
             null);
     }
 

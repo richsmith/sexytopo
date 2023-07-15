@@ -101,24 +101,6 @@ public class IoUtils {
         return directory.getPath() + File.separator + filename;
     }
 
-    public static void copyFile(
-            Context context, DocumentFile source, DocumentFile destination) throws IOException {
-
-        /* FIXME
-        if (source.isDirectory()) {
-            DocumentFile childDirectory = destination.createDirectory(
-                    Objects.requireNonNull(source.getName()));
-            for (DocumentFile file : source.listFiles()) {
-                copyFile(context, file, childDirectory);
-            }
-
-        } else {
-            String contents = Loader.slurpFile(context, source);
-            DocumentFile file = destination.createFile(source.getType(), source.getName());
-            Saver.saveFile(context, file, contents);
-        }*/
-    }
-
 
     public static Uri getParentUri(Survey survey) {
         Uri uri = null;
