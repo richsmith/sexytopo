@@ -101,7 +101,7 @@
     <string name="delete_successful">Deletion of survey %1$s successful</string>
     <string name="error_deleting_survey">Error deleting survey</string>
     <string name="cannot_extend_unsaved_survey">Cannot extend unsaved survey</string>
-    <string name="loaded">Loaded  %1$s</string>
+    <string name="loaded">Loaded %1$s</string>
     <string name="restored">Restored</string>
     <string name="file_restore_error">Error restoring autosave</string>
     <string name="warning_survey_not_saved">Warning: current survey not saved</string>
@@ -279,7 +279,6 @@
     <string name="log">Log</string>
     <string name="log_starting_up">Starting up</string>
     <string name="log_error_no_station_notification_intent">Unable to start new station notification intent</string>
-    <string name="clear_log">Clear</string>
     <string name="device_log_connected">Connected :)</string>
     <string name="device_log_not_connected">Not connected :(</string>
     <string name="device_log_connecting">Connecting&#8230;</string>
