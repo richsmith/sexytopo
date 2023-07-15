@@ -1,10 +1,13 @@
 package org.hwyl.sexytopo.control.io.basic;
 
 import android.content.Context;
+import android.net.Uri;
+
+import androidx.documentfile.provider.DocumentFile;
 
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.Log;
-import org.hwyl.sexytopo.control.io.Util;
+import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.SurveyConnection;
@@ -32,8 +35,8 @@ public class MetadataTranslater {
 
     public static void translateAndUpdate(Context context, Survey survey, String string)
             throws Exception {
-        Set<String> surveyNamesNotToLoad = new HashSet<>();
-        translateAndUpdate(context, survey, string, surveyNamesNotToLoad);
+        Set<Uri> surveyUrisNotToLoad = new HashSet<>();
+        translateAndUpdate(context, survey, string, surveyUrisNotToLoad);
     }
 
 
@@ -41,10 +44,10 @@ public class MetadataTranslater {
             Context context,
             Survey survey,
             String string,
-            Set<String> surveyNamesNotToLoad)
+            Set<Uri> surveyUrisNotToLoad)
             throws Exception {
         JSONObject json = new JSONObject(string);
-        translateAndUpdate(context, survey, json, surveyNamesNotToLoad);
+        translateAndUpdate(context, survey, json, surveyUrisNotToLoad);
     }
 
 
@@ -85,17 +88,17 @@ public class MetadataTranslater {
 
     private static JSONArray toJson(SurveyConnection connection) {
         JSONArray pair = new JSONArray();
-        pair.put(connection.otherSurvey.getName());
+        pair.put(connection.otherSurvey.getUri().toString());
         pair.put(connection.stationInOtherSurvey.getName());
         return pair;
     }
 
 
     private static void translateAndUpdate(
-            Context context, Survey survey, JSONObject json, Set<String> surveyNamesNotToLoad)
+            Context context, Survey survey, JSONObject json, Set<Uri> surveyUrisNotToLoad)
             throws Exception {
         translateAndUpdateActiveStation(survey, json);
-        translateAndUpdateConnections(context, survey, json, surveyNamesNotToLoad);
+        translateAndUpdateConnections(context, survey, json, surveyUrisNotToLoad);
     }
 
 
@@ -106,7 +109,7 @@ public class MetadataTranslater {
             Station activeStation = survey.getStationByName(activeStationName);
             survey.setActiveStation(activeStation);
         } catch (JSONException exception) {
-            Log.e("Could not load active station: " + exception.toString());
+            Log.e("Could not load active station: " + exception);
             throw new Exception("Error loading active station");
         }
     }
@@ -117,12 +120,11 @@ public class MetadataTranslater {
             Context context,
             Survey survey,
             JSONObject json,
-            Set<String> surveyNamesNotToLoad)
+            Set<Uri> surveyUrisNotToLoad)
             throws Exception {
-
         try {
             JSONObject connectionsObject = json.getJSONObject(CONNECTIONS_TAG);
-            Map<String, JSONArray> outerMap = Util.toMap(connectionsObject);
+            Map<String, JSONArray> outerMap = IoUtils.toMap(connectionsObject);
 
             for (String stationName : outerMap.keySet()) {
 
@@ -133,32 +135,36 @@ public class MetadataTranslater {
                 for (JSONArray connectionPair : toListOfArrays(setArray)) {
 
                     assert connectionPair.length() == 2;
-                    String connectedSurveyName = connectionPair.get(0).toString();
+                    String connectedSurveyUriString = connectionPair.get(0).toString();
+                    Uri connectedSurveyUri = Uri.parse(connectedSurveyUriString);
                     String connectionPointName = connectionPair.get(1).toString();
 
-                    if (surveyNamesNotToLoad.contains(connectedSurveyName)) {
+                    if (surveyUrisNotToLoad.contains(connectedSurveyUri)) {
                         // if this survey is already loaded, don't do the whole infinite loop thing
                         continue;
 
                     } else {
                         // we *really* want to avoid infinite loops :)
                         // this should be added on load, but just as a precaution..
-                        surveyNamesNotToLoad.add(connectedSurveyName);
+                        surveyUrisNotToLoad.add(connectedSurveyUri);
 
                         try {
+                            DocumentFile directory =
+                                    DocumentFile.fromTreeUri(context, connectedSurveyUri);
                             Survey connectedSurvey = Loader.loadSurvey(
-                                    context, connectedSurveyName, surveyNamesNotToLoad, false);
+                                    context, directory, surveyUrisNotToLoad, false);
                             Station connectionPoint =
                                     connectedSurvey.getStationByName(connectionPointName);
                             if (connectionPoint == null) {
-                                Log.e("Connection point not found: " + connectionPoint.getName());
+                                Log.e("Connection point not found for survey "
+                                        + connectedSurvey.getName());
                                 throw new Exception("Connection point not found");
                             }
                             survey.connect(station, connectedSurvey, connectionPoint);
                         } catch (Exception exception) {
                             // the linked survey or connecting station has probably been deleted;
                             // not much we can do...
-                            Log.e("Could not load connected survey " + connectedSurveyName);
+                            Log.e("Could not load connected survey " + connectedSurveyUri);
                             continue;
                         }
                     }

@@ -1,13 +1,11 @@
 package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
-import org.junit.Assert;
-
 import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
+import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -297,16 +295,10 @@ public class TherionImporterTest {
         TherionImporter.getContentsOfBeginEndBlock(LINES, "block");
     }
 
-    @Test
-    public void testTitleExtraction() {
-        String actual = TherionImporter.getSurveyName(new File("White Lightning"));
-        String expected = "White Lightning";
-        Assert.assertEquals(expected, actual);
-    }
 
     @Test
     public void testElevationDirectionExtraction() throws Exception {
-        Survey survey = new Survey("Test");
+        Survey survey = new Survey();
         TherionImporter.updateCentreline(LINES, survey);
 
         Station stationTwo = survey.getStationByName("2");

@@ -15,7 +15,7 @@ public class SurvexImporterTest {
     public void testBasicImport() throws Exception {
         final String testContent =
                 "1\t2\t5.0\t0.0\t0.0";
-        Survey survey = new Survey("Test");
+        Survey survey = new Survey();
         SurvexImporter.parse(testContent, survey);
         Assert.assertEquals(survey.getAllStations().size(), 2);
     }
@@ -24,7 +24,7 @@ public class SurvexImporterTest {
     public void testBasicImportRecordsPromotions() throws Exception {
         final String testContent =
                 "1\t2\t5.0\t0.0\t0.0\t; {from: 5.0 0.0 0.0, 5.0 0.0 0.0, 5.0 0.0 0.0}";
-        Survey survey = new Survey("Test");
+        Survey survey = new Survey();
         SurvexImporter.parse(testContent, survey);
         Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
         Assert.assertEquals(3, leg.getPromotedFrom().length);
@@ -34,7 +34,7 @@ public class SurvexImporterTest {
     public void testBasicImportHandlesComments() throws Exception {
         final String testContent =
                 "1\t2\t5.0\t0.0\t0.0\t; {from: 5.0 0.0 0.0, 5.0 0.0 0.0, 5.0 0.0 0.0} testComment";
-        Survey survey = new Survey("Test");
+        Survey survey = new Survey();
         SurvexImporter.parse(testContent, survey);
         Station created = survey.getStationByName("2");
         Assert.assertEquals(created.getComment(), "testComment");

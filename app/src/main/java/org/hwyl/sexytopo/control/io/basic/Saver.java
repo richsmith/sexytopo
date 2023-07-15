@@ -2,101 +2,62 @@ package org.hwyl.sexytopo.control.io.basic;
 
 import android.content.Context;
 
-import org.hwyl.sexytopo.SexyTopo;
-import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
-import org.hwyl.sexytopo.control.io.Util;
+import org.hwyl.sexytopo.control.io.SurveyFile;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.json.JSONException;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 
 
-/**
- * The entry point for saving survey and sketch data.
- */
 public class Saver {
 
-
     public static synchronized void save(Context context, Survey survey) throws Exception {
-
-        if (survey.getName().equals("")) {
-            throw new IllegalArgumentException("Not saved; survey name cannot be empty");
-        } else if (survey.getName().contains("/")) {
-            throw new IllegalArgumentException("Not saved; survey name cannot contain a slash");
-        }
-
-        saveMetadata(context, survey, SexyTopo.METADATA_EXTENSION);
-        saveSurveyData(context, survey, SexyTopo.DATA_EXTENSION);
-        saveSketch(context, survey, survey.getPlanSketch(), SexyTopo.PLAN_SKETCH_EXTENSION);
-        saveSketch(context, survey, survey.getElevationSketch(),
-                SexyTopo.EXT_ELEVATION_SKETCH_EXTENSION);
+        saveMetadata(context, survey, SurveyFile.METADATA.get(survey));
+        saveSurveyData(context, survey, SurveyFile.DATA.get(survey));
+        savePlanSketch(context, survey, SurveyFile.SKETCH_PLAN.get(survey));
+        saveElevationSketch(context, survey, SurveyFile.SKETCH_EXT_ELEVATION.get(survey));
         survey.setSaved(true);
-
-        Log.d("Saved survey " + survey.getName());
     }
 
     public static synchronized void autosave(Context context, Survey survey) throws Exception {
-
-        if (survey.isAutosaved()) {
-            return;
-        }
-        
-        saveMetadata(context, survey,
-                SexyTopo.METADATA_EXTENSION + "." + SexyTopo.AUTOSAVE_EXTENSION);
-        saveSurveyData(context, survey, SexyTopo.DATA_EXTENSION + "." + SexyTopo.AUTOSAVE_EXTENSION);
-        saveSketch(context, survey, survey.getPlanSketch(),
-                SexyTopo.PLAN_SKETCH_EXTENSION + "." + SexyTopo.AUTOSAVE_EXTENSION);
-        saveSketch(context, survey, survey.getElevationSketch(),
-                SexyTopo.EXT_ELEVATION_SKETCH_EXTENSION + "." + SexyTopo.AUTOSAVE_EXTENSION);
+        saveMetadata(context, survey, SurveyFile.METADATA.AUTOSAVE.get(survey));
+        saveSurveyData(context, survey, SurveyFile.DATA.AUTOSAVE.get(survey));
+        savePlanSketch(context, survey, SurveyFile.SKETCH_PLAN.AUTOSAVE.get(survey));
+        saveElevationSketch(context, survey, SurveyFile.SKETCH_EXT_ELEVATION.AUTOSAVE.get(survey));
+        survey.setAutosaved(true);
     }
 
-
-    private static void saveSurveyData(Context context, Survey survey, String extension)
-            throws IOException,JSONException {
-        String path = Util.getPathForSurveyFile(context, survey.getName(), extension);
+    private static void saveSurveyData(
+            Context context, Survey survey, SurveyFile surveyFile)
+            throws IOException, JSONException {
         String versionName = SexyTopoActivity.getVersionName(context);
         int versionCode = SexyTopoActivity.getVersionCode(context);
         String surveyText = SurveyJsonTranslater.toText(survey, versionName, versionCode);
-        saveFile(path, surveyText);
+        surveyFile.save(context, surveyText);
     }
 
-
-    private static void saveSketch(Context context, Survey survey, Sketch sketch, String extension)
+    private static void savePlanSketch(
+            Context context, Survey survey, SurveyFile surveyFile)
             throws IOException, JSONException {
-        String path = Util.getPathForSurveyFile(context, survey.getName(), extension);
+        Sketch sketch = survey.getPlanSketch();
         String planText = SketchJsonTranslater.translate(sketch);
-        saveFile(path, planText);
+        surveyFile.save(context, planText);
     }
 
+    private static void saveElevationSketch(
+            Context context, Survey survey, SurveyFile surveyFile)
+            throws IOException, JSONException {
+        Sketch sketch = survey.getElevationSketch();
+        String eeText = SketchJsonTranslater.translate(sketch);
+        surveyFile.save(context, eeText);
+    }
 
-    private static void saveMetadata(Context context, Survey survey, String extension) throws Exception {
-        String path = Util.getPathForSurveyFile(context, survey.getName(), extension);
+    private static void saveMetadata(
+            Context context, Survey survey, SurveyFile surveyFile)
+            throws Exception {
         String metadataText = MetadataTranslater.translate(survey);
-        saveFile(path, metadataText);
+        surveyFile.save(context, metadataText);
     }
-
-
-    public static void saveFile(String path, String contents) throws IOException {
-
-        File file = new File(path);
-        String location = file.getParentFile().getPath();
-        Util.ensureDirectoriesInPathExist(location);
-
-        file.createNewFile();
-        FileOutputStream fileOutputStream = new FileOutputStream(file);
-        OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
-        outputStreamWriter.append(contents);
-        outputStreamWriter.close();
-        fileOutputStream.flush();
-        fileOutputStream.close();
-
-
-    }
-
-
 }

@@ -1,5 +1,7 @@
 package org.hwyl.sexytopo.control.util;
 
+import static org.hwyl.sexytopo.SexyTopo.ALLOWED_DOUBLE_DELTA;
+
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -7,15 +9,13 @@ import org.hwyl.sexytopo.testhelpers.BasicTestSurveyCreator;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.hwyl.sexytopo.SexyTopo.ALLOWED_DOUBLE_DELTA;
-
 
 public class SurveyUpdaterTest {
 
     @Test
     public void testUpdateWithOneLegAddsOneLegToSurvey() {
         Leg leg = new Leg(5, 0, 0);
-        Survey survey = new Survey("Test Survey");
+        Survey survey = new Survey();
         SurveyUpdater.update(survey, leg);
         Assert.assertEquals(survey.getAllLegs().size(), 1);
     }
@@ -25,7 +25,7 @@ public class SurveyUpdaterTest {
         Leg leg = new Leg(5, 0, 0);
         Leg similarLeg = new Leg(5, 0.001f, 0);
         Leg anotherSimilarLeg = new Leg(5, 0, 0.001f);
-        Survey survey = new Survey("Test Survey");
+        Survey survey = new Survey();
         SurveyUpdater.update(survey, leg);
         SurveyUpdater.update(survey, similarLeg);
         SurveyUpdater.update(survey, anotherSimilarLeg);
@@ -35,7 +35,7 @@ public class SurveyUpdaterTest {
     @Test
     public void testEditLegWorks() {
         Leg leg = new Leg(5, 0, 0);
-        Survey survey = new Survey("Test Survey");
+        Survey survey = new Survey();
         SurveyUpdater.update(survey, leg);
 
         Leg newEdit = new Leg(6, 0, 0);
@@ -49,7 +49,7 @@ public class SurveyUpdaterTest {
     @Test
     public void testEditStationWorks() {
         Leg leg = new Leg(5, 0, 0);
-        Survey survey = new Survey("Test Survey");
+        Survey survey = new Survey();
         SurveyUpdater.update(survey, leg);
 
         Leg newEdit = new Leg(6, 0, 0);

@@ -1,5 +1,9 @@
 package org.hwyl.sexytopo.control.io.basic;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anySet;
+
 import android.content.Context;
 
 import org.hwyl.sexytopo.model.survey.Station;
@@ -13,11 +17,6 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anySet;
-import static org.mockito.Matchers.anyString;
-
 @PrepareForTest(Loader.class)
 @RunWith(PowerMockRunner.class)
 public class MetadataTranslaterTest {
@@ -25,7 +24,7 @@ public class MetadataTranslaterTest {
 
     @Test
     public void testActiveStationIsTranslatedToJson() throws Exception {
-        Survey survey = new Survey("test");
+        Survey survey = new Survey();
         String translated = MetadataTranslater.translate(survey);
         String expected = "{\"active-station\":\"1\",\"connections\":{}}";
         Assert.assertEquals(expected, translated.replaceAll("\\s", ""));
@@ -34,7 +33,7 @@ public class MetadataTranslaterTest {
 
     @Test
     public void testActiveStationIsTParsed() throws Exception {
-        Survey survey = new Survey("test");
+        Survey survey = new Survey();
         String text = "{\"active-station\":\"1\",\"connections\":{}}";
         MetadataTranslater.translateAndUpdate(null, survey, text);
         Assert.assertEquals(survey.getActiveStation().getName(), "1");
@@ -43,8 +42,10 @@ public class MetadataTranslaterTest {
 
     @Test
     public void testConnectedSurveyIsTranslatedToJson() throws Exception {
-        Survey survey = new Survey("first");
-        Survey connectedSurvey = new Survey("connected");
+        Survey survey = new Survey();
+        BasicTestSurveyCreator.mockSurveyUri(survey, "basic");
+        Survey connectedSurvey = new Survey();
+        BasicTestSurveyCreator.mockSurveyUri(connectedSurvey, "connected");
         connectTwoSurveys(survey, survey.getOrigin(), connectedSurvey, connectedSurvey.getOrigin());
         String translated = MetadataTranslater.translate(survey);
         Assert.assertEquals(
@@ -69,12 +70,12 @@ public class MetadataTranslaterTest {
     public void testConnectedSurveyJsonIsTranslatedToConnectedSurvey() throws Exception {
         String json = "{\"active-station\":\"1\",\"connections\":{\"1\":[[\"connected\",\"1\"]]}}";
 
-        Survey survey = new Survey("test");
-        Survey connected = new Survey("connected");
+        Survey survey = new Survey();
+        Survey connected = new Survey();
 
         PowerMockito.mockStatic(Loader.class);
         Mockito.when(
-                Loader.loadSurvey((Context)any(), anyString(), anySet(), anyBoolean()))
+                Loader.loadSurvey((Context)any(), any(), anySet(), anyBoolean()))
                 .thenReturn(connected);
 
         MetadataTranslater.translateAndUpdate(null, survey, json);

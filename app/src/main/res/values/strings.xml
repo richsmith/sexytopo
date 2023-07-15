@@ -2,7 +2,43 @@
 <!-- resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2" -->
 <resources>
 
+    <!-- Common -->
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="carry_on">Continue</string>
+    <string name="delete">Delete</string>
+    <string name="save">Save</string>
+    <string name="overwrite">Overwrite</string>
+    <string name="move">Move</string>
+    <string name="replace">Replace</string>
+    <string name="rename">Rename</string>
+    <string name="clear">Clear</string>
+    <string name="add">Add</string>
+    <string name="edit">Edit</string>
+    <string name="continue_question">Continue?</string>
+    <string name="delete_question">Delete?</string>
+    <string name="exit_question">Exit?</string>
+    <string name="station">Station</string>
+    <string name="leg">Leg</string>
+    <string name="splay">Splay</string>
+    <string name="not_applicable">N/A</string>
+    <string name="no_data">No Data</string>
+    <string name="error_prefix">Error</string>
+
+    <!-- System -->
     <string name="app_name">SexyTopo</string>
+    <string name="title_activity_start_up">Starting Up</string>
+    <string name="title_activity_device">Connect</string>
+    <string name="title_activity_table">Table</string>
+    <string name="title_activity_plan">Plan</string>
+    <string name="title_activity_elevation">Elevation</string>
+    <string name="title_activity_calibration">Calibration</string>
+    <string name="title_activity_survey">Stats</string>
+    <string name="title_activity_system_log">System Log</string>
+    <string name="title_activity_help">Help</string>
+    <string name="title_activity_guide">Guide</string>
+
+    <!-- Action bar menu -->
     <string name="action_table">Table</string>
     <string name="action_plan">Plan</string>
     <string name="action_elevation">Elevation</string>
@@ -19,13 +55,15 @@
     <string name="action_about">About</string>
     <string name="action_file_new">New Survey</string>
     <string name="action_file_open">Open Survey…</string>
-    <string name="action_file_delete">Delete Current Survey</string>
+    <string name="action_file_delete">Delete Survey…</string>
     <string name="action_file_save">Save</string>
     <string name="action_file_save_as">Save As…</string>
-    <string name="action_file_import">Import…</string>
+    <string name="action_file_import">Import</string>
     <string name="action_file_export">Export…</string>
     <string name="action_file_restore_autosave">Restore Autosave</string>
     <string name="action_file_exit">Exit SexyTopo</string>
+    <string name="action_file_import_file">Import File…</string>
+    <string name="action_file_import_directory">Import Folder…</string>
     <string name="action_input">Input Mode</string>
     <string name="action_input_mode_forward">Forward</string>
     <string name="action_input_mode_backward">Backsights</string>
@@ -37,23 +75,39 @@
     <string name="action_system_log">System Log</string>
     <string name="action_generate_test_survey">Generate Test Survey</string>
     <string name="action_debug_mode">Debug mode</string>
+    <string name="action_trigger_autosave">Trigger autosave</string>
     <string name="action_kill_connection">Kill comms thread (danger!)</string>
     <string name="action_force_crash">Force crash (danger!)</string>
-    <string name="loaded">Loaded</string>
+
+    <!-- File handling -->
+    <string name="file_loading_name">Loading file %1$s</string>
+    <string name="file_loading_error_not_survey">Not a valid survey folder</string>
+    <string name="loading_survey_error">Error loading survey</string>
+    <string name="link_survey_station">Choose station to link active station to</string>
+    <string name="link_survey_save_error">Error saving new connection</string>
+    <string name="file_unlink_survey_dialog_title">Unlink Survey</string>
+    <string name="survey_saved">Saved</string>
+    <string name="file_save_autosaved">Autosaved</string>
+    <string name="file_save_autosave_error">Error autosaving</string>
+    <string name="error_saving_survey">FAILED to save survey</string>
+    <string name="restoring_autosave">Restoring autosave</string>
+    <string name="intent_save_as_title">Create a folder to save survey in</string>
+    <string name="intent_open_title">Select survey folder</string>
+    <string name="intent_link_title">Select survey folder to link</string>
+    <string name="intent_import_select_source">Select import folder</string>
+    <string name="intent_delete_select_target">Select survey folder for deletion</string>
+    <string name="dialog_delete_survey_title">Delete Survey?</string>
+    <string name="dialog_delete_survey_content">This will delete the survey and any associated files</string>
+    <string name="delete_error_not_survey">Selection does not appear to be a survey</string>
+    <string name="delete_successful">Deletion of survey %1$s successful</string>
+    <string name="error_deleting_survey">Error deleting survey</string>
+    <string name="cannot_extend_unsaved_survey">Cannot extend unsaved survey</string>
+    <string name="loaded">Loaded %1$s</string>
     <string name="restored">Restored</string>
-    <string name="external_storage_unwriteable">WARNING: Can\'t write to external storage (will use internal storage instead)</string>
-    <string name="table_head_from">From</string>
-    <string name="table_head_to">To</string>
-    <string name="table_head_distance">Dist</string>
-    <string name="table_head_azimuth">Azm</string>
-    <string name="move_leg_select_station_title">Select station to move to</string>
-    <string name="move_leg_no_valid_move">Nowhere valid to move this leg</string>
-    <string name="table_head_elevation">Incl</string>
-    <string name="title_activity_table">Table</string>
-    <string name="title_activity_plan">Plan</string>
-    <string name="title_activity_elevation">Elevation</string>
-    <string name="title_activity_device">Connect</string>
-    <string name="title_activity_system_log">System Log</string>
+    <string name="file_restore_error">Error restoring autosave</string>
+    <string name="warning_survey_not_saved">Warning: current survey not saved</string>
+
+    <!-- Context menu(s) -->
     <string name="menu_context_title">Station</string>
     <string name="menu_set_active_station">Set Active Station</string>
     <string name="menu_rename_station">Rename Station</string>
@@ -75,6 +129,21 @@
     <string name="menu_unlink_survey">Unlink Linked Survey</string>
     <string name="menu_comment">Comment</string>
     <string name="menu_toggle_left_right">Toggle Left/Right</string>
+
+    <!-- Import / Export -->
+    <string name="import_successful">"Import complete (not yet saved)"</string>
+    <string name="import_failed">Import failed</string>
+    <string name="export_select_type">Select export format</string>
+    <string name="export_select_destination">Select export folder</string>
+    <string name="export_successful">Export completed</string>
+    <string name="export_failed">Export failed</string>
+    <string name="third_party_therion">Therion</string>
+    <string name="third_party_pocket_topo_txt">PocketTopo .txt</string>
+    <string name="third_party_survex">Survex</string>
+    <string name="third_party_compass">Compass</string>
+    <string name="third_party_svg">SVG</string>
+
+    <!-- Sketch view -->
     <string name="sketch_toolbar_draw">Draw mode</string>
     <string name="sketch_toolbar_move">Move mode</string>
     <string name="sketch_toolbar_eraser">Eraser</string>
@@ -86,6 +155,15 @@
     <string name="sketch_toolbar_redo">Redo</string>
     <string name="sketch_toolbar_zoom_in">Zoom in</string>
     <string name="sketch_toolbar_zoom_out">Zoom out</string>
+    <string name="sketch_toolbar_colour_main">Main colour</string>
+    <string name="sketch_toolbar_colour_brown">Brown</string>
+    <string name="sketch_toolbar_colour_grey">Grey</string>
+    <string name="sketch_toolbar_colour_red">Red</string>
+    <string name="sketch_toolbar_colour_orange">Orange</string>
+    <string name="sketch_toolbar_colour_green">Green</string>
+    <string name="sketch_toolbar_colour_blue">Blue</string>
+    <string name="sketch_toolbar_colour_purple">Purple</string>
+    <string name="sketch_toolbar_symbol_close">Close symbol toolbar</string>
     <string name="sketch_menu_delete_last_leg">Undo Last Reading</string>
     <string name="sketch_menu_centre_view">Centre on Active</string>
     <string name="sketch_menu_auto_recentre">Auto-Recentre</string>
@@ -98,53 +176,36 @@
     <string name="sketch_menu_show_sketch">Show Sketch</string>
     <string name="sketch_menu_show_connect">Linked Surveys</string>
     <string name="sketch_menu_back_measurements">Reverse Legs</string>
-    <string name="title_activity_start_up">StartUpActivity</string>
-    <string name="default_survey_name">NewSurvey</string>
-    <string name="loading_survey">Loading</string>
-    <string name="loading_survey_error">Failed; error loading survey</string>
-    <string name="title_activity_survey">Stats</string>
-    <string name="field_survey_name">Survey Name</string>
-    <string name="open_survey">Open Survey</string>
-    <string name="link_survey">Link Survey</string>
-    <string name="link_survey_station">Choose station to link active station to</string>
-    <string name="unlink_survey">Unlink Survey</string>
-    <string name="no_surveys">No surveys found to open</string>
-    <string name="select_export_type">Select export format</string>
-    <string name="export_successful">export completed</string>
-    <string name="dialog_new_survey_title">New Survey: Enter Name</string>
-    <string name="dialog_new_survey_name_must_be_unique">Failed: survey name must be unique</string>
-    <string name="survey_saved">Saved</string>
-    <string name="error_saving_survey">Failed: survey not saved</string>
-    <string name="dialog_save_as_title">Save As</string>
-    <string name="dialog_delete_survey_title">Delete Survey?</string>
-    <string name="dialog_delete_survey_content">This will delete the current survey and any associated files (this cannot be undone).</string>
-    <string name="error_deleting_survey">Failed: error deleting survey</string>
-    <string name="cannot_delete_unsaved_survey">Failed: cannot delete unsaved survey</string>
-    <string name="cannot_extend_unsaved_survey">Failed: cannot extend unsaved survey</string>
-    <string name="import_survey">Import Survey</string>
-    <string name="no_imports">No import files found</string>
-    <string name="ok">OK</string>
-    <string name="cancel">Cancel</string>
-    <string name="carry_on">Continue</string>
-    <string name="delete">Delete</string>
-    <string name="save">Save</string>
-    <string name="move">Move</string>
-    <string name="replace">Replace</string>
-    <string name="clear">Clear</string>
-    <string name="add">Add</string>
-    <string name="edit">Edit</string>
-    <string name="this_will_delete">This will delete:</string>
-    <string name="dialog_confirm_clear_title">Clear Calibration Readings?</string>
-    <string name="station">Station</string>
-    <string name="leg">Leg</string>
-    <string name="splay">Splay</string>
-    <string name="not_applicable">N/A</string>
-    <string name="title_activity_help">Help</string>
-    <string name="title_activity_guide">Guide</string>
+    <string name="position_cross_section_instruction">Select where to draw cross-section</string>
+
+    <!-- Table view -->
+    <string name="table_head_from">From</string>
+    <string name="table_head_to">To</string>
+    <string name="table_head_distance">Dist</string>
+    <string name="table_head_azimuth">Azm</string>
+    <string name="table_head_elevation">Incl</string>
+    <string name="manual_add_station_title">Add Station</string>
+    <string name="manual_add_splay_title">Add Splay</string>
+    <string name="manual_edit_leg_title">Edit Leg</string>
+    <string name="manual_edit_distance">Distance (m)</string>
+    <string name="manual_edit_distance_error">Bad distance</string>
+    <string name="manual_edit_azimuth">Azimuth (&#176;)</string>
+    <string name="manual_edit_azimuth_error">Bad azimuth</string>
+    <string name="manual_edit_azimuth_deg_mins_secs">Azimuth (&#176; \' \")</string>
+    <string name="manual_edit_inclination">Inclination (&#176;)</string>
+    <string name="manual_edit_inclination_error">Bad inclination</string>
+    <string name="manual_edit_left">Left (m)</string>
+    <string name="manual_edit_right">Right (m)</string>
+    <string name="manual_edit_up">Up (m)</string>
+    <string name="manual_edit_down">Down (m)</string>
+    <string name="manual_rename_station_title">Rename Station</string>
+    <string name="manual_rename_error">Rename failed</string>
+    <string name="delete_row_question">Delete Row?</string>
+
+    <!-- Calibration -->
     <string name="bluetooth_status">1. Bluetooth</string>
-    <string name="connect_automatically">3. Connect</string>
-    <string name="bluetooth_none">No Bluetooth capabilities</string>
     <string name="paired_status">2. Paired With</string>
+    <string name="connect_automatically">3. Connect</string>
     <string name="request_pair">Pair</string>
     <string name="request_unpair">Unpair</string>
     <string name="bluetooth_on">On</string>
@@ -154,54 +215,6 @@
     <string name="device_log_connection_requested">Connection requested</string>
     <string name="device_trying_fallback">Failed to create socket; trying fallback socket</string>
     <string name="pairing_request">PAIRING requested\n-> Perform pairing steps. Connect again</string>
-    <string name="device_log_connected">Connected :)</string>
-    <string name="device_log_not_connected">Not connected :(</string>
-    <string name="device_log_connecting">Connecting&#8230;</string>
-    <string name="device_log_ready_for_measurements">Ready to receive data</string>
-    <string name="device_log_received">Received measurement</string>
-    <string name="device_log_connection_stop_requested">Connection close requested</string>
-    <string name="device_log_stopping">Closing connection&#8230;</string>
-    <string name="device_log_stopped">Connection closed</string>
-    <string name="title_activity_calibration">Calibration</string>
-    <string name="log">Log</string>
-    <string name="clear_log">Clear</string>
-    <string name="error_prefix">Error:</string>
-    <string name="manual_add_station_title">Add Station</string>
-    <string name="manual_add_splay_title">Add Splay</string>
-    <string name="manual_edit_leg_title">Edit Leg</string>
-    <string name="manual_edit_distance">Distance (m)</string>
-    <string name="manual_edit_azimuth">Azimuth (&#176;)</string>
-    <string name="manual_edit_azimuth_deg_mins_secs">Azimuth (&#176; \' \")</string>
-    <string name="manual_edit_inclination">Inclination (&#176;)</string>
-    <string name="manual_edit_left">Left (m)</string>
-    <string name="manual_edit_right">Right (m)</string>
-    <string name="manual_edit_up">Up (m)</string>
-    <string name="manual_edit_down">Down (m)</string>
-    <string name="replace_question">Survey with that name already exists. Replace?</string>
-    <string name="continue_question">Continue?</string>
-    <string name="delete_question">Delete?</string>
-    <string name="exit_question">Exit?</string>
-    <string name="no_data">No Data</string>
-    <string name="delete_row_question">Delete Row?</string>
-    <string name="stats_title_this_survey">Current Survey</string>
-    <string name="stats_title_linked_surveys">All Linked Surveys</string>
-    <string name="stats_number_linked_surveys">Number of Surveys</string>
-    <string name="stats_length">Length (m)</string>
-    <string name="stats_vertical_range">Vertical Range (m)</string>
-    <string name="stats_number_stations">Number of Stations</string>
-    <string name="stats_number_legs">Number of Legs</string>
-    <string name="stats_number_splays">Number of Splays</string>
-    <string name="stats_longest_leg">Longest Leg (m)</string>
-    <string name="stats_shortest_leg">Shortest Leg (m)</string>
-    <string name="pref_station_symbol">Station symbol</string>
-    <string name="position_cross_section_instruction">Select where to draw cross-section</string>
-    <string name="warning_survey_not_saved">Warning: current survey not saved</string>
-    <string name="survey_already_exists">Warning: a survey with that name already exists</string>
-    <string name="third_party_therion">Therion</string>
-    <string name="third_party_pocket_topo_txt">PocketTopo .txt</string>
-    <string name="third_party_survex">Survex</string>
-    <string name="third_party_compass">Compass</string>
-    <string name="third_party_svg">SVG</string>
     <string name="calibration_wrong_device">No connected DistoX</string>
     <string name="calibration_index">Reading number</string>
     <string name="calibration_start">Disto Cal Mode On</string>
@@ -217,10 +230,12 @@
     <string name="calibration_assessment">Calibration Assessment</string>
     <string name="calibration_update">Write</string>
     <string name="calibration_error_updating_device">Could not write calibration</string>
-    <string name="calibration_no_files">No saved calibrations found to open</string>
-    <string name="calibration_default_filename">calibration</string>
     <string name="calibration_writing">Writing calibration data</string>
     <string name="calibration_success">Successfully wrote calibration data</string>
+    <string name="calibration_saved_to_file">Calibration data saved</string>
+    <string name="calibration_loaded_file">Calibration data loaded</string>
+    <string name="calibration_load_error">Error reading calibration file</string>
+    <string name="calibration_save_error">Error saving calibration file</string>
     <string name="direction_forward">Forward</string>
     <string name="direction_right">Right</string>
     <string name="direction_back">Back</string>
@@ -239,7 +254,13 @@
     <string name="orientation_face_right">Face Right</string>
     <string name="orientation_face_down">Face Down</string>
     <string name="orientation_face_left">Face Left</string>
-    <string name="killing_comms_process">Killing comms process</string>
+    <string name="dialog_confirm_clear_title">Clear Calibration Readings?</string>
+    <plurals name="instruments">
+        <item quantity="one">%1$s instrument</item>
+        <item quantity="other">%1$s instruments</item>
+    </plurals>
+
+    <!-- Trip -->
     <string name="trip">Trip</string>
     <string name="team">Team</string>
     <string name="dialog_title_add_to_team">Add to Team</string>
@@ -247,8 +268,36 @@
     <string name="dialog_confirm_clear_trip">Clear Trip Data?</string>
     <string name="comments">Comments</string>
     <string name="save_trip">Save Trip</string>
-    <plurals name="instruments">
-        <item quantity="one">%1$s instrument</item>
-        <item quantity="other">%1$s instruments</item>
-    </plurals>
+
+    <!-- Stats -->
+    <string name="stats_title_this_survey">Current Survey</string>
+    <string name="stats_title_linked_surveys">All Linked Surveys</string>
+    <string name="stats_number_linked_surveys">Number of Surveys</string>
+    <string name="stats_length">Length (m)</string>
+    <string name="stats_vertical_range">Vertical Range (m)</string>
+    <string name="stats_number_stations">Number of Stations</string>
+    <string name="stats_number_legs">Number of Legs</string>
+    <string name="stats_number_splays">Number of Splays</string>
+    <string name="stats_longest_leg">Longest Leg (m)</string>
+    <string name="stats_shortest_leg">Shortest Leg (m)</string>
+
+    <!-- Logging -->
+    <string name="log">Log</string>
+    <string name="log_starting_up">Starting up</string>
+    <string name="log_error_no_station_notification_intent">Unable to start new station notification intent</string>
+    <string name="device_log_connected">Connected :)</string>
+    <string name="device_log_not_connected">Not connected :(</string>
+    <string name="device_log_connecting">Connecting&#8230;</string>
+    <string name="device_log_ready_for_measurements">Ready to receive data</string>
+    <string name="device_log_received">Received measurement</string>
+    <string name="device_log_connection_stop_requested">Connection close requested</string>
+    <string name="device_log_stopping">Closing connection&#8230;</string>
+    <string name="device_log_stopped">Connection closed</string>
+
+    <!-- Misc -->
+    <string name="killing_comms_process">Killing comms process</string>
+    <string name="this_will_delete">This will delete:</string>
+    <string name="move_leg_select_station_title">Select station to move to</string>
+    <string name="move_leg_no_valid_move">Nowhere valid to move this leg</string>
+
 </resources>

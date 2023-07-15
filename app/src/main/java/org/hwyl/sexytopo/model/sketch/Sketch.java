@@ -80,7 +80,6 @@ public class Sketch extends SketchDetail {
 
     public void finishPath() {
         float epsilon = Space2DUtils.simplificationEpsilon(activePath);
-        Log.d("Sketch epsilon = " + epsilon);
         activePath.setPath(Space2DUtils.simplify(activePath.getPath(), epsilon));
         activePath = null;
     }

@@ -134,7 +134,7 @@ public class DeviceActivity extends SexyTopoActivity {
             requestComms().requestConnect();
 
         } catch (Exception exception) {
-            showException(exception);
+            showExceptionAndLog(exception);
         }
 
     }

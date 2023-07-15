@@ -1,9 +1,13 @@
 package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
+import android.content.Context;
+
+import androidx.documentfile.provider.DocumentFile;
+
 import org.apache.commons.io.FilenameUtils;
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.Log;
-import org.hwyl.sexytopo.control.io.basic.Loader;
+import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexImporter;
 import org.hwyl.sexytopo.control.io.thirdparty.xvi.XviImporter;
 import org.hwyl.sexytopo.control.io.translation.Importer;
@@ -14,7 +18,6 @@ import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,22 +25,22 @@ import java.util.List;
 
 public class TherionImporter extends Importer {
 
-    public Survey toSurvey(File directory) throws Exception {
+    public Survey toSurvey(Context context, DocumentFile directory) throws Exception {
 
         Survey survey = null;
 
-        for (File file : directory.listFiles()) {
+        for (DocumentFile file : directory.listFiles()) {
 
             if (file.getName().endsWith("th")) {
-                survey = parseTh(file);
+                survey = parseTh(context, file);
 
             } else if (file.getName().endsWith("xvi")) {
                 String filenameNoExtension = FilenameUtils.removeExtension(file.getName());
                 if (filenameNoExtension.endsWith(SexyTopo.PLAN_SUFFIX)) {
-                    Sketch sketch = XviImporter.getSketch(file);
+                    Sketch sketch = XviImporter.getSketch(context, file);
                     survey.setPlanSketch(sketch);
                 } else if (filenameNoExtension.endsWith(SexyTopo.EE_SUFFIX)) {
-                    Sketch sketch = XviImporter.getSketch(file);
+                    Sketch sketch = XviImporter.getSketch(context, file);
                     survey.setElevationSketch(sketch);
                 }
 
@@ -47,34 +50,20 @@ public class TherionImporter extends Importer {
         return survey;
     }
 
-    private static Survey parseTh(File file) throws Exception {
-        String contents = Loader.slurpFile(file);
-
-        String name = getSurveyName(file);
-        Survey survey = new Survey(name);
-
+    private static Survey parseTh(Context context, DocumentFile file) throws Exception {
+        Survey survey = new Survey();
+        String contents = IoUtils.slurpFile(context, file);
         List<String> lines = Arrays.asList(contents.split("\n"));
         updateCentreline(lines, survey);
-
         return survey;
     }
 
-    public static String getSurveyName(File file) {
-        return FilenameUtils.getBaseName(file.getName());
-        /* Regexing probably isn't worth it; just using the filename is more reliable...
-        Pattern pattern = Pattern.compile("survey\\s*\"(.*)+?\"");
-        Matcher matcher = pattern.matcher(text);
-        matcher.find();
-        return matcher.group(1);
-        */
-    }
 
-
-    public boolean canHandleFile(File directory) {
+    public boolean canHandleFile(DocumentFile directory) {
         if (!directory.isDirectory()) {
             return false;
         }
-        for (File file : directory.listFiles()) {
+        for (DocumentFile file : directory.listFiles()) {
             if (file.getName().endsWith("th")) {
                 return true;
             }

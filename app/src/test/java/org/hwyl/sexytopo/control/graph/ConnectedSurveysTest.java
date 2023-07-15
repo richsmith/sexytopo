@@ -2,7 +2,6 @@ package org.hwyl.sexytopo.control.graph;
 
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.activity.GraphActivity;
-import org.hwyl.sexytopo.control.activity.PlanActivity;
 import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.graph.Coord2D;
@@ -13,6 +12,7 @@ import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
+import org.hwyl.sexytopo.testhelpers.BasicTestSurveyCreator;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,7 +31,7 @@ public class ConnectedSurveysTest {
     @Test
     public void testNoConnectedSurveysReturnNoUpdatedSurveys() {
 
-        Survey currentSurvey = getBasicSurvey("not-connected");
+        Survey currentSurvey = getBasicSurvey("current");
 
         // As of v2 of Mockito the following emits an 'UnnecessaryStubbingException'
         //Sketch fakeSketch = new Sketch();
@@ -39,11 +39,47 @@ public class ConnectedSurveysTest {
 
         Map<Survey, Space<Coord2D>> translated =
                 ConnectedSurveys.getTranslatedConnectedSurveys(
-                        mockActivity, currentSurvey, new Space<>());
+                        Projection2D.PLAN, currentSurvey, new Space<>());
 
         Assert.assertEquals(translated.size(), 0);
     }
 
+    @Test
+    public void testBasicSurveyConnectionWorks() {
+
+        Survey currentSurvey = getBasicSurvey("current");
+        Survey joinedSurvey = getBasicSurvey("joined");
+
+        connectTwoSurveys(currentSurvey, currentSurvey.getActiveStation(),
+                joinedSurvey, joinedSurvey.getOrigin());
+
+        Assert.assertTrue(currentSurvey.isConnectedTo(joinedSurvey));
+        Assert.assertTrue(joinedSurvey.isConnectedTo(currentSurvey));
+    }
+
+
+    @Test
+    public void testSecondarySurveyConnectionWorks() {
+
+        Survey currentSurvey = getBasicSurvey("current");
+        Survey joinedSurvey = getBasicSurvey("joined");
+        Survey secondarySurvey = getBasicSurvey("joined-2");
+
+
+        connectTwoSurveys(currentSurvey, currentSurvey.getActiveStation(),
+                joinedSurvey, joinedSurvey.getOrigin());
+        connectTwoSurveys(secondarySurvey, joinedSurvey.getActiveStation(),
+                joinedSurvey, joinedSurvey.getOrigin());
+
+        Assert.assertTrue(currentSurvey.isConnectedTo(joinedSurvey));
+        Assert.assertTrue(joinedSurvey.isConnectedTo(currentSurvey));
+
+        Assert.assertFalse(currentSurvey.isConnectedTo(secondarySurvey));
+        Assert.assertFalse(secondarySurvey.isConnectedTo(currentSurvey));
+
+        Assert.assertTrue(joinedSurvey.isConnectedTo(secondarySurvey));
+        Assert.assertTrue(secondarySurvey.isConnectedTo(joinedSurvey));
+    }
 
     @Test
     public void testConnectedSurveyGetsTranslatedCorrectly() throws Exception {
@@ -53,15 +89,13 @@ public class ConnectedSurveysTest {
         connectTwoSurveys(currentSurvey, currentSurvey.getActiveStation(),
                 joinedSurvey, joinedSurvey.getOrigin());
 
-        GraphActivity activity = new PlanActivity();
-
         Space<Coord2D> planProjection = Projection2D.PLAN.project(currentSurvey);
         Map<Survey, Space<Coord2D>> translated =
                 ConnectedSurveys.getTranslatedConnectedSurveys(
-                        activity, currentSurvey, planProjection);
+                        Projection2D.PLAN, currentSurvey, planProjection);
 
-        Assert.assertEquals(translated.size(), 1);
-        Survey translatedSurvey = getNamedSurvey(translated, "joined");
+        Assert.assertEquals(1, translated.size());
+        Survey translatedSurvey = getSurveyWithUri(translated, "joined");
         Space<Coord2D> projection = translated.get(translatedSurvey);
         assert projection != null;
         Coord2D newStationPoint = getStationPosition(projection, "2");
@@ -80,16 +114,14 @@ public class ConnectedSurveysTest {
         connectTwoSurveys(joinedSurvey0, joinedSurvey0.getActiveStation(),
                 joinedSurvey1, joinedSurvey1.getOrigin());
 
-        GraphActivity activity = new PlanActivity();
-
         Space<Coord2D> planProjection = Projection2D.PLAN.project(currentSurvey);
         Map<Survey, Space<Coord2D>> translated =
                 ConnectedSurveys.getTranslatedConnectedSurveys(
-                        activity, currentSurvey, planProjection);
+                        Projection2D.PLAN, currentSurvey, planProjection);
 
-        Assert.assertEquals(translated.size(), 2);
+        Assert.assertEquals(2, translated.size());
 
-        Survey translatedSurvey = getNamedSurvey(translated, "joined-1");
+        Survey translatedSurvey = getSurveyWithUri(translated, "joined-1");
         Space<Coord2D> projection = translated.get(translatedSurvey);
 
         assert projection != null;
@@ -97,13 +129,13 @@ public class ConnectedSurveysTest {
         Assert.assertEquals(-3.0, newStationPoint.y, SexyTopo.ALLOWED_DOUBLE_DELTA);
     }
 
-    private Survey getNamedSurvey(Map<Survey, Space<Coord2D>> map, String name) throws Exception {
+    private Survey getSurveyWithUri(Map<Survey, Space<Coord2D>> map, String uri) throws Exception {
         for (Survey survey : map.keySet()) {
-            if (survey.getName().equals(name)) {
+            if (survey.getUri().toString().equals(uri)) {
                 return survey;
             }
         }
-        throw new Exception("Could not find survey " + name);
+        throw new Exception("Could not find survey " + uri);
     }
 
 
@@ -121,12 +153,13 @@ public class ConnectedSurveysTest {
         connectTwoSurveys(currentSurvey, currentSurvey.getActiveStation(),
                 joinedSurvey, joinedSurvey.getOrigin());
 
-        GraphActivity activity = new PlanActivity();
+        Assert.assertTrue(currentSurvey.isConnectedTo(joinedSurvey));
+        Assert.assertTrue(joinedSurvey.isConnectedTo(currentSurvey));
 
         Space<Coord2D> planProjection = Projection2D.PLAN.project(currentSurvey);
         Map<Survey, Space<Coord2D>> translated =
                 ConnectedSurveys.getTranslatedConnectedSurveys(
-                        activity, currentSurvey, planProjection);
+                        Projection2D.PLAN, currentSurvey, planProjection);
 
         Sketch translatedSketch = translated.keySet().iterator().next().getPlanSketch();
         PathDetail translatedPathDetail =
@@ -137,11 +170,12 @@ public class ConnectedSurveysTest {
     }
 
 
-    private static Survey getBasicSurvey(String name) {
-        Survey basicSurvey = new Survey(name);
+    private static Survey getBasicSurvey(String uri) {
+        Survey basicSurvey = new Survey();
         Leg l0 = new Leg(1.0f, 0.0f, 0.0f);
         SurveyUpdater.update(basicSurvey, l0);
         SurveyUpdater.upgradeSplayToConnectedLeg(basicSurvey, l0, InputMode.FORWARD);
+        BasicTestSurveyCreator.mockSurveyUri(basicSurvey, uri);
         return basicSurvey;
     }
 

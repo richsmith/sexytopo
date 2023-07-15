@@ -1,14 +1,17 @@
 package org.hwyl.sexytopo.control.io.thirdparty.survex;
 
+import android.content.Context;
+
+import androidx.documentfile.provider.DocumentFile;
+
 import org.hwyl.sexytopo.SexyTopo;
 import org.hwyl.sexytopo.control.Log;
-import org.hwyl.sexytopo.control.io.basic.Loader;
+import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.io.translation.Importer;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,9 +27,9 @@ public class SurvexImporter extends Importer {
 
 
     @Override
-    public Survey toSurvey(File file) throws Exception {
-        String text = Loader.slurpFile(file.getAbsolutePath());
-        Survey survey = new Survey(getDefaultName(file));
+    public Survey toSurvey(Context context, DocumentFile file) throws Exception {
+        Survey survey = new Survey();
+        String text = IoUtils.slurpFile(context, file);
         parse(text, survey);
         return survey;
     }
@@ -146,7 +149,7 @@ public class SurvexImporter extends Importer {
 
 
     @Override
-    public boolean canHandleFile(File file) {
-        return file.getName().endsWith("svx");
+    public boolean canHandleFile(DocumentFile file) {
+        return file.isFile() && !file.isDirectory() && file.getName().endsWith("svx");
     }
 }

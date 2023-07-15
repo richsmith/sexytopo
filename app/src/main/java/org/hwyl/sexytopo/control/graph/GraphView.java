@@ -334,7 +334,7 @@ public class GraphView extends View {
             return;
         }
 
-        if (!activity.getBooleanPreference("pref_hot_corners")) {
+        if (!PreferenceAccess.getBoolean(activity, "pref_hot_corners", false)) {
             return;
         }
 
@@ -795,7 +795,8 @@ public class GraphView extends View {
         if (doTranslatedConnectedSurveysNeedUpdating()) {
             try {
                 this.translatedConnectedSurveys =
-                        ConnectedSurveys.getTranslatedConnectedSurveys(activity, survey, projection);
+                        ConnectedSurveys.getTranslatedConnectedSurveys(
+                                activity.getProjectionType(), survey, projection);
             } catch (Exception exception) {
                 Log.e("Error getting translated connected surveys");
                 Log.e(exception);
@@ -1295,7 +1296,7 @@ public class GraphView extends View {
 
     private void drawHotCorners(Canvas canvas) {
 
-        if (!activity.getBooleanPreference("pref_hot_corners")) {
+        if (!PreferenceAccess.getBoolean(activity, "pref_hot_corners", false)) {
             return;
         }
 

@@ -53,5 +53,4 @@ public class SurvexExporter extends SingleFileExporter {
     public String getExportDirectoryName() {
         return "survex";
     }
-
 }

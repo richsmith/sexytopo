@@ -9,7 +9,7 @@ public class TestSurveyCreatorTest {
 
     @Test
     public void testCreateDoesNotThrowException() {
-        TestSurveyCreator.create("TestSurvey", 10, 10);
+        TestSurveyCreator.create(10, 10);
         Assert.assertTrue(true);
     }
 
