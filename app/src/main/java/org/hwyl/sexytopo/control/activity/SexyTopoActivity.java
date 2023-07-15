@@ -585,10 +585,13 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                         showExceptionAndLog(R.string.link_survey_save_error, exception);
                     }
 
+                    getSurveyManager().broadcastSurveyUpdated();
+
                 } catch (Exception exception) {
                     showExceptionAndLog(exception);
                 }
             });
+
         builderSingle.show();
     }
 
