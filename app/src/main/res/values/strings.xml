@@ -11,6 +11,7 @@
     <string name="overwrite">Overwrite</string>
     <string name="move">Move</string>
     <string name="replace">Replace</string>
+    <string name="rename">Rename</string>
     <string name="clear">Clear</string>
     <string name="add">Add</string>
     <string name="edit">Edit</string>
@@ -187,13 +188,18 @@
     <string name="manual_add_splay_title">Add Splay</string>
     <string name="manual_edit_leg_title">Edit Leg</string>
     <string name="manual_edit_distance">Distance (m)</string>
+    <string name="manual_edit_distance_error">Bad distance</string>
     <string name="manual_edit_azimuth">Azimuth (&#176;)</string>
+    <string name="manual_edit_azimuth_error">Bad azimuth</string>
     <string name="manual_edit_azimuth_deg_mins_secs">Azimuth (&#176; \' \")</string>
     <string name="manual_edit_inclination">Inclination (&#176;)</string>
+    <string name="manual_edit_inclination_error">Bad inclination</string>
     <string name="manual_edit_left">Left (m)</string>
     <string name="manual_edit_right">Right (m)</string>
     <string name="manual_edit_up">Up (m)</string>
     <string name="manual_edit_down">Down (m)</string>
+    <string name="manual_rename_station_title">Rename Station</string>
+    <string name="manual_rename_error">Rename failed</string>
     <string name="delete_row_question">Delete Row?</string>
 
     <!-- Calibration -->

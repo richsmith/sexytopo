@@ -1138,17 +1138,17 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         showSimpleToast(getString(id));
     }
 
-    protected void showExceptionAndLog(Exception exception) {
+    public void showExceptionAndLog(Exception exception) {
         String prefix = getString(R.string.error_prefix);
         showExceptionAndLog(prefix, exception);
     }
 
-    protected void showExceptionAndLog(int id, Exception exception) {
+    public void showExceptionAndLog(int id, Exception exception) {
         String prefix = getString(id);
         showExceptionAndLog(prefix, exception);
     }
 
-    protected void showExceptionAndLog(String prefix, Exception exception) {
+    public void showExceptionAndLog(String prefix, Exception exception) {
         Log.e(exception);
         showSimpleToast(prefix + ": " + exception.getMessage());
     }
