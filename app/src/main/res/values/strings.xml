@@ -83,30 +83,30 @@
     <!-- File handling -->
     <string name="file_loading_name">Loading file %1$s</string>
     <string name="file_loading_error_not_survey">Not a valid survey folder</string>
-    <string name="loading_survey_error">Error loading survey</string>
-    <string name="link_survey_station">Choose station to link active station to</string>
-    <string name="link_survey_save_error">Error saving new connection</string>
+    <string name="file_loading_survey_error">Error loading survey</string>
+    <string name="file_link_survey_station">Choose station to link active station to</string>
+    <string name="file_link_survey_save_error">Error saving new connection</string>
     <string name="file_unlink_survey_dialog_title">Unlink Survey</string>
-    <string name="survey_saved">Saved</string>
+    <string name="file_survey_saved">Saved</string>
     <string name="file_save_autosaved">Autosaved</string>
     <string name="file_save_autosave_error">Error autosaving</string>
-    <string name="error_saving_survey">FAILED to save survey</string>
-    <string name="restoring_autosave">Restoring autosave</string>
-    <string name="intent_save_as_title">Create a folder to save survey in</string>
-    <string name="intent_open_title">Select survey folder</string>
-    <string name="intent_link_title">Select survey folder to link</string>
-    <string name="intent_import_select_source">Select import folder</string>
-    <string name="intent_delete_select_target">Select survey folder for deletion</string>
-    <string name="dialog_delete_survey_title">Delete Survey?</string>
-    <string name="dialog_delete_survey_content">This will delete the survey and any associated files</string>
-    <string name="delete_error_not_survey">Selection does not appear to be a survey</string>
-    <string name="delete_successful">Deletion of survey %1$s successful</string>
-    <string name="error_deleting_survey">Error deleting survey</string>
-    <string name="cannot_extend_unsaved_survey">Cannot extend unsaved survey</string>
-    <string name="loaded">Loaded %1$s</string>
-    <string name="restored">Restored</string>
+    <string name="file_error_saving_survey">FAILED to save survey</string>
+    <string name="file_restoring_autosave">Restoring autosave</string>
+    <string name="file_intent_save_as_title">Create a folder to save survey in</string>
+    <string name="file_intent_open_title">Select survey folder</string>
+    <string name="file_intent_link_title">Select survey folder to link</string>
+    <string name="file_intent_import_select_source">Select import folder</string>
+    <string name="file_intent_delete_select_target">Select survey folder for deletion</string>
+    <string name="file_dialog_delete_survey_title">Delete Survey?</string>
+    <string name="file_dialog_delete_survey_content">This will delete the survey and any associated files</string>
+    <string name="file_delete_error_not_survey">Selection does not appear to be a survey</string>
+    <string name="file_delete_successful">Deletion of survey %1$s successful</string>
+    <string name="file_error_deleting_survey">Error deleting survey</string>
+    <string name="file_cannot_extend_unsaved_survey">Cannot extend unsaved survey</string>
+    <string name="file_loaded">Loaded %1$s</string>
+    <string name="file_restored">Restored</string>
     <string name="file_restore_error">Error restoring autosave</string>
-    <string name="warning_survey_not_saved">Warning: current survey not saved</string>
+    <string name="file_warning_survey_not_saved">Warning: current survey not saved</string>
 
     <!-- Context menu(s) -->
     <string name="menu_context_title">Station</string>
@@ -177,7 +177,7 @@
     <string name="sketch_menu_show_sketch">Show Sketch</string>
     <string name="sketch_menu_show_connect">Linked Surveys</string>
     <string name="sketch_menu_back_measurements">Reverse Legs</string>
-    <string name="position_cross_section_instruction">Select where to draw cross-section</string>
+    <string name="sketch_position_cross_section_instruction">Select where to draw cross-section</string>
 
     <!-- Table view -->
     <string name="table_head_from">From</string>
@@ -185,6 +185,7 @@
     <string name="table_head_distance">Dist</string>
     <string name="table_head_azimuth">Azm</string>
     <string name="table_head_elevation">Incl</string>
+    <string name="table_delete_row_question">Delete Row?</string>
     <string name="manual_add_station_title">Add Station</string>
     <string name="manual_add_splay_title">Add Splay</string>
     <string name="manual_edit_leg_title">Edit Leg</string>
@@ -201,21 +202,28 @@
     <string name="manual_edit_down">Down (m)</string>
     <string name="manual_rename_station_title">Rename Station</string>
     <string name="manual_rename_error">Rename failed</string>
-    <string name="delete_row_question">Delete Row?</string>
 
     <!-- Device -->
-    <string name="bluetooth_status">1. Bluetooth</string>
-    <string name="paired_status">2. Paired With</string>
-    <string name="connect_automatically">3. Connect</string>
-    <string name="request_pair">Pair</string>
-    <string name="request_unpair">Unpair</string>
-    <string name="bluetooth_on">On</string>
-    <string name="no_device">no device</string>
-    <string name="bluetooth_off">Off</string>
+    <string name="device_bluetooth_status">1. Bluetooth</string>
+    <string name="device_paired_status">2. Paired With</string>
+    <string name="device_connect_automatically">3. Connect</string>
+    <string name="device_request_pair">Pair</string>
+    <string name="device_request_unpair">Unpair</string>
+    <string name="device_bluetooth_on">On</string>
+    <string name="device_no_device">no device</string>
+    <string name="device_bluetooth_off">Off</string>
     <string name="device_bluetooth_no_adapter">Cannot access bluetooth adapter</string>
     <string name="device_log_connection_requested">Connection requested</string>
-    <string name="device_trying_fallback">Failed to create socket; trying fallback socket</string>
-    <string name="pairing_request">PAIRING requested\n-> Perform pairing steps. Connect again</string>
+    <string name="device_pairing_request">PAIRING requested\n-> Perform pairing steps. Connect again</string>
+    <string name="device_log_connected">Connected :)</string>
+    <string name="device_log_not_connected">Not connected :(</string>
+    <string name="device_log_connecting">Connecting&#8230;</string>
+    <string name="device_log_trying_fallback">Failed to create socket; trying fallback socket</string>
+    <string name="device_log_ready_for_measurements">Ready to receive data</string>
+    <string name="device_log_received">Received measurement</string>
+    <string name="device_log_connection_stop_requested">Connection close requested</string>
+    <string name="device_log_stopping">Closing connection&#8230;</string>
+    <string name="device_log_stopped">Connection closed</string>
 
     <!-- Calibration -->
     <string name="calibration_wrong_device">No connected DistoX</string>
@@ -265,12 +273,12 @@
 
     <!-- Trip -->
     <string name="trip">Trip</string>
-    <string name="team">Team</string>
-    <string name="dialog_title_add_to_team">Add to Team</string>
-    <string name="dialog_add_to_team_name_hint">Name</string>
-    <string name="dialog_confirm_clear_trip">Clear Trip Data?</string>
-    <string name="comments">Comments</string>
-    <string name="save_trip">Save Trip</string>
+    <string name="trip_team">Team</string>
+    <string name="trip_dialog_title_add_to_team">Add to Team</string>
+    <string name="trip_dialog_add_to_team_name_hint">Name</string>
+    <string name="trip_dialog_confirm_clear_trip">Clear Trip Data?</string>
+    <string name="trip_comments">Comments</string>
+    <string name="trip_save_trip">Save Trip</string>
 
     <!-- Stats -->
     <string name="stats_title_this_survey">Current Survey</string>
@@ -311,14 +319,6 @@
     <string name="log">Log</string>
     <string name="log_starting_up">Starting up</string>
     <string name="log_error_no_station_notification_intent">Unable to start new station notification intent</string>
-    <string name="device_log_connected">Connected :)</string>
-    <string name="device_log_not_connected">Not connected :(</string>
-    <string name="device_log_connecting">Connecting&#8230;</string>
-    <string name="device_log_ready_for_measurements">Ready to receive data</string>
-    <string name="device_log_received">Received measurement</string>
-    <string name="device_log_connection_stop_requested">Connection close requested</string>
-    <string name="device_log_stopping">Closing connection&#8230;</string>
-    <string name="device_log_stopped">Connection closed</string>
 
     <!-- Misc -->
     <string name="killing_comms_process">Killing comms process</string>

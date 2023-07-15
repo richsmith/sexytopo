@@ -86,7 +86,7 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
         String formatted = DATE_FORMAT.format(date);
         TextView dateField = findViewById(R.id.trip_date);
         dateField.setText(
-            getText(R.string.trip) + " " + formatted + ". " + getText(R.string.team) + ":");
+            getText(R.string.trip) + " " + formatted + ". " + getText(R.string.trip_team) + ":");
 
         syncListWithTeam();
         updateButtonStatus();
@@ -95,7 +95,7 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
 
     public void requestClear(View view) {
         new AlertDialog.Builder(this)
-                .setTitle(R.string.dialog_confirm_clear_trip)
+                .setTitle(R.string.trip_dialog_confirm_clear_trip)
                 .setPositiveButton(R.string.clear, (dialog, whichButton) -> {
                     EditText comments = findViewById(R.id.trip_comments);
                     comments.setText("");
@@ -113,7 +113,7 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
         layout.setOrientation(LinearLayout.VERTICAL);
 
         final EditText nameField = new EditText(this);
-        nameField.setHint(R.string.dialog_add_to_team_name_hint);
+        nameField.setHint(R.string.trip_dialog_add_to_team_name_hint);
         nameField.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
         layout.addView(nameField);
 
@@ -128,7 +128,7 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
 
         AlertDialog.Builder builderSingle =
             new AlertDialog.Builder(this)
-            .setTitle(R.string.dialog_title_add_to_team)
+            .setTitle(R.string.trip_dialog_title_add_to_team)
             .setView(layout)
             .setPositiveButton(R.string.add,
                     (dialog, which) -> {
@@ -232,7 +232,7 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
         layout.setOrientation(LinearLayout.VERTICAL);
 
         final EditText nameField = new EditText(this);
-        nameField.setHint(R.string.dialog_add_to_team_name_hint);
+        nameField.setHint(R.string.trip_dialog_add_to_team_name_hint);
         nameField.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
         nameField.setText(teamEntry.name);
         layout.addView(nameField);

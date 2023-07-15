@@ -648,7 +648,7 @@ public class GraphView extends View {
             } else if (id == R.id.graph_station_new_cross_section) {
                 setActiveStation(station);
                 setSketchTool(SketchTool.POSITION_CROSS_SECTION);
-                activity.showSimpleToast(R.string.position_cross_section_instruction);
+                activity.showSimpleToast(R.string.sketch_position_cross_section_instruction);
             } else if (id == R.id.graph_station_jump_to_table) {
                 activity.jumpToStation(station, TableActivity.class);
             } else if (id == R.id.graph_station_jump_to_plan) {
@@ -657,7 +657,7 @@ public class GraphView extends View {
                 activity.jumpToStation(station, ExtendedElevationActivity.class);
             } else if (id == R.id.graph_station_start_new_survey) {
                 if (!survey.isSaved()) {
-                    activity.showSimpleToast(R.string.cannot_extend_unsaved_survey);
+                    activity.showSimpleToast(R.string.file_cannot_extend_unsaved_survey);
                 }
                 activity.continueSurvey(station);
             } else if (id == R.id.graph_station_unlink_survey) {

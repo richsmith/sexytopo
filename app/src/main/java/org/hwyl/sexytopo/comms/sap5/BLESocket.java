@@ -155,7 +155,7 @@ class BLESocket extends BluetoothGattCallback {
                     } else {
                         Log.d(TAG, "pairing request ");
                     }
-                    onSerialConnectError(new IOException(context.getString(R.string.pairing_request)));
+                    onSerialConnectError(new IOException(context.getString(R.string.device_pairing_request)));
                     // pairing dialog brings app to background (onPause), but it is still partly visible (no onStop), so there is no automatic disconnect()
                     break;
                 case BluetoothDevice.ACTION_BOND_STATE_CHANGED:

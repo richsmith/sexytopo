@@ -57,7 +57,7 @@
         android:layout_height="0dp"
         android:layout_weight="30"
         android:gravity="top"
-        android:hint="@string/comments"/>
+        android:hint="@string/trip_comments"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -71,7 +71,7 @@
             android:layout_weight="1"
             android:textAlignment="gravity"
             android:gravity="center"
-            android:text="@string/save_trip"
+            android:text="@string/trip_save_trip"
             android:enabled="true"
             android:onClick="requestSaveTrip"
             />

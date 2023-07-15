@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:text="@string/bluetooth_status"
+        android:text="@string/device_bluetooth_status"
         android:layout_gravity="end"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:id="@+id/bluetoothSwitch" />
@@ -38,7 +38,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="@string/paired_status"/>
+                android:text="@string/device_paired_status"/>
 
             <TextView
                 android:layout_alignParentEnd="true"
@@ -60,7 +60,7 @@
                 android:layout_margin="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/request_pair"
+                android:text="@string/device_request_pair"
                 android:id="@+id/pairButton"
                 android:onClick="requestPair"
                 tools:ignore="ButtonStyle" />
@@ -69,7 +69,7 @@
                 android:layout_margin="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/request_unpair"
+                android:text="@string/device_request_unpair"
                 android:id="@+id/unpairButton"
                 android:onClick="requestUnpair"
                 tools:ignore="ButtonStyle" />
@@ -82,7 +82,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:text="@string/connect_automatically"
+        android:text="@string/device_connect_automatically"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:checked="false"
         android:id="@+id/connectionSwitch" />
