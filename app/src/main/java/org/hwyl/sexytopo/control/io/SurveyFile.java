@@ -4,20 +4,16 @@ import android.content.Context;
 
 import androidx.documentfile.provider.DocumentFile;
 
+import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.io.translation.AbstractSurveyFile;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 @SuppressWarnings("UnnecessaryLocalVariable")
 public class SurveyFile extends AbstractSurveyFile {
 
     public static class SurveyFileType {
-
-        public static final String DEFAULT_MIME_TYPE = "application/json";
-        public static final String AUTOSAVE_EXTENSION = "autosave";
 
         private final String extension;
         private final String mimeType;
@@ -25,18 +21,22 @@ public class SurveyFile extends AbstractSurveyFile {
         public final SurveyFileType AUTOSAVE;
 
         public SurveyFileType(String extension) {
-            this(extension, DEFAULT_MIME_TYPE);
+            this(extension, SexyTopoConstants.DEFAULT_MIME_TYPE);
         }
 
         public SurveyFileType(String extension, String mimeType) {
             this.extension = extension;
             this.mimeType = mimeType;
 
-            if (!extension.endsWith(AUTOSAVE_EXTENSION)) {
-                AUTOSAVE = new SurveyFileType(withExtension(extension, AUTOSAVE_EXTENSION));
+            if (!extension.endsWith(SexyTopoConstants.AUTOSAVE_EXTENSION)) {
+                AUTOSAVE = new SurveyFileType(withExtension(extension, SexyTopoConstants.AUTOSAVE_EXTENSION));
             } else {
                 AUTOSAVE = null;
             }
+        }
+
+        public String getExtension() {
+            return extension;
         }
 
         public SurveyFile get(Survey survey) {
@@ -49,14 +49,13 @@ public class SurveyFile extends AbstractSurveyFile {
 
     }
 
-    public static SurveyFileType DATA = new SurveyFileType("data.json");
-    public static SurveyFileType METADATA = new SurveyFileType("metadata.json");
-    public static SurveyFileType SKETCH_PLAN = new SurveyFileType("plan.json");
-    public static SurveyFileType SKETCH_EXT_ELEVATION = new SurveyFileType("ext-elevation.json");
-
-    private static final List<SurveyFileType> ALL_TYPES =
-            Arrays.asList(DATA, METADATA, SKETCH_PLAN, SKETCH_EXT_ELEVATION);
-
+    public static SurveyFileType DATA = new SurveyFileType(SexyTopoConstants.DATA_EXTENSION);
+    public static SurveyFileType METADATA =
+        new SurveyFileType(SexyTopoConstants.METADATA_EXTENSION);
+    public static SurveyFileType SKETCH_PLAN =
+        new SurveyFileType(SexyTopoConstants.PLAN_SKETCH_EXTENSION);
+    public static SurveyFileType SKETCH_EXT_ELEVATION =
+        new SurveyFileType(SexyTopoConstants.EXT_ELEVATION_SKETCH_EXTENSION);
 
     private final SurveyFileType surveyFileType;
 

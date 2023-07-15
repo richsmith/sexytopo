@@ -2,7 +2,7 @@ package org.hwyl.sexytopo.control.io.basic;
 
 import android.widget.Toast;
 
-import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.model.graph.Direction;
@@ -60,7 +60,7 @@ public class SurveyJsonTranslater {
 
     public static String toText(Survey survey, String versionName, int versionCode)
             throws JSONException {
-        return toJson(survey, versionName, versionCode).toString(SexyTopo.JSON_INDENT);
+        return toJson(survey, versionName, versionCode).toString(SexyTopoConstants.JSON_INDENT);
     }
 
 
@@ -133,7 +133,7 @@ public class SurveyJsonTranslater {
 
         if (errors) {
             String message = "Partial errors encountered; survey load was incomplete";
-            Toast.makeText(SexyTopo.context, message, Toast.LENGTH_SHORT).show();
+            Toast.makeText(SexyTopoConstants.context, message, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -346,7 +346,7 @@ public class SurveyJsonTranslater {
         String destinationName = json.getString(DESTINATION_TAG);
 
         Leg leg;
-        if (destinationName.equals(SexyTopo.BLANK_STATION_NAME)) {
+        if (destinationName.equals(SexyTopoConstants.BLANK_STATION_NAME)) {
             leg = new Leg(distance, azimuth, inclination, wasShotBackwards);
 
         } else {

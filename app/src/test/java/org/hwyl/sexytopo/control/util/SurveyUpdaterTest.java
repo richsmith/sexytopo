@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.control.util;
 
-import static org.hwyl.sexytopo.SexyTopo.ALLOWED_DOUBLE_DELTA;
+import static org.hwyl.sexytopo.SexyTopoConstants.ALLOWED_DOUBLE_DELTA;
 
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;

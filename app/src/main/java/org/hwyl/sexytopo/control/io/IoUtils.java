@@ -10,8 +10,7 @@ import android.os.storage.StorageManager;
 
 import androidx.documentfile.provider.DocumentFile;
 
-import org.hwyl.sexytopo.SexyTopo;
-import org.hwyl.sexytopo.control.Log;
+import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -45,23 +44,13 @@ public class IoUtils {
         DocumentFile[] files = directory.listFiles();
         for (DocumentFile file : files) {
             String filename = file.getName();
-            if (filename.endsWith(SexyTopo.DATA_EXTENSION)) {
+            if (filename.endsWith(SurveyFile.DATA.getExtension())) {
                 return true;
             }
         }
         return false;
     }
 
-    public static void deleteSurvey(Context context, Survey survey) {
-        DocumentFile surveyDirectory = DocumentFile.fromTreeUri(context, survey.getUri());
-        boolean deleted = surveyDirectory.delete();
-        if (deleted) {
-            Log.i("Deleted survey " + survey.getName());
-        } else {
-            Log.e("Failed to delete survey " + survey.getName());
-        }
-
-    }
 
     public static boolean wasSurveyImported(Context context, Survey survey) {
         SurveyDirectory importSourceDirectory = SurveyDirectory.IMPORT_SOURCE.get(survey);
@@ -118,7 +107,7 @@ public class IoUtils {
         Uri uri = null;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            String startDir = SexyTopo.DEFAULT_ROOT_DIR;
+            String startDir = SexyTopoConstants.DEFAULT_ROOT_DIR;
             StorageManager sm = (StorageManager) context.getSystemService(Context.STORAGE_SERVICE);
             Intent intent = sm.getPrimaryStorageVolume().createOpenDocumentTreeIntent();
             Uri initial = intent.getParcelableExtra("android.provider.extra.INITIAL_URI");

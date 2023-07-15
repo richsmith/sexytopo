@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.control.graph;
 
-import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.activity.GraphActivity;
 import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
@@ -99,7 +99,7 @@ public class ConnectedSurveysTest {
         Space<Coord2D> projection = translated.get(translatedSurvey);
         assert projection != null;
         Coord2D newStationPoint = getStationPosition(projection, "2");
-        Assert.assertEquals(-2.0, newStationPoint.y, SexyTopo.ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(-2.0, newStationPoint.y, SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
     }
 
 
@@ -126,7 +126,7 @@ public class ConnectedSurveysTest {
 
         assert projection != null;
         Coord2D newStationPoint = getStationPosition(projection, "2");
-        Assert.assertEquals(-3.0, newStationPoint.y, SexyTopo.ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(-3.0, newStationPoint.y, SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
     }
 
     private Survey getSurveyWithUri(Map<Survey, Space<Coord2D>> map, String uri) throws Exception {

@@ -3,7 +3,7 @@ package org.hwyl.sexytopo.comms.sap5;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 
-import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
 
 import java.io.IOException;
@@ -47,7 +47,7 @@ public class SerialSocket {
         try {
             Log.device("Connecting...");
             classicSocket = bluetoothDevice.createInsecureRfcommSocketToServiceRecord(
-                    SexyTopo.DISTO_X_UUID);
+                    SexyTopoConstants.DISTO_X_UUID);
             classicSocket.connect(); // blocks until connection is complete or fails with an exception
 
         } catch(Exception exception) {
@@ -78,7 +78,7 @@ public class SerialSocket {
         Log.d("BLEConnect2");
         bleSocket = new BLESocket();
         Log.d("BLEConnect3");
-        bleSocket.connect(SexyTopo.context, bleListener, bluetoothDevice);
+        bleSocket.connect(SexyTopoConstants.context, bleListener, bluetoothDevice);
         long startTime = System.currentTimeMillis();
         while (System.currentTimeMillis() < startTime+8000) {
             if (bleSocket.isConnected()) return;

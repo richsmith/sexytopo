@@ -17,7 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.comms.Communicator;
 import org.hwyl.sexytopo.comms.Instrument;
 import org.hwyl.sexytopo.control.Log;
@@ -68,7 +68,7 @@ public class DeviceActivity extends SexyTopoActivity {
         stateChangeReceiver = new StateChangeReceiver();
 
         logFilter = new IntentFilter();
-        logFilter.addAction(SexyTopo.DEVICE_LOG_UPDATED_EVENT);
+        logFilter.addAction(SexyTopoConstants.DEVICE_LOG_UPDATED_EVENT);
 
 
         logUpdateReceiver = new DeviceLogUpdateReceiver();

@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.control.io.basic;
 
-import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
@@ -43,7 +43,7 @@ public class SketchJsonTranslater {
 
 
     public static String translate(Sketch sketch) throws JSONException {
-        return toJson(sketch).toString(SexyTopo.JSON_INDENT);
+        return toJson(sketch).toString(SexyTopoConstants.JSON_INDENT);
     }
 
 

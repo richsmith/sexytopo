@@ -9,7 +9,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.util.LogUpdateReceiver;
 
@@ -38,7 +38,7 @@ public class SystemLogActivity extends SexyTopoActivity {
 
         LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
         IntentFilter logFilter = new IntentFilter();
-        logFilter.addAction(SexyTopo.SYSTEM_LOG_UPDATED_EVENT);
+        logFilter.addAction(SexyTopoConstants.SYSTEM_LOG_UPDATED_EVENT);
         broadcastManager.registerReceiver(logUpdateReceiver, logFilter);
         logUpdateReceiver.update();
     }

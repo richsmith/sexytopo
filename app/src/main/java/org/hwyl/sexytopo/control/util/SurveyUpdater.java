@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.control.util;
 
-import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.survey.Leg;
@@ -105,7 +105,7 @@ public class SurveyUpdater {
 
     private static boolean createNewStationIfTripleShot(Survey survey, boolean backsightMode) {
 
-        int requiredNumber = SexyTopo.NUM_OF_REPEATS_FOR_NEW_STATION;
+        int requiredNumber = SexyTopoConstants.NUM_OF_REPEATS_FOR_NEW_STATION;
 
         Station activeStation = survey.getActiveStation();
         List<Leg> activeLegs = activeStation.getOnwardLegs();
@@ -308,7 +308,7 @@ public class SurveyUpdater {
     private static float getMaxDistanceDelta() {
         try {
             float maxDistanceDiff = PreferenceAccess.getFloat(
-                    SexyTopo.context, "pref_max_distance_delta", DEFAULT_MAX_DISTANCE_DELTA);
+                    SexyTopoConstants.context, "pref_max_distance_delta", DEFAULT_MAX_DISTANCE_DELTA);
             return maxDistanceDiff;
         } catch (Exception exception) {
             // just in case the static Context trick doesn't work :)
@@ -319,7 +319,7 @@ public class SurveyUpdater {
     private static float getMaxAngleDelta() {
         try {
             float maxAngleDelta = PreferenceAccess.getFloat(
-                    SexyTopo.context, "pref_max_angle_delta", DEFAULT_MAX_ANGLE_DELTA);
+                    SexyTopoConstants.context, "pref_max_angle_delta", DEFAULT_MAX_ANGLE_DELTA);
             return maxAngleDelta;
         } catch (Exception exception) {
             // just in case the static Context trick doesn't work :)

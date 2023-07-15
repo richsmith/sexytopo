@@ -9,7 +9,7 @@ import android.os.AsyncTask;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.io.basic.Saver;
 import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
@@ -83,23 +83,23 @@ public class SurveyManager {
 
     public InputMode getInputMode() {
         SharedPreferences preferences = context.getSharedPreferences(
-                SexyTopo.GENERAL_PREFS, android.content.Context.MODE_PRIVATE);
+                SexyTopoConstants.GENERAL_PREFS, android.content.Context.MODE_PRIVATE);
         String modeName = preferences.getString(
-                SexyTopo.INPUT_MODE_PREFERENCE, InputMode.FORWARD.name());
+                SexyTopoConstants.INPUT_MODE_PREFERENCE, InputMode.FORWARD.name());
         InputMode inputMode = InputMode.valueOf(modeName);
         return inputMode;
     }
 
     public void broadcastSurveyUpdated() {
-        broadcast(new Intent(SexyTopo.SURVEY_UPDATED_EVENT));
+        broadcast(new Intent(SexyTopoConstants.SURVEY_UPDATED_EVENT));
     }
 
     public void broadcastNewStationCreated() {
-        broadcast(new Intent(SexyTopo.NEW_STATION_CREATED_EVENT));
+        broadcast(new Intent(SexyTopoConstants.NEW_STATION_CREATED_EVENT));
     }
 
     public void broadcastCalibrationUpdated() {
-        broadcast(new Intent(SexyTopo.CALIBRATION_UPDATED_EVENT));
+        broadcast(new Intent(SexyTopoConstants.CALIBRATION_UPDATED_EVENT));
     }
 
     private void broadcast(Intent intent) {

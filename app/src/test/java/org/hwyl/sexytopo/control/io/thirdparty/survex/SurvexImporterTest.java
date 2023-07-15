@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.control.io.thirdparty.survex;
 
-import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -47,9 +47,9 @@ public class SurvexImporterTest {
                 "{from: 1 0 0, 1.0 0.0 0.0, 1.0 0.0 0.0}");
         Assert.assertEquals(3, legs.length);
         for (Leg leg : legs) {
-            Assert.assertEquals(leg.getDistance(), 1.0, SexyTopo.ALLOWED_DOUBLE_DELTA);
-            Assert.assertEquals(leg.getAzimuth(), 0.0, SexyTopo.ALLOWED_DOUBLE_DELTA);
-            Assert.assertEquals(leg.getInclination(), 0.0, SexyTopo.ALLOWED_DOUBLE_DELTA);
+            Assert.assertEquals(leg.getDistance(), 1.0, SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
+            Assert.assertEquals(leg.getAzimuth(), 0.0, SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
+            Assert.assertEquals(leg.getInclination(), 0.0, SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
         }
     }
 }

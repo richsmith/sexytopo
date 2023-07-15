@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.control.io.basic;
 
-import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -75,7 +75,7 @@ public class OldStyleLoader {
 
     private static Station retrieveOrCreateStation(Map<String, Station> nameToStation,
                                                    String name, String comment) {
-        if (name.equals(SexyTopo.BLANK_STATION_NAME)) {
+        if (name.equals(SexyTopoConstants.BLANK_STATION_NAME)) {
             return Survey.NULL_STATION;
         } else if (nameToStation.containsKey(name)) {
             return nameToStation.get(name);

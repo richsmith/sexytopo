@@ -1,7 +1,7 @@
 package org.hwyl.sexytopo.control.util;
 
 
-import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.SexyTopoConstants;
 import org.junit.Assert;
 
 import org.hwyl.sexytopo.testhelpers.BasicTestSurveyCreator;
@@ -64,11 +64,11 @@ public class StationRenameTest {
         List<Leg> legs = new ArrayList<>(2); legs.add(leg1); legs.add(leg2);
         Leg avgLeg = SurveyUpdater.averageLegs(legs);
         Assert.assertEquals(
-                "Dist", 15.0, avgLeg.getDistance(), SexyTopo.ALLOWED_DOUBLE_DELTA);
+                "Dist", 15.0, avgLeg.getDistance(), SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
         Assert.assertEquals(
-                "Azm", 0.0, avgLeg.getAzimuth(), SexyTopo.ALLOWED_DOUBLE_DELTA);
+                "Azm", 0.0, avgLeg.getAzimuth(), SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
         Assert.assertEquals(
-                "Inc", 0.0, avgLeg.getInclination(), SexyTopo.ALLOWED_DOUBLE_DELTA);
+                "Inc", 0.0, avgLeg.getInclination(), SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
     }
 
     @Test

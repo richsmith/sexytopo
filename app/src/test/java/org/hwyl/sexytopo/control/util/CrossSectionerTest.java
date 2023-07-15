@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.control.util;
 
-import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.testhelpers.BasicTestSurveyCreator;
@@ -16,7 +16,7 @@ public class CrossSectionerTest {
 
         Station s2 = testSurvey.getStationByName("2");
         double angle = CrossSectioner.getAngleOfSection(testSurvey, s2);
-        Assert.assertEquals(0.0, angle, SexyTopo.ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(0.0, angle, SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
     }
 
     @Test
@@ -25,6 +25,6 @@ public class CrossSectionerTest {
 
         Station s2 = testSurvey.getStationByName("2");
         double angle = CrossSectioner.getAngleOfSection(testSurvey, s2);
-        Assert.assertEquals(180.0, angle, SexyTopo.ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(180.0, angle, SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
     }
 }

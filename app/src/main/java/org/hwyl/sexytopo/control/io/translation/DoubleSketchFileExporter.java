@@ -2,7 +2,7 @@ package org.hwyl.sexytopo.control.io.translation;
 
 import android.content.Context;
 
-import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.io.SurveyFile;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -14,9 +14,9 @@ public abstract class DoubleSketchFileExporter extends Exporter {
 
     public void run(Context context, Survey survey) throws IOException {
         String planContent = getContent(survey.getPlanSketch());
-        saveSketchFile(context, planContent, SexyTopo.PLAN_SUFFIX);
+        saveSketchFile(context, planContent, SexyTopoConstants.PLAN_SUFFIX);
         String eeContent = getContent(survey.getElevationSketch());
-        saveSketchFile(context, eeContent, SexyTopo.EE_SUFFIX);
+        saveSketchFile(context, eeContent, SexyTopoConstants.EE_SUFFIX);
     }
 
     protected void saveSketchFile(Context context, String content, String suffix)

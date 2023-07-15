@@ -10,7 +10,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.SexyTopoConstants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,7 @@ public class ScrollingTable extends LinearLayout
         try {
             onLayout2( changed, l, t, r, b );
         } catch (Exception e) {
-            Log.d(SexyTopo.TAG, "Error updating table: " + e);
+            Log.d(SexyTopoConstants.TAG, "Error updating table: " + e);
         }
 
     }

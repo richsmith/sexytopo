@@ -12,7 +12,7 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.apache.commons.text.StringEscapeUtils;
 
-import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.io.IoUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -74,8 +74,8 @@ public class Log {
             deviceLog.remove();
         }
         deviceLog.add(new Message(message));
-        broadcast(SexyTopo.DEVICE_LOG_UPDATED_EVENT);
-        android.util.Log.i(SexyTopo.TAG, message);
+        broadcast(SexyTopoConstants.DEVICE_LOG_UPDATED_EVENT);
+        android.util.Log.i(SexyTopoConstants.TAG, message);
     }
 
     public static String formatDebugString(String value) {
@@ -88,7 +88,7 @@ public class Log {
             systemLog.remove();
         }
         systemLog.add(new Message(message, isError));
-        broadcast(SexyTopo.SYSTEM_LOG_UPDATED_EVENT);
+        broadcast(SexyTopoConstants.SYSTEM_LOG_UPDATED_EVENT);
         save(LogType.SYSTEM);
     }
 
@@ -96,7 +96,7 @@ public class Log {
         d(context.getString(stringId));
     }
     public static void d(String message) {
-        android.util.Log.d(SexyTopo.TAG, message);
+        android.util.Log.d(SexyTopoConstants.TAG, message);
         systemLog(message, false);
     }
 
@@ -105,7 +105,7 @@ public class Log {
     }
 
     public static void e(String message) {
-        android.util.Log.e(SexyTopo.TAG, "" + message);
+        android.util.Log.e(SexyTopoConstants.TAG, "" + message);
         systemLog(message, true);
     }
 
@@ -120,7 +120,7 @@ public class Log {
     }
 
     public static void i(String message) {
-        android.util.Log.i(SexyTopo.TAG, message);
+        android.util.Log.i(SexyTopoConstants.TAG, message);
         systemLog(message, false);
     }
 
@@ -159,7 +159,7 @@ public class Log {
 
     public static void clearDeviceLog() {
         deviceLog.clear();
-        broadcast(SexyTopo.DEVICE_LOG_UPDATED_EVENT);
+        broadcast(SexyTopoConstants.DEVICE_LOG_UPDATED_EVENT);
     }
 
 

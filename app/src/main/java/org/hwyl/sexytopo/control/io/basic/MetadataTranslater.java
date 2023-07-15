@@ -5,7 +5,7 @@ import android.net.Uri;
 
 import androidx.documentfile.provider.DocumentFile;
 
-import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -29,7 +29,7 @@ public class MetadataTranslater {
 
 
     public static String translate(Survey survey) throws Exception {
-        return toJson(survey).toString(SexyTopo.JSON_INDENT);
+        return toJson(survey).toString(SexyTopoConstants.JSON_INDENT);
     }
 
 

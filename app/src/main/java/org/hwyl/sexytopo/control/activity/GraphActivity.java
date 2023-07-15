@@ -22,7 +22,7 @@ import android.widget.PopupWindow;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.graph.GraphView;
 import org.hwyl.sexytopo.control.graph.StationContextMenu;
 import org.hwyl.sexytopo.control.util.SurveyStats;
@@ -182,9 +182,9 @@ public abstract class GraphActivity extends SexyTopoActivity
     private void registerReceivers() {
         LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
         broadcastManager.registerReceiver(updatedReceiver,
-                new IntentFilter(SexyTopo.SURVEY_UPDATED_EVENT));
+                new IntentFilter(SexyTopoConstants.SURVEY_UPDATED_EVENT));
         broadcastManager.registerReceiver(createdReceiver,
-                new IntentFilter(SexyTopo.NEW_STATION_CREATED_EVENT));
+                new IntentFilter(SexyTopoConstants.NEW_STATION_CREATED_EVENT));
     }
 
     private void unregisterReceivers() {
@@ -195,8 +195,8 @@ public abstract class GraphActivity extends SexyTopoActivity
 
     private void setViewLocation() {
         Bundle bundle = getIntent().getExtras();
-        if (bundle != null && bundle.getString(SexyTopo.JUMP_TO_STATION) != null) {
-            String requestedStationName = bundle.getString(SexyTopo.JUMP_TO_STATION);
+        if (bundle != null && bundle.getString(SexyTopoConstants.JUMP_TO_STATION) != null) {
+            String requestedStationName = bundle.getString(SexyTopoConstants.JUMP_TO_STATION);
             Station requestedStation = getSurvey().getStationByName(requestedStationName);
             graphView.centreViewOnStation(requestedStation);
         } else {

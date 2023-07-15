@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.NewStationNotificationService;
 
@@ -19,7 +19,7 @@ public class StartUpActivity extends SexyTopoActivity {
 
         setContentView(R.layout.activity_start_up);
 
-        SexyTopo.context = this.getApplicationContext();
+        SexyTopoConstants.context = this.getApplicationContext();
 
         Log.setContext(this.getApplicationContext());
         Log.load(Log.LogType.SYSTEM);

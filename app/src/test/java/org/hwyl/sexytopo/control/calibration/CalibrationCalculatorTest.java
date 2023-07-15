@@ -2,7 +2,7 @@ package org.hwyl.sexytopo.control.calibration;
 
 import org.junit.Assert;
 
-import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.model.calibration.CalibrationReading;
 import org.junit.Test;
 
@@ -116,13 +116,13 @@ public class CalibrationCalculatorTest {
         int iterations = calibrationCalculator.calculate(calibrationReadings);
         Assert.assertEquals(43, iterations);
         Assert.assertEquals(0.603272, calibrationCalculator.getDelta(),
-                SexyTopo.ALLOWED_DOUBLE_DELTA);
+                SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
 
         calibrationCalculator = new CalibrationCalculator(true);
         iterations = calibrationCalculator.calculate(calibrationReadings);
         Assert.assertEquals(75, iterations);
         Assert.assertEquals(0.5775869, calibrationCalculator.getDelta(),
-                SexyTopo.ALLOWED_DOUBLE_DELTA);
+                SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
 
     }
 
@@ -193,7 +193,7 @@ public class CalibrationCalculatorTest {
         int iterations = calibrationCalculator.calculate(calibrationReadings);
         Assert.assertEquals(53, iterations);
         Assert.assertEquals(0.6157666, calibrationCalculator.getDelta(),
-                SexyTopo.ALLOWED_DOUBLE_DELTA);
+                SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
 
         calibrationCalculator = new CalibrationCalculator(true);
         iterations = calibrationCalculator.calculate(calibrationReadings);
@@ -201,7 +201,7 @@ public class CalibrationCalculatorTest {
         // Not sure why this is, but it gets the right answer so probably minor rounding issue
         // Assert.assertEquals(64, iterations);
         Assert.assertEquals(0.6132727, calibrationCalculator.getDelta(),
-                SexyTopo.ALLOWED_DOUBLE_DELTA);
+                SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
     }
 
 
@@ -218,8 +218,8 @@ public class CalibrationCalculatorTest {
 
 
     private static void assertVectorEquality(Vector expected, Vector actual) {
-        Assert.assertEquals(expected.x, actual.x, SexyTopo.ALLOWED_DOUBLE_DELTA);
-        Assert.assertEquals(expected.y, actual.y, SexyTopo.ALLOWED_DOUBLE_DELTA);
-        Assert.assertEquals(expected.z, actual.z, SexyTopo.ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(expected.x, actual.x, SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(expected.y, actual.y, SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(expected.z, actual.z, SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
     }
 }

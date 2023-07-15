@@ -4,7 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.text.TextUtils;
 
-import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
@@ -64,7 +64,7 @@ public class ThExporter {
     private static String getSurveyText(Context context, Survey survey, List<String> th2Files) {
 
         String attribution = "created with " +
-                SexyTopo.APP_NAME + " " + SexyTopoActivity.getVersionName(context);
+                SexyTopoConstants.APP_NAME + " " + SexyTopoActivity.getVersionName(context);
 
         String surveyText =
             COMMENT_CHAR + " " + attribution + "\n\n" +

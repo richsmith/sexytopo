@@ -4,7 +4,7 @@ import android.content.Context;
 
 import androidx.documentfile.provider.DocumentFile;
 
-import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.io.translation.Importer;
@@ -97,7 +97,7 @@ public class SurvexImporter extends Importer {
 
     private static Station retrieveOrCreateStation(Map<String, Station> nameToStation,
                                                    String name, String comment) {
-        if (name.equals(SexyTopo.BLANK_STATION_NAME)) {
+        if (name.equals(SexyTopoConstants.BLANK_STATION_NAME)) {
             return Survey.NULL_STATION;
         } else if (nameToStation.containsKey(name)) {
             return nameToStation.get(name);

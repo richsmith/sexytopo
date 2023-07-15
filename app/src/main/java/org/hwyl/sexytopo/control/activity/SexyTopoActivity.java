@@ -34,7 +34,7 @@ import androidx.documentfile.provider.DocumentFile;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.comms.Communicator;
 import org.hwyl.sexytopo.comms.Instrument;
 import org.hwyl.sexytopo.comms.missing.NullCommunicator;
@@ -83,7 +83,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        SexyTopo.context = this.getApplicationContext();
+        SexyTopoConstants.context = this.getApplicationContext();
         dataManager = SurveyManager.getInstance(this.getApplicationContext());
 
         // if Android restarts the activity after a crash, force it to go through the startup
@@ -97,7 +97,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        SexyTopo.context = this.getApplicationContext();
+        SexyTopoConstants.context = this.getApplicationContext();
         setOrientation();
 
         // this causes the request to happen twice because it is called by StartupActivity, then
@@ -286,7 +286,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     protected void requestSaveAs() {
         // Would like to use createDirectory here, but Androids devs are incompetent
         selectDirectory(
-            SexyTopo.REQUEST_CODE_SAVE_AS_SURVEY,
+            SexyTopoConstants.REQUEST_CODE_SAVE_AS_SURVEY,
             StartLocation.TOP_LEVEL,
             R.string.intent_save_as_title);
     }
@@ -294,7 +294,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     @SuppressLint("UnusedDeclaration") // called through Reflection
     public void requestOpenSurvey() {
         selectDirectory(
-            SexyTopo.REQUEST_CODE_OPEN_SURVEY,
+            SexyTopoConstants.REQUEST_CODE_OPEN_SURVEY,
             StartLocation.SURVEY_PARENT,
             R.string.intent_open_title);
     }
@@ -302,7 +302,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     @SuppressLint("UnusedDeclaration") // called through Reflection
     public void requestLinkExistingSurvey() {
         selectDirectory(
-            SexyTopo.REQUEST_CODE_SELECT_SURVEY_TO_LINK,
+            SexyTopoConstants.REQUEST_CODE_SELECT_SURVEY_TO_LINK,
             StartLocation.SURVEY_PARENT,
             R.string.intent_link_title);
     }
@@ -327,7 +327,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     @SuppressLint("UnusedDeclaration")  // called through Reflection
     public void requestImportSurveyFile() {
         selectFile(
-                SexyTopo.REQUEST_CODE_IMPORT_SURVEY_FILE,
+                SexyTopoConstants.REQUEST_CODE_IMPORT_SURVEY_FILE,
                 StartLocation.TOP_LEVEL,
                 R.string.intent_import_select_source);
     }
@@ -335,14 +335,14 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     @SuppressLint("UnusedDeclaration")  // called through Reflection
     public void requestImportSurveyDirectory() {
         selectDirectory(
-                SexyTopo.REQUEST_CODE_IMPORT_SURVEY_DIRECTORY,
+                SexyTopoConstants.REQUEST_CODE_IMPORT_SURVEY_DIRECTORY,
                 StartLocation.TOP_LEVEL,
                 R.string.intent_import_select_source);
     }
 
     public void requestDelete() {
         selectDirectory(
-            SexyTopo.REQUEST_CODE_DELETE_SURVEY_DIRECTORY,
+            SexyTopoConstants.REQUEST_CODE_DELETE_SURVEY_DIRECTORY,
             StartLocation.TOP_LEVEL,
             R.string.intent_delete_select_target);
     }
@@ -416,13 +416,13 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
     private boolean isThereAnActiveSurvey() {
-        return getPreferences().contains(SexyTopo.PREFERENCE_ACTIVE_SURVEY_URI);
+        return getPreferences().contains(SexyTopoConstants.PREFERENCE_ACTIVE_SURVEY_URI);
     }
 
     public void loadActiveSurvey() {
 
         String activeSurveyUriString = PreferenceAccess.getString(
-                this, SexyTopo.PREFERENCE_ACTIVE_SURVEY_URI, "Error");
+                this, SexyTopoConstants.PREFERENCE_ACTIVE_SURVEY_URI, "Error");
         Log.d("Active survey is <i>" + activeSurveyUriString + "</i>");
 
         Uri activeSurveyUri = Uri.parse(activeSurveyUriString);
@@ -650,7 +650,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
      */
     private void updateRememberedSurvey() {
         Uri uri = getSurvey().getUri();
-        PreferenceAccess.setString(this, SexyTopo.PREFERENCE_ACTIVE_SURVEY_URI, uri.toString());
+        PreferenceAccess.setString(this, SexyTopoConstants.PREFERENCE_ACTIVE_SURVEY_URI, uri.toString());
     }
 
     protected void redraw() {
@@ -781,32 +781,32 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
         switch(requestCode) {
 
-            case SexyTopo.REQUEST_CODE_SAVE_AS_SURVEY:
+            case SexyTopoConstants.REQUEST_CODE_SAVE_AS_SURVEY:
                 DocumentFile toSaveAs = DocumentFile.fromTreeUri(this, uri);
                 saveSurveyAs(toSaveAs);
                 break;
 
-            case SexyTopo.REQUEST_CODE_OPEN_SURVEY:
+            case SexyTopoConstants.REQUEST_CODE_OPEN_SURVEY:
                 DocumentFile toOpen = DocumentFile.fromTreeUri(this, uri);
                 loadSurvey(toOpen);
                 break;
 
-            case SexyTopo.REQUEST_CODE_DELETE_SURVEY_DIRECTORY:
+            case SexyTopoConstants.REQUEST_CODE_DELETE_SURVEY_DIRECTORY:
                 DocumentFile toDelete = DocumentFile.fromTreeUri(this, uri);
                 deleteSurvey(toDelete);
                 break;
 
-            case SexyTopo.REQUEST_CODE_IMPORT_SURVEY_FILE:
+            case SexyTopoConstants.REQUEST_CODE_IMPORT_SURVEY_FILE:
                 DocumentFile importFile = DocumentFile.fromSingleUri(this, uri);
                 importSurvey(importFile);
                 break;
 
-            case SexyTopo.REQUEST_CODE_IMPORT_SURVEY_DIRECTORY:
+            case SexyTopoConstants.REQUEST_CODE_IMPORT_SURVEY_DIRECTORY:
                 DocumentFile importDir = DocumentFile.fromTreeUri(this, uri);
                 importSurvey(importDir);
                 break;
 
-            case SexyTopo.REQUEST_CODE_SELECT_SURVEY_TO_LINK:
+            case SexyTopoConstants.REQUEST_CODE_SELECT_SURVEY_TO_LINK:
                 DocumentFile toLink = DocumentFile.fromTreeUri(this, uri);
                 linkToStationInSurvey(toLink);
                 break;
@@ -1058,11 +1058,11 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     private void setInputModePreference(MenuItem item) {
         item.setChecked(!item.isChecked());
         SharedPreferences preferences =
-                getSharedPreferences(SexyTopo.GENERAL_PREFS, android.content.Context.MODE_PRIVATE);
+                getSharedPreferences(SexyTopoConstants.GENERAL_PREFS, android.content.Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         int id = item.getItemId();
         InputMode inputMode = InputMode.byMenuId(id);
-        editor.putString(SexyTopo.INPUT_MODE_PREFERENCE, inputMode.name());
+        editor.putString(SexyTopoConstants.INPUT_MODE_PREFERENCE, inputMode.name());
         editor.apply();
     }
 
@@ -1172,7 +1172,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     public void jumpToStation(Station station, Class<? extends SexyTopoActivity> clazz) {
         Intent intent = new Intent(this, clazz);
         Bundle bundle = new Bundle();
-        bundle.putString(SexyTopo.JUMP_TO_STATION, station.getName());
+        bundle.putString(SexyTopoConstants.JUMP_TO_STATION, station.getName());
         intent.putExtras(bundle);
         startActivity(intent);
     }

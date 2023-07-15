@@ -3,7 +3,7 @@ package org.hwyl.sexytopo.comms.distox;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 
-import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
 
 import java.io.IOException;
@@ -29,7 +29,7 @@ public class DistoXSocket {
         try {
             Log.device("Connecting...");
             BluetoothSocket bluetoothSocket = bluetoothDevice.createInsecureRfcommSocketToServiceRecord(
-                    SexyTopo.DISTO_X_UUID);
+                    SexyTopoConstants.DISTO_X_UUID);
             bluetoothSocket.connect(); // blocks until connection is complete or fails with an exception
             return bluetoothSocket;
         } catch(Exception exception) {

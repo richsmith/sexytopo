@@ -24,7 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.graph.GraphView;
 import org.hwyl.sexytopo.control.table.ManualEntry;
@@ -96,13 +96,13 @@ public class TableActivity extends SexyTopoActivity
         super.onResume();
 
         LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
-        broadcastManager.registerReceiver(receiver, new IntentFilter(SexyTopo.SURVEY_UPDATED_EVENT));
+        broadcastManager.registerReceiver(receiver, new IntentFilter(SexyTopoConstants.SURVEY_UPDATED_EVENT));
 
         syncTableWithSurvey();
 
         Bundle bundle = getIntent().getExtras();
-        if (bundle != null && bundle.getString(SexyTopo.JUMP_TO_STATION) != null) {
-            String requestedStationName = bundle.getString(SexyTopo.JUMP_TO_STATION);
+        if (bundle != null && bundle.getString(SexyTopoConstants.JUMP_TO_STATION) != null) {
+            String requestedStationName = bundle.getString(SexyTopoConstants.JUMP_TO_STATION);
             Station requestedStation = getSurvey().getStationByName(requestedStationName);
             jumpToStation(requestedStation);
         } else {

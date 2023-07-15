@@ -22,7 +22,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.SexyTopo;
+import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.comms.Communicator;
 import org.hwyl.sexytopo.comms.distox.DistoXCommunicator;
 import org.hwyl.sexytopo.comms.distox.WriteCalibrationProtocol;
@@ -30,7 +30,6 @@ import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.calibration.CalibrationCalculator;
 import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.io.StartLocation;
-import org.hwyl.sexytopo.control.io.SurveyFile;
 import org.hwyl.sexytopo.control.io.basic.CalibrationJsonTranslater;
 import org.hwyl.sexytopo.control.util.PreferenceAccess;
 import org.hwyl.sexytopo.control.util.TextTools;
@@ -128,7 +127,7 @@ public class CalibrationActivity extends SexyTopoActivity {
 
         LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
         broadcastManager.registerReceiver(updatedCalibrationReceiver,
-                new IntentFilter(SexyTopo.CALIBRATION_UPDATED_EVENT));
+                new IntentFilter(SexyTopoConstants.CALIBRATION_UPDATED_EVENT));
     }
 
     @Override
@@ -331,15 +330,15 @@ public class CalibrationActivity extends SexyTopoActivity {
 
     public void requestSaveCalibration(View view) {
         createFile(
-            SexyTopo.REQUEST_CODE_SAVE_CALIBRATION,
+            SexyTopoConstants.REQUEST_CODE_SAVE_CALIBRATION,
             StartLocation.TOP_LEVEL,
-            SurveyFile.SurveyFileType.DEFAULT_MIME_TYPE,
+            SexyTopoConstants.DEFAULT_MIME_TYPE,
             null);
     }
 
 
     public void requestLoadCalibration(View view) {
-        selectFile(SexyTopo.REQUEST_CODE_OPEN_CALIBRATION, StartLocation.TOP_LEVEL, null);
+        selectFile(SexyTopoConstants.REQUEST_CODE_OPEN_CALIBRATION, StartLocation.TOP_LEVEL, null);
     }
 
     private void saveCalibration(Uri uri) throws JSONException, IOException {
@@ -412,14 +411,14 @@ public class CalibrationActivity extends SexyTopoActivity {
 
         Uri uri = resultData.getData();
 
-        if (requestCode == SexyTopo.REQUEST_CODE_OPEN_CALIBRATION) {
+        if (requestCode == SexyTopoConstants.REQUEST_CODE_OPEN_CALIBRATION) {
             try {
                 loadCalibration(uri);
             } catch (Exception exception) {
                 showExceptionAndLog("Could not open calibration file", exception);
             }
 
-        } else if (requestCode == SexyTopo.REQUEST_CODE_SAVE_CALIBRATION) {
+        } else if (requestCode == SexyTopoConstants.REQUEST_CODE_SAVE_CALIBRATION) {
             try {
                 saveCalibration(uri);
             } catch (Exception exception) {
