@@ -79,11 +79,15 @@
     <string name="action_force_crash">Force crash (danger!)</string>
 
     <!-- File handling -->
+    <string name="file_loading_name">Loading file %1$s</string>
+    <string name="file_loading_error_not_survey">Not a valid survey folder</string>
     <string name="loading_survey_error">Error loading survey</string>
     <string name="link_survey_station">Choose station to link active station to</string>
     <string name="link_survey_save_error">Error saving new connection</string>
     <string name="file_unlink_survey_dialog_title">Unlink Survey</string>
     <string name="survey_saved">Saved</string>
+    <string name="file_save_autosaved">Autosaved</string>
+    <string name="file_save_autosave_error">Error autosaving</string>
     <string name="error_saving_survey">FAILED to save survey</string>
     <string name="restoring_autosave">Restoring autosave</string>
     <string name="intent_save_as_title">Create a folder to save survey in</string>
@@ -150,6 +154,15 @@
     <string name="sketch_toolbar_redo">Redo</string>
     <string name="sketch_toolbar_zoom_in">Zoom in</string>
     <string name="sketch_toolbar_zoom_out">Zoom out</string>
+    <string name="sketch_toolbar_colour_main">Main colour</string>
+    <string name="sketch_toolbar_colour_brown">Brown</string>
+    <string name="sketch_toolbar_colour_grey">Grey</string>
+    <string name="sketch_toolbar_colour_red">Red</string>
+    <string name="sketch_toolbar_colour_orange">Orange</string>
+    <string name="sketch_toolbar_colour_green">Green</string>
+    <string name="sketch_toolbar_colour_blue">Blue</string>
+    <string name="sketch_toolbar_colour_purple">Purple</string>
+    <string name="sketch_toolbar_symbol_close">Close symbol toolbar</string>
     <string name="sketch_menu_delete_last_leg">Undo Last Reading</string>
     <string name="sketch_menu_centre_view">Centre on Active</string>
     <string name="sketch_menu_auto_recentre">Auto-Recentre</string>
