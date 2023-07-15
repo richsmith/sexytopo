@@ -76,12 +76,6 @@
 
         </LinearLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/disto_connection_instructions"/>
     </LinearLayout>
 
     <androidx.appcompat.widget.SwitchCompat

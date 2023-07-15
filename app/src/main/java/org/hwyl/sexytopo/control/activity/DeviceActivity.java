@@ -14,7 +14,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
@@ -26,9 +28,6 @@ import org.hwyl.sexytopo.control.util.LogUpdateReceiver;
 import java.lang.reflect.Method;
 import java.util.Set;
 
-import androidx.appcompat.widget.SwitchCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 
 public class DeviceActivity extends SexyTopoActivity {
 
@@ -36,7 +35,7 @@ public class DeviceActivity extends SexyTopoActivity {
     public static final String DISTO_X_PREFIX = "DistoX";
     public static final String SHETLAND_PREFIX = "Shetland";
 
-    private static final BluetoothAdapter BLUETOOTH_ADAPTER = BluetoothAdapter.getDefaultAdapter();
+    private static BluetoothAdapter bluetoothAdapter;
 
     private IntentFilter logFilter;
     private IntentFilter statusFilter;
@@ -53,6 +52,8 @@ public class DeviceActivity extends SexyTopoActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device);
+
+         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         setupSwitchListeners();
         updateStatuses();
@@ -154,20 +155,31 @@ public class DeviceActivity extends SexyTopoActivity {
     }
 
 
+    private static BluetoothAdapter getBluetoothAdapter() {
+        if (bluetoothAdapter == null) {
+            bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        }
+        return bluetoothAdapter;
+    }
+
+
     @SuppressWarnings("RedundantIfStatement")
     private void updateBluetooth() {
 
-        if (BLUETOOTH_ADAPTER == null) {
-            Toast.makeText(getApplicationContext(), "No Bluetooth capabilities detected",
-                    Toast.LENGTH_SHORT).show();
+        if (bluetoothAdapter == null) {
+            bluetoothAdapter = getBluetoothAdapter();
+        }
+
+        if (bluetoothAdapter == null) {
+            showSimpleToast(R.string.device_bluetooth_no_adapter);
         }
 
         SwitchCompat bluetoothSwitch = findViewById(R.id.bluetoothSwitch);
 
-        if (BLUETOOTH_ADAPTER == null) {
+        if (bluetoothAdapter == null) {
             bluetoothSwitch.setChecked(false);
             bluetoothSwitch.setEnabled(false);
-        } else if (BLUETOOTH_ADAPTER.isEnabled()) {
+        } else if (bluetoothAdapter.isEnabled()) {
             bluetoothSwitch.setChecked(true);
         } else {
             bluetoothSwitch.setChecked(false);
@@ -178,7 +190,7 @@ public class DeviceActivity extends SexyTopoActivity {
     }
 
 
-    public void toggleBluetooth(View view) {
+    public void toggleBluetooth(View view) throws SecurityException {
         SwitchCompat bluetoothSwitch = (SwitchCompat)view;
         if (bluetoothSwitch.isChecked()) {
             BluetoothAdapter.getDefaultAdapter().enable();
@@ -209,14 +221,16 @@ public class DeviceActivity extends SexyTopoActivity {
     }
 
 
-    public void requestPair(View view) {
+    public void requestPair(View view) throws SecurityException {
 
-        if (BLUETOOTH_ADAPTER.isDiscovering()) {
+        bluetoothAdapter = getBluetoothAdapter();
+
+        if (bluetoothAdapter.isDiscovering()) {
             Log.device("Cancelling...");
-            BLUETOOTH_ADAPTER.cancelDiscovery();
+            bluetoothAdapter.cancelDiscovery();
 
         } else {
-            boolean started = BLUETOOTH_ADAPTER.startDiscovery();
+            boolean started = bluetoothAdapter.startDiscovery();
             if (started) {
                 Log.device("Scanning...");
             } else {
@@ -226,7 +240,7 @@ public class DeviceActivity extends SexyTopoActivity {
     }
 
 
-    private void updatePairedStatus() {
+    private void updatePairedStatus() throws SecurityException {
 
         BluetoothDevice device = getPairedDevice();
         boolean isPaired = (device != null);
@@ -273,7 +287,7 @@ public class DeviceActivity extends SexyTopoActivity {
     }
 
 
-    private void unpair(BluetoothDevice device) {
+    private void unpair(BluetoothDevice device) throws SecurityException {
 
         if (device == null) {
             return;
@@ -310,7 +324,7 @@ public class DeviceActivity extends SexyTopoActivity {
     }
 
 
-    private static void pair(BluetoothDevice device) {
+    private static void pair(BluetoothDevice device) throws SecurityException {
         try {
             Log.device("Pairing with " + device.getName());
             Method m = device.getClass().getMethod("createBond", (Class[]) null);
@@ -322,13 +336,14 @@ public class DeviceActivity extends SexyTopoActivity {
 
     }
 
-    private static BluetoothDevice getPairedDevice() {
-        
-        if (BLUETOOTH_ADAPTER == null) {
+    private static BluetoothDevice getPairedDevice() throws SecurityException {
+
+        BluetoothAdapter bluetoothAdapter = getBluetoothAdapter();
+        if (bluetoothAdapter == null) {
             return null;
         }
 
-        Set<BluetoothDevice> allPairedDevices = BLUETOOTH_ADAPTER.getBondedDevices();
+        Set<BluetoothDevice> allPairedDevices = bluetoothAdapter.getBondedDevices();
         for (BluetoothDevice device : allPairedDevices) {
             Instrument instrument = Instrument.byDevice(device);
             if (instrument != Instrument.OTHER && instrument != Instrument.NONE) {
@@ -361,15 +376,20 @@ public class DeviceActivity extends SexyTopoActivity {
                     return;
                 }
 
-                String name = device.getName();
-                Instrument instrument = Instrument.byName(name);
-                if (instrument == Instrument.OTHER) {
-                    Log.device("Incompatible device \"" + name + "\" detected");
+                try {
+                    String name = device.getName();
+                    Instrument instrument = Instrument.byName(name);
+                    if (instrument == Instrument.OTHER) {
+                        Log.device("Incompatible device \"" + name + "\" detected");
 
-                } else {
-                    Log.device(instrument.getName() + " detected");
-                    pair(device);
-                    BLUETOOTH_ADAPTER.cancelDiscovery();
+                    } else {
+                        Log.device(instrument.getName() + " detected");
+                        pair(device);
+                        BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
+                    }
+                } catch (SecurityException e) {
+                    Log.device(e.toString());
+                    Log.device("Security error (check permissions)");
                 }
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 Log.device("Scan finished");

@@ -1,6 +1,5 @@
 package org.hwyl.sexytopo.control.activity;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -41,6 +40,7 @@ import org.hwyl.sexytopo.comms.Communicator;
 import org.hwyl.sexytopo.comms.Instrument;
 import org.hwyl.sexytopo.comms.missing.NullCommunicator;
 import org.hwyl.sexytopo.control.Log;
+import org.hwyl.sexytopo.control.SexyTopoPermissions;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.io.StartLocation;
@@ -60,7 +60,6 @@ import org.hwyl.sexytopo.model.survey.SurveyConnection;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -361,14 +360,10 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             return; // no need to request permissions for earlier Android versions
         }
-        String[] PERMISSIONS = new String[]{
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACCESS_FINE_LOCATION,
-        };
 
-        List<String> notYetGotPermissions = new ArrayList<>(Arrays.asList(PERMISSIONS));
-        for (String permission : PERMISSIONS) {
+        List<String> perms = SexyTopoPermissions.getPermissions();
+        List<String> notYetGotPermissions = new ArrayList<>();
+        for (String permission : SexyTopoPermissions.getPermissions()) {
             int permissionCheck = ContextCompat.checkSelfPermission(this, permission);
             if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
                 notYetGotPermissions.add(permission);

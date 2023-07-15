@@ -203,7 +203,7 @@
     <string name="manual_rename_error">Rename failed</string>
     <string name="delete_row_question">Delete Row?</string>
 
-    <!-- Calibration -->
+    <!-- Device -->
     <string name="bluetooth_status">1. Bluetooth</string>
     <string name="paired_status">2. Paired With</string>
     <string name="connect_automatically">3. Connect</string>
@@ -212,10 +212,12 @@
     <string name="bluetooth_on">On</string>
     <string name="no_device">no device</string>
     <string name="bluetooth_off">Off</string>
-    <string name="disto_connection_instructions">To pair: turn on the instrument, click \'Pair…\', wait, and enter \'0000\' if a code is requested.</string>
+    <string name="device_bluetooth_no_adapter">Cannot access bluetooth adapter</string>
     <string name="device_log_connection_requested">Connection requested</string>
     <string name="device_trying_fallback">Failed to create socket; trying fallback socket</string>
     <string name="pairing_request">PAIRING requested\n-> Perform pairing steps. Connect again</string>
+
+    <!-- Calibration -->
     <string name="calibration_wrong_device">No connected DistoX</string>
     <string name="calibration_index">Reading number</string>
     <string name="calibration_start">Disto Cal Mode On</string>
