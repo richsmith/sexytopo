@@ -3,12 +3,10 @@ package org.hwyl.sexytopo.control.table;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.EditText;
+import android.widget.Button;
 import android.widget.TextView;
 
 import org.hwyl.sexytopo.R;
@@ -31,14 +29,14 @@ public class ManualEntry {
 
     public static void addStation(final TableActivity tableActivity, final Survey survey) {
         AlertDialog dialog = createDialog(R.layout.leg_edit_dialog,
-            tableActivity,
-            (leg, ignore) -> {
-                SurveyUpdater.updateWithNewStation(survey, leg);
-                SurveyManager manager = tableActivity.getSurveyManager();
-                manager.broadcastSurveyUpdated();
-                manager.broadcastNewStationCreated();
-                tableActivity.syncTableWithSurvey();
-            });
+                tableActivity,
+                (leg, ignore) -> {
+                    SurveyUpdater.updateWithNewStation(survey, leg);
+                    SurveyManager manager = tableActivity.getSurveyManager();
+                    manager.broadcastSurveyUpdated();
+                    manager.broadcastNewStationCreated();
+                    tableActivity.syncTableWithSurvey();
+                });
         dialog.setTitle(R.string.manual_add_station_title);
     }
 
@@ -46,12 +44,12 @@ public class ManualEntry {
 
     public static void addSplay(final TableActivity tableActivity, final Survey survey) {
         AlertDialog dialog = createDialog(R.layout.leg_edit_dialog,
-            tableActivity,
-            (leg, ignore) -> {
-                SurveyUpdater.update(survey, leg);
-                tableActivity.getSurveyManager().broadcastSurveyUpdated();
-                tableActivity.syncTableWithSurvey();
-            });
+                tableActivity,
+                (leg, ignore) -> {
+                    SurveyUpdater.update(survey, leg);
+                    tableActivity.getSurveyManager().broadcastSurveyUpdated();
+                    tableActivity.syncTableWithSurvey();
+                });
         dialog.setTitle(R.string.manual_add_splay_title);
     }
 
@@ -61,15 +59,15 @@ public class ManualEntry {
                                final Leg toEdit) {
 
         AlertDialog dialog = createDialog(R.layout.leg_edit_dialog,
-            tableActivity,
-            (edited, ignore) -> {
+                tableActivity,
+                (edited, ignore) -> {
                     if (toEdit.hasDestination()) {
                         edited = new Leg(
-                            edited.getDistance(),
-                            edited.getAzimuth(),
-                            edited.getInclination(),
-                            toEdit.getDestination(),
-                            new Leg[]{});
+                                edited.getDistance(),
+                                edited.getAzimuth(),
+                                edited.getInclination(),
+                                toEdit.getDestination(),
+                                new Leg[]{});
                     }
                     if (toEdit.wasShotBackwards()) {
                         edited = edited.reverse();
@@ -77,7 +75,7 @@ public class ManualEntry {
                     SurveyUpdater.editLeg(survey, toEdit, edited);
                     tableActivity.getSurveyManager().broadcastSurveyUpdated();
                     tableActivity.syncTableWithSurvey();
-            });
+                });
 
         dialog.setTitle(R.string.manual_edit_leg_title);
 
@@ -152,10 +150,10 @@ public class ManualEntry {
             dialogView.findViewById(R.id.azimuth_deg_mins_secs).setVisibility(View.VISIBLE);
         }
         builder
-            .setView(dialogView)
-            .setTitle(R.string.manual_add_station_title)
-            .setPositiveButton(R.string.save, null)
-            .setNegativeButton(R.string.cancel, null);
+                .setView(dialogView)
+                .setTitle(R.string.manual_add_station_title)
+                .setPositiveButton(R.string.save, null)
+                .setNegativeButton(R.string.cancel, null);
 
         final AlertDialog dialog = builder.create();
 
@@ -178,9 +176,9 @@ public class ManualEntry {
                             azimuth = null;
                         } else {
                             azimuth =
-                                degrees +
-                                (minutes * (1.0f / 60.0f)) +
-                                (seconds * (1.0f / 60.0f) * (1.0f / 60.0f));
+                                    degrees +
+                                            (minutes * (1.0f / 60.0f)) +
+                                            (seconds * (1.0f / 60.0f) * (1.0f / 60.0f));
                         }
                     } else {
                         azimuth = getFieldValue(dialog, R.id.editAzimuth);
@@ -211,52 +209,41 @@ public class ManualEntry {
 
     public static void renameStation(final TableActivity activity,
                                      final Survey survey, final Station toRename) {
+        final RenameStationForm form = new RenameStationForm(activity, survey, toRename);
 
-        final EditText renameField = new EditText(activity);
-        renameField.setText(toRename.getName());
-
-
-        renameField.addTextChangedListener(new TextWatcher() {
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // nothing
+        Runnable renameAction = () -> {
+            String newName = form.stationName.getText().toString();
+            try {
+                SurveyUpdater.renameStation(survey, toRename, newName);
+                activity.syncTableWithSurvey();
+            } catch (Exception e) {
+                activity.showSimpleToast("Rename failed");
             }
+        };
 
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // nothing
-            }
+        AlertDialog dialog = new AlertDialog.Builder(activity)
+                .setTitle("Rename Station")
+                .setView(form.stationName)
+                .setPositiveButton("Rename", (ignore, buttonId) -> renameAction.run())
+                .setNegativeButton(R.string.cancel, null)
+                .create();
 
-            public void afterTextChanged(Editable s) {
+        form.stationName.setOnEditorActionListener((view, actionId, event) -> {
+            form.validate();
 
-                String currentName = toRename.getName();
-                String currentText = renameField.getText().toString();
-
-                // only check for non-null or max length
-                if (currentText.isEmpty()) {
-                    renameField.setError("Cannot be blank");
-                } else if (currentText.equals("-")) {
-                    renameField.setError("Station cannot be named \"-\"");
-                } else if (!currentText.equals(currentName) && (survey.getStationByName(currentText) != null)) {
-                    renameField.setError("Station name must be unique");
-                } else {
-                    renameField.setError(null);
-                }
+            if(form.isValid()) {
+                renameAction.run();
+                dialog.dismiss();
+                return true;
+            } else {
+                return false;
             }
         });
 
-        AlertDialog dialog = new AlertDialog.Builder(activity)
-                .setTitle("Edit name")
-                .setView(renameField)
-                .setPositiveButton("Rename", (ignore, buttonId) -> {
-                    String newName = renameField.getText().toString();
-                    try {
-                        SurveyUpdater.renameStation(survey, toRename, newName);
-                        activity.syncTableWithSurvey();
-                    } catch (Exception e) {
-                        activity.showSimpleToast("Rename failed");
-                    }
-                })
-                .setNegativeButton(R.string.cancel, null)
-                .create();
+        form.setOnDidValidateCallback((valid) -> {
+            Button positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+            positiveButton.setEnabled(valid);
+        });
 
         dialog.getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
