@@ -8,6 +8,8 @@ import org.hwyl.sexytopo.control.io.translation.AbstractSurveyFile;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 @SuppressWarnings("UnnecessaryLocalVariable")
 public class SurveyFile extends AbstractSurveyFile {
@@ -52,6 +54,10 @@ public class SurveyFile extends AbstractSurveyFile {
     public static SurveyFileType SKETCH_PLAN = new SurveyFileType("plan.json");
     public static SurveyFileType SKETCH_EXT_ELEVATION = new SurveyFileType("ext-elevation.json");
 
+    private static final List<SurveyFileType> ALL_TYPES =
+            Arrays.asList(DATA, METADATA, SKETCH_PLAN, SKETCH_EXT_ELEVATION);
+
+
     private final SurveyFileType surveyFileType;
 
     private SurveyFile(Survey survey, SurveyFileType surveyFileType) {
@@ -62,6 +68,15 @@ public class SurveyFile extends AbstractSurveyFile {
         this.survey = survey;
         this.parent = parent;
         this.surveyFileType = surveyFileType;
+    }
+
+    public SurveyFile getAutosaveVersion() {
+        SurveyFileType autosaveType = surveyFileType.AUTOSAVE;
+        if (autosaveType == null) {
+            return this;
+        } else {
+            return autosaveType.get(survey);
+        }
     }
 
     public String getFilename() {
@@ -96,14 +111,7 @@ public class SurveyFile extends AbstractSurveyFile {
         return documentFile;
     }
 
-    public SurveyFile getAutosaveVersion() {
-        SurveyFileType autosaveType = surveyFileType.AUTOSAVE;
-        if (autosaveType == null) {
-            return this;
-        } else {
-            return autosaveType.get(survey);
-        }
-    }
+
 
     public void save(Context context, String contents) throws IOException {
         parent.ensureExists(context);
