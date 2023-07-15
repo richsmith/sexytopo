@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory
         android:title="General"
-        android:key="pref_general">
+        android:key="pref_general"
+        app:iconSpaceReserved="false">
 
         <ListPreference
             android:key="pref_orientation"
@@ -118,7 +120,7 @@
             android:title="Station label size"/>
         <CheckBoxPreference
             android:key="pref_key_anti_alias"
-            android:summary="Apply antialising to sketch lines etc. (improves visual display at the cost of some perfomance)"
+            android:summary="Apply antialiasing to sketch lines etc. (improves visual display at the cost of some perfomance)"
             android:title="Anti-alias sketch lines"
             android:defaultValue="false"/>
     </PreferenceCategory>
