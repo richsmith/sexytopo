@@ -1,17 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <color name="panelBackground">#7FAF7F</color>
-    <color name="headerBackground">#7FAF7F</color>
+    <color name="white">#FFFFFF</color>
+    <color name="sexyTopoGreen">#7FAF7F</color>
+    <color name="lowKeyGrey">#DDDDDD</color>
+    <color name="lightGrey">#D3D3D3</color>
+    <color name="darkGrey">#A9A9A9</color>
 
-    <color name="sketchBlack">#000000</color>
-    <color name="sketchBlue">#0000FF</color>
-    <color name="paintGreen">#00FF00</color>
-    <color name="sketchOrange">#FFA500</color>
+    <color name="panelBackground">@color/sexyTopoGreen</color>
+    <color name="headerBackground">@color/sexyTopoGreen</color>
+
+    <color name="innerPanelBackground">@color/lowKeyGrey</color>
+
+    <color name="buttonHighlight">@color/white</color>
+
+
+    <color name="lightBackground">#FFFFFF</color>
+    <color name="darkBackground">#00FF00</color>
+
+    <color name="colorBackground">@color/lightBackground</color>
+    <color name="colorBackgroundDark">@color/darkBackground</color>
+
+    <color name="grid">#D3D3D3</color>
+
+    <color name="actionBar">#000000</color>
 
     <color name="error">#FF0000</color>
     <color name="standard">#000000</color>
 
     <color name="tableBackground">#DFDFDF</color>
+
 
 </resources>

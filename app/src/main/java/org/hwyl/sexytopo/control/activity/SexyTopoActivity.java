@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -26,6 +27,7 @@ import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuCompat;
@@ -108,6 +110,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        setTheme();
         setOrientation();
 
     }
@@ -1155,7 +1158,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
     @SuppressLint("SourceLockedOrientationActivity")
-    private void setOrientation() {
+    protected void setOrientation() {
         String orientationPreference = PreferenceAccess.getString(
                 this, "pref_orientation", "");
 
@@ -1168,6 +1171,17 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         }
     }
 
+    protected void setTheme() {
+        String themeMode = PreferenceAccess.getString(this, "pref_theme", "auto");
+        if ("light".equals(themeMode)) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        } else if ("dark".equals(themeMode)) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+        }
+    }
+
 
     public void jumpToStation(Station station, Class<? extends SexyTopoActivity> clazz) {
         Intent intent = new Intent(this, clazz);
@@ -1177,6 +1191,10 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    boolean isDarkModeActive() {
+        int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        return nightModeFlags == Configuration.UI_MODE_NIGHT_YES;
+    }
 
     private class SaveTask extends AsyncTask<android.content.Context, Void, Boolean> {
 

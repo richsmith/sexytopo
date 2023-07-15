@@ -21,6 +21,14 @@ public abstract class SketchDetail {
         return colour;
     }
 
+    public Colour getDrawColour(boolean isDarkModeActive) {
+        if (isDarkModeActive && colour == Colour.BLACK) {
+            return Colour.WHITE;
+        } else {
+            return colour;
+        }
+    }
+
     public abstract float getDistanceFrom(Coord2D point);
 
     public abstract SketchDetail translate(Coord2D point);

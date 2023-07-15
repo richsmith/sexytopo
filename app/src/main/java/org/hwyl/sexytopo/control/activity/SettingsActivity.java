@@ -1,12 +1,16 @@
 package org.hwyl.sexytopo.control.activity;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.preference.PreferenceFragmentCompat;
 
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.control.util.PreferenceAccess;
 
 public class SettingsActivity extends SexyTopoActivity {
+
+    private SharedPreferences.OnSharedPreferenceChangeListener prefListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -15,7 +19,28 @@ public class SettingsActivity extends SexyTopoActivity {
         getSupportFragmentManager().beginTransaction()
             .replace(R.id.settings_container, new SettingsFragment())
             .commit();
+
+        prefListener = (prefs, key) -> {
+            if (key.equals("pref_theme")) {
+                setTheme();
+            }
+        };
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences prefs = PreferenceAccess.getPreferences(this);
+        prefs.registerOnSharedPreferenceChangeListener(prefListener);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        SharedPreferences prefs = PreferenceAccess.getPreferences(this);
+        prefs.unregisterOnSharedPreferenceChangeListener(prefListener);
+    }
+
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
         @Override

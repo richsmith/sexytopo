@@ -20,6 +20,8 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.PopupWindow;
 
+import androidx.core.content.ContextCompat;
+
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
@@ -104,7 +106,9 @@ public class GraphView extends View {
     public static final int LEGEND_SIZE = 18;
     public final float LEGEND_TICK_SIZE = 5;
     public static final Colour LEGEND_COLOUR = Colour.BLACK;
-    public static final Colour GRID_COLOUR = Colour.LIGHT_GREY;
+    //public static final Colour GRID_COLOUR = Colour.LIGHT_GREY;
+    public static final Colour GRID_COLOUR = Colour.NAVY;
+
 
     public static final float DELETE_PATHS_WITHIN_N_PIXELS = 5.0f;
     public static final float SELECTION_SENSITIVITY_IN_PIXELS = 25.0f;
@@ -123,6 +127,8 @@ public class GraphView extends View {
     private Map<Survey, Space<Coord2D>> translatedConnectedSurveys = new HashMap<>();
 
     boolean surveyChanged;
+
+    private boolean isDarkModeActive = false;
 
     // cached for performance
     private Coord2D canvasBottomRight;
@@ -172,11 +178,13 @@ public class GraphView extends View {
         super(context, attrs);
         scaleGestureDetector = new ScaleGestureDetector(context, new ScaleListener());
         longPressDetector = new GestureDetector(context, new LongPressListener());
-        initialisePaint();
     }
 
 
     public void initialisePaint() {
+
+        int gridColour = ContextCompat.getColor(activity, R.color.grid);
+        gridPaint.setColor(gridColour);
 
         boolean applyAntiAlias = PreferenceAccess.getBoolean(
                 getContext(), "pref_key_anti_alias", false);
@@ -220,8 +228,6 @@ public class GraphView extends View {
         fadedSplayPaint.setStrokeWidth(splayStrokeWidth);
         fadedSplayPaint.setColor(LEG_COLOUR.intValue);
         fadedSplayPaint.setAlpha(FADED_ALPHA);
-
-        gridPaint.setColor(GRID_COLOUR.intValue);
 
         drawPaint.setColor(DEFAULT_SKETCH_COLOUR.intValue);
         drawPaint.setStrokeWidth(3);
@@ -282,6 +288,10 @@ public class GraphView extends View {
 
     public void setSketch(Sketch sketch) {
         this.sketch = sketch;
+    }
+
+    public void setIsDarkModeActive(boolean isDarkModeActive) {
+        this.isDarkModeActive = isDarkModeActive;
     }
 
 
@@ -533,16 +543,14 @@ public class GraphView extends View {
                 final EditText input = new EditText(getContext());
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setView(input)
-                        .setPositiveButton("OK", (dialog, which) -> {
+                        .setPositiveButton(R.string.ok, (dialog, which) -> {
                             String text = input.getText().toString();
                             int startingSize = PreferenceAccess.getInt(getContext(),
                                     "pref_survey_text_tool_font_size", 50);
                             float size = startingSize / surveyToViewScale;
                             sketch.addTextDetail(touchPointOnSurvey, text, size);
                         })
-                        .setNegativeButton("Cancel", (dialog, which) -> {
-                            // do nothing
-                        });
+                        .setNegativeButton(R.string.cancel, null);
                 AlertDialog dialog = builder.create();
                 dialog.getWindow().setSoftInputMode(
                         WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
@@ -677,14 +685,13 @@ public class GraphView extends View {
         input.setText(station.getComment());
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setView(input)
-                .setTitle(station.getName())
-                .setPositiveButton(R.string.save,
-                        (dialog, which) -> station.setComment(input.getText().toString()))
-                .setNegativeButton("Cancel",
-                        (dialog, which) -> { /* Do nothing */ });
+            .setTitle(station.getName())
+            .setPositiveButton(R.string.save,
+                (dialog, which) -> station.setComment(input.getText().toString()))
+            .setNegativeButton(R.string.cancel, null);
         AlertDialog dialog = builder.create();
         dialog.getWindow().setSoftInputMode(
-                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+            WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         dialog.show();
     }
 
@@ -837,6 +844,7 @@ public class GraphView extends View {
 
 
     private void drawGrid(Canvas canvas) {
+
         int tickSizeInMetres = getMinorGridBoxSize();
         int numberTicksJustBeforeViewpointOffsetX = (int)(viewpointOffset.x / tickSizeInMetres);
 
@@ -1190,8 +1198,9 @@ public class GraphView extends View {
             // Avoiding constantly updating the paint colour saves approx. 10% of sketch draw time.
             // Ideally getPathDetails() would return the paths in colour order but HashSets
             // are unordered collections
-            if (pathDetail.getColour() != lastColour) {
-                lastColour = pathDetail.getColour();
+            Colour drawColour = pathDetail.getDrawColour(isDarkModeActive);
+            if (drawColour != lastColour) {
+                lastColour = drawColour;
                 drawPaint.setColor(lastColour.intValue);
             }
 
@@ -1241,7 +1250,7 @@ public class GraphView extends View {
             Coord2D location = surveyCoordsToViewCoords(textDetail.getPosition());
             float x = location.x, y = location.y;
             String text = textDetail.getText();
-            labelPaint.setColor(textDetail.getColour().intValue);
+            setDrawColour(labelPaint, textDetail);
             labelPaint.setTextSize(textDetail.getSize() * surveyToViewScale);
             for (String line : text.split("\n")) {
                 canvas.drawText(line, x, y, labelPaint);
@@ -1265,6 +1274,11 @@ public class GraphView extends View {
             float x = location.x, y = location.y;
             canvas.drawBitmap(bitmap, x, y, labelPaint);
         }
+    }
+
+    private void setDrawColour(Paint paint, SketchDetail sketchDetail) {
+        Colour colour = sketchDetail.getDrawColour(isDarkModeActive);
+        paint.setColor(colour.intValue);
     }
 
 
@@ -1442,7 +1456,6 @@ public class GraphView extends View {
         if (MIN_ZOOM >= newZoom || newZoom >= MAX_ZOOM) {
             return;
         }
-
 
         Coord2D focusInSurveyCoords = viewCoordsToSurveyCoords(focusOnScreen);
 

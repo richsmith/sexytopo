@@ -20,6 +20,9 @@ import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.PopupWindow;
 
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
@@ -30,13 +33,12 @@ import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.BrushColour;
+import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchTool;
 import org.hwyl.sexytopo.model.sketch.Symbol;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
-
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 
 public abstract class GraphActivity extends SexyTopoActivity
@@ -111,6 +113,8 @@ public abstract class GraphActivity extends SexyTopoActivity
     private BroadcastReceiver updatedReceiver;
     private BroadcastReceiver createdReceiver;
 
+    private int buttonHighlightColour = Colour.WHITE.intValue;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -164,6 +168,7 @@ public abstract class GraphActivity extends SexyTopoActivity
         registerReceivers();
         syncGraphWithSurvey();
 
+        intialiseActivity();
         initialiseGraphView();
         initialiseSketchTool();
         initialiseBrushColour();
@@ -204,10 +209,16 @@ public abstract class GraphActivity extends SexyTopoActivity
         }
     }
 
+    private void intialiseActivity() {
+        buttonHighlightColour = ContextCompat.getColor(this, R.color.buttonHighlight);
+    }
 
     private void initialiseGraphView() {
         graphView.initialisePaint();
         graphView.setProjectionType(getProjectionType());
+
+        boolean isDarkModeActive = isDarkModeActive();
+        graphView.setIsDarkModeActive(isDarkModeActive);
     }
 
 
@@ -285,6 +296,13 @@ public abstract class GraphActivity extends SexyTopoActivity
 
 
     private void setSketchButtonsStatus() {
+
+        if (isDarkModeActive()) {
+            ImageButton blackButton = findViewById(R.id.buttonBlack);
+            blackButton.setImageResource(R.drawable.white);
+        }
+
+
        boolean isEnabled = graphView.getDisplayPreference(DisplayPreference.SHOW_SKETCH);
         for (int id : SKETCH_BUTTON_IDS) {
             ImageButton button = findViewById(id);
@@ -444,7 +462,7 @@ public abstract class GraphActivity extends SexyTopoActivity
         editor.apply();
 
         ImageButton selectedSymbolButton = findViewById(symbol.getBitmapId());
-        selectedSymbolButton.getBackground().setColorFilter(0xffffffff, PorterDuff.Mode.SRC_ATOP);
+        selectedSymbolButton.getBackground().setColorFilter(buttonHighlightColour, PorterDuff.Mode.SRC_ATOP);
 
         ImageButton symbolButton = findViewById(R.id.buttonSymbol);
         symbolButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
@@ -488,7 +506,7 @@ public abstract class GraphActivity extends SexyTopoActivity
             }
 
             if (sketchTool == toSelect) {
-                button.getBackground().setColorFilter(0xffffffff, PorterDuff.Mode.SRC_ATOP);
+                button.getBackground().setColorFilter(buttonHighlightColour, PorterDuff.Mode.SRC_ATOP);
             } else {
                 button.getBackground().clearColorFilter();
             }
@@ -522,7 +540,7 @@ public abstract class GraphActivity extends SexyTopoActivity
 
             View button = findViewById(brushColour.getId());
             if (brushColour == toSelect) {
-                button.getBackground().setColorFilter(0xffffffff, PorterDuff.Mode.SRC_ATOP);
+                button.getBackground().setColorFilter(buttonHighlightColour, PorterDuff.Mode.SRC_ATOP);
                 button.invalidate();
             } else {
                 button.getBackground().clearColorFilter();
