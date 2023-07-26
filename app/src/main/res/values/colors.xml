@@ -2,21 +2,28 @@
 
 <resources>
     <color name="white">#FFFFFF</color>
+    <color name="pink">#FFC0CB</color>
+    <color name="red">#FF0000</color>
     <color name="sexyTopoGreen">#7FAF7F</color>
+    <color name="navy">#000080</color>
+
     <color name="lowKeyGrey">#DDDDDD</color>
     <color name="lightGrey">#D3D3D3</color>
     <color name="darkGrey">#A9A9A9</color>
+    <color name="black">#000000</color>
 
     <color name="panelBackground">@color/sexyTopoGreen</color>
     <color name="headerBackground">@color/sexyTopoGreen</color>
-
     <color name="innerPanelBackground">@color/lowKeyGrey</color>
+
+    <color name="station">@color/red</color>
+    <color name="legend">@color/black</color>
 
     <color name="buttonHighlight">@color/white</color>
 
 
-    <color name="lightBackground">#FFFFFF</color>
-    <color name="darkBackground">#00FF00</color>
+    <color name="lightBackground">@color/white</color>
+    <color name="darkBackground">@color/black</color>
 
     <color name="colorBackground">@color/lightBackground</color>
     <color name="colorBackgroundDark">@color/darkBackground</color>

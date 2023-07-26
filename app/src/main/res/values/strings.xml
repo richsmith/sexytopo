@@ -26,8 +26,8 @@
     <string name="error_prefix">Error</string>
 
     <!-- System -->
-    <string name="app_name">SexyTopo</string>
-    <string name="title_activity_start_up">Starting Up</string>
+    <string name="app_name" translatable="false">SexyTopo</string>
+    <string name="title_activity_start_up">Starting</string>
     <string name="title_activity_device">Connect</string>
     <string name="title_activity_table">Table</string>
     <string name="title_activity_plan">Plan</string>
@@ -35,7 +35,7 @@
     <string name="title_activity_calibration">Calibration</string>
     <string name="title_activity_survey">Stats</string>
     <string name="title_activity_settings">Settings</string>
-    <string name="title_activity_system_log">System Log</string>
+    <string name="title_activity_system_log">Log</string>
     <string name="title_activity_help">Help</string>
     <string name="title_activity_guide">Guide</string>
 
@@ -81,16 +81,24 @@
     <string name="action_force_crash">Force crash (danger!)</string>
 
     <!-- File handling -->
-    <string name="file_loading_name">Loading file %1$s</string>
+    <string name="file_started_new_survey">Started new survey</string>
+    <string name="file_error_initialising_survey">Error initialising survey</string>
+    <string name="file_loading_survey">Loading <i>%1$s</i></string>
+    <string name="file_loaded_survey">Loaded <i>%1$s</i></string>
+    <string name="file_loading_file">Loading file %1$s</string>
+    <string name="file_loaded_file">Loaded file %1$s</string>
     <string name="file_loading_error_not_survey">Not a valid survey folder</string>
     <string name="file_loading_survey_error">Error loading survey</string>
     <string name="file_link_survey_station">Choose station to link active station to</string>
     <string name="file_link_survey_save_error">Error saving new connection</string>
     <string name="file_unlink_survey_dialog_title">Unlink Survey</string>
+    <string name="file_unlink_survey_not_found">Could not find survey to unlink</string>
+    <string name="file_unlink_survey_no_surveys">No surveys to unlink</string>
+    <string name="file_unlink_survey_error">Error unlinking survey</string>
     <string name="file_survey_saved">Saved</string>
     <string name="file_save_autosaved">Autosaved</string>
     <string name="file_save_autosave_error">Error autosaving</string>
-    <string name="file_error_saving_survey">FAILED to save survey</string>
+    <string name="file_save_survey_error">FAILED to save survey</string>
     <string name="file_restoring_autosave">Restoring autosave</string>
     <string name="file_intent_save_as_title">Create a folder to save survey in</string>
     <string name="file_intent_open_title">Select survey folder</string>
@@ -98,15 +106,22 @@
     <string name="file_intent_import_select_source">Select import folder</string>
     <string name="file_intent_delete_select_target">Select survey folder for deletion</string>
     <string name="file_dialog_delete_survey_title">Delete Survey?</string>
-    <string name="file_dialog_delete_survey_content">This will delete the survey and any associated files</string>
+    <string name="file_dialog_delete_survey_content">This will delete all the files in this survey</string>
     <string name="file_delete_error_not_survey">Selection does not appear to be a survey</string>
     <string name="file_delete_successful">Deletion of survey %1$s successful</string>
     <string name="file_error_deleting_survey">Error deleting survey</string>
     <string name="file_cannot_extend_unsaved_survey">Cannot extend unsaved survey</string>
-    <string name="file_loaded">Loaded %1$s</string>
-    <string name="file_restored">Restored</string>
-    <string name="file_restore_error">Error restoring autosave</string>
+    <string name="file_autosave_restored">Restored autosave</string>
+    <string name="file_autosave_load_error">Error restoring autosave</string>
     <string name="file_warning_survey_not_saved">Warning: current survey not saved</string>
+    <string name="file_active_survey">Active survey is %1$s</string>
+    <string name="file_active_survey_not_present">No active survey</string>
+    <string name="file_active_survey_uri">Active survey URI is %1$s</string>
+    <string name="file_saving_error_invalid_folder">Cannot write to folder</string>
+    <string name="file_saving_overwrite_survey_title_question">Folder contains survey; overwrite?</string>
+    <string name="file_saving_save_to_non_empty_directory_question">Folder is not empty; save anyway?</string>
+    <string name="file_operation_initialisation_error">Error initialising file operation</string>
+
 
     <!-- Context menu(s) -->
     <string name="menu_context_title">Station</string>
@@ -318,12 +333,22 @@
     <!-- Logging -->
     <string name="log">Log</string>
     <string name="log_starting_up">Starting up</string>
+    <string name="log_shown">Shown: %1$s</string>
     <string name="log_error_no_station_notification_intent">Unable to start new station notification intent</string>
+
 
     <!-- Misc -->
     <string name="killing_comms_process">Killing comms process</string>
     <string name="this_will_delete">This will delete:</string>
     <string name="move_leg_select_station_title">Select station to move to</string>
     <string name="move_leg_no_valid_move">Nowhere valid to move this leg</string>
+    <string name="tool_generate_test_title">Generate Test Data</string>
+    <string name="tool_generate_test_question">Replace the existing survey with randomly-generated data?</string>
+    <string name="tool_generate_test_error">Error generating test data</string>
+    <string name="tool_force_kill_error">Error killing connection</string>
+    <string name="tool_force_crash_message">Boom! Forced crash requested(!)</string>
+    <string name="survey_update_new_station_added">New station added</string>
+    <string name="request_code_error">Error code %1$d from request code %2$d</string>
+
 
 </resources>

@@ -142,8 +142,7 @@ public class ManualEntry {
         LayoutInflater inflater = tableActivity.getLayoutInflater();
         final View dialogView = inflater.inflate(layoutId, null);
 
-        boolean usingDegMinsSecs = PreferenceAccess.getBoolean(
-            tableActivity, "pref_key_deg_mins_secs", false);
+        boolean usingDegMinsSecs = PreferenceAccess.isDegMinsSecsModeOn();
 
         if (usingDegMinsSecs) {
             dialogView.findViewById(R.id.azimuth_standard).setVisibility(View.GONE);

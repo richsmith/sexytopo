@@ -4,6 +4,8 @@ import android.app.Application;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
+import org.hwyl.sexytopo.control.util.PreferenceAccess;
+
 
 public class SexyTopo extends Application {
 
@@ -14,6 +16,7 @@ public class SexyTopo extends Application {
         super.onCreate();
         defaultHandler = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler (this::handleUncaughtException);
+        PreferenceAccess.initialise(this.getApplicationContext());
     }
 
     public void handleUncaughtException (Thread thread, Throwable e) {

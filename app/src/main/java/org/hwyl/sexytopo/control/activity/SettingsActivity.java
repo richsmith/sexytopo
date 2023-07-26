@@ -2,11 +2,11 @@ package org.hwyl.sexytopo.control.activity;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 
 import androidx.preference.PreferenceFragmentCompat;
 
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.control.util.PreferenceAccess;
 
 public class SettingsActivity extends SexyTopoActivity {
 
@@ -30,14 +30,14 @@ public class SettingsActivity extends SexyTopoActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        SharedPreferences prefs = PreferenceAccess.getPreferences(this);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(prefListener);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        SharedPreferences prefs = PreferenceAccess.getPreferences(this);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.unregisterOnSharedPreferenceChangeListener(prefListener);
     }
 

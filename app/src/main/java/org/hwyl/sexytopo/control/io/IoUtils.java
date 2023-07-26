@@ -31,8 +31,9 @@ import java.util.Map;
 @SuppressWarnings("UnnecessaryLocalVariable")
 public class IoUtils {
 
-    public static boolean doesSurveyExist(Context context, Uri uri) {
-        return DocumentFile.fromTreeUri(context, uri).isDirectory();
+    public static boolean doesDirectoryExist(Context context, Uri uri) {
+        DocumentFile documentFile = DocumentFile.fromTreeUri(context, uri);
+        return documentFile != null && documentFile.isDirectory();
     }
 
     public static boolean isDirectoryEmpty(DocumentFile directory) {
@@ -44,7 +45,7 @@ public class IoUtils {
         DocumentFile[] files = directory.listFiles();
         for (DocumentFile file : files) {
             String filename = file.getName();
-            if (filename.endsWith(SurveyFile.DATA.getExtension())) {
+            if (filename != null && filename.endsWith(SurveyFile.DATA.getExtension())) {
                 return true;
             }
         }
@@ -61,7 +62,7 @@ public class IoUtils {
         Map<String, JSONArray> map = new HashMap<>();
         Iterator<String> iterator = object.keys();
         while (iterator.hasNext()) {
-            String key = (String)iterator.next();
+            String key = iterator.next();
             JSONArray value = object.getJSONArray(key);
             map.put(key, value);
         }

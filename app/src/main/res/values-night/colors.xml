@@ -2,9 +2,11 @@
 
 <resources>
 
-    <color name="grid">#000080</color>
+    <color name="grid">@color/navy</color>
     <color name="innerPanelBackground">@color/darkGrey</color>
+    <color name="station">@color/pink</color>
     <color name="buttonHighlight">@color/darkGrey</color>
+    <color name="legend">@color/lightGrey</color>
 
 
 </resources>

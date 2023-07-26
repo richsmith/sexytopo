@@ -358,23 +358,24 @@ public class CalibrationActivity extends SexyTopoActivity {
         Log.i(R.string.calibration_loaded_file);
     }
 
+    @SuppressWarnings("ConstantConditions")
     private boolean useNonLinearAlgorithm() {
 
-        String pref = PreferenceAccess.getString(
-                this, "pref_calibration_algorithm", "Auto");
+        String algorithm = PreferenceAccess.getCalibrationAlgorithm();
 
         boolean useNonLinear = false; // linear probably safer as default
 
         try {
-            switch (pref) {
-                case "Auto":
+            switch (algorithm) {
+                case "auto":
                     useNonLinear = getComms().doesCurrentDistoPreferNonLinearCalibration();
                     break;
-                case "Non-Linear":
+                case "nonlinear":
                     useNonLinear = true;
                     break;
-                case "Linear":
+                case "linear":
                     useNonLinear = false;
+                    break;
             }
         } catch (Exception exception) {
             // e.g. if disto not connected - just return false and deal with issues elsewhere
@@ -404,7 +405,7 @@ public class CalibrationActivity extends SexyTopoActivity {
 
         if (resultCode != Activity.RESULT_OK) {
             Exception exception = new Exception(
-                    "Error code " + resultCode + " from request code " + requestCode);
+                    getString(R.string.request_code_error, resultCode, requestCode));
             showExceptionAndLog(exception);
             return;
         }
@@ -415,7 +416,7 @@ public class CalibrationActivity extends SexyTopoActivity {
             try {
                 loadCalibration(uri);
             } catch (Exception exception) {
-                showExceptionAndLog("Could not open calibration file", exception);
+                showExceptionAndLog(R.string.calibration_load_error, exception);
             }
 
         } else if (requestCode == SexyTopoConstants.REQUEST_CODE_SAVE_CALIBRATION) {

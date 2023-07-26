@@ -15,7 +15,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.provider.DocumentsContract;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -45,7 +44,6 @@ import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.io.StartLocation;
 import org.hwyl.sexytopo.control.io.SurveyDirectory;
-import org.hwyl.sexytopo.control.io.SurveyFile;
 import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.control.io.basic.Saver;
 import org.hwyl.sexytopo.control.io.translation.Exporter;
@@ -60,6 +58,7 @@ import org.hwyl.sexytopo.model.survey.SurveyConnection;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -135,7 +134,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         MenuItem deviceMenu = menu.findItem(R.id.action_device_menu);
         SubMenu subMenu = deviceMenu.getSubMenu();
         subMenu.clear();
-        subMenu.add(Menu.NONE, R.id.action_device_connect, 0, getString(R.string.action_device_connect));
+        subMenu.add(Menu.NONE, R.id.action_device_connect, 0, R.string.action_device_connect);
         Map<Integer, String> commands = requestComms().getCustomCommands();
         for (Map.Entry<Integer, String> entry: commands.entrySet()) {
             int id = entry.getKey();
@@ -143,8 +142,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             subMenu.add(Menu.NONE, id, 0, name);
         }
 
-        boolean isDevMenuVisible = PreferenceAccess.getBoolean(
-                this,"pref_key_developer_mode", false);
+        boolean isDevMenuVisible = PreferenceAccess.isDevModeOn();
         MenuItem devMenu = menu.findItem(R.id.action_dev_menu);
         devMenu.setVisible(isDevMenuVisible);
 
@@ -267,7 +265,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     @SuppressLint("UnusedDeclaration") // called through Reflection
     public void requestStartNewSurvey() {
-        Log.d("Starting new survey");
         startNewSurvey();
     }
 
@@ -311,18 +308,24 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     @SuppressLint("UnusedDeclaration") // called through Reflection
     public void requestRename() {
+        /* Currently unused...
         Survey survey = getSurvey();
         DocumentFile directory = survey.getDirectory();
-        directory.renameTo("foobar2");
+        directory.renameTo("New Name");
         getSurveyManager().broadcastSurveyUpdated();
-
+        */
     }
 
     @SuppressLint("UnusedDeclaration") // called through Reflection
     public void requestRestoreAutosave() {
         Survey survey = getSurvey();
         DocumentFile directory = SurveyDirectory.TOP.get(survey).getDocumentFile(this);
-        restoreAutosave(directory);
+
+        try {
+            restoreAutosave(directory);
+        } catch (Exception exception) {
+            showExceptionAndLog(R.string.file_autosave_load_error, exception);
+        }
     }
 
 
@@ -361,14 +364,12 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             return; // no need to request permissions for earlier Android versions
         }
 
-        List<String> perms = SexyTopoPermissions.getPermissions();
         List<String> notYetGotPermissions = new ArrayList<>();
         for (String permission : SexyTopoPermissions.getPermissions()) {
             int permissionCheck = ContextCompat.checkSelfPermission(this, permission);
             if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
                 notYetGotPermissions.add(permission);
             }
-
         }
 
         if (!notYetGotPermissions.isEmpty()) {
@@ -377,7 +378,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 notYetGotPermissions.toArray(new String[]{}),
                 0);
         }
-
     }
 
 
@@ -399,79 +399,12 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
 
-    protected void initialiseData() {
-        try {
-            if (isThereAnActiveSurvey()) {
-                loadActiveSurvey();
-            } else {
-                createNewActiveSurvey();
-            }
-        } catch (Exception exception) {
-            Log.e(exception);
-            helpThereSeemsToBeNoSurveyDoSomething();
-        }
-
-    }
-
-    private boolean isThereAnActiveSurvey() {
-        return getPreferences().contains(SexyTopoConstants.PREFERENCE_ACTIVE_SURVEY_URI);
-    }
-
-    public void loadActiveSurvey() {
-
-        String activeSurveyUriString = PreferenceAccess.getString(
-                this, SexyTopoConstants.PREFERENCE_ACTIVE_SURVEY_URI, "Error");
-        Log.d("Active survey is <i>" + activeSurveyUriString + "</i>");
-
-        Uri activeSurveyUri = Uri.parse(activeSurveyUriString);
-        DocumentFile surveyDirectory = DocumentFile.fromTreeUri(this, activeSurveyUri);
-
-        // Create a temp survey without loading the data just for file-handling convenience
-        Survey placeholder = new Survey();
-        placeholder.setDirectory(surveyDirectory);
-
-        if (!IoUtils.doesSurveyExist(this, activeSurveyUri)) {
-            Log.e("Survey at " + activeSurveyUri + " does not exist");
-            helpThereSeemsToBeNoSurveyDoSomething();
-
-        } else if (isAutosaveNewerThanProperSave(this, placeholder)) {
-            restoreAutosave(surveyDirectory);
-        } else {
-            loadSurvey(surveyDirectory);
-        }
-    }
-
-    private boolean isAutosaveNewerThanProperSave(Context context, Survey survey) {
-
-        DocumentFile dataFile = SurveyFile.DATA.get(survey).getDocumentFile(context);
-        DocumentFile autosaveFile = SurveyFile.DATA.AUTOSAVE.get(survey).getDocumentFile(context);
-
-        boolean dataFileExists = dataFile != null && dataFile.exists();
-        boolean autosaveFileExists = autosaveFile != null && autosaveFile.exists();
-
-        if (!autosaveFileExists) {
-            return false;
-        } else if (!dataFileExists) {
-            Log.e("Data file seems to be missing!?");
-            return true;
-        } else if (autosaveFile.lastModified() > dataFile.lastModified()) {
-            Log.i("Autosave file is newer than data file");
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-
-    private void helpThereSeemsToBeNoSurveyDoSomething() {
-        createNewActiveSurvey();
-    }
-
-
-    private void createNewActiveSurvey() {
+    protected void startNewSurvey() {
         Survey survey = new Survey();
         setSurvey(survey);
+        Log.i(R.string.file_started_new_survey);
     }
+
 
     private void openAboutDialog() {
         View messageView = getLayoutInflater().inflate(R.layout.about_dialog, null, false);
@@ -516,7 +449,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         String version;
         try {
             PackageInfo pInfo =
-                    context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+                context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
             version = pInfo.versionName;
         } catch (Exception exception) {
             version = "Unknown";
@@ -529,7 +462,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         int version;
         try {
             PackageInfo pInfo =
-                    context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+                context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
             version = pInfo.versionCode;
         } catch (Exception exception) {
             version = -1;
@@ -607,8 +540,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         Survey survey = getSurvey();
 
         if (directory == null || !directory.exists() || !directory.canWrite()) {
-            Exception exception = new Exception("invalid survey directory");
-            showExceptionAndLog(R.string.file_error_saving_survey, exception);
+            Exception exception = new Exception(getString(R.string.file_saving_error_invalid_folder));
+            showExceptionAndLog(R.string.file_save_survey_error, exception);
             return;
         }
 
@@ -618,7 +551,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
         } else if (IoUtils.isSurveyDirectory(directory)) {
             new AlertDialog.Builder(this)
-                    .setTitle("Directory contains survey; overwrite?")
+                    .setTitle(R.string.file_saving_overwrite_survey_title_question)
                     .setPositiveButton(R.string.overwrite, (dialogInterface, id) -> {
                         survey.setDirectory(directory);
                         saveSurvey();
@@ -628,7 +561,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
         } else {
             new AlertDialog.Builder(this)
-                .setTitle("Directory is not empty; save anyway?")
+                .setTitle(getString(R.string.file_saving_save_to_non_empty_directory_question))
                 .setPositiveButton(R.string.save, (dialogInterface, id) -> {
                     survey.setDirectory(directory);
                     saveSurvey();
@@ -648,7 +581,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
      */
     private void updateRememberedSurvey() {
         Uri uri = getSurvey().getUri();
-        PreferenceAccess.setString(this, SexyTopoConstants.PREFERENCE_ACTIVE_SURVEY_URI, uri.toString());
+        PreferenceAccess.setActiveSurveyUri(uri);
     }
 
     protected void redraw() {
@@ -659,9 +592,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         }
     }
 
-    protected SharedPreferences getPreferences() {
-        return PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-    }
 
     @SuppressWarnings({"CommentedOutCode", "UnusedDeclaration"})
     protected void createDirectory(
@@ -723,7 +653,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             startActivityForResult(intent, requestCode);
 
         } catch (Exception exception) {
-            showExceptionAndLog("Failed to intialise file operation", exception);
+            showExceptionAndLog(R.string.file_operation_initialisation_error, exception);
         }
     }
 
@@ -750,10 +680,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         }
     }
 
-    protected void startNewSurvey() {
-        Survey survey = new Survey();
-        setSurvey(survey);
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
@@ -764,7 +690,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
         if (resultCode != Activity.RESULT_OK) {
             Exception exception = new Exception(
-                    "Error code " + resultCode + " from request code " + requestCode);
+                    getString(R.string.request_code_error, resultCode, requestCode));
             showExceptionAndLog(exception);
             return;
         }
@@ -844,7 +770,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
             Set<SurveyConnection> linked = survey.getConnectedSurveys().get(station);
             if (linked == null || linked.size() < 1) {
-                throw new Exception("Can't find any surveys to unlink");
+                throw new Exception(getString(R.string.file_unlink_survey_no_surveys));
             } else if (linked.size() == 1) {
                 SurveyConnection onlyConnection = linked.iterator().next();
                 unlinkSurveyConnection(survey, station,
@@ -852,9 +778,9 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             } else {
                 chooseSurveyToUnlink(survey, station);
             }
+
         } catch (Exception exception) {
-            showSimpleToast("Error unlinking survey: " + exception.getMessage());
-            showExceptionAndLog(exception);
+            showExceptionAndLog(R.string.file_unlink_survey_error, exception);
         }
     }
 
@@ -890,7 +816,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                                 return;
                             }
                         }
-                        throw new Exception("Couldn't find linked survey");
+                        throw new Exception(getString(R.string.file_unlink_survey_not_found));
 
                     } catch (Exception exception) {
                         showExceptionAndLog(exception);
@@ -918,39 +844,39 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     protected void loadSurvey(DocumentFile surveyDirectory) {
         try {
-            Log.d("Loading from <i>" + surveyDirectory.getName() + "</i>...");
+            Log.i(R.string.file_loading_survey, surveyDirectory.getName());
             Survey survey = Loader.loadSurvey(SexyTopoActivity.this, surveyDirectory);
             getSurveyManager().setCurrentSurvey(survey);
             updateRememberedSurvey();
             startActivity(PlanActivity.class);
-            Log.d("Loaded");
-            showSimpleToast(getString(R.string.file_loaded, survey.getName()));
+            showSimpleToast(R.string.file_loaded_survey, survey.getName());
+
         } catch (Exception exception) {
-            showExceptionAndLog(exception);
+            showExceptionAndLog(R.string.file_loading_survey_error, exception);
         }
 
     }
 
     public void deleteSurvey(DocumentFile directory) {
 
-        boolean doesExist = IoUtils.doesSurveyExist(this, directory.getUri());
-        if (doesExist) {
-            boolean isSurvey = IoUtils.isSurveyDirectory(directory);
-            if (! isSurvey) {
-                showSimpleToast(R.string.file_delete_error_not_survey);
-                return;
-            }
+        boolean doesExist = directory != null &&
+                IoUtils.doesDirectoryExist(this, directory.getUri());
+        boolean isSurvey = doesExist && !IoUtils.isSurveyDirectory(directory);
+
+        if (!isSurvey) {
+            showSimpleToast(R.string.file_delete_error_not_survey);
+            return;
         }
 
-        String name = directory.getName();
         new AlertDialog.Builder(this)
             .setTitle(R.string.file_dialog_delete_survey_title)
             .setMessage(R.string.file_dialog_delete_survey_content)
             .setPositiveButton(R.string.delete,
                 (dialog, whichButton) -> {
                     try {
+                        String name = directory.getName();
                         directory.delete();
-                        Log.i(getString(R.string.file_delete_successful, name));
+                        Log.i(R.string.file_delete_successful, name);
                     } catch (Exception e) {
                         showExceptionAndLog(R.string.file_error_deleting_survey, e);
                     }
@@ -960,14 +886,11 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
 
-    protected void restoreAutosave(DocumentFile directory) {
-        try {
-            Survey survey = Loader.loadAutosave(this, directory);
-            getSurveyManager().setCurrentSurvey(survey);
-            showSimpleToast(R.string.file_restored);
-        } catch (Exception exception) {
-            showExceptionAndLog(R.string.file_restore_error, exception);
-        }
+    protected void restoreAutosave(DocumentFile directory) throws Exception {
+        Survey survey = Loader.loadAutosave(this, directory);
+        getSurveyManager().setCurrentSurvey(survey);
+        showSimpleToast(R.string.file_autosave_restored);
+
     }
 
 
@@ -1066,15 +989,15 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     private void generateTestSurvey() {
         new AlertDialog.Builder(this)
-                .setTitle("Generate Test Data")
-                .setMessage("Replace the existing survey with randomly-generated data?")
+                .setTitle(R.string.tool_generate_test_title)
+                .setMessage(R.string.tool_generate_test_question)
                 .setCancelable(false)
-                .setPositiveButton("Replace", (dialog, id) -> {
+                .setPositiveButton(R.string.replace, (dialog, id) -> {
                     try {
                         Survey currentSurvey = TestSurveyCreator.create(10, 5);
                         setSurvey(currentSurvey);
                     } catch (Exception exception) {
-                        showExceptionAndLog(exception);
+                        showExceptionAndLog(R.string.tool_generate_test_error, exception);
                     }
                 })
                 .setNegativeButton(R.string.cancel, null)
@@ -1096,17 +1019,18 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         try {
             showSimpleToast(R.string.killing_comms_process);
             comms.forceStop();
-        } catch (Exception e) {
-            Log.e("problem when trying to kill connection: " + e);
+        } catch (Exception exception) {
+            showExceptionAndLog(R.string.tool_force_kill_error, exception);
         }
     }
 
 
     private void forceCrash() {
-        throw new RuntimeException("Boom! Forced crash requested(!)");
+        throw new RuntimeException(getString(R.string.tool_force_crash_message));
     }
 
 
+    @SuppressWarnings("AccessStaticViaInstance")
     protected Survey getSurvey() {
         return getSurveyManager().getCurrentSurvey();
     }
@@ -1129,12 +1053,12 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     public void showSimpleToast(String message) {
         if (!isFinishing()) {
             Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-            Log.d("Shown: " + message);
+            Log.i(R.string.log_shown, message);
         }
     }
 
-    public void showSimpleToast(int id) {
-        showSimpleToast(getString(id));
+    public void showSimpleToast(int id, String ... args) {
+        showSimpleToast(getString(id, Arrays.asList(args)));
     }
 
     public void showExceptionAndLog(Exception exception) {
@@ -1142,8 +1066,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         showExceptionAndLog(prefix, exception);
     }
 
-    public void showExceptionAndLog(int id, Exception exception) {
-        String prefix = getString(id);
+    public void showExceptionAndLog(int id, Exception exception, String ... args) {
+        String prefix = getString(id, Arrays.asList(args));
         showExceptionAndLog(prefix, exception);
     }
 
@@ -1154,12 +1078,11 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     @SuppressLint("SourceLockedOrientationActivity")
     protected void setOrientation() {
-        String orientationPreference = PreferenceAccess.getString(
-                this, "pref_orientation", "");
+        String orientationPreference = PreferenceAccess.getOrientationMode();
 
-        if (orientationPreference.equals("Force Portrait")) {
+        if (orientationPreference.equals("portrait")) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        } else if (orientationPreference.equals("Force Landscape")) {
+        } else if (orientationPreference.equals("landscape")) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
@@ -1167,7 +1090,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
     protected void setTheme() {
-        String themeMode = PreferenceAccess.getString(this, "pref_theme", "auto");
+        String themeMode = PreferenceAccess.getTheme();
         if ("light".equals(themeMode)) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         } else if ("dark".equals(themeMode)) {
@@ -1220,7 +1143,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 SexyTopoActivity.this.redraw();
                 showSimpleToast(R.string.file_survey_saved);
             } else {
-                showSimpleToast(R.string.file_error_saving_survey);
+                showSimpleToast(R.string.file_save_survey_error);
             }
         }
     }

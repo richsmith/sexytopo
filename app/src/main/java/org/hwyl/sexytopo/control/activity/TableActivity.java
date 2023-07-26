@@ -23,6 +23,8 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
@@ -44,8 +46,6 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 
 public class TableActivity extends SexyTopoActivity
@@ -260,16 +260,28 @@ public class TableActivity extends SexyTopoActivity
 
         if (itemId == R.id.setActiveStation) {
             Station newActive = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
-            getSurvey().setActiveStation(newActive);
-            syncTableWithSurvey();
+            if (newActive == Survey.NULL_STATION) {
+                showSimpleToast("Can't set splay end as active station");
+            } else {
+                getSurvey().setActiveStation(newActive);
+                syncTableWithSurvey();
+            }
             return true;
         } else if (itemId == R.id.graph_station_jump_to_plan) {
             Station planStation = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
-            jumpToStation(planStation, PlanActivity.class);
+            if (planStation == Survey.NULL_STATION) {
+                showSimpleToast("Can't jump to a splay end");
+            } else {
+                jumpToStation(planStation, PlanActivity.class);
+            }
             return true;
         } else if (itemId == R.id.graph_station_jump_to_ee) {
             Station eeStation = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
-            jumpToStation(eeStation, ExtendedElevationActivity.class);
+            if (eeStation == Survey.NULL_STATION) {
+                showSimpleToast("Can't jump to splay end");
+            } else {
+                jumpToStation(eeStation, ExtendedElevationActivity.class);
+            }
             return true;
         } else if (itemId == R.id.renameStation) {
             Station toRename = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
@@ -375,7 +387,7 @@ public class TableActivity extends SexyTopoActivity
 
 
     public void manuallyAddStation(View view) {
-        if (PreferenceAccess.getBoolean(this, "pref_key_lrud_fields", false)) {
+        if (PreferenceAccess.isManualLrudModeOn()) {
             ManualEntry.addStationWithLruds(this, getSurvey());
         } else {
             ManualEntry.addStation(this, getSurvey());

@@ -120,14 +120,20 @@
             android:summary="How big to draw station symbols"
             android:title="Station diameter"/>
         <EditTextPreference
-            android:key="pref_station_label_font_size"
+            android:key="pref_station_label_font_size_sp"
             android:inputType="number"
-            android:defaultValue="22"
+            android:defaultValue="8"
             android:summary="Font size of station labels"
-            android:title="Station label size"/>
+            android:title="Station label font size"/>
+        <EditTextPreference
+            android:key="pref_legend_font_size_sp"
+            android:inputType="number"
+            android:defaultValue="8"
+            android:summary="Font size of legend"
+            android:title="Legend font size"/>
         <CheckBoxPreference
             android:key="pref_key_anti_alias"
-            android:summary="Apply antialiasing to sketch lines etc. (improves visual display at the cost of some perfomance)"
+            android:summary="Apply antialiasing to sketch lines etc. (improves visual display at the cost of some performance)"
             android:title="Anti-alias sketch lines"
             android:defaultValue="false"/>
     </PreferenceCategory>
