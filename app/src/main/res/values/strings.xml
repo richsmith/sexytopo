@@ -23,6 +23,7 @@
     <string name="splay">Splay</string>
     <string name="not_applicable">N/A</string>
     <string name="no_data">No Data</string>
+    <string name="unknown">Unknown</string>
     <string name="error_prefix">Error</string>
 
     <!-- System -->
@@ -122,30 +123,6 @@
     <string name="file_saving_save_to_non_empty_directory_question">Folder is not empty; save anyway?</string>
     <string name="file_operation_initialisation_error">Error initialising file operation</string>
 
-
-    <!-- Context menu(s) -->
-    <string name="menu_context_title">Station</string>
-    <string name="menu_set_active_station">Set Active Station</string>
-    <string name="menu_rename_station">Rename Station</string>
-    <string name="menu_edit_leg">Edit Row</string>
-    <string name="menu_upgrade_row">Force New Station</string>
-    <string name="menu_delete_leg">Delete Leg</string>
-    <string name="menu_delete_splay">Delete Splay</string>
-    <string name="menu_move_row">Move to Different Station</string>
-    <string name="menu_jump_to">Jump</string>
-    <string name="menu_jump_to_station_in_plan">→ Plan</string>
-    <string name="menu_jump_to_station_in_elevation">→ Elevation</string>
-    <string name="menu_station_label">Station</string>
-    <string name="menu_select">Select</string>
-    <string name="menu_new_cross_section">New Cross-Section</string>
-    <string name="menu_jump_to_station_in_table">→ Data Table</string>
-    <string name="menu_delete_station">Delete</string>
-    <string name="menu_reverse">Reverse</string>
-    <string name="menu_start_new_survey">Start New Survey Here</string>
-    <string name="menu_unlink_survey">Unlink Linked Survey</string>
-    <string name="menu_comment">Comment</string>
-    <string name="menu_toggle_left_right">Toggle Left/Right</string>
-
     <!-- Import / Export -->
     <string name="import_successful">"Import complete (not yet saved)"</string>
     <string name="import_failed">Import failed</string>
@@ -239,6 +216,8 @@
     <string name="device_log_connection_stop_requested">Connection close requested</string>
     <string name="device_log_stopping">Closing connection&#8230;</string>
     <string name="device_log_stopped">Connection closed</string>
+    <string name="device_log_stopping_error">Error stopping thread: %1$s</string>
+
 
     <!-- Calibration -->
     <string name="calibration_wrong_device">No connected DistoX</string>
@@ -330,6 +309,33 @@
     <string name="settings_hot_corners_title">Hot corners</string>
     <string name="settings_hot_corners_summary">Drag from the corners of the sketch to move the view in drawing modes</string>
 
+    <!-- Context menu(s) -->
+    <string name="menu_context_title">Station</string>
+    <string name="menu_set_active_station">Set Active Station</string>
+    <string name="menu_rename_station">Rename Station</string>
+    <string name="menu_edit_leg">Edit Row</string>
+    <string name="menu_upgrade_row">Force New Station</string>
+    <string name="menu_delete_leg">Delete Leg</string>
+    <string name="menu_delete_splay">Delete Splay</string>
+    <string name="menu_move_row">Move to Different Station</string>
+    <string name="menu_jump_to">Jump</string>
+    <string name="menu_jump_to_station_in_plan">→ Plan</string>
+    <string name="menu_jump_to_station_in_elevation">→ Elevation</string>
+    <string name="menu_station_label">Station</string>
+    <string name="menu_select">Select</string>
+    <string name="menu_new_cross_section">New Cross-Section</string>
+    <string name="menu_jump_to_station_in_table">→ Data Table</string>
+    <string name="menu_delete_station">Delete</string>
+    <string name="menu_reverse">Reverse</string>
+    <string name="menu_start_new_survey">Start New Survey Here</string>
+    <string name="menu_unlink_survey">Unlink Linked Survey</string>
+    <string name="menu_comment">Comment</string>
+    <string name="menu_toggle_left_right">Toggle Left/Right</string>
+    <string name="context_this_will_delete">This will delete:</string>
+    <string name="context_jump_to_station_error">Could not jump to station %1$s</string>
+    <string name="context_move_leg_select_station_title">Select station to move to</string>
+    <string name="context_move_leg_no_valid_move">Nowhere valid to move this leg</string>
+
     <!-- Logging -->
     <string name="log">Log</string>
     <string name="log_starting_up">Starting up</string>
@@ -339,9 +345,6 @@
 
     <!-- Misc -->
     <string name="killing_comms_process">Killing comms process</string>
-    <string name="this_will_delete">This will delete:</string>
-    <string name="move_leg_select_station_title">Select station to move to</string>
-    <string name="move_leg_no_valid_move">Nowhere valid to move this leg</string>
     <string name="tool_generate_test_title">Generate Test Data</string>
     <string name="tool_generate_test_question">Replace the existing survey with randomly-generated data?</string>
     <string name="tool_generate_test_error">Error generating test data</string>

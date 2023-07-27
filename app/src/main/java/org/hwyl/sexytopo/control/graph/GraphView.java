@@ -712,7 +712,7 @@ public class GraphView extends View {
         int numSplaysToBeDeleted = SurveyStats.calcNumberSubSplays(station);
 
         Context context = getContext();
-        String message = context.getString(R.string.this_will_delete);
+        String message = context.getString(R.string.context_this_will_delete);
 
         if (numFullLegsToBeDeleted > 0) {
             String noun = context.getString(R.string.leg).toLowerCase();

@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.control.activity;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -31,6 +32,7 @@ import java.util.List;
 
 public class TripActivity extends SexyTopoActivity implements View.OnClickListener {
 
+    @SuppressLint("SimpleDateFormat")
     public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
 

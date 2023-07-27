@@ -27,7 +27,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
-import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.graph.GraphView;
 import org.hwyl.sexytopo.control.table.ManualEntry;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
@@ -65,14 +64,14 @@ public class TableActivity extends SexyTopoActivity
 
 
     private static final EnumMap<TableCol, Integer> TABLE_COL_BY_ANDROID_ID =
-        new EnumMap<TableCol, Integer>(TableCol.class) {{
-            put(TableCol.FROM, R.id.tableRowFrom);
-            put(TableCol.TO, R.id.tableRowTo);
-            put(TableCol.DISTANCE, R.id.tableRowDistance);
-            put(TableCol.AZIMUTH, R.id.tableRowAzimuth);
-            put(TableCol.INCLINATION, R.id.tableRowInclination);
+            new EnumMap<>(TableCol.class) {{
+                put(TableCol.FROM, R.id.tableRowFrom);
+                put(TableCol.TO, R.id.tableRowTo);
+                put(TableCol.DISTANCE, R.id.tableRowDistance);
+                put(TableCol.AZIMUTH, R.id.tableRowAzimuth);
+                put(TableCol.INCLINATION, R.id.tableRowInclination);
 
-        }};
+            }};
 
 
     @Override
@@ -126,17 +125,11 @@ public class TableActivity extends SexyTopoActivity
             final View requestedRow = tableLayout.getChildAt(requestedIndex);
             final ScrollView scrollView = findViewById(R.id.BodyTableScrollView);
 
-            scrollView.post(new Runnable() {
-                @Override
-                public void run() {
-                    scrollView.smoothScrollTo(0, requestedRow.getTop());
-                }
-            });
+            scrollView.post(() -> scrollView.smoothScrollTo(0, requestedRow.getTop()));
 
         } catch (Exception exception) {
-            String name = station == null? "Unknown" : station.getName();
-            Log.e("Could not jump to station " + name);
-            Log.e(exception);
+            String name = station == null? getString(R.string.unknown) : station.getName();
+            showExceptionAndLog(R.string.context_jump_to_station_error, exception, name);
         }
     }
 
@@ -349,7 +342,7 @@ public class TableActivity extends SexyTopoActivity
             numSplaysToBeDeleted += SurveyStats.calcNumberSubSplays(root);
         }
 
-        String message = context.getString(R.string.this_will_delete);
+        String message = context.getString(R.string.context_this_will_delete);
 
         if (numFullLegsToBeDeleted > 0) {
             String noun = context.getString(R.string.leg).toLowerCase();
@@ -413,7 +406,7 @@ public class TableActivity extends SexyTopoActivity
         List<Station> stations = LegMover.getValidDestinations(getSurvey(), toMove);
 
         if (stations.isEmpty()) {
-            showSimpleToast(R.string.move_leg_no_valid_move);
+            showSimpleToast(R.string.context_move_leg_no_valid_move);
             return;
         }
 
@@ -427,7 +420,7 @@ public class TableActivity extends SexyTopoActivity
         spinner.setAdapter(adapter);
 
         new AlertDialog.Builder(this)
-                .setMessage(R.string.move_leg_select_station_title)
+                .setMessage(R.string.context_move_leg_select_station_title)
                 .setView(stationView)
                 .setPositiveButton(R.string.move, (dialog, which) -> {
                     String selectedName = spinner.getSelectedItem().toString();
