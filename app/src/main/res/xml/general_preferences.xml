@@ -23,11 +23,6 @@
             android:title="@string/settings_new_station_vibration_title"
             android:summary="@string/settings_new_station_vibration_summary"
             android:defaultValue="true"/>
-        <CheckBoxPreference
-            android:key="pref_hot_corners"
-            android:title="@string/settings_hot_corners_title"
-            android:summary="@string/settings_hot_corners_summary"
-            android:defaultValue="true"/>
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -65,6 +60,11 @@
 
     <PreferenceCategory
         android:title="@string/settings_sketching_title">
+        <CheckBoxPreference
+            android:key="pref_hot_corners"
+            android:title="@string/settings_hot_corners_title"
+            android:summary="@string/settings_hot_corners_summary"
+            android:defaultValue="true"/>
         <CheckBoxPreference
             android:key="pref_delete_path_fragments"
             android:title="@string/settings_delete_path_fragments_title"
