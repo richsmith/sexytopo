@@ -146,7 +146,7 @@ public class DeviceActivity extends SexyTopoActivity {
         try {
             requestComms().requestDisconnect();
         } catch (Exception e) {
-            Log.device("Error stopping thread:\n" + e.getMessage());
+            Log.device(getString(R.string.device_log_stopping_error, e.getMessage()));
         }
     }
 

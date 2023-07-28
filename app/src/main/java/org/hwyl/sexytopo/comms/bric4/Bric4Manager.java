@@ -157,10 +157,10 @@ public class Bric4Manager extends BleManager {
             setIndicationCallback(measurementErrorsCharacteristic).with(handler);
 
             beginAtomicRequestQueue()
-                    .add(enableIndications(measurementPrimaryCharacteristic))
-                    .add(enableIndications(measurementMetadataCharacteristic))
-                    .add(enableIndications(measurementErrorsCharacteristic))
-                    .enqueue();
+                .add(enableIndications(measurementPrimaryCharacteristic))
+                .add(enableIndications(measurementMetadataCharacteristic))
+                .add(enableIndications(measurementErrorsCharacteristic))
+                .enqueue();
         }
 
         @Override

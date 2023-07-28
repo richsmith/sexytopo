@@ -3,7 +3,6 @@ package org.hwyl.sexytopo.control.graph;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -31,7 +30,8 @@ import org.hwyl.sexytopo.control.activity.PlanActivity;
 import org.hwyl.sexytopo.control.activity.TableActivity;
 import org.hwyl.sexytopo.control.util.CohenSutherlandAlgorithm;
 import org.hwyl.sexytopo.control.util.CrossSectioner;
-import org.hwyl.sexytopo.control.util.PreferenceAccess;
+import org.hwyl.sexytopo.control.util.GeneralPreferences;
+import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
@@ -71,6 +71,7 @@ public class GraphView extends View {
     private final ScaleGestureDetector scaleGestureDetector;
     private final GestureDetector longPressDetector;
 
+
     // The offset of the viewing window (what can be seen on the screen) from the whole survey
     private Coord2D viewpointOffset = Coord2D.ORIGIN;
 
@@ -98,16 +99,14 @@ public class GraphView extends View {
 
     public static final int STATION_COLOUR = Colour.DARK_RED.intValue;
     public static final int STATION_DIAMETER = 8;
-    public static final int CROSS_DIAMETER = 16;
+
     public static final int STATION_STROKE_WIDTH = 5;
     public static final int HIGHLIGHT_OUTLINE = 4;
     private final float DASHED_LINE_INTERVAL = 5;
 
     public static final int LEGEND_SIZE = 18;
     public final float LEGEND_TICK_SIZE = 5;
-    public static final Colour LEGEND_COLOUR = Colour.BLACK;
-    //public static final Colour GRID_COLOUR = Colour.LIGHT_GREY;
-    public static final Colour GRID_COLOUR = Colour.NAVY;
+
 
 
     public static final float DELETE_PATHS_WITHIN_N_PIXELS = 5.0f;
@@ -128,7 +127,11 @@ public class GraphView extends View {
 
     boolean surveyChanged;
 
+    // cached preferences for performance
     private boolean isDarkModeActive = false;
+    private boolean isTwoFingerModeActive = true;
+    private boolean isHotCornersModeActive = true;
+
 
     // cached for performance
     private Coord2D canvasBottomRight;
@@ -146,6 +149,9 @@ public class GraphView extends View {
     // used to jump back to the previous tool when using one-use tools
     private SketchTool previousSketchTool = SketchTool.SELECT;
     private Symbol currentSymbol = Symbol.getDefault();
+
+
+    // ********** Paints and other drawing variables **********
 
     private final Paint stationPaint = new Paint();
 
@@ -173,6 +179,8 @@ public class GraphView extends View {
             crossSectionConnectorPaint, crossSectionIndicatorPaint
     };
 
+    private int stationCrossDiameter;
+
 
     public GraphView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -183,36 +191,36 @@ public class GraphView extends View {
 
     public void initialisePaint() {
 
-        int gridColour = ContextCompat.getColor(activity, R.color.grid);
-        gridPaint.setColor(gridColour);
-
-        boolean applyAntiAlias = PreferenceAccess.getBoolean(
-                getContext(), "pref_key_anti_alias", false);
+        boolean applyAntiAlias = GeneralPreferences.isAntialiasingModeOn();
         for (Paint paint: ANTI_ALIAS_PAINTS) {
             if (paint.isAntiAlias() != applyAntiAlias) {
                 paint.setAntiAlias(applyAntiAlias);
             }
         }
 
-        stationPaint.setColor(STATION_COLOUR);
+        int gridColour = ContextCompat.getColor(activity, R.color.grid);
+        gridPaint.setColor(gridColour);
+
+        int stationColour = ContextCompat.getColor(activity, R.color.station);
+        stationPaint.setColor(stationColour);
         stationPaint.setStrokeWidth(STATION_STROKE_WIDTH);
-        int labelSize = PreferenceAccess.getInt(
-                getContext(), "pref_station_label_font_size", 22);
-        stationPaint.setTextSize(labelSize);
+        int stationLabelFontSizeSp = GeneralPreferences.getStationLabelFontSizeSp();
+        float stationLabelFontSizePixels = spToPixels(stationLabelFontSizeSp);
+        stationPaint.setTextSize(stationLabelFontSizePixels);
 
         highlightPaint.setStyle(Paint.Style.STROKE);
         highlightPaint.setStrokeWidth(HIGHLIGHT_OUTLINE);
         highlightPaint.setColor(HIGHLIGHT_COLOUR.intValue);
 
         // active legs/splays
-        int legStrokeWidth = PreferenceAccess.getInt(getContext(), "pref_leg_width", 3);
+        int legStrokeWidth = GeneralPreferences.getLegStrokeWidth();
         legPaint.setStrokeWidth(legStrokeWidth);
         legPaint.setColor(LEG_COLOUR.intValue);
 
         latestLegPaint.setStrokeWidth(legStrokeWidth);
         latestLegPaint.setColor(LATEST_LEG_COLOUR.intValue);
 
-        int splayStrokeWidth = PreferenceAccess.getInt(getContext(), "pref_splay_width", 1);
+        int splayStrokeWidth = GeneralPreferences.getSplayStrokeWidth();
         splayPaint.setStrokeWidth(splayStrokeWidth);
         splayPaint.setColor(LEG_COLOUR.intValue);
 
@@ -235,12 +243,17 @@ public class GraphView extends View {
         drawPaint.setStrokeJoin(Paint.Join.ROUND);
         drawPaint.setStrokeCap(Paint.Cap.ROUND);
 
-        legendPaint.setColor(LEGEND_COLOUR.intValue);
-        legendPaint.setTextSize(LEGEND_SIZE);
+        int legendColour = ContextCompat.getColor(activity, R.color.legend);
+        legendPaint.setColor(legendColour);
+        float legendSizeSp = GeneralPreferences.getLegendFontSizeSp();
+        float legendSizePixels = spToPixels(legendSizeSp);
+        legendPaint.setTextSize(legendSizePixels);
 
-        labelPaint.setColor(STATION_COLOUR);
-        int textSize = PreferenceAccess.getInt(getContext(), "pref_survey_text_font_size", 32);
-        labelPaint.setTextSize(textSize);
+        int labelColour = ContextCompat.getColor(activity, R.color.station);
+        legPaint.setColor(labelColour);
+        int labelSizeSp = GeneralPreferences.getLabelFontSizeSp();
+        float labelSizePixels = spToPixels(labelSizeSp);
+        legPaint.setTextSize(labelSizePixels);
 
         crossSectionConnectorPaint.setColor(CROSS_SECTION_CONNECTION_COLOUR.intValue);
         crossSectionConnectorPaint.setStrokeWidth(3);
@@ -250,8 +263,13 @@ public class GraphView extends View {
         crossSectionIndicatorPaint.setStrokeWidth(2);
         crossSectionIndicatorPaint.setStyle(Paint.Style.FILL);
 
+        isTwoFingerModeActive = GeneralPreferences.isTwoFingerModeActive();
+
+        isHotCornersModeActive = GeneralPreferences.isHotCornersModeActive();
         hotCornersPaint.setColor(Colour.GREY.intValue);
         hotCornersPaint.setAlpha(FADED_ALPHA);
+
+        stationCrossDiameter = GeneralPreferences.getStationCrossDiameterPixels();
 
         commentIcon = BitmapFactory.decodeResource(getResources(), R.drawable.speech_bubble);
         linkIcon = BitmapFactory.decodeResource(getResources(), R.drawable.link);
@@ -316,7 +334,10 @@ public class GraphView extends View {
             return true;
         }
 
-        considerModalMoveSelection(event);
+        if (isModalMoveSelection(event)) {
+            setSketchTool(SketchTool.MODAL_MOVE);
+            // handled below
+        }
 
         switch (currentSketchTool) {
             case MOVE:
@@ -338,14 +359,26 @@ public class GraphView extends View {
         return false;
     }
 
-    private void considerModalMoveSelection(MotionEvent event) {
+    private boolean isModalMoveSelection(MotionEvent event) {
 
         if (currentSketchTool == SketchTool.MODAL_MOVE) {
-            return;
+            return false;
         }
 
-        if (!PreferenceAccess.getBoolean(activity, "pref_hot_corners", false)) {
-            return;
+        if (isTwoFingerModeActive && event.getPointerCount() >= 2) {
+            return true;
+        }
+
+        if (isHotCornersModeActive && didEventHitHotCorner(event)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean didEventHitHotCorner(MotionEvent event) {
+        if (!isHotCornersModeActive) {
+            return false;
         }
 
         float x = event.getX();
@@ -364,9 +397,7 @@ public class GraphView extends View {
                 (hitLeftEdge && (hitBottomEdge || hitTopEdge)) ||
                 (hitRightEdge && (hitBottomEdge || hitTopEdge));
 
-        if (hitCorner) {
-            setSketchTool(SketchTool.MODAL_MOVE);
-        }
+        return hitCorner;
     }
 
 
@@ -394,7 +425,7 @@ public class GraphView extends View {
         Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
         Coord2D surveyCoords = viewCoordsToSurveyCoords(touchPointOnView);
 
-        boolean snapToLines = getDisplayPreference(GraphActivity.DisplayPreference.SNAP_TO_LINES);
+        boolean snapToLines = SketchPreferences.Toggle.SNAP_TO_LINES.isOn();
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -476,8 +507,7 @@ public class GraphView extends View {
         Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
         Coord2D touchPointOnSurvey = viewCoordsToSurveyCoords(touchPointOnView);
 
-        boolean deleteLineFragments = PreferenceAccess.getBoolean(
-            getContext(), "pref_delete_path_fragments", true);
+        boolean deleteLineFragments = GeneralPreferences.isDeletePathFragmentsModeOn();
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -520,8 +550,7 @@ public class GraphView extends View {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                int startingSize = PreferenceAccess.getInt(getContext(),
-                        "pref_survey_symbol_size", 35);
+                float startingSize = GeneralPreferences.getSymbolStartingSizePixels();
                 float size = startingSize / surveyToViewScale;
                 sketch.addSymbolDetail(touchPointOnSurvey, currentSymbol, size);
                 invalidate();
@@ -543,14 +572,13 @@ public class GraphView extends View {
                 final EditText input = new EditText(getContext());
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setView(input)
-                        .setPositiveButton(R.string.ok, (dialog, which) -> {
-                            String text = input.getText().toString();
-                            int startingSize = PreferenceAccess.getInt(getContext(),
-                                    "pref_survey_text_tool_font_size", 50);
-                            float size = startingSize / surveyToViewScale;
-                            sketch.addTextDetail(touchPointOnSurvey, text, size);
-                        })
-                        .setNegativeButton(R.string.cancel, null);
+                    .setPositiveButton(R.string.ok, (dialog, which) -> {
+                        String text = input.getText().toString();
+                        int startingSize = GeneralPreferences.getTextStartingSizePixels();
+                        float size = startingSize / surveyToViewScale;
+                        sketch.addTextDetail(touchPointOnSurvey, text, size);
+                    })
+                    .setNegativeButton(R.string.cancel, null);
                 AlertDialog dialog = builder.create();
                 dialog.getWindow().setSoftInputMode(
                         WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
@@ -702,7 +730,7 @@ public class GraphView extends View {
         int numSplaysToBeDeleted = SurveyStats.calcNumberSubSplays(station);
 
         Context context = getContext();
-        String message = context.getString(R.string.this_will_delete);
+        String message = context.getString(R.string.context_this_will_delete);
 
         if (numFullLegsToBeDeleted > 0) {
             String noun = context.getString(R.string.leg).toLowerCase();
@@ -723,6 +751,12 @@ public class GraphView extends View {
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show();
+    }
+
+    public float spToPixels(float sp) {
+        float scaledSizeInPixels =
+                sp * getContext().getResources().getDisplayMetrics().scaledDensity;
+        return scaledSizeInPixels;
     }
 
 
@@ -772,11 +806,11 @@ public class GraphView extends View {
         viewpointTopLeftOnSurvey = viewCoordsToSurveyCoords(Coord2D.ORIGIN);
         viewpointBottomRightOnSurvey = viewCoordsToSurveyCoords(canvasBottomRight);
 
-        if (getDisplayPreference(GraphActivity.DisplayPreference.SHOW_GRID)) {
+        if (SketchPreferences.Toggle.SHOW_GRID.isOn()) {
             drawGrid(canvas);
         }
 
-        if (getDisplayPreference(GraphActivity.DisplayPreference.SHOW_CONNECTIONS)) {
+        if (SketchPreferences.Toggle.SHOW_CONNECTIONS.isOn()) {
             drawConnectedSurveys(canvas, projection, FADED_ALPHA);
         }
 
@@ -891,8 +925,7 @@ public class GraphView extends View {
     private void drawCrossSections(
             Canvas canvas, List<CrossSectionDetail> crossSectionDetails, int alpha) {
 
-        boolean showStationLabels =
-                getDisplayPreference(GraphActivity.DisplayPreference.SHOW_STATION_LABELS);
+        boolean showStationLabels = SketchPreferences.Toggle.SHOW_STATION_LABELS.isOn();
 
         crossSectionConnectorPaint.setAlpha(alpha);
 
@@ -955,13 +988,10 @@ public class GraphView extends View {
 
     private void drawLegs(Canvas canvas, Space<Coord2D> space, int baseAlpha) {
 
-        boolean showSplays = getDisplayPreference(GraphActivity.DisplayPreference.SHOW_SPLAYS);
-        boolean highlightLatestLeg =
-                PreferenceAccess.getBoolean(
-                        getContext(), "pref_key_highlight_latest_leg", true);
+        boolean highlightLatestLeg = GeneralPreferences.isHighlightLatestLegModeOn();
 
-        boolean fadingNonActive =
-                getDisplayPreference(GraphActivity.DisplayPreference.FADE_NON_ACTIVE);
+        boolean showSplays = SketchPreferences.Toggle.SHOW_SPLAYS.isOn();
+        boolean fadingNonActive = SketchPreferences.Toggle.FADE_NON_ACTIVE.isOn();
 
         Map<Leg, Line<Coord2D>> legMap = space.getLegMap();
 
@@ -1012,8 +1042,8 @@ public class GraphView extends View {
 
     private void drawStations(Survey survey, Canvas canvas, Space<Coord2D> space, int baseAlpha) {
 
-        boolean fadingNonActive =
-                getDisplayPreference(GraphActivity.DisplayPreference.FADE_NON_ACTIVE);
+        boolean fadingNonActive = SketchPreferences.Toggle.FADE_NON_ACTIVE.isOn();
+        boolean showStationLabels = SketchPreferences.Toggle.SHOW_STATION_LABELS.isOn();
 
         if (fadingNonActive) {
             baseAlpha = FADED_ALPHA;
@@ -1021,12 +1051,6 @@ public class GraphView extends View {
 
         int alpha = baseAlpha;
         stationPaint.setAlpha(alpha);
-
-        boolean showStationLabels =
-                getDisplayPreference(GraphActivity.DisplayPreference.SHOW_STATION_LABELS);
-
-        int crossDiameter =
-                PreferenceAccess.getInt(this.getContext(), "pref_station_diameter", CROSS_DIAMETER);
 
         for (Map.Entry<Station, Coord2D> entry : space.getStationMap().entrySet()) {
             Station station = entry.getKey();
@@ -1043,14 +1067,14 @@ public class GraphView extends View {
             int x = (int)(translatedStation.x);
             int y = (int)(translatedStation.y);
 
-            drawStationCross(canvas, stationPaint, x, y, crossDiameter, alpha);
+            drawStationCross(canvas, stationPaint, x, y, stationCrossDiameter, alpha);
 
             if (station == survey.getActiveStation()) {
                 highlightActiveStation(canvas, x, y);
             }
 
-            int spacing = crossDiameter / 2;
-            int nextX = x + crossDiameter;
+            int spacing = stationCrossDiameter / 2;
+            int nextX = x + stationCrossDiameter;
 
             if (showStationLabels) {
                 String name = station.getName();
@@ -1072,10 +1096,10 @@ public class GraphView extends View {
                 icons.add(linkIcon);
             }
 
-            for (Bitmap icon : icons) {int yTop = y - crossDiameter / 2;
-                Rect rect = new Rect(nextX, yTop, nextX + crossDiameter, yTop + crossDiameter);
+            for (Bitmap icon : icons) {int yTop = y - stationCrossDiameter / 2;
+                Rect rect = new Rect(nextX, yTop, nextX + stationCrossDiameter, yTop + stationCrossDiameter);
                 canvas.drawBitmap(icon, null, rect, stationPaint);
-                nextX += crossDiameter + spacing;
+                nextX += stationCrossDiameter + spacing;
             }
 
             CrossSectionDetail crossSectionDetail = sketch.getCrossSectionDetail(station);
@@ -1167,18 +1191,10 @@ public class GraphView extends View {
     }
 
 
-    public boolean getDisplayPreference(GraphActivity.DisplayPreference preference) {
-        SharedPreferences preferences =
-            getContext().getSharedPreferences("display", Context.MODE_PRIVATE);
-        boolean isSelected =
-            preferences.getBoolean(preference.toString(), preference.getDefault());
-        return isSelected;
-    }
-
 
     private void drawSketch(Canvas canvas, Sketch sketch, int alpha) {
 
-        if (!getDisplayPreference(GraphActivity.DisplayPreference.SHOW_SKETCH)) {
+        if (!SketchPreferences.Toggle.SHOW_SKETCH.isOn()) {
             return;
         }
 
@@ -1287,30 +1303,34 @@ public class GraphView extends View {
         String surveyLabel =
             survey.getName() +
             " L" + TextTools.formatTo0dpWithComma(surveyLength) +
-            " H" + TextTools.formatTo0dpWithComma(surveyHeight);
+            " V" + TextTools.formatTo0dpWithComma(surveyHeight);
 
-        float offsetX = getWidth() * 0.03f;
-        float offsetY = getHeight() - LEGEND_SIZE * 2;
-        canvas.drawText(surveyLabel, offsetX, offsetY, legendPaint);
+        float legendSize = legendPaint.getTextSize();
+        float offsetX = legendSize * 1.25f;
+        float offsetY = legendSize * 1.25f;
+        float y = getHeight() - offsetY;
+        float x = offsetX;
+        canvas.drawText(surveyLabel, x, y, legendPaint);
 
         int minorGridSize = getMinorGridBoxSize();
         float scaleWidth = surveyToViewScale * minorGridSize;
-        float scaleOffsetY = getHeight() - (LEGEND_SIZE * 4);
+        float scaleOffsetY = offsetY * 2;
+        float scaleY = getHeight() - scaleOffsetY;
         canvas.drawLine(
-                offsetX, scaleOffsetY, offsetX + scaleWidth, scaleOffsetY, legendPaint);
+                x, scaleY, x + scaleWidth, scaleY, legendPaint);
         canvas.drawLine(
-                offsetX, scaleOffsetY, offsetX, scaleOffsetY - LEGEND_TICK_SIZE, legendPaint);
-        canvas.drawLine(offsetX + scaleWidth, scaleOffsetY,
-                offsetX + scaleWidth, scaleOffsetY - LEGEND_TICK_SIZE, legendPaint);
+                x, scaleY, offsetX, scaleY - LEGEND_TICK_SIZE, legendPaint);
+        canvas.drawLine(x + scaleWidth, scaleY,
+                x + scaleWidth, scaleY - LEGEND_TICK_SIZE, legendPaint);
         String scaleLabel = minorGridSize + "m";
-        canvas.drawText(scaleLabel, offsetX + scaleWidth + 5, scaleOffsetY, legendPaint);
+        canvas.drawText(scaleLabel, x + scaleWidth + 0.2f * legendSize, scaleY, legendPaint);
 
     }
 
 
     private void drawHotCorners(Canvas canvas) {
 
-        if (!PreferenceAccess.getBoolean(activity, "pref_hot_corners", false)) {
+        if (!isHotCornersModeActive) {
             return;
         }
 

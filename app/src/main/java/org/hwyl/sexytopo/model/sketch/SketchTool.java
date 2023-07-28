@@ -18,10 +18,16 @@ public enum SketchTool {
     private final boolean usesColour;
     private final boolean isModal;
 
+    private static final SketchTool DEFAULT = MOVE;
+
     SketchTool(int id, boolean usesColour, boolean isModal) {
         this.id = id;
         this.usesColour = usesColour;
         this.isModal = isModal;
+    }
+
+    public static SketchTool fromString(String name) {
+        return name == null? DEFAULT : SketchTool.valueOf(name);
     }
 
     public int getId() {

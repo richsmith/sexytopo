@@ -9,6 +9,7 @@ import org.hwyl.sexytopo.control.io.translation.AbstractSurveyFile;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.io.IOException;
+import java.util.List;
 
 @SuppressWarnings("UnnecessaryLocalVariable")
 public class SurveyFile extends AbstractSurveyFile {
@@ -49,14 +50,16 @@ public class SurveyFile extends AbstractSurveyFile {
 
     }
 
-    public static SurveyFileType DATA = new SurveyFileType(SexyTopoConstants.DATA_EXTENSION);
-    public static SurveyFileType METADATA =
+    public static final SurveyFileType DATA = new SurveyFileType(SexyTopoConstants.DATA_EXTENSION);
+    public static final SurveyFileType METADATA =
         new SurveyFileType(SexyTopoConstants.METADATA_EXTENSION);
-    public static SurveyFileType SKETCH_PLAN =
+    public static final SurveyFileType SKETCH_PLAN =
         new SurveyFileType(SexyTopoConstants.PLAN_SKETCH_EXTENSION);
-    public static SurveyFileType SKETCH_EXT_ELEVATION =
+    public static final SurveyFileType SKETCH_EXT_ELEVATION =
         new SurveyFileType(SexyTopoConstants.EXT_ELEVATION_SKETCH_EXTENSION);
 
+    public static final List<SurveyFileType> ALL_TYPES =
+            List.of(DATA, METADATA, SKETCH_PLAN, SKETCH_EXT_ELEVATION);
     private final SurveyFileType surveyFileType;
 
     private SurveyFile(Survey survey, SurveyFileType surveyFileType) {

@@ -1,12 +1,19 @@
 package org.hwyl.sexytopo.control.activity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+
+import androidx.documentfile.provider.DocumentFile;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.NewStationNotificationService;
+import org.hwyl.sexytopo.control.io.IoUtils;
+import org.hwyl.sexytopo.control.io.SurveyFile;
+import org.hwyl.sexytopo.control.util.GeneralPreferences;
+import org.hwyl.sexytopo.model.survey.Survey;
 
 
 public class StartUpActivity extends SexyTopoActivity {
@@ -37,20 +44,92 @@ public class StartUpActivity extends SexyTopoActivity {
             Log.e(exception);
         }
 
-        initialiseData();
+        initialiseSurvey();
 
         Intent intent = new Intent(this, DeviceActivity.class);
         startActivity(intent);
     }
 
 
+    protected void initialiseSurvey() {
+        try {
+            DocumentFile activeSurveyDirectory = tryToFindActiveSurveyDirectory();
 
+            if (activeSurveyDirectory == null) {
+                startNewSurvey();
 
+            } else {
+                if (shouldWeRestoreAutosave(activeSurveyDirectory)) {
+                    restoreAutosave(activeSurveyDirectory);
+                } else {
+                    loadSurvey(activeSurveyDirectory);
+                }
+                loadSurvey(activeSurveyDirectory);
+            }
 
+        } catch (Exception exception) {
+            Log.e(exception);
 
+        } finally {
+            if (getSurvey() == null) { // should be impossible
+                startNewSurvey();
+            }
+        }
 
+    }
 
+    public DocumentFile tryToFindActiveSurveyDirectory() {
 
+        Uri activeSurveyUri = GeneralPreferences.getActiveSurveyUri();
+
+        if (activeSurveyUri == null) {
+            Log.i(R.string.file_active_survey_not_present);
+            return null;
+        }
+
+        Log.d(R.string.file_active_survey_uri, activeSurveyUri.toString());
+
+        DocumentFile surveyDirectory = DocumentFile.fromTreeUri(this, activeSurveyUri);
+
+        if (surveyDirectory == null) {
+            Log.e(R.string.file_loading_survey_error);
+            return null;
+        }
+
+        if (!IoUtils.doesDirectoryExist(this, activeSurveyUri)) {
+            Log.e(R.string.file_loading_survey_error);
+            return null;
+
+        }
+
+        Log.i(R.string.file_active_survey, surveyDirectory.getName());
+        return surveyDirectory;
+    }
+
+    @SuppressWarnings("RedundantIfStatement")
+    private boolean shouldWeRestoreAutosave(DocumentFile surveyDirectory) {
+
+        Survey protoSurvey = new Survey();
+        protoSurvey.setDirectory(surveyDirectory);
+
+        boolean shouldRestoreAutosave = false;
+
+        for (SurveyFile.SurveyFileType fileType : SurveyFile.ALL_TYPES) {
+            DocumentFile surveyFile = fileType.get(protoSurvey).getDocumentFile(this);
+            DocumentFile autosaveFile = fileType.AUTOSAVE.get(protoSurvey).getDocumentFile(this);
+
+            if (autosaveFile == null) {
+                continue;
+            }
+
+            if (autosaveFile.lastModified() > surveyFile.lastModified()) {
+                shouldRestoreAutosave = true;
+                break;
+            }
+        }
+
+        return shouldRestoreAutosave;
+    }
 
 
 }

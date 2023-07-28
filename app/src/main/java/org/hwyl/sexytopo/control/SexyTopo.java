@@ -4,6 +4,9 @@ import android.app.Application;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
+import org.hwyl.sexytopo.control.util.SketchPreferences;
+import org.hwyl.sexytopo.control.util.GeneralPreferences;
+
 
 public class SexyTopo extends Application {
 
@@ -14,6 +17,9 @@ public class SexyTopo extends Application {
         super.onCreate();
         defaultHandler = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler (this::handleUncaughtException);
+
+        GeneralPreferences.initialise(this.getApplicationContext());
+        SketchPreferences.initialise(this.getApplicationContext());
     }
 
     public void handleUncaughtException (Thread thread, Throwable e) {

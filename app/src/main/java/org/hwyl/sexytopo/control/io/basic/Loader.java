@@ -63,7 +63,7 @@ public class Loader {
         SurveyFile surveyFile = SurveyFile.METADATA.get(survey);
         surveyFile = considerSwappingForAutosave(context, surveyFile, restoreAutosave);
         if (surveyFile.exists(context)) {
-            Log.i(context.getString(R.string.file_loading_name, surveyFile.getFilename()));
+            Log.i(context.getString(R.string.file_loading_file, surveyFile.getFilename()));
             String metadataText = surveyFile.slurp(context);
             MetadataTranslater.translateAndUpdate(
                     context, survey, metadataText, surveyUrisNotToLoad);
@@ -77,7 +77,7 @@ public class Loader {
         SurveyFile surveyFile = SurveyFile.DATA.get(survey);
         surveyFile = considerSwappingForAutosave(context, surveyFile, restoreAutosave);
         if (surveyFile.exists(context)) {
-            Log.i(context.getString(R.string.file_loading_name, surveyFile.getFilename()));
+            Log.i(context.getString(R.string.file_loading_file, surveyFile.getFilename()));
             String text = surveyFile.slurp(context);
             SurveyJsonTranslater.populateSurvey(survey, text);
         }
@@ -90,7 +90,7 @@ public class Loader {
         SurveyFile planFile = SurveyFile.SKETCH_PLAN.get(survey);
         planFile = considerSwappingForAutosave(context, planFile, restoreAutosave);
         if (planFile.exists(context)) {
-            Log.i(context.getString(R.string.file_loading_name, planFile.getFilename()));
+            Log.i(context.getString(R.string.file_loading_file, planFile.getFilename()));
             String planText = planFile.slurp(context);
             Sketch plan = SketchJsonTranslater.translate(survey, planText);
             survey.setPlanSketch(plan);
@@ -98,7 +98,7 @@ public class Loader {
 
         SurveyFile elevationFile = SurveyFile.SKETCH_EXT_ELEVATION.get(survey);
         if (elevationFile.exists(context)) {
-            Log.i(context.getString(R.string.file_loading_name, planFile.getFilename()));
+            Log.i(context.getString(R.string.file_loading_file, planFile.getFilename()));
             String elevationText = elevationFile.slurp(context);
             Sketch elevation = SketchJsonTranslater.translate(survey, elevationText);
             survey.setElevationSketch(elevation);

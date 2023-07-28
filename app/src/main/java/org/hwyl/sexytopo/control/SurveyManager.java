@@ -67,7 +67,7 @@ public class SurveyManager {
             broadcastSurveyUpdated();
 
             if (stationAdded) {
-                Log.i("New station added");
+                Log.i(R.string.survey_update_new_station_added);
                 broadcastNewStationCreated();
             }
 
@@ -109,7 +109,7 @@ public class SurveyManager {
         broadcastManager.sendBroadcast(intent);
     }
 
-    public Survey getCurrentSurvey() {
+    public static Survey getCurrentSurvey() {
         return currentSurvey;
     }
 

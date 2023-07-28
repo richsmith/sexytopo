@@ -10,8 +10,8 @@ import org.hwyl.sexytopo.R;
 
 public enum Symbol {
 
-    STALAGMITE(R.drawable.ic_stalagmite),
     STALACTITE(R.drawable.ic_stalactite),
+    STALAGMITE(R.drawable.ic_stalagmite),
     COLUMN(R.drawable.ic_column),
     STRAWS(R.drawable.ic_straws),
     HELICTITE(R.drawable.ic_helictite),
@@ -23,12 +23,18 @@ public enum Symbol {
     private Bitmap bitmap;
     private Bitmap buttonBitmap;
 
+    private static final Symbol DEFAULT = STALACTITE;
+
     Symbol(int bitmapId) {
         this.bitmapId = bitmapId;
     }
 
     public static void setResources(Resources resources) {
         Symbol.resources = resources;
+    }
+
+    public static Symbol fromString(String name) {
+        return name == null? DEFAULT : Symbol.valueOf(name);
     }
 
     public int getBitmapId() {

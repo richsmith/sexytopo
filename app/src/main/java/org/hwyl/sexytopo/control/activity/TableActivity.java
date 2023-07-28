@@ -23,14 +23,15 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
-import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.graph.GraphView;
 import org.hwyl.sexytopo.control.table.ManualEntry;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
 import org.hwyl.sexytopo.control.util.LegMover;
-import org.hwyl.sexytopo.control.util.PreferenceAccess;
+import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.control.util.TextTools;
@@ -44,8 +45,6 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 
 public class TableActivity extends SexyTopoActivity
@@ -65,14 +64,14 @@ public class TableActivity extends SexyTopoActivity
 
 
     private static final EnumMap<TableCol, Integer> TABLE_COL_BY_ANDROID_ID =
-        new EnumMap<TableCol, Integer>(TableCol.class) {{
-            put(TableCol.FROM, R.id.tableRowFrom);
-            put(TableCol.TO, R.id.tableRowTo);
-            put(TableCol.DISTANCE, R.id.tableRowDistance);
-            put(TableCol.AZIMUTH, R.id.tableRowAzimuth);
-            put(TableCol.INCLINATION, R.id.tableRowInclination);
+            new EnumMap<>(TableCol.class) {{
+                put(TableCol.FROM, R.id.tableRowFrom);
+                put(TableCol.TO, R.id.tableRowTo);
+                put(TableCol.DISTANCE, R.id.tableRowDistance);
+                put(TableCol.AZIMUTH, R.id.tableRowAzimuth);
+                put(TableCol.INCLINATION, R.id.tableRowInclination);
 
-        }};
+            }};
 
 
     @Override
@@ -126,17 +125,11 @@ public class TableActivity extends SexyTopoActivity
             final View requestedRow = tableLayout.getChildAt(requestedIndex);
             final ScrollView scrollView = findViewById(R.id.BodyTableScrollView);
 
-            scrollView.post(new Runnable() {
-                @Override
-                public void run() {
-                    scrollView.smoothScrollTo(0, requestedRow.getTop());
-                }
-            });
+            scrollView.post(() -> scrollView.smoothScrollTo(0, requestedRow.getTop()));
 
         } catch (Exception exception) {
-            String name = station == null? "Unknown" : station.getName();
-            Log.e("Could not jump to station " + name);
-            Log.e(exception);
+            String name = station == null? getString(R.string.unknown) : station.getName();
+            showExceptionAndLog(R.string.context_jump_to_station_error, exception, name);
         }
     }
 
@@ -260,16 +253,28 @@ public class TableActivity extends SexyTopoActivity
 
         if (itemId == R.id.setActiveStation) {
             Station newActive = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
-            getSurvey().setActiveStation(newActive);
-            syncTableWithSurvey();
+            if (newActive == Survey.NULL_STATION) {
+                showSimpleToast("Can't set splay end as active station");
+            } else {
+                getSurvey().setActiveStation(newActive);
+                syncTableWithSurvey();
+            }
             return true;
         } else if (itemId == R.id.graph_station_jump_to_plan) {
             Station planStation = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
-            jumpToStation(planStation, PlanActivity.class);
+            if (planStation == Survey.NULL_STATION) {
+                showSimpleToast("Can't jump to a splay end");
+            } else {
+                jumpToStation(planStation, PlanActivity.class);
+            }
             return true;
         } else if (itemId == R.id.graph_station_jump_to_ee) {
             Station eeStation = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
-            jumpToStation(eeStation, ExtendedElevationActivity.class);
+            if (eeStation == Survey.NULL_STATION) {
+                showSimpleToast("Can't jump to splay end");
+            } else {
+                jumpToStation(eeStation, ExtendedElevationActivity.class);
+            }
             return true;
         } else if (itemId == R.id.renameStation) {
             Station toRename = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
@@ -337,7 +342,7 @@ public class TableActivity extends SexyTopoActivity
             numSplaysToBeDeleted += SurveyStats.calcNumberSubSplays(root);
         }
 
-        String message = context.getString(R.string.this_will_delete);
+        String message = context.getString(R.string.context_this_will_delete);
 
         if (numFullLegsToBeDeleted > 0) {
             String noun = context.getString(R.string.leg).toLowerCase();
@@ -375,7 +380,7 @@ public class TableActivity extends SexyTopoActivity
 
 
     public void manuallyAddStation(View view) {
-        if (PreferenceAccess.getBoolean(this, "pref_key_lrud_fields", false)) {
+        if (GeneralPreferences.isManualLrudModeOn()) {
             ManualEntry.addStationWithLruds(this, getSurvey());
         } else {
             ManualEntry.addStation(this, getSurvey());
@@ -401,7 +406,7 @@ public class TableActivity extends SexyTopoActivity
         List<Station> stations = LegMover.getValidDestinations(getSurvey(), toMove);
 
         if (stations.isEmpty()) {
-            showSimpleToast(R.string.move_leg_no_valid_move);
+            showSimpleToast(R.string.context_move_leg_no_valid_move);
             return;
         }
 
@@ -415,7 +420,7 @@ public class TableActivity extends SexyTopoActivity
         spinner.setAdapter(adapter);
 
         new AlertDialog.Builder(this)
-                .setMessage(R.string.move_leg_select_station_title)
+                .setMessage(R.string.context_move_leg_select_station_title)
                 .setView(stationView)
                 .setPositiveButton(R.string.move, (dialog, which) -> {
                     String selectedName = spinner.getSelectedItem().toString();
