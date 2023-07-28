@@ -31,7 +31,7 @@ import org.hwyl.sexytopo.control.graph.GraphView;
 import org.hwyl.sexytopo.control.table.ManualEntry;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
 import org.hwyl.sexytopo.control.util.LegMover;
-import org.hwyl.sexytopo.control.util.PreferenceAccess;
+import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.control.util.TextTools;
@@ -380,7 +380,7 @@ public class TableActivity extends SexyTopoActivity
 
 
     public void manuallyAddStation(View view) {
-        if (PreferenceAccess.isManualLrudModeOn()) {
+        if (GeneralPreferences.isManualLrudModeOn()) {
             ManualEntry.addStationWithLruds(this, getSurvey());
         } else {
             ManualEntry.addStation(this, getSurvey());

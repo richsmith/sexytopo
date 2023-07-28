@@ -50,7 +50,7 @@ import org.hwyl.sexytopo.control.io.translation.Exporter;
 import org.hwyl.sexytopo.control.io.translation.ImportManager;
 import org.hwyl.sexytopo.control.io.translation.SelectableExporters;
 import org.hwyl.sexytopo.control.util.InputMode;
-import org.hwyl.sexytopo.control.util.PreferenceAccess;
+import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.demo.TestSurveyCreator;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -142,7 +142,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             subMenu.add(Menu.NONE, id, 0, name);
         }
 
-        boolean isDevMenuVisible = PreferenceAccess.isDevModeOn();
+        boolean isDevMenuVisible = GeneralPreferences.isDevModeOn();
         MenuItem devMenu = menu.findItem(R.id.action_dev_menu);
         devMenu.setVisible(isDevMenuVisible);
 
@@ -581,7 +581,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
      */
     private void updateRememberedSurvey() {
         Uri uri = getSurvey().getUri();
-        PreferenceAccess.setActiveSurveyUri(uri);
+        GeneralPreferences.setActiveSurveyUri(uri);
     }
 
     protected void redraw() {
@@ -1078,7 +1078,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     @SuppressLint("SourceLockedOrientationActivity")
     protected void setOrientation() {
-        String orientationPreference = PreferenceAccess.getOrientationMode();
+        String orientationPreference = GeneralPreferences.getOrientationMode();
 
         if (orientationPreference.equals("portrait")) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -1090,7 +1090,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
     protected void setTheme() {
-        String themeMode = PreferenceAccess.getTheme();
+        String themeMode = GeneralPreferences.getTheme();
         if ("light".equals(themeMode)) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         } else if ("dark".equals(themeMode)) {

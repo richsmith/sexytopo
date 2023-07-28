@@ -293,8 +293,8 @@ public class SurveyUpdater {
         float azimuthDiff = maxAzimuth - minAzimuth;
         float inclinationDiff = maxInclination - minInclination;
 
-        float maxDistanceDelta = PreferenceAccess.getMaxDistanceDelta();
-        float maxAngleDelta = PreferenceAccess.getMaxAngleDelta();
+        float maxDistanceDelta = GeneralPreferences.getMaxDistanceDelta();
+        float maxAngleDelta = GeneralPreferences.getMaxAngleDelta();
 
         return distanceDiff <= maxDistanceDelta &&
                azimuthDiff <= maxAngleDelta &&

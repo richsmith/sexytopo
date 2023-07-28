@@ -12,7 +12,7 @@ import android.widget.TextView;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.TableActivity;
-import org.hwyl.sexytopo.control.util.PreferenceAccess;
+import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -142,7 +142,7 @@ public class ManualEntry {
         LayoutInflater inflater = tableActivity.getLayoutInflater();
         final View dialogView = inflater.inflate(layoutId, null);
 
-        boolean usingDegMinsSecs = PreferenceAccess.isDegMinsSecsModeOn();
+        boolean usingDegMinsSecs = GeneralPreferences.isDegMinsSecsModeOn();
 
         if (usingDegMinsSecs) {
             dialogView.findViewById(R.id.azimuth_standard).setVisibility(View.GONE);

@@ -6,7 +6,7 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 
 
-public class PreferenceAccess {
+public class GeneralPreferences {
 
     private static SharedPreferences prefs;
 

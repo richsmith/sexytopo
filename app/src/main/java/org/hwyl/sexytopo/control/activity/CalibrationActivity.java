@@ -31,7 +31,7 @@ import org.hwyl.sexytopo.control.calibration.CalibrationCalculator;
 import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.io.StartLocation;
 import org.hwyl.sexytopo.control.io.basic.CalibrationJsonTranslater;
-import org.hwyl.sexytopo.control.util.PreferenceAccess;
+import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.calibration.CalibrationReading;
 import org.hwyl.sexytopo.model.sketch.Colour;
@@ -361,7 +361,7 @@ public class CalibrationActivity extends SexyTopoActivity {
     @SuppressWarnings("ConstantConditions")
     private boolean useNonLinearAlgorithm() {
 
-        String algorithm = PreferenceAccess.getCalibrationAlgorithm();
+        String algorithm = GeneralPreferences.getCalibrationAlgorithm();
 
         boolean useNonLinear = false; // linear probably safer as default
 

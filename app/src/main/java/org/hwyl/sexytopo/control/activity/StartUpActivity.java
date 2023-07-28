@@ -12,7 +12,7 @@ import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.NewStationNotificationService;
 import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.io.SurveyFile;
-import org.hwyl.sexytopo.control.util.PreferenceAccess;
+import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 
@@ -80,7 +80,7 @@ public class StartUpActivity extends SexyTopoActivity {
 
     public DocumentFile tryToFindActiveSurveyDirectory() {
 
-        Uri activeSurveyUri = PreferenceAccess.getActiveSurveyUri();
+        Uri activeSurveyUri = GeneralPreferences.getActiveSurveyUri();
 
         if (activeSurveyUri == null) {
             Log.i(R.string.file_active_survey_not_present);
