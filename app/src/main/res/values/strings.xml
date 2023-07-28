@@ -287,6 +287,7 @@
     <string name="stats_shortest_leg">Shortest Leg (m)</string>
 
     <!-- Settings -->
+    <string name="settings_general_title">General</string>
     <string name="settings_theme_title">Theme</string>
     <string name="settings_theme_summary">Join the dark side? (Restarts app, so save your survey before changing!)</string>
     <string-array name="settings_theme_entries">
@@ -294,6 +295,8 @@
         <item>Light</item>
         <item>Dark</item>
     </string-array>
+    <string name="settings_orientation_title">Orientation</string>
+    <string name="settings_orientation_summary">Override device orientation on the Table and Graph views</string>
     <string-array name="settings_orientation_entries">
         <item>System default</item>
         <item>Force Portrait</item>
@@ -308,6 +311,45 @@
     <string name="settings_new_station_vibration_summary">Vibrate when new station is created</string>
     <string name="settings_hot_corners_title">Hot corners</string>
     <string name="settings_hot_corners_summary">Drag from the corners of the sketch to move the view in drawing modes</string>
+    <string name="settings_instruments_title">Instruments</string>
+    <string name="settings_backsight_promotion_title">Automatic backsight promotion</string>
+    <string name="settings_backsight_promotion_summary">Replace pairs of inverted readings with a new station leg</string>
+    <string name="settings_max_distance_delta_title">Max distance delta (m)</string>
+    <string name="settings_max_distance_delta_summary">How much error tolerated when deciding whether to create a new station</string>
+    <string name="settings_max_angle_delta_title">Max angle delta (degrees)</string>
+    <string name="settings_max_angle_delta_summary">How much error tolerated when deciding whether to create a new station</string>
+    <string name="settings_calibration_title">Calibration</string>
+    <string name="settings_calibration_algorithm_title">Disto-X calibration algorithm</string>
+    <string name="settings_calibration_algorithm_summary">Override Disto-X calibration algorithm choice</string>
+    <string name="settings_sketching_title">Sketching</string>
+    <string name="settings_delete_path_fragments_title">Delete line fragments</string>
+    <string name="settings_delete_path_fragments_summary">Delete only the nearest parts of a sketch line in delete mode (if off, deletes the whole line)</string>
+    <string name="settings_highlight_latest_leg_title">Highlight latest leg</string>
+    <string name="settings_highlight_latest_leg_summary">Show most recent measurement in purple</string>
+    <string name="settings_survey_text_tool_font_size_title">Text tool label size</string>
+    <string name="settings_survey_text_tool_font_size_summary">How big to initially draw manually-placed text (pixels)</string>
+    <string name="settings_survey_symbol_size_title">Survey symbol size</string>
+    <string name="settings_survey_symbol_size_summary">How big to intially draw symbols (pixels)</string>
+    <string name="settings_leg_width_title">Leg line thickness</string>
+    <string name="settings_leg_width_summary">How wide to draw leg lines</string>
+    <string name="settings_splay_width_title">Splay line thickness</string>
+    <string name="settings_splay_width_summary">How wide to draw splay lines</string>
+    <string name="settings_station_diameter_title">Station diameter</string>
+    <string name="settings_station_diameter_summary">How big to draw station symbols</string>
+    <string name="settings_station_label_font_size_sp_title">Station label font size</string>
+    <string name="settings_station_label_font_size_sp_summary">Font size of station labels</string>
+    <string name="settings_legend_font_size_sp_title">Legend font size</string>
+    <string name="settings_legend_font_size_sp_summary">Font size of legend</string>
+    <string name="settings_anti_alias_title">Anti-alias sketch lines</string>
+    <string name="settings_anti_alias_summary">Apply antialiasing to sketch lines etc. (improves visual display at the cost of some performance)</string>
+    <string name="settings_manual_data_entry_title">Manual Data Entry</string>
+    <string name="settings_key_lrud_fields_title">LRUD entries</string>
+    <string name="settings_key_lrud_fields_summary">Show fields for entering LRUDs (Left-Right-Up-Down) for each new station</string>
+    <string name="settings_key_deg_mins_secs_title">Azimuth as degrees/minutes/seconds</string>
+    <string name="settings_key_deg_mins_secs_summary">Enter azimuth values in deg/mins/secs (as opposed to the default of decimal)</string>
+    <string name="settings_developer_title">Developer</string>
+    <string name="settings_key_developer_mode_title">Developer mode</string>
+    <string name="settings_key_developer_mode_summary">Show debugging menu entries</string>
 
     <!-- Context menu(s) -->
     <string name="menu_context_title">Station</string>
@@ -342,9 +384,7 @@
     <string name="log_shown">Shown: %1$s</string>
     <string name="log_error_no_station_notification_intent">Unable to start new station notification intent</string>
 
-
     <!-- Misc -->
-    <string name="killing_comms_process">Killing comms process</string>
     <string name="tool_generate_test_title">Generate Test Data</string>
     <string name="tool_generate_test_question">Replace the existing survey with randomly-generated data?</string>
     <string name="tool_generate_test_error">Error generating test data</string>
@@ -352,6 +392,6 @@
     <string name="tool_force_crash_message">Boom! Forced crash requested(!)</string>
     <string name="survey_update_new_station_added">New station added</string>
     <string name="request_code_error">Error code %1$d from request code %2$d</string>
-
+    <string name="killing_comms_process">Killing comms process</string>
 
 </resources>
