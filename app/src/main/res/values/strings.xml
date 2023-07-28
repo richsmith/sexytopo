@@ -326,6 +326,8 @@
     <string name="settings_delete_path_fragments_summary">Delete only the nearest parts of a sketch line in delete mode (if off, deletes the whole line)</string>
     <string name="settings_highlight_latest_leg_title">Highlight latest leg</string>
     <string name="settings_highlight_latest_leg_summary">Show most recent measurement in purple</string>
+    <string name="settings_two_finger_movement_title">Two-finger movement</string>
+    <string name="settings_two_finger_movement_summary">Two fingers move the screen even when drawing etc.</string>
     <string name="settings_survey_text_tool_font_size_title">Text tool label size</string>
     <string name="settings_survey_text_tool_font_size_summary">How big to initially draw manually-placed text (pixels)</string>
     <string name="settings_survey_symbol_size_title">Survey symbol size</string>

@@ -127,8 +127,11 @@ public class GraphView extends View {
 
     boolean surveyChanged;
 
+    // cached preferences for performance
     private boolean isDarkModeActive = false;
+    private boolean isTwoFingerModeActive = true;
     private boolean isHotCornersModeActive = true;
+
 
     // cached for performance
     private Coord2D canvasBottomRight;
@@ -260,6 +263,8 @@ public class GraphView extends View {
         crossSectionIndicatorPaint.setStrokeWidth(2);
         crossSectionIndicatorPaint.setStyle(Paint.Style.FILL);
 
+        isTwoFingerModeActive = GeneralPreferences.isTwoFingerModeActive();
+
         isHotCornersModeActive = GeneralPreferences.isHotCornersModeActive();
         hotCornersPaint.setColor(Colour.GREY.intValue);
         hotCornersPaint.setAlpha(FADED_ALPHA);
@@ -360,7 +365,7 @@ public class GraphView extends View {
             return false;
         }
 
-        if (event.getPointerCount() >= 2) {
+        if (isTwoFingerModeActive && event.getPointerCount() >= 2) {
             return true;
         }
 

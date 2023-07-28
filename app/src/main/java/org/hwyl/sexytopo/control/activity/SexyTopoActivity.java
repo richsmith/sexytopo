@@ -1111,7 +1111,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     boolean isDarkModeActive() {
         int nightModeFlags =
-                getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+            getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
         return nightModeFlags == Configuration.UI_MODE_NIGHT_YES;
     }
 

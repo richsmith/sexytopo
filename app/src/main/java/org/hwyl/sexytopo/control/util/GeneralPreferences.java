@@ -132,7 +132,12 @@ public class GeneralPreferences {
         return getBoolean("pref_hot_corners", true);
     }
 
+    public static boolean isTwoFingerModeActive() {
+        return getBoolean("pref_two_finger_movement", true);
+    }
+
     // ********** Sketching ***********
+
     public static boolean isAntialiasingModeOn() {
         return getBoolean("pref_anti_alias", false);
     }
