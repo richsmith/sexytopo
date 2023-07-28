@@ -16,9 +16,6 @@ public class PreferenceAccess {
 
     // ********** General ***********
 
-
-
-
     public static Uri getActiveSurveyUri() {
         String uriString = prefs.getString("pref_active_survey_uri", null);
         if (uriString == null) {
@@ -43,7 +40,7 @@ public class PreferenceAccess {
         return prefs.getString("pref_theme", "auto");
     }
     public static boolean isDevModeOn() {
-        return prefs.getBoolean("pref_key_developer_mode", false);
+        return prefs.getBoolean("pref_developer_mode", false);
     }
 
     public static String getOrientationMode() {
@@ -55,18 +52,18 @@ public class PreferenceAccess {
     }
 
     public static boolean isHighlightLatestLegModeOn() {
-        return prefs.getBoolean("pref_key_highlight_latest_leg", true);
+        return prefs.getBoolean("pref_highlight_latest_leg", true);
     }
 
 
     // ********** Table ***********
 
     public static boolean isManualLrudModeOn() {
-        return prefs.getBoolean("pref_key_lrud_fields", false);
+        return prefs.getBoolean("pref_lrud_fields", false);
     }
 
     public static boolean isDegMinsSecsModeOn() {
-        return prefs.getBoolean("pref_key_deg_mins_secs", false);
+        return prefs.getBoolean("pref_deg_mins_secs", false);
     }
 
     // ********** Surveying ***********
@@ -85,7 +82,7 @@ public class PreferenceAccess {
 
     // ********** Sketching ***********
     public static boolean isAntialiasingModeOn() {
-        return prefs.getBoolean("pref_key_anti_alias", false);
+        return prefs.getBoolean("pref_anti_alias", false);
     }
 
     public static int getStationCrossDiameterPixels() {

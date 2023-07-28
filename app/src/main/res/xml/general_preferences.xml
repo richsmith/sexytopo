@@ -127,12 +127,12 @@
     <PreferenceCategory
         android:title="@string/settings_manual_data_entry_title">
         <CheckBoxPreference
-            android:key="pref_key_lrud_fields"
+            android:key="pref_lrud_fields"
             android:title="@string/settings_key_lrud_fields_title"
             android:summary="@string/settings_key_lrud_fields_summary"
             android:defaultValue="false"/>
         <CheckBoxPreference
-            android:key="pref_key_deg_mins_secs"
+            android:key="pref_deg_mins_secs"
             android:title="@string/settings_key_deg_mins_secs_title"
             android:summary="@string/settings_key_deg_mins_secs_summary"
             android:defaultValue="false"/>
@@ -141,7 +141,7 @@
     <PreferenceCategory
         android:title="@string/settings_developer_title">
         <CheckBoxPreference
-            android:key="pref_key_developer_mode"
+            android:key="pref_developer_mode"
             android:title="@string/settings_key_developer_mode_title"
             android:summary="@string/settings_key_developer_mode_summary"
             android:defaultValue="false"/>
