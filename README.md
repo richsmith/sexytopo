@@ -24,19 +24,29 @@ A large phone or "phablet" (as oppposed to a full-size tablet or small phone) se
 A Galaxy Note is a good choice. Apart from being about the right size, a proper stylus helps greatly in surveying. Consider buying second hand to get an affordable device for taking underground.
 
 ## What measuring instruments does SexyTopo work with?
-Currently three:
-* The [DistoX2](https://paperless.bheeb.ch/)
-* The [Shetland Attack Pony 5](https://www.shetlandattackpony.co.uk/)
-* The [Bric4](https://www.caveexploration.org/gear/bric4)
+Currently the following:
 
-You can also use it in manual mode and input data from old-fashioned analogue instruments if you really have to.
+* The [DistoX2](https://paperless.bheeb.ch/) (several versions)
+* The [Shetland Attack Pony 5](https://www.shetlandattackpony.co.uk/)
+* The [Shetland Attack Pony 6](https://www.shetlandattackpony.co.uk/)
+* The [Bric4](https://www.caveexploration.org/gear/bric4)
+* Analogue instruments (if you input the data by hand, though not really recommended)
+
+Please get in touch if think you can help SexyTopo work with any other instruments.
+
+## Does SexyTopo need all those permissions?
+Yes, even if it might not be obvious what they do. E.g. asking for certain Bluetooth permissions requires asking for location permissions (presumably you can use Bluetooth to find your location in some way). If you don't grant it everything it asks for then it may fail in unexpected ways.
 
 ## I'm interested in the SexyTopo project; can I help?
-Great! Please get in touch. I'm interested in programmers, testers, ideas, etc.! There's also a Facebook group for updates about SexyTopo.
+Awesome! Please get in touch. I'm interested in programmers, testers, ideas, etc.! There's also a Facebook group for updates about SexyTopo.
 https://www.facebook.com/groups/sexytopo
 
+If you are interested in contributing code (yay), I'd ideally prefer it if you talk to me before committing. I (or someone) might already be working on that feature, or there might be some other reason why your idea hasn't made it in yet. I'm likely to be enthusiastic 
+
 ## I've had this problem...
-If you get a crash (hopefully rare now), please make sure you connect your device to WiFi when you get a chance. A very basic error report will get uploaded if SexyTopo gets a chance (please also select "Send Error Report" for best results). A bug report email with more details is also super-useful.
+Please open a Github issue. You can also email me, ask on the FB page, or track me down in the pub, but Github isues are easiest to track.
+
+If you get a crash (hopefully rare now), please make sure you connect your device to WiFi when you get a chance. A very basic error report will get uploaded if SexyTopo gets a chance (please also select "Send Error Report" for best results).
 
 ## What import / export options does SexyTopo have?
 Sexytopo understands the following formats. If you are interested in helping SexyTopo understand other formats, please contact me.
