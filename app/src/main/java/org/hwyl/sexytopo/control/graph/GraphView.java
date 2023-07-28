@@ -31,6 +31,7 @@ import org.hwyl.sexytopo.control.activity.PlanActivity;
 import org.hwyl.sexytopo.control.activity.TableActivity;
 import org.hwyl.sexytopo.control.util.CohenSutherlandAlgorithm;
 import org.hwyl.sexytopo.control.util.CrossSectioner;
+import org.hwyl.sexytopo.control.util.DisplayPreferences;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.control.util.SurveyStats;
@@ -407,7 +408,7 @@ public class GraphView extends View {
         Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
         Coord2D surveyCoords = viewCoordsToSurveyCoords(touchPointOnView);
 
-        boolean snapToLines = getDisplayPreference(GraphActivity.DisplayPreference.SNAP_TO_LINES);
+        boolean snapToLines = getDisplayPreference(DisplayPreferences.Toggle.SNAP_TO_LINES);
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -788,11 +789,11 @@ public class GraphView extends View {
         viewpointTopLeftOnSurvey = viewCoordsToSurveyCoords(Coord2D.ORIGIN);
         viewpointBottomRightOnSurvey = viewCoordsToSurveyCoords(canvasBottomRight);
 
-        if (getDisplayPreference(GraphActivity.DisplayPreference.SHOW_GRID)) {
+        if (getDisplayPreference(DisplayPreferences.Toggle.SHOW_GRID)) {
             drawGrid(canvas);
         }
 
-        if (getDisplayPreference(GraphActivity.DisplayPreference.SHOW_CONNECTIONS)) {
+        if (getDisplayPreference(DisplayPreferences.Toggle.SHOW_CONNECTIONS)) {
             drawConnectedSurveys(canvas, projection, FADED_ALPHA);
         }
 
@@ -908,7 +909,7 @@ public class GraphView extends View {
             Canvas canvas, List<CrossSectionDetail> crossSectionDetails, int alpha) {
 
         boolean showStationLabels =
-                getDisplayPreference(GraphActivity.DisplayPreference.SHOW_STATION_LABELS);
+                getDisplayPreference(DisplayPreferences.Toggle.SHOW_STATION_LABELS);
 
         crossSectionConnectorPaint.setAlpha(alpha);
 
@@ -973,9 +974,9 @@ public class GraphView extends View {
 
         boolean highlightLatestLeg = GeneralPreferences.isHighlightLatestLegModeOn();
 
-        boolean showSplays = getDisplayPreference(GraphActivity.DisplayPreference.SHOW_SPLAYS);
+        boolean showSplays = getDisplayPreference(DisplayPreferences.Toggle.SHOW_SPLAYS);
         boolean fadingNonActive =
-                getDisplayPreference(GraphActivity.DisplayPreference.FADE_NON_ACTIVE);
+                getDisplayPreference(DisplayPreferences.Toggle.FADE_NON_ACTIVE);
 
         Map<Leg, Line<Coord2D>> legMap = space.getLegMap();
 
@@ -1027,7 +1028,7 @@ public class GraphView extends View {
     private void drawStations(Survey survey, Canvas canvas, Space<Coord2D> space, int baseAlpha) {
 
         boolean fadingNonActive =
-                getDisplayPreference(GraphActivity.DisplayPreference.FADE_NON_ACTIVE);
+                getDisplayPreference(DisplayPreferences.Toggle.FADE_NON_ACTIVE);
 
         if (fadingNonActive) {
             baseAlpha = FADED_ALPHA;
@@ -1037,7 +1038,7 @@ public class GraphView extends View {
         stationPaint.setAlpha(alpha);
 
         boolean showStationLabels =
-                getDisplayPreference(GraphActivity.DisplayPreference.SHOW_STATION_LABELS);
+                getDisplayPreference(DisplayPreferences.Toggle.SHOW_STATION_LABELS);
 
 
         for (Map.Entry<Station, Coord2D> entry : space.getStationMap().entrySet()) {
@@ -1179,7 +1180,7 @@ public class GraphView extends View {
     }
 
 
-    public boolean getDisplayPreference(GraphActivity.DisplayPreference preference) {
+    public boolean getDisplayPreference(DisplayPreferences.Toggle preference) {
         SharedPreferences preferences =
             getContext().getSharedPreferences("display", Context.MODE_PRIVATE);
         boolean isSelected =
@@ -1190,7 +1191,7 @@ public class GraphView extends View {
 
     private void drawSketch(Canvas canvas, Sketch sketch, int alpha) {
 
-        if (!getDisplayPreference(GraphActivity.DisplayPreference.SHOW_SKETCH)) {
+        if (!getDisplayPreference(DisplayPreferences.Toggle.SHOW_SKETCH)) {
             return;
         }
 

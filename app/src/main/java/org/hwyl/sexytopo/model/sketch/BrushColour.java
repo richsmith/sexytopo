@@ -16,9 +16,16 @@ public enum BrushColour {
 
     private final int id;
     private final Colour colour;
+
+    private static final BrushColour DEFAULT = BLACK;
+
     BrushColour(int id, Colour colour) {
         this.id = id;
         this.colour = colour;
+    }
+
+    public static BrushColour fromString(String name) {
+        return name == null? DEFAULT : BrushColour.valueOf(name);
     }
 
     public int getId() {
