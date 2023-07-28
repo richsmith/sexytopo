@@ -3,7 +3,6 @@ package org.hwyl.sexytopo.control.graph;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -31,8 +30,8 @@ import org.hwyl.sexytopo.control.activity.PlanActivity;
 import org.hwyl.sexytopo.control.activity.TableActivity;
 import org.hwyl.sexytopo.control.util.CohenSutherlandAlgorithm;
 import org.hwyl.sexytopo.control.util.CrossSectioner;
-import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
+import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
@@ -330,7 +329,10 @@ public class GraphView extends View {
             return true;
         }
 
-        considerModalMoveSelection(event);
+        if (isModalMoveSelection(event)) {
+            setSketchTool(SketchTool.MODAL_MOVE);
+            // handled below
+        }
 
         switch (currentSketchTool) {
             case MOVE:
@@ -352,14 +354,26 @@ public class GraphView extends View {
         return false;
     }
 
-    private void considerModalMoveSelection(MotionEvent event) {
+    private boolean isModalMoveSelection(MotionEvent event) {
 
         if (currentSketchTool == SketchTool.MODAL_MOVE) {
-            return;
+            return false;
         }
 
+        if (event.getPointerCount() >= 2) {
+            return true;
+        }
+
+        if (isHotCornersModeActive && didEventHitHotCorner(event)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean didEventHitHotCorner(MotionEvent event) {
         if (!isHotCornersModeActive) {
-            return;
+            return false;
         }
 
         float x = event.getX();
@@ -378,9 +392,7 @@ public class GraphView extends View {
                 (hitLeftEdge && (hitBottomEdge || hitTopEdge)) ||
                 (hitRightEdge && (hitBottomEdge || hitTopEdge));
 
-        if (hitCorner) {
-            setSketchTool(SketchTool.MODAL_MOVE);
-        }
+        return hitCorner;
     }
 
 
@@ -408,7 +420,7 @@ public class GraphView extends View {
         Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
         Coord2D surveyCoords = viewCoordsToSurveyCoords(touchPointOnView);
 
-        boolean snapToLines = getDisplayPreference(SketchPreferences.Toggle.SNAP_TO_LINES);
+        boolean snapToLines = SketchPreferences.Toggle.SNAP_TO_LINES.isOn();
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -789,11 +801,11 @@ public class GraphView extends View {
         viewpointTopLeftOnSurvey = viewCoordsToSurveyCoords(Coord2D.ORIGIN);
         viewpointBottomRightOnSurvey = viewCoordsToSurveyCoords(canvasBottomRight);
 
-        if (getDisplayPreference(SketchPreferences.Toggle.SHOW_GRID)) {
+        if (SketchPreferences.Toggle.SHOW_GRID.isOn()) {
             drawGrid(canvas);
         }
 
-        if (getDisplayPreference(SketchPreferences.Toggle.SHOW_CONNECTIONS)) {
+        if (SketchPreferences.Toggle.SHOW_CONNECTIONS.isOn()) {
             drawConnectedSurveys(canvas, projection, FADED_ALPHA);
         }
 
@@ -908,8 +920,7 @@ public class GraphView extends View {
     private void drawCrossSections(
             Canvas canvas, List<CrossSectionDetail> crossSectionDetails, int alpha) {
 
-        boolean showStationLabels =
-                getDisplayPreference(SketchPreferences.Toggle.SHOW_STATION_LABELS);
+        boolean showStationLabels = SketchPreferences.Toggle.SHOW_STATION_LABELS.isOn();
 
         crossSectionConnectorPaint.setAlpha(alpha);
 
@@ -974,9 +985,8 @@ public class GraphView extends View {
 
         boolean highlightLatestLeg = GeneralPreferences.isHighlightLatestLegModeOn();
 
-        boolean showSplays = getDisplayPreference(SketchPreferences.Toggle.SHOW_SPLAYS);
-        boolean fadingNonActive =
-                getDisplayPreference(SketchPreferences.Toggle.FADE_NON_ACTIVE);
+        boolean showSplays = SketchPreferences.Toggle.SHOW_SPLAYS.isOn();
+        boolean fadingNonActive = SketchPreferences.Toggle.FADE_NON_ACTIVE.isOn();
 
         Map<Leg, Line<Coord2D>> legMap = space.getLegMap();
 
@@ -1027,8 +1037,8 @@ public class GraphView extends View {
 
     private void drawStations(Survey survey, Canvas canvas, Space<Coord2D> space, int baseAlpha) {
 
-        boolean fadingNonActive =
-                getDisplayPreference(SketchPreferences.Toggle.FADE_NON_ACTIVE);
+        boolean fadingNonActive = SketchPreferences.Toggle.FADE_NON_ACTIVE.isOn();
+        boolean showStationLabels = SketchPreferences.Toggle.SHOW_STATION_LABELS.isOn();
 
         if (fadingNonActive) {
             baseAlpha = FADED_ALPHA;
@@ -1036,10 +1046,6 @@ public class GraphView extends View {
 
         int alpha = baseAlpha;
         stationPaint.setAlpha(alpha);
-
-        boolean showStationLabels =
-                getDisplayPreference(SketchPreferences.Toggle.SHOW_STATION_LABELS);
-
 
         for (Map.Entry<Station, Coord2D> entry : space.getStationMap().entrySet()) {
             Station station = entry.getKey();
@@ -1180,18 +1186,10 @@ public class GraphView extends View {
     }
 
 
-    public boolean getDisplayPreference(SketchPreferences.Toggle preference) {
-        SharedPreferences preferences =
-            getContext().getSharedPreferences("display", Context.MODE_PRIVATE);
-        boolean isSelected =
-            preferences.getBoolean(preference.toString(), preference.getDefault());
-        return isSelected;
-    }
-
 
     private void drawSketch(Canvas canvas, Sketch sketch, int alpha) {
 
-        if (!getDisplayPreference(SketchPreferences.Toggle.SHOW_SKETCH)) {
+        if (!SketchPreferences.Toggle.SHOW_SKETCH.isOn()) {
             return;
         }
 

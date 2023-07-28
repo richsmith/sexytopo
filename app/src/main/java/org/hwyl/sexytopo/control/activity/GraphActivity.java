@@ -122,7 +122,7 @@ public abstract class GraphActivity extends SexyTopoActivity
 
 
     private void handleAutoRecentre() {
-        if (graphView.getDisplayPreference(SketchPreferences.Toggle.AUTO_RECENTRE)) {
+        if (SketchPreferences.Toggle.AUTO_RECENTRE.isOn()) {
             graphView.centreViewOnActiveStation();
         }
     }
@@ -425,7 +425,7 @@ public abstract class GraphActivity extends SexyTopoActivity
 
         Symbol.setResources(getResources());
         Symbol selectedSymbol = SketchPreferences.getSelectedSymbol();
-        selectSymbol(selectedSymbol);
+        // selectSymbol(selectedSymbol); FIXME currently throwing a NPE
     }
 
 
