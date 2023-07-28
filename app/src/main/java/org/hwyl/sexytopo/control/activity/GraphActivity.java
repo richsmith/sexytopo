@@ -27,7 +27,7 @@ import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.graph.GraphView;
 import org.hwyl.sexytopo.control.graph.StationContextMenu;
-import org.hwyl.sexytopo.control.util.DisplayPreferences;
+import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Projection2D;
@@ -122,7 +122,7 @@ public abstract class GraphActivity extends SexyTopoActivity
 
 
     private void handleAutoRecentre() {
-        if (graphView.getDisplayPreference(DisplayPreferences.Toggle.AUTO_RECENTRE)) {
+        if (graphView.getDisplayPreference(SketchPreferences.Toggle.AUTO_RECENTRE)) {
             graphView.centreViewOnActiveStation();
         }
     }
@@ -222,35 +222,35 @@ public abstract class GraphActivity extends SexyTopoActivity
         // this has to be a big hairy if-else chain instead of a switch statement
         // (itemId is no longer a constant in later Android versions)
         if (itemId == R.id.buttonSnapToLines) {
-            DisplayPreferences.Toggle.SNAP_TO_LINES.set(!item.isChecked());
+            SketchPreferences.Toggle.SNAP_TO_LINES.set(!item.isChecked());
             return true;
         } else if (itemId == R.id.buttonShowGrid) {
-            DisplayPreferences.Toggle.SHOW_GRID.set(!item.isChecked());
+            SketchPreferences.Toggle.SHOW_GRID.set(!item.isChecked());
             graphView.invalidate();
             return true;
         } else if (itemId == R.id.buttonFadeNonActive) {
-            DisplayPreferences.Toggle.FADE_NON_ACTIVE.set(!item.isChecked());
+            SketchPreferences.Toggle.FADE_NON_ACTIVE.set(!item.isChecked());
             graphView.invalidate();
             return true;
         } else if (itemId == R.id.buttonShowSplays) {
-            DisplayPreferences.Toggle.SHOW_SPLAYS.set(!item.isChecked());
+            SketchPreferences.Toggle.SHOW_SPLAYS.set(!item.isChecked());
             graphView.invalidate();
             return true;
         } else if (itemId == R.id.buttonShowSketch) {
-            DisplayPreferences.Toggle.SHOW_SKETCH.set(!item.isChecked());
+            SketchPreferences.Toggle.SHOW_SKETCH.set(!item.isChecked());
             setSketchButtonsStatus();
             graphView.invalidate();
             return true;
         } else if (itemId == R.id.buttonShowStationLabels) {
-            DisplayPreferences.Toggle.SHOW_STATION_LABELS.set(!item.isChecked());
+            SketchPreferences.Toggle.SHOW_STATION_LABELS.set(!item.isChecked());
             graphView.invalidate();
             return true;
         } else if (itemId == R.id.buttonShowConnections) {
-            DisplayPreferences.Toggle.SHOW_CONNECTIONS.set(!item.isChecked());
+            SketchPreferences.Toggle.SHOW_CONNECTIONS.set(!item.isChecked());
             graphView.invalidate();
             return true;
         } else if (itemId == R.id.buttonAutoRecentre) {
-            DisplayPreferences.Toggle.AUTO_RECENTRE.set(!item.isChecked());
+            SketchPreferences.Toggle.AUTO_RECENTRE.set(!item.isChecked());
             graphView.invalidate();
             return true;
         } else {
@@ -267,7 +267,7 @@ public abstract class GraphActivity extends SexyTopoActivity
             blackButton.setImageResource(R.drawable.white);
         }
 
-       boolean isEnabled = DisplayPreferences.Toggle.SHOW_SKETCH.isOn();
+       boolean isEnabled = SketchPreferences.Toggle.SHOW_SKETCH.isOn();
         for (int id : SKETCH_BUTTON_IDS) {
             ImageButton button = findViewById(id);
             button.setEnabled(isEnabled);
@@ -356,7 +356,7 @@ public abstract class GraphActivity extends SexyTopoActivity
         popup.getMenuInflater().inflate(R.menu.drawing, menu);
         popup.setOnMenuItemClickListener(this);
 
-        for (DisplayPreferences.Toggle toggle : DisplayPreferences.Toggle.values()) {
+        for (SketchPreferences.Toggle toggle : SketchPreferences.Toggle.values()) {
             int controlId = toggle.getControlId();
             MenuItem menuItem = menu.findItem(controlId);
             menuItem.setChecked(toggle.isOn());
@@ -399,7 +399,7 @@ public abstract class GraphActivity extends SexyTopoActivity
 
 
     private void selectSymbol(Symbol symbol) {
-        DisplayPreferences.setSelectedSymbol(symbol);
+        SketchPreferences.setSelectedSymbol(symbol);
 
         ImageButton selectedSymbolButton = findViewById(symbol.getBitmapId());
         selectedSymbolButton.getBackground().setColorFilter(buttonHighlightColour, PorterDuff.Mode.SRC_ATOP);
@@ -417,21 +417,21 @@ public abstract class GraphActivity extends SexyTopoActivity
 
 
     private void initialiseTools() {
-        SketchTool selected = DisplayPreferences.getSelectedSketchTool();
+        SketchTool selected = SketchPreferences.getSelectedSketchTool();
         selectSketchTool(selected);
 
-        BrushColour brushColour = DisplayPreferences.getSelectedBrushColour();
+        BrushColour brushColour = SketchPreferences.getSelectedBrushColour();
         selectBrushColour(brushColour);
 
         Symbol.setResources(getResources());
-        Symbol selectedSymbol = DisplayPreferences.getSelectedSymbol();
+        Symbol selectedSymbol = SketchPreferences.getSelectedSymbol();
         selectSymbol(selectedSymbol);
     }
 
 
     private void selectSketchTool(SketchTool toSelect) {
 
-        DisplayPreferences.setSelectedSketchTool(toSelect);
+        SketchPreferences.setSelectedSketchTool(toSelect);
         graphView.setSketchTool(toSelect);
 
         for (SketchTool sketchTool : SketchTool.values()) {
@@ -451,7 +451,7 @@ public abstract class GraphActivity extends SexyTopoActivity
 
     private void selectBrushColour(BrushColour toSelect) {
 
-        DisplayPreferences.setSelectedBrushColour(toSelect);
+        SketchPreferences.setSelectedBrushColour(toSelect);
         graphView.setBrushColour(toSelect);
 
         for (BrushColour brushColour : BrushColour.values()) {

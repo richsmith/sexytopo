@@ -9,7 +9,7 @@ import org.hwyl.sexytopo.model.sketch.SketchTool;
 import org.hwyl.sexytopo.model.sketch.Symbol;
 
 
-public class DisplayPreferences {
+public class SketchPreferences {
 
     public static final String SKETCH_PREFERENCES_KEY = "display";
 
