@@ -14,6 +14,58 @@ public class GeneralPreferences {
         prefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
+    private static String getString(String key, String defaultValue) {
+        return prefs.getString(key, defaultValue);
+    }
+
+    private static boolean getBoolean(String key, Boolean defaultValue) {
+        boolean value;
+
+        try {
+            value = prefs.getBoolean(key, defaultValue);
+        } catch (ClassCastException cce) {
+            String string = prefs.getString(key, defaultValue.toString());
+            value = Boolean.parseBoolean(string);
+        }
+        return value;
+    }
+
+    private static int getInt(String key, Integer defaultValue) {
+        int value = defaultValue;
+
+        try {
+            value = prefs.getInt(key, defaultValue);
+        } catch (ClassCastException cce) {
+            String string = prefs.getString(key, defaultValue.toString());
+            try {
+                value = Integer.parseInt(string);
+            } catch (NumberFormatException nfe) {
+                // Keep default
+            }
+        }
+
+        return value;
+    }
+
+    private static float getFloat(String key, float defaultValue) {
+        float value = defaultValue;
+
+        try {
+            value = prefs.getFloat(key, defaultValue);
+        } catch (ClassCastException cce) {
+            String string = prefs.getString(key, null);
+            if (string != null) {
+                try {
+                    value = Float.parseFloat(string);
+                } catch (NumberFormatException nfe) {
+                    // Keep default
+                }
+            }
+        }
+
+        return value;
+    }
+
     // ********** General ***********
 
     public static Uri getActiveSurveyUri() {
@@ -37,90 +89,90 @@ public class GeneralPreferences {
     }
 
     public static String getTheme() {
-        return prefs.getString("pref_theme", "auto");
+        return getString("pref_theme", "auto");
     }
     public static boolean isDevModeOn() {
-        return prefs.getBoolean("pref_developer_mode", false);
+        return getBoolean("pref_developer_mode", false);
     }
 
     public static String getOrientationMode() {
-        return prefs.getString("pref_orientation", "auto");
+        return getString("pref_orientation", "auto");
     }
 
     public static boolean isDeletePathFragmentsModeOn() {
-        return prefs.getBoolean("pref_delete_path_fragments", true);
+        return getBoolean("pref_delete_path_fragments", true);
     }
 
     public static boolean isHighlightLatestLegModeOn() {
-        return prefs.getBoolean("pref_highlight_latest_leg", true);
+        return getBoolean("pref_highlight_latest_leg", true);
     }
 
 
     // ********** Table ***********
 
     public static boolean isManualLrudModeOn() {
-        return prefs.getBoolean("pref_lrud_fields", false);
+        return getBoolean("pref_lrud_fields", false);
     }
 
     public static boolean isDegMinsSecsModeOn() {
-        return prefs.getBoolean("pref_deg_mins_secs", false);
+        return getBoolean("pref_deg_mins_secs", false);
     }
 
     // ********** Surveying ***********
 
     public static float getMaxDistanceDelta() {
-        return prefs.getFloat("pref_max_distance_delta", 0.05f);
+        return getFloat("pref_max_distance_delta", 0.05f);
     }
 
     public static float getMaxAngleDelta() {
-        return prefs.getFloat("pref_max_angle_delta", 1.7f);
+        return getFloat("pref_max_angle_delta", 1.7f);
     }
 
     public static boolean isHotCornersModeActive() {
-        return prefs.getBoolean("pref_hot_corners", true);
+        return getBoolean("pref_hot_corners", true);
     }
 
     // ********** Sketching ***********
     public static boolean isAntialiasingModeOn() {
-        return prefs.getBoolean("pref_anti_alias", false);
+        return getBoolean("pref_anti_alias", false);
     }
 
     public static int getStationCrossDiameterPixels() {
-        return prefs.getInt("pref_station_diameter", 16);
+        return getInt("pref_station_diameter", 16);
     }
 
     public static int getLegStrokeWidth() {
-        return prefs.getInt("pref_leg_width", 3);
+        return getInt("pref_leg_width", 3);
     }
 
     public static int getSplayStrokeWidth() {
-        return prefs.getInt("pref_splay_width", 1);
+        return getInt("pref_splay_width", 1);
     }
 
     public static int getLegendFontSizeSp() {
-        return prefs.getInt("pref_legend_font_size_sp", 10);
+        return getInt("pref_legend_font_size_sp", 10);
     }
 
     public static int getLabelFontSizeSp() {
-        return prefs.getInt("pref_label_font_size_sp", 12);
+        return getInt("pref_label_font_size_sp", 12);
     }
 
     public static int getStationLabelFontSizeSp() {
-        return prefs.getInt("pref_station_label_font_size_sp", 10);
+        return getInt("pref_station_label_font_size_sp", 10);
     }
 
     public static int getTextStartingSizePixels() {
-        return prefs.getInt("pref_survey_text_tool_font_size", 50);
+        return getInt("pref_survey_text_tool_font_size", 50);
     }
 
     public static int getSymbolStartingSizePixels() {
-        return prefs.getInt("pref_survey_symbol_size", 35);
+        return getInt("pref_survey_symbol_size", 35);
     }
 
     // ********** Calibration ***********
 
     public static String getCalibrationAlgorithm() {
-        return prefs.getString("pref_calibration_algorithm", "linear");
+        return getString("pref_calibration_algorithm", "linear");
     }
 
 
