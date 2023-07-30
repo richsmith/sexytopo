@@ -61,11 +61,8 @@ public class Log {
         Log.hasFilesystemAccess = hasFilesystemAccess;
     }
 
-    public static synchronized void device(String message, boolean andToSystemLog) {
-        device(message);
-        if (andToSystemLog) {
-            systemLog(message, false);
-        }
+    public static synchronized void device(int stringId, String ... args) {
+        device(context.getString(stringId, args));
     }
 
     public static synchronized void device(String message) {
@@ -92,7 +89,7 @@ public class Log {
         save(LogType.SYSTEM);
     }
 
-    public static void d(int stringId, String ... args) {
+    public static void d(int stringId, Object ... args) {
         d(context.getString(stringId, args));
     }
     public static void d(String message) {
@@ -100,7 +97,7 @@ public class Log {
         systemLog(message, false);
     }
 
-    public static void e(int stringId, String ... args) {
+    public static void e(int stringId, Object ... args) {
         e(context.getString(stringId, args));
     }
 
@@ -115,7 +112,7 @@ public class Log {
         e(android.util.Log.getStackTraceString(throwable));
     }
 
-    public static void i(int stringId, String ... args) {
+    public static void i(int stringId, Object ... args) {
         i(context.getString(stringId, args));
     }
 
