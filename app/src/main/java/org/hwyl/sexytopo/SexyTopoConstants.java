@@ -1,8 +1,5 @@
 package org.hwyl.sexytopo;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-
 import java.util.UUID;
 
 
@@ -76,15 +73,6 @@ public class SexyTopoConstants {
     public static final int NUM_OF_REPEATS_FOR_NEW_STATION = 3;
     public static final String BLANK_STATION_NAME = "-";
     public static final String JUMP_TO_STATION = "jumpToStation";
-
-
-
-    // ********** To move **********
-
-    // This is extremely hacky but quite useful for getting a context when it's not sensible
-    // to pass one around
-    @SuppressLint("StaticFieldLeak") // shouldn't be problem, because using ApplicationContext
-    public static Context context;
 
 
 
