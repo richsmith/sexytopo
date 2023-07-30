@@ -4,6 +4,7 @@ import android.widget.Toast;
 
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
+import org.hwyl.sexytopo.control.SexyTopo;
 import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.survey.Leg;
@@ -133,7 +134,7 @@ public class SurveyJsonTranslater {
 
         if (errors) {
             String message = "Partial errors encountered; survey load was incomplete";
-            Toast.makeText(SexyTopoConstants.context, message, Toast.LENGTH_SHORT).show();
+            Toast.makeText(SexyTopo.context, message, Toast.LENGTH_SHORT).show();
         }
     }
 

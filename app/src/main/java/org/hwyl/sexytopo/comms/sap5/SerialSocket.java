@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothSocket;
 
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
+import org.hwyl.sexytopo.control.SexyTopo;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -78,7 +79,7 @@ public class SerialSocket {
         Log.d("BLEConnect2");
         bleSocket = new BLESocket();
         Log.d("BLEConnect3");
-        bleSocket.connect(SexyTopoConstants.context, bleListener, bluetoothDevice);
+        bleSocket.connect(SexyTopo.context, bleListener, bluetoothDevice);
         long startTime = System.currentTimeMillis();
         while (System.currentTimeMillis() < startTime+8000) {
             if (bleSocket.isConnected()) return;
