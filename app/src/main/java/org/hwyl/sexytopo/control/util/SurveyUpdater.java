@@ -1,7 +1,9 @@
 package org.hwyl.sexytopo.control.util;
 
+import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
+import org.hwyl.sexytopo.control.SexyTopo;
 import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -38,7 +40,7 @@ public class SurveyUpdater {
     public static synchronized boolean update(Survey survey, Leg leg, InputMode inputMode) {
         Station activeStation = survey.getActiveStation();
 
-        Log.d("Adding leg " + leg);
+        Log.i(R.string.survey_update_adding_leg, leg);
         activeStation.getOnwardLegs().add(leg);
         survey.setSaved(false);
         survey.addLegRecord(leg);
@@ -56,10 +58,6 @@ public class SurveyUpdater {
                         createNewStationIfTripleShot(survey, false);
             case CALIBRATION_CHECK:
                 break; // do nothing :)
-        }
-
-        if (justCreatedNewStation) {
-            Log.d("Created new station " + survey.getActiveStation().getName());
         }
 
         return justCreatedNewStation;
@@ -201,33 +199,34 @@ public class SurveyUpdater {
     public static synchronized void editLeg(
             final Survey survey, final Leg toEdit, final Leg edited) {
         SurveyTools.traverseLegs(
-                survey,
-                (origin, leg) -> {
-                    if (leg == toEdit) {
-                        origin.getOnwardLegs().remove(toEdit);
-                        origin.getOnwardLegs().add(edited);
-                        survey.replaceLegInRecord(toEdit, edited);
-                        Log.d("Edited leg " + toEdit + " -> " + edited);
-                        return true;
-                    } else {
-                        return false;
-                    }
-                });
+            survey,
+            (origin, leg) -> {
+                if (leg == toEdit) {
+                    origin.getOnwardLegs().remove(toEdit);
+                    origin.getOnwardLegs().add(edited);
+                    survey.replaceLegInRecord(toEdit, edited);
+                    Log.d(R.string.survey_update_edited_leg, toEdit, edited);
+                    return true;
+                } else {
+                    return false;
+                }
+            });
         survey.setSaved(false);
     }
 
 
     public static void renameStation(Survey survey, Station station, String name) {
         String previousName = station.getName();
-        Log.d("Renaming station from: " + Log.formatDebugString(previousName) + " to: " + Log.formatDebugString(name));
 
         Station existing = survey.getStationByName(name);
         if (existing != null) {
-            throw new IllegalArgumentException("New station name is not unique");
+            String message = SexyTopo.staticGetString(R.string.survey_update_rename_error_not_unique);
+            throw new IllegalArgumentException(message);
         }
 
         station.setName(name);
-        Log.d("Renamed station from: " + Log.formatDebugString(previousName) + " to: " + Log.formatDebugString(station.getName()));
+        survey.setSaved(false);
+        Log.i(R.string.survey_update_renamed_station, previousName, name);
     }
 
 
@@ -236,6 +235,7 @@ public class SurveyUpdater {
         originating.getOnwardLegs().remove(leg);
         newSource.addOnwardLeg(leg);
         survey.setSaved(false);
+        Log.i(R.string.survey_update_moved_leg, newSource.getName());
     }
 
 
@@ -359,19 +359,19 @@ public class SurveyUpdater {
     public static void reverseLeg(final Survey survey, final Station toReverse) {
         Log.d("Reversing leg to " + toReverse.getName());
         SurveyTools.traverseLegs(
-                survey,
-                (origin, leg) -> {
-                    if (leg.hasDestination() && leg.getDestination() == toReverse) {
-                        Leg reversed = leg.reverse();
-                        Log.d("Reversed direction of leg " + leg + " to " + reversed);
-                        origin.getOnwardLegs().remove(leg);
-                        origin.addOnwardLeg(reversed);
-                        survey.replaceLegInRecord(leg, reversed);
-                        return true;
-                    } else {
-                        return false;
-                    }
-                });
+            survey,
+            (origin, leg) -> {
+                if (leg.hasDestination() && leg.getDestination() == toReverse) {
+                    Leg reversed = leg.reverse();
+                    Log.d("Reversed direction of leg " + leg + " to " + reversed);
+                    origin.getOnwardLegs().remove(leg);
+                    origin.addOnwardLeg(reversed);
+                    survey.replaceLegInRecord(leg, reversed);
+                    return true;
+                } else {
+                    return false;
+                }
+            });
         survey.setSaved(false);
     }
 

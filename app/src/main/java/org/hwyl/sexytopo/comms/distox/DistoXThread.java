@@ -100,7 +100,7 @@ public class DistoXThread extends Thread {
         oneOff(new DistoXOffProtocol(context, bluetoothDevice, dataManager));
     }
 
-    public WriteCalibrationProtocol writeCalibration(byte[] coeff) {
+    public WriteCalibrationProtocol writeCalibration(Byte[] coeff) {
         WriteCalibrationProtocol writeCalibration =
                 new WriteCalibrationProtocol(context, bluetoothDevice, dataManager);
         writeCalibration.setCoeffToWrite(coeff);

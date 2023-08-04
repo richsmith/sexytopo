@@ -78,7 +78,7 @@
             android:exported="false" >
         </service>
         <activity
-            android:name=".control.activity.CalibrationActivity"
+            android:name=".control.activity.DistoXCalibrationActivity"
             android:label="@string/title_activity_calibration">
         </activity>
         <activity

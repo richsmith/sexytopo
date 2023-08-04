@@ -7,7 +7,7 @@ import org.hwyl.sexytopo.comms.Communicator;
 import org.hwyl.sexytopo.control.activity.DeviceActivity;
 
 
-public class Sap5Communicator extends Communicator {
+public class Sap5Communicator implements Communicator {
 
     private final DeviceActivity activity;
 

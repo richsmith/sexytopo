@@ -61,7 +61,7 @@ public class Log {
         Log.hasFilesystemAccess = hasFilesystemAccess;
     }
 
-    public static synchronized void device(int stringId, String ... args) {
+    public static synchronized void device(int stringId, Object ... args) {
         device(context.getString(stringId, args));
     }
 
@@ -93,6 +93,8 @@ public class Log {
         d(context.getString(stringId, args));
     }
     public static void d(String message) {
+        // currently treating debug and info as the same, but at some point we might get around
+        // to treating them differently
         android.util.Log.d(SexyTopoConstants.TAG, message);
         systemLog(message, false);
     }

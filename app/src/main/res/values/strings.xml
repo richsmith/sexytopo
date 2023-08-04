@@ -203,6 +203,7 @@
     <string name="device_request_unpair">Unpair</string>
     <string name="device_bluetooth_on">On</string>
     <string name="device_no_device">no device</string>
+    <string name="device_null_device">null device</string>
     <string name="device_no_permitted_access">[inaccessible device]</string>
     <string name="device_bluetooth_off">Off</string>
     <string name="device_bluetooth_no_adapter">Cannot access bluetooth adapter</string>
@@ -221,24 +222,34 @@
     <string name="device_log_received_null_data">Null data received</string>
     <string name="device_log_received_empty_data">Empty data received</string>
     <string name="device_log_unknown_identifier">Unknown packet identifier</string>
+    <string name="device_ble_invalid_data_received">Invalid data received</string>
+    <string name="device_ble_device_error">Invalid data received</string>
     <string name="device_ble_connecting_to">Connecting to %1$s…</string>
     <string name="device_ble_connected_to">Connected to %1$s</string>
     <string name="device_ble_device_ready">%1$s ready :)</string>
     <string name="device_ble_device_disconnecting">%1$s disconnecting</string>
     <string name="device_ble_device_disconnected">%1$s ready :)</string>
-
     <string name="device_ble_failed_to_connect_to">Failed to connect to %1$s</string>
     <string name="device_ble_invalid_data">Invalid data received: %1$s</string>
     <string name="device_log_acknowledged_packet">Acknowledged packet</string>
     <string name="device_distox_command_calibration">Calibration…</string>
     <string name="device_distox_command_laser_on">Laser On</string>
+    <string name="device_distox_command_silent_mode_on">Silent Mode On</string>
+    <string name="device_distox_command_silent_mode_off">Silent Mode Off</string>
     <string name="device_distox_command_take_shot">Take Shot</string>
     <string name="device_distox_command_laser_off">Laser Off</string>
     <string name="device_distox_command_distox_off">Device Off</string>
+    <string name="device_distox_force_disconnect_for_calibration">Disto busy; forcing disconnect to write calibration</string>
+    <string name="device_distox_calibration_result">Calibration assessment (should be under %1$f): %2$s\n\nCalibration algorithm: %3$s</string>
+    <string name="device_distox_calibration_writing">Writing calibration coefficients</string>
+    <string name="device_distox_calibration_write_success">Calibration writing successful</string>
+    <string name="device_distox_calibration_write_error">Error writing calibration %1$s</string>
+    <string name="device_distox_calibration_write_rejected">Disto rejected calibration data</string>
     <string name="device_bric_command_take_shot">Take Shot</string>
     <string name="device_bric_command_toggle_laser">Toggle Laser</string>
     <string name="device_bric_command_power_off">Power Off</string>
     <string name="device_bric_command_clear_memory">Clear Memory</string>
+    <string name="device_bric_device_reported_error">%1$s reported error: %2$s</string>
     <string name="device_sap_command_calibration_start">Start Calibration</string>
     <string name="device_sap_command_calibration_stop">Stop Calibration</string>
     <string name="device_sap_command_laser_on">Laser On</string>
@@ -293,7 +304,7 @@
     <string name="orientation_face_left">Face Left</string>
     <string name="dialog_confirm_clear_title">Clear Calibration Readings?</string>
     <plurals name="instruments">
-        <item quantity="one">%1$s instrument</item>
+        <item quantity="one">%1$s instrumentType</item>
         <item quantity="other">%1$s instruments</item>
     </plurals>
 
@@ -385,6 +396,14 @@
     <string name="settings_key_developer_mode_title">Developer mode</string>
     <string name="settings_key_developer_mode_summary">Show debugging menu entries</string>
 
+    <!-- Survey updates -->
+    <string name="survey_update_new_station_added">New station added</string>
+    <string name="survey_update_renamed_station">Renamed station from %1$s to %2$s</string>
+    <string name="survey_update_edited_leg">Edited leg %1$s to %2$s</string>
+    <string name="survey_update_rename_error_not_unique">New station name is not unique</string>
+    <string name="survey_update_moved_leg">Moved leg to station %1$s</string>
+    <string name="survey_update_adding_leg">Adding leg %1$s</string>
+
     <!-- Context menu(s) -->
     <string name="menu_context_title">Station</string>
     <string name="menu_set_active_station">Set Active Station</string>
@@ -424,7 +443,6 @@
     <string name="tool_generate_test_error">Error generating test data</string>
     <string name="tool_force_kill_error">Error killing connection</string>
     <string name="tool_force_crash_message">Boom! Forced crash requested(!)</string>
-    <string name="survey_update_new_station_added">New station added</string>
     <string name="request_code_error">Error code %1$d from request code %2$d</string>
     <string name="killing_comms_process">Killing comms process</string>
 

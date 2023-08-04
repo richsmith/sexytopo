@@ -4,25 +4,25 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public abstract class Communicator {
+public interface Communicator {
 
-    protected static final Map<Integer, String> NO_COMMANDS = new HashMap<>();
+    Map<Integer, Integer> NO_COMMANDS = new HashMap<>();
 
-    public abstract boolean isConnected();
+    boolean isConnected();
 
-    public abstract void requestConnect();
+    void requestConnect();
 
-    public abstract void requestDisconnect();
+    void requestDisconnect();
 
-    public Map<Integer, String> getCustomCommands() {
+    default Map<Integer, Integer> getCustomCommands() {
         return NO_COMMANDS;
     }
 
-    public boolean handleCustomCommand(int viewId) {
+    default boolean handleCustomCommand(int viewId) {
         return false;
     }
 
-    public void forceStop() {
+    default void forceStop() {
         // Do nothing unless implemented
     }
 

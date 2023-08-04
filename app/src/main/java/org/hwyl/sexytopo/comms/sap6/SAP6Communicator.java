@@ -3,10 +3,11 @@ package org.hwyl.sexytopo.comms.sap6;
 import android.bluetooth.BluetoothDevice;
 import android.view.View;
 
+import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.comms.Communicator;
+import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.DeviceActivity;
-import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.model.survey.Leg;
 
 import java.util.HashMap;
@@ -14,7 +15,7 @@ import java.util.Map;
 
 import kotlin.Unit;
 
-public class SAP6Communicator extends Communicator {
+public class SAP6Communicator implements Communicator {
 
     private final DeviceActivity activity;
 
@@ -30,15 +31,15 @@ public class SAP6Communicator extends Communicator {
     private static final int DEVICE_OFF_ID = View.generateViewId();
 
 
-    private static final Map<Integer, String> CUSTOM_COMMANDS = new HashMap<>();
+    private static final Map<Integer, Integer> CUSTOM_COMMANDS = new HashMap<>();
 
     static {
-        CUSTOM_COMMANDS.put(START_CALIBRATION_ID, "Start Calibration");
-        CUSTOM_COMMANDS.put(STOP_CALIBRATION_ID, "Stop Calibration");
-        CUSTOM_COMMANDS.put(LASER_ON_ID, "Laser on");
-        CUSTOM_COMMANDS.put(SHOT_ID, "Take shot");
-        CUSTOM_COMMANDS.put(LASER_OFF_ID, "Laser off");
-        CUSTOM_COMMANDS.put(DEVICE_OFF_ID, "Device off");
+        CUSTOM_COMMANDS.put(START_CALIBRATION_ID, R.string.device_sap_command_calibration_start);
+        CUSTOM_COMMANDS.put(STOP_CALIBRATION_ID, R.string.device_sap_command_calibration_stop);
+        CUSTOM_COMMANDS.put(LASER_ON_ID, R.string.device_sap_command_laser_on);
+        CUSTOM_COMMANDS.put(SHOT_ID, R.string.device_sap_command_take_shot);
+        CUSTOM_COMMANDS.put(LASER_OFF_ID, R.string.device_sap_command_laser_off);
+        CUSTOM_COMMANDS.put(DEVICE_OFF_ID, R.string.device_sap_command_device_off);
     }
 
     public SAP6Communicator(DeviceActivity activity, BluetoothDevice bluetoothDevice) {
@@ -63,7 +64,7 @@ public class SAP6Communicator extends Communicator {
     }
 
     @Override
-    public Map<Integer, String> getCustomCommands() {
+    public Map<Integer, Integer> getCustomCommands() {
         return CUSTOM_COMMANDS;
     }
 

@@ -3,6 +3,7 @@ package org.hwyl.sexytopo.control.activity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -24,7 +25,9 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.comms.Communicator;
+import org.hwyl.sexytopo.comms.DistoX;
 import org.hwyl.sexytopo.comms.distox.DistoXCommunicator;
+import org.hwyl.sexytopo.comms.distox.DistoXStyleCommunicator;
 import org.hwyl.sexytopo.comms.distox.WriteCalibrationProtocol;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.calibration.CalibrationCalculator;
@@ -42,7 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class CalibrationActivity extends SexyTopoActivity {
+public class DistoXCalibrationActivity extends SexyTopoActivity {
 
     public static final double MAX_ERROR = 0.5;
 
@@ -167,11 +170,11 @@ public class CalibrationActivity extends SexyTopoActivity {
 
         if (calibrationReadings.size() < positions.size()) {
             Pair<CalibrationDirection, Orientation> suggestedNext =
-                    positions.get(calibrationReadings.size());
+                positions.get(calibrationReadings.size());
             setInfoField(R.id.calibration_next_direction,
-                    getString(suggestedNext.first.stringId));
+                getString(suggestedNext.first.stringId));
             setInfoField(R.id.calibration_next_orientation,
-                    getString(suggestedNext.second.stringId));
+                getString(suggestedNext.second.stringId));
             TextView assessmentField = findViewById(R.id.calibrationFieldAssessment);
             assessmentField.setTextColor(Color.BLACK);
             setInfoField(R.id.calibrationFieldAssessment, getString(R.string.not_applicable));
@@ -181,7 +184,7 @@ public class CalibrationActivity extends SexyTopoActivity {
 
             boolean useNonLinearity = useNonLinearAlgorithm();
             final CalibrationCalculator calibrationCalculator =
-                    new CalibrationCalculator(useNonLinearity);
+                new CalibrationCalculator(useNonLinearity);
             calibrationCalculator.calculate(calibrationReadings);
             double calibrationAssessment = calibrationCalculator.getDelta();
 
@@ -192,7 +195,7 @@ public class CalibrationActivity extends SexyTopoActivity {
                 assessmentField.setTextColor(Colour.RED.intValue);
             }
             setInfoField(
-                    R.id.calibrationFieldAssessment,TextTools.formatTo2dp(calibrationAssessment));
+                R.id.calibrationFieldAssessment,TextTools.formatTo2dp(calibrationAssessment));
         }
     }
 
@@ -287,9 +290,10 @@ public class CalibrationActivity extends SexyTopoActivity {
                 new CalibrationCalculator(useNonLinearity);
         calibrationCalculator.calculate(calibrationReadings);
         double calibrationAssessment = calibrationCalculator.getDelta();
-        String message = "Calibration assessment (should be under " + MAX_ERROR + "): " +
-            TextTools.formatTo2dp(calibrationAssessment) +
-                "\n\nCalibration algorithm: " + (useNonLinearity? "Non-Linear" : "Linear");
+        String result = TextTools.formatTo2dp(calibrationAssessment);
+        String algorithm = useNonLinearity? "Non-Linear" : "Linear";
+        String message = getString(
+                R.string.device_distox_calibration_result, MAX_ERROR, result, algorithm);
 
         new AlertDialog.Builder(this)
             .setTitle(R.string.calibration_assessment)
@@ -298,7 +302,7 @@ public class CalibrationActivity extends SexyTopoActivity {
                 try {
                     byte[] coeffs = calibrationCalculator.getCoefficients();
                     Byte[] coefficients = ArrayUtils.toObject(coeffs);
-                    new WriteCalibrationTask(view).execute(coefficients);
+                    requestWriteCalibration(view, coefficients);
                 } catch (Exception exception) {
                     showExceptionAndLog(exception);
                 } finally {
@@ -341,6 +345,23 @@ public class CalibrationActivity extends SexyTopoActivity {
         selectFile(SexyTopoConstants.REQUEST_CODE_OPEN_CALIBRATION, StartLocation.TOP_LEVEL, null);
     }
 
+    public void requestWriteCalibration(View view, Byte[] coefficients) {
+        try {
+            DistoXStyleCommunicator comms = getComms();
+
+            if (comms instanceof DistoXCommunicator) {
+                // This is a bit hacky, but the old Disto needs some real-time management
+                new WriteCalibrationTask(view).execute(coefficients);
+            } else {
+                comms.writeCalibration(coefficients);
+            }
+
+        } catch (Exception exception) {
+            showExceptionAndLog(exception);
+        }
+
+    }
+
     private void saveCalibration(Uri uri) throws JSONException, IOException {
         DocumentFile file = DocumentFile.fromSingleUri(this, uri);
         String contents = CalibrationJsonTranslater.toText(calibrationReadings);
@@ -368,7 +389,7 @@ public class CalibrationActivity extends SexyTopoActivity {
         try {
             switch (algorithm) {
                 case "auto":
-                    useNonLinear = getComms().doesCurrentDistoPreferNonLinearCalibration();
+                    useNonLinear = getDistox().prefersNonLinearCalibration();
                     break;
                 case "nonlinear":
                     useNonLinear = true;
@@ -384,15 +405,20 @@ public class CalibrationActivity extends SexyTopoActivity {
         return useNonLinear;
     }
 
-    private DistoXCommunicator getComms() throws NotConnectedToDistoException {
+    private DistoXStyleCommunicator getComms() throws NotConnectedToDistoException {
         Communicator communicator = requestComms();
-        if (communicator instanceof DistoXCommunicator) {
-            return (DistoXCommunicator) communicator;
+        if (communicator instanceof DistoXStyleCommunicator) {
+            return (DistoXStyleCommunicator) communicator;
         } else {
             throw new NotConnectedToDistoException();
         }
     }
 
+    private DistoX getDistox() throws SecurityException {
+        BluetoothDevice device = getInstrument().getBluetoothDevice();
+        DistoX distoX = DistoX.fromDevice(device);
+        return distoX;
+    }
 
 
     @Override
@@ -405,7 +431,7 @@ public class CalibrationActivity extends SexyTopoActivity {
 
         if (resultCode != Activity.RESULT_OK) {
             Exception exception = new Exception(
-                    getString(R.string.request_code_error, resultCode, requestCode));
+                getString(R.string.request_code_error, resultCode, requestCode));
             showExceptionAndLog(exception);
             return;
         }
@@ -449,12 +475,12 @@ public class CalibrationActivity extends SexyTopoActivity {
         protected Boolean doInBackground(Byte... coefficients) {
 
             try {
-                byte[] coeffs = ArrayUtils.toPrimitive(coefficients);
-                DistoXCommunicator comms = getComms();
-                WriteCalibrationProtocol writeCalibrationProtocol = comms.writeCalibration(coeffs);
+                DistoXCommunicator comms = (DistoXCommunicator)getComms();
+                WriteCalibrationProtocol writeCalibrationProtocol =
+                        comms.writeCalibration(coefficients);
                 waitForEnd(writeCalibrationProtocol, 60);
                 if (!writeCalibrationProtocol.isFinished()) {
-                    Log.device("Disto busy; forcing disconnect to write calibration");
+                    Log.device(R.string.device_distox_force_disconnect_for_calibration);
                     comms.requestDisconnect(); // force it to stop what it's doing
                     waitForEnd(writeCalibrationProtocol, 80);
                 }

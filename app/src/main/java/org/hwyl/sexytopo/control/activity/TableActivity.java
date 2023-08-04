@@ -64,14 +64,14 @@ public class TableActivity extends SexyTopoActivity
 
 
     private static final EnumMap<TableCol, Integer> TABLE_COL_BY_ANDROID_ID =
-            new EnumMap<>(TableCol.class) {{
-                put(TableCol.FROM, R.id.tableRowFrom);
-                put(TableCol.TO, R.id.tableRowTo);
-                put(TableCol.DISTANCE, R.id.tableRowDistance);
-                put(TableCol.AZIMUTH, R.id.tableRowAzimuth);
-                put(TableCol.INCLINATION, R.id.tableRowInclination);
+        new EnumMap<TableCol, Integer>(TableCol.class) {{
+            put(TableCol.FROM, R.id.tableRowFrom);
+            put(TableCol.TO, R.id.tableRowTo);
+            put(TableCol.DISTANCE, R.id.tableRowDistance);
+            put(TableCol.AZIMUTH, R.id.tableRowAzimuth);
+            put(TableCol.INCLINATION, R.id.tableRowInclination);
 
-            }};
+        }};
 
 
     @Override

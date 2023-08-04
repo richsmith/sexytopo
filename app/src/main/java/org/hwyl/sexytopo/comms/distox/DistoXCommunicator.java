@@ -5,16 +5,16 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.view.View;
 
-import org.hwyl.sexytopo.comms.Communicator;
-import org.hwyl.sexytopo.control.activity.CalibrationActivity;
+import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.activity.DeviceActivity;
+import org.hwyl.sexytopo.control.activity.DistoXCalibrationActivity;
 import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
 
 import java.util.HashMap;
 import java.util.Map;
 
 
-public class DistoXCommunicator extends Communicator {
+public class DistoXCommunicator implements DistoXStyleCommunicator {
 
     private final DeviceActivity activity;
     private final BluetoothDevice bluetoothDevice;
@@ -26,25 +26,14 @@ public class DistoXCommunicator extends Communicator {
     private static final int DISTO_X_OFF_ID = View.generateViewId();
 
 
-    private static final Map<Integer, String> CUSTOM_COMMANDS = new HashMap<>();
+    private static final Map<Integer, Integer> CUSTOM_COMMANDS = new HashMap<>();
 
     static {
-        CUSTOM_COMMANDS.put(CALIBRATION_ID, "Calibration…");
-        CUSTOM_COMMANDS.put(LASER_ON_ID, "Laser on");
-        CUSTOM_COMMANDS.put(SHOT_ID, "Take shot");
-        CUSTOM_COMMANDS.put(LASER_OFF_ID, "Laser off");
-        CUSTOM_COMMANDS.put(DISTO_X_OFF_ID, "DistoX off");
-    }
-
-    public enum DistoXType {
-        A3(false),
-        X310(true);
-
-        public final boolean preferNonLinearCalibration;
-
-        DistoXType(boolean preferNonLinearCalibration) {
-            this.preferNonLinearCalibration = preferNonLinearCalibration;
-        }
+        CUSTOM_COMMANDS.put(CALIBRATION_ID, R.string.device_distox_command_calibration);
+        CUSTOM_COMMANDS.put(LASER_ON_ID, R.string.device_distox_command_laser_on);
+        CUSTOM_COMMANDS.put(SHOT_ID, R.string.device_distox_command_take_shot);
+        CUSTOM_COMMANDS.put(LASER_OFF_ID, R.string.device_distox_command_laser_off);
+        CUSTOM_COMMANDS.put(DISTO_X_OFF_ID, R.string.device_distox_command_distox_off);
     }
 
     protected DistoXThread thread;
@@ -92,7 +81,7 @@ public class DistoXCommunicator extends Communicator {
     }
 
     @Override
-    public Map<Integer, String> getCustomCommands() {
+    public Map<Integer, Integer> getCustomCommands() {
         return CUSTOM_COMMANDS;
     }
 
@@ -120,7 +109,7 @@ public class DistoXCommunicator extends Communicator {
     }
 
     private void startCalibrationActivity() {
-        Intent intent = new Intent(activity, CalibrationActivity.class);
+        Intent intent = new Intent(activity, DistoXCalibrationActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         activity.startActivity(intent);
     }
@@ -134,21 +123,11 @@ public class DistoXCommunicator extends Communicator {
     }
 
     @SuppressWarnings("UnnecessaryLocalVariable")
-    public WriteCalibrationProtocol writeCalibration(byte[] coeffs) {
+    public WriteCalibrationProtocol writeCalibration(Byte[] coeffs) {
         WriteCalibrationProtocol writeCalibrationProtocol = thread.writeCalibration(coeffs);
         return writeCalibrationProtocol;
     }
 
-    public boolean doesCurrentDistoPreferNonLinearCalibration() {
-        String name = bluetoothDevice.getName();
-        if (name.startsWith("DistoX-")) {
-            return DistoXType.X310.preferNonLinearCalibration;
-        } else if (name.startsWith("DistoX")) {
-            return DistoXType.A3.preferNonLinearCalibration;
-        } else {
-            return false; // shouldn't get here but linear is safer as default?
-        }
-    }
 
 
 }

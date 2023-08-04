@@ -1,9 +1,9 @@
 package org.hwyl.sexytopo.control;
 
-import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.content.res.Resources;
+import android.widget.Toast;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
@@ -15,7 +15,6 @@ public class SexyTopo extends Application {
 
     // This is extremely hacky but quite useful for getting a context when it's not sensible
     // to pass one around
-    @SuppressLint("StaticFieldLeak") // shouldn't be problem, because using ApplicationContext
     public static Context context;
     private Thread.UncaughtExceptionHandler defaultHandler;
 
@@ -44,5 +43,14 @@ public class SexyTopo extends Application {
 
     public static String staticGetString(int id, Object... formatArgs) {
         return resources.getString(id, formatArgs);
+    }
+
+    public static void showToast(int id, Object... formatArgs) {
+        String message = resources.getString(id, formatArgs);
+        showToast(message);
+    }
+
+    public static void showToast(String message) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 }

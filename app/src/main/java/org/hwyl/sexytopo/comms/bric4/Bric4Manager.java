@@ -6,57 +6,56 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.os.Build;
-import android.widget.Toast;
+import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+
+import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.comms.InstrumentType;
+import org.hwyl.sexytopo.comms.ble.SexyTopoBleManager;
+import org.hwyl.sexytopo.comms.ble.SexyTopoDataHandler;
 import org.hwyl.sexytopo.control.Log;
+import org.hwyl.sexytopo.control.SexyTopo;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.util.NumberTools;
 import org.hwyl.sexytopo.model.survey.Leg;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import no.nordicsemi.android.ble.BleManager;
-import no.nordicsemi.android.ble.callback.profile.ProfileDataCallback;
 import no.nordicsemi.android.ble.data.Data;
 
 
-/**
- * See https://github.com/NordicSemiconductor/Android-BLE-Library
- * for documentation for the library we're using
- */
-public class Bric4Manager extends BleManager {
 
-    public enum CustomCommand {
-        SCAN("scan"),
-        TAKE_SHOT("shot"),
-        LASER_TOGGLE("laser"),
-        POWER_OFF("power off"),
-        CLEAR_MEMORY("clear memory");
+@SuppressWarnings({"FieldCanBeLocal", "unused"})
+public class Bric4Manager extends SexyTopoBleManager {
 
-        private final String commandString;
+    public static final int COMMAND_SCAN = View.generateViewId(); //  currently unused
+    public static final int COMMAND_TAKE_SHOT_ID = View.generateViewId();
+    public static final int COMMAND_TOGGLE_LASER_ID = View.generateViewId();
+    public static final int COMMAND_POWER_OFF_ID = View.generateViewId();
+    public static final int COMMAND_CLEAR_MEMORY_ID = View.generateViewId();
 
-        CustomCommand(String commandString) {
-            this.commandString = commandString;
-        }
+    private static final Map<Integer, Integer> CUSTOM_COMMANDS = new HashMap<>();
+    private static final Map<Integer, String> CUSTOM_COMMAND_STRINGS = new HashMap<>();
+    private static final Map<Integer, String> COMMAND_ID_TO_COMMAND_STRING = new HashMap<>();
 
-        public String getCommandString() {
-            return commandString;
-        }
 
+    static {
+        CUSTOM_COMMANDS.put(COMMAND_TAKE_SHOT_ID, R.string.device_bric_command_take_shot);
+        CUSTOM_COMMANDS.put(COMMAND_TOGGLE_LASER_ID, R.string.device_bric_command_toggle_laser);
+        CUSTOM_COMMANDS.put(COMMAND_POWER_OFF_ID, R.string.device_bric_command_power_off);
+        CUSTOM_COMMANDS.put(COMMAND_CLEAR_MEMORY_ID, R.string.device_bric_command_clear_memory);
+
+        COMMAND_ID_TO_COMMAND_STRING.put(COMMAND_SCAN, "scan");
+        COMMAND_ID_TO_COMMAND_STRING.put(COMMAND_TAKE_SHOT_ID, "shot");
+        COMMAND_ID_TO_COMMAND_STRING.put(COMMAND_TOGGLE_LASER_ID, "laser");
+        COMMAND_ID_TO_COMMAND_STRING.put(COMMAND_POWER_OFF_ID, "power off");
+        COMMAND_ID_TO_COMMAND_STRING.put(COMMAND_CLEAR_MEMORY_ID, "clear memory");
     }
-
-    public void sendCustomCommand(CustomCommand command) {
-        String commandString = command.getCommandString();
-        byte[] bytes = commandString.getBytes(); // { (byte)0x6c, (byte)0x61, (byte)0x73, (byte)0x65, (byte)0x72 };
-        writeCharacteristic(deviceControlCharacteristic, bytes)
-                .done(device -> Log.device("Command sent: " + commandString))
-                .enqueue();
-    }
-
 
     final static UUID DEVICE_INFORMATION_SERVICE_UUID =
             UUID.fromString("0000180A-0000-1000-8000-00805f9b34fb");
@@ -97,79 +96,84 @@ public class Bric4Manager extends BleManager {
         this.dataManager = dataManager;
     }
 
-    @NonNull
+
     @Override
-    protected BleManagerGattCallback getGattCallback() {
-        return new MyManagerGattCallback();
+    public boolean isRequiredServiceSupported(@NonNull final BluetoothGatt gatt) {
+        final BluetoothGattService measurementService =
+                gatt.getService(MEASUREMENT_SYNC_SERVICE_UUID);
+        if (measurementService != null) {
+            measurementPrimaryCharacteristic = measurementService.getCharacteristic(
+                MEASUREMENT_PRIMARY_CHARACTERISTIC_UUID);
+            measurementMetadataCharacteristic = measurementService.getCharacteristic(
+                MEASUREMENT_METADATA_CHARACTERISTIC_UUID);
+            measurementErrorsCharacteristic = measurementService.getCharacteristic(
+                MEASUREMENT_ERRORS_CHARACTERISTIC_UUID);
+            lastTimeCharacteristic = measurementService.getCharacteristic(
+                LAST_TIME_CHARACTERISTIC_UUID);
+        }
+
+        final BluetoothGattService controlService =
+                gatt.getService(DEVICE_CONTROL_SERVICE_UUID);
+        if (controlService != null) {
+            deviceControlCharacteristic = controlService.getCharacteristic(
+                DEVICE_CONTROL_CHARACTERISTIC_UUID);
+        }
+
+        return measurementPrimaryCharacteristic != null &&
+            measurementMetadataCharacteristic != null &&
+            measurementErrorsCharacteristic != null;
     }
 
-    /**
-     * BluetoothGatt callbacks object.
-     */
-    private class MyManagerGattCallback extends BleManagerGattCallback {
+    protected void onServicesInvalidated() {
+        measurementPrimaryCharacteristic = null;
+        measurementMetadataCharacteristic = null;
+        measurementErrorsCharacteristic = null;
+    }
 
-        // This method will be called when the device is connected and services are discovered.
-        // You need to obtain references to the characteristics and descriptors that you will use.
-        // Return true if all required services are found, false otherwise.
-        @Override
-        public boolean isRequiredServiceSupported(@NonNull final BluetoothGatt gatt) {
-            final BluetoothGattService measurementService =
-                    gatt.getService(MEASUREMENT_SYNC_SERVICE_UUID);
-            if (measurementService != null) {
-                measurementPrimaryCharacteristic = measurementService.getCharacteristic(
-                        MEASUREMENT_PRIMARY_CHARACTERISTIC_UUID);
-                measurementMetadataCharacteristic = measurementService.getCharacteristic(
-                        MEASUREMENT_METADATA_CHARACTERISTIC_UUID);
-                measurementErrorsCharacteristic = measurementService.getCharacteristic(
-                        MEASUREMENT_ERRORS_CHARACTERISTIC_UUID);
-                lastTimeCharacteristic = measurementService.getCharacteristic(
-                        LAST_TIME_CHARACTERISTIC_UUID);
-            }
+    @Override
+    protected void initialize() {
+        // You may enqueue multiple operations. A queue ensures that all operations are
+        // performed one after another, but it is not required.
+        Bric4Manager.DataHandler handler = new Bric4Manager.DataHandler();
+        setIndicationCallback(measurementPrimaryCharacteristic).with(handler);
+        setIndicationCallback(measurementMetadataCharacteristic).with(handler);
+        setIndicationCallback(measurementErrorsCharacteristic).with(handler);
 
-            final BluetoothGattService controlService =
-                    gatt.getService(DEVICE_CONTROL_SERVICE_UUID);
-            if (controlService != null) {
-                deviceControlCharacteristic = controlService.getCharacteristic(
-                        DEVICE_CONTROL_CHARACTERISTIC_UUID);
-            }
+        beginAtomicRequestQueue()
+            .add(enableIndications(measurementPrimaryCharacteristic))
+            .add(enableIndications(measurementMetadataCharacteristic))
+            .add(enableIndications(measurementErrorsCharacteristic))
+            .enqueue();
+    }
 
-            return measurementPrimaryCharacteristic != null &&
-                    measurementMetadataCharacteristic != null &&
-                    measurementErrorsCharacteristic != null;
-        }
 
-        // If you have any optional services, allocate them here. Return true only if
-        // they are found.
-        @Override
-        protected boolean isOptionalServiceSupported(@NonNull final BluetoothGatt gatt) {
-            return super.isOptionalServiceSupported(gatt);
-        }
+    @Override
+    public Map<Integer, Integer> getCustomCommands() {
+        return CUSTOM_COMMANDS;
+    }
 
-        // Initialize your device here. Often you need to enable notifications and set required
-        // MTU or write some initial data. Do it here.
-        @Override
-        protected void initialize() {
-            // You may enqueue multiple operations. A queue ensures that all operations are
-            // performed one after another, but it is not required.
-            DataHandler handler = new DataHandler();
-            setIndicationCallback(measurementPrimaryCharacteristic).with(handler);
-            setIndicationCallback(measurementMetadataCharacteristic).with(handler);
-            setIndicationCallback(measurementErrorsCharacteristic).with(handler);
+    @Override
+    public boolean handleCustomCommand(Integer id) {
+        if (COMMAND_ID_TO_COMMAND_STRING.containsKey(id)) {
+            String command = COMMAND_ID_TO_COMMAND_STRING.get(id);
+            Integer stringId = CUSTOM_COMMANDS.get(id);
+            sendCustomCommand(command, stringId);
+            return true;
 
-            beginAtomicRequestQueue()
-                .add(enableIndications(measurementPrimaryCharacteristic))
-                .add(enableIndications(measurementMetadataCharacteristic))
-                .add(enableIndications(measurementErrorsCharacteristic))
-                .enqueue();
-        }
-
-        @Override
-        protected void onDeviceDisconnected() {
-            measurementPrimaryCharacteristic = null;
-            measurementMetadataCharacteristic = null;
-            measurementErrorsCharacteristic = null;
+        } else {
+            return false;
         }
     }
+
+    public void sendCustomCommand(String command, Integer stringId) {
+        byte[] bytes = command.getBytes();
+        writeCharacteristic(
+                deviceControlCharacteristic, bytes, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
+            .done(device -> Log.device(stringId))
+            .enqueue();
+    }
+
+
 
     private enum State {
         MEASUREMENT,
@@ -183,7 +187,7 @@ public class Bric4Manager extends BleManager {
         }
     }
 
-    private class DataHandler implements ProfileDataCallback {
+    private class DataHandler extends SexyTopoDataHandler {
 
         State state = State.MEASUREMENT;
 
@@ -272,7 +276,7 @@ public class Bric4Manager extends BleManager {
 
                     } else { // final characteristic read: only update survey if no errors reported
                         String message = "Got #" + currentRef + ": " + current;
-                        Log.device(message, true);
+                        Log.device(message);
                         dataManager.updateSurvey(current);
                     }
 
@@ -286,8 +290,9 @@ public class Bric4Manager extends BleManager {
 
         private void reportError(int code, float data1, float data2, boolean showToUser) {
             Bric4Error error = Bric4Error.fromCode(code);
-            String device = Objects.requireNonNull(getBluetoothDevice()).getName();
-            String shortDescription = device + " error: " + error;
+            String device = InstrumentType.describe(getBluetoothDevice());
+            String shortDescription = SexyTopo.staticGetString(R.string.device_bric_device_reported_error, device, error);
+
             Log.device(shortDescription);
 
             String longDescription = shortDescription +
@@ -295,16 +300,11 @@ public class Bric4Manager extends BleManager {
             Log.e(longDescription);
 
             if (showToUser) {
-                Toast.makeText(getContext(), shortDescription, Toast.LENGTH_SHORT).show();
+                SexyTopo.showToast(shortDescription);
             }
         }
 
-        @Override
-        public void onInvalidDataReceived(@NonNull final BluetoothDevice device,
-                                          @NonNull final Data data) {
 
-            Log.device("invalid data received from " + device.getName() + ": " + data);
-        }
 
     }
 }

@@ -22,6 +22,7 @@ import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.comms.Communicator;
 import org.hwyl.sexytopo.comms.Instrument;
+import org.hwyl.sexytopo.comms.InstrumentType;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.util.LogUpdateReceiver;
 
@@ -306,19 +307,20 @@ public class DeviceActivity extends SexyTopoActivity {
 
     private void updateComms() {
         BluetoothDevice device = getPairedDevice();
-        Instrument instrument = Instrument.byDevice(device);
+        InstrumentType instrumentType = InstrumentType.byDevice(device);
 
         try {
-            if (instrument != getInstrument()) {
+            if (instrumentType != getInstrument().getInstrumentType()) {
+                Instrument instrument = new Instrument(device);
                 setInstrument(instrument);
-                Communicator communicator = instrument.getNewCommunicator(this, device);
+                Communicator communicator = instrumentType.getNewCommunicator(this, device);
                 setComms(communicator);
                 invalidateOptionsMenu();
             }
 
         } catch (Exception exception) {
             Log.e(exception);
-            String name = instrument.getName();
+            String name = instrumentType.describe();
             Log.device("Failed to create communicator for " + name);
         }
     }
@@ -345,8 +347,8 @@ public class DeviceActivity extends SexyTopoActivity {
 
         Set<BluetoothDevice> allPairedDevices = bluetoothAdapter.getBondedDevices();
         for (BluetoothDevice device : allPairedDevices) {
-            Instrument instrument = Instrument.byDevice(device);
-            if (instrument != Instrument.OTHER && instrument != Instrument.NONE) {
+            InstrumentType instrumentType = InstrumentType.byDevice(device);
+            if (instrumentType != InstrumentType.OTHER && instrumentType != InstrumentType.NONE) {
                 return device; // we should only be paired with one, so return the first
             }
         }
@@ -378,12 +380,12 @@ public class DeviceActivity extends SexyTopoActivity {
 
                 try {
                     String name = device.getName();
-                    Instrument instrument = Instrument.byName(name);
-                    if (instrument == Instrument.OTHER) {
+                    InstrumentType instrumentType = InstrumentType.byName(name);
+                    if (instrumentType == InstrumentType.OTHER) {
                         Log.device("Incompatible device \"" + name + "\" detected");
 
                     } else {
-                        Log.device(instrument.getName() + " detected");
+                        Log.device(instrumentType.describe() + " detected");
                         pair(device);
                         BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
                     }

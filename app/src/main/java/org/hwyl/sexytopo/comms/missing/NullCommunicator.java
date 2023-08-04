@@ -8,7 +8,7 @@ import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.activity.DeviceActivity;
 
 
-public class NullCommunicator extends Communicator {
+public class NullCommunicator implements Communicator {
 
     private final static NullCommunicator INSTANCE = new NullCommunicator(null, null);
 

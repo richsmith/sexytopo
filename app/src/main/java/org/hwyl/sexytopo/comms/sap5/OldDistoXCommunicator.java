@@ -1,10 +1,15 @@
 
 package org.hwyl.sexytopo.comms.sap5;
 
+import static org.hwyl.sexytopo.comms.distox.DistoXProtocol.WAIT_BETWEEN_CONNECTION_ATTEMPTS_MS;
+import static org.hwyl.sexytopo.control.activity.DeviceActivity.DISTO_X_PREFIX;
+import static org.hwyl.sexytopo.control.activity.DeviceActivity.SHETLAND_PREFIX;
+
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.comms.InstrumentType;
 import org.hwyl.sexytopo.comms.distox.CalibrationProtocol;
 import org.hwyl.sexytopo.comms.distox.DistoXProtocol;
 import org.hwyl.sexytopo.comms.distox.MeasurementProtocol;
@@ -21,10 +26,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-
-import static org.hwyl.sexytopo.comms.distox.DistoXProtocol.WAIT_BETWEEN_CONNECTION_ATTEMPTS_MS;
-import static org.hwyl.sexytopo.control.activity.DeviceActivity.DISTO_X_PREFIX;
-import static org.hwyl.sexytopo.control.activity.DeviceActivity.SHETLAND_PREFIX;
 
 
 /**
@@ -119,7 +120,7 @@ public class OldDistoXCommunicator extends Thread {
     }
 
 
-    public WriteCalibrationProtocol writeCalibration(byte[] coeff) {
+    public WriteCalibrationProtocol writeCalibration(Byte[] coeff) {
         setProtocol(Protocol.NULL);
         disconnect(); // need to interrupt any reads in progress or we'll be waiting forever
         WriteCalibrationProtocol writeCalibration =
@@ -286,7 +287,7 @@ public class OldDistoXCommunicator extends Thread {
     }
 
 
-    private static Set<BluetoothDevice> getPairedDistos() {
+    private static Set<BluetoothDevice> getPairedDistos() throws SecurityException {
 
         if (BLUETOOTH_ADAPTER == null) {
             return new HashSet<>(0);
@@ -304,18 +305,18 @@ public class OldDistoXCommunicator extends Thread {
     }
 
     private static boolean isDistoX(BluetoothDevice device) {
-        String name = device.getName();
+        String name = InstrumentType.describe(device);
         return name.toLowerCase().contains(DISTO_X_PREFIX.toLowerCase());
     }
 
     private static boolean isShetland(BluetoothDevice device) {
-        String name = device.getName();
+        String name = InstrumentType.describe(device);
         return name.toLowerCase().contains(SHETLAND_PREFIX.toLowerCase());
     }
 
 
     public boolean doesCurrentDistoPreferNonLinearCalibration() {
-        String name = bluetoothDevice.getName();
+        String name = InstrumentType.describe(bluetoothDevice);
         if (name.startsWith("DistoX-")) {
             return DistoXType.X310.preferNonLinearCalibration;
         } else if (name.startsWith("DistoX")) {

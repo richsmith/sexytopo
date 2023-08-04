@@ -107,7 +107,7 @@ public class CalibrationProtocol extends DistoXProtocol {
     }
 
 
-    private static void updateAccelerationSensorReading(byte[] packet, CalibrationReading reading) {
+    public static void updateAccelerationSensorReading(byte[] packet, CalibrationReading reading) {
         int gx = readDoubleByte(packet, ACCELERATION_GX_LOW_BYTE, ACCELERATION_GX_HIGH_BYTE);
         int gy = readDoubleByte(packet, ACCELERATION_GY_LOW_BYTE, ACCELERATION_GY_HIGH_BYTE);
         int gz = readDoubleByte(packet, ACCELERATION_GZ_LOW_BYTE, ACCELERATION_GZ_HIGH_BYTE);
@@ -115,7 +115,7 @@ public class CalibrationProtocol extends DistoXProtocol {
     }
 
 
-    private static void updateMagneticSensorReading(byte[] packet, CalibrationReading reading) {
+    public static void updateMagneticSensorReading(byte[] packet, CalibrationReading reading) {
         int mx = readDoubleByte(packet, MAGNETIC_MX_LOW_BYTE, MAGNETIC_MX_HIGH_BYTE);
         int my = readDoubleByte(packet, MAGNETIC_MY_LOW_BYTE, MAGNETIC_MY_HIGH_BYTE);
         int mz = readDoubleByte(packet, MAGNETIC_MZ_LOW_BYTE, MAGNETIC_MZ_HIGH_BYTE);

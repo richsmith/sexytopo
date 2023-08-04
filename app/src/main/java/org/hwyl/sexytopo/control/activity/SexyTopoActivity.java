@@ -49,8 +49,8 @@ import org.hwyl.sexytopo.control.io.basic.Saver;
 import org.hwyl.sexytopo.control.io.translation.Exporter;
 import org.hwyl.sexytopo.control.io.translation.ImportManager;
 import org.hwyl.sexytopo.control.io.translation.SelectableExporters;
-import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
+import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.demo.TestSurveyCreator;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -72,7 +72,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     protected SurveyManager dataManager;
 
-    private static Instrument instrument = Instrument.OTHER;
+    protected static Instrument instrument;
+
     private static Communicator comms = NullCommunicator.getInstance();
 
     protected static boolean hasStarted = false;
@@ -83,7 +84,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        SexyTopoConstants.context = this.getApplicationContext();
         dataManager = SurveyManager.getInstance(this.getApplicationContext());
 
         // if Android restarts the activity after a crash, force it to go through the startup
@@ -97,11 +97,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        SexyTopoConstants.context = this.getApplicationContext();
-        setOrientation();
-
-        // this causes the request to happen twice because it is called by StartupActivity, then
-        // immediately when the activity is started... something to fix sometime
         requestPermissionsIfRequired();
     }
 
@@ -135,10 +130,11 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         SubMenu subMenu = deviceMenu.getSubMenu();
         subMenu.clear();
         subMenu.add(Menu.NONE, R.id.action_device_connect, 0, R.string.action_device_connect);
-        Map<Integer, String> commands = requestComms().getCustomCommands();
-        for (Map.Entry<Integer, String> entry: commands.entrySet()) {
+        Map<Integer, Integer> commands = requestComms().getCustomCommands();
+        for (Map.Entry<Integer, Integer> entry: commands.entrySet()) {
             int id = entry.getKey();
-            String name = entry.getValue();
+            int stringId = entry.getValue();
+            String name = getString(stringId);
             subMenu.add(Menu.NONE, id, 0, name);
         }
 
