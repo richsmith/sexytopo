@@ -403,6 +403,7 @@
     <string name="survey_update_rename_error_not_unique">New station name is not unique</string>
     <string name="survey_update_moved_leg">Moved leg to station %1$s</string>
     <string name="survey_update_adding_leg">Adding leg %1$s</string>
+    <string name="survey_update_reversed_leg">Reversed leg %1$s to %2$s</string>
 
     <!-- Context menu(s) -->
     <string name="menu_context_title">Station</string>

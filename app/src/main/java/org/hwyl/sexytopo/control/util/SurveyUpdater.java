@@ -357,16 +357,17 @@ public class SurveyUpdater {
 
 
     public static void reverseLeg(final Survey survey, final Station toReverse) {
-        Log.d("Reversing leg to " + toReverse.getName());
         SurveyTools.traverseLegs(
             survey,
             (origin, leg) -> {
                 if (leg.hasDestination() && leg.getDestination() == toReverse) {
+                    String previousDescription = leg.toString();
                     Leg reversed = leg.reverse();
-                    Log.d("Reversed direction of leg " + leg + " to " + reversed);
+                    String newDescription = reversed.toString();
                     origin.getOnwardLegs().remove(leg);
                     origin.addOnwardLeg(reversed);
                     survey.replaceLegInRecord(leg, reversed);
+                    Log.i(R.string.survey_update_reversed_leg, previousDescription, newDescription);
                     return true;
                 } else {
                     return false;
