@@ -43,7 +43,7 @@ public class Loader {
             throws Exception {
 
         if (!IoUtils.isSurveyDirectory(directory)) {
-            throw new Exception(context.getString(R.string.file_loading_error_not_survey));
+            throw new Exception(context.getString(R.string.file_load_error_not_survey));
         }
 
         Survey survey = new Survey();

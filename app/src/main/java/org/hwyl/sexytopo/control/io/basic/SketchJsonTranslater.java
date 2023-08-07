@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.control.io.basic;
 
+import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.io.IoUtils;
@@ -96,7 +97,7 @@ public class SketchJsonTranslater {
             }
             sketch.setPathDetails(pathDetails);
         } catch (JSONException e) {
-            Log.e("Failed to load sketch paths: " + e);
+            Log.e(R.string.file_load_sketch_paths_error, e);
         }
 
         try {
@@ -107,7 +108,7 @@ public class SketchJsonTranslater {
             }
             sketch.setSymbolDetails(symbolDetails);
         } catch (JSONException e) {
-            Log.e("Failed to load symbols: " + e);
+            Log.e(R.string.file_load_symbols_error, e);
         }
 
         try {
@@ -118,7 +119,7 @@ public class SketchJsonTranslater {
             }
             sketch.setTextDetails(textDetails);
         } catch (JSONException e) {
-            Log.e("Failed to load sketch labels: " + e);
+            Log.e(R.string.file_load_sketch_labels_error, e);
         }
 
         try {
@@ -129,7 +130,7 @@ public class SketchJsonTranslater {
             }
             sketch.setCrossSectionDetails(crossSectionDetails);
         } catch (JSONException e) {
-            Log.e("Failed to load cross-sections: " + e);
+            Log.e(R.string.file_load_cross_sections_error, e);
         }
 
         return sketch;

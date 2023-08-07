@@ -89,12 +89,12 @@ public class StartUpActivity extends SexyTopoActivity {
         DocumentFile surveyDirectory = DocumentFile.fromTreeUri(this, activeSurveyUri);
 
         if (surveyDirectory == null) {
-            Log.e(R.string.file_loading_survey_error);
+            Log.e(R.string.file_load_survey_error);
             return null;
         }
 
         if (!IoUtils.doesDirectoryExist(this, activeSurveyUri)) {
-            Log.e(R.string.file_loading_survey_error);
+            Log.e(R.string.file_load_survey_error);
             return null;
 
         }

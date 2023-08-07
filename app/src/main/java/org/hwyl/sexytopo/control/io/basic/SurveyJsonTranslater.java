@@ -2,6 +2,7 @@ package org.hwyl.sexytopo.control.io.basic;
 
 import android.widget.Toast;
 
+import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SexyTopo;
@@ -113,7 +114,7 @@ public class SurveyJsonTranslater {
                 survey.setTrip(trip);
             }
         } catch (JSONException exception) {
-            Log.e("Failed to load trip: " + exception);
+            Log.e(R.string.file_load_survey_trip_error, exception);
             // carry on... unfortunate, but not *that* important
         }
 
@@ -121,7 +122,7 @@ public class SurveyJsonTranslater {
             JSONArray stationsArray = json.getJSONArray(STATIONS_TAG);
             loadSurveyData(survey, stationsArray);
         } catch (JSONException exception) {
-            Log.e("Failed to load stations: " + exception);
+            Log.e(R.string.file_load_survey_stations_error, exception);
         }
 
         try {

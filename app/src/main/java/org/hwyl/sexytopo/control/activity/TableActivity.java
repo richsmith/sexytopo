@@ -254,7 +254,7 @@ public class TableActivity extends SexyTopoActivity
         if (itemId == R.id.setActiveStation) {
             Station newActive = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
             if (newActive == Survey.NULL_STATION) {
-                showSimpleToast("Can't set splay end as active station");
+                showSimpleToast(R.string.context_set_active_splay_error);
             } else {
                 getSurvey().setActiveStation(newActive);
                 syncTableWithSurvey();
@@ -263,7 +263,7 @@ public class TableActivity extends SexyTopoActivity
         } else if (itemId == R.id.graph_station_jump_to_plan) {
             Station planStation = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
             if (planStation == Survey.NULL_STATION) {
-                showSimpleToast("Can't jump to a splay end");
+                showSimpleToast(R.string.context_jump_to_splay_error);
             } else {
                 jumpToStation(planStation, PlanActivity.class);
             }
@@ -271,7 +271,7 @@ public class TableActivity extends SexyTopoActivity
         } else if (itemId == R.id.graph_station_jump_to_ee) {
             Station eeStation = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
             if (eeStation == Survey.NULL_STATION) {
-                showSimpleToast("Can't jump to splay end");
+                showSimpleToast(R.string.context_jump_to_splay_error);
             } else {
                 jumpToStation(eeStation, ExtendedElevationActivity.class);
             }
@@ -279,7 +279,7 @@ public class TableActivity extends SexyTopoActivity
         } else if (itemId == R.id.renameStation) {
             Station toRename = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
             if (toRename == Survey.NULL_STATION) {
-                showSimpleToast("Can't rename a splay end");
+                showSimpleToast(R.string.context_rename_splay_error);
             } else {
                 ManualEntry.renameStation(this, getSurvey(), toRename);
             }

@@ -18,21 +18,21 @@ import java.lang.reflect.InvocationTargetException;
 public enum InstrumentType {
 
     // DISTOX BLE gets listed before DistoX due to the BT prefix overlap
-    DISTOX_BLE("DistoX BLE", "DistoX BLE", "DistoXBLE-", DistoXBleCommunicator.class),
-    DISTOX("DistoX", "DistoX", "DistoX", DistoXCommunicator.class),
-    BRIC4("BRIC4", "BRIC4", "BRIC4_", Bric4Communicator.class),
-    SAP5("Shetland Attack Pony 5", "SAP5", "Shetland", Sap5Communicator.class),
-    SAP6("Shetland Attack Pony 6", "SAP6", "SAP6", SAP6Communicator.class),
-    OTHER("[Unknown device]", "Unknown", "", NullCommunicator.class),
-    NONE("[Missing device]", "missing", "", NullCommunicator.class);
+    DISTOX_BLE(R.string.device_distox_ble_name, R.string.device_distox_ble_short_name, "DistoXBLE-", DistoXBleCommunicator.class),
+    DISTOX(R.string.device_distox_name, R.string.device_distox_short_name, "DistoX", DistoXCommunicator.class),
+    BRIC4(R.string.device_bric4_name, R.string.device_bric4_short_name, "BRIC4_", Bric4Communicator.class),
+    SAP5(R.string.device_sap5_name, R.string.device_sap5_short_name, "Shetland", Sap5Communicator.class),
+    SAP6(R.string.device_sap6_name, R.string.device_sap6_short_name, "SAP6", SAP6Communicator.class),
+    OTHER(R.string.device_unknown_name, R.string.device_unknown_short_name, "", NullCommunicator.class),
+    NONE(R.string.device_missing_name, R.string.device_missing_short_name, "", NullCommunicator.class);
 
-    private final String name;
-    private final String shortName;
+    private final int name;
+    private final int shortName;
     private final String prefix;
     private final Class<? extends Communicator> communicator;
 
-    InstrumentType(String name,
-                   String shortName,
+    InstrumentType(int name,
+                   int shortName,
                    String bluetoothPrefix,
                    Class<? extends Communicator> communicator) {
         this.name = name;
@@ -42,11 +42,12 @@ public enum InstrumentType {
     }
 
     public String describe() {
-        return name;
+        return SexyTopo.staticGetString(name);
     }
 
     public String getShortName() {
-        return shortName;
+        return SexyTopo.staticGetString(name);
+
     }
 
     public Communicator getNewCommunicator(

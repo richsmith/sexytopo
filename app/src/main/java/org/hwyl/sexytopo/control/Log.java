@@ -10,8 +10,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
-import org.apache.commons.text.StringEscapeUtils;
-
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.io.IoUtils;
 import org.json.JSONArray;
@@ -73,10 +71,6 @@ public class Log {
         deviceLog.add(new Message(message));
         broadcast(SexyTopoConstants.DEVICE_LOG_UPDATED_EVENT);
         android.util.Log.i(SexyTopoConstants.TAG, message);
-    }
-
-    public static String formatDebugString(String value) {
-        return '"' + StringEscapeUtils.escapeJava(value) + '"';
     }
 
     public static synchronized void systemLog(String message, boolean isError) {

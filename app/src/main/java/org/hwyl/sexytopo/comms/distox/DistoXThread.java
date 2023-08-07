@@ -66,7 +66,7 @@ public class DistoXThread extends Thread {
                         new CalibrationProtocol(context, bluetoothDevice, dataManager);
                 break;
             default:
-                Log.e("Unexpected protocol requested");
+                Log.e(R.string.device_distox_unknown_protocol);
         }
     }
 
@@ -283,7 +283,7 @@ public class DistoXThread extends Thread {
     }
 
 
-    private static Set<BluetoothDevice> getPairedDistos() {
+    private static Set<BluetoothDevice> getPairedDistos() throws SecurityException {
 
         if (BLUETOOTH_ADAPTER == null) {
             return new HashSet<>(0);

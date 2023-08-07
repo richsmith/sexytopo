@@ -471,7 +471,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             Survey surveyToLink = Loader.loadSurvey(this, directory);
             linkToStationInSurvey(surveyToLink);
         } catch (Exception exception) {
-            showExceptionAndLog(R.string.file_loading_survey_error, exception);
+            showExceptionAndLog(R.string.file_load_survey_error, exception);
         }
     }
 
@@ -536,7 +536,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         Survey survey = getSurvey();
 
         if (directory == null || !directory.exists() || !directory.canWrite()) {
-            Exception exception = new Exception(getString(R.string.file_saving_error_invalid_folder));
+            Exception exception = new Exception(getString(R.string.file_save_error_invalid_folder));
             showExceptionAndLog(R.string.file_save_survey_error, exception);
             return;
         }
@@ -547,7 +547,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
         } else if (IoUtils.isSurveyDirectory(directory)) {
             new AlertDialog.Builder(this)
-                    .setTitle(R.string.file_saving_overwrite_survey_title_question)
+                    .setTitle(R.string.file_save_overwrite_survey_title_question)
                     .setPositiveButton(R.string.overwrite, (dialogInterface, id) -> {
                         survey.setDirectory(directory);
                         saveSurvey();
@@ -557,7 +557,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
         } else {
             new AlertDialog.Builder(this)
-                .setTitle(getString(R.string.file_saving_save_to_non_empty_directory_question))
+                .setTitle(getString(R.string.file_save_to_non_empty_directory_question))
                 .setPositiveButton(R.string.save, (dialogInterface, id) -> {
                     survey.setDirectory(directory);
                     saveSurvey();
@@ -848,7 +848,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             showSimpleToast(R.string.file_loaded_survey, survey.getName());
 
         } catch (Exception exception) {
-            showExceptionAndLog(R.string.file_loading_survey_error, exception);
+            showExceptionAndLog(R.string.file_load_survey_error, exception);
         }
 
     }
