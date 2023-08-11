@@ -16,6 +16,7 @@ import java.util.List;
 @SuppressWarnings("UnnecessaryLocalVariable")
 public class SurveyUpdater {
 
+
     public static boolean update(Survey survey, List<Leg> legs, InputMode inputMode) {
         boolean anyStationsAdded = false;
         for (Leg leg : legs) {

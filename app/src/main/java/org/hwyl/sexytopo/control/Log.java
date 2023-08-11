@@ -60,7 +60,9 @@ public class Log {
     }
 
     public static synchronized void device(int stringId, Object ... args) {
-        device(context.getString(stringId, args));
+        if (context != null) {
+            device(context.getString(stringId, args));
+        }
     }
 
     public static synchronized void device(String message) {
@@ -84,7 +86,9 @@ public class Log {
     }
 
     public static void d(int stringId, Object ... args) {
-        d(context.getString(stringId, args));
+        if (context != null) {
+            d(context.getString(stringId, args));
+        }
     }
     public static void d(String message) {
         // currently treating debug and info as the same, but at some point we might get around
@@ -94,7 +98,9 @@ public class Log {
     }
 
     public static void e(int stringId, Object ... args) {
-        e(context.getString(stringId, args));
+        if (context != null) {
+            e(context.getString(stringId, args));
+        }
     }
 
     public static void e(String message) {
@@ -109,7 +115,9 @@ public class Log {
     }
 
     public static void i(int stringId, Object ... args) {
-        i(context.getString(stringId, args));
+        if (context != null) {
+            i(context.getString(stringId, args));
+        }
     }
 
     public static void i(String message) {

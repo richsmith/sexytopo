@@ -50,24 +50,23 @@ repositories {
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.10.1'
-    testImplementation 'junit:junit:4.13.2'
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'androidx.preference:preference:1.2.1'
+    implementation 'com.google.firebase:firebase-analytics:21.3.0'
+    implementation 'com.google.firebase:firebase-crashlytics:18.4.0'
     implementation 'commons-io:commons-io:2.6'
+    implementation 'no.nordicsemi.android:ble:2.6.1'
+    implementation 'org.apache.commons:commons-lang3:3.11'
     implementation 'org.apache.commons:commons-text:1.9'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
 
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.json:json:20180813'
     testImplementation('org.powermock:powermock-api-mockito2:2.0.9')
     testImplementation('org.powermock:powermock-module-junit4:2.0.9')
 
-    testImplementation 'org.json:json:20180813'
-    implementation 'org.apache.commons:commons-lang3:3.11'
-    implementation 'com.google.firebase:firebase-analytics:21.3.0'
-    implementation 'com.google.firebase:firebase-crashlytics:18.4.0'
-    implementation 'no.nordicsemi.android:ble:2.6.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    androidTestImplementation 'androidx.test:rules:1.5.0'
     androidTestImplementation 'androidx.test.ext:junit-ktx:1.1.5'
+    androidTestImplementation 'androidx.test:rules:1.5.0'
 }
-

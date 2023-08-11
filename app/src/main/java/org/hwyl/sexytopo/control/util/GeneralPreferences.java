@@ -15,10 +15,20 @@ public class GeneralPreferences {
     }
 
     private static String getString(String key, String defaultValue) {
+
+        if (prefs == null) {  // e.g. during tests
+            return defaultValue;
+        }
+
         return prefs.getString(key, defaultValue);
     }
 
     private static boolean getBoolean(String key, Boolean defaultValue) {
+
+        if (prefs == null) {  // e.g. during tests
+            return defaultValue;
+        }
+
         boolean value;
 
         try {
@@ -31,6 +41,11 @@ public class GeneralPreferences {
     }
 
     private static int getInt(String key, Integer defaultValue) {
+
+        if (prefs == null) {  // e.g. during tests
+            return defaultValue;
+        }
+
         int value = defaultValue;
 
         try {
@@ -48,6 +63,11 @@ public class GeneralPreferences {
     }
 
     private static float getFloat(String key, float defaultValue) {
+
+        if (prefs == null) {  // e.g. during tests
+            return defaultValue;
+        }
+
         float value = defaultValue;
 
         try {

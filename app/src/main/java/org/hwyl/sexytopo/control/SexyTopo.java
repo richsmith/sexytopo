@@ -42,6 +42,9 @@ public class SexyTopo extends Application {
     }
 
     public static String staticGetString(int id, Object... formatArgs) {
+        if (resources == null) {  // e.g. during tests
+            return Integer.toString(id);
+        }
         return resources.getString(id, formatArgs);
     }
 
