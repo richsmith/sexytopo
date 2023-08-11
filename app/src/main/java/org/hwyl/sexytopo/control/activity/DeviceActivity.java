@@ -205,7 +205,7 @@ public class DeviceActivity extends SexyTopoActivity {
     public void toggleConnection(View view) {
         SwitchCompat connectionSwitch = (SwitchCompat)view;
         if (connectionSwitch.isChecked()) {
-            Log.device(getString(R.string.device_log_connection_requested));
+            Log.device(getString(R.string.device_connection_requested));
             isConnectionStartingOrStarted = true;
             startConnection();
         } else {
@@ -233,9 +233,9 @@ public class DeviceActivity extends SexyTopoActivity {
         } else {
             boolean started = bluetoothAdapter.startDiscovery();
             if (started) {
-                Log.device("Scanning...");
+                Log.device(R.string.device_scan_start);
             } else {
-                Log.device("Unable to scan (bluetooth failure?)");
+                Log.device(R.string.device_scan_failure);
             }
         }
     }
@@ -295,45 +295,44 @@ public class DeviceActivity extends SexyTopoActivity {
         }
 
         try {
-            Log.device("Unpairing " + device.getName());
+            Log.device(R.string.device_pairing_unpairing_device, device.getName());
             Method method = device.getClass().getMethod("removeBond", (Class[]) null);
             method.invoke(device, (Object[])null);
             updateComms();
-            Log.device("Unpairing successful");
+            Log.device(R.string.device_pairing_unpairing_success);
         } catch (Exception e) {
-            Log.device("Error unpairing: " + e.getMessage());
+            Log.device(R.string.device_pairing_unpairing_error, e.getMessage());
         }
     }
 
     private void updateComms() {
         BluetoothDevice device = getPairedDevice();
         InstrumentType instrumentType = InstrumentType.byDevice(device);
+        Instrument instrument = getInstrument();
+        if (instrument != null && instrumentType != getInstrument().getInstrumentType()) {
+            instrument = new Instrument(device);
+            setInstrument(instrument);
 
-        try {
-            if (instrumentType != getInstrument().getInstrumentType()) {
-                Instrument instrument = new Instrument(device);
-                setInstrument(instrument);
+            try {
                 Communicator communicator = instrumentType.getNewCommunicator(this, device);
                 setComms(communicator);
                 invalidateOptionsMenu();
+            } catch (Exception exception) {
+                Log.e(exception);
+                Log.device(R.string.device_communicator_creation_error, exception.getMessage());
             }
-
-        } catch (Exception exception) {
-            Log.e(exception);
-            String name = instrumentType.describe();
-            Log.device("Failed to create communicator for " + name);
         }
     }
 
 
     private static void pair(BluetoothDevice device) throws SecurityException {
         try {
-            Log.device("Pairing with " + device.getName());
+            Log.device(R.string.device_pairing_attempt, device.getName());
             Method m = device.getClass().getMethod("createBond", (Class[]) null);
             m.invoke(device, (Object[])null);
-            Log.device("Pairing successful");
+            Log.device(R.string.device_pairing_successful);
         } catch (Exception e) {
-            Log.device("Error pairing: " + e.getMessage());
+            Log.device(R.string.device_pairing_error, e.getMessage());
         }
 
     }
@@ -374,27 +373,27 @@ public class DeviceActivity extends SexyTopoActivity {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
                 if (device == null) {
-                    Log.device("Error detecting instruments; please try again");
+                    Log.device(R.string.device_scan_device_not_found);
                     return;
                 }
 
                 try {
                     String name = device.getName();
                     InstrumentType instrumentType = InstrumentType.byName(name);
-                    if (instrumentType == InstrumentType.OTHER) {
-                        Log.device("Incompatible device \"" + name + "\" detected");
-
-                    } else {
-                        Log.device(instrumentType.describe() + " detected");
+                    if (instrumentType.isUsable()) {
+                        Log.device(R.string.device_scan_detected, instrumentType.describe());
                         pair(device);
                         BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
+                    } else {
+                        Log.device(R.string.device_pairing_incompatible, name);
                     }
+
                 } catch (SecurityException e) {
-                    Log.device(e.toString());
-                    Log.device("Security error (check permissions)");
+                    Log.e(e);
+                    Log.device(R.string.device_access_failure);
                 }
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-                Log.device("Scan finished");
+                Log.device(R.string.device_scan_end);
             }
         }
     }

@@ -100,4 +100,8 @@ public enum InstrumentType {
             return SexyTopo.staticGetString(R.string.device_no_permitted_access);
         }
     }
+
+    public boolean isUsable() {
+        return this != NONE && this != OTHER;
+    }
 }
