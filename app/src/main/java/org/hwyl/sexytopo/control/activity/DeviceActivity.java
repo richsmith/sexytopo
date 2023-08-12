@@ -3,6 +3,7 @@ package org.hwyl.sexytopo.control.activity;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +28,7 @@ import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.util.LogUpdateReceiver;
 
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.Set;
 
 
@@ -54,10 +56,15 @@ public class DeviceActivity extends SexyTopoActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device);
 
-         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        bluetoothAdapter = getBluetoothAdapter();
 
         setupSwitchListeners();
-        updateStatuses();
+        try {
+            updateStatuses();
+        } catch (Exception exception) {
+            Log.e(exception);
+            Log.e("Error updating statuses: " + exception.getMessage());
+        }
 
         scanFilter = new IntentFilter();
         scanFilter.addAction(BluetoothDevice.ACTION_FOUND);
@@ -155,9 +162,15 @@ public class DeviceActivity extends SexyTopoActivity {
     }
 
 
-    private static BluetoothAdapter getBluetoothAdapter() {
+    private BluetoothAdapter getBluetoothAdapter() {
         if (bluetoothAdapter == null) {
-            bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            try {
+                BluetoothManager bluetoothManager =
+                        (BluetoothManager) (getSystemService(Context.BLUETOOTH_SERVICE));
+                bluetoothAdapter = bluetoothManager.getAdapter();
+            } catch (Exception exception) {
+                Log.e(exception);
+            }
         }
         return bluetoothAdapter;
     }
@@ -224,6 +237,11 @@ public class DeviceActivity extends SexyTopoActivity {
     public void requestPair(View view) throws SecurityException {
 
         bluetoothAdapter = getBluetoothAdapter();
+
+        if (bluetoothAdapter == null) {
+            showSimpleToast(R.string.device_bluetooth_no_adapter);
+            return;
+        }
 
         if (bluetoothAdapter.isDiscovering()) {
             Log.device(R.string.device_scan_cancel);
@@ -309,8 +327,18 @@ public class DeviceActivity extends SexyTopoActivity {
     private void updateComms() {
         BluetoothDevice device = getPairedDevice();
         InstrumentType instrumentType = InstrumentType.byDevice(device);
+
         Instrument instrument = getInstrument();
-        if (instrument == null || instrumentType != getInstrument().getInstrumentType()) {
+
+        boolean doWeNeedToUpdateInstrument = false;
+
+        if (instrument == null && instrumentType.isUsable()) {
+            doWeNeedToUpdateInstrument = true;
+        } else if (instrument != null && instrumentType != instrument.getInstrumentType()) {
+            doWeNeedToUpdateInstrument = true;
+        }
+
+        if (doWeNeedToUpdateInstrument) {
             instrument = new Instrument(device);
             setInstrument(instrument);
 
@@ -337,14 +365,20 @@ public class DeviceActivity extends SexyTopoActivity {
 
     }
 
-    private static BluetoothDevice getPairedDevice() throws SecurityException {
+    private BluetoothDevice getPairedDevice() {
 
         BluetoothAdapter bluetoothAdapter = getBluetoothAdapter();
         if (bluetoothAdapter == null) {
             return null;
         }
 
-        Set<BluetoothDevice> allPairedDevices = bluetoothAdapter.getBondedDevices();
+        Set<BluetoothDevice> allPairedDevices;
+        try {
+            allPairedDevices = bluetoothAdapter.getBondedDevices();
+        } catch (SecurityException exception) {
+            allPairedDevices = new HashSet<>(); // probably not got permissions yet
+        }
+
         for (BluetoothDevice device : allPairedDevices) {
             InstrumentType instrumentType = InstrumentType.byDevice(device);
             if (instrumentType != InstrumentType.OTHER && instrumentType != InstrumentType.NONE) {

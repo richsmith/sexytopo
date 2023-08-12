@@ -20,12 +20,17 @@ public class StartUpActivity extends SexyTopoActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_start_up);
+        Log.setContext(this.getApplicationContext());
+    }
+
+
+    @Override
+    protected void onStart() {
+
+        super.onStart();
 
         hasStarted = true;
-
-        setContentView(R.layout.activity_start_up);
-
-        Log.setContext(this.getApplicationContext());
         Log.load(Log.LogType.SYSTEM);
         Log.i("--------------------");
         Log.i(R.string.log_starting_up);
@@ -127,6 +132,5 @@ public class StartUpActivity extends SexyTopoActivity {
 
         return shouldRestoreAutosave;
     }
-
 
 }
