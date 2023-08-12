@@ -85,10 +85,22 @@ public class Log {
         save(LogType.SYSTEM);
     }
 
-    public static void d(int stringId, Object ... args) {
-        if (context != null) {
-            d(context.getString(stringId, args));
+    private static String getString(int stringId, Object ... args) {
+        String message;
+        if (context == null) {
+            message = "[no context to translate]: " + stringId;
+        } else {
+            try {
+                message = context.getString(stringId, args);
+            } catch (Exception e) {
+                message = "[error getting string]: " + stringId;
+            }
         }
+        return message;
+    }
+
+    public static void d(int stringId, Object ... args) {
+        d(getString(stringId, args));
     }
     public static void d(String message) {
         // currently treating debug and info as the same, but at some point we might get around
@@ -98,9 +110,7 @@ public class Log {
     }
 
     public static void e(int stringId, Object ... args) {
-        if (context != null) {
-            e(context.getString(stringId, args));
-        }
+        e(getString(stringId, args));
     }
 
     public static void e(String message) {
@@ -115,9 +125,7 @@ public class Log {
     }
 
     public static void i(int stringId, Object ... args) {
-        if (context != null) {
-            i(context.getString(stringId, args));
-        }
+        i(getString(stringId, args));
     }
 
     public static void i(String message) {
