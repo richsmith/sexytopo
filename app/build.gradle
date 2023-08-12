@@ -52,7 +52,7 @@ repositories {
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.core:core-ktx:1.10.1'
-    implementation 'androidx.preference:preference:1.2.1'
+    implementation 'androidx.preference:preference-ktx:1.2.1'
     implementation 'com.google.firebase:firebase-analytics:21.3.0'
     implementation 'com.google.firebase:firebase-crashlytics:18.4.0'
     implementation 'commons-io:commons-io:2.6'
@@ -63,9 +63,9 @@ dependencies {
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.json:json:20180813'
-    testImplementation('org.powermock:powermock-api-mockito2:2.0.9')
-    testImplementation('org.powermock:powermock-module-junit4:2.0.9')
-
+    testImplementation 'org.mockito:mockito-core:3.4.0'
+    testImplementation 'org.mockito:mockito-inline:3.4.0'
+    androidTestImplementation 'org.mockito:mockito-android:3.4.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     androidTestImplementation 'androidx.test.ext:junit-ktx:1.1.5'
     androidTestImplementation 'androidx.test:rules:1.5.0'

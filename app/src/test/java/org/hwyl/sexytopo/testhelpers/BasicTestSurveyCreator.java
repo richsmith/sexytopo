@@ -1,8 +1,5 @@
 package org.hwyl.sexytopo.testhelpers;
 
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.when;
-
 import android.net.Uri;
 
 import androidx.documentfile.provider.DocumentFile;
@@ -11,6 +8,7 @@ import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
+import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -199,11 +197,11 @@ public class BasicTestSurveyCreator {
     }
 
     public static void mockSurveyUri(Survey survey, String uri) {
-        Uri mockUri = mock(Uri.class);
-        when(mockUri.toString()).thenReturn(uri);
-        DocumentFile mockDocumentFile = mock(DocumentFile.class);
-        when(mockDocumentFile.getUri()).thenReturn(mockUri);
-        when(mockDocumentFile.getName()).thenReturn(uri);
+        Uri mockUri = Mockito.mock(Uri.class);
+        Mockito.when(mockUri.toString()).thenReturn(uri);
+        DocumentFile mockDocumentFile = Mockito.mock(DocumentFile.class);
+        Mockito.when(mockDocumentFile.getUri()).thenReturn(mockUri);
+        Mockito.when(mockDocumentFile.getName()).thenReturn(uri);
         survey.setDirectory(mockDocumentFile);
     }
 }

@@ -1,24 +1,18 @@
 package org.hwyl.sexytopo.control.io.basic;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anySet;
-
-import android.content.Context;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anySet;
 
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.testhelpers.BasicTestSurveyCreator;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
-@PrepareForTest(Loader.class)
-@RunWith(PowerMockRunner.class)
+
 public class MetadataTranslaterTest {
 
 
@@ -49,8 +43,8 @@ public class MetadataTranslaterTest {
         connectTwoSurveys(survey, survey.getOrigin(), connectedSurvey, connectedSurvey.getOrigin());
         String translated = MetadataTranslater.translate(survey);
         Assert.assertEquals(
-                "{\"active-station\":\"1\",\"connections\":{\"1\":[[\"connected\",\"1\"]]}}",
-                translated.replaceAll("\\s", ""));
+            "{\"active-station\":\"1\",\"connections\":{\"1\":[[\"connected\",\"1\"]]}}",
+            translated.replaceAll("\\s", ""));
     }
 
     @Test
@@ -73,10 +67,15 @@ public class MetadataTranslaterTest {
         Survey survey = new Survey();
         Survey connected = new Survey();
 
-        PowerMockito.mockStatic(Loader.class);
-        Mockito.when(
-                Loader.loadSurvey((Context)any(), any(), anySet(), anyBoolean()))
-                .thenReturn(connected);
+        //PowerMockito.mockStatic(Loader.class);
+        //Mockito.when(
+        //        Loader.loadSurvey((Context)any(), any(), anySet(), anyBoolean()))
+        //        .thenReturn(connected);
+
+        MockedStatic<Loader> mockLoader = Mockito.mockStatic(Loader.class);
+        mockLoader.when(() -> Loader.loadSurvey(
+                any(), any(), anySet(), anyBoolean())
+        ).thenReturn(connected);
 
         MetadataTranslater.translateAndUpdate(null, survey, json);
         Assert.assertEquals(1, survey.getConnectedSurveys().size());

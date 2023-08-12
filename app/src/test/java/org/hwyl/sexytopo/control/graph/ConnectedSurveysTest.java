@@ -1,7 +1,6 @@
 package org.hwyl.sexytopo.control.graph;
 
 import org.hwyl.sexytopo.SexyTopoConstants;
-import org.hwyl.sexytopo.control.activity.GraphActivity;
 import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.graph.Coord2D;
@@ -15,28 +14,16 @@ import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.testhelpers.BasicTestSurveyCreator;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.List;
 import java.util.Map;
 
-@RunWith(MockitoJUnitRunner.class)
 public class ConnectedSurveysTest {
-
-    @Mock
-    GraphActivity mockActivity;
 
     @Test
     public void testNoConnectedSurveysReturnNoUpdatedSurveys() {
 
         Survey currentSurvey = getBasicSurvey("current");
-
-        // As of v2 of Mockito the following emits an 'UnnecessaryStubbingException'
-        //Sketch fakeSketch = new Sketch();
-        //when(mockActivity.getSketch(currentSurvey)).thenReturn(fakeSketch);
-
         Map<Survey, Space<Coord2D>> translated =
                 ConnectedSurveys.getTranslatedConnectedSurveys(
                         Projection2D.PLAN, currentSurvey, new Space<>());
