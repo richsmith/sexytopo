@@ -255,9 +255,9 @@ public class OldDistoXCommunicator extends Thread {
             Log.device("Failed to create socket: " + e.getMessage());
         } finally {
             if (isConnected()) {
-                Log.device(activity.getString(R.string.device_log_connected));
+                Log.device(activity.getString(R.string.device_connection_connected));
             } else {
-                Log.device(activity.getString(R.string.device_log_not_connected));
+                Log.device(activity.getString(R.string.device_connection_not_connected));
             }
         }
 
@@ -268,7 +268,7 @@ public class OldDistoXCommunicator extends Thread {
         try {
             if (socket != null && socket.isConnected()) {
                 socket.close();
-                Log.device(activity.getString(R.string.device_log_stopped));
+                Log.device(activity.getString(R.string.device_connection_closed));
             }
         } catch (Exception e) {
             Log.device("Error disconnecting: " + e.getMessage());

@@ -59,7 +59,7 @@ public class MeasurementProtocol extends DistoXProtocol {
 
     public void go(DataInputStream inStream, DataOutputStream outStream) throws Exception {
 
-        Log.device(context.getString(R.string.device_log_ready_for_measurements));
+        Log.device(context.getString(R.string.device_connection_ready));
 
         byte[] packet = readPacket(inStream);
 
@@ -74,7 +74,7 @@ public class MeasurementProtocol extends DistoXProtocol {
                 Log.device("(Duplicated measurement #" + ++duplicateCount + ")");
             } else {
                 duplicateCount = 0;
-                Log.device(context.getString(R.string.device_log_received));
+                Log.device(context.getString(R.string.device_data_received));
                 Leg leg = parseDataPacket(packet);
                 dataManager.updateSurvey(leg);
             }

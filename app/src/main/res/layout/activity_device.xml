@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:text="@string/device_bluetooth_status"
+        android:text="@string/device_instruction_bluetooth"
         android:layout_gravity="end"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:id="@+id/bluetoothSwitch" />
@@ -38,7 +38,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="@string/device_paired_status"/>
+                android:text="@string/device_instruction_pair"/>
 
             <TextView
                 android:layout_alignParentEnd="true"
@@ -82,7 +82,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:text="@string/device_connect_automatically"
+        android:text="@string/device_instruction_connect"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:checked="false"
         android:id="@+id/connectionSwitch" />

@@ -142,13 +142,12 @@ public class DeviceActivity extends SexyTopoActivity {
     }
 
     public void stopConnection() {
-        Log.device(getString(R.string.device_log_stopping));
+        Log.device(getString(R.string.device_connection_closing));
 
         try {
             requestComms().requestDisconnect();
         } catch (Exception e) {
-            Log.device(getString(R.string.device_log_stopping_error, e.getMessage()));
-        }
+            Log.device(R.string.device_connection_closing_error, e.getMessage());        }
     }
 
     public void setConnectionStopped() {
@@ -209,7 +208,7 @@ public class DeviceActivity extends SexyTopoActivity {
             isConnectionStartingOrStarted = true;
             startConnection();
         } else {
-            Log.device(getString(R.string.device_log_connection_stop_requested));
+            Log.device(getString(R.string.device_connection_stop_requested));
             isConnectionStartingOrStarted = false;
             stopConnection();
         }

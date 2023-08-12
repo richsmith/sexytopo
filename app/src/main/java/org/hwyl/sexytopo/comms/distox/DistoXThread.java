@@ -237,9 +237,9 @@ public class DistoXThread extends Thread {
                 Log.device("Failed to create socket: " + e.getMessage());
         } finally {
             if (isConnected()) {
-                Log.device(context.getString(R.string.device_log_connected));
+                Log.device(context.getString(R.string.device_connection_connected));
             } else {
-                Log.device(context.getString(R.string.device_log_not_connected));
+                Log.device(context.getString(R.string.device_connection_not_connected));
             }
         }
 
@@ -248,10 +248,12 @@ public class DistoXThread extends Thread {
 
     public void disconnect() {
         try {
-            closeSocket();
-            Log.device(context.getString(R.string.device_log_stopped));
+            if (socket != null && socket.isConnected()) {
+                socket.close();
+                Log.device(context.getString(R.string.device_connection_closed));
+            }
         } catch (Exception e) {
-            Log.device("Error disconnecting: " + e.getMessage());
+            Log.device(R.string.device_connection_closing_error, e.getMessage());
         }
     }
 
@@ -261,13 +263,6 @@ public class DistoXThread extends Thread {
             inStream = new DataInputStream(socket.getInputStream());
         } catch (Exception e) {
             Log.device("Error interrupting read: " + e.getMessage());
-        }
-    }
-
-    private void closeSocket() throws IOException {
-        if (socket != null && socket.isConnected()) {
-            socket.close();
-            Log.device(context.getString(R.string.device_log_stopped));
         }
     }
 

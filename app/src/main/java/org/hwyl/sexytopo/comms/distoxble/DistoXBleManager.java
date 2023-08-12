@@ -245,12 +245,12 @@ public class DistoXBleManager extends SexyTopoBleManager {
             byte[] packet = data.getValue();
 
             if (packet == null) { // impossible?
-                Log.device(R.string.device_log_received_null_data);
+                Log.device(R.string.device_data_received_null);
                 return;
             }
 
             if (packet.length == 0) { // impossible?
-                Log.device(R.string.device_log_received_empty_data);
+                Log.device(R.string.device_data_received_empty);
                 return;
             }
 
@@ -263,7 +263,7 @@ public class DistoXBleManager extends SexyTopoBleManager {
                 handleCalibrationPacket(packet);
                 acknowledgePacket(packet);
             } else {
-                Log.device(R.string.device_log_unknown_identifier);
+                Log.device(R.string.device_data_unknown_identifier);
             }
         }
 
@@ -283,7 +283,7 @@ public class DistoXBleManager extends SexyTopoBleManager {
 
         private void acknowledgePacket(byte[] packet) {
             Byte[] acknowledgementPacket = createAcknowledgementPacket(packet);
-            writePacket(acknowledgementPacket, R.string.device_log_acknowledged_packet);
+            writePacket(acknowledgementPacket, R.string.device_data_acknowledged_packet);
         }
 
         private Byte[] createAcknowledgementPacket(byte[] packet) {
