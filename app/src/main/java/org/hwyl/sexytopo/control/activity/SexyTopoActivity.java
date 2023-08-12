@@ -883,6 +883,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
 
     protected void restoreAutosave(DocumentFile directory) throws Exception {
+        Log.i(R.string.file_restoring_autosave);
         Survey survey = Loader.loadAutosave(this, directory);
         getSurveyManager().setCurrentSurvey(survey);
         showSimpleToast(R.string.file_autosave_restored);

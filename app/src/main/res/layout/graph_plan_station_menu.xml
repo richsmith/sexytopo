@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/panelBackground"
-        android:text="@string/menu_station_label"
+        android:text="@string/menu_context_title"
         android:padding="10dp" />
 
     <Button

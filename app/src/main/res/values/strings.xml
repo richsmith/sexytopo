@@ -50,7 +50,6 @@
     <string name="action_dev">Dev</string>
     <string name="action_device">Instrument</string>
     <string name="action_device_connect">Connect…</string>
-    <string name="action_calibration">Calibration…</string>
     <string name="action_trip">Current Trip</string>
     <string name="action_help">Help</string>
     <string name="action_guide">Guide</string>
@@ -83,7 +82,7 @@
 
     <!-- File handling -->
     <string name="file_started_new_survey">Started new survey</string>
-    <string name="file_error_initialising_survey">Error initialising survey</string>
+    <string name="file_error_initialising_survey">Error initialising survey: %1$s</string>
     <string name="file_loading_survey">Loading <i>%1$s</i></string>
     <string name="file_loaded_survey">Loaded <i>%1$s</i></string>
     <string name="file_loading_file">Loading file %1$s</string>
@@ -134,7 +133,6 @@
     <string name="import_successful">"Import complete (not yet saved)"</string>
     <string name="import_failed">Import failed</string>
     <string name="export_select_type">Select export format</string>
-    <string name="export_select_destination">Select export folder</string>
     <string name="export_successful">Export completed</string>
     <string name="export_failed">Export failed</string>
     <string name="third_party_therion" translatable="false">Therion</string>
@@ -208,8 +206,6 @@
     <string name="device_instruction_connect">3. Connect</string>
     <string name="device_request_pair">Pair</string>
     <string name="device_request_unpair">Unpair</string>
-    <string name="device_bluetooth_on">On</string>
-    <string name="device_bluetooth_off">Off</string>
     <string name="device_no_permitted_access">[inaccessible device]</string>
     <string name="device_bluetooth_no_adapter">Cannot access bluetooth adapter</string>
     <string name="device_connection_requested">Connection requested</string>
@@ -248,7 +244,6 @@
     <string name="device_unknown_name">[Unknown device]</string>
     <string name="device_unknown_short_name">Unknown</string>
     <string name="device_ble_invalid_data_received">Invalid data received</string>
-    <string name="device_ble_device_error">Invalid data received</string>
     <string name="device_ble_connecting_to">Connecting to %1$s…</string>
     <string name="device_ble_connected_to">Connected to %1$s</string>
     <string name="device_ble_device_ready">%1$s ready :)</string>
@@ -293,7 +288,6 @@
     <string name="device_sap_command_device_off">Device Off</string>
 
     <!-- Calibration -->
-    <string name="calibration_wrong_device">No connected DistoX</string>
     <string name="calibration_index">Reading number</string>
     <string name="calibration_start">Disto Cal Mode On</string>
     <string name="calibration_stop">Disto Cal Mode Off</string>
@@ -333,10 +327,6 @@
     <string name="orientation_face_down">Face Down</string>
     <string name="orientation_face_left">Face Left</string>
     <string name="dialog_confirm_clear_title">Clear Calibration Readings?</string>
-    <plurals name="instruments">
-        <item quantity="one">%1$s instrumentType</item>
-        <item quantity="other">%1$s instruments</item>
-    </plurals>
 
     <!-- Trip -->
     <string name="trip">Trip</string>
@@ -447,8 +437,6 @@
     <string name="menu_jump_to">Jump</string>
     <string name="menu_jump_to_station_in_plan">→ Plan</string>
     <string name="menu_jump_to_station_in_elevation">→ Elevation</string>
-    <string name="menu_station_label">Station</string>
-    <string name="menu_select">Select</string>
     <string name="menu_new_cross_section">New Cross-Section</string>
     <string name="menu_jump_to_station_in_table">→ Data Table</string>
     <string name="menu_delete_station">Delete</string>
@@ -467,7 +455,6 @@
 
 
     <!-- Logging -->
-    <string name="log">Log</string>
     <string name="log_starting_up">Starting up</string>
     <string name="log_shown">Shown: %1$s</string>
     <string name="log_error_no_station_notification_intent">Unable to start new station notification intent</string>

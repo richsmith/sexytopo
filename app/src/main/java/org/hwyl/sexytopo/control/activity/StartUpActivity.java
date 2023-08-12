@@ -70,7 +70,7 @@ public class StartUpActivity extends SexyTopoActivity {
             }
 
         } catch (Exception exception) {
-            Log.e(exception);
+            Log.e(R.string.file_error_initialising_survey, exception.getMessage());
 
         } finally {
             if (getSurvey() == null) { // should be impossible
