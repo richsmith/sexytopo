@@ -227,7 +227,7 @@ public class DeviceActivity extends SexyTopoActivity {
         bluetoothAdapter = getBluetoothAdapter();
 
         if (bluetoothAdapter.isDiscovering()) {
-            Log.device("Cancelling...");
+            Log.device(R.string.device_scan_cancel);
             bluetoothAdapter.cancelDiscovery();
 
         } else {
@@ -238,6 +238,15 @@ public class DeviceActivity extends SexyTopoActivity {
                 Log.device(R.string.device_scan_failure);
             }
         }
+    }
+
+
+
+    public void requestUnpair(View view) {
+        BluetoothDevice device = getPairedDevice();
+        stopConnection();
+        unpair(device);
+        updatePairedStatus();
     }
 
 
@@ -280,13 +289,6 @@ public class DeviceActivity extends SexyTopoActivity {
     }
 
 
-    public void requestUnpair(View view) {
-        BluetoothDevice device = getPairedDevice();
-        stopConnection();
-        unpair(device);
-        updatePairedStatus();
-    }
-
 
     private void unpair(BluetoothDevice device) throws SecurityException {
 
@@ -309,7 +311,7 @@ public class DeviceActivity extends SexyTopoActivity {
         BluetoothDevice device = getPairedDevice();
         InstrumentType instrumentType = InstrumentType.byDevice(device);
         Instrument instrument = getInstrument();
-        if (instrument != null && instrumentType != getInstrument().getInstrumentType()) {
+        if (instrument == null || instrumentType != getInstrument().getInstrumentType()) {
             instrument = new Instrument(device);
             setInstrument(instrument);
 
@@ -328,8 +330,7 @@ public class DeviceActivity extends SexyTopoActivity {
     private static void pair(BluetoothDevice device) throws SecurityException {
         try {
             Log.device(R.string.device_pairing_attempt, device.getName());
-            Method m = device.getClass().getMethod("createBond", (Class[]) null);
-            m.invoke(device, (Object[])null);
+            device.createBond();
             Log.device(R.string.device_pairing_successful);
         } catch (Exception e) {
             Log.device(R.string.device_pairing_error, e.getMessage());

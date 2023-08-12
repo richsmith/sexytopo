@@ -12,7 +12,7 @@ public class Instrument {
     private final String reportedName;
     public Instrument(BluetoothDevice bluetoothDevice) throws SecurityException {
         this.bluetoothDevice = bluetoothDevice;
-        reportedName = bluetoothDevice.getName();
+        reportedName = bluetoothDevice == null? null : bluetoothDevice.getName();
         instrumentType = InstrumentType.byName(reportedName);
 
     }

@@ -217,6 +217,7 @@
     <string name="device_connection_requested">Connection requested</string>
     <string name="device_scan_start">Scanning for devices…</string>
     <string name="device_scan_end">Scan finished</string>
+    <string name="device_scan_cancel">Cancelling scan</string>
     <string name="device_scan_detected">Device "%1$s" detected</string>
     <string name="device_scan_failure">Unable to scan (bluetooth failure?)</string>
     <string name="device_scan_device_not_found">Device not found; please try again</string>
