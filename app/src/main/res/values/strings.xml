@@ -210,8 +210,6 @@
     <string name="device_request_unpair">Unpair</string>
     <string name="device_bluetooth_on">On</string>
     <string name="device_bluetooth_off">Off</string>
-    <string name="device_no_device">no device</string>
-    <string name="device_null_device">null device</string>
     <string name="device_no_permitted_access">[inaccessible device]</string>
     <string name="device_bluetooth_no_adapter">Cannot access bluetooth adapter</string>
     <string name="device_connection_requested">Connection requested</string>
@@ -244,6 +242,11 @@
     <string name="device_data_received_empty">Empty data received</string>
     <string name="device_data_unknown_identifier">Unknown packet identifier</string>
     <string name="device_data_acknowledged_packet">Acknowledged packet</string>
+    <string name="device_no_device">no device</string>
+    <string name="device_missing_name">[Missing device]</string>
+    <string name="device_missing_short_name">Missing</string>
+    <string name="device_unknown_name">[Unknown device]</string>
+    <string name="device_unknown_short_name">Unknown</string>
     <string name="device_ble_invalid_data_received">Invalid data received</string>
     <string name="device_ble_device_error">Invalid data received</string>
     <string name="device_ble_connecting_to">Connecting to %1$s…</string>
@@ -253,10 +256,6 @@
     <string name="device_ble_device_disconnected">%1$s ready :)</string>
     <string name="device_ble_failed_to_connect_to">Failed to connect to %1$s</string>
     <string name="device_ble_invalid_data">Invalid data received: %1$s</string>
-    <string name="device_missing_name">[Missing device]</string>
-    <string name="device_missing_short_name">Missing</string>
-    <string name="device_unknown_name">[Unknown device]</string>
-    <string name="device_unknown_short_name">Unknown</string>
     <string name="device_distox_name" translatable="false">DistoX</string>
     <string name="device_distox_short_name" translatable="false">DistoX</string>
     <string name="device_distox_ble_name" translatable="false">DistoX BLE</string>
