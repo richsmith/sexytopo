@@ -42,8 +42,8 @@ public class DistoXBleManager extends SexyTopoBleManager {
         FIRMWARE_VERSION(0xE000, 0xE003),
         HARDWARE_VERSION(0xE004, 0xE007),
         RAM(0xC000, 0xDFFF);
-        private Byte start;
-        private Byte end;
+        private final Byte start;
+        private final Byte end;
 
         MemoryRange(int start, int end) {
             this.start = (byte)start;
@@ -120,17 +120,20 @@ public class DistoXBleManager extends SexyTopoBleManager {
         setIndicationCallback(readCharacteristic).with(handler);
         setIndicationCallback(writeCharacteristic).with(handler);
 
+        /* This may not be needed
         beginAtomicRequestQueue()
             .add(enableIndications(readCharacteristic))
             .add(enableIndications(writeCharacteristic))
             .enqueue();
+         */
+
+        setNotificationCallback(readCharacteristic).with(handler);
     }
 
 
     @Override
     public boolean isRequiredServiceSupported(@NonNull final BluetoothGatt gatt) {
-        final BluetoothGattService service =
-                gatt.getService(SERVICE_UUID);
+        final BluetoothGattService service = gatt.getService(SERVICE_UUID);
         if (service != null) {
             writeCharacteristic = service.getCharacteristic(WRITE_CHARACTERISTIC_UUID);
             readCharacteristic = service.getCharacteristic(READ_CHARACTERISTIC_UUID);
@@ -151,7 +154,15 @@ public class DistoXBleManager extends SexyTopoBleManager {
             int commandInt = CUSTOM_COMMAND_TO_COMMAND_BYTE.get(id);
             Byte commandByte = (byte)commandInt;
             Byte[] packet = createWriteCommandPacket(commandByte);
-            Integer stringId = CUSTOM_COMMANDS.get(id);
+
+            Integer stringId;
+            if (id == COMMAND_CALIBRATION_MODE_START) {
+                stringId = R.string.device_distox_command_calibration_start;
+            } else if (id == COMMAND_CALIBRATION_MODE_START) {
+                stringId = R.string.device_distox_command_calibration_stop;
+            } else {
+                stringId = CUSTOM_COMMANDS.get(id);
+            }
             writePacket(packet, stringId);
             return true;
 
@@ -193,7 +204,7 @@ public class DistoXBleManager extends SexyTopoBleManager {
     }
 
 
-    private static Byte[] createWriteCommandPacket(Byte commandByte) {
+    public static Byte[] createWriteCommandPacket(Byte commandByte) {
         return createWritePacket(new Byte[]{commandByte});
     }
 
@@ -206,9 +217,23 @@ public class DistoXBleManager extends SexyTopoBleManager {
 
 
     private static Byte[] createWritePacket(Byte[] payload) {
+
+
+
         Byte[] payloadLength = new Byte[]{(byte)(payload.length)};
-        Byte[] packet = (Byte[]) ArrayUtils.addAll(
-            WRITE_HEADER, payloadLength, payload, WRITE_FOOTER);
+
+        // This is a nice way of doing it, but it makes the app hang
+        // for some reason - to be investigated some time
+        // Byte[] packet = (Byte[]) ArrayUtils.addAll(
+        //    WRITE_HEADER, payloadLength, payload, WRITE_FOOTER);
+
+        // code contributed by Siwei Tian
+        Byte[] packet = new Byte[payload.length + 8];
+        System.arraycopy(WRITE_HEADER, 0, packet, 0, WRITE_HEADER.length);
+        System.arraycopy(payloadLength, 0, packet, 5, 1);
+        System.arraycopy(payload, 0, packet, 6, payload.length);
+        System.arraycopy(WRITE_FOOTER, 0, packet, 6 + payload.length, 2);
+
         return packet;
     }
 
