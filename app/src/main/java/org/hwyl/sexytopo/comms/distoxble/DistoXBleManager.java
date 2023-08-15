@@ -3,6 +3,7 @@ package org.hwyl.sexytopo.comms.distoxble;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.content.Intent;
@@ -42,16 +43,23 @@ public class DistoXBleManager extends SexyTopoBleManager {
         FIRMWARE_VERSION(0xE000, 0xE003),
         HARDWARE_VERSION(0xE004, 0xE007),
         RAM(0xC000, 0xDFFF);
-        private final Byte start;
-        private final Byte end;
+        private final int start;
+        private final int end;
 
         MemoryRange(int start, int end) {
-            this.start = (byte)start;
-            this.end = (byte)end;
+            this.start = start;
+            this.end = end;
         }
 
         public Byte[] asArray() {
-            return new Byte[] {start, end};
+            return intToBytes(start);
+        }
+
+        private static Byte[] intToBytes(int value) {
+            Byte[] result = new Byte[2];
+            result[0] = (byte) (value & 0xFF);
+            result[1] = (byte) ((value >> 8) & 0xFF);
+            return result;
         }
     }
 
@@ -117,8 +125,8 @@ public class DistoXBleManager extends SexyTopoBleManager {
     @Override
     protected void initialize() {
         DataHandler handler = new DataHandler();
-        setIndicationCallback(readCharacteristic).with(handler);
-        setIndicationCallback(writeCharacteristic).with(handler);
+        //setIndicationCallback(readCharacteristic).with(handler);
+        //setIndicationCallback(writeCharacteristic).with(handler);
 
         /* This may not be needed
         beginAtomicRequestQueue()
@@ -126,8 +134,9 @@ public class DistoXBleManager extends SexyTopoBleManager {
             .add(enableIndications(writeCharacteristic))
             .enqueue();
          */
-
         setNotificationCallback(readCharacteristic).with(handler);
+
+        enableNotifications(readCharacteristic).enqueue();
     }
 
 
@@ -158,7 +167,7 @@ public class DistoXBleManager extends SexyTopoBleManager {
             Integer stringId;
             if (id == COMMAND_CALIBRATION_MODE_START) {
                 stringId = R.string.device_distox_command_calibration_start;
-            } else if (id == COMMAND_CALIBRATION_MODE_START) {
+            } else if (id == COMMAND_CALIBRATION_MODE_STOP) {
                 stringId = R.string.device_distox_command_calibration_stop;
             } else {
                 stringId = CUSTOM_COMMANDS.get(id);
@@ -242,8 +251,13 @@ public class DistoXBleManager extends SexyTopoBleManager {
             MemoryRange memoryRange, Byte[] payload) {
         Byte[] payloadLength = new Byte[]{(byte)payload.length};
         Byte[] payloadAddress = memoryRange.asArray();
-        Byte[] packet = (Byte[]) ArrayUtils.addAll(
-            WRITE_MEMORY_PAYLOAD_HEADER, payloadAddress, payloadLength, payload);
+        Byte[] packet = new Byte[payload.length + 4];
+        System.arraycopy(WRITE_MEMORY_PAYLOAD_HEADER,0,packet,0,1);
+        System.arraycopy(payloadAddress,0,packet,1,2);
+        System.arraycopy(payloadLength,0,packet,3,1);
+        System.arraycopy(payload,0,packet,4,payload.length);
+        //Byte[] packet = (Byte[]) ArrayUtils.addAll(
+        //    WRITE_MEMORY_PAYLOAD_HEADER, payloadAddress, payloadLength, payload);
         return packet;
     }
 
@@ -293,7 +307,8 @@ public class DistoXBleManager extends SexyTopoBleManager {
         }
 
         private void handleMeasurementPacket(byte[] packet) {
-            Leg leg = MeasurementProtocol.parseDataPacket(packet);
+            byte[] data = Arrays.copyOfRange(packet,1,16);
+            Leg leg = MeasurementProtocol.parseDataPacket(data);
             dataManager.updateSurvey(leg);
         }
 
