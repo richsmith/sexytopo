@@ -3,7 +3,6 @@ package org.hwyl.sexytopo.comms.distoxble;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.content.Intent;
@@ -125,17 +124,7 @@ public class DistoXBleManager extends SexyTopoBleManager {
     @Override
     protected void initialize() {
         DataHandler handler = new DataHandler();
-        //setIndicationCallback(readCharacteristic).with(handler);
-        //setIndicationCallback(writeCharacteristic).with(handler);
-
-        /* This may not be needed
-        beginAtomicRequestQueue()
-            .add(enableIndications(readCharacteristic))
-            .add(enableIndications(writeCharacteristic))
-            .enqueue();
-         */
         setNotificationCallback(readCharacteristic).with(handler);
-
         enableNotifications(readCharacteristic).enqueue();
     }
 
@@ -252,12 +241,10 @@ public class DistoXBleManager extends SexyTopoBleManager {
         Byte[] payloadLength = new Byte[]{(byte)payload.length};
         Byte[] payloadAddress = memoryRange.asArray();
         Byte[] packet = new Byte[payload.length + 4];
-        System.arraycopy(WRITE_MEMORY_PAYLOAD_HEADER,0,packet,0,1);
+        System.arraycopy(WRITE_MEMORY_PAYLOAD_HEADER,0 ,packet,0,1);
         System.arraycopy(payloadAddress,0,packet,1,2);
         System.arraycopy(payloadLength,0,packet,3,1);
-        System.arraycopy(payload,0,packet,4,payload.length);
-        //Byte[] packet = (Byte[]) ArrayUtils.addAll(
-        //    WRITE_MEMORY_PAYLOAD_HEADER, payloadAddress, payloadLength, payload);
+        System.arraycopy(payload,0,packet,4, payload.length);
         return packet;
     }
 
