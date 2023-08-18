@@ -27,12 +27,16 @@ A Galaxy Note is a good choice. Apart from being about the right size, a proper 
 Currently the following:
 
 * The [DistoX2](https://paperless.bheeb.ch/) (several versions)
+* The DistoX BLE
 * The [Shetland Attack Pony 5](https://www.shetlandattackpony.co.uk/)
 * The [Shetland Attack Pony 6](https://www.shetlandattackpony.co.uk/)
 * The [Bric4](https://www.caveexploration.org/gear/bric4)
 * Analogue instruments (if you input the data by hand, though not really recommended)
 
 Please get in touch if think you can help SexyTopo work with any other instruments.
+
+## Why... SexyTopo?
+It was originally a placeholder name: a cave surveying app with a sexier interface. It now has name recognition so probably won't get around to changing it.
 
 ## Does SexyTopo need all those permissions?
 Yes, even if it might not be obvious what they do. E.g. asking for certain Bluetooth permissions requires asking for location permissions (presumably you can use Bluetooth to find your location in some way). If you don't grant it everything it asks for then it may fail in unexpected ways.
