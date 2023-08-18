@@ -153,7 +153,7 @@ public class GeneralPreferences {
     }
 
     public static boolean isTwoFingerModeActive() {
-        return getBoolean("pref_two_finger_movement", true);
+        return getBoolean("pref_two_finger_movement", false);
     }
 
     // ********** Sketching ***********

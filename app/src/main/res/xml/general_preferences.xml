@@ -79,7 +79,7 @@
             android:key="pref_two_finger_movement"
             android:title="@string/settings_two_finger_movement_title"
             android:summary="@string/settings_two_finger_movement_summary"
-            android:defaultValue="true"/>
+            android:defaultValue="false"/>
         <EditTextPreference
             android:key="pref_survey_text_tool_font_size"
             android:title="@string/settings_survey_text_tool_font_size_title"
