@@ -31,7 +31,7 @@ public class TherionExporter extends Exporter {
     private static SurveyFile.SurveyFileType TH2_EE =
             new SurveyFile.SurveyFileType("ee.th2", "plain/text");
     private static SurveyFile.SurveyFileType XVI_EE =
-            new SurveyFile.SurveyFileType("plan.xvi", "plain/text");
+            new SurveyFile.SurveyFileType("ee.xvi", "plain/text");
 
     private String originalThFileContent = null;
     private String originalTh2PlanFileContent = null;
