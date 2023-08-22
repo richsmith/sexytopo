@@ -46,95 +46,103 @@
         android:background="@color/panelBackground">
 
         <ImageButton
-            android:layout_weight="0.2"
-            android:src="@drawable/black"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/toolbar_button_height"
-            android:scaleType="fitCenter"
             android:id="@+id/buttonBlack"
-            android:tooltipText="@string/sketch_toolbar_colour_main"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:layout_weight="0.2"
             android:contentDescription="@string/sketch_toolbar_colour_main"
-            />
-        <ImageButton
-            android:layout_weight="0.2"
-            android:src="@drawable/brown"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/toolbar_button_height"
+            android:hapticFeedbackEnabled="true"
             android:scaleType="fitCenter"
+            android:src="@drawable/black"
+            android:tooltipText="@string/sketch_toolbar_colour_main" />
+
+        <ImageButton
             android:id="@+id/buttonBrown"
-            android:tooltipText="@string/sketch_toolbar_colour_brown"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:layout_weight="0.2"
             android:contentDescription="@string/sketch_toolbar_colour_brown"
-            />
-        <ImageButton
-            android:layout_weight="0.2"
-            android:src="@drawable/grey"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/toolbar_button_height"
+            android:hapticFeedbackEnabled="true"
             android:scaleType="fitCenter"
+            android:src="@drawable/brown"
+            android:tooltipText="@string/sketch_toolbar_colour_brown" />
+
+        <ImageButton
             android:id="@+id/buttonGrey"
-            android:tooltipText="@string/sketch_toolbar_colour_grey"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:layout_weight="0.2"
             android:contentDescription="@string/sketch_toolbar_colour_grey"
-            />
-        <ImageButton
-            android:layout_weight="0.2"
-            android:src="@drawable/red"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/toolbar_button_height"
+            android:hapticFeedbackEnabled="true"
             android:scaleType="fitCenter"
+            android:src="@drawable/grey"
+            android:tooltipText="@string/sketch_toolbar_colour_grey" />
+
+        <ImageButton
             android:id="@+id/buttonRed"
-            android:tooltipText="@string/sketch_toolbar_colour_red"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:layout_weight="0.2"
             android:contentDescription="@string/sketch_toolbar_colour_red"
-            />
-        <ImageButton
-            android:layout_weight="0.2"
-            android:src="@drawable/orange"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/toolbar_button_height"
+            android:hapticFeedbackEnabled="true"
             android:scaleType="fitCenter"
+            android:src="@drawable/red"
+            android:tooltipText="@string/sketch_toolbar_colour_red" />
+
+        <ImageButton
             android:id="@+id/buttonOrange"
-            android:tooltipText="@string/sketch_toolbar_colour_orange"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:layout_weight="0.2"
             android:contentDescription="@string/sketch_toolbar_colour_orange"
-            />
-        <ImageButton
-            android:layout_weight="0.2"
-            android:src="@drawable/green"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/toolbar_button_height"
+            android:hapticFeedbackEnabled="true"
             android:scaleType="fitCenter"
+            android:src="@drawable/orange"
+            android:tooltipText="@string/sketch_toolbar_colour_orange" />
+
+        <ImageButton
             android:id="@+id/buttonGreen"
-            android:tooltipText="@string/sketch_toolbar_colour_green"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:layout_weight="0.2"
             android:contentDescription="@string/sketch_toolbar_colour_green"
-            />
-        <ImageButton
-            android:layout_weight="0.2"
-            android:src="@drawable/blue"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/toolbar_button_height"
+            android:hapticFeedbackEnabled="true"
             android:scaleType="fitCenter"
+            android:src="@drawable/green"
+            android:tooltipText="@string/sketch_toolbar_colour_green" />
+
+        <ImageButton
             android:id="@+id/buttonBlue"
-            android:tooltipText="@string/sketch_toolbar_colour_blue"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:layout_weight="0.2"
             android:contentDescription="@string/sketch_toolbar_colour_blue"
-            />
-        <ImageButton
-            android:layout_weight="0.2"
-            android:src="@drawable/purple"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/toolbar_button_height"
+            android:hapticFeedbackEnabled="true"
             android:scaleType="fitCenter"
+            android:src="@drawable/blue"
+            android:tooltipText="@string/sketch_toolbar_colour_blue" />
+
+        <ImageButton
             android:id="@+id/buttonPurple"
-            android:tooltipText="@string/sketch_toolbar_colour_purple"
-            android:contentDescription="@string/sketch_toolbar_colour_purple"
-            />
-        <ImageButton
-            android:layout_weight="0.2"
-            android:src="@drawable/zoom_in"
-            android:tooltipText="@string/sketch_toolbar_zoom_in"
-            android:contentDescription="@string/sketch_toolbar_zoom_in"
             android:layout_width="0dp"
             android:layout_height="@dimen/toolbar_button_height"
+            android:layout_weight="0.2"
+            android:contentDescription="@string/sketch_toolbar_colour_purple"
+            android:hapticFeedbackEnabled="true"
             android:scaleType="fitCenter"
+            android:src="@drawable/purple"
+            android:tooltipText="@string/sketch_toolbar_colour_purple" />
+
+        <ImageButton
             android:id="@+id/buttonZoomIn"
-            />
+            android:layout_width="0dp"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:layout_weight="0.2"
+            android:contentDescription="@string/sketch_toolbar_zoom_in"
+            android:hapticFeedbackEnabled="true"
+            android:scaleType="fitCenter"
+            android:src="@drawable/zoom_in"
+            android:tooltipText="@string/sketch_toolbar_zoom_in" />
     </LinearLayout>
 
     <LinearLayout
@@ -144,106 +152,115 @@
         android:background="@color/panelBackground">
 
         <ImageButton
-            android:layout_weight="0.2"
-            android:src="@drawable/pencil"
-            android:tooltipText="@string/sketch_toolbar_draw"
-            android:contentDescription="@string/sketch_toolbar_draw"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/toolbar_button_height"
-            android:scaleType="fitCenter"
             android:id="@+id/buttonDraw"
-            />
-        <ImageButton
-            android:layout_weight="0.2"
-            android:src="@drawable/move"
-            android:tooltipText="@string/sketch_toolbar_move"
-            android:contentDescription="@string/sketch_toolbar_move"
             android:layout_width="0dp"
             android:layout_height="@dimen/toolbar_button_height"
+            android:layout_weight="0.2"
+            android:contentDescription="@string/sketch_toolbar_draw"
+            android:hapticFeedbackEnabled="true"
             android:scaleType="fitCenter"
+            android:src="@drawable/pencil"
+            android:tooltipText="@string/sketch_toolbar_draw" />
+
+        <ImageButton
             android:id="@+id/buttonMove"
-            />
-        <ImageButton
-            android:layout_weight="0.2"
-            android:src="@drawable/eraser"
-            android:tooltipText="@string/sketch_toolbar_eraser"
-            android:contentDescription="@string/sketch_toolbar_eraser"
             android:layout_width="0dp"
             android:layout_height="@dimen/toolbar_button_height"
-            android:scaleType="fitCenter"
-            android:id="@+id/buttonErase"
-            />
-        <ImageButton
             android:layout_weight="0.2"
+            android:contentDescription="@string/sketch_toolbar_move"
+            android:hapticFeedbackEnabled="true"
+            android:scaleType="fitCenter"
+            android:src="@drawable/move"
+            android:tooltipText="@string/sketch_toolbar_move" />
+
+        <ImageButton
+            android:id="@+id/buttonErase"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:layout_weight="0.2"
+            android:contentDescription="@string/sketch_toolbar_eraser"
+            android:hapticFeedbackEnabled="true"
+            android:scaleType="fitCenter"
+            android:src="@drawable/eraser"
+            android:tooltipText="@string/sketch_toolbar_eraser" />
+
+        <ImageButton
+            android:id="@+id/buttonSymbol"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:layout_weight="0.2"
+            android:contentDescription="@string/sketch_toolbar_symbol"
+            android:hapticFeedbackEnabled="true"
+            android:scaleType="fitCenter"
             android:src="@drawable/ic_crystal"
             android:tooltipText="@string/sketch_toolbar_symbol"
-            android:contentDescription="@string/sketch_toolbar_symbol"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/toolbar_button_height"
-            android:scaleType="fitCenter"
-            android:id="@+id/buttonSymbol"
-            android:visibility="gone"
-            />
+            android:visibility="gone" />
+
         <ImageButton
-            android:layout_weight="0.2"
-            android:src="@drawable/text"
-            android:tooltipText="@string/sketch_toolbar_text"
-            android:contentDescription="@string/sketch_toolbar_text"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/toolbar_button_height"
-            android:scaleType="fitCenter"
             android:id="@+id/buttonText"
-            />
-        <ImageButton
-            android:layout_weight="0.2"
-            android:src="@drawable/select"
-            android:tooltipText="@string/sketch_toolbar_selector"
-            android:contentDescription="@string/sketch_toolbar_selector"
             android:layout_width="0dp"
             android:layout_height="@dimen/toolbar_button_height"
+            android:layout_weight="0.2"
+            android:contentDescription="@string/sketch_toolbar_text"
+            android:hapticFeedbackEnabled="true"
             android:scaleType="fitCenter"
+            android:src="@drawable/text"
+            android:tooltipText="@string/sketch_toolbar_text" />
+
+        <ImageButton
             android:id="@+id/buttonSelect"
-            />
-        <ImageButton
-            android:layout_weight="0.2"
-            android:src="@drawable/settings"
-            android:tooltipText="@string/sketch_toolbar_settings"
-            android:contentDescription="@string/sketch_toolbar_settings"
             android:layout_width="0dp"
             android:layout_height="@dimen/toolbar_button_height"
+            android:layout_weight="0.2"
+            android:contentDescription="@string/sketch_toolbar_selector"
+            android:hapticFeedbackEnabled="true"
             android:scaleType="fitCenter"
+            android:src="@drawable/select"
+            android:tooltipText="@string/sketch_toolbar_selector" />
+
+        <ImageButton
             android:id="@+id/buttonMenu"
-            />
-        <ImageButton
-            android:layout_weight="0.2"
-            android:src="@drawable/undo"
-            android:tooltipText="@string/sketch_toolbar_undo"
-            android:contentDescription="@string/sketch_toolbar_undo"
             android:layout_width="0dp"
             android:layout_height="@dimen/toolbar_button_height"
+            android:layout_weight="0.2"
+            android:contentDescription="@string/sketch_toolbar_settings"
+            android:hapticFeedbackEnabled="true"
             android:scaleType="fitCenter"
+            android:src="@drawable/settings"
+            android:tooltipText="@string/sketch_toolbar_settings" />
+
+        <ImageButton
             android:id="@+id/buttonUndo"
-            />
-        <ImageButton
-            android:layout_weight="0.2"
-            android:src="@drawable/redo"
-            android:tooltipText="@string/sketch_toolbar_redo"
-            android:contentDescription="@string/sketch_toolbar_redo"
             android:layout_width="0dp"
             android:layout_height="@dimen/toolbar_button_height"
+            android:layout_weight="0.2"
+            android:contentDescription="@string/sketch_toolbar_undo"
+            android:hapticFeedbackEnabled="true"
             android:scaleType="fitCenter"
+            android:src="@drawable/undo"
+            android:tooltipText="@string/sketch_toolbar_undo" />
+
+        <ImageButton
             android:id="@+id/buttonRedo"
-            />
-        <ImageButton
-            android:layout_weight="0.2"
-            android:src="@drawable/zoom_out"
-            android:tooltipText="@string/sketch_toolbar_zoom_out"
-            android:contentDescription="@string/sketch_toolbar_zoom_out"
             android:layout_width="0dp"
             android:layout_height="@dimen/toolbar_button_height"
+            android:layout_weight="0.2"
+            android:contentDescription="@string/sketch_toolbar_redo"
+            android:hapticFeedbackEnabled="true"
             android:scaleType="fitCenter"
+            android:src="@drawable/redo"
+            android:tooltipText="@string/sketch_toolbar_redo" />
+
+        <ImageButton
             android:id="@+id/buttonZoomOut"
-            />
+            android:layout_width="0dp"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:layout_weight="0.2"
+            android:contentDescription="@string/sketch_toolbar_zoom_out"
+            android:hapticFeedbackEnabled="true"
+            android:scaleType="fitCenter"
+            android:src="@drawable/zoom_out"
+            android:tooltipText="@string/sketch_toolbar_zoom_out" />
     </LinearLayout>
 
 </LinearLayout>
