@@ -29,7 +29,7 @@
             android:layout_alignParentEnd="true"
             android:tooltipText="@string/sketch_toolbar_symbol_close"
             android:contentDescription="@string/sketch_toolbar_symbol_close"
-             />
+            />
 
     </RelativeLayout>
 
@@ -43,13 +43,12 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="1.8"
         android:background="@color/panelBackground">
 
         <ImageButton
             android:layout_weight="0.2"
             android:src="@drawable/black"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonBlack"
@@ -59,7 +58,7 @@
         <ImageButton
             android:layout_weight="0.2"
             android:src="@drawable/brown"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonBrown"
@@ -69,7 +68,7 @@
         <ImageButton
             android:layout_weight="0.2"
             android:src="@drawable/grey"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonGrey"
@@ -79,7 +78,7 @@
         <ImageButton
             android:layout_weight="0.2"
             android:src="@drawable/red"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonRed"
@@ -89,7 +88,7 @@
         <ImageButton
             android:layout_weight="0.2"
             android:src="@drawable/orange"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonOrange"
@@ -99,7 +98,7 @@
         <ImageButton
             android:layout_weight="0.2"
             android:src="@drawable/green"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonGreen"
@@ -109,7 +108,7 @@
         <ImageButton
             android:layout_weight="0.2"
             android:src="@drawable/blue"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonBlue"
@@ -119,7 +118,7 @@
         <ImageButton
             android:layout_weight="0.2"
             android:src="@drawable/purple"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonPurple"
@@ -131,7 +130,7 @@
             android:src="@drawable/zoom_in"
             android:tooltipText="@string/sketch_toolbar_zoom_in"
             android:contentDescription="@string/sketch_toolbar_zoom_in"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonZoomIn"
@@ -142,7 +141,6 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="1.8"
         android:background="@color/panelBackground">
 
         <ImageButton
@@ -150,7 +148,7 @@
             android:src="@drawable/pencil"
             android:tooltipText="@string/sketch_toolbar_draw"
             android:contentDescription="@string/sketch_toolbar_draw"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonDraw"
@@ -160,7 +158,7 @@
             android:src="@drawable/move"
             android:tooltipText="@string/sketch_toolbar_move"
             android:contentDescription="@string/sketch_toolbar_move"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonMove"
@@ -170,7 +168,7 @@
             android:src="@drawable/eraser"
             android:tooltipText="@string/sketch_toolbar_eraser"
             android:contentDescription="@string/sketch_toolbar_eraser"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonErase"
@@ -180,7 +178,7 @@
             android:src="@drawable/ic_crystal"
             android:tooltipText="@string/sketch_toolbar_symbol"
             android:contentDescription="@string/sketch_toolbar_symbol"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonSymbol"
@@ -191,7 +189,7 @@
             android:src="@drawable/text"
             android:tooltipText="@string/sketch_toolbar_text"
             android:contentDescription="@string/sketch_toolbar_text"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonText"
@@ -201,7 +199,7 @@
             android:src="@drawable/select"
             android:tooltipText="@string/sketch_toolbar_selector"
             android:contentDescription="@string/sketch_toolbar_selector"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonSelect"
@@ -211,7 +209,7 @@
             android:src="@drawable/settings"
             android:tooltipText="@string/sketch_toolbar_settings"
             android:contentDescription="@string/sketch_toolbar_settings"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonMenu"
@@ -221,7 +219,7 @@
             android:src="@drawable/undo"
             android:tooltipText="@string/sketch_toolbar_undo"
             android:contentDescription="@string/sketch_toolbar_undo"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonUndo"
@@ -231,7 +229,7 @@
             android:src="@drawable/redo"
             android:tooltipText="@string/sketch_toolbar_redo"
             android:contentDescription="@string/sketch_toolbar_redo"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonRedo"
@@ -241,7 +239,7 @@
             android:src="@drawable/zoom_out"
             android:tooltipText="@string/sketch_toolbar_zoom_out"
             android:contentDescription="@string/sketch_toolbar_zoom_out"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonZoomOut"
