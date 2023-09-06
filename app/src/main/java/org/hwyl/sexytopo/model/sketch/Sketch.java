@@ -1,7 +1,6 @@
 package org.hwyl.sexytopo.model.sketch;
 
 import org.apache.commons.lang3.NotImplementedException;
-import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -94,8 +93,8 @@ public class Sketch extends SketchDetail {
         return symbolDetails;
     }
 
-    public void addSymbolDetail(Coord2D location, Symbol symbol, float size) {
-        SymbolDetail symbolDetail = new SymbolDetail(location, symbol, activeColour, size);
+    public void addSymbolDetail(Coord2D location, Symbol symbol, float size, float angle) {
+        SymbolDetail symbolDetail = new SymbolDetail(location, symbol, activeColour, size, angle);
         symbolDetails.add(symbolDetail);
         addSketchDetail(symbolDetail);
     }

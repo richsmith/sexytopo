@@ -175,6 +175,7 @@
     <string name="sketch_menu_show_connect">Linked Surveys</string>
     <string name="sketch_menu_back_measurements">Reverse Legs</string>
     <string name="sketch_position_cross_section_instruction">Select where to draw cross-section</string>
+    <string name="sketch_symbol_orientation_education">Drag to set symbol direction</string>
 
     <!-- Table view -->
     <string name="table_head_from">From</string>
@@ -394,9 +395,9 @@
     <string name="settings_two_finger_movement_title">Two-finger movement (experimental)</string>
     <string name="settings_two_finger_movement_summary">Two fingers move the screen even when drawing etc.</string>
     <string name="settings_survey_text_tool_font_size_title">Text tool label size</string>
-    <string name="settings_survey_text_tool_font_size_summary">How big to initially draw manually-placed text (pixels)</string>
+    <string name="settings_survey_text_tool_font_size_summary">How big to initially draw manually-placed text (sp)</string>
     <string name="settings_survey_symbol_size_title">Survey symbol size</string>
-    <string name="settings_survey_symbol_size_summary">How big to initially draw symbols (pixels)</string>
+    <string name="settings_survey_symbol_size_summary">How big to initially draw symbols (dp)</string>
     <string name="settings_leg_width_title">Leg line thickness</string>
     <string name="settings_leg_width_summary">How wide to draw leg lines</string>
     <string name="settings_splay_width_title">Splay line thickness</string>
@@ -427,6 +428,28 @@
     <string name="survey_update_adding_leg">Adding leg %1$s</string>
     <string name="survey_update_reversed_leg">Reversed leg %1$s to %2$s</string>
 
+    <!-- Survey symbols -->
+    <string name="symbol_text">Text</string>
+    <string name="symbol_entrance">Entrance</string>
+    <string name="symbol_gradient">Gradient</string>
+    <string name="symbol_too_tight">Too tight</string>
+    <string name="symbol_sand">Sand</string>
+    <string name="symbol_clay">Clay</string>
+    <string name="symbol_pebbles">Pebbles</string>
+    <string name="symbol_blocks">Blocks</string>
+    <string name="symbol_stalactite">Stalactite</string>
+    <string name="symbol_stalagmite">Stalagmite</string>
+    <string name="symbol_column">Column</string>
+    <string name="symbol_curtain">Curtain</string>
+    <string name="symbol_straws">Straws</string>
+    <string name="symbol_helictites">Helictites</string>
+    <string name="symbol_crystals">Crystals</string>
+    <string name="symbol_gour">Gour</string>
+    <string name="symbol_water_flow">Flow</string>
+    <string name="symbol_air_draught">Air draught</string>
+    <string name="symbol_guano">Guano</string>
+    <string name="symbol_debris">Debris</string>
+
     <!-- Context menu(s) -->
     <string name="menu_context_title">Station</string>
     <string name="menu_set_active_station">Set Active Station</string>
@@ -454,7 +477,6 @@
     <string name="context_move_leg_no_valid_move">Nowhere valid to move this leg</string>
     <string name="context_rename_splay_error">Cannot rename a splay end</string>
     <string name="context_set_active_splay_error">Cannot set splay end as the active station</string>
-
 
     <!-- Logging -->
     <string name="log_starting_up">Starting up</string>

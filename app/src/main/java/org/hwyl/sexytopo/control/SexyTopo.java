@@ -3,6 +3,7 @@ package org.hwyl.sexytopo.control;
 import android.app.Application;
 import android.content.Context;
 import android.content.res.Resources;
+import android.util.DisplayMetrics;
 import android.widget.Toast;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
@@ -55,5 +56,10 @@ public class SexyTopo extends Application {
 
     public static void showToast(String message) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+    }
+
+    public static float dpToPixels(float dp){
+        return dp * ((float)
+            resources.getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
     }
 }

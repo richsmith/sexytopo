@@ -7,6 +7,7 @@
     <color name="station">@color/pink</color>
     <color name="buttonHighlight">@color/darkGrey</color>
     <color name="legend">@color/lightGrey</color>
-
+    <color name="panelBackground">@color/sexyTopoDarkGreen</color>
+    <color name="headerBackground">@color/sexyTopoDarkGreen</color>
 
 </resources>

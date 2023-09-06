@@ -1,32 +1,61 @@
 package org.hwyl.sexytopo.model.sketch;
 
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.DisplayMetrics;
+import android.graphics.drawable.Drawable;
+
+import androidx.core.content.res.ResourcesCompat;
 
 import org.hwyl.sexytopo.R;
 
 
 public enum Symbol {
 
-    STALACTITE(R.drawable.ic_stalactite),
-    STALAGMITE(R.drawable.ic_stalagmite),
-    COLUMN(R.drawable.ic_column),
-    STRAWS(R.drawable.ic_straws),
-    HELICTITE(R.drawable.ic_helictite),
-    CRYSTAL(R.drawable.ic_crystal);
+    // ********** Special **********
+    TEXT(R.string.symbol_entrance, R.drawable.text, false),
+
+    // ********** Cave geometry **********
+    ENTRANCE(R.string.symbol_entrance, R.drawable.symbol_uis_entrance, true),
+    GRADIENT(R.string.symbol_gradient, R.drawable.symbol_uis_gradient, true),
+    TOO_TIGHT(R.string.symbol_too_tight, R.drawable.symbol_uis_too_tight, true),
+
+    // ********** Floor stuff **********
+    SAND(R.string.symbol_sand, R.drawable.symbol_uis_sand, false),
+    CLAY(R.string.symbol_clay, R.drawable.symbol_uis_clay, false),
+    PEBBLES(R.string.symbol_pebbles, R.drawable.symbol_uis_pebbles, false),
+    BLOCKS(R.string.symbol_blocks, R.drawable.symbol_uis_blocks, false),
+
+    // ********** Speleothems **********
+    STALACTITE(R.string.symbol_stalactite, R.drawable.symbol_uis_stalactite, false),
+    STALAGMITE(R.string.symbol_stalagmite, R.drawable.symbol_uis_stalagmite, false),
+    COLUMN(R.string.symbol_column, R.drawable.symbol_uis_column, false),
+    CURTAIN(R.string.symbol_curtain, R.drawable.symbol_uis_curtain, false),
+    STRAWS(R.string.symbol_straws, R.drawable.symbol_uis_straws, false),
+    HELICTITES(R.string.symbol_helictites, R.drawable.symbol_uis_helictite, false),
+    CRYSTALS(R.string.symbol_crystals, R.drawable.symbol_uis_crystal, false),
+    GOUR(R.string.symbol_gour, R.drawable.symbol_uis_gour, true),
+
+    // ********** Fluids **********
+    WATER_FLOW(R.string.symbol_water_flow, R.drawable.symbol_uis_flow, true),
+    AIR_DRAUGHT(R.string.symbol_air_draught, R.drawable.symbol_uis_air_draught, true),
+
+    // ********** Other **********
+    GUANO(R.string.symbol_guano, R.drawable.symbol_uis_guano, false),
+    DEBRIS(R.string.symbol_debris, R.drawable.symbol_uis_debris, false);
 
     private static Resources resources;
 
-    private final int bitmapId;
-    private Bitmap bitmap;
-    private Bitmap buttonBitmap;
+    private final int stringId;
+    private final int drawableId;
+
+    private final boolean isDirectional;
+
 
     private static final Symbol DEFAULT = STALACTITE;
 
-    Symbol(int bitmapId) {
-        this.bitmapId = bitmapId;
+    Symbol(int stringId, int drawableId, boolean isDirectional) {
+        this.stringId = stringId;
+        this.drawableId = drawableId;
+        this.isDirectional = isDirectional;
     }
 
     public static void setResources(Resources resources) {
@@ -37,51 +66,29 @@ public enum Symbol {
         return name == null? DEFAULT : Symbol.valueOf(name);
     }
 
-    public int getBitmapId() {
-        return bitmapId;
+    public String getName() {
+        return resources == null? this.toString() : resources.getString(stringId);
     }
 
-    public Bitmap getBitmap() {
-        if (resources == null) {
-            return null;
-        }
-        if (bitmap == null) {
-            bitmap = BitmapFactory.decodeResource(resources, bitmapId);
-        }
-        return bitmap;
+    public int getDrawableId() {
+        return drawableId;
     }
 
-    public Bitmap getButtonBitmap() {
-        if (resources == null) {
-            return null;
-        }
-
-        if (buttonBitmap == null) {
-            Bitmap bitmap = getBitmap();
-            if (bitmap == null) {
-                return null;
-            }
-
-            int dimen = (int)resources.getDimension(R.dimen.toolbar_button_height);
-            buttonBitmap = Bitmap.createScaledBitmap(bitmap, dimen, dimen, true);
-        }
-
-        return buttonBitmap;
+    public boolean isDirectional() {
+        return isDirectional;
     }
 
-    public Bitmap getBitmapWithHeightDp(float heightDp) {
-        int heightInPixels = (int)convertDpToPixel(heightDp);
-        return Bitmap.createScaledBitmap(getBitmap(), heightInPixels, heightInPixels, true);
+    public int getViewId() {
+        return 4629347 + getDrawableId();
     }
 
-    private static float convertDpToPixel(float dp){
-        return dp * ((float)
-            resources.getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+    public Drawable createDrawable() {
+        return ResourcesCompat.getDrawable(resources, drawableId, null).mutate();
     }
-
 
     public static Symbol getDefault() {
         return STALACTITE;
     }
+
 
 }

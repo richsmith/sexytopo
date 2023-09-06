@@ -180,6 +180,10 @@ public class SketchJsonTranslater {
         json.put(COLOUR_TAG, symbolDetail.getColour().toString());
         json.put(SIZE_TAG, symbolDetail.getSize());
 
+        if (symbolDetail.getAngle() != 0) {
+            json.put(ANGLE_TAG, symbolDetail.getAngle());
+        }
+
         return json;
     }
 
@@ -191,8 +195,9 @@ public class SketchJsonTranslater {
         Symbol symbol = Symbol.valueOf(json.getString(SYMBOL_ID_TAG));
 
         float size = (float)(json.has(SIZE_TAG)? json.getDouble(SIZE_TAG) : 1);
+        float angle = (float)(json.has(ANGLE_TAG)? json.getDouble(ANGLE_TAG) : 0);
 
-        SymbolDetail symbolDetail = new SymbolDetail(location, symbol, colour, size);
+        SymbolDetail symbolDetail = new SymbolDetail(location, symbol, colour, size, angle);
         return symbolDetail;
     }
 

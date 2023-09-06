@@ -4,11 +4,15 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.RoundRectShape;
 import android.os.Bundle;
 import android.view.HapticFeedbackConstants;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -51,7 +55,6 @@ public abstract class GraphActivity extends SexyTopoActivity
     private static final int[] SKETCH_BUTTON_IDS = new int[] {
             R.id.buttonDraw,
             R.id.buttonErase,
-            R.id.buttonText,
             R.id.buttonSymbol,
             R.id.buttonUndo,
             R.id.buttonRedo,
@@ -82,7 +85,9 @@ public abstract class GraphActivity extends SexyTopoActivity
     private BroadcastReceiver updatedReceiver;
     private BroadcastReceiver createdReceiver;
 
-    private int buttonHighlightColour = Colour.WHITE.intValue;
+    private int buttonHighlightColour = Colour.RED.intValue;
+
+    private boolean symbolToolbarOpenedOnce = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,9 +115,6 @@ public abstract class GraphActivity extends SexyTopoActivity
             button.setOnClickListener(this);
         }
 
-        View button = findViewById(R.id.buttonSymbolToolbarClose);
-        button.setOnClickListener(this);
-
         graphView = findViewById(R.id.graphView);
         graphView.setActivity(this);
 
@@ -137,8 +139,8 @@ public abstract class GraphActivity extends SexyTopoActivity
 
         intialiseActivity();
         initialiseGraphView();
-        initialiseTools();
         initialiseSymbolToolbar();
+        initialiseTools();
 
         setSketchButtonsStatus();
     }
@@ -152,9 +154,9 @@ public abstract class GraphActivity extends SexyTopoActivity
     private void registerReceivers() {
         LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
         broadcastManager.registerReceiver(updatedReceiver,
-                new IntentFilter(SexyTopoConstants.SURVEY_UPDATED_EVENT));
+            new IntentFilter(SexyTopoConstants.SURVEY_UPDATED_EVENT));
         broadcastManager.registerReceiver(createdReceiver,
-                new IntentFilter(SexyTopoConstants.NEW_STATION_CREATED_EVENT));
+            new IntentFilter(SexyTopoConstants.NEW_STATION_CREATED_EVENT));
     }
 
     private void unregisterReceivers() {
@@ -284,35 +286,9 @@ public abstract class GraphActivity extends SexyTopoActivity
         GraphView graphView = findViewById(R.id.graphView);
         graphView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
 
-        for (BrushColour brushColour: BrushColour.values()) {
-            if (brushColour.getId() == itemId) {
-                selectBrushColour(brushColour);
-                if (!graphView.getSketchTool().usesColour()) {
-                    selectSketchTool(SketchTool.DRAW);
-                }
-                return true;
-            }
-        }
-
         SketchTool alreadySelectedTool = graphView.getSketchTool();
-        for (SketchTool sketchTool: SketchTool.values()) {
-            if (sketchTool.getId() == itemId) {
-                if (alreadySelectedTool == SketchTool.SYMBOL && sketchTool == SketchTool.SYMBOL) {
-                    toggleSymbolToolbar();
-                } else {
-                    selectSketchTool(sketchTool);
-                }
-                return true;
-            }
-        }
 
-        for (Symbol symbol : Symbol.values()) {
-            if (itemId == symbol.getBitmapId()) {
-                selectSketchTool(SketchTool.SYMBOL);
-                selectSymbol(symbol);
-                return true;
-            }
-        }
+        // ********** Handle special commands **********
 
         if (itemId == R.id.buttonSymbolToolbarClose) {
             setSymbolToolbarOpen(false);
@@ -344,6 +320,50 @@ public abstract class GraphActivity extends SexyTopoActivity
             return true;
         }
 
+        // ********** General colour selection **********
+
+        for (BrushColour brushColour: BrushColour.values()) {
+            if (brushColour.getId() == itemId) {
+                selectBrushColour(brushColour);
+                if (!graphView.getSketchTool().usesColour()) {
+                    selectSketchTool(SketchTool.DRAW);
+                }
+                return true;
+            }
+        }
+
+        // ********** Handle special symbol logic **********
+
+
+        if (itemId == R.id.buttonSymbol) {
+            // Open the symbol toolbar if the symbol tool is selected twice
+            // (also open it the first time ever selected to teach the user that it's there)
+            if (!symbolToolbarOpenedOnce || alreadySelectedTool == SketchTool.SYMBOL) {
+                symbolToolbarOpenedOnce = true;
+                toggleSymbolToolbar();
+            } else { // else standard sketch tool selection
+                selectSketchTool(SketchTool.SYMBOL);
+            }
+            return true;
+        }
+
+        for (Symbol symbol : Symbol.values()) {
+            if (itemId == symbol.getViewId()) {
+                selectSketchTool(SketchTool.SYMBOL);
+                selectSymbol(symbol);
+                return true;
+            }
+        }
+
+        // ********** Handle generic sketch tools **********
+
+        for (SketchTool sketchTool : SketchTool.values()) {
+            if (sketchTool.getId() == itemId) {
+                selectSketchTool(sketchTool);
+                return true;
+            }
+        }
+
         return false;
     }
 
@@ -372,15 +392,18 @@ public abstract class GraphActivity extends SexyTopoActivity
         LinearLayout buttonPanel = findViewById(R.id.symbolToolbarButtonPanel);
         buttonPanel.removeAllViews();
 
+        int heightDp = Math.round(getResources().getDimension(R.dimen.toolbar_button_height));
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(heightDp, heightDp);
+
         for (Symbol symbol : Symbol.values()) {
-            LayoutInflater inflater = LayoutInflater.from(this);
-            LinearLayout linearLayout = (LinearLayout)
-                (inflater.inflate(R.layout.tool_button, buttonPanel, false));
-            ImageButton imageButton = (ImageButton)linearLayout.getChildAt(0);
-            imageButton.setId(symbol.getBitmapId()); // bit hacky :P
-            imageButton.setImageBitmap(symbol.getButtonBitmap());
-            imageButton.setOnClickListener(this);
-            buttonPanel.addView(linearLayout);
+            Drawable drawable = symbol.createDrawable();
+            ImageButton button = new ImageButton(this);
+            button.setId(symbol.getViewId());
+            button.setLayoutParams(params);
+            button.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            button.setImageDrawable(drawable);
+            button.setOnClickListener(this);
+            buttonPanel.addView(button);
         }
         buttonPanel.invalidate();
     }
@@ -401,15 +424,28 @@ public abstract class GraphActivity extends SexyTopoActivity
     private void selectSymbol(Symbol symbol) {
         SketchPreferences.setSelectedSymbol(symbol);
 
-        ImageButton selectedSymbolButton = findViewById(symbol.getBitmapId());
+        for (Symbol s : Symbol.values()) {
+            ImageButton button = findViewById(s.getViewId());
+            button.getBackground().clearColorFilter();
+        }
+
+        ImageButton selectedSymbolButton = findViewById(symbol.getViewId());
         selectedSymbolButton.getBackground().setColorFilter(buttonHighlightColour, PorterDuff.Mode.SRC_ATOP);
 
         ImageButton symbolButton = findViewById(R.id.buttonSymbol);
         symbolButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
-        Symbol.setResources(this.getResources());
-        Bitmap buttonBitmap = symbol.getButtonBitmap();
-        symbolButton.setImageBitmap(buttonBitmap);
+        ShapeDrawable border = new ShapeDrawable(new RoundRectShape(
+                new float[] { 5, 5, 5, 5, 5, 5, 5, 5 }, null, null));
+        border.getPaint().setColor(Color.BLACK); // Set border color
+        border.getPaint().setStyle(Paint.Style.STROKE); // Set to be a border (not filled)
+        border.getPaint().setStrokeWidth(10); // Set border width
+
+        Drawable drawable = symbol.createDrawable();
+        Drawable[] layers = {drawable, border};
+        LayerDrawable layerDrawable = new LayerDrawable(layers);
+        symbolButton.setImageDrawable(layerDrawable);
+
 
         graphView.setCurrentSymbol(symbol);
 
@@ -425,7 +461,7 @@ public abstract class GraphActivity extends SexyTopoActivity
 
         Symbol.setResources(getResources());
         Symbol selectedSymbol = SketchPreferences.getSelectedSymbol();
-        // selectSymbol(selectedSymbol); FIXME currently throwing a NPE
+        selectSymbol(selectedSymbol);
     }
 
 

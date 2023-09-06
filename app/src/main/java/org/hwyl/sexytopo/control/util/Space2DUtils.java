@@ -98,6 +98,14 @@ public class Space2DUtils {
         return new Line<>(start.plus(point), end.plus(point));
     }
 
+    public static float getAngleBetween(Coord2D p0, Coord2D p1) {
+        float deltaY = p0.y - p1.y;
+        float deltaX = p0.x - p1.x;
+        float radians = (float)Math.atan2(deltaY, deltaX);
+        float angle = (float)Math.toDegrees(radians);
+        return angle;
+    }
+
     private static List<Coord2D> douglasPeukerIteration(List<Coord2D> path, float epsilon) {
 
         // Find the point with the maximum distance

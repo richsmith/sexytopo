@@ -45,7 +45,7 @@
             />
         <ImageButton
             android:layout_weight="0.2"
-            android:src="@drawable/ic_stalactite"
+            android:src="@drawable/symbol_uis_stalactite"
             android:tooltipText="@string/sketch_toolbar_symbol"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/toolbar_button_height"

@@ -186,12 +186,12 @@ public class GeneralPreferences {
         return getInt("pref_station_label_font_size_sp", 10);
     }
 
-    public static int getTextStartingSizePixels() {
-        return getInt("pref_survey_text_tool_font_size", 50);
+    public static int getTextStartingSizeSp() {
+        return getInt("pref_survey_text_tool_font_size_sp", 16);
     }
 
-    public static int getSymbolStartingSizePixels() {
-        return getInt("pref_survey_symbol_size", 35);
+    public static int getSymbolStartingSizeDp() {
+        return getInt("pref_survey_symbol_size", 25);
     }
 
     // ********** Calibration ***********
