@@ -1,7 +1,7 @@
 package org.hwyl.sexytopo.model.survey;
 
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
-import org.hwyl.sexytopo.testhelpers.BasicTestSurveyCreator;
+import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
 import org.junit.Assert;
 import org.junit.Test;
 

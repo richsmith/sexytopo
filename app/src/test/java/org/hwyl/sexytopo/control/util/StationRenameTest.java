@@ -4,7 +4,7 @@ package org.hwyl.sexytopo.control.util;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.junit.Assert;
 
-import org.hwyl.sexytopo.testhelpers.BasicTestSurveyCreator;
+import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;

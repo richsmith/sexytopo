@@ -1,14 +1,9 @@
-package org.hwyl.sexytopo.testhelpers;
-
-import android.net.Uri;
-
-import androidx.documentfile.provider.DocumentFile;
+package org.hwyl.sexytopo.testutils;
 
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
-import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,6 +11,10 @@ import java.util.List;
 
 
 public class BasicTestSurveyCreator {
+
+    public static Survey createEmptySurvey() {
+        return new Survey();
+    }
 
 
     public static Survey createStraightNorthThroughRepeats() {
@@ -196,12 +195,4 @@ public class BasicTestSurveyCreator {
         return survey;
     }
 
-    public static void mockSurveyUri(Survey survey, String uri) {
-        Uri mockUri = Mockito.mock(Uri.class);
-        Mockito.when(mockUri.toString()).thenReturn(uri);
-        DocumentFile mockDocumentFile = Mockito.mock(DocumentFile.class);
-        Mockito.when(mockDocumentFile.getUri()).thenReturn(mockUri);
-        Mockito.when(mockDocumentFile.getName()).thenReturn(uri);
-        survey.setDirectory(mockDocumentFile);
-    }
 }

@@ -387,8 +387,6 @@ public abstract class GraphActivity extends SexyTopoActivity
 
 
     private void initialiseSymbolToolbar() {
-        Symbol.setResources(getResources());
-
         LinearLayout buttonPanel = findViewById(R.id.symbolToolbarButtonPanel);
         buttonPanel.removeAllViews();
 

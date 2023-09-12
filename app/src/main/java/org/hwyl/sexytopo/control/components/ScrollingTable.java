@@ -1,4 +1,4 @@
-package org.hwyl.sexytopo.util;
+package org.hwyl.sexytopo.control.components;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

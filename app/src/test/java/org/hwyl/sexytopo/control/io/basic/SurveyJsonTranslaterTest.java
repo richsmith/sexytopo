@@ -1,9 +1,9 @@
 package org.hwyl.sexytopo.control.io.basic;
 
-import org.hwyl.sexytopo.demo.TestSurveyCreator;
+import org.hwyl.sexytopo.testutils.ExampleSurveyCreator;
 import org.hwyl.sexytopo.model.survey.Survey;
-import org.hwyl.sexytopo.testhelpers.BasicTestSurveyCreator;
-import org.hwyl.sexytopo.testhelpers.SurveyChecker;
+import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
+import org.hwyl.sexytopo.testutils.SurveyChecker;
 import org.junit.Test;
 
 
@@ -44,7 +44,7 @@ public class SurveyJsonTranslaterTest {
 
     @Test
     public void testRandomSurveyIsParsed() throws Exception {
-        Survey survey = TestSurveyCreator.create(10, 10);
+        Survey survey = ExampleSurveyCreator.create(10, 10);
         String text = SurveyJsonTranslater.toText(survey, "test", 0);
 
         Survey newSurvey = new Survey();

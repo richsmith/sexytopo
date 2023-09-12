@@ -491,5 +491,6 @@
     <string name="tool_force_crash_message">Boom! Forced crash requested(!)</string>
     <string name="request_code_error">Error code %1$d from request code %2$d</string>
     <string name="killing_comms_process">Killing comms process</string>
+    <string name="setup_error_load_symbol_svg">Error loading symbol SVG %1$s</string>
 
 </resources>

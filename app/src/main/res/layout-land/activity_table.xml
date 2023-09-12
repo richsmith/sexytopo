@@ -45,7 +45,7 @@
 
     </RelativeLayout>
 
-    <org.hwyl.sexytopo.util.ScrollingTable
+    <org.hwyl.sexytopo.control.components.ScrollingTable
         android:layout_width="0dp"
         android:orientation="vertical" android:layout_weight="1"
         android:layout_height="match_parent">
@@ -96,6 +96,6 @@
 
             </TableLayout>
         </ScrollView>
-    </org.hwyl.sexytopo.util.ScrollingTable>
+    </org.hwyl.sexytopo.control.components.ScrollingTable>
 
 </LinearLayout>

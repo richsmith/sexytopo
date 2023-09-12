@@ -51,7 +51,7 @@ import org.hwyl.sexytopo.control.io.translation.ImportManager;
 import org.hwyl.sexytopo.control.io.translation.SelectableExporters;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.InputMode;
-import org.hwyl.sexytopo.demo.TestSurveyCreator;
+import org.hwyl.sexytopo.testutils.ExampleSurveyCreator;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.SurveyConnection;
@@ -991,7 +991,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 .setCancelable(false)
                 .setPositiveButton(R.string.replace, (dialog, id) -> {
                     try {
-                        Survey currentSurvey = TestSurveyCreator.create(10, 5);
+                        Survey currentSurvey = ExampleSurveyCreator.create(10, 5);
                         setSurvey(currentSurvey);
                     } catch (Exception exception) {
                         showExceptionAndLog(R.string.tool_generate_test_error, exception);

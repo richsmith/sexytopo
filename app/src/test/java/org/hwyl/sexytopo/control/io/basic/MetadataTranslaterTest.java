@@ -6,7 +6,8 @@ import static org.mockito.ArgumentMatchers.anySet;
 
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
-import org.hwyl.sexytopo.testhelpers.BasicTestSurveyCreator;
+import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
+import org.hwyl.sexytopo.testhelpers.SurveyMocker;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -38,9 +39,9 @@ public class MetadataTranslaterTest {
     @Test
     public void testConnectedSurveyIsTranslatedToJson() throws Exception {
         Survey survey = new Survey();
-        BasicTestSurveyCreator.mockSurveyUri(survey, "basic");
+        SurveyMocker.mockSurveyUri(survey, "basic");
         Survey connectedSurvey = new Survey();
-        BasicTestSurveyCreator.mockSurveyUri(connectedSurvey, "connected");
+        SurveyMocker.mockSurveyUri(connectedSurvey, "connected");
         connectTwoSurveys(survey, survey.getOrigin(), connectedSurvey, connectedSurvey.getOrigin());
         String translated = MetadataTranslater.translate(survey);
         Assert.assertEquals(

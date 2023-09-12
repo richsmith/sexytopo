@@ -1,7 +1,7 @@
 package org.hwyl.sexytopo.control.io.thirdparty.xvi;
 
-import org.hwyl.sexytopo.testhelpers.BasicTestSketchCreator;
-import org.hwyl.sexytopo.testhelpers.BasicTestSurveyCreator;
+import org.hwyl.sexytopo.testutils.BasicTestSketchCreator;
+import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
 import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.junit.Assert;

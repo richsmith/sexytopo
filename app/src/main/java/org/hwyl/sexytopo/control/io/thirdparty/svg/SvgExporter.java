@@ -9,6 +9,7 @@ import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
+import org.hwyl.sexytopo.model.sketch.SymbolDetail;
 import org.hwyl.sexytopo.model.sketch.TextDetail;
 import org.xmlpull.v1.XmlSerializer;
 
@@ -68,6 +69,10 @@ public class SvgExporter extends DoubleSketchFileExporter {
         for (TextDetail textDetail : sketch.getTextDetails()) {
             writeTextDetail(xmlSerializer, textDetail, scale);
         }
+
+        for (SymbolDetail symbolDetail : sketch.getSymbolDetails()) {
+            writeSymbolDetail(xmlSerializer, symbolDetail, scale);
+        }
     }
 
     private static void writePathDetail(
@@ -102,6 +107,16 @@ public class SvgExporter extends DoubleSketchFileExporter {
         xmlSerializer.attribute(null, "stroke", textDetail.getColour().toString());
         xmlSerializer.text(textDetail.getText());
         xmlSerializer.endTag(null,"text");
+    }
+
+    private static void writeSymbolDetail(
+        XmlSerializer xmlSerializer, SymbolDetail symbolDetail, int scale)  throws IOException {
+
+        xmlSerializer.startTag(null, "svg");
+        String svg = symbolDetail.getSymbol().asRawSvg();
+        xmlSerializer.entityRef(svg);
+        //xmlSerializer.text(svg);
+        xmlSerializer.endTag(null, "svg");
     }
 
 
