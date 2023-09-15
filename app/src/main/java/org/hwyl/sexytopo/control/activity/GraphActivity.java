@@ -348,7 +348,7 @@ public abstract class GraphActivity extends SexyTopoActivity
         }
 
         for (Symbol symbol : Symbol.values()) {
-            if (itemId == symbol.getViewId()) {
+            if (itemId == symbol.getButtonViewId()) {
                 selectSketchTool(SketchTool.SYMBOL);
                 selectSymbol(symbol);
                 return true;
@@ -396,7 +396,7 @@ public abstract class GraphActivity extends SexyTopoActivity
         for (Symbol symbol : Symbol.values()) {
             Drawable drawable = symbol.createDrawable();
             ImageButton button = new ImageButton(this);
-            button.setId(symbol.getViewId());
+            button.setId(symbol.getButtonViewId());
             button.setLayoutParams(params);
             button.setScaleType(ImageView.ScaleType.FIT_CENTER);
             button.setImageDrawable(drawable);
@@ -423,11 +423,11 @@ public abstract class GraphActivity extends SexyTopoActivity
         SketchPreferences.setSelectedSymbol(symbol);
 
         for (Symbol s : Symbol.values()) {
-            ImageButton button = findViewById(s.getViewId());
+            ImageButton button = findViewById(s.getButtonViewId());
             button.getBackground().clearColorFilter();
         }
 
-        ImageButton selectedSymbolButton = findViewById(symbol.getViewId());
+        ImageButton selectedSymbolButton = findViewById(symbol.getButtonViewId());
         selectedSymbolButton.getBackground().setColorFilter(buttonHighlightColour, PorterDuff.Mode.SRC_ATOP);
 
         ImageButton symbolButton = findViewById(R.id.buttonSymbol);

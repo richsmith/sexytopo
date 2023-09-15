@@ -51,7 +51,7 @@ public enum Symbol {
 
     private static Resources resources;
 
-    private final int viewId = getViewId();
+    private final int viewId;
     private final int stringId;
     private final int drawableId;
     private final String svgFilename;
@@ -69,6 +69,7 @@ public enum Symbol {
         this.drawableId = drawableId;
         this.svgFilename = svgFilename;
         this.isDirectional = isDirectional;
+        this.viewId = this.hashCode() + drawableId;  // arbitrary, hopefully unique value...
     }
 
     public static void setResources(Resources resources) {
@@ -80,7 +81,7 @@ public enum Symbol {
     }
 
 
-    public int getViewId() {
+    public int getButtonViewId() {
         return viewId;
     }
 
