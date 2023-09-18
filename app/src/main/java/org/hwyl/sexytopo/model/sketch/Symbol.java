@@ -85,6 +85,11 @@ public enum Symbol {
         return viewId;
     }
 
+    public String getSvgRefId() {
+        String underscored = this.toString().toLowerCase().replaceAll(" ", "_");
+        return "symbol_" + underscored;
+    }
+
     public String getName() {
         return resources == null? this.toString() : resources.getString(stringId);
     }

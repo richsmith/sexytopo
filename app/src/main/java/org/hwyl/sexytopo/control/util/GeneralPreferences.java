@@ -5,6 +5,9 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 
+import org.hwyl.sexytopo.control.Log;
+import org.hwyl.sexytopo.model.sketch.Colour;
+
 
 public class GeneralPreferences {
 
@@ -198,6 +201,17 @@ public class GeneralPreferences {
 
     public static String getCalibrationAlgorithm() {
         return getString("pref_calibration_algorithm", "linear");
+    }
+
+    // ********** Export ***********
+    public static Colour getExportSvgBackgroundColour() {
+        String colour = getString("pref_export_svg_background", "transparent");
+        Log.i("Colour is " + colour);
+        if (colour.toLowerCase().equals("transparent")) {
+            return Colour.TRANSPARENT;
+        } else {
+            return Colour.WHITE;
+        }
     }
 
 

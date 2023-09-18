@@ -415,6 +415,13 @@
     <string name="settings_key_lrud_fields_summary">Show fields for entering LRUDs (Left-Right-Up-Down) for each new station</string>
     <string name="settings_key_deg_mins_secs_title">Azimuth as degrees/minutes/seconds</string>
     <string name="settings_key_deg_mins_secs_summary">Enter azimuth values in deg/mins/secs (as opposed to the default of decimal)</string>
+    <string name="settings_export_title">Export</string>
+    <string name="settings_export_svg_background_title">SVG background</string>
+    <string name="settings_export_svg_background_summary">Optionally export with an opaque background</string>
+    <string-array name="settings_export_svg_background_entries">
+        <item>Transparent</item>
+        <item>White</item>
+    </string-array>
     <string name="settings_developer_title">Developer</string>
     <string name="settings_key_developer_mode_title">Developer mode</string>
     <string name="settings_key_developer_mode_summary">Show debugging menu entries</string>

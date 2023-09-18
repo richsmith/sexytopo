@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.model.sketch;
 
+import org.hwyl.sexytopo.model.graph.BoundingBox;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 
 
@@ -93,5 +94,9 @@ public abstract class SketchDetail {
         } else {
             return new Coord2D(right, bottom);
         }
+    }
+
+    public BoundingBox getBoundingBox() {
+        return new BoundingBox(left, right, top, bottom);
     }
 }

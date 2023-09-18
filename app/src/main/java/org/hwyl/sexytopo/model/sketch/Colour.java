@@ -4,6 +4,8 @@ package org.hwyl.sexytopo.model.sketch;
 @SuppressWarnings("unused")
 public enum Colour {
 
+    TRANSPARENT(-1),
+
     NONE(0),
 
     WHITE(0xFFFFFF),

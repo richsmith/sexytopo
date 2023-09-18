@@ -10,10 +10,14 @@
         <item>portrait</item>
         <item>landscape</item>
     </string-array>
-    <string-array name="settings_calibration_algorithm_options">
+    <string-array name="settings_calibration_algorithm_values">
         <item>auto</item>
         <item>linear</item>
         <item>nonlinear</item>
+    </string-array>
+    <string-array name="settings_export_svg_background_values">
+        <item>transparent</item>
+        <item>white</item>
     </string-array>
 </resources>
 

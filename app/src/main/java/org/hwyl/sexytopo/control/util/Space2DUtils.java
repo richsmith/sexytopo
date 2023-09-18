@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.control.util;
 
+import org.hwyl.sexytopo.model.graph.BoundingBox;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Space;
@@ -104,6 +105,15 @@ public class Space2DUtils {
         float radians = (float)Math.atan2(deltaY, deltaX);
         float angle = (float)Math.toDegrees(radians);
         return angle;
+    }
+
+    public static BoundingBox getBoundingBox(Space<Coord2D> space) {
+        BoundingBox boundingBox = new BoundingBox();
+        for (Line<Coord2D> line : space.getLegMap().values()) {
+            boundingBox.update(line.getStart());
+            boundingBox.update(line.getEnd());
+        }
+        return boundingBox;
     }
 
     private static List<Coord2D> douglasPeukerIteration(List<Coord2D> path, float epsilon) {

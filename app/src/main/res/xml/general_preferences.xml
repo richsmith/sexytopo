@@ -15,8 +15,8 @@
             android:key="pref_orientation"
             android:title="@string/settings_orientation_title"
             android:summary="@string/settings_orientation_summary"
-            android:entries="@array/settings_orientation_values"
-            android:entryValues="@array/settings_orientation_entries"
+            android:entries="@array/settings_orientation_entries"
+            android:entryValues="@array/settings_orientation_values"
             android:defaultValue="auto"/>
         <CheckBoxPreference
             android:key="pref_vibrate_on_new_station"
@@ -52,8 +52,7 @@
             android:key="pref_calibration_algorithm"
             android:title="@string/settings_calibration_algorithm_title"
             android:summary="@string/settings_calibration_algorithm_summary"
-            android:dialogTitle="Select Calibration Algorithm"
-            android:entries="@array/settings_calibration_algorithm_options"
+            android:entries="@array/settings_calibration_algorithm_values"
             android:entryValues="@array/settings_calibration_algorithm_entries"
             android:defaultValue="auto" />
     </PreferenceCategory>
@@ -141,6 +140,17 @@
             android:title="@string/settings_key_deg_mins_secs_title"
             android:summary="@string/settings_key_deg_mins_secs_summary"
             android:defaultValue="false"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/settings_export_title">
+        <ListPreference
+            android:key="pref_export_svg_background"
+            android:title="@string/settings_export_svg_background_title"
+            android:summary="@string/settings_export_svg_background_summary"
+            android:entries="@array/settings_export_svg_background_entries"
+            android:entryValues="@array/settings_export_svg_background_values"
+            android:defaultValue="transparent" />
     </PreferenceCategory>
 
     <PreferenceCategory
