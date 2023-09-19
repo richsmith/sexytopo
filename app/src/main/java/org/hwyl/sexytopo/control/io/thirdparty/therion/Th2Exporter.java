@@ -41,6 +41,7 @@ public class Th2Exporter {
         SketchDimensions dimensions = SketchDimensions.getDimensions(projection);
         double width = dimensions.getWidth();
         double height = dimensions.getHeight();
+
         double widthBorder = 0.2 * width;
         double heightBorder = 0.2 * height;
 

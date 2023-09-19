@@ -207,11 +207,15 @@ public class GeneralPreferences {
     public static Colour getExportSvgBackgroundColour() {
         String colour = getString("pref_export_svg_background", "transparent");
         Log.i("Colour is " + colour);
-        if (colour.toLowerCase().equals("transparent")) {
+        if (colour.equalsIgnoreCase("transparent")) {
             return Colour.TRANSPARENT;
         } else {
             return Colour.WHITE;
         }
+    }
+
+    public static int getExportSvgStrokeWidth() {
+        return getInt("pref_export_svg_stroke_width", 1);
     }
 
 

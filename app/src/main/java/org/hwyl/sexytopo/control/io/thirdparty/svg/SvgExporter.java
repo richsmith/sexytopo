@@ -150,6 +150,7 @@ public class SvgExporter extends DoubleSketchFileExporter {
 
     private static void writePathDetail(
             XmlSerializer xmlSerializer, PathDetail pathDetail, int scale)  throws IOException {
+        Integer strokeWidth = GeneralPreferences.getExportSvgStrokeWidth();
         List<String> coordStrings = new ArrayList<>();
         for (Coord2D coord2D : pathDetail.getPath()) {
             coordStrings.add(toXmlText(coord2D, scale));
@@ -157,7 +158,7 @@ public class SvgExporter extends DoubleSketchFileExporter {
         xmlSerializer.startTag(null,"polyline");
         xmlSerializer.attribute(null, "points", TextTools.join(" ", coordStrings));
         xmlSerializer.attribute(null, "stroke", pathDetail.getColour().toString());
-        xmlSerializer.attribute(null, "stroke-width", "3");
+        xmlSerializer.attribute(null, "stroke-width", strokeWidth.toString());
         xmlSerializer.attribute(null, "fill", "none");
         xmlSerializer.endTag(null,"polyline");
     }
@@ -239,7 +240,7 @@ public class SvgExporter extends DoubleSketchFileExporter {
                 ",", scale * line.getStart().x, scale * line.getStart().y, scale * line.getEnd().x, scale * line.getEnd().y);
             xmlSerializer.attribute("", "points", pointsString);
             xmlSerializer.attribute("", "stroke", "red");
-            xmlSerializer.attribute("", "stroke-width", leg.hasDestination()? "3" : "1");
+            xmlSerializer.attribute("", "stroke-width", leg.hasDestination()? "2" : "1");
             xmlSerializer.attribute("", "fill", "none");
             xmlSerializer.endTag("", "polyline");
         }

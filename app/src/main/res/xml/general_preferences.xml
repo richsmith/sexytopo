@@ -151,6 +151,12 @@
             android:entries="@array/settings_export_svg_background_entries"
             android:entryValues="@array/settings_export_svg_background_values"
             android:defaultValue="transparent" />
+        <EditTextPreference
+            android:key="pref_export_svg_stroke_width"
+            android:title="@string/settings_export_svg_stroke_width_title"
+            android:summary="@string/settings_export_svg_stroke_width_summary"
+            android:inputType="number"
+            android:defaultValue="1"/>
     </PreferenceCategory>
 
     <PreferenceCategory
