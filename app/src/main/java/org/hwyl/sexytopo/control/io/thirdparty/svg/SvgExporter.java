@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @SuppressWarnings({"UnnecessaryLocalVariable", "SameParameterValue"})
@@ -61,13 +63,45 @@ public class SvgExporter extends DoubleSketchFileExporter {
     private static void writeSketch(XmlSerializer xmlSerializer, Sketch sketch, int scale)
             throws IOException {
 
-        for (PathDetail pathDetail : sketch.getPathDetails()) {
-            writePathDetail(xmlSerializer, pathDetail, scale);
+        Set<String> pathColors = getPathColors(sketch);
+        for (String color : pathColors) {
+            xmlSerializer.startTag(null,"g");
+            xmlSerializer.attribute(null, "id", "path_" + color);
+            for (PathDetail pathDetail : sketch.getPathDetails()) {
+                if (pathDetail.getColour().toString().equals(color)) {
+                    writePathDetail(xmlSerializer, pathDetail, scale);
+                }
+            }
+            xmlSerializer.endTag(null,"g");
         }
 
-        for (TextDetail textDetail : sketch.getTextDetails()) {
-            writeTextDetail(xmlSerializer, textDetail, scale);
+        Set<String> textColors = getTextColors(sketch);
+        for (String color : textColors) {
+            xmlSerializer.startTag(null, "g");
+            xmlSerializer.attribute(null, "id", "text_" + color);
+            for (TextDetail textDetail : sketch.getTextDetails()) {
+                if(textDetail.getColour().toString().equals(color)) {
+                    writeTextDetail(xmlSerializer, textDetail, scale);
+                }
+            }
+            xmlSerializer.endTag(null,"g");
         }
+    }
+
+    private static Set<String> getPathColors(Sketch sketch) {
+        Set<String> colors = new HashSet<>();
+        for (PathDetail pathDetail : sketch.getPathDetails()) {
+            colors.add(pathDetail.getColour().toString());
+        }
+        return colors;
+    }
+
+    private static Set<String> getTextColors(Sketch sketch) {
+        Set<String> colors = new HashSet<>();
+        for (TextDetail textDetail : sketch.getTextDetails()) {
+            colors.add(textDetail.getColour().toString());
+        }
+        return colors;
     }
 
     private static void writePathDetail(
@@ -83,8 +117,6 @@ public class SvgExporter extends DoubleSketchFileExporter {
         xmlSerializer.attribute(null, "fill", "none");
         xmlSerializer.endTag(null,"polyline");
     }
-
-
 
     private static String toXmlText(Coord2D coord2D, int scale) {
         return coord2D.x * scale + "," + coord2D.y * scale;
