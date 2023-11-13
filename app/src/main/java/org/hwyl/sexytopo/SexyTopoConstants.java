@@ -54,6 +54,8 @@ public class SexyTopoConstants {
 
     public static final String DEFAULT_MIME_TYPE = "application/json";
 
+    public static final String SVG_MIME_TYPE = "image/svg+xml";
+
     public static final int JSON_INDENT = 2;
 
 

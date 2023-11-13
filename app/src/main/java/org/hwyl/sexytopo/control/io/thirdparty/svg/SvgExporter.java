@@ -4,6 +4,8 @@ import android.content.Context;
 import android.util.Xml;
 
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.SexyTopoConstants;
+import org.hwyl.sexytopo.control.io.SurveyFile;
 import org.hwyl.sexytopo.control.io.translation.DoubleSketchFileExporter;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
 import org.hwyl.sexytopo.control.util.TextTools;
@@ -221,5 +223,14 @@ public class SvgExporter extends DoubleSketchFileExporter {
     @Override
     public String getExportTypeName(Context context) {
         return context.getString(R.string.third_party_svg);
+    }
+
+    protected void saveSketchFile(Context context, String content, String suffix)
+            throws IOException {
+        String extension = getFileExtension();
+        SurveyFile.SurveyFileType fileType =
+                new SurveyFile.SurveyFileType(suffix + "." + extension, SexyTopoConstants.SVG_MIME_TYPE);
+        SurveyFile outputFile = getOutputFile(fileType);
+        outputFile.save(context, content);
     }
 }
