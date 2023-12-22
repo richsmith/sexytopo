@@ -4,9 +4,9 @@ import android.content.Context;
 import android.util.Xml;
 
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.control.io.basic.ExportSizeCalculator;
 import org.hwyl.sexytopo.control.io.translation.DoubleSketchFileExporter;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
-import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.BoundingBox;
 import org.hwyl.sexytopo.model.graph.Coord2D;
@@ -55,15 +55,15 @@ public class SvgExporter extends DoubleSketchFileExporter {
 
         Sketch sketch = survey.getSketch(projectionType);
         Space<Coord2D> projection = projectionType.project(survey);
-        BoundingBox sketchBox = sketch.getBoundingBox();
-        BoundingBox surveyDataBox = Space2DUtils.getBoundingBox(projection);
-        BoundingBox combinedBox = sketchBox.union(surveyDataBox);
 
-        double svgWidth = (combinedBox.getWidth() + (2 * BORDER)) * SCALE;
-        double svgHeight = (combinedBox.getHeight() + (2 * BORDER)) * SCALE;
-        Coord2D topLeft = combinedBox.getTopLeft();
-        double svgTopLeftX = (topLeft.x - BORDER) * SCALE;
-        double svgTopLeftY = (topLeft.y - BORDER) * SCALE;
+        BoundingBox boundingBox = ExportSizeCalculator.getExportBoundingBox(survey, projectionType, SCALE);
+
+
+        double svgWidth = boundingBox.getWidth();
+        double svgHeight = boundingBox.getHeight();
+        Coord2D topLeft = boundingBox.getTopLeft();
+        double svgTopLeftX = boundingBox.getLeft();
+        double svgTopLeftY = boundingBox.getTop();
 
         XmlSerializer xmlSerializer = Xml.newSerializer();
         StringWriter writer = new StringWriter();

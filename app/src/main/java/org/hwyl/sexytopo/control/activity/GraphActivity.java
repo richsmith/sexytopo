@@ -290,10 +290,7 @@ public abstract class GraphActivity extends SexyTopoActivity
 
         // ********** Handle special commands **********
 
-        if (itemId == R.id.buttonSymbolToolbarClose) {
-            setSymbolToolbarOpen(false);
-            return true;
-        } else if (itemId == R.id.buttonZoomIn) {
+        if (itemId == R.id.buttonZoomIn) {
             graphView.adjustZoomBy(ZOOM_INCREMENT);
             graphView.invalidate();
             return true;

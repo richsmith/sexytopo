@@ -18,36 +18,36 @@ public enum Symbol {
 
 
     // ********** Special **********
-    TEXT(R.string.symbol_entrance, R.drawable.text, "text.svg", false),
+    TEXT(R.string.symbol_text, R.drawable.text, "text.svg", false, "label"),
 
     // ********** Cave geometry **********
-    ENTRANCE(R.string.symbol_entrance, R.drawable.symbol_uis_entrance, "symbol_uis_entrance.svg", true),
-    GRADIENT(R.string.symbol_gradient, R.drawable.symbol_uis_gradient, "symbol_uis_gradient.svg", true),
-    TOO_TIGHT(R.string.symbol_too_tight, R.drawable.symbol_uis_too_tight, "symbol_uis_too_tight.svg", true),
+    ENTRANCE(R.string.symbol_entrance, R.drawable.symbol_uis_entrance, "symbol_uis_entrance.svg", true, "entrance"),
+    GRADIENT(R.string.symbol_gradient, R.drawable.symbol_uis_gradient, "symbol_uis_gradient.svg", true, "gradient"),
+    TOO_TIGHT(R.string.symbol_too_tight, R.drawable.symbol_uis_too_tight, "symbol_uis_too_tight.svg", true, "narrow-end"),
 
     // ********** Floor stuff **********
-    SAND(R.string.symbol_sand, R.drawable.symbol_uis_sand, "symbol_uis_sand.svg", false),
-    CLAY(R.string.symbol_clay, R.drawable.symbol_uis_clay, "symbol_uis_clay.svg", false),
-    PEBBLES(R.string.symbol_pebbles, R.drawable.symbol_uis_pebbles, "symbol_uis_pebbles.svg", false),
-    BLOCKS(R.string.symbol_blocks, R.drawable.symbol_uis_blocks, "symbol_uis_blocks.svg", false),
+    SAND(R.string.symbol_sand, R.drawable.symbol_uis_sand, "symbol_uis_sand.svg", false, "sand"),
+    CLAY(R.string.symbol_clay, R.drawable.symbol_uis_clay, "symbol_uis_clay.svg", false, "clay"),
+    PEBBLES(R.string.symbol_pebbles, R.drawable.symbol_uis_pebbles, "symbol_uis_pebbles.svg", false, "pebbles"),
+    BLOCKS(R.string.symbol_blocks, R.drawable.symbol_uis_blocks, "symbol_uis_blocks.svg", false, "blocks"),
 
     // ********** Speleothems **********
-    STALACTITE(R.string.symbol_stalactite, R.drawable.symbol_uis_stalactite, "symbol_uis_stalactite.svg", false),
-    STALAGMITE(R.string.symbol_stalagmite, R.drawable.symbol_uis_stalagmite, "symbol_uis_stalagmite.svg", false),
-    COLUMN(R.string.symbol_column, R.drawable.symbol_uis_column, "symbol_uis_column.svg", false),
-    CURTAIN(R.string.symbol_curtain, R.drawable.symbol_uis_curtain, "symbol_uis_curtain.svg", false),
-    STRAWS(R.string.symbol_straws, R.drawable.symbol_uis_straws, "symbol_uis_straws.svg", false),
-    HELICTITES(R.string.symbol_helictites, R.drawable.symbol_uis_helictite, "symbol_uis_helictite.svg", false),
-    CRYSTALS(R.string.symbol_crystals, R.drawable.symbol_uis_crystal, "symbol_uis_crystal.svg", false),
-    GOUR(R.string.symbol_gour, R.drawable.symbol_uis_gour, "symbol_uis_gour.svg", true),
+    STALACTITE(R.string.symbol_stalactite, R.drawable.symbol_uis_stalactite, "symbol_uis_stalactite.svg", false, "stalactite"),
+    STALAGMITE(R.string.symbol_stalagmite, R.drawable.symbol_uis_stalagmite, "symbol_uis_stalagmite.svg", false, "stalagmite"),
+    COLUMN(R.string.symbol_column, R.drawable.symbol_uis_column, "symbol_uis_column.svg", false, "pillar"),
+    CURTAIN(R.string.symbol_curtain, R.drawable.symbol_uis_curtain, "symbol_uis_curtain.svg", false, "curtain"),
+    STRAWS(R.string.symbol_straws, R.drawable.symbol_uis_straws, "symbol_uis_straws.svg", false, "soda-straw"),
+    HELICTITES(R.string.symbol_helictites, R.drawable.symbol_uis_helictite, "symbol_uis_helictite.svg", false, "helictite"),
+    CRYSTALS(R.string.symbol_crystals, R.drawable.symbol_uis_crystal, "symbol_uis_crystal.svg", false, "crystal"),
+    GOUR(R.string.symbol_gour, R.drawable.symbol_uis_gour, "symbol_uis_gour.svg", true, "rimstone-dam"),
 
     // ********** Fluids **********
-    WATER_FLOW(R.string.symbol_water_flow, R.drawable.symbol_uis_flow, "symbol_uis_flow.svg", true),
-    AIR_DRAUGHT(R.string.symbol_air_draught, R.drawable.symbol_uis_air_draught, "symbol_uis_air_draught.svg", true),
+    WATER_FLOW(R.string.symbol_water_flow, R.drawable.symbol_uis_flow, "symbol_uis_flow.svg", true, "water-flow"),
+    AIR_DRAUGHT(R.string.symbol_air_draught, R.drawable.symbol_uis_air_draught, "symbol_uis_air_draught.svg", true, "air-draught"),
 
     // ********** Other **********
-    GUANO(R.string.symbol_guano, R.drawable.symbol_uis_guano, "symbol_uis_guano.svg", false),
-    DEBRIS(R.string.symbol_debris, R.drawable.symbol_uis_debris, "symbol_uis_debris.svg", false);
+    GUANO(R.string.symbol_guano, R.drawable.symbol_uis_guano, "symbol_uis_guano.svg", false, "guano"),
+    DEBRIS(R.string.symbol_debris, R.drawable.symbol_uis_debris, "symbol_uis_debris.svg", false, "debris");
 
     private static Resources resources;
 
@@ -59,16 +59,19 @@ public enum Symbol {
 
     private final boolean isDirectional;
 
+    private String therionName;
+
 
     private static final Symbol DEFAULT = TEXT;
 
     public static final String SVG_DIR = "svg/symbols/";
 
-    Symbol(int stringId, int drawableId, String svgFilename, boolean isDirectional) {
+    Symbol(int stringId, int drawableId, String svgFilename, boolean isDirectional, String therionName) {
         this.stringId = stringId;
         this.drawableId = drawableId;
         this.svgFilename = svgFilename;
         this.isDirectional = isDirectional;
+        this.therionName = therionName;
         this.viewId = this.hashCode() + drawableId;  // arbitrary, hopefully unique value...
     }
 
@@ -96,6 +99,10 @@ public enum Symbol {
 
     public boolean isDirectional() {
         return isDirectional;
+    }
+
+    public String getTherionName() {
+        return therionName;
     }
 
     public String asRawSvg() {

@@ -4,13 +4,14 @@ import android.content.Context;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.io.SurveyFile;
+import org.hwyl.sexytopo.control.io.basic.ExportSizeCalculator;
 import org.hwyl.sexytopo.control.io.thirdparty.xvi.XviExporter;
 import org.hwyl.sexytopo.control.io.translation.Exporter;
 import org.hwyl.sexytopo.control.util.SpaceFlipper;
+import org.hwyl.sexytopo.model.graph.BoundingBox;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
-import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.io.IOException;
@@ -40,6 +41,10 @@ public class TherionExporter extends Exporter {
     private final List<String> th2Files = new ArrayList<>();
 
     public void run(Context context, Survey survey) throws IOException {
+
+        // Therion export notes:
+        // Therion coordinate system is in traditional graph-style, with positive y going up.
+
         th2Files.clear();
         readOriginalFilesIfPresent(context, survey);
 
@@ -49,12 +54,12 @@ public class TherionExporter extends Exporter {
 
         SurveyFile th2_plan_file = getOutputFile(TH2_PLAN);
         SurveyFile xvi_plan_file = getOutputFile(XVI_PLAN);
-        handleProjection(context, survey, Projection2D.PLAN, survey.getPlanSketch(),
+        handleProjection(context, survey, Projection2D.PLAN,
                 th2_plan_file, xvi_plan_file, originalTh2PlanFileContent);
 
         SurveyFile th2_ee_file = getOutputFile(TH2_EE);
         SurveyFile xvi_ee_file = getOutputFile(XVI_EE);
-        handleProjection(context, survey, Projection2D.EXTENDED_ELEVATION, survey.getElevationSketch(),
+        handleProjection(context, survey, Projection2D.EXTENDED_ELEVATION,
                 th2_ee_file, xvi_ee_file, originalTh2EeFileContent);
 
         String thContent;
@@ -72,7 +77,6 @@ public class TherionExporter extends Exporter {
             Context context,
             Survey survey,
             Projection2D projection,
-            Sketch sketch,
             SurveyFile th2File,
             SurveyFile xviFile,
             String originalFileContent)
@@ -83,17 +87,21 @@ public class TherionExporter extends Exporter {
         Space<Coord2D> space = projection.project(survey);
         space = SpaceFlipper.flipVertically(space);
 
+        BoundingBox dimensions = ExportSizeCalculator.getExportBoundingBox(survey, projection, scale);
+
         String content;
         if (originalFileContent == null) {
             content = Th2Exporter.getContent(
-                    survey, scale, xviFile.getFilename(), space);
+                    survey, scale, xviFile.getFilename(), dimensions);
         } else {
             content = Th2Exporter.updateOriginalContent(
-                    survey, scale, xviFile.getFilename(), space, originalFileContent);
+                    survey, scale, xviFile.getFilename(), dimensions, originalFileContent);
         }
         th2File.save(context, content);
 
-        String xviContent = XviExporter.getContent(sketch, space, scale);
+
+        //String xviContent = XviExporter.getContent(sketch, space, scale);
+        String xviContent = XviExporter.getContent(survey, projection, scale);
         xviFile.save(context, xviContent);
 
         th2Files.add(th2File.getFilename());

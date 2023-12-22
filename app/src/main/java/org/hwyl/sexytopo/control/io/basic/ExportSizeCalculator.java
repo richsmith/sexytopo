@@ -1,63 +1,57 @@
-package org.hwyl.sexytopo.control.io.thirdparty.therion;
+package org.hwyl.sexytopo.control.io.basic;
 
+import org.hwyl.sexytopo.control.Log;
+import org.hwyl.sexytopo.control.util.Space2DUtils;
+import org.hwyl.sexytopo.model.graph.BoundingBox;
 import org.hwyl.sexytopo.model.graph.Coord2D;
-import org.hwyl.sexytopo.model.graph.Line;
+import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
+import org.hwyl.sexytopo.model.sketch.Sketch;
+import org.hwyl.sexytopo.model.survey.Survey;
 
 
-public class SketchDimensions {
+public class ExportSizeCalculator {
 
-    final public float minX, maxX, minY, maxY;
+    public static BoundingBox getExportBoundingBox(
+            Survey survey, Projection2D projectionType, float scale) {
 
-    private SketchDimensions(float minX, float maxX, float minY, float maxY) {
-        this.minX = minX;
-        this.maxX = maxX;
-        this.minY = minY;
-        this.maxY = maxY;
+        // Basic bounds are the union of the sketch and the survey data
+        Sketch sketch = survey.getSketch(projectionType);
+        Space<Coord2D> projection = projectionType.project(survey);
+        return getExportBoundingBox(sketch, projection, scale);
     }
 
-    public float getWidth() {
-        return Math.abs(maxX - minX);
+    public static BoundingBox getExportBoundingBox(
+            Sketch sketch, Space<Coord2D> projection, float scale) {
+        BoundingBox sketchBox = sketch.getBoundingBox();
+        Log.d("sketchBox: " + sketchBox.toString());
+        BoundingBox surveyDataBox = Space2DUtils.getBoundingBox(projection);
+        Log.d("surveyDataBox: " + surveyDataBox.toString());
+        BoundingBox combinedBox = sketchBox.union(surveyDataBox);
+        Log.d("combinedBox: " + combinedBox.toString());
+        BoundingBox scaledBox = combinedBox.scale(scale);
+        Log.d("scaledBox: " + scaledBox.toString());
+
+        // Add some padding
+        BoundingBox padded;
+        float largestDimension = Math.max(scaledBox.getWidth(), scaledBox.getHeight());
+
+        // guessing here what would be a sensible size for the border
+        if (largestDimension <= 50) {
+            padded = scaledBox.addBorder(5);
+        } else {
+            padded = scaledBox.addBorder(10);
+        }
+
+        Log.d("padded: " + padded.toString());
+
+        // Round up to nearest 10m for tidiness; also good for neat grid size etc.
+        BoundingBox rounded = padded.roundToNearest(10);
+        Log.d("rounded: " + rounded.toString());
+
+        return rounded;
     }
 
-    public float getHeight() {
-        return Math.abs(maxY - minY);
-    }
 
-    public static SketchDimensions getDimensions(Space<Coord2D> space) {
-        Float minX = null, maxX = null, minY = null, maxY = null;
-        for (Line<Coord2D> line : space.getLegMap().values()) {
-            for (Coord2D point : new Coord2D[]{line.getStart(), line.getEnd()}) {
-                if (minX == null || point.x < minX) {
-                    minX = point.x;
-                }
-                if (maxX == null || point.x > maxX) {
-                    maxX = point.x;
-                }
-                if (minY == null || point.y < minY) {
-                    minY = point.y;
-                }
-                if (maxY == null || point.y > maxY) {
-                    maxY = point.y;
-                }
-            }
-        }
-
-        if (minX == null) {
-            minX = 0.0f;
-        }
-        if (maxX == null) {
-            maxX = 20.0f;
-        }
-        if (minY == null) {
-            minY = 0.0f;
-        }
-        if (maxY == null) {
-            maxY = 20.0f;
-        }
-
-        return new SketchDimensions(minX, maxX, minY, maxY);
-
-    }
 
 }

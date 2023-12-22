@@ -1,5 +1,7 @@
 package org.hwyl.sexytopo.model.graph;
 
+import org.hwyl.sexytopo.control.util.TextTools;
+
 public class BoundingBox {
 
     private float left;
@@ -11,8 +13,8 @@ public class BoundingBox {
         this(
             Float.POSITIVE_INFINITY,
             Float.NEGATIVE_INFINITY,
-            Float.POSITIVE_INFINITY,
-            Float.NEGATIVE_INFINITY);
+            Float.NEGATIVE_INFINITY,
+            Float.POSITIVE_INFINITY);
     }
 
     public BoundingBox(float left, float right, float top, float bottom) {
@@ -30,6 +32,37 @@ public class BoundingBox {
         }
     }
 
+    public float getLeft() {
+        if (left == Float.POSITIVE_INFINITY) {
+            return 0;
+        } else {
+            return left;
+        }
+    }
+
+    public float getBottom() {
+        if (bottom == Float.NEGATIVE_INFINITY) {
+            return 0;
+        } else {
+            return bottom;
+        }
+    }
+
+    public float getTop() {
+        if (top == Float.POSITIVE_INFINITY) {
+            return 0;
+        } else {
+            return top;
+        }
+    }
+
+    public float getRight() {
+        if (right == Float.NEGATIVE_INFINITY) {
+            return 0;
+        } else {
+            return right;
+        }
+    }
 
     public Coord2D getBottomRight() {
         if (bottom == Float.NEGATIVE_INFINITY || right == Float.NEGATIVE_INFINITY) {
@@ -58,16 +91,52 @@ public class BoundingBox {
     public void update(Coord2D point) {
         left = Math.min(left, point.x);
         right = Math.max(right, point.x);
-        top = Math.min(top, point.y);
-        bottom = Math.max(bottom, point.y);
+        top = Math.max(top, point.y);
+        bottom = Math.min(bottom, point.y);
     }
 
     public BoundingBox union(BoundingBox boundingBox) {
         return new BoundingBox(
                 Math.min(left, boundingBox.left),
                 Math.max(right, boundingBox.right),
-                Math.min(top, boundingBox.top),
-                Math.max(bottom, boundingBox.bottom)
+                Math.max(top, boundingBox.top),
+                Math.min(bottom, boundingBox.bottom)
         );
+    }
+
+    public BoundingBox roundToNearest(int n) {
+        return new BoundingBox(
+                roundDownTo(left, n),
+                roundUpTo(right, n),
+                roundDownTo(top, n),
+                roundUpTo(bottom, n));
+    }
+
+    public BoundingBox addBorder(int border) {
+        return new BoundingBox(
+            left - border,
+            right + border,
+            top - border,
+            bottom + border);
+    }
+
+    private static int roundUpTo(double value, int n) {
+        return (int)Math.ceil(value / n) * n;
+    }
+
+    private static int roundDownTo(double value, int n) {
+        return (int)Math.floor(value / n) * n;
+    }
+
+    public BoundingBox scale(float scale) {
+        return new BoundingBox(
+            left * scale,
+            right * scale,
+            top * scale,
+            bottom * scale);
+    }
+
+    public String toString() {
+        return "L:" + TextTools.formatTo2dp(left) + " R:" + TextTools.formatTo2dp(right) + " T:" + TextTools.formatTo2dp(top) + " B:" + TextTools.formatTo2dp(bottom);
     }
 }

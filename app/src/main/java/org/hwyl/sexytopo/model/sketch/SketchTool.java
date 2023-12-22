@@ -8,7 +8,7 @@ public enum SketchTool {
     DRAW(R.id.buttonDraw, true, false),
     ERASE(R.id.buttonErase, false, false),
     SYMBOL(R.id.buttonSymbol, true, false),
-    TEXT(R.id.buttonText, true, false),
+    TEXT(387348957, true, false),
     SELECT(R.id.buttonSelect, false, false),
     POSITION_CROSS_SECTION(R.id.graph_station_new_cross_section, false, false),
     PINCH_TO_ZOOM(-1, false, true),

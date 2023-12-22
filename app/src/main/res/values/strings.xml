@@ -274,6 +274,8 @@
     <string name="device_distox_unknown_protocol">Unknown protocol requested</string>
     <string name="device_bric4_name" translatable="false">BRIC4</string>
     <string name="device_bric4_short_name" translatable="false">BRIC4</string>
+    <string name="device_bric5_name" translatable="false">BRIC5</string>
+    <string name="device_bric5_short_name" translatable="false">BRIC5</string>
     <string name="device_bric_command_take_shot">Take Shot</string>
     <string name="device_bric_command_toggle_laser">Toggle Laser</string>
     <string name="device_bric_command_power_off">Power Off</string>

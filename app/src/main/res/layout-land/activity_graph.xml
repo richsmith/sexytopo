@@ -5,6 +5,23 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
 
+    <ScrollView
+        android:id="@+id/symbolToolbar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone">
+        <LinearLayout
+            android:orientation="vertical"
+            android:id="@+id/symbolToolbarButtonPanel"
+            android:weightSum="1"
+            android:background="@color/sexyTopoDarkGreen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        </LinearLayout>
+
+    </ScrollView>
+
+
     <LinearLayout
         android:layout_width="50dp"
         android:layout_height="fill_parent"
@@ -12,6 +29,17 @@
         android:padding="1px"
         android:weightSum="1.8"
         android:background="@color/panelBackground">
+
+        <ImageButton
+            android:layout_weight="0.2"
+            android:src="@drawable/move"
+            android:tooltipText="@string/sketch_toolbar_move"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:scaleType="fitCenter"
+            android:id="@+id/buttonMove"
+            android:hapticFeedbackEnabled="true"
+            />
 
         <ImageButton
             android:layout_weight="0.2"
@@ -23,16 +51,22 @@
             android:id="@+id/buttonDraw"
             android:hapticFeedbackEnabled="true"
             />
+
         <ImageButton
+            android:id="@+id/buttonSymbol"
             android:layout_weight="0.2"
-            android:src="@drawable/move"
-            android:tooltipText="@string/sketch_toolbar_move"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/toolbar_button_height"
-            android:scaleType="fitCenter"
-            android:id="@+id/buttonMove"
+            android:layout_columnWeight="1"
+            android:layout_margin="0dp"
+            android:contentDescription="@string/sketch_toolbar_symbol"
+            android:padding="10dp"
+            android:cropToPadding="false"
             android:hapticFeedbackEnabled="true"
-            />
+            android:scaleType="fitCenter"
+            android:src="@drawable/text"
+            android:tooltipText="@string/sketch_toolbar_symbol" />
+
         <ImageButton
             android:layout_weight="0.2"
             android:src="@drawable/eraser"
@@ -43,26 +77,7 @@
             android:id="@+id/buttonErase"
             android:hapticFeedbackEnabled="true"
             />
-        <ImageButton
-            android:layout_weight="0.2"
-            android:src="@drawable/symbol_uis_stalactite"
-            android:tooltipText="@string/sketch_toolbar_symbol"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/toolbar_button_height"
-            android:scaleType="fitCenter"
-            android:id="@+id/buttonSymbol"
-            android:visibility="gone"
-            />
-        <ImageButton
-            android:layout_weight="0.2"
-            android:src="@drawable/text"
-            android:tooltipText="@string/sketch_toolbar_text"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/toolbar_button_height"
-            android:scaleType="fitCenter"
-            android:id="@+id/buttonText"
-            android:hapticFeedbackEnabled="true"
-            />
+
         <ImageButton
             android:layout_weight="0.2"
             android:src="@drawable/select"
@@ -212,34 +227,6 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"/>
-
-    <RelativeLayout
-        android:id="@+id/symbolToolbar"
-        android:orientation="vertical"
-        android:layout_width="@dimen/toolbar_button_height"
-        android:layout_height="fill_parent"
-        android:background="@color/panelBackground"
-        android:visibility="gone">
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:id="@+id/symbolToolbarButtonPanel"
-            android:weightSum="1"
-            android:layout_width="@dimen/toolbar_button_height"
-            android:layout_height="wrap_content">
-        </LinearLayout>
-
-        <ImageButton
-            android:id="@+id/buttonSymbolToolbarClose"
-            android:layout_width="@dimen/toolbar_button_height"
-            android:layout_height="@dimen/toolbar_button_height"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_close"
-            android:backgroundTint="#DD4444"
-            android:layout_alignParentBottom="true"
-            android:contentDescription="Close symbol toolbar" />
-
-    </RelativeLayout>
     
 
 </LinearLayout>
