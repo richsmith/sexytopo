@@ -21,6 +21,8 @@ public enum InstrumentType {
     DISTOX_BLE(R.string.device_distox_ble_name, R.string.device_distox_ble_short_name, "DistoXBLE-", DistoXBleCommunicator.class),
     DISTOX(R.string.device_distox_name, R.string.device_distox_short_name, "DistoX", DistoXCommunicator.class),
     BRIC4(R.string.device_bric4_name, R.string.device_bric4_short_name, "BRIC4_", Bric4Communicator.class),
+    BRIC5(R.string.device_bric5_name, R.string.device_bric5_short_name, "BRIC5_", Bric4Communicator.class),
+
     SAP5(R.string.device_sap5_name, R.string.device_sap5_short_name, "Shetland", Sap5Communicator.class),
     SAP6(R.string.device_sap6_name, R.string.device_sap6_short_name, "SAP6", SAP6Communicator.class),
     OTHER(R.string.device_unknown_name, R.string.device_unknown_short_name, "", NullCommunicator.class),
