@@ -4,18 +4,29 @@ import android.content.Context;
 import android.util.Xml;
 
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.SexyTopoConstants;
+import org.hwyl.sexytopo.control.io.SurveyFile;
 import org.hwyl.sexytopo.control.io.translation.DoubleSketchFileExporter;
+import org.hwyl.sexytopo.control.util.GraphToListTranslator;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.TextDetail;
+import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.Station;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Queue;
+import java.util.Set;
+import java.util.concurrent.LinkedBlockingQueue;
 
 
 @SuppressWarnings({"UnnecessaryLocalVariable", "SameParameterValue"})
@@ -24,6 +35,13 @@ public class SvgExporter extends DoubleSketchFileExporter {
     public static final int SCALE = 10;
     public static final int BORDER = 10;
 
+    private static final GraphToListTranslator graphToListTranslator = new GraphToListTranslator();
+
+    HashMap<String, LinkedBlockingQueue<PathDetail>> pathsByColors = new HashMap<String, LinkedBlockingQueue<PathDetail>>();
+    HashMap<String, LinkedBlockingQueue<TextDetail>> textsByColors = new HashMap<String, LinkedBlockingQueue<TextDetail>>();
+//    LinkedHashSet<Station> stations = new LinkedHashSet<Station>();
+//    LinkedBlockingQueue<Leg> legs = new LinkedBlockingQueue<Leg>();
+//    HashMap<String, LinkedBlockingQueue<Leg>> splaysByStation = new HashMap<String, LinkedBlockingQueue<Leg>>();
 
     @Override
     public String getContent(Sketch sketch) throws IOException {
@@ -57,22 +75,110 @@ public class SvgExporter extends DoubleSketchFileExporter {
         return text;
     }
 
-
-    private static void writeSketch(XmlSerializer xmlSerializer, Sketch sketch, int scale)
+    private void writeSketch(XmlSerializer xmlSerializer, Sketch sketch, int scale)
             throws IOException {
+//        List<GraphToListTranslator.SurveyListEntry> data =
+//                graphToListTranslator.toChronoListOfSurveyListEntries(survey);
+//
+//        for (GraphToListTranslator.SurveyListEntry entry : data) {
+//            Leg leg = entry.getLeg();
+//            Station from = entry.getFrom();
+//
+//            stations.add(from);
+//            if (leg.hasDestination()) {
+//                legs.add(leg);
+//            }
+//            else {
+//                addSplayToMap(from.getName(), leg);
+//            }
+//        }
+//
+//        xmlSerializer.startTag(null, "g");
+//        xmlSerializer.attribute(null, "id", "legs");
+//        for (Leg leg: legs) {
+//            writeLeg(xmlSerializer, leg, scale);
+//        }
+//        xmlSerializer.endTag(null,"g");
+
 
         for (PathDetail pathDetail : sketch.getPathDetails()) {
-            writePathDetail(xmlSerializer, pathDetail, scale);
+            addPathToMap(pathDetail);
         }
+        for (HashMap.Entry<String, LinkedBlockingQueue<PathDetail>> pathsByColor : pathsByColors.entrySet()) {
+            String color = pathsByColor.getKey();
+            LinkedBlockingQueue<PathDetail> paths = pathsByColor.getValue();
+            xmlSerializer.startTag(null, "g");
+            xmlSerializer.attribute(null, "id", "path_" + color);
+            for (PathDetail path : paths) {
+                writePathDetail(xmlSerializer, path, scale);
+            }
+            xmlSerializer.endTag(null,"g");
+        }
+        pathsByColors.clear();
 
         for (TextDetail textDetail : sketch.getTextDetails()) {
-            writeTextDetail(xmlSerializer, textDetail, scale);
+            addTextToMap(textDetail);
         }
+        for (HashMap.Entry<String, LinkedBlockingQueue<TextDetail>> textsByColor : textsByColors.entrySet()) {
+            String color = textsByColor.getKey();
+            LinkedBlockingQueue<TextDetail> texts = textsByColor.getValue();
+            xmlSerializer.startTag(null, "g");
+            xmlSerializer.attribute(null, "id", "path_" + color);
+            for (TextDetail text : texts) {
+                writeTextDetail(xmlSerializer, text, scale);
+            }
+            xmlSerializer.endTag(null,"g");
+        }
+        textsByColors.clear();
     }
 
-    private static void writePathDetail(
+//    private void addSplayToMap(String station, Leg splay) {
+//        if (!splaysByStation.containsKey(station)) {
+//            splaysByStation.put(station, new LinkedBlockingQueue<Leg>());
+//        }
+//        splaysByStation.get(station).add(leg);
+//    }
+
+    private void addTextToMap(TextDetail textDetail) {
+        String color = textDetail.getColour().toString();
+        if (!textsByColors.containsKey(color)) {
+            textsByColors.put(color, new LinkedBlockingQueue<TextDetail>());
+        }
+        textsByColors.get(color).add(textDetail);
+    }
+
+    private void addPathToMap(PathDetail pathDetail) {
+        String color = pathDetail.getColour().toString();
+        if (!pathsByColors.containsKey(color)) {
+            pathsByColors.put(color, new LinkedBlockingQueue<PathDetail>());
+        }
+        pathsByColors.get(color).add(pathDetail);
+    }
+
+//    private void writeLeg(
+//            XmlSerializer xmlSerializer, Leg leg, int scale)  throws IOException {
+//        List<String> coordStrings = new ArrayList<>();
+//
+////        for (Coord2D coord2D : leg.getPath()) {
+////            coordStrings.add(toXmlText(coord2D, scale));
+////        }
+////
+////        // Write the SVG line element
+////        printWriter.println("<line x1=\"" + x1 + "\" y1=\"" + y1 + "\" x2=\"" + x2 + "\" y2=\"" + y2 + "\" stroke=\"black\" />");
+////
+//
+//        xmlSerializer.startTag(null,"line");
+//        xmlSerializer.attribute(null, "points", TextTools.join(" ", coordStrings));
+//        xmlSerializer.attribute(null, "stroke", pathDetail.getColour().toString());
+//        xmlSerializer.attribute(null, "stroke-width", "3");
+//        xmlSerializer.attribute(null, "fill", "none");
+//        xmlSerializer.endTag(null,"polyline");
+//    }
+
+    private void writePathDetail(
             XmlSerializer xmlSerializer, PathDetail pathDetail, int scale)  throws IOException {
         List<String> coordStrings = new ArrayList<>();
+
         for (Coord2D coord2D : pathDetail.getPath()) {
             coordStrings.add(toXmlText(coord2D, scale));
         }
@@ -84,14 +190,12 @@ public class SvgExporter extends DoubleSketchFileExporter {
         xmlSerializer.endTag(null,"polyline");
     }
 
-
-
-    private static String toXmlText(Coord2D coord2D, int scale) {
+    private String toXmlText(Coord2D coord2D, int scale) {
         return coord2D.x * scale + "," + coord2D.y * scale;
     }
 
 
-    private static void writeTextDetail(
+    private void writeTextDetail(
             XmlSerializer xmlSerializer, TextDetail textDetail, int scale)  throws IOException {
         xmlSerializer.startTag(null,"text");
         Coord2D coord2D = textDetail.getPosition();
@@ -119,5 +223,14 @@ public class SvgExporter extends DoubleSketchFileExporter {
     @Override
     public String getExportTypeName(Context context) {
         return context.getString(R.string.third_party_svg);
+    }
+
+    protected void saveSketchFile(Context context, String content, String suffix)
+            throws IOException {
+        String extension = getFileExtension();
+        SurveyFile.SurveyFileType fileType =
+                new SurveyFile.SurveyFileType(suffix + "." + extension, SexyTopoConstants.SVG_MIME_TYPE);
+        SurveyFile outputFile = getOutputFile(fileType);
+        outputFile.save(context, content);
     }
 }

@@ -12,7 +12,7 @@ import java.io.IOException;
 @SuppressWarnings("UnnecessaryLocalVariable")
 public abstract class Exporter {
 
-    private Survey survey;
+    protected Survey survey;
 
     public void export(Context context, Survey survey) throws IOException {
         this.survey = survey;
