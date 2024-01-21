@@ -4,6 +4,8 @@ import org.hwyl.sexytopo.control.util.TextTools;
 
 public class BoundingBox {
 
+    // uses SexyTopo coordinates (i.e. y increases downwards)
+
     private float left;
     private float right;
     private float top;
@@ -95,38 +97,9 @@ public class BoundingBox {
         bottom = Math.min(bottom, point.y);
     }
 
-    public BoundingBox union(BoundingBox boundingBox) {
-        return new BoundingBox(
-                Math.min(left, boundingBox.left),
-                Math.max(right, boundingBox.right),
-                Math.max(top, boundingBox.top),
-                Math.min(bottom, boundingBox.bottom)
-        );
-    }
 
-    public BoundingBox roundToNearest(int n) {
-        return new BoundingBox(
-                roundDownTo(left, n),
-                roundUpTo(right, n),
-                roundDownTo(top, n),
-                roundUpTo(bottom, n));
-    }
 
-    public BoundingBox addBorder(int border) {
-        return new BoundingBox(
-            left - border,
-            right + border,
-            top - border,
-            bottom + border);
-    }
 
-    private static int roundUpTo(double value, int n) {
-        return (int)Math.ceil(value / n) * n;
-    }
-
-    private static int roundDownTo(double value, int n) {
-        return (int)Math.floor(value / n) * n;
-    }
 
     public BoundingBox scale(float scale) {
         return new BoundingBox(

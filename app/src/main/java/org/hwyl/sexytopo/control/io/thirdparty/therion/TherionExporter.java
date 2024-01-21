@@ -4,14 +4,8 @@ import android.content.Context;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.io.SurveyFile;
-import org.hwyl.sexytopo.control.io.basic.ExportSizeCalculator;
-import org.hwyl.sexytopo.control.io.thirdparty.xvi.XviExporter;
 import org.hwyl.sexytopo.control.io.translation.Exporter;
-import org.hwyl.sexytopo.control.util.SpaceFlipper;
-import org.hwyl.sexytopo.model.graph.BoundingBox;
-import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Projection2D;
-import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.io.IOException;
@@ -82,6 +76,7 @@ public class TherionExporter extends Exporter {
             String originalFileContent)
             throws IOException {
 
+        /*
         float scale = getScale();
 
         Space<Coord2D> space = projection.project(survey);
@@ -104,7 +99,7 @@ public class TherionExporter extends Exporter {
         String xviContent = XviExporter.getContent(survey, projection, scale);
         xviFile.save(context, xviContent);
 
-        th2Files.add(th2File.getFilename());
+        th2Files.add(th2File.getFilename());*/
     }
 
 

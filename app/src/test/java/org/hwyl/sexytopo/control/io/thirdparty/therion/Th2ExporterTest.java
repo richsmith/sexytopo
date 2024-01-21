@@ -1,8 +1,6 @@
 package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
-import org.hwyl.sexytopo.control.io.basic.ExportSizeCalculator;
 import org.hwyl.sexytopo.model.graph.BoundingBox;
-import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
 import org.junit.Assert;
@@ -15,7 +13,7 @@ public class Th2ExporterTest {
     public void testHappyPath() {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         float scale = TherionExporter.getScale();
-        BoundingBox boundingBox = ExportSizeCalculator.getExportBoundingBox(survey, Projection2D.PLAN, scale);
+        BoundingBox boundingBox = null; //ExportSizeCalculator.getExportBoundingBox(survey, Projection2D.PLAN, scale);
         String th2 = new Th2Exporter().getContent(survey, scale, "filename.xvi", boundingBox);
         Assert.assertTrue(th2.contains("##XTHERION##"));
     }

@@ -6,7 +6,6 @@ import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.SHOT_COMM
 import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.SKETCHLINE_COMMAND;
 import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.STATIONS_COMMAND;
 
-import org.hwyl.sexytopo.control.io.basic.ExportSizeCalculator;
 import org.hwyl.sexytopo.control.util.SpaceFlipper;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.BoundingBox;
@@ -28,7 +27,7 @@ import java.util.Map;
 public class XviExporter {
 
     public static String getContent(Survey survey, Projection2D projectionType, float scale) {
-        BoundingBox dimensions = ExportSizeCalculator.getExportBoundingBox(survey, projectionType, scale);
+        BoundingBox dimensions = null; // ExportSizeCalculator.getExportBoundingBox(survey, projectionType, scale);
         Space<Coord2D> space = projectionType.project(survey);
         space = SpaceFlipper.flipVertically(space);
         Sketch sketch = survey.getSketch(projectionType);

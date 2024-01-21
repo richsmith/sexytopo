@@ -8,7 +8,7 @@ import org.hwyl.sexytopo.control.io.basic.ExportSizeCalculator;
 import org.hwyl.sexytopo.control.io.translation.DoubleSketchFileExporter;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.TextTools;
-import org.hwyl.sexytopo.model.graph.BoundingBox;
+import org.hwyl.sexytopo.model.common.Frame;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Projection2D;
@@ -43,6 +43,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 
+/** @noinspection WrapperTypeMayBePrimitive*/
 @SuppressWarnings({"UnnecessaryLocalVariable", "SameParameterValue"})
 public class SvgExporter extends DoubleSketchFileExporter {
 
@@ -56,14 +57,15 @@ public class SvgExporter extends DoubleSketchFileExporter {
         Sketch sketch = survey.getSketch(projectionType);
         Space<Coord2D> projection = projectionType.project(survey);
 
-        BoundingBox boundingBox = ExportSizeCalculator.getExportBoundingBox(survey, projectionType, SCALE);
+        Frame frame = ExportSizeCalculator.getExportFrame(survey, projectionType);
+        frame = frame.scale(SCALE);
 
 
-        double svgWidth = boundingBox.getWidth();
-        double svgHeight = boundingBox.getHeight();
-        Coord2D topLeft = boundingBox.getTopLeft();
-        double svgTopLeftX = boundingBox.getLeft();
-        double svgTopLeftY = boundingBox.getTop();
+        double svgWidth = frame.getWidth();
+        double svgHeight = frame.getHeight();
+        Coord2D topLeft = frame.getTopLeft();
+        double svgTopLeftX = topLeft.x;
+        double svgTopLeftY = topLeft.y;
 
         XmlSerializer xmlSerializer = Xml.newSerializer();
         StringWriter writer = new StringWriter();
@@ -88,7 +90,7 @@ public class SvgExporter extends DoubleSketchFileExporter {
             xmlSerializer.attribute(null, "y", Double.toString(svgTopLeftY));
             xmlSerializer.attribute(null, "width", Double.toString(svgWidth));
             xmlSerializer.attribute(null, "height", Double.toString(svgHeight));
-            xmlSerializer.attribute(null, "fill", GeneralPreferences.getExportSvgBackgroundColour().toString());
+            xmlSerializer.attribute(null, "fill", background.toString());
             xmlSerializer.endTag(null,"rect");
             xmlSerializer.endTag("", "g");
         }

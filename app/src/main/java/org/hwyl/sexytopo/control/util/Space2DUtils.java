@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.control.util;
 
-import org.hwyl.sexytopo.model.graph.BoundingBox;
+import org.hwyl.sexytopo.model.common.Frame;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Space;
@@ -107,13 +107,13 @@ public class Space2DUtils {
         return angle;
     }
 
-    public static BoundingBox getBoundingBox(Space<Coord2D> space) {
-        BoundingBox boundingBox = new BoundingBox();
+    public static Frame toFrame(Space<Coord2D> space) {
+        Frame frame = new Frame();
         for (Line<Coord2D> line : space.getLegMap().values()) {
-            boundingBox.update(line.getStart());
-            boundingBox.update(line.getEnd());
+            frame.updateBoundingBox(line.getStart());
+            frame.updateBoundingBox(line.getEnd());
         }
-        return boundingBox;
+        return frame;
     }
 
     private static List<Coord2D> douglasPeukerIteration(List<Coord2D> path, float epsilon) {
