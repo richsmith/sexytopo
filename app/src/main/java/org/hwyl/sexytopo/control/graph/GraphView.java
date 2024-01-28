@@ -610,6 +610,7 @@ public class GraphView extends View {
                         float startingSizePixels = spToPixels(startingSizeSp);
                         float size = startingSizePixels / surveyToViewScale;
                         sketch.addTextDetail(touchPointOnSurvey, text, size);
+                        invalidate();
                     })
                     .setNegativeButton(R.string.cancel, null);
 
