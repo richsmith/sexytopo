@@ -1,7 +1,7 @@
 package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
 import org.hwyl.sexytopo.control.util.TextTools;
-import org.hwyl.sexytopo.model.graph.BoundingBox;
+import org.hwyl.sexytopo.model.common.Frame;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.util.ArrayList;
@@ -18,18 +18,18 @@ import java.util.List;
 public class Th2Exporter {
 
     public static String getContent(
-            Survey survey, double scale, String xviFilename, BoundingBox dimensions) {
+            Survey survey, double scale, String xviFilename, Frame exportFrame) {
         List<String> lines = new ArrayList<>();
         lines.add(TherionExporter.getEncodingText());
-        lines.add(getXviBlock(survey, scale, xviFilename, dimensions));
+        lines.add(getXviBlock(survey, scale, xviFilename, exportFrame));
         return TextTools.join("\n\n", lines);
     }
 
     public static String updateOriginalContent(
-            Survey survey, double scale, String filename, BoundingBox dimensions,
+            Survey survey, double scale, String filename, Frame exportFrame,
             String originalFileContent) {
         String newContent = stripXTherion(originalFileContent);
-        newContent += "\n" + getXviBlock(survey, scale, filename, dimensions);
+        newContent += "\n" + getXviBlock(survey, scale, filename, exportFrame);
         return newContent;
     }
 
@@ -40,21 +40,14 @@ public class Th2Exporter {
 
 
     public static String getXviBlock(
-            Survey survey, double scale, String filename, BoundingBox dimensions) {
+            Survey survey, double scale, String filename, Frame exportFrame) {
 
         List<String> lines = new ArrayList<>();
 
-        double width = dimensions.getWidth();
-        double height = dimensions.getHeight();
-
-        double widthBorder = 0.2 * width;
-        double heightBorder = 0.2 * height;
+        double width = exportFrame.getWidth();
+        double height = exportFrame.getHeight();
 
         // see https://bitbucket.org/AndrewA/topparser/src/b85fe3ea07a51d8c4e30ced88a643f97fc2127d3/Writeth2.py?at=default&fileviewer=file-view-default
-
-        /*
-*/
-
 
         /*
         From a file in Therion:
@@ -75,8 +68,8 @@ public class Th2Exporter {
         String firstStation = survey.getOrigin().getName();
 
         lines.add(getXviLine("xth_me_image_insert",
-                "{" + dimensions.getLeft() + " 1 1.0}",
-                "{" + dimensions.getBottom() + " " + firstStation + "}",
+                "{" + exportFrame.getLeft() + " 1 1.0}",
+                "{" + exportFrame.getBottom() + " " + firstStation + "}",
                 "\"" + filename + "\"",
                 0,
                 "{}"));
@@ -96,10 +89,10 @@ public class Th2Exporter {
 
          */
         lines.add(getXviLine("xth_me_area_adjust",
-                TextTools.formatTo2dp(dimensions.getLeft()),
-                TextTools.formatTo2dp(dimensions.getTop()),
-                TextTools.formatTo2dp(dimensions.getRight()),
-                TextTools.formatTo2dp(dimensions.getBottom())));
+                TextTools.formatTo2dp(exportFrame.getLeft()),
+                TextTools.formatTo2dp(exportFrame.getTop()),
+                TextTools.formatTo2dp(exportFrame.getRight()),
+                TextTools.formatTo2dp(exportFrame.getBottom())));
 
         lines.add(getXviLine("xth_me_area_zoom_to", 50)); // zoom adjustment (100%?)
 

@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.Xml;
 
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.control.io.basic.ExportSizeCalculator;
+import org.hwyl.sexytopo.control.io.basic.ExportFrameFactory;
 import org.hwyl.sexytopo.control.io.translation.DoubleSketchFileExporter;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.TextTools;
@@ -57,7 +57,7 @@ public class SvgExporter extends DoubleSketchFileExporter {
         Sketch sketch = survey.getSketch(projectionType);
         Space<Coord2D> projection = projectionType.project(survey);
 
-        Frame frame = ExportSizeCalculator.getExportFrame(survey, projectionType);
+        Frame frame = ExportFrameFactory.getExportFrame(survey, projectionType);
         frame = frame.scale(SCALE);
 
 

@@ -8,7 +8,7 @@ import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Survey;
 
-public class ExportSizeCalculator {
+public class ExportFrameFactory {
 
 
     public static Frame getExportFrame(

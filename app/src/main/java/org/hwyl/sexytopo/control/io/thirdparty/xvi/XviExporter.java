@@ -6,17 +6,14 @@ import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.SHOT_COMM
 import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.SKETCHLINE_COMMAND;
 import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.STATIONS_COMMAND;
 
-import org.hwyl.sexytopo.control.util.SpaceFlipper;
 import org.hwyl.sexytopo.control.util.TextTools;
-import org.hwyl.sexytopo.model.graph.BoundingBox;
+import org.hwyl.sexytopo.model.common.Frame;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
-import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Station;
-import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,17 +23,14 @@ import java.util.Map;
 
 public class XviExporter {
 
-    public static String getContent(Survey survey, Projection2D projectionType, float scale) {
-        BoundingBox dimensions = null; // ExportSizeCalculator.getExportBoundingBox(survey, projectionType, scale);
-        Space<Coord2D> space = projectionType.project(survey);
-        space = SpaceFlipper.flipVertically(space);
-        Sketch sketch = survey.getSketch(projectionType);
+    public static String getContent(Sketch sketch, Space<Coord2D> space, float scale, Frame exportFrame) {
+
 
         String text = field(GRIDS_COMMAND, "1 m");
         text += multilineField(STATIONS_COMMAND, getStationsText(space, scale));
         text += multilineField(SHOT_COMMAND, getLegsText(space, scale));
         text += multilineField(SKETCHLINE_COMMAND, getSketchLinesText(sketch, scale));
-        text += field(GRID_COMMAND, getGridText(dimensions, scale));
+        text += field(GRID_COMMAND, getGridText(exportFrame, scale));
         return text;
     }
 
@@ -92,7 +86,7 @@ public class XviExporter {
         return field("\t", TextTools.join(" ", fields));
     }
 
-    private static String getGridText(BoundingBox dimensions, float scale) {
+    private static String getGridText(Frame dimensions, float scale) {
     // Grid is{bottom left x, bottom left y,
     // x1 dist, y1 dist, x2 dist, y2 dist, number of x, number of y}
         Float[] values = new Float[] {

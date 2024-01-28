@@ -58,19 +58,43 @@ public class Shape {
 
 
     public Coord2D getTopLeft() {
-        if (top == Float.POSITIVE_INFINITY || left == Float.POSITIVE_INFINITY) {
-            return new Coord2D(0, 0);
-        } else {
-            return new Coord2D(left, top);
-        }
+        return new Coord2D(getLeft(), getTop());
     }
 
 
     public Coord2D getBottomRight() {
-        if (bottom == Float.NEGATIVE_INFINITY || right == Float.NEGATIVE_INFINITY) {
-            return new Coord2D(0, 0);
+        return new Coord2D(getRight(), getBottom());
+    }
+
+    public float getLeft() {
+        if (left == Float.POSITIVE_INFINITY) {
+            return 0;
         } else {
-            return new Coord2D(right, bottom);
+            return left;
+        }
+    }
+
+    public float getRight() {
+        if (right == Float.NEGATIVE_INFINITY) {
+            return 0;
+        } else {
+            return right;
+        }
+    }
+
+    public float getTop () {
+        if (top == Float.POSITIVE_INFINITY) {
+            return 0;
+        } else {
+            return top;
+        }
+    }
+
+    public float getBottom() {
+        if (bottom == Float.NEGATIVE_INFINITY) {
+            return 0;
+        } else {
+            return bottom;
         }
     }
 
