@@ -86,21 +86,22 @@ public class TherionExporter extends Exporter {
         float scale = getScale();
 
         Space<Coord2D> space = projectionType.project(survey);
-        space = space.scale(scale);
+        // Therion y-coordinates are inverse of SexyTopo's
         space = SpaceFlipper.flipVertically(space);
 
         Sketch sketch = survey.getSketch(projectionType);
 
         Frame exportFrame = ExportFrameFactory.getExportFrame(survey, projectionType);
         exportFrame = exportFrame.scale(scale);
+        exportFrame.flipVertically();
 
         String content;
         if (originalFileContent == null) {
             content = Th2Exporter.getContent(
-                    survey, scale, xviFile.getFilename(), exportFrame);
+                    survey, scale, xviFile.getFilename(), sketch, exportFrame);
         } else {
             content = Th2Exporter.updateOriginalContent(
-                    survey, scale, xviFile.getFilename(), exportFrame, originalFileContent);
+                    survey, scale, xviFile.getFilename(), sketch, exportFrame, originalFileContent);
         }
         th2File.save(context, content);
 

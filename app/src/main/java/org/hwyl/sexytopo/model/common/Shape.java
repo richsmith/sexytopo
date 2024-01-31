@@ -43,7 +43,7 @@ public class Shape {
         if (left == Float.POSITIVE_INFINITY || right == Float.NEGATIVE_INFINITY) {
             return 0;
         } else {
-            return right - left;
+            return Math.abs(right - left);
         }
     }
 
@@ -52,7 +52,7 @@ public class Shape {
         if (top == Float.POSITIVE_INFINITY || bottom == Float.NEGATIVE_INFINITY) {
             return 0;
         } else {
-            return bottom - top;
+            return Math.abs(bottom - top);
         }
     }
 
@@ -107,6 +107,11 @@ public class Shape {
         float bottom1 = rectangleBottomRight.y;
 
         return (right >= left1 && left <= right1) && (top <= bottom1 && bottom >= top1);
+    }
+
+    public void flipVertically() {
+        top = -top;
+        bottom = -bottom;
     }
 
 }

@@ -8,6 +8,7 @@ import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.STATIONS_
 
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.common.Frame;
+import org.hwyl.sexytopo.model.common.Shape;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Space;
@@ -30,7 +31,7 @@ public class XviExporter {
         text += multilineField(STATIONS_COMMAND, getStationsText(space, scale));
         text += multilineField(SHOT_COMMAND, getLegsText(space, scale));
         text += multilineField(SKETCHLINE_COMMAND, getSketchLinesText(sketch, scale));
-        text += field(GRID_COMMAND, getGridText(exportFrame, scale));
+        text += field(GRID_COMMAND, getGridText(sketch, scale));
         return text;
     }
 
@@ -86,18 +87,21 @@ public class XviExporter {
         return field("\t", TextTools.join(" ", fields));
     }
 
-    private static String getGridText(Frame dimensions, float scale) {
+    private static String getGridText(Shape frame, float scale) {
+
+        float numberX = Math.round(frame.getWidth());
+        float numberY = Math.round(frame.getHeight());
     // Grid is{bottom left x, bottom left y,
     // x1 dist, y1 dist, x2 dist, y2 dist, number of x, number of y}
         Float[] values = new Float[] {
-            dimensions.getLeft(), // bottom left x
-            dimensions.getBottom(), // bottom left y
+            frame.getLeft(), // bottom left x
+            frame.getBottom(), // bottom left y
             scale, // x1 dist
             0.0f,  // y1 dist
             0.0f, // x2 dist
             scale, // y2 dist
-            dimensions.getWidth() / scale,  // unsure // number of x
-            dimensions.getHeight() / scale  // unsure  // number of y
+            numberX,  // unsure // number of x
+            numberY  // unsure  // number of y
         };
 
         return TextTools.join(" ", Arrays.asList(values));

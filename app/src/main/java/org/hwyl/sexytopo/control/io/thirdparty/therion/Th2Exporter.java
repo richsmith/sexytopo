@@ -1,7 +1,7 @@
 package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
 import org.hwyl.sexytopo.control.util.TextTools;
-import org.hwyl.sexytopo.model.common.Frame;
+import org.hwyl.sexytopo.model.common.Shape;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.util.ArrayList;
@@ -18,18 +18,18 @@ import java.util.List;
 public class Th2Exporter {
 
     public static String getContent(
-            Survey survey, double scale, String xviFilename, Frame exportFrame) {
+            Survey survey, double scale, String xviFilename, Shape innerFrame, Shape outerFrame) {
         List<String> lines = new ArrayList<>();
         lines.add(TherionExporter.getEncodingText());
-        lines.add(getXviBlock(survey, scale, xviFilename, exportFrame));
+        lines.add(getXviBlock(survey, scale, xviFilename, innerFrame, outerFrame));
         return TextTools.join("\n\n", lines);
     }
 
     public static String updateOriginalContent(
-            Survey survey, double scale, String filename, Frame exportFrame,
+            Survey survey, double scale, String filename, Shape innerFrame, Shape outerFrame,
             String originalFileContent) {
         String newContent = stripXTherion(originalFileContent);
-        newContent += "\n" + getXviBlock(survey, scale, filename, exportFrame);
+        newContent += "\n" + getXviBlock(survey, scale, filename, innerFrame, outerFrame);
         return newContent;
     }
 
@@ -40,12 +40,9 @@ public class Th2Exporter {
 
 
     public static String getXviBlock(
-            Survey survey, double scale, String filename, Frame exportFrame) {
+            Survey survey, double scale, String filename, Shape innerFrame, Shape outerFrame) {
 
         List<String> lines = new ArrayList<>();
-
-        double width = exportFrame.getWidth();
-        double height = exportFrame.getHeight();
 
         // see https://bitbucket.org/AndrewA/topparser/src/b85fe3ea07a51d8c4e30ced88a643f97fc2127d3/Writeth2.py?at=default&fileviewer=file-view-default
 
@@ -65,14 +62,37 @@ public class Th2Exporter {
 
          */
 
-        String firstStation = survey.getOrigin().getName();
 
+        // xth_me_area_adjust <Xmin> <Ymin> <Xmax> <Ymax>
+        // Xmin, Ymin and Xmax, Ymax are cartesian coordinates of lower left and upper right
+        // corners of drawing area
+        lines.add(getXviLine("xth_me_area_adjust",
+                TextTools.formatTo2dp(outerFrame.getLeft()),
+                TextTools.formatTo2dp(outerFrame.getBottom()),
+                TextTools.formatTo2dp(outerFrame.getRight()),
+                TextTools.formatTo2dp(outerFrame.getTop())));
+
+
+        //  xth_me_image_insert {<Xpos> <visibility> <gamma>} {<Ypos> <root>} {<filename>} 0 {}
+        //  <Xpos> <Ypos> is the position of the 0,0 point of XVI coordinate system
+        //  <visibility> - 0 image is hidden / 1 image is shown
+        //  <gamma> - image gamma
+        //  <root> - root station name. Can be omitted.
+        //  <filename> - name of image file
+        //  0 {} - image identifiers, can be 0 {} for all images
+        String firstStation = survey.getOrigin().getName();
         lines.add(getXviLine("xth_me_image_insert",
-                "{" + exportFrame.getLeft() + " 1 1.0}",
-                "{" + exportFrame.getBottom() + " " + firstStation + "}",
+                "{" + innerFrame.getLeft() + " 1 1.0}",
+                "{" + innerFrame.getBottom() + " " + firstStation + "}",
                 "\"" + filename + "\"",
                 0,
                 "{}"));
+
+
+        // xth_me_area_zoom_to <zoom>
+        // where <zoom> is the default zoom factor, when drawing is open in xtherion.
+        // Should be 25,50,100,200,400.
+        lines.add(getXviLine("xth_me_area_zoom_to", 50));
 
 
         /*
@@ -88,13 +108,9 @@ public class Th2Exporter {
          0.1 is just for a border.
 
          */
-        lines.add(getXviLine("xth_me_area_adjust",
-                TextTools.formatTo2dp(exportFrame.getLeft()),
-                TextTools.formatTo2dp(exportFrame.getTop()),
-                TextTools.formatTo2dp(exportFrame.getRight()),
-                TextTools.formatTo2dp(exportFrame.getBottom())));
 
-        lines.add(getXviLine("xth_me_area_zoom_to", 50)); // zoom adjustment (100%?)
+
+
 
 
         return TextTools.join("\n", lines);
