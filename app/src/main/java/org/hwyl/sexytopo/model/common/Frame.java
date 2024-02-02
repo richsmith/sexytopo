@@ -30,12 +30,12 @@ public class Frame extends Shape {
             roundUpTo(bottom, n));
     }
 
-    public Frame addPadding(int border) {
+    public Frame addPadding(int xPadding, int yPadding) {
         return new Frame(
-            left - border,
-            right + border,
-            top - border,
-            bottom + border);
+            left - xPadding,
+            right + xPadding,
+            top - yPadding,
+            bottom + yPadding);
     }
 
     public Frame union(Frame other) {

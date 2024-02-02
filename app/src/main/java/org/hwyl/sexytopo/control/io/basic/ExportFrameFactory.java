@@ -17,31 +17,38 @@ public class ExportFrameFactory {
         // Basic bounds are the union of the sketch and the survey data
         Sketch sketch = survey.getSketch(projectionType);
         Space<Coord2D> projection = projectionType.project(survey);
-        return getExportFrame(sketch, projection);
-    }
-
-    public static Frame getExportFrame(
-            Sketch sketch, Space<Coord2D> projection) {
         Frame sketchBox = Frame.from(sketch);
         Frame surveyDataBox = Space2DUtils.toFrame(projection);
         Frame export = sketchBox.union(surveyDataBox);
 
-        // Add some padding
+        return export;
+
+
+    }
+
+
+    public static Frame addBorder(Frame export) {
         float largestDimension = Math.max(export.getWidth(), export.getHeight());
 
-        // guessing here what would be a sensible size for the border
-        if (largestDimension <= 10) {
-            export = export.addPadding(1);
-        } else if (largestDimension <= 50) {
-            export = export.addPadding(5);
-        } else {
-            export = export.addPadding(10);
-        }
+        int xPadding = getPadding(export.getWidth());
+        int yPadding = getPadding(export.getHeight());
+
+        export = export.addPadding(xPadding, yPadding);
 
         // Round up to nearest 10m for tidiness; also good for neat grid size etc.
-        export = export.expandToNearest(10);
+        export = export.expandToNearest(1);
 
         return export;
+    }
+
+    private static int getPadding(float dimension) {
+        if (dimension <= 10) {
+            return 1;
+        } else if (dimension <= 50) {
+            return 5;
+        } else {
+            return 10;
+        }
     }
 
 

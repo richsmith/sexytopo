@@ -24,14 +24,12 @@ import java.util.Map;
 
 public class XviExporter {
 
-    public static String getContent(Sketch sketch, Space<Coord2D> space, float scale, Frame exportFrame) {
-
-
+    public static String getContent(Sketch sketch, Space<Coord2D> space, float scale, Frame gridFrame) {
         String text = field(GRIDS_COMMAND, "1 m");
         text += multilineField(STATIONS_COMMAND, getStationsText(space, scale));
         text += multilineField(SHOT_COMMAND, getLegsText(space, scale));
         text += multilineField(SKETCHLINE_COMMAND, getSketchLinesText(sketch, scale));
-        text += field(GRID_COMMAND, getGridText(sketch, scale));
+        text += field(GRID_COMMAND, getGridText(gridFrame, scale));
         return text;
     }
 
@@ -87,21 +85,22 @@ public class XviExporter {
         return field("\t", TextTools.join(" ", fields));
     }
 
-    private static String getGridText(Shape frame, float scale) {
+    private static String getGridText(Shape gridFrame, float scale) {
 
-        float numberX = Math.round(frame.getWidth());
-        float numberY = Math.round(frame.getHeight());
-    // Grid is{bottom left x, bottom left y,
-    // x1 dist, y1 dist, x2 dist, y2 dist, number of x, number of y}
+        float numberX = Math.round(gridFrame.getWidth() / scale);
+        float numberY = Math.round(gridFrame.getHeight() / scale);
+
+        // Grid is{bottom left x, bottom left y,
+        // x1 dist, y1 dist, x2 dist, y2 dist, number of x, number of y}
         Float[] values = new Float[] {
-            frame.getLeft(), // bottom left x
-            frame.getBottom(), // bottom left y
+            gridFrame.getLeft(), // bottom left x
+            gridFrame.getBottom(), // bottom left y
             scale, // x1 dist
             0.0f,  // y1 dist
             0.0f, // x2 dist
             scale, // y2 dist
-            numberX,  // unsure // number of x
-            numberY  // unsure  // number of y
+            numberX,  // x squares
+            numberY  // y squares
         };
 
         return TextTools.join(" ", Arrays.asList(values));

@@ -1,5 +1,8 @@
 package org.hwyl.sexytopo;
 
+import android.annotation.SuppressLint;
+
+import java.text.SimpleDateFormat;
 import java.util.UUID;
 
 
@@ -10,6 +13,9 @@ public class SexyTopoConstants {
     public static final String APP_NAME = "SexyTopo";
     public static final String TAG = APP_NAME; // for writing debug log
 
+    @SuppressLint("SimpleDateFormat")
+    public static final SimpleDateFormat ISO_FORMAT =
+            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
     // ********** Event codes **********
 

@@ -110,6 +110,9 @@ public class Shape {
     }
 
     public void flipVertically() {
+        // This is a bit hacky! Provided for flipping the Y axis for e.g. Therion export.
+        // Do this after all other processing has been done, because it will break things.
+        // Not sure if it's worth handling this properly...
         top = -top;
         bottom = -bottom;
     }

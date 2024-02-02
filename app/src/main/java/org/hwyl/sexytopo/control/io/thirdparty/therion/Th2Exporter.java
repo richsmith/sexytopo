@@ -92,7 +92,7 @@ public class Th2Exporter {
         // xth_me_area_zoom_to <zoom>
         // where <zoom> is the default zoom factor, when drawing is open in xtherion.
         // Should be 25,50,100,200,400.
-        lines.add(getXviLine("xth_me_area_zoom_to", 50));
+        lines.add(getXviLine("xth_me_area_zoom_to", 25));
 
 
         /*

@@ -58,6 +58,7 @@ public class SvgExporter extends DoubleSketchFileExporter {
         Space<Coord2D> projection = projectionType.project(survey);
 
         Frame frame = ExportFrameFactory.getExportFrame(survey, projectionType);
+        frame = ExportFrameFactory.addBorder(frame);
         frame = frame.scale(SCALE);
 
 

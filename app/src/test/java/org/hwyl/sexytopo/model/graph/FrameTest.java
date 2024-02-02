@@ -17,8 +17,8 @@ public class FrameTest extends TestCase {
         assertEquals(new Coord2D(10, 10), rounded.getBottomRight());
     }
 
-    public void testAddBorder() {
-        Frame bordered = regularFrame.addPadding(10);
+    public void testAddPadding() {
+        Frame bordered = regularFrame.addPadding(10, 10);
         assertEquals(new Coord2D(-20, -20), bordered.getTopLeft());
         assertEquals(new Coord2D(20, 20), bordered.getBottomRight());
     }

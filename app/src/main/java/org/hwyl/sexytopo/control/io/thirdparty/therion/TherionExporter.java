@@ -8,6 +8,7 @@ import org.hwyl.sexytopo.control.io.basic.ExportFrameFactory;
 import org.hwyl.sexytopo.control.io.thirdparty.xvi.XviExporter;
 import org.hwyl.sexytopo.control.io.translation.Exporter;
 import org.hwyl.sexytopo.control.util.SpaceFlipper;
+import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.common.Frame;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Projection2D;
@@ -22,17 +23,18 @@ import java.util.List;
 
 public class TherionExporter extends Exporter {
 
-    private static SurveyFile.SurveyFileType THCONFIG =
+    public static final char COMMENT_CHAR = '#';
+    private static final SurveyFile.SurveyFileType THCONFIG =
             new SurveyFile.SurveyFileType("thconfig", "plain/text");
-    private static SurveyFile.SurveyFileType TH =
+    private static final SurveyFile.SurveyFileType TH =
             new SurveyFile.SurveyFileType("th", "plain/text");
-    private static SurveyFile.SurveyFileType TH2_PLAN =
+    private static final SurveyFile.SurveyFileType TH2_PLAN =
             new SurveyFile.SurveyFileType("plan.th2", "plain/text");
-    private static SurveyFile.SurveyFileType XVI_PLAN =
+    private static final SurveyFile.SurveyFileType XVI_PLAN =
             new SurveyFile.SurveyFileType("plan.xvi", "plain/text");
-    private static SurveyFile.SurveyFileType TH2_EE =
+    private static final SurveyFile.SurveyFileType TH2_EE =
             new SurveyFile.SurveyFileType("ee.th2", "plain/text");
-    private static SurveyFile.SurveyFileType XVI_EE =
+    private static final SurveyFile.SurveyFileType XVI_EE =
             new SurveyFile.SurveyFileType("ee.xvi", "plain/text");
 
     private String originalThFileContent = null;
@@ -43,6 +45,8 @@ public class TherionExporter extends Exporter {
 
     public void run(Context context, Survey survey) throws IOException {
 
+        String attribution = getFileAttribution(context);
+
         // Therion export notes:
         // Therion coordinate system is in traditional graph-style, with positive y going up.
 
@@ -51,7 +55,7 @@ public class TherionExporter extends Exporter {
 
         String thconfigContent = ThconfigExporter.getContent(survey);
         SurveyFile thconfig = getOutputFile(THCONFIG);
-        thconfig.save(context, thconfigContent);
+        thconfig.save(context, attribution + thconfigContent);
 
         SurveyFile th2_plan_file = getOutputFile(TH2_PLAN);
         SurveyFile xvi_plan_file = getOutputFile(XVI_PLAN);
@@ -70,7 +74,7 @@ public class TherionExporter extends Exporter {
             thContent = ThExporter.updateOriginalContent(survey, originalThFileContent, th2Files);
         }
         SurveyFile th = getOutputFile(TH);
-        th.save(context, thContent);
+        th.save(context, attribution + thContent);
     }
 
 
@@ -83,6 +87,7 @@ public class TherionExporter extends Exporter {
             String originalFileContent)
             throws IOException {
 
+        String attribution = getFileAttribution(context);
         float scale = getScale();
 
         Space<Coord2D> space = projectionType.project(survey);
@@ -91,22 +96,31 @@ public class TherionExporter extends Exporter {
 
         Sketch sketch = survey.getSketch(projectionType);
 
-        Frame exportFrame = ExportFrameFactory.getExportFrame(survey, projectionType);
-        exportFrame = exportFrame.scale(scale);
-        exportFrame.flipVertically();
+        Frame baseFrame = ExportFrameFactory.getExportFrame(survey, projectionType);
+        Frame gridFrame = ExportFrameFactory.addBorder(baseFrame);
+        Frame outerFrame = ExportFrameFactory.addBorder(gridFrame);
+
+        Frame innerFrame = baseFrame.scale(scale);
+        innerFrame.flipVertically();
+
+        gridFrame = gridFrame.scale(scale);
+        gridFrame.flipVertically();
+
+        outerFrame = outerFrame.scale(scale);
+        outerFrame.flipVertically();
 
         String content;
         if (originalFileContent == null) {
             content = Th2Exporter.getContent(
-                    survey, scale, xviFile.getFilename(), sketch, exportFrame);
+                    survey, scale, xviFile.getFilename(), innerFrame, outerFrame);
         } else {
             content = Th2Exporter.updateOriginalContent(
-                    survey, scale, xviFile.getFilename(), sketch, exportFrame, originalFileContent);
+                    survey, scale, xviFile.getFilename(), innerFrame, outerFrame, originalFileContent);
         }
-        th2File.save(context, content);
+        th2File.save(context, attribution + content);
 
 
-        String xviContent = XviExporter.getContent(sketch, space, scale, exportFrame);
+        String xviContent = XviExporter.getContent(sketch, space, scale, gridFrame);
         xviFile.save(context, xviContent);
 
         th2Files.add(th2File.getFilename());
@@ -165,6 +179,10 @@ public class TherionExporter extends Exporter {
                 }
             }
         }*/
+    }
+
+    private String getFileAttribution(Context context) {
+        return COMMENT_CHAR + " " + TextTools.getFileAttribution(context) + "\n\n";
     }
 
 }

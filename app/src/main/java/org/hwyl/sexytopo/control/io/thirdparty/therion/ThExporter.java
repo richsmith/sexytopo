@@ -25,7 +25,6 @@ import java.util.List;
 @SuppressWarnings("UnnecessaryLocalVariable")
 public class ThExporter {
 
-    public static final char COMMENT_CHAR = '#';
     public static final String DATE_PATTERN = "yyyy.MM.dd";
 
 
@@ -67,7 +66,7 @@ public class ThExporter {
                 SexyTopoConstants.APP_NAME + " " + SexyTopoActivity.getVersionName(context);
 
         String surveyText =
-            COMMENT_CHAR + " " + attribution + "\n\n" +
+            TherionExporter.COMMENT_CHAR + " " + attribution + "\n\n" +
             "survey " + survey.getName() + "\n\n" +
             getInputText(th2Files) + "\n\n" +
             indent(getCentrelineText(survey)) + "\n\n" +
@@ -123,7 +122,7 @@ public class ThExporter {
                 graphToListTranslator.toChronoListOfSurveyListEntries(survey);
 
         for (GraphToListTranslator.SurveyListEntry entry : list) {
-            SurvexTherionUtil.formatEntry(builder, entry, COMMENT_CHAR);
+            SurvexTherionUtil.formatEntry(builder, entry, TherionExporter.COMMENT_CHAR);
             builder.append("\n");
         }
 

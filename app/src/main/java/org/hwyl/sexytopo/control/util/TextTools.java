@@ -1,6 +1,10 @@
 package org.hwyl.sexytopo.control.util;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+
+import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -140,5 +144,12 @@ public class TextTools {
 
     public static String toIsoDate(Date date) {
         return ISO_DATE_FORMAT.format(date);
+    }
+
+    public static String getFileAttribution(Context context) {
+        String date = TextTools.toIsoDate(new Date());
+        String app = context.getString(R.string.app_name) +
+                " " + SexyTopoActivity.getVersionName(context);
+        return context.getString(R.string.created_with, app, date);
     }
 }

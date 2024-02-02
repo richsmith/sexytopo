@@ -140,6 +140,7 @@
     <string name="third_party_survex" translatable="false">Survex</string>
     <string name="third_party_compass" translatable="false">Compass</string>
     <string name="third_party_svg" translatable="false">SVG</string>
+    <string name="created_with">Created with %1$s on %2$s</string>
 
     <!-- Sketch view -->
     <string name="sketch_toolbar_draw">Draw mode</string>

@@ -1110,6 +1110,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         return nightModeFlags == Configuration.UI_MODE_NIGHT_YES;
     }
 
+
     private class SaveTask extends AsyncTask<android.content.Context, Void, Boolean> {
 
         @Override
