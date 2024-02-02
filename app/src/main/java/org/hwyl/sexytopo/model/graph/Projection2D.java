@@ -18,7 +18,7 @@ public enum Projection2D {
     // it in the GraphView)...
     // We just have to remember to reverse the flip when exporting the sketch :)
 
-    PLAN {
+    PLAN("Plan", "plan") {
         public Coord2D project(Coord3D coord3D) {
             return new Coord2D(coord3D.x, -coord3D.y);
         }
@@ -27,7 +27,7 @@ public enum Projection2D {
             return -45 < leg.getInclination() && leg.getInclination() < 45;
         }
     },
-    ELEVATION_NS {
+    ELEVATION_NS("Elevation NS", "elev_ns") {
         public Coord2D project(Coord3D coord3D) {
             return new Coord2D(coord3D.y, -coord3D.z);
         }
@@ -36,7 +36,7 @@ public enum Projection2D {
             return true;
         }
     },
-    ELEVATION_EW {
+    ELEVATION_EW("Elevation EW", "elev_ew") {
         public Coord2D project(Coord3D coord3D) {
             return new Coord2D(coord3D.x, -coord3D.z);
         }
@@ -45,7 +45,7 @@ public enum Projection2D {
             return true;
         }
     },
-    EXTENDED_ELEVATION {
+    EXTENDED_ELEVATION("Extended Elevation", "ee") {
         public Coord2D project(Coord3D coord3D) {
             return ELEVATION_NS.project(coord3D);
         }
@@ -59,6 +59,21 @@ public enum Projection2D {
             new Space3DTransformer();
     private static final Space3DTransformerForElevation space3DTransformerForElevation =
             new Space3DTransformerForElevation();
+    private final String name;
+    private final String abbreviation;
+
+    public String getName() {
+        return name;
+    }
+
+    public String getAbbreviation() {
+        return abbreviation;
+    }
+
+    Projection2D(String name, String abbreviation) {
+        this.name = name;
+        this.abbreviation = abbreviation;
+    }
 
     public Space<Coord3D> transform(Survey survey) {
         if (this == EXTENDED_ELEVATION) {

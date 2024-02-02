@@ -5,7 +5,7 @@ import android.graphics.drawable.Drawable;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 
 
-public class SymbolDetail extends SinglePositionDetail {
+public class SymbolDetail extends SinglePositionDetail implements AutoScalableDetail {
 
     private final Symbol symbol;
     private final float size;

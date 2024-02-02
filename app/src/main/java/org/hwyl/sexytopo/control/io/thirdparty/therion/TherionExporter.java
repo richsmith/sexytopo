@@ -87,7 +87,6 @@ public class TherionExporter extends Exporter {
             String originalFileContent)
             throws IOException {
 
-        String attribution = getFileAttribution(context);
         float scale = getScale();
 
         Space<Coord2D> space = projectionType.project(survey);
@@ -110,15 +109,10 @@ public class TherionExporter extends Exporter {
         outerFrame.flipVertically();
 
         String content;
-        if (originalFileContent == null) {
-            content = Th2Exporter.getContent(
-                    survey, scale, xviFile.getFilename(), innerFrame, outerFrame);
-        } else {
-            content = Th2Exporter.updateOriginalContent(
-                    survey, scale, xviFile.getFilename(), innerFrame, outerFrame, originalFileContent);
-        }
-        th2File.save(context, attribution + content);
 
+        content = Th2Exporter.getContent(
+                survey, projectionType, space, xviFile.getFilename(), innerFrame, outerFrame);
+        th2File.save(context, content);
 
         String xviContent = XviExporter.getContent(sketch, space, scale, gridFrame);
         xviFile.save(context, xviContent);
