@@ -58,7 +58,7 @@ public class SexyTopoConstants {
     public static final String PLAN_SUFFIX = "plan";
     public static final String EE_SUFFIX = "ee";
 
-    public static final String DEFAULT_MIME_TYPE = "application/json";
+    public static final String DEFAULT_MIME_TYPE = "text/plain";
 
     public static final int JSON_INDENT = 2;
 

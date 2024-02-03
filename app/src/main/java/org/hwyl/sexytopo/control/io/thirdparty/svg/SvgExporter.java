@@ -266,6 +266,10 @@ public class SvgExporter extends DoubleSketchFileExporter {
         return context.getString(R.string.third_party_svg);
     }
 
+    public String getMimeType() {
+        return "image/svg+xml";
+    }
+
     public String prettyPrintXML(String input) {
         String output;
         try {

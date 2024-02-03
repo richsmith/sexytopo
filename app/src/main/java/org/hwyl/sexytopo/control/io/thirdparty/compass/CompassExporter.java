@@ -75,6 +75,10 @@ public class CompassExporter extends SingleFileExporter {
         return "dat";
     }
 
+    public String getMimeType() {
+        return "text/dat";
+    }
+
 
     @Override
     public String getExportTypeName(Context context) {

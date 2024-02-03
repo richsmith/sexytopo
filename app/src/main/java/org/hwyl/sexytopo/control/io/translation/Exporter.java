@@ -42,4 +42,9 @@ public abstract class Exporter {
         return surveyFile;
     }
 
+
+    public String getMimeType() {
+        return "text/plain";
+    }
+
 }

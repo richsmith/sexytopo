@@ -23,7 +23,7 @@ public abstract class DoubleSketchFileExporter extends Exporter {
             throws IOException {
         String extension = getFileExtension();
         SurveyFile.SurveyFileType fileType =
-            new SurveyFile.SurveyFileType(suffix + "." + extension);
+            new SurveyFile.SurveyFileType(suffix + "." + extension, getMimeType());
         SurveyFile outputFile = getOutputFile(fileType);
         outputFile.save(context, content);
     }
