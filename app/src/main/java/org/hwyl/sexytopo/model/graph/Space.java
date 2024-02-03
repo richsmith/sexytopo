@@ -36,7 +36,6 @@ public class Space<T extends Coord> {
             scaled.addStation(entry.getKey(), (T) entry.getValue().scale(scale));
         }
 
-        Map<Leg, Line<T>> scaledLegs = new HashMap<>();
         for (Map.Entry<Leg, Line<T>> entry: legs.entrySet()) {
             scaled.addLeg(entry.getKey(), (Line<T>) entry.getValue().scale(scale));
         }

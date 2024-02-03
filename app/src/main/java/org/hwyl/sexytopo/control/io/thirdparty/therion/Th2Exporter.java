@@ -29,20 +29,21 @@ import java.util.Map;
 public class Th2Exporter {
 
     public static String getContent(
-            Survey survey, Projection2D projection, Space<Coord2D> space, String xviFilename, Shape innerFrame, Shape outerFrame) {
+        Survey survey, Projection2D projection, Space<Coord2D> space, String xviFilename,
+        Shape innerFrame, Shape outerFrame, float scale) {
         List<String> sections = new ArrayList<>();
         sections.add(TherionExporter.getEncodingText());
-        sections.add(getXviBlock(survey, space, xviFilename, innerFrame, outerFrame));
+        sections.add(getXviBlock(survey, space, xviFilename, outerFrame));
 
         Sketch sketch = survey.getSketch(projection);
         String scrapName = getScrapName(survey, projection);
-        sections.add(getScrap(scrapName, projection, sketch, space, innerFrame));
+        sections.add(getScrap(scrapName, projection, sketch, space, innerFrame, scale));
         return TextTools.join("\n\n", sections);
     }
 
 
     public static String getXviBlock(
-            Survey survey, Space<Coord2D> space, String filename, Shape innerFrame, Shape outerFrame) {
+        Survey survey, Space<Coord2D> space, String filename, Shape outerFrame) {
 
         List<String> lines = new ArrayList<>();
 
@@ -88,10 +89,11 @@ public class Th2Exporter {
         return TextTools.join(joiner, name, projectionSuffix);
     }
 
-    public static String getScrap(String name, Projection2D projection, Sketch sketch, Space<Coord2D> space, Shape frame) {
+    public static String getScrap(String name, Projection2D projection, Sketch sketch,
+                                  Space<Coord2D> space, Shape frame, float scale) {
         List<String> lines = new ArrayList<>();
         lines.add(getStartScrapCommands(name, projection, frame));
-        lines.addAll(getScrapCommands(sketch, space));
+        lines.addAll(getScrapCommands(sketch, space, scale));
         lines.add("endscrap");
         return TextTools.join("\n\n", lines);
 
@@ -114,8 +116,7 @@ public class Th2Exporter {
 
     }
 
-    private static List<String> getScrapCommands(Sketch sketch, Space<Coord2D> space) {
-        float scale = 78.74016f;
+    private static List<String> getScrapCommands(Sketch sketch, Space<Coord2D> space, float scale) {
         List<String> commands = new ArrayList<>();
         for (Map.Entry<Station, Coord2D> entry : space.getStationMap().entrySet()) {
             Station station = entry.getKey();

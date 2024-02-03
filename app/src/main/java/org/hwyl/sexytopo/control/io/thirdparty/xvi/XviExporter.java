@@ -7,7 +7,6 @@ import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.SKETCHLIN
 import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.STATIONS_COMMAND;
 
 import org.hwyl.sexytopo.control.util.TextTools;
-import org.hwyl.sexytopo.model.common.Frame;
 import org.hwyl.sexytopo.model.common.Shape;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
@@ -24,7 +23,8 @@ import java.util.Map;
 
 public class XviExporter {
 
-    public static String getContent(Sketch sketch, Space<Coord2D> space, float scale, Frame gridFrame) {
+    public static String getContent(Sketch sketch, Space<Coord2D> space, float scale,
+                                    Shape gridFrame) {
         String text = field(GRIDS_COMMAND, "1 m");
         text += multilineField(STATIONS_COMMAND, getStationsText(space, scale));
         text += multilineField(SHOT_COMMAND, getLegsText(space, scale));

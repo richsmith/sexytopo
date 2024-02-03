@@ -21,7 +21,8 @@ public class Th2ExporterTest {
         Frame exportFrame = ExportFrameFactory.getExportFrame(survey, projection);
         Space<Coord2D> space = projection.project(survey);
         exportFrame = exportFrame.scale(scale);
-        String th2 = Th2Exporter.getContent(survey, projection, space, "filename.xvi", exportFrame, exportFrame);
+        String th2 = Th2Exporter.getContent(survey, projection, space, "filename.xvi",
+            exportFrame, exportFrame, scale);
         Assert.assertTrue(th2.contains("##XTHERION##"));
     }
 

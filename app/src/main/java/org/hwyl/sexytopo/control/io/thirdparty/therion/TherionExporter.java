@@ -90,8 +90,10 @@ public class TherionExporter extends Exporter {
         float scale = getScale();
 
         Space<Coord2D> space = projectionType.project(survey);
-        // Therion y-coordinates are inverse of SexyTopo's
         space = SpaceFlipper.flipVertically(space);
+        // Therion y-coordinates are inverse of SexyTopo's
+        // (it would be more consistent to either do all the processing like scaling and flipping
+        // all at once or all just before using, but we currently have a mix :/)
 
         Sketch sketch = survey.getSketch(projectionType);
 
@@ -111,7 +113,7 @@ public class TherionExporter extends Exporter {
         String content;
 
         content = Th2Exporter.getContent(
-                survey, projectionType, space, xviFile.getFilename(), innerFrame, outerFrame);
+            survey, projectionType, space, xviFile.getFilename(), innerFrame, outerFrame, scale);
         th2File.save(context, content);
 
         String xviContent = XviExporter.getContent(sketch, space, scale, gridFrame);
