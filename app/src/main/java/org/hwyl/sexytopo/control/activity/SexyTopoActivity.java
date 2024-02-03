@@ -568,7 +568,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     }
 
-    private void saveSurvey() {
+    protected void saveSurvey() {
         new SaveTask().execute(this);
     }
 
