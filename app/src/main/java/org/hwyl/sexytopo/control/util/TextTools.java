@@ -25,12 +25,26 @@ public class TextTools {
     final static DecimalFormat dp2WithoutCommaFormatterUk =
         new DecimalFormat("##0.00", new DecimalFormatSymbols(Locale.UK));
 
+    final static Character[] PROBLEMATIC = {' ', '\t', '\n', '\r', ':'};
+    final static Character DEFAULT_JOINER = '-';
+
     @SuppressLint("SimpleDateFormat")
     public final static DateFormat ISO_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
 
     public static String pluralise(int n, String noun) {
         return n + " " + ((n == 1)? noun : noun + "s");
+    }
+
+    public static Character getJoiner(String text) {
+        return text.contains("_")? '_' : DEFAULT_JOINER;
+    }
+    public static String intelligentlySanitise(String text) {
+        Character joiner = getJoiner(text);
+        for (Character c : PROBLEMATIC) {
+            text = text.replace(c, joiner);
+        }
+        return text;
     }
 
     public static String joinAll(String joiner, Object ... list) {

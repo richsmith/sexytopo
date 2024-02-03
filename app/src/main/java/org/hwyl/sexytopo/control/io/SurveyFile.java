@@ -22,7 +22,7 @@ public class SurveyFile extends AbstractSurveyFile {
         public final SurveyFileType AUTOSAVE;
 
         public SurveyFileType(String extension) {
-            this(extension, SexyTopoConstants.DEFAULT_MIME_TYPE);
+            this(extension, SexyTopoConstants.MIME_TYPE_DEFAULT);
         }
 
         public SurveyFileType(String extension, String mimeType) {
@@ -50,13 +50,16 @@ public class SurveyFile extends AbstractSurveyFile {
 
     }
 
-    public static final SurveyFileType DATA = new SurveyFileType(SexyTopoConstants.DATA_EXTENSION);
+    public static final SurveyFileType DATA =
+        new SurveyFileType(SexyTopoConstants.DATA_EXTENSION, SexyTopoConstants.MIME_TYPE_JSON);
     public static final SurveyFileType METADATA =
-        new SurveyFileType(SexyTopoConstants.METADATA_EXTENSION);
+        new SurveyFileType(SexyTopoConstants.METADATA_EXTENSION, SexyTopoConstants.MIME_TYPE_JSON);
     public static final SurveyFileType SKETCH_PLAN =
-        new SurveyFileType(SexyTopoConstants.PLAN_SKETCH_EXTENSION);
+        new SurveyFileType(
+            SexyTopoConstants.PLAN_SKETCH_EXTENSION, SexyTopoConstants.MIME_TYPE_JSON);
     public static final SurveyFileType SKETCH_EXT_ELEVATION =
-        new SurveyFileType(SexyTopoConstants.EXT_ELEVATION_SKETCH_EXTENSION);
+        new SurveyFileType(
+            SexyTopoConstants.EXT_ELEVATION_SKETCH_EXTENSION, SexyTopoConstants.MIME_TYPE_JSON);
 
     public static final List<SurveyFileType> ALL_TYPES =
             List.of(DATA, METADATA, SKETCH_PLAN, SKETCH_EXT_ELEVATION);

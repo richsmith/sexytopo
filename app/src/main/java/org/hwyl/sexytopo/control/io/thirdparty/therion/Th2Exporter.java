@@ -84,8 +84,9 @@ public class Th2Exporter {
 
     public static String getScrapName(Survey survey, Projection2D projection) {
         String name = survey.getName().toLowerCase();
+        name = TextTools.intelligentlySanitise(name);
         String projectionSuffix = projection.getAbbreviation();
-        String joiner = name.contains("_") ? "_" : "-";
+        String joiner = "" + TextTools.getJoiner(name);
         return TextTools.join(joiner, name, projectionSuffix);
     }
 
