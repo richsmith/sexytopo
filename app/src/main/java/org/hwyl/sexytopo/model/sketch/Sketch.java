@@ -75,6 +75,7 @@ public class Sketch extends Shape {
     public void finishPath() {
         float epsilon = Space2DUtils.simplificationEpsilon(activePath);
         activePath.setPath(Space2DUtils.simplify(activePath.getPath(), epsilon));
+        updateBoundingBox(activePath);
         activePath = null;
     }
 
