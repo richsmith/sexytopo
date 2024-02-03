@@ -96,7 +96,7 @@ public class SketchJsonTranslater {
                 pathDetails.add(toPathDetail(object));
             }
             sketch.setPathDetails(pathDetails);
-        } catch (JSONException e) {
+        } catch (Exception e) {
             Log.e(R.string.file_load_sketch_paths_error, e);
         }
 
@@ -104,10 +104,14 @@ public class SketchJsonTranslater {
             JSONArray symbolsArray = json.getJSONArray(SYMBOLS_TAG);
             List<SymbolDetail> symbolDetails = new ArrayList<>();
             for (JSONObject object : IoUtils.toList(symbolsArray)) {
-                symbolDetails.add(toSymbolDetail(object));
+                try {
+                    symbolDetails.add(toSymbolDetail(object));
+                } catch (Exception e) {
+                    Log.i(R.string.file_load_symbols_error, e);
+                }
             }
             sketch.setSymbolDetails(symbolDetails);
-        } catch (JSONException e) {
+        } catch (Exception e) {
             Log.e(R.string.file_load_symbols_error, e);
         }
 
@@ -118,7 +122,7 @@ public class SketchJsonTranslater {
                 textDetails.add(toTextDetail(object));
             }
             sketch.setTextDetails(textDetails);
-        } catch (JSONException e) {
+        } catch (Exception e) {
             Log.e(R.string.file_load_sketch_labels_error, e);
         }
 
@@ -129,7 +133,7 @@ public class SketchJsonTranslater {
                 crossSectionDetails.add(toCrossSectionDetail(survey, object));
             }
             sketch.setCrossSectionDetails(crossSectionDetails);
-        } catch (JSONException e) {
+        } catch (Exception e) {
             Log.e(R.string.file_load_cross_sections_error, e);
         }
 
