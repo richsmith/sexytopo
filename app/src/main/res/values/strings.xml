@@ -381,8 +381,6 @@
     <string name="settings_hot_corners_title">Hot corners</string>
     <string name="settings_hot_corners_summary">Drag from the corners of the sketch to move the view in drawing modes</string>
     <string name="settings_instruments_title">Instruments</string>
-    <string name="settings_backsight_promotion_title">Automatic backsight promotion</string>
-    <string name="settings_backsight_promotion_summary">Replace pairs of inverted readings with a new station leg</string>
     <string name="settings_max_distance_delta_title">Max distance delta (m)</string>
     <string name="settings_max_distance_delta_summary">How much error tolerated when deciding whether to create a new station</string>
     <string name="settings_max_angle_delta_title">Max angle delta (degrees)</string>

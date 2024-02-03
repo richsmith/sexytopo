@@ -27,11 +27,6 @@
 
     <PreferenceCategory
         android:title="@string/settings_instruments_title">
-        <CheckBoxPreference
-            android:key="pref_backsight_promotion"
-            android:title="@string/settings_backsight_promotion_title"
-            android:summary="@string/settings_backsight_promotion_summary"
-            android:defaultValue="false"/>
         <EditTextPreference
             android:key="pref_max_distance_delta"
             android:inputType="numberDecimal"
