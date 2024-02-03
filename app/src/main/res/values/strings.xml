@@ -110,7 +110,7 @@
     <string name="file_intent_import_select_source">Select import folder</string>
     <string name="file_intent_delete_select_target">Select survey folder for deletion</string>
     <string name="file_dialog_delete_survey_title">Delete Survey?</string>
-    <string name="file_dialog_delete_survey_content">This will delete all the files in this survey</string>
+    <string name="file_dialog_delete_survey_content">This will delete all the files in the survey "%1$s"</string>
     <string name="file_delete_error_not_survey">Selection does not appear to be a survey</string>
     <string name="file_delete_successful">Deletion of survey %1$s successful</string>
     <string name="file_error_deleting_survey">Error deleting survey</string>

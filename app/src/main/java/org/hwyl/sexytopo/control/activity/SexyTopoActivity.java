@@ -866,13 +866,13 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
         new AlertDialog.Builder(this)
             .setTitle(R.string.file_dialog_delete_survey_title)
-            .setMessage(R.string.file_dialog_delete_survey_content)
+            .setMessage(getString(R.string.file_dialog_delete_survey_content, directory.getName()))
             .setPositiveButton(R.string.delete,
                 (dialog, whichButton) -> {
                     try {
                         String name = directory.getName();
                         directory.delete();
-                        Log.i(R.string.file_delete_successful, name);
+                        showSimpleToast(R.string.file_delete_successful, name);
                     } catch (Exception e) {
                         showExceptionAndLog(R.string.file_error_deleting_survey, e);
                     }
