@@ -84,15 +84,5 @@
             android:onClick="manuallyAddSplay"/>
         </LinearLayout>
 
-        <ImageButton
-            android:id="@+id/buttonDeleteLastLeg"
-            android:layout_width="@dimen/toolbar_button_height"
-            android:layout_height="@dimen/toolbar_button_height"
-            android:scaleType="fitCenter"
-            android:src="@drawable/bin"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:onClick="deleteLastLeg"/>
-
     </RelativeLayout>
 </LinearLayout>
