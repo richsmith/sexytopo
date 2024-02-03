@@ -7,7 +7,7 @@
 
 
     <RelativeLayout
-        android:id="@+id/relativeLayout1"
+        android:id="@+id/relativeLayout1Landscape"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:background="@color/panelBackground" >
@@ -33,15 +33,6 @@
                 android:onClick="manuallyAddSplay"/>
         </LinearLayout>
 
-        <ImageButton
-            android:id="@+id/buttonDeleteLastLeg"
-            android:layout_width="@dimen/toolbar_button_height"
-            android:layout_height="@dimen/toolbar_button_height"
-            android:scaleType="fitCenter"
-            android:src="@drawable/bin"
-            android:onClick="deleteLastLeg"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true" />
 
     </RelativeLayout>
 

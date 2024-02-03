@@ -405,14 +405,24 @@ public abstract class GraphActivity extends SexyTopoActivity
 
 
     private void toggleSymbolToolbar() {
-        View toolbar = findViewById(R.id.symbolToolbar);
+        View toolbar = getSymbolToolbar();
         boolean isVisible = toolbar.getVisibility() == View.VISIBLE;
         setSymbolToolbarOpen(!isVisible);
     }
 
     private void setSymbolToolbarOpen(boolean setOpen) {
-        View toolbar = findViewById(R.id.symbolToolbar);
+        View toolbar = getSymbolToolbar();
         toolbar.setVisibility(setOpen? View.VISIBLE : View.GONE);
+    }
+
+    private View getSymbolToolbar() {
+        // Have to have separate IDs because Android goes nuts if it tries to restore the state
+        // of a scroll view with the same ID in two different layouts
+        if (isInPortraitMode()) {
+            return findViewById(R.id.symbolToolbar);
+        } else {
+            return findViewById(R.id.symbolToolbarLandscape);
+        }
     }
 
 

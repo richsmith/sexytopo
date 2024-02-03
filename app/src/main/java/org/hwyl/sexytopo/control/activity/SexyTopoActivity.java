@@ -1104,12 +1104,16 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    boolean isDarkModeActive() {
+    protected boolean isDarkModeActive() {
         int nightModeFlags =
             getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
         return nightModeFlags == Configuration.UI_MODE_NIGHT_YES;
     }
 
+    protected boolean isInPortraitMode() {
+        int orientation = getResources().getConfiguration().orientation;
+        return orientation == Configuration.ORIENTATION_PORTRAIT;
+    }
 
     private class SaveTask extends AsyncTask<android.content.Context, Void, Boolean> {
 
