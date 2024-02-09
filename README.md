@@ -7,7 +7,7 @@ The SexyTopo cave and underground surveying app for Android. Next-gen surveying 
 
 This app is experimental software made available for free with no guarantee it is fit for anything in particular. I'm not responsible if it loses your data or leads you into some horrific adventure. Caving is a potentially dangerous activity etc. etc. - you know the score :)
 
-ℹ️ There's a Facebook group for updates about SexyTopo - https://www.facebook.com/groups/sexytopo - but bug reports are easier to deal with as github issues. Other than that please email (or see me in the pub).
+ℹ️ There's a Facebook group for updates about SexyTopo - https://www.facebook.com/groups/sexytopo - but bug reports are easier to deal with as [GitHub issues](https://github.com/richsmith/sexytopo/issues). Other than that please email (or see me in the pub).
 
 🏆 SexyTopo was awarded the [Arthur Butcher award](https://bcra.org.uk/detail/awards.butcher.html) for excellence in surveying by the [BCRA](https://bcra.org.uk) at [Hidden Earth](https://hidden.earth) 2023.
 
