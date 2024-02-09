@@ -336,7 +336,7 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
         createFile(
             SexyTopoConstants.REQUEST_CODE_SAVE_CALIBRATION,
             StartLocation.TOP_LEVEL,
-            SexyTopoConstants.DEFAULT_MIME_TYPE,
+            SexyTopoConstants.MIME_TYPE_DEFAULT,
             null);
     }
 

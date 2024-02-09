@@ -1,5 +1,8 @@
 package org.hwyl.sexytopo;
 
+import android.annotation.SuppressLint;
+
+import java.text.SimpleDateFormat;
 import java.util.UUID;
 
 
@@ -10,6 +13,9 @@ public class SexyTopoConstants {
     public static final String APP_NAME = "SexyTopo";
     public static final String TAG = APP_NAME; // for writing debug log
 
+    @SuppressLint("SimpleDateFormat")
+    public static final SimpleDateFormat ISO_FORMAT =
+            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
     // ********** Event codes **********
 
@@ -52,7 +58,8 @@ public class SexyTopoConstants {
     public static final String PLAN_SUFFIX = "plan";
     public static final String EE_SUFFIX = "ee";
 
-    public static final String DEFAULT_MIME_TYPE = "application/json";
+    public static final String MIME_TYPE_DEFAULT = "text/plain";
+    public static final String MIME_TYPE_JSON = "application/json";
 
     public static final int JSON_INDENT = 2;
 

@@ -8,6 +8,7 @@ import androidx.documentfile.provider.DocumentFile;
 import org.hwyl.sexytopo.control.util.StationNamer;
 import org.hwyl.sexytopo.control.util.SurveyTools;
 import org.hwyl.sexytopo.control.util.Wrapper;
+import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 
 import java.util.ArrayList;
@@ -134,6 +135,17 @@ public class Survey {
     public Sketch getElevationSketch() {
         return elevationSketch;
     }
+
+    public Sketch getSketch(Projection2D projection) {
+        if (projection == Projection2D.PLAN) {
+            return getPlanSketch();
+        } else if (projection == Projection2D.EXTENDED_ELEVATION) {
+            return getElevationSketch();
+        } else {
+            throw new IllegalArgumentException("Unknown projection: " + projection);
+        }
+    }
+
 
     public Station getOrigin() {
         return origin;

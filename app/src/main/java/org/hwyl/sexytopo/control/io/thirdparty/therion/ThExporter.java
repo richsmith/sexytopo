@@ -25,12 +25,10 @@ import java.util.List;
 @SuppressWarnings("UnnecessaryLocalVariable")
 public class ThExporter {
 
-    public static final char COMMENT_CHAR = '#';
-    public static final String DATE_PATTERN = "yyyy.MM.dd";
+    public static final String TRIP_DATE_PATTERN = "yyyy.MM.dd";
 
 
     public static String getContent(Context context, Survey survey, List<String> th2Files) {
-
         String text =
             TherionExporter.getEncodingText() + "\n" +
             getSurveyText(context, survey, th2Files) + "\n";
@@ -67,7 +65,7 @@ public class ThExporter {
                 SexyTopoConstants.APP_NAME + " " + SexyTopoActivity.getVersionName(context);
 
         String surveyText =
-            COMMENT_CHAR + " " + attribution + "\n\n" +
+            TherionExporter.COMMENT_CHAR + " " + attribution + "\n\n" +
             "survey " + survey.getName() + "\n\n" +
             getInputText(th2Files) + "\n\n" +
             indent(getCentrelineText(survey)) + "\n\n" +
@@ -107,7 +105,6 @@ public class ThExporter {
     }
 
     private static String getCentreline(Survey survey) {
-
         GraphToListTranslator graphToListTranslator = new GraphToListTranslator();
 
         StringBuilder builder = new StringBuilder();
@@ -123,7 +120,7 @@ public class ThExporter {
                 graphToListTranslator.toChronoListOfSurveyListEntries(survey);
 
         for (GraphToListTranslator.SurveyListEntry entry : list) {
-            SurvexTherionUtil.formatEntry(builder, entry, COMMENT_CHAR);
+            SurvexTherionUtil.formatEntry(builder, entry, TherionExporter.COMMENT_CHAR);
             builder.append("\n");
         }
 
@@ -132,10 +129,7 @@ public class ThExporter {
 
 
     private static String formatTrip(Trip trip) {
-
         StringBuilder builder = new StringBuilder();
-
-
 
         builder.append(formatDate(trip.getDate()));
         builder.append("\n");
@@ -186,8 +180,7 @@ public class ThExporter {
 
     @SuppressLint("SimpleDateFormat")
     private static String formatDate(Date date) {
-
-        DateFormat dateFormat = new SimpleDateFormat(DATE_PATTERN);
+        DateFormat dateFormat = new SimpleDateFormat(TRIP_DATE_PATTERN);
         String dateString = dateFormat.format(date);
         return "date " + dateString;
     }

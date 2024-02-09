@@ -5,6 +5,9 @@
     <color name="pink">#FFC0CB</color>
     <color name="red">#FF0000</color>
     <color name="sexyTopoGreen">#7FAF7F</color>
+    <color name="sexyTopoDarkGreen">#3A5738</color>
+    <color name="sexyTopoPurple">#AF7FAF</color>
+    <color name="sexyTopoDarkPurple">#383A57</color>
     <color name="navy">#000080</color>
 
     <color name="lowKeyGrey">#DDDDDD</color>

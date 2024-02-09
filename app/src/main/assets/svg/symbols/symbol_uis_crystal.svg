@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
+  <line y2="20.08935" x2="32.68762" y1="19.91065" x1="7.31238" stroke="#000000" fill="none"/>
+  <line transform="rotate(-55.1862, 20, 20)" y2="20.02618" x2="32.68761" y1="19.97384" x1="7.31237" stroke="#000000" fill="none"/>
+  <line transform="rotate(55, 20, 20)" y2="20.08935" x2="32.68763" y1="19.91065" x1="7.31239" stroke="#000000" fill="none"/>
+</svg>

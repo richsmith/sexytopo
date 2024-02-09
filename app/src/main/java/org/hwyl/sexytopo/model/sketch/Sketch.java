@@ -1,8 +1,7 @@
 package org.hwyl.sexytopo.model.sketch;
 
-import org.apache.commons.lang3.NotImplementedException;
-import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
+import org.hwyl.sexytopo.model.common.Shape;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.survey.Station;
 
@@ -10,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Sketch extends SketchDetail {
+public class Sketch extends Shape {
 
     private List<PathDetail> pathDetails = new ArrayList<>();
     private List<SymbolDetail> symbolDetails = new ArrayList<>();
@@ -59,11 +58,6 @@ public class Sketch extends SketchDetail {
     }
 
 
-    public Sketch() {
-        super(Colour.NONE);
-    }
-
-
     public PathDetail startNewPath(Coord2D start) {
         activePath = new PathDetail(start, activeColour);
         pathDetails.add(activePath);
@@ -81,6 +75,7 @@ public class Sketch extends SketchDetail {
     public void finishPath() {
         float epsilon = Space2DUtils.simplificationEpsilon(activePath);
         activePath.setPath(Space2DUtils.simplify(activePath.getPath(), epsilon));
+        updateBoundingBox(activePath);
         activePath = null;
     }
 
@@ -94,8 +89,8 @@ public class Sketch extends SketchDetail {
         return symbolDetails;
     }
 
-    public void addSymbolDetail(Coord2D location, Symbol symbol, float size) {
-        SymbolDetail symbolDetail = new SymbolDetail(location, symbol, activeColour, size);
+    public void addSymbolDetail(Coord2D location, Symbol symbol, float size, float angle) {
+        SymbolDetail symbolDetail = new SymbolDetail(location, symbol, activeColour, size, angle);
         symbolDetails.add(symbolDetail);
         addSketchDetail(symbolDetail);
     }
@@ -310,20 +305,4 @@ public class Sketch extends SketchDetail {
         }
     }
 
-    public void updateBoundingBox(SketchDetail sketchDetail) {
-        updateBoundingBox(sketchDetail.getTopLeft());
-        updateBoundingBox(sketchDetail.getBottomRight());
-    }
-
-
-    @Override
-    public float getDistanceFrom(Coord2D point) {
-        throw new NotImplementedException("Not yet implemented");
-    }
-
-
-    @Override
-    public SketchDetail translate(Coord2D point) {
-        throw new NotImplementedException("Not yet implemented");
-    }
 }

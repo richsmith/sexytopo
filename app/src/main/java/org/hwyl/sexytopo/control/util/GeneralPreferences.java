@@ -5,6 +5,9 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 
+import org.hwyl.sexytopo.control.Log;
+import org.hwyl.sexytopo.model.sketch.Colour;
+
 
 public class GeneralPreferences {
 
@@ -186,18 +189,33 @@ public class GeneralPreferences {
         return getInt("pref_station_label_font_size_sp", 10);
     }
 
-    public static int getTextStartingSizePixels() {
-        return getInt("pref_survey_text_tool_font_size", 50);
+    public static int getTextStartingSizeSp() {
+        return getInt("pref_survey_text_tool_font_size_sp", 16);
     }
 
-    public static int getSymbolStartingSizePixels() {
-        return getInt("pref_survey_symbol_size", 35);
+    public static int getSymbolStartingSizeDp() {
+        return getInt("pref_survey_symbol_size", 25);
     }
 
     // ********** Calibration ***********
 
     public static String getCalibrationAlgorithm() {
         return getString("pref_calibration_algorithm", "linear");
+    }
+
+    // ********** Export ***********
+    public static Colour getExportSvgBackgroundColour() {
+        String colour = getString("pref_export_svg_background", "transparent");
+        Log.i("Colour is " + colour);
+        if (colour.equalsIgnoreCase("transparent")) {
+            return Colour.TRANSPARENT;
+        } else {
+            return Colour.WHITE;
+        }
+    }
+
+    public static int getExportSvgStrokeWidth() {
+        return getInt("pref_export_svg_stroke_width", 1);
     }
 
 

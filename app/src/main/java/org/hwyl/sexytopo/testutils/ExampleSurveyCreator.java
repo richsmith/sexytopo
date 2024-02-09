@@ -1,4 +1,4 @@
-package org.hwyl.sexytopo.demo;
+package org.hwyl.sexytopo.testutils;
 
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Leg;
@@ -9,8 +9,12 @@ import org.hwyl.sexytopo.model.table.LRUD;
 import java.util.List;
 import java.util.Random;
 
-
-public class TestSurveyCreator {
+/**
+ * Creates a test survey with a random number of branches and stations.
+ * Unlike the other test utils in this package, this is expected to be
+ * called from user-facing code, not from tests.
+ */
+public class ExampleSurveyCreator {
 
     private static final Random random = new Random();
 

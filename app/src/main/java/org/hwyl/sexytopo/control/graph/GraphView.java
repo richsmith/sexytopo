@@ -8,7 +8,11 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.RotateDrawable;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.Gravity;
@@ -16,6 +20,7 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.PopupWindow;
 
@@ -23,6 +28,7 @@ import androidx.core.content.ContextCompat;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.Log;
+import org.hwyl.sexytopo.control.SexyTopo;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.ExtendedElevationActivity;
 import org.hwyl.sexytopo.control.activity.GraphActivity;
@@ -545,16 +551,42 @@ public class GraphView extends View {
     @SuppressWarnings("SwitchStatementWithTooFewBranches")
     private boolean handleSymbol(MotionEvent event) {
 
+        if (currentSymbol == Symbol.TEXT) {
+            return handleText(event);
+        }
+
         final Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
         final Coord2D touchPointOnSurvey = viewCoordsToSurveyCoords(touchPointOnView);
+        float startingSizeDp = GeneralPreferences.getSymbolStartingSizeDp();
+        float startingSizePixels = SexyTopo.dpToPixels(startingSizeDp);
+        float size = startingSizePixels / surveyToViewScale;
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                float startingSize = GeneralPreferences.getSymbolStartingSizePixels();
-                float size = startingSize / surveyToViewScale;
-                sketch.addSymbolDetail(touchPointOnSurvey, currentSymbol, size);
+                if (currentSymbol.isDirectional()) {
+                    actionDownPointOnView = touchPointOnView;
+                } else {
+                    sketch.addSymbolDetail(touchPointOnSurvey, currentSymbol, size, 0);
+                }
                 invalidate();
                 return true;
+
+            case MotionEvent.ACTION_UP:
+                if (currentSymbol.isDirectional()) {
+                    float angle = Space2DUtils.getAngleBetween(
+                        actionDownPointOnView, touchPointOnView);
+                    angle = Space2DUtils.adjustAngle(angle, -90);
+                    Coord2D firstTouch = viewCoordsToSurveyCoords(actionDownPointOnView);
+                    sketch.addSymbolDetail(firstTouch, currentSymbol, size, angle);
+                    float distance = Space2DUtils.getDistance(
+                        actionDownPointOnView, touchPointOnView);
+                    if (distance < 5) {
+                        activity.showSimpleToast(R.string.sketch_symbol_orientation_education);
+                    }
+                    invalidate();
+                }
+                return true;
+
             default:
                 return false;
         }
@@ -574,16 +606,30 @@ public class GraphView extends View {
                 builder.setView(input)
                     .setPositiveButton(R.string.ok, (dialog, which) -> {
                         String text = input.getText().toString();
-                        int startingSize = GeneralPreferences.getTextStartingSizePixels();
-                        float size = startingSize / surveyToViewScale;
+                        int startingSizeSp = GeneralPreferences.getTextStartingSizeSp();
+                        float startingSizePixels = spToPixels(startingSizeSp);
+                        float size = startingSizePixels / surveyToViewScale;
                         sketch.addTextDetail(touchPointOnSurvey, text, size);
+                        invalidate();
                     })
                     .setNegativeButton(R.string.cancel, null);
+
                 AlertDialog dialog = builder.create();
+
+                // Automatically select text field
+                dialog.setOnShowListener(dialogInterface -> {
+                    input.requestFocus();
+                    InputMethodManager imm = (InputMethodManager)
+                        getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
+                });
+
+                // Keep keyboard visible
                 dialog.getWindow().setSoftInputMode(
                         WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
                 dialog.show();
                 return true;
+
             default:
                 return false;
         }
@@ -1122,7 +1168,7 @@ public class GraphView extends View {
         CrossSection crossSection = crossSectionDetail.getCrossSection();
 
         float angle = (float)Math.toRadians(crossSection.getAngle());
-        float indicatorWidth = (float)(1 * surveyToViewScale);
+        float indicatorWidth = (1 * surveyToViewScale);
         float startX = x - ((indicatorWidth / 2) * (float)Math.cos(angle));
         float startY = y - ((indicatorWidth / 2) * (float)Math.sin(angle));
         float endX = x + ((indicatorWidth / 2) * (float)Math.cos(angle));
@@ -1279,16 +1325,35 @@ public class GraphView extends View {
                 continue;
             }
             Coord2D location = surveyCoordsToViewCoords(symbolDetail.getPosition());
-            Bitmap bitmap = symbolDetail.getSymbol().getBitmap();
 
-            int size = (int)(symbolDetail.getSize() * surveyToViewScale);
-            if (size == 0) {
+            Symbol symbol = symbolDetail.getSymbol();
+
+            int size = Math.round(symbolDetail.getSize() * surveyToViewScale);
+            if (size < 1) {
                 continue;
             }
 
-            bitmap = Bitmap.createScaledBitmap(bitmap, size, size, true);
-            float x = location.x, y = location.y;
-            canvas.drawBitmap(bitmap, x, y, labelPaint);
+            Drawable drawable = symbolDetail.getDrawable();
+            float offset = size / 2f;
+            int x = Math.round(location.x - offset), y = Math.round(location.y - offset);
+            drawable.setBounds(x, y, x + size, y + size);
+            drawable.setAlpha(alpha);
+            Colour drawColour = symbolDetail.getDrawColour(isDarkModeActive);
+            drawable.setColorFilter(
+                new PorterDuffColorFilter(drawColour.intValue, PorterDuff.Mode.SRC_IN));
+
+            if (symbol.isDirectional()) {
+                RotateDrawable rotateDrawable = new RotateDrawable();
+                rotateDrawable.setDrawable(drawable);
+                rotateDrawable.setPivotX(0.5f);
+                rotateDrawable.setPivotY(0.5f);
+                rotateDrawable.setLevel((int) (10000 * (symbolDetail.getAngle() / 360f)));
+                rotateDrawable.setBounds(x, y, x + size, y + size);
+                rotateDrawable.draw(canvas);
+
+            } else { // skip some calcs for efficiency
+                drawable.draw(canvas);
+            }
         }
     }
 

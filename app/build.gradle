@@ -9,10 +9,10 @@ android {
     defaultConfig {
         applicationId "org.hwyl.sexytopo"
         minSdkVersion 21
-        compileSdk 33
+        compileSdk 34
         targetSdkVersion 33
-        versionCode 74
-        versionName "1.7.1"
+        versionCode 76
+        versionName "1.8.0-beta3"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
 
@@ -35,6 +35,7 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
     }
+
     lint {
         abortOnError false
         disable 'UnnecessaryLocalVariable', 'SameParameterValue'
@@ -51,10 +52,10 @@ repositories {
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.core:core-ktx:1.10.1'
+    implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'androidx.preference:preference-ktx:1.2.1'
     implementation 'com.google.firebase:firebase-analytics:21.3.0'
-    implementation 'com.google.firebase:firebase-crashlytics:18.4.0'
+    implementation 'com.google.firebase:firebase-crashlytics:18.4.2'
     implementation 'commons-io:commons-io:2.6'
     implementation 'no.nordicsemi.android:ble:2.6.1'
     implementation 'org.apache.commons:commons-lang3:3.11'

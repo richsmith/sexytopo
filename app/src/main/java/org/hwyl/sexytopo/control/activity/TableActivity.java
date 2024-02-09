@@ -48,10 +48,7 @@ import java.util.Map;
 
 
 public class TableActivity extends SexyTopoActivity
-        implements
-            PopupMenu.OnMenuItemClickListener,
-            PopupMenu.OnDismissListener,
-            OnLongClickListener {
+    implements PopupMenu.OnMenuItemClickListener, PopupMenu.OnDismissListener, OnLongClickListener {
 
     private final GraphToListTranslator graphToListTranslator = new GraphToListTranslator();
 
@@ -356,18 +353,18 @@ public class TableActivity extends SexyTopoActivity
         }
 
         new AlertDialog.Builder(context)
-                .setMessage(message)
-                .setPositiveButton(R.string.delete, (dialog, which) -> {
-                    Survey survey = getSurvey();
-                    if (deletingLeg) {
-                        SurveyUpdater.deleteSplay(survey, station, leg);
-                    } else {
-                        SurveyUpdater.deleteStation(survey, station);
-                    }
-                    getSurveyManager().broadcastSurveyUpdated();
-                })
-                .setNegativeButton(R.string.cancel, null)
-                .show();
+            .setMessage(message)
+            .setPositiveButton(R.string.delete, (dialog, which) -> {
+                Survey survey = getSurvey();
+                if (deletingLeg) {
+                    SurveyUpdater.deleteSplay(survey, station, leg);
+                } else {
+                    SurveyUpdater.deleteStation(survey, station);
+                }
+                getSurveyManager().broadcastSurveyUpdated();
+            })
+            .setNegativeButton(R.string.cancel, null)
+            .show();
     }
 
 
@@ -420,17 +417,17 @@ public class TableActivity extends SexyTopoActivity
         spinner.setAdapter(adapter);
 
         new AlertDialog.Builder(this)
-                .setMessage(R.string.context_move_leg_select_station_title)
-                .setView(stationView)
-                .setPositiveButton(R.string.move, (dialog, which) -> {
-                    String selectedName = spinner.getSelectedItem().toString();
-                    Station newStation = getSurvey().getStationByName(selectedName);
+            .setMessage(R.string.context_move_leg_select_station_title)
+            .setView(stationView)
+            .setPositiveButton(R.string.move, (dialog, which) -> {
+                String selectedName = spinner.getSelectedItem().toString();
+                Station newStation = getSurvey().getStationByName(selectedName);
 
-                    SurveyUpdater.moveLeg(getSurvey(), toMove, newStation);
-                    syncTableWithSurvey();
-                })
-                .setNegativeButton(R.string.cancel, null)
-                .show();
+                SurveyUpdater.moveLeg(getSurvey(), toMove, newStation);
+                syncTableWithSurvey();
+            })
+            .setNegativeButton(R.string.cancel, null)
+            .show();
     }
 
 

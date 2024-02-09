@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.control.util;
 
+import org.hwyl.sexytopo.model.common.Frame;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Space;
@@ -96,6 +97,23 @@ public class Space2DUtils {
         Coord2D start = line.getStart();
         Coord2D end = line.getEnd();
         return new Line<>(start.plus(point), end.plus(point));
+    }
+
+    public static float getAngleBetween(Coord2D p0, Coord2D p1) {
+        float deltaY = p0.y - p1.y;
+        float deltaX = p0.x - p1.x;
+        float radians = (float)Math.atan2(deltaY, deltaX);
+        float angle = (float)Math.toDegrees(radians);
+        return angle;
+    }
+
+    public static Frame toFrame(Space<Coord2D> space) {
+        Frame frame = new Frame();
+        for (Line<Coord2D> line : space.getLegMap().values()) {
+            frame.updateBoundingBox(line.getStart());
+            frame.updateBoundingBox(line.getEnd());
+        }
+        return frame;
     }
 
     private static List<Coord2D> douglasPeukerIteration(List<Coord2D> path, float epsilon) {

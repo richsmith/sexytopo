@@ -63,11 +63,11 @@ public class ManualEntry {
             (edited, ignore) -> {
                 if (toEdit.hasDestination()) {
                     edited = new Leg(
-                            edited.getDistance(),
-                            edited.getAzimuth(),
-                            edited.getInclination(),
-                            toEdit.getDestination(),
-                            new Leg[]{});
+                        edited.getDistance(),
+                        edited.getAzimuth(),
+                        edited.getInclination(),
+                        toEdit.getDestination(),
+                        new Leg[]{});
                 }
                 if (toEdit.wasShotBackwards()) {
                     edited = edited.reverse();
@@ -86,6 +86,9 @@ public class ManualEntry {
                 .setText(Float.toString(editData.getAzimuth()));
         ((TextView) (dialog.findViewById(R.id.editInclination)))
                 .setText(Float.toString(editData.getInclination()));
+
+
+
     }
 
 

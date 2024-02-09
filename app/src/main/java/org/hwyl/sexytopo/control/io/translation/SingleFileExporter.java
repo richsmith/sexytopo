@@ -22,8 +22,5 @@ public abstract class SingleFileExporter extends Exporter {
 
     public abstract String getFileExtension();
 
-    public String getMimeType() {
-        return "text/plain";
-    }
 
 }

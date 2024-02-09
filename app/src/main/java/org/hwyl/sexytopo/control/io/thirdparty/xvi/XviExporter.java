@@ -1,7 +1,13 @@
 package org.hwyl.sexytopo.control.io.thirdparty.xvi;
 
-import org.hwyl.sexytopo.control.io.thirdparty.therion.SketchDimensions;
+import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.GRIDS_COMMAND;
+import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.GRID_COMMAND;
+import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.SHOT_COMMAND;
+import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.SKETCHLINE_COMMAND;
+import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.STATIONS_COMMAND;
+
 import org.hwyl.sexytopo.control.util.TextTools;
+import org.hwyl.sexytopo.model.common.Shape;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Space;
@@ -14,22 +20,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.GRIDS_COMMAND;
-import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.GRID_COMMAND;
-import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.SHOT_COMMAND;
-import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.SKETCHLINE_COMMAND;
-import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.STATIONS_COMMAND;
-
 
 public class XviExporter {
 
-    public static String getContent(Sketch sketch, Space<Coord2D> space, float scale) {
-
+    public static String getContent(Sketch sketch, Space<Coord2D> space, float scale,
+                                    Shape gridFrame) {
         String text = field(GRIDS_COMMAND, "1 m");
         text += multilineField(STATIONS_COMMAND, getStationsText(space, scale));
         text += multilineField(SHOT_COMMAND, getLegsText(space, scale));
         text += multilineField(SKETCHLINE_COMMAND, getSketchLinesText(sketch, scale));
-        text += field(GRID_COMMAND, getGridText(space, scale));
+        text += field(GRID_COMMAND, getGridText(gridFrame, scale));
         return text;
     }
 
@@ -85,18 +85,22 @@ public class XviExporter {
         return field("\t", TextTools.join(" ", fields));
     }
 
-    private static String getGridText(Space<Coord2D> space, float scale) {
-        SketchDimensions dimensions = SketchDimensions.getDimensions(space);
+    private static String getGridText(Shape gridFrame, float scale) {
 
+        float numberX = Math.round(gridFrame.getWidth() / scale);
+        float numberY = Math.round(gridFrame.getHeight() / scale);
+
+        // Grid is{bottom left x, bottom left y,
+        // x1 dist, y1 dist, x2 dist, y2 dist, number of x, number of y}
         Float[] values = new Float[] {
-            (dimensions.minX - 1) * scale,
-            (dimensions.minY - 1) * scale,
-            scale,
-            0.0f,
-            0.0f,
-            scale,
-            dimensions.getWidth() + 2,
-            dimensions.getHeight() + 2
+            gridFrame.getLeft(), // bottom left x
+            gridFrame.getBottom(), // bottom left y
+            scale, // x1 dist
+            0.0f,  // y1 dist
+            0.0f, // x2 dist
+            scale, // y2 dist
+            numberX,  // x squares
+            numberY  // y squares
         };
 
         return TextTools.join(" ", Arrays.asList(values));

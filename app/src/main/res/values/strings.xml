@@ -110,7 +110,7 @@
     <string name="file_intent_import_select_source">Select import folder</string>
     <string name="file_intent_delete_select_target">Select survey folder for deletion</string>
     <string name="file_dialog_delete_survey_title">Delete Survey?</string>
-    <string name="file_dialog_delete_survey_content">This will delete all the files in this survey</string>
+    <string name="file_dialog_delete_survey_content">This will delete all the files in the survey "%1$s"</string>
     <string name="file_delete_error_not_survey">Selection does not appear to be a survey</string>
     <string name="file_delete_successful">Deletion of survey %1$s successful</string>
     <string name="file_error_deleting_survey">Error deleting survey</string>
@@ -140,6 +140,7 @@
     <string name="third_party_survex" translatable="false">Survex</string>
     <string name="third_party_compass" translatable="false">Compass</string>
     <string name="third_party_svg" translatable="false">SVG</string>
+    <string name="created_with">Created with %1$s on %2$s</string>
 
     <!-- Sketch view -->
     <string name="sketch_toolbar_draw">Draw mode</string>
@@ -175,6 +176,7 @@
     <string name="sketch_menu_show_connect">Linked Surveys</string>
     <string name="sketch_menu_back_measurements">Reverse Legs</string>
     <string name="sketch_position_cross_section_instruction">Select where to draw cross-section</string>
+    <string name="sketch_symbol_orientation_education">Drag to set symbol direction</string>
 
     <!-- Table view -->
     <string name="table_head_from">From</string>
@@ -379,8 +381,6 @@
     <string name="settings_hot_corners_title">Hot corners</string>
     <string name="settings_hot_corners_summary">Drag from the corners of the sketch to move the view in drawing modes</string>
     <string name="settings_instruments_title">Instruments</string>
-    <string name="settings_backsight_promotion_title">Automatic backsight promotion</string>
-    <string name="settings_backsight_promotion_summary">Replace pairs of inverted readings with a new station leg</string>
     <string name="settings_max_distance_delta_title">Max distance delta (m)</string>
     <string name="settings_max_distance_delta_summary">How much error tolerated when deciding whether to create a new station</string>
     <string name="settings_max_angle_delta_title">Max angle delta (degrees)</string>
@@ -396,9 +396,9 @@
     <string name="settings_two_finger_movement_title">Two-finger movement (experimental)</string>
     <string name="settings_two_finger_movement_summary">Two fingers move the screen even when drawing etc.</string>
     <string name="settings_survey_text_tool_font_size_title">Text tool label size</string>
-    <string name="settings_survey_text_tool_font_size_summary">How big to initially draw manually-placed text (pixels)</string>
+    <string name="settings_survey_text_tool_font_size_summary">How big to initially draw manually-placed text (sp)</string>
     <string name="settings_survey_symbol_size_title">Survey symbol size</string>
-    <string name="settings_survey_symbol_size_summary">How big to initially draw symbols (pixels)</string>
+    <string name="settings_survey_symbol_size_summary">How big to initially draw symbols (dp)</string>
     <string name="settings_leg_width_title">Leg line thickness</string>
     <string name="settings_leg_width_summary">How wide to draw leg lines</string>
     <string name="settings_splay_width_title">Splay line thickness</string>
@@ -416,6 +416,15 @@
     <string name="settings_key_lrud_fields_summary">Show fields for entering LRUDs (Left-Right-Up-Down) for each new station</string>
     <string name="settings_key_deg_mins_secs_title">Azimuth as degrees/minutes/seconds</string>
     <string name="settings_key_deg_mins_secs_summary">Enter azimuth values in deg/mins/secs (as opposed to the default of decimal)</string>
+    <string name="settings_export_title">Export</string>
+    <string name="settings_export_svg_background_title">SVG background</string>
+    <string name="settings_export_svg_background_summary">Optionally export with an opaque background</string>
+    <string-array name="settings_export_svg_background_entries">
+        <item>Transparent</item>
+        <item>White</item>
+    </string-array>
+    <string name="settings_export_svg_stroke_width_title">SVG stroke width</string>
+    <string name="settings_export_svg_stroke_width_summary">How wide to draw lines in SVG export</string>
     <string name="settings_developer_title">Developer</string>
     <string name="settings_key_developer_mode_title">Developer mode</string>
     <string name="settings_key_developer_mode_summary">Show debugging menu entries</string>
@@ -428,6 +437,28 @@
     <string name="survey_update_moved_leg">Moved leg to station %1$s</string>
     <string name="survey_update_adding_leg">Adding leg %1$s</string>
     <string name="survey_update_reversed_leg">Reversed leg %1$s to %2$s</string>
+
+    <!-- Survey symbols -->
+    <string name="symbol_text">Text</string>
+    <string name="symbol_entrance">Entrance</string>
+    <string name="symbol_gradient">Gradient</string>
+    <string name="symbol_too_tight">Too tight</string>
+    <string name="symbol_sand">Sand</string>
+    <string name="symbol_clay">Clay</string>
+    <string name="symbol_pebbles">Pebbles</string>
+    <string name="symbol_blocks">Blocks</string>
+    <string name="symbol_stalactite">Stalactite</string>
+    <string name="symbol_stalagmite">Stalagmite</string>
+    <string name="symbol_column">Column</string>
+    <string name="symbol_curtain">Curtain</string>
+    <string name="symbol_straws">Straws</string>
+    <string name="symbol_helictites">Helictites</string>
+    <string name="symbol_crystals">Crystals</string>
+    <string name="symbol_gour">Gour</string>
+    <string name="symbol_water_flow">Flow</string>
+    <string name="symbol_air_draught">Air draught</string>
+    <string name="symbol_guano">Guano</string>
+    <string name="symbol_debris">Debris</string>
 
     <!-- Context menu(s) -->
     <string name="menu_context_title">Station</string>
@@ -457,7 +488,6 @@
     <string name="context_rename_splay_error">Cannot rename a splay end</string>
     <string name="context_set_active_splay_error">Cannot set splay end as the active station</string>
 
-
     <!-- Logging -->
     <string name="log_starting_up">Starting up</string>
     <string name="log_shown">Shown: %1$s</string>
@@ -471,5 +501,6 @@
     <string name="tool_force_crash_message">Boom! Forced crash requested(!)</string>
     <string name="request_code_error">Error code %1$d from request code %2$d</string>
     <string name="killing_comms_process">Killing comms process</string>
+    <string name="setup_error_load_symbol_svg">Error loading symbol SVG %1$s</string>
 
 </resources>

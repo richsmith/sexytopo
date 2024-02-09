@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
+  <ellipse stroke="black" fill="none" transform="matrix(0.707688, 0.262121, -0.257577, 0.72017, 8.54411, 2.83931)" ry="4" rx="8" cy="22.07394" cx="23.33119"/>
+  <ellipse stroke="black" fill="none" transform="matrix(0.601457, -0.461224, 0.45323, 0.612065, -1.05267, 23.0778)" ry="4" rx="8" cy="16.20012" cx="34.2683"/>
+  <ellipse stroke="black" fill="none" transform="matrix(0.353562, -0.676682, 0.664953, 0.359798, -4.78253, 19.7919)" ry="4" rx="8" cy="17.89155" cx="13.3612"/>
+</svg>

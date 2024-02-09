@@ -42,4 +42,9 @@ public final class Coord3D extends Coord {
     public String toString() {
         return String.format("(%f, %f, %f)", x, y, z);
     }
+
+    @Override
+    public Coord scale(float scale) {
+        return new Coord3D(x * scale, y * scale, z * scale);
+    }
 }

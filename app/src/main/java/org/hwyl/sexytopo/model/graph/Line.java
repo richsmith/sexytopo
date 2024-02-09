@@ -21,4 +21,8 @@ public final class Line<T extends Coord> {
     public String toString() {
         return start + " -> " + end;
     }
+
+    public Line<T> scale(float scale) {
+        return new Line<>((T) start.scale(scale), (T) end.scale(scale));
+    }
 }

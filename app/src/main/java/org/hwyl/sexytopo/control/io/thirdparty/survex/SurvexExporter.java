@@ -48,6 +48,10 @@ public class SurvexExporter extends SingleFileExporter {
         return context.getString(R.string.third_party_survex);
     }
 
+    public String getMimeType() {
+        return "text/svx";
+    }
+
 
     @Override
     public String getExportDirectoryName() {

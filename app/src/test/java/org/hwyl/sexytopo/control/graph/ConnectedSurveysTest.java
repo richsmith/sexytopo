@@ -11,7 +11,7 @@ import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
-import org.hwyl.sexytopo.testhelpers.BasicTestSurveyCreator;
+import org.hwyl.sexytopo.testhelpers.SurveyMocker;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -162,7 +162,7 @@ public class ConnectedSurveysTest {
         Leg l0 = new Leg(1.0f, 0.0f, 0.0f);
         SurveyUpdater.update(basicSurvey, l0);
         SurveyUpdater.upgradeSplayToConnectedLeg(basicSurvey, l0, InputMode.FORWARD);
-        BasicTestSurveyCreator.mockSurveyUri(basicSurvey, uri);
+        SurveyMocker.mockSurveyUri(basicSurvey, uri);
         return basicSurvey;
     }
 

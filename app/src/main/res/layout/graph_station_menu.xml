@@ -18,7 +18,7 @@
         android:id="@+id/graph_station_select"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/abc_cab_background_internal_bg"
+        android:background="?android:attr/windowBackground"
         android:text="@string/menu_set_active_station"
         android:padding="10dp" />
 
@@ -26,7 +26,7 @@
         android:id="@+id/graph_station_jump_to_table"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/abc_cab_background_internal_bg"
+        android:background="?android:attr/windowBackground"
         android:text="@string/menu_jump_to_station_in_table"
         android:padding="10dp"/>
 
@@ -34,7 +34,7 @@
         android:id="@+id/graph_station_comment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/abc_cab_background_internal_bg"
+        android:background="?android:attr/windowBackground"
         android:text="@string/menu_comment"
         android:padding="10dp"/>
 
@@ -42,7 +42,7 @@
         android:id="@+id/graph_station_toggle_left_right"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/abc_cab_background_internal_bg"
+        android:background="?android:attr/windowBackground"
         android:text="@string/menu_toggle_left_right"
         android:padding="10dp"
         android:visibility="gone"/>
@@ -51,7 +51,7 @@
         android:id="@+id/graph_station_reverse"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/abc_cab_background_internal_bg"
+        android:background="?android:attr/windowBackground"
         android:text="@string/menu_reverse"
         android:padding="10dp"/>
 
@@ -59,7 +59,7 @@
         android:id="@+id/graph_station_new_cross_section"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/abc_cab_background_internal_bg"
+        android:background="?android:attr/windowBackground"
         android:text="@string/menu_new_cross_section"
         android:padding="10dp"/>
 
@@ -67,7 +67,7 @@
         android:id="@+id/graph_station_start_new_survey"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/abc_cab_background_internal_bg"
+        android:background="?android:attr/windowBackground"
         android:text="@string/menu_start_new_survey"
         android:padding="10dp"/>
 
@@ -75,7 +75,7 @@
         android:id="@+id/graph_station_unlink_survey"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/abc_cab_background_internal_bg"
+        android:background="?android:attr/windowBackground"
         android:text="@string/menu_unlink_survey"
         android:padding="10dp"
         android:enabled="false"/>
@@ -84,7 +84,7 @@
         android:id="@+id/graph_station_delete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/abc_cab_background_internal_bg"
+        android:background="?android:attr/windowBackground"
         android:text="@string/menu_delete_station"
         android:padding="10dp"/>
 

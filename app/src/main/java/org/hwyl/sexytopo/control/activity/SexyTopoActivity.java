@@ -51,7 +51,7 @@ import org.hwyl.sexytopo.control.io.translation.ImportManager;
 import org.hwyl.sexytopo.control.io.translation.SelectableExporters;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.InputMode;
-import org.hwyl.sexytopo.demo.TestSurveyCreator;
+import org.hwyl.sexytopo.testutils.ExampleSurveyCreator;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.SurveyConnection;
@@ -568,7 +568,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     }
 
-    private void saveSurvey() {
+    protected void saveSurvey() {
         new SaveTask().execute(this);
     }
 
@@ -866,13 +866,13 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
         new AlertDialog.Builder(this)
             .setTitle(R.string.file_dialog_delete_survey_title)
-            .setMessage(R.string.file_dialog_delete_survey_content)
+            .setMessage(getString(R.string.file_dialog_delete_survey_content, directory.getName()))
             .setPositiveButton(R.string.delete,
                 (dialog, whichButton) -> {
                     try {
                         String name = directory.getName();
                         directory.delete();
-                        Log.i(R.string.file_delete_successful, name);
+                        showSimpleToast(R.string.file_delete_successful, name);
                     } catch (Exception e) {
                         showExceptionAndLog(R.string.file_error_deleting_survey, e);
                     }
@@ -991,7 +991,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 .setCancelable(false)
                 .setPositiveButton(R.string.replace, (dialog, id) -> {
                     try {
-                        Survey currentSurvey = TestSurveyCreator.create(10, 5);
+                        Survey currentSurvey = ExampleSurveyCreator.create(10, 5);
                         setSurvey(currentSurvey);
                     } catch (Exception exception) {
                         showExceptionAndLog(R.string.tool_generate_test_error, exception);
@@ -1081,8 +1081,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else if (orientationPreference.equals("landscape")) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        } else {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
         }
     }
 
@@ -1106,10 +1104,15 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    boolean isDarkModeActive() {
+    protected boolean isDarkModeActive() {
         int nightModeFlags =
             getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
         return nightModeFlags == Configuration.UI_MODE_NIGHT_YES;
+    }
+
+    protected boolean isInPortraitMode() {
+        int orientation = getResources().getConfiguration().orientation;
+        return orientation == Configuration.ORIENTATION_PORTRAIT;
     }
 
     private class SaveTask extends AsyncTask<android.content.Context, Void, Boolean> {

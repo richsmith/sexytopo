@@ -96,7 +96,7 @@ public class SketchJsonTranslater {
                 pathDetails.add(toPathDetail(object));
             }
             sketch.setPathDetails(pathDetails);
-        } catch (JSONException e) {
+        } catch (Exception e) {
             Log.e(R.string.file_load_sketch_paths_error, e);
         }
 
@@ -104,10 +104,14 @@ public class SketchJsonTranslater {
             JSONArray symbolsArray = json.getJSONArray(SYMBOLS_TAG);
             List<SymbolDetail> symbolDetails = new ArrayList<>();
             for (JSONObject object : IoUtils.toList(symbolsArray)) {
-                symbolDetails.add(toSymbolDetail(object));
+                try {
+                    symbolDetails.add(toSymbolDetail(object));
+                } catch (Exception e) {
+                    Log.i(R.string.file_load_symbols_error, e);
+                }
             }
             sketch.setSymbolDetails(symbolDetails);
-        } catch (JSONException e) {
+        } catch (Exception e) {
             Log.e(R.string.file_load_symbols_error, e);
         }
 
@@ -118,7 +122,7 @@ public class SketchJsonTranslater {
                 textDetails.add(toTextDetail(object));
             }
             sketch.setTextDetails(textDetails);
-        } catch (JSONException e) {
+        } catch (Exception e) {
             Log.e(R.string.file_load_sketch_labels_error, e);
         }
 
@@ -129,7 +133,7 @@ public class SketchJsonTranslater {
                 crossSectionDetails.add(toCrossSectionDetail(survey, object));
             }
             sketch.setCrossSectionDetails(crossSectionDetails);
-        } catch (JSONException e) {
+        } catch (Exception e) {
             Log.e(R.string.file_load_cross_sections_error, e);
         }
 
@@ -180,6 +184,10 @@ public class SketchJsonTranslater {
         json.put(COLOUR_TAG, symbolDetail.getColour().toString());
         json.put(SIZE_TAG, symbolDetail.getSize());
 
+        if (symbolDetail.getAngle() != 0) {
+            json.put(ANGLE_TAG, symbolDetail.getAngle());
+        }
+
         return json;
     }
 
@@ -191,8 +199,9 @@ public class SketchJsonTranslater {
         Symbol symbol = Symbol.valueOf(json.getString(SYMBOL_ID_TAG));
 
         float size = (float)(json.has(SIZE_TAG)? json.getDouble(SIZE_TAG) : 1);
+        float angle = (float)(json.has(ANGLE_TAG)? json.getDouble(ANGLE_TAG) : 0);
 
-        SymbolDetail symbolDetail = new SymbolDetail(location, symbol, colour, size);
+        SymbolDetail symbolDetail = new SymbolDetail(location, symbol, colour, size, angle);
         return symbolDetail;
     }
 
