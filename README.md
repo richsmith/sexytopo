@@ -42,7 +42,7 @@ Please get in touch if think you can help SexyTopo work with any other instrumen
 It was originally a placeholder name: a cave surveying app with a sexier interface. It now has name recognition so probably won't get around to changing it.
 
 ## How do I save / create a survey?
-SexyTopo automatically creates an unsaved survey when you open it (or you select `File → New Survey` from the menu. If you save it (big save button or through the menu) then you have to create a folder for the survey to live in. Older versions of Android don't make this very easy. This is an Android-enforced change from older versions of SexyTopo. 
+SexyTopo automatically creates an unsaved survey when you open it (or you select `File → New Survey` from the menu). If you save it (big save button or through the menu) then you have to create a folder for the survey to live in. Older versions of Android don't make this very easy. This is an Android-enforced change from older versions of SexyTopo. 
 
 ## Does SexyTopo need all those permissions?
 Yes, even if it might not be obvious what they do. E.g. asking for certain Bluetooth permissions requires asking for location permissions (presumably you can use Bluetooth to find your location in some way). If you don't grant it everything it asks for then it may fail in unexpected ways.
