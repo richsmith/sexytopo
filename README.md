@@ -39,7 +39,7 @@ Currently the following:
 Please get in touch if think you can help SexyTopo work with any other instruments.
 
 ## Why... SexyTopo?
-It was originally a placeholder name: a cave surveying app with a sexier interface. It now has name recognition so probably won't get around to changing it.
+It was originally a placeholder name: a cave surveying app with a sexier interface. It now has name recognition so I probably won't get around to changing it now unless Google starts cracking down on "interesting" app names.
 
 ## How do I save / create a survey?
 SexyTopo automatically creates an unsaved survey when you open it (or you select `File → New Survey` from the menu). If you save it (big save button or through the menu) then you have to create a folder for the survey to live in. Older versions of Android don't make this very easy. This is an Android-enforced change from older versions of SexyTopo. 
@@ -51,7 +51,7 @@ Yes, even if it might not be obvious what they do. E.g. asking for certain Bluet
 Awesome! Please get in touch. I'm interested in programmers, testers, ideas, etc.! There's also a Facebook group for updates about SexyTopo.
 https://www.facebook.com/groups/sexytopo
 
-If you are interested in contributing code (yay), I'd ideally prefer it if you talk to me before committing. I (or someone) might already be working on that feature, or there might be some other reason why your idea hasn't made it in yet. I'm likely to be enthusiastic 
+If you are interested in contributing code (yay), I'd ideally prefer it if you talk to me before committing. I (or someone) might already be working on that feature, or there might be some other reason why your idea hasn't made it in yet. I'm likely to be enthusiastic if you want to add a feature or fix a problem.
 
 ## I've had this problem...
 Please open a Github issue. You can also email me, ask on the FB page, or track me down in the pub, but Github isues are easiest to track.
