@@ -128,7 +128,8 @@ public class Th2Exporter {
         for (TextDetail textDetail : sketch.getTextDetails()) {
             Coord2D coord = textDetail.getPosition().scale(scale).flipVertically();
             commands.add(
-                getPoint(coord.x, coord.y, "label", "-text", textDetail.getText(), "-scale", getScale(textDetail)));
+                getPoint(coord.x, coord.y, "label", "-text \"", textDetail.getText(), "\" -scale",
+                    getScale(textDetail)));
         }
 
         for (SymbolDetail symbolDetail : sketch.getSymbolDetails()) {
