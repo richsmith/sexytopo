@@ -2,8 +2,10 @@ package org.hwyl.sexytopo.control.io.translation;
 
 import android.content.Context;
 
+import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.io.SurveyDirectory;
 import org.hwyl.sexytopo.control.io.SurveyFile;
+import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 
@@ -20,6 +22,16 @@ public abstract class Exporter {
     public abstract void run(Context context, Survey survey) throws Exception;
 
     public abstract String getExportTypeName(Context context);
+
+    public String getExportTypeDescription(Context context) {
+        String name = getExportTypeName(context);
+        if (this instanceof Experimental) {
+            String experimental = context.getString(R.string.experimental_warning);
+            return TextTools.join(" ", name, "[" + experimental + "]");
+        } else {
+            return name;
+        }
+    }
 
     public SurveyDirectory getParentExportDirectory() {
         SurveyDirectory exportDirectory = SurveyDirectory.EXPORT.get(survey);

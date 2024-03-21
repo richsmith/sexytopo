@@ -147,4 +147,15 @@ public class IoUtils {
         pfd.close();
     }
 
+/*
+    public static void saveToFile(Context context, DocumentFile documentFile, String contents)
+        throws IOException {
+        Uri uri = documentFile.getUri();
+        try (ParcelFileDescriptor pfd =
+                 context.getContentResolver().openFileDescriptor(uri, "w");
+             FileOutputStream fileOutputStream = new FileOutputStream(pfd.getFileDescriptor())) {
+            fileOutputStream.write(contents.getBytes());
+        }
+    }*/
+
 }

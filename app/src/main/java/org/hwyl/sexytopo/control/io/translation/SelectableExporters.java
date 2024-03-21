@@ -18,14 +18,14 @@ public class SelectableExporters {
     public static final List<? extends Exporter> EXPORTERS = Arrays.asList(
         new TherionExporter(),
         new SurvexExporter(),
+        new SvgExporter(),
         new PocketTopoTxtExporter(),
-        new CompassExporter(),
-        new SvgExporter()
+        new CompassExporter()
     );
 
     public static Exporter fromName(Context context, String name) {
         for (Exporter exporter: EXPORTERS) {
-            if (exporter.getExportTypeName(context).equals(name)) {
+            if (exporter.getExportTypeDescription(context).equals(name)) {
                 return exporter;
             }
         }
@@ -35,7 +35,7 @@ public class SelectableExporters {
     public static List<String> getExportTypeNames(Context context) {
         List<String> names = new ArrayList<>();
         for (Exporter exporter: EXPORTERS) {
-            names.add(exporter.getExportTypeName(context));
+            names.add(exporter.getExportTypeDescription(context));
         }
         return names;
     }

@@ -4,6 +4,7 @@ import android.content.Context;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexExporter;
+import org.hwyl.sexytopo.control.io.translation.Experimental;
 import org.hwyl.sexytopo.control.io.translation.SingleFileExporter;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Coord2D;
@@ -22,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class PocketTopoTxtExporter extends SingleFileExporter {
+public class PocketTopoTxtExporter extends SingleFileExporter implements Experimental {
 
 
     public String getContent(Survey survey) {

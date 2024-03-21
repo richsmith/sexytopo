@@ -25,6 +25,7 @@
     <string name="no_data">No Data</string>
     <string name="unknown">Unknown</string>
     <string name="error_prefix">Error</string>
+    <string name="experimental_warning">Experimental</string>
 
     <!-- System -->
     <string name="app_name" translatable="false">SexyTopo</string>
