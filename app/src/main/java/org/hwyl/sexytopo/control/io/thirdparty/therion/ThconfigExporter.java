@@ -12,7 +12,7 @@ public class ThconfigExporter {
         "layout local\n" +
         "  debug off\n" +
         "  # map-header 0 0 off\n" +
-        "  symbol-hide group cave-centreline\n" +
+        "  # symbol-hide group cave-centreline\n" + // if on Therion can fail to compile the survey
         "endlayout";
 
     public static String getContent(Survey survey) {
