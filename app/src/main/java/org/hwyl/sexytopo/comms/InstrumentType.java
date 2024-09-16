@@ -6,6 +6,7 @@ import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.comms.bric4.Bric4Communicator;
 import org.hwyl.sexytopo.comms.distox.DistoXCommunicator;
 import org.hwyl.sexytopo.comms.distoxble.DistoXBleCommunicator;
+import org.hwyl.sexytopo.comms.fcl.FCLCommunicator;
 import org.hwyl.sexytopo.comms.missing.NullCommunicator;
 import org.hwyl.sexytopo.comms.sap5.Sap5Communicator;
 import org.hwyl.sexytopo.comms.sap6.SAP6Communicator;
@@ -25,6 +26,7 @@ public enum InstrumentType {
 
     SAP5(R.string.device_sap5_name, R.string.device_sap5_short_name, "Shetland", Sap5Communicator.class),
     SAP6(R.string.device_sap6_name, R.string.device_sap6_short_name, "SAP6", SAP6Communicator.class),
+    FCL(R.string.device_fcl_name, R.string.device_fcl_short_name, "FCL", FCLCommunicator.class),
     OTHER(R.string.device_unknown_name, R.string.device_unknown_short_name, "", NullCommunicator.class),
     NONE(R.string.device_missing_name, R.string.device_missing_short_name, "", NullCommunicator.class);
 
