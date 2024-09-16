@@ -36,9 +36,9 @@
     <string name="title_activity_calibration">Kalibrierung</string>
     <string name="title_activity_survey">Statistik</string>
     <string name="title_activity_settings">Einstellungen</string>
-    <string name="title_activity_system_log">Log</string>
+    <string name="title_activity_system_log">Protokoll-Datei (Log)</string>
     <string name="title_activity_help">Hilfe</string>
-    <string name="title_activity_guide">Handbuch</string>
+    <string name="title_activity_guide">Anleitung</string>
 
     <!--  Action bar menu  -->
     <string name="action_table">Tabelle</string>
@@ -48,11 +48,11 @@
     <string name="action_stats">Statistik</string>
     <string name="action_settings">Einstellungen</string>
     <string name="action_dev">Dev</string>
-    <string name="action_device">Gerät</string>
+    <string name="action_device">Messgerät</string>
     <string name="action_device_connect">Verbinden…</string>
     <string name="action_trip">Aktuelle Tour</string>
     <string name="action_help">Hilfe</string>
-    <string name="action_guide">Handbuch</string>
+    <string name="action_guide">Anleitung</string>
     <string name="action_about">Über</string>
     <string name="action_file_new">Neue Vermessung</string>
     <string name="action_file_open">Vermessungsdatei öffnen…</string>
@@ -157,7 +157,7 @@
     <string name="sketch_toolbar_colour_green">Grün</string>
     <string name="sketch_toolbar_colour_blue">Blau</string>
     <string name="sketch_toolbar_colour_purple">Violett</string>
-    <string name="sketch_toolbar_symbol_close">Werkzeugleiste Symbole schließen</string>
+    <string name="sketch_toolbar_symbol_close">Werkzeugleiste Symbole schliessen</string>
     <string name="sketch_menu_delete_last_leg">Letzten Dateneintrag rückgängig machen</string>
     <string name="sketch_menu_centre_view">Aktives Objekt in Bildschirmmitte anzeigen</string>
     <string name="sketch_menu_auto_recentre">Automatisches Zentrieren</string>
@@ -178,7 +178,7 @@
     <string name="table_head_to">Nach</string>
     <string name="table_head_distance">Dist</string>
     <string name="table_head_azimuth">Azi</string>
-    <string name="table_head_elevation">Incl</string>
+    <string name="table_head_elevation">Neig</string>
     <string name="table_delete_row_question">Zeile löschen?</string>
     <string name="manual_add_station_title">Messpunkt hinzufügen</string>
     <string name="manual_add_splay_title">Dimension oder Hilfslinie hinzufügen</string>
@@ -257,8 +257,8 @@
     <string name="device_distox_command_distox_off">Gerät ausschalten</string>
     <string name="device_distox_command_calibration_start">Kalibrier-Modus starten</string>
     <string name="device_distox_command_calibration_stop">Kalibrier-Modus beenden </string>
-    <string name="device_distox_force_disconnect_for_calibration">DistoX beschäftigt; Trennen der Verbindung zum Schreiben der Kalibrierung erfordrlich</string>
-    <string name="device_distox_calibration_result">Beurteilung der Kaibrierung (Wert sollte unter %1$f liegen): %2$s\n\nKalibrierungs-Algorithmus: %3$s</string>
+    <string name="device_distox_force_disconnect_for_calibration">DistoX beschäftigt; Trennen der Verbindung zum Schreiben der Kalibrierung erforderlich</string>
+    <string name="device_distox_calibration_result">Beurteilung der Kalibrierung (Wert sollte unter %1$f liegen): %2$s\n\nKalibrierungs-Algorithmus: %3$s</string>
     <string name="device_distox_calibration_writing">Schreiben der Kalibrierungskoeffizienten</string>
     <string name="device_distox_calibration_write_success">Schreiben der Kalibrierung erfolgreich</string>
     <string name="device_distox_calibration_write_error">Fehler %1$s beim Übertragen der Kalibrierung</string>
@@ -325,6 +325,10 @@
     <string name="trip_dialog_confirm_clear_trip">Tourdaten löschen?</string>
     <string name="trip_comments">Bemerkungen</string>
     <string name="trip_save_trip">Tour speichern</string>
+    <string name="trip_role_book">Zeichnung</string>
+    <string name="trip_role_instruments">Vermessung</string>
+    <string name="trip_role_dog">Assistenz/Mithilfe</string>
+    <string name="trip_role_exploration">Erforschung</string>
 
     <!--  Stats  -->
     <string name="stats_title_this_survey">Aktuelle Vermessung</string>
@@ -340,7 +344,7 @@
 
     <!--  Settings  -->
     <string name="settings_general_title">Allgemeines</string>
-    <string name="settings_theme_title">Thema</string>
+    <string name="settings_theme_title">Farbschema</string>
     <string name="settings_theme_summary">Nachtmodus verwenden? (Startet die App neu, Datei vor dem Wechseln speichern!)</string>
     <string-array name="settings_theme_entries">
         <item>Standard-Einstellung</item>
@@ -369,8 +373,8 @@
     <string name="settings_max_angle_delta_title">Maximal zulässige Abweichung beim Neigungswinkel (Grad)</string>
     <string name="settings_max_angle_delta_summary">Maximal zulässiger Fehler bei der Erfassung einer neuen Messstrecke</string>
     <string name="settings_calibration_title">Kalibrierung</string>
-    <string name="settings_calibration_algorithm_title">Disto-X Kalibrierungs-Algorithmus</string>
-    <string name="settings_calibration_algorithm_summary">Auswahl des DistoX-Kalibrierungsalgorithmus außer Kraft setzen</string>
+    <string name="settings_calibration_algorithm_title">DistoX Kalibrierungs-Algorithmus</string>
+    <string name="settings_calibration_algorithm_summary">Auswahl des DistoX-Kalibrierungsalgorithmus ausser Kraft setzen</string>
     <string name="settings_sketching_title">Skizzieren</string>
     <string name="settings_delete_path_fragments_title">Linienteile löschen</string>
     <string name="settings_delete_path_fragments_summary">Im Löschmodus: nur die nächstgelegenen Teile einer Linie löschen (sofern ausgeschaltet, wird die gesamte Linie gelöscht)</string>
@@ -380,7 +384,7 @@
     <string name="settings_two_finger_movement_summary">Touch-Gesten auch beim Zeichnen zulassen</string>
     <string name="settings_survey_text_tool_font_size_title">Beschriftungsgrösse Textfeld</string>
     <string name="settings_survey_text_tool_font_size_summary">Ausgangsgrösse von manuell platziertem Text (sp)</string>
-    <string name="settings_survey_symbol_size_title">Größe Vermessungs-Symbol</string>
+    <string name="settings_survey_symbol_size_title">Grösse Vermessungs-Symbol</string>
     <string name="settings_survey_symbol_size_summary">Ausgangsgrösse Symbole (dp)</string>
     <string name="settings_leg_width_title">Liniendicke Messstrecke</string>
     <string name="settings_leg_width_summary">Wie breit Messstrecken dargestellt werden sollen</string>
@@ -388,10 +392,10 @@
     <string name="settings_splay_width_summary">Wie breit Dimensionen und Hilfslinien dargestellt werden sollen</string>
     <string name="settings_station_diameter_title">Durchmesser Messpunkt</string>
     <string name="settings_station_diameter_summary">Wie gross Messpunkt-Symbole dargestellt werden sollen</string>
-    <string name="settings_station_label_font_size_sp_title">Größe der Messpunkt-Beschriftung</string>
-    <string name="settings_station_label_font_size_sp_summary">Größe der Messpunkt-Beschriftung</string>
-    <string name="settings_legend_font_size_sp_title">Größe der Legenden-Beschriftung</string>
-    <string name="settings_legend_font_size_sp_summary">Größe der Legenden-Beschriftung</string>
+    <string name="settings_station_label_font_size_sp_title">Grösse der Messpunkt-Beschriftung</string>
+    <string name="settings_station_label_font_size_sp_summary">Grösse der Messpunkt-Beschriftung</string>
+    <string name="settings_legend_font_size_sp_title">Grösse der Legenden-Beschriftung</string>
+    <string name="settings_legend_font_size_sp_summary">Grösse der Legenden-Beschriftung</string>
     <string name="settings_anti_alias_title">Anti-Alias-Skizzenlinien</string>
     <string name="settings_anti_alias_summary">Anti-Aliasing auf Skizzenlinien usw. anwenden (verbessert die visuelle Darstellung auf Kosten der Rechenleistung)</string>
     <string name="settings_manual_data_entry_title">Manuelle Daten-Eingabe</string>
@@ -458,7 +462,7 @@
     <string name="menu_new_cross_section">Neuer Querschnitt</string>
     <string name="menu_jump_to_station_in_table">→ Daten-Tabelle</string>
     <string name="menu_delete_station">Löschen</string>
-    <string name="menu_reverse">Rückwärts</string>
+    <string name="menu_reverse">Rückblick</string>
     <string name="menu_start_new_survey">Hier neue Vermessung beginnen</string>
     <string name="menu_unlink_survey">Verknüpfung zu anderer Vermessungsdatei lösen</string>
     <string name="menu_comment">Kommentar</string>
