@@ -104,7 +104,7 @@ public class FCLCommunicator implements Communicator {
                 activity.updateConnectionStatus();
                 break;
             case FCLBLE.CONNECTION_FAILED:
-                Log.device(R.string.connection_error, msg);
+                Log.device(R.string.device_connection_error, msg);
                 activity.setConnectionStopped();
                 activity.updateConnectionStatus();
         }
