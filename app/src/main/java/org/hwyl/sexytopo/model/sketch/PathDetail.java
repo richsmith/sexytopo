@@ -19,10 +19,10 @@ public final class PathDetail extends SketchDetail {
         updateBoundingBox(start);
     }
 
-    public PathDetail(List<Coord2D> paths, Colour colour) {
+    public PathDetail(List<Coord2D> path, Colour colour) {
         super(colour);
-        this.path = paths;
-        for (Coord2D point : paths) {
+        this.path = path;
+        for (Coord2D point : path) {
             updateBoundingBox(point);
         }
     }
