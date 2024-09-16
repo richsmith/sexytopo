@@ -36,6 +36,7 @@ Currently the following:
 * The [Shetland Attack Pony 6](https://www.shetlandattackpony.co.uk/)
 * The [Bric4](https://www.caveexploration.org/gear/bric4)
 * The [Bric5](https://www.caveexploration.org/gear/bric4)
+* The [Friken Cave Laser](https://frikencavelaser.com/)
 * Analogue instruments (if you input the data by hand, though not really recommended)
 
 Please get in touch if think you can help SexyTopo work with any other instruments.
