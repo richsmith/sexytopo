@@ -96,15 +96,15 @@ public class FCLCommunicator implements Communicator {
     public Unit statusCallback(int status, String msg) {
         switch (status) {
             case FCLBLE.CONNECTED:
-                Log.device("Connected");
+                Log.device(R.string.device_connection_connected);
                 break;
             case FCLBLE.DISCONNECTED:
-                Log.device("Disconnected");
+                Log.device(R.string.device_connection_closed);
                 activity.setConnectionStopped();
                 activity.updateConnectionStatus();
                 break;
             case FCLBLE.CONNECTION_FAILED:
-                Log.device("Communication error: "+msg);
+                Log.device(R.string.connection_error, msg);
                 activity.setConnectionStopped();
                 activity.updateConnectionStatus();
         }

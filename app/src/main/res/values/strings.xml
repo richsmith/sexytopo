@@ -235,6 +235,7 @@
     <string name="device_connection_stop_requested">Connection close requested</string>
     <string name="device_connection_closing">Closing connection&#8230;</string>
     <string name="device_connection_closed">Connection closed</string>
+    <string name="device_connection_error">Connection error: %1$s</string>
     <string name="device_connection_closing_error">Error closing connection: %1$s</string>
     <string name="device_data_received">Received measurement</string>
     <string name="device_data_received_null">Null data received</string>
