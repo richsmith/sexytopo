@@ -16,6 +16,7 @@ import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
+import org.hwyl.sexytopo.model.sketch.SketchDetail;
 import org.hwyl.sexytopo.model.sketch.Symbol;
 import org.hwyl.sexytopo.model.sketch.SymbolDetail;
 import org.hwyl.sexytopo.model.sketch.TextDetail;
@@ -160,7 +161,7 @@ public class SvgExporter extends DoubleSketchFileExporter {
         }
         xmlSerializer.startTag(null,"polyline");
         xmlSerializer.attribute(null, "points", TextTools.join(" ", coordStrings));
-        xmlSerializer.attribute(null, "stroke", pathDetail.getColour().toString());
+        xmlSerializer.attribute(null, "stroke", getSvgColour(pathDetail));
         xmlSerializer.attribute(null, "stroke-width", strokeWidth.toString());
         xmlSerializer.attribute(null, "fill", "none");
         xmlSerializer.endTag(null,"polyline");
@@ -181,7 +182,7 @@ public class SvgExporter extends DoubleSketchFileExporter {
         double y = coord2D.y * scale;
         xmlSerializer.attribute(null, "x", Double.toString(x));
         xmlSerializer.attribute(null, "y", Double.toString(y));
-        xmlSerializer.attribute(null, "stroke", textDetail.getColour().toString());
+        xmlSerializer.attribute(null, "stroke", getSvgColour(textDetail));
         xmlSerializer.text(textDetail.getText());
         xmlSerializer.endTag(null,"text");
     }
@@ -202,7 +203,7 @@ public class SvgExporter extends DoubleSketchFileExporter {
         float offsetY = centreY - size / 2f;
         xmlSerializer.attribute("", "x", Double.toString(offsetX));
         xmlSerializer.attribute("", "y", Double.toString(offsetY));
-        xmlSerializer.attribute("", "color", symbolDetail.getColour().name());
+        xmlSerializer.attribute("", "color", getSvgColour(symbolDetail));
 
         if (symbol.isDirectional()) {
             xmlSerializer.attribute("", "transform",
@@ -290,5 +291,16 @@ public class SvgExporter extends DoubleSketchFileExporter {
         }
 
         return output;
+    }
+
+    public static String getSvgColour(SketchDetail sketchDetail) {
+        Colour colour = sketchDetail.getColour();
+
+        // Special case hack! SVG should be able to handle British English
+        // but it seems that CorelDraw gets confused by "grey" >:(
+        if (colour == Colour.GREY) {
+            colour = Colour.GRAY;
+        }
+        return colour.toString();
     }
 }
