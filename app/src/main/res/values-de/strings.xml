@@ -229,6 +229,7 @@
     <string name="device_connection_stop_requested">Antrag auf Verbindungsabbruch</string>
     <string name="device_connection_closing">Verbindung wird beendet…</string>
     <string name="device_connection_closed"> Verbindung wurde beendet</string>
+    <string name="device_connection_error">Verbindungsfehler: %1$s</string>
     <string name="device_connection_closing_error">Fehler beim Beenden einer Verbindung: %1$s</string>
     <string name="device_data_received">Messung eingegangen</string>
     <string name="device_data_received_null">Keine Daten erhalten</string>
