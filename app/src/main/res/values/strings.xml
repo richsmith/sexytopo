@@ -293,6 +293,12 @@
     <string name="device_sap_command_take_shot">Take Shot</string>
     <string name="device_sap_command_laser_off">Laser Off</string>
     <string name="device_sap_command_device_off">Device Off</string>
+    <string name="device_fcl_name" translatable="false">Friken Cave Laser</string>
+    <string name="device_fcl_short_name" translatable="false">FCL</string>
+    <string name="device_fcl_command_laser_on">Laser On</string>
+    <string name="device_fcl_command_take_shot">Take Shot</string>
+    <string name="device_fcl_command_laser_off">Laser Off</string>
+    <string name="device_fcl_command_device_off">Device Off</string>
 
     <!-- Calibration -->
     <string name="calibration_index">Reading number</string>
