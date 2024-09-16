@@ -1,28 +1,23 @@
 package org.hwyl.sexytopo.model.survey;
 
+import org.hwyl.sexytopo.R;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import androidx.annotation.NonNull;
 
 
 public class Trip {
 
     public enum Role {
-        BOOK("Book (drawing)"),
-        INSTRUMENTS("Instruments"),
-        DOG("Dog (assistant)"),
-        EXPLORATION("Exploration Team");
+        BOOK(R.string.trip_role_book),
+        INSTRUMENTS(R.string.trip_role_instruments),
+        DOG(R.string.trip_role_dog),
+        EXPLORATION(R.string.trip_role_exploration),;
 
-        public final String description;
-        Role(String description) {
-            this.description = description;
-        }
-
-        @NonNull
-        public String toString() {
-            return description;
+        public final int descriptionId;
+        Role(int descriptionId) {
+            this.descriptionId = descriptionId;
         }
     }
 

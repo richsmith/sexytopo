@@ -349,6 +349,10 @@
     <string name="trip_dialog_confirm_clear_trip">Clear Trip Data?</string>
     <string name="trip_comments">Comments</string>
     <string name="trip_save_trip">Save Trip</string>
+    <string name="trip_role_book">Book (drawing)</string>
+    <string name="trip_role_instruments">Instruments</string>
+    <string name="trip_role_dog">Dog (assistant)</string>
+    <string name="trip_role_exploration">Exploration Team</string>
 
     <!-- Stats -->
     <string name="stats_title_this_survey">Current Survey</string>
