@@ -14,6 +14,9 @@ This app is experimental software made available for free with no guarantee it i
 
 # FAQ
 
+## Who are you?
+Rich Smith, caver, sometime surveyor. Based in Cardiff, Wales. For other credits, see [About](https://github.com/richsmith/sexytopo/blob/main/app/src/main/res/values/about_text.xml).
+
 ## How does SexyTopo work?
 SexyTopo is an app that runs on Android and talks to a laser measuring device over Bluetooth. SexyTopo builds up a skeleton of the cave using laser measurements and provides sketching tools to fill in the details. It does other things too.
 
