@@ -66,7 +66,7 @@
     <string name="action_file_exit">Quitter SexyTopo</string>
     <string name="action_file_import_file">Importer un fichier…</string>
     <string name="action_file_import_directory">Importer un dossier…</string>
-    <string name="action_input">Mode d'entrée des données</string>
+    <string name="action_input">Mode d\'entrée des données</string>
     <string name="action_input_mode_forward">Avant</string>
     <string name="action_input_mode_backward">Rétroviseur</string>
     <string name="action_input_mode_combo">Avant/Arrière</string>
@@ -83,46 +83,46 @@
 
     <!-- File handling -->
     <string name="file_started_new_survey">Nouvelle topographie démarrée</string>
-    <string name="file_error_initialising_survey">Erreur lors de l'initialisation de la topographie : %1$s</string>
+    <string name="file_error_initialising_survey">Erreur lors de l\'initialisation de la topographie : %1$s</string>
     <string name="file_loading_survey">Chargement de topographie <i>%1$s</i></string>
     <string name="file_loaded_survey">Topographie téléchargé <i>%1$s</i></string>
     <string name="file_loading_file">Chargement du fichier %1$s</string>
     <string name="file_loaded_file">Fichier chargé %1$s</string>
     <string name="file_load_error_not_survey">Dossier de topographie non valide</string>
     <string name="file_load_survey_error">Erreur de chargement de topographie</string>
-    <string name="file_load_survey_trip_error">Impossible de charger la topographie/string>
+    <string name="file_load_survey_trip_error">Impossible de charger la topographie</string>
     <string name="file_load_survey_stations_error">Impossible de charger les stations</string>
     <string name="file_load_survey_partial_failure">Échec de chargement des stations</string>
-    <string name="file_load_sketch_paths_error">Impossible de charger les chemins d'esquisse</string>
+    <string name="file_load_sketch_paths_error">Impossible de charger les chemins d\'esquisse</string>
     <string name="file_load_symbols_error">Impossible de charger les symboles</string>
-    <string name="file_load_sketch_labels_error">Impossible de télécharger les noms d'esquisse</string>
+    <string name="file_load_sketch_labels_error">Impossible de télécharger les noms d\'esquisse</string>
     <string name="file_load_cross_sections_error">Impossible de télécharger les sections transversales</string>
     <string name="file_survey_saved">Sauvegardé</string>
     <string name="file_save_autosaved">Sauvegardé automatiquement</string>
     <string name="file_save_autosave_error">Erreur lors de la sauvegarde automatique</string>
     <string name="file_save_survey_error">Échec de la sauvegarde du relevé</string>
-    <string name="file_save_error_invalid_folder">Impossible d'écrire dans le dossier</string>
+    <string name="file_save_error_invalid_folder">Impossible d\'écrire dans le dossier</string>
     <string name="file_save_overwrite_survey_title_question">Le dossier contient une topographie ; écraser?</string>
-    <string name="file_save_to_non_empty_directory_question">Le dossier n'est pas vide ; enregistrer quand même?</string>
+    <string name="file_save_to_non_empty_directory_question">Le dossier n\'est pas vide ; enregistrer quand même?</string>
     <string name="file_restoring_autosave">Restauration de la sauvegarde automatique</string>
     <string name="file_intent_save_as_title">Créer un dossier pour enregistrer le relevé</string>
     <string name="file_intent_open_title">Sélectionner le dossier du relevé</string>
     <string name="file_intent_link_title">Sélectionner le dossier du relevé à joindre</string>
-    <string name="file_intent_import_select_source">Sélectionner le dossier d'importation</string>
+    <string name="file_intent_import_select_source">Sélectionner le dossier d\'importation</string>
     <string name="file_intent_delete_select_target">Sélectionner le dossier de topographie à supprimer</string>
     <string name="file_dialog_delete_survey_title">Supprimer la topographie ?</string>
     <string name="file_dialog_delete_survey_content">Cela supprimera tous les fichiers de toporaphie "%1$s"</string>
     <string name="file_delete_error_not_survey">La sélection ne semble pas être une topographie</string>
     <string name="file_delete_successful">Suppression de la topographie %1$s réussie</string>
     <string name="file_error_deleting_survey">Erreur lors de la suppression de la topographie</string>
-    <string name="file_cannot_extend_unsaved_survey">Impossible d'étendre une topographie non sauvegardé</string>
+    <string name="file_cannot_extend_unsaved_survey">Impossible d\'étendre une topographie non sauvegardé</string>
     <string name="file_autosave_restored">Sauvegarde automatique restaurée</string>
     <string name="file_autosave_load_error">Erreur lors de la restauration de la sauvegarde automatique</string>
-    <string name="file_warning_survey_not_saved">Attention : le relevé actuel n'est pas sauvegardé</string>
+    <string name="file_warning_survey_not_saved">Attention : le relevé actuel n\'est pas sauvegardé</string>
     <string name="file_active_survey">Le relevé actif est %1$s</string>
     <string name="file_active_survey_not_present">Aucun relevé actif</string>
-    <string name="file_active_survey_uri">L'URI du relevé actif est %1$s</string>
-    <string name="file_operation_initialisation_error">Erreur d'initialisation de l'opération sur le fichier</string>
+    <string name="file_active_survey_uri">L\'URI du relevé actif est %1$s</string>
+    <string name="file_operation_initialisation_error">Erreur d\'initialisation de l\'opération sur le fichier</string>
     <string name="file_link_survey_station">Choisissez la station à relier à la station active</string>
     <string name="file_link_survey_save_error">Erreur lors de la sauvegarde de la nouvelle connexion</string>
     <string name="file_unlink_survey_dialog_title">Dissocier la topographie</string>
@@ -132,10 +132,10 @@
 
     <!-- Import / Export -->
     <string name="import_successful">"Importation terminée (pas encore sauvegardée)"</string>
-    <string name="import_failed">Échec de l'importation</string>
-    <string name="export_select_type">Sélectionner le format d'exportation</string>
+    <string name="import_failed">Échec de l\'importation</string>
+    <string name="export_select_type">Sélectionner le format d\'exportation</string>
     <string name="export_successful">Exportation réussie</string>
-    <string name="export_failed">Échec de l'exportation</string>
+    <string name="export_failed">Échec de l\'exportation</string>
     <string name="created_with">Créé avec %1$s le %2$s</string>
 
     <!-- Sketch view -->
@@ -158,17 +158,17 @@
     <string name="sketch_toolbar_colour_green">Vert</string>
     <string name="sketch_toolbar_colour_blue">Bleu</string>
     <string name="sketch_toolbar_colour_purple">Violet</string>
-    <string name="sketch_toolbar_symbol_close">Fermer la barre d'outils des symboles</string>
+    <string name="sketch_toolbar_symbol_close">Fermer la barre d\'outils des symboles</string>
     <string name="sketch_menu_delete_last_leg">Annuler le dernièr segement</string>
-    <string name="sketch_menu_centre_view">Centrer sur l'actif</string>
+    <string name="sketch_menu_centre_view">Centrer sur l\'actif</string>
     <string name="sketch_menu_auto_recentre">Recentrage automatique</string>
-    <string name="sketch_menu_redo">Refaire l'action d'esquisse</string>
+    <string name="sketch_menu_redo">Refaire l\'action d\'esquisse</string>
     <string name="sketch_menu_show_grid">Papier millimétré</string>
     <string name="sketch_menu_snap_to_lines">Accrocher aux lignes</string>
     <string name="sketch_menu_fade_non_active">Atténuer les éléments non actifs</string>
     <string name="sketch_menu_show_station_labels">Noms des stations</string>
     <string name="sketch_menu_show_splays">Afficher les radiales</string>
-    <string name="sketch_menu_show_sketch">Afficher l'esquisse</string>
+    <string name="sketch_menu_show_sketch">Afficher l\'esquisse</string>
     <string name="sketch_menu_show_connect">Topographies liées</string>
     <string name="sketch_menu_back_measurements">Inverser les segments</string>
     <string name="sketch_position_cross_section_instruction">Sélectionnez où dessiner la coupe transversale</string>
@@ -205,19 +205,19 @@
     <string name="device_request_pair">Associer?</string>
     <string name="device_request_unpair">Dissocier</string>
     <string name="device_no_permitted_access">[appareil inaccessible]</string>
-    <string name="device_bluetooth_no_adapter">Impossible d'accéder à l'adaptateur Bluetooth</string>
+    <string name="device_bluetooth_no_adapter">Impossible d\'accéder à l\'adaptateur Bluetooth</string>
     <string name="device_connection_requested">Connexion demandée</string>
-    <string name="device_scan_start">Recherche d'appareils…</string>
+    <string name="device_scan_start">Recherche d\'appareils…</string>
     <string name="device_scan_end">Recherche terminée</string>
     <string name="device_scan_cancel">Annulation de la recherche</string>
     <string name="device_scan_detected">Appareil "%1$s" détecté</string>
     <string name="device_scan_failure">Impossible de scanner (échec du Bluetooth ?)</string>
     <string name="device_scan_device_not_found">Appareil non trouvé ; veuillez réessayer</string>
     <string name="device_access_failure">Erreur de sécurité (vérifier les permissions ?)</string>
-    <string name="device_pairing_request">Association demandé\n-> Effectuez les étapes d'association. Connectez-vous à nouveau</string>
+    <string name="device_pairing_request">Association demandé\n-> Effectuez les étapes d\'association. Connectez-vous à nouveau</string>
     <string name="device_pairing_successful">Association réussi :)</string>
     <string name="device_pairing_attempt">Association avec %1$s…</string>
-    <string name="device_pairing_error">Erreur d'association : %1$s</string>
+    <string name="device_pairing_error">Erreur d\'association : %1$s</string>
     <string name="device_pairing_incompatible">Appareil incompatible "%1$s" détecté</string>
     <string name="device_pairing_unpairing_device">Dissociation de %1$s</string>
     <string name="device_pairing_unpairing_success">Dissociation réussi</string>
@@ -266,7 +266,7 @@
     <string name="device_distox_calibration_result">Évaluation de la calibration (devrait être inférieure à %1$f) : %2$s\n\nAlgorithme de calibration : %3$s</string>
     <string name="device_distox_calibration_writing">Écriture des coefficients de calibration</string>
     <string name="device_distox_calibration_write_success">Écriture de la calibration réussie</string>
-    <string name="device_distox_calibration_write_error">Erreur d'écriture de la calibration %1$s</string>
+    <string name="device_distox_calibration_write_error">Erreur d\'écriture de la calibration %1$s</string>
     <string name="device_distox_calibration_write_rejected">Disto a rejeté les données de calibration</string>
     <string name="device_distox_unknown_protocol">Protocole inconnu demandé</string>
     <string name="device_bric4_name" translatable="false">BRIC4</string>
@@ -309,7 +309,7 @@
     <string name="calibration_not_enough">Pas assez de lectures effectuées</string>
     <string name="calibration_assessment">Évaluation de la calibration</string>
     <string name="calibration_update">Écrire</string>
-    <string name="calibration_error_updating_device">Impossible d'écrire la calibration</string>
+    <string name="calibration_error_updating_device">Impossible d\'écrire la calibration</string>
     <string name="calibration_writing">Écriture des données de calibration</string>
     <string name="calibration_success">Écriture des données de calibration réussie</string>
     <string name="calibration_saved_to_file">Données de calibration sauvegardées</string>
@@ -339,15 +339,15 @@
     <!-- Trip -->
     <string name="trip">Sortie</string>
     <string name="trip_team">Équipe</string>
-    <string name="trip_dialog_title_add_to_team">Ajouter à l'équipe</string>
-    <string name="trip_dialog_add_to_team_name_hint">Nom d'équipe</string>
+    <string name="trip_dialog_title_add_to_team">Ajouter à l\'équipe</string>
+    <string name="trip_dialog_add_to_team_name_hint">Nom d\'équipe</string>
     <string name="trip_dialog_confirm_clear_trip">Effacer les données de la sortie?</string>
     <string name="trip_comments">Commentaires</string>
     <string name="trip_save_trip">Sauvegarder la sortie</string>
     <string name="trip_role_book">Livre (dessin)</string>
     <string name="trip_role_instruments">Outils</string>
     <string name="trip_role_dog">Chien (assistant)</string>
-    <string name="trip_role_exploration">Équipe d'exploration</string>
+    <string name="trip_role_exploration">Équipe d\'exploration</string>
 
     <!-- Stats -->
     <string name="stats_title_this_survey">Topographie actuelle</string>
@@ -364,18 +364,18 @@
     <!-- Settings -->
     <string name="settings_general_title">Général</string>
     <string name="settings_theme_title">Thème</string>
-    <string name="settings_theme_summary">Rejoignez le côté obscur ? (Redémarre l'application, donc sauvegardez votre relevé avant de changer !)</string>
+    <string name="settings_theme_summary">Rejoignez le côté obscur ? (Redémarre l\'application, donc sauvegardez votre relevé avant de changer !)</string>
     <string-array name="settings_theme_entries">
         <item>Par défaut du système</item>
         <item>Clair</item>
         <item>Sombre</item>
     </string-array>
     <string name="settings_orientation_title">Orientation</string>
-    <string name="settings_orientation_summary">Remplacer l'orientation de l'appareil dans les vues Tableau et Graphique</string>
+    <string name="settings_orientation_summary">Remplacer l\'orientation de l\'appareil dans les vues Tableau et Graphique</string>
     <string-array name="settings_orientation_entries">
         <item>Par défaut du système</item>
-        <item>Forcer l'affichage portrait</item>
-        <item>Forcer l'affichage paysage</item>
+        <item>Forcer l\'affichage portrait</item>
+        <item>Forcer l\'affichage paysage</item>
     </string-array>
     <string-array name="settings_calibration_algorithm_entries">
         <item>Automatique</item>
@@ -383,25 +383,25 @@
         <item>Non linéaire</item>
     </string-array>
     <string name="settings_new_station_vibration_title">Vibrer à la nouvelle station</string>
-    <string name="settings_new_station_vibration_summary">Vibrer lors de la création d'une nouvelle station</string>
+    <string name="settings_new_station_vibration_summary">Vibrer lors de la création d\'une nouvelle station</string>
     <string name="settings_hot_corners_title">Coins actifs</string>
-    <string name="settings_hot_corners_summary">Faites glisser à partir des coins de l'esquisse pour déplacer la vue en mode dessin</string>
+    <string name="settings_hot_corners_summary">Faites glisser à partir des coins de l\'esquisse pour déplacer la vue en mode dessin</string>
     <string name="settings_instruments_title">Outils</string>
     <string name="settings_max_distance_delta_title">Delta de distance max (m)</string>
     <string name="settings_max_distance_delta_summary">Erreur maximale tolérée pour décider de créer une nouvelle station</string>
-    <string name="settings_max_angle_delta_title">Delta d'angle max (degrés)</string>
+    <string name="settings_max_angle_delta_title">Delta d\'angle max (degrés)</string>
     <string name="settings_max_angle_delta_summary">Erreur maximale tolérée pour décider de créer une nouvelle station</string>
     <string name="settings_calibration_title">Calibration</string>
     <string name="settings_calibration_algorithm_title">Algorithme de calibration Disto-X</string>
-    <string name="settings_calibration_algorithm_summary">Remplacer le choix de l'algorithme de calibration du Disto-X</string>
+    <string name="settings_calibration_algorithm_summary">Remplacer le choix de l\'algorithme de calibration du Disto-X</string>
     <string name="settings_sketching_title">Esquisse</string>
     <string name="settings_delete_path_fragments_title">Supprimer des fragments de ligne</string>
-    <string name="settings_delete_path_fragments_summary">Supprimer uniquement les parties les plus proches d'une ligne d'esquisse en mode suppression (si désactivé, supprimer la ligne entière)</string>
+    <string name="settings_delete_path_fragments_summary">Supprimer uniquement les parties les plus proches d\'une ligne d\'esquisse en mode suppression (si désactivé, supprimer la ligne entière)</string>
     <string name="settings_highlight_latest_leg_title">Mettre en évidence le dernier segment</string>
     <string name="settings_highlight_latest_leg_summary">Afficher la dernière mesure en violet</string>
     <string name="settings_two_finger_movement_title">Déplacement à deux doigts (expérimental)</string>
-    <string name="settings_two_finger_movement_summary">Deux doigts déplacent l'écran même en dessinant, etc.</string>
-    <string name="settings_survey_text_tool_font_size_title">Taille de la police de l'outil texte</string>
+    <string name="settings_two_finger_movement_summary">Deux doigts déplacent l\'écran même en dessinant, etc.</string>
+    <string name="settings_survey_text_tool_font_size_title">Taille de la police de l\'outil texte</string>
     <string name="settings_survey_text_tool_font_size_summary">Quelle taille dessiner le texte placé manuellement (sp)</string>
     <string name="settings_survey_symbol_size_title">Taille du symbole de la topographie</string>
     <string name="settings_survey_symbol_size_summary">De quelle taille dessiner les symboles (dp)</string>
@@ -415,13 +415,13 @@
     <string name="settings_station_label_font_size_sp_summary">Taille de la police des noms des stations</string>
     <string name="settings_legend_font_size_sp_title">Taille de la police de la légende</string>
     <string name="settings_legend_font_size_sp_summary">Taille de la police de la légende</string>
-    <string name="settings_anti_alias_title">Lisser les lignes de l'esquisse</string>
-    <string name="settings_anti_alias_summary">Appliquer un lissage aux lignes d'esquisse, etc. (améliore l'affichage visuel au détriment de certaines performances)</string>
+    <string name="settings_anti_alias_title">Lisser les lignes de l\'esquisse</string>
+    <string name="settings_anti_alias_summary">Appliquer un lissage aux lignes d\'esquisse, etc. (améliore l\'affichage visuel au détriment de certaines performances)</string>
     <string name="settings_manual_data_entry_title">Saisie manuelle des données</string>
     <string name="settings_key_lrud_fields_title">Champs LRUD</string>
     <string name="settings_key_lrud_fields_summary">Afficher les champs pour entrer les LRUD (Gauche-Droite-Haut-Bas) pour chaque nouvelle station</string>
     <string name="settings_key_deg_mins_secs_title">Azimut en degrés/minutes/secondes</string>
-    <string name="settings_key_deg_mins_secs_summary">Entrer les valeurs d'azimut en degrés/minutes/secondes (au lieu du mode décimal par défaut)</string>
+    <string name="settings_key_deg_mins_secs_summary">Entrer les valeurs d\'azimut en degrés/minutes/secondes (au lieu du mode décimal par défaut)</string>
     <string name="settings_export_title">Exporter</string>
     <string name="settings_export_svg_background_title">Arrière-plan SVG</string>
     <string name="settings_export_svg_background_summary">Optionnellement exporter avec un arrière-plan opaque</string>
@@ -430,7 +430,7 @@
         <item>Blanc</item>
     </string-array>
     <string name="settings_export_svg_stroke_width_title">Largeur du trait SVG</string>
-    <string name="settings_export_svg_stroke_width_summary">Quelle largeur pour dessiner les lignes dans l'export SVG</string>
+    <string name="settings_export_svg_stroke_width_summary">Quelle largeur pour dessiner les lignes dans l\'export SVG</string>
     <string name="settings_developer_title">Développeur</string>
     <string name="settings_key_developer_mode_title">Mode développeur</string>
     <string name="settings_key_developer_mode_summary">Afficher les entrées du menu de débogage</string>
@@ -439,7 +439,7 @@
     <string name="survey_update_new_station_added">Nouvelle station ajoutée</string>
     <string name="survey_update_renamed_station">Station renommée de %1$s à %2$s</string>
     <string name="survey_update_edited_leg">Segment modifié de %1$s à %2$s</string>
-    <string name="survey_update_rename_error_not_unique">Le nouveau nom de la station n'est pas unique</string>
+    <string name="survey_update_rename_error_not_unique">Le nouveau nom de la station n\'est pas unique</string>
     <string name="survey_update_moved_leg">Segment déplacé vers la station %1$s</string>
     <string name="survey_update_adding_leg">Ajout du segment %1$s</string>
     <string name="survey_update_reversed_leg">Segment inversé de %1$s à %2$s</string>
@@ -462,7 +462,7 @@
     <string name="symbol_crystals">Cristaux</string>
     <string name="symbol_gour">Gour</string>
     <string name="symbol_water_flow">Écoulement</string>
-    <string name="symbol_air_draught">Courant d'air</string>
+    <string name="symbol_air_draught">Courant d\'air</string>
     <string name="symbol_guano">Guano</string>
     <string name="symbol_debris">Débris</string>
 
@@ -487,7 +487,7 @@
     <string name="menu_comment">Commentaire</string>
     <string name="menu_toggle_left_right">Basculer Gauche/Droite</string>
     <string name="context_this_will_delete">Cela supprimera :</string>
-    <string name="context_jump_to_splay_error">Impossible de se rendre à l'extrémité d'une radiale</string>
+    <string name="context_jump_to_splay_error">Impossible de se rendre à l\'extrémité d\'une radiale</string>
     <string name="context_jump_to_station_error">Impossible de se rendre à la station %1$s</string>
     <string name="context_move_leg_select_station_title">Sélectionner la station à déplacer</string>
     <string name="context_move_leg_no_valid_move">Aucun emplacement valide pour déplacer ce segment</string>
