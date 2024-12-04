@@ -1631,7 +1631,7 @@ public class GraphView extends View {
             Coord2D touchPointOnView = new Coord2D(motionEvent.getX(), motionEvent.getY());
             Station matchedStation = checkForStation(touchPointOnView);
             if (matchedStation != null) {
-                showContextMenu(motionEvent, newSelectedStation);
+                showContextMenu(motionEvent, matchedStation);
             }
         }
     }
