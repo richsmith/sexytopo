@@ -728,7 +728,7 @@ public class GraphView extends View {
                 askAboutDeletingStation(station);
                 invalidate();
             } else if (id == R.id.graph_station_new_cross_section) {
-                surveyNameBeingCrossSectioned = station.getName();
+                stationNameBeingCrossSectioned = station.getName();
                 setSketchTool(SketchTool.POSITION_CROSS_SECTION);
                 activity.showSimpleToast(R.string.sketch_position_cross_section_instruction);
             } else if (id == R.id.graph_station_jump_to_table) {
