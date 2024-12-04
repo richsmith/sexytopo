@@ -6,23 +6,24 @@
 <h1>SexyTopo Guide</h1>
 
 <h2>Overview</h2>
-<p>SexyTopo is an app for surveying caves and underground spaces. It is designed to work with a Disto-X or Disto-X2 measuring tool which the surveyor uses to measure out survey legs. It is also possible (though significantly less convenient) to use SexyTopo as a tool for manual entry of survey data.</p>
+<p>SexyTopo is an app for surveying caves and underground spaces. It is designed to work with an electronic measuring device which the surveyor uses to measure out survey legs. It is also possible (though significantly less convenient) to use SexyTopo as a tool for manual entry of survey data.</p>
 
 <h2>Setup</h2>
 <p>SexyTopo runs on Android devices (the newer/more powerful the better). For obvious reasons a water- and dust-proof device is recommended. Both phones and tablets are supported. It is possible to control SexyTopo with finger movements but it is designed for use with a stylus.</p>
-<p>The Android device needs to have bluetooth communication turned on and be paired with a Disto-X before it can receive readings. This can be done through the DistoX page (accessible from the Action Bar extended menu, or the menu key on older devices).</p>
-<p>The DistoX page lays out the steps needed to connect to the DistoX in order. A small console at the bottom reports status updates as you go though the steps.</p>
+<p>The Android device needs to have bluetooth communication turned on and be paired with an instrument before it can receive readings. This can be done through the Instrument menu.</p>
+<p>The instrument page lays out the steps needed to connect to the device in order. A small console at the bottom reports status updates from the device.</p>
 <ol>
-	<li>First, you need to turn on Bluetooth connectivity (if it isn't on already).</li>
-	<li>The next step is to pair the DistoX with the device running SexyTopo: ensure the DistoX is turned on, and then click "Pair". (Enter "0000" if the device's O/S asks for it). Note that by design you can only pair one DistoX at once (this avoids confusion!) To change the DistoX the device is paired with, click "Unpair", then "Pair".</li>
-	<li>With the DistoX paired, click the "Connect" switch to begin communication between the devices. Any readings taken by the device should now show up in the data views, though remember to calibrate the DistoX before using it for serious data collection.</li>
+	<li>First, turn on Bluetooth connectivity (if it isn't on already).</li>
+	<li>Next, pair the instrument with the mobile device running SexyTopo: ensure the ddevice is turned on, and then tap "Pair". (Enter "0000" if the device's O/S asks for it). Note that by design only one instrument can be paired at once. To change the device that is paired, click "Unpair", then "Pair".</li>
+	<li>With the instrument paired, activate the "Connect" switch to begin communication between the devices. Any readings taken by the device should now show up in the data views.</li>
+    <li>Perform any required calibration procedures required by the device before starting a survey. If you are using a DistoX, SexyTopo provides a calibration tool.</li>
 </ol>
-<p>Messages received from the DistoX, and any errors, will be reported in the console. You don't need to worry about reading the console if everything is working OK.</p>
 
 <h2>Data Table Screen</h2>
-<p>This is a tabular view of the collected data. It can be accessed through the first icon on the Action Bar. It is intended that most interaction with SexyTopo should be through the graph screens but it is occasionally useful to check the raw data.</p>
-<p>There are on-screen buttons for manually inputting data: there are two buttons for adding new stations and splays. Another button deletes the last measurement inputted or read from the Disto.</p>
-<p>Long-pressing on a table cell activates a context menu, which will have different options depening on whether the cell is a station or a measurement and if the row represents a full leg or a splay.
+<p>This is a tabular view of the collected data. It can be accessed through the first icon on the Action Bar. SexyTopo is designed with the intention that most interaction should be through the sketch screens but it is occasionally useful to check the raw data.</p>
+<p>There are onscreen buttons for manually inputting data: there are two buttons for adding new stations and splays. Another button deletes the last measurement inputted or read from the Disto.</p>
+<p>Long-pressing on a table cell activates a context menu, which will have different options depening on whether the cell is a station or a measurement and if the row represents a full leg or a splay.</p>
+
 <h3>Table Context Menu</h3>
 <ul>
 	<li><strong>Set Active Station</strong> (only available for stations) sets the station as the current active one so measurements are considered to be made from that station (see <a href="#surveyingWithSexyTopo">Surveying with SexyTopo</a> for more details on this).</li>
@@ -32,9 +33,6 @@
 	<li><strong>Force New Station</strong></li> (only available for splays) essentially upgrades a splay to a full leg, creating a new station in the survey. If using a Disto, this bypasses the usual requirement to shoot three splays in succession to create a new station. Misuse of this feature can result in an inaccurate survey.</li>
 </ul>
 
-<h2>Calibration</h2>
-<p>The DistoX device needs calibration before it can be used reliably. This is not just a theoretical requirement; without calibration, measurements can be significantly off.</p>
-<p>However, calibration is not yet implemented in SexyTopo. Calibration will need to be performed using another software package, such as PocketTopo on a PDA or Windows laptop.</p>
 
 <a name="surveyingWithSexyTopo"><h2>Surveying with SexyTopo</h2></a>
 <p>A full description of surveying is beyond the scope of this document but this is a brief overview of how to survey with SexyTopo.</p>
@@ -48,17 +46,17 @@
 <p>The sketch views (plan and extended elevation) can be accessed through buttons on the Action Bar at the top of the screen. These show a projection of the calculated survey on a canvas so that a sketch of the cave can be drawn on top. The plan view is an intuitive map of the cave whilst the extended elevation is an "unrolled" view of the vertical layout of the cave that may take some getting used to.</p>
 <p>Several sketching tools are provided via a toolbar at the bottom of the screen:
 <ul>
-	<li><img src="../../res/drawable-hdpi/black.png"><strong>Colours</strong> set the current sketching colour</li>
-	<li><img src="@drawable/blue"><strong>Zoom Out</strong> lets you see more of the survey</li>
-	<li><img src="file:///res/drawable-hdpi/black.png"><strong>Zoom In</strong> lets you focus on the detail of the survey</li>
-	<li><img src="file://main/res/drawable-hdpi/black.png"><strong>Move</strong> enters a mode which allows you to drag the survey around to see different parts</li>
-	<li><img src="file://src/main/res/drawable-hdpi/black.png"><strong>Draw</strong> enters a mode which lets you sketch the shape of the cave in the selected colour</li>
-	<li><img src=""><strong>Erase</strong> deletes lines sketched in Draw mode</li>
-	<li><img src=""><strong>Text</strong> allows you to enter text at a point you choose</li>
-	<li><img src=""><strong>Select</strong> picks out a station as the active station when you click on it; selecting it a second time opens the <strong>station context menu</strong></li>
-	<li><img src=""><strong>Settings</strong> opens an extended commands menu</li>
-	<li><img src=""><strong>Undo</strong>Undoes the last sketching command</li>
-	<li><img src=""><strong>Redo</strong>Cancels the last undo</li>
+	<li><strong>Colours</strong> set the current sketching colour</li>
+	<li><strong>Zoom Out</strong> shows more of the survey</li>
+	<li><strong>Zoom In</strong> focuses on an area of the survey</li>
+	<li><strong>Move</strong> enters view mode</li>
+	<li><strong>Draw</strong> enters sketch mode which reacts to input in the form</li>
+	<li><strong>Erase</strong> deletes lines sketched in Draw mode</li>
+	<li><strong>Text</strong> allows you to enter text at a point you choose</li>
+	<li><strong>Select</strong> marks a station as the active station; selecting it a second time opens the <strong>station context menu</strong></li>
+	<li><strong>Quick Settings</strong> opens an extended commands menu</li>
+	<li><strong>Undo</strong>Undoes the last sketching command</li>
+	<li><strong>Redo</strong>Cancels the last undo</li>
 </ul>
 </p>
 
