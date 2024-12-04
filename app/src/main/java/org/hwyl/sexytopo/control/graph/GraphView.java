@@ -156,6 +156,9 @@ public class GraphView extends View {
     private SketchTool previousSketchTool = SketchTool.SELECT;
     private Symbol currentSymbol = Symbol.getDefault();
 
+    // a bit hacky but I can't think of a better way to do this
+    private String stationNameBeingCrossSectioned = null;
+
 
     // ********** Paints and other drawing variables **********
 
@@ -672,9 +675,9 @@ public class GraphView extends View {
                 SELECTION_SENSITIVITY_IN_PIXELS / surveyToViewScale;
         Coord2D touchPointOnSurvey = viewCoordsToSurveyCoords(touchPointOnView);
 
-        Station newSelectedStation = findNearestStationWithinDelta(projection,
+        Station matchedStation = findNearestStationWithinDelta(projection,
                 touchPointOnSurvey, selectionTolerance);
-        return newSelectedStation; // this could be null if nothing is near
+        return matchedStation; // this could be null if nothing is near
     }
 
 
@@ -683,7 +686,12 @@ public class GraphView extends View {
         Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
         Coord2D touchPointOnSurvey = viewCoordsToSurveyCoords(touchPointOnView);
 
-        final Station station = survey.getActiveStation();
+        final Station station = survey.getStationByName(stationNameBeingCrossSectioned);
+        stationNameBeingCrossSectioned = null;
+        if (station == null) {
+            return true;
+        }
+
         CrossSection crossSection = CrossSectioner.section(survey, station);
 
         sketch.addCrossSection(crossSection, touchPointOnSurvey);
@@ -720,7 +728,7 @@ public class GraphView extends View {
                 askAboutDeletingStation(station);
                 invalidate();
             } else if (id == R.id.graph_station_new_cross_section) {
-                setActiveStation(station);
+                surveyNameBeingCrossSectioned = station.getName();
                 setSketchTool(SketchTool.POSITION_CROSS_SECTION);
                 activity.showSimpleToast(R.string.sketch_position_cross_section_instruction);
             } else if (id == R.id.graph_station_jump_to_table) {
@@ -1617,8 +1625,8 @@ public class GraphView extends View {
         @Override
         public void onLongPress(MotionEvent motionEvent) {
             Coord2D touchPointOnView = new Coord2D(motionEvent.getX(), motionEvent.getY());
-            Station newSelectedStation = checkForStation(touchPointOnView);
-            if (newSelectedStation != null) {
+            Station matchedStation = checkForStation(touchPointOnView);
+            if (matchedStation != null) {
                 showContextMenu(motionEvent, newSelectedStation);
             }
         }
