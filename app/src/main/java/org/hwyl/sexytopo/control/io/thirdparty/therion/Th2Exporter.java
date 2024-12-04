@@ -37,7 +37,7 @@ public class Th2Exporter {
 
         Sketch sketch = survey.getSketch(projection);
         String scrapName = getScrapName(survey, projection);
-        sections.add(getScrap(scrapName, projection, sketch, space, innerFrame, scale));
+        sections.add(getScrap(survey, scrapName, projection, sketch, space, innerFrame, scale));
         return TextTools.join("\n\n", sections);
     }
 
@@ -90,11 +90,11 @@ public class Th2Exporter {
         return TextTools.join(joiner, name, projectionSuffix);
     }
 
-    public static String getScrap(String name, Projection2D projection, Sketch sketch,
+    public static String getScrap(Survey survey, String name, Projection2D projection, Sketch sketch,
                                   Space<Coord2D> space, Shape frame, float scale) {
         List<String> lines = new ArrayList<>();
         lines.add(getStartScrapCommands(name, projection, frame));
-        lines.addAll(getScrapCommands(sketch, space, scale));
+        lines.addAll(getScrapCommands(survey, sketch, space, scale));
         lines.add("endscrap");
         return TextTools.join("\n\n", lines);
 
@@ -117,11 +117,13 @@ public class Th2Exporter {
 
     }
 
-    private static List<String> getScrapCommands(Sketch sketch, Space<Coord2D> space, float scale) {
+    private static List<String> getScrapCommands(Survey survey, Sketch sketch, Space<Coord2D> space, float scale) {
         List<String> commands = new ArrayList<>();
-        for (Map.Entry<Station, Coord2D> entry : space.getStationMap().entrySet()) {
-            Station station = entry.getKey();
-            Coord2D coord = entry.getValue().scale(scale);
+
+        Map<Station, Coord2D> stationMap = space.getStationMap();
+        List<Station> orderedStations = survey.getAllStationsInChronoOrder();
+        for (Station station : orderedStations) {
+            Coord2D coord = stationMap.get(station).scale(scale);
             commands.add(getPoint(coord.x, coord.y, "station", "-name", station.getName()));
         }
 

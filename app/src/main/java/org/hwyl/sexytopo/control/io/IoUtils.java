@@ -136,26 +136,15 @@ public class IoUtils {
         }
     }
 
-    public static void saveToFile(Context context, DocumentFile documentFile, String contents)
+    public static synchronized void saveToFile(Context context, DocumentFile documentFile, String contents)
             throws IOException{
         Uri uri = documentFile.getUri();
-        ParcelFileDescriptor pfd = context.getContentResolver().openFileDescriptor(uri, "w");
-        FileOutputStream fileOutputStream =
-                new FileOutputStream(pfd.getFileDescriptor());
-        fileOutputStream.write(contents.getBytes());
-        fileOutputStream.close();
-        pfd.close();
-    }
-
-/*
-    public static void saveToFile(Context context, DocumentFile documentFile, String contents)
-        throws IOException {
-        Uri uri = documentFile.getUri();
-        try (ParcelFileDescriptor pfd =
-                 context.getContentResolver().openFileDescriptor(uri, "w");
-             FileOutputStream fileOutputStream = new FileOutputStream(pfd.getFileDescriptor())) {
-            fileOutputStream.write(contents.getBytes());
+        outputStream = context.getContentResolver().openOutputStream(uri, "wt");
+        
+        if (outputStream == null) {
+            throw new IOException("Failed to open output stream");
         }
-    }*/
-
+        outputStream.write(contents.getBytes(StandardCharsets.UTF_8));
+        outputStream.flush();
+    }
 }
