@@ -765,16 +765,20 @@ public class GraphView extends View {
         input.setLines(8);
         input.setGravity(Gravity.START | Gravity.TOP);
         input.setText(station.getComment());
+        input.setFocusableInTouchMode(true);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setView(input)
             .setTitle(station.getName())
             .setPositiveButton(R.string.save,
                 (dialog, which) -> station.setComment(input.getText().toString()))
             .setNegativeButton(R.string.cancel, null);
+
         AlertDialog dialog = builder.create();
         dialog.getWindow().setSoftInputMode(
             WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         dialog.show();
+        input.requestFocus();
     }
 
 
