@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
-import android.os.ParcelFileDescriptor;
 import android.os.storage.StorageManager;
 
 import androidx.documentfile.provider.DocumentFile;
@@ -18,9 +17,10 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -137,14 +137,14 @@ public class IoUtils {
     }
 
     public static synchronized void saveToFile(Context context, DocumentFile documentFile, String contents)
-            throws IOException{
+        throws IOException {
         Uri uri = documentFile.getUri();
-        outputStream = context.getContentResolver().openOutputStream(uri, "wt");
-        
-        if (outputStream == null) {
-            throw new IOException("Failed to open output stream");
+        try (OutputStream outputStream = context.getContentResolver().openOutputStream(uri, "wt")) {
+            if (outputStream == null) {
+                throw new IOException("Failed to open output stream");
+            }
+            outputStream.write(contents.getBytes(StandardCharsets.UTF_8));
+            outputStream.flush();
         }
-        outputStream.write(contents.getBytes(StandardCharsets.UTF_8));
-        outputStream.flush();
     }
 }

@@ -29,10 +29,13 @@ public class SurveyFile extends AbstractSurveyFile {
             this.extension = extension;
             this.mimeType = mimeType;
 
-            if (!extension.endsWith(SexyTopoConstants.AUTOSAVE_EXTENSION)) {
-                AUTOSAVE = new SurveyFileType(withExtension(extension, SexyTopoConstants.AUTOSAVE_EXTENSION));
-            } else {
+            if (this == LOG || extension.endsWith(SexyTopoConstants.AUTOSAVE_EXTENSION)) {
                 AUTOSAVE = null;
+            } else {
+                AUTOSAVE = new SurveyFileType(
+                    withExtension(extension, SexyTopoConstants.AUTOSAVE_EXTENSION),
+                    "application/octet-stream");  // mime type for no additional extension
+
             }
         }
 
@@ -60,8 +63,10 @@ public class SurveyFile extends AbstractSurveyFile {
     public static final SurveyFileType SKETCH_EXT_ELEVATION =
         new SurveyFileType(
             SexyTopoConstants.EXT_ELEVATION_SKETCH_EXTENSION, SexyTopoConstants.MIME_TYPE_JSON);
+    public static final SurveyFileType LOG =
+        new SurveyFileType(SexyTopoConstants.LOG_EXTENSION, SexyTopoConstants.MIME_TYPE_JSON);
 
-    public static final List<SurveyFileType> ALL_TYPES =
+    public static final List<SurveyFileType> ALL_DATA_TYPES =
             List.of(DATA, METADATA, SKETCH_PLAN, SKETCH_EXT_ELEVATION);
     private final SurveyFileType surveyFileType;
 

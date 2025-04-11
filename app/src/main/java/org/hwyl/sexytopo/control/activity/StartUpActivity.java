@@ -115,7 +115,7 @@ public class StartUpActivity extends SexyTopoActivity {
 
         boolean shouldRestoreAutosave = false;
 
-        for (SurveyFile.SurveyFileType fileType : SurveyFile.ALL_TYPES) {
+        for (SurveyFile.SurveyFileType fileType : SurveyFile.ALL_DATA_TYPES) {
             DocumentFile surveyFile = fileType.get(protoSurvey).getDocumentFile(this);
             DocumentFile autosaveFile = fileType.AUTOSAVE.get(protoSurvey).getDocumentFile(this);
 
