@@ -54,6 +54,7 @@ public class SexyTopoConstants {
     public static final String EXT_ELEVATION_SKETCH_EXTENSION = "ext-elevation.json";
     public static final String METADATA_EXTENSION = "metadata.json";
     public static final String AUTOSAVE_EXTENSION = "autosave";
+    public static final String LOG_EXTENSION = "log";
 
     public static final String PLAN_SUFFIX = "plan";
     public static final String EE_SUFFIX = "ee";
