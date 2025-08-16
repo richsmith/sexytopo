@@ -407,6 +407,9 @@ public class TableActivity extends SexyTopoActivity
             return;
         }
 
+        // Reverse the order of stations to show the most recent stations at the top
+        java.util.Collections.reverse(stations);
+        
         for (Station station : stations) {
             spinnerArray.add(station.getName());
         }
