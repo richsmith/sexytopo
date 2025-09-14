@@ -9,6 +9,8 @@ import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Arrays;
+
 
 public class SurveyUpdaterTest {
 
@@ -70,6 +72,35 @@ public class SurveyUpdaterTest {
         SurveyUpdater.moveLeg(survey, toMove, destinationStation);
         Assert.assertTrue(destinationStation.getOnwardLegs().contains(toMove));
         Assert.assertFalse(originatingStation.getOnwardLegs().contains(toMove));
+    }
+
+    @Test
+    public void testAreLegsAboutTheSame() {
+        Assert.assertTrue(SurveyUpdater.areLegsAboutTheSame(Arrays.asList(
+                new Leg(10, 159.5f, 0),
+                new Leg(10, 160.0f, 0),
+                new Leg(10, 160.5f, 0)
+        )));
+        Assert.assertFalse(SurveyUpdater.areLegsAboutTheSame(Arrays.asList(
+                new Leg(10, 119.5f, 0),
+                new Leg(10, 110.0f, 0),
+                new Leg(10, 110.5f, 0)
+        )));
+        Assert.assertFalse(SurveyUpdater.areLegsAboutTheSame(Arrays.asList(
+                new Leg(10, 349.5f, 0),
+                new Leg(10, 10.0f, 0),
+                new Leg(10, 10.5f, 0)
+        )));
+        Assert.assertTrue(SurveyUpdater.areLegsAboutTheSame(Arrays.asList(
+                new Leg(10, 359.5f, 0),
+                new Leg(10, 0.0f, 0),
+                new Leg(10, 0.5f, 0)
+        )));
+        Assert.assertFalse(SurveyUpdater.areLegsAboutTheSame(Arrays.asList(
+                new Leg(10.0f, 90.0f, 5.0f),   // First: 90°
+                new Leg(10.1f, 270.0f, 4.0f), // Second: 270° (opposite direction)
+                new Leg(9.9f, 85.0f, 6.0f)    // Third: 85° (close to first)
+        )));
     }
 
 }

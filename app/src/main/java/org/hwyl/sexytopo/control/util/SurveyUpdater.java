@@ -270,7 +270,7 @@ public class SurveyUpdater {
     }
 
 
-    private static boolean areLegsAboutTheSame(List<Leg> legs) {
+    public static boolean areLegsAboutTheSame(List<Leg> legs) {
 
         for (Leg leg : legs) { // full legs must be unique by definition
             if (leg.hasDestination()) {
@@ -281,12 +281,14 @@ public class SurveyUpdater {
         float minDistance = Float.POSITIVE_INFINITY, maxDistance = Float.NEGATIVE_INFINITY;
         float minAzimuth = Float.POSITIVE_INFINITY, maxAzimuth = Float.NEGATIVE_INFINITY;
         float minInclination = Float.POSITIVE_INFINITY, maxInclination = Float.NEGATIVE_INFINITY;
+        float offsetAzimuth = 540 - legs.get(0).getAzimuth();
 
         for (Leg leg : legs) {
             minDistance = Math.min(leg.getDistance(), minDistance);
             maxDistance = Math.max(leg.getDistance(), maxDistance);
-            minAzimuth = Math.min(leg.getAzimuth(), minAzimuth);
-            maxAzimuth = Math.max(leg.getAzimuth(), maxAzimuth);
+            float shiftedAzimuth = (leg.getAzimuth() + offsetAzimuth) % 360;
+            minAzimuth = Math.min(shiftedAzimuth, minAzimuth);
+            maxAzimuth = Math.max(shiftedAzimuth, maxAzimuth);
             minInclination = Math.min(leg.getInclination(), minInclination);
             maxInclination = Math.max(leg.getInclination(), maxInclination);
         }
