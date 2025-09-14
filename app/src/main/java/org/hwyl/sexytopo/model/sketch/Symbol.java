@@ -72,7 +72,7 @@ public enum Symbol {
         this.svgFilename = svgFilename;
         this.isDirectional = isDirectional;
         this.therionName = therionName;
-        this.viewId = this.hashCode() + drawableId;  // arbitrary, hopefully unique value...
+        this.viewId = android.view.View.generateViewId();
     }
 
     public static void setResources(Resources resources) {
