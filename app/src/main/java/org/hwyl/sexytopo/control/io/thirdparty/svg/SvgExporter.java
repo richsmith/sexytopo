@@ -182,7 +182,7 @@ public class SvgExporter extends DoubleSketchFileExporter {
         double y = coord2D.y * scale;
         xmlSerializer.attribute(null, "x", Double.toString(x));
         xmlSerializer.attribute(null, "y", Double.toString(y));
-        xmlSerializer.attribute(null, "font-size", Integer.toString(textDetail.getSize() * scale));
+        xmlSerializer.attribute(null, "font-size", Float.toString(textDetail.getSize() * scale));
         xmlSerializer.attribute(null, "stroke", getSvgColour(textDetail));
         xmlSerializer.text(textDetail.getText());
         xmlSerializer.endTag(null,"text");
