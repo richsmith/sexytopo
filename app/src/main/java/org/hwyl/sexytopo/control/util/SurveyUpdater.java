@@ -265,6 +265,7 @@ public class SurveyUpdater {
     public static void deleteSplay(Survey survey, Station station, Leg splay) {
         survey.removeLegRecord(splay);
         station.getOnwardLegs().remove(splay);
+        survey.checkSurveyIntegrity();
         survey.setSaved(false);
     }
 
