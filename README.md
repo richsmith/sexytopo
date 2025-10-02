@@ -12,6 +12,13 @@ This app is experimental software made available for free with no guarantee it i
 🏆 SexyTopo was awarded the [Arthur Butcher award](https://bcra.org.uk/detail/awards.butcher.html) for excellence in surveying by the [BCRA](https://bcra.org.uk) at [Hidden Earth](https://hidden.earth) 2023.
 
 
+# Manual
+
+There is a basic manual available in the app, but I can never seem to find time to update it, so it is 
+quite out of date.
+
+Alternatively, Tarquin has written an excellent [guide to surveying with SexyTopo](https://www.cavinguk.co.uk/info/sexytopo.html).
+
 # FAQ
 
 ## Who are you?
@@ -24,11 +31,14 @@ SexyTopo is an app that runs on Android and talks to a laser measuring device ov
 You need an Android phone or tablet. The easiest way is to install SexyTopo via the Google Play app store. Just search for "SexyTopo" and click install. It's a very small download.
 https://play.google.com/store/apps/details?id=org.hwyl.sexytopo
 
-If you can't access Google Play for some reason (e.g. you're in China) then you should be able to get the APK from here: https://github.com/richsmith/sexytopo/tree/master/app/release
+There are other options (at least until Google makes sideloading impossible):
+F-Droid: https://f-droid.org/en/packages/org.hwyl.sexytopo/
+APK: https://github.com/richsmith/sexytopo/releases
 
 ## What Android device is best to use with SexyTopo?
 A large phone or "phablet" (as oppposed to a full-size tablet or small phone) seems to be the best form factor.
-A Galaxy Note is a good choice. Apart from being about the right size, a proper stylus helps greatly in surveying. Consider buying second hand to get an affordable device for taking underground.
+A Samsung Galaxy Note or its successor, the Ultra, is a good choice. Apart from being about the right size,
+a proper stylus helps greatly in surveying. Consider buying second hand to get an affordable device for taking underground.
 
 ## What measuring instruments does SexyTopo work with?
 Currently the following:
