@@ -288,6 +288,8 @@
     <string name="device_sap5_short_name" translatable="false">SAP5</string>
     <string name="device_sap6_name" translatable="false">Shetland Attack Pony 6</string>
     <string name="device_sap6_short_name" translatable="false">SAP6</string>
+    <string name="device_discox_name" translatable="false">DiscoX</string>
+    <string name="device_discox_short_name" translatable="false">DiscoX</string>
     <string name="device_sap_command_calibration_start">Start Calibration</string>
     <string name="device_sap_command_calibration_stop">Stop Calibration</string>
     <string name="device_sap_command_laser_on">Laser On</string>
