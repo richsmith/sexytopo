@@ -218,5 +218,13 @@ public class GeneralPreferences {
         return getInt("pref_export_svg_stroke_width", 1);
     }
 
+    public static int getExportSvgLegStrokeWidth() {
+        return getInt("pref_export_svg_leg_width", 2);
+    }
+
+    public static int getExportSvgSplayStrokeWidth() {
+        return getInt("pref_export_svg_splay_width", 1);
+    }
+
 
 }

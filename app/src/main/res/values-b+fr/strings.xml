@@ -434,6 +434,10 @@
     </string-array>
     <string name="settings_export_svg_stroke_width_title">Largeur du trait SVG</string>
     <string name="settings_export_svg_stroke_width_summary">Quelle largeur pour dessiner les lignes dans l\'export SVG</string>
+    <string name="settings_export_svg_leg_width_title">Largeur du trait des segments SVG</string>
+    <string name="settings_export_svg_leg_width_summary">Quelle largeur pour dessiner les segments dans l\'export SVG</string>
+    <string name="settings_export_svg_splay_width_title">Largeur du trait des radiales SVG</string>
+    <string name="settings_export_svg_splay_width_summary">Quelle largeur pour dessiner les radiales dans l\'export SVG</string>
     <string name="settings_developer_title">Développeur</string>
     <string name="settings_key_developer_mode_title">Mode développeur</string>
     <string name="settings_key_developer_mode_summary">Afficher les entrées du menu de débogage</string>

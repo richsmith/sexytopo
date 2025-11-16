@@ -443,6 +443,10 @@
     </string-array>
     <string name="settings_export_svg_stroke_width_title">SVG stroke width</string>
     <string name="settings_export_svg_stroke_width_summary">How wide to draw lines in SVG export</string>
+    <string name="settings_export_svg_leg_width_title">SVG leg width</string>
+    <string name="settings_export_svg_leg_width_summary">How wide to draw leg lines in SVG export</string>
+    <string name="settings_export_svg_splay_width_title">SVG splay width</string>
+    <string name="settings_export_svg_splay_width_summary">How wide to draw splay lines in SVG export</string>
     <string name="settings_developer_title">Developer</string>
     <string name="settings_key_developer_mode_title">Developer mode</string>
     <string name="settings_key_developer_mode_summary">Show debugging menu entries</string>

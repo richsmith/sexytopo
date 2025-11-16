@@ -238,6 +238,8 @@ public class SvgExporter extends DoubleSketchFileExporter {
      private static void writeSurveyData(XmlSerializer xmlSerializer, Space<Coord2D> projection, int scale)
             throws IOException {
         Map<Leg, Line<Coord2D>> legMap = projection.getLegMap();
+        Integer legStrokeWidth = GeneralPreferences.getExportSvgLegStrokeWidth();
+        Integer splayStrokeWidth = GeneralPreferences.getExportSvgSplayStrokeWidth();
         for (Leg leg : legMap.keySet()) {
             Line<Coord2D> line = legMap.get(leg);
             xmlSerializer.startTag("", "polyline");
@@ -245,7 +247,8 @@ public class SvgExporter extends DoubleSketchFileExporter {
                 ",", scale * line.getStart().x, scale * line.getStart().y, scale * line.getEnd().x, scale * line.getEnd().y);
             xmlSerializer.attribute("", "points", pointsString);
             xmlSerializer.attribute("", "stroke", "red");
-            xmlSerializer.attribute("", "stroke-width", leg.hasDestination()? "2" : "1");
+            Integer strokeWidth = leg.hasDestination() ? legStrokeWidth : splayStrokeWidth;
+            xmlSerializer.attribute("", "stroke-width", strokeWidth.toString());
             xmlSerializer.attribute("", "fill", "none");
             xmlSerializer.endTag("", "polyline");
         }

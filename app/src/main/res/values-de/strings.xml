@@ -419,8 +419,12 @@
         <item>Transparent</item>
         <item>Weiß</item>
     </string-array>
-    <string name="settings_export_svg_stroke_width_title">SVG-Strichstärke</string> SVG stroke width
+    <string name="settings_export_svg_stroke_width_title">SVG-Strichstärke</string>
     <string name="settings_export_svg_stroke_width_summary">Wie breit Linien im SVG-Export dargestellt werden sollen</string>
+    <string name="settings_export_svg_leg_width_title">SVG-Messstrecken-Strichstärke</string>
+    <string name="settings_export_svg_leg_width_summary">Wie breit Messstrecken im SVG-Export dargestellt werden sollen</string>
+    <string name="settings_export_svg_splay_width_title">SVG-Dimensions-Strichstärke</string>
+    <string name="settings_export_svg_splay_width_summary">Wie breit Dimensionen im SVG-Export dargestellt werden sollen</string>
     <string name="settings_developer_title">Entwickler</string>
     <string name="settings_key_developer_mode_title"> Entwickler-Modus</string>
     <string name="settings_key_developer_mode_summary">Einträge im Debugging-Menü anzeigen</string>
