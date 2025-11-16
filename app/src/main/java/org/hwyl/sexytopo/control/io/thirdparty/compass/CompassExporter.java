@@ -58,7 +58,7 @@ public class CompassExporter extends SingleFileExporter implements Experimental 
             double azm = leg.getAzimuth();
             double inc = leg.getInclination();
 
-            sb.append(String.format("%s\t%s\t%.2f\t%.2f\t%.2f\t", from, to, dist, azm, inc));
+            sb.append(String.format(Locale.US, "%s\t%s\t%.2f\t%.2f\t%.2f\t", from, to, dist, azm, inc));
             sb.append("-9.99\t-9.99\t-9.99\t-9.99\t");  // LUDR, must be in that order
             if (!leg.hasDestination()) {
                 sb.append("#|L#");  // exclude splay shots from cave length calculations
