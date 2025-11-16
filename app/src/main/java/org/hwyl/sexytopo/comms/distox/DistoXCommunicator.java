@@ -30,10 +30,10 @@ public class DistoXCommunicator implements DistoXStyleCommunicator {
 
     static {
         CUSTOM_COMMANDS.put(CALIBRATION_ID, R.string.device_distox_command_calibration);
-        CUSTOM_COMMANDS.put(LASER_ON_ID, R.string.device_distox_command_laser_on);
-        CUSTOM_COMMANDS.put(SHOT_ID, R.string.device_distox_command_take_shot);
-        CUSTOM_COMMANDS.put(LASER_OFF_ID, R.string.device_distox_command_laser_off);
-        CUSTOM_COMMANDS.put(DISTO_X_OFF_ID, R.string.device_distox_command_distox_off);
+        CUSTOM_COMMANDS.put(LASER_ON_ID, R.string.device_command_laser_on);
+        CUSTOM_COMMANDS.put(SHOT_ID, R.string.device_command_take_shot);
+        CUSTOM_COMMANDS.put(LASER_OFF_ID, R.string.device_command_laser_off);
+        CUSTOM_COMMANDS.put(DISTO_X_OFF_ID, R.string.device_command_device_off);
     }
 
     protected DistoXThread thread;

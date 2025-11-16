@@ -247,6 +247,10 @@
     <string name="device_missing_short_name">Missing</string>
     <string name="device_unknown_name">[Unknown device]</string>
     <string name="device_unknown_short_name">Unknown</string>
+    <string name="device_command_laser_on">Laser On</string>
+    <string name="device_command_laser_off">Laser Off</string>
+    <string name="device_command_take_shot">Take Shot</string>
+    <string name="device_command_device_off">Device Off</string>
     <string name="device_ble_invalid_data_received">Invalid data received</string>
     <string name="device_ble_connecting_to">Connecting to %1$s…</string>
     <string name="device_ble_connected_to">Connected to %1$s</string>
@@ -259,13 +263,13 @@
     <string name="device_distox_short_name" translatable="false">DistoX</string>
     <string name="device_distox_ble_name" translatable="false">DistoX BLE</string>
     <string name="device_distox_ble_short_name" translatable="false">DistoX BLE</string>
+    <string name="device_cavway_x1_name" translatable="false">Cavway X1</string>
+    <string name="device_cavway_x1_short_name" translatable="false">Cavway X1</string>
+    <string name="device_cavway_x1_calibration_on">Enter Calibration Mode</string>
+    <string name="device_cavway_x1_calibration_off">Quit Calibration Mode</string>
     <string name="device_distox_command_calibration">Calibration…</string>
-    <string name="device_distox_command_laser_on">Laser On</string>
     <string name="device_distox_command_silent_mode_on">Silent Mode On</string>
     <string name="device_distox_command_silent_mode_off">Silent Mode Off</string>
-    <string name="device_distox_command_take_shot">Take Shot</string>
-    <string name="device_distox_command_laser_off">Laser Off</string>
-    <string name="device_distox_command_distox_off">Device Off</string>
     <string name="device_distox_command_calibration_start">Start calibration mode</string>
     <string name="device_distox_command_calibration_stop">Stop calibration mode</string>
     <string name="device_distox_force_disconnect_for_calibration">Disto busy; forcing disconnect to write calibration</string>

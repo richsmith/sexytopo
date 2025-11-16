@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothDevice;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.comms.bric4.Bric4Communicator;
+import org.hwyl.sexytopo.comms.cavwayx1.CavwayX1Communicator;
 import org.hwyl.sexytopo.comms.distox.DistoXCommunicator;
 import org.hwyl.sexytopo.comms.distoxble.DistoXBleCommunicator;
 import org.hwyl.sexytopo.comms.fcl.FCLCommunicator;
@@ -21,6 +22,7 @@ public enum InstrumentType {
     // DISTOX BLE gets listed before DistoX due to the BT prefix overlap
     DISTOX_BLE(R.string.device_distox_ble_name, R.string.device_distox_ble_short_name, "DistoXBLE-", DistoXBleCommunicator.class),
     DISTOX(R.string.device_distox_name, R.string.device_distox_short_name, "DistoX", DistoXCommunicator.class),
+    CAVWAY_X1_BLE(R.string.device_cavway_x1_name, R.string.device_cavway_x1_short_name, "CavwayX1-", CavwayX1Communicator.class),
     BRIC4(R.string.device_bric4_name, R.string.device_bric4_short_name, "BRIC4_", Bric4Communicator.class),
     BRIC5(R.string.device_bric5_name, R.string.device_bric5_short_name, "BRIC5_", Bric4Communicator.class),
 

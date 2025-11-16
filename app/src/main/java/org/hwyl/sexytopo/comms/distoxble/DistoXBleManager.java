@@ -88,12 +88,12 @@ public class DistoXBleManager extends SexyTopoBleManager {
     private static final Map<Integer, Integer> CUSTOM_COMMANDS = new HashMap<>();
     static {
         CUSTOM_COMMANDS.put(COMMAND_OPEN_CALIBRATION_VIEW, R.string.device_distox_command_calibration);
-        CUSTOM_COMMANDS.put(COMMAND_LASER_ON, R.string.device_distox_command_laser_on);
-        CUSTOM_COMMANDS.put(COMMAND_LASER_TRIGGER, R.string.device_distox_command_take_shot);
-        CUSTOM_COMMANDS.put(COMMAND_LASER_OFF, R.string.device_distox_command_laser_off);
+        CUSTOM_COMMANDS.put(COMMAND_LASER_ON, R.string.device_command_laser_on);
+        CUSTOM_COMMANDS.put(COMMAND_LASER_TRIGGER, R.string.device_command_take_shot);
+        CUSTOM_COMMANDS.put(COMMAND_LASER_OFF, R.string.device_command_laser_off);
         CUSTOM_COMMANDS.put(COMMAND_SILENT_MODE_START, R.string.device_distox_command_silent_mode_on);
         CUSTOM_COMMANDS.put(COMMAND_SILENT_MODE_STOP, R.string.device_distox_command_silent_mode_off);
-        CUSTOM_COMMANDS.put(COMMAND_DEVICE_POWER_OFF, R.string.device_distox_command_distox_off);
+        CUSTOM_COMMANDS.put(COMMAND_DEVICE_POWER_OFF, R.string.device_command_device_off);
     }
 
     private static final Map<Integer, Integer> CUSTOM_COMMAND_TO_COMMAND_BYTE = new HashMap<>();
