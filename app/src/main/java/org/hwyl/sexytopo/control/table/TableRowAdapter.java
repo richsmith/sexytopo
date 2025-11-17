@@ -134,9 +134,9 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
 
             // Bold for full legs, normal for splays
             if (entry.getLeg().hasDestination()) {
-                textView.setTypeface(textView.getTypeface(), Typeface.BOLD);
+                textView.setTypeface(Typeface.DEFAULT_BOLD);
             } else {
-                textView.setTypeface(textView.getTypeface(), Typeface.NORMAL);
+                textView.setTypeface(Typeface.DEFAULT);
             }
 
             // Set alignment based on column type
