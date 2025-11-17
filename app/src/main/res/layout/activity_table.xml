@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
@@ -5,59 +6,29 @@
     android:layout_height="fill_parent"
     android:keepScreenOn="true">
 
-    <org.hwyl.sexytopo.control.components.ScrollingTable
+    <!-- Header Row (fixed at top, scrolls with content below) -->
+    <TableLayout
+        android:id="@+id/HeaderTable"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent">
+        <TableRow style="@style/HeaderRow">
+            <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_from"/>
+            <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_to"/>
+            <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_distance"/>
+            <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_azimuth"/>
+            <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_elevation"/>
+        </TableRow>
+    </TableLayout>
+
+    <!-- RecyclerView for scrollable content -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/tableRecyclerView"
         android:layout_width="match_parent"
-        android:orientation="vertical" android:layout_weight="1"
-        android:layout_height="0dp">
-        <TableLayout android:layout_height="wrap_content"
-            android:layout_width="match_parent" android:id="@+id/HeaderTable">
-            <TableRow style="@style/HeaderRow">
-                <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_from"/>
-                <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_to"/>
-                <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_distance"/>
-                <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_azimuth"/>
-                <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_elevation"/>
-            </TableRow>
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"/>
 
-
-
-            <TableRow style="@style/BodyRow">
-                <TextView android:text="A" style="@style/BodyText" android:layout_weight="1" android:height="0dp" />
-                <TextView android:text="B" style="@style/BodyText" android:layout_weight="1" android:height="0dp" />
-                <TextView android:text="12.46" style="@style/BodyText" android:layout_weight="1" android:height="0dp" />
-                <TextView android:text="0.36" style="@style/BodyText" android:layout_weight="1" android:height="0dp" />
-                <TextView android:text="0.36" style="@style/BodyText" android:layout_weight="1" android:height="0dp" />
-            </TableRow>
-        </TableLayout>
-
-
-        <ScrollView
-            android:id="@+id/BodyTableScrollView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <TableLayout
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent" android:id="@+id/BodyTable">
-
-                <TableRow style="@style/BodyRow">
-                    <TextView style="@style/BodyText" android:layout_weight="1" android:height="0dp" android:text="@string/table_head_from"/>
-                    <TextView style="@style/BodyText" android:layout_weight="1" android:height="0dp" android:text="@string/table_head_to"/>
-                    <TextView style="@style/BodyText" android:layout_weight="1" android:height="0dp" android:text="@string/table_head_distance"/>
-                    <TextView style="@style/BodyText" android:layout_weight="1" android:height="0dp" android:text="@string/table_head_azimuth"/>
-                    <TextView style="@style/BodyText" android:layout_weight="1" android:height="0dp" android:text="@string/table_head_elevation"/>
-                </TableRow>
-                <TableRow style="@style/BodyRow">
-                    <TextView android:text="A" style="@style/BodyText" android:layout_weight="1" android:gravity="left"/>
-                    <TextView android:text="B" style="@style/BodyText" android:layout_weight="1" android:gravity="left"/>
-                    <TextView android:text="12.46" style="@style/BodyText" android:layout_weight="1" android:gravity="right"/>
-                    <TextView android:text="0.36" style="@style/BodyText" android:layout_weight="1" android:gravity="right"/>
-                    <TextView android:text="0.36" style="@style/BodyText" android:layout_weight="1" android:gravity="right"/>
-                </TableRow>
-
-            </TableLayout>
-        </ScrollView>
-    </org.hwyl.sexytopo.control.components.ScrollingTable>
-
+    <!-- Toolbar -->
     <RelativeLayout
         android:id="@+id/relativeLayout1"
         android:layout_width="fill_parent"
@@ -67,21 +38,21 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
-        <ImageButton
-            android:id="@+id/buttonAddStation"
-            android:layout_width="@dimen/toolbar_button_height"
-            android:layout_height="@dimen/toolbar_button_height"
-            android:src="@drawable/add"
-            android:scaleType="fitCenter"
-            android:onClick="manuallyAddStation"/>
+            <ImageButton
+                android:id="@+id/buttonAddStation"
+                android:layout_width="@dimen/toolbar_button_height"
+                android:layout_height="@dimen/toolbar_button_height"
+                android:src="@drawable/add"
+                android:scaleType="fitCenter"
+                android:onClick="manuallyAddStation"/>
 
-        <ImageButton
-            android:id="@+id/buttonAddSplay"
-            android:layout_width="@dimen/toolbar_button_height"
-            android:layout_height="@dimen/toolbar_button_height"
-            android:src="@drawable/add_splay"
-            android:scaleType="fitCenter"
-            android:onClick="manuallyAddSplay"/>
+            <ImageButton
+                android:id="@+id/buttonAddSplay"
+                android:layout_width="@dimen/toolbar_button_height"
+                android:layout_height="@dimen/toolbar_button_height"
+                android:src="@drawable/add_splay"
+                android:scaleType="fitCenter"
+                android:onClick="manuallyAddSplay"/>
         </LinearLayout>
 
     </RelativeLayout>

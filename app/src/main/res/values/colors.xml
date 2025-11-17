@@ -38,7 +38,9 @@
     <color name="error">#FF0000</color>
     <color name="standard">#000000</color>
 
-    <color name="tableBackground">#DFDFDF</color>
+    <color name="tableBackground">#FFFFFF</color>
+    <color name="tableBackgroundAlt">#F5F5F5</color>
+    <color name="tableHighlight">#FFD700</color>
 
 
 </resources>

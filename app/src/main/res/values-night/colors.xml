@@ -9,5 +9,8 @@
     <color name="legend">@color/lightGrey</color>
     <color name="panelBackground">@color/sexyTopoDarkGreen</color>
     <color name="headerBackground">@color/sexyTopoDarkGreen</color>
+    <color name="tableBackground">#2A2A2A</color>
+    <color name="tableBackgroundAlt">#1F1F1F</color>
+    <color name="tableHighlight">#FFD700</color>
 
 </resources>
