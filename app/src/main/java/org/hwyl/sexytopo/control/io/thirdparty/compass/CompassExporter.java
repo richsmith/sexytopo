@@ -14,6 +14,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -103,7 +104,7 @@ public class CompassExporter extends SingleFileExporter implements Experimental 
             this.currentFrom = from;
             this.splayCount = 0;
         }
-        return String.format("%sss%03d", from, this.splayCount++);
+        return String.format(Locale.US,"%sss%03d", from, this.splayCount++);
     }
 
 }
