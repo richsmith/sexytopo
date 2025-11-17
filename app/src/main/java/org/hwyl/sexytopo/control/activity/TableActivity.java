@@ -7,31 +7,28 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnLongClickListener;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.PopupMenu;
-import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
-import org.hwyl.sexytopo.control.graph.GraphView;
 import org.hwyl.sexytopo.control.table.ManualEntry;
+import org.hwyl.sexytopo.control.table.TableRowAdapter;
+import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
 import org.hwyl.sexytopo.control.util.LegMover;
-import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.control.util.TextTools;
@@ -41,34 +38,18 @@ import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.table.TableCol;
 
 import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 public class TableActivity extends SexyTopoActivity
-    implements PopupMenu.OnMenuItemClickListener, PopupMenu.OnDismissListener, OnLongClickListener {
+    implements PopupMenu.OnMenuItemClickListener, PopupMenu.OnDismissListener, TableRowAdapter.OnRowClickListener {
 
     private final GraphToListTranslator graphToListTranslator = new GraphToListTranslator();
 
-    private final Map<TextView, GraphToListTranslator.SurveyListEntry> fieldToSurveyEntry
-            = new HashMap<>();
-    private final Map<TextView, TableCol> fieldToTableCol = new HashMap<>();
-    private final static Map<Station, Integer> stationsToTableIndex = new HashMap<>();
+    private RecyclerView recyclerView;
+    private TableRowAdapter tableRowAdapter;
     private BroadcastReceiver receiver;
     private TextView cellBeingClicked;
-
-
-    private static final EnumMap<TableCol, Integer> TABLE_COL_BY_ANDROID_ID =
-        new EnumMap<TableCol, Integer>(TableCol.class) {{
-            put(TableCol.FROM, R.id.tableRowFrom);
-            put(TableCol.TO, R.id.tableRowTo);
-            put(TableCol.DISTANCE, R.id.tableRowDistance);
-            put(TableCol.AZIMUTH, R.id.tableRowAzimuth);
-            put(TableCol.INCLINATION, R.id.tableRowInclination);
-
-        }};
 
 
     @Override
@@ -78,12 +59,31 @@ public class TableActivity extends SexyTopoActivity
         setContentView(R.layout.activity_table);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+        recyclerView = findViewById(R.id.tableRecyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        tableRowAdapter = new TableRowAdapter(this, getSurvey(), this);
+        recyclerView.setAdapter(tableRowAdapter);
+
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(android.content.Context context, Intent intent) {
                 syncTableWithSurvey();
             }
         };
+    }
+
+    private void measureAndSyncHeaderWidths() {
+        TableLayout headerTable = findViewById(R.id.HeaderTable);
+        List<Integer> widths = new ArrayList<>();
+
+        if (headerTable.getChildCount() > 0) {
+            android.widget.TableRow headerRow = (android.widget.TableRow) headerTable.getChildAt(0);
+            for (int i = 0; i < headerRow.getChildCount(); i++) {
+                View cell = headerRow.getChildAt(i);
+                widths.add(cell.getWidth());
+            }
+            tableRowAdapter.setColumnWidths(widths);
+        }
     }
 
 
@@ -96,14 +96,27 @@ public class TableActivity extends SexyTopoActivity
 
         syncTableWithSurvey();
 
+        // Measure header widths after layout is complete
+        TableLayout headerTable = findViewById(R.id.HeaderTable);
+        headerTable.getViewTreeObserver().addOnGlobalLayoutListener(new android.view.ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                headerTable.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                measureAndSyncHeaderWidths();
+            }
+        });
+
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && bundle.getString(SexyTopoConstants.JUMP_TO_STATION) != null) {
             String requestedStationName = bundle.getString(SexyTopoConstants.JUMP_TO_STATION);
             Station requestedStation = getSurvey().getStationByName(requestedStationName);
             jumpToStation(requestedStation);
         } else {
-            final ScrollView scrollView = findViewById(R.id.BodyTableScrollView);
-            scrollView.fullScroll(View.FOCUS_DOWN);
+            // Scroll to bottom (latest data)
+            int itemCount = tableRowAdapter.getItemCount();
+            if (itemCount > 0) {
+                recyclerView.scrollToPosition(itemCount - 1);
+            }
         }
     }
 
@@ -117,13 +130,17 @@ public class TableActivity extends SexyTopoActivity
 
     private void jumpToStation(Station station) {
         try {
-            final TableLayout tableLayout = findViewById(R.id.BodyTable);
-            int requestedIndex = stationsToTableIndex.get(station);
-            final View requestedRow = tableLayout.getChildAt(requestedIndex);
-            final ScrollView scrollView = findViewById(R.id.BodyTableScrollView);
-
-            scrollView.post(() -> scrollView.smoothScrollTo(0, requestedRow.getTop()));
-
+            int position = tableRowAdapter.getPositionForStation(station);
+            if (position >= 0) {
+                // Post to ensure RecyclerView layout is complete
+                recyclerView.post(() -> {
+                    LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                    if (layoutManager != null) {
+                        // Scroll so target is at the top of the visible area (with small offset for header)
+                        layoutManager.scrollToPositionWithOffset(position, 0);
+                    }
+                });
+            }
         } catch (Exception exception) {
             String name = station == null? getString(R.string.unknown) : station.getName();
             showExceptionAndLog(R.string.context_jump_to_station_error, exception, name);
@@ -132,93 +149,35 @@ public class TableActivity extends SexyTopoActivity
 
 
     public void syncTableWithSurvey() {
-
         Survey survey = getSurvey();
-
-        stationsToTableIndex.clear();
+        tableRowAdapter.setSurvey(survey);
 
         List<GraphToListTranslator.SurveyListEntry> tableEntries =
                 graphToListTranslator.toChronoListOfSurveyListEntries(survey);
 
-        if (tableEntries.size() == 0) {
+        if (tableEntries.isEmpty()) {
             Toast.makeText(getApplicationContext(), R.string.no_data,
                     Toast.LENGTH_SHORT).show();
         }
 
-        final TableLayout tableLayout = findViewById(R.id.BodyTable);
-        tableLayout.removeAllViews();
-
-        for (GraphToListTranslator.SurveyListEntry entry : tableEntries) {
-
-            TableRow tableRow = (TableRow)LayoutInflater.from(this).inflate(R.layout.table_row, null);
-            final Map<TableCol, Object> map = GraphToListTranslator.createMap(entry);
-
-            for (TableCol col : TableCol.values()) {
-
-                if (col == TableCol.COMMENT) {
-                    continue;
-                }
-
-                String display = map.containsKey(col) ? col.format(map.get(col)) : "?";
-                int id = TABLE_COL_BY_ANDROID_ID.get(col);
-                TextView textView = tableRow.findViewById(id);
-                textView.setText(display);
-
-                if (isActiveStation(map.get(col))) {
-                    textView.setBackgroundColor(GraphView.HIGHLIGHT_COLOUR.intValue);
-                }
-
-				if (entry.getLeg().hasDestination()) {
-					textView.setTypeface(textView.getTypeface(), Typeface.BOLD);
-                } else {
-                    textView.setTypeface(textView.getTypeface(), Typeface.NORMAL);
-                }
-
-                fieldToSurveyEntry.put(textView, entry);
-                fieldToTableCol.put(textView, col);
-
-                textView.setOnLongClickListener(this);
-            }
-
-            int rowCount = tableLayout.getChildCount();
-            tableLayout.addView(tableRow, rowCount);
-
-            if (entry.getLeg().hasDestination()) {
-                Station to = entry.getLeg().getDestination();
-                stationsToTableIndex.put(to, rowCount);
-            }
-        }
-
-        tableLayout.requestLayout();
-
-
-    }
-
-    private boolean isActiveStation(Object object) {
-        return (object instanceof Station) &&
-            object == getSurvey().getActiveStation();
+        tableRowAdapter.setEntries(tableEntries);
     }
 
     @Override
-    public boolean onLongClick(View view) {
-        TextView textView = (TextView)view;
+    public void onRowLongClick(View view, GraphToListTranslator.SurveyListEntry entry, TableCol col) {
+        TextView textView = (TextView) view;
         cellBeingClicked = textView;
-        TableCol col = fieldToTableCol.get(textView);
 
         if (col == TableCol.FROM || col == TableCol.TO) {
             showPopup(view, R.menu.table_station_selected, this);
         } else {
-            final GraphToListTranslator.SurveyListEntry surveyEntry =
-                    fieldToSurveyEntry.get(cellBeingClicked);
-            Leg leg = surveyEntry.getLeg();
+            Leg leg = entry.getLeg();
             if (leg.hasDestination()) {
                 showPopup(view, R.menu.table_full_leg_selected, this);
             } else {
                 showPopup(view, R.menu.table_splay_selected, this);
             }
         }
-
-        return true;
     }
 
 
@@ -240,10 +199,13 @@ public class TableActivity extends SexyTopoActivity
     @Override
     public boolean onMenuItemClick(MenuItem menuItem) {
 
-        final TableCol col = fieldToTableCol.get(cellBeingClicked);
+        final TableCol col = tableRowAdapter.getFieldToTableCol().get(cellBeingClicked);
         final GraphToListTranslator.SurveyListEntry surveyEntry =
-                fieldToSurveyEntry.get(cellBeingClicked);
+                tableRowAdapter.getFieldToSurveyEntry().get(cellBeingClicked);
 
+        if (col == null || surveyEntry == null) {
+            return false;
+        }
 
         Context context = this;
         int itemId = menuItem.getItemId();

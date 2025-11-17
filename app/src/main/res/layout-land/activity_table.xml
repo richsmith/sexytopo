@@ -5,7 +5,6 @@
     android:layout_height="fill_parent"
     android:keepScreenOn="true">
 
-
     <RelativeLayout
         android:id="@+id/relativeLayout1Landscape"
         android:layout_width="wrap_content"
@@ -33,15 +32,18 @@
                 android:onClick="manuallyAddSplay"/>
         </LinearLayout>
 
-
     </RelativeLayout>
 
-    <org.hwyl.sexytopo.control.components.ScrollingTable
+    <LinearLayout
         android:layout_width="0dp"
-        android:orientation="vertical" android:layout_weight="1"
-        android:layout_height="match_parent">
-        <TableLayout android:layout_height="wrap_content"
-            android:layout_width="match_parent" android:id="@+id/HeaderTable">
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TableLayout
+            android:id="@+id/HeaderTable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
             <TableRow style="@style/HeaderRow">
                 <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_from"/>
                 <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_to"/>
@@ -49,44 +51,13 @@
                 <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_azimuth"/>
                 <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_elevation"/>
             </TableRow>
-
-
-
-            <TableRow style="@style/BodyRow">
-                <TextView android:text="A" style="@style/BodyText" android:layout_weight="1" android:height="0dp" />
-                <TextView android:text="B" style="@style/BodyText" android:layout_weight="1" android:height="0dp" />
-                <TextView android:text="12.46" style="@style/BodyText" android:layout_weight="1" android:height="0dp" />
-                <TextView android:text="0.36" style="@style/BodyText" android:layout_weight="1" android:height="0dp" />
-                <TextView android:text="0.36" style="@style/BodyText" android:layout_weight="1" android:height="0dp" />
-            </TableRow>
         </TableLayout>
 
-
-        <ScrollView
-            android:id="@+id/BodyTableScrollView"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/tableRecyclerView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <TableLayout
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent" android:id="@+id/BodyTable">
+            android:layout_height="match_parent" />
 
-                <TableRow style="@style/BodyRow">
-                    <TextView style="@style/BodyText" android:layout_weight="1" android:height="0dp" android:text="@string/table_head_from"/>
-                    <TextView style="@style/BodyText" android:layout_weight="1" android:height="0dp" android:text="@string/table_head_to"/>
-                    <TextView style="@style/BodyText" android:layout_weight="1" android:height="0dp" android:text="@string/table_head_distance"/>
-                    <TextView style="@style/BodyText" android:layout_weight="1" android:height="0dp" android:text="@string/table_head_azimuth"/>
-                    <TextView style="@style/BodyText" android:layout_weight="1" android:height="0dp" android:text="@string/table_head_elevation"/>
-                </TableRow>
-                <TableRow style="@style/BodyRow">
-                    <TextView android:text="A" style="@style/BodyText" android:layout_weight="1" android:gravity="left"/>
-                    <TextView android:text="B" style="@style/BodyText" android:layout_weight="1" android:gravity="left"/>
-                    <TextView android:text="12.46" style="@style/BodyText" android:layout_weight="1" android:gravity="right"/>
-                    <TextView android:text="0.36" style="@style/BodyText" android:layout_weight="1" android:gravity="right"/>
-                    <TextView android:text="0.36" style="@style/BodyText" android:layout_weight="1" android:gravity="right"/>
-                </TableRow>
-
-            </TableLayout>
-        </ScrollView>
-    </org.hwyl.sexytopo.control.components.ScrollingTable>
+    </LinearLayout>
 
 </LinearLayout>
