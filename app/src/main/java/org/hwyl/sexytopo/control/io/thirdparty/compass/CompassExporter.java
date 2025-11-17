@@ -13,7 +13,6 @@ import org.hwyl.sexytopo.model.survey.Survey;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 
 
@@ -28,7 +27,6 @@ public class CompassExporter extends SingleFileExporter implements Experimental 
     private static final GraphToListTranslator graphToListTranslator = new GraphToListTranslator();
     private Station currentFrom;
     private int splayCount;
-    private HashMap<String, Integer> splay_station = HashMap<String, Integer>();
 
     final public static double METERS_TO_FEET = 3.28084;
 
@@ -101,8 +99,11 @@ public class CompassExporter extends SingleFileExporter implements Experimental 
      * @return A station label of, for example, `A53ss003` for the third splay off station A53
      */
     private String splayStationFrom(Station from) {
-        final int ret = splay_station.containsKey(from) ? splay_station.get(from) : 1;
-        splay_station.put(from, ret + 1);
-        return String.format("%sss%03d", from, ret);
+        if (!from.equals(this.currentFrom)) {
+            this.currentFrom = from;
+            this.splayCount = 0;
+        }
+        return String.format("%sss%03d", from, this.splayCount++);
     }
+
 }
