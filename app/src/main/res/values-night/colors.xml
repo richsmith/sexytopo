@@ -12,5 +12,9 @@
     <color name="tableBackground">#2A2A2A</color>
     <color name="tableBackgroundAlt">#1F1F1F</color>
     <color name="tableHighlight">#FFD700</color>
+    <color name="lightBackground">#121212</color>
+    <color name="darkBackground">#000000</color>
+    <color name="colorBackground">@color/lightBackground</color>
+    <color name="colorBackgroundDark">@color/darkBackground</color>
 
 </resources>

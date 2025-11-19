@@ -5,6 +5,7 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:background="@color/lightBackground"
     android:keepScreenOn="true">
 
     <!-- Header Row (fixed at top, scrolls with content below) -->

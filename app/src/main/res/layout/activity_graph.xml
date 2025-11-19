@@ -3,6 +3,7 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:background="@color/lightBackground"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <org.hwyl.sexytopo.control.graph.GraphView

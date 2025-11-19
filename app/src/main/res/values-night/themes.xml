@@ -2,8 +2,11 @@
 <resources>
 
     <style name="AppTheme" parent="Theme.AppCompat.DayNight">
-        <item name="actionBarStyle">@style/ActionBarHack</item>
+        <item name="actionBarStyle">@style/ActionBarStyle</item>
         <item name="background">@color/colorBackground</item>
+        <item name="android:windowBackground">@color/panelBackground</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
     </style>
 
 </resources>
