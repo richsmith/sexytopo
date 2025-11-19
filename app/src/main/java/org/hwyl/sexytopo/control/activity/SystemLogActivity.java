@@ -27,6 +27,8 @@ public class SystemLogActivity extends SexyTopoActivity {
 
         setContentView(R.layout.activity_debug_log);
 
+        applyEdgeToEdgeInsets(R.id.rootLayout, true, true);
+
         logUpdateReceiver = new SystemLogUpdateReceiver();
     }
 

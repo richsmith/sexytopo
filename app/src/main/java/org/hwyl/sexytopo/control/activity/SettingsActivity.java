@@ -16,8 +16,10 @@ public class SettingsActivity extends SexyTopoActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        applyEdgeToEdgeInsets(R.id.rootLayout, true, true);
+
         getSupportFragmentManager().beginTransaction()
-            .replace(R.id.settings_container, new SettingsFragment())
+            .replace(R.id.rootLayout, new SettingsFragment())
             .commit();
 
         prefListener = (prefs, key) -> {

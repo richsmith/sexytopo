@@ -110,6 +110,8 @@ public abstract class GraphActivity extends SexyTopoActivity
         setContentView(R.layout.activity_graph);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+        applyEdgeToEdgeInsets(R.id.rootLayout, true, true);
+
         for (int id : BUTTON_IDS) {
             View button = findViewById(id);
             button.setOnClickListener(this);

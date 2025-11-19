@@ -64,6 +64,9 @@ public class TableActivity extends SexyTopoActivity
         tableRowAdapter = new TableRowAdapter(this, getSurvey(), this);
         recyclerView.setAdapter(tableRowAdapter);
 
+        applyEdgeToEdgeInsets(R.id.rootLayout, true, false);
+        applyEdgeToEdgeInsets(R.id.relativeLayout1, false, true);
+
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(android.content.Context context, Intent intent) {

@@ -4,6 +4,10 @@
     <style name="AppTheme" parent="Theme.AppCompat.DayNight">
         <item name="actionBarStyle">@style/ActionBarHack</item>
         <item name="background">@color/colorBackground</item>
+        <!-- Edge-to-edge support: transparent system bars -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 
 

@@ -56,6 +56,8 @@ public class DeviceActivity extends SexyTopoActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device);
 
+        applyEdgeToEdgeInsets(R.id.rootLayout, true, true);
+
         bluetoothAdapter = getBluetoothAdapter();
 
         setupSwitchListeners();

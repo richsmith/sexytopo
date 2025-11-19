@@ -44,6 +44,8 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trip);
+        applyEdgeToEdgeInsets(R.id.rootLayout, true, true);
+
         ListView personList = findViewById(R.id.person_list);
         teamListAdapter = new TeamListArrayAdapter(this, team);
         personList.setAdapter(teamListAdapter);

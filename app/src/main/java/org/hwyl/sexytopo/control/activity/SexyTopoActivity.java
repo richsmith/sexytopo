@@ -29,6 +29,9 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.documentfile.provider.DocumentFile;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
@@ -84,6 +87,9 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Enable edge-to-edge display (SDK 35+)
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+
         dataManager = SurveyManager.getInstance(this.getApplicationContext());
 
         // if Android restarts the activity after a crash, force it to go through the startup
@@ -98,6 +104,30 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         requestPermissionsIfRequired();
+    }
+
+    /**
+     * Helper method to apply window inset padding to a view for edge-to-edge layout.
+     * Handles both status bar and navigation bar insets.
+     * Can be called from onCreate of any activity.
+     *
+     * @param viewId the ID of the root view to apply insets to
+     * @param applyTopInset whether to apply status bar inset to top padding
+     * @param applyBottomInset whether to apply navigation bar inset to bottom padding
+     */
+    protected void applyEdgeToEdgeInsets(int viewId, boolean applyTopInset, boolean applyBottomInset) {
+        View view = findViewById(viewId);
+        if (view != null) {
+            ViewCompat.setOnApplyWindowInsetsListener(view, (v, insets) -> {
+                int topInset = applyTopInset ? insets.getInsets(
+                    WindowInsetsCompat.Type.statusBars()).top : 0;
+                int bottomInset = applyBottomInset ? insets.getInsets(
+                    WindowInsetsCompat.Type.navigationBars()).bottom : 0;
+                v.setPadding(v.getPaddingLeft(), v.getPaddingTop() + topInset,
+                             v.getPaddingRight(), v.getPaddingBottom() + bottomInset);
+                return insets;
+            });
+        }
     }
 
     @Override

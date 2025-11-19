@@ -21,6 +21,7 @@ public class StartUpActivity extends SexyTopoActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_up);
+        applyEdgeToEdgeInsets(R.id.rootLayout, true, true);
     }
 
 

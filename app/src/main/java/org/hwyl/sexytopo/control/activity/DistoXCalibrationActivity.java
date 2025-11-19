@@ -120,6 +120,7 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
 
         setContentView(R.layout.activity_calibration);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        applyEdgeToEdgeInsets(R.id.rootLayout, true, true);
 
         BroadcastReceiver updatedCalibrationReceiver = new BroadcastReceiver() {
             @Override
