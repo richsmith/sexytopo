@@ -4,7 +4,8 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:keepScreenOn="true">
+    android:keepScreenOn="true"
+    android:fitsSystemWindows="true">
 
     <!-- Header Row (fixed at top, scrolls with content below) -->
     <TableLayout
@@ -33,7 +34,8 @@
         android:id="@+id/relativeLayout1"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="@color/panelBackground" >
+        android:background="@color/panelBackground"
+        android:fitsSystemWindows="true" >
 
         <LinearLayout
             android:layout_width="wrap_content"

@@ -5,11 +5,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * ItemDecoration for drawing a sticky header above the RecyclerView content.
- * The header stays fixed at the top while scrolling.
+ * The header stays fixed at the top while scrolling, accounting for system insets (action bar, etc).
  */
 public class StickyHeaderDecoration extends RecyclerView.ItemDecoration {
 
@@ -25,14 +28,22 @@ public class StickyHeaderDecoration extends RecyclerView.ItemDecoration {
 
         // Measure header if needed
         measureHeaderView(parent);
-        
-        // Save canvas state and translate to top of RecyclerView
+
+        // Get system insets (action bar, status bar, etc.)
+        WindowInsetsCompat insets = ViewCompat.getRootWindowInsets(parent);
+        float topInset = 0;
+        if (insets != null) {
+            Insets systemInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            topInset = systemInsets.top;
+        }
+
+        // Save canvas state and translate to below system bars
         canvas.save();
-        canvas.translate(0, 0);  // Keep at top, don't translate
-        
-        // Draw the header at the top
+        canvas.translate(0, topInset);
+
+        // Draw the header at the adjusted top position
         headerView.draw(canvas);
-        
+
         canvas.restore();
     }
 
