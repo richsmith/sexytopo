@@ -1416,15 +1416,10 @@ public class GraphView extends View {
             hotCornersPaint.setAlpha(FADED_ALPHA);
         }
 
-        if (topLeftCorner == null || topRightCorner == null || bottomRightCorner == null) {
-            final int side = (int) (HOT_CORNER_DISTANCE_PROPORTION * getWidth());
-            topLeftCorner =
-                new Rect(0, 0, side, side);
-            topRightCorner =
-                new Rect(getWidth() - side, 0, getWidth(), side);
-            bottomRightCorner =
-                new Rect(getWidth() - side, getHeight() - side, getWidth(), getHeight());
-        }
+        final int side = (int) (HOT_CORNER_DISTANCE_PROPORTION * getWidth());
+        topLeftCorner = new Rect(0, 0, side, side);
+        topRightCorner = new Rect(getWidth() - side, 0, getWidth(), side);
+        bottomRightCorner = new Rect(getWidth() - side, getHeight() - side, getWidth(), getHeight());
 
         canvas.drawRect(topLeftCorner, hotCornersPaint);
         canvas.drawRect(topRightCorner, hotCornersPaint);
