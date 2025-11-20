@@ -6,7 +6,7 @@
         android:id="@+id/action_save"
         android:title="@string/action_file_save"
         android:icon="@drawable/save"
-        android:color="@color/actionBar"
+        android:color="@color/black"
         app:showAsAction="always"
         tools:ignore="AlwaysShowAction"/>
     <item

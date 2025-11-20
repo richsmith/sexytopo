@@ -2,21 +2,39 @@
 
 <resources>
 
-    <color name="grid">#505050</color>
-    <color name="innerPanelBackground">#2A2A2A</color>
-    <color name="station">@color/pink</color>
-    <color name="buttonHighlight">@color/darkGrey</color>
-    <color name="legend">@color/lightGrey</color>
-    <color name="panelBackground">@color/sexyTopoDarkGreen</color>
-    <color name="headerBackground">@color/sexyTopoDarkGreen</color>
-    <color name="tableBackground">#2A2A2A</color>
-    <color name="tableBackgroundAlt">#1F1F1F</color>
-    <color name="tableHighlight">#FFD700</color>
-    <color name="lightBackground">#121212</color>
-    <color name="darkBackground">#0D0D0D</color>
-    <color name="colorBackground">@color/lightBackground</color>
-    <color name="colorBackgroundDark">@color/darkBackground</color>
-    <color name="bodyTextColor">#BFBFBF</color>
-    <color name="logTextColor">#E0E0E0</color>
+    <!-- ============================================
+         LAYER 2: SEMANTIC - Dark Theme Overrides
+         Redefine semantic colors using dark primitives
+         ============================================ -->
+
+    <!-- Context-Specific Backgrounds -->
+    <color name="backgroundColor">@color/md_dark_bg</color>
+    <color name="lightBackground">@color/md_dark_bg</color>
+    <color name="darkBackground">@color/md_dark_surface_dim</color>
+    <color name="surfaceColor">@color/md_dark_surface</color>
+    <color name="surfaceVariant">@color/md_dark_surface_dim</color>
+
+    <!-- Panels -->
+    <color name="panelBackground">@color/md_sexy_dark_green</color>
+    <color name="headerBackground">@color/md_sexy_dark_green</color>
+    <color name="innerPanelBackground">@color/md_dark_surface</color>
+
+    <!-- Tables -->
+    <color name="tableBackground">@color/md_dark_surface</color>
+    <color name="tableBackgroundAlt">@color/md_dark_surface_dim</color>
+    <color name="tableHighlight">@color/md_yellow</color>
+
+    <!-- UI Elements -->
+    <color name="grid">@color/md_dark_grid</color>
+    <color name="station">@color/md_pink</color>
+    <color name="legend">@color/md_grey_200</color>
+    <color name="buttonHighlight">@color/md_grey_300</color>
+    <color name="error">@color/md_red</color>
+
+    <!-- Text Colors -->
+    <color name="bodyTextColor">@color/md_dark_body_text</color>
+    <color name="logTextColor">@color/md_dark_log_text</color>
+    <color name="preferenceTextColor">@color/md_white</color>
+    <color name="preferenceSecondaryTextColor">@color/md_dark_body_text</color>
 
 </resources>

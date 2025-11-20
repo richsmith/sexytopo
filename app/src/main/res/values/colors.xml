@@ -1,48 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <color name="white">#FFFFFF</color>
-    <color name="pink">#FFC0CB</color>
-    <color name="red">#FF0000</color>
-    <color name="sexyTopoGreen">#7FAF7F</color>
-    <color name="sexyTopoDarkGreen">#3A5738</color>
-    <color name="sexyTopoPurple">#AF7FAF</color>
-    <color name="sexyTopoDarkPurple">#383A57</color>
-    <color name="navy">#000080</color>
 
-    <color name="lowKeyGrey">#DDDDDD</color>
-    <color name="lightGrey">#D3D3D3</color>
-    <color name="darkGrey">#A9A9A9</color>
-    <color name="black">#000000</color>
+    <!-- ============================================
+         LAYER 1: PRIMITIVES - Raw RGB Values Only
+         These are defined once and never overridden
+         ============================================ -->
 
-    <color name="panelBackground">@color/sexyTopoGreen</color>
-    <color name="headerBackground">@color/sexyTopoGreen</color>
-    <color name="innerPanelBackground">@color/lowKeyGrey</color>
+    <!-- Basic Colors -->
+    <color name="md_white">#FFFFFF</color>
+    <color name="md_black">#000000</color>
+    <color name="md_pink">#FFC0CB</color>
+    <color name="md_red">#FF0000</color>
 
-    <color name="station">@color/red</color>
-    <color name="legend">@color/black</color>
+    <!-- Brand Colors -->
+    <color name="md_sexy_green">#7FAF7F</color>
+    <color name="md_sexy_dark_green">#3A5738</color>
+    <color name="md_sexy_purple">#AF7FAF</color>
+    <color name="md_sexy_dark_purple">#383A57</color>
+    <color name="md_navy">#000080</color>
 
-    <color name="buttonHighlight">@color/white</color>
+    <!-- Grey Scale -->
+    <color name="md_grey_100">#DDDDDD</color>
+    <color name="md_grey_200">#D3D3D3</color>
+    <color name="md_grey_300">#A9A9A9</color>
+    <color name="md_grey_400">#7F7F7F</color>
+    <color name="md_grey_500">#333333</color>
+
+    <!-- Light Theme Specific Primitives -->
+    <color name="md_light_surface">#F5F5F5</color>
+    <color name="md_light_surface_dim">#0D0D0D</color>
+    <color name="md_yellow">#FFD700</color>
+
+    <!-- Dark Theme Specific Primitives -->
+    <color name="md_dark_bg">#121212</color>
+    <color name="md_dark_surface">#2A2A2A</color>
+    <color name="md_dark_surface_dim">#1F1F1F</color>
+    <color name="md_dark_grid">#505050</color>
+    <color name="md_dark_body_text">#BFBFBF</color>
+    <color name="md_dark_log_text">#E0E0E0</color>
 
 
-    <color name="lightBackground">@color/white</color>
-    <color name="darkBackground">#0D0D0D</color>
+    <!-- ============================================
+         LAYER 2: SEMANTIC - Context-Specific Names
+         Light theme defaults - overridden in values-night/
+         ============================================ -->
 
-    <color name="colorBackground">@color/lightBackground</color>
-    <color name="colorBackgroundDark">@color/darkBackground</color>
+    <!-- Basic Semantic Aliases -->
+    <color name="white">@color/md_white</color>
+    <color name="black">@color/md_black</color>
+    <color name="pink">@color/md_pink</color>
+    <color name="red">@color/md_red</color>
 
-    <color name="grid">#D3D3D3</color>
+    <!-- Brand Colors -->
+    <color name="sexyTopoGreen">@color/md_sexy_green</color>
+    <color name="sexyTopoDarkGreen">@color/md_sexy_dark_green</color>
+    <color name="sexyTopoPurple">@color/md_sexy_purple</color>
+    <color name="sexyTopoDarkPurple">@color/md_sexy_dark_purple</color>
+    <color name="navy">@color/md_navy</color>
 
-    <color name="actionBar">#000000</color>
+    <!-- Grey Aliases -->
+    <color name="lowKeyGrey">@color/md_grey_100</color>
+    <color name="lightGrey">@color/md_grey_200</color>
+    <color name="darkGrey">@color/md_grey_300</color>
 
-    <color name="error">#FF0000</color>
-    <color name="standard">#000000</color>
+    <!-- Context-Specific Backgrounds -->
+    <color name="backgroundColor">@color/md_white</color>
+    <color name="lightBackground">@color/md_white</color>
+    <color name="darkBackground">@color/md_light_surface_dim</color>
+    <color name="surfaceColor">@color/md_grey_100</color>
+    <color name="surfaceVariant">@color/md_light_surface</color>
 
-    <color name="tableBackground">#FFFFFF</color>
-    <color name="tableBackgroundAlt">#F5F5F5</color>
-    <color name="tableHighlight">#FFD700</color>
+    <!-- Panels -->
+    <color name="panelBackground">@color/md_sexy_green</color>
+    <color name="headerBackground">@color/md_sexy_green</color>
+    <color name="innerPanelBackground">@color/md_grey_100</color>
 
-    <color name="bodyTextColor">#7F7F7F</color>
-    <color name="logTextColor">#333333</color>
+    <!-- Tables -->
+    <color name="tableBackground">@color/md_white</color>
+    <color name="tableBackgroundAlt">@color/md_light_surface</color>
+    <color name="tableHighlight">@color/md_yellow</color>
+
+    <!-- UI Elements -->
+    <color name="grid">@color/md_grey_200</color>
+    <color name="station">@color/md_red</color>
+    <color name="legend">@color/md_black</color>
+    <color name="buttonHighlight">@color/md_white</color>
+    <color name="error">@color/md_red</color>
+
+    <!-- Text Colors -->
+    <color name="bodyTextColor">@color/md_grey_400</color>
+    <color name="logTextColor">@color/md_grey_500</color>
+    <color name="preferenceTextColor">@color/md_black</color>
+    <color name="preferenceSecondaryTextColor">@color/md_grey_400</color>
 
 </resources>
