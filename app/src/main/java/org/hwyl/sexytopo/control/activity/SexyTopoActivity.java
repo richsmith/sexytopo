@@ -308,6 +308,9 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         } else if (itemId == R.id.action_force_crash) {
             forceCrash();
             return true;
+        } else if (itemId == R.id.action_fullscreen) {
+            toggleImmersiveMode();
+            return true;
         } else {
             boolean handled = requestComms().handleCustomCommand(itemId);
             if (handled) {
@@ -1083,6 +1086,49 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     private void forceCrash() {
         throw new RuntimeException(getString(R.string.tool_force_crash_message));
+    }
+
+    private void toggleImmersiveMode() {
+        boolean isCurrentlyImmersive = GeneralPreferences.isImmersiveModeOn();
+        boolean newImmersiveState = !isCurrentlyImmersive;
+
+        GeneralPreferences.setImmersiveMode(newImmersiveState);
+        applyImmersiveMode(newImmersiveState);
+
+        String message = newImmersiveState ?
+            "Fullscreen mode enabled" : "Fullscreen mode disabled";
+        showSimpleToast(message);
+    }
+
+    /**
+     * Apply immersive mode (hides system UI bars) or restore normal mode.
+     * When enabled, swipe from edges to temporarily reveal system bars.
+     */
+    private void applyImmersiveMode(boolean enabled) {
+        View decorView = getWindow().getDecorView();
+
+        if (enabled) {
+            // Hide status bar, navigation bar, and action bar
+            // Use IMMERSIVE_STICKY so system bars reappear on gesture
+            int flags = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+            decorView.setSystemUiVisibility(flags);
+        } else {
+            // Restore normal visibility
+            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+        }
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+
+        // Reapply immersive mode when window regains focus
+        // (e.g., after home button press or notification)
+        if (hasFocus && GeneralPreferences.isImmersiveModeOn()) {
+            applyImmersiveMode(true);
+        }
     }
 
 

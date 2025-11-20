@@ -122,6 +122,16 @@ public class GeneralPreferences {
         return getString("pref_orientation", "auto");
     }
 
+    public static boolean isImmersiveModeOn() {
+        return getBoolean("pref_immersive_mode", false);
+    }
+
+    public static void setImmersiveMode(boolean enabled) {
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean("pref_immersive_mode", enabled);
+        editor.apply();
+    }
+
     public static boolean isDeletePathFragmentsModeOn() {
         return getBoolean("pref_delete_path_fragments", true);
     }

@@ -70,6 +70,8 @@
     <string name="action_input_mode_backward">Rückblick</string>
     <string name="action_input_mode_combo">Vor-/Rückblick</string>
     <string name="action_input_mode_cal_check">Nur Dimensionen/Hilfslinien</string>
+    <string name="action_view">Ansicht</string>
+    <string name="action_fullscreen">Vollbild umschalten</string>
     <string name="action_tools">Werkzeuge</string>
     <string name="action_undo_last_leg">Letzte Messung rückgängig machen</string>
     <string name="action_link_to_existing_survey">Mit einer bestehenden Vermessungsdatei verknüpfen</string>

@@ -51,6 +51,14 @@
 
         </menu>
     </item>
+        <item android:id="@+id/action_view"
+          android:title="@string/action_view"
+          app:showAsAction="never">
+        <menu>
+            <item android:id="@+id/action_fullscreen"
+                  android:title="@string/action_fullscreen"/>
+        </menu>
+    </item>
     <item android:id="@+id/action_device_menu"
         android:title="@string/action_device"
         app:showAsAction="never">
