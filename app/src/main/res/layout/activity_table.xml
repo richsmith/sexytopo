@@ -5,57 +5,80 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@color/lightBackground"
     android:keepScreenOn="true">
 
-    <!-- Header Row (fixed at top, scrolls with content below) -->
-    <TableLayout
-        android:id="@+id/HeaderTable"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent">
-        <TableRow style="@style/HeaderRow">
-            <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_from"/>
-            <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_to"/>
-            <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_distance"/>
-            <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_azimuth"/>
-            <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_elevation"/>
-        </TableRow>
-    </TableLayout>
-
-    <!-- RecyclerView for scrollable content -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/tableRecyclerView"
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"/>
-
-    <!-- Toolbar -->
-    <RelativeLayout
-        android:id="@+id/relativeLayout1"
-        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="@color/panelBackground">
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <ImageButton
-                android:id="@+id/buttonAddStation"
-                android:layout_width="@dimen/toolbar_button_height"
-                android:layout_height="@dimen/toolbar_button_height"
-                android:src="@drawable/add"
-                android:scaleType="fitCenter"
-                android:onClick="manuallyAddStation"/>
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/panelBackground"
+            app:title="@string/title_activity_table"
+            app:titleTextColor="@color/white" />
 
-            <ImageButton
-                android:id="@+id/buttonAddSplay"
-                android:layout_width="@dimen/toolbar_button_height"
-                android:layout_height="@dimen/toolbar_button_height"
-                android:src="@drawable/add_splay"
-                android:scaleType="fitCenter"
-                android:onClick="manuallyAddSplay"/>
-        </LinearLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
-    </RelativeLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/lightBackground">
+
+        <!-- Header Row (fixed at top, scrolls with content below) -->
+        <TableLayout
+            android:id="@+id/HeaderTable"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent">
+            <TableRow style="@style/HeaderRow">
+                <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_from"/>
+                <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_to"/>
+                <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_distance"/>
+                <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_azimuth"/>
+                <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_elevation"/>
+            </TableRow>
+        </TableLayout>
+
+        <!-- RecyclerView for scrollable content -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/tableRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"/>
+
+        <!-- Toolbar -->
+        <RelativeLayout
+            android:id="@+id/relativeLayout1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/panelBackground">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <ImageButton
+                    android:id="@+id/buttonAddStation"
+                    android:layout_width="@dimen/toolbar_button_height"
+                    android:layout_height="@dimen/toolbar_button_height"
+                    android:src="@drawable/add"
+                    android:scaleType="fitCenter"
+                    android:onClick="manuallyAddStation"/>
+
+                <ImageButton
+                    android:id="@+id/buttonAddSplay"
+                    android:layout_width="@dimen/toolbar_button_height"
+                    android:layout_height="@dimen/toolbar_button_height"
+                    android:src="@drawable/add_splay"
+                    android:scaleType="fitCenter"
+                    android:onClick="manuallyAddSplay"/>
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
 </LinearLayout>

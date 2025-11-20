@@ -57,6 +57,7 @@ public class TableActivity extends SexyTopoActivity
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_table);
+        setupMaterialToolbar();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         recyclerView = findViewById(R.id.tableRecyclerView);

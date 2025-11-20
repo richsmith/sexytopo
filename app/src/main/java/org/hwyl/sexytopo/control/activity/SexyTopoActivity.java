@@ -32,7 +32,9 @@ import androidx.core.view.MenuCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.documentfile.provider.DocumentFile;
+import com.google.android.material.appbar.MaterialToolbar;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
@@ -87,8 +89,19 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Enable edge-to-edge display (SDK 35+)
+        // Enable edge-to-edge display - allows content to extend behind system bars
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+
+        // Set icon colors for readability based on theme
+        boolean isDarkMode = isDarkModeActive();
+        View decor = getWindow().getDecorView();
+
+        // Use WindowInsetsController for icon colors (API 30+)
+        WindowInsetsControllerCompat insetsController = WindowCompat.getInsetsController(getWindow(), decor);
+        if (insetsController != null) {
+            insetsController.setAppearanceLightStatusBars(!isDarkMode);
+            insetsController.setAppearanceLightNavigationBars(!isDarkMode);
+        }
 
         dataManager = SurveyManager.getInstance(this.getApplicationContext());
 
@@ -104,6 +117,17 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         requestPermissionsIfRequired();
+    }
+
+    /**
+     * Helper method to set up MaterialToolbar for menu handling.
+     * Call this in onCreate after setContentView if using a MaterialToolbar.
+     */
+    protected void setupMaterialToolbar() {
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+        }
     }
 
     /**
@@ -135,6 +159,11 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         super.onResume();
         setTheme();
         setOrientation();
+
+        // Reapply system bar colors after theme changes
+        int panelColor = ContextCompat.getColor(this, R.color.panelBackground);
+        getWindow().setStatusBarColor(panelColor);
+        getWindow().setNavigationBarColor(panelColor);
 
     }
 

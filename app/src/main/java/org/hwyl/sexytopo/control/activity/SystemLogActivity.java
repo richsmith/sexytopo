@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.hwyl.sexytopo.R;
@@ -26,6 +25,7 @@ public class SystemLogActivity extends SexyTopoActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_debug_log);
+        setupMaterialToolbar();
 
         applyEdgeToEdgeInsets(R.id.rootLayout, true, true);
 
@@ -61,10 +61,8 @@ public class SystemLogActivity extends SexyTopoActivity {
         }
 
         public void update() {
-            TextView logView = findViewById(R.id.debugLog);
-            final ScrollView scrollView = findViewById(R.id.scrollView);
-            LogUpdateReceiver.update(Log.LogType.SYSTEM, scrollView, logView);
-            scrollView.postDelayed(() -> scrollView.fullScroll(ScrollView.FOCUS_DOWN),1000);
+            TextView logView = findViewById(R.id.logText);
+            LogUpdateReceiver.update(Log.LogType.SYSTEM, null, logView);
         }
     }
 

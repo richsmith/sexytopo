@@ -19,6 +19,7 @@ public class StatsActivity extends SexyTopoActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stats);
+        setupMaterialToolbar();
         applyEdgeToEdgeInsets(R.id.rootLayout, true, true);
     }
 

@@ -119,6 +119,7 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_calibration);
+        setupMaterialToolbar();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         applyEdgeToEdgeInsets(R.id.rootLayout, true, true);
 

@@ -16,6 +16,7 @@ public class SettingsActivity extends SexyTopoActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        setupMaterialToolbar();
         applyEdgeToEdgeInsets(R.id.rootLayout, true, true);
 
         getSupportFragmentManager().beginTransaction()

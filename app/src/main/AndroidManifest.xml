@@ -42,6 +42,7 @@
         <activity
             android:name=".control.activity.PlanActivity"
             android:label="@string/title_activity_plan"
+            android:windowSoftInputMode="adjustNothing"
             android:exported="false">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -49,7 +50,8 @@
         </activity>
         <activity
             android:name=".control.activity.ExtendedElevationActivity"
-            android:label="@string/title_activity_elevation" >
+            android:label="@string/title_activity_elevation"
+            android:windowSoftInputMode="adjustNothing" >
         </activity>
         <activity
             android:name=".control.activity.DeviceActivity"

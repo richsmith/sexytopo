@@ -55,6 +55,7 @@ public class DeviceActivity extends SexyTopoActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device);
+        setupMaterialToolbar();
 
         applyEdgeToEdgeInsets(R.id.rootLayout, true, true);
 

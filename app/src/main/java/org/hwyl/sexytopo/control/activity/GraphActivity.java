@@ -108,6 +108,7 @@ public abstract class GraphActivity extends SexyTopoActivity
         };
 
         setContentView(R.layout.activity_graph);
+        setupMaterialToolbar();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         applyEdgeToEdgeInsets(R.id.rootLayout, true, true);
