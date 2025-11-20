@@ -1126,8 +1126,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
         // Reapply immersive mode when window regains focus
         // (e.g., after home button press or notification)
-        if (hasFocus && GeneralPreferences.isImmersiveModeOn()) {
-            applyImmersiveMode(true);
+        if (hasFocus) {
+            applyImmersiveMode(GeneralPreferences.isImmersiveModeOn());
         }
     }
 
