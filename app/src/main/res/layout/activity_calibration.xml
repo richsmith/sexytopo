@@ -99,7 +99,7 @@
         android:padding="5dp"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
-        android:background="#dddddd">
+        android:background="@color/innerPanelBackground">
         <TableRow>
             <TextView
                 android:text="@string/calibration_index"
@@ -227,7 +227,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         android:padding="5dp"
-        android:background="#dddddd">
+        android:background="@color/innerPanelBackground">
         <TableRow>
             <TextView
                 android:text="@string/calibration_next_step"

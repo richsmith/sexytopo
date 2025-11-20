@@ -3,7 +3,7 @@
 <resources>
 
     <color name="grid">#505050</color>
-    <color name="innerPanelBackground">@color/darkGrey</color>
+    <color name="innerPanelBackground">#2A2A2A</color>
     <color name="station">@color/pink</color>
     <color name="buttonHighlight">@color/darkGrey</color>
     <color name="legend">@color/lightGrey</color>
