@@ -18,6 +18,7 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -189,7 +190,7 @@ public class TableActivity extends SexyTopoActivity
 
         TextView selectedCell = (TextView)view;
 
-        selectedCell.setTextColor(Color.RED);
+        selectedCell.setTextColor(ContextCompat.getColor(this, R.color.red));
 
         PopupMenu popup = new PopupMenu(this, selectedCell);
         popup.getMenuInflater().inflate(id, popup.getMenu());
@@ -335,8 +336,7 @@ public class TableActivity extends SexyTopoActivity
 
     @Override
     public void onDismiss(PopupMenu popupMenu) {
-        // Ideally this colour should be named somewhere, but for now...
-        int usualTextColour = Color.rgb(0x7F, 0x7F, 0x7F);
+        int usualTextColour = ContextCompat.getColor(this, R.color.bodyTextColor);
         cellBeingClicked.setTextColor(usualTextColour);
     }
 

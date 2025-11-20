@@ -17,6 +17,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.hwyl.sexytopo.R;
@@ -280,16 +281,17 @@ public class DeviceActivity extends SexyTopoActivity {
         Button unpairButton = findViewById(R.id.unpairButton);
 
         TextView deviceList = findViewById(R.id.deviceList);
-        deviceList.setTextColor(device == null? Color.BLACK : Color.RED);
+        int textColor = device == null ? ContextCompat.getColor(this, android.R.color.darker_gray) : ContextCompat.getColor(this, R.color.red);
+        deviceList.setTextColor(textColor);
         if (isPaired) {
             pairButton.setEnabled(false);
             unpairButton.setEnabled(true);
-            deviceList.setTextColor(Color.BLACK);
+            deviceList.setTextColor(ContextCompat.getColor(this, android.R.color.darker_gray));
             deviceList.setText(device.getName());
         } else {
             pairButton.setEnabled(true);
             unpairButton.setEnabled(false);
-            deviceList.setTextColor(Color.RED);
+            deviceList.setTextColor(ContextCompat.getColor(this, R.color.red));
             deviceList.setText(R.string.device_no_device);
         }
 
