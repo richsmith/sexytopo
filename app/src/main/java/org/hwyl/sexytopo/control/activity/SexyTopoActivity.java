@@ -142,17 +142,23 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     protected void applyEdgeToEdgeInsets(int viewId, boolean applyTopInset, boolean applyBottomInset) {
         View view = findViewById(viewId);
         if (view != null) {
+            final int left = view.getPaddingLeft();
+            final int top = view.getPaddingTop();
+            final int right = view.getPaddingRight();
+            final int bottom = view.getPaddingBottom();
+
             ViewCompat.setOnApplyWindowInsetsListener(view, (v, insets) -> {
                 int topInset = applyTopInset ? insets.getInsets(
                     WindowInsetsCompat.Type.statusBars()).top : 0;
                 int bottomInset = applyBottomInset ? insets.getInsets(
                     WindowInsetsCompat.Type.navigationBars()).bottom : 0;
-                v.setPadding(v.getPaddingLeft(), v.getPaddingTop() + topInset,
-                             v.getPaddingRight(), v.getPaddingBottom() + bottomInset);
+                v.setPadding(left, top + topInset, right, bottom + bottomInset);
                 return insets;
             });
         }
     }
+
+
 
     @Override
     protected void onResume() {
