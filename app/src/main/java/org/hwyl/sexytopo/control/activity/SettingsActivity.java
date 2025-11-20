@@ -20,7 +20,7 @@ public class SettingsActivity extends SexyTopoActivity {
         applyEdgeToEdgeInsets(R.id.rootLayout, true, true);
 
         getSupportFragmentManager().beginTransaction()
-            .replace(R.id.rootLayout, new SettingsFragment())
+            .replace(R.id.settingsFragment, new SettingsFragment())
             .commit();
 
         prefListener = (prefs, key) -> {
