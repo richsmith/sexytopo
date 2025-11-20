@@ -17,5 +17,6 @@
     <color name="colorBackground">@color/lightBackground</color>
     <color name="colorBackgroundDark">@color/darkBackground</color>
     <color name="bodyTextColor">#BFBFBF</color>
+    <color name="logTextColor">#E0E0E0</color>
 
 </resources>

@@ -43,5 +43,6 @@
     <color name="tableHighlight">#FFD700</color>
 
     <color name="bodyTextColor">#7F7F7F</color>
+    <color name="logTextColor">#333333</color>
 
 </resources>
