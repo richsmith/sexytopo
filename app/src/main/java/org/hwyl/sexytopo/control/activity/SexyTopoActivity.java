@@ -98,10 +98,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
         // Use WindowInsetsController for icon colors (API 30+)
         WindowInsetsControllerCompat insetsController = WindowCompat.getInsetsController(getWindow(), decor);
-        if (insetsController != null) {
-            insetsController.setAppearanceLightStatusBars(!isDarkMode);
-            insetsController.setAppearanceLightNavigationBars(!isDarkMode);
-        }
+        insetsController.setAppearanceLightStatusBars(!isDarkMode);
+        insetsController.setAppearanceLightNavigationBars(!isDarkMode);
 
         dataManager = SurveyManager.getInstance(this.getApplicationContext());
 
@@ -420,10 +418,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
     private void requestPermissionsIfRequired() {
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return; // no need to request permissions for earlier Android versions
-        }
 
         List<String> notYetGotPermissions = new ArrayList<>();
         for (String permission : SexyTopoPermissions.getPermissions()) {
@@ -830,7 +824,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             Survey survey = getSurvey();
 
             Set<SurveyConnection> linked = survey.getConnectedSurveys().get(station);
-            if (linked == null || linked.size() < 1) {
+            if (linked == null || linked.isEmpty()) {
                 throw new Exception(getString(R.string.file_unlink_survey_no_surveys));
             } else if (linked.size() == 1) {
                 SurveyConnection onlyConnection = linked.iterator().next();
@@ -1056,7 +1050,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 .setCancelable(false)
                 .setPositiveButton(R.string.replace, (dialog, id) -> {
                     try {
-                        Survey currentSurvey = ExampleSurveyCreator.create(10, 5);
+                        Survey currentSurvey = ExampleSurveyCreator.create();
                         setSurvey(currentSurvey);
                     } catch (Exception exception) {
                         showExceptionAndLog(R.string.tool_generate_test_error, exception);

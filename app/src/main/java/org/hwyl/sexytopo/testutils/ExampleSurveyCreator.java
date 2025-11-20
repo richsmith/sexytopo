@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.testutils;
 
+import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -18,8 +19,13 @@ public class ExampleSurveyCreator {
 
     private static final Random random = new Random();
 
+    public static Survey create() {
+        return create(10, 5);
+    }
 
     public static Survey create(int numStations, int numBranches) {
+
+        Log.i("Generating example survey");
 
         Survey survey = new Survey();
 
