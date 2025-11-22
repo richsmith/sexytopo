@@ -72,7 +72,7 @@
     <string name="action_input_mode_combo">Fore-/Backsights</string>
     <string name="action_input_mode_cal_check">Splays Only</string>
     <string name="action_view">View</string>
-    <string name="action_fullscreen">Toggle Fullscreen</string>
+    <string name="action_fullscreen">Fullscreen</string>
     <string name="action_tools">Tools</string>
     <string name="action_undo_last_leg">Undo last reading</string>
     <string name="action_link_to_existing_survey">Link to an Existing Survey</string>

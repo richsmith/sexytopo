@@ -72,7 +72,7 @@
     <string name="action_input_mode_combo">Avant/Arrière</string>
     <string name="action_input_mode_cal_check">Radiales seulement</string>
     <string name="action_view">Affichage</string>
-    <string name="action_fullscreen">Basculer le plein écran</string>
+    <string name="action_fullscreen">Plein écran</string>
     <string name="action_tools">Outils</string>
     <string name="action_undo_last_leg">Annuler la dernière lecture</string>
     <string name="action_link_to_existing_survey">Joindre à une topographie existante</string>

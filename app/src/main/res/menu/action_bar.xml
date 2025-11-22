@@ -55,8 +55,25 @@
           android:title="@string/action_view"
           app:showAsAction="never">
         <menu>
-            <item android:id="@+id/action_fullscreen"
-                  android:title="@string/action_fullscreen"/>
+            <group android:id="@+id/view_items">
+                <item android:id="@+id/action_table"
+                      android:title="@string/action_table"/>
+                <item android:id="@+id/action_plan"
+                      android:title="@string/action_plan"/>
+                <item android:id="@+id/action_elevation"
+                      android:title="@string/action_elevation"/>
+                <item android:id="@+id/action_connection"
+                      android:title="@string/action_device"/>
+                <item android:id="@+id/action_trip"
+                      android:title="@string/action_trip"/>
+                <item android:id="@+id/action_stats"
+                      android:title="@string/action_stats"/>
+            </group>
+            <group android:id="@+id/view_display" android:checkableBehavior="single">
+                <item android:id="@+id/action_fullscreen"
+                      android:title="@string/action_fullscreen"
+                      android:checkable="true"/>
+            </group>
         </menu>
     </item>
     <item android:id="@+id/action_device_menu"
@@ -91,18 +108,12 @@
                 android:title="@string/action_undo_last_leg" />
             <item android:id="@+id/action_link_survey"
                   android:title="@string/action_link_to_existing_survey"/>
-            <item android:id="@+id/action_stats"
-                  android:title="@string/action_stats"
-                  app:showAsAction="never" />
             <item android:id="@+id/action_generate_test_survey"
                   android:title="@string/action_generate_test_survey" />
             <item android:id="@+id/action_system_log"
                   android:title="@string/action_system_log" />
         </menu>
     </item>
-    <item android:id="@+id/action_trip"
-          android:title="@string/action_trip"
-          app:showAsAction="never"/>
     <item android:id="@+id/action_dev_menu"
           android:title="@string/action_dev"
           android:visible="false"

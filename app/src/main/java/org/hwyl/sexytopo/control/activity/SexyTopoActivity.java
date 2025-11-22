@@ -205,6 +205,12 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         MenuItem devMenu = menu.findItem(R.id.action_dev_menu);
         devMenu.setVisible(isDevMenuVisible);
 
+        // update Fullscreen menu item checked state
+        MenuItem fullscreenItem = menu.findItem(R.id.action_fullscreen);
+        if (fullscreenItem != null) {
+            fullscreenItem.setChecked(GeneralPreferences.isImmersiveModeOn());
+        }
+
         return super.onPrepareOptionsMenu(menu);
     }
 
