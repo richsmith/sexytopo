@@ -211,6 +211,14 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             fullscreenItem.setChecked(GeneralPreferences.isImmersiveModeOn());
         }
 
+        // update Connection menu item state
+        MenuItem connectItem = menu.findItem(R.id.action_connect);
+        if (connectItem != null) {
+            boolean hasInstrument = !(requestComms() instanceof NullCommunicator);
+            connectItem.setEnabled(hasInstrument);
+            connectItem.setChecked(hasInstrument && requestComms().isConnected());
+        }
+
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -313,6 +321,9 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             return true;
         } else if (itemId == R.id.action_force_crash) {
             forceCrash();
+            return true;
+        } else if (itemId == R.id.action_connect) {
+            toggleConnection();
             return true;
         } else if (itemId == R.id.action_fullscreen) {
             toggleImmersiveMode();
@@ -1092,6 +1103,23 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     private void forceCrash() {
         throw new RuntimeException(getString(R.string.tool_force_crash_message));
+    }
+
+    private void toggleConnection() {
+        Communicator communicator = requestComms();
+
+        if (communicator instanceof NullCommunicator) {
+            showSimpleToast("No instrument connected");
+            return;
+        }
+
+        if (communicator.isConnected()) {
+            communicator.requestDisconnect();
+            showSimpleToast(getString(R.string.device_connection_stop_requested));
+        } else {
+            communicator.requestConnect();
+            showSimpleToast(getString(R.string.device_connection_requested));
+        }
     }
 
     private void toggleImmersiveMode() {

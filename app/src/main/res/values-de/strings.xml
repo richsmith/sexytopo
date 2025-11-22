@@ -50,6 +50,7 @@
     <string name="action_dev">Dev</string>
     <string name="action_device">Messgerät</string>
     <string name="action_device_connect">Verbinden…</string>
+    <string name="action_connection">Verbindung</string>
     <string name="action_trip">Aktuelle Tour</string>
     <string name="action_help">Hilfe</string>
     <string name="action_guide">Anleitung</string>

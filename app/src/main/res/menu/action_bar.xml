@@ -62,8 +62,6 @@
                       android:title="@string/action_plan"/>
                 <item android:id="@+id/action_elevation"
                       android:title="@string/action_elevation"/>
-                <item android:id="@+id/action_connection"
-                      android:title="@string/action_device"/>
                 <item android:id="@+id/action_trip"
                       android:title="@string/action_trip"/>
                 <item android:id="@+id/action_stats"
@@ -114,6 +112,11 @@
                   android:title="@string/action_system_log" />
         </menu>
     </item>
+    <item android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        android:visible="true"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
     <item android:id="@+id/action_dev_menu"
           android:title="@string/action_dev"
           android:visible="false"
@@ -131,11 +134,6 @@
                   android:visible="true"/>
         </menu>
     </item>
-    <item android:id="@+id/action_settings"
-        android:title="@string/action_settings"
-        android:visible="true"
-        android:orderInCategory="100"
-        app:showAsAction="never" />
     <item android:id="@+id/help_menu"
         android:title="@string/action_help"
         android:orderInCategory="100"
@@ -151,6 +149,13 @@
                   app:showAsAction="never" />
         </menu>
     </item>
-
+    <group android:id="@+id/connection_group">
+        <item android:id="@+id/action_connect"
+            android:title="@string/action_connection"
+            android:checkable="true"
+            android:enabled="false"
+            android:orderInCategory="100"
+            app:showAsAction="never" />
+    </group>
 
 </menu>

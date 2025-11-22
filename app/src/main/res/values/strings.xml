@@ -51,6 +51,7 @@
     <string name="action_dev">Dev</string>
     <string name="action_device">Instrument</string>
     <string name="action_device_connect">Connect…</string>
+    <string name="action_connection">Connection</string>
     <string name="action_trip">Current Trip</string>
     <string name="action_help">Help</string>
     <string name="action_guide">Guide</string>

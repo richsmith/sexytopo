@@ -51,6 +51,7 @@
     <string name="action_dev">Développement</string>
     <string name="action_device">Outils</string>
     <string name="action_device_connect">Connecter…</string>
+    <string name="action_connection">Connexion</string>
     <string name="action_trip">Sortie actuelle</string>
     <string name="action_help">Aide</string>
     <string name="action_guide">Guide</string>
