@@ -5,6 +5,7 @@ import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.GRID_COMM
 import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.SHOT_COMMAND;
 import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.SKETCHLINE_COMMAND;
 import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.STATIONS_COMMAND;
+import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.TEXT_COMMAND;
 
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.common.Shape;
@@ -13,6 +14,8 @@ import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
+import org.hwyl.sexytopo.model.sketch.SketchDetail;
+import org.hwyl.sexytopo.model.sketch.TextDetail;
 import org.hwyl.sexytopo.model.survey.Station;
 
 import java.util.ArrayList;
@@ -29,6 +32,10 @@ public class XviExporter {
         text += multilineField(STATIONS_COMMAND, getStationsText(space, scale));
         text += multilineField(SHOT_COMMAND, getLegsText(space, scale));
         text += multilineField(SKETCHLINE_COMMAND, getSketchLinesText(sketch, scale));
+        String textContent = getTextLinesText(sketch, scale);
+        if (!textContent.isEmpty()) {
+            text += multilineField(TEXT_COMMAND, textContent);
+        }
         text += field(GRID_COMMAND, getGridText(gridFrame, scale));
         return text;
     }
@@ -70,6 +77,10 @@ public class XviExporter {
         for (PathDetail pathDetail : sketch.getPathDetails()) {
             builder.append(getSketchLineText(pathDetail, scale));
         }
+
+        for (TextDetail textDetail : sketch.getTextDetails()) {
+            builder.append(getTextText(textDetail, scale));
+        }
         return builder.toString();
     }
 
@@ -83,6 +94,10 @@ public class XviExporter {
             fields.add(y);
         }
         return field("\t", TextTools.join(" ", fields));
+    }
+
+    private static String getTextText(TextDetail textDetail, double scale) {
+        
     }
 
     private static String getGridText(Shape gridFrame, float scale) {
@@ -104,6 +119,36 @@ public class XviExporter {
         };
 
         return TextTools.join(" ", Arrays.asList(values));
+    }
+
+    private static String getTextLinesText(Sketch sketch, double scale) {
+        StringBuilder builder = new StringBuilder();
+        for (TextDetail textDetail : sketch.getTextDetails()) {
+            builder.append(getTextLineText(textDetail, scale));
+        }
+        return builder.toString();
+    }
+
+    private static String getTextLineText(TextDetail textDetail, double scale) {
+        Coord2D location = textDetail.getPosition();
+        String x = TextTools.formatTo2dpWithDot(location.x * scale);
+        String y = TextTools.formatTo2dpWithDot((-location.y + 0.0) * scale); // +0.0 to avoid -0.0
+        String text = textDetail.getText();
+        String colour = textDetail.getColour().toString();
+        float size = textDetail.getSize();
+        
+        // Convert text to glyph coordinates
+        List<String> glyphCoords = XviText.textToGlyphCoords(text, 0, 0, (float)scale);
+        
+        // Build the text entry: color x y size text_glyphs
+        List<Object> fields = new ArrayList<>();
+        fields.add(colour);
+        fields.add(x);
+        fields.add(y);
+        fields.add(String.valueOf(size));
+        fields.addAll(glyphCoords);
+        
+        return field("\t", TextTools.join(" ", fields));
     }
 
     private static String field(String text, String content) {
