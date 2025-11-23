@@ -59,7 +59,7 @@ public enum Symbol {
 
     private final boolean isDirectional;
 
-    private String therionName;
+    private final String therionName;
 
 
     private static final Symbol DEFAULT = TEXT;
