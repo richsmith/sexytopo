@@ -202,13 +202,11 @@ public class FCLCommunicator implements Communicator {
 
             case FCLBLE.DISCONNECTED:
                 Log.device("FCL Disconnected");
-                activity.setConnectionStopped();
                 activity.updateConnectionStatus();
                 break;
 
             case FCLBLE.CONNECTION_FAILED:
                 Log.device("FCL Connection Failed: " + msg);
-                activity.setConnectionStopped();
                 activity.updateConnectionStatus();
                 break;
         }

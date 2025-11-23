@@ -104,12 +104,10 @@ public class SAP6Communicator implements Communicator {
                 break;
             case CaveBLE.DISCONNECTED:
                 Log.device("Disconnected");
-                activity.setConnectionStopped();
                 activity.updateConnectionStatus();
                 break;
             case CaveBLE.CONNECTION_FAILED:
                 Log.device("Communication error: "+msg);
-                activity.setConnectionStopped();
                 activity.updateConnectionStatus();
         }
         return Unit.INSTANCE;

@@ -80,7 +80,6 @@ public abstract class BleCommunicator implements Communicator, ConnectionObserve
     public void onDeviceFailedToConnect(@NonNull BluetoothDevice device, int reason) {
         String name = InstrumentType.describe(device);
         Log.device(R.string.device_ble_failed_to_connect_to, name);
-        activity.setConnectionStopped();
         activity.updateConnectionStatus();
     }
 
@@ -103,7 +102,6 @@ public abstract class BleCommunicator implements Communicator, ConnectionObserve
     public void onDeviceDisconnected(@NonNull BluetoothDevice device, int reason) {
         String name = InstrumentType.describe(device);
         Log.device(R.string.device_ble_device_disconnected, name);
-        activity.setConnectionStopped();
         activity.updateConnectionStatus();
     }
 }

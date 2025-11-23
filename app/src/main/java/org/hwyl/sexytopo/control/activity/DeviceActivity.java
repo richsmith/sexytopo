@@ -48,8 +48,6 @@ public class DeviceActivity extends SexyTopoActivity {
     private StateChangeReceiver stateChangeReceiver;
     private ScanReceiver scanReceiver;
 
-    private boolean isConnectionStartingOrStarted = false;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,10 +159,6 @@ public class DeviceActivity extends SexyTopoActivity {
             Log.device(R.string.device_connection_closing_error, e.getMessage());        }
     }
 
-    public void setConnectionStopped() {
-        isConnectionStartingOrStarted = false;
-    }
-
 
     private BluetoothAdapter getBluetoothAdapter() {
         if (bluetoothAdapter == null) {
@@ -222,11 +216,9 @@ public class DeviceActivity extends SexyTopoActivity {
         SwitchCompat connectionSwitch = (SwitchCompat)view;
         if (connectionSwitch.isChecked()) {
             Log.device(getString(R.string.device_connection_requested));
-            isConnectionStartingOrStarted = true;
             startConnection();
         } else {
             Log.device(getString(R.string.device_connection_stop_requested));
-            isConnectionStartingOrStarted = false;
             stopConnection();
         }
     }
@@ -307,7 +299,8 @@ public class DeviceActivity extends SexyTopoActivity {
 
     public void updateConnectionStatus() {
         SwitchCompat connectionSwitch = findViewById(R.id.connectionSwitch);
-        connectionSwitch.setChecked(isConnectionStartingOrStarted);
+        boolean isActuallyConnected = requestComms().isConnected();
+        connectionSwitch.setChecked(isActuallyConnected);
     }
 
 
