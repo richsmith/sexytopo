@@ -13,6 +13,7 @@ import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
+import org.hwyl.sexytopo.model.sketch.TextDetail;
 import org.hwyl.sexytopo.model.survey.Station;
 
 import java.util.ArrayList;
@@ -68,12 +69,16 @@ public class XviExporter {
     private static String getSketchLinesText(Sketch sketch, double scale) {
         StringBuilder builder = new StringBuilder();
         for (PathDetail pathDetail : sketch.getPathDetails()) {
-            builder.append(getSketchLineText(pathDetail, scale));
+            builder.append(getPathDetailText(pathDetail, scale));
+        }
+
+        for (TextDetail textDetail : sketch.getTextDetails()) {
+            builder.append(getTextDetailText(textDetail, scale));
         }
         return builder.toString();
     }
 
-    private static String getSketchLineText(PathDetail pathDetail, double scale) {
+    private static String getPathDetailText(PathDetail pathDetail, double scale) {
         List<Object> fields = new ArrayList<>();
         fields.add(pathDetail.getColour().toString());
         for (Coord2D coord2D : pathDetail.getPath()) {
