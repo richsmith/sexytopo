@@ -56,4 +56,20 @@ public class SymbolDetail extends SinglePositionDetail implements AutoScalableDe
             getPosition(), getSymbol(), getColour(), getSize() * scale, getAngle());
     }
 
+    @Override
+    public float getDistanceFrom(Coord2D point) {
+        // Check if point is within the symbol's radius
+        float radius = size / 2;
+        float distance = super.getDistanceFrom(point);
+
+        // If within the symbol bounds, return scaled distance to center
+        // This gives priority without completely blocking line deletion
+        if (distance <= radius) {
+            return distance * 0.5f;
+        }
+
+        // Otherwise, return distance from edge
+        return distance - radius;
+    }
+
 }

@@ -1143,7 +1143,7 @@ public class GraphView extends View {
                         nextX,
                         y + STATION_LABEL_OFFSET,
                         stationPaint);
-                nextX += stationPaint.measureText(name) + spacing;
+                nextX += Math.round(stationPaint.measureText(name)) + spacing;
             }
 
             List<Bitmap> icons = new ArrayList<>();
