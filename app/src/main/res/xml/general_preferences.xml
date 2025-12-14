@@ -47,8 +47,8 @@
             android:key="pref_calibration_algorithm"
             android:title="@string/settings_calibration_algorithm_title"
             android:summary="@string/settings_calibration_algorithm_summary"
-            android:entries="@array/settings_calibration_algorithm_values"
-            android:entryValues="@array/settings_calibration_algorithm_entries"
+            android:entries="@array/settings_calibration_algorithm_entries"
+            android:entryValues="@array/settings_calibration_algorithm_values"
             android:defaultValue="auto" />
     </PreferenceCategory>
 
