@@ -9,11 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TextDetailTranslater extends SketchDetailTranslater<TextDetail> {
-    private static final float CHAR_WIDTH = 2.0f;
     private static final float CHAR_HEIGHT = 4.0f;
-    private static final float CHAR_SPACING = 0.5f;
+    private static final float INTER_CHAR_SPACE = 1f;
 
-    private static final int INTER_CHAR_SPACE = 2;
+    // Bit of a fudge factor to get text scale to be similar to likely text scale
+    // More art than science ;)
+    private static final float SCALE_FACTOR = 0.15f;
 
 
     /* ********** copied from TopoDroid - thanks, Marco! ********** */
@@ -106,8 +107,8 @@ public class TextDetailTranslater extends SketchDetailTranslater<TextDetail> {
         int[] glyph = getGlyphCode(ch);
         List<PathDetail> glyphPaths = new ArrayList<>();
         for (int i = 0; i < glyph.length; i += 4) {
-            Coord2D from = new Coord2D(glyph[i], -glyph[i + 1]);
-            Coord2D to = new Coord2D(glyph[i + 2], -glyph[i + 3]);
+            Coord2D from = new Coord2D(glyph[i], -glyph[i + 1] + CHAR_HEIGHT);
+            Coord2D to = new Coord2D(glyph[i + 2], -glyph[i + 3] + CHAR_HEIGHT);
             PathDetail pathDetail = new PathDetail(List.of(from, to), colour);
             glyphPaths.add(pathDetail);
         }
@@ -126,6 +127,8 @@ public class TextDetailTranslater extends SketchDetailTranslater<TextDetail> {
         String text = textDetail.getText();
         Coord2D position = textDetail.getPosition();
         float size = textDetail.getSize();
+        float scale = size * SCALE_FACTOR;
+
 
         String cleaned = text.toUpperCase();
         char[] chars = cleaned.toCharArray();
@@ -135,9 +138,13 @@ public class TextDetailTranslater extends SketchDetailTranslater<TextDetail> {
             char ch = chars[i];
             List<PathDetail> charPaths = getPathsForChar(ch, colour);
 
-            float charWidth = 0;
+            // Letters such as "1" are vertical lines so have no width!
+            // Set a minimum width to handle this
+            float minWidth = INTER_CHAR_SPACE * scale;
+
+            float charWidth = minWidth;
             for (PathDetail pathDetail : charPaths) {
-                PathDetail scaledPath = pathDetail.scale(size);
+                PathDetail scaledPath = pathDetail.scale(scale);
                 // adjust for position in string
                 PathDetail translatedPath = scaledPath.translate(new Coord2D(xPos, 0));
                 // adjust for position on sketch
@@ -148,8 +155,8 @@ public class TextDetailTranslater extends SketchDetailTranslater<TextDetail> {
                 charWidth = Math.max(charWidth, scaledPath.getWidth());
             }
 
-        float interCharSpace = INTER_CHAR_SPACE * size;
-            xPos += charWidth + (INTER_CHAR_SPACE * size);
+            float interCharSpace = INTER_CHAR_SPACE * scale;
+            xPos += charWidth + interCharSpace;
         }
 
         return pathDetails;
