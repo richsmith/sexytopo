@@ -13,6 +13,7 @@ import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
+import org.hwyl.sexytopo.model.sketch.SymbolDetail;
 import org.hwyl.sexytopo.model.sketch.TextDetail;
 import org.hwyl.sexytopo.model.survey.Station;
 
@@ -73,8 +74,13 @@ public class XviExporter {
         }
 
         for (TextDetail textDetail : sketch.getTextDetails()) {
-            builder.append(getTextDetailText(textDetail, scale));
+            builder.append(getTextDetailAsPathsText(textDetail, scale));
         }
+
+        for (SymbolDetail symbolDetail : sketch.getSymbolDetails()) {
+            builder.append(getSymbolDetailAsPathsText(symbolDetail, scale));
+        }
+
         return builder.toString();
     }
 
@@ -88,6 +94,24 @@ public class XviExporter {
             fields.add(y);
         }
         return field("\t", TextTools.join(" ", fields));
+    }
+
+    private static String getTextDetailAsPathsText(TextDetail textDetail, double scale) {
+        StringBuilder builder = new StringBuilder();
+        List<PathDetail> pathDetails = TextDetailTranslater.getPathDetailsForText(textDetail);
+        for (PathDetail pathDetail : pathDetails) {
+            builder.append(getPathDetailText(pathDetail, scale));
+        }
+        return builder.toString();
+    }
+
+    private static String getSymbolDetailAsPathsText(SymbolDetail symbolDetail, double scale) {
+        StringBuilder builder = new StringBuilder();
+        List<PathDetail> pathDetails = new SymbolDetailTranslater().translate(symbolDetail);
+        for (PathDetail pathDetail : pathDetails) {
+            builder.append(getPathDetailText(pathDetail, scale));
+        }
+        return builder.toString();
     }
 
     private static String getGridText(Shape gridFrame, float scale) {

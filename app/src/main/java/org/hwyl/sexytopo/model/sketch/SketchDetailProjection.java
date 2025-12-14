@@ -29,6 +29,9 @@ public class SketchDetailProjection extends SketchDetail {
 
     @Override
     public SketchDetail translate(Coord2D point) {
-        return null;
+        throw new UnsupportedOperationException();
     }
+
+    @Override
+    public SketchDetail scale(float scale) { throw new UnsupportedOperationException(); }
 }

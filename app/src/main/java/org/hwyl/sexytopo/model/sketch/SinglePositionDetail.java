@@ -22,4 +22,11 @@ public abstract class SinglePositionDetail extends SketchDetail {
     public float getDistanceFrom(Coord2D point) {
         return Space2DUtils.getDistance(point, position);
     }
+
+    @Override
+    public SinglePositionDetail scale(float scale) {
+        // if just a point, do we need to scale anything?
+        // override in subclass if necessary
+        return this;
+    }
 }

@@ -56,6 +56,10 @@ public class Shape {
         }
     }
 
+    public float getMaxDimension() {
+        return Math.max(getWidth(), getHeight());
+    }
+
 
     public Coord2D getTopLeft() {
         return new Coord2D(getLeft(), getTop());

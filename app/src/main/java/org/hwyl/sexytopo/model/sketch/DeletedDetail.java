@@ -39,6 +39,12 @@ public class DeletedDetail extends SketchDetail {
         return new DeletedDetail(deletedDetail.translate(point));
     }
 
+    @Override
+    public SketchDetail scale(float scale) {
+        return new DeletedDetail(deletedDetail.scale(scale));
+    }
+
+
 
     public SketchDetail getDeletedDetail() {
         return deletedDetail;

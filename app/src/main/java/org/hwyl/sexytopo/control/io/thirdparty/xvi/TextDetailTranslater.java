@@ -8,12 +8,15 @@ import org.hwyl.sexytopo.model.sketch.TextDetail;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TextDetailTranslater /*extends SketchDetailTranslater<TextDetail>*/ {
+public class TextDetailTranslater extends SketchDetailTranslater<TextDetail> {
     private static final float CHAR_WIDTH = 2.0f;
     private static final float CHAR_HEIGHT = 4.0f;
     private static final float CHAR_SPACING = 0.5f;
 
-    /* ********** copied from TopoDroid ********** */ 
+    private static final int INTER_CHAR_SPACE = 2;
+
+
+    /* ********** copied from TopoDroid - thanks, Marco! ********** */
     static final private int[] CHAR_ANY = {2, 2, 1, 4, 1, 4, 0, 2, 0, 2, 1, 0, 1, 0, 2, 2};
     static final private int[] CHAR_SPACE = {};
     static final private int[] CHAR_UNDERSCORE = {0, 0, 2, 0};
@@ -99,46 +102,54 @@ public class TextDetailTranslater /*extends SketchDetailTranslater<TextDetail>*/
         }
     }
 
-    private static List<PathDetail> getGlyphPaths(char ch, Colour colour) {
+    private static List<PathDetail> getPathsForChar(char ch, Colour colour) {
         int[] glyph = getGlyphCode(ch);
         List<PathDetail> glyphPaths = new ArrayList<>();
         for (int i = 0; i < glyph.length; i += 4) {
-            Coord2D from = new Coord2D(glyph[i], glyph[i + 1]);
-            Coord2D to = new Coord2D(glyph[i + 2], glyph[i + 3]);
+            Coord2D from = new Coord2D(glyph[i], -glyph[i + 1]);
+            Coord2D to = new Coord2D(glyph[i + 2], -glyph[i + 3]);
             PathDetail pathDetail = new PathDetail(List.of(from, to), colour);
             glyphPaths.add(pathDetail);
         }
         return glyphPaths;
     }
 
-    static List<PathDetail> asPathDetails(TextDetail textDetail) {
+    @Override
+    public List<PathDetail> asPathDetails(TextDetail textDetail) {
+        return getPathDetailsForText(textDetail);
+    }
+
+    static List<PathDetail> getPathDetailsForText(TextDetail textDetail) {
+        List<PathDetail> pathDetails = new ArrayList<>();
+
         Colour colour = textDetail.getColour();
         String text = textDetail.getText();
         Coord2D position = textDetail.getPosition();
+        float size = textDetail.getSize();
 
-        int INTER_CHAR_SPACE = 1;
-        int CHAR_WIDTH = 4;
         String cleaned = text.toUpperCase();
-
-
-        List<PathDetail> pathDetails = new ArrayList<>();
-
         char[] chars = cleaned.toCharArray();
 
+        float xPos = 0;
         for (int i = 0; i < text.length(); i++) {
             char ch = chars[i];
-            List<PathDetail> glyphPaths = getGlyphPaths(ch, colour);
-            int xDelta = (CHAR_WIDTH + INTER_CHAR_SPACE);
-            List<PathDetail> translatedPaths = new ArrayList<>();
-            for (PathDetail pathDetail : glyphPaths) {
-                // translate for position in string
-                PathDetail translatedPath = pathDetail.translate(new Coord2D(xDelta, 0));
-                // translate for position in sketch
+            List<PathDetail> charPaths = getPathsForChar(ch, colour);
+
+            float charWidth = 0;
+            for (PathDetail pathDetail : charPaths) {
+                PathDetail scaledPath = pathDetail.scale(size);
+                // adjust for position in string
+                PathDetail translatedPath = scaledPath.translate(new Coord2D(xPos, 0));
+                // adjust for position on sketch
                 translatedPath = translatedPath.translate(position);
-                // scale for text size
-                translatedPaths.add(translatedPath);
+                pathDetails.add(translatedPath);
+
+                // keep a total of widest bit to get total char width
+                charWidth = Math.max(charWidth, scaledPath.getWidth());
             }
-            pathDetails.addAll(translatedPaths);
+
+        float interCharSpace = INTER_CHAR_SPACE * size;
+            xPos += charWidth + (INTER_CHAR_SPACE * size);
         }
 
         return pathDetails;

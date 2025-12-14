@@ -26,10 +26,15 @@ public abstract class SketchDetail extends Shape {
         }
     }
 
+    public String getXviString() {
+        return null;
+    }
+
     public abstract float getDistanceFrom(Coord2D point);
 
     public abstract SketchDetail translate(Coord2D point);
 
+    public abstract SketchDetail scale(float scale);
 
 
 }

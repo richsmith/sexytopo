@@ -55,6 +55,15 @@ public final class PathDetail extends SketchDetail {
         return new PathDetail(newPath, getColour());
     }
 
+    @Override
+    public PathDetail scale(float scale) {
+        List<Coord2D> newPath = new ArrayList<>();
+        for (Coord2D step : path) {
+            newPath.add(step.scale(scale));
+        }
+        return new PathDetail(newPath, getColour());
+    }
+
 
     public List<SketchDetail> getPathFragmentsOutsideRadius(Coord2D targetPoint, double radius) {
         List<SketchDetail> fragments = new ArrayList<>();

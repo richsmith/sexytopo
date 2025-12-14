@@ -47,7 +47,13 @@ public class SymbolDetail extends SinglePositionDetail implements AutoScalableDe
     @Override
     public SymbolDetail translate(Coord2D point) {
         return new SymbolDetail(
-                getPosition().plus(point), getSymbol(), getColour(), getSize(), getAngle());
+            getPosition().plus(point), getSymbol(), getColour(), getSize(), getAngle());
+    }
+
+    @Override
+    public SymbolDetail scale(float scale) {
+        return new SymbolDetail(
+            getPosition(), getSymbol(), getColour(), getSize() * scale, getAngle());
     }
 
 }
