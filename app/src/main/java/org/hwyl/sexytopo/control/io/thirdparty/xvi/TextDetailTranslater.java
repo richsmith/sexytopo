@@ -11,6 +11,7 @@ import java.util.List;
 public class TextDetailTranslater extends SketchDetailTranslater<TextDetail> {
     private static final float CHAR_HEIGHT = 4.0f;
     private static final float INTER_CHAR_SPACE = 1f;
+    private static final float LINE_SPACING = 1.2f;
 
     // Bit of a fudge factor to get text scale to be similar to likely text scale
     // More art than science ;)
@@ -129,34 +130,44 @@ public class TextDetailTranslater extends SketchDetailTranslater<TextDetail> {
         float size = textDetail.getSize();
         float scale = size * SCALE_FACTOR;
 
+        // Split text by newlines to handle multi-line text
+        String[] lines = text.split("\n", -1);
+        float lineHeight = CHAR_HEIGHT * LINE_SPACING * scale;
 
-        String cleaned = text.toUpperCase();
-        char[] chars = cleaned.toCharArray();
+        for (int lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+            String line = lines[lineIndex];
+            String cleaned = line.toUpperCase();
+            char[] chars = cleaned.toCharArray();
 
-        float xPos = 0;
-        for (int i = 0; i < text.length(); i++) {
-            char ch = chars[i];
-            List<PathDetail> charPaths = getPathsForChar(ch, colour);
+            // Calculate Y offset for this line
+            float yOffset = lineIndex * lineHeight;
+            Coord2D linePosition = position.plus(new Coord2D(0, yOffset));
 
-            // Letters such as "1" are vertical lines so have no width!
-            // Set a minimum width to handle this
-            float minWidth = INTER_CHAR_SPACE * scale;
+            float xPos = 0;
+            for (int i = 0; i < line.length(); i++) {
+                char ch = chars[i];
+                List<PathDetail> charPaths = getPathsForChar(ch, colour);
 
-            float charWidth = minWidth;
-            for (PathDetail pathDetail : charPaths) {
-                PathDetail scaledPath = pathDetail.scale(scale);
-                // adjust for position in string
-                PathDetail translatedPath = scaledPath.translate(new Coord2D(xPos, 0));
-                // adjust for position on sketch
-                translatedPath = translatedPath.translate(position);
-                pathDetails.add(translatedPath);
+                // Letters such as "1" are vertical lines so have no width!
+                // Set a minimum width to handle this
+                float minWidth = INTER_CHAR_SPACE * scale;
 
-                // keep a total of widest bit to get total char width
-                charWidth = Math.max(charWidth, scaledPath.getWidth());
+                float charWidth = minWidth;
+                for (PathDetail pathDetail : charPaths) {
+                    PathDetail scaledPath = pathDetail.scale(scale);
+                    // adjust for position in string
+                    PathDetail translatedPath = scaledPath.translate(new Coord2D(xPos, 0));
+                    // adjust for position on sketch
+                    translatedPath = translatedPath.translate(linePosition);
+                    pathDetails.add(translatedPath);
+
+                    // keep a total of widest bit to get total char width
+                    charWidth = Math.max(charWidth, scaledPath.getWidth());
+                }
+
+                float interCharSpace = INTER_CHAR_SPACE * scale;
+                xPos += charWidth + interCharSpace;
             }
-
-            float interCharSpace = INTER_CHAR_SPACE * scale;
-            xPos += charWidth + interCharSpace;
         }
 
         return pathDetails;
