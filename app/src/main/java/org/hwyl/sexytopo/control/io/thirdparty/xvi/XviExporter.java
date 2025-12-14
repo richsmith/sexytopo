@@ -107,7 +107,7 @@ public class XviExporter {
 
     private static String getSymbolDetailAsPathsText(SymbolDetail symbolDetail, double scale) {
         StringBuilder builder = new StringBuilder();
-        List<PathDetail> pathDetails = new SymbolDetailTranslater().translate(symbolDetail);
+        List<PathDetail> pathDetails = new SymbolDetailTranslater().asPathDetails(symbolDetail);
         for (PathDetail pathDetail : pathDetails) {
             builder.append(getPathDetailText(pathDetail, scale));
         }
