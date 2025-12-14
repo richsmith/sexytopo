@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -10 20 20">
-  <path d="M-3,-4 L0,-2.2 L-4,-1 Z"/>
-  <path d="M2,-4 L4,-1 L1,-1 Z"/>
-  <path d="M-1,0 L2,3 L-2,3 Z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
+  <path d="M14,12 L20,15.6 L12,18 Z"/>
+  <path d="M24,12 L28,18 L22,18 Z"/>
+  <path d="M18,20 L24,26 L16,26 Z"/>
 </svg>
 
