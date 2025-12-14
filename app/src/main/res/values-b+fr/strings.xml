@@ -441,6 +441,10 @@
     <string name="settings_export_svg_leg_width_summary">Quelle largeur pour dessiner les segments dans l\'export SVG</string>
     <string name="settings_export_svg_splay_width_title">Largeur du trait des radiales SVG</string>
     <string name="settings_export_svg_splay_width_summary">Quelle largeur pour dessiner les radiales dans l\'export SVG</string>
+    <string name="settings_export_therion_symbols_title">Exportation Therion des symboles</string>
+    <string name="settings_export_therion_symbols_summary">Inclure les symboles lors de l\'exportation au format Therion</string>
+    <string name="settings_export_therion_text_title">Exportation Therion du texte</string>
+    <string name="settings_export_therion_text_summary">Inclure le texte lors de l\'exportation au format Therion</string>
     <string name="settings_developer_title">Développeur</string>
     <string name="settings_key_developer_mode_title">Mode développeur</string>
     <string name="settings_key_developer_mode_summary">Afficher les entrées du menu de débogage</string>

@@ -428,6 +428,10 @@
     <string name="settings_export_svg_leg_width_summary">Wie breit Messstrecken im SVG-Export dargestellt werden sollen</string>
     <string name="settings_export_svg_splay_width_title">SVG-Dimensions-Strichstärke</string>
     <string name="settings_export_svg_splay_width_summary">Wie breit Dimensionen im SVG-Export dargestellt werden sollen</string>
+    <string name="settings_export_therion_symbols_title">Therion-Export Symbole</string>
+    <string name="settings_export_therion_symbols_summary">Symbole beim Exportieren im Therion-Format einschließen</string>
+    <string name="settings_export_therion_text_title">Therion-Export Text</string>
+    <string name="settings_export_therion_text_summary">Text beim Exportieren im Therion-Format einschließen</string>
     <string name="settings_developer_title">Entwickler</string>
     <string name="settings_key_developer_mode_title"> Entwickler-Modus</string>
     <string name="settings_key_developer_mode_summary">Einträge im Debugging-Menü anzeigen</string>

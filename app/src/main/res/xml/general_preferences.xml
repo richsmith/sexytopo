@@ -164,6 +164,16 @@
             android:summary="@string/settings_export_svg_splay_width_summary"
             android:inputType="numberDecimal"
             android:defaultValue="1"/>
+        <CheckBoxPreference
+            android:key="pref_therion_export_symbols"
+            android:title="@string/settings_export_therion_symbols_title"
+            android:summary="@string/settings_export_therion_symbols_summary"
+            android:defaultValue="true"/>
+        <CheckBoxPreference
+            android:key="pref_therion_export_text"
+            android:title="@string/settings_export_therion_text_title"
+            android:summary="@string/settings_export_therion_text_summary"
+            android:defaultValue="true"/>
     </PreferenceCategory>
 
     <PreferenceCategory

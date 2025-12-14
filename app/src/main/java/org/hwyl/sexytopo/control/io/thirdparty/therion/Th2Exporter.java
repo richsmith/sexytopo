@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
+import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.common.Shape;
 import org.hwyl.sexytopo.model.graph.Coord2D;
@@ -127,23 +128,27 @@ public class Th2Exporter {
             commands.add(getPoint(coord.x, coord.y, "station", "-name", station.getName()));
         }
 
-        for (TextDetail textDetail : sketch.getTextDetails()) {
-            Coord2D coord = textDetail.getPosition().scale(scale).flipVertically();
-            commands.add(
-                getPoint(coord.x, coord.y, "label", "-text \"", textDetail.getText(), "\" -scale",
-                    getScale(textDetail)));
+        if (GeneralPreferences.isXviExportTextEnabled()) {
+            for (TextDetail textDetail : sketch.getTextDetails()) {
+                Coord2D coord = textDetail.getPosition().scale(scale).flipVertically();
+                commands.add(
+                    getPoint(coord.x, coord.y, "label", "-text \"", textDetail.getText(), "\" -scale",
+                        getScale(textDetail)));
+            }
         }
 
-        for (SymbolDetail symbolDetail : sketch.getSymbolDetails()) {
-            Coord2D coord = symbolDetail.getPosition().scale(scale).flipVertically();
-            Symbol symbol = symbolDetail.getSymbol();
+        if (GeneralPreferences.isXviExportSymbolsEnabled()) {
+            for (SymbolDetail symbolDetail : sketch.getSymbolDetails()) {
+                Coord2D coord = symbolDetail.getPosition().scale(scale).flipVertically();
+                Symbol symbol = symbolDetail.getSymbol();
 
-            List<String> args = new ArrayList<>();
-            args.add("-scale " + getScale(symbolDetail));
-            if (symbol.isDirectional()) {
-                args.add("-orientation " + symbolDetail.getAngle());
+                List<String> args = new ArrayList<>();
+                args.add("-scale " + getScale(symbolDetail));
+                if (symbol.isDirectional()) {
+                    args.add("-orientation " + symbolDetail.getAngle());
+                }
+                commands.add(getPoint(coord.x, coord.y, symbolDetail.getSymbol().getTherionName(), args));
             }
-            commands.add(getPoint(coord.x, coord.y, symbolDetail.getSymbol().getTherionName(), args));
         }
 
         return commands;

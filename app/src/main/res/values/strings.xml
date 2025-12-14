@@ -450,6 +450,10 @@
     <string name="settings_export_svg_leg_width_summary">How wide to draw leg lines in SVG export</string>
     <string name="settings_export_svg_splay_width_title">SVG splay width</string>
     <string name="settings_export_svg_splay_width_summary">How wide to draw splay lines in SVG export</string>
+    <string name="settings_export_therion_symbols_title">Therion export symbols</string>
+    <string name="settings_export_therion_symbols_summary">Include symbols when exporting to Therion format</string>
+    <string name="settings_export_therion_text_title">Therion export text</string>
+    <string name="settings_export_therion_text_summary">Include text when exporting to Therion format</string>
     <string name="settings_developer_title">Developer</string>
     <string name="settings_key_developer_mode_title">Developer mode</string>
     <string name="settings_key_developer_mode_summary">Show debugging menu entries</string>

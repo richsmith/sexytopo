@@ -236,5 +236,13 @@ public class GeneralPreferences {
         return getInt("pref_export_svg_splay_width", 1);
     }
 
+    public static boolean isXviExportSymbolsEnabled() {
+        return getBoolean("pref_therion_export_symbols", true);
+    }
+
+    public static boolean isXviExportTextEnabled() {
+        return getBoolean("pref_therion_export_text", true);
+    }
+
 
 }
