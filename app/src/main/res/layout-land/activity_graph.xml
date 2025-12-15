@@ -13,6 +13,7 @@
         android:background="@color/panelBackground">
 
         <ImageButton
+            android:layout_marginLeft="-4dp"
             android:layout_weight="0.2"
             android:src="@drawable/move"
             android:tooltipText="@string/sketch_toolbar_move"
@@ -24,6 +25,7 @@
             />
 
         <ImageButton
+            android:layout_marginLeft="-4dp"
             android:layout_weight="0.2"
             android:src="@drawable/pencil"
             android:tooltipText="@string/sketch_toolbar_draw"
@@ -35,6 +37,7 @@
             />
 
         <ImageButton
+            android:layout_marginLeft="-4dp"
             android:id="@+id/buttonSymbol"
             android:layout_weight="0.2"
             android:layout_width="wrap_content"
@@ -50,6 +53,7 @@
             android:tooltipText="@string/sketch_toolbar_symbol" />
 
         <ImageButton
+            android:layout_marginLeft="-4dp"
             android:layout_weight="0.2"
             android:src="@drawable/eraser"
             android:tooltipText="@string/sketch_toolbar_eraser"
@@ -61,6 +65,7 @@
             />
 
         <ImageButton
+            android:layout_marginLeft="-4dp"
             android:layout_weight="0.2"
             android:src="@drawable/select"
             android:tooltipText="@string/sketch_toolbar_selector"
@@ -71,6 +76,7 @@
             android:hapticFeedbackEnabled="true"
             />
         <ImageButton
+            android:layout_marginLeft="-4dp"
             android:layout_weight="0.2"
             android:src="@drawable/settings"
             android:tooltipText="@string/sketch_toolbar_settings"
@@ -81,6 +87,7 @@
             android:hapticFeedbackEnabled="true"
             />
         <ImageButton
+            android:layout_marginLeft="-4dp"
             android:layout_weight="0.2"
             android:src="@drawable/undo"
             android:tooltipText="@string/sketch_toolbar_undo"
@@ -91,6 +98,7 @@
             android:hapticFeedbackEnabled="true"
             />
         <ImageButton
+            android:layout_marginLeft="-4dp"
             android:layout_weight="0.2"
             android:src="@drawable/redo"
             android:tooltipText="@string/sketch_toolbar_redo"
@@ -101,6 +109,7 @@
             android:hapticFeedbackEnabled="true"
             />
         <ImageButton
+            android:layout_marginLeft="-4dp"
             android:layout_weight="0.2"
             android:src="@drawable/zoom_out"
             android:tooltipText="@string/sketch_toolbar_zoom_out"
@@ -122,6 +131,7 @@
         android:background="@color/panelBackground">
 
         <ImageButton
+            android:layout_marginLeft="-4dp"
             android:layout_weight="0.2"
             android:src="@drawable/black"
             android:layout_width="wrap_content"
@@ -131,6 +141,7 @@
             android:hapticFeedbackEnabled="true"
             />
         <ImageButton
+            android:layout_marginLeft="-4dp"
             android:layout_weight="0.2"
             android:src="@drawable/brown"
             android:layout_width="wrap_content"
@@ -140,6 +151,7 @@
             android:hapticFeedbackEnabled="true"
             />
         <ImageButton
+            android:layout_marginLeft="-4dp"
             android:layout_weight="0.2"
             android:src="@drawable/grey"
             android:layout_width="wrap_content"
@@ -148,6 +160,7 @@
             android:id="@+id/buttonGrey"
             />
         <ImageButton
+            android:layout_marginLeft="-4dp"
             android:layout_weight="0.2"
             android:src="@drawable/red"
             android:layout_width="wrap_content"
@@ -156,6 +169,7 @@
             android:id="@+id/buttonRed"
             />
         <ImageButton
+            android:layout_marginLeft="-4dp"
             android:layout_weight="0.2"
             android:src="@drawable/orange"
             android:layout_width="wrap_content"
@@ -165,6 +179,7 @@
             android:hapticFeedbackEnabled="true"
             />
         <ImageButton
+            android:layout_marginLeft="-4dp"
             android:layout_weight="0.2"
             android:src="@drawable/green"
             android:layout_width="wrap_content"
@@ -174,6 +189,7 @@
             android:hapticFeedbackEnabled="true"
             />
         <ImageButton
+            android:layout_marginLeft="-4dp"
             android:layout_weight="0.2"
             android:src="@drawable/blue"
             android:layout_width="wrap_content"
@@ -183,6 +199,7 @@
             android:hapticFeedbackEnabled="true"
             />
         <ImageButton
+            android:layout_marginLeft="-4dp"
             android:layout_weight="0.2"
             android:src="@drawable/purple"
             android:layout_width="wrap_content"
@@ -192,6 +209,7 @@
             android:hapticFeedbackEnabled="true"
             />
         <ImageButton
+            android:layout_marginLeft="-4dp"
             android:layout_weight="0.2"
             android:src="@drawable/zoom_in"
             android:layout_width="wrap_content"
