@@ -60,6 +60,7 @@
             android:useDefaultMargins="false">
 
             <ImageButton
+                style="@style/ToolbarImageButton"
                 android:id="@+id/buttonBlack"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/toolbar_button_height"
@@ -72,6 +73,7 @@
                 android:tooltipText="@string/sketch_toolbar_colour_main" />
 
             <ImageButton
+                style="@style/ToolbarImageButton"
                 android:id="@+id/buttonBrown"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/toolbar_button_height"
@@ -85,6 +87,7 @@
                 android:tooltipText="@string/sketch_toolbar_colour_brown" />
 
             <ImageButton
+                style="@style/ToolbarImageButton"
                 android:id="@+id/buttonGrey"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/toolbar_button_height"
@@ -98,6 +101,7 @@
                 android:tooltipText="@string/sketch_toolbar_colour_grey" />
 
             <ImageButton
+                style="@style/ToolbarImageButton"
                 android:id="@+id/buttonRed"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/toolbar_button_height"
@@ -111,6 +115,7 @@
                 android:tooltipText="@string/sketch_toolbar_colour_red" />
 
             <ImageButton
+                style="@style/ToolbarImageButton"
                 android:id="@+id/buttonOrange"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/toolbar_button_height"
@@ -124,6 +129,7 @@
                 android:tooltipText="@string/sketch_toolbar_colour_orange" />
 
             <ImageButton
+                style="@style/ToolbarImageButton"
                 android:id="@+id/buttonGreen"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/toolbar_button_height"
@@ -137,6 +143,7 @@
                 android:tooltipText="@string/sketch_toolbar_colour_green" />
 
             <ImageButton
+                style="@style/ToolbarImageButton"
                 android:id="@+id/buttonBlue"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/toolbar_button_height"
@@ -150,6 +157,7 @@
                 android:tooltipText="@string/sketch_toolbar_colour_blue" />
 
             <ImageButton
+                style="@style/ToolbarImageButton"
                 android:id="@+id/buttonPurple"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/toolbar_button_height"
@@ -163,6 +171,7 @@
                 android:tooltipText="@string/sketch_toolbar_colour_purple" />
 
             <ImageButton
+                style="@style/ToolbarImageButton"
                 android:id="@+id/buttonZoomIn"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/toolbar_button_height"
@@ -177,6 +186,7 @@
 
 
             <ImageButton
+                style="@style/ToolbarImageButton"
                 android:id="@+id/buttonMove"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/toolbar_button_height"
@@ -191,6 +201,7 @@
                 android:tooltipText="@string/sketch_toolbar_move" />
 
             <ImageButton
+                style="@style/ToolbarImageButton"
                 android:id="@+id/buttonDraw"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/toolbar_button_height"
@@ -206,6 +217,7 @@
 
 
             <ImageButton
+                style="@style/ToolbarImageButton"
                 android:id="@+id/buttonSymbol"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/toolbar_button_height"
@@ -221,6 +233,7 @@
                 android:tooltipText="@string/sketch_toolbar_symbol" />
 
             <ImageButton
+                style="@style/ToolbarImageButton"
                 android:id="@+id/buttonErase"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/toolbar_button_height"
@@ -238,6 +251,7 @@
 
 
             <ImageButton
+                style="@style/ToolbarImageButton"
                 android:id="@+id/buttonSelect"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/toolbar_button_height"
@@ -252,6 +266,7 @@
                 android:tooltipText="@string/sketch_toolbar_selector" />
 
             <ImageButton
+                style="@style/ToolbarImageButton"
                 android:id="@+id/buttonMenu"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/toolbar_button_height"
@@ -266,6 +281,7 @@
                 android:tooltipText="@string/sketch_toolbar_settings" />
 
             <ImageButton
+                style="@style/ToolbarImageButton"
                 android:id="@+id/buttonUndo"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/toolbar_button_height"
@@ -280,6 +296,7 @@
                 android:tooltipText="@string/sketch_toolbar_undo" />
 
             <ImageButton
+                style="@style/ToolbarImageButton"
                 android:id="@+id/buttonRedo"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/toolbar_button_height"
@@ -294,6 +311,7 @@
                 android:tooltipText="@string/sketch_toolbar_symbol" />
 
             <ImageButton
+                style="@style/ToolbarImageButton"
                 android:id="@+id/buttonZoomOut"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/toolbar_button_height"
