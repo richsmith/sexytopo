@@ -191,6 +191,9 @@
     <string name="manual_edit_azimuth">Azimut (°)</string>
     <string name="manual_edit_azimuth_error">Fehlerhafte Richtungsmessung</string>
     <string name="manual_edit_azimuth_deg_mins_secs">Azimut (° \' \")</string>
+    <string name="deg">Grad</string>
+    <string name="min">Min</string>
+    <string name="sec">Sek</string>
     <string name="manual_edit_inclination">Neigung (°)</string>
     <string name="manual_edit_inclination_error">Fehlerhafte Neigungsmessung</string>
     <string name="manual_edit_left">Links (m)</string>
@@ -198,7 +201,10 @@
     <string name="manual_edit_up">Nach oben (m)</string>
     <string name="manual_edit_down">Nach unten (m)</string>
     <string name="manual_rename_station_title">Messpunkt umbenennen</string>
+    <string name="manual_rename_station_hint">Stationsname</string>
     <string name="manual_rename_error">Umbenennen fehlgeschlagen</string>
+    <string name="graph_text_hint">Text eingeben</string>
+    <string name="graph_comment_hint">Stationskommentar</string>
 
     <!--  Device  -->
     <string name="device_instruction_bluetooth">1. Bluetooth</string>

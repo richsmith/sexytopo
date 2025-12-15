@@ -1,13 +1,15 @@
 package org.hwyl.sexytopo.control.table;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AlertDialog;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.SurveyManager;
@@ -37,7 +39,7 @@ public class ManualEntry {
                 manager.broadcastNewStationCreated();
                 tableActivity.syncTableWithSurvey();
             });
-        dialog.setTitle(R.string.manual_add_station_title);
+        dialog.setTitle(tableActivity.getString(R.string.manual_add_station_title));
     }
 
 
@@ -50,7 +52,7 @@ public class ManualEntry {
                 tableActivity.getSurveyManager().broadcastSurveyUpdated();
                 tableActivity.syncTableWithSurvey();
             });
-        dialog.setTitle(R.string.manual_add_splay_title);
+        dialog.setTitle(tableActivity.getString(R.string.manual_add_splay_title));
     }
 
 
@@ -77,7 +79,7 @@ public class ManualEntry {
                 tableActivity.syncTableWithSurvey();
             });
 
-        dialog.setTitle(R.string.manual_edit_leg_title);
+        dialog.setTitle(tableActivity.getString(R.string.manual_edit_leg_title));
 
         Leg editData = toEdit.wasShotBackwards()? toEdit.reverse() : toEdit;
         ((TextView) (dialog.findViewById(R.id.editDistance)))
@@ -109,12 +111,12 @@ public class ManualEntry {
                 tableActivity.getSurveyManager().broadcastSurveyUpdated();
                 tableActivity.syncTableWithSurvey();
             });
-        dialog.setTitle(R.string.manual_add_station_title);
+        dialog.setTitle(tableActivity.getString(R.string.manual_add_station_title));
     }
 
 
     private static void createLrudIfPresent(Survey survey, Station station,
-                                            Dialog dialog, int fieldId,
+                                            AlertDialog dialog, int fieldId,
                                             LRUD direction) {
         Float value = getFieldValue(dialog, fieldId);
         if (value != null) {
@@ -125,7 +127,7 @@ public class ManualEntry {
     }
 
 
-    private static Float getFieldValue(Dialog dialog, int id) {
+    private static Float getFieldValue(AlertDialog dialog, int id) {
         try {
             TextView field = dialog.findViewById(id);
             return Float.parseFloat(field.getText().toString());
@@ -140,7 +142,7 @@ public class ManualEntry {
             final TableActivity tableActivity,
             final EditCallback editCallback) {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(tableActivity);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(tableActivity);
 
         LayoutInflater inflater = tableActivity.getLayoutInflater();
         final View dialogView = inflater.inflate(layoutId, null);
@@ -229,9 +231,9 @@ public class ManualEntry {
             }
         };
 
-        AlertDialog dialog = new AlertDialog.Builder(activity)
+        AlertDialog dialog = new MaterialAlertDialogBuilder(activity)
             .setTitle(R.string.manual_rename_station_title)
-            .setView(form.stationName)
+            .setView(form.stationNameLayout)
             .setPositiveButton(R.string.rename, (ignore, buttonId) -> renameAction.run())
             .setNegativeButton(R.string.cancel, null)
             .create();
@@ -260,7 +262,7 @@ public class ManualEntry {
 
 
     public interface EditCallback {
-        void submit(Leg leg, Dialog dialog);
+        void submit(Leg leg, AlertDialog dialog);
     }
 
 }

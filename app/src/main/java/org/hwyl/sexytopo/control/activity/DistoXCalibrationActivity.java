@@ -1,8 +1,7 @@
 package org.hwyl.sexytopo.control.activity;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
+import android.app.Dialog;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -20,6 +19,8 @@ import android.widget.TextView;
 
 import androidx.documentfile.provider.DocumentFile;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.hwyl.sexytopo.R;
@@ -297,7 +298,7 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
         String message = getString(
                 R.string.device_distox_calibration_result, MAX_ERROR, result, algorithm);
 
-        new AlertDialog.Builder(this)
+        new MaterialAlertDialogBuilder(this)
             .setTitle(R.string.calibration_assessment)
             .setMessage(message)
             .setPositiveButton(R.string.calibration_update, (dialog, whichButton) -> {
@@ -324,7 +325,7 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
 
 
     public void requestClearCalibration(View view) {
-        new AlertDialog.Builder(this)
+        new MaterialAlertDialogBuilder(this)
             .setTitle(R.string.dialog_confirm_clear_title)
             .setPositiveButton(getString(R.string.clear), (dialog, whichButton) -> {
                 getSurveyManager().clearCalibrationReadings();
@@ -462,14 +463,21 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
 
     private class WriteCalibrationTask extends AsyncTask<Byte, Void, Boolean> {
 
-        private final ProgressDialog progressDialog;
+        private Dialog progressDialog;
 
         private WriteCalibrationTask(View view) {
-            progressDialog = new ProgressDialog(view.getContext(), ProgressDialog.STYLE_SPINNER);
+            android.widget.ProgressBar progressBar = new android.widget.ProgressBar(view.getContext());
+            progressBar.setIndeterminate(true);
+            progressBar.setPadding(0, 50, 0, 50);
+
+            progressDialog = new MaterialAlertDialogBuilder(view.getContext())
+                .setMessage(getString(R.string.calibration_writing))
+                .setView(progressBar)
+                .setCancelable(false)
+                .create();
         }
 
         protected void onPreExecute() {
-            progressDialog.setMessage(getString(R.string.calibration_writing));
             progressDialog.show();
         }
 

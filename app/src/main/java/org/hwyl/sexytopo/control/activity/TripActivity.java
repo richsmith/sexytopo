@@ -1,7 +1,6 @@
 package org.hwyl.sexytopo.control.activity;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
@@ -18,6 +17,8 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.util.TextTools;
@@ -100,7 +101,7 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
 
 
     public void requestClear(View view) {
-        new AlertDialog.Builder(this)
+        new MaterialAlertDialogBuilder(this)
             .setTitle(R.string.trip_dialog_confirm_clear_trip)
             .setPositiveButton(R.string.clear, (dialog, whichButton) -> {
                 EditText comments = findViewById(R.id.trip_comments);
@@ -140,8 +141,8 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
         roleList.setAdapter(arrayAdapter);
         layout.addView(roleList);
 
-        AlertDialog.Builder builderSingle =
-            new AlertDialog.Builder(this)
+        MaterialAlertDialogBuilder builderSingle =
+            new MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.trip_dialog_title_add_to_team)
                 .setView(layout)
                 .setPositiveButton(R.string.add,
@@ -281,8 +282,8 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
 
         layout.addView(roleList);
 
-        AlertDialog.Builder builderSingle =
-            new AlertDialog.Builder(this)
+        MaterialAlertDialogBuilder builderSingle =
+            new MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.edit)
                 .setView(layout)
                 .setPositiveButton(R.string.save,

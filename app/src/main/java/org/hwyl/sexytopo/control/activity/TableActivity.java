@@ -1,7 +1,6 @@
 package org.hwyl.sexytopo.control.activity;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -22,6 +21,8 @@ import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
@@ -318,7 +319,7 @@ public class TableActivity extends SexyTopoActivity
             message += "\n" + TextTools.pluralise(numSplaysToBeDeleted, noun);
         }
 
-        new AlertDialog.Builder(context)
+        new MaterialAlertDialogBuilder(context)
             .setMessage(message)
             .setPositiveButton(R.string.delete, (dialog, which) -> {
                 Survey survey = getSurvey();
@@ -384,7 +385,7 @@ public class TableActivity extends SexyTopoActivity
         final Spinner spinner = stationView.findViewById(R.id.stationSpinner);
         spinner.setAdapter(adapter);
 
-        new AlertDialog.Builder(this)
+        new MaterialAlertDialogBuilder(this)
             .setMessage(R.string.context_move_leg_select_station_title)
             .setView(stationView)
             .setPositiveButton(R.string.move, (dialog, which) -> {

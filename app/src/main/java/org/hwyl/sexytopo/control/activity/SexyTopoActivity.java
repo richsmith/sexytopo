@@ -2,7 +2,6 @@ package org.hwyl.sexytopo.control.activity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -35,6 +34,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.documentfile.provider.DocumentFile;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
@@ -486,7 +486,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
         String version = getVersionName(this);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this)
                 .setIcon(R.drawable.laser_icon)
                 .setTitle(getText(R.string.app_name) + " v" + version)
                 .setNeutralButton(R.string.ok, null)
@@ -499,7 +499,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     @SuppressLint("UnusedDeclaration")
     public void requestExportSurvey() {  // public due to stupid Reflection requirements
 
-        AlertDialog.Builder builderSingle = new AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder builderSingle = new MaterialAlertDialogBuilder(this);
 
         builderSingle.setTitle(R.string.export_select_type);
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
@@ -557,7 +557,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     private void linkToStationInSurvey(final Survey surveyToLink) {
         final Station[] stations = surveyToLink.getAllStations().toArray(new Station[]{});
 
-        AlertDialog.Builder builderSingle = new AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder builderSingle = new MaterialAlertDialogBuilder(this);
 
         builderSingle.setTitle(R.string.file_link_survey_station);
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
@@ -625,7 +625,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             saveSurvey();
 
         } else if (IoUtils.isSurveyDirectory(directory)) {
-            new AlertDialog.Builder(this)
+            new MaterialAlertDialogBuilder(this)
                     .setTitle(R.string.file_save_overwrite_survey_title_question)
                     .setPositiveButton(R.string.overwrite, (dialogInterface, id) -> {
                         survey.setDirectory(directory);
@@ -635,7 +635,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                     .show();
 
         } else {
-            new AlertDialog.Builder(this)
+            new MaterialAlertDialogBuilder(this)
                 .setTitle(getString(R.string.file_save_to_non_empty_directory_question))
                 .setPositiveButton(R.string.save, (dialogInterface, id) -> {
                     survey.setDirectory(directory);
@@ -862,7 +862,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     private void chooseSurveyToUnlink(final Survey survey, final Station station) {
 
-        AlertDialog.Builder builderSingle = new AlertDialog.Builder(
+        MaterialAlertDialogBuilder builderSingle = new MaterialAlertDialogBuilder(
                 this);
 
         builderSingle.setTitle(R.string.file_unlink_survey_dialog_title);
@@ -943,7 +943,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             return;
         }
 
-        new AlertDialog.Builder(this)
+        new MaterialAlertDialogBuilder(this)
             .setTitle(R.string.file_dialog_delete_survey_title)
             .setMessage(getString(R.string.file_dialog_delete_survey_content, directory.getName()))
             .setPositiveButton(R.string.delete,
@@ -998,7 +998,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             final String methodToCallIfProceeding,
             final Object... args) {
 
-        new AlertDialog.Builder(this)
+        new MaterialAlertDialogBuilder(this)
             .setTitle(titleId)
             .setMessage(messageId)
             .setPositiveButton(confirmId,
@@ -1064,7 +1064,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
     private void generateTestSurvey() {
-        new AlertDialog.Builder(this)
+        new MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.tool_generate_test_title)
                 .setMessage(R.string.tool_generate_test_question)
                 .setCancelable(false)

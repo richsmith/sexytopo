@@ -1,7 +1,6 @@
 package org.hwyl.sexytopo.control.graph;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -25,6 +24,10 @@ import android.widget.EditText;
 import android.widget.PopupWindow;
 
 import androidx.core.content.ContextCompat;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.Log;
@@ -604,9 +607,19 @@ public class GraphView extends View {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                final EditText input = new EditText(getContext());
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setView(input)
+                TextInputLayout inputLayout = new TextInputLayout(getContext());
+                inputLayout.setBoxBackgroundMode(TextInputLayout.BOX_BACKGROUND_OUTLINE);
+                inputLayout.setHint(getContext().getString(R.string.graph_text_hint));
+
+                TextInputEditText input = new TextInputEditText(getContext());
+                inputLayout.addView(input);
+
+                int paddingH = (int) (24 * getResources().getDisplayMetrics().density);
+                int paddingV = (int) (20 * getResources().getDisplayMetrics().density);
+                inputLayout.setPadding(paddingH, paddingV, paddingH, 0);
+
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
+                builder.setView(inputLayout)
                     .setPositiveButton(R.string.ok, (dialog, which) -> {
                         String text = input.getText().toString();
                         int startingSizeSp = GeneralPreferences.getTextStartingSizeSp();
@@ -617,7 +630,7 @@ public class GraphView extends View {
                     })
                     .setNegativeButton(R.string.cancel, null);
 
-                AlertDialog dialog = builder.create();
+                android.app.Dialog dialog = builder.create();
 
                 // Automatically select text field
                 dialog.setOnShowListener(dialogInterface -> {
@@ -761,20 +774,29 @@ public class GraphView extends View {
 
 
     private void openCommentDialog(final Station station) {
-        final EditText input = new EditText(getContext());
+        TextInputLayout inputLayout = new TextInputLayout(getContext());
+        inputLayout.setBoxBackgroundMode(TextInputLayout.BOX_BACKGROUND_OUTLINE);
+        inputLayout.setHint(getContext().getString(R.string.graph_comment_hint));
+
+        TextInputEditText input = new TextInputEditText(getContext());
         input.setLines(8);
         input.setGravity(Gravity.START | Gravity.TOP);
         input.setText(station.getComment());
         input.setFocusableInTouchMode(true);
+        inputLayout.addView(input);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setView(input)
+        int paddingH = (int) (24 * getResources().getDisplayMetrics().density);
+        int paddingV = (int) (20 * getResources().getDisplayMetrics().density);
+        inputLayout.setPadding(paddingH, paddingV, paddingH, 0);
+
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
+        builder.setView(inputLayout)
             .setTitle(station.getName())
             .setPositiveButton(R.string.save,
                 (dialog, which) -> station.setComment(input.getText().toString()))
             .setNegativeButton(R.string.cancel, null);
 
-        AlertDialog dialog = builder.create();
+        android.app.Dialog dialog = builder.create();
         dialog.getWindow().setSoftInputMode(
             WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         dialog.show();
@@ -801,7 +823,7 @@ public class GraphView extends View {
             message += "\n" + TextTools.pluralise(numSplaysToBeDeleted, noun);
         }
 
-        new AlertDialog.Builder(getContext())
+        new MaterialAlertDialogBuilder(getContext())
                 .setMessage(message)
                 .setPositiveButton(R.string.delete, (dialog, which) -> {
                     SurveyUpdater.deleteStation(survey, station);

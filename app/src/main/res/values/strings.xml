@@ -197,6 +197,9 @@
     <string name="manual_edit_azimuth">Azimuth (&#176;)</string>
     <string name="manual_edit_azimuth_error">Bad azimuth</string>
     <string name="manual_edit_azimuth_deg_mins_secs">Azimuth (&#176; \' \")</string>
+    <string name="deg">Deg</string>
+    <string name="min">Min</string>
+    <string name="sec">Sec</string>
     <string name="manual_edit_inclination">Inclination (&#176;)</string>
     <string name="manual_edit_inclination_error">Bad inclination</string>
     <string name="manual_edit_left">Left (m)</string>
@@ -204,7 +207,10 @@
     <string name="manual_edit_up">Up (m)</string>
     <string name="manual_edit_down">Down (m)</string>
     <string name="manual_rename_station_title">Rename Station</string>
+    <string name="manual_rename_station_hint">Station name</string>
     <string name="manual_rename_error">Rename failed</string>
+    <string name="graph_text_hint">Enter text</string>
+    <string name="graph_comment_hint">Station comment</string>
 
     <!-- Device -->
     <string name="device_instruction_bluetooth">1. Bluetooth</string>

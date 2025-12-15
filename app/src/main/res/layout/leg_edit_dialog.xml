@@ -1,86 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:padding="10dp"
-    android:layout_height="match_parent">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-        <TextView
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:text="@string/manual_edit_distance"
-            >
-            <requestFocus />
-            </TextView>
-        <EditText
-            android:id="@+id/editDistance"
-            android:layout_width="100dp"
-            android:layout_height="50dp"
-            android:inputType="number|numberDecimal"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/azimuth_standard"
-        android:layout_width="wrap_content"
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="visible"
-        >
-        <TextView
-            android:layout_width="100dp"
+        android:hint="@string/manual_edit_distance"
+        app:errorEnabled="true"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editDistance"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/manual_edit_azimuth"
-            />
-        <EditText
+            android:inputType="numberDecimal">
+            <requestFocus />
+        </com.google.android.material.textfield.TextInputEditText>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/azimuth_standard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="@string/manual_edit_azimuth"
+        android:visibility="visible"
+        app:errorEnabled="true"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/editAzimuth"
-            android:layout_width="100dp"
-            android:layout_height="50dp"
-            android:inputType="number|numberDecimal"/>
-    </LinearLayout>
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"/>
+    </com.google.android.material.textfield.TextInputLayout>
 
     <LinearLayout
         android:id="@+id/azimuth_deg_mins_secs"
-        android:visibility="gone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-        <TextView
-            android:layout_width="100dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal"
+        android:visibility="gone">
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/manual_edit_azimuth_deg_mins_secs"
-            />
-        <EditText
-            android:id="@+id/editAzimuthDegrees"
-            android:layout_width="40dp"
-            android:layout_height="50dp"
-            android:inputType="number"/>
-        <EditText
-            android:id="@+id/editAzimuthMinutes"
-            android:layout_width="40dp"
-            android:layout_height="50dp"
-            android:inputType="number"/>
-        <EditText
-            android:id="@+id/editAzimuthSeconds"
-            android:layout_width="40dp"
-            android:layout_height="50dp"
-            android:inputType="number"/>
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:hint="@string/deg"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editAzimuthDegrees"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"/>
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:hint="@string/min"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editAzimuthMinutes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"/>
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:hint="@string/sec"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editAzimuthSeconds"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"/>
+        </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-        <TextView
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:text="@string/manual_edit_inclination"
-            />
-        <EditText
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="@string/manual_edit_inclination"
+        app:errorEnabled="true"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/editInclination"
-            android:layout_width="100dp"
-            android:layout_height="50dp"
-            android:inputType="number|numberDecimal|numberSigned"/>
-    </LinearLayout>
-
-
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal|numberSigned"/>
+    </com.google.android.material.textfield.TextInputLayout>
 
 </LinearLayout>
