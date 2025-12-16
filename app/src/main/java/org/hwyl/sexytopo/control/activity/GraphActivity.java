@@ -515,7 +515,7 @@ public abstract class GraphActivity extends SurveyEditorActivity
     }
 
     @Override
-    protected void handleNewCrossSection(Station station) {
+    public void onNewCrossSection(Station station) {
         graphView.handleNewCrossSection(station);
     }
 
