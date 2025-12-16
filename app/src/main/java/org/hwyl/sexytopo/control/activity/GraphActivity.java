@@ -510,28 +510,13 @@ public abstract class GraphActivity extends SurveyEditorActivity
     }
 
     @Override
-    protected void setActiveStation(Station station) {
-        graphView.setActiveStation(station);
-    }
-
-    @Override
     protected void invalidateView() {
         graphView.invalidate();
     }
 
     @Override
-    protected void openCommentDialog(Station station) {
-        graphView.openCommentDialog(station);
-    }
-
-    @Override
     protected void handleNewCrossSection(Station station) {
         graphView.handleNewCrossSection(station);
-    }
-
-    @Override
-    protected void askAboutDeletingStation(Station station) {
-        graphView.askAboutDeletingStation(station);
     }
 
 }
