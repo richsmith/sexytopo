@@ -18,7 +18,7 @@
         android:id="@+id/graph_station_jump_to_table"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/abc_cab_background_internal_bg"
+        style="@style/ContextMenuButton"
         android:text="@string/menu_jump_to_station_in_table"
         android:padding="10dp"/>
 
@@ -26,7 +26,7 @@
         android:id="@+id/graph_station_delete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/abc_cab_background_internal_bg"
+        style="@style/ContextMenuButton"
         android:text="Delete"
         android:padding="10dp"/>
 
@@ -34,7 +34,7 @@
         android:id="@+id/graph_station_reverse"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/abc_cab_background_internal_bg"
+        style="@style/ContextMenuButton"
         android:text="Reverse"
         android:padding="10dp"/>
 
@@ -42,7 +42,7 @@
         android:id="@+id/graph_station_switchback"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/abc_cab_background_internal_bg"
+        style="@style/ContextMenuButton"
         android:text="Switch Direction"
         android:visibility="gone"/>
 

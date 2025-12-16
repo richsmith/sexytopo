@@ -30,7 +30,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.graph.GraphView;
-import org.hwyl.sexytopo.control.graph.StationContextMenu;
 import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.model.graph.Coord2D;
@@ -45,7 +44,7 @@ import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 
-public abstract class GraphActivity extends SexyTopoActivity
+public abstract class GraphActivity extends SurveyEditorActivity
         implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
 
     private static final float ZOOM_INCREMENT = 1.1f;
@@ -510,8 +509,29 @@ public abstract class GraphActivity extends SexyTopoActivity
         }
     }
 
-    public PopupWindow getContextMenu(Station station, View.OnClickListener listener) {
-        return new StationContextMenu().getFakeStationContextMenu(this, station, listener);
+    @Override
+    protected void setActiveStation(Station station) {
+        graphView.setActiveStation(station);
+    }
+
+    @Override
+    protected void invalidateView() {
+        graphView.invalidate();
+    }
+
+    @Override
+    protected void openCommentDialog(Station station) {
+        graphView.openCommentDialog(station);
+    }
+
+    @Override
+    protected void handleNewCrossSection(Station station) {
+        graphView.handleNewCrossSection(station);
+    }
+
+    @Override
+    protected void askAboutDeletingStation(Station station) {
+        graphView.askAboutDeletingStation(station);
     }
 
 }
