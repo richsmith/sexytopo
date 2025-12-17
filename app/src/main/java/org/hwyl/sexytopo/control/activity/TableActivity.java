@@ -26,7 +26,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
-import org.hwyl.sexytopo.control.table.ManualEntry;
+import org.hwyl.sexytopo.control.table.LegDialogs;
 import org.hwyl.sexytopo.control.table.TableRowAdapter;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
@@ -245,13 +245,13 @@ public class TableActivity extends SexyTopoActivity
             if (toRename == Survey.NULL_STATION) {
                 showSimpleToast(R.string.context_rename_splay_error);
             } else {
-                ManualEntry.renameStation(this, getSurvey(), toRename);
+                LegDialogs.renameStation(this, getSurvey(), toRename);
             }
             return true;
         } else if (itemId == R.id.editLeg) {
             Station fromStation = surveyEntry.getFrom();
             Leg toEdit = surveyEntry.getLeg();
-            ManualEntry.editLeg(this, getSurvey(), fromStation, toEdit);
+            LegDialogs.editLeg(this, getSurvey(), fromStation, toEdit);
             return true;
         } else if (itemId == R.id.moveRow) {
             final Leg toMove = surveyEntry.getLeg();
@@ -345,15 +345,15 @@ public class TableActivity extends SexyTopoActivity
 
     public void manuallyAddStation(View view) {
         if (GeneralPreferences.isManualLrudModeOn()) {
-            ManualEntry.addStationWithLruds(this, getSurvey());
+            LegDialogs.addStationWithLruds(this, getSurvey());
         } else {
-            ManualEntry.addStation(this, getSurvey());
+            LegDialogs.addStation(this, getSurvey());
         }
     }
 
 
     public void manuallyAddSplay(View view) {
-        ManualEntry.addSplay(this, getSurvey());
+        LegDialogs.addSplay(this, getSurvey());
     }
 
     public void deleteLastLeg(View view) {

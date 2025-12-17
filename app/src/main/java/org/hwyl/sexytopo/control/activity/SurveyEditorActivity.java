@@ -11,7 +11,7 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.graph.ContextMenuManager;
-import org.hwyl.sexytopo.control.table.ManualEntry;
+import org.hwyl.sexytopo.control.table.LegDialogs;
 import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.control.util.TextTools;
@@ -96,7 +96,7 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         }
 
         // Call the unified edit leg dialog
-        ManualEntry.editLeg(this, getSurvey(), fromStation, leg);
+        LegDialogs.editLeg(this, getSurvey(), fromStation, leg);
     }
 
     public void onDeleteStation(Station station) {

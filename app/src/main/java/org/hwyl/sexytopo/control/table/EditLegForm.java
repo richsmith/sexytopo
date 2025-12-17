@@ -24,15 +24,24 @@ public class EditLegForm extends Form {
     EditText azimuthField;
     EditText inclinationField;
 
-    public EditLegForm(Survey survey, Station fromStation, Leg leg,
+    // Deg/Min/Sec fields (optional, used when in deg/min/sec mode)
+    EditText azimuthDegreesField;
+    EditText azimuthMinutesField;
+    EditText azimuthSecondsField;
+
+    /**
+     * Constructor for editing an existing leg
+     */
+    public EditLegForm(Survey survey, Station fromStation, Leg legToEdit,
                        TextInputLayout fromStationLayout, EditText fromStationField,
                        TextInputLayout toStationLayout, EditText toStationField,
-                       EditText distanceField, EditText azimuthField, EditText inclinationField) {
+                       EditText distanceField, EditText azimuthField, EditText inclinationField,
+                       EditText azimuthDegreesField, EditText azimuthMinutesField, EditText azimuthSecondsField) {
         super();
         this.survey = survey;
-        this.originalLeg = leg;
+        this.originalLeg = legToEdit;
         this.originalFromStation = fromStation;
-        this.isSplay = !leg.hasDestination();
+        this.isSplay = !legToEdit.hasDestination();
 
         // Use the provided layouts and fields from the dialog
         this.fromStationLayout = fromStationLayout;
@@ -42,6 +51,9 @@ public class EditLegForm extends Form {
         this.distanceField = distanceField;
         this.azimuthField = azimuthField;
         this.inclinationField = inclinationField;
+        this.azimuthDegreesField = azimuthDegreesField;
+        this.azimuthMinutesField = azimuthMinutesField;
+        this.azimuthSecondsField = azimuthSecondsField;
 
         // Set up validation listeners
         this.fromStationField.addTextChangedListener(new TextViewValidationTrigger(this));
@@ -52,19 +64,63 @@ public class EditLegForm extends Form {
         this.azimuthField.addTextChangedListener(new TextViewValidationTrigger(this));
         this.inclinationField.addTextChangedListener(new TextViewValidationTrigger(this));
 
-        // Populate the fields
+        // Populate the fields from the leg being edited
         this.fromStationField.setText(fromStation.getName());
         if (!isSplay) {
-            this.toStationField.setText(leg.getDestination().getName());
+            this.toStationField.setText(legToEdit.getDestination().getName());
+        }
+    }
+
+    /**
+     * Constructor for adding a new leg (no existing leg to edit)
+     */
+    public EditLegForm(Survey survey, Station defaultFromStation, String defaultToName, boolean isSplay,
+                       TextInputLayout fromStationLayout, EditText fromStationField,
+                       TextInputLayout toStationLayout, EditText toStationField,
+                       EditText distanceField, EditText azimuthField, EditText inclinationField,
+                       EditText azimuthDegreesField, EditText azimuthMinutesField, EditText azimuthSecondsField) {
+        super();
+        this.survey = survey;
+        this.originalLeg = null;  // No original leg when adding
+        this.originalFromStation = defaultFromStation;
+        this.isSplay = isSplay;
+
+        // Use the provided layouts and fields from the dialog
+        this.fromStationLayout = fromStationLayout;
+        this.fromStationField = fromStationField;
+        this.toStationLayout = toStationLayout;
+        this.toStationField = toStationField;
+        this.distanceField = distanceField;
+        this.azimuthField = azimuthField;
+        this.inclinationField = inclinationField;
+        this.azimuthDegreesField = azimuthDegreesField;
+        this.azimuthMinutesField = azimuthMinutesField;
+        this.azimuthSecondsField = azimuthSecondsField;
+
+        // Set up validation listeners
+        this.fromStationField.addTextChangedListener(new TextViewValidationTrigger(this));
+        if (!isSplay) {
+            this.toStationField.addTextChangedListener(new TextViewValidationTrigger(this));
+        }
+        this.distanceField.addTextChangedListener(new TextViewValidationTrigger(this));
+        this.azimuthField.addTextChangedListener(new TextViewValidationTrigger(this));
+        this.inclinationField.addTextChangedListener(new TextViewValidationTrigger(this));
+
+        // Populate with defaults for new leg
+        this.fromStationField.setText(defaultFromStation.getName());
+        if (!isSplay && defaultToName != null) {
+            this.toStationField.setText(defaultToName);
         }
     }
 
     @Override
     protected void performValidation() {
+        // Validate stations
         validateFromStation();
         if (!isSplay) {
             validateToStation();
         }
+        // Validate measurements
         validateDistance();
         validateAzimuth();
         validateInclination();
@@ -90,7 +146,6 @@ public class EditLegForm extends Form {
     private void validateToStation() {
         String toStationName = this.toStationField.getText().toString();
         String fromStationName = this.fromStationField.getText().toString();
-        String currentToStationName = originalLeg.getDestination().getName();
 
         if (toStationName.isEmpty()) {
             setError(this.toStationField, "Cannot be blank");
@@ -98,16 +153,28 @@ public class EditLegForm extends Form {
             setError(this.toStationField, "Station cannot be named \"-\"");
         } else if (toStationName.equals(fromStationName)) {
             setError(this.toStationField, "Cannot be the same as from station");
-        } else if (!toStationName.equals(currentToStationName)) {
-            // Only check for uniqueness if we're changing the name
-            Station existing = survey.getStationByName(toStationName);
-            if (existing != null) {
-                setError(this.toStationField, "Station name must be unique");
+        } else {
+            // Check if we need to validate uniqueness
+            boolean needsUniquenessCheck = true;
+
+            // For edit mode: only check uniqueness if name is changing
+            if (originalLeg != null && originalLeg.hasDestination()) {
+                String currentToStationName = originalLeg.getDestination().getName();
+                if (toStationName.equals(currentToStationName)) {
+                    needsUniquenessCheck = false;
+                }
+            }
+
+            if (needsUniquenessCheck) {
+                Station existing = survey.getStationByName(toStationName);
+                if (existing != null) {
+                    setError(this.toStationField, "Station name must be unique");
+                } else {
+                    setError(this.toStationField, null);
+                }
             } else {
                 setError(this.toStationField, null);
             }
-        } else {
-            setError(this.toStationField, null);
         }
     }
 
@@ -171,5 +238,59 @@ public class EditLegForm extends Form {
 
     public String getToStationName() {
         return this.toStationField.getText().toString();
+    }
+
+    /**
+     * Parse and return the distance value
+     * Should only be called after validation passes
+     */
+    public float getDistance() {
+        return Float.parseFloat(this.distanceField.getText().toString());
+    }
+
+    /**
+     * Parse and return the inclination value
+     * Should only be called after validation passes
+     */
+    public float getInclination() {
+        return Float.parseFloat(this.inclinationField.getText().toString());
+    }
+
+    /**
+     * Parse and return the azimuth value
+     * Handles both standard decimal and deg/min/sec modes
+     * Should only be called after validation passes
+     */
+    public float getAzimuth() {
+        // Check if we're using deg/min/sec mode by checking if those fields have values
+        if (azimuthDegreesField != null && azimuthDegreesField.getText().length() > 0) {
+            float degrees = Float.parseFloat(azimuthDegreesField.getText().toString());
+            float minutes = Float.parseFloat(azimuthMinutesField.getText().toString());
+            float seconds = Float.parseFloat(azimuthSecondsField.getText().toString());
+            return degrees + (minutes * (1.0f / 60.0f)) + (seconds * (1.0f / 60.0f) * (1.0f / 60.0f));
+        } else {
+            // Standard decimal mode
+            return Float.parseFloat(this.azimuthField.getText().toString());
+        }
+    }
+
+    /**
+     * Look up and return the from station
+     * Should only be called after validation passes
+     */
+    public Station getFromStation() {
+        return survey.getStationByName(getFromStationName());
+    }
+
+    /**
+     * Look up and return the to station
+     * Only valid for full legs (not splays)
+     * Should only be called after validation passes
+     */
+    public Station getToStation() {
+        if (isSplay) {
+            throw new IllegalStateException("Cannot get to station for a splay");
+        }
+        return survey.getStationByName(getToStationName());
     }
 }
