@@ -46,6 +46,7 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
         }};
 
     public interface OnRowClickListener {
+        void onRowClick(View view, GraphToListTranslator.SurveyListEntry entry, TableCol col);
         void onRowLongClick(View view, GraphToListTranslator.SurveyListEntry entry, TableCol col);
     }
 
@@ -154,6 +155,13 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
             fieldToSurveyEntry.put(textView, entry);
             fieldToTableCol.put(textView, col);
             viewToPosition.put(textView, position);
+
+            // Set click listener
+            textView.setOnClickListener(v -> {
+                if (onRowClickListener != null) {
+                    onRowClickListener.onRowClick(v, entry, col);
+                }
+            });
 
             // Set long click listener
             textView.setOnLongClickListener(v -> {

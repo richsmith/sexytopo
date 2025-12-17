@@ -169,6 +169,13 @@ public class TableActivity extends SexyTopoActivity
     }
 
     @Override
+    public void onRowClick(View view, GraphToListTranslator.SurveyListEntry entry, TableCol col) {
+        Station fromStation = entry.getFrom();
+        Leg leg = entry.getLeg();
+        LegDialogs.editLeg(this, getSurvey(), fromStation, leg);
+    }
+
+    @Override
     public void onRowLongClick(View view, GraphToListTranslator.SurveyListEntry entry, TableCol col) {
         TextView textView = (TextView) view;
         cellBeingClicked = textView;
