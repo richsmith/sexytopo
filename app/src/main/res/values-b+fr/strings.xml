@@ -187,6 +187,7 @@
     <string name="manual_add_station_title">Ajouter une station</string>
     <string name="manual_add_splay_title">Ajouter une radiale</string>
     <string name="manual_edit_leg_title">Modifier le segment</string>
+    <string name="manual_edit_splay_title">Modifier la radiale</string>
     <string name="manual_edit_distance">Distance (m)</string>
     <string name="manual_edit_distance_error">Distance incorrecte</string>
     <string name="manual_edit_azimuth">Azimut (&#176;)</string>
@@ -201,6 +202,10 @@
     <string name="manual_edit_right">Droite (m)</string>
     <string name="manual_edit_up">Haut (m)</string>
     <string name="manual_edit_down">Bas (m)</string>
+    <string name="manual_edit_from_station">Station de départ</string>
+    <string name="manual_edit_from_station_error">Station de départ invalide</string>
+    <string name="manual_edit_to_station">Station d\'arrivée</string>
+    <string name="manual_edit_to_station_error">Station d\'arrivée invalide</string>
     <string name="manual_rename_station_title">Renommer la station</string>
     <string name="manual_rename_station_hint">Nom de la station</string>
     <string name="manual_rename_error">Échec du renommage</string>

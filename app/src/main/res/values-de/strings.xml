@@ -186,6 +186,7 @@
     <string name="manual_add_station_title">Messpunkt hinzufügen</string>
     <string name="manual_add_splay_title">Dimension oder Hilfslinie hinzufügen</string>
     <string name="manual_edit_leg_title">Messstrecke bearbeiten</string>
+    <string name="manual_edit_splay_title">Peilung bearbeiten</string>
     <string name="manual_edit_distance">Distanz (m)</string>
     <string name="manual_edit_distance_error">Fehlerhafte Distanzmessung</string>
     <string name="manual_edit_azimuth">Azimut (°)</string>
@@ -200,6 +201,10 @@
     <string name="manual_edit_right">Rechts (m)</string>
     <string name="manual_edit_up">Nach oben (m)</string>
     <string name="manual_edit_down">Nach unten (m)</string>
+    <string name="manual_edit_from_station">Von Station</string>
+    <string name="manual_edit_from_station_error">Ungültige Startstation</string>
+    <string name="manual_edit_to_station">Zur Station</string>
+    <string name="manual_edit_to_station_error">Ungültige Zielstation</string>
     <string name="manual_rename_station_title">Messpunkt umbenennen</string>
     <string name="manual_rename_station_hint">Stationsname</string>
     <string name="manual_rename_error">Umbenennen fehlgeschlagen</string>
