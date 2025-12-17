@@ -98,7 +98,7 @@ public class ManualEntry {
 
         builder
             .setView(dialogView)
-            .setTitle(R.string.manual_edit_leg_title)
+            .setTitle(toEdit.hasDestination() ? R.string.manual_edit_leg_title : R.string.manual_edit_splay_title)
             .setPositiveButton(R.string.save, null)
             .setNegativeButton(R.string.cancel, null);
 

@@ -192,6 +192,7 @@
     <string name="manual_add_station_title">Add Station</string>
     <string name="manual_add_splay_title">Add Splay</string>
     <string name="manual_edit_leg_title">Edit Leg</string>
+    <string name="manual_edit_splay_title">Edit Splay</string>
     <string name="manual_edit_distance">Distance (m)</string>
     <string name="manual_edit_distance_error">Bad distance</string>
     <string name="manual_edit_azimuth">Azimuth (&#176;)</string>
