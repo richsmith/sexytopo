@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.control.activity;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.view.Gravity;
 import android.view.WindowManager;
@@ -10,10 +11,12 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.graph.ContextMenuManager;
+import org.hwyl.sexytopo.control.table.ManualEntry;
 import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Direction;
+import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 
 /**
@@ -79,8 +82,21 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
     }
 
     public void onEditLeg(Station station) {
-        // Default: not applicable in some views
-        // Override in activities that support leg editing
+        // Get the leg that leads to this station
+        Leg leg = getSurvey().getReferringLeg(station);
+        if (leg == null) {
+            // This is the origin station, cannot edit
+            return;
+        }
+
+        // Get the station this leg originates from
+        Station fromStation = getSurvey().getOriginatingStation(leg);
+        if (fromStation == null) {
+            return;
+        }
+
+        // Call the unified edit leg dialog
+        ManualEntry.editLeg(this, getSurvey(), fromStation, leg);
     }
 
     public void onDeleteStation(Station station) {
@@ -131,7 +147,7 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
                 })
             .setNegativeButton(R.string.cancel, null);
 
-        android.app.Dialog dialog = builder.create();
+        Dialog dialog = builder.create();
         dialog.getWindow().setSoftInputMode(
             WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         dialog.show();

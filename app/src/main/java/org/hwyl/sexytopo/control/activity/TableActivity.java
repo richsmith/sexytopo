@@ -249,8 +249,9 @@ public class TableActivity extends SexyTopoActivity
             }
             return true;
         } else if (itemId == R.id.editLeg) {
+            Station fromStation = surveyEntry.getFrom();
             Leg toEdit = surveyEntry.getLeg();
-            ManualEntry.editLeg(this, getSurvey(), toEdit);
+            ManualEntry.editLeg(this, getSurvey(), fromStation, toEdit);
             return true;
         } else if (itemId == R.id.moveRow) {
             final Leg toMove = surveyEntry.getLeg();
