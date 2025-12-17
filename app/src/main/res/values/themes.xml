@@ -14,7 +14,7 @@
         <item name="colorSecondary">@color/sexyTopoGreen</item>
 
         <!-- Surface colors for menus and popups -->
-        <item name="colorSurface">@android:color/white</item>
+        <item name="colorSurface">@color/dialogSurface</item>
         <item name="colorOnSurface">@android:color/black</item>
 
         <!-- Material dialog styling -->

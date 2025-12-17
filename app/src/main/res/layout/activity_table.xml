@@ -1,84 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/rootLayout"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:keepScreenOn="true">
-
-    <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/panelBackground">
-
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/panelBackground"
-            app:title="@string/title_activity_table"
-            app:titleTextColor="@color/white" />
-
-    </com.google.android.material.appbar.AppBarLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="@color/lightBackground">
+        android:orientation="vertical">
 
-        <!-- Header Row (fixed at top, scrolls with content below) -->
-        <TableLayout
-            android:id="@+id/HeaderTable"
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent">
-            <TableRow style="@style/HeaderRow">
-                <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_from"/>
-                <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_to"/>
-                <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_distance"/>
-                <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_azimuth"/>
-                <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_elevation"/>
-            </TableRow>
-        </TableLayout>
-
-        <!-- RecyclerView for scrollable content -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/tableRecyclerView"
+        <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:clipToPadding="false"/>
-
-        <!-- Toolbar -->
-        <RelativeLayout
-            android:id="@+id/relativeLayout1"
-            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:background="@color/panelBackground">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-                <ImageButton
-                    android:id="@+id/buttonAddStation"
-                    android:layout_width="@dimen/toolbar_button_height"
-                    android:layout_height="@dimen/toolbar_button_height"
-                    android:src="@drawable/add"
-                    android:scaleType="fitCenter"
-                    android:onClick="manuallyAddStation"/>
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@color/panelBackground"
+                app:title="@string/title_activity_table"
+                app:titleTextColor="@color/white" />
 
-                <ImageButton
-                    android:id="@+id/buttonAddSplay"
-                    android:layout_width="@dimen/toolbar_button_height"
-                    android:layout_height="@dimen/toolbar_button_height"
-                    android:src="@drawable/add_splay"
-                    android:scaleType="fitCenter"
-                    android:onClick="manuallyAddSplay"/>
-            </LinearLayout>
+        </com.google.android.material.appbar.AppBarLayout>
 
-        </RelativeLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="@color/lightBackground">
+
+            <!-- Header Row (fixed at top, scrolls with content below) -->
+            <TableLayout
+                android:id="@+id/HeaderTable"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent">
+                <TableRow style="@style/HeaderRow">
+                    <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_from"/>
+                    <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_to"/>
+                    <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_distance"/>
+                    <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_azimuth"/>
+                    <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_elevation"/>
+                </TableRow>
+            </TableLayout>
+
+            <!-- RecyclerView for scrollable content -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/tableRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 
-</LinearLayout>
+    <!-- Mini FAB for Add Splay (positioned above primary FAB) -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddSplay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:contentDescription="@string/manual_add_splay_title"
+        app:fabSize="mini"
+        app:srcCompat="@drawable/add_splay" />
+
+    <!-- Primary FAB for Add Station -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddStation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:contentDescription="@string/manual_add_station_title"
+        app:srcCompat="@drawable/add" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

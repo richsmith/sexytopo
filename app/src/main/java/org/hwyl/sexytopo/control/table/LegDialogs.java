@@ -114,8 +114,10 @@ public class LegDialogs {
             .setNegativeButton(R.string.cancel, null);
 
         final AlertDialog dialog = builder.create();
-        dialog.getWindow().setSoftInputMode(
-                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setSoftInputMode(
+                    WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        }
         dialog.show();
 
         // Set up validation callback
@@ -231,8 +233,10 @@ public class LegDialogs {
 
         final AlertDialog dialog = builder.create();
 
-        dialog.getWindow().setSoftInputMode(
-                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setSoftInputMode(
+                    WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        }
         dialog.show();
 
         // Populate fields with current values
@@ -411,8 +415,10 @@ public class LegDialogs {
             positiveButton.setEnabled(valid);
         });
 
-        dialog.getWindow().setSoftInputMode(
-            WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        }
         dialog.show();
     }
 

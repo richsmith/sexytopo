@@ -19,6 +19,9 @@
     <color name="headerBackground">@color/md_sexy_dark_green</color>
     <color name="innerPanelBackground">@color/md_dark_surface</color>
 
+    <!-- Dialogs -->
+    <color name="dialogSurface">@color/md_dark_surface_dim</color>
+
     <!-- Tables -->
     <color name="tableBackground">@color/md_dark_surface</color>
     <color name="tableBackgroundAlt">@color/md_dark_surface_dim</color>

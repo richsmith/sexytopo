@@ -17,12 +17,17 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
@@ -67,7 +72,15 @@ public class TableActivity extends SexyTopoActivity
         tableRowAdapter = new TableRowAdapter(this, getSurvey(), this);
         recyclerView.setAdapter(tableRowAdapter);
 
-        applyEdgeToEdgeInsets(R.id.rootLayout, true, true);
+        // Set up FAB click listeners
+        findViewById(R.id.fabAddStation).setOnClickListener(v -> manuallyAddStation());
+        findViewById(R.id.fabAddSplay).setOnClickListener(v -> manuallyAddSplay());
+
+        // Allow content to scroll behind bottom nav bar (translucent effect)
+        applyEdgeToEdgeInsets(R.id.rootLayout, true, false);
+
+        // Position FABs dynamically above navigation bar
+        setupFabPositioning();
 
         receiver = new BroadcastReceiver() {
             @Override
@@ -75,6 +88,38 @@ public class TableActivity extends SexyTopoActivity
                 syncTableWithSurvey();
             }
         };
+    }
+
+    private void setupFabPositioning() {
+        View rootLayout = findViewById(R.id.rootLayout);
+        FloatingActionButton fabAddStation = findViewById(R.id.fabAddStation);
+        FloatingActionButton fabAddSplay = findViewById(R.id.fabAddSplay);
+
+        ViewCompat.setOnApplyWindowInsetsListener(rootLayout, (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            int statusBarHeight = systemBars.top;
+            int navBarHeight = systemBars.bottom;
+
+            // Apply top padding for status bar
+            rootLayout.setPadding(0, statusBarHeight, 0, 0);
+
+            // Position primary FAB above nav bar with base margin
+            CoordinatorLayout.LayoutParams stationParams = (CoordinatorLayout.LayoutParams) fabAddStation.getLayoutParams();
+            stationParams.bottomMargin = navBarHeight + dpToPx(16);
+            fabAddStation.setLayoutParams(stationParams);
+
+            // Position mini FAB above primary FAB
+            CoordinatorLayout.LayoutParams splayParams = (CoordinatorLayout.LayoutParams) fabAddSplay.getLayoutParams();
+            splayParams.bottomMargin = navBarHeight + dpToPx(88);
+            fabAddSplay.setLayoutParams(splayParams);
+
+            return insets;
+        });
+    }
+
+    private int dpToPx(int dp) {
+        float density = getResources().getDisplayMetrics().density;
+        return Math.round(dp * density);
     }
 
     private void measureAndSyncHeaderWidths() {
@@ -350,7 +395,7 @@ public class TableActivity extends SexyTopoActivity
     }
 
 
-    public void manuallyAddStation(View view) {
+    private void manuallyAddStation() {
         if (GeneralPreferences.isManualLrudModeOn()) {
             LegDialogs.addStationWithLruds(this, getSurvey());
         } else {
@@ -358,8 +403,7 @@ public class TableActivity extends SexyTopoActivity
         }
     }
 
-
-    public void manuallyAddSplay(View view) {
+    private void manuallyAddSplay() {
         LegDialogs.addSplay(this, getSurvey());
     }
 

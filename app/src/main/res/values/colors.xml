@@ -76,6 +76,9 @@
     <color name="headerBackground">@color/md_sexy_green</color>
     <color name="innerPanelBackground">@color/md_grey_100</color>
 
+    <!-- Dialogs -->
+    <color name="dialogSurface">@color/md_white</color>
+
     <!-- Tables -->
     <color name="tableBackground">@color/md_white</color>
     <color name="tableBackgroundAlt">@color/md_light_surface</color>
