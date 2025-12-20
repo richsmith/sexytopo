@@ -136,8 +136,7 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         getSurveyManager().broadcastSurveyUpdated();
     }
 
-    public void onUpgradeSplay(Station station) {
-        Leg leg = getSurvey().getReferringLeg(station);
+    public void onUpgradeSplay(Leg leg) {
         if (leg == null || leg.hasDestination()) {
             return;
         }
@@ -146,8 +145,7 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         getSurveyManager().broadcastSurveyUpdated();
     }
 
-    public void onDowngradeLeg(Station station) {
-        Leg leg = getSurvey().getReferringLeg(station);
+    public void onDowngradeLeg(Leg leg) {
         if (leg == null || !leg.hasDestination()) {
             return;
         }

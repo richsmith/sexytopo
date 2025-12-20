@@ -22,6 +22,7 @@ import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.core.content.ContextCompat;
 
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
@@ -41,6 +42,9 @@ public class ContextMenuManager {
     private final ViewContext viewContext;
     private final org.hwyl.sexytopo.control.activity.SurveyEditorActivity activity;
     private final Map<Integer, Consumer<Station>> menuActions;
+
+    // Store the current leg context for actions that need it
+    private Leg currentLeg;
 
     public ContextMenuManager(Context context, ViewContext viewContext, org.hwyl.sexytopo.control.activity.SurveyEditorActivity activity) {
         this.context = context;
@@ -63,8 +67,7 @@ public class ContextMenuManager {
         menuActions.put(R.id.action_edit_leg, activity::onEditLeg);
         menuActions.put(R.id.action_delete_station, activity::onDeleteStation);
         menuActions.put(R.id.action_delete_leg, activity::onDeleteLeg);
-        menuActions.put(R.id.action_upgrade_splay, activity::onUpgradeSplay);
-        menuActions.put(R.id.action_downgrade_leg, activity::onDowngradeLeg);
+        // Note: upgrade_splay and downgrade_leg are handled specially in handleMenuItemClick
     }
 
     /**
@@ -166,8 +169,11 @@ public class ContextMenuManager {
      * @param onDismiss Optional callback when menu is dismissed
      * @param leg The specific leg clicked on (or null to infer from station)
      */
-    public void showMenu(View anchorView, Station station, org.hwyl.sexytopo.model.survey.Survey survey,
-                        String customTitle, Runnable onDismiss, org.hwyl.sexytopo.model.survey.Leg leg) {
+    public void showMenu(View anchorView, Station station, Survey survey,
+                        String customTitle, Runnable onDismiss, Leg leg) {
+        // Store the leg for action handlers
+        this.currentLeg = leg;
+
         PopupMenu popup = new PopupMenu(context, anchorView);
         popup.inflate(R.menu.station_context);
 
@@ -205,7 +211,7 @@ public class ContextMenuManager {
      * Configure which menu items are visible based on the current view context.
      * @param leg The specific leg clicked on (or null to infer from station)
      */
-    private void configureMenuVisibility(Menu menu, Station station, Survey survey, org.hwyl.sexytopo.model.survey.Leg leg) {
+    private void configureMenuVisibility(Menu menu, Station station, Survey survey, Leg leg) {
         // Enable/disable unlink survey based on whether station has connections
         MenuItem unlinkItem = menu.findItem(R.id.action_unlink_survey);
         if (unlinkItem != null && survey != null) {
@@ -221,8 +227,7 @@ public class ContextMenuManager {
         // Configure upgrade/downgrade visibility and submenu title based on leg type
         if (survey != null) {
             // Use provided leg, or infer from station if not provided
-            org.hwyl.sexytopo.model.survey.Leg referringLeg =
-                (leg != null) ? leg : survey.getReferringLeg(station);
+            Leg referringLeg = (leg != null) ? leg : survey.getReferringLeg(station);
             MenuItem upgradeItem = menu.findItem(R.id.action_upgrade_splay);
             MenuItem downgradeItem = menu.findItem(R.id.action_downgrade_leg);
             MenuItem legSubmenu = menu.findItem(R.id.menu_leg);
@@ -233,7 +238,10 @@ public class ContextMenuManager {
                     upgradeItem.setVisible(isSplay);
                 }
                 if (downgradeItem != null) {
-                    downgradeItem.setVisible(!isSplay);
+                    // Only show downgrade if it's a full leg AND destination has no onward legs
+                    boolean canDowngrade = !isSplay &&
+                        referringLeg.getDestination().getOnwardLegs().isEmpty();
+                    downgradeItem.setVisible(canDowngrade);
                 }
                 // Set submenu title based on leg type
                 if (legSubmenu != null) {
@@ -299,7 +307,19 @@ public class ContextMenuManager {
      * Handle menu item clicks and delegate to the appropriate listener method.
      */
     private boolean handleMenuItemClick(MenuItem item, Station station) {
-        Consumer<Station> action = menuActions.get(item.getItemId());
+        int itemId = item.getItemId();
+
+        // Special handling for upgrade/downgrade actions that need the leg
+        if (itemId == R.id.action_upgrade_splay && currentLeg != null) {
+            activity.onUpgradeSplay(currentLeg);
+            return true;
+        }
+        if (itemId == R.id.action_downgrade_leg && currentLeg != null) {
+            activity.onDowngradeLeg(currentLeg);
+            return true;
+        }
+
+        Consumer<Station> action = menuActions.get(itemId);
         if (action != null) {
             action.accept(station);
             return true;
