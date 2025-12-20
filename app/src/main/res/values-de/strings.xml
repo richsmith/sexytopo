@@ -508,7 +508,7 @@
     <string name="menu_toggle_left_right">Links/Rechts umschalten</string>
     <string name="menu_context_title_leg_to">Messung zu %s</string>
     <string name="menu_context_title_leg_from">Messung von %s</string>
-    <string name="menu_context_title_splay">%s Splay</string>
+    <string name="menu_context_title_splay">%s zu Splay</string>
     <string name="context_this_will_delete">Dadurch wird Folgendes gelöscht:</string>
     <string name="context_jump_to_splay_error">Kann nicht zum Ende einer Dimension/Hilfslinie springen</string>
     <string name="context_jump_to_station_error">Fehler beim Springen zum Messpunkt %1$s</string>

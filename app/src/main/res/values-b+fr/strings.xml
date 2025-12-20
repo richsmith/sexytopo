@@ -493,6 +493,9 @@
 
     <!-- Context menu(s) -->
     <string name="menu_context_title">Station</string>
+    <string name="menu_context_title_leg_to">Visée vers %s</string>
+    <string name="menu_context_title_leg_from">Visée depuis %s</string>
+    <string name="menu_context_title_splay">%s à Visée rayonnante</string>
     <string name="menu_leg">Visée</string>
     <string name="menu_splay">Visée rayonnante</string>
     <string name="menu_station">Station</string>

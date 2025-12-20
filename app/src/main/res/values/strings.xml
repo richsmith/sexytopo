@@ -530,7 +530,7 @@
     <string name="menu_toggle_left_right">Toggle Left/Right</string>
     <string name="menu_context_title_leg_to">Leg to %s</string>
     <string name="menu_context_title_leg_from">Leg from %s</string>
-    <string name="menu_context_title_splay">%s splay</string>
+    <string name="menu_context_title_splay">%s to Splay</string>
     <string name="context_this_will_delete">This will delete:</string>
     <string name="context_jump_to_splay_error">Cannot jump to a splay end</string>
     <string name="context_jump_to_station_error">Could not jump to station %1$s</string>
