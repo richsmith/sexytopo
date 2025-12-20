@@ -7,6 +7,29 @@
         android:title="@string/station"
         android:enabled="false"/>
 
+    <!-- Station actions sub-menu -->
+    <item
+        android:id="@+id/menu_station"
+        android:title="@string/menu_station">
+        <menu>
+            <item
+                android:id="@+id/action_set_active_station"
+                android:title="@string/menu_set_active_station"/>
+
+            <item
+                android:id="@+id/action_comment"
+                android:title="@string/menu_comment"/>
+
+            <item
+                android:id="@+id/action_rename_station"
+                android:title="@string/menu_rename_station"/>
+
+            <item
+                android:id="@+id/action_delete_station"
+                android:title="@string/menu_delete_station"/>
+        </menu>
+    </item>
+
     <!-- Leg actions sub-menu -->
     <item
         android:id="@+id/menu_leg"
@@ -55,29 +78,6 @@
                     android:title="@string/menu_draw_right"
                     android:checkable="true"/>
             </group>
-        </menu>
-    </item>
-
-    <!-- Station actions sub-menu -->
-    <item
-        android:id="@+id/menu_station"
-        android:title="@string/menu_station">
-        <menu>
-            <item
-                android:id="@+id/action_set_active_station"
-                android:title="@string/menu_set_active_station"/>
-
-            <item
-                android:id="@+id/action_comment"
-                android:title="@string/menu_comment"/>
-
-            <item
-                android:id="@+id/action_rename_station"
-                android:title="@string/menu_rename_station"/>
-
-            <item
-                android:id="@+id/action_delete_station"
-                android:title="@string/menu_delete_station"/>
         </menu>
     </item>
 

@@ -262,7 +262,7 @@ public class TableActivity extends SurveyEditorActivity
         }
 
         // Show menu with custom title and clear highlight on dismiss
-        contextMenuManager.showMenu(view, station, getSurvey(), customTitle, this::clearHighlight);
+        contextMenuManager.showMenu(view, station, getSurvey(), customTitle, this::clearHighlight, leg);
     }
 
     private void clearHighlight() {

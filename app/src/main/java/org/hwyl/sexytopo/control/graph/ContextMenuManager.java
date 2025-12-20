@@ -154,10 +154,24 @@ public class ContextMenuManager {
      */
     public void showMenu(View anchorView, Station station, org.hwyl.sexytopo.model.survey.Survey survey,
                         String customTitle, Runnable onDismiss) {
+        showMenu(anchorView, station, survey, customTitle, onDismiss, null);
+    }
+
+    /**
+     * Show the station context menu with explicit leg context.
+     * @param anchorView View to anchor the menu to
+     * @param station Station for this context menu
+     * @param survey Survey context
+     * @param customTitle Custom title to display (or null to use station name)
+     * @param onDismiss Optional callback when menu is dismissed
+     * @param leg The specific leg clicked on (or null to infer from station)
+     */
+    public void showMenu(View anchorView, Station station, org.hwyl.sexytopo.model.survey.Survey survey,
+                        String customTitle, Runnable onDismiss, org.hwyl.sexytopo.model.survey.Leg leg) {
         PopupMenu popup = new PopupMenu(context, anchorView);
         popup.inflate(R.menu.station_context);
 
-        configureMenuVisibility(popup.getMenu(), station, survey);
+        configureMenuVisibility(popup.getMenu(), station, survey, leg);
         if (customTitle != null) {
             setCustomTitle(popup.getMenu(), customTitle);
         } else {
@@ -184,6 +198,14 @@ public class ContextMenuManager {
      * Configure which menu items are visible based on the current view context.
      */
     private void configureMenuVisibility(Menu menu, Station station, Survey survey) {
+        configureMenuVisibility(menu, station, survey, null);
+    }
+
+    /**
+     * Configure which menu items are visible based on the current view context.
+     * @param leg The specific leg clicked on (or null to infer from station)
+     */
+    private void configureMenuVisibility(Menu menu, Station station, Survey survey, org.hwyl.sexytopo.model.survey.Leg leg) {
         // Enable/disable unlink survey based on whether station has connections
         MenuItem unlinkItem = menu.findItem(R.id.action_unlink_survey);
         if (unlinkItem != null && survey != null) {
@@ -198,7 +220,9 @@ public class ContextMenuManager {
 
         // Configure upgrade/downgrade visibility and submenu title based on leg type
         if (survey != null) {
-            org.hwyl.sexytopo.model.survey.Leg referringLeg = survey.getReferringLeg(station);
+            // Use provided leg, or infer from station if not provided
+            org.hwyl.sexytopo.model.survey.Leg referringLeg =
+                (leg != null) ? leg : survey.getReferringLeg(station);
             MenuItem upgradeItem = menu.findItem(R.id.action_upgrade_splay);
             MenuItem downgradeItem = menu.findItem(R.id.action_downgrade_leg);
             MenuItem legSubmenu = menu.findItem(R.id.menu_leg);
