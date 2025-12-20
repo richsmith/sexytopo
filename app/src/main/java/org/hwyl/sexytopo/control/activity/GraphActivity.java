@@ -418,13 +418,7 @@ public abstract class GraphActivity extends SurveyEditorActivity
     }
 
     private View getSymbolToolbar() {
-        // Have to have separate IDs because Android goes nuts if it tries to restore the state
-        // of a scroll view with the same ID in two different layouts
-        if (isInPortraitMode()) {
-            return findViewById(R.id.symbolToolbar);
-        } else {
-            return findViewById(R.id.symbolToolbarLandscape);
-        }
+        return findViewById(R.id.symbolToolbar);
     }
 
 
