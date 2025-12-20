@@ -480,12 +480,20 @@
 
     <!--  Context menu(s)  -->
     <string name="menu_context_title">Messpunkt</string>
-    <string name="menu_set_active_station">Messpunkt als aktiv setzen</string>
-    <string name="menu_rename_station">Messpunkt umbenennen</string>
-    <string name="menu_edit_leg">Zeile Bearbeiten</string>
+    <string name="menu_leg">Messung</string>
+    <string name="menu_splay">Splay</string>
+    <string name="menu_station">Messpunkt</string>
+    <string name="menu_set_active_station">Als aktiv setzen</string>
+    <string name="menu_rename_station">Umbenennen</string>
+    <string name="menu_edit_leg">Bearbeiten</string>
     <string name="menu_upgrade_row">Neuen Messpunkt erzwingen</string>
-    <string name="menu_delete_leg">Messstrecke löschen</string>
+    <string name="menu_upgrade_splay">Zu Messstrecke aufwerten</string>
+    <string name="menu_downgrade_leg">Zu Splay abwerten</string>
+    <string name="menu_delete_leg">Löschen</string>
     <string name="menu_delete_splay">Dimension oder Hilfslinie löschen</string>
+    <string name="menu_elevation">Aufriss</string>
+    <string name="menu_draw_left">Links zeichnen</string>
+    <string name="menu_draw_right">Rechts zeichnen</string>
     <string name="menu_move_row">Zu anderem Messpunkt wechseln</string>
     <string name="menu_jump_to">Springen</string>
     <string name="menu_jump_to_station_in_plan">→ Grundriss</string>
@@ -498,6 +506,9 @@
     <string name="menu_unlink_survey">Verknüpfung zu anderer Vermessungsdatei lösen</string>
     <string name="menu_comment">Kommentar</string>
     <string name="menu_toggle_left_right">Links/Rechts umschalten</string>
+    <string name="menu_context_title_leg_to">Messung zu %s</string>
+    <string name="menu_context_title_leg_from">Messung von %s</string>
+    <string name="menu_context_title_splay">%s Splay</string>
     <string name="context_this_will_delete">Dadurch wird Folgendes gelöscht:</string>
     <string name="context_jump_to_splay_error">Kann nicht zum Ende einer Dimension/Hilfslinie springen</string>
     <string name="context_jump_to_station_error">Fehler beim Springen zum Messpunkt %1$s</string>

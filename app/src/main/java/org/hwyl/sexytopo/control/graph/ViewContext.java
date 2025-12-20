@@ -1,6 +1,7 @@
 package org.hwyl.sexytopo.control.graph;
 
 import android.view.Menu;
+import android.view.MenuItem;
 
 import org.hwyl.sexytopo.R;
 
@@ -13,30 +14,37 @@ public enum ViewContext {
         @Override
         public void configureViewSpecificItems(Menu menu) {
             menu.findItem(R.id.action_jump_to_table).setVisible(false);
-            menu.findItem(R.id.action_toggle_left_right).setVisible(false);
+            setDirectionSubmenuVisible(menu, false);
         }
     },
     PLAN {
         @Override
         public void configureViewSpecificItems(Menu menu) {
             menu.findItem(R.id.action_jump_to_plan).setVisible(false);
-            menu.findItem(R.id.action_toggle_left_right).setVisible(true);
+            setDirectionSubmenuVisible(menu, false);
         }
     },
     ELEVATION {
         @Override
         public void configureViewSpecificItems(Menu menu) {
             menu.findItem(R.id.action_jump_to_elevation).setVisible(false);
-            menu.findItem(R.id.action_toggle_left_right).setVisible(false);
+            setDirectionSubmenuVisible(menu, false);
         }
     },
     EXTENDED_ELEVATION {
         @Override
         public void configureViewSpecificItems(Menu menu) {
             menu.findItem(R.id.action_jump_to_elevation).setVisible(false);
-            menu.findItem(R.id.action_toggle_left_right).setVisible(false);
+            setDirectionSubmenuVisible(menu, true);
         }
     };
 
     public abstract void configureViewSpecificItems(Menu menu);
+
+    protected void setDirectionSubmenuVisible(Menu menu, boolean visible) {
+        MenuItem elevationMenu = menu.findItem(R.id.menu_elevation);
+        if (elevationMenu != null) {
+            elevationMenu.setVisible(visible);
+        }
+    }
 }

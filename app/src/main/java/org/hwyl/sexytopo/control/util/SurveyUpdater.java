@@ -71,7 +71,7 @@ public class SurveyUpdater {
         if (!leg.hasDestination()) {
             Station newStation =
                     new Station(StationNamer.generateNextStationName(survey, activeStation));
-            leg = Leg.manuallyUpgradeSplayToConnectedLeg(leg, newStation);
+            leg = Leg.toFullLeg(leg, newStation);
         }
 
         // FIXME; could the below be moved into Survey? And from elsewhere in this file?
@@ -84,7 +84,7 @@ public class SurveyUpdater {
     public static void upgradeSplayToConnectedLeg(Survey survey, Leg leg, InputMode inputMode) {
         Station newStation = new Station(getNextStationName(survey));
 
-        Leg newLeg = Leg.manuallyUpgradeSplayToConnectedLeg(leg, newStation);
+        Leg newLeg = Leg.toFullLeg(leg, newStation);
 
         if (inputMode == InputMode.BACKWARD) {
             newLeg = newLeg.reverse();
@@ -181,7 +181,7 @@ public class SurveyUpdater {
                     activeStation.getExtendedElevationDirection());
 
             Leg newLeg = averageBacksights(fore, back);
-            newLeg = Leg.manuallyUpgradeSplayToConnectedLeg(newLeg, newStation);
+            newLeg = Leg.toFullLeg(newLeg, newStation);
 
             survey.undoAddLeg();
             survey.undoAddLeg();
@@ -245,26 +245,46 @@ public class SurveyUpdater {
             return;
         }
 
+        // Station comes as a package with the leg that forms it, so
+        // remove that to delete the station from the graph
         Leg referringLeg = survey.getReferringLeg(toDelete);
-        survey.removeLegRecord(referringLeg);
-
-        SurveyTools.traverseLegs(survey, (origin, leg) -> {
-            if (leg.hasDestination() && leg.getDestination() == toDelete) {
-                origin.getOnwardLegs().remove(leg);
-                survey.checkSurveyIntegrity();
-                return true;
-            } else {
-                return false;
-            }
-        });
-
-        survey.setSaved(false);
+        Station fromStation = survey.getOriginatingStation(referringLeg);
+        deleteLeg(survey, fromStation, referringLeg);
     }
 
 
-    public static void deleteSplay(Survey survey, Station station, Leg splay) {
-        survey.removeLegRecord(splay);
-        station.getOnwardLegs().remove(splay);
+    public static void deleteLeg(Survey survey, Station fromStation, Leg leg) {
+
+        // First remove all legs in the subtree from the survey record
+        SurveyTools.traverseLegs(
+            fromStation,
+            (origin, subLeg) -> {
+                survey.removeLegRecord(subLeg);
+                return false;
+            });
+
+        // Then remove the referring leg from its originating station
+        fromStation.getOnwardLegs().remove(leg);
+        survey.checkSurveyIntegrity();
+        survey.setSaved(false);
+    }
+
+    public static void downgradeLegToSplay(Survey survey, Leg leg) {
+        if (!leg.hasDestination()) {
+            // Already a splay, so nothing to do
+            return;
+        }
+
+        Station destination = leg.getDestination();
+
+        if (!destination.getOnwardLegs().isEmpty()) {
+            throw new IllegalStateException(
+                "Cannot downgrade leg to splay: destination station has onward legs");
+        }
+
+        Leg newSplay = leg.toSplay();
+        editLeg(survey, leg, newSplay);
+
         survey.checkSurveyIntegrity();
         survey.setSaved(false);
     }

@@ -12,6 +12,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.graph.ContextMenuManager;
 import org.hwyl.sexytopo.control.table.LegDialogs;
+import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.control.util.TextTools;
@@ -51,6 +52,22 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         SurveyUpdater.setDirectionOfSubtree(station, newDirection);
         getSurveyManager().broadcastSurveyUpdated();
         invalidateView();
+    }
+
+    public void onSetDirectionLeft(Station station) {
+        if (station.getExtendedElevationDirection() != Direction.LEFT) {
+            SurveyUpdater.setDirectionOfSubtree(station, Direction.LEFT);
+            getSurveyManager().broadcastSurveyUpdated();
+            invalidateView();
+        }
+    }
+
+    public void onSetDirectionRight(Station station) {
+        if (station.getExtendedElevationDirection() != Direction.RIGHT) {
+            SurveyUpdater.setDirectionOfSubtree(station, Direction.RIGHT);
+            getSurveyManager().broadcastSurveyUpdated();
+            invalidateView();
+        }
     }
 
     public void onReverse(Station station) {
@@ -102,6 +119,41 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
     public void onDeleteStation(Station station) {
         askAboutDeletingStation(station);
         invalidateView();
+    }
+
+    public void onDeleteLeg(Station station) {
+        Leg leg = getSurvey().getReferringLeg(station);
+        if (leg == null) {
+            return;
+        }
+
+        Station fromStation = getSurvey().getOriginatingStation(leg);
+        if (fromStation == null) {
+            return;
+        }
+
+        SurveyUpdater.deleteLeg(getSurvey(), fromStation, leg);
+        getSurveyManager().broadcastSurveyUpdated();
+    }
+
+    public void onUpgradeSplay(Station station) {
+        Leg leg = getSurvey().getReferringLeg(station);
+        if (leg == null || leg.hasDestination()) {
+            return;
+        }
+
+        SurveyUpdater.upgradeSplayToConnectedLeg(getSurvey(), leg, InputMode.FORWARD);
+        getSurveyManager().broadcastSurveyUpdated();
+    }
+
+    public void onDowngradeLeg(Station station) {
+        Leg leg = getSurvey().getReferringLeg(station);
+        if (leg == null || !leg.hasDestination()) {
+            return;
+        }
+
+        SurveyUpdater.downgradeLegToSplay(getSurvey(), leg);
+        getSurveyManager().broadcastSurveyUpdated();
     }
 
     /**

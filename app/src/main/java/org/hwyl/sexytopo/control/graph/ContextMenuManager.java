@@ -53,7 +53,8 @@ public class ContextMenuManager {
         menuActions.put(R.id.action_jump_to_table, activity::onJumpToTable);
         menuActions.put(R.id.action_jump_to_plan, activity::onJumpToPlan);
         menuActions.put(R.id.action_jump_to_elevation, activity::onJumpToElevation);
-        menuActions.put(R.id.action_toggle_left_right, activity::onToggleLeftRight);
+        menuActions.put(R.id.action_direction_left, activity::onSetDirectionLeft);
+        menuActions.put(R.id.action_direction_right, activity::onSetDirectionRight);
         menuActions.put(R.id.action_reverse, activity::onReverse);
         menuActions.put(R.id.action_new_cross_section, activity::onNewCrossSection);
         menuActions.put(R.id.action_start_new_survey, activity::onStartNewSurvey);
@@ -61,6 +62,9 @@ public class ContextMenuManager {
         menuActions.put(R.id.action_rename_station, activity::onRenameStation);
         menuActions.put(R.id.action_edit_leg, activity::onEditLeg);
         menuActions.put(R.id.action_delete_station, activity::onDeleteStation);
+        menuActions.put(R.id.action_delete_leg, activity::onDeleteLeg);
+        menuActions.put(R.id.action_upgrade_splay, activity::onUpgradeSplay);
+        menuActions.put(R.id.action_downgrade_leg, activity::onDowngradeLeg);
     }
 
     /**
@@ -137,13 +141,33 @@ public class ContextMenuManager {
      * @param survey Survey context (used to check linked surveys, origin station, etc.)
      */
     public void showMenu(View anchorView, Station station, org.hwyl.sexytopo.model.survey.Survey survey) {
+        showMenu(anchorView, station, survey, null, null);
+    }
+
+    /**
+     * Show the station context menu anchored to the given view with custom title.
+     * @param anchorView View to anchor the menu to
+     * @param station Station for this context menu
+     * @param survey Survey context (used to check linked surveys, origin station, etc.)
+     * @param customTitle Custom title to display (or null to use station name)
+     * @param onDismiss Optional callback when menu is dismissed
+     */
+    public void showMenu(View anchorView, Station station, org.hwyl.sexytopo.model.survey.Survey survey,
+                        String customTitle, Runnable onDismiss) {
         PopupMenu popup = new PopupMenu(context, anchorView);
         popup.inflate(R.menu.station_context);
 
         configureMenuVisibility(popup.getMenu(), station, survey);
-        setStationTitle(popup.getMenu(), station);
+        if (customTitle != null) {
+            setCustomTitle(popup.getMenu(), customTitle);
+        } else {
+            setStationTitle(popup.getMenu(), station);
+        }
 
         popup.setOnMenuItemClickListener(item -> handleMenuItemClick(item, station));
+        if (onDismiss != null) {
+            popup.setOnDismissListener(menu -> onDismiss.run());
+        }
         popup.show();
     }
 
@@ -172,6 +196,50 @@ public class ContextMenuManager {
             commentItem.setEnabled(station != survey.getOrigin());
         }
 
+        // Configure upgrade/downgrade visibility and submenu title based on leg type
+        if (survey != null) {
+            org.hwyl.sexytopo.model.survey.Leg referringLeg = survey.getReferringLeg(station);
+            MenuItem upgradeItem = menu.findItem(R.id.action_upgrade_splay);
+            MenuItem downgradeItem = menu.findItem(R.id.action_downgrade_leg);
+            MenuItem legSubmenu = menu.findItem(R.id.menu_leg);
+
+            if (referringLeg != null) {
+                boolean isSplay = !referringLeg.hasDestination();
+                if (upgradeItem != null) {
+                    upgradeItem.setVisible(isSplay);
+                }
+                if (downgradeItem != null) {
+                    downgradeItem.setVisible(!isSplay);
+                }
+                // Set submenu title based on leg type
+                if (legSubmenu != null) {
+                    legSubmenu.setTitle(isSplay ? R.string.menu_splay : R.string.menu_leg);
+                }
+            } else {
+                // No referring leg (origin station) - hide both
+                if (upgradeItem != null) {
+                    upgradeItem.setVisible(false);
+                }
+                if (downgradeItem != null) {
+                    downgradeItem.setVisible(false);
+                }
+                // Default to "Leg" title
+                if (legSubmenu != null) {
+                    legSubmenu.setTitle(R.string.menu_leg);
+                }
+            }
+        }
+
+        // Configure direction radio buttons based on current station direction
+        MenuItem leftItem = menu.findItem(R.id.action_direction_left);
+        MenuItem rightItem = menu.findItem(R.id.action_direction_right);
+        if (leftItem != null && rightItem != null) {
+            org.hwyl.sexytopo.model.graph.Direction currentDirection =
+                station.getExtendedElevationDirection();
+            leftItem.setChecked(currentDirection == org.hwyl.sexytopo.model.graph.Direction.LEFT);
+            rightItem.setChecked(currentDirection == org.hwyl.sexytopo.model.graph.Direction.RIGHT);
+        }
+
         // Configure view-specific menu items using polymorphism
         // Do this last so we can hide anything made visible above
         viewContext.configureViewSpecificItems(menu);
@@ -181,17 +249,24 @@ public class ContextMenuManager {
      * Set the menu title to show the station name with primary color background.
      */
     private void setStationTitle(Menu menu, Station station) {
+        setCustomTitle(menu, station.getName());
+    }
+
+    /**
+     * Set a custom menu title with primary color background.
+     */
+    private void setCustomTitle(Menu menu, String title) {
         MenuItem titleItem = menu.findItem(R.id.station_title);
         if (titleItem != null) {
-            String stationName = " " + station.getName() + " ";
-            SpannableString spannable = new SpannableString(stationName);
+            String displayTitle = " " + title + " ";
+            SpannableString spannable = new SpannableString(displayTitle);
 
             TypedValue typedValue = new TypedValue();
             context.getTheme().resolveAttribute(androidx.appcompat.R.attr.colorPrimary, typedValue, true);
             int backgroundColor = typedValue.data;
 
-            spannable.setSpan(new BackgroundColorSpan(backgroundColor), 0, stationName.length(), 0);
-            spannable.setSpan(new ForegroundColorSpan(Color.WHITE), 0, stationName.length(), 0);
+            spannable.setSpan(new BackgroundColorSpan(backgroundColor), 0, displayTitle.length(), 0);
+            spannable.setSpan(new ForegroundColorSpan(Color.WHITE), 0, displayTitle.length(), 0);
             titleItem.setTitle(spannable);
         }
     }

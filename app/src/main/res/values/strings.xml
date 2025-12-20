@@ -502,12 +502,20 @@
 
     <!-- Context menu(s) -->
     <string name="menu_context_title">Station</string>
-    <string name="menu_set_active_station">Set Active Station</string>
-    <string name="menu_rename_station">Rename Station</string>
-    <string name="menu_edit_leg">Edit Row</string>
+    <string name="menu_leg">Leg</string>
+    <string name="menu_splay">Splay</string>
+    <string name="menu_station">Station</string>
+    <string name="menu_set_active_station">Set Active</string>
+    <string name="menu_rename_station">Rename</string>
+    <string name="menu_edit_leg">Edit</string>
     <string name="menu_upgrade_row">Force New Station</string>
-    <string name="menu_delete_leg">Delete Leg</string>
+    <string name="menu_upgrade_splay">Upgrade to Leg</string>
+    <string name="menu_downgrade_leg">Downgrade to Splay</string>
+    <string name="menu_delete_leg">Delete</string>
     <string name="menu_delete_splay">Delete Splay</string>
+    <string name="menu_elevation">Elevation</string>
+    <string name="menu_draw_left">Draw Left</string>
+    <string name="menu_draw_right">Draw Right</string>
     <string name="menu_move_row">Move to Different Station</string>
     <string name="menu_jump_to">Jump</string>
     <string name="menu_jump_to_station_in_plan">→ Plan</string>
@@ -520,6 +528,9 @@
     <string name="menu_unlink_survey">Unlink Linked Survey</string>
     <string name="menu_comment">Comment</string>
     <string name="menu_toggle_left_right">Toggle Left/Right</string>
+    <string name="menu_context_title_leg_to">Leg to %s</string>
+    <string name="menu_context_title_leg_from">Leg from %s</string>
+    <string name="menu_context_title_splay">%s splay</string>
     <string name="context_this_will_delete">This will delete:</string>
     <string name="context_jump_to_splay_error">Cannot jump to a splay end</string>
     <string name="context_jump_to_station_error">Could not jump to station %1$s</string>
