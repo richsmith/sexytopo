@@ -6,6 +6,7 @@
     android:orientation="horizontal">
 
     <ImageButton
+        style="@style/ToolbarImageButton"
         android:layout_width="@dimen/toolbar_button_height"
         android:layout_height="@dimen/toolbar_button_height"
         android:layout_weight="1"
