@@ -1,15 +1,19 @@
 package org.hwyl.sexytopo.control.table;
 
+import android.content.Context;
 import android.text.Editable;
 import android.widget.EditText;
 
 import com.google.android.material.textfield.TextInputLayout;
 
+import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.control.util.SurveyTools;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 public class EditLegForm extends Form {
+    Context context;
     Survey survey;
     Leg originalLeg;
     Station originalFromStation;
@@ -32,12 +36,13 @@ public class EditLegForm extends Form {
     /**
      * Constructor for editing an existing leg
      */
-    public EditLegForm(Survey survey, Station fromStation, Leg legToEdit,
+    public EditLegForm(Context context, Survey survey, Station fromStation, Leg legToEdit,
                        TextInputLayout fromStationLayout, EditText fromStationField,
                        TextInputLayout toStationLayout, EditText toStationField,
                        EditText distanceField, EditText azimuthField, EditText inclinationField,
                        EditText azimuthDegreesField, EditText azimuthMinutesField, EditText azimuthSecondsField) {
         super();
+        this.context = context;
         this.survey = survey;
         this.originalLeg = legToEdit;
         this.originalFromStation = fromStation;
@@ -74,12 +79,13 @@ public class EditLegForm extends Form {
     /**
      * Constructor for adding a new leg (no existing leg to edit)
      */
-    public EditLegForm(Survey survey, Station defaultFromStation, String defaultToName, boolean isSplay,
+    public EditLegForm(Context context, Survey survey, Station defaultFromStation, String defaultToName, boolean isSplay,
                        TextInputLayout fromStationLayout, EditText fromStationField,
                        TextInputLayout toStationLayout, EditText toStationField,
                        EditText distanceField, EditText azimuthField, EditText inclinationField,
                        EditText azimuthDegreesField, EditText azimuthMinutesField, EditText azimuthSecondsField) {
         super();
+        this.context = context;
         this.survey = survey;
         this.originalLeg = null;  // No original leg when adding
         this.originalFromStation = defaultFromStation;
@@ -130,13 +136,21 @@ public class EditLegForm extends Form {
         String fromStationName = this.fromStationField.getText().toString();
 
         if (fromStationName.isEmpty()) {
-            setError(this.fromStationField, "Cannot be blank");
+            setError(this.fromStationField, context.getString(R.string.validation_error_cannot_be_blank));
         } else if (fromStationName.equals("-")) {
-            setError(this.fromStationField, "Station cannot be named \"-\"");
+            setError(this.fromStationField, context.getString(R.string.validation_error_station_named_dash));
         } else {
             Station fromStation = survey.getStationByName(fromStationName);
             if (fromStation == null) {
-                setError(this.fromStationField, "Station does not exist");
+                setError(this.fromStationField, context.getString(R.string.validation_error_station_does_not_exist));
+            } else if (originalLeg != null && originalLeg.hasDestination()) {
+                Station destination = originalLeg.getDestination();
+                if (SurveyTools.isDescendantOf(fromStation, destination)) {
+                    setError(this.fromStationField,
+                             context.getString(R.string.survey_update_error_descendant_station));
+                } else {
+                    setError(this.fromStationField, null);
+                }
             } else {
                 setError(this.fromStationField, null);
             }
@@ -148,11 +162,11 @@ public class EditLegForm extends Form {
         String fromStationName = this.fromStationField.getText().toString();
 
         if (toStationName.isEmpty()) {
-            setError(this.toStationField, "Cannot be blank");
+            setError(this.toStationField, context.getString(R.string.validation_error_cannot_be_blank));
         } else if (toStationName.equals("-")) {
-            setError(this.toStationField, "Station cannot be named \"-\"");
+            setError(this.toStationField, context.getString(R.string.validation_error_station_named_dash));
         } else if (toStationName.equals(fromStationName)) {
-            setError(this.toStationField, "Cannot be the same as from station");
+            setError(this.toStationField, context.getString(R.string.validation_error_same_as_from_station));
         } else {
             // Check if we need to validate uniqueness
             boolean needsUniquenessCheck = true;
@@ -168,7 +182,7 @@ public class EditLegForm extends Form {
             if (needsUniquenessCheck) {
                 Station existing = survey.getStationByName(toStationName);
                 if (existing != null) {
-                    setError(this.toStationField, "Station name must be unique");
+                    setError(this.toStationField, context.getString(R.string.validation_error_station_name_not_unique));
                 } else {
                     setError(this.toStationField, null);
                 }
@@ -182,17 +196,18 @@ public class EditLegForm extends Form {
         String distanceText = this.distanceField.getText().toString();
         try {
             if (distanceText.isEmpty()) {
-                setError(this.distanceField, "Cannot be blank");
+                setError(this.distanceField, context.getString(R.string.validation_error_cannot_be_blank));
             } else {
                 float distance = Float.parseFloat(distanceText);
                 if (!Leg.isDistanceLegal(distance)) {
-                    setError(this.distanceField, "Must be >= " + Leg.MIN_DISTANCE);
+                    setError(this.distanceField,
+                        context.getString(R.string.validation_error_distance_minimum, Leg.MIN_DISTANCE));
                 } else {
                     setError(this.distanceField, null);
                 }
             }
         } catch (NumberFormatException e) {
-            setError(this.distanceField, "Must be a number");
+            setError(this.distanceField, context.getString(R.string.validation_error_must_be_number));
         }
     }
 
@@ -200,17 +215,18 @@ public class EditLegForm extends Form {
         String azimuthText = this.azimuthField.getText().toString();
         try {
             if (azimuthText.isEmpty()) {
-                setError(this.azimuthField, "Cannot be blank");
+                setError(this.azimuthField, context.getString(R.string.validation_error_cannot_be_blank));
             } else {
                 float azimuth = Float.parseFloat(azimuthText);
                 if (!Leg.isAzimuthLegal(azimuth)) {
-                    setError(this.azimuthField, "Must be " + Leg.MIN_AZIMUTH + "-" + Leg.MAX_AZIMUTH);
+                    setError(this.azimuthField,
+                        context.getString(R.string.validation_error_azimuth_range, Leg.MIN_AZIMUTH, Leg.MAX_AZIMUTH));
                 } else {
                     setError(this.azimuthField, null);
                 }
             }
         } catch (NumberFormatException e) {
-            setError(this.azimuthField, "Must be a number");
+            setError(this.azimuthField, context.getString(R.string.validation_error_must_be_number));
         }
     }
 
@@ -218,17 +234,18 @@ public class EditLegForm extends Form {
         String inclinationText = this.inclinationField.getText().toString();
         try {
             if (inclinationText.isEmpty()) {
-                setError(this.inclinationField, "Cannot be blank");
+                setError(this.inclinationField, context.getString(R.string.validation_error_cannot_be_blank));
             } else {
                 float inclination = Float.parseFloat(inclinationText);
                 if (!Leg.isInclinationLegal(inclination)) {
-                    setError(this.inclinationField, "Must be " + Leg.MIN_INCLINATION + " to " + Leg.MAX_INCLINATION);
+                    setError(this.inclinationField,
+                        context.getString(R.string.validation_error_inclination_range, Leg.MIN_INCLINATION, Leg.MAX_INCLINATION));
                 } else {
                     setError(this.inclinationField, null);
                 }
             }
         } catch (NumberFormatException e) {
-            setError(this.inclinationField, "Must be a number");
+            setError(this.inclinationField, context.getString(R.string.validation_error_must_be_number));
         }
     }
 

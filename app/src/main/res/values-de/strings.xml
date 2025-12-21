@@ -455,6 +455,18 @@
     <string name="survey_update_moved_leg">Messstrecke zum Messpunkt %1$s verschoben</string>
     <string name="survey_update_adding_leg">Messstrecke %1$s wird hinzugefügt</string>
     <string name="survey_update_reversed_leg">Messstrecke %1$s nach %2$s gedreht</string>
+    <string name="survey_update_error_descendant_station">Messstrecke kann nicht zu einem nachgeordneten Messpunkt verschoben werden</string>
+
+    <!--  Form validation errors  -->
+    <string name="validation_error_cannot_be_blank">Darf nicht leer sein</string>
+    <string name="validation_error_station_named_dash">Messpunkt kann nicht \"-\" heißen</string>
+    <string name="validation_error_station_does_not_exist">Messpunkt existiert nicht</string>
+    <string name="validation_error_same_as_from_station">Kann nicht derselbe wie der Ursprungsmesspunkt sein</string>
+    <string name="validation_error_station_name_not_unique">Messpunktname muss eindeutig sein</string>
+    <string name="validation_error_must_be_number">Muss eine Zahl sein</string>
+    <string name="validation_error_distance_minimum">Muss >= %1$s sein</string>
+    <string name="validation_error_azimuth_range">Muss zwischen %1$s und %2$s liegen</string>
+    <string name="validation_error_inclination_range">Muss zwischen %1$s und %2$s liegen</string>
 
     <!--  Survey symbols  -->
     <string name="symbol_text">Text</string>

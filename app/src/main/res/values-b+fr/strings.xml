@@ -468,6 +468,18 @@
     <string name="survey_update_moved_leg">Segment déplacé vers la station %1$s</string>
     <string name="survey_update_adding_leg">Ajout du segment %1$s</string>
     <string name="survey_update_reversed_leg">Segment inversé de %1$s à %2$s</string>
+    <string name="survey_update_error_descendant_station">Impossible de déplacer le segment vers une station descendante</string>
+
+    <!-- Form validation errors -->
+    <string name="validation_error_cannot_be_blank">Ne peut pas être vide</string>
+    <string name="validation_error_station_named_dash">La station ne peut pas s\'appeler \"-\"</string>
+    <string name="validation_error_station_does_not_exist">La station n\'existe pas</string>
+    <string name="validation_error_same_as_from_station">Ne peut pas être identique à la station d\'origine</string>
+    <string name="validation_error_station_name_not_unique">Le nom de la station doit être unique</string>
+    <string name="validation_error_must_be_number">Doit être un nombre</string>
+    <string name="validation_error_distance_minimum">Doit être >= %1$s</string>
+    <string name="validation_error_azimuth_range">Doit être entre %1$s et %2$s</string>
+    <string name="validation_error_inclination_range">Doit être entre %1$s et %2$s</string>
 
     <!-- Survey symbols -->
     <string name="symbol_text">Texte</string>

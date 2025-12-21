@@ -101,7 +101,7 @@ public class LegDialogs {
 
         // Create validation form
         final EditLegForm form = new EditLegForm(
-            survey, activeStation, defaultToName, isSplay,
+            tableActivity, survey, activeStation, defaultToName, isSplay,
             fromStationLayout, fromStationField,
             toStationLayout, toStationField,
             distanceField, azimuthField, inclinationField,
@@ -214,7 +214,7 @@ public class LegDialogs {
 
         // Create and configure the form for validation
         final EditLegForm form = new EditLegForm(
-            survey, fromStation, toEdit,
+            activity, survey, fromStation, toEdit,
             fromStationLayout, fromStationField,
             toStationLayout, toStationField,
             distanceField, azimuthField, inclinationField,
