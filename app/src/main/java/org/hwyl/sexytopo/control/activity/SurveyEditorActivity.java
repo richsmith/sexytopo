@@ -1,7 +1,6 @@
 package org.hwyl.sexytopo.control.activity;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.view.Gravity;
 import android.view.WindowManager;
 
@@ -10,7 +9,6 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.control.graph.ContextMenuManager;
 import org.hwyl.sexytopo.control.table.LegDialogs;
 import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.control.util.SurveyStats;
@@ -141,7 +139,7 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
             return;
         }
 
-        SurveyUpdater.upgradeSplayToConnectedLeg(getSurvey(), leg, InputMode.FORWARD);
+        SurveyUpdater.upgradeSplay(getSurvey(), leg, InputMode.FORWARD);
         getSurveyManager().broadcastSurveyUpdated();
     }
 
@@ -150,7 +148,7 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
             return;
         }
 
-        SurveyUpdater.downgradeLegToSplay(getSurvey(), leg);
+        SurveyUpdater.downgradeLeg(getSurvey(), leg);
         getSurveyManager().broadcastSurveyUpdated();
     }
 

@@ -81,7 +81,7 @@ public class SurveyUpdater {
         survey.setActiveStation(leg.getDestination());
     }
 
-    public static void upgradeSplayToConnectedLeg(Survey survey, Leg leg, InputMode inputMode) {
+    public static void upgradeSplay(Survey survey, Leg leg, InputMode inputMode) {
         Station newStation = new Station(getNextStationName(survey));
 
         Leg newLeg = Leg.toFullLeg(leg, newStation);
@@ -269,7 +269,7 @@ public class SurveyUpdater {
         survey.setSaved(false);
     }
 
-    public static void downgradeLegToSplay(Survey survey, Leg leg) {
+    public static void downgradeLeg(Survey survey, Leg leg) {
         if (!leg.hasDestination()) {
             // Already a splay, so nothing to do
             return;
