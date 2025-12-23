@@ -1,12 +1,16 @@
 package org.hwyl.sexytopo.control.table;
 
 import android.content.Context;
-import android.text.Editable;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.util.SurveyTools;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -15,14 +19,19 @@ import org.hwyl.sexytopo.model.survey.Survey;
 public class EditLegForm extends Form {
     Context context;
     Survey survey;
+    private String defaultToName;
+    private Station originalFromStation;
     Leg originalLeg;
-    Station originalFromStation;
     boolean isSplay;
+    boolean isEditingLeg;
 
     EditText fromStationField;
     TextInputLayout fromStationLayout;
     EditText toStationField;
     TextInputLayout toStationLayout;
+    // These point to one of the above fields, depending on input mode
+    EditText graphFromStationField;
+    EditText graphToStationField;
 
     EditText distanceField;
     EditText azimuthField;
@@ -33,75 +42,63 @@ public class EditLegForm extends Form {
     EditText azimuthMinutesField;
     EditText azimuthSecondsField;
 
+    Spinner inputModeSpinner;
+    boolean isShotBackwards = false;  // Explicit tracking of shot direction
+
+    boolean isInitialising;
+
     /**
      * Constructor for editing an existing leg
      */
-    public EditLegForm(Context context, Survey survey, Station fromStation, Leg legToEdit,
-                       TextInputLayout fromStationLayout, EditText fromStationField,
-                       TextInputLayout toStationLayout, EditText toStationField,
-                       EditText distanceField, EditText azimuthField, EditText inclinationField,
-                       EditText azimuthDegreesField, EditText azimuthMinutesField, EditText azimuthSecondsField) {
-        super();
+    public EditLegForm(Context context, Survey survey, Station fromStation, Leg legToEdit, View dialogView) {
+        super(context);
         this.context = context;
         this.survey = survey;
-        this.originalLeg = legToEdit;
         this.originalFromStation = fromStation;
+        this.originalLeg = legToEdit;
         this.isSplay = !legToEdit.hasDestination();
+        this.isShotBackwards = legToEdit.wasShotBackwards();
 
-        // Use the provided layouts and fields from the dialog
-        this.fromStationLayout = fromStationLayout;
-        this.fromStationField = fromStationField;
-        this.toStationLayout = toStationLayout;
-        this.toStationField = toStationField;
-        this.distanceField = distanceField;
-        this.azimuthField = azimuthField;
-        this.inclinationField = inclinationField;
-        this.azimuthDegreesField = azimuthDegreesField;
-        this.azimuthMinutesField = azimuthMinutesField;
-        this.azimuthSecondsField = azimuthSecondsField;
-
-        // Set up validation listeners
-        this.fromStationField.addTextChangedListener(new TextViewValidationTrigger(this));
-        if (!isSplay) {
-            this.toStationField.addTextChangedListener(new TextViewValidationTrigger(this));
-        }
-        this.distanceField.addTextChangedListener(new TextViewValidationTrigger(this));
-        this.azimuthField.addTextChangedListener(new TextViewValidationTrigger(this));
-        this.inclinationField.addTextChangedListener(new TextViewValidationTrigger(this));
-
-        // Populate the fields from the leg being edited
-        this.fromStationField.setText(fromStation.getName());
-        if (!isSplay) {
-            this.toStationField.setText(legToEdit.getDestination().getName());
-        }
+        this.initialise(dialogView);
     }
 
     /**
      * Constructor for adding a new leg (no existing leg to edit)
      */
-    public EditLegForm(Context context, Survey survey, Station defaultFromStation, String defaultToName, boolean isSplay,
-                       TextInputLayout fromStationLayout, EditText fromStationField,
-                       TextInputLayout toStationLayout, EditText toStationField,
-                       EditText distanceField, EditText azimuthField, EditText inclinationField,
-                       EditText azimuthDegreesField, EditText azimuthMinutesField, EditText azimuthSecondsField) {
-        super();
+    public EditLegForm(Context context, Survey survey, Station fromStation, String defaultToName,
+                       boolean isSplay, View dialogView) {
+        super(context);
         this.context = context;
         this.survey = survey;
+        this.originalFromStation = fromStation;
         this.originalLeg = null;  // No original leg when adding
-        this.originalFromStation = defaultFromStation;
+        this.defaultToName = defaultToName;
         this.isSplay = isSplay;
 
-        // Use the provided layouts and fields from the dialog
-        this.fromStationLayout = fromStationLayout;
-        this.fromStationField = fromStationField;
-        this.toStationLayout = toStationLayout;
-        this.toStationField = toStationField;
-        this.distanceField = distanceField;
-        this.azimuthField = azimuthField;
-        this.inclinationField = inclinationField;
-        this.azimuthDegreesField = azimuthDegreesField;
-        this.azimuthMinutesField = azimuthMinutesField;
-        this.azimuthSecondsField = azimuthSecondsField;
+        this.initialise(dialogView);
+    }
+
+    private void initialise(View dialogView) {
+        this.isInitialising = true;
+        this.initialiseFields(dialogView);
+        this.initialiseInputMode(dialogView);
+        this.initialiseStationDisplay();
+        this.isInitialising = false;
+    }
+
+    private void initialiseFields(View dialogView) {
+        // Find all view references from the dialog
+        this.fromStationLayout = dialogView.findViewById(R.id.fromStationLayout);
+        this.fromStationField = dialogView.findViewById(R.id.editFromStation);
+        this.toStationLayout = dialogView.findViewById(R.id.toStationLayout);
+        this.toStationField = dialogView.findViewById(R.id.editToStation);
+        this.distanceField = dialogView.findViewById(R.id.editDistance);
+        this.azimuthField = dialogView.findViewById(R.id.editAzimuth);
+        this.inclinationField = dialogView.findViewById(R.id.editInclination);
+        this.azimuthDegreesField = dialogView.findViewById(R.id.editAzimuthDegrees);
+        this.azimuthMinutesField = dialogView.findViewById(R.id.editAzimuthMinutes);
+        this.azimuthSecondsField = dialogView.findViewById(R.id.editAzimuthSeconds);
+        this.inputModeSpinner = dialogView.findViewById(R.id.inputModeSpinner);
 
         // Set up validation listeners
         this.fromStationField.addTextChangedListener(new TextViewValidationTrigger(this));
@@ -112,98 +109,138 @@ public class EditLegForm extends Form {
         this.azimuthField.addTextChangedListener(new TextViewValidationTrigger(this));
         this.inclinationField.addTextChangedListener(new TextViewValidationTrigger(this));
 
-        // Populate with defaults for new leg
-        this.fromStationField.setText(defaultFromStation.getName());
-        if (!isSplay && defaultToName != null) {
-            this.toStationField.setText(defaultToName);
+    }
+
+    private void initialiseInputMode(View dialogView) {
+        if (!isSplay) {
+            View inputModeContainer = dialogView.findViewById(R.id.inputModeContainer);
+            inputModeContainer.setVisibility(View.VISIBLE);
+
+            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+                context, R.array.leg_edit_input_mode_options, android.R.layout.simple_spinner_item);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            this.inputModeSpinner.setAdapter(adapter);
+
+            // Set initial selection (0 = Forward, 1 = Backsight)
+            this.inputModeSpinner.setSelection(isShotBackwards ? 1 : 0);
+
+            // Set up spinner listener to update display when selection changes
+            this.inputModeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    boolean newValue = (position == 1);
+                    boolean isChange = isShotBackwards != newValue;
+
+                    if (isChange) {
+                        isShotBackwards = newValue;
+
+                        if (!isInitialising) {
+                            swapStationDisplay();
+                        }
+                        validate();
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                    // Do nothing
+                }
+            });
         }
     }
 
     @Override
     protected void performValidation() {
         // Validate stations
-        validateFromStation();
+        EditText graphFromField = isShotBackwards? toStationField : fromStationField;
+        EditText graphToField = isShotBackwards? fromStationField : toStationField;
+       
+        Station fromStation = validateGraphFromField(graphFromField);
         if (!isSplay) {
-            validateToStation();
+            validateGraphToField(fromStation, graphToField);
         }
+        
         // Validate measurements
         validateDistance();
         validateAzimuth();
         validateInclination();
     }
 
-    private void validateFromStation() {
-        String fromStationName = this.fromStationField.getText().toString();
+    private Station validateGraphFromField(EditText fromField) {
+        String fromName = fromField.getText().toString();
+        Station fromStation = survey.getStationByName(fromName);
 
-        if (fromStationName.isEmpty()) {
-            setError(this.fromStationField, context.getString(R.string.validation_error_cannot_be_blank));
-        } else if (fromStationName.equals("-")) {
-            setError(this.fromStationField, context.getString(R.string.validation_error_station_named_dash));
-        } else {
-            Station fromStation = survey.getStationByName(fromStationName);
-            if (fromStation == null) {
-                setError(this.fromStationField, context.getString(R.string.validation_error_station_does_not_exist));
-            } else if (originalLeg != null && originalLeg.hasDestination()) {
-                Station destination = originalLeg.getDestination();
-                if (SurveyTools.isDescendantOf(fromStation, destination)) {
-                    setError(this.fromStationField,
-                             context.getString(R.string.survey_update_error_descendant_station));
-                } else {
-                    setError(this.fromStationField, null);
+        Integer error = null;
+
+        if (fromName.isEmpty()) {
+            error = R.string.validation_error_cannot_be_blank;
+        } else if (fromName.equals(SexyTopoConstants.BLANK_STATION_NAME)) {
+            error = R.string.validation_error_station_named_dash;
+        } else if (fromStation == null) {
+            error = R.string.validation_error_station_does_not_exist;
+        } else if (originalLeg != null) {
+            Station originalStation = survey.getOriginatingStation(originalLeg);
+            boolean isMovingLeg = originalStation != fromStation;
+
+            if (isMovingLeg) {
+                if (SurveyTools.isDescendantOf(originalStation, fromStation)) {
+                    error = R.string.survey_update_error_descendant_station;
                 }
-            } else {
-                setError(this.fromStationField, null);
             }
         }
+
+        setError(fromField, error);
+        return fromStation;
     }
 
-    private void validateToStation() {
-        String toStationName = this.toStationField.getText().toString();
-        String fromStationName = this.fromStationField.getText().toString();
+    private void validateGraphToField(Station fromStation, EditText toField) {
+        String fromName = fromStation == null? null : fromStation.getName();
+        String toName = toField.getText().toString();
 
-        if (toStationName.isEmpty()) {
-            setError(this.toStationField, context.getString(R.string.validation_error_cannot_be_blank));
-        } else if (toStationName.equals("-")) {
-            setError(this.toStationField, context.getString(R.string.validation_error_station_named_dash));
-        } else if (toStationName.equals(fromStationName)) {
-            setError(this.toStationField, context.getString(R.string.validation_error_same_as_from_station));
-        } else {
-            // Check if we need to validate uniqueness
-            boolean needsUniquenessCheck = true;
+        Integer error = null;
 
-            // For edit mode: only check uniqueness if name is changing
-            if (originalLeg != null && originalLeg.hasDestination()) {
-                String currentToStationName = originalLeg.getDestination().getName();
-                if (toStationName.equals(currentToStationName)) {
-                    needsUniquenessCheck = false;
+        if (toName.isEmpty()) {
+            error = R.string.validation_error_cannot_be_blank;
+        } else if (toName.equals(SexyTopoConstants.BLANK_STATION_NAME)) {
+            error = R.string.validation_error_station_named_dash;
+        } else if (toName.equals(fromName)) {
+            error = R.string.validation_error_same_as_from_station;
+        } else if (originalLeg != null && originalLeg.hasDestination()) {
+            // Only validate uniqueness for existing legs being edited
+            Station originalStation = originalLeg.getDestination();
+            boolean isRenamingStation = !originalStation.getName().equals(toName);
+
+            // For edit mode: only check uniqueness if the graph to station name is changing
+            if (isRenamingStation) {
+                Station existing = survey.getStationByName(toName);
+                if (existing != null) {
+                    error = R.string.validation_error_station_name_not_unique;
                 }
             }
-
-            if (needsUniquenessCheck) {
-                Station existing = survey.getStationByName(toStationName);
-                if (existing != null) {
-                    setError(this.toStationField, context.getString(R.string.validation_error_station_name_not_unique));
-                } else {
-                    setError(this.toStationField, null);
-                }
-            } else {
-                setError(this.toStationField, null);
+        } else {
+            // New leg - check that station name doesn't already exist
+            Station existing = survey.getStationByName(toName);
+            if (existing != null) {
+                error = R.string.validation_error_station_name_not_unique;
             }
         }
+
+        setError(toField, error);
     }
 
     private void validateDistance() {
         String distanceText = this.distanceField.getText().toString();
         try {
             if (distanceText.isEmpty()) {
-                setError(this.distanceField, context.getString(R.string.validation_error_cannot_be_blank));
+                setError(this.distanceField, R.string.validation_error_cannot_be_blank);
             } else {
                 float distance = Float.parseFloat(distanceText);
                 if (!Leg.isDistanceLegal(distance)) {
                     setError(this.distanceField,
-                        context.getString(R.string.validation_error_distance_minimum, Leg.MIN_DISTANCE));
+                        context.getString(R.string.validation_error_distance_minimum,
+                            Leg.MIN_DISTANCE));
                 } else {
-                    setError(this.distanceField, null);
+                    setError(this.distanceField, (Integer) null);
                 }
             }
         } catch (NumberFormatException e) {
@@ -222,7 +259,7 @@ public class EditLegForm extends Form {
                     setError(this.azimuthField,
                         context.getString(R.string.validation_error_azimuth_range, Leg.MIN_AZIMUTH, Leg.MAX_AZIMUTH));
                 } else {
-                    setError(this.azimuthField, null);
+                    setError(this.azimuthField, (Integer) null);
                 }
             }
         } catch (NumberFormatException e) {
@@ -241,7 +278,7 @@ public class EditLegForm extends Form {
                     setError(this.inclinationField,
                         context.getString(R.string.validation_error_inclination_range, Leg.MIN_INCLINATION, Leg.MAX_INCLINATION));
                 } else {
-                    setError(this.inclinationField, null);
+                    setError(this.inclinationField, (Integer) null);
                 }
             }
         } catch (NumberFormatException e) {
@@ -249,12 +286,70 @@ public class EditLegForm extends Form {
         }
     }
 
-    public String getFromStationName() {
-        return this.fromStationField.getText().toString();
+    /**
+     * Update the station display based on current shot direction
+     */
+    private void swapStationDisplay() {
+        String fromText = graphFromStationField.getText().toString();
+        String toText = graphToStationField.getText().toString();
+        graphFromStationField.setText(toText);
+        graphToStationField.setText(fromText);
     }
 
+    private void mapGraphFields() {
+        if (isSplay) {
+            graphFromStationField = fromStationField;
+            graphToStationField = toStationField; // not used for splay but probably safer to set
+        } else {
+            graphFromStationField = isShotBackwards? toStationField : fromStationField;
+            graphToStationField = isShotBackwards? fromStationField : toStationField;
+        }
+
+    }
+
+    /**
+     * Initialise the station display based on current data
+     */
+    private void initialiseStationDisplay() {
+        mapGraphFields();
+        graphFromStationField.setText(originalFromStation.getName());
+
+        if (!isSplay) {
+            String toName = "";
+            if (originalLeg != null) {
+                toName = originalLeg.getDestination().getName();
+            } else if (defaultToName != null) {
+                toName = defaultToName;
+            }
+            graphToStationField.setText(toName);
+        }
+    }
+
+    /**
+     * Get the graph from station name (what user sees may be reversed if in backsight mode)
+     */
+    public String getFromStationName() {
+        if (isShotBackwards && !isSplay) {
+            return toStationField.getText().toString();
+        }
+        return fromStationField.getText().toString();
+    }
+
+    /**
+     * Get the graph to station name (what user sees may be reversed if in backsight mode)
+     */
     public String getToStationName() {
-        return this.toStationField.getText().toString();
+        if (isShotBackwards) {
+            return fromStationField.getText().toString();
+        }
+        return toStationField.getText().toString();
+    }
+
+    /**
+     * Returns whether the leg was/is shot backwards
+     */
+    public boolean wasShotBackwards() {
+        return isShotBackwards;
     }
 
     /**

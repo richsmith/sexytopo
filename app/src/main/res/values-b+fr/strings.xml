@@ -477,9 +477,9 @@
     <string name="validation_error_same_as_from_station">Ne peut pas être identique à la station d\'origine</string>
     <string name="validation_error_station_name_not_unique">Le nom de la station doit être unique</string>
     <string name="validation_error_must_be_number">Doit être un nombre</string>
-    <string name="validation_error_distance_minimum">Doit être >= %1$s</string>
-    <string name="validation_error_azimuth_range">Doit être entre %1$s et %2$s</string>
-    <string name="validation_error_inclination_range">Doit être entre %1$s et %2$s</string>
+    <string name="validation_error_distance_minimum">Doit être >= %1$f</string>
+    <string name="validation_error_azimuth_range">Doit être entre %1$f et %2$f</string>
+    <string name="validation_error_inclination_range">Doit être entre %1$f et %2$f</string>
 
     <!-- Survey symbols -->
     <string name="symbol_text">Texte</string>

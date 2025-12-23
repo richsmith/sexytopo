@@ -205,6 +205,7 @@
     <string name="manual_edit_from_station_error">Ungültige Startstation</string>
     <string name="manual_edit_to_station">Zur Station</string>
     <string name="manual_edit_to_station_error">Ungültige Zielstation</string>
+    <string name="manual_edit_shot_backwards">⬅ Rückwärts gemessen</string>
     <string name="manual_rename_station_title">Messpunkt umbenennen</string>
     <string name="manual_rename_station_hint">Stationsname</string>
     <string name="manual_rename_error">Umbenennen fehlgeschlagen</string>
@@ -464,9 +465,9 @@
     <string name="validation_error_same_as_from_station">Kann nicht derselbe wie der Ursprungsmesspunkt sein</string>
     <string name="validation_error_station_name_not_unique">Messpunktname muss eindeutig sein</string>
     <string name="validation_error_must_be_number">Muss eine Zahl sein</string>
-    <string name="validation_error_distance_minimum">Muss >= %1$s sein</string>
-    <string name="validation_error_azimuth_range">Muss zwischen %1$s und %2$s liegen</string>
-    <string name="validation_error_inclination_range">Muss zwischen %1$s und %2$s liegen</string>
+    <string name="validation_error_distance_minimum">Muss >= %1$f sein</string>
+    <string name="validation_error_azimuth_range">Muss zwischen %1$f und %2$f liegen</string>
+    <string name="validation_error_inclination_range">Muss zwischen %1$f und %2$f liegen</string>
 
     <!--  Survey symbols  -->
     <string name="symbol_text">Text</string>

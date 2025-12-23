@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.control.table;
 
+import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.TextView;
@@ -7,6 +8,8 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 
 abstract public class Form {
+    private final Context context;
+
     static class TextViewValidationTrigger implements TextWatcher {
         private final Form form;
 
@@ -33,7 +36,8 @@ abstract public class Form {
     private boolean valid;
     @Nullable private OnDidValidateCallback onDidValidateCallback;
 
-    Form() {
+    Form(Context context) {
+        this.context = context;
         this.valid = true;
         this.onDidValidateCallback = null;
     }
@@ -62,5 +66,10 @@ abstract public class Form {
 
         this.valid = this.valid  & fieldValid;
         field.setError(error);
+    }
+
+    protected void setError(TextView field, Integer error) {
+        CharSequence message = error == null? null : context.getString(error);
+        this.setError(field, message);
     }
 }

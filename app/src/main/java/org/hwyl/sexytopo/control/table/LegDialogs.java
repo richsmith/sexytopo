@@ -82,30 +82,14 @@ public class LegDialogs {
             dialogView.findViewById(R.id.azimuth_deg_mins_secs).setVisibility(View.VISIBLE);
         }
 
-        // Get the views from the dialog
-        TextInputLayout fromStationLayout = dialogView.findViewById(R.id.fromStationLayout);
-        TextInputEditText fromStationField = dialogView.findViewById(R.id.editFromStation);
-        TextInputLayout toStationLayout = dialogView.findViewById(R.id.toStationLayout);
-        TextInputEditText toStationField = dialogView.findViewById(R.id.editToStation);
-        TextInputEditText distanceField = dialogView.findViewById(R.id.editDistance);
-        TextInputEditText azimuthField = dialogView.findViewById(R.id.editAzimuth);
-        TextInputEditText inclinationField = dialogView.findViewById(R.id.editInclination);
-        TextInputEditText azimuthDegreesField = dialogView.findViewById(R.id.editAzimuthDegrees);
-        TextInputEditText azimuthMinutesField = dialogView.findViewById(R.id.editAzimuthMinutes);
-        TextInputEditText azimuthSecondsField = dialogView.findViewById(R.id.editAzimuthSeconds);
-
         // Hide TO field for splays
         if (isSplay) {
-            toStationLayout.setVisibility(View.GONE);
+            dialogView.findViewById(R.id.toStationLayout).setVisibility(View.GONE);
         }
 
         // Create validation form
         final EditLegForm form = new EditLegForm(
-            tableActivity, survey, activeStation, defaultToName, isSplay,
-            fromStationLayout, fromStationField,
-            toStationLayout, toStationField,
-            distanceField, azimuthField, inclinationField,
-            azimuthDegreesField, azimuthMinutesField, azimuthSecondsField);
+            tableActivity, survey, activeStation, defaultToName, isSplay, dialogView);
 
         builder
             .setView(dialogView)
@@ -200,30 +184,14 @@ public class LegDialogs {
             dialogView.findViewById(R.id.azimuth_deg_mins_secs).setVisibility(View.VISIBLE);
         }
 
-        // Get the views from the dialog
-        TextInputLayout fromStationLayout = dialogView.findViewById(R.id.fromStationLayout);
-        TextInputEditText fromStationField = dialogView.findViewById(R.id.editFromStation);
-        TextInputLayout toStationLayout = dialogView.findViewById(R.id.toStationLayout);
-        TextInputEditText toStationField = dialogView.findViewById(R.id.editToStation);
-        TextInputEditText distanceField = dialogView.findViewById(R.id.editDistance);
-        TextInputEditText azimuthField = dialogView.findViewById(R.id.editAzimuth);
-        TextInputEditText inclinationField = dialogView.findViewById(R.id.editInclination);
-        TextInputEditText azimuthDegreesField = dialogView.findViewById(R.id.editAzimuthDegrees);
-        TextInputEditText azimuthMinutesField = dialogView.findViewById(R.id.editAzimuthMinutes);
-        TextInputEditText azimuthSecondsField = dialogView.findViewById(R.id.editAzimuthSeconds);
+        // Hide to station field for splays
+        if (!toEdit.hasDestination()) {
+            dialogView.findViewById(R.id.toStationLayout).setVisibility(View.GONE);
+        }
 
         // Create and configure the form for validation
         final EditLegForm form = new EditLegForm(
-            activity, survey, fromStation, toEdit,
-            fromStationLayout, fromStationField,
-            toStationLayout, toStationField,
-            distanceField, azimuthField, inclinationField,
-            azimuthDegreesField, azimuthMinutesField, azimuthSecondsField);
-
-        // Hide to station field for splays
-        if (!toEdit.hasDestination()) {
-            toStationLayout.setVisibility(View.GONE);
-        }
+            activity, survey, fromStation, toEdit, dialogView);
 
         builder
             .setView(dialogView)

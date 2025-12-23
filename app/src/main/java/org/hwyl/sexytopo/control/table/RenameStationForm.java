@@ -20,7 +20,7 @@ public class RenameStationForm extends Form {
     TextInputLayout stationNameLayout;
 
     RenameStationForm(Context context, Survey survey, Station station) {
-        super();
+        super(context);
         this.survey = survey;
         this.station = station;
 
@@ -56,7 +56,7 @@ public class RenameStationForm extends Form {
         } else if (!currentTextString.equals(currentName) && (survey.getStationByName(currentTextString) != null)) {
             setError(this.stationName, "Station name must be unique");
         } else {
-            setError(this.stationName, null);
+            setError(this.stationName, (CharSequence) null);
         }
     }
 }

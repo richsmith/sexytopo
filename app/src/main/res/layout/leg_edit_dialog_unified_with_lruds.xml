@@ -10,6 +10,27 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
+        <LinearLayout
+            android:id="@+id/inputModeContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:visibility="gone">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/action_input"
+                android:layout_marginEnd="8dp"
+                android:textSize="14sp"/>
+            <Spinner
+                android:id="@+id/inputModeSpinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="120dp"/>
+        </LinearLayout>
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/fromStationLayout"
             android:layout_width="match_parent"
