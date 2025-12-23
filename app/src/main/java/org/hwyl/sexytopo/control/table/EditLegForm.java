@@ -325,55 +325,22 @@ public class EditLegForm extends Form {
         }
     }
 
-    /**
-     * Get the graph from station name (what user sees may be reversed if in backsight mode)
-     */
-    public String getFromStationName() {
+    private String getFromStationName() {
         if (isShotBackwards && !isSplay) {
             return toStationField.getText().toString();
         }
         return fromStationField.getText().toString();
     }
 
-    /**
-     * Get the graph to station name (what user sees may be reversed if in backsight mode)
-     */
-    public String getToStationName() {
-        if (isShotBackwards) {
-            return fromStationField.getText().toString();
-        }
-        return toStationField.getText().toString();
-    }
-
-    /**
-     * Returns whether the leg was/is shot backwards
-     */
-    public boolean wasShotBackwards() {
-        return isShotBackwards;
-    }
-
-    /**
-     * Parse and return the distance value
-     * Should only be called after validation passes
-     */
-    public float getDistance() {
+    private float getDistance() {
         return Float.parseFloat(this.distanceField.getText().toString());
     }
 
-    /**
-     * Parse and return the inclination value
-     * Should only be called after validation passes
-     */
-    public float getInclination() {
+    private float getInclination() {
         return Float.parseFloat(this.inclinationField.getText().toString());
     }
 
-    /**
-     * Parse and return the azimuth value
-     * Handles both standard decimal and deg/min/sec modes
-     * Should only be called after validation passes
-     */
-    public float getAzimuth() {
+    private float getAzimuth() {
         // Check if we're using deg/min/sec mode by checking if those fields have values
         if (azimuthDegreesField != null && azimuthDegreesField.getText().length() > 0) {
             float degrees = Float.parseFloat(azimuthDegreesField.getText().toString());
@@ -386,24 +353,15 @@ public class EditLegForm extends Form {
         }
     }
 
-    /**
-     * Look up and return the from station
-     * Should only be called after validation passes
-     */
-    public Station getFromStation() {
+    private Station getFromStation() {
         return survey.getStationByName(getFromStationName());
     }
 
-    /**
-     * Look up and return the to station
-     * Only valid for full legs (not splays)
-     * Should only be called after validation passes
-     */
-    public Station getToStation() {
-        if (isSplay) {
-            throw new IllegalStateException("Cannot get to station for a splay");
+    private String getToStationName() {
+        if (isShotBackwards) {
+            return fromStationField.getText().toString();
         }
-        return survey.getStationByName(getToStationName());
+        return toStationField.getText().toString();
     }
 
     /**
