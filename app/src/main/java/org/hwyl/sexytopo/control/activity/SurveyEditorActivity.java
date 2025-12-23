@@ -115,23 +115,20 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
     }
 
     public void onDeleteStation(Station station) {
-        askAboutDeletingStation(station);
-        invalidateView();
-    }
-
-    public void onDeleteLeg(Station station) {
         Leg leg = getSurvey().getReferringLeg(station);
         if (leg == null) {
             return;
         }
 
-        Station fromStation = getSurvey().getOriginatingStation(leg);
-        if (fromStation == null) {
+        onDeleteLeg(leg);
+    }
+
+    public void onDeleteLeg(Leg leg) {
+        if (leg == null) {
             return;
         }
 
-        SurveyUpdater.deleteLeg(getSurvey(), fromStation, leg);
-        getSurveyManager().broadcastSurveyUpdated();
+        askAboutDeletingLeg(leg);
     }
 
     public void onUpgradeSplay(Leg leg) {
@@ -203,11 +200,25 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
     }
 
     /**
-     * Ask the user about deleting the given station.
+     * Ask the user about deleting the given leg (and any onwards legs
+     * / stations if it's a full leg).
      */
-    protected void askAboutDeletingStation(Station station) {
-        int numFullLegsToBeDeleted = 1 + SurveyStats.calcNumberSubFullLegs(station);
-        int numSplaysToBeDeleted = SurveyStats.calcNumberSubSplays(station);
+    protected void askAboutDeletingLeg(Leg leg) {
+        Station fromStation = getSurvey().getOriginatingStation(leg);
+        if (fromStation == null) {
+            return;
+        }
+
+        int numFullLegsToBeDeleted = 0;
+        int numSplaysToBeDeleted = 0;
+
+        if (leg.hasDestination()) {
+            Station toStation = leg.getDestination();
+            numFullLegsToBeDeleted = 1 + SurveyStats.calcNumberSubFullLegs(toStation);
+            numSplaysToBeDeleted = SurveyStats.calcNumberSubSplays(toStation);
+        } else {
+            numSplaysToBeDeleted = 1;
+        }
 
         String message = getString(R.string.context_this_will_delete);
 
@@ -223,11 +234,13 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         }
 
         new MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.delete_question)
             .setMessage(message)
+            .setIcon(android.R.drawable.ic_dialog_alert)
             .setPositiveButton(R.string.delete, (dialog, which) -> {
-                    SurveyUpdater.deleteStation(getSurvey(), station);
-                    getSurveyManager().broadcastSurveyUpdated();
-                    invalidateView();
+                SurveyUpdater.deleteLeg(getSurvey(), fromStation, leg);
+                getSurveyManager().broadcastSurveyUpdated();
+                invalidateView();
             })
             .setNegativeButton(R.string.cancel, null)
             .show();

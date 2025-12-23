@@ -289,38 +289,6 @@ public class TableActivity extends SurveyEditorActivity
         LegDialogs.renameStation(this, getSurvey(), station);
     }
 
-    @Override
-    public void onDeleteStation(Station station) {
-        askAboutDeletingStation(station);
-    }
-
-    protected void askAboutDeletingStation(Station station) {
-        int numFullLegsToBeDeleted = 1; // The leg leading to this station
-        numFullLegsToBeDeleted += SurveyStats.calcNumberSubFullLegs(station);
-        int numSplaysToBeDeleted = SurveyStats.calcNumberSubSplays(station);
-
-        String message = getString(R.string.context_this_will_delete);
-
-        if (numFullLegsToBeDeleted > 0) {
-            String noun = getString(R.string.leg).toLowerCase();
-            message += "\n" + TextTools.pluralise(numFullLegsToBeDeleted, noun);
-            noun = getString(R.string.station).toLowerCase();
-            message += " (" + TextTools.pluralise(numFullLegsToBeDeleted, noun) + ")";
-        }
-        if (numSplaysToBeDeleted > 0) {
-            String noun = getString(R.string.splay).toLowerCase();
-            message += "\n" + TextTools.pluralise(numSplaysToBeDeleted, noun);
-        }
-
-        new MaterialAlertDialogBuilder(this)
-            .setMessage(message)
-            .setPositiveButton(R.string.delete, (dialog, which) -> {
-                SurveyUpdater.deleteStation(getSurvey(), station);
-                getSurveyManager().broadcastSurveyUpdated();
-            })
-            .setNegativeButton(R.string.cancel, null)
-            .show();
-    }
 
 
 

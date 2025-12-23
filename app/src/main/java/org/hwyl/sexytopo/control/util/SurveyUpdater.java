@@ -256,14 +256,19 @@ public class SurveyUpdater {
     public static void deleteLeg(Survey survey, Station fromStation, Leg leg) {
 
         // First remove all legs in the subtree from the survey record
-        SurveyTools.traverseLegs(
-            fromStation,
-            (origin, subLeg) -> {
-                survey.removeLegRecord(subLeg);
-                return false;
-            });
+        if (leg.hasDestination()) {
+            SurveyTools.traverseLegs(
+                leg.getDestination(),
+                (origin, subLeg) -> {
+                    survey.removeLegRecord(subLeg);
+                    return false;
+                });
+        }
 
-        // Then remove the referring leg from its originating station
+        // Remove this leg's record
+        survey.removeLegRecord(leg);
+
+        // Then remove the leg from its originating station
         fromStation.getOnwardLegs().remove(leg);
         survey.checkSurveyIntegrity();
         survey.setSaved(false);
