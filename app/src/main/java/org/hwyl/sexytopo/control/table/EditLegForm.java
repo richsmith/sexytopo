@@ -43,7 +43,7 @@ public class EditLegForm extends Form {
     EditText azimuthSecondsField;
 
     Spinner inputModeSpinner;
-    boolean isShotBackwards = false;  // Explicit tracking of shot direction
+    InputMode inputMode = InputMode.FORWARD;
 
     boolean isInitialising;
 
@@ -57,7 +57,7 @@ public class EditLegForm extends Form {
         this.originalFromStation = fromStation;
         this.originalLeg = legToEdit;
         this.isSplay = !legToEdit.hasDestination();
-        this.isShotBackwards = legToEdit.wasShotBackwards();
+        this.inputMode = legToEdit.wasShotBackwards() ? InputMode.BACKSIGHT : InputMode.FORWARD;
 
         this.initialise(dialogView);
     }
@@ -121,18 +121,18 @@ public class EditLegForm extends Form {
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             this.inputModeSpinner.setAdapter(adapter);
 
-            // Set initial selection (0 = Forward, 1 = Backsight)
-            this.inputModeSpinner.setSelection(isShotBackwards ? 1 : 0);
+            // Set initial selection
+            this.inputModeSpinner.setSelection(inputMode.getSpinnerPosition());
 
             // Set up spinner listener to update display when selection changes
             this.inputModeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    boolean newValue = (position == 1);
-                    boolean isChange = isShotBackwards != newValue;
+                    InputMode newMode = InputMode.fromSpinnerPosition(position);
+                    boolean isChange = inputMode != newMode;
 
                     if (isChange) {
-                        isShotBackwards = newValue;
+                        inputMode = newMode;
 
                         if (!isInitialising) {
                             swapStationDisplay();
@@ -152,8 +152,8 @@ public class EditLegForm extends Form {
     @Override
     protected void performValidation() {
         // Validate stations
-        EditText graphFromField = isShotBackwards? toStationField : fromStationField;
-        EditText graphToField = isShotBackwards? fromStationField : toStationField;
+        EditText graphFromField = inputMode.isBacksight() ? toStationField : fromStationField;
+        EditText graphToField = inputMode.isBacksight() ? fromStationField : toStationField;
        
         Station fromStation = validateGraphFromField(graphFromField);
         if (!isSplay) {
@@ -301,8 +301,8 @@ public class EditLegForm extends Form {
             graphFromStationField = fromStationField;
             graphToStationField = toStationField; // not used for splay but probably safer to set
         } else {
-            graphFromStationField = isShotBackwards? toStationField : fromStationField;
-            graphToStationField = isShotBackwards? fromStationField : toStationField;
+            graphFromStationField = inputMode.isBacksight() ? toStationField : fromStationField;
+            graphToStationField = inputMode.isBacksight() ? fromStationField : toStationField;
         }
 
     }
@@ -326,7 +326,7 @@ public class EditLegForm extends Form {
     }
 
     private String getFromStationName() {
-        if (isShotBackwards && !isSplay) {
+        if (inputMode.isBacksight() && !isSplay) {
             return toStationField.getText().toString();
         }
         return fromStationField.getText().toString();
@@ -358,7 +358,7 @@ public class EditLegForm extends Form {
     }
 
     private String getToStationName() {
-        if (isShotBackwards) {
+        if (inputMode.isBacksight()) {
             return fromStationField.getText().toString();
         }
         return toStationField.getText().toString();
@@ -388,7 +388,7 @@ public class EditLegForm extends Form {
         }
 
         // Apply backwards flag if needed
-        if (wasShotBackwards()) {
+        if (inputMode.isBacksight()) {
             leg = leg.reverse();
         }
 
