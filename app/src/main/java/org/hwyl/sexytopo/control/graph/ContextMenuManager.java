@@ -66,7 +66,7 @@ public class ContextMenuManager {
         menuActions.put(R.id.action_rename_station, activity::onRenameStation);
         menuActions.put(R.id.action_edit_leg, activity::onEditLeg);
         menuActions.put(R.id.action_delete_station, activity::onDeleteStation);
-        menuActions.put(R.id.action_delete_leg, activity::onDeleteLeg);
+        menuActions.put(R.id.action_delete_leg, activity::onDeleteStation);
         // Note: upgrade_splay and downgrade_leg are handled specially in handleMenuItemClick
     }
 
@@ -309,13 +309,17 @@ public class ContextMenuManager {
     private boolean handleMenuItemClick(MenuItem item, Station station) {
         int itemId = item.getItemId();
 
-        // Special handling for upgrade/downgrade actions that need the leg
+        // Special handling for actions that need the leg context
         if (itemId == R.id.action_upgrade_splay && currentLeg != null) {
             activity.onUpgradeSplay(currentLeg);
             return true;
         }
         if (itemId == R.id.action_downgrade_leg && currentLeg != null) {
             activity.onDowngradeLeg(currentLeg);
+            return true;
+        }
+        if ((itemId == R.id.action_delete_leg || itemId == R.id.action_delete_station) && currentLeg != null) {
+            activity.onDeleteLeg(currentLeg);
             return true;
         }
 
