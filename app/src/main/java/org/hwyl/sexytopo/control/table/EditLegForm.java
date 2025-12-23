@@ -7,8 +7,6 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import com.google.android.material.textfield.TextInputLayout;
-
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.util.InputMode;
@@ -18,39 +16,36 @@ import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 public class EditLegForm extends Form {
-    // Input mode spinner positions
-    private static final int SPINNER_POSITION_FORWARD = 0;
-    private static final int SPINNER_POSITION_BACKWARD = 1;
+    private static final int SPINNER_FORWARD = 0;
+    private static final int SPINNER_BACKWARD = 1;
 
-    Context context;
-    Survey survey;
+    private final Context context;
+    private final Survey survey;
     private String defaultToName;
     private final Station originalFromStation;
-    Leg originalLeg;
-    boolean isSplay;
-    boolean isEditingLeg;
+    private final Leg originalLeg;
+    private final boolean isSplay;
+    private boolean isEditingLeg;
 
-    EditText fromStationField;
-    TextInputLayout fromStationLayout;
-    EditText toStationField;
-    TextInputLayout toStationLayout;
+    private EditText fromStationField;
+    private EditText toStationField;
     // These point to one of the above fields, depending on input mode
-    EditText graphFromStationField;
-    EditText graphToStationField;
+    private EditText graphFromStationField;
+    private EditText graphToStationField;
 
-    EditText distanceField;
-    EditText azimuthField;
-    EditText inclinationField;
+    private EditText distanceField;
+    private EditText azimuthField;
+    private EditText inclinationField;
 
     // Deg/Min/Sec fields (optional, used when in deg/min/sec mode)
-    EditText azimuthDegreesField;
-    EditText azimuthMinutesField;
-    EditText azimuthSecondsField;
+    private EditText azimuthDegreesField;
+    private EditText azimuthMinutesField;
+    private EditText azimuthSecondsField;
 
-    Spinner inputModeSpinner;
-    InputMode inputMode = InputMode.FORWARD;
+    private Spinner inputModeSpinner;
+    private InputMode inputMode = InputMode.FORWARD;
 
-    boolean isInitialising;
+    private boolean isInitialising;
 
     /**
      * Constructor for editing an existing leg
@@ -93,9 +88,7 @@ public class EditLegForm extends Form {
 
     private void initialiseFields(View dialogView) {
         // Find all view references from the dialog
-        this.fromStationLayout = dialogView.findViewById(R.id.fromStationLayout);
         this.fromStationField = dialogView.findViewById(R.id.editFromStation);
-        this.toStationLayout = dialogView.findViewById(R.id.toStationLayout);
         this.toStationField = dialogView.findViewById(R.id.editToStation);
         this.distanceField = dialogView.findViewById(R.id.editDistance);
         this.azimuthField = dialogView.findViewById(R.id.editAzimuth);

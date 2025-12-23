@@ -10,8 +10,6 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.SurveyManager;
