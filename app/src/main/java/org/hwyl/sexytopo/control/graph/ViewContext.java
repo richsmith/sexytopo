@@ -15,6 +15,7 @@ public enum ViewContext {
         public void configureViewSpecificItems(Menu menu) {
             menu.findItem(R.id.action_jump_to_table).setVisible(false);
             setDirectionSubmenuVisible(menu, false);
+            setCrossSectionVisible(menu, false);
         }
     },
     PLAN {
@@ -22,6 +23,7 @@ public enum ViewContext {
         public void configureViewSpecificItems(Menu menu) {
             menu.findItem(R.id.action_jump_to_plan).setVisible(false);
             setDirectionSubmenuVisible(menu, false);
+            setCrossSectionVisible(menu, true);
         }
     },
     ELEVATION {
@@ -29,6 +31,7 @@ public enum ViewContext {
         public void configureViewSpecificItems(Menu menu) {
             menu.findItem(R.id.action_jump_to_elevation).setVisible(false);
             setDirectionSubmenuVisible(menu, false);
+            setCrossSectionVisible(menu, false);
         }
     },
     EXTENDED_ELEVATION {
@@ -45,6 +48,13 @@ public enum ViewContext {
         MenuItem elevationMenu = menu.findItem(R.id.menu_elevation);
         if (elevationMenu != null) {
             elevationMenu.setVisible(visible);
+        }
+    }
+
+    protected void setCrossSectionVisible(Menu menu, boolean visible) {
+        MenuItem crossSectionItem = menu.findItem(R.id.action_new_cross_section);
+        if (crossSectionItem != null) {
+            crossSectionItem.setVisible(visible);
         }
     }
 }

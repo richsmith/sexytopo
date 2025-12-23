@@ -11,16 +11,21 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
+import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.control.util.SurveyTools;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 public class EditLegForm extends Form {
+    // Input mode spinner positions
+    private static final int SPINNER_POSITION_FORWARD = 0;
+    private static final int SPINNER_POSITION_BACKWARD = 1;
+
     Context context;
     Survey survey;
     private String defaultToName;
-    private Station originalFromStation;
+    private final Station originalFromStation;
     Leg originalLeg;
     boolean isSplay;
     boolean isEditingLeg;
@@ -57,7 +62,7 @@ public class EditLegForm extends Form {
         this.originalFromStation = fromStation;
         this.originalLeg = legToEdit;
         this.isSplay = !legToEdit.hasDestination();
-        this.inputMode = legToEdit.wasShotBackwards() ? InputMode.BACKSIGHT : InputMode.FORWARD;
+        this.inputMode = legToEdit.wasShotBackwards() ? InputMode.BACKWARD : InputMode.FORWARD;
 
         this.initialise(dialogView);
     }
@@ -122,13 +127,15 @@ public class EditLegForm extends Form {
             this.inputModeSpinner.setAdapter(adapter);
 
             // Set initial selection
-            this.inputModeSpinner.setSelection(inputMode.getSpinnerPosition());
+            this.inputModeSpinner.setSelection(
+                inputMode == InputMode.FORWARD ? SPINNER_FORWARD : SPINNER_BACKWARD);
 
             // Set up spinner listener to update display when selection changes
             this.inputModeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    InputMode newMode = InputMode.fromSpinnerPosition(position);
+                    InputMode newMode = position == SPINNER_FORWARD ?
+                        InputMode.FORWARD : InputMode.BACKWARD;
                     boolean isChange = inputMode != newMode;
 
                     if (isChange) {
@@ -152,8 +159,8 @@ public class EditLegForm extends Form {
     @Override
     protected void performValidation() {
         // Validate stations
-        EditText graphFromField = inputMode.isBacksight() ? toStationField : fromStationField;
-        EditText graphToField = inputMode.isBacksight() ? fromStationField : toStationField;
+        EditText graphFromField = inputMode == InputMode.BACKWARD ? toStationField : fromStationField;
+        EditText graphToField = inputMode == InputMode.BACKWARD ? fromStationField : toStationField;
        
         Station fromStation = validateGraphFromField(graphFromField);
         if (!isSplay) {
@@ -301,8 +308,8 @@ public class EditLegForm extends Form {
             graphFromStationField = fromStationField;
             graphToStationField = toStationField; // not used for splay but probably safer to set
         } else {
-            graphFromStationField = inputMode.isBacksight() ? toStationField : fromStationField;
-            graphToStationField = inputMode.isBacksight() ? fromStationField : toStationField;
+            graphFromStationField = inputMode == InputMode.BACKWARD ? toStationField : fromStationField;
+            graphToStationField = inputMode == InputMode.BACKWARD ? fromStationField : toStationField;
         }
 
     }
@@ -326,7 +333,7 @@ public class EditLegForm extends Form {
     }
 
     private String getFromStationName() {
-        if (inputMode.isBacksight() && !isSplay) {
+        if (inputMode == InputMode.BACKWARD && !isSplay) {
             return toStationField.getText().toString();
         }
         return fromStationField.getText().toString();
@@ -358,7 +365,7 @@ public class EditLegForm extends Form {
     }
 
     private String getToStationName() {
-        if (inputMode.isBacksight()) {
+        if (inputMode == InputMode.BACKWARD) {
             return fromStationField.getText().toString();
         }
         return toStationField.getText().toString();
@@ -388,7 +395,7 @@ public class EditLegForm extends Form {
         }
 
         // Apply backwards flag if needed
-        if (inputMode.isBacksight()) {
+        if (inputMode == InputMode.BACKWARD) {
             leg = leg.reverse();
         }
 

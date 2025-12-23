@@ -17,12 +17,17 @@
                 android:title="@string/menu_set_active_station"/>
 
             <item
-                android:id="@+id/action_comment"
-                android:title="@string/menu_comment"/>
-
-            <item
                 android:id="@+id/action_rename_station"
                 android:title="@string/menu_rename_station"/>
+
+            <item
+                android:id="@+id/action_new_cross_section"
+                android:title="@string/menu_new_cross_section"
+                android:visible="false"/>
+
+            <item
+                android:id="@+id/action_comment"
+                android:title="@string/menu_comment"/>
 
             <item
                 android:id="@+id/action_delete_station"
@@ -105,10 +110,6 @@
         android:id="@+id/menu_survey"
         android:title="Survey">
         <menu>
-            <item
-                android:id="@+id/action_new_cross_section"
-                android:title="@string/menu_new_cross_section"/>
-
             <item
                 android:id="@+id/action_start_new_survey"
                 android:title="@string/menu_start_new_survey"/>
