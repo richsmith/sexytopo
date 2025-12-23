@@ -405,4 +405,52 @@ public class EditLegForm extends Form {
         }
         return survey.getStationByName(getToStationName());
     }
+
+    /**
+     * Create a Leg object from the form data with measurements and shot direction.
+     * For editing: preserves the existing destination station object.
+     * For adding: destination will be null (caller must create and set the station).
+     * Should only be called after validation passes.
+     */
+    public Leg getUpdatedLeg() {
+        float distance = getDistance();
+        float azimuth = getAzimuth();
+        float inclination = getInclination();
+
+        Leg leg;
+        if (isSplay) {
+            leg = new Leg(distance, azimuth, inclination);
+        } else {
+            // For editing: reuse existing destination station object
+            // For adding: destination will be null, caller creates the station
+            Station destination = (originalLeg != null && originalLeg.hasDestination())
+                ? originalLeg.getDestination()
+                : null;
+            leg = new Leg(distance, azimuth, inclination, destination, new Leg[]{});
+        }
+
+        // Apply backwards flag if needed
+        if (wasShotBackwards()) {
+            leg = leg.reverse();
+        }
+
+        return leg;
+    }
+
+    /**
+     * Get the from station for the leg.
+     * Should only be called after validation passes.
+     */
+    public Station getUpdatedFromStation() {
+        return getFromStation();
+    }
+
+    /**
+     * Get the to station name for the leg.
+     * Returns null for splays.
+     * Should only be called after validation passes.
+     */
+    public String getUpdatedToStationName() {
+        return isSplay ? null : getToStationName();
+    }
 }

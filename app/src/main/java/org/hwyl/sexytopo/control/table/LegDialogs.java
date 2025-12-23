@@ -123,23 +123,21 @@ public class LegDialogs {
                     return;
                 }
 
-                // Parse measurements using form methods
-                float distance = form.getDistance();
-                float azimuth = form.getAzimuth();
-                float inclination = form.getInclination();
-
-                // Get from station using form method
-                Station fromStation = form.getFromStation();
+                // Get the leg with measurements and shot direction from form
+                Leg leg = form.getUpdatedLeg();
+                Station fromStation = form.getUpdatedFromStation();
 
                 if (isSplay) {
-                    // Create splay (no destination)
-                    Leg splay = new Leg(distance, azimuth, inclination);
-                    fromStation.getOnwardLegs().add(splay);
+                    // Add splay to from station
+                    fromStation.getOnwardLegs().add(leg);
                 } else {
-                    // Get to station name and create new station
-                    String toStationName = form.getToStationName();
+                    // Create new destination station and set it on the leg
+                    String toStationName = form.getUpdatedToStationName();
                     Station newStation = new Station(toStationName);
-                    Leg leg = new Leg(distance, azimuth, inclination, newStation, new Leg[]{});
+
+                    // Reconstruct leg with destination station (preserving backwards flag from form)
+                    leg = new Leg(leg.getDistance(), leg.getAzimuth(), leg.getInclination(),
+                                  newStation, new Leg[]{}, leg.wasShotBackwards());
 
                     // Add leg to from station
                     fromStation.getOnwardLegs().add(leg);
@@ -255,31 +253,11 @@ public class LegDialogs {
 
                 dialogInterface.dismiss();
 
-                // Parse measurements using form methods
-                float distance = form.getDistance();
-                float azimuth = form.getAzimuth();
-                float inclination = form.getInclination();
-
-                // Create the edited leg with new measurements
-                Leg edited = new Leg(distance, azimuth, inclination);
-
-                // Preserve destination if it's a full leg
-                if (toEdit.hasDestination()) {
-                    edited = new Leg(
-                        edited.getDistance(),
-                        edited.getAzimuth(),
-                        edited.getInclination(),
-                        toEdit.getDestination(),
-                        new Leg[]{});
-                }
-
-                // Handle backwards shots
-                if (toEdit.wasShotBackwards()) {
-                    edited = edited.reverse();
-                }
+                // Get the updated leg with measurements and shot direction from form
+                Leg edited = form.getUpdatedLeg();
 
                 // Get the new station names from the form
-                String newFromStationName = form.getFromStationName();
+                Station newFromStation = form.getUpdatedFromStation();
                 String oldFromStationName = fromStation.getName();
 
                 // Apply changes in the correct order:
@@ -287,14 +265,13 @@ public class LegDialogs {
                 SurveyUpdater.editLeg(survey, toEdit, edited);
 
                 // 2. Move leg if from station changed
-                if (!newFromStationName.equals(oldFromStationName)) {
-                    Station newFromStation = survey.getStationByName(newFromStationName);
+                if (!newFromStation.getName().equals(oldFromStationName)) {
                     SurveyUpdater.moveLeg(survey, edited, newFromStation);
                 }
 
                 // 3. Rename destination station if to station name changed (for full legs)
                 if (toEdit.hasDestination()) {
-                    String newToStationName = form.getToStationName();
+                    String newToStationName = form.getUpdatedToStationName();
                     String oldToStationName = toEdit.getDestination().getName();
                     if (!newToStationName.equals(oldToStationName)) {
                         SurveyUpdater.renameStation(survey, edited.getDestination(), newToStationName);
