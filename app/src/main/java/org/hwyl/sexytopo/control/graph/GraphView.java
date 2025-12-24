@@ -223,7 +223,9 @@ public class GraphView extends View {
 
         highlightPaint.setStyle(Paint.Style.STROKE);
         highlightPaint.setStrokeWidth(HIGHLIGHT_OUTLINE);
-        highlightPaint.setColor(HIGHLIGHT_COLOUR.intValue);
+        int activeStationHighlightColor = androidx.core.content.ContextCompat.getColor(
+            getContext(), R.color.activeStationHighlight);
+        highlightPaint.setColor(activeStationHighlightColor);
 
         // active legs/splays
         int legStrokeWidth = GeneralPreferences.getLegStrokeWidth();

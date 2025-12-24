@@ -120,17 +120,26 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
 
             // Set background color with alternate row shading (theme-aware)
             if (isActiveStation(map.get(col))) {
-                // Highlight active station with theme-aware color
+                // Highlight active station with theme-aware amber/yellow
                 int bgColor = ContextCompat.getColor(context, R.color.tableHighlight);
                 textView.setBackgroundColor(bgColor);
-            } else if (position % 2 == 0) {
-                // Even rows - main background color
-                int bgColor = ContextCompat.getColor(context, R.color.tableBackground);
-                textView.setBackgroundColor(bgColor);
+                // Set contrasting text color for readability
+                int textColor = ContextCompat.getColor(context, R.color.tableHighlightText);
+                textView.setTextColor(textColor);
             } else {
-                // Odd rows - alternate background color
-                int bgColor = ContextCompat.getColor(context, R.color.tableBackgroundAlt);
-                textView.setBackgroundColor(bgColor);
+                // Reset text color to default for non-highlighted rows
+                int textColor = ContextCompat.getColor(context, R.color.bodyTextColor);
+                textView.setTextColor(textColor);
+
+                if (position % 2 == 0) {
+                    // Even rows - main background color
+                    int bgColor = ContextCompat.getColor(context, R.color.tableBackground);
+                    textView.setBackgroundColor(bgColor);
+                } else {
+                    // Odd rows - alternate background color
+                    int bgColor = ContextCompat.getColor(context, R.color.tableBackgroundAlt);
+                    textView.setBackgroundColor(bgColor);
+                }
             }
 
             // Bold for full legs, normal for splays

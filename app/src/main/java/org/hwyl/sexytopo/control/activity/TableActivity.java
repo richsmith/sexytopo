@@ -247,17 +247,20 @@ public class TableActivity extends SurveyEditorActivity
             clearHighlight();
             highlightedRow = viewHolder.itemView;
 
-            // Get highlight color and make it semi-transparent
-            int highlightColor = androidx.core.content.ContextCompat.getColor(this, R.color.tableHighlight);
-            ColorDrawable highlightDrawable = new ColorDrawable(highlightColor);
-            highlightDrawable.setAlpha(80); // 0-255, where 80 is about 30% opacity
+            // Get primary color and make it semi-transparent
+            android.util.TypedValue typedValue = new android.util.TypedValue();
+            getTheme().resolveAttribute(androidx.appcompat.R.attr.colorPrimary, typedValue, true);
+            int primaryColor = typedValue.data;
+
+            ColorDrawable highlightDrawable = new ColorDrawable(primaryColor);
+            highlightDrawable.setAlpha(51); // 0-255, where 51 is 20% opacity
 
             // Set foreground on the row to highlight it (works on API 23+)
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
                 highlightedRow.setForeground(highlightDrawable);
             } else {
                 // Fallback: set background with transparency to show through
-                highlightedRow.setBackgroundColor(highlightColor & 0x50FFFFFF); // 50 = ~30% alpha
+                highlightedRow.setBackgroundColor(primaryColor & 0x33FFFFFF); // 33 = 20% alpha
             }
         }
 
