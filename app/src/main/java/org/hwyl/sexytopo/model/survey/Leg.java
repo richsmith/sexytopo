@@ -86,7 +86,7 @@ public class Leg extends SurveyComponent {
                 leg.promotedFrom, leg.wasShotBackwards);
     }
 
-    public static Leg manuallyUpgradeSplayToConnectedLeg(Leg splay, Station destination) {
+    public static Leg toFullLeg(Leg splay, Station destination) {
         return upgradeSplayToConnectedLeg(splay, destination, NO_LEGS);
     }
 
@@ -134,6 +134,10 @@ public class Leg extends SurveyComponent {
 
     public Leg asBacksight() {
         return asBacksight(Survey.NULL_STATION);
+    }
+
+    public Leg toSplay() {
+        return new Leg(distance, azimuth, inclination, wasShotBackwards);
     }
 
     public float getDistance() {

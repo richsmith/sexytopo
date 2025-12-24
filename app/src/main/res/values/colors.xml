@@ -31,6 +31,8 @@
     <color name="md_light_surface">#F5F5F5</color>
     <color name="md_light_surface_dim">#0D0D0D</color>
     <color name="md_yellow">#FFD700</color>
+    <color name="md_amber_500">#FFC107</color>
+    <color name="md_amber_300">#FFD54F</color>
 
     <!-- Dark Theme Specific Primitives -->
     <color name="md_dark_bg">#121212</color>
@@ -76,14 +78,19 @@
     <color name="headerBackground">@color/md_sexy_green</color>
     <color name="innerPanelBackground">@color/md_grey_100</color>
 
+    <!-- Dialogs -->
+    <color name="dialogSurface">@color/md_white</color>
+
     <!-- Tables -->
     <color name="tableBackground">@color/md_white</color>
     <color name="tableBackgroundAlt">@color/md_light_surface</color>
-    <color name="tableHighlight">@color/md_yellow</color>
+    <color name="tableHighlight">@color/md_amber_500</color>
+    <color name="tableHighlightText">@color/md_black</color>
 
     <!-- UI Elements -->
     <color name="grid">@color/md_grey_200</color>
     <color name="station">@color/md_red</color>
+    <color name="activeStationHighlight">@color/md_amber_500</color>
     <color name="legend">@color/md_black</color>
     <color name="buttonHighlight">@color/md_white</color>
     <color name="error">@color/md_red</color>

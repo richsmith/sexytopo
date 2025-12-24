@@ -42,8 +42,6 @@ import org.hwyl.sexytopo.control.util.CrossSectioner;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
-import org.hwyl.sexytopo.control.util.SurveyStats;
-import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Direction;
@@ -157,6 +155,9 @@ public class GraphView extends View {
     public SketchTool currentSketchTool = SketchTool.MOVE;
     // used to jump back to the previous tool when using one-use tools
     private SketchTool previousSketchTool = SketchTool.SELECT;
+
+    // Flag to prevent double menu opening during this touch sequence
+    private boolean menuShownInThisTouch = false;
     private Symbol currentSymbol = Symbol.getDefault();
 
     // a bit hacky but I can't think of a better way to do this
@@ -222,7 +223,9 @@ public class GraphView extends View {
 
         highlightPaint.setStyle(Paint.Style.STROKE);
         highlightPaint.setStrokeWidth(HIGHLIGHT_OUTLINE);
-        highlightPaint.setColor(HIGHLIGHT_COLOUR.intValue);
+        int activeStationHighlightColor = androidx.core.content.ContextCompat.getColor(
+            getContext(), R.color.activeStationHighlight);
+        highlightPaint.setColor(activeStationHighlightColor);
 
         // active legs/splays
         int legStrokeWidth = GeneralPreferences.getLegStrokeWidth();
@@ -328,6 +331,11 @@ public class GraphView extends View {
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+
+        // Reset menu flag at start of new touch sequence
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            menuShownInThisTouch = false;
+        }
 
         scaleGestureDetector.onTouchEvent(event);
         longPressDetector.onTouchEvent(event);
@@ -664,12 +672,17 @@ public class GraphView extends View {
                     return false;
 
                 } else if (newSelectedStation != survey.getActiveStation()) {
-                    setActiveStation(newSelectedStation);
+                    survey.setActiveStation(newSelectedStation);
+                    broadcastSurveyUpdated();
                     invalidate();
                     return true;
 
                 } else { // double selection opens context menu
-                    showContextMenu(event, newSelectedStation);
+                    if (!menuShownInThisTouch) {
+                        showContextMenu(event, newSelectedStation);
+                        menuShownInThisTouch = true;
+                    }
+                    return true;
                 }
 
             case MotionEvent.ACTION_MOVE:
@@ -717,121 +730,31 @@ public class GraphView extends View {
 
 
     private void showContextMenu(MotionEvent event, final Station station) {
+        // Determine view context based on projection type
+        ViewContext viewContext = getViewContextFromProjection();
 
-        OnClickListener listener = view -> {
-            int id = view.getId();
-
-            // this has to be a big if-else chain rather than a switch statement
-            // because IDs are no longer final
-            if (id == R.id.graph_station_select) {
-                setActiveStation(station);
-                invalidate();
-            } else if (id == R.id.graph_station_toggle_left_right) {
-                Direction newDirection = station.getExtendedElevationDirection().opposite();
-                SurveyUpdater.setDirectionOfSubtree(station,newDirection);
-                broadcastSurveyUpdated();
-                invalidate();
-            } else if (id == R.id.graph_station_comment) {
-                openCommentDialog(station);
-            } else if (id == R.id.graph_station_reverse) {
-                SurveyUpdater.reverseLeg(survey, station);
-                broadcastSurveyUpdated();
-                invalidate();
-            } else if (id == R.id.graph_station_delete) {
-                askAboutDeletingStation(station);
-                invalidate();
-            } else if (id == R.id.graph_station_new_cross_section) {
-                stationNameBeingCrossSectioned = station.getName();
-                setSketchTool(SketchTool.POSITION_CROSS_SECTION);
-                activity.showSimpleToast(R.string.sketch_position_cross_section_instruction);
-            } else if (id == R.id.graph_station_jump_to_table) {
-                activity.jumpToStation(station, TableActivity.class);
-            } else if (id == R.id.graph_station_jump_to_plan) {
-                activity.jumpToStation(station, PlanActivity.class);
-            } else if (id == R.id.graph_station_jump_to_ee) {
-                activity.jumpToStation(station, ExtendedElevationActivity.class);
-            } else if (id == R.id.graph_station_start_new_survey) {
-                if (!survey.isSaved()) {
-                    activity.showSimpleToast(R.string.file_cannot_extend_unsaved_survey);
-                }
-                activity.continueSurvey(station);
-            } else if (id == R.id.graph_station_unlink_survey) {
-                activity.unlinkSurvey(station);
-            }
-        };
-
-        PopupWindow menu = activity.getContextMenu(station, listener);
-
-        View unlinkSurveyButton = menu.getContentView().findViewById(R.id.graph_station_unlink_survey);
-        unlinkSurveyButton.setEnabled(survey.hasLinkedSurveys(station));
-
-        View commentButton = menu.getContentView().findViewById(R.id.graph_station_comment);
-        commentButton.setEnabled(station != survey.getOrigin());
-
-        menu.showAtLocation(this, Gravity.START | Gravity.TOP,
-                (int) (event.getX()), (int) (event.getY()));
+        // Use activity as listener (it implements ContextMenuManager.StationMenuListener)
+        ContextMenuManager menuManager = new ContextMenuManager(getContext(), viewContext, activity);
+        menuManager.showMenu(this, station, survey, (int) event.getX(), (int) event.getY());
     }
 
-
-    private void openCommentDialog(final Station station) {
-        TextInputLayout inputLayout = new TextInputLayout(getContext());
-        inputLayout.setBoxBackgroundMode(TextInputLayout.BOX_BACKGROUND_OUTLINE);
-        inputLayout.setHint(getContext().getString(R.string.graph_comment_hint));
-
-        TextInputEditText input = new TextInputEditText(getContext());
-        input.setLines(8);
-        input.setGravity(Gravity.START | Gravity.TOP);
-        input.setText(station.getComment());
-        input.setFocusableInTouchMode(true);
-        inputLayout.addView(input);
-
-        int paddingH = (int) (24 * getResources().getDisplayMetrics().density);
-        int paddingV = (int) (20 * getResources().getDisplayMetrics().density);
-        inputLayout.setPadding(paddingH, paddingV, paddingH, 0);
-
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
-        builder.setView(inputLayout)
-            .setTitle(station.getName())
-            .setPositiveButton(R.string.save,
-                (dialog, which) -> station.setComment(input.getText().toString()))
-            .setNegativeButton(R.string.cancel, null);
-
-        android.app.Dialog dialog = builder.create();
-        dialog.getWindow().setSoftInputMode(
-            WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-        dialog.show();
-        input.requestFocus();
-    }
-
-
-    private void askAboutDeletingStation(final Station station) {
-
-        int numFullLegsToBeDeleted = 1 + SurveyStats.calcNumberSubFullLegs(station);
-        int numSplaysToBeDeleted = SurveyStats.calcNumberSubSplays(station);
-
-        Context context = getContext();
-        String message = context.getString(R.string.context_this_will_delete);
-
-        if (numFullLegsToBeDeleted > 0) {
-            String noun = context.getString(R.string.leg).toLowerCase();
-            message += "\n" + TextTools.pluralise(numFullLegsToBeDeleted, noun);
-            noun = context.getString(R.string.station).toLowerCase();
-            message += " (" + TextTools.pluralise(numFullLegsToBeDeleted, noun) + ")";
-        }
-        if (numSplaysToBeDeleted > 0) {
-            String noun = context.getString(R.string.splay).toLowerCase();
-            message += "\n" + TextTools.pluralise(numSplaysToBeDeleted, noun);
+    /**
+     * Determine the view context for the context menu based on current projection.
+     */
+    private ViewContext getViewContextFromProjection() {
+        if (projectionType == null) {
+            return ViewContext.PLAN;
         }
 
-        new MaterialAlertDialogBuilder(getContext())
-                .setMessage(message)
-                .setPositiveButton(R.string.delete, (dialog, which) -> {
-                    SurveyUpdater.deleteStation(survey, station);
-                    broadcastSurveyUpdated();
-                })
-                .setNegativeButton(R.string.cancel, null)
-                .show();
+        if (projectionType == Projection2D.PLAN) {
+            return ViewContext.PLAN;
+        } else if (projectionType == Projection2D.EXTENDED_ELEVATION) {
+            return ViewContext.EXTENDED_ELEVATION;
+        } else {
+            return ViewContext.ELEVATION;
+        }
     }
+
 
     public float spToPixels(float sp) {
         float scaledSizeInPixels =
@@ -865,9 +788,10 @@ public class GraphView extends View {
 
     }
 
-    private void setActiveStation(Station station) {
-        survey.setActiveStation(station);
-        broadcastSurveyUpdated();
+    public void handleNewCrossSection(Station station) {
+        stationNameBeingCrossSectioned = station.getName();
+        setSketchTool(SketchTool.POSITION_CROSS_SECTION);
+        activity.showSimpleToast(R.string.sketch_position_cross_section_instruction);
     }
 
     private void broadcastSurveyUpdated() {
@@ -1647,8 +1571,9 @@ public class GraphView extends View {
         public void onLongPress(MotionEvent motionEvent) {
             Coord2D touchPointOnView = new Coord2D(motionEvent.getX(), motionEvent.getY());
             Station matchedStation = checkForStation(touchPointOnView);
-            if (matchedStation != null) {
+            if (matchedStation != null && !menuShownInThisTouch) {
                 showContextMenu(motionEvent, matchedStation);
+                menuShownInThisTouch = true;
             }
         }
     }

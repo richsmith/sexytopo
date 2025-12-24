@@ -81,5 +81,13 @@ public class SurveyTools {
         boolean call(Station station);
     }
 
+    public static boolean isInSubtree(Station root, Station station) {
+        if (root == null || station == null) {
+            return false;
+        }
+        return traverseStations(
+            root,
+            s -> s.equals(station));
+    }
 
 }

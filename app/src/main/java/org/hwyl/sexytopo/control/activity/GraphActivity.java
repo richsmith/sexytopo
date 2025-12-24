@@ -30,7 +30,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.graph.GraphView;
-import org.hwyl.sexytopo.control.graph.StationContextMenu;
 import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.model.graph.Coord2D;
@@ -45,7 +44,7 @@ import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 
-public abstract class GraphActivity extends SexyTopoActivity
+public abstract class GraphActivity extends SurveyEditorActivity
         implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
 
     private static final float ZOOM_INCREMENT = 1.1f;
@@ -419,13 +418,7 @@ public abstract class GraphActivity extends SexyTopoActivity
     }
 
     private View getSymbolToolbar() {
-        // Have to have separate IDs because Android goes nuts if it tries to restore the state
-        // of a scroll view with the same ID in two different layouts
-        if (isInPortraitMode()) {
-            return findViewById(R.id.symbolToolbar);
-        } else {
-            return findViewById(R.id.symbolToolbarLandscape);
-        }
+        return findViewById(R.id.symbolToolbar);
     }
 
 
@@ -510,8 +503,14 @@ public abstract class GraphActivity extends SexyTopoActivity
         }
     }
 
-    public PopupWindow getContextMenu(Station station, View.OnClickListener listener) {
-        return new StationContextMenu().getFakeStationContextMenu(this, station, listener);
+    @Override
+    protected void invalidateView() {
+        graphView.invalidate();
+    }
+
+    @Override
+    public void onNewCrossSection(Station station) {
+        graphView.handleNewCrossSection(station);
     }
 
 }

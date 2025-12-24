@@ -13,6 +13,10 @@
         <item name="colorAccent">@color/sexyTopoGreen</item>
         <item name="colorSecondary">@color/sexyTopoGreen</item>
 
+        <!-- Surface colors for menus and popups -->
+        <item name="colorSurface">@color/dialogSurface</item>
+        <item name="colorOnSurface">@android:color/black</item>
+
         <!-- Material dialog styling -->
         <item name="materialAlertDialogTheme">@style/MaterialAlertDialog.App</item>
     </style>

@@ -46,4 +46,14 @@
         <item name="android:elevation">2dp</item>
     </style>
 
+    <style name="ContextMenuButton" parent="Widget.AppCompat.Button">
+        <item name="android:background">?attr/colorSurface</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="ShapeAppearance.App.SmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">6dp</item>
+    </style>
+
 </resources>

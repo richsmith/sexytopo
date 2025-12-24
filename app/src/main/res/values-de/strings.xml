@@ -186,6 +186,7 @@
     <string name="manual_add_station_title">Messpunkt hinzufügen</string>
     <string name="manual_add_splay_title">Dimension oder Hilfslinie hinzufügen</string>
     <string name="manual_edit_leg_title">Messstrecke bearbeiten</string>
+    <string name="manual_edit_splay_title">Peilung bearbeiten</string>
     <string name="manual_edit_distance">Distanz (m)</string>
     <string name="manual_edit_distance_error">Fehlerhafte Distanzmessung</string>
     <string name="manual_edit_azimuth">Azimut (°)</string>
@@ -200,6 +201,11 @@
     <string name="manual_edit_right">Rechts (m)</string>
     <string name="manual_edit_up">Nach oben (m)</string>
     <string name="manual_edit_down">Nach unten (m)</string>
+    <string name="manual_edit_from_station">Von Station</string>
+    <string name="manual_edit_from_station_error">Ungültige Startstation</string>
+    <string name="manual_edit_to_station">Zur Station</string>
+    <string name="manual_edit_to_station_error">Ungültige Zielstation</string>
+    <string name="manual_edit_shot_backwards">⬅ Rückwärts gemessen</string>
     <string name="manual_rename_station_title">Messpunkt umbenennen</string>
     <string name="manual_rename_station_hint">Stationsname</string>
     <string name="manual_rename_error">Umbenennen fehlgeschlagen</string>
@@ -450,6 +456,18 @@
     <string name="survey_update_moved_leg">Messstrecke zum Messpunkt %1$s verschoben</string>
     <string name="survey_update_adding_leg">Messstrecke %1$s wird hinzugefügt</string>
     <string name="survey_update_reversed_leg">Messstrecke %1$s nach %2$s gedreht</string>
+    <string name="survey_update_error_descendant_station">Messstrecke kann nicht zu einem nachgeordneten Messpunkt verschoben werden</string>
+
+    <!--  Form validation errors  -->
+    <string name="validation_error_cannot_be_blank">Darf nicht leer sein</string>
+    <string name="validation_error_station_named_dash">Messpunkt kann nicht \"-\" heißen</string>
+    <string name="validation_error_station_does_not_exist">Messpunkt existiert nicht</string>
+    <string name="validation_error_same_as_from_station">Kann nicht derselbe wie der Ursprungsmesspunkt sein</string>
+    <string name="validation_error_station_name_not_unique">Messpunktname muss eindeutig sein</string>
+    <string name="validation_error_must_be_number">Muss eine Zahl sein</string>
+    <string name="validation_error_distance_minimum">Muss >= %1$f sein</string>
+    <string name="validation_error_azimuth_range">Muss zwischen %1$f und %2$f liegen</string>
+    <string name="validation_error_inclination_range">Muss zwischen %1$f und %2$f liegen</string>
 
     <!--  Survey symbols  -->
     <string name="symbol_text">Text</string>
@@ -475,12 +493,20 @@
 
     <!--  Context menu(s)  -->
     <string name="menu_context_title">Messpunkt</string>
-    <string name="menu_set_active_station">Messpunkt als aktiv setzen</string>
-    <string name="menu_rename_station">Messpunkt umbenennen</string>
-    <string name="menu_edit_leg">Zeile Bearbeiten</string>
+    <string name="menu_leg">Messung</string>
+    <string name="menu_splay">Splay</string>
+    <string name="menu_station">Messpunkt</string>
+    <string name="menu_set_active_station">Als aktiv setzen</string>
+    <string name="menu_rename_station">Umbenennen</string>
+    <string name="menu_edit_leg">Bearbeiten</string>
     <string name="menu_upgrade_row">Neuen Messpunkt erzwingen</string>
-    <string name="menu_delete_leg">Messstrecke löschen</string>
+    <string name="menu_upgrade_splay">Zu Messstrecke aufwerten</string>
+    <string name="menu_downgrade_leg">Zu Splay abwerten</string>
+    <string name="menu_delete_leg">Löschen</string>
     <string name="menu_delete_splay">Dimension oder Hilfslinie löschen</string>
+    <string name="menu_elevation">Aufriss</string>
+    <string name="menu_draw_left">Links zeichnen</string>
+    <string name="menu_draw_right">Rechts zeichnen</string>
     <string name="menu_move_row">Zu anderem Messpunkt wechseln</string>
     <string name="menu_jump_to">Springen</string>
     <string name="menu_jump_to_station_in_plan">→ Grundriss</string>
@@ -493,6 +519,9 @@
     <string name="menu_unlink_survey">Verknüpfung zu anderer Vermessungsdatei lösen</string>
     <string name="menu_comment">Kommentar</string>
     <string name="menu_toggle_left_right">Links/Rechts umschalten</string>
+    <string name="menu_context_title_leg_to">Messung zu %s</string>
+    <string name="menu_context_title_leg_from">Messung von %s</string>
+    <string name="menu_context_title_splay">%s zu Splay</string>
     <string name="context_this_will_delete">Dadurch wird Folgendes gelöscht:</string>
     <string name="context_jump_to_splay_error">Kann nicht zum Ende einer Dimension/Hilfslinie springen</string>
     <string name="context_jump_to_station_error">Fehler beim Springen zum Messpunkt %1$s</string>

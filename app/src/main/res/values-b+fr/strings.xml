@@ -187,6 +187,7 @@
     <string name="manual_add_station_title">Ajouter une station</string>
     <string name="manual_add_splay_title">Ajouter une radiale</string>
     <string name="manual_edit_leg_title">Modifier le segment</string>
+    <string name="manual_edit_splay_title">Modifier la radiale</string>
     <string name="manual_edit_distance">Distance (m)</string>
     <string name="manual_edit_distance_error">Distance incorrecte</string>
     <string name="manual_edit_azimuth">Azimut (&#176;)</string>
@@ -201,6 +202,10 @@
     <string name="manual_edit_right">Droite (m)</string>
     <string name="manual_edit_up">Haut (m)</string>
     <string name="manual_edit_down">Bas (m)</string>
+    <string name="manual_edit_from_station">Station de départ</string>
+    <string name="manual_edit_from_station_error">Station de départ invalide</string>
+    <string name="manual_edit_to_station">Station d\'arrivée</string>
+    <string name="manual_edit_to_station_error">Station d\'arrivée invalide</string>
     <string name="manual_rename_station_title">Renommer la station</string>
     <string name="manual_rename_station_hint">Nom de la station</string>
     <string name="manual_rename_error">Échec du renommage</string>
@@ -463,6 +468,18 @@
     <string name="survey_update_moved_leg">Segment déplacé vers la station %1$s</string>
     <string name="survey_update_adding_leg">Ajout du segment %1$s</string>
     <string name="survey_update_reversed_leg">Segment inversé de %1$s à %2$s</string>
+    <string name="survey_update_error_descendant_station">Impossible de déplacer le segment vers une station descendante</string>
+
+    <!-- Form validation errors -->
+    <string name="validation_error_cannot_be_blank">Ne peut pas être vide</string>
+    <string name="validation_error_station_named_dash">La station ne peut pas s\'appeler \"-\"</string>
+    <string name="validation_error_station_does_not_exist">La station n\'existe pas</string>
+    <string name="validation_error_same_as_from_station">Ne peut pas être identique à la station d\'origine</string>
+    <string name="validation_error_station_name_not_unique">Le nom de la station doit être unique</string>
+    <string name="validation_error_must_be_number">Doit être un nombre</string>
+    <string name="validation_error_distance_minimum">Doit être >= %1$f</string>
+    <string name="validation_error_azimuth_range">Doit être entre %1$f et %2$f</string>
+    <string name="validation_error_inclination_range">Doit être entre %1$f et %2$f</string>
 
     <!-- Survey symbols -->
     <string name="symbol_text">Texte</string>
@@ -488,12 +505,23 @@
 
     <!-- Context menu(s) -->
     <string name="menu_context_title">Station</string>
-    <string name="menu_set_active_station">Définir la station active</string>
-    <string name="menu_rename_station">Renommer la station</string>
-    <string name="menu_edit_leg">Modifier la ligne</string>
+    <string name="menu_context_title_leg_to">Visée vers %s</string>
+    <string name="menu_context_title_leg_from">Visée depuis %s</string>
+    <string name="menu_context_title_splay">%s à Visée rayonnante</string>
+    <string name="menu_leg">Visée</string>
+    <string name="menu_splay">Visée rayonnante</string>
+    <string name="menu_station">Station</string>
+    <string name="menu_set_active_station">Définir active</string>
+    <string name="menu_rename_station">Renommer</string>
+    <string name="menu_edit_leg">Modifier</string>
     <string name="menu_upgrade_row">Forcer une nouvelle station</string>
-    <string name="menu_delete_leg">Supprimer le segment</string>
+    <string name="menu_upgrade_splay">Convertir en visée directionnelle</string>
+    <string name="menu_downgrade_leg">Convertir en visée rayonnante</string>
+    <string name="menu_delete_leg">Supprimer</string>
     <string name="menu_delete_splay">Supprimer la radiale</string>
+    <string name="menu_elevation">Élévation</string>
+    <string name="menu_draw_left">Dessiner à gauche</string>
+    <string name="menu_draw_right">Dessiner à droite</string>
     <string name="menu_move_row">Changer de station</string>
     <string name="menu_jump_to">Aller à</string>
     <string name="menu_jump_to_station_in_plan">→ Plan</string>
@@ -528,5 +556,10 @@
     <string name="request_code_error">Erreur de code %1$d lors de la demande de code %2$d</string>
     <string name="killing_comms_process">Processus de communication terminé</string>
     <string name="setup_error_load_symbol_svg">Erreur lors du chargement du symbole SVG %1$s</string>
+
+    <!-- Table context menu titles -->
+    <string name="table_context_leg_to">Visée vers %s</string>
+    <string name="table_context_leg_from">Visée depuis %s</string>
+    <string name="table_context_splay">Visée rayonnante %s</string>
 
 </resources>

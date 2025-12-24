@@ -2,31 +2,33 @@ package org.hwyl.sexytopo.control.activity;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
-import android.widget.PopupMenu;
 import android.widget.Spinner;
 import android.widget.TableLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.core.content.ContextCompat;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
-import org.hwyl.sexytopo.control.table.ManualEntry;
+import org.hwyl.sexytopo.control.graph.ContextMenuManager;
+import org.hwyl.sexytopo.control.graph.ViewContext;
+import org.hwyl.sexytopo.control.table.LegDialogs;
 import org.hwyl.sexytopo.control.table.TableRowAdapter;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
@@ -43,15 +45,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class TableActivity extends SexyTopoActivity
-    implements PopupMenu.OnMenuItemClickListener, PopupMenu.OnDismissListener, TableRowAdapter.OnRowClickListener {
+public class TableActivity extends SurveyEditorActivity
+    implements TableRowAdapter.OnRowClickListener {
 
     private final GraphToListTranslator graphToListTranslator = new GraphToListTranslator();
 
     private RecyclerView recyclerView;
     private TableRowAdapter tableRowAdapter;
     private BroadcastReceiver receiver;
-    private TextView cellBeingClicked;
+    private ContextMenuManager contextMenuManager;
+    private View highlightedRow;
 
 
     @Override
@@ -62,12 +65,22 @@ public class TableActivity extends SexyTopoActivity
         setupMaterialToolbar();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+        contextMenuManager = new ContextMenuManager(this, ViewContext.TABLE, this);
+
         recyclerView = findViewById(R.id.tableRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         tableRowAdapter = new TableRowAdapter(this, getSurvey(), this);
         recyclerView.setAdapter(tableRowAdapter);
 
-        applyEdgeToEdgeInsets(R.id.rootLayout, true, true);
+        // Set up FAB click listeners
+        findViewById(R.id.fabAddStation).setOnClickListener(v -> manuallyAddStation());
+        findViewById(R.id.fabAddSplay).setOnClickListener(v -> manuallyAddSplay());
+
+        // Allow content to scroll behind bottom nav bar (translucent effect)
+        applyEdgeToEdgeInsets(R.id.rootLayout, true, false);
+
+        // Position FABs dynamically above navigation bar
+        setupFabPositioning();
 
         receiver = new BroadcastReceiver() {
             @Override
@@ -75,6 +88,38 @@ public class TableActivity extends SexyTopoActivity
                 syncTableWithSurvey();
             }
         };
+    }
+
+    private void setupFabPositioning() {
+        View rootLayout = findViewById(R.id.rootLayout);
+        FloatingActionButton fabAddStation = findViewById(R.id.fabAddStation);
+        FloatingActionButton fabAddSplay = findViewById(R.id.fabAddSplay);
+
+        ViewCompat.setOnApplyWindowInsetsListener(rootLayout, (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            int statusBarHeight = systemBars.top;
+            int navBarHeight = systemBars.bottom;
+
+            // Apply top padding for status bar
+            rootLayout.setPadding(0, statusBarHeight, 0, 0);
+
+            // Position primary FAB above nav bar with base margin
+            CoordinatorLayout.LayoutParams stationParams = (CoordinatorLayout.LayoutParams) fabAddStation.getLayoutParams();
+            stationParams.bottomMargin = navBarHeight + dpToPx(16);
+            fabAddStation.setLayoutParams(stationParams);
+
+            // Position mini FAB above primary FAB
+            CoordinatorLayout.LayoutParams splayParams = (CoordinatorLayout.LayoutParams) fabAddSplay.getLayoutParams();
+            splayParams.bottomMargin = navBarHeight + dpToPx(88);
+            fabAddSplay.setLayoutParams(splayParams);
+
+            return insets;
+        });
+    }
+
+    private int dpToPx(int dp) {
+        float density = getResources().getDisplayMetrics().density;
+        return Math.round(dp * density);
     }
 
     private void measureAndSyncHeaderWidths() {
@@ -169,190 +214,97 @@ public class TableActivity extends SexyTopoActivity
     }
 
     @Override
+    public void onRowClick(View view, GraphToListTranslator.SurveyListEntry entry, TableCol col) {
+        Station fromStation = entry.getFrom();
+        Leg leg = entry.getLeg();
+        LegDialogs.editLeg(this, getSurvey(), fromStation, leg);
+    }
+
+    @Override
     public void onRowLongClick(View view, GraphToListTranslator.SurveyListEntry entry, TableCol col) {
-        TextView textView = (TextView) view;
-        cellBeingClicked = textView;
+        Leg leg = entry.getLeg();
+        Station fromStation = entry.getFrom();
 
-        if (col == TableCol.FROM || col == TableCol.TO) {
-            showPopup(view, R.menu.table_station_selected, this);
-        } else {
-            Leg leg = entry.getLeg();
-            if (leg.hasDestination()) {
-                showPopup(view, R.menu.table_full_leg_selected, this);
+        // Row-centric: always show destination station for full legs, from station for splays
+        // This matches the tap-to-edit behavior which edits the leg/row
+        Station station = leg.hasDestination() ? leg.getDestination() : fromStation;
+
+        // Create custom title considering backwards shots
+        String customTitle;
+        if (leg.hasDestination()) {
+            if (leg.wasShotBackwards()) {
+                customTitle = getString(R.string.menu_context_title_leg_from, station.getName());
             } else {
-                showPopup(view, R.menu.table_splay_selected, this);
+                customTitle = getString(R.string.menu_context_title_leg_to, station.getName());
+            }
+        } else {
+            customTitle = getString(R.string.menu_context_title_splay, fromStation.getName());
+        }
+
+        // Highlight the entire row using ViewHolder
+        RecyclerView.ViewHolder viewHolder = recyclerView.findContainingViewHolder(view);
+        if (viewHolder != null) {
+            clearHighlight();
+            highlightedRow = viewHolder.itemView;
+
+            // Get primary color and make it semi-transparent
+            android.util.TypedValue typedValue = new android.util.TypedValue();
+            getTheme().resolveAttribute(androidx.appcompat.R.attr.colorPrimary, typedValue, true);
+            int primaryColor = typedValue.data;
+
+            ColorDrawable highlightDrawable = new ColorDrawable(primaryColor);
+            highlightDrawable.setAlpha(51); // 0-255, where 51 is 20% opacity
+
+            // Set foreground on the row to highlight it (works on API 23+)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                highlightedRow.setForeground(highlightDrawable);
+            } else {
+                // Fallback: set background with transparency to show through
+                highlightedRow.setBackgroundColor(primaryColor & 0x33FFFFFF); // 33 = 20% alpha
             }
         }
+
+        // Show menu with custom title and clear highlight on dismiss
+        contextMenuManager.showMenu(view, station, getSurvey(), customTitle, this::clearHighlight, leg);
     }
 
-
-    @SuppressWarnings("UnusedParameters")
-    private void showPopup(View view, int id, PopupMenu.OnMenuItemClickListener listener) {
-
-        TextView selectedCell = (TextView)view;
-
-        selectedCell.setTextColor(ContextCompat.getColor(this, R.color.red));
-
-        PopupMenu popup = new PopupMenu(this, selectedCell);
-        popup.getMenuInflater().inflate(id, popup.getMenu());
-        popup.setOnMenuItemClickListener(this);
-        popup.setOnDismissListener(this);
-        popup.show();
+    private void clearHighlight() {
+        if (highlightedRow != null) {
+            // Clear foreground highlight
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                highlightedRow.setForeground(null);
+            } else {
+                highlightedRow.setBackgroundColor(
+                    androidx.core.content.ContextCompat.getColor(this, android.R.color.transparent));
+            }
+            highlightedRow = null;
+        }
     }
 
 
     @Override
-    public boolean onMenuItemClick(MenuItem menuItem) {
-
-        final TableCol col = tableRowAdapter.getFieldToTableCol().get(cellBeingClicked);
-        final GraphToListTranslator.SurveyListEntry surveyEntry =
-                tableRowAdapter.getFieldToSurveyEntry().get(cellBeingClicked);
-
-        if (col == null || surveyEntry == null) {
-            return false;
-        }
-
-        Context context = this;
-        int itemId = menuItem.getItemId();
-
-        if (itemId == R.id.setActiveStation) {
-            Station newActive = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
-            if (newActive == Survey.NULL_STATION) {
-                showSimpleToast(R.string.context_set_active_splay_error);
-            } else {
-                getSurvey().setActiveStation(newActive);
-                syncTableWithSurvey();
-            }
-            return true;
-        } else if (itemId == R.id.graph_station_jump_to_plan) {
-            Station planStation = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
-            if (planStation == Survey.NULL_STATION) {
-                showSimpleToast(R.string.context_jump_to_splay_error);
-            } else {
-                jumpToStation(planStation, PlanActivity.class);
-            }
-            return true;
-        } else if (itemId == R.id.graph_station_jump_to_ee) {
-            Station eeStation = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
-            if (eeStation == Survey.NULL_STATION) {
-                showSimpleToast(R.string.context_jump_to_splay_error);
-            } else {
-                jumpToStation(eeStation, ExtendedElevationActivity.class);
-            }
-            return true;
-        } else if (itemId == R.id.renameStation) {
-            Station toRename = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
-            if (toRename == Survey.NULL_STATION) {
-                showSimpleToast(R.string.context_rename_splay_error);
-            } else {
-                ManualEntry.renameStation(this, getSurvey(), toRename);
-            }
-            return true;
-        } else if (itemId == R.id.editLeg) {
-            Leg toEdit = surveyEntry.getLeg();
-            ManualEntry.editLeg(this, getSurvey(), toEdit);
-            return true;
-        } else if (itemId == R.id.moveRow) {
-            final Leg toMove = surveyEntry.getLeg();
-            requestMoveLeg(toMove);
-            return true;
-        } else if (itemId == R.id.upgradeRow) {
-            Leg toUpgrade = surveyEntry.getLeg();
-            SurveyUpdater.upgradeSplayToConnectedLeg(getSurvey(), toUpgrade, getInputMode());
-            syncTableWithSurvey();
-            return true;
-        } else if (itemId == R.id.deleteStation) {
-            Station toDelete = (Station)(GraphToListTranslator.createMap(surveyEntry).get(col));
-            askAboutDeleting(context, toDelete, null);
-            return true;
-        } else if (itemId == R.id.deleteLeg) {
-            askAboutDeleting(context, surveyEntry.getFrom(), surveyEntry.getLeg());
-            return true;
-        } else if (itemId == R.id.deleteSplay) {
-            askAboutDeleting(context, surveyEntry.getFrom(), surveyEntry.getLeg());
-            return true;
-        } else {
-            return false;
-        }
+    protected void invalidateView() {
+        syncTableWithSurvey();
     }
-
-
-
-    /*
-        This method is a bit convoluted but reflects the UI choices.
-
-        We are either deleting a splay or a leg (if we are deleting a station,
-        we still have to delete the source leg). If the latter, we are also deleting any
-        onward survey from the station.
-
-        If leg is null, we are deleting the station
-        If leg is not null, we are only deleting the leg from the specified station
-     */
-    public void askAboutDeleting(Context context, final Station station, final Leg leg) {
-
-        int numFullLegsToBeDeleted = 0;
-        int numSplaysToBeDeleted = 0;
-
-        final boolean deletingLeg = leg != null;
-        boolean deletingSplay = (deletingLeg && !leg.hasDestination());
-
-        if (deletingSplay) {
-            numSplaysToBeDeleted += 1;
-
-        } else {
-            numFullLegsToBeDeleted++;
-            Station root = deletingLeg? leg.getDestination() : station;
-            numFullLegsToBeDeleted += SurveyStats.calcNumberSubFullLegs(root);
-            numSplaysToBeDeleted += SurveyStats.calcNumberSubSplays(root);
-        }
-
-        String message = context.getString(R.string.context_this_will_delete);
-
-        if (numFullLegsToBeDeleted > 0) {
-            String noun = context.getString(R.string.leg).toLowerCase();
-            message += "\n" + TextTools.pluralise(numFullLegsToBeDeleted, noun);
-            noun = context.getString(R.string.station).toLowerCase();
-            message += " (" + TextTools.pluralise(numFullLegsToBeDeleted, noun) + ")";
-        }
-        if (numSplaysToBeDeleted > 0) {
-            String noun = context.getString(R.string.splay).toLowerCase();
-            message += "\n" + TextTools.pluralise(numSplaysToBeDeleted, noun);
-        }
-
-        new MaterialAlertDialogBuilder(context)
-            .setMessage(message)
-            .setPositiveButton(R.string.delete, (dialog, which) -> {
-                Survey survey = getSurvey();
-                if (deletingLeg) {
-                    SurveyUpdater.deleteSplay(survey, station, leg);
-                } else {
-                    SurveyUpdater.deleteStation(survey, station);
-                }
-                getSurveyManager().broadcastSurveyUpdated();
-            })
-            .setNegativeButton(R.string.cancel, null)
-            .show();
-    }
-
 
     @Override
-    public void onDismiss(PopupMenu popupMenu) {
-        int usualTextColour = ContextCompat.getColor(this, R.color.bodyTextColor);
-        cellBeingClicked.setTextColor(usualTextColour);
+    public void onRenameStation(Station station) {
+        LegDialogs.renameStation(this, getSurvey(), station);
     }
 
 
-    public void manuallyAddStation(View view) {
+
+
+    private void manuallyAddStation() {
         if (GeneralPreferences.isManualLrudModeOn()) {
-            ManualEntry.addStationWithLruds(this, getSurvey());
+            LegDialogs.addStationWithLruds(this, getSurvey());
         } else {
-            ManualEntry.addStation(this, getSurvey());
+            LegDialogs.addStation(this, getSurvey());
         }
     }
 
-
-    public void manuallyAddSplay(View view) {
-        ManualEntry.addSplay(this, getSurvey());
+    private void manuallyAddSplay() {
+        LegDialogs.addSplay(this, getSurvey());
     }
 
     public void deleteLastLeg(View view) {

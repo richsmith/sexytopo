@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Station title (disabled, shows station name) -->
+    <item
+        android:id="@+id/station_title"
+        android:title="@string/station"
+        android:enabled="false"/>
+
+    <!-- Station actions sub-menu -->
+    <item
+        android:id="@+id/menu_station"
+        android:title="@string/menu_station">
+        <menu>
+            <item
+                android:id="@+id/action_set_active_station"
+                android:title="@string/menu_set_active_station"/>
+
+            <item
+                android:id="@+id/action_rename_station"
+                android:title="@string/menu_rename_station"/>
+
+            <item
+                android:id="@+id/action_new_cross_section"
+                android:title="@string/menu_new_cross_section"
+                android:visible="false"/>
+
+            <item
+                android:id="@+id/action_comment"
+                android:title="@string/menu_comment"/>
+
+            <item
+                android:id="@+id/action_delete_station"
+                android:title="@string/menu_delete_station"/>
+        </menu>
+    </item>
+
+    <!-- Leg actions sub-menu -->
+    <item
+        android:id="@+id/menu_leg"
+        android:title="@string/menu_leg">
+        <menu>
+            <item
+                android:id="@+id/action_edit_leg"
+                android:title="@string/menu_edit_leg"/>
+
+            <item
+                android:id="@+id/action_reverse"
+                android:title="@string/menu_reverse"/>
+
+            <item
+                android:id="@+id/action_upgrade_splay"
+                android:title="@string/menu_upgrade_splay"
+                android:visible="false"/>
+
+            <item
+                android:id="@+id/action_downgrade_leg"
+                android:title="@string/menu_downgrade_leg"
+                android:visible="false"/>
+
+            <item
+                android:id="@+id/action_delete_leg"
+                android:title="@string/menu_delete_leg"/>
+        </menu>
+    </item>
+
+    <!-- Elevation sub-menu -->
+    <item
+        android:id="@+id/menu_elevation"
+        android:title="@string/menu_elevation"
+        android:visible="false">
+        <menu>
+            <group
+                android:id="@+id/group_direction"
+                android:checkableBehavior="single">
+                <item
+                    android:id="@+id/action_direction_left"
+                    android:title="@string/menu_draw_left"
+                    android:checkable="true"/>
+
+                <item
+                    android:id="@+id/action_direction_right"
+                    android:title="@string/menu_draw_right"
+                    android:checkable="true"/>
+            </group>
+        </menu>
+    </item>
+
+    <!-- Navigate sub-menu -->
+    <item
+        android:id="@+id/menu_navigate"
+        android:title="Navigate">
+        <menu>
+            <item
+                android:id="@+id/action_jump_to_table"
+                android:title="@string/menu_jump_to_station_in_table"/>
+
+            <item
+                android:id="@+id/action_jump_to_plan"
+                android:title="@string/menu_jump_to_station_in_plan"/>
+
+            <item
+                android:id="@+id/action_jump_to_elevation"
+                android:title="@string/menu_jump_to_station_in_elevation"/>
+        </menu>
+    </item>
+
+    <!-- Survey actions sub-menu -->
+    <item
+        android:id="@+id/menu_survey"
+        android:title="Survey">
+        <menu>
+            <item
+                android:id="@+id/action_start_new_survey"
+                android:title="@string/menu_start_new_survey"/>
+
+            <item
+                android:id="@+id/action_unlink_survey"
+                android:title="@string/menu_unlink_survey"
+                android:enabled="false"/>
+        </menu>
+    </item>
+
+</menu>

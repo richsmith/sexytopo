@@ -161,7 +161,7 @@ public class ConnectedSurveysTest {
         Survey basicSurvey = new Survey();
         Leg l0 = new Leg(1.0f, 0.0f, 0.0f);
         SurveyUpdater.update(basicSurvey, l0);
-        SurveyUpdater.upgradeSplayToConnectedLeg(basicSurvey, l0, InputMode.FORWARD);
+        SurveyUpdater.upgradeSplay(basicSurvey, l0, InputMode.FORWARD);
         SurveyMocker.mockSurveyUri(basicSurvey, uri);
         return basicSurvey;
     }

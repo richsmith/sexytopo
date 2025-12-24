@@ -19,14 +19,19 @@
     <color name="headerBackground">@color/md_sexy_dark_green</color>
     <color name="innerPanelBackground">@color/md_dark_surface</color>
 
+    <!-- Dialogs -->
+    <color name="dialogSurface">@color/md_dark_surface_dim</color>
+
     <!-- Tables -->
     <color name="tableBackground">@color/md_dark_surface</color>
     <color name="tableBackgroundAlt">@color/md_dark_surface_dim</color>
-    <color name="tableHighlight">@color/md_yellow</color>
+    <color name="tableHighlight">@color/md_amber_300</color>
+    <color name="tableHighlightText">@color/md_black</color>
 
     <!-- UI Elements -->
     <color name="grid">@color/md_dark_grid</color>
     <color name="station">@color/md_red</color>
+    <color name="activeStationHighlight">@color/md_amber_300</color>
     <color name="legend">@color/md_grey_200</color>
     <color name="buttonHighlight">@color/md_grey_300</color>
     <color name="error">@color/md_red</color>

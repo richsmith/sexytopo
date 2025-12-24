@@ -192,6 +192,7 @@
     <string name="manual_add_station_title">Add Station</string>
     <string name="manual_add_splay_title">Add Splay</string>
     <string name="manual_edit_leg_title">Edit Leg</string>
+    <string name="manual_edit_splay_title">Edit Splay</string>
     <string name="manual_edit_distance">Distance (m)</string>
     <string name="manual_edit_distance_error">Bad distance</string>
     <string name="manual_edit_azimuth">Azimuth (&#176;)</string>
@@ -206,6 +207,11 @@
     <string name="manual_edit_right">Right (m)</string>
     <string name="manual_edit_up">Up (m)</string>
     <string name="manual_edit_down">Down (m)</string>
+    <string name="manual_edit_from_station">From station</string>
+    <string name="manual_edit_from_station_error">Invalid from station</string>
+    <string name="manual_edit_to_station">To station</string>
+    <string name="manual_edit_to_station_error">Invalid to station</string>
+    <string name="manual_edit_shot_backwards">⬅ Shot backwards</string>
     <string name="manual_rename_station_title">Rename Station</string>
     <string name="manual_rename_station_hint">Station name</string>
     <string name="manual_rename_error">Rename failed</string>
@@ -472,6 +478,24 @@
     <string name="survey_update_moved_leg">Moved leg to station %1$s</string>
     <string name="survey_update_adding_leg">Adding leg %1$s</string>
     <string name="survey_update_reversed_leg">Reversed leg %1$s to %2$s</string>
+    <string name="survey_update_error_descendant_station">Cannot move leg to a descendant station</string>
+
+    <!-- Form validation errors -->
+    <string name="validation_error_cannot_be_blank">Cannot be blank</string>
+    <string name="validation_error_station_named_dash">Station cannot be named \"-\"</string>
+    <string name="validation_error_station_does_not_exist">Station does not exist</string>
+    <string name="validation_error_same_as_from_station">Cannot be the same as from station</string>
+    <string name="validation_error_station_name_not_unique">Station name must be unique</string>
+    <string name="validation_error_must_be_number">Must be a number</string>
+    <string name="validation_error_distance_minimum">Must be >= %1$f</string>
+    <string name="validation_error_azimuth_range">Must be %1$f-%2$f</string>
+    <string name="validation_error_inclination_range">Must be %1$f to %2$f</string>
+
+    <!-- Input mode for leg editing -->
+    <string-array name="leg_edit_input_mode_options">
+        <item>@string/action_input_mode_forward</item>
+        <item>@string/action_input_mode_backward</item>
+    </string-array>
 
     <!-- Survey symbols -->
     <string name="symbol_text">Text</string>
@@ -497,12 +521,20 @@
 
     <!-- Context menu(s) -->
     <string name="menu_context_title">Station</string>
-    <string name="menu_set_active_station">Set Active Station</string>
-    <string name="menu_rename_station">Rename Station</string>
-    <string name="menu_edit_leg">Edit Row</string>
+    <string name="menu_leg">Leg</string>
+    <string name="menu_splay">Splay</string>
+    <string name="menu_station">Station</string>
+    <string name="menu_set_active_station">Set Active</string>
+    <string name="menu_rename_station">Rename</string>
+    <string name="menu_edit_leg">Edit</string>
     <string name="menu_upgrade_row">Force New Station</string>
-    <string name="menu_delete_leg">Delete Leg</string>
+    <string name="menu_upgrade_splay">Upgrade to Leg</string>
+    <string name="menu_downgrade_leg">Downgrade to Splay</string>
+    <string name="menu_delete_leg">Delete</string>
     <string name="menu_delete_splay">Delete Splay</string>
+    <string name="menu_elevation">Elevation</string>
+    <string name="menu_draw_left">Draw Left</string>
+    <string name="menu_draw_right">Draw Right</string>
     <string name="menu_move_row">Move to Different Station</string>
     <string name="menu_jump_to">Jump</string>
     <string name="menu_jump_to_station_in_plan">→ Plan</string>
@@ -515,6 +547,9 @@
     <string name="menu_unlink_survey">Unlink Linked Survey</string>
     <string name="menu_comment">Comment</string>
     <string name="menu_toggle_left_right">Toggle Left/Right</string>
+    <string name="menu_context_title_leg_to">Leg to %s</string>
+    <string name="menu_context_title_leg_from">Leg from %s</string>
+    <string name="menu_context_title_splay">%s to Splay</string>
     <string name="context_this_will_delete">This will delete:</string>
     <string name="context_jump_to_splay_error">Cannot jump to a splay end</string>
     <string name="context_jump_to_station_error">Could not jump to station %1$s</string>
