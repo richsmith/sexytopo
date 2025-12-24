@@ -178,12 +178,12 @@ public class EditLegForm extends Form {
             error = R.string.validation_error_station_named_dash;
         } else if (fromStation == null) {
             error = R.string.validation_error_station_does_not_exist;
-        } else if (originalLeg != null) {
+        } else if (originalLeg != null && originalLeg.hasDestination()) {
             Station originalStation = survey.getOriginatingStation(originalLeg);
             boolean isMovingLeg = originalStation != fromStation;
 
             if (isMovingLeg) {
-                if (SurveyTools.isDescendantOf(originalStation, fromStation)) {
+                if (SurveyTools.isInSubtree(originalLeg.getDestination(), fromStation)) {
                     error = R.string.survey_update_error_descendant_station;
                 }
             }

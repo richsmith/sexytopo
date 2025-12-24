@@ -81,19 +81,13 @@ public class SurveyTools {
         boolean call(Station station);
     }
 
-    public static boolean isDescendantOf(Station potentialDescendant, Station potentialAncestor) {
-        if (potentialDescendant == null || potentialAncestor == null) {
+    public static boolean isInSubtree(Station root, Station station) {
+        if (root == null || station == null) {
             return false;
         }
-
         return traverseStations(
-            potentialAncestor,
-            station -> {
-                if (station.equals(potentialAncestor)) {
-                    return false;
-                }
-                return station.equals(potentialDescendant);
-            });
+            root,
+            s -> s.equals(station));
     }
 
 }

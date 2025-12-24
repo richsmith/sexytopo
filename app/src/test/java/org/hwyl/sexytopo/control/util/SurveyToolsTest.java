@@ -1,6 +1,5 @@
 package org.hwyl.sexytopo.control.util;
 
-import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
@@ -10,75 +9,75 @@ import org.junit.Test;
 public class SurveyToolsTest {
 
     @Test
-    public void testIsDescendantOfReturnsFalseForNull() {
+    public void testIsInSubtreeReturnsFalseForNull() {
         Survey survey = new Survey();
         Station station = survey.getOrigin();
 
-        Assert.assertFalse(SurveyTools.isDescendantOf(null, station));
-        Assert.assertFalse(SurveyTools.isDescendantOf(station, null));
-        Assert.assertFalse(SurveyTools.isDescendantOf(null, null));
+        Assert.assertFalse(SurveyTools.isInSubtree(station, null));
+        Assert.assertFalse(SurveyTools.isInSubtree(null, station));
+        Assert.assertFalse(SurveyTools.isInSubtree(null, null));
     }
 
     @Test
-    public void testIsDescendantOfReturnsFalseForSameStation() {
+    public void testIsInSubtreeReturnsTrueForSameStation() {
         Survey survey = new Survey();
         Station station = survey.getOrigin();
 
-        Assert.assertFalse(SurveyTools.isDescendantOf(station, station));
+        Assert.assertTrue(SurveyTools.isInSubtree(station, station));
     }
 
     @Test
-    public void testIsDescendantOfReturnsTrueForDirectChild() {
+    public void testIsInSubtreeReturnsTrueForDirectChild() {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         Station origin = survey.getOrigin();
         Station station2 = survey.getStationByName("2");
 
-        Assert.assertTrue(SurveyTools.isDescendantOf(station2, origin));
+        Assert.assertTrue(SurveyTools.isInSubtree(origin, station2));
     }
 
     @Test
-    public void testIsDescendantOfReturnsTrueForGrandchild() {
+    public void testIsInSubtreeReturnsTrueForGrandchild() {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         Station origin = survey.getOrigin();
         Station station3 = survey.getStationByName("3");
 
-        Assert.assertTrue(SurveyTools.isDescendantOf(station3, origin));
+        Assert.assertTrue(SurveyTools.isInSubtree(origin, station3));
     }
 
     @Test
-    public void testIsDescendantOfReturnsFalseForAncestor() {
+    public void testIsInSubtreeReturnsFalseForAncestor() {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         Station origin = survey.getOrigin();
         Station station2 = survey.getStationByName("2");
 
-        Assert.assertFalse(SurveyTools.isDescendantOf(origin, station2));
+        Assert.assertFalse(SurveyTools.isInSubtree(station2, origin));
     }
 
     @Test
-    public void testIsDescendantOfReturnsFalseForUnrelatedStations() {
+    public void testIsInSubtreeReturnsFalseForUnrelatedStations() {
         Survey survey = BasicTestSurveyCreator.createStraightNorthWith1EBranch();
         Station station2 = survey.getStationByName("2");
         Station station5 = survey.getStationByName("5");
 
-        Assert.assertFalse(SurveyTools.isDescendantOf(station2, station5));
-        Assert.assertFalse(SurveyTools.isDescendantOf(station5, station2));
+        Assert.assertFalse(SurveyTools.isInSubtree(station5, station2));
+        Assert.assertFalse(SurveyTools.isInSubtree(station2, station5));
     }
 
     @Test
-    public void testIsDescendantOfWorksWithBranches() {
+    public void testIsInSubtreeWorksWithBranches() {
         Survey survey = BasicTestSurveyCreator.createStraightNorthWith1EBranch();
         Station station1 = survey.getStationByName("1");
         Station station5 = survey.getStationByName("5");
 
-        Assert.assertTrue(SurveyTools.isDescendantOf(station5, station1));
+        Assert.assertTrue(SurveyTools.isInSubtree(station1, station5));
     }
 
     @Test
-    public void testIsDescendantOfReturnsTrueForDeepDescendant() {
+    public void testIsInSubtreeReturnsTrueForDeepDescendant() {
         Survey survey = BasicTestSurveyCreator.createStraightNorthWith2EBranch();
         Station origin = survey.getOrigin();
         Station station6 = survey.getStationByName("6");
 
-        Assert.assertTrue(SurveyTools.isDescendantOf(station6, origin));
+        Assert.assertTrue(SurveyTools.isInSubtree(origin, station6));
     }
 }
