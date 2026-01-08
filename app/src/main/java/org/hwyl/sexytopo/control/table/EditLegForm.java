@@ -367,7 +367,7 @@ public class EditLegForm extends Form {
     /**
      * Create a Leg object from the form data with measurements and shot direction.
      * For editing: preserves the existing destination station object.
-     * For adding: destination will be null (caller must create and set the station).
+     * For adding: creates a splay-like leg (caller must create destination and reconstruct).
      * Should only be called after validation passes.
      */
     public Leg getUpdatedLeg() {
@@ -378,13 +378,14 @@ public class EditLegForm extends Form {
         Leg leg;
         if (isSplay) {
             leg = new Leg(distance, azimuth, inclination);
-        } else {
+        } else if (originalLeg != null && originalLeg.hasDestination()) {
             // For editing: reuse existing destination station object
-            // For adding: destination will be null, caller creates the station
-            Station destination = (originalLeg != null && originalLeg.hasDestination())
-                ? originalLeg.getDestination()
-                : null;
+            Station destination = originalLeg.getDestination();
             leg = new Leg(distance, azimuth, inclination, destination, new Leg[]{});
+        } else {
+            // For adding a new station: create a temporary splay-like leg
+            // Caller will reconstruct with proper destination station
+            leg = new Leg(distance, azimuth, inclination);
         }
 
         // Apply backwards flag if needed

@@ -127,7 +127,7 @@ public class LegDialogs {
 
                 if (isSplay) {
                     // Add splay to from station
-                    fromStation.getOnwardLegs().add(leg);
+                    SurveyUpdater.addLegFromStation(survey, fromStation, leg);
                 } else {
                     // Create new destination station and set it on the leg
                     String toStationName = form.getUpdatedToStationName();
@@ -137,8 +137,9 @@ public class LegDialogs {
                     leg = new Leg(leg.getDistance(), leg.getAzimuth(), leg.getInclination(),
                                   newStation, new Leg[]{}, leg.wasShotBackwards());
 
-                    // Add leg to from station
-                    fromStation.getOnwardLegs().add(leg);
+                    // Add leg to from station using SurveyUpdater
+                    // This also sets the active station to the new destination
+                    SurveyUpdater.addLegFromStation(survey, fromStation, leg);
 
                     // Add LRUDs if requested
                     if (includeLruds) {
@@ -147,9 +148,6 @@ public class LegDialogs {
                         createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceUp, LRUD.UP);
                         createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceDown, LRUD.DOWN);
                     }
-
-                    // Set active station to the new station
-                    survey.setActiveStation(newStation);
                 }
 
                 dialogInterface.dismiss();

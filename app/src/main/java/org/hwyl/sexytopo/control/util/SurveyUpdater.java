@@ -74,11 +74,17 @@ public class SurveyUpdater {
             leg = Leg.toFullLeg(leg, newStation);
         }
 
-        // FIXME; could the below be moved into Survey? And from elsewhere in this file?
-        activeStation.getOnwardLegs().add(leg);
+        addLegFromStation(survey, activeStation, leg);
+    }
+
+    public static void addLegFromStation(Survey survey, Station fromStation, Leg leg) {
+        Log.i(R.string.survey_update_adding_leg, leg);
+        fromStation.getOnwardLegs().add(leg);
         survey.setSaved(false);
         survey.addLegRecord(leg);
-        survey.setActiveStation(leg.getDestination());
+        if (leg.hasDestination()) {
+            survey.setActiveStation(leg.getDestination());
+        }
     }
 
     public static void upgradeSplay(Survey survey, Leg leg, InputMode inputMode) {
