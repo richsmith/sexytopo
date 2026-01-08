@@ -9,11 +9,10 @@ import androidx.annotation.Nullable;
 
 import junit.framework.TestCase;
 
-import org.junit.Test;
 import org.mockito.Mockito;
 
 public class FormTest extends TestCase {
-    class MockForm extends Form {
+    static class MockForm extends Form {
         EditText name;
         EditText phone;
         boolean validName;
@@ -44,7 +43,7 @@ public class FormTest extends TestCase {
         }
     }
 
-    class MockValidateCallback implements Form.OnDidValidateCallback {
+    static class MockValidateCallback implements Form.OnDidValidateCallback {
         @Nullable Boolean value = null;
 
         @Override
@@ -55,13 +54,11 @@ public class FormTest extends TestCase {
 
     private MockForm form = new MockForm();
 
-    @Test
     public void testValidateWithValidFields() {
         form.validate();
         assert(form.isValid());
     }
 
-    @Test
     public void testValidateWithSingleInvalidField() {
         form.validName = false;
 
@@ -69,7 +66,6 @@ public class FormTest extends TestCase {
         assert(!form.isValid());
     }
 
-    @Test
     public void testValidateWithMultipleInvalidFields() {
         form.validName = false;
         form.validPhone = false;
@@ -78,7 +74,6 @@ public class FormTest extends TestCase {
         assert(!form.isValid());
     }
 
-    @Test
     public void testDelegatesSetErrorToFields() {
         form.name = Mockito.mock(EditText.class);
         form.validName = true;
@@ -91,16 +86,14 @@ public class FormTest extends TestCase {
         verify(form.phone).setError("invalid phone");
     }
 
-    @Test
     public void testCallsOnDidValidateCallbackWithValidForm() {
         MockValidateCallback callback = new MockValidateCallback();
         form.setOnDidValidateCallback(callback);
         form.validate();
 
-        assert(callback.value);
+        assert(Boolean.TRUE.equals(callback.value));
     }
 
-    @Test
     public void testCallsOnDidValidateCallbackWithInvalidForm() {
         MockValidateCallback callback = new MockValidateCallback();
         form.setOnDidValidateCallback(callback);
@@ -108,6 +101,6 @@ public class FormTest extends TestCase {
         form.validPhone = false;
         form.validate();
 
-        assert(!callback.value);
+        assert(Boolean.FALSE.equals(callback.value));
     }
 }
