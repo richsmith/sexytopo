@@ -557,9 +557,4 @@
     <string name="killing_comms_process">Processus de communication terminé</string>
     <string name="setup_error_load_symbol_svg">Erreur lors du chargement du symbole SVG %1$s</string>
 
-    <!-- Table context menu titles -->
-    <string name="table_context_leg_to">Visée vers %s</string>
-    <string name="table_context_leg_from">Visée depuis %s</string>
-    <string name="table_context_splay">Visée rayonnante %s</string>
-
 </resources>
