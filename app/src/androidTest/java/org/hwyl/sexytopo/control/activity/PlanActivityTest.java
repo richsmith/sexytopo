@@ -1,5 +1,7 @@
 package org.hwyl.sexytopo.control.activity;
 
+import android.content.pm.ActivityInfo;
+
 import org.hwyl.sexytopo.R;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,6 +38,14 @@ public class PlanActivityTest {
     @Test
     public void graphViewVisible() {
         onView(withId(R.id.action_plan)).perform(click());
+        onView(withId(R.id.graphView)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void graphViewVisibleInLandscape() {
+        onView(withId(R.id.action_plan)).perform(click());
+        activityRule.getScenario().onActivity(activity ->
+                activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE));
         onView(withId(R.id.graphView)).check(matches(isDisplayed()));
     }
 }
