@@ -6,6 +6,10 @@ plugins {
 
 android {
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId "org.hwyl.sexytopo"
         minSdkVersion 23
@@ -24,23 +28,26 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '11'
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     testOptions {
         unitTests.returnDefaultValues = true
+        unitTests.all {
+            jvmArgs "-javaagent:${classpath.find { it.name.contains("mockito-core") }.absolutePath}"
+        }
     }
 
     lint {
-        abortOnError false
+        abortOnError = false
         disable 'UnnecessaryLocalVariable', 'SameParameterValue'
     }
-    namespace 'org.hwyl.sexytopo'
+    namespace = 'org.hwyl.sexytopo'
 
 }
 

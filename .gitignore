@@ -9,3 +9,7 @@
 .idea
 /app/release
 *.hprof
+.classpath
+.project
+.settings/
+bin/
