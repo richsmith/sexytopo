@@ -145,7 +145,7 @@ public class PocketTopoTxtImporter extends Importer {
         Coord2D offset = getOffsetForNamedStation(lines, guessedAnchorStation);
 
         if (offset == null) {
-            if (guessedAnchorStation.getConnectedOnwardLegs().size() > 0) {
+            if (!guessedAnchorStation.getConnectedOnwardLegs().isEmpty()) {
                 Leg onward = guessedAnchorStation.getConnectedOnwardLegs().get(0);
                 guessedAnchorStation = onward.getDestination();
                 offset = getOffsetForNamedStation(lines, guessedAnchorStation);

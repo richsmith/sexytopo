@@ -52,7 +52,7 @@ public class FormTest extends TestCase {
         }
     };
 
-    private MockForm form = new MockForm();
+    private final MockForm form = new MockForm();
 
     public void testValidateWithValidFields() {
         form.validate();

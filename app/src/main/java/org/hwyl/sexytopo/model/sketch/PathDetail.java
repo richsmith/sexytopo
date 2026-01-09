@@ -71,7 +71,7 @@ public final class PathDetail extends SketchDetail {
         List<Coord2D> currentLine = new ArrayList<>();
         for (Coord2D currentPoint : path) {
 
-            if (currentLine.size() == 0) {
+            if (currentLine.isEmpty()) {
                 currentLine.add(currentPoint);
                 continue;
             }

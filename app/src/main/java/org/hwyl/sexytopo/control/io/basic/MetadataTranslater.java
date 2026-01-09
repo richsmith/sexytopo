@@ -74,6 +74,9 @@ public class MetadataTranslater {
 
         for (Station connectionPoint : connectedSurveys.keySet()) {
             Set<SurveyConnection> connections = connectedSurveys.get(connectionPoint);
+            if (connections == null) {
+                connections = new HashSet<>();
+            }
             JSONArray setObject = new JSONArray();
             for (SurveyConnection connection : connections) {
                 JSONArray connectionObject = toJson(connection);

@@ -70,7 +70,7 @@ public class SurvexImporter extends Importer {
         float azimuth = Float.parseFloat(fields[3]);
         float inclination = Float.parseFloat(fields[4]);
 
-        if (nameToStation.size() == 0) {
+        if (nameToStation.isEmpty()) {
             Station origin = new Station(fromName);
             survey.setOrigin(origin);
             nameToStation.put(origin.getName(), origin);

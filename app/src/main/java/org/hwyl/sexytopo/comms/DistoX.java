@@ -13,11 +13,9 @@ public enum DistoX {
 
     UNKNOWN("???", false);
 
-    private String name;
-    private boolean preferNonLinearCalibration;
+    private final boolean preferNonLinearCalibration;
 
     DistoX(String name, boolean preferNonLinearCalibration) {
-        this.name = name;
         this.preferNonLinearCalibration = preferNonLinearCalibration;
     }
 

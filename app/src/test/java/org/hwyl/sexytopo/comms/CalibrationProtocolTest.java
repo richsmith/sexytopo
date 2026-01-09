@@ -7,9 +7,9 @@ import org.junit.Test;
 
 public class CalibrationProtocolTest {
 
-    private byte IGNORE = 0b0;
-    private byte[] TEST_ACCELERATION_PACKET = new byte[] {IGNORE, -102, -1,  86, -3, -52, 96, 11};
-    private byte[] TEST_MAGNETIC_PACKET =     new byte[] {IGNORE,   48, 31, -43, -7, -56, 62, 1};
+    private final byte IGNORE = 0b0;
+    private final byte[] TEST_ACCELERATION_PACKET = new byte[] {IGNORE, -102, -1,  86, -3, -52, 96, 11};
+    private final byte[] TEST_MAGNETIC_PACKET =     new byte[] {IGNORE,   48, 31, -43, -7, -56, 62, 1};
 
     // Doesn't need to be exact; data input taken from Disto;
     // similar reading read via PocketTopo for check

@@ -150,7 +150,7 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
 
     private void updateFields() {
 
-        if (calibrationReadings.size() > 0) {
+        if (!calibrationReadings.isEmpty()) {
             CalibrationReading lastReading =
                     calibrationReadings.get(calibrationReadings.size() - 1);
             setInfoField(R.id.calibrationFieldGx, lastReading.getGx());
@@ -209,7 +209,7 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
             state = State.CALIBRATED;
         }
 
-        if (calibrationReadings.size() < 1) {
+        if (calibrationReadings.isEmpty()) {
             setButtonEnabled(R.id.calibration_save, false);
             setButtonEnabled(R.id.calibration_clear, false);
 
@@ -463,7 +463,7 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
 
     private class WriteCalibrationTask extends AsyncTask<Byte, Void, Boolean> {
 
-        private Dialog progressDialog;
+        private final Dialog progressDialog;
 
         private WriteCalibrationTask(View view) {
             android.widget.ProgressBar progressBar = new android.widget.ProgressBar(view.getContext());

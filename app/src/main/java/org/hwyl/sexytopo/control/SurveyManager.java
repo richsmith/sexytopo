@@ -57,7 +57,7 @@ public class SurveyManager {
 
     public void updateSurvey(List<Leg> legs) {
 
-        if (legs.size() > 0) {
+        if (!legs.isEmpty()) {
 
             InputMode inputMode = getInputMode();
             boolean stationAdded = SurveyUpdater.update(currentSurvey, legs, inputMode);
@@ -137,7 +137,7 @@ public class SurveyManager {
     }
 
     public void deleteLastCalibrationReading() {
-        if (calibrationReadings.size() > 0) {
+        if (!calibrationReadings.isEmpty()) {
             calibrationReadings.remove(calibrationReadings.size() - 1);
         }
     }

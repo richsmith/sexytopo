@@ -10,7 +10,7 @@ public class SexyTopoPermissions {
 
     // ********** Permissions **********
 
-    private static String[] BASIC_PERMISSIONS = new String[]{
+    private static final String[] BASIC_PERMISSIONS = new String[]{
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION,

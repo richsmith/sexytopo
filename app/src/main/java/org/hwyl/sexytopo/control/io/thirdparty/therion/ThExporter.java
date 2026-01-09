@@ -134,7 +134,7 @@ public class ThExporter {
         builder.append(formatDate(trip.getDate()));
         builder.append("\n");
 
-        if (trip.getComments().length() > 0) {
+        if (!trip.getComments().isEmpty()) {
             builder.append(commentMultiline(trip.getComments()));
         }
 

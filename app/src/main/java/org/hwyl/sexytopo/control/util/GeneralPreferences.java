@@ -3,7 +3,8 @@ package org.hwyl.sexytopo.control.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.preference.PreferenceManager;
+
+import androidx.preference.PreferenceManager;
 
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.model.sketch.Colour;

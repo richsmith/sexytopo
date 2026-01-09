@@ -8,7 +8,8 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.os.Vibrator;
-import android.preference.PreferenceManager;
+
+import androidx.preference.PreferenceManager;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 

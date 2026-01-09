@@ -2,9 +2,9 @@ package org.hwyl.sexytopo.control.activity;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
 
 import org.hwyl.sexytopo.R;
 

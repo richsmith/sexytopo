@@ -236,7 +236,7 @@ public class Survey {
         for (SurveyConnection connection : connections) {
             if (connection.otherSurvey == otherSurvey) {
                 connections.remove(connection);
-                if (connections.size() == 0) {
+                if (connections.isEmpty()) {
                     stationsToSurveyConnections.remove(joinInThisSurvey);
                 }
                 return;
@@ -398,7 +398,7 @@ public class Survey {
 
     public void undoAddLeg() {
 
-        if (legsInChronoOrder.size() < 1) {
+        if (legsInChronoOrder.isEmpty()) {
             return;
         }
 

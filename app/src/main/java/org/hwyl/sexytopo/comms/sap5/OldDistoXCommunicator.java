@@ -63,8 +63,8 @@ public class OldDistoXCommunicator extends Thread {
     private DataInputStream inStream = null;
     private DataOutputStream outStream = null;
 
-    private SurveyManager dataManager;
-    private SexyTopoActivity activity;
+    private final SurveyManager dataManager;
+    private final SexyTopoActivity activity;
 
     private boolean keepAlive;
 

@@ -110,7 +110,7 @@ public class TextTools {
 
     public static String advanceLastNumber(String originatingName) {
 
-        if (originatingName.length() == 0) {
+        if (originatingName.isEmpty()) {
             return "1";
         }
 

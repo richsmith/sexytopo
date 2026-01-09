@@ -87,7 +87,7 @@ public class Station extends SurveyComponent {
     }
 
     public boolean hasComment() {
-        return comment.length() > 0;
+        return !comment.isEmpty();
     }
 
     public Direction getExtendedElevationDirection() {

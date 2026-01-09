@@ -181,7 +181,7 @@ public class TherionImporterTest {
         "\n";
 
 
-    private static String FAKE_TEXT =
+    private static final String FAKE_TEXT =
         "survey smugglers-hole -title \"Smugglers' Hole\"\n" +
         "\n" +
         "# input \"smugglers-hole plan.th2\"\n" +
