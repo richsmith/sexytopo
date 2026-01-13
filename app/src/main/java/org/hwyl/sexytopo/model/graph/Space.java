@@ -37,7 +37,7 @@ public class Space<T extends Coord> {
         }
 
         for (Map.Entry<Leg, Line<T>> entry: legs.entrySet()) {
-            scaled.addLeg(entry.getKey(), (Line<T>) entry.getValue().scale(scale));
+            scaled.addLeg(entry.getKey(), entry.getValue().scale(scale));
         }
 
         return scaled;

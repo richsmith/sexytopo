@@ -127,6 +127,7 @@ public class CalibrationCalculatorTest {
     }
 
 
+    /** @noinspection UnusedAssignment*/
     @Test
     public void testExampleCalibration2IsAssessedCorrectly() {
         int[][] testCalibrations = new int[][] {

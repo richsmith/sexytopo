@@ -21,7 +21,7 @@ public class SurveyUpdaterTest {
         Leg leg = new Leg(5, 0, 0);
         Survey survey = new Survey();
         SurveyUpdater.update(survey, leg);
-        Assert.assertEquals(survey.getAllLegs().size(), 1);
+        Assert.assertEquals(1, survey.getAllLegs().size());
     }
 
     @Test
@@ -33,7 +33,7 @@ public class SurveyUpdaterTest {
         SurveyUpdater.update(survey, leg);
         SurveyUpdater.update(survey, similarLeg);
         SurveyUpdater.update(survey, anotherSimilarLeg);
-        Assert.assertEquals(survey.getAllStations().size(), 2);
+        Assert.assertEquals(2, survey.getAllStations().size());
     }
 
     @Test
@@ -45,8 +45,8 @@ public class SurveyUpdaterTest {
         Leg newEdit = new Leg(6, 0, 0);
         SurveyUpdater.editLeg(survey, leg, newEdit);
 
-        Assert.assertEquals(survey.getAllLegs().size(), 1);
-        Assert.assertEquals(survey.getAllLegs().get(0).getDistance(), 6,
+        Assert.assertEquals(1, survey.getAllLegs().size());
+        Assert.assertEquals(6, survey.getAllLegs().get(0).getDistance(),
                 ALLOWED_DOUBLE_DELTA);
     }
 
@@ -59,8 +59,8 @@ public class SurveyUpdaterTest {
         Leg newEdit = new Leg(6, 0, 0);
         SurveyUpdater.editLeg(survey, leg, newEdit);
 
-        Assert.assertEquals(survey.getAllLegs().size(), 1);
-        Assert.assertEquals(survey.getAllLegs().get(0).getDistance(), 6,
+        Assert.assertEquals(1, survey.getAllLegs().size());
+        Assert.assertEquals(6, survey.getAllLegs().get(0).getDistance(),
                 ALLOWED_DOUBLE_DELTA);
     }
 

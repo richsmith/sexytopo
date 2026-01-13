@@ -30,7 +30,7 @@ public class SurveyTest {
         baseSurvey.connect(baseSurvey.getActiveStation(),
                 otherSurvey, otherSurvey.getActiveStation());
         Assert.assertTrue(baseSurvey.isConnectedTo(otherSurvey));
-        Assert.assertEquals(baseSurvey.getConnectedSurveys().size(), 1);
+        Assert.assertEquals(1, baseSurvey.getConnectedSurveys().size());
     }
 
 
@@ -42,7 +42,7 @@ public class SurveyTest {
                 otherSurvey, otherSurvey.getActiveStation());
         baseSurvey.disconnect(baseSurvey.getActiveStation(), otherSurvey);
         Assert.assertFalse(baseSurvey.isConnectedTo(otherSurvey));
-        Assert.assertEquals(baseSurvey.getConnectedSurveys().size(), 0);
+        Assert.assertEquals(0, baseSurvey.getConnectedSurveys().size());
     }
 
 }

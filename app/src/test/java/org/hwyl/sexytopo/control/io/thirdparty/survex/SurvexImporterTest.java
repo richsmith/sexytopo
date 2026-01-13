@@ -17,7 +17,7 @@ public class SurvexImporterTest {
                 "1\t2\t5.0\t0.0\t0.0";
         Survey survey = new Survey();
         SurvexImporter.parse(testContent, survey);
-        Assert.assertEquals(survey.getAllStations().size(), 2);
+        Assert.assertEquals(2, survey.getAllStations().size());
     }
 
     @Test
@@ -37,7 +37,7 @@ public class SurvexImporterTest {
         Survey survey = new Survey();
         SurvexImporter.parse(testContent, survey);
         Station created = survey.getStationByName("2");
-        Assert.assertEquals(created.getComment(), "testComment");
+        Assert.assertEquals("testComment", created.getComment());
     }
 
 
@@ -47,9 +47,9 @@ public class SurvexImporterTest {
                 "{from: 1 0 0, 1.0 0.0 0.0, 1.0 0.0 0.0}");
         Assert.assertEquals(3, legs.length);
         for (Leg leg : legs) {
-            Assert.assertEquals(leg.getDistance(), 1.0, SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
-            Assert.assertEquals(leg.getAzimuth(), 0.0, SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
-            Assert.assertEquals(leg.getInclination(), 0.0, SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
+            Assert.assertEquals(1.0, leg.getDistance(), SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
+            Assert.assertEquals(0.0, leg.getAzimuth(), SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
+            Assert.assertEquals(0.0, leg.getInclination(), SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
         }
     }
 }

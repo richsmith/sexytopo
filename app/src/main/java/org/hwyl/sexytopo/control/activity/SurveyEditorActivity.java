@@ -202,6 +202,7 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
     /**
      * Ask the user about deleting the given leg (and any onwards legs
      * / stations if it's a full leg).
+     * @noinspection UnusedAssignment
      */
     protected void askAboutDeletingLeg(Leg leg) {
         Station fromStation = getSurvey().getOriginatingStation(leg);

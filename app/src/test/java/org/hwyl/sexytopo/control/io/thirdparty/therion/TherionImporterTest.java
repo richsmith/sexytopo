@@ -279,8 +279,8 @@ public class TherionImporterTest {
     public void testBasicBlockExtraction() throws Exception {
         List<String> LINES = Arrays.asList("block", "content", "endblock");
         List<String> output = TherionImporter.getContentsOfBeginEndBlock(LINES, "block");
-        Assert.assertEquals(output.size(), 1);
-        Assert.assertEquals(output.get(0), "content");
+        Assert.assertEquals(1, output.size());
+        Assert.assertEquals("content", output.get(0));
     }
 
     @Test(expected=Exception.class)

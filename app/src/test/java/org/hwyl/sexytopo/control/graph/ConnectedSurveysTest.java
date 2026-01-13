@@ -28,7 +28,7 @@ public class ConnectedSurveysTest {
                 ConnectedSurveys.getTranslatedConnectedSurveys(
                         Projection2D.PLAN, currentSurvey, new Space<>());
 
-        Assert.assertEquals(translated.size(), 0);
+        Assert.assertEquals(0, translated.size());
     }
 
     @Test

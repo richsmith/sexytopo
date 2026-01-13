@@ -229,7 +229,6 @@ public class OldDistoXCommunicator extends Thread {
                 } catch (InterruptedException exception) {
                     break;
                 }
-                continue;
             }
         }
 

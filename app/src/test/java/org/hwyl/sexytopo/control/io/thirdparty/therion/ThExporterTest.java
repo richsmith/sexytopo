@@ -30,9 +30,7 @@ public class ThExporterTest {
 
     @Test
     public void testReplaceCentreline() {
-
-
-        String updated = new ThExporter().replaceCentreline(TEST_CONTENT, "replacement");
+        String updated = ThExporter.replaceCentreline(TEST_CONTENT, "replacement");
         Assert.assertTrue(updated.contains("replacement"));
         Assert.assertFalse(updated.contains("Calculated"));
     }
@@ -40,8 +38,7 @@ public class ThExporterTest {
 
     @Test
     public void testReplaceInputs() {
-
-        String updated = new ThExporter().replaceInputsText(TEST_CONTENT, "input replacement");
+        String updated = ThExporter.replaceInputsText(TEST_CONTENT, "input replacement");
         Assert.assertTrue(updated.contains("input replacement"));
         Assert.assertFalse(updated.contains("dafung-down-west.th2"));
     }

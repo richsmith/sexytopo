@@ -32,7 +32,7 @@ public class MetadataTranslaterTest {
         Survey survey = new Survey();
         String text = "{\"active-station\":\"1\",\"connections\":{}}";
         MetadataTranslater.translateAndUpdate(null, survey, text);
-        Assert.assertEquals(survey.getActiveStation().getName(), "1");
+        Assert.assertEquals("1", survey.getActiveStation().getName());
     }
 
 
