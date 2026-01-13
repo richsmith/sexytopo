@@ -81,7 +81,7 @@ public class TextDetailTranslater extends SketchDetailTranslater<TextDetail> {
 
     private static List<PathDetail> getPathsForChar(char ch, Colour colour) {
         // Get glyph data, defaulting to the unknown character glyph
-        int[] glyph = GLYPH_DATA.getOrDefault(ch, GLYPH_DATA.get('\0'));
+        int[] glyph = GLYPH_DATA.containsKey(ch) ? GLYPH_DATA.get(ch) : GLYPH_DATA.get('\0');
 
         List<PathDetail> glyphPaths = new ArrayList<>();
         for (int i = 0; i < glyph.length; i += 4) {

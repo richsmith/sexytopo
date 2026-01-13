@@ -18,7 +18,6 @@ import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * Unified manager for station context menus across all views (table, plan, elevation).
@@ -26,10 +25,18 @@ import java.util.function.Consumer;
  */
 public class ContextMenuManager {
 
+    /**
+     * Simple functional interface for station actions (replacement for java.util.function.Consumer
+     * which requires API 24, but our minSdk is 23).
+     */
+    private interface StationAction {
+        void execute(Station station);
+    }
+
     private final Context context;
     private final ViewContext viewContext;
     private final org.hwyl.sexytopo.control.activity.SurveyEditorActivity activity;
-    private final Map<Integer, Consumer<Station>> menuActions;
+    private final Map<Integer, StationAction> menuActions;
 
     // Store the current leg context for actions that need it
     private Leg currentLeg;
@@ -311,9 +318,9 @@ public class ContextMenuManager {
             return true;
         }
 
-        Consumer<Station> action = menuActions.get(itemId);
+        StationAction action = menuActions.get(itemId);
         if (action != null) {
-            action.accept(station);
+            action.execute(station);
             return true;
         }
         return false;
