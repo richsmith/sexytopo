@@ -28,7 +28,6 @@
     <string name="experimental_warning">Expérimental</string>
 
     <!-- System -->
-    <string name="app_name" translatable="false">SexyTopo</string>
     <string name="title_activity_start_up">Démarrage</string>
     <string name="title_activity_device">Connecter</string>
     <string name="title_activity_table">Tableau</string>
@@ -266,10 +265,6 @@
     <string name="device_ble_invalid_data">Données invalides reçues : %1$s</string>
     <string name="device_cavway_x1_calibration_on">Démarrer le mode calibration</string>
     <string name="device_cavway_x1_calibration_off">Quitter le mode calibration</string>
-    <string name="device_distox_name" translatable="false">DistoX</string>
-    <string name="device_distox_short_name" translatable="false">DistoX</string>
-    <string name="device_distox_ble_name" translatable="false">DistoX BLE</string>
-    <string name="device_distox_ble_short_name" translatable="false">DistoX BLE</string>
     <string name="device_distox_command_calibration">Calibration…</string>
     <string name="device_command_laser_on">Laser allumé</string>
     <string name="device_distox_command_silent_mode_on">Mode silencieux activé</string>
@@ -286,27 +281,17 @@
     <string name="device_distox_calibration_write_error">Erreur d\'écriture de la calibration %1$s</string>
     <string name="device_distox_calibration_write_rejected">Disto a rejeté les données de calibration</string>
     <string name="device_distox_unknown_protocol">Protocole inconnu demandé</string>
-    <string name="device_bric4_name" translatable="false">BRIC4</string>
-    <string name="device_bric4_short_name" translatable="false">BRIC4</string>
-    <string name="device_bric5_name" translatable="false">BRIC5</string>
-    <string name="device_bric5_short_name" translatable="false">BRIC5</string>
     <string name="device_bric_command_take_shot">Prendre une mesure</string>
     <string name="device_bric_command_toggle_laser">Basculer le laser</string>
     <string name="device_bric_command_power_off">Éteindre</string>
     <string name="device_bric_command_clear_memory">Effacer la mémoire</string>
     <string name="device_bric_device_reported_error">%1$s a signalé une erreur : %2$s</string>
-    <string name="device_sap5_name" translatable="false">Shetland Attack Pony 5</string>
-    <string name="device_sap5_short_name" translatable="false">SAP5</string>
-    <string name="device_sap6_name" translatable="false">Shetland Attack Pony 6</string>
-    <string name="device_sap6_short_name" translatable="false">SAP6</string>
     <string name="device_sap_command_calibration_start">Démarrer la calibration</string>
     <string name="device_sap_command_calibration_stop">Arrêter la calibration</string>
     <string name="device_sap_command_laser_on">Laser allumé</string>
     <string name="device_sap_command_take_shot">Prendre une mesure</string>
     <string name="device_sap_command_laser_off">Laser éteint</string>
     <string name="device_sap_command_device_off">Appareil éteint</string>
-    <string name="device_fcl_name" translatable="false">Friken Cave Laser</string>
-    <string name="device_fcl_short_name" translatable="false">FCL</string>
     <string name="device_fcl_command_laser_on">Laser allumé</string>
     <string name="device_fcl_command_take_shot">Prendre une mesure</string>
     <string name="device_fcl_command_laser_off">Laser éteint</string>
@@ -530,6 +515,9 @@
     <string name="menu_jump_to_station_in_table">→ Tableau de données</string>
     <string name="menu_delete_station">Supprimer</string>
     <string name="menu_reverse">Inverser</string>
+    <string name="menu_switch_direction">Changer de direction</string>
+    <string name="menu_navigate">Naviguer</string>
+    <string name="menu_survey">Topographie</string>
     <string name="menu_start_new_survey">Commencer une nouvelle topographie ici</string>
     <string name="menu_unlink_survey">Dissocier la topographie liée</string>
     <string name="menu_comment">Commentaire</string>

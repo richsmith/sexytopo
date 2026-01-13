@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/panelBackground"
-        android:text="Station"
+        android:text="@string/station"
         android:padding="10dp" />
 
     <Button
@@ -27,7 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/ContextMenuButton"
-        android:text="Delete"
+        android:text="@string/delete"
         android:padding="10dp"/>
 
     <Button
@@ -35,7 +35,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/ContextMenuButton"
-        android:text="Reverse"
+        android:text="@string/menu_reverse"
         android:padding="10dp"/>
 
     <Button
@@ -43,7 +43,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/ContextMenuButton"
-        android:text="Switch Direction"
+        android:text="@string/menu_switch_direction"
         android:visibility="gone"/>
 
 

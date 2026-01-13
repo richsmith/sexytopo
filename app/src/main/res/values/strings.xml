@@ -343,6 +343,12 @@
     <string name="calibration_loaded_file">Calibration data loaded</string>
     <string name="calibration_load_error">Error reading calibration file</string>
     <string name="calibration_save_error">Error saving calibration file</string>
+    <string name="calibration_field_gx" translatable="false">Gx</string>
+    <string name="calibration_field_gy" translatable="false">Gy</string>
+    <string name="calibration_field_gz" translatable="false">Gz</string>
+    <string name="calibration_field_mx" translatable="false">Mx</string>
+    <string name="calibration_field_my" translatable="false">My</string>
+    <string name="calibration_field_mz" translatable="false">Mz</string>
     <string name="direction_forward">Forward</string>
     <string name="direction_right">Right</string>
     <string name="direction_back">Back</string>
@@ -543,6 +549,9 @@
     <string name="menu_jump_to_station_in_table">→ Data Table</string>
     <string name="menu_delete_station">Delete</string>
     <string name="menu_reverse">Reverse</string>
+    <string name="menu_switch_direction">Switch Direction</string>
+    <string name="menu_navigate">Navigate</string>
+    <string name="menu_survey">Survey</string>
     <string name="menu_start_new_survey">Start New Survey Here</string>
     <string name="menu_unlink_survey">Unlink Linked Survey</string>
     <string name="menu_comment">Comment</string>

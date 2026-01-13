@@ -293,8 +293,6 @@
     <string name="device_sap_command_take_shot">Messung auslösen</string>
     <string name="device_sap_command_laser_off">Laser ausschalten</string>
     <string name="device_sap_command_device_off">Gerät ausschalten</string>
-    <string name="device_fcl_name" translatable="false">Friken Cave Laser</string>
-    <string name="device_fcl_short_name" translatable="false">FCL</string>
     <string name="device_fcl_command_laser_on">Laser einschalten</string>
     <string name="device_fcl_command_take_shot">Messung auslösen</string>
     <string name="device_fcl_command_laser_off">Laser ausschalten</string>
@@ -515,6 +513,9 @@
     <string name="menu_jump_to_station_in_table">→ Daten-Tabelle</string>
     <string name="menu_delete_station">Löschen</string>
     <string name="menu_reverse">Rückblick</string>
+    <string name="menu_switch_direction">Richtung wechseln</string>
+    <string name="menu_navigate">Navigieren</string>
+    <string name="menu_survey">Vermessung</string>
     <string name="menu_start_new_survey">Hier neue Vermessung beginnen</string>
     <string name="menu_unlink_survey">Verknüpfung zu anderer Vermessungsdatei lösen</string>
     <string name="menu_comment">Kommentar</string>

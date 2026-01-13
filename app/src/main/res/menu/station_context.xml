@@ -89,7 +89,7 @@
     <!-- Navigate sub-menu -->
     <item
         android:id="@+id/menu_navigate"
-        android:title="Navigate">
+        android:title="@string/menu_navigate">
         <menu>
             <item
                 android:id="@+id/action_jump_to_table"
@@ -108,7 +108,7 @@
     <!-- Survey actions sub-menu -->
     <item
         android:id="@+id/menu_survey"
-        android:title="Survey">
+        android:title="@string/menu_survey">
         <menu>
             <item
                 android:id="@+id/action_start_new_survey"

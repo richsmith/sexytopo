@@ -121,10 +121,9 @@
         android:stretchColumns="1">
         <TableRow>
             <TextView
-                android:text="Gx"
+                android:text="@string/calibration_field_gx"
                 android:textSize="16sp"
-                android:gravity="start"
-                />
+                android:gravity="start" />
             <TextView
                 android:id="@+id/calibrationFieldGx"
                 android:textSize="16sp"
@@ -132,10 +131,9 @@
         </TableRow>
         <TableRow>
             <TextView
-                android:text="Gy"
+                android:text="@string/calibration_field_gy"
                 android:textSize="16sp"
-                android:gravity="start"
-                />
+                android:gravity="start" />
             <TextView
                 android:id="@+id/calibrationFieldGy"
                 android:textSize="16sp"
@@ -143,10 +141,9 @@
         </TableRow>
         <TableRow>
             <TextView
-                android:text="Gz"
+                android:text="@string/calibration_field_gz"
                 android:textSize="16sp"
-                android:gravity="start"
-                />
+                android:gravity="start" />
             <TextView
                 android:id="@+id/calibrationFieldGz"
                 android:textSize="16sp"
@@ -154,10 +151,9 @@
         </TableRow>
         <TableRow>
             <TextView
-                android:text="Mx"
+                android:text="@string/calibration_field_mx"
                 android:textSize="16sp"
-                android:gravity="start"
-                />
+                android:gravity="start" />
             <TextView
                 android:id="@+id/calibrationFieldMx"
                 android:textSize="16sp"
@@ -165,10 +161,9 @@
         </TableRow>
         <TableRow>
             <TextView
-                android:text="My"
+                android:text="@string/calibration_field_my"
                 android:textSize="16sp"
-                android:gravity="start"
-                />
+                android:gravity="start" />
             <TextView
                 android:id="@+id/calibrationFieldMy"
                 android:textSize="16sp"
@@ -176,10 +171,9 @@
         </TableRow>
         <TableRow>
             <TextView
-                android:text="Mz"
+                android:text="@string/calibration_field_mz"
                 android:textSize="16sp"
-                android:gravity="start"
-                />
+                android:gravity="start" />
             <TextView
                 android:id="@+id/calibrationFieldMz"
                 android:textAppearance="?android:attr/textAppearanceMedium"
