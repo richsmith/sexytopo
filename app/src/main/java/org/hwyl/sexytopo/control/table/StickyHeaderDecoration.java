@@ -2,7 +2,6 @@ package org.hwyl.sexytopo.control.table;
 
 import android.graphics.Canvas;
 import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.core.graphics.Insets;

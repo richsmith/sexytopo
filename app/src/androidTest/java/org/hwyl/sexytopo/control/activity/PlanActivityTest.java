@@ -24,7 +24,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 public class PlanActivityTest {
 
     @Rule
-    public ActivityScenarioRule<StartUpActivity> activityRule =
+    public final ActivityScenarioRule<StartUpActivity> activityRule =
             new ActivityScenarioRule<>(StartUpActivity.class);
 
 

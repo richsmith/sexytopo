@@ -260,8 +260,8 @@ public class DistoXBleManager extends SexyTopoBleManager {
 
     private class DataHandler extends SexyTopoDataHandler {
 
-        byte MEASUREMENT_IDENTIFIER = 0x01;
-        byte CALIBRATION_IDENTIFIER = 0x02;
+        final byte MEASUREMENT_IDENTIFIER = 0x01;
+        final byte CALIBRATION_IDENTIFIER = 0x02;
 
 
         @RequiresApi(api = Build.VERSION_CODES.O)

@@ -6,9 +6,9 @@ import org.hwyl.sexytopo.model.common.Frame;
 
 public class FrameTest extends TestCase {
 
-    Frame irregularFrame = new Frame(-6.0f, 10.0f, -9.0f, 3.0f);
-    Frame regularFrame = new Frame(-10.0f, 10.0f, -10.0f, 10.0f);
-    Frame offsetFrame = new Frame(0.0f, 20.0f, 0.0f, 20.0f);
+    final Frame irregularFrame = new Frame(-6.0f, 10.0f, -9.0f, 3.0f);
+    final Frame regularFrame = new Frame(-10.0f, 10.0f, -10.0f, 10.0f);
+    final Frame offsetFrame = new Frame(0.0f, 20.0f, 0.0f, 20.0f);
 
     public void testExpanding() {
 

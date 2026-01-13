@@ -13,11 +13,11 @@ import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 public class RenameStationForm extends Form {
-    Survey survey;
-    Station station;
+    final Survey survey;
+    final Station station;
 
-    EditText stationName;
-    TextInputLayout stationNameLayout;
+    final EditText stationName;
+    final TextInputLayout stationNameLayout;
 
     RenameStationForm(Context context, Survey survey, Station station) {
         super(context);

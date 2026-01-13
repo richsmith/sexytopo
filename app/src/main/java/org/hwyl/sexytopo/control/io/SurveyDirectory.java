@@ -35,11 +35,11 @@ public class SurveyDirectory extends AbstractSurveyFile {
         }
     }
 
-    public static SurveyDirectoryType TOP =
+    public static final SurveyDirectoryType TOP =
             new SurveyDirectoryType(".");
-    public static SurveyDirectoryType IMPORT_SOURCE =
+    public static final SurveyDirectoryType IMPORT_SOURCE =
             new SurveyDirectoryType("Import Source");
-    public static SurveyDirectoryType EXPORT =
+    public static final SurveyDirectoryType EXPORT =
             new SurveyDirectoryType("Exported");
 
     private final SurveyDirectoryType surveyDirectoryType;

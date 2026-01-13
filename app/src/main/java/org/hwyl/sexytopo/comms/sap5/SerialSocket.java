@@ -13,12 +13,12 @@ import java.io.OutputStream;
 
 
 public class SerialSocket {
-    private BluetoothDevice bluetoothDevice;
+    private final BluetoothDevice bluetoothDevice;
     private BluetoothSocket classicSocket;
     private BLESocket bleSocket;
     private BLEListener bleListener;
-    private InputStream inputStream;
-    private OutputStream outputStream;
+    private final InputStream inputStream;
+    private final OutputStream outputStream;
 
     public SerialSocket(BluetoothDevice device) throws Exception{
         bluetoothDevice = device;

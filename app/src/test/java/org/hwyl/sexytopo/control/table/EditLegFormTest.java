@@ -2,8 +2,6 @@ package org.hwyl.sexytopo.control.table;
 
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
-import org.hwyl.sexytopo.model.survey.Survey;
-import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
 import org.junit.Assert;
 import org.junit.Test;
 
