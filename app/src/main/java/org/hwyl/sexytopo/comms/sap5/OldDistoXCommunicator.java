@@ -132,12 +132,6 @@ public class OldDistoXCommunicator extends Thread {
     }
 
 
-    @Override
-    public void start() {
-        super.start();
-    }
-
-
     public void requestStart(Protocol protocol) {
 
         setProtocol(protocol);

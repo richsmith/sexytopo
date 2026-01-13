@@ -9,10 +9,10 @@ public class Instrument {
 
     private final InstrumentType instrumentType;
     private final BluetoothDevice bluetoothDevice;
-    private final String reportedName;
+
     public Instrument(BluetoothDevice bluetoothDevice) throws SecurityException {
         this.bluetoothDevice = bluetoothDevice;
-        reportedName = bluetoothDevice == null? null : bluetoothDevice.getName();
+        String reportedName = bluetoothDevice == null ? null : bluetoothDevice.getName();
         instrumentType = InstrumentType.byName(reportedName);
 
     }

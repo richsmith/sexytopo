@@ -555,7 +555,6 @@ public class GraphView extends View {
         return true;
     }
 
-    @SuppressWarnings("SwitchStatementWithTooFewBranches")
     private boolean handleSymbol(MotionEvent event) {
 
         if (currentSymbol == Symbol.TEXT) {
