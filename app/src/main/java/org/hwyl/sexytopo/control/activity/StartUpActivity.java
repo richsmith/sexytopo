@@ -108,7 +108,6 @@ public class StartUpActivity extends SexyTopoActivity {
         return surveyDirectory;
     }
 
-    @SuppressWarnings("RedundantIfStatement")
     private boolean shouldWeRestoreAutosave(DocumentFile surveyDirectory) {
 
         Survey protoSurvey = new Survey();
