@@ -224,6 +224,9 @@
     <string name="device_instruction_connect">3. Connect</string>
     <string name="device_request_pair">Pair</string>
     <string name="device_request_unpair">Unpair</string>
+    <string name="device_log_title">Device Log</string>
+    <string name="device_enable_bluetooth">Enable Bluetooth</string>
+    <string name="device_connect_to_device">Connect to Device</string>
     <string name="device_no_permitted_access">[inaccessible device]</string>
     <string name="device_bluetooth_no_adapter">Cannot access bluetooth adapter</string>
     <string name="device_connection_requested">Connection requested</string>

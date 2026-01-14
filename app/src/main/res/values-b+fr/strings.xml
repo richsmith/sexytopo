@@ -217,6 +217,9 @@
     <string name="device_instruction_connect">3. Connecter</string>
     <string name="device_request_pair">Associer?</string>
     <string name="device_request_unpair">Dissocier</string>
+    <string name="device_log_title">Journal de l\'appareil</string>
+    <string name="device_enable_bluetooth">Activer Bluetooth</string>
+    <string name="device_connect_to_device">Connecter à l\'appareil</string>
     <string name="device_no_permitted_access">[appareil inaccessible]</string>
     <string name="device_bluetooth_no_adapter">Impossible d\'accéder à l\'adaptateur Bluetooth</string>
     <string name="device_connection_requested">Connexion demandée</string>

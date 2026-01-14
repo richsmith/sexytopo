@@ -218,6 +218,9 @@
     <string name="device_instruction_connect">3. Verbinden</string>
     <string name="device_request_pair">Koppeln</string>
     <string name="device_request_unpair">Kopplung Aufheben</string>
+    <string name="device_log_title">Geräte-Protokoll</string>
+    <string name="device_enable_bluetooth">Bluetooth aktivieren</string>
+    <string name="device_connect_to_device">Mit Gerät verbinden</string>
     <string name="device_no_permitted_access">[Gerät nicht erreichbar]</string>
     <string name="device_bluetooth_no_adapter">Kein Zugriff auf Bluetooth-Adapter möglich</string>
     <string name="device_connection_requested">Verbindung erforderlich</string>
