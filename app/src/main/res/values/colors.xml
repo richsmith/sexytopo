@@ -68,7 +68,7 @@
 
     <!-- Context-Specific Backgrounds -->
     <color name="backgroundColor">@color/md_white</color>
-    <color name="lightBackground">@color/md_white</color>
+    <color name="lightBackground">@color/md_light_surface</color>
     <color name="darkBackground">@color/md_light_surface_dim</color>
     <color name="surfaceColor">@color/md_grey_100</color>
     <color name="surfaceVariant">@color/md_light_surface</color>
