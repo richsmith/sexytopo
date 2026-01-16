@@ -5,6 +5,7 @@ plugins {
 }
 
 android {
+    compileSdk 36
 
     buildFeatures {
         buildConfig = true
@@ -13,7 +14,6 @@ android {
     defaultConfig {
         applicationId "org.hwyl.sexytopo"
         minSdkVersion 23
-        compileSdk 36
         targetSdkVersion 35
         versionCode 87
         versionName "1.9.0"
@@ -64,7 +64,7 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.4.0'
     implementation 'com.google.android.material:material:1.13.0'
     implementation 'com.google.firebase:firebase-analytics:23.0.0'
-    implementation 'com.google.firebase:firebase-crashlytics:20.0.3'
+    implementation 'com.google.firebase:firebase-crashlytics:20.0.4'
     implementation 'commons-io:commons-io:2.21.0'
     implementation 'no.nordicsemi.android:ble:2.11.0'
     implementation 'org.apache.commons:commons-lang3:3.20.0'
