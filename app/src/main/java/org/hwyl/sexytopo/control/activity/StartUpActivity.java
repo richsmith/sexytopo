@@ -50,6 +50,7 @@ public class StartUpActivity extends SexyTopoActivity {
 
         Intent intent = new Intent(this, DeviceActivity.class);
         startActivity(intent);
+        finish();
     }
 
 
@@ -66,7 +67,6 @@ public class StartUpActivity extends SexyTopoActivity {
                 } else {
                     loadSurvey(activeSurveyDirectory);
                 }
-                loadSurvey(activeSurveyDirectory);
             }
 
         } catch (Exception exception) {
