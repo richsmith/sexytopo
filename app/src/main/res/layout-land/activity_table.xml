@@ -6,30 +6,52 @@
     android:keepScreenOn="true">
 
     <LinearLayout
-        android:id="@+id/tableContentLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="@color/lightBackground">
+        android:orientation="vertical">
 
-        <TableLayout
-            android:id="@+id/HeaderTable"
+        <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <TableRow style="@style/HeaderRow">
-                <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_from"/>
-                <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_to"/>
-                <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_distance"/>
-                <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_azimuth"/>
-                <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_elevation"/>
-            </TableRow>
-        </TableLayout>
+            android:layout_height="wrap_content"
+            android:background="@color/panelBackground">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/tableRecyclerView"
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@color/panelBackground"
+                app:title="@string/title_activity_table"
+                app:titleTextColor="@color/white" />
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <LinearLayout
+            android:id="@+id/tableContentLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:clipToPadding="false" />
+            android:orientation="vertical"
+            android:background="@color/lightBackground">
+
+            <TableLayout
+                android:id="@+id/HeaderTable"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TableRow style="@style/HeaderRow">
+                    <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_from"/>
+                    <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_to"/>
+                    <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_distance"/>
+                    <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_azimuth"/>
+                    <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_elevation"/>
+                </TableRow>
+            </TableLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/tableRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
