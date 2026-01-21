@@ -1,44 +1,16 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="horizontal"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:id="@+id/rootLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:keepScreenOn="true">
 
-    <RelativeLayout
-        android:id="@+id/relativeLayout1Landscape"
-        android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
-        android:background="@color/panelBackground" >
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <ImageButton
-                android:id="@+id/buttonAddStation"
-                android:layout_width="@dimen/toolbar_button_height"
-                android:layout_height="@dimen/toolbar_button_height"
-                android:src="@drawable/add"
-                android:scaleType="fitCenter"
-                android:onClick="manuallyAddStation"/>
-
-            <ImageButton
-                android:id="@+id/buttonAddSplay"
-                android:layout_width="@dimen/toolbar_button_height"
-                android:layout_height="@dimen/toolbar_button_height"
-                android:src="@drawable/add_splay"
-                android:scaleType="fitCenter"
-                android:onClick="manuallyAddSplay"/>
-        </LinearLayout>
-
-    </RelativeLayout>
-
     <LinearLayout
-        android:layout_width="0dp"
+        android:id="@+id/tableContentLayout"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="@color/lightBackground">
 
         <TableLayout
             android:id="@+id/HeaderTable"
@@ -56,8 +28,31 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/tableRecyclerView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:clipToPadding="false" />
 
     </LinearLayout>
 
-</LinearLayout>
+    <!-- Primary FAB for Add Station (positioned at bottom-right) -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddStation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_marginEnd="@dimen/fab_margin"
+        android:layout_marginBottom="@dimen/fab_margin"
+        android:contentDescription="@string/manual_add_station_title"
+        app:srcCompat="@drawable/add" />
+
+    <!-- Mini FAB for Add Splay (positioned above primary FAB) -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddSplay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_marginEnd="@dimen/fab_margin"
+        android:contentDescription="@string/manual_add_splay_title"
+        app:fabSize="mini"
+        app:srcCompat="@drawable/add_splay" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,5 +1,8 @@
 package org.hwyl.sexytopo.control.activity;
 
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
+
 import org.hwyl.sexytopo.R;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,5 +40,29 @@ public class TableActivityTest {
     public void tableHeaderVisible() {
         onView(withId(R.id.action_table)).perform(click());
         onView(withId(R.id.HeaderTable)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void tableRotationDoesNotCrash() {
+        onView(withId(R.id.action_table)).perform(click());
+        onView(withId(R.id.HeaderTable)).check(matches(isDisplayed()));
+
+        activityRule.getScenario().onActivity(activity -> {
+            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        });
+
+        onView(withId(R.id.HeaderTable)).check(matches(isDisplayed()));
+        onView(withId(R.id.tableRecyclerView)).check(matches(isDisplayed()));
+        onView(withId(R.id.fabAddStation)).check(matches(isDisplayed()));
+        onView(withId(R.id.fabAddSplay)).check(matches(isDisplayed()));
+
+        activityRule.getScenario().onActivity(activity -> {
+            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        });
+
+        onView(withId(R.id.HeaderTable)).check(matches(isDisplayed()));
+        onView(withId(R.id.tableRecyclerView)).check(matches(isDisplayed()));
+        onView(withId(R.id.fabAddStation)).check(matches(isDisplayed()));
+        onView(withId(R.id.fabAddSplay)).check(matches(isDisplayed()));
     }
 }

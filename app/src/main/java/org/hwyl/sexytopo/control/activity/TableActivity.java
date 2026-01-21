@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
@@ -74,11 +75,8 @@ public class TableActivity extends SurveyEditorActivity
         findViewById(R.id.fabAddStation).setOnClickListener(v -> manuallyAddStation());
         findViewById(R.id.fabAddSplay).setOnClickListener(v -> manuallyAddSplay());
 
-        // Allow content to scroll behind bottom nav bar (translucent effect)
-        applyEdgeToEdgeInsets(R.id.rootLayout, true, false);
-
-        // Position FABs dynamically above navigation bar
-        setupFabPositioning();
+        // Apply edge-to-edge insets
+        setupEdgeToEdge();
 
         receiver = new BroadcastReceiver() {
             @Override
@@ -88,30 +86,65 @@ public class TableActivity extends SurveyEditorActivity
         };
     }
 
-    private void setupFabPositioning() {
+    private void setupEdgeToEdge() {
         View rootLayout = findViewById(R.id.rootLayout);
         FloatingActionButton fabAddStation = findViewById(R.id.fabAddStation);
         FloatingActionButton fabAddSplay = findViewById(R.id.fabAddSplay);
+        RecyclerView recyclerView = findViewById(R.id.tableRecyclerView);
+
+        int fabMargin = getResources().getDimensionPixelSize(R.dimen.fab_margin);
+        int fabVerticalSpacing = getResources().getDimensionPixelSize(R.dimen.fab_vertical_spacing);
 
         ViewCompat.setOnApplyWindowInsetsListener(rootLayout, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            int statusBarHeight = systemBars.top;
-            int navBarHeight = systemBars.bottom;
+            boolean isPortrait = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
 
-            // Apply top padding for status bar
-            rootLayout.setPadding(0, statusBarHeight, 0, 0);
+            if (isPortrait) {
+                // Portrait: let content slide behind nav bar, but keep FABs clear
+                rootLayout.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
 
-            // Position primary FAB above nav bar with base margin
-            CoordinatorLayout.LayoutParams stationParams = (CoordinatorLayout.LayoutParams) fabAddStation.getLayoutParams();
-            stationParams.bottomMargin = navBarHeight + dpToPx(16);
-            fabAddStation.setLayoutParams(stationParams);
+                // Add bottom padding to RecyclerView so content can scroll clear of FABs
+                recyclerView.setPadding(0, 0, 0, systemBars.bottom);
+                recyclerView.setClipToPadding(false);
+            } else {
+                // Landscape: apply all insets as padding to keep everything clear
+                rootLayout.setPadding(
+                    systemBars.left,
+                    systemBars.top,
+                    systemBars.right,
+                    systemBars.bottom
+                );
+                recyclerView.setPadding(0, 0, 0, 0);
+            }
 
-            // Position mini FAB above primary FAB
-            CoordinatorLayout.LayoutParams splayParams = (CoordinatorLayout.LayoutParams) fabAddSplay.getLayoutParams();
-            splayParams.bottomMargin = navBarHeight + dpToPx(88);
-            fabAddSplay.setLayoutParams(splayParams);
+            // Position FABs with margins relative to the padded area
+            fabAddStation.post(() -> {
+                int normalFabSize = fabAddStation.getHeight();
 
-            return insets;
+                CoordinatorLayout.LayoutParams stationParams =
+                    (CoordinatorLayout.LayoutParams) fabAddStation.getLayoutParams();
+                CoordinatorLayout.LayoutParams splayParams =
+                    (CoordinatorLayout.LayoutParams) fabAddSplay.getLayoutParams();
+
+                if (isPortrait) {
+                    stationParams.bottomMargin = systemBars.bottom + fabMargin;
+                    stationParams.rightMargin = fabMargin;
+
+                    splayParams.bottomMargin = systemBars.bottom + fabMargin + normalFabSize + fabVerticalSpacing;
+                    splayParams.rightMargin = fabMargin;
+                } else {
+                    stationParams.bottomMargin = fabMargin;
+                    stationParams.rightMargin = fabMargin;
+
+                    splayParams.bottomMargin = fabMargin + normalFabSize + fabVerticalSpacing;
+                    splayParams.rightMargin = fabMargin;
+                }
+
+                fabAddStation.setLayoutParams(stationParams);
+                fabAddSplay.setLayoutParams(splayParams);
+            });
+
+            return WindowInsetsCompat.CONSUMED;
         });
     }
 
