@@ -22,6 +22,7 @@
                 <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_distance"/>
                 <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_azimuth"/>
                 <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_elevation"/>
+                <TextView style="@style/HeaderText" android:layout_weight="1" android:text="@string/table_head_comment"/>
             </TableRow>
         </TableLayout>
 

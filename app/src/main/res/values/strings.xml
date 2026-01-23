@@ -188,6 +188,7 @@
     <string name="table_head_distance">Dist</string>
     <string name="table_head_azimuth">Azm</string>
     <string name="table_head_elevation">Incl</string>
+    <string name="table_head_comment">Comment</string>
     <string name="table_delete_row_question">Delete Row?</string>
     <string name="manual_add_station_title">Add Station</string>
     <string name="manual_add_splay_title">Add Splay</string>

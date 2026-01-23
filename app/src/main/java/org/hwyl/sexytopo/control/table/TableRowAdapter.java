@@ -1,6 +1,7 @@
 package org.hwyl.sexytopo.control.table;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,6 +43,7 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
             put(TableCol.DISTANCE, R.id.tableRowDistance);
             put(TableCol.AZIMUTH, R.id.tableRowAzimuth);
             put(TableCol.INCLINATION, R.id.tableRowInclination);
+            put(TableCol.COMMENT, R.id.tableRowComment);
         }};
 
     public interface OnRowClickListener {
@@ -89,21 +91,28 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
         Map<TableCol, Object> map = GraphToListTranslator.createMap(entry);
 
         for (TableCol col : TableCol.values()) {
-            if (col == TableCol.COMMENT) {
-                continue;
-            }
-
-            String display = map.containsKey(col) ? col.format(map.get(col)) : "?";
             int id = TABLE_COL_TO_ANDROID_ID.get(col);
             TextView textView = holder.itemView.findViewById(id);
-            textView.setText(display);
+
+            if (col == TableCol.COMMENT) {
+                if (!isLandscape()) {
+                    textView.setVisibility(View.GONE); // Hide the view
+                    continue;
+                } else {
+                    textView.setVisibility(View.VISIBLE); // Show the view
+                    textView.setText(map.containsKey(col) ? col.format(map.get(col)) : "");
+                }
+            } else {
+                String display = map.containsKey(col) ? col.format(map.get(col)) : "?";
+                textView.setText(display);
+            }
 
             // Apply column width if available
             if (!columnWidths.isEmpty()) {
                 TableCol[] cols = TableCol.values();
                 int colIndex = 0;
                 for (int i = 0; i < cols.length; i++) {
-                    if (cols[i] != TableCol.COMMENT) {
+                    if (cols[i] != TableCol.COMMENT || isLandscape()) {
                         if (cols[i] == col) {
                             if (colIndex < columnWidths.size()) {
                                 android.view.ViewGroup.LayoutParams params = textView.getLayoutParams();
@@ -221,4 +230,12 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
             super(itemView);
         }
     }
+    private boolean isLandscape() {
+        // Get the current configuration from the context
+        Configuration config = context.getResources().getConfiguration();
+
+        // Check the orientation field
+        return config.orientation == Configuration.ORIENTATION_LANDSCAPE;
+    }
+
 }
