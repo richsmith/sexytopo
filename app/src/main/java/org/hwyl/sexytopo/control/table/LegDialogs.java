@@ -83,6 +83,7 @@ public class LegDialogs {
         // Hide TO field for splays
         if (isSplay) {
             dialogView.findViewById(R.id.toStationLayout).setVisibility(View.GONE);
+            dialogView.findViewById(R.id.commentLayout).setVisibility(View.GONE);
         }
 
         // Create validation form
@@ -133,6 +134,12 @@ public class LegDialogs {
                     String toStationName = form.getUpdatedToStationName();
                     Station newStation = new Station(toStationName);
 
+                    String comment = form.getUpdatedComment();
+                    if (comment != null) {
+                        newStation.setComment(comment);
+                    }
+
+
                     // Reconstruct leg with destination station (preserving backwards flag from form)
                     leg = new Leg(leg.getDistance(), leg.getAzimuth(), leg.getInclination(),
                                   newStation, new Leg[]{}, leg.wasShotBackwards());
@@ -181,6 +188,7 @@ public class LegDialogs {
         // Hide to station field for splays
         if (!toEdit.hasDestination()) {
             dialogView.findViewById(R.id.toStationLayout).setVisibility(View.GONE);
+            dialogView.findViewById(R.id.commentLayout).setVisibility(View.GONE);
         }
 
         // Create and configure the form for validation
@@ -267,7 +275,12 @@ public class LegDialogs {
 
                 // 3. Rename destination station if to station name changed (for full legs)
                 if (toEdit.hasDestination()) {
+                    Station destinationStation = toEdit.getDestination();
                     String newToStationName = form.getUpdatedToStationName();
+                    String newComment = form.getUpdatedComment();
+
+                    destinationStation.setComment(newComment);
+
                     String oldToStationName = toEdit.getDestination().getName();
                     if (!newToStationName.equals(oldToStationName)) {
                         SurveyUpdater.renameStation(survey, edited.getDestination(), newToStationName);
