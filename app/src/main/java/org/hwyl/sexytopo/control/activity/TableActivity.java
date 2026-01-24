@@ -227,7 +227,7 @@ public class TableActivity extends SurveyEditorActivity
     }
 
     private int calculateStationColumnWidth(Survey survey) {
-        String longestStationName = "";
+        String longestStationName = "ABCD";
         for (Station station : survey.getAllStations()) {
             if (station.getName().length() > longestStationName.length()) {
                 longestStationName = station.getName();
