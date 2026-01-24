@@ -30,11 +30,11 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
     private final Map<TextView, GraphToListTranslator.SurveyListEntry> fieldToSurveyEntry = new HashMap<>();
     private final Map<TextView, TableCol> fieldToTableCol = new HashMap<>();
     private final Map<View, Integer> viewToPosition = new HashMap<>();
-    private final List<Integer> columnWidths = new ArrayList<>();
     
     private final Context context;
     private Survey survey;
     private final OnRowClickListener onRowClickListener;
+    private int stationColumnWidth = -1; // Default to no width
 
     private static final EnumMap<TableCol, Integer> TABLE_COL_TO_ANDROID_ID =
         new EnumMap<TableCol, Integer>(TableCol.class) {{
@@ -55,6 +55,11 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
         this.context = context;
         this.survey = survey;
         this.onRowClickListener = listener;
+    }
+
+    public void setStationColumnWidth(int width) {
+        this.stationColumnWidth = width;
+        notifyDataSetChanged(); // Redraw the view with new widths
     }
 
     public void setSurvey(Survey updatedSurvey) {
@@ -94,6 +99,13 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
             int id = TABLE_COL_TO_ANDROID_ID.get(col);
             TextView textView = holder.itemView.findViewById(id);
 
+            // Set width for station columns
+            if (stationColumnWidth != -1 && (col == TableCol.FROM || col == TableCol.TO)) {
+                ViewGroup.LayoutParams params = textView.getLayoutParams();
+                params.width = stationColumnWidth;
+                textView.setLayoutParams(params);
+            }
+
             if (col == TableCol.COMMENT) {
                 if (!isLandscape()) {
                     textView.setVisibility(View.GONE); // Hide the view
@@ -105,25 +117,6 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
             } else {
                 String display = map.containsKey(col) ? col.format(map.get(col)) : "?";
                 textView.setText(display);
-            }
-
-            // Apply column width if available
-            if (!columnWidths.isEmpty()) {
-                TableCol[] cols = TableCol.values();
-                int colIndex = 0;
-                for (int i = 0; i < cols.length; i++) {
-                    if (cols[i] != TableCol.COMMENT || isLandscape()) {
-                        if (cols[i] == col) {
-                            if (colIndex < columnWidths.size()) {
-                                android.view.ViewGroup.LayoutParams params = textView.getLayoutParams();
-                                params.width = columnWidths.get(colIndex);
-                                textView.setLayoutParams(params);
-                            }
-                            break;
-                        }
-                        colIndex++;
-                    }
-                }
             }
 
             // Set background color with alternate row shading (theme-aware)
@@ -188,12 +181,6 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
                 return true;
             });
         }
-    }
-
-    public void setColumnWidths(List<Integer> widths) {
-        columnWidths.clear();
-        columnWidths.addAll(widths);
-        notifyDataSetChanged();
     }
 
     @Override
