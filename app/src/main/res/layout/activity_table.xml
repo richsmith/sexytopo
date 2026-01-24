@@ -41,10 +41,10 @@
                 <TableRow style="@style/HeaderRow">
                     <TextView android:id="@+id/headerFrom" style="@style/HeaderText" android:layout_width="wrap_content" android:text="@string/table_head_from"/>
                     <TextView android:id="@+id/headerTo" style="@style/HeaderText" android:layout_width="wrap_content" android:text="@string/table_head_to"/>
-                    <TextView style="@style/HeaderText" android:layout_width="0dp" android:layout_weight="1" android:text="@string/table_head_distance"/>
-                    <TextView style="@style/HeaderText" android:layout_width="0dp" android:layout_weight="1" android:text="@string/table_head_azimuth"/>
-                    <TextView style="@style/HeaderText" android:layout_width="0dp" android:layout_weight="1" android:text="@string/table_head_elevation"/>
-                    <TextView style="@style/HeaderText" android:layout_width="0dp" android:layout_weight="2" android:text="@string/table_head_comment" android:visibility="gone"/>
+                    <TextView style="@style/HeaderText" android:layout_width="0dp" android:layout_weight="1" android:text="@string/table_head_distance" android:gravity="end" android:layout_marginEnd="4dp"/>
+                    <TextView style="@style/HeaderText" android:layout_width="0dp" android:layout_weight="1" android:text="@string/table_head_azimuth" android:gravity="end" android:layout_marginEnd="4dp" />
+                    <TextView style="@style/HeaderText" android:layout_width="0dp" android:layout_weight="1" android:text="@string/table_head_elevation" android:gravity="end" android:layout_marginEnd="4dp"/>
+                    <TextView style="@style/HeaderText" android:layout_width="0dp" android:layout_weight="3" android:text="@string/table_head_comment" android:visibility="gone"/>
                 </TableRow>
             </TableLayout>
 
