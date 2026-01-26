@@ -151,10 +151,16 @@ public class LegDialogs {
 
                     // Add LRUDs if requested
                     if (includeLruds) {
+                        // Restore the active station back to the FROM station
+                        survey.setActiveStation(fromStation);
+
                         createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceLeft, LRUD.LEFT);
                         createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceRight, LRUD.RIGHT);
                         createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceUp, LRUD.UP);
                         createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceDown, LRUD.DOWN);
+
+                        // Move active station back to the TO station again
+                        survey.setActiveStation(newStation);
                     }
                 }
 
