@@ -235,6 +235,9 @@ public class SurveyUpdater {
         Log.i(R.string.survey_update_renamed_station, previousName, name);
     }
 
+    public static void renameOrigin(Survey survey, String name) {
+        renameStation(survey, survey.getOrigin(), name);
+    }
 
     public static void moveLeg(Survey survey, Leg leg, Station newSource) {
         Station originating = survey.getOriginatingStation(leg);
@@ -246,15 +249,13 @@ public class SurveyUpdater {
 
 
     public static void deleteStation(final Survey survey, final Station toDelete) {
-        if (toDelete == survey.getOrigin()) {
-            return;
+        if (!survey.isOrigin(toDelete)) {
+            // Station comes as a package with the leg that forms it, so
+            // remove that to delete the station from the graph
+            Leg referringLeg = survey.getReferringLeg(toDelete);
+            Station fromStation = survey.getOriginatingStation(referringLeg);
+            deleteLeg(survey, fromStation, referringLeg);
         }
-
-        // Station comes as a package with the leg that forms it, so
-        // remove that to delete the station from the graph
-        Leg referringLeg = survey.getReferringLeg(toDelete);
-        Station fromStation = survey.getOriginatingStation(referringLeg);
-        deleteLeg(survey, fromStation, referringLeg);
     }
 
 
