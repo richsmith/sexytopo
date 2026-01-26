@@ -154,7 +154,7 @@ public class EditLegForm extends Form {
         // Validate stations
         EditText graphFromField = inputMode == InputMode.BACKWARD ? toStationField : fromStationField;
         EditText graphToField = inputMode == InputMode.BACKWARD ? fromStationField : toStationField;
-       
+
         Station fromStation = validateGraphFromField(graphFromField);
         if (!isSplay) {
             validateGraphToField(fromStation, graphToField);
@@ -176,6 +176,19 @@ public class EditLegForm extends Form {
             error = R.string.validation_error_cannot_be_blank;
         } else if (fromName.equals(SexyTopoConstants.BLANK_STATION_NAME)) {
             error = R.string.validation_error_station_named_dash;
+        } else if (survey.isOrigin(originalFromStation) && fromStation == null) {
+            // Are we just renaming the origin station
+            boolean isRenamingStation = !originalFromStation.getName().equals(fromName);
+
+            // For edit mode: only check uniqueness if the graph from station name is changing
+            if (isRenamingStation) {
+                Station existing = survey.getStationByName(fromName);
+                if (existing == null) {
+                    fromStation=survey.getOrigin(); // Send back the origin station so that it can be renamed
+                } else {
+                    error = R.string.validation_error_station_name_not_unique;
+                }
+            }
         } else if (fromStation == null) {
             error = R.string.validation_error_station_does_not_exist;
         } else if (originalLeg != null && originalLeg.hasDestination()) {
@@ -354,7 +367,13 @@ public class EditLegForm extends Form {
     }
 
     private Station getFromStation() {
-        return survey.getStationByName(getFromStationName());
+        Station fromStation = survey.getStationByName(getFromStationName());
+        if (fromStation == null && survey.isOrigin(originalFromStation)) {
+            // As a special case if we can't find the from station and we are
+            // at the origin, we must be wanting to rename it - so return the origin
+            return(originalFromStation);
+        }
+        return fromStation;
     }
 
     private String getToStationName() {
@@ -402,6 +421,10 @@ public class EditLegForm extends Form {
      */
     public Station getUpdatedFromStation() {
         return getFromStation();
+    }
+
+    public String getUpdatedFromStationName() {
+        return getFromStationName();
     }
 
     /**
