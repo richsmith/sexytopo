@@ -62,7 +62,7 @@ public class ExampleSurveyCreator {
 
     public static void createLruds(Survey survey, Station station) {
         for (LRUD lrud : LRUD.values()) {
-            Leg splay = lrud.createSplay(survey, station, 1 + random.nextInt(3));
+            Leg splay = lrud.createSplay(survey, station, null, 1 + random.nextInt(3));
             SurveyUpdater.update(survey, splay);
         }
     }
