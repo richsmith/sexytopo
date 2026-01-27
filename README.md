@@ -12,12 +12,11 @@ This app is experimental software made available for free with no guarantee it i
 🏆 SexyTopo was awarded the [Arthur Butcher award](https://bcra.org.uk/detail/awards.butcher.html) for excellence in surveying by the [BCRA](https://bcra.org.uk) at [Hidden Earth](https://hidden.earth) 2023.
 
 
-# Manual
+# Documentation
 
-There is a basic manual available in the app, but I can never seem to find time to update it, so it is 
-quite out of date.
+A basic [SexyTopo Manual](docs/manual.html) is available both in-app (Help → Manual) and online here.
 
-Alternatively, Tarquin has written an excellent [guide to surveying with SexyTopo](https://www.cavinguk.co.uk/info/sexytopo.html).
+Tarquin has also written an excellent [guide to surveying with SexyTopo](https://www.cavinguk.co.uk/info/sexytopo.html).
 
 # FAQ
 
