@@ -36,6 +36,7 @@ public class EditLegForm extends Form {
     private EditText distanceField;
     private EditText azimuthField;
     private EditText inclinationField;
+    private EditText commentField;
 
     // Deg/Min/Sec fields (optional, used when in deg/min/sec mode)
     private EditText azimuthDegreesField;
@@ -93,6 +94,7 @@ public class EditLegForm extends Form {
         this.distanceField = dialogView.findViewById(R.id.editDistance);
         this.azimuthField = dialogView.findViewById(R.id.editAzimuth);
         this.inclinationField = dialogView.findViewById(R.id.editInclination);
+        this.commentField = dialogView.findViewById(R.id.editComment);
         this.azimuthDegreesField = dialogView.findViewById(R.id.editAzimuthDegrees);
         this.azimuthMinutesField = dialogView.findViewById(R.id.editAzimuthMinutes);
         this.azimuthSecondsField = dialogView.findViewById(R.id.editAzimuthSeconds);
@@ -329,12 +331,19 @@ public class EditLegForm extends Form {
 
         if (!isSplay) {
             String toName = "";
+            String comment = ""; // Not used for splay
             if (originalLeg != null) {
                 toName = originalLeg.getDestination().getName();
+                Station destStation = survey.getStationByName(toName);
+                if (destStation != null && destStation.hasComment()) {
+                    comment = destStation.getComment();
+                }
+
             } else if (defaultToName != null) {
                 toName = defaultToName;
             }
             graphToStationField.setText(toName);
+            commentField.setText(comment);
         }
     }
 
@@ -381,6 +390,12 @@ public class EditLegForm extends Form {
             return fromStationField.getText().toString();
         }
         return toStationField.getText().toString();
+    }
+    private String getComment() {
+        if (commentField != null) {
+            return commentField.getText().toString();
+        }
+        return null;
     }
 
     /**
@@ -434,5 +449,8 @@ public class EditLegForm extends Form {
      */
     public String getUpdatedToStationName() {
         return isSplay ? null : getToStationName();
+    }
+    public String getUpdatedComment() {
+        return isSplay ? null : getComment();
     }
 }
