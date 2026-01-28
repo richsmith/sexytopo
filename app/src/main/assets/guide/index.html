@@ -5,16 +5,19 @@
 		body {
 			font-family: sans-serif;
 			line-height: 1.6;
-			margin: 15px;
+			margin: 1rem auto;
+			padding: 0 1rem;
+			max-width: 70ch;
 			background-color: #ffffff;
 			color: #000000;
 		}
 		#toc {
 			background: #f5f5f5;
 			border: 1px solid #ccc;
-			padding: 15px;
-			margin: 20px 0;
-			border-radius: 5px;
+			padding: 1rem;
+			margin: 1.5rem auto;
+			max-width: 50ch;
+			border-radius: 0.3rem;
 		}
 		#toc h2 {
 			margin-top: 0;
@@ -260,26 +263,27 @@
   <p>SexyTopo attempts to default the save location to a folder in <code>Documents/SexyTopo/Surveys</code>, but this doesn't work on all devices, and you are free to choose your own folder structure. At the time of writing, SexyTopo doesn't care about where linked surveys are saved, but this may change in the future.</p>
 
 <h2 id="import-export">Import and Export</h2>
-<p>SexyTopo can exchange data with other cave surveying software through import and export functions.</p>
+  <p>SexyTopo can exchange data with other cave surveying software through import and export functions.</p>
 
-<h3>Importing Surveys</h3>
-<p>To import survey data from other software, select an action from File → Import in the menu.</p>
-<ul>
-<li><strong>Import File</strong> - Imports a single survey file (e.g. a Survex file)</li>
-<li><strong>Import Directory</strong> - Imports a survey from a folder, probably containing multiple files (e.g. a Therion survey)</p>
+  <h3>Importing Surveys</h3>
+    <p>To import survey data from other software, select an action from File → Import in the menu.</p>
+    <ul>
+      <li><strong>Import File</strong> - Imports a single survey file (e.g. a Survex file)</li>
+      <li><strong>Import Directory</strong> - Imports a survey from a folder, probably containing multiple files (e.g. a Therion survey)</li>
+    </ul>
 
-<h3>Exporting Surveys</h3>
-<p>Export allows you to save your survey in various formats for use with other software, sharing, or publishing. Select File → Export and choose your desired format.</p>
-<p>The exported file or folder will be produced in an <code>Exported</code> folder inside your survey folder with a name of the export selected (e.g. <code>Exported/therion</code>).</p>
+  <h3>Exporting Surveys</h3>
+    <p>Export allows you to save your survey in various formats for use with other software, sharing, or publishing. Select File → Export and choose your desired format.</p>
+    <p>The exported file or folder will be produced in an <code>Exported</code> folder inside your survey folder with a name of the export selected (e.g. <code>Exported/therion</code>).</p>
 
 <h2 id="troubleshooting">Troubleshooting</h2>
-<p>In typical caver fashion, you've probably cajoled someone into lending you their shiny measuring device, completely failed to have a practice with it and assumed you'd just wing it. Now you've found yourself in the sharp end of some crappy hole somewhere realising that you have no idea why your surveying kit doesn't work. Luckily you've found SexyTopo has a help file and you're desperately trying to scan through it looking for some hope. First of all, don't panic...</p>
-<h3>Problems Connecting to Your Instrument</h3>
-<p>Check the following are true: Bluetooth is turned on on the device, the device is paired with your instrument and the Connect switch is on. Check the on-screen console on the Instrument page: it may show an error message or give some clue as to what is wrong.</p>
-<p>If that fails, try turning your instrument off and back on. Try unpairing and re-pairing, or even turning Bluetooth off and on again. It shouldn't make a difference but you could kill SexyTopo and reopen it. Check you haven't paired with the wrong device (the Unpair dialog shows which devices are paired).</p>
-<p>For DistoX devices: if all else fails a factory reset may be necessary. Press CLEAR, FUNC and MEM (the latter has a floppy disk or save icon) for five seconds. Note that this is an option of last resort and requires recalibrating the device.</p>
-<h3>Strange Measurements</h3>
-<p>Your instrument may need calibrating. Consult your instrument's documentation for calibration procedures. Some devices (such as DistoX) provide calibration tools within SexyTopo accessible from the Instrument menu.</p>
+  <p>In typical caver fashion, you've probably cajoled someone into lending you their shiny measuring device, completely failed to have a practice with it and assumed you'd just wing it. Now you've found yourself in the sharp end of some crappy hole somewhere realising that you have no idea why your surveying kit doesn't work. Luckily you've found SexyTopo has a help file and you're desperately trying to scan through it looking for some hope. First of all, don't panic...</p>
+  <h3>Problems Connecting to Your Instrument</h3>
+    <p>Check the following are true: Bluetooth is turned on on the device, the device is paired with your instrument and the Connect switch is on. Check the on-screen console on the Instrument page: it may show an error message or give some clue as to what is wrong.</p>
+    <p>If that fails, try turning your instrument off and back on. Try unpairing and re-pairing, or even turning Bluetooth off and on again. It shouldn't make a difference but you could kill SexyTopo and reopen it. Check you haven't paired with the wrong device (the Unpair dialog shows which devices are paired).</p>
+    <p>For DistoX devices: if all else fails a factory reset may be necessary. Press CLEAR, FUNC and MEM (the latter has a floppy disk or save icon) for five seconds. Note that this is an option of last resort and requires recalibrating the device.</p>
+  <h3>Strange Measurements</h3>
+    <p>Your instrument may need calibrating. Consult your instrument's documentation for calibration procedures. Some devices (such as DistoX) provide calibration tools within SexyTopo accessible from the Instrument menu.</p>
 
 </body>
 </html>
