@@ -456,6 +456,8 @@
     <string name="settings_manual_data_entry_title">Manual Data Entry</string>
     <string name="settings_key_lrud_fields_title">LRUD entries</string>
     <string name="settings_key_lrud_fields_summary">Show fields for entering LRUDs (Left-Right-Up-Down) for each new station</string>
+    <string name="settings_lrud_bisect_angle_title">Left and Right bisect angle</string>
+    <string name="settings_lrud_bisect_angle_summary">Left and Right bisect angle between last station and the next one (as opposed to just being perpendicular to the direction to the next station)</string>
     <string name="settings_key_deg_mins_secs_title">Azimuth as degrees/minutes/seconds</string>
     <string name="settings_key_deg_mins_secs_summary">Enter azimuth values in deg/mins/secs (as opposed to the default of decimal)</string>
     <string name="settings_export_title">Export</string>
