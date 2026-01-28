@@ -14,7 +14,7 @@ This app is experimental software made available for free with no guarantee it i
 
 # Documentation
 
-A basic [SexyTopo Manual](https://richsmith.github.io/sexytopo/manual.html) is available both in-app (Help → Manual) and online.
+A basic [SexyTopo Manual](https://richsmith.github.io/sexytopo/manual/) is available both in-app (Help → Manual) and online.
 
 Tarquin has also written an excellent [guide to surveying with SexyTopo](https://www.cavinguk.co.uk/info/sexytopo.html).
 
