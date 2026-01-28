@@ -14,6 +14,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
+import org.hwyl.sexytopo.control.activity.SurveyEditorActivity;
 import org.hwyl.sexytopo.control.activity.TableActivity;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.StationNamer;
@@ -171,7 +172,7 @@ public class LegDialogs {
                 if (!isSplay) {
                     manager.broadcastNewStationCreated();
                 }
-                tableActivity.syncTableWithSurvey();
+                tableActivity.syncWithSurvey();
             });
     }
 
@@ -296,9 +297,9 @@ public class LegDialogs {
 
                 activity.getSurveyManager().broadcastSurveyUpdated();
 
-                // Sync table view if this is a TableActivity
-                if (activity instanceof TableActivity) {
-                    ((TableActivity) activity).syncTableWithSurvey();
+                // Sync view with survey data
+                if (activity instanceof SurveyEditorActivity) {
+                    ((SurveyEditorActivity) activity).syncWithSurvey();
                 }
             });
     }
@@ -338,7 +339,7 @@ public class LegDialogs {
     }
 
 
-    public static void renameStation(final TableActivity activity,
+    public static void renameStation(final SurveyEditorActivity activity,
                                      final Survey survey, final Station toRename) {
         final RenameStationForm form = new RenameStationForm(activity, survey, toRename);
 
@@ -346,7 +347,8 @@ public class LegDialogs {
             String newName = form.stationName.getText().toString();
             try {
                 SurveyUpdater.renameStation(survey, toRename, newName);
-                activity.syncTableWithSurvey();
+                activity.getSurveyManager().broadcastSurveyUpdated();
+                activity.syncWithSurvey();
             } catch (Exception e) {
                 activity.showExceptionAndLog(R.string.manual_rename_error, e);
             }
