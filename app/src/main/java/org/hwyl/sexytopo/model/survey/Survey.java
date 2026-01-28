@@ -155,6 +155,10 @@ public class Survey {
         this.origin = origin;
     }
 
+    public boolean isOrigin(Station station) {
+        return station == origin;
+    }
+
     public List<Station> getAllStations() {
         return getAllStations(origin);
     }

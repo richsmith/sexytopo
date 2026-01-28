@@ -53,7 +53,7 @@
     <string name="action_connection">Verbindung</string>
     <string name="action_trip">Aktuelle Tour</string>
     <string name="action_help">Hilfe</string>
-    <string name="action_guide">Anleitung</string>
+    <string name="action_guide">Handbuch</string>
     <string name="action_about">Über</string>
     <string name="action_file_new">Neue Vermessung</string>
     <string name="action_file_open">Vermessungsdatei öffnen…</string>

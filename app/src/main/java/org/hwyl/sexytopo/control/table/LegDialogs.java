@@ -126,6 +126,14 @@ public class LegDialogs {
                 Leg leg = form.getUpdatedLeg();
                 Station fromStation = form.getUpdatedFromStation();
 
+                // Get the new station names from the form
+                String newFromStationName = form.getUpdatedFromStationName();
+                String oldFromStationName = fromStation.getName();
+                if (!newFromStationName.equals(oldFromStationName) && survey.isOrigin(fromStation)) {
+                    // Just rename the origin station
+                    SurveyUpdater.renameOrigin(survey, newFromStationName);
+                }
+
                 if (isSplay) {
                     // Add splay to from station
                     SurveyUpdater.addLegFromStation(survey, fromStation, leg);
@@ -150,10 +158,16 @@ public class LegDialogs {
 
                     // Add LRUDs if requested
                     if (includeLruds) {
+                        // Restore the active station back to the FROM station
+                        survey.setActiveStation(fromStation);
+
                         createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceLeft, LRUD.LEFT);
                         createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceRight, LRUD.RIGHT);
                         createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceUp, LRUD.UP);
                         createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceDown, LRUD.DOWN);
+
+                        // Move active station back to the TO station again
+                        survey.setActiveStation(newStation);
                     }
                 }
 
@@ -262,15 +276,21 @@ public class LegDialogs {
 
                 // Get the new station names from the form
                 Station newFromStation = form.getUpdatedFromStation();
+                String newFromStationName = form.getUpdatedFromStationName();
                 String oldFromStationName = fromStation.getName();
 
                 // Apply changes in the correct order:
                 // 1. First, edit the leg measurements
                 SurveyUpdater.editLeg(survey, toEdit, edited);
 
-                // 2. Move leg if from station changed
-                if (!newFromStation.getName().equals(oldFromStationName)) {
-                    SurveyUpdater.moveLeg(survey, edited, newFromStation);
+                // 2. Move leg (or rename origin station) if from station changed
+                if (!newFromStationName.equals(oldFromStationName)) {
+                    if (newFromStation == fromStation && survey.isOrigin(newFromStation)) {
+                        // If the station hasn't changed and it is the origin, then just rename the origin
+                        SurveyUpdater.renameOrigin(survey, newFromStationName);
+                    } else {
+                        SurveyUpdater.moveLeg(survey, edited, newFromStation);
+                    }
                 }
 
                 // 3. Rename destination station if to station name changed (for full legs)
