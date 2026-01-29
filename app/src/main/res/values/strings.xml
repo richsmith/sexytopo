@@ -207,9 +207,9 @@
     <string name="manual_edit_right">Right (m)</string>
     <string name="manual_edit_up">Up (m)</string>
     <string name="manual_edit_down">Down (m)</string>
-    <string name="manual_edit_from_station">From station</string>
+    <string name="manual_edit_from_station">From</string>
     <string name="manual_edit_from_station_error">Invalid from station</string>
-    <string name="manual_edit_to_station">To station</string>
+    <string name="manual_edit_to_station">To</string>
     <string name="manual_edit_to_station_error">Invalid to station</string>
     <string name="manual_edit_shot_backwards">⬅ Shot backwards</string>
     <string name="manual_rename_station_title">Rename Station</string>

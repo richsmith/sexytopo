@@ -135,6 +135,8 @@ public class LegDialogs {
                     SurveyUpdater.renameOrigin(survey, newFromStationName);
                 }
 
+                fromStation.setComment(form.getUpdatedFromComment());
+
                 if (isSplay) {
                     // Add splay to from station
                     SurveyUpdater.addLegFromStation(survey, fromStation, leg);
@@ -143,9 +145,9 @@ public class LegDialogs {
                     String toStationName = form.getUpdatedToStationName();
                     Station newStation = new Station(toStationName);
 
-                    String comment = form.getUpdatedToComment();
-                    if (comment != null) {
-                        newStation.setComment(comment);
+                    String toComment = form.getUpdatedToComment();
+                    if (toComment != null) {
+                        newStation.setComment(toComment);
                     }
 
 
@@ -294,13 +296,15 @@ public class LegDialogs {
                     }
                 }
 
+                fromStation.setComment(form.getUpdatedFromComment());
+
                 // 3. Rename destination station if to station name changed (for full legs)
                 if (toEdit.hasDestination()) {
                     Station destinationStation = toEdit.getDestination();
                     String newToStationName = form.getUpdatedToStationName();
-                    String newComment = form.getUpdatedToComment();
+                    String newToComment = form.getUpdatedToComment();
 
-                    destinationStation.setComment(newComment);
+                    destinationStation.setComment(newToComment);
 
                     String oldToStationName = toEdit.getDestination().getName();
                     if (!newToStationName.equals(oldToStationName)) {

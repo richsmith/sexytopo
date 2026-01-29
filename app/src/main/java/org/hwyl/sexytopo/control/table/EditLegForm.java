@@ -33,7 +33,11 @@ public class EditLegForm extends Form {
     private EditText graphFromStationField;
     private EditText graphToStationField;
 
+
+    private EditText fromCommentField;
     private EditText toCommentField;
+
+    private Station lastFromStation;
 
     private EditText distanceField;
     private EditText azimuthField;
@@ -73,6 +77,7 @@ public class EditLegForm extends Form {
         this.context = context;
         this.survey = survey;
         this.originalFromStation = fromStation;
+        this.lastFromStation = fromStation;
         this.originalLeg = null;  // No original leg when adding
         this.defaultToName = defaultToName;
         this.isSplay = isSplay;
@@ -91,6 +96,7 @@ public class EditLegForm extends Form {
     private void initialiseFields(View dialogView) {
         // Find all view references from the dialog
         this.fromStationField = dialogView.findViewById(R.id.editFromStation);
+        this.fromCommentField = dialogView.findViewById(R.id.editFromComment);
         this.toStationField = dialogView.findViewById(R.id.editToStation);
         this.toCommentField = dialogView.findViewById(R.id.editToComment);
         this.distanceField = dialogView.findViewById(R.id.editDistance);
@@ -203,6 +209,18 @@ public class EditLegForm extends Form {
                     error = R.string.survey_update_error_descendant_station;
                 }
             }
+        }
+
+        // Has the from station changed
+        if (fromStation!=null && fromStation != lastFromStation) {
+            // Update the comment to the new station
+            String fromComment = "";
+            if (fromStation.hasComment()) {
+                fromComment = fromStation.getComment();
+            }
+
+            fromCommentField.setText(fromComment);
+            lastFromStation = fromStation;
         }
 
         setError(fromField, error);
@@ -328,7 +346,12 @@ public class EditLegForm extends Form {
      */
     private void initialiseStationDisplay() {
         mapGraphFields();
+        String fromComment = "";
+        if (originalFromStation.hasComment()) {
+            fromComment = originalFromStation.getComment();
+        }
         graphFromStationField.setText(originalFromStation.getName());
+        fromCommentField.setText(fromComment);
 
         if (!isSplay) {
             String toName = "";
@@ -399,6 +422,14 @@ public class EditLegForm extends Form {
         return null;
     }
 
+    private String getFromComment() {
+        if (fromCommentField != null) {
+            return fromCommentField.getText().toString();
+        }
+        return null;
+    }
+
+
     /**
      * Create a Leg object from the form data with measurements and shot direction.
      * For editing: preserves the existing destination station object.
@@ -441,6 +472,9 @@ public class EditLegForm extends Form {
 
     public String getUpdatedFromStationName() {
         return getFromStationName();
+    }
+    public String getUpdatedFromComment() {
+        return getFromComment();
     }
 
     /**
