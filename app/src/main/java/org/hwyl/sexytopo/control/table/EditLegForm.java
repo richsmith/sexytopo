@@ -33,15 +33,10 @@ public class EditLegForm extends Form {
     private EditText graphFromStationField;
     private EditText graphToStationField;
 
-
-    private EditText fromCommentField;
-    private EditText toCommentField;
-
-    private Station lastFromStation;
-
     private EditText distanceField;
     private EditText azimuthField;
     private EditText inclinationField;
+    private EditText commentField;
 
     // Deg/Min/Sec fields (optional, used when in deg/min/sec mode)
     private EditText azimuthDegreesField;
@@ -77,7 +72,6 @@ public class EditLegForm extends Form {
         this.context = context;
         this.survey = survey;
         this.originalFromStation = fromStation;
-        this.lastFromStation = fromStation;
         this.originalLeg = null;  // No original leg when adding
         this.defaultToName = defaultToName;
         this.isSplay = isSplay;
@@ -96,12 +90,11 @@ public class EditLegForm extends Form {
     private void initialiseFields(View dialogView) {
         // Find all view references from the dialog
         this.fromStationField = dialogView.findViewById(R.id.editFromStation);
-        this.fromCommentField = dialogView.findViewById(R.id.editFromComment);
         this.toStationField = dialogView.findViewById(R.id.editToStation);
-        this.toCommentField = dialogView.findViewById(R.id.editToComment);
         this.distanceField = dialogView.findViewById(R.id.editDistance);
         this.azimuthField = dialogView.findViewById(R.id.editAzimuth);
         this.inclinationField = dialogView.findViewById(R.id.editInclination);
+        this.commentField = dialogView.findViewById(R.id.editComment);
         this.azimuthDegreesField = dialogView.findViewById(R.id.editAzimuthDegrees);
         this.azimuthMinutesField = dialogView.findViewById(R.id.editAzimuthMinutes);
         this.azimuthSecondsField = dialogView.findViewById(R.id.editAzimuthSeconds);
@@ -209,18 +202,6 @@ public class EditLegForm extends Form {
                     error = R.string.survey_update_error_descendant_station;
                 }
             }
-        }
-
-        // Has the from station changed
-        if (fromStation!=null && fromStation != lastFromStation) {
-            // Update the comment to the new station
-            String fromComment = "";
-            if (fromStation.hasComment()) {
-                fromComment = fromStation.getComment();
-            }
-
-            fromCommentField.setText(fromComment);
-            lastFromStation = fromStation;
         }
 
         setError(fromField, error);
@@ -346,28 +327,23 @@ public class EditLegForm extends Form {
      */
     private void initialiseStationDisplay() {
         mapGraphFields();
-        String fromComment = "";
-        if (originalFromStation.hasComment()) {
-            fromComment = originalFromStation.getComment();
-        }
         graphFromStationField.setText(originalFromStation.getName());
-        fromCommentField.setText(fromComment);
 
         if (!isSplay) {
             String toName = "";
-            String toComment = ""; // Not used for splay
+            String comment = ""; // Not used for splay
             if (originalLeg != null) {
                 toName = originalLeg.getDestination().getName();
                 Station destStation = survey.getStationByName(toName);
                 if (destStation != null && destStation.hasComment()) {
-                    toComment = destStation.getComment();
+                    comment = destStation.getComment();
                 }
 
             } else if (defaultToName != null) {
                 toName = defaultToName;
             }
             graphToStationField.setText(toName);
-            toCommentField.setText(toComment);
+            commentField.setText(comment);
         }
     }
 
@@ -415,20 +391,12 @@ public class EditLegForm extends Form {
         }
         return toStationField.getText().toString();
     }
-    private String getToComment() {
-        if (toCommentField != null) {
-            return toCommentField.getText().toString();
+    private String getComment() {
+        if (commentField != null) {
+            return commentField.getText().toString();
         }
         return null;
     }
-
-    private String getFromComment() {
-        if (fromCommentField != null) {
-            return fromCommentField.getText().toString();
-        }
-        return null;
-    }
-
 
     /**
      * Create a Leg object from the form data with measurements and shot direction.
@@ -473,9 +441,6 @@ public class EditLegForm extends Form {
     public String getUpdatedFromStationName() {
         return getFromStationName();
     }
-    public String getUpdatedFromComment() {
-        return getFromComment();
-    }
 
     /**
      * Get the to station name for the leg.
@@ -485,7 +450,7 @@ public class EditLegForm extends Form {
     public String getUpdatedToStationName() {
         return isSplay ? null : getToStationName();
     }
-    public String getUpdatedToComment() {
-        return isSplay ? null : getToComment();
+    public String getUpdatedComment() {
+        return isSplay ? null : getComment();
     }
 }
