@@ -163,6 +163,12 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
      */
     protected abstract void invalidateView();
 
+    /**
+     * Synchronise the view with the survey data.
+     * Must be implemented by subclasses.
+     */
+    public abstract void syncWithSurvey();
+
 
     /**
      * Open the comment dialog for the given station.
