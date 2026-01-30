@@ -1,3 +1,6 @@
+# 2026-01-16 1.10.1
+- Bugfixes including another rotation bug and station renaming issues
+
 # 2026-01-16 1.10.0
 - Table UI redesign - tap to view / edit rows and edit data more intuitively
 - Unified context menu - can now do (most) operations from any data view
