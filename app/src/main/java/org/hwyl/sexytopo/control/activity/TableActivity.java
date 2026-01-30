@@ -219,6 +219,14 @@ public class TableActivity extends SurveyEditorActivity
             Toast.makeText(getApplicationContext(), R.string.no_data,
                     Toast.LENGTH_SHORT).show();
         }
+
+        // Synchronize header visibility
+        TextView commentHeader = findViewById(R.id.headerComment);
+        if (commentHeader != null) {
+            commentHeader.setVisibility(
+                    tableRowAdapter.shouldShowCommentColumn() ? View.VISIBLE : View.GONE);
+        }
+
         // Calculate and set the optimal width for station columns
         int stationColumnWidth = calculateStationColumnWidth(survey);
         tableRowAdapter.setStationColumnWidth(stationColumnWidth);
