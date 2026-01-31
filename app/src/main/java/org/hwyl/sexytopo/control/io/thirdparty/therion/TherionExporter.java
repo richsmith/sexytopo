@@ -74,7 +74,7 @@ public class TherionExporter extends Exporter {
             thContent = ThExporter.updateOriginalContent(survey, originalThFileContent, th2Files);
         }
         SurveyFile th = getOutputFile(TH);
-        th.save(context, attribution + thContent);
+        th.save(context, thContent);
     }
 
 
