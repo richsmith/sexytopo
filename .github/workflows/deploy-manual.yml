@@ -32,9 +32,9 @@ jobs:
 
       - name: Prepare docs directory
         run: |
-          mkdir -p docs
-          cp app/src/main/assets/guide/index.html docs/manual.html
-          echo "✓ Manual copied to docs/manual.html"
+          mkdir -p docs/manual
+          cp app/src/main/assets/guide/index.html docs/manual/index.html
+          echo "✓ Manual copied to docs/manual/index.html"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

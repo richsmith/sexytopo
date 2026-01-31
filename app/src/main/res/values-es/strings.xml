@@ -1,0 +1,558 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2" -->
+<resources>
+
+    <!-- Common -->
+    <string name="ok">OK</string>
+    <string name="cancel">Cancelar</string>
+    <string name="carry_on">Continuar</string>
+    <string name="delete">Eliminar</string>
+    <string name="save">Guardar</string>
+    <string name="overwrite">Sobrescribir</string>
+    <string name="move">Mover</string>
+    <string name="replace">Reemplazar</string>
+    <string name="rename">Renombrar</string>
+    <string name="clear">Limpiar</string>
+    <string name="add">Añadir</string>
+    <string name="edit">Editar</string>
+    <string name="continue_question">¿Continuar?</string>
+    <string name="delete_question">¿Eliminar?</string>
+    <string name="exit_question">¿Salir?</string>
+    <string name="station">Estación</string>
+    <string name="leg">Tramo</string>
+    <string name="splay">Radial</string>
+    <string name="not_applicable">N/A</string>
+    <string name="no_data">Sin Datos</string>
+    <string name="unknown">Desconocido</string>
+    <string name="error_prefix">Error</string>
+    <string name="experimental_warning">Experimental</string>
+
+    <!-- System -->
+    <string name="title_activity_start_up">Iniciando</string>
+    <string name="title_activity_device">Conectar</string>
+    <string name="title_activity_table">Tabla</string>
+    <string name="title_activity_plan">Planta</string>
+    <string name="title_activity_elevation">Alzado</string>
+    <string name="title_activity_calibration">Calibración</string>
+    <string name="title_activity_survey">Estadísticas</string>
+    <string name="title_activity_settings">Ajustes</string>
+    <string name="title_activity_system_log">Registro</string>
+    <string name="title_activity_help">Ayuda</string>
+    <string name="title_activity_guide">Guía</string>
+
+    <!-- Action bar menu -->
+    <string name="action_table">Tabla</string>
+    <string name="action_plan">Planta</string>
+    <string name="action_elevation">Alzado</string>
+    <string name="action_file">Archivo</string>
+    <string name="action_stats">Estadísticas</string>
+    <string name="action_settings">Ajustes</string>
+    <string name="action_dev">Desarrollo</string>
+    <string name="action_device">Instrumento</string>
+    <string name="action_device_connect">Conectar…</string>
+    <string name="action_connection">Conexión</string>
+    <string name="action_trip">Salida Actual</string>
+    <string name="action_help">Ayuda</string>
+    <string name="action_guide">Manual</string>
+    <string name="action_about">Acerca de</string>
+    <string name="action_file_new">Nueva Topografía</string>
+    <string name="action_file_open">Abrir Topografía…</string>
+    <string name="action_file_delete">Eliminar Topografía…</string>
+    <string name="action_file_save">Guardar</string>
+    <string name="action_file_save_as">Guardar Como…</string>
+    <string name="action_file_import">Importar</string>
+    <string name="action_file_export">Exportar…</string>
+    <string name="action_file_restore_autosave">Restaurar Autoguardado</string>
+    <string name="action_file_exit">Salir de SexyTopo</string>
+    <string name="action_file_import_file">Importar Archivo…</string>
+    <string name="action_file_import_directory">Importar Carpeta…</string>
+    <string name="action_input">Modo de Entrada</string>
+    <string name="action_input_mode_forward">Avance</string>
+    <string name="action_input_mode_backward">Contravisual</string>
+    <string name="action_input_mode_combo">Avance/Contravisual</string>
+    <string name="action_input_mode_cal_check">Solo Radiales</string>
+    <string name="action_view">Vista</string>
+    <string name="action_fullscreen">Pantalla Completa</string>
+    <string name="action_tools">Herramientas</string>
+    <string name="action_undo_last_leg">Deshacer última lectura</string>
+    <string name="action_link_to_existing_survey">Enlazar a una Topografía Existente</string>
+    <string name="action_system_log">Registro del Sistema</string>
+    <string name="action_generate_test_survey">Generar Topografía de Prueba</string>
+    <string name="action_debug_mode">Modo Depuración</string>
+    <string name="action_trigger_autosave">Activar Autoguardado</string>
+    <string name="action_kill_connection">Matar Hilo de Comunicación (¡Peligro!)</string>
+    <string name="action_force_crash">Forzar Fallo (¡Peligro!)</string>
+
+    <!-- File handling -->
+    <string name="file_started_new_survey">Nueva topografía iniciada</string>
+    <string name="file_error_initialising_survey">Error al inicializar la topografía: %1$s</string>
+    <string name="file_loading_survey">Cargando <i>%1$s</i></string>
+    <string name="file_loaded_survey">Cargado <i>%1$s</i></string>
+    <string name="file_loading_file">Cargando archivo %1$s</string>
+    <string name="file_loaded_file">Archivo cargado %1$s</string>
+    <string name="file_load_error_not_survey">No es una carpeta de topografía válida</string>
+    <string name="file_load_survey_error">Error al cargar la topografía</string>
+    <string name="file_load_survey_trip_error">No se pudo cargar la salida</string>
+    <string name="file_load_survey_stations_error">No se pudieron cargar las estaciones</string>
+    <string name="file_load_survey_partial_failure">No se pudieron cargar las estaciones</string>
+    <string name="file_load_sketch_paths_error">No se pudieron cargar las rutas del croquis</string>
+    <string name="file_load_symbols_error">No se pudieron cargar los símbolos</string>
+    <string name="file_load_sketch_labels_error">No se pudieron cargar las etiquetas del croquis</string>
+    <string name="file_load_cross_sections_error">No se pudieron cargar las secciones transversales</string>
+    <string name="file_survey_saved">Guardado</string>
+    <string name="file_save_autosaved">Autoguardado</string>
+    <string name="file_save_autosave_error">Error en el autoguardado</string>
+    <string name="file_save_survey_error">ERROR al guardar la topografía</string>
+    <string name="file_save_error_invalid_folder">No se puede escribir en la carpeta</string>
+    <string name="file_save_overwrite_survey_title_question">La carpeta contiene una topografía; ¿sobrescribir?</string>
+    <string name="file_save_to_non_empty_directory_question">La carpeta no está vacía; ¿guardar de todos modos?</string>
+    <string name="file_restoring_autosave">Restaurando autoguardado</string>
+    <string name="file_intent_save_as_title">Crear una carpeta para guardar la topografía</string>
+    <string name="file_intent_open_title">Seleccionar carpeta de topografía</string>
+    <string name="file_intent_link_title">Seleccionar carpeta de topografía para enlazar</string>
+    <string name="file_intent_import_select_source">Seleccionar carpeta de importación</string>
+    <string name="file_intent_delete_select_target">Seleccionar carpeta de topografía para eliminar</string>
+    <string name="file_dialog_delete_survey_title">¿Eliminar Topografía?</string>
+    <string name="file_dialog_delete_survey_content">Esto eliminará todos los archivos de la topografía "%1$s"</string>
+    <string name="file_delete_error_not_survey">La selección no parece ser una topografía</string>
+    <string name="file_delete_successful">Eliminación de la topografía %1$s exitosa</string>
+    <string name="file_error_deleting_survey">Error al eliminar la topografía</string>
+    <string name="file_cannot_extend_unsaved_survey">No se puede extender una topografía sin guardar</string>
+    <string name="file_autosave_restored">Autoguardado restaurado</string>
+    <string name="file_autosave_load_error">Error al restaurar el autoguardado</string>
+    <string name="file_warning_survey_not_saved">Advertencia: topografía actual no guardada</string>
+    <string name="file_active_survey">La topografía activa es %1$s</string>
+    <string name="file_active_survey_not_present">No hay topografía activa</string>
+    <string name="file_active_survey_uri">La URI de la topografía activa es %1$s</string>
+    <string name="file_operation_initialisation_error">Error al inicializar la operación de archivo</string>
+    <string name="file_link_survey_station">Elegir estación a la que enlazar la estación activa</string>
+    <string name="file_link_survey_save_error">Error al guardar la nueva conexión</string>
+    <string name="file_unlink_survey_dialog_title">Desenlazar Topografía</string>
+    <string name="file_unlink_survey_not_found">No se pudo encontrar la topografía para desenlazar</string>
+    <string name="file_unlink_survey_no_surveys">No hay topografías para desenlazar</string>
+    <string name="file_unlink_survey_error">Error al desenlazar la topografía</string>
+
+    <!-- Import / Export -->
+    <string name="import_successful">"Importación completada (aún no guardada)"</string>
+    <string name="import_failed">Importación fallida</string>
+    <string name="export_select_type">Seleccionar formato de exportación</string>
+    <string name="export_successful">Exportación completada</string>
+    <string name="export_failed">Exportación fallida</string>
+    <string name="created_with">Creado con %1$s el %2$s</string>
+
+    <!-- Sketch view -->
+    <string name="sketch_toolbar_draw">Modo dibujo</string>
+    <string name="sketch_toolbar_move">Modo mover</string>
+    <string name="sketch_toolbar_eraser">Borrador</string>
+    <string name="sketch_toolbar_text">Herramienta de texto</string>
+    <string name="sketch_toolbar_symbol">Herramienta de símbolo</string>
+    <string name="sketch_toolbar_selector">Selector</string>
+    <string name="sketch_toolbar_settings">Ajustes rápidos</string>
+    <string name="sketch_toolbar_undo">Deshacer</string>
+    <string name="sketch_toolbar_redo">Rehacer</string>
+    <string name="sketch_toolbar_zoom_in">Acercar</string>
+    <string name="sketch_toolbar_zoom_out">Alejar</string>
+    <string name="sketch_toolbar_colour_main">Color principal</string>
+    <string name="sketch_toolbar_colour_brown">Marrón</string>
+    <string name="sketch_toolbar_colour_grey">Gris</string>
+    <string name="sketch_toolbar_colour_red">Rojo</string>
+    <string name="sketch_toolbar_colour_orange">Naranja</string>
+    <string name="sketch_toolbar_colour_green">Verde</string>
+    <string name="sketch_toolbar_colour_blue">Azul</string>
+    <string name="sketch_toolbar_colour_purple">Morado</string>
+    <string name="sketch_toolbar_symbol_close">Cerrar barra de símbolos</string>
+    <string name="sketch_menu_delete_last_leg">Deshacer Última Lectura</string>
+    <string name="sketch_menu_centre_view">Centrar en Activa</string>
+    <string name="sketch_menu_auto_recentre">Auto-Centrado</string>
+    <string name="sketch_menu_redo">Rehacer acción de croquis</string>
+    <string name="sketch_menu_show_grid">Papel Cuadriculado</string>
+    <string name="sketch_menu_snap_to_lines">Ajustar a Líneas</string>
+    <string name="sketch_menu_fade_non_active">Atenuar No-Activas</string>
+    <string name="sketch_menu_show_station_labels">Etiquetas de Estaciones</string>
+    <string name="sketch_menu_show_splays">Mostrar Radiales</string>
+    <string name="sketch_menu_show_sketch">Mostrar Croquis</string>
+    <string name="sketch_menu_show_connect">Topografías Enlazadas</string>
+    <string name="sketch_menu_back_measurements">Tramos Inversos</string>
+    <string name="sketch_position_cross_section_instruction">Seleccionar dónde dibujar la sección transversal</string>
+    <string name="sketch_symbol_orientation_education">Arrastrar para establecer la dirección del símbolo</string>
+
+    <!-- Table view -->
+    <string name="table_head_from">Desde</string>
+    <string name="table_head_to">Hasta</string>
+    <string name="table_head_distance">Dist</string>
+    <string name="table_head_azimuth">Azm</string>
+    <string name="table_head_elevation">Incl</string>
+    <string name="table_delete_row_question">¿Eliminar Fila?</string>
+    <string name="manual_add_station_title">Añadir Estación</string>
+    <string name="manual_add_splay_title">Añadir Radial</string>
+    <string name="manual_edit_leg_title">Editar Tramo</string>
+    <string name="manual_edit_splay_title">Editar Radial</string>
+    <string name="manual_edit_distance">Distancia (m)</string>
+    <string name="manual_edit_distance_error">Distancia incorrecta</string>
+    <string name="manual_edit_azimuth">Azimut (&#176;)</string>
+    <string name="manual_edit_azimuth_error">Azimut incorrecto</string>
+    <string name="manual_edit_azimuth_deg_mins_secs">Azimut (&#176; \' \")</string>
+    <string name="deg">Gra</string>
+    <string name="min">Min</string>
+    <string name="sec">Seg</string>
+    <string name="manual_edit_inclination">Inclinación (&#176;)</string>
+    <string name="manual_edit_inclination_error">Inclinación incorrecta</string>
+    <string name="manual_edit_left">Izquierda (m)</string>
+    <string name="manual_edit_right">Derecha (m)</string>
+    <string name="manual_edit_up">Arriba (m)</string>
+    <string name="manual_edit_down">Abajo (m)</string>
+    <string name="manual_edit_from_station">Desde estación</string>
+    <string name="manual_edit_from_station_error">Estación de origen no válida</string>
+    <string name="manual_edit_to_station">Hasta estación</string>
+    <string name="manual_edit_to_station_error">Estación de destino no válida</string>
+    <string name="manual_edit_shot_backwards">⬅ Lectura hacia atrás</string>
+    <string name="manual_rename_station_title">Renombrar Estación</string>
+    <string name="manual_rename_station_hint">Nombre de estación</string>
+    <string name="manual_rename_error">Renombrado fallido</string>
+    <string name="graph_text_hint">Introducir texto</string>
+    <string name="graph_comment_hint">Comentario de estación</string>
+
+    <!-- Device -->
+    <string name="device_instruction_bluetooth">1. Bluetooth</string>
+    <string name="device_instruction_pair">2. Emparejado Con</string>
+    <string name="device_instruction_connect">3. Conectar</string>
+    <string name="device_request_pair">Emparejar</string>
+    <string name="device_request_unpair">Desemparejar</string>
+    <string name="device_log_title">Registro del Dispositivo</string>
+    <string name="device_enable_bluetooth">Habilitar Bluetooth</string>
+    <string name="device_connect_to_device">Conectar al Dispositivo</string>
+    <string name="device_no_permitted_access">[dispositivo inaccesible]</string>
+    <string name="device_bluetooth_no_adapter">No se puede acceder al adaptador Bluetooth</string>
+    <string name="device_connection_requested">Conexión solicitada</string>
+    <string name="device_scan_start">Buscando dispositivos…</string>
+    <string name="device_scan_end">Búsqueda finalizada</string>
+    <string name="device_scan_cancel">Cancelando búsqueda</string>
+    <string name="device_scan_detected">Dispositivo "%1$s" detectado</string>
+    <string name="device_scan_failure">No se puede buscar (¿fallo de bluetooth?)</string>
+    <string name="device_scan_device_not_found">Dispositivo no encontrado; por favor, inténtalo de nuevo</string>
+    <string name="device_access_failure">Error de seguridad (¿comprobar permisos?)</string>
+    <string name="device_pairing_request">EMPAREJAMIENTO solicitado\n-> Realizar pasos de emparejamiento. Conectar de nuevo</string>
+    <string name="device_pairing_successful">Emparejamiento exitoso :)</string>
+    <string name="device_pairing_attempt">Emparejando con %1$s…</string>
+    <string name="device_pairing_error">Error al emparejar: %1$s</string>
+    <string name="device_pairing_incompatible">Dispositivo incompatible "%1$s" detectado</string>
+    <string name="device_pairing_unpairing_device">Desemparejando %1$s</string>
+    <string name="device_pairing_unpairing_success">Desemparejamiento exitoso</string>
+    <string name="device_pairing_unpairing_error">Error al desemparejar: %1$s</string>
+    <string name="device_communicator_creation_error">Error al crear el comunicador: %1$s</string>
+    <string name="device_connection_connected">Conectado :)</string>
+    <string name="device_connection_ready">Listo para recibir datos</string>
+    <string name="device_connection_not_connected">No conectado :(</string>
+    <string name="device_connection_connecting">Conectando&#8230;</string>
+    <string name="device_connection_stop_requested">Cierre de conexión solicitado</string>
+    <string name="device_connection_closing">Cerrando conexión&#8230;</string>
+    <string name="device_connection_closed">Conexión cerrada</string>
+    <string name="device_connection_error">Error de conexión: %1$s</string>
+    <string name="device_connection_closing_error">Error al cerrar la conexión: %1$s</string>
+    <string name="device_data_received">Medición recibida</string>
+    <string name="device_data_received_null">Datos nulos recibidos</string>
+    <string name="device_data_received_empty">Datos vacíos recibidos</string>
+    <string name="device_data_unknown_identifier">Identificador de paquete desconocido</string>
+    <string name="device_data_acknowledged_packet">Paquete confirmado</string>
+    <string name="device_no_device">sin dispositivo</string>
+    <string name="device_missing_name">[Dispositivo faltante]</string>
+    <string name="device_missing_short_name">Faltante</string>
+    <string name="device_unknown_name">[Dispositivo desconocido]</string>
+    <string name="device_unknown_short_name">Desconocido</string>
+    <string name="device_command_laser_on">Láser Encendido</string>
+    <string name="device_command_laser_off">Láser Apagado</string>
+    <string name="device_command_take_shot">Tomar Lectura</string>
+    <string name="device_command_device_off">Dispositivo Apagado</string>
+    <string name="device_ble_invalid_data_received">Datos no válidos recibidos</string>
+    <string name="device_ble_connecting_to">Conectando a %1$s…</string>
+    <string name="device_ble_connected_to">Conectado a %1$s</string>
+    <string name="device_ble_device_ready">%1$s listo :)</string>
+    <string name="device_ble_device_disconnecting">%1$s desconectando</string>
+    <string name="device_ble_device_disconnected">%1$s listo :)</string>
+    <string name="device_ble_failed_to_connect_to">Error al conectar a %1$s</string>
+    <string name="device_ble_invalid_data">Datos no válidos recibidos: %1$s</string>
+    <string name="device_cavway_x1_calibration_on">Entrar en Modo Calibración</string>
+    <string name="device_cavway_x1_calibration_off">Salir del Modo Calibración</string>
+    <string name="device_distox_command_calibration">Calibración…</string>
+    <string name="device_distox_command_silent_mode_on">Modo Silencioso Encendido</string>
+    <string name="device_distox_command_silent_mode_off">Modo Silencioso Apagado</string>
+    <string name="device_distox_command_calibration_start">Iniciar modo calibración</string>
+    <string name="device_distox_command_calibration_stop">Detener modo calibración</string>
+    <string name="device_distox_force_disconnect_for_calibration">Disto ocupado; forzando desconexión para escribir la calibración</string>
+    <string name="device_distox_calibration_result">Evaluación de calibración (debería estar por debajo de %1$f): %2$s\n\nAlgoritmo de calibración: %3$s</string>
+    <string name="device_distox_calibration_writing">Escribiendo coeficientes de calibración</string>
+    <string name="device_distox_calibration_write_success">Escritura de calibración exitosa</string>
+    <string name="device_distox_calibration_write_error">Error al escribir la calibración %1$s</string>
+    <string name="device_distox_calibration_write_rejected">Disto rechazó los datos de calibración</string>
+    <string name="device_distox_unknown_protocol">Protocolo solicitado desconocido</string>
+    <string name="device_bric_command_take_shot">Tomar Lectura</string>
+    <string name="device_bric_command_toggle_laser">Alternar Láser</string>
+    <string name="device_bric_command_power_off">Apagar</string>
+    <string name="device_bric_command_clear_memory">Borrar Memoria</string>
+    <string name="device_bric_device_reported_error">%1$s reportó un error: %2$s</string>
+    <string name="device_sap_command_calibration_start">Iniciar Calibración</string>
+    <string name="device_sap_command_calibration_stop">Detener Calibración</string>
+    <string name="device_sap_command_laser_on">Láser Encendido</string>
+    <string name="device_sap_command_take_shot">Tomar Lectura</string>
+    <string name="device_sap_command_laser_off">Láser Apagado</string>
+    <string name="device_sap_command_device_off">Dispositivo Apagado</string>
+    <string name="device_fcl_command_laser_on">Láser Encendido</string>
+    <string name="device_fcl_command_take_shot">Tomar Lectura</string>
+    <string name="device_fcl_command_laser_off">Láser Apagado</string>
+    <string name="device_fcl_command_device_off">Dispositivo Apagado</string>
+
+    <!-- Calibration -->
+    <string name="calibration_index">Número de lectura</string>
+    <string name="calibration_start">Modo Cal Disto Encendido</string>
+    <string name="calibration_stop">Modo Cal Disto Apagado</string>
+    <string name="calibration_delete_last">Eliminar Lectura</string>
+    <string name="calibration_next_step">Siguiente (sugerido)</string>
+    <string name="calibration_complete">Cargar Calibración</string>
+    <string name="calibration_load">Cargar</string>
+    <string name="calibration_save">Guardar</string>
+    <string name="calibration_direction">Dirección</string>
+    <string name="calibration_orientation">Orientación</string>
+    <string name="calibration_not_enough">Lecturas insuficientes</string>
+    <string name="calibration_assessment">Evaluación de Calibración</string>
+    <string name="calibration_update">Escribir</string>
+    <string name="calibration_error_updating_device">No se pudo escribir la calibración</string>
+    <string name="calibration_writing">Escribiendo datos de calibración</string>
+    <string name="calibration_success">Datos de calibración escritos exitosamente</string>
+    <string name="calibration_saved_to_file">Datos de calibración guardados</string>
+    <string name="calibration_loaded_file">Datos de calibración cargados</string>
+    <string name="calibration_load_error">Error al leer el archivo de calibración</string>
+    <string name="calibration_save_error">Error al guardar el archivo de calibración</string>
+    <string name="direction_forward">Adelante</string>
+    <string name="direction_right">Derecha</string>
+    <string name="direction_back">Atrás</string>
+    <string name="direction_left">Izquierda</string>
+    <string name="direction_up">Arriba</string>
+    <string name="direction_down">Abajo</string>
+    <string name="direction_forward_left_up">Adelante Izquierda Arriba</string>
+    <string name="direction_forward_left_down">Adelante Izquierda Abajo</string>
+    <string name="direction_forward_right_up">Adelante Derecha Arriba</string>
+    <string name="direction_forward_right_down">Adelante Derecha Abajo</string>
+    <string name="direction_back_right_up">Atrás Derecha Arriba</string>
+    <string name="direction_back_right_down">Atrás Derecha Abajo</string>
+    <string name="direction_back_left_up">Atrás Izquierda Arriba</string>
+    <string name="direction_back_left_down">Atrás Izquierda Abajo</string>
+    <string name="orientation_face_up">Cara Arriba</string>
+    <string name="orientation_face_right">Cara Derecha</string>
+    <string name="orientation_face_down">Cara Abajo</string>
+    <string name="orientation_face_left">Cara Izquierda</string>
+    <string name="dialog_confirm_clear_title">¿Borrar Lecturas de Calibración?</string>
+
+    <!-- Trip -->
+    <string name="trip">Salida</string>
+    <string name="trip_team">Equipo</string>
+    <string name="trip_dialog_title_add_to_team">Añadir al Equipo</string>
+    <string name="trip_dialog_add_to_team_name_hint">Nombre</string>
+    <string name="trip_dialog_confirm_clear_trip">¿Borrar Datos de Salida?</string>
+    <string name="trip_comments">Comentarios</string>
+    <string name="trip_save_trip">Guardar Salida</string>
+    <string name="trip_role_book">Topógrafo (dibujo)</string>
+    <string name="trip_role_instruments">Instrumentos</string>
+    <string name="trip_role_dog">Perro (asistente)</string>
+    <string name="trip_role_exploration">Equipo de Exploración</string>
+
+    <!-- Stats -->
+    <string name="stats_title_this_survey">Topografía Actual</string>
+    <string name="stats_title_linked_surveys">Todas las Topografías Enlazadas</string>
+    <string name="stats_number_linked_surveys">Número de Topografías</string>
+    <string name="stats_length">Longitud (m)</string>
+    <string name="stats_vertical_range">Rango Vertical (m)</string>
+    <string name="stats_number_stations">Número de Estaciones</string>
+    <string name="stats_number_legs">Número de Tramos</string>
+    <string name="stats_number_splays">Número de Radiales</string>
+    <string name="stats_longest_leg">Tramo Más Largo (m)</string>
+    <string name="stats_shortest_leg">Tramo Más Corto (m)</string>
+
+    <!-- Settings -->
+    <string name="settings_general_title">General</string>
+    <string name="settings_theme_title">Tema</string>
+    <string name="settings_theme_summary">¿Unirse al lado oscuro? (¡Reinicia la aplicación, así que guarda tu topografía antes de cambiar!)</string>
+    <string-array name="settings_theme_entries">
+        <item>Predeterminado del sistema</item>
+        <item>Claro</item>
+        <item>Oscuro</item>
+    </string-array>
+    <string name="settings_orientation_title">Orientación</string>
+    <string name="settings_orientation_summary">Anular la orientación del dispositivo en las vistas de Tabla y Gráfico</string>
+    <string-array name="settings_orientation_entries">
+        <item>Predeterminado del sistema</item>
+        <item>Forzar Vertical</item>
+        <item>Forzar Horizontal</item>
+    </string-array>
+    <string-array name="settings_calibration_algorithm_entries">
+        <item>Auto</item>
+        <item>Lineal</item>
+        <item>No Lineal</item>
+    </string-array>
+    <string name="settings_new_station_vibration_title">Vibrar en nueva estación</string>
+    <string name="settings_new_station_vibration_summary">Vibrar cuando se crea una nueva estación</string>
+    <string name="settings_hot_corners_title">Esquinas activas</string>
+    <string name="settings_hot_corners_summary">Arrastra desde las esquinas del croquis para mover la vista en modos de dibujo</string>
+    <string name="settings_instruments_title">Instrumentos</string>
+    <string name="settings_max_distance_delta_title">Delta de distancia máxima (m)</string>
+    <string name="settings_max_distance_delta_summary">Cuánto error se tolera al decidir si crear una nueva estación</string>
+    <string name="settings_max_angle_delta_title">Delta de ángulo máximo (grados)</string>
+    <string name="settings_max_angle_delta_summary">Cuánto error se tolera al decidir si crear una nueva estación</string>
+    <string name="settings_calibration_title">Calibración</string>
+    <string name="settings_calibration_algorithm_title">Algoritmo de calibración Disto-X</string>
+    <string name="settings_calibration_algorithm_summary">Anular la elección del algoritmo de calibración Disto-X</string>
+    <string name="settings_sketching_title">Dibujo</string>
+    <string name="settings_delete_path_fragments_title">Eliminar fragmentos de línea</string>
+    <string name="settings_delete_path_fragments_summary">Eliminar solo las partes más cercanas de una línea de croquis en modo borrado (si está desactivado, elimina toda la línea)</string>
+    <string name="settings_highlight_latest_leg_title">Resaltar último tramo</string>
+    <string name="settings_highlight_latest_leg_summary">Mostrar la medición más reciente en morado</string>
+    <string name="settings_two_finger_movement_title">Movimiento con dos dedos (experimental)</string>
+    <string name="settings_two_finger_movement_summary">Dos dedos mueven la pantalla incluso cuando se dibuja, etc.</string>
+    <string name="settings_survey_text_tool_font_size_title">Tamaño de etiqueta de herramienta de texto</string>
+    <string name="settings_survey_text_tool_font_size_summary">Qué tan grande dibujar inicialmente el texto colocado manualmente (sp)</string>
+    <string name="settings_survey_symbol_size_title">Tamaño de símbolos de topografía</string>
+    <string name="settings_survey_symbol_size_summary">Qué tan grandes dibujar inicialmente los símbolos (dp)</string>
+    <string name="settings_leg_width_title">Grosor de línea de tramo</string>
+    <string name="settings_leg_width_summary">Qué tan gruesas dibujar las líneas de tramos</string>
+    <string name="settings_splay_width_title">Grosor de línea de radial</string>
+    <string name="settings_splay_width_summary">Qué tan gruesas dibujar las líneas de radiales</string>
+    <string name="settings_station_diameter_title">Diámetro de estación</string>
+    <string name="settings_station_diameter_summary">Qué tan grandes dibujar los símbolos de estaciones</string>
+    <string name="settings_station_label_font_size_sp_title">Tamaño de fuente de etiquetas de estación</string>
+    <string name="settings_station_label_font_size_sp_summary">Tamaño de fuente de las etiquetas de estaciones</string>
+    <string name="settings_legend_font_size_sp_title">Tamaño de fuente de leyenda</string>
+    <string name="settings_legend_font_size_sp_summary">Tamaño de fuente de la leyenda</string>
+    <string name="settings_anti_alias_title">Suavizar líneas de croquis</string>
+    <string name="settings_anti_alias_summary">Aplicar suavizado a las líneas de croquis, etc. (mejora la visualización a costa de cierto rendimiento)</string>
+    <string name="settings_manual_data_entry_title">Entrada Manual de Datos</string>
+    <string name="settings_key_lrud_fields_title">Entradas LRUD</string>
+    <string name="settings_key_lrud_fields_summary">Mostrar campos para ingresar LRUD (Izquierda-Derecha-Arriba-Abajo) para cada nueva estación</string>
+    <string name="settings_key_deg_mins_secs_title">Azimut en grados/minutos/segundos</string>
+    <string name="settings_key_deg_mins_secs_summary">Ingresar valores de azimut en grados/minutos/segundos (en lugar del predeterminado decimal)</string>
+    <string name="settings_export_title">Exportación</string>
+    <string name="settings_export_svg_background_title">Fondo SVG</string>
+    <string name="settings_export_svg_background_summary">Opcionalmente exportar con un fondo opaco</string>
+    <string-array name="settings_export_svg_background_entries">
+        <item>Transparente</item>
+        <item>Blanco</item>
+    </string-array>
+    <string name="settings_export_svg_stroke_width_title">Ancho de trazo SVG</string>
+    <string name="settings_export_svg_stroke_width_summary">Qué tan gruesas dibujar las líneas en la exportación SVG</string>
+    <string name="settings_export_svg_leg_width_title">Ancho de tramo SVG</string>
+    <string name="settings_export_svg_leg_width_summary">Qué tan gruesas dibujar las líneas de tramos en la exportación SVG</string>
+    <string name="settings_export_svg_splay_width_title">Ancho de radial SVG</string>
+    <string name="settings_export_svg_splay_width_summary">Qué tan gruesas dibujar las líneas de radiales en la exportación SVG</string>
+    <string name="settings_export_therion_symbols_title">Símbolos de exportación Therion</string>
+    <string name="settings_export_therion_symbols_summary">Incluir símbolos al exportar a formato Therion</string>
+    <string name="settings_export_therion_text_title">Texto de exportación Therion</string>
+    <string name="settings_export_therion_text_summary">Incluir texto al exportar a formato Therion</string>
+    <string name="settings_developer_title">Desarrollador</string>
+    <string name="settings_key_developer_mode_title">Modo desarrollador</string>
+    <string name="settings_key_developer_mode_summary">Mostrar entradas de menú de depuración</string>
+
+    <!-- Survey updates -->
+    <string name="survey_update_new_station_added">Nueva estación añadida</string>
+    <string name="survey_update_renamed_station">Estación renombrada de %1$s a %2$s</string>
+    <string name="survey_update_edited_leg">Tramo editado de %1$s a %2$s</string>
+    <string name="survey_update_rename_error_not_unique">El nuevo nombre de estación no es único</string>
+    <string name="survey_update_moved_leg">Tramo movido a la estación %1$s</string>
+    <string name="survey_update_adding_leg">Añadiendo tramo %1$s</string>
+    <string name="survey_update_reversed_leg">Tramo invertido de %1$s a %2$s</string>
+    <string name="survey_update_error_descendant_station">No se puede mover el tramo a una estación descendiente</string>
+
+    <!-- Form validation errors -->
+    <string name="validation_error_cannot_be_blank">No puede estar vacío</string>
+    <string name="validation_error_station_named_dash">La estación no puede llamarse \"-\"</string>
+    <string name="validation_error_station_does_not_exist">La estación no existe</string>
+    <string name="validation_error_same_as_from_station">No puede ser la misma que la estación de origen</string>
+    <string name="validation_error_station_name_not_unique">El nombre de estación debe ser único</string>
+    <string name="validation_error_must_be_number">Debe ser un número</string>
+    <string name="validation_error_distance_minimum">Debe ser >= %1$f</string>
+    <string name="validation_error_azimuth_range">Debe ser %1$f-%2$f</string>
+    <string name="validation_error_inclination_range">Debe ser de %1$f a %2$f</string>
+
+    <!-- Input mode for leg editing -->
+    <string-array name="leg_edit_input_mode_options">
+        <item>@string/action_input_mode_forward</item>
+        <item>@string/action_input_mode_backward</item>
+    </string-array>
+
+    <!-- Survey symbols -->
+    <string name="symbol_text">Texto</string>
+    <string name="symbol_entrance">Entrada</string>
+    <string name="symbol_gradient">Gradiente</string>
+    <string name="symbol_too_tight">Demasiado estrecho</string>
+    <string name="symbol_sand">Arena</string>
+    <string name="symbol_clay">Arcilla</string>
+    <string name="symbol_pebbles">Guijarros</string>
+    <string name="symbol_blocks">Bloques</string>
+    <string name="symbol_stalactite">Estalactita</string>
+    <string name="symbol_stalagmite">Estalagmita</string>
+    <string name="symbol_column">Columna</string>
+    <string name="symbol_curtain">Cortina</string>
+    <string name="symbol_straws">Macarrones</string>
+    <string name="symbol_helictites">Helictitas</string>
+    <string name="symbol_crystals">Cristales</string>
+    <string name="symbol_gour">Gour</string>
+    <string name="symbol_water_flow">Flujo</string>
+    <string name="symbol_air_draught">Corriente de aire</string>
+    <string name="symbol_guano">Guano</string>
+    <string name="symbol_debris">Escombros</string>
+
+    <!-- Context menu(s) -->
+    <string name="menu_context_title">Estación</string>
+    <string name="menu_leg">Tramo</string>
+    <string name="menu_splay">Radial</string>
+    <string name="menu_station">Estación</string>
+    <string name="menu_set_active_station">Establecer como Activa</string>
+    <string name="menu_rename_station">Renombrar</string>
+    <string name="menu_edit_leg">Editar</string>
+    <string name="menu_upgrade_row">Forzar Nueva Estación</string>
+    <string name="menu_upgrade_splay">Promover a Tramo</string>
+    <string name="menu_downgrade_leg">Degradar a Radial</string>
+    <string name="menu_delete_leg">Eliminar</string>
+    <string name="menu_delete_splay">Eliminar Radial</string>
+    <string name="menu_elevation">Alzado</string>
+    <string name="menu_draw_left">Dibujar Izquierda</string>
+    <string name="menu_draw_right">Dibujar Derecha</string>
+    <string name="menu_move_row">Mover a Estación Diferente</string>
+    <string name="menu_jump_to">Saltar</string>
+    <string name="menu_jump_to_station_in_plan">→ Planta</string>
+    <string name="menu_jump_to_station_in_elevation">→ Alzado</string>
+    <string name="menu_new_cross_section">Nueva Sección Transversal</string>
+    <string name="menu_jump_to_station_in_table">→ Tabla de Datos</string>
+    <string name="menu_delete_station">Eliminar</string>
+    <string name="menu_reverse">Invertir</string>
+    <string name="menu_switch_direction">Cambiar Dirección</string>
+    <string name="menu_navigate">Navegar</string>
+    <string name="menu_survey">Topografía</string>
+    <string name="menu_start_new_survey">Iniciar Nueva Topografía Aquí</string>
+    <string name="menu_unlink_survey">Desenlazar Topografía Enlazada</string>
+    <string name="menu_comment">Comentario</string>
+    <string name="menu_toggle_left_right">Alternar Izquierda/Derecha</string>
+    <string name="menu_context_title_leg_to">Tramo a %s</string>
+    <string name="menu_context_title_leg_from">Tramo desde %s</string>
+    <string name="menu_context_title_splay">%s a Radial</string>
+    <string name="context_this_will_delete">Esto eliminará:</string>
+    <string name="context_jump_to_splay_error">No se puede saltar a un extremo de radial</string>
+    <string name="context_jump_to_station_error">No se pudo saltar a la estación %1$s</string>
+    <string name="context_move_leg_select_station_title">Seleccionar estación a la que mover</string>
+    <string name="context_move_leg_no_valid_move">No hay lugar válido para mover este tramo</string>
+    <string name="context_rename_splay_error">No se puede renombrar un extremo de radial</string>
+    <string name="context_set_active_splay_error">No se puede establecer el extremo de radial como estación activa</string>
+
+    <!-- Logging -->
+    <string name="log_starting_up">Iniciando</string>
+    <string name="log_shown">Mostrado: %1$s</string>
+    <string name="log_error_no_station_notification_intent">No se puede iniciar el intent de notificación de nueva estación</string>
+
+    <!-- Misc -->
+    <string name="tool_generate_test_title">Generar Datos de Prueba</string>
+    <string name="tool_generate_test_question">¿Reemplazar la topografía existente con datos generados aleatoriamente?</string>
+    <string name="tool_generate_test_error">Error al generar datos de prueba</string>
+    <string name="tool_force_kill_error">Error al matar la conexión</string>
+    <string name="tool_force_crash_message">¡Boom! ¡Fallo forzado solicitado(!)</string>
+    <string name="request_code_error">Código de error %1$d del código de solicitud %2$d</string>
+    <string name="killing_comms_process">Matando proceso de comunicación</string>
+    <string name="setup_error_load_symbol_svg">Error al cargar el símbolo SVG %1$s</string>
+
+</resources>

@@ -29,6 +29,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.graph.GraphView;
+import org.hwyl.sexytopo.control.table.LegDialogs;
 import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.model.graph.Coord2D;
@@ -94,7 +95,7 @@ public abstract class GraphActivity extends SurveyEditorActivity
         updatedReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                syncGraphWithSurvey();
+                syncWithSurvey();
             }
         };
 
@@ -136,7 +137,7 @@ public abstract class GraphActivity extends SurveyEditorActivity
         super.onResume();
 
         registerReceivers();
-        syncGraphWithSurvey();
+        syncWithSurvey();
 
         intialiseActivity();
         initialiseGraphView();
@@ -190,7 +191,8 @@ public abstract class GraphActivity extends SurveyEditorActivity
     }
 
 
-    private void syncGraphWithSurvey() {
+    @Override
+    public void syncWithSurvey() {
         Survey survey = getSurvey();
         graphView.setSurvey(survey);
         graphView.setSketch(getSketch(survey));
@@ -314,7 +316,7 @@ public abstract class GraphActivity extends SurveyEditorActivity
             return true;
         } else if (itemId == R.id.buttonDeleteLastLeg) {
             getSurvey().undoAddLeg();
-            syncGraphWithSurvey();
+            syncWithSurvey();
             return true;
         }
 
@@ -510,6 +512,11 @@ public abstract class GraphActivity extends SurveyEditorActivity
     @Override
     public void onNewCrossSection(Station station) {
         graphView.handleNewCrossSection(station);
+    }
+
+    @Override
+    public void onRenameStation(Station station) {
+        LegDialogs.renameStation(this, getSurvey(), station);
     }
 
 }
