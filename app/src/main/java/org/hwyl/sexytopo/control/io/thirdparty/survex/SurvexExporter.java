@@ -5,36 +5,38 @@ import android.content.Context;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
 import org.hwyl.sexytopo.control.io.translation.SingleFileExporter;
-import org.hwyl.sexytopo.control.util.GraphToListTranslator;
 import org.hwyl.sexytopo.model.survey.Survey;
-
-import java.util.List;
 
 
 public class SurvexExporter extends SingleFileExporter {
 
     public static final char COMMENT_CHAR = ';';
-
-    protected static final GraphToListTranslator graphToListTranslator =
-            new GraphToListTranslator();
+    public static final String SYNTAX_MARKER = "*";
 
     public String getContent(Survey survey) {
-
         StringBuilder builder = new StringBuilder();
 
-        builder.append("*alias station - ..\n\n");
-
-        List<GraphToListTranslator.SurveyListEntry> list =
-                graphToListTranslator.toChronoListOfSurveyListEntries(survey);
-
-        for (GraphToListTranslator.SurveyListEntry entry : list) {
-            SurvexTherionUtil.formatEntry(builder, entry, COMMENT_CHAR);
-            builder.append("\n");
-        }
+        // Begin survey block
+        builder.append("*begin ").append(survey.getName()).append("\n");
+        
+        // Creation comment (no version info available without Context)
+        builder.append(SurvexTherionUtil.getCreationComment(COMMENT_CHAR, "SexyTopo")).append("\n\n");
+        
+        // Metadata (date, instrument, team, explo block)
+        builder.append(SurvexTherionUtil.getMetadata(survey, SYNTAX_MARKER, COMMENT_CHAR)).append("\n");
+        
+        // Centreline data
+        builder.append(SurvexTherionUtil.getCentrelineData(survey, SYNTAX_MARKER, COMMENT_CHAR, true));
+        
+        // Extended elevation
+        builder.append("\n");
+        builder.append(SurvexTherionUtil.getExtendedElevationExtensions(survey, SYNTAX_MARKER));
+        
+        // End survey block
+        builder.append("*end ").append(survey.getName()).append("\n");
 
         return builder.toString();
     }
-
 
 
     @Override
