@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <CheckBoxPreference
+        android:key="pref_lrud_fields"
+        android:title="@string/settings_key_lrud_fields_title"
+        android:summary="@string/settings_key_lrud_fields_summary"
+        android:defaultValue="false"/>
+
+    <CheckBoxPreference
+        android:key="pref_deg_mins_secs"
+        android:title="@string/settings_key_deg_mins_secs_title"
+        android:summary="@string/settings_key_deg_mins_secs_summary"
+        android:defaultValue="false"/>
+
+</PreferenceScreen>

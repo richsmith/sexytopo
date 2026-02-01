@@ -20,6 +20,8 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
@@ -51,6 +53,8 @@ import org.hwyl.sexytopo.control.io.StartLocation;
 import org.hwyl.sexytopo.control.io.SurveyDirectory;
 import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.control.io.basic.Saver;
+import org.hwyl.sexytopo.control.io.thirdparty.therion.TherionExporter;
+import org.hwyl.sexytopo.control.io.thirdparty.therion.TherionExportOptions;
 import org.hwyl.sexytopo.control.io.translation.Exporter;
 import org.hwyl.sexytopo.control.io.translation.ImportManager;
 import org.hwyl.sexytopo.control.io.translation.SelectableExporters;
@@ -983,6 +987,49 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
     protected void exportSurvey(Exporter exporter) {
+        if (exporter instanceof TherionExporter) {
+            showTherionExportDialog((TherionExporter) exporter);
+        } else {
+            doExport(exporter);
+        }
+    }
+
+    private void showTherionExportDialog(TherionExporter exporter) {
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_therion_export, null);
+
+        EditText planScrapsInput = dialogView.findViewById(R.id.planScrapsInput);
+        EditText eeScrapsInput = dialogView.findViewById(R.id.eeScrapsInput);
+        CheckBox stationsInPlanCheckbox = dialogView.findViewById(R.id.stationsInPlanCheckbox);
+        CheckBox stationsInEeCheckbox = dialogView.findViewById(R.id.stationsInEeCheckbox);
+
+        new MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.therion_export_dialog_title)
+            .setView(dialogView)
+            .setPositiveButton(R.string.ok, (dialog, which) -> {
+                int planScraps = parseIntSafe(planScrapsInput.getText().toString(), 1);
+                int eeScraps = parseIntSafe(eeScrapsInput.getText().toString(), 1);
+                boolean stationsInPlan = stationsInPlanCheckbox.isChecked();
+                boolean stationsInEe = stationsInEeCheckbox.isChecked();
+
+                TherionExportOptions options = new TherionExportOptions(
+                    planScraps, eeScraps, stationsInPlan, stationsInEe);
+                exporter.setExportOptions(options);
+                doExport(exporter);
+            })
+            .setNegativeButton(R.string.cancel, null)
+            .show();
+    }
+
+    private int parseIntSafe(String value, int defaultValue) {
+        try {
+            int parsed = Integer.parseInt(value.trim());
+            return Math.max(1, parsed);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
+    private void doExport(Exporter exporter) {
         try {
             Survey survey = getSurvey();
             exporter.export(this, survey);
