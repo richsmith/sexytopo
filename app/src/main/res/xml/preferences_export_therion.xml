@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <CheckBoxPreference
+        android:key="pref_therion_export_symbols"
+        android:title="@string/settings_export_therion_symbols_title"
+        android:summary="@string/settings_export_therion_symbols_summary"
+        android:defaultValue="true"/>
+
+    <CheckBoxPreference
+        android:key="pref_therion_export_text"
+        android:title="@string/settings_export_therion_text_title"
+        android:summary="@string/settings_export_therion_text_summary"
+        android:defaultValue="true"/>
+
+</PreferenceScreen>

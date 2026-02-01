@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ListPreference
+        android:key="pref_export_svg_background"
+        android:title="@string/settings_export_svg_background_title"
+        android:summary="@string/settings_export_svg_background_summary"
+        android:entries="@array/settings_export_svg_background_entries"
+        android:entryValues="@array/settings_export_svg_background_values"
+        android:defaultValue="transparent" />
+
+    <EditTextPreference
+        android:key="pref_export_svg_stroke_width"
+        android:title="@string/settings_export_svg_stroke_width_title"
+        android:summary="@string/settings_export_svg_stroke_width_summary"
+        android:inputType="number"
+        android:defaultValue="1"/>
+
+    <EditTextPreference
+        android:key="pref_export_svg_leg_width"
+        android:title="@string/settings_export_svg_leg_width_title"
+        android:summary="@string/settings_export_svg_leg_width_summary"
+        android:inputType="numberDecimal"
+        android:defaultValue="2"/>
+
+    <EditTextPreference
+        android:key="pref_export_svg_splay_width"
+        android:title="@string/settings_export_svg_splay_width_title"
+        android:summary="@string/settings_export_svg_splay_width_summary"
+        android:inputType="numberDecimal"
+        android:defaultValue="1"/>
+
+</PreferenceScreen>

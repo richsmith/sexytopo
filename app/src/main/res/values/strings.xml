@@ -399,6 +399,12 @@
 
     <!-- Settings -->
     <string name="settings_general_title">General</string>
+    <string name="settings_general_summary">Theme, orientation, vibration</string>
+    <string name="settings_sketching_summary">Drawing tools, display options</string>
+    <string name="settings_export_summary">Export formats and folder options</string>
+    <string name="settings_manual_data_entry_summary">LRUD fields, angle format</string>
+    <string name="settings_instruments_summary">Instrument tolerances, calibration</string>
+    <string name="settings_developer_summary">Debugging options</string>
     <string name="settings_theme_title">Theme</string>
     <string name="settings_theme_summary">Join the dark side? (Restarts app, so save your survey before changing!)</string>
     <string-array name="settings_theme_entries">
@@ -475,6 +481,14 @@
     <string name="settings_export_therion_symbols_summary">Include symbols when exporting to Therion format</string>
     <string name="settings_export_therion_text_title">Therion export text</string>
     <string name="settings_export_therion_text_summary">Include text when exporting to Therion format</string>
+    <string name="settings_export_folder_name_title">Export folder name</string>
+    <string name="settings_export_folder_name_summary">Name of the folder within the survey folder to export to</string>
+    <string name="settings_export_type_subfolders_title">Export type subfolders</string>
+    <string name="settings_export_type_subfolders_summary">Create subfolders named after export type (e.g. therion, survex)</string>
+    <string name="settings_export_svg_title">SVG</string>
+    <string name="settings_export_svg_section_summary">SVG export options</string>
+    <string name="settings_export_therion_title">Therion</string>
+    <string name="settings_export_therion_section_summary">Therion export options</string>
     <string name="settings_developer_title">Developer</string>
     <string name="settings_key_developer_mode_title">Developer mode</string>
     <string name="settings_key_developer_mode_summary">Show debugging menu entries</string>

@@ -245,5 +245,12 @@ public class GeneralPreferences {
         return getBoolean("pref_therion_export_text", true);
     }
 
+    public static String getExportFolderName() {
+        return getString("pref_export_folder_name", "Exported");
+    }
+
+    public static boolean isExportTypeSubfoldersEnabled() {
+        return getBoolean("pref_export_type_subfolders", true);
+    }
 
 }
