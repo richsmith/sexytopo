@@ -126,7 +126,17 @@ public class Th2Exporter {
     private static String getCrossSectionScrap(String name, CrossSectionDetail xsDetail, float scale) {
         List<String> lines = new ArrayList<>();
 
-        lines.add("scrap " + name + " -projection none");
+        // Calculate scale parameter: [px1 py1 px2 py2 rx1 ry1 rx2 ry2 m]
+        // Picture points are in export units, real world points are in metres
+        float realWorldRef = 10.0f;  // Reference distance in metres
+        float pictureRef = realWorldRef * scale;  // Corresponding distance in picture units
+        String scaleParam = String.format(java.util.Locale.US, "[0 0 %s %s 0 0 %s %s m]",
+                TextTools.formatTo2dp(pictureRef),
+                TextTools.formatTo2dp(pictureRef),
+                TextTools.formatTo2dp(realWorldRef),
+                TextTools.formatTo2dp(realWorldRef));
+
+        lines.add("scrap " + name + " -projection none -scale " + scaleParam);
 
         // Add the station point at the cross-section center
         Station station = xsDetail.getCrossSection().getStation();
@@ -183,6 +193,9 @@ public class Th2Exporter {
 
         Station origin = survey.getOrigin();
         Coord2D originPos = space.getStationMap().get(survey.getOrigin());
+        if (originPos == null) {
+            return TextTools.join("\n", lines);
+        }
         float xPos = originPos.x;
         float yPos = originPos.y;
         lines.add(getXviLine("xth_me_image_insert",
@@ -250,7 +263,11 @@ public class Th2Exporter {
             Map<Station, Coord2D> stationMap = space.getStationMap();
             List<Station> orderedStations = survey.getAllStationsInChronoOrder();
             for (Station station : orderedStations) {
-                Coord2D coord = stationMap.get(station).scale(scale);
+                Coord2D coord = stationMap.get(station);
+                if (coord == null) {
+                    continue;
+                }
+                coord = coord.scale(scale);
                 commands.add(getPoint(coord.x, coord.y, "station", "-name", station.getName()));
             }
         }
