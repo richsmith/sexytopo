@@ -50,11 +50,18 @@ public class SurvexTherionUtil {
             // Date
             builder.append(marker).append(formatDate(trip.getDate())).append("\n");
             
-            // Instrument line (commented out)
-            builder.append(commentChar).append(marker).append("instrument inst \"\"\n");
+            // Instrument line - commented ONLY if field is empty
+            if (trip.hasInstrument()) {
+                builder.append(marker).append("instrument inst \"").append(trip.getInstrument()).append("\"\n");
+            } else {
+                builder.append(commentChar).append(marker).append("instrument inst \"\"\n");
+            }
             
-            // Team members (only include if they have roles other than just EXPLORATION for TH)
+            // Team members - ONLY SKIP if they have NO ROLES (empty roles list)
             for (Trip.TeamEntry entry : trip.getTeam()) {
+                if (!entry.hasRoles()) {
+                    continue;  // Skip team members with no roles selected
+                }
                 String teamLine = formatMember(entry, isSurvex);
                 if (teamLine != null) {
                     builder.append(marker).append(teamLine).append("\n");
@@ -64,24 +71,43 @@ public class SurvexTherionUtil {
             // Blank line before explo block
             builder.append("\n");
             
-            // Exploration date comment
-            if (isSurvex) {
-                builder.append(commentChar).append("*date explored yyyy.mm.dd\n");
+            // Exploration date handling:
+            // Output ACTUAL date ONLY if:
+            //   - "same as survey" checkbox is NOT ticked AND
+            //   - exploration date is provided
+            // Otherwise output commented placeholder
+            boolean sameAsSurvey = trip.isExplorationDateSameAsSurvey();
+            Date exploDate = trip.getExplorationDate();
+            
+            if (!sameAsSurvey && exploDate != null) {
+                // User has unchecked "same as survey" AND provided a specific date
+                String formattedExploDate = formatDate(exploDate).substring(5); // Remove "date " prefix
+                if (isSurvex) {
+                    builder.append(marker).append("date explored ").append(formattedExploDate).append("\n");
+                } else {
+                    builder.append("explo-date ").append(formattedExploDate).append("\n");
+                }
             } else {
-                builder.append(commentChar).append("explo-date yyyy.mm.dd\n");
+                // Either "same as survey" is ticked, or no specific date provided
+                // Output commented placeholder
+                if (isSurvex) {
+                    builder.append(commentChar).append("*date explored yyyy.mm.dd\n");
+                } else {
+                    builder.append(commentChar).append("explo-date yyyy.mm.dd\n");
+                }
             }
             
-            // Explo-team lines for Therion (not commented)
+            // Explo-team lines for Therion (not commented) - only for members with roles
             if (!isSurvex) {
                 for (Trip.TeamEntry entry : trip.getTeam()) {
-                    if (hasExplorerRole(entry)) {
+                    if (entry.hasRoles() && hasExplorerRole(entry)) {
                         builder.append("explo-team \"").append(entry.name).append("\"\n");
                     }
                 }
             }
             
             // Trip comments block if any
-            if (!trip.getComments().isEmpty()) {
+            if (trip.getComments() != null && !trip.getComments().isEmpty()) {
                 builder.append("\n");
                 builder.append(commentChar).append("Comment from SexyTopo trip information\n");
                 builder.append(commentMultiline(trip.getComments(), commentChar));

@@ -74,6 +74,8 @@ public class TherionExporter extends Exporter {
             thContent = ThExporter.updateOriginalContent(survey, originalThFileContent, th2Files);
         }
         SurveyFile th = getOutputFile(TH);
+        // FIXED: Removed 'attribution +' to prevent duplicate "Created with SexyTopo" comment
+        // ThExporter now handles the creation comment in the correct location
         th.save(context, thContent);
     }
 

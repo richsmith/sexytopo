@@ -22,7 +22,7 @@ public class SurvexExporter extends SingleFileExporter {
         // Creation comment (no version info available without Context)
         builder.append(SurvexTherionUtil.getCreationComment(COMMENT_CHAR, "SexyTopo")).append("\n\n");
         
-        // Metadata (date, instrument, team, explo block)
+        // Metadata (instrument is now in Trip, not passed separately)
         builder.append(SurvexTherionUtil.getMetadata(survey, SYNTAX_MARKER, COMMENT_CHAR)).append("\n");
         
         // Centreline data

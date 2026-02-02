@@ -28,7 +28,7 @@ public class ThExporter {
         // Input files
         builder.append(SurvexTherionUtil.getInputText(th2Files)).append("\n\n");
         
-        // Metadata (date, instrument, team, explo block)
+        // Metadata (instrument is now in Trip, not passed separately)
         builder.append(SurvexTherionUtil.getMetadata(survey, null, TherionExporter.COMMENT_CHAR)).append("\n");
         
         // Centreline block
