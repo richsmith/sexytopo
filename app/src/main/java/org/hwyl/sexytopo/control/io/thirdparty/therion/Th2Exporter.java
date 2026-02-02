@@ -211,7 +211,7 @@ public class Th2Exporter {
     }
 
     public static String getBaseScrapName(Survey survey) {
-        String name = survey.getName().toLowerCase();
+        String name = survey.getName();
         name = TextTools.intelligentlySanitise(name);
         return name;
     }
