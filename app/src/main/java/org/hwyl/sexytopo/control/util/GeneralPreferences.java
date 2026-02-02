@@ -266,7 +266,7 @@ public class GeneralPreferences {
     }
 
     public static boolean isTherionCrossSectionsEnabled() {
-        return getBoolean("pref_therion_cross_sections", false);
+        return getBoolean("pref_therion_cross_sections", true);
     }
 
     public static String getTherionPlanXsSuffix() {

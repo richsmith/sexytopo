@@ -78,12 +78,10 @@ public class Th2Exporter {
         crossSections.sort(Comparator.comparingInt(xs ->
                 orderedStations.indexOf(xs.getCrossSection().getStation())));
 
-        int index = 1;
         for (CrossSectionDetail xsDetail : crossSections) {
             Station station = xsDetail.getCrossSection().getStation();
-            String scrapName = formatXsScrapName(baseName, xsSuffix, station.getName(), index);
+            String scrapName = formatXsScrapName(baseName, xsSuffix, station.getName());
             scraps.add(getCrossSectionScrap(scrapName, xsDetail, scale));
-            index++;
         }
 
         return scraps;
@@ -97,19 +95,32 @@ public class Th2Exporter {
         }
     }
 
-    private static String formatXsScrapName(String baseName, String suffixPattern, String stationName, int index) {
+    private static String formatXsScrapName(String baseName, String suffixPattern, String stationName) {
         String suffix = suffixPattern;
 
-        // Handle ## for zero-padded index
-        if (suffix.contains("##")) {
-            String paddedNum = String.format("%02d", index);
-            suffix = suffix.replace("##", paddedNum);
+        // Replace # patterns with station name
+        // If station name is numeric, ## and ### can be zero-padded
+        if (suffix.contains("###")) {
+            suffix = replaceHashPattern(suffix, "###", stationName, 3);
+        } else if (suffix.contains("##")) {
+            suffix = replaceHashPattern(suffix, "##", stationName, 2);
         } else if (suffix.contains("#")) {
-            // Handle # for simple index
-            suffix = suffix.replace("#", String.valueOf(index));
+            suffix = suffix.replace("#", stationName);
         }
 
-        return baseName + "-" + suffix;
+        return baseName + suffix;
+    }
+
+    private static String replaceHashPattern(String suffix, String pattern, String stationName, int padLength) {
+        // If station name is numeric, zero-pad it; otherwise just use the name
+        try {
+            int num = Integer.parseInt(stationName);
+            String format = "%0" + padLength + "d";
+            return suffix.replace(pattern, String.format(format, num));
+        } catch (NumberFormatException e) {
+            // Not a number, just replace with the name
+            return suffix.replace(pattern, stationName);
+        }
     }
 
     private static String getCrossSectionScrap(String name, CrossSectionDetail xsDetail, float scale) {

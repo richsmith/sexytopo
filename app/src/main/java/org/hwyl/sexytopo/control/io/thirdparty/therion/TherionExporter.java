@@ -100,10 +100,22 @@ public class TherionExporter extends Exporter {
         if (suffix == null || suffix.isEmpty()) {
             return fileType;
         }
-        if (suffix.endsWith(".")) {
-            return suffix + fileType;
+        // If suffix starts with a dot (e.g., ".plan"), preserve it
+        // SurveyFile.withExtension will not add another dot if extension starts with "."
+        // Result: filename.plan.th2
+        if (suffix.startsWith(".")) {
+            return suffix + "." + fileType;
+        } else if (suffix.endsWith(".")) {
+            // Suffix ends with dot already (e.g., "P.")
+            // Use "|" marker for direct append (no separator)
+            // Result: filenameP.th2
+            return "|" + suffix + fileType;
+        } else {
+            // No leading dot in suffix (e.g., "P")
+            // Use "|" marker for direct append (no separator between filename and suffix)
+            // Result: filenameP.th2
+            return "|" + suffix + "." + fileType;
         }
-        return suffix + "." + fileType;
     }
 
     private SurveyFile getXviOutputFile(Context context, SurveyFile.SurveyFileType fileType, String xviFolder) {

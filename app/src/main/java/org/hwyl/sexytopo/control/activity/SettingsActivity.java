@@ -25,12 +25,13 @@ public class SettingsActivity extends SexyTopoActivity
         setupMaterialToolbar();
         applyEdgeToEdgeInsets(R.id.rootLayout, true, true);
 
-        // Always start fresh at the main settings page
+        // Always start fresh at the main settings page when activity is created
+        // Clear any saved fragment state and back stack
         getSupportFragmentManager().popBackStackImmediate(null,
                 androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
         getSupportFragmentManager().beginTransaction()
             .replace(R.id.settingsFragment, new MainSettingsFragment())
-            .commit();
+            .commitNow();
 
         getSupportFragmentManager().addOnBackStackChangedListener(() -> {
             boolean isAtRoot = getSupportFragmentManager().getBackStackEntryCount() == 0;
