@@ -60,6 +60,7 @@ import org.hwyl.sexytopo.testutils.ExampleSurveyCreator;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.SurveyConnection;
+import org.hwyl.sexytopo.model.survey.Trip;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -475,9 +476,37 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
 
     protected void startNewSurvey() {
+        // Save team from current survey before creating new one
+        Survey previousSurvey = getSurvey();
+        List<Trip.TeamEntry> previousTeam = new ArrayList<>();
+        String previousInstrument = "";
+        
+        if (previousSurvey != null && previousSurvey.getTrip() != null) {
+            Trip previousTrip = previousSurvey.getTrip();
+            // Copy team members
+            for (Trip.TeamEntry entry : previousTrip.getTeam()) {
+                previousTeam.add(new Trip.TeamEntry(entry.name, new ArrayList<>(entry.roles)));
+            }
+            // Copy instrument
+            if (previousTrip.hasInstrument()) {
+                previousInstrument = previousTrip.getInstrument();
+            }
+        }
+        
+        // Create new survey
         Survey survey = new Survey();
         setSurvey(survey);
         Log.i(R.string.file_started_new_survey);
+        
+        // Set up new trip with copied data
+        Trip newTrip = new Trip();
+        newTrip.setTeam(previousTeam);
+        newTrip.setInstrument(previousInstrument);
+        // Comments cleared (default)
+        // explorationDateSameAsSurvey defaults to true
+        survey.setTrip(newTrip);
+        
+        startActivity(TripActivity.class);
     }
 
 

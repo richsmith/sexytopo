@@ -115,13 +115,17 @@
             android:text="@string/exploration_date_label"
             android:textStyle="bold"/>
 
-        <TextView
-            android:id="@+id/exploration_date_display"
+        <EditText
+            android:id="@+id/exploration_date_field"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="end"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:inputType="date"
+            android:hint="@string/exploration_date_hint"
+            android:background="@android:color/transparent"
+            android:enabled="false"/>
     </LinearLayout>
 
     <CheckBox
@@ -131,18 +135,11 @@
         android:text="@string/same_as_survey_date"
         android:checked="true"/>
 
-    <EditText
-        android:id="@+id/exploration_date_field"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="date"
-        android:hint="@string/exploration_date_hint"
-        android:visibility="gone"/>
 
     <EditText
         android:id="@+id/trip_comments"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="96dp"
         android:inputType="textMultiLine"
         android:gravity="top"
         android:hint="@string/trip_comments"
