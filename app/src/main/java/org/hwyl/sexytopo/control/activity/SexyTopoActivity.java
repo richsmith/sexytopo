@@ -249,7 +249,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         } else if (itemId == R.id.action_stats) {
             startActivity(StatsActivity.class);
             return true;
-        } else if (itemId == R.id.action_trip) {
+        } else if (itemId == R.id.action_trip || itemId == R.id.action_trip_menu) {
             startActivity(TripActivity.class);
             return true;
         } else if (itemId == R.id.action_settings) {

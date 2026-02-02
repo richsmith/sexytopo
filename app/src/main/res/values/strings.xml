@@ -375,6 +375,7 @@
     <!-- Trip -->
     <string name="trip">Trip</string>
     <string name="trip_team">Team</string>
+    <string name="trip_header">%1$s %2$s. %3$s:</string>
     <string name="trip_dialog_title_add_to_team">Add to Team</string>
     <string name="trip_dialog_add_to_team_name_hint">Name</string>
     <string name="trip_dialog_confirm_clear_trip">Clear Trip Data?</string>
@@ -383,7 +384,7 @@
     <string name="trip_role_book">Book (drawing)</string>
     <string name="trip_role_instruments">Instruments</string>
     <string name="trip_role_dog">Dog (assistant)</string>
-    <string name="trip_role_exploration">Exploration Team</string>
+    <string name="trip_role_exploration">Explorer</string>
     
     <!-- NEW: Instrument field strings -->
     <string name="instrument_label">Instrument:</string>

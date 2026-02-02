@@ -72,14 +72,21 @@ public class SurvexTherionUtil {
             builder.append("\n");
             
             // Exploration date handling:
-            // Output ACTUAL date ONLY if:
-            //   - "same as survey" checkbox is NOT ticked AND
-            //   - exploration date is provided
-            // Otherwise output commented placeholder
+            // - If "same as survey" is ticked: use survey date as exploration date
+            // - If "same as survey" NOT ticked AND exploration date provided: use exploration date
+            // - If "same as survey" NOT ticked AND no date provided: commented placeholder
             boolean sameAsSurvey = trip.isExplorationDateSameAsSurvey();
             Date exploDate = trip.getExplorationDate();
             
-            if (!sameAsSurvey && exploDate != null) {
+            if (sameAsSurvey) {
+                // Use survey date as exploration date
+                String formattedDate = formatDate(trip.getDate()).substring(5); // Remove "date " prefix
+                if (isSurvex) {
+                    builder.append(marker).append("date explored ").append(formattedDate).append("\n");
+                } else {
+                    builder.append("explo-date ").append(formattedDate).append("\n");
+                }
+            } else if (exploDate != null) {
                 // User has unchecked "same as survey" AND provided a specific date
                 String formattedExploDate = formatDate(exploDate).substring(5); // Remove "date " prefix
                 if (isSurvex) {
@@ -88,8 +95,7 @@ public class SurvexTherionUtil {
                     builder.append("explo-date ").append(formattedExploDate).append("\n");
                 }
             } else {
-                // Either "same as survey" is ticked, or no specific date provided
-                // Output commented placeholder
+                // No specific date provided - output commented placeholder
                 if (isSurvex) {
                     builder.append(commentChar).append("*date explored yyyy.mm.dd\n");
                 } else {
