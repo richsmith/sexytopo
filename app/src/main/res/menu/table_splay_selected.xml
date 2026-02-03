@@ -12,6 +12,9 @@
         android:id="@+id/upgradeRow"
         android:title="@string/menu_upgrade_row"/>
     <item
+        android:id="@+id/promoteToAboveLeg"
+        android:title="@string/menu_promote_to_above_leg"/>
+    <item
         android:id="@+id/deleteSplay"
         android:title="@string/menu_delete_splay"/>
     <item
