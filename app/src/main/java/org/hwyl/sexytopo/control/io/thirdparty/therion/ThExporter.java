@@ -16,7 +16,7 @@ public class ThExporter {
         StringBuilder builder = new StringBuilder();
         
         // Encoding
-        builder.append(TherionExporter.getEncodingText()).append("\n\n");
+        builder.append(TherionExporter.getEncodingText()).append("\n");
         
         // Survey block
         builder.append("survey ").append(survey.getName()).append("\n");
@@ -33,6 +33,7 @@ public class ThExporter {
         
         // Centreline block
         builder.append("centreline\n");
+        builder.append(SurvexTherionUtil.getStationCommentsData(survey, null));
         builder.append(SurvexTherionUtil.getCentrelineData(survey, null, TherionExporter.COMMENT_CHAR, false));
         builder.append(SurvexTherionUtil.getExtendedElevationExtensions(survey, null));
         builder.append("endcentreline\n");
@@ -49,6 +50,7 @@ public class ThExporter {
         // Replace centreline block
         String centrelineText = 
             "centreline\n" +
+            SurvexTherionUtil.getStationCommentsData(survey, null) +
             SurvexTherionUtil.getCentrelineData(survey, null, TherionExporter.COMMENT_CHAR, false) +
             SurvexTherionUtil.getExtendedElevationExtensions(survey, null) +
             "endcentreline\n";
@@ -61,13 +63,13 @@ public class ThExporter {
         return newContent;
     }
 
-    private static String replaceCentreline(String original, String replacementText) {
+    static String replaceCentreline(String original, String replacementText) {
         return original.replaceFirst(
                 "(?s)(\\s*?(centreline|centerline)(.*)(endcentreline|endcenterline)\\s*)",
                 replacementText);
     }
 
-    private static String replaceInputsText(String original, String replacementText) {
+    static String replaceInputsText(String original, String replacementText) {
         return original.replaceFirst("(?m)(^input .*\\n)+", replacementText);
     }
 

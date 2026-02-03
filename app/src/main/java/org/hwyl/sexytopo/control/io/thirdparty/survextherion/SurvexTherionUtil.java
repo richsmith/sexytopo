@@ -136,6 +136,44 @@ public class SurvexTherionUtil {
         return entry.roles.size() == 1 && entry.roles.contains(Trip.Role.EXPLORATION);
     }
 
+    public static String getStationCommentsData(
+            Survey survey,
+            String syntaxMarker) {
+
+        StringBuilder builder = new StringBuilder();
+        String marker = (syntaxMarker != null) ? syntaxMarker : "";
+
+        // Collect all stations with comments
+        List<Station> stationsWithComments = new ArrayList<>();
+        collectStationsWithComments(survey.getOrigin(), stationsWithComments);
+
+        if (stationsWithComments.isEmpty()) {
+            return "";
+        }
+
+        // Output the data passage block
+        builder.append(marker).append("data passage station ignoreall\n");
+
+        for (Station station : stationsWithComments) {
+            builder.append(station.getName()).append("\t");
+            formatComment(builder, station.getComment());
+            builder.append("\n");
+        }
+
+        builder.append("\n");
+
+        return builder.toString();
+    }
+
+    private static void collectStationsWithComments(Station station, List<Station> result) {
+        if (station.hasComment()) {
+            result.add(station);
+        }
+        for (Leg leg : station.getConnectedOnwardLegs()) {
+            collectStationsWithComments(leg.getDestination(), result);
+        }
+    }
+
     public static String getCentrelineData(
             Survey survey, 
             String syntaxMarker, 
@@ -238,12 +276,6 @@ public class SurvexTherionUtil {
         formatField(builder, TableCol.DISTANCE.format(leg.getDistance(), Locale.UK));
         formatField(builder, TableCol.AZIMUTH.format(leg.getAzimuth(), Locale.UK));
         formatField(builder, TableCol.INCLINATION.format(leg.getInclination(), Locale.UK));
-
-        // Add comment for station comment
-        if (to.hasComment()) {
-            builder.append("\t").append(commentChar).append(" ");
-            formatComment(builder, to.getComment());
-        }
         
         // Handle promoted legs - put readings on subsequent lines
         if (leg.wasPromoted()) {

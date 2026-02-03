@@ -25,6 +25,9 @@ public class SurvexExporter extends SingleFileExporter {
         // Metadata (instrument is now in Trip, not passed separately)
         builder.append(SurvexTherionUtil.getMetadata(survey, SYNTAX_MARKER, COMMENT_CHAR)).append("\n");
         
+        // Station comments data block
+        builder.append(SurvexTherionUtil.getStationCommentsData(survey, SYNTAX_MARKER));
+        
         // Centreline data
         builder.append(SurvexTherionUtil.getCentrelineData(survey, SYNTAX_MARKER, COMMENT_CHAR, true));
         
