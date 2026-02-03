@@ -45,13 +45,6 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         jumpToStation(station, ExtendedElevationActivity.class);
     }
 
-    public void onToggleLeftRight(Station station) {
-        Direction newDirection = station.getExtendedElevationDirection().opposite();
-        SurveyUpdater.setDirectionOfSubtree(station, newDirection);
-        getSurveyManager().broadcastSurveyUpdated();
-        invalidateView();
-    }
-
     public void onSetDirectionLeft(Station station) {
         if (station.getExtendedElevationDirection() != Direction.LEFT) {
             SurveyUpdater.setDirectionOfSubtree(station, Direction.LEFT);
@@ -84,7 +77,92 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
             showSimpleToast(R.string.file_cannot_extend_unsaved_survey);
             return;
         }
-        continueSurvey(station);
+        showNewSurveyStartStationDialog(station);
+    }
+
+    private void showNewSurveyStartStationDialog(Station station) {
+        String continueOption = getString(R.string.file_new_survey_continue_from, station.getName());
+
+        String[] options = {
+            continueOption,
+            getString(R.string.file_new_survey_start_from_1),
+            getString(R.string.file_new_survey_other)
+        };
+
+        new MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.file_new_survey_start_station_title)
+            .setItems(options, (dialog, which) -> {
+                switch (which) {
+                    case 0:
+                        continueSurvey(station, station.getName());
+                        break;
+                    case 1:
+                        continueSurvey(station, "1");
+                        break;
+                    case 2:
+                        showCustomStationInputDialog(station);
+                        break;
+                }
+            })
+            .setNegativeButton(R.string.cancel, null)
+            .show();
+    }
+
+    private void showCustomStationInputDialog(Station station) {
+        TextInputLayout inputLayout = new TextInputLayout(this);
+        inputLayout.setHint(R.string.file_new_survey_enter_station);
+
+        TextInputEditText input = new TextInputEditText(inputLayout.getContext());
+        input.setGravity(Gravity.CENTER_HORIZONTAL);
+        input.setFocusable(true);
+        input.setFocusableInTouchMode(true);
+        inputLayout.addView(input);
+
+        int paddingH = (int) (24 * getResources().getDisplayMetrics().density);
+        int paddingV = (int) (20 * getResources().getDisplayMetrics().density);
+        inputLayout.setPadding(paddingH, paddingV, paddingH, 0);
+
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+        builder.setView(inputLayout)
+            .setTitle(R.string.file_new_survey_start_station_title)
+            .setPositiveButton(R.string.file_new_survey_select, null)
+            .setNegativeButton(R.string.cancel, null);
+
+        androidx.appcompat.app.AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(dialogInterface -> {
+            android.widget.Button selectButton = dialog
+                .getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE);
+            selectButton.setEnabled(false);
+
+            input.addTextChangedListener(new android.text.TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+                @Override
+                public void afterTextChanged(android.text.Editable s) {
+                    selectButton.setEnabled(!s.toString().trim().isEmpty());
+                }
+            });
+
+            selectButton.setOnClickListener(v -> {
+                CharSequence inputText = input.getText();
+                String stationName = inputText != null ? inputText.toString().trim() : "";
+                if (!stationName.isEmpty()) {
+                    continueSurvey(station, stationName);
+                    dialog.dismiss();
+                }
+            });
+        });
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        }
+        dialog.show();
+        input.requestFocus();
     }
 
     public void onUnlinkSurvey(Station station) {
@@ -193,14 +271,17 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         builder.setView(inputLayout)
             .setTitle(station.getName())
             .setPositiveButton(R.string.save, (dialog, which) -> {
-                    station.setComment(input.getText().toString());
+                    CharSequence inputText = input.getText();
+                    station.setComment(inputText != null ? inputText.toString() : "");
                     invalidateView();
                 })
             .setNegativeButton(R.string.cancel, null);
 
         Dialog dialog = builder.create();
-        dialog.getWindow().setSoftInputMode(
-            WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        }
         dialog.show();
         input.requestFocus();
     }

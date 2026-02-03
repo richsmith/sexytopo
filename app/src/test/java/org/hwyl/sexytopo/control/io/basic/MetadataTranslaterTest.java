@@ -87,4 +87,95 @@ public class MetadataTranslaterTest {
         survey1.connect(join1, survey0, join0);
     }
 
+
+    @Test
+    public void testBidirectionalConnectionWithDifferentStationNames() throws Exception {
+        Survey surveyA = BasicTestSurveyCreator.createStraightNorth();
+        SurveyMocker.mockSurveyUri(surveyA, "surveyA");
+        Station joinPointA = surveyA.getStationByName("2");
+
+        Survey surveyB = new Survey();
+        SurveyMocker.mockSurveyUri(surveyB, "surveyB");
+        surveyB.getOrigin().setName("1");
+
+        connectTwoSurveys(surveyA, joinPointA, surveyB, surveyB.getOrigin());
+
+        // Verify in-memory bidirectional connection
+        Assert.assertTrue(surveyA.isConnectedTo(surveyB));
+        Assert.assertTrue(surveyB.isConnectedTo(surveyA));
+
+        // Verify JSON serialization stores correct station names for survey A
+        String jsonA = MetadataTranslater.translate(surveyA);
+        Assert.assertTrue("Survey A should reference station '1' in survey B",
+            jsonA.contains("\"1\""));
+        Assert.assertTrue("Survey A should connect from station '2'",
+            jsonA.contains("\"2\""));
+
+        // Verify JSON serialization stores correct station names for survey B
+        String jsonB = MetadataTranslater.translate(surveyB);
+        Assert.assertTrue("Survey B should reference station '2' in survey A",
+            jsonB.contains("\"2\""));
+    }
+
+
+    @Test
+    public void testBidirectionalConnectionWithAlphanumericStationName() throws Exception {
+        Survey surveyA = BasicTestSurveyCreator.createStraightNorth();
+        SurveyMocker.mockSurveyUri(surveyA, "surveyA");
+        Station joinPointA = surveyA.getStationByName("2");
+
+        Survey surveyB = new Survey();
+        SurveyMocker.mockSurveyUri(surveyB, "surveyB");
+        surveyB.getOrigin().setName("A23");
+
+        connectTwoSurveys(surveyA, joinPointA, surveyB, surveyB.getOrigin());
+
+        // Verify in-memory bidirectional connection
+        Assert.assertTrue(surveyA.isConnectedTo(surveyB));
+        Assert.assertTrue(surveyB.isConnectedTo(surveyA));
+
+        // Verify station lookup works with alphanumeric name
+        Assert.assertNotNull("Should find station A23",
+            surveyB.getStationByName("A23"));
+
+        // Verify JSON serialization for survey A contains alphanumeric station name
+        String jsonA = MetadataTranslater.translate(surveyA);
+        Assert.assertTrue("Survey A should reference alphanumeric station 'A23' in survey B",
+            jsonA.contains("\"A23\""));
+
+        // Verify JSON serialization for survey B contains the join point from survey A
+        String jsonB = MetadataTranslater.translate(surveyB);
+        Assert.assertTrue("Survey B should reference station '2' in survey A",
+            jsonB.contains("\"2\""));
+        Assert.assertTrue("Survey B connection should be from station 'A23'",
+            jsonB.contains("\"A23\""));
+    }
+
+
+    @Test
+    public void testBidirectionalConnectionWithTextStationName() throws Exception {
+        Survey surveyA = BasicTestSurveyCreator.createStraightNorth();
+        SurveyMocker.mockSurveyUri(surveyA, "surveyA");
+        Station joinPointA = surveyA.getStationByName("2");
+
+        Survey surveyB = new Survey();
+        SurveyMocker.mockSurveyUri(surveyB, "surveyB");
+        surveyB.getOrigin().setName("Entrance");
+
+        connectTwoSurveys(surveyA, joinPointA, surveyB, surveyB.getOrigin());
+
+        // Verify in-memory connection
+        Assert.assertTrue(surveyA.isConnectedTo(surveyB));
+        Assert.assertTrue(surveyB.isConnectedTo(surveyA));
+
+        // Verify station lookup works with text name
+        Assert.assertNotNull("Should find station 'Entrance'",
+            surveyB.getStationByName("Entrance"));
+
+        // Verify JSON contains the text station name
+        String jsonA = MetadataTranslater.translate(surveyA);
+        Assert.assertTrue("Survey A should reference station 'Entrance'",
+            jsonA.contains("\"Entrance\""));
+    }
+
 }

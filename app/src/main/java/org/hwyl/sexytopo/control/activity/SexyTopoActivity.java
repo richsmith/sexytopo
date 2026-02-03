@@ -191,14 +191,16 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         // provided by the connected Instrument's Communicator
         MenuItem deviceMenu = menu.findItem(R.id.action_device_menu);
         SubMenu subMenu = deviceMenu.getSubMenu();
-        subMenu.clear();
-        subMenu.add(Menu.NONE, R.id.action_device_connect, 0, R.string.action_device_connect);
-        Map<Integer, Integer> commands = requestComms().getCustomCommands();
-        for (Map.Entry<Integer, Integer> entry: commands.entrySet()) {
-            int id = entry.getKey();
-            int stringId = entry.getValue();
-            String name = getString(stringId);
-            subMenu.add(Menu.NONE, id, 0, name);
+        if (subMenu != null) {
+            subMenu.clear();
+            subMenu.add(Menu.NONE, R.id.action_device_connect, 0, R.string.action_device_connect);
+            Map<Integer, Integer> commands = requestComms().getCustomCommands();
+            for (Map.Entry<Integer, Integer> entry: commands.entrySet()) {
+                int id = entry.getKey();
+                int stringId = entry.getValue();
+                String name = getString(stringId);
+                subMenu.add(Menu.NONE, id, 0, name);
+            }
         }
 
         boolean isDevMenuVisible = GeneralPreferences.isDevModeOn();
@@ -586,7 +588,9 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                     Survey current = getSurvey();
                     joinSurveys(current, current.getActiveStation(), surveyToLink, selectedStation);
 
+                    // Save both surveys so the connection is persisted in both directions
                     try {
+                        Saver.save(SexyTopoActivity.this, current);
                         Saver.save(SexyTopoActivity.this, surveyToLink);
                     } catch (Exception exception) {
                         showExceptionAndLog(R.string.file_link_survey_save_error, exception);
@@ -817,6 +821,10 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
 
     public void continueSurvey(final Station joinPoint) {
+        continueSurvey(joinPoint, joinPoint.getName());
+    }
+
+    public void continueSurvey(final Station joinPoint, final String startingStationName) {
 
         final Survey currentSurvey = getSurvey();
 
@@ -826,8 +834,16 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         }
 
         Survey newSurvey = new Survey();
-        newSurvey.getOrigin().setName(joinPoint.getName());
+        newSurvey.getOrigin().setName(startingStationName);
         joinSurveys(currentSurvey, joinPoint, newSurvey, newSurvey.getOrigin());
+
+        // Save the original survey so the connection is persisted in both directions
+        try {
+            Saver.save(this, currentSurvey);
+        } catch (Exception e) {
+            Log.e("Error saving original survey after linking: " + e.getMessage());
+        }
+
         setSurvey(newSurvey);
     }
 
