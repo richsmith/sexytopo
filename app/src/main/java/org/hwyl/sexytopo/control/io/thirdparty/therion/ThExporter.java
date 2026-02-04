@@ -4,6 +4,7 @@ import android.content.Context;
 
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
+import org.hwyl.sexytopo.control.io.thirdparty.survextherion.ExportFormat;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
 import org.hwyl.sexytopo.model.survey.Survey;
 
@@ -29,12 +30,12 @@ public class ThExporter {
         builder.append(SurvexTherionUtil.getInputText(th2Files)).append("\n\n");
         
         // Metadata (date, instrument, team, explo block)
-        builder.append(SurvexTherionUtil.getMetadata(survey, null, TherionExporter.COMMENT_CHAR)).append("\n");
+        builder.append(SurvexTherionUtil.getMetadata(survey, TherionExporter.COMMENT_CHAR, ExportFormat.THERION)).append("\n");
         
         // Centreline block
         builder.append("centreline\n");
-        builder.append(SurvexTherionUtil.getCentrelineData(survey, null, TherionExporter.COMMENT_CHAR, false));
-        builder.append(SurvexTherionUtil.getExtendedElevationExtensions(survey, null));
+        builder.append(SurvexTherionUtil.getCentrelineData(survey, TherionExporter.COMMENT_CHAR, ExportFormat.THERION));
+        builder.append(SurvexTherionUtil.getExtendedElevationExtensions(survey, ExportFormat.THERION));
         builder.append("endcentreline\n");
         
         // End survey
@@ -49,8 +50,8 @@ public class ThExporter {
         // Replace centreline block
         String centrelineText = 
             "centreline\n" +
-            SurvexTherionUtil.getCentrelineData(survey, null, TherionExporter.COMMENT_CHAR, false) +
-            SurvexTherionUtil.getExtendedElevationExtensions(survey, null) +
+            SurvexTherionUtil.getCentrelineData(survey, TherionExporter.COMMENT_CHAR, ExportFormat.THERION) +
+            SurvexTherionUtil.getExtendedElevationExtensions(survey, ExportFormat.THERION) +
             "endcentreline\n";
         String newContent = replaceCentreline(originalFileContent, centrelineText);
 
