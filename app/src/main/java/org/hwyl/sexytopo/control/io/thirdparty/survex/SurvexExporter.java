@@ -3,6 +3,7 @@ package org.hwyl.sexytopo.control.io.thirdparty.survex;
 import android.content.Context;
 
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.control.io.thirdparty.survextherion.ExportFormat;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
 import org.hwyl.sexytopo.control.io.translation.SingleFileExporter;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -11,8 +12,9 @@ import org.hwyl.sexytopo.model.survey.Survey;
 public class SurvexExporter extends SingleFileExporter {
 
     public static final char COMMENT_CHAR = ';';
-    public static final String SYNTAX_MARKER = "*";
 
+    // StringBuilder is more efficient than string concatenation for multiple appends
+    @SuppressWarnings("StringBufferReplaceableByString")
     public String getContent(Survey survey) {
         StringBuilder builder = new StringBuilder();
 
@@ -23,14 +25,14 @@ public class SurvexExporter extends SingleFileExporter {
         builder.append(SurvexTherionUtil.getCreationComment(COMMENT_CHAR, "SexyTopo")).append("\n\n");
         
         // Metadata (date, instrument, team, explo block)
-        builder.append(SurvexTherionUtil.getMetadata(survey, SYNTAX_MARKER, COMMENT_CHAR)).append("\n");
+        builder.append(SurvexTherionUtil.getMetadata(survey, COMMENT_CHAR, ExportFormat.SURVEX)).append("\n");
         
         // Centreline data
-        builder.append(SurvexTherionUtil.getCentrelineData(survey, SYNTAX_MARKER, COMMENT_CHAR, true));
+        builder.append(SurvexTherionUtil.getCentrelineData(survey, COMMENT_CHAR, ExportFormat.SURVEX));
         
         // Extended elevation
         builder.append("\n");
-        builder.append(SurvexTherionUtil.getExtendedElevationExtensions(survey, SYNTAX_MARKER));
+        builder.append(SurvexTherionUtil.getExtendedElevationExtensions(survey, ExportFormat.SURVEX));
         
         // End survey block
         builder.append("*end ").append(survey.getName()).append("\n");
