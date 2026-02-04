@@ -385,18 +385,12 @@
     <string name="trip_role_instruments">Instruments</string>
     <string name="trip_role_dog">Dog (assistant)</string>
     <string name="trip_role_exploration">Explorer</string>
-    
-    <!-- NEW: Instrument field strings -->
     <string name="instrument_label">Instrument:</string>
     <string name="instrument_hint">Enter instrument name</string>
     <string name="instrument_get_button">Get</string>
-    
-    <!-- NEW: Exploration date strings -->
     <string name="exploration_date_label">Exploration Date:</string>
     <string name="same_as_survey_date">Same as survey date</string>
     <string name="exploration_date_hint">yyyy-mm-dd</string>
-    
-    <!-- NEW: Copy team string -->
     <string name="copy_team_from_last_trip">Copy team from last trip</string>
 
 
