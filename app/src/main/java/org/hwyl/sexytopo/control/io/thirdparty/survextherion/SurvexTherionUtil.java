@@ -18,7 +18,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-
 public class SurvexTherionUtil {
 
     public static final String TRIP_DATE_PATTERN = "yyyy.MM.dd";
@@ -39,45 +38,45 @@ public class SurvexTherionUtil {
         return builder.toString();
     }
 
-    public static String getMetadata(Survey survey, String syntaxMarker, char commentChar) {
+    public static String getMetadata(Survey survey, char commentChar, ExportFormat format) {
         StringBuilder builder = new StringBuilder();
-        
+
         Trip trip = survey.getTrip();
         if (trip != null) {
-            String marker = (syntaxMarker != null) ? syntaxMarker : "";
-            boolean isSurvex = (syntaxMarker != null);
-            
+            String marker = (format == ExportFormat.SURVEX) ? "*" : "";
+            boolean isSurvex = (format == ExportFormat.SURVEX);
+
             // Date
             builder.append(marker).append(formatDate(trip.getDate())).append("\n");
-            
+
             // Instrument line - commented ONLY if field is empty
             if (trip.hasInstrument()) {
                 builder.append(marker).append("instrument inst \"").append(trip.getInstrument()).append("\"\n");
             } else {
                 builder.append(commentChar).append(marker).append("instrument inst \"\"\n");
             }
-            
+
             // Team members - ONLY SKIP if they have NO ROLES (empty roles list)
             for (Trip.TeamEntry entry : trip.getTeam()) {
                 if (!entry.hasRoles()) {
                     continue;  // Skip team members with no roles selected
                 }
-                String teamLine = formatMember(entry, isSurvex);
+                String teamLine = formatMember(entry, format);
                 if (teamLine != null) {
                     builder.append(marker).append(teamLine).append("\n");
                 }
             }
-            
+
             // Blank line before explo block
             builder.append("\n");
-            
+
             // Exploration date handling:
             // - If "same as survey" is ticked: use survey date as exploration date
             // - If "same as survey" NOT ticked AND exploration date provided: use exploration date
             // - If "same as survey" NOT ticked AND no date provided: commented placeholder
             boolean sameAsSurvey = trip.isExplorationDateSameAsSurvey();
             Date exploDate = trip.getExplorationDate();
-            
+
             if (sameAsSurvey) {
                 // Use survey date as exploration date
                 String formattedDate = formatDate(trip.getDate()).substring(5); // Remove "date " prefix
@@ -102,7 +101,7 @@ public class SurvexTherionUtil {
                     builder.append(commentChar).append("explo-date yyyy.mm.dd\n");
                 }
             }
-            
+
             // Explo-team lines for Therion (not commented) - only for members with roles
             if (!isSurvex) {
                 for (Trip.TeamEntry entry : trip.getTeam()) {
@@ -111,7 +110,7 @@ public class SurvexTherionUtil {
                     }
                 }
             }
-            
+
             // Trip comments block if any
             if (trip.getComments() != null && !trip.getComments().isEmpty()) {
                 builder.append("\n");
@@ -119,7 +118,7 @@ public class SurvexTherionUtil {
                 builder.append(commentMultiline(trip.getComments(), commentChar));
             }
         }
-        
+
         return builder.toString();
     }
 
@@ -136,12 +135,10 @@ public class SurvexTherionUtil {
         return entry.roles.size() == 1 && entry.roles.contains(Trip.Role.EXPLORATION);
     }
 
-    public static String getStationCommentsData(
-            Survey survey,
-            String syntaxMarker) {
+    public static String getStationCommentsData(Survey survey, ExportFormat format) {
 
         StringBuilder builder = new StringBuilder();
-        String marker = (syntaxMarker != null) ? syntaxMarker : "";
+        String marker = (format == ExportFormat.SURVEX) ? "*" : "";
 
         // Collect all stations with comments
         List<Station> stationsWithComments = new ArrayList<>();
@@ -175,45 +172,45 @@ public class SurvexTherionUtil {
     }
 
     public static String getCentrelineData(
-            Survey survey, 
-            String syntaxMarker, 
+            Survey survey,
             char commentChar,
-            boolean useSurvexStationSyntax) {
-        
+            ExportFormat format) {
+
         GraphToListTranslator graphToListTranslator = new GraphToListTranslator();
         StringBuilder builder = new StringBuilder();
-        
+
         // Add data declaration line with optional syntax marker
-        String marker = (syntaxMarker != null) ? syntaxMarker : "";
+        String marker = (format == ExportFormat.SURVEX) ? "*" : "";
         builder.append(marker).append("data normal from to tape compass clino ignoreall\n");
-        
+
         // Get chronological list of survey entries
         List<GraphToListTranslator.SurveyListEntry> list =
                 graphToListTranslator.toChronoListOfSurveyListEntries(survey);
-        
+
         // Format each entry
         for (GraphToListTranslator.SurveyListEntry entry : list) {
-            formatEntry(builder, entry, commentChar, useSurvexStationSyntax);
+            formatEntry(builder, entry, commentChar, format);
             builder.append("\n");
         }
-        
+
         // Blank line after data block
         builder.append("\n");
-        
+
         return builder.toString();
     }
 
-    private static String formatMember(Trip.TeamEntry member, boolean isSurvex) {
+    private static String formatMember(Trip.TeamEntry member, ExportFormat format) {
+        boolean isSurvex = (format == ExportFormat.SURVEX);
         // For Therion, skip team members who only have EXPLORATION role
         if (!isSurvex && hasOnlyExplorerRole(member)) {
             return null;
         }
-        
+
         List<String> fields = new ArrayList<>();
         fields.add("team");
         fields.add("\"" + member.name + "\"");
         for (Trip.Role role : member.roles) {
-            String roleDesc = getRoleDescription(role, isSurvex);
+            String roleDesc = getRoleDescription(role, format);
             if (roleDesc != null) {
                 fields.add(roleDesc);
             }
@@ -221,7 +218,7 @@ public class SurvexTherionUtil {
         return TextUtils.join(" ", fields);
     }
 
-    private static String getRoleDescription(Trip.Role role, boolean isSurvex) {
+    private static String getRoleDescription(Trip.Role role, ExportFormat format) {
         switch(role) {
             case BOOK:
                 return "notes";
@@ -229,7 +226,7 @@ public class SurvexTherionUtil {
                 return "instruments";
             case EXPLORATION:
                 // Survex can use "explorer", Therion cannot (uses explo-team separately)
-                return isSurvex ? "explorer" : null;
+                return (format == ExportFormat.SURVEX) ? "explorer" : null;
             case DOG:
             default:
                 return "assistant";
@@ -252,12 +249,11 @@ public class SurvexTherionUtil {
         return builder.toString();
     }
 
-
     public static void formatEntry(
             StringBuilder builder,
             GraphToListTranslator.SurveyListEntry entry,
             char commentChar,
-            boolean useSurvexStationSyntax) {
+            ExportFormat format) {
 
         Station from = entry.getFrom();
         String fromName = from.getName();
@@ -267,7 +263,7 @@ public class SurvexTherionUtil {
         String toName = to.getName();
 
         // Replace "-" with ".." for Survex splay syntax
-        if (useSurvexStationSyntax && toName.equals("-")) {
+        if (format == ExportFormat.SURVEX && toName.equals("-")) {
             toName = "..";
         }
 
@@ -276,7 +272,7 @@ public class SurvexTherionUtil {
         formatField(builder, TableCol.DISTANCE.format(leg.getDistance(), Locale.UK));
         formatField(builder, TableCol.AZIMUTH.format(leg.getAzimuth(), Locale.UK));
         formatField(builder, TableCol.INCLINATION.format(leg.getInclination(), Locale.UK));
-        
+
         // Handle promoted legs - put readings on subsequent lines
         if (leg.wasPromoted()) {
             Leg[] precursors = leg.getPromotedFrom();
@@ -301,10 +297,10 @@ public class SurvexTherionUtil {
         String formatted = comment.replaceAll("(\\r|\\n|\\r\\n)+", "\\\\n");
         builder.append(formatted);
     }
-    
-    public static String getExtendedElevationExtensions(Survey survey, String syntaxMarker) {
+
+    public static String getExtendedElevationExtensions(Survey survey, ExportFormat format) {
         StringBuilder builder = new StringBuilder();
-        String marker = (syntaxMarker != null) ? syntaxMarker : "";
+        String marker = (format == ExportFormat.SURVEX) ? "*" : "";
         generateExtendCommandsFromStation(builder, survey.getOrigin(), null, marker);
         return builder.toString();
     }
