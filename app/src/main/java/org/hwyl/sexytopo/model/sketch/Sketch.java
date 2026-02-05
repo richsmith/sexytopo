@@ -11,10 +11,11 @@ import java.util.List;
 
 public class Sketch extends Shape {
 
-    private List<PathDetail> pathDetails = new ArrayList<>();
-    private List<SymbolDetail> symbolDetails = new ArrayList<>();
-    private List<TextDetail> textDetails = new ArrayList<>();
-    private List<CrossSectionDetail> crossSectionDetails = new ArrayList<>();
+    private static final String DEFAULT_LAYER_NAME = "Layer 0";
+
+    private List<SketchLayer> layers = new ArrayList<>();
+    private int activeLayerId = 0;
+    private int nextLayerId = 0;
 
     private final List<SketchDetail> sketchHistory = new ArrayList<>();
     private final List<SketchDetail> undoneHistory = new ArrayList<>();
@@ -24,6 +25,10 @@ public class Sketch extends Shape {
 
     private boolean isSaved = true;
 
+    public Sketch() {
+        addLayer(DEFAULT_LAYER_NAME);
+    }
+
     public boolean isSaved() {
         return isSaved;
     }
@@ -32,35 +37,141 @@ public class Sketch extends Shape {
         this.isSaved = isSaved;
     }
 
+    // Layer management
+
+    public List<SketchLayer> getLayers() {
+        return layers;
+    }
+
+    public void setLayers(List<SketchLayer> layers) {
+        this.layers = layers;
+        if (!layers.isEmpty()) {
+            nextLayerId = layers.stream().mapToInt(SketchLayer::getId).max().orElse(0) + 1;
+            activeLayerId = layers.get(0).getId();
+        }
+        recalculateBoundingBox();
+    }
+
+    public SketchLayer addLayer(String name) {
+        SketchLayer layer = new SketchLayer(nextLayerId++, name);
+        layers.add(layer);
+        return layer;
+    }
+
+    public SketchLayer getActiveLayer() {
+        return getLayerById(activeLayerId);
+    }
+
+    public int getActiveLayerId() {
+        return activeLayerId;
+    }
+
+    public void setActiveLayerId(int layerId) {
+        if (getLayerById(layerId) != null) {
+            int previousLayerId = this.activeLayerId;
+            this.activeLayerId = layerId;
+            
+            // Ensure active layer is visible
+            SketchLayer activeLayer = getActiveLayer();
+            if (activeLayer != null && activeLayer.getVisibility() != SketchLayer.Visibility.SHOWING) {
+                activeLayer.setVisibility(SketchLayer.Visibility.SHOWING);
+            }
+            
+            // Record layer switch in undo history
+            if (previousLayerId != layerId) {
+                LayerSwitchDetail switchDetail = new LayerSwitchDetail(previousLayerId, layerId);
+                sketchHistory.add(switchDetail);
+                undoneHistory.clear();
+                setSaved(false);
+            }
+        }
+    }
+
+    public SketchLayer getLayerById(int id) {
+        for (SketchLayer layer : layers) {
+            if (layer.getId() == id) {
+                return layer;
+            }
+        }
+        return null;
+    }
+
+    public void removeLayer(int layerId) {
+        if (layers.size() <= 1) {
+            return; // Don't remove last layer
+        }
+        SketchLayer layer = getLayerById(layerId);
+        if (layer != null) {
+            layers.remove(layer);
+            if (activeLayerId == layerId) {
+                activeLayerId = layers.get(0).getId();
+            }
+            recalculateBoundingBox();
+        }
+    }
+
+    // Backward compatibility methods - delegate to active layer
+
     public void setPathDetails(List<PathDetail> pathDetails) {
-        this.pathDetails = pathDetails;
+        getActiveLayer().setPathDetails(pathDetails);
         recalculateBoundingBox();
     }
 
     public void setSymbolDetails(List<SymbolDetail> symbolDetails) {
-        this.symbolDetails = symbolDetails;
+        getActiveLayer().setSymbolDetails(symbolDetails);
         recalculateBoundingBox();
     }
 
     public void setTextDetails(List<TextDetail> textDetails) {
-        this.textDetails = textDetails;
+        getActiveLayer().setTextDetails(textDetails);
         recalculateBoundingBox();
     }
 
-
     public List<PathDetail> getPathDetails() {
-        return pathDetails;
+        List<PathDetail> all = new ArrayList<>();
+        for (SketchLayer layer : layers) {
+            all.addAll(layer.getPathDetails());
+        }
+        return all;
     }
 
+    public List<SymbolDetail> getSymbolDetails() {
+        List<SymbolDetail> all = new ArrayList<>();
+        for (SketchLayer layer : layers) {
+            all.addAll(layer.getSymbolDetails());
+        }
+        return all;
+    }
+
+    public List<TextDetail> getTextDetails() {
+        List<TextDetail> all = new ArrayList<>();
+        for (SketchLayer layer : layers) {
+            all.addAll(layer.getTextDetails());
+        }
+        return all;
+    }
+
+    public List<CrossSectionDetail> getCrossSectionDetails() {
+        List<CrossSectionDetail> all = new ArrayList<>();
+        for (SketchLayer layer : layers) {
+            all.addAll(layer.getCrossSectionDetails());
+        }
+        return all;
+    }
+
+    public void setCrossSectionDetails(List<CrossSectionDetail> crossSectionDetails) {
+        getActiveLayer().setCrossSectionDetails(crossSectionDetails);
+    }
+
+    // Path handling
 
     public PathDetail getActivePath() {
         return activePath;
     }
 
-
     public PathDetail startNewPath(Coord2D start) {
         activePath = new PathDetail(start, activeColour);
-        pathDetails.add(activePath);
+        getActiveLayer().addPathDetail(activePath);
         addSketchDetail(activePath);
         return activePath;
     }
@@ -81,35 +192,35 @@ public class Sketch extends Shape {
 
     public void addTextDetail(Coord2D location, String text, float size) {
         TextDetail textDetail = new TextDetail(location, text, activeColour, size);
-        textDetails.add(textDetail);
+        getActiveLayer().addTextDetail(textDetail);
         addSketchDetail(textDetail);
-    }
-
-    public List<SymbolDetail> getSymbolDetails() {
-        return symbolDetails;
     }
 
     public void addSymbolDetail(Coord2D location, Symbol symbol, float size, float angle) {
         SymbolDetail symbolDetail = new SymbolDetail(location, symbol, activeColour, size, angle);
-        symbolDetails.add(symbolDetail);
+        getActiveLayer().addSymbolDetail(symbolDetail);
         addSketchDetail(symbolDetail);
-    }
-
-    public List<TextDetail> getTextDetails() {
-        return textDetails;
     }
 
     public void setActiveColour(Colour colour) {
         this.activeColour = colour;
     }
 
+    // Undo/Redo
 
     public void undo() {
         if (!sketchHistory.isEmpty()) {
             SketchDetail toUndo = sketchHistory.remove(sketchHistory.size() - 1);
 
-            if (toUndo instanceof DeletedDetail) {
-                DeletedDetail deletedDetail = (DeletedDetail)toUndo;
+            if (toUndo instanceof LayerSwitchDetail) {
+                LayerSwitchDetail switchDetail = (LayerSwitchDetail) toUndo;
+                activeLayerId = switchDetail.getFromLayerId();
+                SketchLayer layer = getActiveLayer();
+                if (layer != null) {
+                    layer.setVisibility(SketchLayer.Visibility.SHOWING);
+                }
+            } else if (toUndo instanceof DeletedDetail) {
+                DeletedDetail deletedDetail = (DeletedDetail) toUndo;
                 restoreDetailToSketch(deletedDetail.getDeletedDetail());
                 for (SketchDetail sketchDetail : deletedDetail.getReplacementDetails()) {
                     removeDetailFromSketch(sketchDetail);
@@ -122,13 +233,19 @@ public class Sketch extends Shape {
         }
     }
 
-
     public void redo() {
         if (!undoneHistory.isEmpty()) {
             SketchDetail toRedo = undoneHistory.remove(undoneHistory.size() - 1);
 
-            if (toRedo instanceof DeletedDetail) {
-                DeletedDetail deletedDetail = (DeletedDetail)toRedo;
+            if (toRedo instanceof LayerSwitchDetail) {
+                LayerSwitchDetail switchDetail = (LayerSwitchDetail) toRedo;
+                activeLayerId = switchDetail.getToLayerId();
+                SketchLayer layer = getActiveLayer();
+                if (layer != null) {
+                    layer.setVisibility(SketchLayer.Visibility.SHOWING);
+                }
+            } else if (toRedo instanceof DeletedDetail) {
+                DeletedDetail deletedDetail = (DeletedDetail) toRedo;
                 removeDetailFromSketch(deletedDetail.getDeletedDetail());
                 for (SketchDetail sketchDetail : deletedDetail.getReplacementDetails()) {
                     restoreDetailToSketch(sketchDetail);
@@ -141,14 +258,11 @@ public class Sketch extends Shape {
         }
     }
 
-
     public void deleteDetail(SketchDetail sketchDetail) {
         deleteDetail(sketchDetail, new ArrayList<>());
     }
 
-
-    public void deleteDetail(
-            SketchDetail sketchDetail, List<SketchDetail> replacementDetails) {
+    public void deleteDetail(SketchDetail sketchDetail, List<SketchDetail> replacementDetails) {
         DeletedDetail deletedDetail = new DeletedDetail(sketchDetail, replacementDetails);
         addSketchDetail(deletedDetail);
         removeDetailFromSketch(sketchDetail);
@@ -157,75 +271,58 @@ public class Sketch extends Shape {
         }
     }
 
-
     private void removeDetailFromSketch(SketchDetail sketchDetail) {
-        // this is a separate function to deleteDetail because former is user-called and handles
-        // undo history etc. whereas this actually removes the data
-        if (sketchDetail instanceof PathDetail) {
-            pathDetails.remove(sketchDetail);
-        } else if (sketchDetail instanceof SymbolDetail) {
-            symbolDetails.remove(sketchDetail);
-        } else if (sketchDetail instanceof TextDetail) {
-            textDetails.remove(sketchDetail);
-        } else if (sketchDetail instanceof CrossSectionDetail) {
-            crossSectionDetails.remove(sketchDetail);
+        for (SketchLayer layer : layers) {
+            if (layer.removeDetail(sketchDetail)) {
+                break;
+            }
         }
-
         recalculateBoundingBox();
     }
 
-
     public void restoreDetailToSketch(SketchDetail sketchDetail) {
-        if (sketchDetail instanceof PathDetail) {
-            pathDetails.add((PathDetail)sketchDetail);
-        } else if (sketchDetail instanceof SymbolDetail) {
-            symbolDetails.add((SymbolDetail) sketchDetail);
-        } else if (sketchDetail instanceof TextDetail) {
-            textDetails.add((TextDetail) sketchDetail);
-        } else if (sketchDetail instanceof CrossSectionDetail) {
-            crossSectionDetails.add((CrossSectionDetail)sketchDetail);
-        }
-
+        getActiveLayer().restoreDetail(sketchDetail);
         updateBoundingBox(sketchDetail);
     }
 
+    // Snap point finding (across all visible layers)
 
     public Coord2D findEligibleSnapPointWithin(Coord2D point, float delta) {
-
         Coord2D closest = null;
         float minDistance = Float.MAX_VALUE;
 
-        for (PathDetail path : pathDetails) {
-
-            if (activePath == path) {
+        for (SketchLayer layer : layers) {
+            if (layer.getVisibility() == SketchLayer.Visibility.HIDDEN) {
                 continue;
             }
+            for (PathDetail path : layer.getPathDetails()) {
+                if (activePath == path) {
+                    continue;
+                }
 
-            Coord2D start = path.getPath().get(0);
-            Coord2D end = path.getPath().get(path.getPath().size() - 1);
-            for (Coord2D coord2D : new Coord2D[]{start, end}) {
-                float distance = Space2DUtils.getDistance(point, coord2D);
-                if (distance < delta && distance < minDistance) {
-                    closest = coord2D;
-                    minDistance = distance;
+                Coord2D start = path.getPath().get(0);
+                Coord2D end = path.getPath().get(path.getPath().size() - 1);
+                for (Coord2D coord2D : new Coord2D[]{start, end}) {
+                    float distance = Space2DUtils.getDistance(point, coord2D);
+                    if (distance < delta && distance < minDistance) {
+                        closest = coord2D;
+                        minDistance = distance;
+                    }
                 }
             }
         }
         return closest;
     }
 
-
     private List<SketchDetail> allSketchDetails() {
         List<SketchDetail> all = new ArrayList<>();
-        all.addAll(pathDetails);
-        all.addAll(symbolDetails);
-        all.addAll(textDetails);
-        all.addAll(crossSectionDetails);
+        for (SketchLayer layer : layers) {
+            all.addAll(layer.getAllDetails());
+        }
         return all;
     }
 
     public SketchDetail findNearestDetailWithin(Coord2D point, float delta) {
-
         SketchDetail closest = null;
         float minDistance = Float.MAX_VALUE;
 
@@ -240,63 +337,63 @@ public class Sketch extends Shape {
         return closest;
     }
 
+    // Cross-section handling
 
     public void addCrossSection(CrossSection crossSection, Coord2D touchPointOnSurvey) {
         CrossSectionDetail sectionDetail = new CrossSectionDetail(crossSection, touchPointOnSurvey);
-        crossSectionDetails.add(sectionDetail);
+        getActiveLayer().addCrossSectionDetail(sectionDetail);
         addSketchDetail(sectionDetail);
     }
 
-    public List<CrossSectionDetail> getCrossSectionDetails() {
-        return crossSectionDetails;
-    }
-
-    public void setCrossSectionDetails(List<CrossSectionDetail> crossSectionDetails) {
-        this.crossSectionDetails = crossSectionDetails;
-    }
-
     public CrossSectionDetail getCrossSectionDetail(Station station) {
-        // this is a bit inefficient... not sure if it's worth caching this in a map though since
-        // there'll probably be max a couple of dozen x-sections per survey chunk
-        for (CrossSectionDetail detail : crossSectionDetails) {
-            CrossSection crossSection = detail.getCrossSection();
-            if (crossSection.getStation() == station) {
-                return detail;
+        for (SketchLayer layer : layers) {
+            for (CrossSectionDetail detail : layer.getCrossSectionDetails()) {
+                CrossSection crossSection = detail.getCrossSection();
+                if (crossSection.getStation() == station) {
+                    return detail;
+                }
             }
         }
         return null;
     }
 
+    // Copy/translate
+
     public Sketch getTranslatedCopy(Coord2D point) {
         Sketch sketch = new Sketch();
+        sketch.layers.clear(); // Remove default layer
 
-        List<PathDetail> newPathDetails = new ArrayList<>();
-        for (PathDetail pathDetail : pathDetails) {
-            newPathDetails.add(pathDetail.translate(point));
-        }
-        sketch.setPathDetails(newPathDetails);
+        for (SketchLayer layer : layers) {
+            SketchLayer newLayer = sketch.addLayer(layer.getName());
+            newLayer.setVisibility(layer.getVisibility());
 
-        List<SymbolDetail> newSymbolDetails = new ArrayList<>();
-        for (SymbolDetail symbolDetail : symbolDetails) {
-            newSymbolDetails.add(symbolDetail.translate(point));
-        }
-        sketch.setSymbolDetails(newSymbolDetails);
+            List<PathDetail> newPathDetails = new ArrayList<>();
+            for (PathDetail pathDetail : layer.getPathDetails()) {
+                newPathDetails.add(pathDetail.translate(point));
+            }
+            newLayer.setPathDetails(newPathDetails);
 
-        List<TextDetail> newTextDetails = new ArrayList<>();
-        for (TextDetail textDetail : textDetails) {
-            newTextDetails.add(textDetail.translate(point));
-        }
-        sketch.setTextDetails(newTextDetails);
+            List<SymbolDetail> newSymbolDetails = new ArrayList<>();
+            for (SymbolDetail symbolDetail : layer.getSymbolDetails()) {
+                newSymbolDetails.add(symbolDetail.translate(point));
+            }
+            newLayer.setSymbolDetails(newSymbolDetails);
 
-        List<CrossSectionDetail> newCrossSectionDetails = new ArrayList<>();
-        for (CrossSectionDetail crossSectionDetail : crossSectionDetails) {
-            newCrossSectionDetails.add(crossSectionDetail.translate(point));
+            List<TextDetail> newTextDetails = new ArrayList<>();
+            for (TextDetail textDetail : layer.getTextDetails()) {
+                newTextDetails.add(textDetail.translate(point));
+            }
+            newLayer.setTextDetails(newTextDetails);
+
+            List<CrossSectionDetail> newCrossSectionDetails = new ArrayList<>();
+            for (CrossSectionDetail crossSectionDetail : layer.getCrossSectionDetails()) {
+                newCrossSectionDetails.add(crossSectionDetail.translate(point));
+            }
+            newLayer.setCrossSectionDetails(newCrossSectionDetails);
         }
-        sketch.setCrossSectionDetails(newCrossSectionDetails);
 
         return sketch;
     }
-
 
     public void recalculateBoundingBox() {
         resetBoundingBox();
@@ -304,5 +401,4 @@ public class Sketch extends Shape {
             updateBoundingBox(sketchDetail);
         }
     }
-
 }

@@ -48,6 +48,7 @@ import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchDetail;
+import org.hwyl.sexytopo.model.sketch.SketchLayer;
 import org.hwyl.sexytopo.model.sketch.SketchTool;
 import org.hwyl.sexytopo.model.sketch.Symbol;
 import org.hwyl.sexytopo.model.sketch.SymbolDetail;
@@ -96,6 +97,7 @@ public class GraphView extends View {
 
     public static final int SOLID_ALPHA = 0xff;
     public static final int FADED_ALPHA = 0xff / 5;
+    public static final int LAYER_FADED_GREY = 0xFFAAAAAA; // Grey for faded layers
 
     public static final int STATION_COLOUR = Colour.DARK_RED.intValue;
     public static final int STATION_DIAMETER = 8;
@@ -1199,26 +1201,43 @@ public class GraphView extends View {
             return;
         }
 
+        // Draw layers from bottom to top, respecting visibility
+        for (SketchLayer layer : sketch.getLayers()) {
+            if (layer.getVisibility() == SketchLayer.Visibility.HIDDEN) {
+                continue;
+            }
+
+            boolean isFaded = (layer.getVisibility() == SketchLayer.Visibility.FADED);
+            drawLayer(canvas, layer, alpha, isFaded);
+        }
+    }
+
+    private void drawLayer(Canvas canvas, SketchLayer layer, int alpha, boolean isFaded) {
+
         Colour lastColour = Colour.BLACK;
 
-        drawPaint.setColor(lastColour.intValue);
+        if (isFaded) {
+            drawPaint.setColor(LAYER_FADED_GREY);
+        } else {
+            drawPaint.setColor(lastColour.intValue);
+        }
         drawPaint.setAlpha(alpha);
 
         boolean isDebugMode = activity.isDebugMode();
 
-        for (PathDetail pathDetail : sketch.getPathDetails()) {
+        for (PathDetail pathDetail : layer.getPathDetails()) {
 
             if (!couldBeOnScreen(pathDetail)) {
                 continue;
             }
 
-            // Avoiding constantly updating the paint colour saves approx. 10% of sketch draw time.
-            // Ideally getPathDetails() would return the paths in colour order but HashSets
-            // are unordered collections
-            Colour drawColour = pathDetail.getDrawColour(isDarkModeActive);
-            if (drawColour != lastColour) {
-                lastColour = drawColour;
-                drawPaint.setColor(lastColour.intValue);
+            // For faded layers, use grey; otherwise use the path's colour
+            if (!isFaded) {
+                Colour drawColour = pathDetail.getDrawColour(isDarkModeActive);
+                if (drawColour != lastColour) {
+                    lastColour = drawColour;
+                    drawPaint.setColor(lastColour.intValue);
+                }
             }
 
             List<Coord2D> path = pathDetail.getPath();
@@ -1227,12 +1246,8 @@ public class GraphView extends View {
             float fromX = -1, fromY = -1;
             float[] lines = new float[path.size() * 4];
 
-            // This loop is the slowest part of the draw phase. Pulling out the calculations from
-            // within surveyCoordsToViewCoords saves a not insignificant amount of time by not
-            // constructing many thousands of Coord2D objects (approx. 10% of sketch draw time)
             for (Coord2D point : path) {
                 if (fromX == -1) {
-                    //from = surveyCoordsToViewCoords(point);
                     fromX = (point.x - viewpointOffset.x) * surveyToViewScale;
                     fromY = (point.y - viewpointOffset.y) * surveyToViewScale;
 
@@ -1240,7 +1255,6 @@ public class GraphView extends View {
                         canvas.drawCircle(fromX, fromY, 3, drawPaint);
                     }
                 } else {
-                    //Coord2D to = surveyCoordsToViewCoords(point);
                     float toX = (point.x - viewpointOffset.x) * surveyToViewScale;
                     float toY = (point.y - viewpointOffset.y) * surveyToViewScale;
 
@@ -1263,11 +1277,15 @@ public class GraphView extends View {
 
         labelPaint.setAlpha(alpha);
 
-        for (TextDetail textDetail : sketch.getTextDetails()) {
+        for (TextDetail textDetail : layer.getTextDetails()) {
             Coord2D location = surveyCoordsToViewCoords(textDetail.getPosition());
             float x = location.x, y = location.y;
             String text = textDetail.getText();
-            setDrawColour(labelPaint, textDetail);
+            if (isFaded) {
+                labelPaint.setColor(LAYER_FADED_GREY);
+            } else {
+                setDrawColour(labelPaint, textDetail);
+            }
             labelPaint.setTextSize(textDetail.getSize() * surveyToViewScale);
             for (String line : text.split("\n")) {
                 canvas.drawText(line, x, y, labelPaint);
@@ -1275,7 +1293,7 @@ public class GraphView extends View {
             }
         }
 
-        for (SymbolDetail symbolDetail : sketch.getSymbolDetails()) {
+        for (SymbolDetail symbolDetail : layer.getSymbolDetails()) {
             if (!couldBeOnScreen(symbolDetail)) {
                 continue;
             }
@@ -1293,9 +1311,16 @@ public class GraphView extends View {
             int x = Math.round(location.x - offset), y = Math.round(location.y - offset);
             drawable.setBounds(x, y, x + size, y + size);
             drawable.setAlpha(alpha);
-            Colour drawColour = symbolDetail.getDrawColour(isDarkModeActive);
+
+            int colorFilter;
+            if (isFaded) {
+                colorFilter = LAYER_FADED_GREY;
+            } else {
+                Colour drawColour = symbolDetail.getDrawColour(isDarkModeActive);
+                colorFilter = drawColour.intValue;
+            }
             drawable.setColorFilter(
-                new PorterDuffColorFilter(drawColour.intValue, PorterDuff.Mode.SRC_IN));
+                new PorterDuffColorFilter(colorFilter, PorterDuff.Mode.SRC_IN));
 
             if (symbol.isDirectional()) {
                 RotateDrawable rotateDrawable = new RotateDrawable();
@@ -1306,7 +1331,7 @@ public class GraphView extends View {
                 rotateDrawable.setBounds(x, y, x + size, y + size);
                 rotateDrawable.draw(canvas);
 
-            } else { // skip some calcs for efficiency
+            } else {
                 drawable.draw(canvas);
             }
         }

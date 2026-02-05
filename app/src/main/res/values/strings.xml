@@ -154,6 +154,12 @@
     <string name="sketch_toolbar_symbol">Symbol tool</string>
     <string name="sketch_toolbar_selector">Selector</string>
     <string name="sketch_toolbar_settings">Quick settings</string>
+    <string name="sketch_toolbar_layers">Layers</string>
+    <string name="layers_dialog_title">Layers</string>
+    <string name="layers_add">Add layer</string>
+    <string name="layers_visibility_showing">Showing</string>
+    <string name="layers_visibility_faded">Faded</string>
+    <string name="layers_visibility_hidden">Hidden</string>
     <string name="sketch_toolbar_undo">Undo</string>
     <string name="sketch_toolbar_redo">Redo</string>
     <string name="sketch_toolbar_zoom_in">Zoom in</string>

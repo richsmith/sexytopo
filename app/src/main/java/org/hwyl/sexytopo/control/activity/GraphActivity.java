@@ -38,6 +38,7 @@ import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.BrushColour;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.Sketch;
+import org.hwyl.sexytopo.model.sketch.SketchLayer;
 import org.hwyl.sexytopo.model.sketch.SketchTool;
 import org.hwyl.sexytopo.model.sketch.Symbol;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -72,6 +73,7 @@ public abstract class GraphActivity extends SurveyEditorActivity
             R.id.buttonSelect,
             R.id.buttonZoomIn,
             R.id.buttonZoomOut,
+            R.id.buttonLayers,
             R.id.buttonMenu
     };
 
@@ -310,6 +312,9 @@ public abstract class GraphActivity extends SurveyEditorActivity
         } else if (itemId == R.id.buttonMenu) {
             openDisplayMenu();
             return true;
+        } else if (itemId == R.id.buttonLayers) {
+            openLayersDialog();
+            return true;
         } else if (itemId == R.id.buttonCentreView) {
             graphView.centreViewOnActiveStation();
             graphView.invalidate();
@@ -517,6 +522,107 @@ public abstract class GraphActivity extends SurveyEditorActivity
     @Override
     public void onRenameStation(Station station) {
         LegDialogs.renameStation(this, getSurvey(), station);
+    }
+
+    private void openLayersDialog() {
+        Sketch sketch = getSketch(getSurvey());
+        
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+        builder.setTitle(R.string.layers_dialog_title);
+        
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(32, 16, 32, 16);
+        
+        for (SketchLayer layer : sketch.getLayers()) {
+            LinearLayout layerRow = createLayerRow(sketch, layer);
+            layout.addView(layerRow);
+        }
+        
+        // Add layer button
+        ImageButton addButton = new ImageButton(this);
+        addButton.setImageResource(android.R.drawable.ic_input_add);
+        addButton.setContentDescription(getString(R.string.layers_add));
+        addButton.setOnClickListener(v -> {
+            int layerCount = sketch.getLayers().size();
+            sketch.addLayer("Layer " + layerCount);
+            openLayersDialog(); // Refresh dialog
+        });
+        
+        LinearLayout addRow = new LinearLayout(this);
+        addRow.setOrientation(LinearLayout.HORIZONTAL);
+        addRow.addView(addButton);
+        layout.addView(addRow);
+        
+        builder.setView(layout);
+        builder.setPositiveButton(android.R.string.ok, (dialog, which) -> {
+            graphView.invalidate();
+        });
+        
+        builder.show();
+    }
+    
+    private LinearLayout createLayerRow(Sketch sketch, SketchLayer layer) {
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setPadding(0, 8, 0, 8);
+        
+        // Active indicator / selector
+        ImageButton activeButton = new ImageButton(this);
+        boolean isActive = (layer.getId() == sketch.getActiveLayerId());
+        activeButton.setImageResource(isActive ? 
+            android.R.drawable.btn_star_big_on : android.R.drawable.btn_star_big_off);
+        activeButton.setContentDescription("Set active");
+        activeButton.setOnClickListener(v -> {
+            sketch.setActiveLayerId(layer.getId());
+            graphView.invalidate();
+            openLayersDialog(); // Refresh
+        });
+        row.addView(activeButton);
+        
+        // Layer name
+        android.widget.TextView nameView = new android.widget.TextView(this);
+        nameView.setText(layer.getName());
+        nameView.setPadding(16, 0, 16, 0);
+        nameView.setTextSize(16);
+        LinearLayout.LayoutParams nameParams = new LinearLayout.LayoutParams(
+            0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+        nameView.setLayoutParams(nameParams);
+        row.addView(nameView);
+        
+        // Visibility toggle
+        ImageButton visibilityButton = new ImageButton(this);
+        updateVisibilityIcon(visibilityButton, layer.getVisibility());
+        visibilityButton.setContentDescription("Toggle visibility");
+        visibilityButton.setOnClickListener(v -> {
+            // Don't allow hiding active layer
+            if (layer.getId() == sketch.getActiveLayerId()) {
+                return;
+            }
+            layer.cycleVisibility();
+            updateVisibilityIcon(visibilityButton, layer.getVisibility());
+            graphView.invalidate();
+        });
+        row.addView(visibilityButton);
+        
+        return row;
+    }
+    
+    private void updateVisibilityIcon(ImageButton button, SketchLayer.Visibility visibility) {
+        switch (visibility) {
+            case SHOWING:
+                button.setImageResource(android.R.drawable.ic_menu_view);
+                button.setAlpha(1.0f);
+                break;
+            case FADED:
+                button.setImageResource(android.R.drawable.ic_menu_view);
+                button.setAlpha(0.5f);
+                break;
+            case HIDDEN:
+                button.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
+                button.setAlpha(1.0f);
+                break;
+        }
     }
 
 }
