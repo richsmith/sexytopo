@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:id="@+id/crossSectionRootLayout"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/panelBackground">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/panelBackground"
+            app:titleTextColor="@color/white"
+            app:navigationIcon="?attr/homeAsUpIndicator" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <org.hwyl.sexytopo.control.graph.CrossSectionView
+        android:id="@+id/crossSectionView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/lightBackground" />
+
+    <!-- Drawing toolbar -->
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="0dp"
+        android:padding="0dp"
+        android:background="@color/panelBackground"
+        android:columnCount="13"
+        android:rowCount="1"
+        android:useDefaultMargins="false">
+
+        <ImageButton
+            style="@style/ToolbarImageButton"
+            android:id="@+id/buttonMove"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:layout_columnWeight="1"
+            android:contentDescription="@string/sketch_toolbar_move"
+            android:src="@drawable/move" />
+
+        <ImageButton
+            style="@style/ToolbarImageButton"
+            android:id="@+id/buttonDraw"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:layout_columnWeight="1"
+            android:contentDescription="@string/sketch_toolbar_draw"
+            android:src="@drawable/pencil" />
+
+        <ImageButton
+            style="@style/ToolbarImageButton"
+            android:id="@+id/buttonErase"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:layout_columnWeight="1"
+            android:contentDescription="@string/sketch_toolbar_eraser"
+            android:src="@drawable/eraser" />
+
+        <ImageButton
+            style="@style/ToolbarImageButton"
+            android:id="@+id/buttonUndo"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:layout_columnWeight="1"
+            android:contentDescription="@string/sketch_toolbar_undo"
+            android:src="@drawable/undo" />
+
+        <ImageButton
+            style="@style/ToolbarImageButton"
+            android:id="@+id/buttonRedo"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:layout_columnWeight="1"
+            android:contentDescription="@string/sketch_toolbar_redo"
+            android:src="@drawable/redo" />
+
+        <ImageButton
+            style="@style/ToolbarImageButton"
+            android:id="@+id/buttonBlack"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:layout_columnWeight="1"
+            android:contentDescription="@string/sketch_toolbar_colour_main"
+            android:src="@drawable/black" />
+
+        <ImageButton
+            style="@style/ToolbarImageButton"
+            android:id="@+id/buttonBrown"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:layout_columnWeight="1"
+            android:contentDescription="@string/sketch_toolbar_colour_brown"
+            android:src="@drawable/brown" />
+
+        <ImageButton
+            style="@style/ToolbarImageButton"
+            android:id="@+id/buttonGrey"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:layout_columnWeight="1"
+            android:contentDescription="@string/sketch_toolbar_colour_grey"
+            android:src="@drawable/grey" />
+
+        <ImageButton
+            style="@style/ToolbarImageButton"
+            android:id="@+id/buttonRed"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:layout_columnWeight="1"
+            android:contentDescription="@string/sketch_toolbar_colour_red"
+            android:src="@drawable/red" />
+
+        <ImageButton
+            style="@style/ToolbarImageButton"
+            android:id="@+id/buttonOrange"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:layout_columnWeight="1"
+            android:contentDescription="@string/sketch_toolbar_colour_orange"
+            android:src="@drawable/orange" />
+
+        <ImageButton
+            style="@style/ToolbarImageButton"
+            android:id="@+id/buttonGreen"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:layout_columnWeight="1"
+            android:contentDescription="@string/sketch_toolbar_colour_green"
+            android:src="@drawable/green" />
+
+        <ImageButton
+            style="@style/ToolbarImageButton"
+            android:id="@+id/buttonBlue"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:layout_columnWeight="1"
+            android:contentDescription="@string/sketch_toolbar_colour_blue"
+            android:src="@drawable/blue" />
+
+        <ImageButton
+            style="@style/ToolbarImageButton"
+            android:id="@+id/buttonPurple"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:layout_columnWeight="1"
+            android:contentDescription="@string/sketch_toolbar_colour_purple"
+            android:src="@drawable/purple" />
+
+    </GridLayout>
+
+</LinearLayout>

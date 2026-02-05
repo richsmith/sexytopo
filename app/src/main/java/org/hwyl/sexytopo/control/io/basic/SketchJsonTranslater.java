@@ -48,6 +48,7 @@ public class SketchJsonTranslater {
     public static final String LAYER_ID_TAG = "id";
     public static final String LAYER_NAME_TAG = "name";
     public static final String LAYER_VISIBILITY_TAG = "visibility";
+    public static final String CROSS_SECTION_SKETCH_TAG = "sketch";
     public static final String ACTIVE_LAYER_ID_TAG = "activeLayerId";
 
 
@@ -308,6 +309,18 @@ public class SketchJsonTranslater {
         json.put(STATION_ID_TAG, crossSectionDetail.getCrossSection().getStation().getName());
         json.put(POSITION_TAG, toJson(crossSectionDetail.getPosition()));
         json.put(ANGLE_TAG, crossSectionDetail.getCrossSection().getAngle());
+        
+        // Save the cross-section's sketch (only the first layer's paths for simplicity)
+        Sketch xsSketch = crossSectionDetail.getCrossSection().getSketch();
+        if (xsSketch != null && !xsSketch.getPathDetails().isEmpty()) {
+            JSONObject sketchJson = new JSONObject();
+            JSONArray pathsArray = new JSONArray();
+            for (PathDetail path : xsSketch.getPathDetails()) {
+                pathsArray.put(toJson(path));
+            }
+            sketchJson.put(PATHS_TAG, pathsArray);
+            json.put(CROSS_SECTION_SKETCH_TAG, sketchJson);
+        }
 
         return json;
     }
@@ -322,8 +335,22 @@ public class SketchJsonTranslater {
         String stationdId = json.getString(STATION_ID_TAG);
         Station station = survey.getStationByName(stationdId);
 
-        CrossSectionDetail crossSectionDetail =
-                new CrossSectionDetail(new CrossSection(station, angle), position);
+        CrossSection crossSection = new CrossSection(station, angle);
+        
+        // Load the cross-section's sketch if present
+        if (json.has(CROSS_SECTION_SKETCH_TAG)) {
+            JSONObject sketchJson = json.getJSONObject(CROSS_SECTION_SKETCH_TAG);
+            if (sketchJson.has(PATHS_TAG)) {
+                JSONArray pathsArray = sketchJson.getJSONArray(PATHS_TAG);
+                List<PathDetail> paths = new ArrayList<>();
+                for (JSONObject pathObj : IoUtils.toList(pathsArray)) {
+                    paths.add(toPathDetail(pathObj));
+                }
+                crossSection.getSketch().setPathDetails(paths);
+            }
+        }
+        
+        CrossSectionDetail crossSectionDetail = new CrossSectionDetail(crossSection, position);
 
         return crossSectionDetail;
     }

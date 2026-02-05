@@ -664,6 +664,13 @@ public class GraphView extends View {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                // Check for cross-section tap first
+                CrossSectionDetail crossSectionDetail = findCrossSectionAtPoint(touchPointOnView);
+                if (crossSectionDetail != null) {
+                    openCrossSectionActivity(crossSectionDetail);
+                    return true;
+                }
+                
                 Station newSelectedStation = checkForStation(touchPointOnView);
 
                 if (newSelectedStation == null) {
@@ -691,6 +698,14 @@ public class GraphView extends View {
         }
 
         return true;
+    }
+    
+    private void openCrossSectionActivity(CrossSectionDetail detail) {
+        String stationName = detail.getCrossSection().getStation().getName();
+        android.content.Intent intent = 
+            org.hwyl.sexytopo.control.activity.CrossSectionActivity.getIntent(
+                getContext(), stationName);
+        getContext().startActivity(intent);
     }
 
 
@@ -722,6 +737,12 @@ public class GraphView extends View {
 
         setSketchTool(previousSketchTool);
         invalidate();
+        
+        // Auto-open the cross-section activity for sketching
+        android.content.Intent intent = 
+            org.hwyl.sexytopo.control.activity.CrossSectionActivity.getIntent(
+                getContext(), station.getName());
+        getContext().startActivity(intent);
 
         return true;
     }
@@ -959,20 +980,20 @@ public class GraphView extends View {
 
             Coord2D centreOnSurvey = sectionDetail.getPosition();
             Coord2D centreOnView = surveyCoordsToViewCoords(centreOnSurvey);
-            drawStationCross(
-                    canvas, stationPaint, centreOnView.x, centreOnView.y, STATION_DIAMETER, alpha);
+            
+            // Draw X placeholder icon instead of full splays
+            drawCrossSectionPlaceholder(canvas, centreOnView.x, centreOnView.y, alpha);
 
-            String description =
-                    sectionDetail.getCrossSection().getStation().getName() + " X";
+            String description = station.getName() + " X";
             if (showStationLabels) {
                 stationPaint.setAlpha(alpha);
-                canvas.drawText(description, centreOnView.x, centreOnView.y, stationPaint);
+                canvas.drawText(description, 
+                    centreOnView.x + CROSS_SECTION_PLACEHOLDER_SIZE + 4, 
+                    centreOnView.y + 4, 
+                    stationPaint);
             }
 
-            Space<Coord2D> projection = sectionDetail.getProjection();
-
-            drawLegs(canvas, projection, alpha);
-
+            // Draw dashed connection line from survey station to placeholder
             Coord2D viewStationLocation = surveyCoordsToViewCoords(surveyStationLocation);
             drawDashedLine(
                     canvas, viewStationLocation, centreOnView,
@@ -985,6 +1006,33 @@ public class GraphView extends View {
             Log.e("Missing station details for cross section on station " + name + "; removing");
             crossSectionDetails.remove(crossSectionDetail);
         }
+    }
+    
+    private static final float CROSS_SECTION_PLACEHOLDER_SIZE = 12f;
+    
+    private void drawCrossSectionPlaceholder(Canvas canvas, float x, float y, int alpha) {
+        crossSectionConnectorPaint.setAlpha(alpha);
+        float size = CROSS_SECTION_PLACEHOLDER_SIZE;
+        
+        // Draw X shape
+        canvas.drawLine(x - size, y - size, x + size, y + size, crossSectionConnectorPaint);
+        canvas.drawLine(x - size, y + size, x + size, y - size, crossSectionConnectorPaint);
+        
+        // Draw small circle around the X
+        canvas.drawCircle(x, y, size * 1.2f, crossSectionConnectorPaint);
+    }
+    
+    public CrossSectionDetail findCrossSectionAtPoint(Coord2D touchPointOnView) {
+        float tolerance = SELECTION_SENSITIVITY_IN_PIXELS;
+        Coord2D touchPointOnSurvey = viewCoordsToSurveyCoords(touchPointOnView);
+        
+        for (CrossSectionDetail detail : sketch.getCrossSectionDetails()) {
+            float distance = Space2DUtils.getDistance(detail.getPosition(), touchPointOnSurvey);
+            if (distance * surveyToViewScale < tolerance) {
+                return detail;
+            }
+        }
+        return null;
     }
 
 
