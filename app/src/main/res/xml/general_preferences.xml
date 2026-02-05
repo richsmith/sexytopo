@@ -131,6 +131,11 @@
             android:summary="@string/settings_key_lrud_fields_summary"
             android:defaultValue="false"/>
         <CheckBoxPreference
+            android:key="pref_lrud_bisect_angle"
+            android:title="@string/settings_lrud_bisect_angle_title"
+            android:summary="@string/settings_lrud_bisect_angle_summary"
+            android:defaultValue="true"/>
+        <CheckBoxPreference
             android:key="pref_deg_mins_secs"
             android:title="@string/settings_key_deg_mins_secs_title"
             android:summary="@string/settings_key_deg_mins_secs_summary"

@@ -19,7 +19,7 @@ public class LrudTest {
 
         Station s2 = testSurvey.getStationByName("2");
         double angle = CrossSectioner.getAngleOfSection(testSurvey, s2);
-        Leg splay = LRUD.LEFT.createSplay(testSurvey, s2, 5);
+        Leg splay = LRUD.LEFT.createSplay(testSurvey, s2, null, 5);
 
         Assert.assertEquals(270.0, splay.getAzimuth(), SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
     }
@@ -31,7 +31,7 @@ public class LrudTest {
 
         Station s2 = testSurvey.getStationByName("2");
         double angle = CrossSectioner.getAngleOfSection(testSurvey, s2);
-        Leg splay = LRUD.RIGHT.createSplay(testSurvey, s2, 5);
+        Leg splay = LRUD.RIGHT.createSplay(testSurvey, s2, null, 5);
 
         Assert.assertEquals(90.0, splay.getAzimuth(), SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
     }
