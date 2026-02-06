@@ -25,13 +25,13 @@ public class SurvexTherionImporter {
 
     /**
      * Parse centreline data from Survex/Therion format.
-     * 
+     *
      * Handles:
      * - Forward and backward legs (detects based on station order)
      * - Promoted legs in inline{} format: {from: d1 a1 i1, d2 a2 i2, ...}
      * - Promoted legs in commented new lines format (below main leg)
      * - Both Survex (;) and Therion (#) comment styles
-     * 
+     *
      * @param text The centreline data text
      * @param survey The survey to populate
      * @throws Exception if parsing fails
@@ -152,12 +152,12 @@ public class SurvexTherionImporter {
 
     /**
      * Merge passage data comments with existing station comments.
-     * 
+     *
      * If a station has both a passage comment and a leg-line comment,
      * combine them with " :: " separator.
-     * 
+     *
      * Format: <passage comment> :: <leg-line comment>
-     * 
+     *
      * @param survey The survey with stations
      * @param passageComments Map of station name to passage comment
      */
@@ -237,7 +237,6 @@ public class SurvexTherionImporter {
         if (isBackward) {
             // This leg was shot backwards (from new station to existing station)
             // Store with swapped stations and wasShotBackwards = true
-            // IMPORTANT: Do NOT reverse the measurements - store original data!
             
             legFrom = to;
             legTo = from;
@@ -254,7 +253,7 @@ public class SurvexTherionImporter {
                 from.setComment(comment);
             }
         } else {
-            // Normal forward leg
+            // Forward leg
             legFrom = from;
             legTo = to;
             
@@ -303,7 +302,7 @@ public class SurvexTherionImporter {
 
     /**
      * Parse promoted legs from commented new lines format.
-     * 
+     *
      * These are shots on commented lines that come AFTER the main leg line.
      * 
      * Example:
@@ -320,7 +319,7 @@ public class SurvexTherionImporter {
         for (int i = startIndex + 1; i < lines.length; i++) {
             String line = lines[i].trim();
             
-            // Stop if we hit a non-comment line or empty line
+            // Stop if a non-comment line or empty line
             if (line.isEmpty() || (!line.startsWith("#") && !line.startsWith(";"))) {
                 break;
             }
