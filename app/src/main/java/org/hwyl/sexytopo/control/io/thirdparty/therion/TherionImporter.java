@@ -8,7 +8,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.io.IoUtils;
-import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexImporter;
+import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionImporter;
 import org.hwyl.sexytopo.control.io.thirdparty.xvi.XviImporter;
 import org.hwyl.sexytopo.control.io.translation.Importer;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
@@ -21,6 +21,7 @@ import org.hwyl.sexytopo.model.survey.Survey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 
 public class TherionImporter extends Importer {
@@ -74,9 +75,13 @@ public class TherionImporter extends Importer {
 
     public static void updateCentreline(List<String> lines, Survey survey) throws Exception {
         List<String> block = getContentsOfBeginEndBlock(lines, "centreline");
+        
+        // Parse passage data from the block (Therion format - no * prefix)
+        String blockText = TextTools.join("\n", block);
+        Map<String, String> passageComments = SurvexTherionImporter.parsePassageData(blockText, false);
+        
         List<String> sanitisedCentrelineData = new ArrayList<>();
         List<String> sanitisedElevationDirectionData = new ArrayList<>();
-
 
         boolean inDataBlock = false;
         for (String line: block) {
@@ -100,8 +105,11 @@ public class TherionImporter extends Importer {
         }
 
         String centrelineText = TextTools.join("\n", sanitisedCentrelineData);
-        SurvexImporter.parse(centrelineText, survey);
+        SurvexTherionImporter.parseCentreline(centrelineText, survey);
         handleElevationDirectionData(sanitisedElevationDirectionData, survey);
+        
+        // Merge passage comments with station comments
+        SurvexTherionImporter.mergePassageComments(survey, passageComments);
     }
 
 
