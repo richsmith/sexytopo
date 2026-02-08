@@ -81,41 +81,13 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
     }
 
     private void showNewSurveyStartStationDialog(Station station) {
-        String continueOption = getString(R.string.file_new_survey_continue_from, station.getName());
-
-        String[] options = {
-            continueOption,
-            getString(R.string.file_new_survey_start_from_1),
-            getString(R.string.file_new_survey_other)
-        };
-
-        new MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.file_new_survey_start_station_title)
-            .setItems(options, (dialog, which) -> {
-                switch (which) {
-                    case 0:
-                        continueSurvey(station, station.getName());
-                        break;
-                    case 1:
-                        continueSurvey(station, "1");
-                        break;
-                    case 2:
-                        showCustomStationInputDialog(station);
-                        break;
-                }
-            })
-            .setNegativeButton(R.string.cancel, null)
-            .show();
-    }
-
-    private void showCustomStationInputDialog(Station station) {
         TextInputLayout inputLayout = new TextInputLayout(this);
-        inputLayout.setHint(R.string.file_new_survey_enter_station);
+        inputLayout.setBoxBackgroundMode(TextInputLayout.BOX_BACKGROUND_OUTLINE);
+        inputLayout.setHint(getString(R.string.menu_survey_start_new_dialog_station_name));
 
-        TextInputEditText input = new TextInputEditText(inputLayout.getContext());
-        input.setGravity(Gravity.CENTER_HORIZONTAL);
-        input.setFocusable(true);
-        input.setFocusableInTouchMode(true);
+        TextInputEditText input = new TextInputEditText(this);
+        input.setText(station.getName());
+        input.selectAll();
         inputLayout.addView(input);
 
         int paddingH = (int) (24 * getResources().getDisplayMetrics().density);
@@ -124,45 +96,17 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setView(inputLayout)
-            .setTitle(R.string.file_new_survey_start_station_title)
-            .setPositiveButton(R.string.file_new_survey_select, null)
-            .setNegativeButton(R.string.cancel, null);
-
-        androidx.appcompat.app.AlertDialog dialog = builder.create();
-        dialog.setOnShowListener(dialogInterface -> {
-            android.widget.Button selectButton = dialog
-                .getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE);
-            selectButton.setEnabled(false);
-
-            input.addTextChangedListener(new android.text.TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
-                @Override
-                public void afterTextChanged(android.text.Editable s) {
-                    selectButton.setEnabled(!s.toString().trim().isEmpty());
-                }
-            });
-
-            selectButton.setOnClickListener(v -> {
-                CharSequence inputText = input.getText();
-                String stationName = inputText != null ? inputText.toString().trim() : "";
+            .setTitle(R.string.menu_survey_start_new_dialog_title)
+            .setPositiveButton(R.string.ok, (dialog, which) -> {
+                String stationName = input.getText().toString().trim();
                 if (!stationName.isEmpty()) {
                     continueSurvey(station, stationName);
-                    dialog.dismiss();
                 }
-            });
-        });
+            })
+            .setNegativeButton(R.string.cancel, null);
 
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setSoftInputMode(
-                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-        }
+        Dialog dialog = builder.create();
         dialog.show();
-        input.requestFocus();
     }
 
     public void onUnlinkSurvey(Station station) {

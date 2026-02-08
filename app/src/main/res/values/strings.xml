@@ -132,12 +132,6 @@
     <string name="file_unlink_survey_not_found">Could not find survey to unlink</string>
     <string name="file_unlink_survey_no_surveys">No surveys to unlink</string>
     <string name="file_unlink_survey_error">Error unlinking survey</string>
-    <string name="file_new_survey_start_station_title">Start new survey from station</string>
-    <string name="file_new_survey_continue_from">Continue from %1$s</string>
-    <string name="file_new_survey_start_from_1">Start from 1</string>
-    <string name="file_new_survey_other">Other…</string>
-    <string name="file_new_survey_enter_station">Enter starting station</string>
-    <string name="file_new_survey_select">Select</string>
 
     <!-- Import / Export -->
     <string name="import_successful">"Import complete (not yet saved)"</string>
@@ -563,6 +557,8 @@
     <string name="menu_survey">Survey</string>
     <string name="menu_start_new_survey">Start New Survey Here</string>
     <string name="menu_unlink_survey">Unlink Linked Survey</string>
+    <string name="menu_survey_start_new_dialog_title">Start new survey</string>
+    <string name="menu_survey_start_new_dialog_station_name">Starting station name</string>
     <string name="menu_comment">Comment</string>
     <string name="menu_toggle_left_right">Toggle Left/Right</string>
     <string name="menu_context_title_leg_to">Leg to %s</string>
