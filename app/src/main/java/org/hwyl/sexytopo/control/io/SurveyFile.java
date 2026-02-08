@@ -94,7 +94,22 @@ public class SurveyFile extends AbstractSurveyFile {
         return filename;
     }
 
+    /**
+     * Combines filename with extension.
+     * - If extension starts with ".", it's appended directly (no extra dot)
+     * - If extension starts with "|", the "|" is removed and extension is appended directly
+     *   (use this for suffixes like "P" that should produce "filenameP.th2")
+     * - Otherwise, a "." separator is added between filename and extension
+     */
     public static String withExtension(String filename, String extension) {
+        if (extension.startsWith(".")) {
+            // Extension has its own leading dot, append as-is
+            return filename + extension;
+        }
+        if (extension.startsWith("|")) {
+            // Special marker: append directly without any separator
+            return filename + extension.substring(1);
+        }
         return filename + "." + extension;
     }
 

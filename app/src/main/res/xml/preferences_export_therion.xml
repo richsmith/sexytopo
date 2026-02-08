@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="@string/settings_export_therion_title">
+
+    <EditTextPreference
+        android:key="pref_therion_plan_suffix"
+        android:title="@string/settings_therion_plan_suffix_title"
+        android:summary="@string/settings_therion_plan_suffix_summary"
+        android:defaultValue=".plan"/>
+
+    <EditTextPreference
+        android:key="pref_therion_ee_suffix"
+        android:title="@string/settings_therion_ee_suffix_title"
+        android:summary="@string/settings_therion_ee_suffix_summary"
+        android:defaultValue=".ee"/>
+
+    <EditTextPreference
+        android:key="pref_therion_xvi_folder"
+        android:title="@string/settings_therion_xvi_folder_title"
+        android:summary="@string/settings_therion_xvi_folder_summary"
+        android:defaultValue=""/>
+
+    <EditTextPreference
+        android:key="pref_therion_plan_scrap_suffix"
+        android:title="@string/settings_therion_plan_scrap_suffix_title"
+        android:summary="@string/settings_therion_plan_scrap_suffix_summary"
+        android:defaultValue="-plan"/>
+
+    <EditTextPreference
+        android:key="pref_therion_ee_scrap_suffix"
+        android:title="@string/settings_therion_ee_scrap_suffix_title"
+        android:summary="@string/settings_therion_ee_scrap_suffix_summary"
+        android:defaultValue="-ee"/>
+
+    <CheckBoxPreference
+        android:key="pref_therion_cross_sections"
+        android:title="@string/settings_therion_cross_sections_title"
+        android:summary="@string/settings_therion_cross_sections_summary"
+        android:defaultValue="true"/>
+
+    <EditTextPreference
+        android:key="pref_therion_plan_xs_suffix"
+        android:title="@string/settings_therion_plan_xs_suffix_title"
+        android:summary="@string/settings_therion_plan_xs_suffix_summary"
+        android:defaultValue="PX#"/>
+
+    <EditTextPreference
+        android:key="pref_therion_ee_xs_suffix"
+        android:title="@string/settings_therion_ee_xs_suffix_title"
+        android:summary="@string/settings_therion_ee_xs_suffix_summary"
+        android:defaultValue="EEX#"/>
+
+    <CheckBoxPreference
+        android:key="pref_therion_export_symbols"
+        android:title="@string/settings_export_therion_symbols_title"
+        android:summary="@string/settings_export_therion_symbols_summary"
+        android:defaultValue="true"/>
+
+    <CheckBoxPreference
+        android:key="pref_therion_export_text"
+        android:title="@string/settings_export_therion_text_title"
+        android:summary="@string/settings_export_therion_text_summary"
+        android:defaultValue="true"/>
+
+</PreferenceScreen>

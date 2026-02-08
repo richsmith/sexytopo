@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Preference
+        android:key="pref_section_general"
+        android:title="@string/settings_general_title"
+        android:summary="@string/settings_general_summary"
+        app:fragment="org.hwyl.sexytopo.control.activity.SettingsActivity$GeneralFragment" />
+
+    <Preference
+        android:key="pref_section_sketching"
+        android:title="@string/settings_sketching_title"
+        android:summary="@string/settings_sketching_summary"
+        app:fragment="org.hwyl.sexytopo.control.activity.SettingsActivity$SketchingFragment" />
+
+    <Preference
+        android:key="pref_section_export"
+        android:title="@string/settings_export_title"
+        android:summary="@string/settings_export_summary"
+        app:fragment="org.hwyl.sexytopo.control.activity.SettingsActivity$ExportFragment" />
+
+    <Preference
+        android:key="pref_section_manual_data_entry"
+        android:title="@string/settings_manual_data_entry_title"
+        android:summary="@string/settings_manual_data_entry_summary"
+        app:fragment="org.hwyl.sexytopo.control.activity.SettingsActivity$ManualDataEntryFragment" />
+
+    <Preference
+        android:key="pref_section_instruments"
+        android:title="@string/settings_instruments_title"
+        android:summary="@string/settings_instruments_summary"
+        app:fragment="org.hwyl.sexytopo.control.activity.SettingsActivity$InstrumentsFragment" />
+
+    <Preference
+        android:key="pref_section_developer"
+        android:title="@string/settings_developer_title"
+        android:summary="@string/settings_developer_summary"
+        app:fragment="org.hwyl.sexytopo.control.activity.SettingsActivity$DeveloperFragment" />
+
+</PreferenceScreen>
