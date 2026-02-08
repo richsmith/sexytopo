@@ -45,13 +45,6 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         jumpToStation(station, ExtendedElevationActivity.class);
     }
 
-    public void onToggleLeftRight(Station station) {
-        Direction newDirection = station.getExtendedElevationDirection().opposite();
-        SurveyUpdater.setDirectionOfSubtree(station, newDirection);
-        getSurveyManager().broadcastSurveyUpdated();
-        invalidateView();
-    }
-
     public void onSetDirectionLeft(Station station) {
         if (station.getExtendedElevationDirection() != Direction.LEFT) {
             SurveyUpdater.setDirectionOfSubtree(station, Direction.LEFT);
@@ -84,7 +77,36 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
             showSimpleToast(R.string.file_cannot_extend_unsaved_survey);
             return;
         }
-        continueSurvey(station);
+        showNewSurveyStartStationDialog(station);
+    }
+
+    private void showNewSurveyStartStationDialog(Station station) {
+        TextInputLayout inputLayout = new TextInputLayout(this);
+        inputLayout.setBoxBackgroundMode(TextInputLayout.BOX_BACKGROUND_OUTLINE);
+        inputLayout.setHint(getString(R.string.menu_survey_start_new_dialog_station_name));
+
+        TextInputEditText input = new TextInputEditText(this);
+        input.setText(station.getName());
+        input.selectAll();
+        inputLayout.addView(input);
+
+        int paddingH = (int) (24 * getResources().getDisplayMetrics().density);
+        int paddingV = (int) (20 * getResources().getDisplayMetrics().density);
+        inputLayout.setPadding(paddingH, paddingV, paddingH, 0);
+
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+        builder.setView(inputLayout)
+            .setTitle(R.string.menu_survey_start_new_dialog_title)
+            .setPositiveButton(R.string.ok, (dialog, which) -> {
+                String stationName = input.getText().toString().trim();
+                if (!stationName.isEmpty()) {
+                    continueSurvey(station, stationName);
+                }
+            })
+            .setNegativeButton(R.string.cancel, null);
+
+        Dialog dialog = builder.create();
+        dialog.show();
     }
 
     public void onUnlinkSurvey(Station station) {
@@ -193,14 +215,17 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         builder.setView(inputLayout)
             .setTitle(station.getName())
             .setPositiveButton(R.string.save, (dialog, which) -> {
-                    station.setComment(input.getText().toString());
+                    CharSequence inputText = input.getText();
+                    station.setComment(inputText != null ? inputText.toString() : "");
                     invalidateView();
                 })
             .setNegativeButton(R.string.cancel, null);
 
         Dialog dialog = builder.create();
-        dialog.getWindow().setSoftInputMode(
-            WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        }
         dialog.show();
         input.requestFocus();
     }

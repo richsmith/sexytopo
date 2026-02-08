@@ -557,6 +557,8 @@
     <string name="menu_survey">Survey</string>
     <string name="menu_start_new_survey">Start New Survey Here</string>
     <string name="menu_unlink_survey">Unlink Linked Survey</string>
+    <string name="menu_survey_start_new_dialog_title">Start new survey</string>
+    <string name="menu_survey_start_new_dialog_station_name">Starting station name</string>
     <string name="menu_comment">Comment</string>
     <string name="menu_toggle_left_right">Toggle Left/Right</string>
     <string name="menu_context_title_leg_to">Leg to %s</string>
