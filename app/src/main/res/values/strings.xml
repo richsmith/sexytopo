@@ -207,9 +207,9 @@
     <string name="manual_edit_right">Right (m)</string>
     <string name="manual_edit_up">Up (m)</string>
     <string name="manual_edit_down">Down (m)</string>
-    <string name="manual_edit_from_station">From station</string>
+    <string name="manual_edit_from_station">From</string>
     <string name="manual_edit_from_station_error">Invalid from station</string>
-    <string name="manual_edit_to_station">To station</string>
+    <string name="manual_edit_to_station">To</string>
     <string name="manual_edit_to_station_error">Invalid to station</string>
     <string name="manual_edit_shot_backwards">⬅ Shot backwards</string>
     <string name="manual_rename_station_title">Rename Station</string>
@@ -586,5 +586,6 @@
     <string name="request_code_error">Error code %1$d from request code %2$d</string>
     <string name="killing_comms_process">Killing comms process</string>
     <string name="setup_error_load_symbol_svg">Error loading symbol SVG %1$s</string>
+    <string name="manual_edit_comment">Comment</string>
 
 </resources>
