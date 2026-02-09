@@ -33,8 +33,8 @@ public class CrossSectionerTest {
         // Issue #176: legs at 350° and 10° should give cross-section at 0°, not 180°
         Survey testSurvey = BasicTestSurveyCreator.createSpanningZeroBoundary();
 
-        Station s1 = testSurvey.getStationByName("1");
-        double angle = CrossSectioner.getAngleOfSection(testSurvey, s1);
+        Station s2 = testSurvey.getStationByName("2");
+        double angle = CrossSectioner.getAngleOfSection(testSurvey, s2);
         Assert.assertEquals(0.0, angle, SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
     }
 }
