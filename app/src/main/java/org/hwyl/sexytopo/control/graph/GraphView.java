@@ -613,7 +613,7 @@ public class GraphView extends View {
             case MotionEvent.ACTION_DOWN:
                 TextInputLayout inputLayout = new TextInputLayout(getContext());
                 inputLayout.setBoxBackgroundMode(TextInputLayout.BOX_BACKGROUND_OUTLINE);
-                inputLayout.setHint(getContext().getString(R.string.graph_text_hint));
+                inputLayout.setHint(getContext().getString(R.string.sketch_text_hint));
 
                 TextInputEditText input = new TextInputEditText(getContext());
                 inputLayout.addView(input);

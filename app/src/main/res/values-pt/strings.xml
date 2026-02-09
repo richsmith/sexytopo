@@ -175,6 +175,7 @@
     <string name="sketch_menu_back_measurements">Trechos Inversos</string>
     <string name="sketch_position_cross_section_instruction">Selecionar onde desenhar a secção transversal</string>
     <string name="sketch_symbol_orientation_education">Arrastar para definir a direção do símbolo</string>
+    <string name="sketch_text_hint">Introduzir texto</string>
 
     <!-- Table view -->
     <string name="table_head_from">De</string>
@@ -206,11 +207,10 @@
     <string name="manual_edit_to_station">Para a estação</string>
     <string name="manual_edit_to_station_error">Estação de destino inválida</string>
     <string name="manual_edit_shot_backwards">⬅ Leitura para trás</string>
+    <string name="manual_edit_comment">Comentário</string>
     <string name="manual_rename_station_title">Renomear Estação</string>
     <string name="manual_rename_station_hint">Nome da estação</string>
     <string name="manual_rename_error">Falha ao renomear</string>
-    <string name="graph_text_hint">Introduzir texto</string>
-    <string name="graph_comment_hint">Comentário da estação</string>
 
     <!-- Device -->
     <string name="device_instruction_bluetooth">1. Bluetooth</string>
@@ -539,6 +539,7 @@
     <string name="context_move_leg_no_valid_move">Não há lugar válido para mover este trecho</string>
     <string name="context_rename_splay_error">Não é possível renomear uma extremidade de raio</string>
     <string name="context_set_active_splay_error">Não é possível definir a extremidade de raio como estação ativa</string>
+    <string name="context_station_comment_hint">Comentário da estação</string>
 
     <!-- Logging -->
     <string name="log_starting_up">Iniciando</string>

@@ -181,6 +181,7 @@
     <string name="sketch_menu_back_measurements">Reverse Legs</string>
     <string name="sketch_position_cross_section_instruction">Select where to draw cross-section</string>
     <string name="sketch_symbol_orientation_education">Drag to set symbol direction</string>
+    <string name="sketch_text_hint">Enter text</string>
 
     <!-- Table view -->
     <string name="table_head_from">From</string>
@@ -212,11 +213,10 @@
     <string name="manual_edit_to_station">To</string>
     <string name="manual_edit_to_station_error">Invalid to station</string>
     <string name="manual_edit_shot_backwards">⬅ Shot backwards</string>
+    <string name="manual_edit_comment">Comment</string>
     <string name="manual_rename_station_title">Rename Station</string>
     <string name="manual_rename_station_hint">Station name</string>
     <string name="manual_rename_error">Rename failed</string>
-    <string name="graph_text_hint">Enter text</string>
-    <string name="graph_comment_hint">Station comment</string>
 
     <!-- Device -->
     <string name="device_instruction_bluetooth">1. Bluetooth</string>
@@ -571,6 +571,7 @@
     <string name="context_move_leg_no_valid_move">Nowhere valid to move this leg</string>
     <string name="context_rename_splay_error">Cannot rename a splay end</string>
     <string name="context_set_active_splay_error">Cannot set splay end as the active station</string>
+    <string name="context_station_comment_hint">Station comment</string>
 
     <!-- Logging -->
     <string name="log_starting_up">Starting up</string>
@@ -586,6 +587,5 @@
     <string name="request_code_error">Error code %1$d from request code %2$d</string>
     <string name="killing_comms_process">Killing comms process</string>
     <string name="setup_error_load_symbol_svg">Error loading symbol SVG %1$s</string>
-    <string name="manual_edit_comment">Comment</string>
 
 </resources>

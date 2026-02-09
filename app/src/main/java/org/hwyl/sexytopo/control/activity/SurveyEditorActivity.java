@@ -198,7 +198,7 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
     protected void openCommentDialog(Station station) {
         TextInputLayout inputLayout = new TextInputLayout(this);
         inputLayout.setBoxBackgroundMode(TextInputLayout.BOX_BACKGROUND_OUTLINE);
-        inputLayout.setHint(getString(R.string.graph_comment_hint));
+        inputLayout.setHint(getString(R.string.context_station_comment_hint));
 
         TextInputEditText input = new TextInputEditText(this);
         input.setLines(8);
