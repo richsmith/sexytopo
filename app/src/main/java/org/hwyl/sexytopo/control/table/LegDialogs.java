@@ -84,6 +84,7 @@ public class LegDialogs {
         // Hide TO field for splays
         if (isSplay) {
             dialogView.findViewById(R.id.toStationLayout).setVisibility(View.GONE);
+            dialogView.findViewById(R.id.toCommentLayout).setVisibility(View.GONE);
         }
 
         // Create validation form
@@ -134,17 +135,25 @@ public class LegDialogs {
                     SurveyUpdater.renameOrigin(survey, newFromStationName);
                 }
 
+                fromStation.setComment(form.getUpdatedFromComment());
+
                 if (isSplay) {
                     // Add splay to from station
                     SurveyUpdater.addLegFromStation(survey, fromStation, leg);
                 } else {
                     // Create new destination station and set it on the leg
                     String toStationName = form.getUpdatedToStationName();
-                    Station newStation = new Station(toStationName);
+                    Station newToStation = new Station(toStationName);
+
+                    String toComment = form.getUpdatedToComment();
+                    if (toComment != null) {
+                        newToStation.setComment(toComment);
+                    }
+
 
                     // Reconstruct leg with destination station (preserving backwards flag from form)
                     leg = new Leg(leg.getDistance(), leg.getAzimuth(), leg.getInclination(),
-                                  newStation, new Leg[]{}, leg.wasShotBackwards());
+                                  newToStation, new Leg[]{}, leg.wasShotBackwards());
 
                     // Add leg to from station using SurveyUpdater
                     // This also sets the active station to the new destination
@@ -161,7 +170,7 @@ public class LegDialogs {
                         createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceDown, LRUD.DOWN);
 
                         // Move active station back to the TO station again
-                        survey.setActiveStation(newStation);
+                        survey.setActiveStation(newToStation);
                     }
                 }
 
@@ -196,6 +205,7 @@ public class LegDialogs {
         // Hide to station field for splays
         if (!toEdit.hasDestination()) {
             dialogView.findViewById(R.id.toStationLayout).setVisibility(View.GONE);
+            dialogView.findViewById(R.id.toCommentLayout).setVisibility(View.GONE);
         }
 
         // Create and configure the form for validation
@@ -286,9 +296,16 @@ public class LegDialogs {
                     }
                 }
 
+                newFromStation.setComment(form.getUpdatedFromComment());
+
                 // 3. Rename destination station if to station name changed (for full legs)
                 if (toEdit.hasDestination()) {
+                    Station newToStation = toEdit.getDestination();
                     String newToStationName = form.getUpdatedToStationName();
+                    String newToComment = form.getUpdatedToComment();
+
+                    newToStation.setComment(newToComment);
+
                     String oldToStationName = toEdit.getDestination().getName();
                     if (!newToStationName.equals(oldToStationName)) {
                         SurveyUpdater.renameStation(survey, edited.getDestination(), newToStationName);

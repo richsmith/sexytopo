@@ -181,6 +181,7 @@
     <string name="sketch_menu_back_measurements">Reverse Legs</string>
     <string name="sketch_position_cross_section_instruction">Select where to draw cross-section</string>
     <string name="sketch_symbol_orientation_education">Drag to set symbol direction</string>
+    <string name="sketch_text_hint">Enter text</string>
 
     <!-- Table view -->
     <string name="table_head_from">From</string>
@@ -208,16 +209,15 @@
     <string name="manual_edit_right">Right (m)</string>
     <string name="manual_edit_up">Up (m)</string>
     <string name="manual_edit_down">Down (m)</string>
-    <string name="manual_edit_from_station">From station</string>
+    <string name="manual_edit_from_station">From</string>
     <string name="manual_edit_from_station_error">Invalid from station</string>
-    <string name="manual_edit_to_station">To station</string>
+    <string name="manual_edit_to_station">To</string>
     <string name="manual_edit_to_station_error">Invalid to station</string>
     <string name="manual_edit_shot_backwards">⬅ Shot backwards</string>
+    <string name="manual_edit_comment">Comment</string>
     <string name="manual_rename_station_title">Rename Station</string>
     <string name="manual_rename_station_hint">Station name</string>
     <string name="manual_rename_error">Rename failed</string>
-    <string name="graph_text_hint">Enter text</string>
-    <string name="graph_comment_hint">Station comment</string>
 
     <!-- Device -->
     <string name="device_instruction_bluetooth">1. Bluetooth</string>
@@ -558,6 +558,8 @@
     <string name="menu_survey">Survey</string>
     <string name="menu_start_new_survey">Start New Survey Here</string>
     <string name="menu_unlink_survey">Unlink Linked Survey</string>
+    <string name="menu_survey_start_new_dialog_title">Start new survey</string>
+    <string name="menu_survey_start_new_dialog_station_name">Starting station name</string>
     <string name="menu_comment">Comment</string>
     <string name="menu_toggle_left_right">Toggle Left/Right</string>
     <string name="menu_context_title_leg_to">Leg to %s</string>
@@ -570,6 +572,7 @@
     <string name="context_move_leg_no_valid_move">Nowhere valid to move this leg</string>
     <string name="context_rename_splay_error">Cannot rename a splay end</string>
     <string name="context_set_active_splay_error">Cannot set splay end as the active station</string>
+    <string name="context_station_comment_hint">Station comment</string>
 
     <!-- Logging -->
     <string name="log_starting_up">Starting up</string>
