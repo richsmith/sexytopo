@@ -84,6 +84,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     protected static boolean hasStarted = false;
     private static boolean debugMode = false;
 
+    private String pendingLinkStation = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -311,9 +313,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         } else if (itemId == R.id.action_find_station) {
             onFindStation();
             return true;
-        } else if (itemId == R.id.action_link_survey) {
-            confirmToProceedIfNotSaved("requestLinkExistingSurvey");
-            return true;
         } else if (itemId == R.id.action_system_log) {
             startActivity(SystemLogActivity.class);
             return true;
@@ -388,8 +387,10 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             R.string.file_intent_open_title);
     }
 
+
     @SuppressLint("UnusedDeclaration") // called through Reflection
-    public void requestLinkExistingSurvey() {
+    public void requestLinkExistingSurveyToStation(Station station) {
+        pendingLinkStation = station.getName();
         selectDirectory(
             SexyTopoConstants.REQUEST_CODE_SELECT_SURVEY_TO_LINK,
             StartLocation.SURVEY_PARENT,
@@ -595,7 +596,12 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                     }
 
                     Survey current = getSurvey();
-                    joinSurveys(current, current.getActiveStation(), surveyToLink, selectedStation);
+                    Station stationToLink = pendingLinkStation != null ?
+                        current.getStationByName(pendingLinkStation) : null;
+                    if (stationToLink != null) {
+                        joinSurveys(current, stationToLink, surveyToLink, selectedStation);
+                    }
+                    pendingLinkStation = null;
 
                     // Save both surveys so the connection is persisted in both directions
                     try {
@@ -861,7 +867,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         currentSurvey.connect(currentJoinPoint, newSurvey, newJoinPoint);
         newSurvey.connect(newJoinPoint, currentSurvey, currentJoinPoint);
     }
-
 
     public void unlinkSurvey(final Station station) {
 

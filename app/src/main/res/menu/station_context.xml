@@ -115,6 +115,10 @@
                 android:title="@string/menu_start_new_survey"/>
 
             <item
+                android:id="@+id/action_link_survey"
+                android:title="@string/action_link_to_existing_survey"/>
+
+            <item
                 android:id="@+id/action_unlink_survey"
                 android:title="@string/menu_unlink_survey"
                 android:enabled="false"/>

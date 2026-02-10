@@ -129,6 +129,18 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         dialog.show();
     }
 
+    public void onLinkSurvey(Station station) {
+        linkSurvey(station);
+    }
+
+    public void linkSurvey(final Station station) {
+        if (!getSurvey().isSaved()) {
+            showSimpleToast(R.string.file_cannot_extend_unsaved_survey);
+            return;
+        }
+        requestLinkExistingSurveyToStation(station);
+    }
+
     public void onUnlinkSurvey(Station station) {
         unlinkSurvey(station);
     }
