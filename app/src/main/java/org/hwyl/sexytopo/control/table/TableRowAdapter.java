@@ -143,17 +143,6 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
                 textView.setTypeface(Typeface.DEFAULT);
             }
 
-            // Set alignment based on column type
-            if (col == TableCol.DISTANCE || col == TableCol.AZIMUTH || col == TableCol.INCLINATION) {
-                // Right-align numeric columns
-                textView.setGravity(android.view.Gravity.END | android.view.Gravity.CENTER_VERTICAL);
-            } else if (col == TableCol.FROM || col == TableCol.TO) {
-                // Center-align station names
-                textView.setGravity(android.view.Gravity.CENTER);
-            } else {
-                textView.setGravity(android.view.Gravity.START | android.view.Gravity.CENTER_VERTICAL);
-            }
-
             // Store mappings and position
             fieldToSurveyEntry.put(textView, entry);
             fieldToTableCol.put(textView, col);

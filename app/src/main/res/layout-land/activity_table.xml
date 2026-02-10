@@ -41,8 +41,8 @@
                 android:orientation="horizontal"
                 style="@style/HeaderRow">
                 <!-- Fixed Columns -->
-                <TextView android:id="@+id/headerFrom" style="@style/HeaderText" android:layout_width="wrap_content" android:text="@string/table_head_from"/>
-                <TextView android:id="@+id/headerTo" style="@style/HeaderText" android:layout_width="wrap_content" android:text="@string/table_head_to"/>
+                <TextView android:id="@+id/headerFrom" style="@style/HeaderStation" android:layout_width="wrap_content" android:text="@string/table_head_from"/>
+                <TextView android:id="@+id/headerTo" style="@style/HeaderStation" android:layout_width="wrap_content" android:text="@string/table_head_to"/>
                 <!-- Scrollable Columns -->
                 <HorizontalScrollView
                     android:id="@+id/header_scroll_view"

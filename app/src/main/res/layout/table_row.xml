@@ -9,12 +9,12 @@
     <!-- Fixed Columns -->
     <TextView
         android:id="@+id/tableRowFrom"
-        style="@style/BodyText"
+        style="@style/BodyStation"
         android:layout_width="wrap_content"
         android:text="AX" />
     <TextView
         android:id="@+id/tableRowTo"
-        style="@style/BodyText"
+        style="@style/BodyStation"
         android:layout_width="wrap_content"
         android:text="BX" />
 
@@ -34,25 +34,25 @@
 
             <TextView
                 android:id="@+id/tableRowDistance"
-                style="@style/BodyText"
+                style="@style/BodyNum"
                 android:layout_width="wrap_content"
                 android:minWidth="70dp"
                 android:text="1.46" />
             <TextView
                 android:id="@+id/tableRowAzimuth"
-                style="@style/BodyText"
+                style="@style/BodyNum"
                 android:layout_width="wrap_content"
                 android:minWidth="70dp"
                 android:text="2.36" />
             <TextView
                 android:id="@+id/tableRowInclination"
-                style="@style/BodyText"
+                style="@style/BodyNum"
                 android:layout_width="wrap_content"
                 android:minWidth="70dp"
                 android:text="2.36" />
             <TextView
                 android:id="@+id/tableRowComment"
-                style="@style/BodyText"
+                style="@style/BodyComment"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:minWidth="200dp"
