@@ -148,6 +148,10 @@ public class GeneralPreferences {
         return getBoolean("pref_lrud_fields", false);
     }
 
+    public static boolean isLrudBisectModeOn() {
+        return getBoolean("pref_lrud_bisect_angle", true);
+    }
+
     public static boolean isDegMinsSecsModeOn() {
         return getBoolean("pref_deg_mins_secs", false);
     }
