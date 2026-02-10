@@ -99,6 +99,111 @@ public class SurveyUpdater {
         survey.setActiveStation(newStation);
     }
 
+    /**
+     * Promote a splay to the leg above it (add it to the promoted legs array).
+     * This is used when the user manually wants to add a splay to an existing
+     * leg to create or extend an averaged leg.
+     * 
+     * @param survey The survey containing the legs
+     * @param splay The splay to promote
+     * @return true if successful, false if no compatible leg above was found
+     */
+    public static boolean promoteToAboveLeg(Survey survey, Leg splay) {
+        if (splay.hasDestination()) {
+            return false; // Not a splay
+        }
+
+        // Find the splay in chronological order
+        List<Leg> legs = survey.getAllLegsInChronoOrder();
+        int splayIndex = legs.indexOf(splay);
+        if (splayIndex <= 0) {
+            return false; // No leg above
+        }
+
+        // Get the leg above
+        Leg legAbove = legs.get(splayIndex - 1);
+        
+        // Verify it's a full leg (can be single-shot or already promoted)
+        if (!legAbove.hasDestination()) {
+            return false; // Leg above must be a full leg, not another splay
+        }
+
+        // Find which station the splay comes from
+        Station splayFrom = findStationWithLeg(survey, splay);
+        if (splayFrom == null) {
+            return false;
+        }
+
+        // Find the from station of the leg above
+        Station legAboveFrom = findStationWithLeg(survey, legAbove);
+        Station legAboveTo = legAbove.getDestination();
+
+        // Verify the splay originates from one of the two stations in the leg above
+        if (splayFrom != legAboveFrom && splayFrom != legAboveTo) {
+            return false;
+        }
+
+        // Determine if splay was shot backwards (from the destination station)
+        Leg splayToAdd = splay;
+        if (splayFrom == legAboveTo) {
+            // Splay is from the destination (shot backwards)
+            // Create a new leg with ORIGINAL measurements but with wasShotBackwards = true
+            // The reversal/correction is handled elsewhere - we preserve the raw data
+            splayToAdd = new Leg(
+                splay.getDistance(),
+                splay.getAzimuth(),
+                splay.getInclination(),
+                true  // wasShotBackwards = true
+            );
+        }
+
+        // Build the list of all shots for averaging
+        List<Leg> allShots = new java.util.ArrayList<>();
+        
+        // Add the original leg (or its promoted shots if it was already averaged)
+        if (legAbove.wasPromoted()) {
+            // Leg was already created from multiple shots, add all those shots
+            allShots.addAll(Arrays.asList(legAbove.getPromotedFrom()));
+        } else {
+            // Single-shot leg, so add the leg itself as the first shot
+            allShots.add(legAbove);
+        }
+        
+        // Add the new splay (with wasShotBackwards flag if needed)
+        allShots.add(splayToAdd);
+
+        // Calculate the new average from all shots
+        Leg averagedLeg = averageLegs(allShots);
+
+        // Create new leg with updated promoted legs array
+        Leg[] newPromotedFrom = allShots.toArray(new Leg[0]);
+        Leg newLegAbove = Leg.upgradeSplayToConnectedLeg(
+            averagedLeg, legAbove.getDestination(), newPromotedFrom);
+
+        // Replace the old leg with the new one
+        editLeg(survey, legAbove, newLegAbove);
+
+        // Remove the splay from its originating station
+        splayFrom.getOnwardLegs().remove(splay);
+        
+        // Remove the splay from the survey record
+        survey.removeLegRecord(splay);
+
+        return true;
+    }
+
+    /**
+     * Find which station contains the given leg in its onward legs.
+     */
+    private static Station findStationWithLeg(Survey survey, Leg leg) {
+        for (Station station : survey.getAllStations()) {
+            if (station.getOnwardLegs().contains(leg)) {
+                return station;
+            }
+        }
+        return null;
+    }
+
     private static synchronized String getNextStationName(Survey survey) {
         return StationNamer.generateNextStationName(survey, survey.getActiveStation());
     }

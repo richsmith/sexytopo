@@ -54,6 +54,11 @@
                 android:visible="false"/>
 
             <item
+                android:id="@+id/action_promote_to_above_leg"
+                android:title="@string/menu_promote_to_above_leg"
+                android:visible="false"/>
+
+            <item
                 android:id="@+id/action_downgrade_leg"
                 android:title="@string/menu_downgrade_leg"
                 android:visible="false"/>

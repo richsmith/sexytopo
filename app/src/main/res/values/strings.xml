@@ -537,6 +537,9 @@
     <string name="menu_rename_station">Rename</string>
     <string name="menu_edit_leg">Edit</string>
     <string name="menu_upgrade_row">Force New Station</string>
+    <string name="menu_promote_to_above_leg">Promote to Above Leg</string>
+    <string name="toast_no_leg_above">Station is not a leg station</string>
+    <string name="toast_splay_promoted">Splay promoted to leg</string>
     <string name="menu_upgrade_splay">Upgrade to Leg</string>
     <string name="menu_downgrade_leg">Downgrade to Splay</string>
     <string name="menu_delete_leg">Delete</string>
