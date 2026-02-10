@@ -20,7 +20,6 @@
     </style>
     <style name="HeaderText">
         <item name="android:textColor">@color/white</item>
-        <item name="android:padding">5dp</item>
         <item name="android:gravity">center</item>
         <item name="android:textSize">14sp</item>
         <item name="android:background">@drawable/border</item>
@@ -28,7 +27,15 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
     </style>
-        <style name="BodyRow">
+    <style name="HeaderNum" parent="HeaderText">
+        <item name="android:gravity">end|center_vertical</item>
+        <item name="android:paddingEnd">10dp</item>
+    </style>
+    <style name="HeaderComment" parent="HeaderText">
+        <item name="android:gravity">start|center_vertical</item>
+        <item name="android:paddingStart">8dp</item>
+    </style>
+    <style name="BodyRow">
         <item name="android:background">@drawable/border</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
