@@ -49,15 +49,17 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:fillViewport="true"
                     android:scrollbars="none">
                     <TableRow
+                        android:id="@+id/scrollable_header_row"
                         style="@style/HeaderRow"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent">
                         <TextView style="@style/HeaderNum" android:layout_width="wrap_content" android:minWidth="70dp" android:text="@string/table_head_distance"/>
                         <TextView style="@style/HeaderNum" android:layout_width="wrap_content" android:minWidth="70dp" android:text="@string/table_head_azimuth"/>
                         <TextView style="@style/HeaderNum" android:layout_width="wrap_content" android:minWidth="70dp" android:text="@string/table_head_elevation"/>
-                        <TextView android:id="@+id/headerComment" style="@style/HeaderComment" android:layout_width="wrap_content" android:minWidth="200dp" android:text="@string/table_head_comment"/>
+                        <TextView android:id="@+id/headerComment" style="@style/HeaderComment" android:layout_width="0dp" android:layout_weight="1" android:minWidth="200dp" android:text="@string/table_head_comment"/>
                     </TableRow>
                 </HorizontalScrollView>
             </LinearLayout>
@@ -67,7 +69,7 @@
                 android:id="@+id/tableRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:clipToPadding="false" />
+                android:clipToPadding="false"/>
 
         </LinearLayout>
 

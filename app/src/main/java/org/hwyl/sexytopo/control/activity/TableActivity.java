@@ -14,7 +14,6 @@ import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.HorizontalScrollView;
 import android.widget.Spinner;
-import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 

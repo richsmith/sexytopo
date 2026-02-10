@@ -2,7 +2,6 @@ package org.hwyl.sexytopo.control.table;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -231,20 +230,4 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
             super(itemView);
         }
     }
-
-    public boolean shouldShowCommentColumn() {
-        // A threshold in dp above which we show the comment column
-        final int COMMENT_COLUMN_MIN_WIDTH_DP = 600;
-
-        // Get the display metrics from the context
-        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
-
-        // Calculate the threshold in pixels
-        float density = displayMetrics.density;
-        float thresholdPx = COMMENT_COLUMN_MIN_WIDTH_DP * density;
-
-        // Check if the screen width is greater than the threshold
-        return displayMetrics.widthPixels > thresholdPx;
-    }
-
 }
