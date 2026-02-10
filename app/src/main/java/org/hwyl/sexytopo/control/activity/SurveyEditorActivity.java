@@ -1,8 +1,18 @@
 package org.hwyl.sexytopo.control.activity;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+
+import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
@@ -23,6 +33,16 @@ import org.hwyl.sexytopo.model.survey.Station;
  * Provides standard context menu action implementations.
  */
 public abstract class SurveyEditorActivity extends SexyTopoActivity {
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        MenuItem findStationItem = menu.findItem(R.id.action_find_station);
+        if (findStationItem != null) {
+            findStationItem.setEnabled(true);
+        }
+        return true;
+    }
 
     public void onSetActiveStation(Station station) {
         setActiveStation(station);
@@ -276,5 +296,85 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
             })
             .setNegativeButton(R.string.cancel, null)
             .show();
+    }
+
+    @Override
+    protected void onFindStation() {
+        Station[] stations = getSurvey().getAllStations().toArray(new Station[0]);
+        String[] stationNames = new String[stations.length];
+        for (int i = 0; i < stations.length; i++) {
+            stationNames[i] = stations[i].getName();
+        }
+
+        TextInputLayout inputLayout = new TextInputLayout(this);
+        inputLayout.setBoxBackgroundMode(TextInputLayout.BOX_BACKGROUND_OUTLINE);
+        inputLayout.setHint(getString(R.string.tool_find_station_dialog_hint));
+
+        AutoCompleteTextView input = new AutoCompleteTextView(this);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+            this,
+            android.R.layout.simple_dropdown_item_1line,
+            stationNames
+        );
+        input.setAdapter(adapter);
+        input.setThreshold(1);
+        input.setFocusableInTouchMode(true);
+        inputLayout.addView(input);
+
+        int paddingH = (int) (24 * getResources().getDisplayMetrics().density);
+        int paddingV = (int) (20 * getResources().getDisplayMetrics().density);
+        inputLayout.setPadding(paddingH, paddingV, paddingH, 0);
+
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+        builder.setView(inputLayout)
+            .setTitle(R.string.tool_find_station_dialog_title)
+            .setPositiveButton(R.string.tool_find_station_dialog_navigate, (dialog, which) -> {
+                String stationName = input.getText().toString().trim();
+                Station station = getSurvey().getStationByName(stationName);
+                if (station != null) {
+                    jumpToStation(station, this.getClass());
+                }
+            })
+            .setNegativeButton(R.string.cancel, null);
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        Button navigateButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+        navigateButton.setEnabled(false);
+
+        input.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String stationName = s.toString().trim();
+                if (stationName.isEmpty()) {
+                    inputLayout.setError(null);
+                    navigateButton.setEnabled(false);
+                } else {
+                    Station station = getSurvey().getStationByName(stationName);
+                    if (station != null) {
+                        inputLayout.setError(null);
+                        navigateButton.setEnabled(true);
+                    } else {
+                        inputLayout.setError(getString(R.string.tool_find_station_error_invalid));
+                        navigateButton.setEnabled(false);
+                    }
+                }
+            }
+        });
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        }
+        input.requestFocus();
     }
 }

@@ -75,6 +75,7 @@
     <string name="action_fullscreen">Schermo Intero</string>
     <string name="action_tools">Strumenti</string>
     <string name="action_undo_last_leg">Annulla ultima lettura</string>
+    <string name="action_find_station">Trova Stazione…</string>
     <string name="action_link_to_existing_survey">Collega a un Rilievo Esistente</string>
     <string name="action_system_log">Registro di Sistema</string>
     <string name="action_generate_test_survey">Genera Rilievo di Test</string>
@@ -545,6 +546,12 @@
     <string name="log_starting_up">Avvio in corso</string>
     <string name="log_shown">Mostrato: %1$s</string>
     <string name="log_error_no_station_notification_intent">Impossibile avviare l\'intent di notifica della nuova stazione</string>
+
+    <!-- Tools -->
+    <string name="tool_find_station_dialog_title">Trova Stazione</string>
+    <string name="tool_find_station_dialog_hint">Nome della stazione</string>
+    <string name="tool_find_station_dialog_navigate">Naviga</string>
+    <string name="tool_find_station_error_invalid">Stazione non trovata</string>
 
     <!-- Misc -->
     <string name="tool_generate_test_title">Genera Dati di Test</string>

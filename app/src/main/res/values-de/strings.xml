@@ -75,6 +75,7 @@
     <string name="action_fullscreen">Vollbild</string>
     <string name="action_tools">Werkzeuge</string>
     <string name="action_undo_last_leg">Letzte Messung rückgängig machen</string>
+    <string name="action_find_station">Station finden…</string>
     <string name="action_link_to_existing_survey">Mit einer bestehenden Vermessungsdatei verknüpfen</string>
     <string name="action_system_log">System Log</string>
     <string name="action_generate_test_survey">Test-Vermessungsdatei erzeugen</string>
@@ -539,6 +540,12 @@
     <string name="log_starting_up">Startprozess läuft</string>
     <string name="log_shown">Wird angezeigt: %1$s</string>
     <string name="log_error_no_station_notification_intent">Fehler beim Versuch einen neuen Messpunkt zu definieren</string>
+
+    <!-- Tools -->
+    <string name="tool_find_station_dialog_title">Station finden</string>
+    <string name="tool_find_station_dialog_hint">Stationsname</string>
+    <string name="tool_find_station_dialog_navigate">Navigieren</string>
+    <string name="tool_find_station_error_invalid">Station nicht gefunden</string>
 
     <!--  Misc  -->
     <string name="tool_generate_test_title">Test-Daten Erzeugen</string>

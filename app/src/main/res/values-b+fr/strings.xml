@@ -75,6 +75,7 @@
     <string name="action_fullscreen">Plein écran</string>
     <string name="action_tools">Outils</string>
     <string name="action_undo_last_leg">Annuler la dernière lecture</string>
+    <string name="action_find_station">Rechercher une station…</string>
     <string name="action_link_to_existing_survey">Joindre à une topographie existante</string>
     <string name="action_system_log">Journal du système</string>
     <string name="action_generate_test_survey">Générer une topographie teste</string>
@@ -539,6 +540,12 @@
     <string name="log_starting_up">Démarrage</string>
     <string name="log_shown">Affiché : %1$s</string>
     <string name="log_error_no_station_notification_intent">Impossible de démarrer la notification de nouvelle station</string>
+
+    <!-- Tools -->
+    <string name="tool_find_station_dialog_title">Rechercher une station</string>
+    <string name="tool_find_station_dialog_hint">Nom de la station</string>
+    <string name="tool_find_station_dialog_navigate">Naviguer</string>
+    <string name="tool_find_station_error_invalid">Station introuvable</string>
 
     <!-- Misc -->
     <string name="tool_generate_test_title">Générer des données de test</string>

@@ -75,6 +75,7 @@
     <string name="action_fullscreen">Ecrã Completo</string>
     <string name="action_tools">Ferramentas</string>
     <string name="action_undo_last_leg">Desfazer última leitura</string>
+    <string name="action_find_station">Localizar Estação…</string>
     <string name="action_link_to_existing_survey">Ligar a uma Topografia Existente</string>
     <string name="action_system_log">Registro do Sistema</string>
     <string name="action_generate_test_survey">Gerar Topografia de Teste</string>
@@ -545,6 +546,12 @@
     <string name="log_starting_up">Iniciando</string>
     <string name="log_shown">Mostrado: %1$s</string>
     <string name="log_error_no_station_notification_intent">Não é possível iniciar o intent de notificação de nova estação</string>
+
+    <!-- Tools -->
+    <string name="tool_find_station_dialog_title">Localizar Estação</string>
+    <string name="tool_find_station_dialog_hint">Nome da estação</string>
+    <string name="tool_find_station_dialog_navigate">Navegar</string>
+    <string name="tool_find_station_error_invalid">Estação não encontrada</string>
 
     <!-- Misc -->
     <string name="tool_generate_test_title">Gerar Dados de Teste</string>

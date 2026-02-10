@@ -221,6 +221,12 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             connectItem.setChecked(hasInstrument && requestComms().isConnected());
         }
 
+        // disable Find Station by default
+        MenuItem findStationItem = menu.findItem(R.id.action_find_station);
+        if (findStationItem != null) {
+            findStationItem.setEnabled(false);
+        }
+
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -301,6 +307,9 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             return true;
         } else if (itemId == R.id.action_undo_last_leg) {
             undoLastLeg();
+            return true;
+        } else if (itemId == R.id.action_find_station) {
+            onFindStation();
             return true;
         } else if (itemId == R.id.action_link_survey) {
             confirmToProceedIfNotSaved("requestLinkExistingSurvey");
@@ -1066,6 +1075,10 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         getSurvey().undoAddLeg();
         getSurveyManager().broadcastSurveyUpdated();
 
+    }
+
+    protected void onFindStation() {
+        // Override in SurveyEditorActivity
     }
 
     private void setInputModePreference(MenuItem item) {

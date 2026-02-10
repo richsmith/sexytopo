@@ -76,6 +76,7 @@
     <string name="action_fullscreen">Fullscreen</string>
     <string name="action_tools">Tools</string>
     <string name="action_undo_last_leg">Undo last reading</string>
+    <string name="action_find_station">Find Station…</string>
     <string name="action_link_to_existing_survey">Link to an Existing Survey</string>
     <string name="action_system_log">System Log</string>
     <string name="action_generate_test_survey">Generate Test Survey</string>
@@ -577,6 +578,12 @@
     <string name="log_starting_up">Starting up</string>
     <string name="log_shown">Shown: %1$s</string>
     <string name="log_error_no_station_notification_intent">Unable to start new station notification intent</string>
+
+    <!-- Tools -->
+    <string name="tool_find_station_dialog_title">Find Station</string>
+    <string name="tool_find_station_dialog_hint">Station name</string>
+    <string name="tool_find_station_dialog_navigate">Navigate</string>
+    <string name="tool_find_station_error_invalid">Station not found</string>
 
     <!-- Misc -->
     <string name="tool_generate_test_title">Generate Test Data</string>
