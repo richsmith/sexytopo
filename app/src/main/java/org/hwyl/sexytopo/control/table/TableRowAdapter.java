@@ -6,6 +6,7 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.HorizontalScrollView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -35,6 +36,8 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
     private Survey survey;
     private final OnRowClickListener onRowClickListener;
     private int stationColumnWidth = -1; // Default to no width
+    private final List<HorizontalScrollView> scrollViews = new ArrayList<>();
+    private HorizontalScrollView headerScrollView;
 
     private static final EnumMap<TableCol, Integer> TABLE_COL_TO_ANDROID_ID =
         new EnumMap<TableCol, Integer>(TableCol.class) {{
@@ -72,6 +75,7 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
         viewToPosition.clear();
         entries.clear();
         entries.addAll(newEntries);
+        scrollViews.clear();
         notifyDataSetChanged();
     }
 
@@ -106,18 +110,8 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
                 textView.setLayoutParams(params);
             }
 
-            if (col == TableCol.COMMENT) {
-                if (!shouldShowCommentColumn()) {
-                    textView.setVisibility(View.GONE); // Hide the view
-                    continue;
-                } else {
-                    textView.setVisibility(View.VISIBLE); // Show the view
-                    textView.setText(map.containsKey(col) ? col.format(map.get(col)) : "");
-                }
-            } else {
-                String display = map.containsKey(col) ? col.format(map.get(col)) : "?";
-                textView.setText(display);
-            }
+            String defaultDisplay = (col == TableCol.COMMENT) ? "" : "?";
+            textView.setText(map.containsKey(col) ? col.format(map.get(col)) : defaultDisplay);
 
             // Set background color with alternate row shading (theme-aware)
             if (isActiveStation(map.get(col))) {
@@ -181,6 +175,26 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
                 return true;
             });
         }
+
+        // Synchronize scrolling
+        final HorizontalScrollView scrollView = holder.itemView.findViewById(R.id.row_scroll_view);
+        if (scrollView != null) {
+            scrollViews.add(scrollView);
+            scrollView.setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+                for (HorizontalScrollView otherScrollView : scrollViews) {
+                    if (otherScrollView != v) {
+                        otherScrollView.scrollTo(scrollX, 0);
+                    }
+                }
+                if (headerScrollView != null) {
+                    headerScrollView.scrollTo(scrollX, 0);
+                }
+            });
+        }
+    }
+
+    public void setHeaderScrollView(HorizontalScrollView headerScrollView) {
+        this.headerScrollView = headerScrollView;
     }
 
     @Override

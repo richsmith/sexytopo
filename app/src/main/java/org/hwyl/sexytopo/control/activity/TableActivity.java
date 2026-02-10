@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
+import android.widget.HorizontalScrollView;
 import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TextView;
@@ -57,6 +58,8 @@ public class TableActivity extends SurveyEditorActivity
     private BroadcastReceiver receiver;
     private ContextMenuManager contextMenuManager;
     private View highlightedRow;
+    private HorizontalScrollView headerScrollView;
+
 
 
     @Override
@@ -73,6 +76,19 @@ public class TableActivity extends SurveyEditorActivity
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         tableRowAdapter = new TableRowAdapter(this, getSurvey(), this);
         recyclerView.setAdapter(tableRowAdapter);
+
+        headerScrollView = findViewById(R.id.header_scroll_view);
+        tableRowAdapter.setHeaderScrollView(headerScrollView);
+
+        headerScrollView.setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+            for (int i = 0; i < recyclerView.getChildCount(); i++) {
+                View child = recyclerView.getChildAt(i);
+                HorizontalScrollView scrollView = child.findViewById(R.id.row_scroll_view);
+                if (scrollView != null) {
+                    scrollView.scrollTo(scrollX, 0);
+                }
+            }
+        });
 
         // Set up FAB click listeners
         findViewById(R.id.fabAddStation).setOnClickListener(v -> manuallyAddStation());
@@ -151,11 +167,6 @@ public class TableActivity extends SurveyEditorActivity
         });
     }
 
-    private int dpToPx(int dp) {
-        float density = getResources().getDisplayMetrics().density;
-        return Math.round(dp * density);
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -164,6 +175,16 @@ public class TableActivity extends SurveyEditorActivity
         broadcastManager.registerReceiver(receiver, new IntentFilter(SexyTopoConstants.SURVEY_UPDATED_EVENT));
 
         syncWithSurvey();
+
+        // Measure header widths after layout is complete
+        View headerContainer = findViewById(R.id.HeaderContainer);
+        headerContainer.getViewTreeObserver().addOnGlobalLayoutListener(new android.view.ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                headerContainer.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                syncStationColumnWidths();
+            }
+        });
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && bundle.getString(SexyTopoConstants.JUMP_TO_STATION) != null) {
@@ -220,23 +241,27 @@ public class TableActivity extends SurveyEditorActivity
                     Toast.LENGTH_SHORT).show();
         }
 
-        // Synchronize header visibility
-        TextView commentHeader = findViewById(R.id.headerComment);
-        if (commentHeader != null) {
-            commentHeader.setVisibility(
-                    tableRowAdapter.shouldShowCommentColumn() ? View.VISIBLE : View.GONE);
-        }
-
-        // Calculate and set the optimal width for station columns
-        int stationColumnWidth = calculateStationColumnWidth(survey);
-        tableRowAdapter.setStationColumnWidth(stationColumnWidth);
-        updateHeaderWidths(stationColumnWidth);
-
         tableRowAdapter.setEntries(tableEntries);
     }
 
+    private void syncStationColumnWidths() {
+        int stationWidth = calculateStationColumnWidth(getSurvey());
+
+        TextView fromHeader = findViewById(R.id.headerFrom);
+        ViewGroup.LayoutParams fromParams = fromHeader.getLayoutParams();
+        fromParams.width = stationWidth;
+        fromHeader.setLayoutParams(fromParams);
+
+        TextView toHeader = findViewById(R.id.headerTo);
+        ViewGroup.LayoutParams toParams = toHeader.getLayoutParams();
+        toParams.width = stationWidth;
+        toHeader.setLayoutParams(toParams);
+
+        tableRowAdapter.setStationColumnWidth(stationWidth);
+    }
+
     private int calculateStationColumnWidth(Survey survey) {
-        String longestStationName = "ABCD";
+        String longestStationName = "ABCDE";
         for (Station station : survey.getAllStations()) {
             if (station.getName().length() > longestStationName.length()) {
                 longestStationName = station.getName();
@@ -245,28 +270,15 @@ public class TableActivity extends SurveyEditorActivity
 
         TextView textView = new TextView(this);
         textView.setText(longestStationName);
-        textView.setTextSize(16); // Match text size from your styles
+        textView.setTextSize(14); // From style
         TextPaint paint = textView.getPaint();
-        int padding = dpToPx(16); // Add some padding
-
+        int padding = dpToPx(40); // 2 * 10dp from style
         return (int) paint.measureText(longestStationName) + padding;
     }
 
-    private void updateHeaderWidths(int stationColumnWidth) {
-        TextView fromHeader = findViewById(R.id.headerFrom);
-        TextView toHeader = findViewById(R.id.headerTo);
-
-        if (fromHeader != null) {
-            ViewGroup.LayoutParams fromParams = fromHeader.getLayoutParams();
-            fromParams.width = stationColumnWidth;
-            fromHeader.setLayoutParams(fromParams);
-        }
-
-        if (toHeader != null) {
-            ViewGroup.LayoutParams toParams = toHeader.getLayoutParams();
-            toParams.width = stationColumnWidth;
-            toHeader.setLayoutParams(toParams);
-        }
+    private int dpToPx(int dp) {
+        float density = getResources().getDisplayMetrics().density;
+        return Math.round(dp * density);
     }
 
     @Override

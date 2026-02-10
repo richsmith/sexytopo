@@ -33,20 +33,34 @@
             android:orientation="vertical"
             android:background="@color/lightBackground">
 
-            <!-- Header Row (fixed at top, scrolls with content below) -->
-            <TableLayout
-                android:id="@+id/HeaderTable"
+            <!-- Header Row -->
+            <LinearLayout
+                android:id="@+id/HeaderContainer"
                 android:layout_height="wrap_content"
-                android:layout_width="match_parent">
-                <TableRow style="@style/HeaderRow">
-                    <TextView android:id="@+id/headerFrom" style="@style/HeaderText" android:layout_width="wrap_content" android:text="@string/table_head_from"/>
-                    <TextView android:id="@+id/headerTo" style="@style/HeaderText" android:layout_width="wrap_content" android:text="@string/table_head_to"/>
-                    <TextView style="@style/HeaderNum" android:layout_width="0dp" android:layout_weight="1" android:text="@string/table_head_distance"/>
-                    <TextView style="@style/HeaderNum" android:layout_width="0dp" android:layout_weight="1" android:text="@string/table_head_azimuth"/>
-                    <TextView style="@style/HeaderNum" android:layout_width="0dp" android:layout_weight="1" android:text="@string/table_head_elevation"/>
-                    <TextView android:id="@+id/headerComment" style="@style/HeaderComment" android:layout_width="0dp" android:layout_weight="4" android:text="@string/table_head_comment" android:visibility="gone"/>
-                </TableRow>
-            </TableLayout>
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                style="@style/HeaderRow">
+                <!-- Fixed Columns -->
+                <TextView android:id="@+id/headerFrom" style="@style/HeaderText" android:layout_width="wrap_content" android:text="@string/table_head_from"/>
+                <TextView android:id="@+id/headerTo" style="@style/HeaderText" android:layout_width="wrap_content" android:text="@string/table_head_to"/>
+                <!-- Scrollable Columns -->
+                <HorizontalScrollView
+                    android:id="@+id/header_scroll_view"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:scrollbars="none">
+                    <TableRow
+                        style="@style/HeaderRow"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent">
+                        <TextView style="@style/HeaderNum" android:layout_width="wrap_content" android:minWidth="70dp" android:text="@string/table_head_distance"/>
+                        <TextView style="@style/HeaderNum" android:layout_width="wrap_content" android:minWidth="70dp" android:text="@string/table_head_azimuth"/>
+                        <TextView style="@style/HeaderNum" android:layout_width="wrap_content" android:minWidth="70dp" android:text="@string/table_head_elevation"/>
+                        <TextView android:id="@+id/headerComment" style="@style/HeaderComment" android:layout_width="wrap_content" android:minWidth="200dp" android:text="@string/table_head_comment"/>
+                    </TableRow>
+                </HorizontalScrollView>
+            </LinearLayout>
 
             <!-- RecyclerView for scrollable content -->
             <androidx.recyclerview.widget.RecyclerView
