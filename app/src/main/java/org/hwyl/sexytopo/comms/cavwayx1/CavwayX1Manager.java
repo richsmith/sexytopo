@@ -153,17 +153,10 @@ public class CavwayX1Manager extends SexyTopoBleManager {
             byte packetType = packet[0];
             byte flags = packet[1];
 
-            // In Cavway-X1, bit 0 of byte 1 is the Leg Flag (0 = is a leg)
-            // bit 1 is the Calibration flag (0 = is calibration)
-            boolean isLeg = (flags & 0b00000001) == 0;
-            boolean isCalibration = (flags & 0b00000010) == 0;
-
-            if (packetType == PACKET_TYPE_NORMAL && isLeg) {
+            if (packetType == PACKET_TYPE_NORMAL) {
                 handleMeasurementPacket(packet);
                 acknowledgePacket(flags);
-            } else if (packetType == PACKET_TYPE_CALIBRATION || isCalibration) {
-                // The doc implies calibration data might be identified in two ways.
-                // For now, we are not handling calibration data from Cavway-X1.
+            } else if (packetType == PACKET_TYPE_CALIBRATION) {
                 Log.device("Cavway-X1 calibration packet received but not handled.");
                 acknowledgePacket(flags);
             } else {
