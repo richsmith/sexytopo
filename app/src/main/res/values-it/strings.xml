@@ -175,6 +175,7 @@
     <string name="sketch_menu_back_measurements">Tratti Inversi</string>
     <string name="sketch_position_cross_section_instruction">Seleziona dove disegnare la sezione trasversale</string>
     <string name="sketch_symbol_orientation_education">Trascina per impostare la direzione del simbolo</string>
+    <string name="sketch_text_hint">Inserisci testo</string>
 
     <!-- Table view -->
     <string name="table_head_from">Da</string>
@@ -206,11 +207,10 @@
     <string name="manual_edit_to_station">Alla stazione</string>
     <string name="manual_edit_to_station_error">Stazione di arrivo non valida</string>
     <string name="manual_edit_shot_backwards">⬅ Lettura all\'indietro</string>
+    <string name="manual_edit_comment">Commento</string>
     <string name="manual_rename_station_title">Rinomina Stazione</string>
     <string name="manual_rename_station_hint">Nome stazione</string>
     <string name="manual_rename_error">Rinomina fallita</string>
-    <string name="graph_text_hint">Inserisci testo</string>
-    <string name="graph_comment_hint">Commento stazione</string>
 
     <!-- Device -->
     <string name="device_instruction_bluetooth">1. Bluetooth</string>
@@ -539,6 +539,7 @@
     <string name="context_move_leg_no_valid_move">Nessun posto valido dove spostare questo tratto</string>
     <string name="context_rename_splay_error">Impossibile rinominare una terminazione di splay</string>
     <string name="context_set_active_splay_error">Impossibile impostare la terminazione di splay come stazione attiva</string>
+    <string name="context_station_comment_hint">Commento stazione</string>
 
     <!-- Logging -->
     <string name="log_starting_up">Avvio in corso</string>

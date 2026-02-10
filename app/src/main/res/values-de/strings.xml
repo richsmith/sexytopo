@@ -175,6 +175,7 @@
     <string name="sketch_menu_back_measurements">Rückwärtsgerichtete Messstrecken</string>
     <string name="sketch_position_cross_section_instruction">Ort zum Zeichnen eines Querschnitts auswählen</string>
     <string name="sketch_symbol_orientation_education"> Ziehen, um die Richtung des Symbols festzulegen</string>
+    <string name="sketch_text_hint">Text eingeben</string>
 
     <!--  Table view  -->
     <string name="table_head_from">Von</string>
@@ -206,11 +207,10 @@
     <string name="manual_edit_to_station">Zur Station</string>
     <string name="manual_edit_to_station_error">Ungültige Zielstation</string>
     <string name="manual_edit_shot_backwards">⬅ Rückwärts gemessen</string>
+    <string name="manual_edit_comment">Kommentar</string>
     <string name="manual_rename_station_title">Messpunkt umbenennen</string>
     <string name="manual_rename_station_hint">Stationsname</string>
     <string name="manual_rename_error">Umbenennen fehlgeschlagen</string>
-    <string name="graph_text_hint">Text eingeben</string>
-    <string name="graph_comment_hint">Stationskommentar</string>
 
     <!--  Device  -->
     <string name="device_instruction_bluetooth">1. Bluetooth</string>
@@ -533,6 +533,7 @@
     <string name="context_move_leg_no_valid_move">Keine gültige Möglichkeit, um diese Messstrecke zu bewegen</string>
     <string name="context_rename_splay_error">Kann das Ende einer Dimension/Hilfslinie nicht umbenennen</string>
     <string name="context_set_active_splay_error">Ende einer Dimension/Hilfslinie kann nicht als aktiver Messpunkt definiert werden</string>
+    <string name="context_station_comment_hint">Stationskommentar</string>
 
     <!--  Logging  -->
     <string name="log_starting_up">Startprozess läuft</string>
