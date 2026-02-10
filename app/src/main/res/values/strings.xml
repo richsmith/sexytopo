@@ -42,6 +42,7 @@
     <string name="title_activity_guide">Guide</string>
     <string name="title_activity_cross_section">Cross-Section</string>
     <string name="cross_section_title">Cross-Section: %1$s</string>
+    <string name="cross_section_open">Open</string>
 
     <!-- Action bar menu -->
     <string name="action_table">Table</string>

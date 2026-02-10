@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -526,7 +527,14 @@ public abstract class GraphActivity extends SurveyEditorActivity
         LegDialogs.renameStation(this, getSurvey(), station);
     }
 
+    private AlertDialog currentLayersDialog;
+    
     private void openLayersDialog() {
+        // Dismiss any existing dialog first
+        if (currentLayersDialog != null && currentLayersDialog.isShowing()) {
+            currentLayersDialog.dismiss();
+        }
+        
         Sketch sketch = getSketch(getSurvey());
         
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
@@ -569,7 +577,7 @@ public abstract class GraphActivity extends SurveyEditorActivity
             graphView.invalidate();
         });
         
-        builder.show();
+        currentLayersDialog = builder.show();
     }
     
     private LinearLayout createLayerRow(Sketch sketch, SketchLayer layer) {
@@ -597,11 +605,12 @@ public abstract class GraphActivity extends SurveyEditorActivity
         nameView.setText(layer.getName());
         nameView.setPadding(16, 0, 16, 0);
         nameView.setTextSize(16);
-        // Apply visual indication of visibility state
+        // Apply visual indication of visibility state (what it will look like when inactive)
+        // For active layer, show in parentheses style to indicate "this is what it will be"
         if (layer.getVisibility() == SketchLayer.Visibility.FADED) {
-            nameView.setAlpha(0.5f);
+            nameView.setAlpha(isActive ? 0.7f : 0.5f);
         } else if (layer.getVisibility() == SketchLayer.Visibility.HIDDEN) {
-            nameView.setAlpha(0.3f);
+            nameView.setAlpha(isActive ? 0.5f : 0.3f);
             nameView.setPaintFlags(nameView.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
         }
         LinearLayout.LayoutParams nameParams = new LinearLayout.LayoutParams(
@@ -610,12 +619,12 @@ public abstract class GraphActivity extends SurveyEditorActivity
         row.addView(nameView);
         
         // Fade button (eye with transparency)
+        // Sets the inactive visibility state - can be changed even for active layer
         ImageButton fadeButton = new ImageButton(this);
         boolean isFaded = layer.getVisibility() == SketchLayer.Visibility.FADED;
         fadeButton.setImageResource(android.R.drawable.ic_menu_view);
         fadeButton.setAlpha(isFaded ? 1.0f : 0.4f);
         fadeButton.setContentDescription(getString(R.string.layers_visibility_faded));
-        fadeButton.setEnabled(!isActive); // Can't fade active layer
         fadeButton.setOnClickListener(v -> {
             if (isFaded) {
                 layer.setVisibility(SketchLayer.Visibility.SHOWING);
@@ -628,12 +637,12 @@ public abstract class GraphActivity extends SurveyEditorActivity
         row.addView(fadeButton);
         
         // Hide button (X icon)
+        // Sets the inactive visibility state - can be changed even for active layer
         ImageButton hideButton = new ImageButton(this);
         boolean isHidden = layer.getVisibility() == SketchLayer.Visibility.HIDDEN;
         hideButton.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
         hideButton.setAlpha(isHidden ? 1.0f : 0.4f);
         hideButton.setContentDescription(getString(R.string.layers_visibility_hidden));
-        hideButton.setEnabled(!isActive); // Can't hide active layer
         hideButton.setOnClickListener(v -> {
             if (isHidden) {
                 layer.setVisibility(SketchLayer.Visibility.SHOWING);

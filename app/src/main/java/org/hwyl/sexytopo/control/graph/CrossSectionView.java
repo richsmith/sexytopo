@@ -11,10 +11,8 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 
-import org.hwyl.sexytopo.control.activity.CrossSectionActivity;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.SketchPreferences;
-import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Space;
@@ -43,7 +41,6 @@ public class CrossSectionView extends View {
     private static final float MAX_ZOOM = 1000.0f;
 
     private CrossSection crossSection;
-    private CrossSectionActivity activity;
     
     private SketchTool currentSketchTool = SketchTool.DRAW;
     private BrushColour currentBrushColour = BrushColour.BLACK;
@@ -89,13 +86,10 @@ public class CrossSectionView extends View {
         drawPaint.setAntiAlias(antiAlias);
     }
 
-    public void setActivity(CrossSectionActivity activity) {
-        this.activity = activity;
-    }
-
     public void setCrossSection(CrossSection crossSection) {
         this.crossSection = crossSection;
-        centreView();
+        // Delay fitting to view until we have dimensions
+        post(this::fitToSplays);
     }
     
     public void setSketchTool(SketchTool tool) {
@@ -110,6 +104,72 @@ public class CrossSectionView extends View {
         this.currentBrushColour = colour;
     }
 
+    private static final float VIEW_MARGIN = 0.15f; // 15% margin on each side
+    
+    private void fitToSplays() {
+        if (crossSection == null || getWidth() == 0 || getHeight() == 0) {
+            return;
+        }
+        
+        // Calculate bounding box of all splays
+        Space<Coord2D> projection = crossSection.getProjection();
+        Map<Leg, Line<Coord2D>> legMap = projection.getLegMap();
+        
+        if (legMap.isEmpty()) {
+            centreView();
+            return;
+        }
+        
+        float minX = Float.MAX_VALUE, maxX = -Float.MAX_VALUE;
+        float minY = Float.MAX_VALUE, maxY = -Float.MAX_VALUE;
+        
+        for (Line<Coord2D> line : legMap.values()) {
+            Coord2D start = line.getStart();
+            Coord2D end = line.getEnd();
+            minX = Math.min(minX, Math.min(start.x, end.x));
+            maxX = Math.max(maxX, Math.max(start.x, end.x));
+            minY = Math.min(minY, Math.min(start.y, end.y));
+            maxY = Math.max(maxY, Math.max(start.y, end.y));
+        }
+        
+        // Add some padding around the bounds
+        float width = maxX - minX;
+        float height = maxY - minY;
+        float paddingX = width * VIEW_MARGIN;
+        float paddingY = height * VIEW_MARGIN;
+        minX -= paddingX;
+        maxX += paddingX;
+        minY -= paddingY;
+        maxY += paddingY;
+        
+        // Recalculate with padding
+        width = maxX - minX;
+        height = maxY - minY;
+        
+        // Ensure minimum size (avoid division by zero for flat splays)
+        if (width < 0.5f) width = 2f;
+        if (height < 0.5f) height = 2f;
+        
+        // Calculate scale to fit
+        float viewWidth = getWidth();
+        float viewHeight = getHeight();
+        float scaleX = viewWidth / width;
+        float scaleY = viewHeight / height;
+        surveyToViewScale = Math.min(scaleX, scaleY);
+        
+        // Clamp to valid range
+        surveyToViewScale = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, surveyToViewScale));
+        
+        // Centre the view on the bounding box centre
+        float centreX = (minX + maxX) / 2f;
+        float centreY = (minY + maxY) / 2f;
+        float viewCentreX = viewWidth / 2f / surveyToViewScale;
+        float viewCentreY = viewHeight / 2f / surveyToViewScale;
+        viewpointOffset = new Coord2D(centreX - viewCentreX, centreY - viewCentreY);
+        
+        invalidate();
+    }
+    
     private void centreView() {
         viewpointOffset = Coord2D.ORIGIN;
         float centreX = getWidth() / 2f / surveyToViewScale;
@@ -239,26 +299,17 @@ public class CrossSectionView extends View {
             return;
         }
 
-        drawGrid(canvas);
+        if (SketchPreferences.Toggle.SHOW_GRID.isOn()) {
+            drawGrid(canvas);
+        }
         drawSplays(canvas);
         drawSketch(canvas);
         drawStation(canvas);
     }
 
     private void drawGrid(Canvas canvas) {
-        int width = getWidth();
-        int height = getHeight();
-        float gridSpacing = surveyToViewScale; // 1 metre grid
-        
-        float startX = (-viewpointOffset.x * surveyToViewScale) % gridSpacing;
-        for (float x = startX; x < width; x += gridSpacing) {
-            canvas.drawLine(x, 0, x, height, gridPaint);
-        }
-        
-        float startY = (-viewpointOffset.y * surveyToViewScale) % gridSpacing;
-        for (float y = startY; y < height; y += gridSpacing) {
-            canvas.drawLine(0, y, width, y, gridPaint);
-        }
+        GridDrawer.drawGrid(canvas, gridPaint, viewpointOffset, surveyToViewScale,
+                           getWidth(), getHeight());
     }
 
     private void drawSplays(Canvas canvas) {

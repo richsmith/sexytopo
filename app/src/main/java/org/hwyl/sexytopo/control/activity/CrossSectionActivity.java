@@ -6,9 +6,10 @@ import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageButton;
 
 import androidx.core.content.ContextCompat;
+
+import com.google.android.material.appbar.MaterialToolbar;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.graph.CrossSectionView;
@@ -39,13 +40,19 @@ public class CrossSectionActivity extends SexyTopoActivity implements View.OnCli
         setupMaterialToolbar();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         
-        applyEdgeToEdgeInsets(R.id.crossSectionRootLayout, true, true);
+        applyEdgeToEdgeInsets(R.id.crossSectionRootLayout, true, false);
+        applyEdgeToEdgeInsets(R.id.crossSectionToolbar, false, true);
 
         stationName = getIntent().getStringExtra(EXTRA_STATION_NAME);
         buttonHighlightColour = ContextCompat.getColor(this, R.color.buttonHighlight);
         
         crossSectionView = findViewById(R.id.crossSectionView);
-        crossSectionView.setActivity(this);
+        
+        // Set up back navigation
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            toolbar.setNavigationOnClickListener(v -> finish());
+        }
         
         // Set up toolbar buttons
         int[] buttonIds = {
@@ -54,6 +61,8 @@ public class CrossSectionActivity extends SexyTopoActivity implements View.OnCli
             R.id.buttonErase,
             R.id.buttonUndo,
             R.id.buttonRedo,
+            R.id.buttonZoomIn,
+            R.id.buttonZoomOut,
             R.id.buttonBlack,
             R.id.buttonBrown,
             R.id.buttonGrey,
@@ -120,6 +129,10 @@ public class CrossSectionActivity extends SexyTopoActivity implements View.OnCli
             crossSectionView.undo();
         } else if (id == R.id.buttonRedo) {
             crossSectionView.redo();
+        } else if (id == R.id.buttonZoomIn) {
+            crossSectionView.adjustZoomBy(1.5f);
+        } else if (id == R.id.buttonZoomOut) {
+            crossSectionView.adjustZoomBy(1 / 1.5f);
         } else {
             // Check colour buttons
             for (BrushColour colour : BrushColour.values()) {

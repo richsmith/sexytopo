@@ -46,7 +46,11 @@ public class Sketch extends Shape {
     public void setLayers(List<SketchLayer> layers) {
         this.layers = layers;
         if (!layers.isEmpty()) {
-            nextLayerId = layers.stream().mapToInt(SketchLayer::getId).max().orElse(0) + 1;
+            int maxId = 0;
+            for (SketchLayer layer : layers) {
+                maxId = Math.max(maxId, layer.getId());
+            }
+            nextLayerId = maxId + 1;
             activeLayerId = layers.get(0).getId();
         }
         recalculateBoundingBox();
@@ -70,12 +74,6 @@ public class Sketch extends Shape {
         if (getLayerById(layerId) != null) {
             int previousLayerId = this.activeLayerId;
             this.activeLayerId = layerId;
-            
-            // Ensure active layer is visible
-            SketchLayer activeLayer = getActiveLayer();
-            if (activeLayer != null && activeLayer.getVisibility() != SketchLayer.Visibility.SHOWING) {
-                activeLayer.setVisibility(SketchLayer.Visibility.SHOWING);
-            }
             
             // Record layer switch in undo history
             if (previousLayerId != layerId) {
@@ -157,6 +155,33 @@ public class Sketch extends Shape {
             all.addAll(layer.getCrossSectionDetails());
         }
         return all;
+    }
+    
+    /**
+     * Returns cross-section details along with their parent layer's visibility state.
+     * Used for rendering to respect layer visibility.
+     */
+    public List<CrossSectionWithVisibility> getCrossSectionDetailsWithVisibility() {
+        List<CrossSectionWithVisibility> all = new ArrayList<>();
+        for (SketchLayer layer : layers) {
+            boolean isActive = (layer.getId() == activeLayerId);
+            SketchLayer.Visibility effectiveVisibility = isActive ? 
+                SketchLayer.Visibility.SHOWING : layer.getVisibility();
+            for (CrossSectionDetail detail : layer.getCrossSectionDetails()) {
+                all.add(new CrossSectionWithVisibility(detail, effectiveVisibility));
+            }
+        }
+        return all;
+    }
+    
+    public static class CrossSectionWithVisibility {
+        public final CrossSectionDetail detail;
+        public final SketchLayer.Visibility visibility;
+        
+        public CrossSectionWithVisibility(CrossSectionDetail detail, SketchLayer.Visibility visibility) {
+            this.detail = detail;
+            this.visibility = visibility;
+        }
     }
 
     public void setCrossSectionDetails(List<CrossSectionDetail> crossSectionDetails) {

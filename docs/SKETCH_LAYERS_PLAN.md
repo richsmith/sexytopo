@@ -279,11 +279,94 @@ public class LayerSwitchDetail extends SketchDetail {
 - [x] How to handle layer selection when importing XVI files? **First layer in file order**
 - [x] Should cross-section popup allow drawing/editing, or view-only initially? **Allow editing**
 - [x] Cross-section placeholder icon design? **Simple X with connection line to station** (same line as current)
-- [x] Cross-section placeholder visibility? **Inherits from parent layer** (hidden/faded/showing)
+- [x] Cross-section placeholder visibility? **Hidden with parent layer** (only visible when layer is SHOWING). *Future consideration: may want to keep cross-section placeholders visible even when layer is faded/hidden, to allow navigation to cross-section sketches from any layer state.*
 - [x] Cross-section layer membership? **Each layer owns its cross-sections**
 - [x] Cross-section popup UI? **New Activity with GraphView**
 - [x] Backward compatibility? **Old format loads into single layer**
 - [x] Undo across layers? **Layer switches recorded in undo stack**
+
+## Performance Optimisations
+
+Sketching becomes slow with multiple layers, particularly when faded layers are visible. The following optimisations are listed in priority order.
+
+### Benchmarking (Future)
+
+To measure the impact of optimisations, consider adding:
+- **Debug timing in GraphView.onDraw()** - Log frame times when debug mode is enabled, average over N frames
+- **Automated benchmark test** - JUnit test that creates a Sketch with known content (e.g., 100 paths with 50 points each) and measures draw time in a loop
+- Compare results before/after changes using git stash/checkout
+
+| Priority | Fix | Effort | Impact |
+|----------|-----|--------|--------|
+| 1 | Bitmap cache for faded layers | Medium | High |
+| 2 | Reusable float array for path drawing | Low | Medium |
+| 3 | Canvas rotation instead of RotateDrawable | Low | Medium |
+| 4 | Spatial index for snap points | High | Medium |
+| 5 | Primitive arrays instead of List\<Coord2D\> | Very High | Low (Not Recommended) |
+
+### 1. Bitmap Cache for Faded Layers
+
+**Location:** `GraphView.java#L1263-L1386`
+
+**Problem:** Faded layers are drawn exactly like visible layers - every path, every point, every symbol. The only difference is the color.
+
+**Fix options:**
+- **A) Bitmap caching for faded layers** - Render faded layers to an off-screen bitmap once, then just `drawBitmap()` on each frame. Invalidate cache when layer content changes or view transforms.
+- **B) Simplified rendering for faded layers** - Skip symbols, reduce path point density, or only draw every Nth path.
+- **C) Draw faded layers less frequently** - Only redraw faded layers when panning stops, not during active drawing.
+
+**Implications:** Option A provides best quality but uses memory. Option B may look visibly worse. Option C causes visual lag but is simple to implement.
+
+### 2. Reusable Float Array for Path Drawing
+
+**Location:** `GraphView.java#L1291-L1323`
+
+**Problem:** Every path drawn allocates a new `float[]` array:
+```java
+float[] lines = new float[path.size() * 4];
+```
+This happens for every path, on every frame, triggering garbage collection.
+
+**Fix options:**
+- **A) Reusable float array pool** - Pre-allocate and reuse arrays.
+- **B) Pre-compute view coordinates** - Cache transformed coordinates when path changes, not on every draw.
+
+**Implications:** Option A is simpler but still iterates all points. Option B requires more refactoring but eliminates per-frame coordinate transforms.
+
+### 3. Canvas Rotation Instead of RotateDrawable
+
+**Location:** `GraphView.java#L1373-L1384`
+
+**Problem:** For each directional symbol, a new `RotateDrawable` is created every frame.
+
+**Fix options:**
+- **A) Cache RotateDrawables per symbol** - Create once, reuse.
+- **B) Use Canvas rotation** - `canvas.save()`, `canvas.rotate()`, draw, `canvas.restore()`.
+
+**Implications:** Option B is cleaner and faster, just needs careful pivot point handling.
+
+### 4. Spatial Index for Snap Points
+
+**Location:** `Sketch.java#L299-L324` and `GraphView.java#L492-L496`
+
+**Problem:** `findEligibleSnapPointWithin()` iterates all paths in all visible layers on ACTION_DOWN and ACTION_UP. With many paths, this is slow.
+
+**Fix options:**
+- **A) Spatial index (quadtree)** - Index path endpoints for O(log n) lookup.
+- **B) Only snap to active layer** - Reduces iteration scope.
+- **C) Cache snap points** - Build list of endpoints once, update incrementally.
+
+**Implications:** Option A is most scalable but adds complexity. Option B changes behavior. Option C is a good middle ground.
+
+### 5. Primitive Arrays Instead of List\<Coord2D\> (Not Recommended)
+
+**Locations:** Multiple, including `GraphView.java#L1297-L1300`
+
+**Problem:** While coordinate transforms already avoid intermediate objects (per comments at lines 424-428), `Coord2D` objects are still created in loops.
+
+**Fix:** Replace `List<Coord2D>` data model with primitive `float[]` arrays throughout the codebase.
+
+**Implications:** Significant refactoring for marginal gains. Would affect serialization, undo/redo, and all path manipulation code. **Not recommended.**
 
 ## Related Files
 
