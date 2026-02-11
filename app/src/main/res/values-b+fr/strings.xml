@@ -126,7 +126,7 @@
     <string name="file_active_survey_not_present">Aucun relevé actif</string>
     <string name="file_active_survey_uri">L\'URI du relevé actif est %1$s</string>
     <string name="file_operation_initialisation_error">Erreur d\'initialisation de l\'opération sur le fichier</string>
-    <string name="file_link_survey_station">Choisissez la station à relier à la station active</string>
+    <string name="file_link_survey_station">Choisissez la station à relier</string>
     <string name="file_link_survey_save_error">Erreur lors de la sauvegarde de la nouvelle connexion</string>
     <string name="file_unlink_survey_dialog_title">Dissocier la topographie</string>
     <string name="file_unlink_survey_not_found">Impossible de trouver la topographie à dissocier</string>

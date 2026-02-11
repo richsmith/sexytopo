@@ -126,7 +126,7 @@
     <string name="file_active_survey_not_present">No hay topografía activa</string>
     <string name="file_active_survey_uri">La URI de la topografía activa es %1$s</string>
     <string name="file_operation_initialisation_error">Error al inicializar la operación de archivo</string>
-    <string name="file_link_survey_station">Elegir estación a la que enlazar la estación activa</string>
+    <string name="file_link_survey_station">Elegir estación para enlazar</string>
     <string name="file_link_survey_save_error">Error al guardar la nueva conexión</string>
     <string name="file_unlink_survey_dialog_title">Desenlazar Topografía</string>
     <string name="file_unlink_survey_not_found">No se pudo encontrar la topografía para desenlazar</string>

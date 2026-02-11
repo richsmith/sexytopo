@@ -126,7 +126,7 @@
     <string name="file_active_survey_not_present">Nessun rilievo attivo</string>
     <string name="file_active_survey_uri">L\'URI del rilievo attivo è %1$s</string>
     <string name="file_operation_initialisation_error">Errore nell\'inizializzazione dell\'operazione file</string>
-    <string name="file_link_survey_station">Scegli la stazione a cui collegare la stazione attiva</string>
+    <string name="file_link_survey_station">Scegli la stazione da collegare</string>
     <string name="file_link_survey_save_error">Errore nel salvataggio della nuova connessione</string>
     <string name="file_unlink_survey_dialog_title">Scollega Rilievo</string>
     <string name="file_unlink_survey_not_found">Impossibile trovare il rilievo da scollegare</string>

@@ -127,7 +127,7 @@
     <string name="file_active_survey_not_present">No active survey</string>
     <string name="file_active_survey_uri">Active survey URI is %1$s</string>
     <string name="file_operation_initialisation_error">Error initialising file operation</string>
-    <string name="file_link_survey_station">Choose station to link active station to</string>
+    <string name="file_link_survey_station">Choose station to link to</string>
     <string name="file_link_survey_save_error">Error saving new connection</string>
     <string name="file_unlink_survey_dialog_title">Unlink Survey</string>
     <string name="file_unlink_survey_not_found">Could not find survey to unlink</string>

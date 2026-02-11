@@ -54,6 +54,7 @@ import org.hwyl.sexytopo.control.io.basic.Saver;
 import org.hwyl.sexytopo.control.io.translation.Exporter;
 import org.hwyl.sexytopo.control.io.translation.ImportManager;
 import org.hwyl.sexytopo.control.io.translation.SelectableExporters;
+import org.hwyl.sexytopo.control.components.StationSelectorDialog;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.testutils.ExampleSurveyCreator;
@@ -567,34 +568,14 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
     private void linkToStationInSurvey(final Survey surveyToLink) {
-        final Station[] stations = surveyToLink.getAllStations().toArray(new Station[]{});
-
-        MaterialAlertDialogBuilder builderSingle = new MaterialAlertDialogBuilder(this);
-
-        builderSingle.setTitle(R.string.file_link_survey_station);
-        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.select_dialog_item);
-
-        for (Station station : stations) {
-            arrayAdapter.add(station.getName());
-        }
-
-        builderSingle.setNegativeButton(R.string.cancel,
-                (dialog, which) -> dialog.dismiss());
-
-        builderSingle.setAdapter(arrayAdapter,
-            (dialog, which) -> {
-                String stationName = arrayAdapter.getItem(which);
+        StationSelectorDialog.show(
+            this,
+            surveyToLink,
+            R.string.file_link_survey_station,
+            R.string.tool_find_station_dialog_hint,
+            android.R.string.ok,
+            selectedStation -> {
                 try {
-                    Station selectedStation = Survey.NULL_STATION;
-                    for (Station station : stations) {
-                        if (station.getName().equals(stationName)) {
-                            selectedStation = station;
-                            break;
-                        }
-                    }
-
                     Survey current = getSurvey();
                     Station stationToLink = pendingLinkStation != null ?
                         current.getStationByName(pendingLinkStation) : null;
@@ -616,9 +597,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 } catch (Exception exception) {
                     showExceptionAndLog(exception);
                 }
-            });
-
-        builderSingle.show();
+            }
+        );
     }
 
 

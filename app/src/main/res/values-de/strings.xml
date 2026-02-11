@@ -126,7 +126,7 @@
     <string name="file_active_survey_not_present">Keine Vermessung ausgewählt</string>
     <string name="file_active_survey_uri">Die URI der aktuellen Vermessung ist %1$s</string>
     <string name="file_operation_initialisation_error">Fehler beim Vorbereiten einer Datei-Aktion</string>
-    <string name="file_link_survey_station">Messpunkt auswählen mit welchem der aktive Messpunkt verbunden werden soll</string>
+    <string name="file_link_survey_station">Messpunkt zum Verbinden auswählen</string>
     <string name="file_link_survey_save_error">Fehler beim Speichern der neuen Verbindung</string>
     <string name="file_unlink_survey_dialog_title">Verknüpfung aus Vermessungsdatei lösen</string>
     <string name="file_unlink_survey_not_found">Konnte keine Vermessungsdatei zum Lösen einer Verknüpfung finden</string>
