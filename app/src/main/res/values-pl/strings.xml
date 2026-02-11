@@ -1,0 +1,568 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2" -->
+<resources>
+
+    <!-- Common -->
+    <string name="ok">OK</string>
+    <string name="cancel">Anuluj</string>
+    <string name="carry_on">Kontynuuj</string>
+    <string name="delete">Usuń</string>
+    <string name="save">Zapisz</string>
+    <string name="overwrite">Nadpisz</string>
+    <string name="move">Przenieś</string>
+    <string name="replace">Zamień</string>
+    <string name="rename">Zmień nazwę</string>
+    <string name="clear">Wyczyść</string>
+    <string name="add">Dodaj</string>
+    <string name="edit">Edytuj</string>
+    <string name="continue_question">Kontynuować?</string>
+    <string name="delete_question">Usunąć?</string>
+    <string name="exit_question">Wyjść?</string>
+    <string name="station">Stanowisko</string>
+    <string name="leg">Ciąg</string>
+    <string name="splay">Pomiar szczegółowy</string>
+    <string name="not_applicable">Nie dotyczy</string>
+    <string name="no_data">Brak danych</string>
+    <string name="unknown">Nieznany</string>
+    <string name="error_prefix">Błąd</string>
+    <string name="experimental_warning">Eksperymentalne</string>
+
+    <!-- System -->
+    <string name="title_activity_start_up">Uruchamianie</string>
+    <string name="title_activity_device">Połącz</string>
+    <string name="title_activity_table">Tabela</string>
+    <string name="title_activity_plan">Plan</string>
+    <string name="title_activity_elevation">Przekrój</string>
+    <string name="title_activity_calibration">Kalibracja</string>
+    <string name="title_activity_survey">Statystyki</string>
+    <string name="title_activity_settings">Ustawienia</string>
+    <string name="title_activity_system_log">Dziennik</string>
+    <string name="title_activity_help">Pomoc</string>
+    <string name="title_activity_guide">Instrukcja</string>
+
+    <!-- Action bar menu -->
+    <string name="action_table">Tabela</string>
+    <string name="action_plan">Plan</string>
+    <string name="action_elevation">Przekrój</string>
+    <string name="action_file">Plik</string>
+    <string name="action_stats">Statystyki</string>
+    <string name="action_settings">Ustawienia</string>
+    <string name="action_dev">Dev</string>
+    <string name="action_device">Instrument</string>
+    <string name="action_device_connect">Połącz…</string>
+    <string name="action_connection">Połączenie</string>
+    <string name="action_trip">Bieżący wyjazd</string>
+    <string name="action_help">Pomoc</string>
+    <string name="action_guide">Podręcznik</string>
+    <string name="action_about">O programie</string>
+    <string name="action_file_new">Nowy pomiar</string>
+    <string name="action_file_open">Otwórz pomiar…</string>
+    <string name="action_file_delete">Usuń pomiar…</string>
+    <string name="action_file_save">Zapisz</string>
+    <string name="action_file_save_as">Zapisz jako…</string>
+    <string name="action_file_import">Importuj</string>
+    <string name="action_file_export">Eksportuj…</string>
+    <string name="action_file_restore_autosave">Przywróć autozapis</string>
+    <string name="action_file_exit">Wyjdź z SexyTopo</string>
+    <string name="action_file_import_file">Importuj plik…</string>
+    <string name="action_file_import_directory">Importuj folder…</string>
+    <string name="action_input">Tryb wprowadzania</string>
+    <string name="action_input_mode_forward">Do przodu</string>
+    <string name="action_input_mode_backward">Do tyłu</string>
+    <string name="action_input_mode_combo">Do przodu/tyłu</string>
+    <string name="action_input_mode_cal_check">Tylko pomiary szczegółowe</string>
+    <string name="action_view">Widok</string>
+    <string name="action_fullscreen">Pełny ekran</string>
+    <string name="action_tools">Narzędzia</string>
+    <string name="action_undo_last_leg">Cofnij ostatni pomiar</string>
+    <string name="action_find_station">Znajdź stanowisko…</string>
+    <string name="action_link_to_existing_survey">Połącz z istniejącym pomiarem</string>
+    <string name="action_system_log">Dziennik systemowy</string>
+    <string name="action_generate_test_survey">Generuj testowy pomiar</string>
+    <string name="action_debug_mode">Tryb debugowania</string>
+    <string name="action_trigger_autosave">Wywołaj autozapis</string>
+    <string name="action_kill_connection">Zakończ połączenie (Niebezpieczne!)</string>
+    <string name="action_force_crash">Wymuś awarię (Niebezpieczne!)</string>
+
+    <!-- File handling -->
+    <string name="file_started_new_survey">Rozpoczęto nowy pomiar</string>
+    <string name="file_error_initialising_survey">Błąd inicjalizacji pomiaru: %1$s</string>
+    <string name="file_loading_survey">Wczytywanie <i>%1$s</i></string>
+    <string name="file_loaded_survey">Wczytano <i>%1$s</i></string>
+    <string name="file_loading_file">Wczytywanie pliku %1$s</string>
+    <string name="file_loaded_file">Wczytano plik %1$s</string>
+    <string name="file_load_error_not_survey">Nieprawidłowy folder pomiaru</string>
+    <string name="file_load_survey_error">Błąd wczytywania pomiaru</string>
+    <string name="file_load_survey_trip_error">Błąd wczytywania wyjazdu</string>
+    <string name="file_load_survey_stations_error">Błąd wczytywania stanowisk</string>
+    <string name="file_load_survey_partial_failure">Błąd wczytywania stanowisk</string>
+    <string name="file_load_sketch_paths_error">Błąd wczytywania ścieżek szkicu</string>
+    <string name="file_load_symbols_error">Błąd wczytywania symboli</string>
+    <string name="file_load_sketch_labels_error">Błąd wczytywania etykiet szkicu</string>
+    <string name="file_load_cross_sections_error">Błąd wczytywania przekrojów</string>
+    <string name="file_survey_saved">Zapisano</string>
+    <string name="file_save_autosaved">Autozapis wykonany</string>
+    <string name="file_save_autosave_error">Błąd autozapisu</string>
+    <string name="file_save_survey_error">NIE UDAŁO SIĘ zapisać pomiaru</string>
+    <string name="file_save_error_invalid_folder">Nie można zapisać do folderu</string>
+    <string name="file_save_overwrite_survey_title_question">Folder zawiera pomiar; nadpisać?</string>
+    <string name="file_save_to_non_empty_directory_question">Folder nie jest pusty; zapisać mimo to?</string>
+    <string name="file_restoring_autosave">Przywracanie autozapisu</string>
+    <string name="file_intent_save_as_title">Utwórz folder do zapisu pomiaru</string>
+    <string name="file_intent_open_title">Wybierz folder pomiaru</string>
+    <string name="file_intent_link_title">Wybierz folder pomiaru do połączenia</string>
+    <string name="file_intent_import_select_source">Wybierz folder do importu</string>
+    <string name="file_intent_delete_select_target">Wybierz folder pomiaru do usunięcia</string>
+    <string name="file_dialog_delete_survey_title">Usunąć pomiar?</string>
+    <string name="file_dialog_delete_survey_content">Spowoduje to usunięcie wszystkich plików pomiaru "%1$s"</string>
+    <string name="file_delete_error_not_survey">Wybór nie wydaje się być pomiarem</string>
+    <string name="file_delete_successful">Pomyślnie usunięto pomiar %1$s</string>
+    <string name="file_error_deleting_survey">Błąd usuwania pomiaru</string>
+    <string name="file_cannot_extend_unsaved_survey">Nie można rozszerzyć niezapisanego pomiaru</string>
+    <string name="file_autosave_restored">Przywrócono autozapis</string>
+    <string name="file_autosave_load_error">Błąd przywracania autozapisu</string>
+    <string name="file_warning_survey_not_saved">Uwaga: bieżący pomiar nie został zapisany</string>
+    <string name="file_active_survey">Aktywny pomiar to %1$s</string>
+    <string name="file_active_survey_not_present">Brak aktywnego pomiaru</string>
+    <string name="file_active_survey_uri">Ścieżka URI aktywnego pomiaru to %1$s</string>
+    <string name="file_operation_initialisation_error">Błąd inicjalizacji operacji na pliku</string>
+    <string name="file_link_survey_station">Wybierz stanowisko do połączenia</string>
+    <string name="file_link_survey_save_error">Błąd zapisywania nowego połączenia</string>
+    <string name="file_unlink_survey_dialog_title">Odłącz pomiar</string>
+    <string name="file_unlink_survey_not_found">Nie znaleziono pomiaru do odłączenia</string>
+    <string name="file_unlink_survey_no_surveys">Brak pomiarów do odłączenia</string>
+    <string name="file_unlink_survey_error">Błąd odłączania pomiaru</string>
+
+    <!-- Import / Export -->
+    <string name="import_successful">"Import zakończony (jeszcze nie zapisano)"</string>
+    <string name="import_failed">Import nie powiódł się</string>
+    <string name="export_select_type">Wybierz format eksportu</string>
+    <string name="export_successful">Eksport zakończony</string>
+    <string name="export_failed">Eksport nie powiódł się</string>
+    <string name="created_with">Utworzono za pomocą %1$s w dniu %2$s</string>
+
+    <!-- Sketch view -->
+    <string name="sketch_toolbar_draw">Tryb rysowania</string>
+    <string name="sketch_toolbar_move">Tryb przesuwania</string>
+    <string name="sketch_toolbar_eraser">Gumka</string>
+    <string name="sketch_toolbar_text">Narzędzie tekstu</string>
+    <string name="sketch_toolbar_symbol">Narzędzie symbolu</string>
+    <string name="sketch_toolbar_selector">Selektor</string>
+    <string name="sketch_toolbar_settings">Szybkie ustawienia</string>
+    <string name="sketch_toolbar_undo">Cofnij</string>
+    <string name="sketch_toolbar_redo">Ponów</string>
+    <string name="sketch_toolbar_zoom_in">Powiększ</string>
+    <string name="sketch_toolbar_zoom_out">Pomniejsz</string>
+    <string name="sketch_toolbar_colour_main">Kolor główny</string>
+    <string name="sketch_toolbar_colour_brown">Brązowy</string>
+    <string name="sketch_toolbar_colour_grey">Szary</string>
+    <string name="sketch_toolbar_colour_red">Czerwony</string>
+    <string name="sketch_toolbar_colour_orange">Pomarańczowy</string>
+    <string name="sketch_toolbar_colour_green">Zielony</string>
+    <string name="sketch_toolbar_colour_blue">Niebieski</string>
+    <string name="sketch_toolbar_colour_purple">Fioletowy</string>
+    <string name="sketch_toolbar_symbol_close">Zamknij pasek symboli</string>
+    <string name="sketch_menu_delete_last_leg">Cofnij ostatni pomiar</string>
+    <string name="sketch_menu_centre_view">Wyśrodkuj na aktywnym</string>
+    <string name="sketch_menu_auto_recentre">Automatyczne wyśrodkowywanie</string>
+    <string name="sketch_menu_redo">Ponów akcję szkicu</string>
+    <string name="sketch_menu_show_grid">Siatka</string>
+    <string name="sketch_menu_snap_to_lines">Przyciąganie do linii</string>
+    <string name="sketch_menu_fade_non_active">Przyciemnij nieaktywne</string>
+    <string name="sketch_menu_show_station_labels">Etykiety stanowisk</string>
+    <string name="sketch_menu_show_splays">Pokaż pomiary szczegółowe</string>
+    <string name="sketch_menu_show_sketch">Pokaż szkic</string>
+    <string name="sketch_menu_show_connect">Połączone pomiary</string>
+    <string name="sketch_menu_back_measurements">Odwrócone ciągi</string>
+    <string name="sketch_position_cross_section_instruction">Wybierz miejsce narysowania przekroju</string>
+    <string name="sketch_symbol_orientation_education">Przeciągnij, aby ustawić kierunek symbolu</string>
+    <string name="sketch_text_hint">Wprowadź tekst</string>
+
+    <!-- Table view -->
+    <string name="table_head_from">Z</string>
+    <string name="table_head_to">Do</string>
+    <string name="table_head_distance">Odl</string>
+    <string name="table_head_azimuth">Azym</string>
+    <string name="table_head_elevation">Kąt</string>
+    <string name="table_delete_row_question">Usunąć wiersz?</string>
+    <string name="manual_add_station_title">Dodaj stanowisko</string>
+    <string name="manual_add_splay_title">Dodaj pomiar szczegółowy</string>
+    <string name="manual_edit_leg_title">Edytuj ciąg</string>
+    <string name="manual_edit_splay_title">Edytuj pomiar szczegółowy</string>
+    <string name="manual_edit_distance">Odległość (m)</string>
+    <string name="manual_edit_distance_error">Nieprawidłowa odległość</string>
+    <string name="manual_edit_azimuth">Azymut (&#176;)</string>
+    <string name="manual_edit_azimuth_error">Nieprawidłowy azymut</string>
+    <string name="manual_edit_azimuth_deg_mins_secs">Azymut (&#176; \' \")</string>
+    <string name="deg">Stop</string>
+    <string name="min">Min</string>
+    <string name="sec">Sek</string>
+    <string name="manual_edit_inclination">Nachylenie (&#176;)</string>
+    <string name="manual_edit_inclination_error">Nieprawidłowe nachylenie</string>
+    <string name="manual_edit_left">Lewo (m)</string>
+    <string name="manual_edit_right">Prawo (m)</string>
+    <string name="manual_edit_up">Góra (m)</string>
+    <string name="manual_edit_down">Dół (m)</string>
+    <string name="manual_edit_from_station">Z</string>
+    <string name="manual_edit_from_station_error">Nieprawidłowe stanowisko początkowe</string>
+    <string name="manual_edit_to_station">Do</string>
+    <string name="manual_edit_to_station_error">Nieprawidłowe stanowisko końcowe</string>
+    <string name="manual_edit_shot_backwards">⬅ Pomiar wsteczny</string>
+    <string name="manual_edit_comment">Komentarz</string>
+    <string name="manual_rename_station_title">Zmień nazwę stanowiska</string>
+    <string name="manual_rename_station_hint">Nazwa stanowiska</string>
+    <string name="manual_rename_error">Zmiana nazwy nie powiodła się</string>
+
+    <!-- Device -->
+    <string name="device_instruction_bluetooth">1. Bluetooth</string>
+    <string name="device_instruction_pair">2. Sparowano z</string>
+    <string name="device_instruction_connect">3. Połącz</string>
+    <string name="device_request_pair">Sparuj</string>
+    <string name="device_request_unpair">Rozłącz</string>
+    <string name="device_log_title">Dziennik urządzenia</string>
+    <string name="device_enable_bluetooth">Włącz Bluetooth</string>
+    <string name="device_connect_to_device">Połącz z urządzeniem</string>
+    <string name="device_no_permitted_access">[niedostępne urządzenie]</string>
+    <string name="device_bluetooth_no_adapter">Brak dostępu do adaptera bluetooth</string>
+    <string name="device_connection_requested">Żądanie połączenia</string>
+    <string name="device_scan_start">Skanowanie urządzeń…</string>
+    <string name="device_scan_end">Skanowanie zakończone</string>
+    <string name="device_scan_cancel">Anulowanie skanowania</string>
+    <string name="device_scan_detected">Wykryto urządzenie "%1$s"</string>
+    <string name="device_scan_failure">Nie można skanować (awaria bluetooth?)</string>
+    <string name="device_scan_device_not_found">Nie znaleziono urządzenia; spróbuj ponownie</string>
+    <string name="device_access_failure">Błąd zabezpieczeń (sprawdź uprawnienia?)</string>
+    <string name="device_pairing_request">Żądanie PAROWANIA\n-> Wykonaj kroki parowania. Połącz ponownie</string>
+    <string name="device_pairing_successful">Parowanie pomyślne :)</string>
+    <string name="device_pairing_attempt">Parowanie z %1$s…</string>
+    <string name="device_pairing_error">Błąd parowania: %1$s</string>
+    <string name="device_pairing_incompatible">Wykryto niekompatybilne urządzenie "%1$s"</string>
+    <string name="device_pairing_unpairing_device">Rozłączanie %1$s</string>
+    <string name="device_pairing_unpairing_success">Rozłączanie pomyślne</string>
+    <string name="device_pairing_unpairing_error">Błąd rozłączania: %1$s</string>
+    <string name="device_communicator_creation_error">Błąd tworzenia komunikatora: %1$s</string>
+    <string name="device_connection_connected">Połączono :)</string>
+    <string name="device_connection_ready">Gotowy do odbierania danych</string>
+    <string name="device_connection_not_connected">Nie połączono :(</string>
+    <string name="device_connection_connecting">Łączenie&#8230;</string>
+    <string name="device_connection_stop_requested">Żądanie zamknięcia połączenia</string>
+    <string name="device_connection_closing">Zamykanie połączenia&#8230;</string>
+    <string name="device_connection_closed">Połączenie zamknięte</string>
+    <string name="device_connection_error">Błąd połączenia: %1$s</string>
+    <string name="device_connection_closing_error">Błąd zamykania połączenia: %1$s</string>
+    <string name="device_data_received">Odebrano pomiar</string>
+    <string name="device_data_received_null">Odebrano dane puste</string>
+    <string name="device_data_received_empty">Odebrano puste dane</string>
+    <string name="device_data_unknown_identifier">Nieznany identyfikator pakietu</string>
+    <string name="device_data_acknowledged_packet">Potwierdzono pakiet</string>
+    <string name="device_no_device">brak urządzenia</string>
+    <string name="device_missing_name">[Brakujące urządzenie]</string>
+    <string name="device_missing_short_name">Brakujące</string>
+    <string name="device_unknown_name">[Nieznane urządzenie]</string>
+    <string name="device_unknown_short_name">Nieznane</string>
+    <string name="device_command_laser_on">Laser włączony</string>
+    <string name="device_command_laser_off">Laser wyłączony</string>
+    <string name="device_command_take_shot">Wykonaj pomiar</string>
+    <string name="device_command_device_off">Urządzenie wyłączone</string>
+    <string name="device_ble_invalid_data_received">Odebrano nieprawidłowe dane</string>
+    <string name="device_ble_connecting_to">Łączenie z %1$s…</string>
+    <string name="device_ble_connected_to">Połączono z %1$s</string>
+    <string name="device_ble_device_ready">%1$s gotowy :)</string>
+    <string name="device_ble_device_disconnecting">%1$s rozłączanie</string>
+    <string name="device_ble_device_disconnected">%1$s gotowy :)</string>
+    <string name="device_ble_failed_to_connect_to">Nie udało się połączyć z %1$s</string>
+    <string name="device_ble_invalid_data">Odebrano nieprawidłowe dane: %1$s</string>
+    <string name="device_cavway_x1_calibration_on">Włącz tryb kalibracji</string>
+    <string name="device_cavway_x1_calibration_off">Wyłącz tryb kalibracji</string>
+    <string name="device_distox_command_calibration">Kalibracja…</string>
+    <string name="device_distox_command_silent_mode_on">Tryb cichy włączony</string>
+    <string name="device_distox_command_silent_mode_off">Tryb cichy wyłączony</string>
+    <string name="device_distox_command_calibration_start">Rozpocznij tryb kalibracji</string>
+    <string name="device_distox_command_calibration_stop">Zatrzymaj tryb kalibracji</string>
+    <string name="device_distox_force_disconnect_for_calibration">Disto zajęty; wymuszanie rozłączenia w celu zapisu kalibracji</string>
+    <string name="device_distox_calibration_result">Ocena kalibracji (powinno być poniżej %1$f): %2$s\n\nAlgorytm kalibracji: %3$s</string>
+    <string name="device_distox_calibration_writing">Zapisywanie współczynników kalibracji</string>
+    <string name="device_distox_calibration_write_success">Pomyślnie zapisano kalibrację</string>
+    <string name="device_distox_calibration_write_error">Błąd zapisu kalibracji %1$s</string>
+    <string name="device_distox_calibration_write_rejected">Disto odrzucił dane kalibracji</string>
+    <string name="device_distox_unknown_protocol">Żądano nieznanego protokołu</string>
+    <string name="device_bric_command_take_shot">Wykonaj pomiar</string>
+    <string name="device_bric_command_toggle_laser">Przełącz laser</string>
+    <string name="device_bric_command_power_off">Wyłącz zasilanie</string>
+    <string name="device_bric_command_clear_memory">Wyczyść pamięć</string>
+    <string name="device_bric_device_reported_error">%1$s zgłosił błąd: %2$s</string>
+    <string name="device_sap_command_calibration_start">Rozpocznij kalibrację</string>
+    <string name="device_sap_command_calibration_stop">Zatrzymaj kalibrację</string>
+    <string name="device_sap_command_laser_on">Laser włączony</string>
+    <string name="device_sap_command_take_shot">Wykonaj pomiar</string>
+    <string name="device_sap_command_laser_off">Laser wyłączony</string>
+    <string name="device_sap_command_device_off">Urządzenie wyłączone</string>
+    <string name="device_fcl_command_laser_on">Laser włączony</string>
+    <string name="device_fcl_command_take_shot">Wykonaj pomiar</string>
+    <string name="device_fcl_command_laser_off">Laser wyłączony</string>
+    <string name="device_fcl_command_device_off">Urządzenie wyłączone</string>
+
+    <!-- Calibration -->
+    <string name="calibration_index">Numer odczytu</string>
+    <string name="calibration_start">Tryb kalibracji Disto włączony</string>
+    <string name="calibration_stop">Tryb kalibracji Disto wyłączony</string>
+    <string name="calibration_delete_last">Usuń odczyt</string>
+    <string name="calibration_next_step">Dalej (sugerowany)</string>
+    <string name="calibration_complete">Wyślij kalibrację</string>
+    <string name="calibration_load">Wczytaj</string>
+    <string name="calibration_save">Zapisz</string>
+    <string name="calibration_direction">Kierunek</string>
+    <string name="calibration_orientation">Orientacja</string>
+    <string name="calibration_not_enough">Niewystarczająca liczba odczytów</string>
+    <string name="calibration_assessment">Ocena kalibracji</string>
+    <string name="calibration_update">Zapisz</string>
+    <string name="calibration_error_updating_device">Nie można zapisać kalibracji</string>
+    <string name="calibration_writing">Zapisywanie danych kalibracji</string>
+    <string name="calibration_success">Pomyślnie zapisano dane kalibracji</string>
+    <string name="calibration_saved_to_file">Zapisano dane kalibracji</string>
+    <string name="calibration_loaded_file">Wczytano dane kalibracji</string>
+    <string name="calibration_load_error">Błąd odczytu pliku kalibracji</string>
+    <string name="calibration_save_error">Błąd zapisu pliku kalibracji</string>
+    <string name="direction_forward">Do przodu</string>
+    <string name="direction_right">W prawo</string>
+    <string name="direction_back">Do tyłu</string>
+    <string name="direction_left">W lewo</string>
+    <string name="direction_up">Do góry</string>
+    <string name="direction_down">W dół</string>
+    <string name="direction_forward_left_up">Do przodu w lewo do góry</string>
+    <string name="direction_forward_left_down">Do przodu w lewo w dół</string>
+    <string name="direction_forward_right_up">Do przodu w prawo do góry</string>
+    <string name="direction_forward_right_down">Do przodu w prawo w dół</string>
+    <string name="direction_back_right_up">Do tyłu w prawo do góry</string>
+    <string name="direction_back_right_down">Do tyłu w prawo w dół</string>
+    <string name="direction_back_left_up">Do tyłu w lewo do góry</string>
+    <string name="direction_back_left_down">Do tyłu w lewo w dół</string>
+    <string name="orientation_face_up">Ekranem do góry</string>
+    <string name="orientation_face_right">Ekranem w prawo</string>
+    <string name="orientation_face_down">Ekranem w dół</string>
+    <string name="orientation_face_left">Ekranem w lewo</string>
+    <string name="dialog_confirm_clear_title">Wyczyścić odczyty kalibracji?</string>
+
+    <!-- Trip -->
+    <string name="trip">Wyjazd</string>
+    <string name="trip_team">Zespół</string>
+    <string name="trip_dialog_title_add_to_team">Dodaj do zespołu</string>
+    <string name="trip_dialog_add_to_team_name_hint">Imię</string>
+    <string name="trip_dialog_confirm_clear_trip">Wyczyścić dane wyjazdu?</string>
+    <string name="trip_comments">Komentarze</string>
+    <string name="trip_save_trip">Zapisz wyjazd</string>
+    <string name="trip_role_book">Dokumentacja (rysowanie)</string>
+    <string name="trip_role_instruments">Instrumenty</string>
+    <string name="trip_role_dog">Asystent</string>
+    <string name="trip_role_exploration">Zespół eksploracyjny</string>
+
+    <!-- Stats -->
+    <string name="stats_title_this_survey">Bieżący pomiar</string>
+    <string name="stats_title_linked_surveys">Wszystkie połączone pomiary</string>
+    <string name="stats_number_linked_surveys">Liczba pomiarów</string>
+    <string name="stats_length">Długość (m)</string>
+    <string name="stats_vertical_range">Zasięg pionowy (m)</string>
+    <string name="stats_number_stations">Liczba stanowisk</string>
+    <string name="stats_number_legs">Liczba ciągów</string>
+    <string name="stats_number_splays">Liczba pomiarów szczegółowych</string>
+    <string name="stats_longest_leg">Najdłuższy ciąg (m)</string>
+    <string name="stats_shortest_leg">Najkrótszy ciąg (m)</string>
+
+    <!-- Settings -->
+    <string name="settings_general_title">Ogólne</string>
+    <string name="settings_theme_title">Motyw</string>
+    <string name="settings_theme_summary">Przejść na ciemną stronę? (Restartuje aplikację, więc zapisz pomiar przed zmianą!)</string>
+    <string-array name="settings_theme_entries">
+        <item>Domyślny systemowy</item>
+        <item>Jasny</item>
+        <item>Ciemny</item>
+    </string-array>
+    <string name="settings_orientation_title">Orientacja</string>
+    <string name="settings_orientation_summary">Nadpisz orientację urządzenia w widokach tabeli i wykresu</string>
+    <string-array name="settings_orientation_entries">
+        <item>Domyślny systemowy</item>
+        <item>Wymuś pionowy</item>
+        <item>Wymuś poziomy</item>
+    </string-array>
+    <string-array name="settings_calibration_algorithm_entries">
+        <item>Auto</item>
+        <item>Liniowy</item>
+        <item>Nieliniowy</item>
+    </string-array>
+    <string name="settings_new_station_vibration_title">Wibracja przy nowym stanowisku</string>
+    <string name="settings_new_station_vibration_summary">Wibruj po utworzeniu nowego stanowiska</string>
+    <string name="settings_hot_corners_title">Aktywne rogi</string>
+    <string name="settings_hot_corners_summary">Przeciągaj z rogów szkicu, aby przesunąć widok w trybach rysowania</string>
+    <string name="settings_instruments_title">Instrumenty</string>
+    <string name="settings_max_distance_delta_title">Maks. delta odległości (m)</string>
+    <string name="settings_max_distance_delta_summary">Dopuszczalny błąd przy decydowaniu, czy utworzyć nowe stanowisko</string>
+    <string name="settings_max_angle_delta_title">Maks. delta kąta (stopnie)</string>
+    <string name="settings_max_angle_delta_summary">Dopuszczalny błąd przy decydowaniu, czy utworzyć nowe stanowisko</string>
+    <string name="settings_calibration_title">Kalibracja</string>
+    <string name="settings_calibration_algorithm_title">Algorytm kalibracji Disto-X</string>
+    <string name="settings_calibration_algorithm_summary">Nadpisz wybór algorytmu kalibracji Disto-X</string>
+    <string name="settings_sketching_title">Szkicowanie</string>
+    <string name="settings_delete_path_fragments_title">Usuwaj fragmenty linii</string>
+    <string name="settings_delete_path_fragments_summary">Usuwaj tylko najbliższe części linii szkicu w trybie usuwania (jeśli wyłączone, usuwa całą linię)</string>
+    <string name="settings_highlight_latest_leg_title">Podświetl ostatni ciąg</string>
+    <string name="settings_highlight_latest_leg_summary">Pokaż najnowszy pomiar na fioletowo</string>
+    <string name="settings_two_finger_movement_title">Ruch dwoma palcami (eksperymentalne)</string>
+    <string name="settings_two_finger_movement_summary">Dwa palce przesuwają ekran nawet podczas rysowania itp.</string>
+    <string name="settings_survey_text_tool_font_size_title">Rozmiar etykiety narzędzia tekstu</string>
+    <string name="settings_survey_text_tool_font_size_summary">Początkowy rozmiar ręcznie umieszczonego tekstu (sp)</string>
+    <string name="settings_survey_symbol_size_title">Rozmiar symbolu pomiaru</string>
+    <string name="settings_survey_symbol_size_summary">Początkowy rozmiar symboli (dp)</string>
+    <string name="settings_leg_width_title">Grubość linii ciągu</string>
+    <string name="settings_leg_width_summary">Grubość rysowania linii ciągów</string>
+    <string name="settings_splay_width_title">Grubość linii pomiarów szczegółowych</string>
+    <string name="settings_splay_width_summary">Grubość rysowania linii pomiarów szczegółowych</string>
+    <string name="settings_station_diameter_title">Średnica stanowiska</string>
+    <string name="settings_station_diameter_summary">Rozmiar rysowania symboli stanowisk</string>
+    <string name="settings_station_label_font_size_sp_title">Rozmiar czcionki etykiety stanowiska</string>
+    <string name="settings_station_label_font_size_sp_summary">Rozmiar czcionki etykiet stanowisk</string>
+    <string name="settings_legend_font_size_sp_title">Rozmiar czcionki legendy</string>
+    <string name="settings_legend_font_size_sp_summary">Rozmiar czcionki legendy</string>
+    <string name="settings_anti_alias_title">Wygładzanie linii szkicu</string>
+    <string name="settings_anti_alias_summary">Zastosuj wygładzanie do linii szkicu itp. (poprawia wygląd kosztem wydajności)</string>
+    <string name="settings_manual_data_entry_title">Ręczne wprowadzanie danych</string>
+    <string name="settings_key_lrud_fields_title">Wpisy LRUD</string>
+    <string name="settings_key_lrud_fields_summary">Pokaż pola do wprowadzania LRUD (Lewo-Prawo-Góra-Dół) dla każdego nowego stanowiska</string>
+    <string name="settings_key_deg_mins_secs_title">Azymut jako stopnie/minuty/sekundy</string>
+    <string name="settings_key_deg_mins_secs_summary">Wprowadź wartości azymutu w stopniach/minutach/sekundach (w przeciwieństwie do domyślnego dziesiętnego)</string>
+    <string name="settings_export_title">Eksport</string>
+    <string name="settings_export_svg_background_title">Tło SVG</string>
+    <string name="settings_export_svg_background_summary">Opcjonalnie eksportuj z nieprzezroczystym tłem</string>
+    <string-array name="settings_export_svg_background_entries">
+        <item>Przezroczyste</item>
+        <item>Białe</item>
+    </string-array>
+    <string name="settings_export_svg_stroke_width_title">Szerokość linii SVG</string>
+    <string name="settings_export_svg_stroke_width_summary">Grubość rysowania linii w eksporcie SVG</string>
+    <string name="settings_export_svg_leg_width_title">Szerokość ciągu SVG</string>
+    <string name="settings_export_svg_leg_width_summary">Grubość rysowania linii ciągów w eksporcie SVG</string>
+    <string name="settings_export_svg_splay_width_title">Szerokość pomiarów szczegółowych SVG</string>
+    <string name="settings_export_svg_splay_width_summary">Grubość rysowania linii pomiarów szczegółowych w eksporcie SVG</string>
+    <string name="settings_export_therion_symbols_title">Symbole eksportu Therion</string>
+    <string name="settings_export_therion_symbols_summary">Uwzględnij symbole podczas eksportu do formatu Therion</string>
+    <string name="settings_export_therion_text_title">Tekst eksportu Therion</string>
+    <string name="settings_export_therion_text_summary">Uwzględnij tekst podczas eksportu do formatu Therion</string>
+    <string name="settings_developer_title">Deweloper</string>
+    <string name="settings_key_developer_mode_title">Tryb dewelopera</string>
+    <string name="settings_key_developer_mode_summary">Pokaż wpisy menu debugowania</string>
+
+    <!-- Survey updates -->
+    <string name="survey_update_new_station_added">Dodano nowe stanowisko</string>
+    <string name="survey_update_renamed_station">Zmieniono nazwę stanowiska z %1$s na %2$s</string>
+    <string name="survey_update_edited_leg">Edytowano ciąg %1$s do %2$s</string>
+    <string name="survey_update_rename_error_not_unique">Nowa nazwa stanowiska nie jest unikalna</string>
+    <string name="survey_update_moved_leg">Przeniesiono ciąg do stanowiska %1$s</string>
+    <string name="survey_update_adding_leg">Dodawanie ciągu %1$s</string>
+    <string name="survey_update_reversed_leg">Odwrócono ciąg %1$s do %2$s</string>
+    <string name="survey_update_error_descendant_station">Nie można przenieść ciągu do stanowiska potomnego</string>
+
+    <!-- Form validation errors -->
+    <string name="validation_error_cannot_be_blank">Nie może być puste</string>
+    <string name="validation_error_station_named_dash">Stanowisko nie może nazywać się \"-\"</string>
+    <string name="validation_error_station_does_not_exist">Stanowisko nie istnieje</string>
+    <string name="validation_error_same_as_from_station">Nie może być takie samo jak stanowisko początkowe</string>
+    <string name="validation_error_station_name_not_unique">Nazwa stanowiska musi być unikalna</string>
+    <string name="validation_error_must_be_number">Musi być liczbą</string>
+    <string name="validation_error_distance_minimum">Musi być >= %1$f</string>
+    <string name="validation_error_azimuth_range">Musi być %1$f-%2$f</string>
+    <string name="validation_error_inclination_range">Musi być od %1$f do %2$f</string>
+
+    <!-- Input mode for leg editing -->
+    <string-array name="leg_edit_input_mode_options">
+        <item>@string/action_input_mode_forward</item>
+        <item>@string/action_input_mode_backward</item>
+    </string-array>
+
+    <!-- Survey symbols -->
+    <string name="symbol_text">Tekst</string>
+    <string name="symbol_entrance">Wejście</string>
+    <string name="symbol_gradient">Gradient</string>
+    <string name="symbol_too_tight">Za ciasno</string>
+    <string name="symbol_sand">Piasek</string>
+    <string name="symbol_clay">Glina</string>
+    <string name="symbol_pebbles">Żwir</string>
+    <string name="symbol_blocks">Bloki</string>
+    <string name="symbol_stalactite">Stalaktyt</string>
+    <string name="symbol_stalagmite">Stalagmit</string>
+    <string name="symbol_column">Kolumna</string>
+    <string name="symbol_curtain">Zasłona</string>
+    <string name="symbol_straws">Słomki</string>
+    <string name="symbol_helictites">Helictyty</string>
+    <string name="symbol_crystals">Kryształy</string>
+    <string name="symbol_gour">Gury</string>
+    <string name="symbol_water_flow">Przepływ</string>
+    <string name="symbol_air_draught">Przeciąg powietrza</string>
+    <string name="symbol_guano">Guano</string>
+    <string name="symbol_debris">Rumowisko</string>
+
+    <!-- Context menu(s) -->
+    <string name="menu_context_title">Stanowisko</string>
+    <string name="menu_leg">Ciąg</string>
+    <string name="menu_splay">Pomiar szczegółowy</string>
+    <string name="menu_station">Stanowisko</string>
+    <string name="menu_set_active_station">Ustaw jako aktywne</string>
+    <string name="menu_rename_station">Zmień nazwę</string>
+    <string name="menu_edit_leg">Edytuj</string>
+    <string name="menu_upgrade_row">Wymuś nowe stanowisko</string>
+    <string name="menu_upgrade_splay">Podnieś do ciągu</string>
+    <string name="menu_downgrade_leg">Obniż do pomiaru szczegółowego</string>
+    <string name="menu_delete_leg">Usuń</string>
+    <string name="menu_delete_splay">Usuń pomiar szczegółowy</string>
+    <string name="menu_elevation">Przekrój</string>
+    <string name="menu_draw_left">Rysuj lewo</string>
+    <string name="menu_draw_right">Rysuj prawo</string>
+    <string name="menu_move_row">Przenieś do innego stanowiska</string>
+    <string name="menu_jump_to">Przeskocz</string>
+    <string name="menu_jump_to_station_in_plan">→ Plan</string>
+    <string name="menu_jump_to_station_in_elevation">→ Przekrój</string>
+    <string name="menu_new_cross_section">Nowy przekrój poprzeczny</string>
+    <string name="menu_jump_to_station_in_table">→ Tabela danych</string>
+    <string name="menu_delete_station">Usuń</string>
+    <string name="menu_reverse">Odwróć</string>
+    <string name="menu_switch_direction">Przełącz kierunek</string>
+    <string name="menu_navigate">Nawiguj</string>
+    <string name="menu_survey">Pomiar</string>
+    <string name="menu_start_new_survey">Rozpocznij nowy pomiar tutaj</string>
+    <string name="menu_unlink_survey">Odłącz połączony pomiar</string>
+    <string name="menu_survey_start_new_dialog_title">Rozpocznij nowy pomiar</string>
+    <string name="menu_survey_start_new_dialog_station_name">Nazwa stanowiska początkowego</string>
+    <string name="menu_comment">Komentarz</string>
+    <string name="menu_toggle_left_right">Przełącz lewo/prawo</string>
+    <string name="menu_context_title_leg_to">Ciąg do %s</string>
+    <string name="menu_context_title_leg_from">Ciąg z %s</string>
+    <string name="menu_context_title_splay">%s do pomiaru szczegółowego</string>
+    <string name="context_this_will_delete">To spowoduje usunięcie:</string>
+    <string name="context_jump_to_splay_error">Nie można przeskoczyć do końca pomiaru szczegółowego</string>
+    <string name="context_jump_to_station_error">Nie można przeskoczyć do stanowiska %1$s</string>
+    <string name="context_move_leg_select_station_title">Wybierz stanowisko do przeniesienia</string>
+    <string name="context_move_leg_no_valid_move">Brak prawidłowego miejsca do przeniesienia tego ciągu</string>
+    <string name="context_rename_splay_error">Nie można zmienić nazwy końca pomiaru szczegółowego</string>
+    <string name="context_set_active_splay_error">Nie można ustawić końca pomiaru szczegółowego jako aktywnego stanowiska</string>
+    <string name="context_station_comment_hint">Komentarz do stanowiska</string>
+
+    <!-- Logging -->
+    <string name="log_starting_up">Uruchamianie</string>
+    <string name="log_shown">Pokazano: %1$s</string>
+    <string name="log_error_no_station_notification_intent">Nie można uruchomić intencji powiadomienia o nowym stanowisku</string>
+
+    <!-- Tools -->
+    <string name="tool_find_station_dialog_title">Znajdź stanowisko</string>
+    <string name="tool_find_station_dialog_hint">Nazwa stanowiska</string>
+    <string name="tool_find_station_dialog_navigate">Nawiguj</string>
+    <string name="tool_find_station_error_invalid">Nie znaleziono stanowiska</string>
+
+    <!-- Misc -->
+    <string name="tool_generate_test_title">Generuj dane testowe</string>
+    <string name="tool_generate_test_question">Zastąpić istniejący pomiar losowo wygenerowanymi danymi?</string>
+    <string name="tool_generate_test_error">Błąd generowania danych testowych</string>
+    <string name="tool_force_kill_error">Błąd zabijania połączenia</string>
+    <string name="tool_force_crash_message">Bum! Zażądano wymuszonej awarii(!)</string>
+    <string name="request_code_error">Kod błędu %1$d z kodu żądania %2$d</string>
+    <string name="killing_comms_process">Zabijanie procesu komunikacji</string>
+    <string name="setup_error_load_symbol_svg">Błąd wczytywania symbolu SVG %1$s</string>
+
+</resources>
