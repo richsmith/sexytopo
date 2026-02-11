@@ -5,9 +5,11 @@ import android.content.Context;
 import androidx.documentfile.provider.DocumentFile;
 
 import org.hwyl.sexytopo.control.io.IoUtils;
+import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionImporter;
 import org.hwyl.sexytopo.control.io.translation.Importer;
 import org.hwyl.sexytopo.model.survey.Survey;
+import org.hwyl.sexytopo.model.survey.Trip;
 
 import java.util.Map;
 
@@ -19,14 +21,20 @@ public class SurvexImporter extends Importer {
         String text = IoUtils.slurpFile(context, file);
         
         // Parse passage data first to extract station comments
-        Map<String, String> passageComments = SurvexTherionImporter.parsePassageData(text, true);
+        Map<String, String> passageComments = SurvexTherionImporter.parsePassageData(text, SurveyFormat.SURVEX);
         
         // Parse centreline data
         SurvexTherionImporter.parseCentreline(text, survey);
         
         // Merge passage comments with station comments
         SurvexTherionImporter.mergePassageComments(survey, passageComments);
-        
+
+        // Parse trip metadata (date, instrument, team, etc.)
+        Trip trip = SurvexTherionImporter.parseMetadata(text, SurveyFormat.SURVEX);
+        if (trip != null) {
+            survey.setTrip(trip);
+        }
+
         return survey;
     }
 

@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.control.io.thirdparty.survextherion;
 
-public enum ExportFormat {
+public enum SurveyFormat {
     SURVEX,
     THERION
 }

@@ -3,7 +3,7 @@ package org.hwyl.sexytopo.control.io.thirdparty.survex;
 import android.content.Context;
 
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.control.io.thirdparty.survextherion.ExportFormat;
+import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
 import org.hwyl.sexytopo.control.io.translation.SingleFileExporter;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -24,17 +24,17 @@ public class SurvexExporter extends SingleFileExporter {
         builder.append(SurvexTherionUtil.getCreationComment(COMMENT_CHAR, "SexyTopo")).append("\n\n");
 
         // Metadata (instrument is now in Trip, not passed separately)
-        builder.append(SurvexTherionUtil.getMetadata(survey, COMMENT_CHAR, ExportFormat.SURVEX)).append("\n");
+        builder.append(SurvexTherionUtil.getMetadata(survey, COMMENT_CHAR, SurveyFormat.SURVEX)).append("\n");
 
         // Station comments data block
-        builder.append(SurvexTherionUtil.getStationCommentsData(survey, ExportFormat.SURVEX));
+        builder.append(SurvexTherionUtil.getStationCommentsData(survey, SurveyFormat.SURVEX));
 
         // Centreline data
-        builder.append(SurvexTherionUtil.getCentrelineData(survey, COMMENT_CHAR, ExportFormat.SURVEX));
+        builder.append(SurvexTherionUtil.getCentrelineData(survey, COMMENT_CHAR, SurveyFormat.SURVEX));
 
         // Extended elevation
         builder.append("\n");
-        builder.append(SurvexTherionUtil.getExtendedElevationExtensions(survey, ExportFormat.SURVEX));
+        builder.append(SurvexTherionUtil.getExtendedElevationExtensions(survey, SurveyFormat.SURVEX));
 
         // End survey block
         builder.append("*end ").append(survey.getName()).append("\n");

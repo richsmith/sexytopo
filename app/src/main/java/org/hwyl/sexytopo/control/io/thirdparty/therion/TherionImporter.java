@@ -8,10 +8,12 @@ import org.apache.commons.io.FilenameUtils;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.io.IoUtils;
+import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionImporter;
 import org.hwyl.sexytopo.control.io.thirdparty.xvi.XviImporter;
 import org.hwyl.sexytopo.control.io.translation.Importer;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
+import org.hwyl.sexytopo.model.survey.Trip;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.sketch.Sketch;
@@ -56,9 +58,14 @@ public class TherionImporter extends Importer {
         String contents = IoUtils.slurpFile(context, file);
         List<String> lines = Arrays.asList(contents.split("\n"));
         updateCentreline(lines, survey);
+
+        Trip trip = SurvexTherionImporter.parseMetadata(contents, SurveyFormat.THERION);
+        if (trip != null) {
+            survey.setTrip(trip);
+        }
+
         return survey;
     }
-
 
     public boolean canHandleFile(DocumentFile directory) {
         if (!directory.isDirectory()) {
@@ -72,18 +79,16 @@ public class TherionImporter extends Importer {
         return false;
     }
 
-
     public static void updateCentreline(List<String> lines, Survey survey) throws Exception {
         List<String> block = getContentsOfBeginEndBlock(lines, "centreline");
-        
-        // Parse passage data from the block (Therion format - no * prefix)
+
         String blockText = TextTools.join("\n", block);
-        Map<String, String> passageComments = SurvexTherionImporter.parsePassageData(blockText, false);
-        
+        Map<String, String> passageComments = SurvexTherionImporter.parsePassageData(blockText, SurveyFormat.THERION);
+
         List<String> sanitisedCentrelineData = new ArrayList<>();
         List<String> sanitisedElevationDirectionData = new ArrayList<>();
 
-        boolean inDataBlock = false;
+        boolean inNormalDataBlock = false;
         for (String line: block) {
             String trimmed = line.trim();
             if (trimmed.equals("")) {
@@ -91,9 +96,12 @@ public class TherionImporter extends Importer {
             }
 
             if (trimmed.startsWith("data")) {
-                inDataBlock = true;
+                inNormalDataBlock = trimmed.startsWith("data normal");
                 continue;
-            } else if (!inDataBlock) {
+            } else if (!inNormalDataBlock) {
+                if (trimmed.startsWith("extend")) {
+                    sanitisedElevationDirectionData.add(trimmed);
+                }
                 continue;
             }
 
@@ -107,11 +115,9 @@ public class TherionImporter extends Importer {
         String centrelineText = TextTools.join("\n", sanitisedCentrelineData);
         SurvexTherionImporter.parseCentreline(centrelineText, survey);
         handleElevationDirectionData(sanitisedElevationDirectionData, survey);
-        
-        // Merge passage comments with station comments
+
         SurvexTherionImporter.mergePassageComments(survey, passageComments);
     }
-
 
     private static void handleElevationDirectionData(List<String> lines, Survey survey) {
         try {
@@ -138,7 +144,6 @@ public class TherionImporter extends Importer {
             Log.e("corrupted survey extended elevation directions: " + exception);
         }
     }
-
 
     public static List<String> getContentsOfBeginEndBlock(List<String> lines, String tag)
             throws Exception {

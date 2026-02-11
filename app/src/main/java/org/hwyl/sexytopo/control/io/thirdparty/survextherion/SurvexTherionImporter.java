@@ -5,8 +5,11 @@ import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
+import org.hwyl.sexytopo.model.survey.Trip;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,10 +90,11 @@ public class SurvexTherionImporter {
      * - Survex:  "*data passage station ignoreall"
      * 
      * @param text The full file text (may contain multiple sections)
-     * @param isSurvex true if parsing Survex format (uses *), false for Therion
+     * @param format the file format being parsed (SURVEX or THERION)
      * @return Map of station name to passage comment
      */
-    public static Map<String, String> parsePassageData(String text, boolean isSurvex) {
+    public static Map<String, String> parsePassageData(String text, SurveyFormat format) {
+        boolean isSurvex = (format == SurveyFormat.SURVEX);
         Map<String, String> passageComments = new HashMap<>();
         
         String[] lines = text.split("\n");
@@ -188,6 +192,244 @@ public class SurvexTherionImporter {
     }
 
 
+    public static Trip parseMetadata(String text, SurveyFormat format) {
+        boolean isSurvex = (format == SurveyFormat.SURVEX);
+        char commentChar = isSurvex ? ';' : '#';
+
+        Date surveyDate = null;
+        Date explorationDate = null;
+        String instrument = null;
+        Map<String, List<Trip.Role>> teamMap = new java.util.LinkedHashMap<>();
+        StringBuilder tripComments = new StringBuilder();
+        boolean foundAnyMetadata = false;
+        boolean readingTripComments = false;
+
+        String[] lines = text.split("\n");
+        for (String line : lines) {
+            String trimmed = line.trim();
+            if (trimmed.isEmpty()) {
+                readingTripComments = false;
+                continue;
+            }
+
+            // Strip Survex * prefix for uniform handling
+            String effective = trimmed;
+            if (isSurvex && effective.startsWith("*")) {
+                effective = effective.substring(1);
+            }
+
+            // Survey date: "date yyyy.MM.dd" (but not "date explored")
+            if (effective.startsWith("date ") && !effective.startsWith("date explored")) {
+                String dateStr = effective.substring(5).trim();
+                surveyDate = parseDate(dateStr);
+                if (surveyDate != null) foundAnyMetadata = true;
+                continue;
+            }
+
+            // Instrument: "instrument inst \"name\""
+            // Commented instrument means empty: "#instrument inst \"\"" or ";*instrument inst \"\""
+            if (effective.startsWith("instrument inst ")) {
+                instrument = extractQuotedValue(effective, "instrument inst ");
+                foundAnyMetadata = true;
+                continue;
+            }
+            // Check for commented-out instrument line
+            String commentedInstrument = isSurvex ? ";*instrument inst " : "#instrument inst ";
+            if (trimmed.startsWith(commentedInstrument)) {
+                instrument = "";
+                foundAnyMetadata = true;
+                continue;
+            }
+
+            // Team: "team \"Name\" role1 role2"
+            if (effective.startsWith("team ")) {
+                parseTeamLine(effective, teamMap, format);
+                foundAnyMetadata = true;
+                continue;
+            }
+
+            // Exploration date
+            if (isSurvex) {
+                // "*date explored yyyy.MM.dd"
+                if (effective.startsWith("date explored ")) {
+                    String dateStr = effective.substring(14).trim();
+                    explorationDate = parseDate(dateStr);
+                    foundAnyMetadata = true;
+                    continue;
+                }
+                // Commented: ";*date explored yyyy.mm.dd"
+                if (trimmed.startsWith(";*date explored ")) {
+                    foundAnyMetadata = true;
+                    continue;
+                }
+            } else {
+                // "explo-date yyyy.MM.dd"
+                if (effective.startsWith("explo-date ")) {
+                    String dateStr = effective.substring(11).trim();
+                    explorationDate = parseDate(dateStr);
+                    foundAnyMetadata = true;
+                    continue;
+                }
+                // Commented: "#explo-date yyyy.mm.dd"
+                if (trimmed.startsWith("#explo-date ")) {
+                    foundAnyMetadata = true;
+                    continue;
+                }
+            }
+
+            // Explo-team (Therion only): "explo-team \"Name\""
+            if (!isSurvex && effective.startsWith("explo-team ")) {
+                String name = extractQuotedValue(effective, "explo-team ");
+                if (!name.isEmpty()) {
+                    List<Trip.Role> roles = teamMap.get(name);
+                    if (roles == null) {
+                        roles = new ArrayList<>();
+                        teamMap.put(name, roles);
+                    }
+                    if (!roles.contains(Trip.Role.EXPLORATION)) {
+                        roles.add(Trip.Role.EXPLORATION);
+                    }
+                }
+                foundAnyMetadata = true;
+                continue;
+            }
+
+            // Survex explorer role is in team line, handled by parseTeamLine
+
+            // Trip comments block: "#Comment from SexyTopo trip information"
+            String commentPrefix = String.valueOf(commentChar);
+            if (trimmed.startsWith(commentPrefix + "Comment from SexyTopo trip information")) {
+                readingTripComments = true;
+                continue;
+            }
+            if (readingTripComments && trimmed.startsWith(commentPrefix)) {
+                if (tripComments.length() > 0) tripComments.append("\n");
+                tripComments.append(trimmed.substring(1));
+                continue;
+            }
+
+            readingTripComments = false;
+        }
+
+        if (!foundAnyMetadata) {
+            return null;
+        }
+
+        Trip trip = new Trip();
+
+        if (surveyDate != null) {
+            trip.setDate(surveyDate);
+        }
+
+        if (instrument != null) {
+            trip.setInstrument(instrument);
+        }
+
+        // Build team list
+        List<Trip.TeamEntry> teamEntries = new ArrayList<>();
+        for (Map.Entry<String, List<Trip.Role>> entry : teamMap.entrySet()) {
+            teamEntries.add(new Trip.TeamEntry(entry.getKey(), entry.getValue()));
+        }
+        trip.setTeam(teamEntries);
+
+        // Exploration date
+        if (explorationDate != null) {
+            if (surveyDate != null && isSameDay(surveyDate, explorationDate)) {
+                trip.setExplorationDateSameAsSurvey(true);
+            } else {
+                trip.setExplorationDateSameAsSurvey(false);
+                trip.setExplorationDate(explorationDate);
+            }
+        } else {
+            trip.setExplorationDateSameAsSurvey(false);
+        }
+
+        if (tripComments.length() > 0) {
+            trip.setComments(tripComments.toString());
+        }
+
+        return trip;
+    }
+
+
+    private static void parseTeamLine(String line, Map<String, List<Trip.Role>> teamMap, SurveyFormat format) {
+        // line: team "Name" role1 role2
+        String afterTeam = line.substring(5).trim();
+        String name = null;
+        String rolesStr = "";
+
+        if (afterTeam.startsWith("\"")) {
+            int closeQuote = afterTeam.indexOf('"', 1);
+            if (closeQuote > 0) {
+                name = afterTeam.substring(1, closeQuote);
+                rolesStr = afterTeam.substring(closeQuote + 1).trim();
+            }
+        }
+
+        if (name == null || name.isEmpty()) return;
+
+        List<Trip.Role> roles = teamMap.get(name);
+        if (roles == null) {
+            roles = new ArrayList<>();
+            teamMap.put(name, roles);
+        }
+
+        if (!rolesStr.isEmpty()) {
+            for (String roleStr : rolesStr.split("\\s+")) {
+                Trip.Role role = parseRole(roleStr, format);
+                if (role != null && !roles.contains(role)) {
+                    roles.add(role);
+                }
+            }
+        }
+    }
+
+
+    private static Trip.Role parseRole(String roleStr, SurveyFormat format) {
+        switch (roleStr.toLowerCase()) {
+            case "notes":
+                return Trip.Role.BOOK;
+            case "instruments":
+                return Trip.Role.INSTRUMENTS;
+            case "explorer":
+                return Trip.Role.EXPLORATION;
+            case "dog":
+            case "assistant":
+                return Trip.Role.DOG;
+            default:
+                return null;
+        }
+    }
+
+
+    private static String extractQuotedValue(String line, String prefix) {
+        String rest = line.substring(prefix.length()).trim();
+        if (rest.startsWith("\"") && rest.endsWith("\"")) {
+            return rest.substring(1, rest.length() - 1);
+        }
+        return rest;
+    }
+
+
+    @SuppressWarnings("deprecation")
+    private static boolean isSameDay(Date d1, Date d2) {
+        return d1.getYear() == d2.getYear()
+            && d1.getMonth() == d2.getMonth()
+            && d1.getDate() == d2.getDate();
+    }
+
+
+    private static Date parseDate(String dateStr) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat(SurvexTherionUtil.TRIP_DATE_PATTERN);
+            return sdf.parse(dateStr);
+        } catch (Exception e) {
+            Log.e("Failed to parse date: " + dateStr);
+            return null;
+        }
+    }
+
+
     private static void addLegToSurvey(
             Survey survey, Map<String, Station> nameToStation, String[] fields, 
             String comment, List<Leg> commentedNewLineLegs) {
@@ -203,6 +445,9 @@ public class SurvexTherionImporter {
             survey.setOrigin(origin);
             nameToStation.put(fromName, origin);
         }
+
+        // Detect if this is a backward leg BEFORE creating new stations
+        boolean isBackward = isBackwardLeg(fromName, toName, nameToStation);
 
         Station from = nameToStation.get(fromName);
         if (from == null) {
@@ -222,14 +467,16 @@ public class SurvexTherionImporter {
         // Extract promoted legs from inline{} comment
         String commentInstructions = extractCommentInstructions(comment);
         Leg[] promotedFrom = parseInlinePromotedLegs(commentInstructions);
+
+        // Strip the instruction from the comment so it doesn't end up on the station
+        if (!commentInstructions.isEmpty()) {
+            comment = comment.replace(commentInstructions, "").trim();
+        }
         
         // If no inline{} promoted legs, use commented new lines if available
         if (promotedFrom.length == 0 && !commentedNewLineLegs.isEmpty()) {
             promotedFrom = commentedNewLineLegs.toArray(new Leg[0]);
         }
-
-        // Detect if this is a backward leg
-        boolean isBackward = isBackwardLeg(fromName, toName, nameToStation);
 
         Leg leg;
         Station legFrom, legTo;

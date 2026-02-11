@@ -4,7 +4,7 @@ import android.content.Context;
 
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
-import org.hwyl.sexytopo.control.io.thirdparty.survextherion.ExportFormat;
+import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
 import org.hwyl.sexytopo.model.survey.Survey;
 
@@ -29,13 +29,13 @@ public class ThExporter {
         builder.append(SurvexTherionUtil.getInputText(th2Files)).append("\n\n");
 
         // Metadata (instrument is now in Trip, not passed separately)
-        builder.append(SurvexTherionUtil.getMetadata(survey, TherionExporter.COMMENT_CHAR, ExportFormat.THERION)).append("\n");
+        builder.append(SurvexTherionUtil.getMetadata(survey, TherionExporter.COMMENT_CHAR, SurveyFormat.THERION)).append("\n");
 
         // Centreline block
         builder.append("centreline\n");
-        builder.append(SurvexTherionUtil.getStationCommentsData(survey, ExportFormat.THERION));
-        builder.append(SurvexTherionUtil.getCentrelineData(survey, TherionExporter.COMMENT_CHAR, ExportFormat.THERION));
-        builder.append(SurvexTherionUtil.getExtendedElevationExtensions(survey, ExportFormat.THERION));
+        builder.append(SurvexTherionUtil.getStationCommentsData(survey, SurveyFormat.THERION));
+        builder.append(SurvexTherionUtil.getCentrelineData(survey, TherionExporter.COMMENT_CHAR, SurveyFormat.THERION));
+        builder.append(SurvexTherionUtil.getExtendedElevationExtensions(survey, SurveyFormat.THERION));
         builder.append("endcentreline\n");
 
         // End survey
@@ -50,9 +50,9 @@ public class ThExporter {
         // Replace centreline block
         String centrelineText =
             "centreline\n" +
-            SurvexTherionUtil.getStationCommentsData(survey, ExportFormat.THERION) +
-            SurvexTherionUtil.getCentrelineData(survey, TherionExporter.COMMENT_CHAR, ExportFormat.THERION) +
-            SurvexTherionUtil.getExtendedElevationExtensions(survey, ExportFormat.THERION) +
+            SurvexTherionUtil.getStationCommentsData(survey, SurveyFormat.THERION) +
+            SurvexTherionUtil.getCentrelineData(survey, TherionExporter.COMMENT_CHAR, SurveyFormat.THERION) +
+            SurvexTherionUtil.getExtendedElevationExtensions(survey, SurveyFormat.THERION) +
             "endcentreline\n";
         String newContent = replaceCentreline(originalFileContent, centrelineText);
 

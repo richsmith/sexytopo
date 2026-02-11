@@ -38,13 +38,13 @@ public class SurvexTherionUtil {
         return builder.toString();
     }
 
-    public static String getMetadata(Survey survey, char commentChar, ExportFormat format) {
+    public static String getMetadata(Survey survey, char commentChar, SurveyFormat format) {
         StringBuilder builder = new StringBuilder();
 
         Trip trip = survey.getTrip();
         if (trip != null) {
-            String marker = (format == ExportFormat.SURVEX) ? "*" : "";
-            boolean isSurvex = (format == ExportFormat.SURVEX);
+            String marker = (format == SurveyFormat.SURVEX) ? "*" : "";
+            boolean isSurvex = (format == SurveyFormat.SURVEX);
 
             // Date
             builder.append(marker).append(formatDate(trip.getDate())).append("\n");
@@ -135,10 +135,10 @@ public class SurvexTherionUtil {
         return entry.roles.size() == 1 && entry.roles.contains(Trip.Role.EXPLORATION);
     }
 
-    public static String getStationCommentsData(Survey survey, ExportFormat format) {
+    public static String getStationCommentsData(Survey survey, SurveyFormat format) {
 
         StringBuilder builder = new StringBuilder();
-        String marker = (format == ExportFormat.SURVEX) ? "*" : "";
+        String marker = (format == SurveyFormat.SURVEX) ? "*" : "";
 
         // Collect all stations with comments
         List<Station> stationsWithComments = new ArrayList<>();
@@ -174,13 +174,13 @@ public class SurvexTherionUtil {
     public static String getCentrelineData(
             Survey survey,
             char commentChar,
-            ExportFormat format) {
+            SurveyFormat format) {
 
         GraphToListTranslator graphToListTranslator = new GraphToListTranslator();
         StringBuilder builder = new StringBuilder();
 
         // Add data declaration line with optional syntax marker
-        String marker = (format == ExportFormat.SURVEX) ? "*" : "";
+        String marker = (format == SurveyFormat.SURVEX) ? "*" : "";
         builder.append(marker).append("data normal from to tape compass clino ignoreall\n");
 
         // Get chronological list of survey entries
@@ -199,8 +199,8 @@ public class SurvexTherionUtil {
         return builder.toString();
     }
 
-    private static String formatMember(Trip.TeamEntry member, ExportFormat format) {
-        boolean isSurvex = (format == ExportFormat.SURVEX);
+    private static String formatMember(Trip.TeamEntry member, SurveyFormat format) {
+        boolean isSurvex = (format == SurveyFormat.SURVEX);
         // For Therion, skip team members who only have EXPLORATION role
         if (!isSurvex && hasOnlyExplorerRole(member)) {
             return null;
@@ -218,7 +218,7 @@ public class SurvexTherionUtil {
         return TextUtils.join(" ", fields);
     }
 
-    private static String getRoleDescription(Trip.Role role, ExportFormat format) {
+    private static String getRoleDescription(Trip.Role role, SurveyFormat format) {
         switch(role) {
             case BOOK:
                 return "notes";
@@ -226,7 +226,7 @@ public class SurvexTherionUtil {
                 return "instruments";
             case EXPLORATION:
                 // Survex can use "explorer", Therion cannot (uses explo-team separately)
-                return (format == ExportFormat.SURVEX) ? "explorer" : null;
+                return (format == SurveyFormat.SURVEX) ? "explorer" : null;
             case DOG:
             default:
                 return "assistant";
@@ -253,7 +253,7 @@ public class SurvexTherionUtil {
             StringBuilder builder,
             GraphToListTranslator.SurveyListEntry entry,
             char commentChar,
-            ExportFormat format) {
+            SurveyFormat format) {
 
         Station from = entry.getFrom();
         String fromName = from.getName();
@@ -263,7 +263,7 @@ public class SurvexTherionUtil {
         String toName = to.getName();
 
         // Replace "-" with ".." for Survex splay syntax
-        if (format == ExportFormat.SURVEX && toName.equals("-")) {
+        if (format == SurveyFormat.SURVEX && toName.equals("-")) {
             toName = "..";
         }
 
@@ -298,9 +298,9 @@ public class SurvexTherionUtil {
         builder.append(formatted);
     }
 
-    public static String getExtendedElevationExtensions(Survey survey, ExportFormat format) {
+    public static String getExtendedElevationExtensions(Survey survey, SurveyFormat format) {
         StringBuilder builder = new StringBuilder();
-        String marker = (format == ExportFormat.SURVEX) ? "*" : "";
+        String marker = (format == SurveyFormat.SURVEX) ? "*" : "";
         generateExtendCommandsFromStation(builder, survey.getOrigin(), null, marker);
         return builder.toString();
     }
