@@ -75,6 +75,7 @@
     <string name="action_fullscreen">Plein écran</string>
     <string name="action_tools">Outils</string>
     <string name="action_undo_last_leg">Annuler la dernière lecture</string>
+    <string name="action_find_station">Rechercher une station…</string>
     <string name="action_link_to_existing_survey">Joindre à une topographie existante</string>
     <string name="action_system_log">Journal du système</string>
     <string name="action_generate_test_survey">Générer une topographie teste</string>
@@ -125,7 +126,7 @@
     <string name="file_active_survey_not_present">Aucun relevé actif</string>
     <string name="file_active_survey_uri">L\'URI du relevé actif est %1$s</string>
     <string name="file_operation_initialisation_error">Erreur d\'initialisation de l\'opération sur le fichier</string>
-    <string name="file_link_survey_station">Choisissez la station à relier à la station active</string>
+    <string name="file_link_survey_station">Choisissez la station à relier</string>
     <string name="file_link_survey_save_error">Erreur lors de la sauvegarde de la nouvelle connexion</string>
     <string name="file_unlink_survey_dialog_title">Dissocier la topographie</string>
     <string name="file_unlink_survey_not_found">Impossible de trouver la topographie à dissocier</string>
@@ -175,6 +176,7 @@
     <string name="sketch_menu_back_measurements">Inverser les segments</string>
     <string name="sketch_position_cross_section_instruction">Sélectionnez où dessiner la coupe transversale</string>
     <string name="sketch_symbol_orientation_education">Faites glisser pour définir la direction du symbole</string>
+    <string name="sketch_text_hint">Entrer le texte</string>
 
     <!-- Table view -->
     <string name="table_head_from">De</string>
@@ -205,11 +207,11 @@
     <string name="manual_edit_from_station_error">Station de départ invalide</string>
     <string name="manual_edit_to_station">Station d\'arrivée</string>
     <string name="manual_edit_to_station_error">Station d\'arrivée invalide</string>
+    <string name="manual_edit_shot_backwards">⬅ Tir en arrière</string>
+    <string name="manual_edit_comment">Commentaire</string>
     <string name="manual_rename_station_title">Renommer la station</string>
     <string name="manual_rename_station_hint">Nom de la station</string>
     <string name="manual_rename_error">Échec du renommage</string>
-    <string name="graph_text_hint">Entrer le texte</string>
-    <string name="graph_comment_hint">Commentaire de station</string>
 
     <!-- Device -->
     <string name="device_instruction_bluetooth">1. Bluetooth</string>
@@ -532,11 +534,18 @@
     <string name="context_move_leg_no_valid_move">Aucun emplacement valide pour déplacer ce segment</string>
     <string name="context_rename_splay_error">Impossible de renommer une extrémité de radiale</string>
     <string name="context_set_active_splay_error">Impossible de définir une extrémité de radiale comme station active</string>
+    <string name="context_station_comment_hint">Commentaire de station</string>
 
     <!-- Logging -->
     <string name="log_starting_up">Démarrage</string>
     <string name="log_shown">Affiché : %1$s</string>
     <string name="log_error_no_station_notification_intent">Impossible de démarrer la notification de nouvelle station</string>
+
+    <!-- Tools -->
+    <string name="tool_find_station_dialog_title">Rechercher une station</string>
+    <string name="tool_find_station_dialog_hint">Nom de la station</string>
+    <string name="tool_find_station_dialog_navigate">Naviguer</string>
+    <string name="tool_find_station_error_invalid">Station introuvable</string>
 
     <!-- Misc -->
     <string name="tool_generate_test_title">Générer des données de test</string>

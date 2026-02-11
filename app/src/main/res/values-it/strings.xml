@@ -75,6 +75,7 @@
     <string name="action_fullscreen">Schermo Intero</string>
     <string name="action_tools">Strumenti</string>
     <string name="action_undo_last_leg">Annulla ultima lettura</string>
+    <string name="action_find_station">Trova Stazione…</string>
     <string name="action_link_to_existing_survey">Collega a un Rilievo Esistente</string>
     <string name="action_system_log">Registro di Sistema</string>
     <string name="action_generate_test_survey">Genera Rilievo di Test</string>
@@ -125,7 +126,7 @@
     <string name="file_active_survey_not_present">Nessun rilievo attivo</string>
     <string name="file_active_survey_uri">L\'URI del rilievo attivo è %1$s</string>
     <string name="file_operation_initialisation_error">Errore nell\'inizializzazione dell\'operazione file</string>
-    <string name="file_link_survey_station">Scegli la stazione a cui collegare la stazione attiva</string>
+    <string name="file_link_survey_station">Scegli la stazione da collegare</string>
     <string name="file_link_survey_save_error">Errore nel salvataggio della nuova connessione</string>
     <string name="file_unlink_survey_dialog_title">Scollega Rilievo</string>
     <string name="file_unlink_survey_not_found">Impossibile trovare il rilievo da scollegare</string>
@@ -175,6 +176,7 @@
     <string name="sketch_menu_back_measurements">Tratti Inversi</string>
     <string name="sketch_position_cross_section_instruction">Seleziona dove disegnare la sezione trasversale</string>
     <string name="sketch_symbol_orientation_education">Trascina per impostare la direzione del simbolo</string>
+    <string name="sketch_text_hint">Inserisci testo</string>
 
     <!-- Table view -->
     <string name="table_head_from">Da</string>
@@ -206,11 +208,10 @@
     <string name="manual_edit_to_station">Alla stazione</string>
     <string name="manual_edit_to_station_error">Stazione di arrivo non valida</string>
     <string name="manual_edit_shot_backwards">⬅ Lettura all\'indietro</string>
+    <string name="manual_edit_comment">Commento</string>
     <string name="manual_rename_station_title">Rinomina Stazione</string>
     <string name="manual_rename_station_hint">Nome stazione</string>
     <string name="manual_rename_error">Rinomina fallita</string>
-    <string name="graph_text_hint">Inserisci testo</string>
-    <string name="graph_comment_hint">Commento stazione</string>
 
     <!-- Device -->
     <string name="device_instruction_bluetooth">1. Bluetooth</string>
@@ -539,11 +540,18 @@
     <string name="context_move_leg_no_valid_move">Nessun posto valido dove spostare questo tratto</string>
     <string name="context_rename_splay_error">Impossibile rinominare una terminazione di splay</string>
     <string name="context_set_active_splay_error">Impossibile impostare la terminazione di splay come stazione attiva</string>
+    <string name="context_station_comment_hint">Commento stazione</string>
 
     <!-- Logging -->
     <string name="log_starting_up">Avvio in corso</string>
     <string name="log_shown">Mostrato: %1$s</string>
     <string name="log_error_no_station_notification_intent">Impossibile avviare l\'intent di notifica della nuova stazione</string>
+
+    <!-- Tools -->
+    <string name="tool_find_station_dialog_title">Trova Stazione</string>
+    <string name="tool_find_station_dialog_hint">Nome della stazione</string>
+    <string name="tool_find_station_dialog_navigate">Naviga</string>
+    <string name="tool_find_station_error_invalid">Stazione non trovata</string>
 
     <!-- Misc -->
     <string name="tool_generate_test_title">Genera Dati di Test</string>

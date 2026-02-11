@@ -1,14 +1,25 @@
 package org.hwyl.sexytopo.control.activity;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+
+import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.control.components.StationSelectorDialog;
 import org.hwyl.sexytopo.control.table.LegDialogs;
 import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.control.util.SurveyStats;
@@ -23,6 +34,16 @@ import org.hwyl.sexytopo.model.survey.Station;
  * Provides standard context menu action implementations.
  */
 public abstract class SurveyEditorActivity extends SexyTopoActivity {
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        MenuItem findStationItem = menu.findItem(R.id.action_find_station);
+        if (findStationItem != null) {
+            findStationItem.setEnabled(true);
+        }
+        return true;
+    }
 
     public void onSetActiveStation(Station station) {
         setActiveStation(station);
@@ -43,13 +64,6 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
 
     public void onJumpToElevation(Station station) {
         jumpToStation(station, ExtendedElevationActivity.class);
-    }
-
-    public void onToggleLeftRight(Station station) {
-        Direction newDirection = station.getExtendedElevationDirection().opposite();
-        SurveyUpdater.setDirectionOfSubtree(station, newDirection);
-        getSurveyManager().broadcastSurveyUpdated();
-        invalidateView();
     }
 
     public void onSetDirectionLeft(Station station) {
@@ -84,7 +98,48 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
             showSimpleToast(R.string.file_cannot_extend_unsaved_survey);
             return;
         }
-        continueSurvey(station);
+        showNewSurveyStartStationDialog(station);
+    }
+
+    private void showNewSurveyStartStationDialog(Station station) {
+        TextInputLayout inputLayout = new TextInputLayout(this);
+        inputLayout.setBoxBackgroundMode(TextInputLayout.BOX_BACKGROUND_OUTLINE);
+        inputLayout.setHint(getString(R.string.menu_survey_start_new_dialog_station_name));
+
+        TextInputEditText input = new TextInputEditText(this);
+        input.setText(station.getName());
+        input.selectAll();
+        inputLayout.addView(input);
+
+        int paddingH = (int) (24 * getResources().getDisplayMetrics().density);
+        int paddingV = (int) (20 * getResources().getDisplayMetrics().density);
+        inputLayout.setPadding(paddingH, paddingV, paddingH, 0);
+
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+        builder.setView(inputLayout)
+            .setTitle(R.string.menu_survey_start_new_dialog_title)
+            .setPositiveButton(R.string.ok, (dialog, which) -> {
+                String stationName = input.getText().toString().trim();
+                if (!stationName.isEmpty()) {
+                    continueSurvey(station, stationName);
+                }
+            })
+            .setNegativeButton(R.string.cancel, null);
+
+        Dialog dialog = builder.create();
+        dialog.show();
+    }
+
+    public void onLinkSurvey(Station station) {
+        linkSurvey(station);
+    }
+
+    public void linkSurvey(final Station station) {
+        if (!getSurvey().isSaved()) {
+            showSimpleToast(R.string.file_cannot_extend_unsaved_survey);
+            return;
+        }
+        requestLinkExistingSurveyToStation(station);
     }
 
     public void onUnlinkSurvey(Station station) {
@@ -176,7 +231,7 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
     protected void openCommentDialog(Station station) {
         TextInputLayout inputLayout = new TextInputLayout(this);
         inputLayout.setBoxBackgroundMode(TextInputLayout.BOX_BACKGROUND_OUTLINE);
-        inputLayout.setHint(getString(R.string.graph_comment_hint));
+        inputLayout.setHint(getString(R.string.context_station_comment_hint));
 
         TextInputEditText input = new TextInputEditText(this);
         input.setLines(8);
@@ -193,14 +248,17 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         builder.setView(inputLayout)
             .setTitle(station.getName())
             .setPositiveButton(R.string.save, (dialog, which) -> {
-                    station.setComment(input.getText().toString());
+                    CharSequence inputText = input.getText();
+                    station.setComment(inputText != null ? inputText.toString() : "");
                     invalidateView();
                 })
             .setNegativeButton(R.string.cancel, null);
 
         Dialog dialog = builder.create();
-        dialog.getWindow().setSoftInputMode(
-            WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        }
         dialog.show();
         input.requestFocus();
     }
@@ -251,5 +309,17 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
             })
             .setNegativeButton(R.string.cancel, null)
             .show();
+    }
+
+    @Override
+    protected void onFindStation() {
+        StationSelectorDialog.show(
+            this,
+            getSurvey(),
+            R.string.tool_find_station_dialog_title,
+            R.string.tool_find_station_dialog_hint,
+            R.string.tool_find_station_dialog_navigate,
+            station -> jumpToStation(station, this.getClass())
+        );
     }
 }

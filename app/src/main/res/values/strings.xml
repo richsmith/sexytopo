@@ -76,6 +76,7 @@
     <string name="action_fullscreen">Fullscreen</string>
     <string name="action_tools">Tools</string>
     <string name="action_undo_last_leg">Undo last reading</string>
+    <string name="action_find_station">Find Station…</string>
     <string name="action_link_to_existing_survey">Link to an Existing Survey</string>
     <string name="action_system_log">System Log</string>
     <string name="action_generate_test_survey">Generate Test Survey</string>
@@ -126,7 +127,7 @@
     <string name="file_active_survey_not_present">No active survey</string>
     <string name="file_active_survey_uri">Active survey URI is %1$s</string>
     <string name="file_operation_initialisation_error">Error initialising file operation</string>
-    <string name="file_link_survey_station">Choose station to link active station to</string>
+    <string name="file_link_survey_station">Choose station to link to</string>
     <string name="file_link_survey_save_error">Error saving new connection</string>
     <string name="file_unlink_survey_dialog_title">Unlink Survey</string>
     <string name="file_unlink_survey_not_found">Could not find survey to unlink</string>
@@ -181,6 +182,7 @@
     <string name="sketch_menu_back_measurements">Reverse Legs</string>
     <string name="sketch_position_cross_section_instruction">Select where to draw cross-section</string>
     <string name="sketch_symbol_orientation_education">Drag to set symbol direction</string>
+    <string name="sketch_text_hint">Enter text</string>
 
     <!-- Table view -->
     <string name="table_head_from">From</string>
@@ -207,16 +209,15 @@
     <string name="manual_edit_right">Right (m)</string>
     <string name="manual_edit_up">Up (m)</string>
     <string name="manual_edit_down">Down (m)</string>
-    <string name="manual_edit_from_station">From station</string>
+    <string name="manual_edit_from_station">From</string>
     <string name="manual_edit_from_station_error">Invalid from station</string>
-    <string name="manual_edit_to_station">To station</string>
+    <string name="manual_edit_to_station">To</string>
     <string name="manual_edit_to_station_error">Invalid to station</string>
     <string name="manual_edit_shot_backwards">⬅ Shot backwards</string>
+    <string name="manual_edit_comment">Comment</string>
     <string name="manual_rename_station_title">Rename Station</string>
     <string name="manual_rename_station_hint">Station name</string>
     <string name="manual_rename_error">Rename failed</string>
-    <string name="graph_text_hint">Enter text</string>
-    <string name="graph_comment_hint">Station comment</string>
 
     <!-- Device -->
     <string name="device_instruction_bluetooth">1. Bluetooth</string>
@@ -592,6 +593,8 @@
     <string name="menu_survey">Survey</string>
     <string name="menu_start_new_survey">Start New Survey Here</string>
     <string name="menu_unlink_survey">Unlink Linked Survey</string>
+    <string name="menu_survey_start_new_dialog_title">Start new survey</string>
+    <string name="menu_survey_start_new_dialog_station_name">Starting station name</string>
     <string name="menu_comment">Comment</string>
     <string name="menu_toggle_left_right">Toggle Left/Right</string>
     <string name="menu_context_title_leg_to">Leg to %s</string>
@@ -604,11 +607,18 @@
     <string name="context_move_leg_no_valid_move">Nowhere valid to move this leg</string>
     <string name="context_rename_splay_error">Cannot rename a splay end</string>
     <string name="context_set_active_splay_error">Cannot set splay end as the active station</string>
+    <string name="context_station_comment_hint">Station comment</string>
 
     <!-- Logging -->
     <string name="log_starting_up">Starting up</string>
     <string name="log_shown">Shown: %1$s</string>
     <string name="log_error_no_station_notification_intent">Unable to start new station notification intent</string>
+
+    <!-- Tools -->
+    <string name="tool_find_station_dialog_title">Find Station</string>
+    <string name="tool_find_station_dialog_hint">Station name</string>
+    <string name="tool_find_station_dialog_navigate">Navigate</string>
+    <string name="tool_find_station_error_invalid">Station not found</string>
 
     <!-- Misc -->
     <string name="tool_generate_test_title">Generate Test Data</string>

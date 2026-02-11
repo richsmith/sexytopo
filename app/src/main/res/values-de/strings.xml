@@ -75,6 +75,7 @@
     <string name="action_fullscreen">Vollbild</string>
     <string name="action_tools">Werkzeuge</string>
     <string name="action_undo_last_leg">Letzte Messung rückgängig machen</string>
+    <string name="action_find_station">Station finden…</string>
     <string name="action_link_to_existing_survey">Mit einer bestehenden Vermessungsdatei verknüpfen</string>
     <string name="action_system_log">System Log</string>
     <string name="action_generate_test_survey">Test-Vermessungsdatei erzeugen</string>
@@ -125,7 +126,7 @@
     <string name="file_active_survey_not_present">Keine Vermessung ausgewählt</string>
     <string name="file_active_survey_uri">Die URI der aktuellen Vermessung ist %1$s</string>
     <string name="file_operation_initialisation_error">Fehler beim Vorbereiten einer Datei-Aktion</string>
-    <string name="file_link_survey_station">Messpunkt auswählen mit welchem der aktive Messpunkt verbunden werden soll</string>
+    <string name="file_link_survey_station">Messpunkt zum Verbinden auswählen</string>
     <string name="file_link_survey_save_error">Fehler beim Speichern der neuen Verbindung</string>
     <string name="file_unlink_survey_dialog_title">Verknüpfung aus Vermessungsdatei lösen</string>
     <string name="file_unlink_survey_not_found">Konnte keine Vermessungsdatei zum Lösen einer Verknüpfung finden</string>
@@ -175,6 +176,7 @@
     <string name="sketch_menu_back_measurements">Rückwärtsgerichtete Messstrecken</string>
     <string name="sketch_position_cross_section_instruction">Ort zum Zeichnen eines Querschnitts auswählen</string>
     <string name="sketch_symbol_orientation_education"> Ziehen, um die Richtung des Symbols festzulegen</string>
+    <string name="sketch_text_hint">Text eingeben</string>
 
     <!--  Table view  -->
     <string name="table_head_from">Von</string>
@@ -206,11 +208,10 @@
     <string name="manual_edit_to_station">Zur Station</string>
     <string name="manual_edit_to_station_error">Ungültige Zielstation</string>
     <string name="manual_edit_shot_backwards">⬅ Rückwärts gemessen</string>
+    <string name="manual_edit_comment">Kommentar</string>
     <string name="manual_rename_station_title">Messpunkt umbenennen</string>
     <string name="manual_rename_station_hint">Stationsname</string>
     <string name="manual_rename_error">Umbenennen fehlgeschlagen</string>
-    <string name="graph_text_hint">Text eingeben</string>
-    <string name="graph_comment_hint">Stationskommentar</string>
 
     <!--  Device  -->
     <string name="device_instruction_bluetooth">1. Bluetooth</string>
@@ -533,11 +534,18 @@
     <string name="context_move_leg_no_valid_move">Keine gültige Möglichkeit, um diese Messstrecke zu bewegen</string>
     <string name="context_rename_splay_error">Kann das Ende einer Dimension/Hilfslinie nicht umbenennen</string>
     <string name="context_set_active_splay_error">Ende einer Dimension/Hilfslinie kann nicht als aktiver Messpunkt definiert werden</string>
+    <string name="context_station_comment_hint">Stationskommentar</string>
 
     <!--  Logging  -->
     <string name="log_starting_up">Startprozess läuft</string>
     <string name="log_shown">Wird angezeigt: %1$s</string>
     <string name="log_error_no_station_notification_intent">Fehler beim Versuch einen neuen Messpunkt zu definieren</string>
+
+    <!-- Tools -->
+    <string name="tool_find_station_dialog_title">Station finden</string>
+    <string name="tool_find_station_dialog_hint">Stationsname</string>
+    <string name="tool_find_station_dialog_navigate">Navigieren</string>
+    <string name="tool_find_station_error_invalid">Station nicht gefunden</string>
 
     <!--  Misc  -->
     <string name="tool_generate_test_title">Test-Daten Erzeugen</string>

@@ -58,6 +58,7 @@ import org.hwyl.sexytopo.control.io.thirdparty.therion.TherionExportOptions;
 import org.hwyl.sexytopo.control.io.translation.Exporter;
 import org.hwyl.sexytopo.control.io.translation.ImportManager;
 import org.hwyl.sexytopo.control.io.translation.SelectableExporters;
+import org.hwyl.sexytopo.control.components.StationSelectorDialog;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.testutils.ExampleSurveyCreator;
@@ -87,6 +88,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     protected static boolean hasStarted = false;
     private static boolean debugMode = false;
+
+    private String pendingLinkStation = null;
 
 
     @Override
@@ -195,14 +198,16 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         // provided by the connected Instrument's Communicator
         MenuItem deviceMenu = menu.findItem(R.id.action_device_menu);
         SubMenu subMenu = deviceMenu.getSubMenu();
-        subMenu.clear();
-        subMenu.add(Menu.NONE, R.id.action_device_connect, 0, R.string.action_device_connect);
-        Map<Integer, Integer> commands = requestComms().getCustomCommands();
-        for (Map.Entry<Integer, Integer> entry: commands.entrySet()) {
-            int id = entry.getKey();
-            int stringId = entry.getValue();
-            String name = getString(stringId);
-            subMenu.add(Menu.NONE, id, 0, name);
+        if (subMenu != null) {
+            subMenu.clear();
+            subMenu.add(Menu.NONE, R.id.action_device_connect, 0, R.string.action_device_connect);
+            Map<Integer, Integer> commands = requestComms().getCustomCommands();
+            for (Map.Entry<Integer, Integer> entry: commands.entrySet()) {
+                int id = entry.getKey();
+                int stringId = entry.getValue();
+                String name = getString(stringId);
+                subMenu.add(Menu.NONE, id, 0, name);
+            }
         }
 
         boolean isDevMenuVisible = GeneralPreferences.isDevModeOn();
@@ -221,6 +226,12 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             boolean hasInstrument = !(requestComms() instanceof NullCommunicator);
             connectItem.setEnabled(hasInstrument);
             connectItem.setChecked(hasInstrument && requestComms().isConnected());
+        }
+
+        // disable Find Station by default
+        MenuItem findStationItem = menu.findItem(R.id.action_find_station);
+        if (findStationItem != null) {
+            findStationItem.setEnabled(false);
         }
 
         return super.onPrepareOptionsMenu(menu);
@@ -304,8 +315,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         } else if (itemId == R.id.action_undo_last_leg) {
             undoLastLeg();
             return true;
-        } else if (itemId == R.id.action_link_survey) {
-            confirmToProceedIfNotSaved("requestLinkExistingSurvey");
+        } else if (itemId == R.id.action_find_station) {
+            onFindStation();
             return true;
         } else if (itemId == R.id.action_system_log) {
             startActivity(SystemLogActivity.class);
@@ -381,8 +392,10 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             R.string.file_intent_open_title);
     }
 
+
     @SuppressLint("UnusedDeclaration") // called through Reflection
-    public void requestLinkExistingSurvey() {
+    public void requestLinkExistingSurveyToStation(Station station) {
+        pendingLinkStation = station.getName();
         selectDirectory(
             SexyTopoConstants.REQUEST_CODE_SELECT_SURVEY_TO_LINK,
             StartLocation.SURVEY_PARENT,
@@ -559,38 +572,25 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
     private void linkToStationInSurvey(final Survey surveyToLink) {
-        final Station[] stations = surveyToLink.getAllStations().toArray(new Station[]{});
-
-        MaterialAlertDialogBuilder builderSingle = new MaterialAlertDialogBuilder(this);
-
-        builderSingle.setTitle(R.string.file_link_survey_station);
-        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.select_dialog_item);
-
-        for (Station station : stations) {
-            arrayAdapter.add(station.getName());
-        }
-
-        builderSingle.setNegativeButton(R.string.cancel,
-                (dialog, which) -> dialog.dismiss());
-
-        builderSingle.setAdapter(arrayAdapter,
-            (dialog, which) -> {
-                String stationName = arrayAdapter.getItem(which);
+        StationSelectorDialog.show(
+            this,
+            surveyToLink,
+            R.string.file_link_survey_station,
+            R.string.tool_find_station_dialog_hint,
+            android.R.string.ok,
+            selectedStation -> {
                 try {
-                    Station selectedStation = Survey.NULL_STATION;
-                    for (Station station : stations) {
-                        if (station.getName().equals(stationName)) {
-                            selectedStation = station;
-                            break;
-                        }
-                    }
-
                     Survey current = getSurvey();
-                    joinSurveys(current, current.getActiveStation(), surveyToLink, selectedStation);
+                    Station stationToLink = pendingLinkStation != null ?
+                        current.getStationByName(pendingLinkStation) : null;
+                    if (stationToLink != null) {
+                        joinSurveys(current, stationToLink, surveyToLink, selectedStation);
+                    }
+                    pendingLinkStation = null;
 
+                    // Save both surveys so the connection is persisted in both directions
                     try {
+                        Saver.save(SexyTopoActivity.this, current);
                         Saver.save(SexyTopoActivity.this, surveyToLink);
                     } catch (Exception exception) {
                         showExceptionAndLog(R.string.file_link_survey_save_error, exception);
@@ -601,9 +601,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 } catch (Exception exception) {
                     showExceptionAndLog(exception);
                 }
-            });
-
-        builderSingle.show();
+            }
+        );
     }
 
 
@@ -821,6 +820,10 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
 
     public void continueSurvey(final Station joinPoint) {
+        continueSurvey(joinPoint, joinPoint.getName());
+    }
+
+    public void continueSurvey(final Station joinPoint, final String startingStationName) {
 
         final Survey currentSurvey = getSurvey();
 
@@ -830,8 +833,16 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         }
 
         Survey newSurvey = new Survey();
-        newSurvey.getOrigin().setName(joinPoint.getName());
+        newSurvey.getOrigin().setName(startingStationName);
         joinSurveys(currentSurvey, joinPoint, newSurvey, newSurvey.getOrigin());
+
+        // Save the original survey so the connection is persisted in both directions
+        try {
+            Saver.save(this, currentSurvey);
+        } catch (Exception e) {
+            Log.e("Error saving original survey after linking: " + e.getMessage());
+        }
+
         setSurvey(newSurvey);
     }
 
@@ -840,7 +851,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         currentSurvey.connect(currentJoinPoint, newSurvey, newJoinPoint);
         newSurvey.connect(newJoinPoint, currentSurvey, currentJoinPoint);
     }
-
 
     public void unlinkSurvey(final Station station) {
 
@@ -1097,6 +1107,10 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         getSurvey().undoAddLeg();
         getSurveyManager().broadcastSurveyUpdated();
 
+    }
+
+    protected void onFindStation() {
+        // Override in SurveyEditorActivity
     }
 
     private void setInputModePreference(MenuItem item) {
