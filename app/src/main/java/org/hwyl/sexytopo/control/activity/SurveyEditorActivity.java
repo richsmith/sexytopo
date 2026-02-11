@@ -1,14 +1,25 @@
 package org.hwyl.sexytopo.control.activity;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+
+import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.control.components.StationSelectorDialog;
 import org.hwyl.sexytopo.control.table.LegDialogs;
 import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.control.util.SurveyStats;
@@ -23,6 +34,16 @@ import org.hwyl.sexytopo.model.survey.Station;
  * Provides standard context menu action implementations.
  */
 public abstract class SurveyEditorActivity extends SexyTopoActivity {
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        MenuItem findStationItem = menu.findItem(R.id.action_find_station);
+        if (findStationItem != null) {
+            findStationItem.setEnabled(true);
+        }
+        return true;
+    }
 
     public void onSetActiveStation(Station station) {
         setActiveStation(station);
@@ -107,6 +128,18 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
 
         Dialog dialog = builder.create();
         dialog.show();
+    }
+
+    public void onLinkSurvey(Station station) {
+        linkSurvey(station);
+    }
+
+    public void linkSurvey(final Station station) {
+        if (!getSurvey().isSaved()) {
+            showSimpleToast(R.string.file_cannot_extend_unsaved_survey);
+            return;
+        }
+        requestLinkExistingSurveyToStation(station);
     }
 
     public void onUnlinkSurvey(Station station) {
@@ -276,5 +309,17 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
             })
             .setNegativeButton(R.string.cancel, null)
             .show();
+    }
+
+    @Override
+    protected void onFindStation() {
+        StationSelectorDialog.show(
+            this,
+            getSurvey(),
+            R.string.tool_find_station_dialog_title,
+            R.string.tool_find_station_dialog_hint,
+            R.string.tool_find_station_dialog_navigate,
+            station -> jumpToStation(station, this.getClass())
+        );
     }
 }

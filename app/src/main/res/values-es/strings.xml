@@ -75,6 +75,7 @@
     <string name="action_fullscreen">Pantalla Completa</string>
     <string name="action_tools">Herramientas</string>
     <string name="action_undo_last_leg">Deshacer última lectura</string>
+    <string name="action_find_station">Buscar Estación…</string>
     <string name="action_link_to_existing_survey">Enlazar a una Topografía Existente</string>
     <string name="action_system_log">Registro del Sistema</string>
     <string name="action_generate_test_survey">Generar Topografía de Prueba</string>
@@ -125,7 +126,7 @@
     <string name="file_active_survey_not_present">No hay topografía activa</string>
     <string name="file_active_survey_uri">La URI de la topografía activa es %1$s</string>
     <string name="file_operation_initialisation_error">Error al inicializar la operación de archivo</string>
-    <string name="file_link_survey_station">Elegir estación a la que enlazar la estación activa</string>
+    <string name="file_link_survey_station">Elegir estación para enlazar</string>
     <string name="file_link_survey_save_error">Error al guardar la nueva conexión</string>
     <string name="file_unlink_survey_dialog_title">Desenlazar Topografía</string>
     <string name="file_unlink_survey_not_found">No se pudo encontrar la topografía para desenlazar</string>
@@ -545,6 +546,12 @@
     <string name="log_starting_up">Iniciando</string>
     <string name="log_shown">Mostrado: %1$s</string>
     <string name="log_error_no_station_notification_intent">No se puede iniciar el intent de notificación de nueva estación</string>
+
+    <!-- Tools -->
+    <string name="tool_find_station_dialog_title">Buscar Estación</string>
+    <string name="tool_find_station_dialog_hint">Nombre de la estación</string>
+    <string name="tool_find_station_dialog_navigate">Navegar</string>
+    <string name="tool_find_station_error_invalid">Estación no encontrada</string>
 
     <!-- Misc -->
     <string name="tool_generate_test_title">Generar Datos de Prueba</string>
