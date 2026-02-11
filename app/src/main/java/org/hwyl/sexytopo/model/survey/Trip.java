@@ -61,15 +61,25 @@ public class Trip {
             }
             return result;
         }
+        
+        // Helper to check if this team entry has any roles
+        public boolean hasRoles() {
+            return roles != null && !roles.isEmpty();
+        }
     }
 
     private Date date;
     private List<TeamEntry> team = new ArrayList<>();
     private String comments;
+    private String instrument;  // Instrument name/description
+    private Date explorationDate;  // Exploration date field
+    private boolean explorationDateSameAsSurvey = true;  // Default to same as survey
 
 
     public Trip() {
         this.date = new Date();
+        this.instrument = "";  // Default to empty string
+        this.comments = "";  // Default to empty string
     }
 
     public List<TeamEntry> getTeam() {
@@ -96,6 +106,36 @@ public class Trip {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    // Instrument methods
+    public String getInstrument() {
+        return instrument;
+    }
+
+    public void setInstrument(String instrument) {
+        this.instrument = instrument;
+    }
+
+    public boolean hasInstrument() {
+        return instrument != null && !instrument.trim().isEmpty();
+    }
+
+    // Exploration date methods
+    public Date getExplorationDate() {
+        return explorationDate;
+    }
+
+    public void setExplorationDate(Date explorationDate) {
+        this.explorationDate = explorationDate;
+    }
+
+    public boolean isExplorationDateSameAsSurvey() {
+        return explorationDateSameAsSurvey;
+    }
+
+    public void setExplorationDateSameAsSurvey(boolean sameAsSurvey) {
+        this.explorationDateSameAsSurvey = sameAsSurvey;
     }
 
     public boolean equalsTripData(Trip trip) {

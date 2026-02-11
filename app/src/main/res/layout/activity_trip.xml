@@ -72,19 +72,84 @@
             />
     </LinearLayout>
 
+    <!-- Instrument Section -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/instrument_label"
+        android:textStyle="bold"
+        android:layout_marginTop="8dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/instrument_field"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:inputType="text"
+            android:hint="@string/instrument_hint"/>
+
+        <Button
+            android:id="@+id/instrument_get_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/instrument_get_button"
+            android:onClick="onGetInstrumentClicked"
+            android:enabled="false"/>
+    </LinearLayout>
+
+    <!-- Exploration Date Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/exploration_date_label"
+            android:textStyle="bold"/>
+
+        <EditText
+            android:id="@+id/exploration_date_field"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:textStyle="bold"
+            android:inputType="date"
+            android:hint="@string/exploration_date_hint"
+            android:background="@android:color/transparent"
+            android:enabled="false"/>
+    </LinearLayout>
+
+    <CheckBox
+        android:id="@+id/exploration_date_same_as_survey"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/same_as_survey_date"
+        android:checked="true"/>
+
+
     <EditText
         android:id="@+id/trip_comments"
         android:layout_width="match_parent"
+        android:layout_height="96dp"
         android:inputType="textMultiLine"
-        android:layout_height="0dp"
-        android:layout_weight="30"
         android:gravity="top"
-        android:hint="@string/trip_comments"/>
+        android:hint="@string/trip_comments"
+        android:layout_marginTop="8dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:padding="0dp"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp">
 
         <Button
             android:id="@+id/set_trip"
@@ -94,7 +159,7 @@
             android:textAlignment="gravity"
             android:gravity="center"
             android:text="@string/trip_save_trip"
-            android:enabled="true"
+            android:enabled="false"
             android:onClick="requestSaveTrip"
             />
         <Button
