@@ -376,7 +376,7 @@ public class SurvexTherionImporter {
 
         if (!rolesStr.isEmpty()) {
             for (String roleStr : rolesStr.split("\\s+")) {
-                Trip.Role role = parseRole(roleStr, format);
+                Trip.Role role = parseRole(roleStr);
                 if (role != null && !roles.contains(role)) {
                     roles.add(role);
                 }
@@ -385,7 +385,7 @@ public class SurvexTherionImporter {
     }
 
 
-    private static Trip.Role parseRole(String roleStr, SurveyFormat format) {
+    private static Trip.Role parseRole(String roleStr) {
         switch (roleStr.toLowerCase()) {
             case "notes":
                 return Trip.Role.BOOK;

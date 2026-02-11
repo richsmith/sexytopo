@@ -141,11 +141,23 @@ public class Trip {
     public boolean equalsTripData(Trip trip) {
         // Note, not "equals" method because the trips could have same data but not the same ID
 
-        if (! trip.date.equals(date)) {
+        if (objectsNotEqual(trip.date, date)) {
             return false;
         }
 
-        if (! trip.comments.equals(comments)) {
+        if (objectsNotEqual(trip.comments, comments)) {
+            return false;
+        }
+
+        if (objectsNotEqual(trip.instrument, instrument)) {
+            return false;
+        }
+
+        if (objectsNotEqual(trip.explorationDate, explorationDate)) {
+            return false;
+        }
+
+        if (trip.explorationDateSameAsSurvey != explorationDateSameAsSurvey) {
             return false;
         }
 
@@ -162,6 +174,11 @@ public class Trip {
         }
 
         return true;
+    }
+
+    private static boolean objectsNotEqual(Object a, Object b) {
+        if (a == null) return b != null;
+        return !a.equals(b);
     }
 
 }
