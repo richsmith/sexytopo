@@ -16,6 +16,7 @@ import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
 import org.hwyl.sexytopo.control.activity.SurveyEditorActivity;
 import org.hwyl.sexytopo.control.activity.TableActivity;
+import org.hwyl.sexytopo.control.components.DialogUtils;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.StationNamer;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
@@ -98,31 +99,10 @@ public class LegDialogs {
             .setNegativeButton(R.string.cancel, null);
 
         final AlertDialog dialog = builder.create();
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setSoftInputMode(
-                    WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-        }
+        DialogUtils.showKeyboardOnDisplay(dialog);
         dialog.show();
 
-        // Set up validation callback
-        form.setOnDidValidateCallback((valid) -> {
-            Button positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
-            if (positiveButton != null) {
-                positiveButton.setEnabled(valid);
-            }
-        });
-
-        // Run initial validation
-        form.validate();
-
-        dialog.setButton(DialogInterface.BUTTON_POSITIVE, tableActivity.getString(R.string.save),
-            (dialogInterface, buttonId) -> {
-                // Validate form first
-                form.validate();
-                if (!form.isValid()) {
-                    return;
-                }
-
+        DialogUtils.enableValidationOnButton(dialog, form, () -> {
                 // Get the leg with measurements and shot direction from form
                 Leg leg = form.getUpdatedLeg();
                 Station fromStation = form.getUpdatedFromStation();
@@ -174,15 +154,13 @@ public class LegDialogs {
                     }
                 }
 
-                dialogInterface.dismiss();
-
                 SurveyManager manager = tableActivity.getSurveyManager();
                 manager.broadcastSurveyUpdated();
                 if (!isSplay) {
                     manager.broadcastNewStationCreated();
                 }
                 tableActivity.syncWithSurvey();
-            });
+        });
     }
 
 
@@ -219,11 +197,7 @@ public class LegDialogs {
             .setNegativeButton(R.string.cancel, null);
 
         final AlertDialog dialog = builder.create();
-
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setSoftInputMode(
-                    WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-        }
+        DialogUtils.showKeyboardOnDisplay(dialog);
         dialog.show();
 
         // Populate fields with current values
@@ -252,27 +226,7 @@ public class LegDialogs {
         ((TextView) (dialog.findViewById(R.id.editInclination)))
                 .setText(Float.toString(editData.getInclination()));
 
-        // Set up validation callback
-        form.setOnDidValidateCallback((valid) -> {
-            Button positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
-            if (positiveButton != null) {
-                positiveButton.setEnabled(valid);
-            }
-        });
-
-        // Run initial validation to enable/disable save button
-        form.validate();
-
-        dialog.setButton(DialogInterface.BUTTON_POSITIVE, activity.getString(R.string.save),
-            (dialogInterface, buttonId) -> {
-
-                // Validate form first
-                form.validate();
-                if (!form.isValid()) {
-                    return;
-                }
-
-                dialogInterface.dismiss();
+        DialogUtils.enableValidationOnButton(dialog, form, () -> {
 
                 // Get the updated leg with measurements and shot direction from form
                 Leg edited = form.getUpdatedLeg();

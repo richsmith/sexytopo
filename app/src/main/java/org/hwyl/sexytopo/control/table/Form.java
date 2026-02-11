@@ -29,7 +29,7 @@ abstract public class Form {
         }
     }
 
-    interface OnDidValidateCallback {
+    public interface OnDidValidateCallback {
         void onDidValidate(Boolean valid);
     }
 
@@ -42,7 +42,7 @@ abstract public class Form {
         this.onDidValidateCallback = null;
     }
 
-    void setOnDidValidateCallback(@Nullable OnDidValidateCallback callback) {
+    public void setOnDidValidateCallback(@Nullable OnDidValidateCallback callback) {
         this.onDidValidateCallback = callback;
     }
 

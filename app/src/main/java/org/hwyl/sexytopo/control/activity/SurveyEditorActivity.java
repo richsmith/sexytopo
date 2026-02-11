@@ -19,6 +19,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.control.components.DialogUtils;
 import org.hwyl.sexytopo.control.components.StationSelectorDialog;
 import org.hwyl.sexytopo.control.table.LegDialogs;
 import org.hwyl.sexytopo.control.util.InputMode;
@@ -102,18 +103,13 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
     }
 
     private void showNewSurveyStartStationDialog(Station station) {
-        TextInputLayout inputLayout = new TextInputLayout(this);
-        inputLayout.setBoxBackgroundMode(TextInputLayout.BOX_BACKGROUND_OUTLINE);
-        inputLayout.setHint(getString(R.string.menu_survey_start_new_dialog_station_name));
+        TextInputLayout inputLayout = DialogUtils.createStandardTextInputLayout(this,
+                R.string.menu_survey_start_new_dialog_station_name);
 
         TextInputEditText input = new TextInputEditText(this);
         input.setText(station.getName());
         input.selectAll();
         inputLayout.addView(input);
-
-        int paddingH = (int) (24 * getResources().getDisplayMetrics().density);
-        int paddingV = (int) (20 * getResources().getDisplayMetrics().density);
-        inputLayout.setPadding(paddingH, paddingV, paddingH, 0);
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setView(inputLayout)
@@ -229,9 +225,8 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
      * Open the comment dialog for the given station.
      */
     protected void openCommentDialog(Station station) {
-        TextInputLayout inputLayout = new TextInputLayout(this);
-        inputLayout.setBoxBackgroundMode(TextInputLayout.BOX_BACKGROUND_OUTLINE);
-        inputLayout.setHint(getString(R.string.context_station_comment_hint));
+        TextInputLayout inputLayout = DialogUtils.createStandardTextInputLayout(this,
+                R.string.context_station_comment_hint);
 
         TextInputEditText input = new TextInputEditText(this);
         input.setLines(8);
@@ -239,10 +234,6 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         input.setText(station.getComment());
         input.setFocusableInTouchMode(true);
         inputLayout.addView(input);
-
-        int paddingH = (int) (24 * getResources().getDisplayMetrics().density);
-        int paddingV = (int) (20 * getResources().getDisplayMetrics().density);
-        inputLayout.setPadding(paddingH, paddingV, paddingH, 0);
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setView(inputLayout)
@@ -255,10 +246,7 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
             .setNegativeButton(R.string.cancel, null);
 
         Dialog dialog = builder.create();
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setSoftInputMode(
-                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-        }
+        DialogUtils.showKeyboardOnDisplay(dialog);
         dialog.show();
         input.requestFocus();
     }
