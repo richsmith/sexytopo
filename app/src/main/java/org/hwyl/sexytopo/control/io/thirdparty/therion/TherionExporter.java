@@ -3,10 +3,12 @@ package org.hwyl.sexytopo.control.io.thirdparty.therion;
 import android.content.Context;
 
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.control.io.SurveyDirectory;
 import org.hwyl.sexytopo.control.io.SurveyFile;
 import org.hwyl.sexytopo.control.io.basic.ExportFrameFactory;
 import org.hwyl.sexytopo.control.io.thirdparty.xvi.XviExporter;
 import org.hwyl.sexytopo.control.io.translation.Exporter;
+import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.SpaceFlipper;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.common.Frame;
@@ -24,18 +26,6 @@ import java.util.List;
 public class TherionExporter extends Exporter {
 
     public static final char COMMENT_CHAR = '#';
-    private static final SurveyFile.SurveyFileType THCONFIG =
-            new SurveyFile.SurveyFileType("thconfig", "plain/text");
-    private static final SurveyFile.SurveyFileType TH =
-            new SurveyFile.SurveyFileType("th", "plain/text");
-    private static final SurveyFile.SurveyFileType TH2_PLAN =
-            new SurveyFile.SurveyFileType("plan.th2", "plain/text");
-    private static final SurveyFile.SurveyFileType XVI_PLAN =
-            new SurveyFile.SurveyFileType("plan.xvi", "plain/text");
-    private static final SurveyFile.SurveyFileType TH2_EE =
-            new SurveyFile.SurveyFileType("ee.th2", "plain/text");
-    private static final SurveyFile.SurveyFileType XVI_EE =
-            new SurveyFile.SurveyFileType("ee.xvi", "plain/text");
 
     private String originalThFileContent = null;
     private String originalTh2PlanFileContent = null;
@@ -43,29 +33,54 @@ public class TherionExporter extends Exporter {
 
     private final List<String> th2Files = new ArrayList<>();
 
+    private TherionExportOptions exportOptions = new TherionExportOptions();
+
+    public void setExportOptions(TherionExportOptions options) {
+        this.exportOptions = options;
+    }
+
+    public TherionExportOptions getExportOptions() {
+        return exportOptions;
+    }
+
     public void run(Context context, Survey survey) throws IOException {
 
         String attribution = getFileAttribution(context);
 
-        // Therion export notes:
         // Therion coordinate system is in traditional graph-style, with positive y going up.
 
         th2Files.clear();
         readOriginalFilesIfPresent(context, survey);
 
         String thconfigContent = ThconfigExporter.getContent(survey);
-        SurveyFile thconfig = getOutputFile(THCONFIG);
+        SurveyFile thconfig = getOutputFile(createFileType("thconfig"));
         thconfig.save(context, attribution + thconfigContent);
 
-        SurveyFile th2_plan_file = getOutputFile(TH2_PLAN);
-        SurveyFile xvi_plan_file = getOutputFile(XVI_PLAN);
-        handleProjection(context, survey, Projection2D.PLAN,
-                th2_plan_file, xvi_plan_file, originalTh2PlanFileContent);
+        String planSuffix = GeneralPreferences.getTherionPlanSuffix();
+        String eeSuffix = GeneralPreferences.getTherionEeSuffix();
+        String xviFolder = GeneralPreferences.getTherionXviFolder();
 
-        SurveyFile th2_ee_file = getOutputFile(TH2_EE);
-        SurveyFile xvi_ee_file = getOutputFile(XVI_EE);
+        SurveyFile.SurveyFileType th2PlanType = createFileType(buildExtension(planSuffix, "th2"));
+        SurveyFile.SurveyFileType xviPlanType = createFileType(buildExtension(planSuffix, "xvi"));
+        SurveyFile th2PlanFile = getOutputFile(th2PlanType);
+        SurveyFile xviPlanFile = getXviOutputFile(context, xviPlanType, xviFolder);
+
+        handleProjection(context, survey, Projection2D.PLAN,
+                th2PlanFile, xviPlanFile, originalTh2PlanFileContent,
+                exportOptions.getPlanScrapCount(),
+                exportOptions.isStationsInFirstPlanScrap(),
+                xviFolder);
+
+        SurveyFile.SurveyFileType th2EeType = createFileType(buildExtension(eeSuffix, "th2"));
+        SurveyFile.SurveyFileType xviEeType = createFileType(buildExtension(eeSuffix, "xvi"));
+        SurveyFile th2EeFile = getOutputFile(th2EeType);
+        SurveyFile xviEeFile = getXviOutputFile(context, xviEeType, xviFolder);
+
         handleProjection(context, survey, Projection2D.EXTENDED_ELEVATION,
-                th2_ee_file, xvi_ee_file, originalTh2EeFileContent);
+                th2EeFile, xviEeFile, originalTh2EeFileContent,
+                exportOptions.getEeScrapCount(),
+                exportOptions.isStationsInFirstEeScrap(),
+                xviFolder);
 
         String thContent;
         if (originalThFileContent == null) {
@@ -73,8 +88,57 @@ public class TherionExporter extends Exporter {
         } else {
             thContent = ThExporter.updateOriginalContent(survey, originalThFileContent, th2Files);
         }
-        SurveyFile th = getOutputFile(TH);
-        th.save(context, attribution + thContent);
+        SurveyFile th = getOutputFile(createFileType("th"));
+        th.save(context, thContent);
+    }
+
+    private SurveyFile.SurveyFileType createFileType(String extension) {
+        return new SurveyFile.SurveyFileType(extension, "plain/text");
+    }
+
+    private String buildExtension(String suffix, String fileType) {
+        if (suffix == null || suffix.isEmpty()) {
+            return fileType;
+        }
+        // If suffix starts with a dot (e.g., ".plan"), preserve it
+        // SurveyFile.withExtension will not add another dot if extension starts with "."
+        // Result: filename.plan.th2
+        if (suffix.startsWith(".")) {
+            return suffix + "." + fileType;
+        } else if (suffix.endsWith(".")) {
+            // Suffix ends with dot already (e.g., "P.")
+            // Use "|" marker for direct append (no separator)
+            // Result: filenameP.th2
+            return "|" + suffix + fileType;
+        } else {
+            // No leading dot in suffix (e.g., "P")
+            // Use "|" marker for direct append (no separator between filename and suffix)
+            // Result: filenameP.th2
+            return "|" + suffix + "." + fileType;
+        }
+    }
+
+    private SurveyFile getXviOutputFile(Context context, SurveyFile.SurveyFileType fileType, String xviFolder) {
+        if (xviFolder == null || xviFolder.trim().isEmpty()) {
+            return getOutputFile(fileType);
+        }
+
+        SurveyDirectory parent = getParentExportDirectory();
+        SurveyDirectory exportDir = getExportDirectory(parent);
+
+        SurveyDirectory.SurveyDirectoryType xviDirType =
+                new SurveyDirectory.SurveyDirectoryType(xviFolder);
+        SurveyDirectory xviDir = xviDirType.get(exportDir);
+        xviDir.ensureExists(context);
+
+        return fileType.get(xviDir);
+    }
+
+    private String getXviPathForTh2(String xviFilename, String xviFolder) {
+        if (xviFolder == null || xviFolder.trim().isEmpty()) {
+            return xviFilename;
+        }
+        return xviFolder + "/" + xviFilename;
     }
 
 
@@ -84,16 +148,16 @@ public class TherionExporter extends Exporter {
             Projection2D projectionType,
             SurveyFile th2File,
             SurveyFile xviFile,
-            String originalFileContent)
+            String originalFileContent,
+            int scrapCount,
+            boolean stationsInFirstScrap,
+            String xviFolder)
             throws IOException {
 
         float scale = getScale();
 
         Space<Coord2D> space = projectionType.project(survey);
         space = SpaceFlipper.flipVertically(space);
-        // Therion y-coordinates are inverse of SexyTopo's
-        // (it would be more consistent to either do all the processing like scaling and flipping
-        // all at once or all just before using, but we currently have a mix :/)
 
         Sketch sketch = survey.getSketch(projectionType);
 
@@ -110,10 +174,11 @@ public class TherionExporter extends Exporter {
         outerFrame = outerFrame.scale(scale);
         outerFrame.flipVertically();
 
-        String content;
+        String xviPathForTh2 = getXviPathForTh2(xviFile.getFilename(), xviFolder);
 
-        content = Th2Exporter.getContent(
-            survey, projectionType, space, xviFile.getFilename(), innerFrame, outerFrame, scale);
+        String content = Th2Exporter.getContent(
+            survey, projectionType, space, xviPathForTh2, innerFrame, outerFrame, scale,
+            scrapCount, stationsInFirstScrap);
         th2File.save(context, content);
 
         String xviContent = XviExporter.getContent(sketch, space, scale, gridFrame);
@@ -150,31 +215,8 @@ public class TherionExporter extends Exporter {
 
 
     private void readOriginalFilesIfPresent(Context context, Survey survey) {
-
-        /*
-        This code currently sacrificed on the altar of trying to get SexyTopo working
-        with scoped storage :/
-
-        if (IoUtils.wasSurveyImported(context, survey)) {
-            DocumentFile directory = IoUtils.getFileSurveyWasImportedFrom(context, survey);
-
-            if (new TherionImporter().canHandleFile(directory)) {
-                File[] files = directory.listFiles();
-                if (files == null) {
-                    files = new File[] {};
-                }
-
-                for (File file : files) {
-                    if (FilenameUtils.getExtension(file.getName()).equals("th")) {
-                        originalThFileContent = Loader.slurpFile(file);
-                    } else if (file.getName().endsWith(SexyTopo.PLAN_SUFFIX + ".th2")) {
-                        originalTh2PlanFileContent = Loader.slurpFile(file);
-                    } else if (file.getName().endsWith(SexyTopo.PLAN_SUFFIX + ".th2")) {
-                        originalTh2EeFileContent = Loader.slurpFile(file);
-                    }
-                }
-            }
-        }*/
+        // Code currently sacrificed on the altar of trying to get SexyTopo working
+        // with scoped storage :/
     }
 
     private String getFileAttribution(Context context) {

@@ -400,6 +400,12 @@
 
     <!-- Settings -->
     <string name="settings_general_title">General</string>
+    <string name="settings_general_summary">Theme, orientation, vibration</string>
+    <string name="settings_sketching_summary">Drawing tools, display options</string>
+    <string name="settings_export_summary">Export formats and folder options</string>
+    <string name="settings_manual_data_entry_summary">LRUD fields, angle format</string>
+    <string name="settings_instruments_summary">Instrument tolerances, calibration</string>
+    <string name="settings_developer_summary">Debugging options</string>
     <string name="settings_theme_title">Theme</string>
     <string name="settings_theme_summary">Join the dark side? (Restarts app, so save your survey before changing!)</string>
     <string-array name="settings_theme_entries">
@@ -472,10 +478,39 @@
     <string name="settings_export_svg_leg_width_summary">How wide to draw leg lines in SVG export</string>
     <string name="settings_export_svg_splay_width_title">SVG splay width</string>
     <string name="settings_export_svg_splay_width_summary">How wide to draw splay lines in SVG export</string>
-    <string name="settings_export_therion_symbols_title">Therion export symbols</string>
-    <string name="settings_export_therion_symbols_summary">Include symbols when exporting to Therion format</string>
-    <string name="settings_export_therion_text_title">Therion export text</string>
-    <string name="settings_export_therion_text_summary">Include text when exporting to Therion format</string>
+    <string name="settings_export_therion_symbols_title">Export symbols</string>
+    <string name="settings_export_therion_symbols_summary">Include symbols when exporting</string>
+    <string name="settings_export_therion_text_title">Export text</string>
+    <string name="settings_export_therion_text_summary">Include text when exporting</string>
+    <string name="settings_export_folder_name_title">Export folder name</string>
+    <string name="settings_export_folder_name_summary">Name of the folder within the survey folder to export to</string>
+    <string name="settings_export_type_subfolders_title">Export type subfolders</string>
+    <string name="settings_export_type_subfolders_summary">Create subfolders named after export type (e.g. therion, survex)</string>
+    <string name="settings_export_svg_title">SVG</string>
+    <string name="settings_export_svg_section_summary">SVG export options</string>
+    <string name="settings_export_therion_title">Therion</string>
+    <string name="settings_export_therion_section_summary">Therion export options</string>
+    <string name="settings_therion_plan_suffix_title">Plan file suffix</string>
+    <string name="settings_therion_plan_suffix_summary">Suffix for plan th2/xvi files</string>
+    <string name="settings_therion_ee_suffix_title">Extended elevation file suffix</string>
+    <string name="settings_therion_ee_suffix_summary">Suffix for extended elevation th2/xvi files</string>
+    <string name="settings_therion_xvi_folder_title">XVI folder</string>
+    <string name="settings_therion_xvi_folder_summary">Subfolder for XVI files (blank for same folder)</string>
+    <string name="settings_therion_plan_scrap_suffix_title">Plan scrap suffix</string>
+    <string name="settings_therion_plan_scrap_suffix_summary">Suffix for plan scraps (# = number, ## = 01, 02…)</string>
+    <string name="settings_therion_ee_scrap_suffix_title">Extended elevation scrap suffix</string>
+    <string name="settings_therion_ee_scrap_suffix_summary">Suffix for elevation scraps (# = number, ## = 01, 02…)</string>
+    <string name="settings_therion_cross_sections_title">Add cross-section scraps</string>
+    <string name="settings_therion_cross_sections_summary">Include cross-section scraps in export</string>
+    <string name="settings_therion_plan_xs_suffix_title">Plan cross-section suffix</string>
+    <string name="settings_therion_plan_xs_suffix_summary">Suffix for plan cross-sections (# = station number)</string>
+    <string name="settings_therion_ee_xs_suffix_title">Extended elevation cross-section suffix</string>
+    <string name="settings_therion_ee_xs_suffix_summary">Suffix for extended elevation cross-sections (# = station number)</string>
+    <string name="therion_export_dialog_title">Therion Export Options</string>
+    <string name="therion_export_plan_scraps">Plan scraps</string>
+    <string name="therion_export_ee_scraps">Elevation scraps</string>
+    <string name="therion_export_stations_in_plan">Add stations to first plan scrap</string>
+    <string name="therion_export_stations_in_ee">Add stations to first elevation scrap</string>
     <string name="settings_developer_title">Developer</string>
     <string name="settings_key_developer_mode_title">Developer mode</string>
     <string name="settings_key_developer_mode_summary">Show debugging menu entries</string>
