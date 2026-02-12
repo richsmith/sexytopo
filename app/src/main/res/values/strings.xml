@@ -40,6 +40,9 @@
     <string name="title_activity_system_log">Log</string>
     <string name="title_activity_help">Help</string>
     <string name="title_activity_guide">Guide</string>
+    <string name="title_activity_cross_section">Cross-Section</string>
+    <string name="cross_section_title">Cross-Section: %1$s</string>
+    <string name="cross_section_open">Open</string>
 
     <!-- Action bar menu -->
     <string name="action_table">Table</string>
@@ -155,6 +158,13 @@
     <string name="sketch_toolbar_symbol">Symbol tool</string>
     <string name="sketch_toolbar_selector">Selector</string>
     <string name="sketch_toolbar_settings">Quick settings</string>
+    <string name="sketch_toolbar_layers">Layers</string>
+    <string name="layers_dialog_title">Layers</string>
+    <string name="layers_add">Add layer</string>
+    <string name="layers_set_active">Set as active layer</string>
+    <string name="layers_visibility_showing">Showing</string>
+    <string name="layers_visibility_faded">Fade layer</string>
+    <string name="layers_visibility_hidden">Hide layer</string>
     <string name="sketch_toolbar_undo">Undo</string>
     <string name="sketch_toolbar_redo">Redo</string>
     <string name="sketch_toolbar_zoom_in">Zoom in</string>

@@ -88,6 +88,11 @@
             android:name=".control.activity.TripActivity"
             android:label="@string/action_trip">
         </activity>
+        <activity
+            android:name=".control.activity.CrossSectionActivity"
+            android:label="@string/title_activity_cross_section"
+            android:windowSoftInputMode="adjustNothing">
+        </activity>
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="983f84c823879eb043bce5e8192c1f953c15a85f"
