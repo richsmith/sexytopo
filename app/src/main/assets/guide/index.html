@@ -130,7 +130,7 @@
 	<li><strong>Colours</strong> set the current sketching colour</li>
 	<li><strong>Move</strong> enters view mode</li>
 	<li><strong>Draw</strong> enters sketch mode</li>
-	<li><strong>Symbol</strong> enters symbol mode (tap twice to open symbol/text selection option)</li>
+	<li><strong>Symbol</strong> enters symbol mode (tap again to open symbol/text selection option)</li>
 	<li><strong>Erase</strong> deletes sketch features</li>
 	<li><strong>Select</strong> (dashed square) marks a station as the active station (select twice to open context menu)</li>
 	<li><strong>Quick Settings</strong> opens settings for adjusting sketch view on the fly</li>
@@ -263,6 +263,11 @@
   <p>After creating a survey (File -> New Survey), it is recommended to save it. Previous versions of SexyTopo handled this for you, but Android now requires the user to manage the file handling. When saving a file for the first time, SexyTopo opens a file selector for you to choose a folder to save it in. Important: you almost certainly want to create a new folder to save the survey in rather than selecting an existing one (otherwise both you and SexyTopo will get confused, and it might overwrite data you want to keep).</p>
 
   <p>SexyTopo attempts to default the save location to a folder in <code>Documents/SexyTopo/Surveys</code>, but this doesn't work on all devices, and you are free to choose your own folder structure. At the time of writing, SexyTopo doesn't care about where linked surveys are saved, but this may change in the future.</p>
+
+<h2 id="linked-surveys">Working with Linked Surveys</h2>
+  <p>To manage the complexity of anything other than very small caves, you will likely need to break the overall survey of a cave into smaller individual surveys. This provides several advantages, including managing the cognitive load of understanding how the survey fits together, improving rendering performance in SexyTopo, and aligning with the standard workflow of cave drawing packages such as Therion.</p>
+  <p>SexyTopo provides UI controls such as fading out or hiding the parts of the survey not currently being worked on. This is particularly helpful for dealing with extended overlapping sections of cave passage, and starting a new linked survey is the recommended way of handling this kind of continuation.</p>
+  <p>To start a new linked survey, select a station from the context menu and select Survey → Start New Survey Here. There is also an option to link to an existing survey and to unlink a survey.</p>
 
 <h2 id="import-export">Import and Export</h2>
   <p>SexyTopo can exchange data with other cave surveying software through import and export functions.</p>
