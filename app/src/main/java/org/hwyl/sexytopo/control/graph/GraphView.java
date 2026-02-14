@@ -31,6 +31,7 @@ import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SexyTopo;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.GraphActivity;
+import org.hwyl.sexytopo.control.components.DialogUtils;
 import org.hwyl.sexytopo.control.util.CohenSutherlandAlgorithm;
 import org.hwyl.sexytopo.control.util.CrossSectioner;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
@@ -611,16 +612,11 @@ public class GraphView extends View {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                TextInputLayout inputLayout = new TextInputLayout(getContext());
-                inputLayout.setBoxBackgroundMode(TextInputLayout.BOX_BACKGROUND_OUTLINE);
-                inputLayout.setHint(getContext().getString(R.string.sketch_text_hint));
+                TextInputLayout inputLayout = DialogUtils.createStandardTextInputLayout(
+                        getContext(), R.string.sketch_text_hint);
 
                 TextInputEditText input = new TextInputEditText(getContext());
                 inputLayout.addView(input);
-
-                int paddingH = (int) (24 * getResources().getDisplayMetrics().density);
-                int paddingV = (int) (20 * getResources().getDisplayMetrics().density);
-                inputLayout.setPadding(paddingH, paddingV, paddingH, 0);
 
                 MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
                 builder.setView(inputLayout)
@@ -644,9 +640,7 @@ public class GraphView extends View {
                     imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
                 });
 
-                // Keep keyboard visible
-                dialog.getWindow().setSoftInputMode(
-                        WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+                DialogUtils.showKeyboardOnDisplay(dialog);
                 dialog.show();
                 return true;
 

@@ -59,15 +59,11 @@ public class StationSelectorDialog {
             .setNegativeButton(R.string.cancel, null);
 
         AlertDialog dialog = builder.create();
+        DialogUtils.showKeyboardOnDisplay(dialog);
         dialog.show();
 
         Button positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
         field.enableValidation(positiveButton);
-
-        if (context instanceof Activity && dialog.getWindow() != null) {
-            dialog.getWindow().setSoftInputMode(
-                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-        }
         field.requestFocus();
     }
 }
