@@ -1,8 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableRow android:id="@+id/TableRow" style="@style/BodyRow" xmlns:android="http://schemas.android.com/apk/res/android">
-<TextView android:id="@+id/tableRowFrom" android:text="AX" style="@style/BodyText" android:layout_weight="1" />
-<TextView android:id="@+id/tableRowTo" android:text="BX" style="@style/BodyText" android:layout_weight="1" />
-<TextView android:id="@+id/tableRowDistance" android:text="1.46" style="@style/BodyText" android:layout_weight="1" />
-<TextView android:id="@+id/tableRowAzimuth" android:text="2.36" style="@style/BodyText" android:layout_weight="1" />
-<TextView android:id="@+id/tableRowInclination" android:text="2.36" style="@style/BodyText" android:layout_weight="1" />
-</TableRow>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/TableRow"
+    style="@style/BodyRow"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <!-- Fixed Columns -->
+    <TextView
+        android:id="@+id/tableRowFrom"
+        style="@style/BodyStation"
+        android:layout_width="wrap_content"
+        android:text="AX" />
+    <TextView
+        android:id="@+id/tableRowTo"
+        style="@style/BodyStation"
+        android:layout_width="wrap_content"
+        android:text="BX" />
+
+    <!-- Scrollable Columns -->
+    <HorizontalScrollView
+        android:id="@+id/row_scroll_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tableRowDistance"
+                style="@style/BodyNum"
+                android:layout_width="wrap_content"
+                android:minWidth="70dp"
+                android:text="1.46" />
+            <TextView
+                android:id="@+id/tableRowAzimuth"
+                style="@style/BodyNum"
+                android:layout_width="wrap_content"
+                android:minWidth="70dp"
+                android:text="2.36" />
+            <TextView
+                android:id="@+id/tableRowInclination"
+                style="@style/BodyNum"
+                android:layout_width="wrap_content"
+                android:minWidth="70dp"
+                android:text="2.36" />
+            <TextView
+                android:id="@+id/tableRowComment"
+                style="@style/BodyComment"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:minWidth="200dp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:text="Comment" />
+        </LinearLayout>
+    </HorizontalScrollView>
+</LinearLayout>

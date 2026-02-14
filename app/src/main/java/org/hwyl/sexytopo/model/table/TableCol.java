@@ -12,7 +12,7 @@ public enum TableCol {
     DISTANCE(R.id.tableRowDistance, "Distance", "%.3f"),
     AZIMUTH(R.id.tableRowAzimuth, "Azimuth", "%.2f"),
     INCLINATION(R.id.tableRowInclination, "Inclination", "%.2f"),
-    COMMENT(-1, "Comment", "%s");
+    COMMENT(R.id.tableRowComment, "Comment", "%s");
 
 
     final int id;

@@ -5,6 +5,7 @@ import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.HorizontalScrollView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -29,11 +30,13 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
     private final Map<TextView, GraphToListTranslator.SurveyListEntry> fieldToSurveyEntry = new HashMap<>();
     private final Map<TextView, TableCol> fieldToTableCol = new HashMap<>();
     private final Map<View, Integer> viewToPosition = new HashMap<>();
-    private final List<Integer> columnWidths = new ArrayList<>();
     
     private final Context context;
     private Survey survey;
     private final OnRowClickListener onRowClickListener;
+    private int stationColumnWidth = -1; // Default to no width
+    private final List<HorizontalScrollView> scrollViews = new ArrayList<>();
+    private HorizontalScrollView headerScrollView;
 
     private static final EnumMap<TableCol, Integer> TABLE_COL_TO_ANDROID_ID =
         new EnumMap<TableCol, Integer>(TableCol.class) {{
@@ -42,6 +45,7 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
             put(TableCol.DISTANCE, R.id.tableRowDistance);
             put(TableCol.AZIMUTH, R.id.tableRowAzimuth);
             put(TableCol.INCLINATION, R.id.tableRowInclination);
+            put(TableCol.COMMENT, R.id.tableRowComment);
         }};
 
     public interface OnRowClickListener {
@@ -55,6 +59,11 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
         this.onRowClickListener = listener;
     }
 
+    public void setStationColumnWidth(int width) {
+        this.stationColumnWidth = width;
+        notifyDataSetChanged(); // Redraw the view with new widths
+    }
+
     public void setSurvey(Survey updatedSurvey) {
         this.survey = updatedSurvey;
     }
@@ -65,6 +74,7 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
         viewToPosition.clear();
         entries.clear();
         entries.addAll(newEntries);
+        scrollViews.clear();
         notifyDataSetChanged();
     }
 
@@ -89,33 +99,18 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
         Map<TableCol, Object> map = GraphToListTranslator.createMap(entry);
 
         for (TableCol col : TableCol.values()) {
-            if (col == TableCol.COMMENT) {
-                continue;
-            }
-
-            String display = map.containsKey(col) ? col.format(map.get(col)) : "?";
             int id = TABLE_COL_TO_ANDROID_ID.get(col);
             TextView textView = holder.itemView.findViewById(id);
-            textView.setText(display);
 
-            // Apply column width if available
-            if (!columnWidths.isEmpty()) {
-                TableCol[] cols = TableCol.values();
-                int colIndex = 0;
-                for (int i = 0; i < cols.length; i++) {
-                    if (cols[i] != TableCol.COMMENT) {
-                        if (cols[i] == col) {
-                            if (colIndex < columnWidths.size()) {
-                                android.view.ViewGroup.LayoutParams params = textView.getLayoutParams();
-                                params.width = columnWidths.get(colIndex);
-                                textView.setLayoutParams(params);
-                            }
-                            break;
-                        }
-                        colIndex++;
-                    }
-                }
+            // Set width for station columns
+            if (stationColumnWidth != -1 && (col == TableCol.FROM || col == TableCol.TO)) {
+                ViewGroup.LayoutParams params = textView.getLayoutParams();
+                params.width = stationColumnWidth;
+                textView.setLayoutParams(params);
             }
+
+            String defaultDisplay = (col == TableCol.COMMENT) ? "" : "?";
+            textView.setText(map.containsKey(col) ? col.format(map.get(col)) : defaultDisplay);
 
             // Set background color with alternate row shading (theme-aware)
             if (isActiveStation(map.get(col))) {
@@ -148,17 +143,6 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
                 textView.setTypeface(Typeface.DEFAULT);
             }
 
-            // Set alignment based on column type
-            if (col == TableCol.DISTANCE || col == TableCol.AZIMUTH || col == TableCol.INCLINATION) {
-                // Right-align numeric columns
-                textView.setGravity(android.view.Gravity.END | android.view.Gravity.CENTER_VERTICAL);
-            } else if (col == TableCol.FROM || col == TableCol.TO) {
-                // Center-align station names
-                textView.setGravity(android.view.Gravity.CENTER);
-            } else {
-                textView.setGravity(android.view.Gravity.START | android.view.Gravity.CENTER_VERTICAL);
-            }
-
             // Store mappings and position
             fieldToSurveyEntry.put(textView, entry);
             fieldToTableCol.put(textView, col);
@@ -179,12 +163,26 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
                 return true;
             });
         }
+
+        // Synchronize scrolling
+        final HorizontalScrollView scrollView = holder.itemView.findViewById(R.id.row_scroll_view);
+        if (scrollView != null) {
+            scrollViews.add(scrollView);
+            scrollView.setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+                for (HorizontalScrollView otherScrollView : scrollViews) {
+                    if (otherScrollView != v) {
+                        otherScrollView.scrollTo(scrollX, 0);
+                    }
+                }
+                if (headerScrollView != null) {
+                    headerScrollView.scrollTo(scrollX, 0);
+                }
+            });
+        }
     }
 
-    public void setColumnWidths(List<Integer> widths) {
-        columnWidths.clear();
-        columnWidths.addAll(widths);
-        notifyDataSetChanged();
+    public void setHeaderScrollView(HorizontalScrollView headerScrollView) {
+        this.headerScrollView = headerScrollView;
     }
 
     @Override
