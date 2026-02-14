@@ -18,6 +18,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.hwyl.sexytopo.R;
@@ -72,6 +74,34 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
             }
         });
 
+        // Instrument field listener
+        EditText instrumentField = findViewById(R.id.instrument_field);
+        instrumentField.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                syncTrip();
+                updateButtonStatus();
+            }
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+        });
+
+        // Exploration date field listener
+        EditText exploDateField = findViewById(R.id.exploration_date_field);
+        exploDateField.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                syncTrip();
+                updateButtonStatus();
+            }
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+        });
+
     }
 
 
@@ -81,6 +111,7 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
         Trip trip = getSurvey().getTrip();
         if (trip == null) {
             trip = new Trip();
+            getSurvey().setTrip(trip);  // Save it back to survey
         }
 
         team = new ArrayList<>(trip.getTeam());
@@ -92,11 +123,34 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
         Date date = trip.getDate();
         String formatted = DATE_FORMAT.format(date);
         TextView dateField = findViewById(R.id.trip_date);
-        dateField.setText(
-            getText(R.string.trip) + " " + formatted + ". " + getText(R.string.trip_team) + ":");
+        dateField.setText(getString(R.string.trip_header, 
+            getText(R.string.trip), formatted, getText(R.string.trip_team)));
+
+        // Load instrument field
+        EditText instrumentField = findViewById(R.id.instrument_field);
+        if (trip.hasInstrument()) {
+            instrumentField.setText(trip.getInstrument());
+        } else {
+            instrumentField.setText("");
+        }
+
+        // Load exploration date checkbox state (without triggering listener)
+        CheckBox sameAsCheckbox = findViewById(R.id.exploration_date_same_as_survey);
+        sameAsCheckbox.setOnCheckedChangeListener(null);  // Temporarily remove listener
+        sameAsCheckbox.setChecked(trip.isExplorationDateSameAsSurvey());
+        
+        // Re-attach listener after setting state
+        EditText exploDateField = findViewById(R.id.exploration_date_field);
+        sameAsCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            exploDateField.setEnabled(!isChecked);
+            updateExplorationDateDisplay();
+            syncTrip();
+            updateButtonStatus();
+        });
 
         syncListWithTeam();
         updateButtonStatus();
+        updateExplorationDateDisplay();
     }
 
 
@@ -125,10 +179,11 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
         layout.addView(nameField);
 
         // Create a custom adapter
-        final ArrayAdapter<Trip.Role> arrayAdapter = new ArrayAdapter<Trip.Role>(
+        final ArrayAdapter<Trip.Role> arrayAdapter = new ArrayAdapter<>(
             this, android.R.layout.simple_list_item_multiple_choice, Trip.Role.values()) {
+            @NonNull
             @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
+            public View getView(int position, View convertView, @NonNull ViewGroup parent) {
                 View view = super.getView(position, convertView, parent);
                 Trip.Role role = getItem(position);
                 ((TextView) view).setText(role != null ? getString(role.descriptionId) : "");
@@ -165,9 +220,6 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
     }
 
     public void addTeamMember(String name, List<Trip.Role> roles) {
-        if (roles.isEmpty()) {
-            roles.add(Trip.Role.EXPLORATION);
-        }
         Trip.TeamEntry newTeamEntry = new Trip.TeamEntry(name, roles);
         team.add(newTeamEntry);
         syncTrip();
@@ -176,9 +228,6 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
 
 
     public void setTeamMember(int position, String name, List<Trip.Role> roles) {
-        if (roles.isEmpty()) {
-            roles.add(Trip.Role.EXPLORATION);
-        }
         Trip.TeamEntry newTeamEntry = new Trip.TeamEntry(name, roles);
         team.set(position, newTeamEntry);
         syncTrip();
@@ -213,6 +262,28 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
         }
         trip.setTeam(team);
         trip.setComments(comments);
+        
+        // Save instrument
+        EditText instrumentField = findViewById(R.id.instrument_field);
+        trip.setInstrument(instrumentField.getText().toString());
+        
+        // Save exploration date settings
+        CheckBox sameAsCheckbox = findViewById(R.id.exploration_date_same_as_survey);
+        trip.setExplorationDateSameAsSurvey(sameAsCheckbox.isChecked());
+        
+        if (!sameAsCheckbox.isChecked()) {
+            EditText exploDateField = findViewById(R.id.exploration_date_field);
+            String exploDateStr = exploDateField.getText().toString();
+            if (!exploDateStr.isEmpty()) {
+                try {
+                    Date exploDate = DATE_FORMAT.parse(exploDateStr);
+                    trip.setExplorationDate(exploDate);
+                } catch (Exception e) {
+                    // Invalid date format - ignore
+                }
+            }
+        }
+        
         getSurvey().setTrip(trip);
     }
 
@@ -234,14 +305,29 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
         Button deleteButton = findViewById(R.id.delete_person);
         deleteButton.setEnabled(unchecked.size() < team.size());
 
-        Button startButton = findViewById(R.id.set_trip);
+        // Check if any field has data
         boolean hasTeam = !team.isEmpty();
-        startButton.setEnabled(hasTeam);
+        
+        TextView commentsView = findViewById(R.id.trip_comments);
+        boolean hasComments = !commentsView.getText().toString().trim().isEmpty();
+        
+        EditText instrumentField = findViewById(R.id.instrument_field);
+        boolean hasInstrument = instrumentField != null && 
+                                !instrumentField.getText().toString().trim().isEmpty();
+        
+        EditText exploDateField = findViewById(R.id.exploration_date_field);
+        CheckBox sameAsCheckbox = findViewById(R.id.exploration_date_same_as_survey);
+        boolean hasExploDate = exploDateField != null && 
+                               !sameAsCheckbox.isChecked() &&
+                               !exploDateField.getText().toString().trim().isEmpty();
+        
+        boolean hasAnyData = hasTeam || hasComments || hasInstrument || hasExploDate;
+
+        Button startButton = findViewById(R.id.set_trip);
+        startButton.setEnabled(hasAnyData);
 
         Button clearButton = findViewById(R.id.clear_trip);
-        TextView commentsView = findViewById(R.id.trip_comments);
-        boolean hasComments = !commentsView.getText().toString().isEmpty();
-        clearButton.setEnabled(hasTeam || hasComments);
+        clearButton.setEnabled(hasAnyData);
     }
 
     private TeamListArrayAdapter getTeamListArrayAdapter() {
@@ -305,6 +391,29 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
         builderSingle.show();
     }
 
+    private void updateExplorationDateDisplay() {
+        EditText dateField = findViewById(R.id.exploration_date_field);
+        CheckBox sameAsCheckbox = findViewById(R.id.exploration_date_same_as_survey);
+        Trip trip = getSurvey().getTrip();
+        
+        if (trip == null) return;
+        
+        if (sameAsCheckbox.isChecked()) {
+            // Show survey date (disabled field)
+            dateField.setText(DATE_FORMAT.format(trip.getDate()));
+            dateField.setEnabled(false);
+        } else {
+            // Show exploration date (enabled field for editing)
+            Date exploDate = trip.getExplorationDate();
+            if (exploDate != null) {
+                dateField.setText(DATE_FORMAT.format(exploDate));
+            } else {
+                dateField.setText("");
+            }
+            dateField.setEnabled(true);
+        }
+    }
+
 
     public class TeamListArrayAdapter extends ArrayAdapter<Trip.TeamEntry> {
 
@@ -322,9 +431,15 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
             this.checked = new boolean[team.size()];
         }
 
+        @NonNull
         @Override
-        public View getView(final int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, @NonNull ViewGroup parent) {
+            // Note: For better performance, consider implementing ViewHolder pattern
             Trip.TeamEntry teamEntry = getItem(position);
+            if (teamEntry == null) {
+                // Return empty view if teamEntry is null
+                return new View(context);
+            }
             LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View rowView = inflater.inflate(R.layout.trip_team_member_item, parent, false);
