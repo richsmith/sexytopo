@@ -55,10 +55,6 @@ public class GraphToListTranslator {
 
         Map<TableCol, Object> map = new HashMap<>();
 
-        if (leg.hasDestination() && leg.getDestination().hasComment()) {
-            map.put(TableCol.COMMENT, leg.getDestination().getComment());
-        }
-
         if (leg.wasShotBackwards()) {
             map.put(TableCol.FROM, leg.getDestination());
             map.put(TableCol.TO, from);
