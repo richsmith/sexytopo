@@ -276,6 +276,7 @@
     <string name="device_ble_device_ready">%1$s ready :)</string>
     <string name="device_ble_device_disconnecting">%1$s disconnecting</string>
     <string name="device_ble_device_disconnected">%1$s ready :)</string>
+    <string name="device_ble_auto_reconnecting">Auto-reconnecting to %1$s…</string>
     <string name="device_ble_failed_to_connect_to">Failed to connect to %1$s</string>
     <string name="device_ble_invalid_data">Invalid data received: %1$s</string>
     <string name="device_distox_name" translatable="false">DistoX</string>
@@ -428,6 +429,9 @@
     <string name="settings_max_distance_delta_summary">How much error tolerated when deciding whether to create a new station</string>
     <string name="settings_max_angle_delta_title">Max angle delta (degrees)</string>
     <string name="settings_max_angle_delta_summary">How much error tolerated when deciding whether to create a new station</string>
+    <string name="settings_connection_title">Connection</string>
+    <string name="settings_auto_reconnect_title">Auto-reconnect</string>
+    <string name="settings_auto_reconnect_summary">Automatically reconnect to BLE devices on unexpected disconnection</string>
     <string name="settings_calibration_title">Calibration</string>
     <string name="settings_calibration_algorithm_title">Disto-X calibration algorithm</string>
     <string name="settings_calibration_algorithm_summary">Override Disto-X calibration algorithm choice</string>
