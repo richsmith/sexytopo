@@ -42,6 +42,15 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:title="@string/settings_connection_title">
+        <CheckBoxPreference
+            android:key="pref_auto_reconnect"
+            android:title="@string/settings_auto_reconnect_title"
+            android:summary="@string/settings_auto_reconnect_summary"
+            android:defaultValue="true"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:title="@string/settings_calibration_title">
         <ListPreference
             android:key="pref_calibration_algorithm"

@@ -299,7 +299,13 @@ public class DeviceActivity extends SexyTopoActivity {
     public void updateConnectionStatus() {
         SwitchCompat connectionSwitch = findViewById(R.id.connectionSwitch);
         boolean isActuallyConnected = requestComms().isConnected();
+        // Temporarily remove listener to avoid triggering toggleConnection()
+        // when the switch state is updated programmatically (e.g. after an
+        // unexpected disconnection), which would cancel auto-reconnect.
+        connectionSwitch.setOnCheckedChangeListener(null);
         connectionSwitch.setChecked(isActuallyConnected);
+        connectionSwitch.setOnCheckedChangeListener(
+                (buttonView, isChecked) -> toggleConnection(buttonView));
     }
 
 
