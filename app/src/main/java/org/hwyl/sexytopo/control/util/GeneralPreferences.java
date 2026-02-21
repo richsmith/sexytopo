@@ -245,5 +245,44 @@ public class GeneralPreferences {
         return getBoolean("pref_therion_export_text", true);
     }
 
+    public static String getTherionPlanSuffix() {
+        return getString("pref_therion_plan_suffix", ".plan");
+    }
+
+    public static String getTherionEeSuffix() {
+        return getString("pref_therion_ee_suffix", ".ee");
+    }
+
+    public static String getTherionXviFolder() {
+        return getString("pref_therion_xvi_folder", "");
+    }
+
+    public static String getTherionPlanScrapSuffix() {
+        return getString("pref_therion_plan_scrap_suffix", "-plan");
+    }
+
+    public static String getTherionEeScrapSuffix() {
+        return getString("pref_therion_ee_scrap_suffix", "-ee");
+    }
+
+    public static boolean isTherionCrossSectionsEnabled() {
+        return getBoolean("pref_therion_cross_sections", true);
+    }
+
+    public static String getTherionPlanXsSuffix() {
+        return getString("pref_therion_plan_xs_suffix", "PX#");
+    }
+
+    public static String getTherionEeXsSuffix() {
+        return getString("pref_therion_ee_xs_suffix", "EEX#");
+    }
+
+    public static String getExportFolderName() {
+        return getString("pref_export_folder_name", "Exported");
+    }
+
+    public static boolean isExportTypeSubfoldersEnabled() {
+        return getBoolean("pref_export_type_subfolders", true);
+    }
 
 }
