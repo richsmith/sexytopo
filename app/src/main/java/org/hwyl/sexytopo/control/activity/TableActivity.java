@@ -247,9 +247,36 @@ public class TableActivity extends SurveyEditorActivity
 
     @Override
     public void onRowClick(View view, GraphToListTranslator.SurveyListEntry entry, TableCol col) {
+        Survey survey = getSurvey();
+
+        // Check if the clicked column is the "FROM" column
+        if (col == TableCol.FROM) {
+            Station fromStation = entry.getFrom();
+            if (fromStation != null) {
+                // Set the active station in the survey
+                survey.setActiveStation(fromStation);
+                // Refresh the table to show the new highlight
+                tableRowAdapter.notifyDataSetChanged();
+            }
+            return;
+        }
+
+        // Handle "TO" column click (only if it is a leg with a destination)
+        if (col == TableCol.TO) {
+            if (entry.getLeg().hasDestination()) {
+                Station toStation = entry.getLeg().getDestination();
+                if (toStation != null) {
+                    survey.setActiveStation(toStation);
+                    tableRowAdapter.notifyDataSetChanged();
+                }
+            }
+            return;
+        }
+
+        // For the other columns we do the leg edit dialog
         Station fromStation = entry.getFrom();
         Leg leg = entry.getLeg();
-        LegDialogs.editLeg(this, getSurvey(), fromStation, leg);
+        LegDialogs.editLeg(this, survey, fromStation, leg);
     }
 
     @Override
