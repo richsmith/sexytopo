@@ -257,9 +257,10 @@ public class TableActivity extends SurveyEditorActivity
         Leg leg = entry.getLeg();
         Station fromStation = entry.getFrom();
 
-        // Row-centric: always show destination station for full legs, from station for splays
+        // Row-centric: show from station if the FROM station clicked or this is splay
+        // otherwise select the destination station
         // This matches the tap-to-edit behavior which edits the leg/row
-        Station station = leg.hasDestination() ? leg.getDestination() : fromStation;
+        Station station = col == TableCol.FROM || !leg.hasDestination() ? fromStation : leg.getDestination();
 
         // Create custom title considering backwards shots
         String customTitle;

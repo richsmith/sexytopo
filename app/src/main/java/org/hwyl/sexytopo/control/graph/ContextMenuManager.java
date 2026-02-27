@@ -227,6 +227,12 @@ public class ContextMenuManager {
             commentItem.setEnabled(station != survey.getOrigin());
         }
 
+        // Enable/disable delete station based on whether this is the from station
+        MenuItem deleteItem = menu.findItem(R.id.action_delete_station);
+        if (deleteItem != null) {
+            deleteItem.setEnabled(leg.hasDestination() && station == leg.getDestination());
+        }
+
         // Configure upgrade/downgrade visibility and submenu title based on leg type
         if (survey != null) {
             // Use provided leg, or infer from station if not provided
@@ -250,6 +256,17 @@ public class ContextMenuManager {
                 if (legSubmenu != null) {
                     legSubmenu.setTitle(isSplay ? R.string.menu_splay : R.string.menu_leg);
                 }
+                // Dynamically set the title for the "Station" submenu INTERNAL header
+                MenuItem stationMenuItem = menu.findItem(R.id.menu_station);
+                if (stationMenuItem != null && stationMenuItem.hasSubMenu() && station != null) {
+                    android.view.SubMenu stationSubMenu = stationMenuItem.getSubMenu();
+
+                    // Create the title string (e.g., "Station: A1")
+                    String title = context.getString(R.string.menu_station_title_dynamic, station.getName());
+
+                    // setHeaderTitle sets the text at the top of the opened submenu
+                    stationSubMenu.setHeaderTitle(title);
+}
             } else {
                 // No referring leg (origin station) - hide both
                 if (upgradeItem != null) {
