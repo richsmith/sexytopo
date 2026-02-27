@@ -168,6 +168,30 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
 
             // Set click listener
             textView.setOnClickListener(v -> {
+                // Check if the clicked column is the "FROM" column
+                if (col == TableCol.FROM) {
+                    Station fromStation = entry.getFrom();
+                    if (fromStation != null) {
+                        // Set the active station in the survey
+                        survey.setActiveStation(fromStation);
+                        // Refresh the table to show the new highlight
+                        notifyDataSetChanged();
+                    }
+                    return;
+                }
+
+                // Handle "TO" column click (only if it is a leg with a destination)
+                if (col == TableCol.TO) {
+                    if (entry.getLeg().hasDestination()) {
+                        Station toStation = entry.getLeg().getDestination();
+                        if (toStation != null) {
+                            survey.setActiveStation(toStation);
+                            notifyDataSetChanged();
+                        }
+                    }
+                    return;
+                }
+
                 if (onRowClickListener != null) {
                     onRowClickListener.onRowClick(v, entry, col);
                 }
