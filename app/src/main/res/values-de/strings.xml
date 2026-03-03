@@ -427,6 +427,12 @@
     <string name="settings_manual_data_entry_title">Manuelle Daten-Eingabe</string>
     <string name="settings_key_lrud_fields_title">LROU-Eingaben (Dimensionen)</string>
     <string name="settings_key_lrud_fields_summary">Felder zur Eingabe von LROU-Werten (Links-Rechts-Oben-Unten) für jeden neuen Messpunkt anzeigen</string>
+    <string name="settings_lrud_direction_title">LROU-Richtung</string>
+    <string name="settings_lrud_direction_summary">Ausrichtung der Links- und Rechtsmessungen: Winkelhalbierende zwischen den Messabschnitten (Vermessungsrichtung) oder senkrecht zum nächsten Abschnitt (Schussrichtung)</string>
+    <string-array name="settings_lrud_direction_entries">
+        <item>Vermessungsrichtung (Winkelhalbierende)</item>
+        <item>Schussrichtung (nächster Abschnitt)</item>
+    </string-array>
     <string name="settings_key_deg_mins_secs_title">Azimut in Grad/Minuten/Sekunden</string>
     <string name="settings_key_deg_mins_secs_summary">Azimutwerte in Grad/Minuten/Sekunden eingeben (im Gegensatz zur Standardeinstellung in Dezimalwerten)</string>
     <string name="settings_export_title">Exportieren</string>

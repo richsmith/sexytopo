@@ -458,6 +458,12 @@
     <string name="settings_manual_data_entry_title">Manual Data Entry</string>
     <string name="settings_key_lrud_fields_title">LRUD entries</string>
     <string name="settings_key_lrud_fields_summary">Show fields for entering LRUDs (Left-Right-Up-Down) for each new station</string>
+    <string name="settings_lrud_direction_title">LRUD direction</string>
+    <string name="settings_lrud_direction_summary">How Left and Right are oriented: bisecting the angle between legs (survey direction) or perpendicular to the next leg (shot direction)</string>
+    <string-array name="settings_lrud_direction_entries">
+        <item>Survey direction (bisect)</item>
+        <item>Shot direction (next leg)</item>
+    </string-array>
     <string name="settings_key_deg_mins_secs_title">Azimuth as degrees/minutes/seconds</string>
     <string name="settings_key_deg_mins_secs_summary">Enter azimuth values in deg/mins/secs (as opposed to the default of decimal)</string>
     <string name="settings_export_title">Export</string>

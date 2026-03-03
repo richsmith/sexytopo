@@ -144,10 +144,11 @@ public class LegDialogs {
                         // Restore the active station back to the FROM station
                         survey.setActiveStation(fromStation);
 
-                        createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceLeft, LRUD.LEFT);
-                        createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceRight, LRUD.RIGHT);
-                        createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceUp, LRUD.UP);
-                        createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceDown, LRUD.DOWN);
+                        LRUD.Mode lrudMode = GeneralPreferences.getLrudMode();
+                        createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceLeft, LRUD.LEFT, lrudMode);
+                        createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceRight, LRUD.RIGHT, lrudMode);
+                        createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceUp, LRUD.UP, lrudMode);
+                        createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceDown, LRUD.DOWN, lrudMode);
 
                         // Move active station back to the TO station again
                         survey.setActiveStation(newToStation);
@@ -290,13 +291,12 @@ public class LegDialogs {
 
     private static void createLrudIfPresent(Survey survey, Station station,
                                             AlertDialog dialog, int fieldId,
-                                            LRUD direction) {
+                                            LRUD direction, LRUD.Mode lrudMode) {
         Float value = getFieldValue(dialog, fieldId);
         if (value != null) {
-            Leg leg = direction.createSplay(survey, station, value);
+            Leg leg = direction.createSplay(survey, station, lrudMode, value);
             SurveyUpdater.update(survey, leg);
         }
-
     }
 
 

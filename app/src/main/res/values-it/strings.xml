@@ -427,6 +427,12 @@
     <string name="settings_manual_data_entry_title">Inserimento Manuale Dati</string>
     <string name="settings_key_lrud_fields_title">Campi LRUD</string>
     <string name="settings_key_lrud_fields_summary">Mostra campi per inserire LRUD (Sinistra-Destra-Su-Giù) per ogni nuova stazione</string>
+    <string name="settings_lrud_direction_title">Direzione LRUD</string>
+    <string name="settings_lrud_direction_summary">Orientamento delle misure Sinistra e Destra: bisettrice dell\'angolo tra i segmenti (direzione del rilievo) o perpendicolare al segmento successivo (direzione del tiro)</string>
+    <string-array name="settings_lrud_direction_entries">
+        <item>Direzione del rilievo (bisettrice)</item>
+        <item>Direzione del tiro (segmento successivo)</item>
+    </string-array>
     <string name="settings_key_deg_mins_secs_title">Azimut in gradi/minuti/secondi</string>
     <string name="settings_key_deg_mins_secs_summary">Inserisci valori di azimut in gradi/minuti/secondi (anziché il predefinito decimale)</string>
     <string name="settings_export_title">Esportazione</string>

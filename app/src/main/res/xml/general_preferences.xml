@@ -130,6 +130,13 @@
             android:title="@string/settings_key_lrud_fields_title"
             android:summary="@string/settings_key_lrud_fields_summary"
             android:defaultValue="false"/>
+        <ListPreference
+            android:key="pref_lrud_direction"
+            android:title="@string/settings_lrud_direction_title"
+            android:summary="@string/settings_lrud_direction_summary"
+            android:entries="@array/settings_lrud_direction_entries"
+            android:entryValues="@array/settings_lrud_direction_values"
+            android:defaultValue="survey"/>
         <CheckBoxPreference
             android:key="pref_deg_mins_secs"
             android:title="@string/settings_key_deg_mins_secs_title"
