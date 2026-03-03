@@ -12,31 +12,48 @@ import org.hwyl.sexytopo.model.survey.Survey;
  */
 public enum LRUD {
     LEFT {
-        public Leg createSplay(Survey survey, Station station, Leg useLeg, float distance) {
-            float angle = Space2DUtils.adjustAngle(
-                    useLeg!=null ? useLeg.getAzimuth() : CrossSectioner.getAngleOfSection(survey, station),
-                    -90.0f);
+        public Leg createSplay(Survey survey, Station station, Mode mode, float distance) {
+            float angle = Space2DUtils.adjustAngle(getSideAzimuth(survey, station, mode), -90.0f);
             return new Leg(distance, angle, 0);
         }
     },
     RIGHT {
-        public Leg createSplay(Survey survey, Station station, Leg useLeg, float distance) {
-            float angle = Space2DUtils.adjustAngle(
-                    useLeg!=null ? useLeg.getAzimuth() : CrossSectioner.getAngleOfSection(survey, station),
-                    90.0f);
+        public Leg createSplay(Survey survey, Station station, Mode mode, float distance) {
+            float angle = Space2DUtils.adjustAngle(getSideAzimuth(survey, station, mode), 90.0f);
             return new Leg(distance, angle, 0);
         }
     },
     UP {
-        public Leg createSplay(Survey survey, Station station, Leg useLeg, float distance) {
+        public Leg createSplay(Survey survey, Station station, Mode mode, float distance) {
             return new Leg(distance, 0, 90.0f);
         }
     },
     DOWN {
-        public Leg createSplay(Survey survey, Station station, Leg useLeg, float distance) {
+        public Leg createSplay(Survey survey, Station station, Mode mode, float distance) {
             return new Leg(distance, 0, -90.0f);
         }
     };
 
-    public abstract Leg createSplay(Survey survey, Station station, Leg useLeg, float distance);
+    public enum Mode {
+        /* Names here are taken from Therion usage */
+        SURVEY,
+        SHOT;
+
+        public static Mode fromPreferenceValue(String value) {
+            if ("shot".equals(value)) {
+                return SHOT;
+            }
+            return SURVEY;
+        }
+    }
+
+    public abstract Leg createSplay(Survey survey, Station station, Mode mode, float distance);
+
+    private static float getSideAzimuth(Survey survey, Station station, Mode mode) {
+        if (mode == Mode.SHOT) {
+            return station.getConnectedOnwardLegs().get(0).getAzimuth();
+        } else {
+            return CrossSectioner.getAngleOfSection(survey, station);
+        }
+    }
 }

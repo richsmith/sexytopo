@@ -154,11 +154,11 @@ public class LegDialogs {
                         // Restore the active station back to the FROM station
                         survey.setActiveStation(fromStation);
 
-                        Leg useLeg = GeneralPreferences.isLrudBisectModeOn() ? null : leg;
-                        createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceLeft, LRUD.LEFT, useLeg);
-                        createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceRight, LRUD.RIGHT, useLeg);
-                        createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceUp, LRUD.UP, useLeg);
-                        createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceDown, LRUD.DOWN, useLeg);
+                        LRUD.Mode lrudMode = GeneralPreferences.getLrudMode();
+                        createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceLeft, LRUD.LEFT, lrudMode);
+                        createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceRight, LRUD.RIGHT, lrudMode);
+                        createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceUp, LRUD.UP, lrudMode);
+                        createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceDown, LRUD.DOWN, lrudMode);
 
                         // Move active station back to the TO station again
                         survey.setActiveStation(newStation);
@@ -319,13 +319,12 @@ public class LegDialogs {
 
     private static void createLrudIfPresent(Survey survey, Station station,
                                             AlertDialog dialog, int fieldId,
-                                            LRUD direction, Leg useLeg) {
+                                            LRUD direction, LRUD.Mode lrudMode) {
         Float value = getFieldValue(dialog, fieldId);
         if (value != null) {
-            Leg leg = direction.createSplay(survey, station, useLeg, value);
+            Leg leg = direction.createSplay(survey, station, lrudMode, value);
             SurveyUpdater.update(survey, leg);
         }
-
     }
 
 

@@ -8,6 +8,7 @@ import androidx.preference.PreferenceManager;
 
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.model.sketch.Colour;
+import org.hwyl.sexytopo.model.table.LRUD;
 
 
 public class GeneralPreferences {
@@ -148,8 +149,8 @@ public class GeneralPreferences {
         return getBoolean("pref_lrud_fields", false);
     }
 
-    public static boolean isLrudBisectModeOn() {
-        return getBoolean("pref_lrud_bisect_angle", true);
+    public static LRUD.Mode getLrudMode() {
+        return LRUD.Mode.fromPreferenceValue(getString("pref_lrud_direction", "survey"));
     }
 
     public static boolean isDegMinsSecsModeOn() {

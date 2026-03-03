@@ -19,5 +19,9 @@
         <item>transparent</item>
         <item>white</item>
     </string-array>
+    <string-array name="settings_lrud_direction_values">
+        <item>survey</item>
+        <item>shot</item>
+    </string-array>
 </resources>
 
