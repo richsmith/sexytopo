@@ -427,6 +427,12 @@
     <string name="settings_manual_data_entry_title">Saisie manuelle des données</string>
     <string name="settings_key_lrud_fields_title">Champs LRUD</string>
     <string name="settings_key_lrud_fields_summary">Afficher les champs pour entrer les LRUD (Gauche-Droite-Haut-Bas) pour chaque nouvelle station</string>
+    <string name="settings_lrud_direction_title">Direction LRUD</string>
+    <string name="settings_lrud_direction_summary">Orientation des mesures Gauche et Droite : bissectrice de l\'angle entre les segments (direction de la topographie) ou perpendiculaire au segment suivant (direction du tir)</string>
+    <string-array name="settings_lrud_direction_entries">
+        <item>Direction de la topographie (bissectrice)</item>
+        <item>Direction du tir (segment suivant)</item>
+    </string-array>
     <string name="settings_key_deg_mins_secs_title">Azimut en degrés/minutes/secondes</string>
     <string name="settings_key_deg_mins_secs_summary">Entrer les valeurs d\'azimut en degrés/minutes/secondes (au lieu du mode décimal par défaut)</string>
     <string name="settings_export_title">Exporter</string>

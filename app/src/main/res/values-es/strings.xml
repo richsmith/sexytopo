@@ -427,6 +427,12 @@
     <string name="settings_manual_data_entry_title">Entrada Manual de Datos</string>
     <string name="settings_key_lrud_fields_title">Entradas LRUD</string>
     <string name="settings_key_lrud_fields_summary">Mostrar campos para ingresar LRUD (Izquierda-Derecha-Arriba-Abajo) para cada nueva estación</string>
+    <string name="settings_lrud_direction_title">Dirección LRUD</string>
+    <string name="settings_lrud_direction_summary">Orientación de las medidas Izquierda y Derecha: bisectriz del ángulo entre los tramos (dirección del levantamiento) o perpendicular al siguiente tramo (dirección del disparo)</string>
+    <string-array name="settings_lrud_direction_entries">
+        <item>Dirección del levantamiento (bisectriz)</item>
+        <item>Dirección del disparo (siguiente tramo)</item>
+    </string-array>
     <string name="settings_key_deg_mins_secs_title">Azimut en grados/minutos/segundos</string>
     <string name="settings_key_deg_mins_secs_summary">Ingresar valores de azimut en grados/minutos/segundos (en lugar del predeterminado decimal)</string>
     <string name="settings_export_title">Exportación</string>

@@ -427,6 +427,12 @@
     <string name="settings_manual_data_entry_title">Ręczne wprowadzanie danych</string>
     <string name="settings_key_lrud_fields_title">Wpisy LRUD</string>
     <string name="settings_key_lrud_fields_summary">Pokaż pola do wprowadzania LRUD (Lewo-Prawo-Góra-Dół) dla każdego nowego stanowiska</string>
+    <string name="settings_lrud_direction_title">Kierunek LRUD</string>
+    <string name="settings_lrud_direction_summary">Orientacja pomiarów Lewo i Prawo: dwusieczna kąta między odcinkami (kierunek pomiarowy) lub prostopadle do następnego odcinka (kierunek strzału)</string>
+    <string-array name="settings_lrud_direction_entries">
+        <item>Kierunek pomiarowy (dwusieczna)</item>
+        <item>Kierunek strzału (następny odcinek)</item>
+    </string-array>
     <string name="settings_key_deg_mins_secs_title">Azymut jako stopnie/minuty/sekundy</string>
     <string name="settings_key_deg_mins_secs_summary">Wprowadź wartości azymutu w stopniach/minutach/sekundach (w przeciwieństwie do domyślnego dziesiętnego)</string>
     <string name="settings_export_title">Eksport</string>
