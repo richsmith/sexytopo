@@ -1,6 +1,8 @@
 package org.hwyl.sexytopo.comms.sap6;
 
 import android.bluetooth.BluetoothDevice;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 
 import org.hwyl.sexytopo.R;
@@ -8,6 +10,7 @@ import org.hwyl.sexytopo.comms.Communicator;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.DeviceActivity;
+import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.model.survey.Leg;
 
 import java.util.HashMap;
@@ -22,6 +25,10 @@ public class SAP6Communicator implements Communicator {
     private final CaveBLE caveBLE;
 
     private final SurveyManager datamanager;
+
+    private boolean userRequestedDisconnect = false;
+    private final Handler reconnectHandler = new Handler(Looper.getMainLooper());
+    private static final long RECONNECT_DELAY_MS = 3000;
 
     private static final int START_CALIBRATION_ID = View.generateViewId();
     private static final int STOP_CALIBRATION_ID = View.generateViewId();
@@ -55,12 +62,20 @@ public class SAP6Communicator implements Communicator {
 
     @Override
     public void requestConnect() {
+        userRequestedDisconnect = false;
         caveBLE.connect();
     }
 
     @Override
     public void requestDisconnect() {
+        userRequestedDisconnect = true;
+        reconnectHandler.removeCallbacksAndMessages(null);
         caveBLE.disconnect();
+    }
+
+    @Override
+    public void forceStop() {
+        reconnectHandler.removeCallbacksAndMessages(null);
     }
 
     @Override
@@ -104,11 +119,20 @@ public class SAP6Communicator implements Communicator {
                 break;
             case CaveBLE.DISCONNECTED:
                 Log.device("Disconnected");
-                activity.updateConnectionStatus();
+                activity.runOnUiThread(activity::updateConnectionStatus);
+                if (!userRequestedDisconnect && GeneralPreferences.isAutoReconnectOn()) {
+                    Log.device(R.string.device_ble_auto_reconnecting, "SAP6");
+                    reconnectHandler.postDelayed(this::requestConnect, RECONNECT_DELAY_MS);
+                }
                 break;
             case CaveBLE.CONNECTION_FAILED:
                 Log.device("Communication error: "+msg);
-                activity.updateConnectionStatus();
+                activity.runOnUiThread(activity::updateConnectionStatus);
+                if (!userRequestedDisconnect && GeneralPreferences.isAutoReconnectOn()) {
+                    Log.device(R.string.device_ble_auto_reconnecting, "SAP6");
+                    reconnectHandler.postDelayed(this::requestConnect, RECONNECT_DELAY_MS);
+                }
+                break;
         }
         return Unit.INSTANCE;
     }

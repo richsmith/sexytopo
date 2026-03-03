@@ -208,6 +208,12 @@ public class GeneralPreferences {
         return getInt("pref_survey_symbol_size", 25);
     }
 
+    // ********** Connection ***********
+
+    public static boolean isAutoReconnectOn() {
+        return getBoolean("pref_auto_reconnect", true);
+    }
+
     // ********** Calibration ***********
 
     public static String getCalibrationAlgorithm() {
