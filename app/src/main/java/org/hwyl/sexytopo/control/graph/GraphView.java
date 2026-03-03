@@ -31,6 +31,7 @@ import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SexyTopo;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.GraphActivity;
+import org.hwyl.sexytopo.control.components.DialogUtils;
 import org.hwyl.sexytopo.control.util.CohenSutherlandAlgorithm;
 import org.hwyl.sexytopo.control.util.CrossSectioner;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
@@ -160,6 +161,7 @@ public class GraphView extends View {
     // ********** Paints and other drawing variables **********
 
     private final Paint stationPaint = new Paint();
+    private final Paint iconPaint = new Paint();
 
     private final Paint legPaint = new Paint();
     private final Paint latestLegPaint = new Paint();
@@ -179,7 +181,7 @@ public class GraphView extends View {
     private final Paint hotCornersPaint = new Paint();
 
     private final Paint[] ANTI_ALIAS_PAINTS = new Paint[] {
-            stationPaint, legendPaint, latestLegPaint, splayPaint,
+            stationPaint, iconPaint, legendPaint, latestLegPaint, splayPaint,
             fadedLegPaint, fadedLatestLegPaint, fadedSplayPaint,
             drawPaint, labelPaint, legendPaint,
             crossSectionConnectorPaint, crossSectionIndicatorPaint
@@ -213,6 +215,9 @@ public class GraphView extends View {
         int stationLabelFontSizeSp = GeneralPreferences.getStationLabelFontSizeSp();
         float stationLabelFontSizePixels = spToPixels(stationLabelFontSizeSp);
         stationPaint.setTextSize(stationLabelFontSizePixels);
+
+        iconPaint.setColorFilter(
+            new PorterDuffColorFilter(stationColour, PorterDuff.Mode.SRC_IN));
 
         highlightPaint.setStyle(Paint.Style.STROKE);
         highlightPaint.setStrokeWidth(HIGHLIGHT_OUTLINE);
@@ -607,16 +612,11 @@ public class GraphView extends View {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                TextInputLayout inputLayout = new TextInputLayout(getContext());
-                inputLayout.setBoxBackgroundMode(TextInputLayout.BOX_BACKGROUND_OUTLINE);
-                inputLayout.setHint(getContext().getString(R.string.graph_text_hint));
+                TextInputLayout inputLayout = DialogUtils.createStandardTextInputLayout(
+                        getContext(), R.string.sketch_text_hint);
 
                 TextInputEditText input = new TextInputEditText(getContext());
                 inputLayout.addView(input);
-
-                int paddingH = (int) (24 * getResources().getDisplayMetrics().density);
-                int paddingV = (int) (20 * getResources().getDisplayMetrics().density);
-                inputLayout.setPadding(paddingH, paddingV, paddingH, 0);
 
                 MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
                 builder.setView(inputLayout)
@@ -640,9 +640,7 @@ public class GraphView extends View {
                     imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
                 });
 
-                // Keep keyboard visible
-                dialog.getWindow().setSoftInputMode(
-                        WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+                DialogUtils.showKeyboardOnDisplay(dialog);
                 dialog.show();
                 return true;
 
@@ -1093,8 +1091,9 @@ public class GraphView extends View {
             }
 
             for (Bitmap icon : icons) {int yTop = y - stationCrossDiameter / 2;
-                Rect rect = new Rect(nextX, yTop, nextX + stationCrossDiameter, yTop + stationCrossDiameter);
-                canvas.drawBitmap(icon, null, rect, stationPaint);
+                Rect rect = new Rect(
+                    nextX, yTop, nextX + stationCrossDiameter, yTop + stationCrossDiameter);
+                canvas.drawBitmap(icon, null, rect, iconPaint);
                 nextX += stationCrossDiameter + spacing;
             }
 

@@ -82,7 +82,7 @@ public enum Projection2D {
             return space3DTransformer.transformTo3D(survey);
         }
     }
-    
+
     public abstract Coord2D project(Coord3D coord3D);
     public abstract boolean isLegInPlane(Leg leg);
 

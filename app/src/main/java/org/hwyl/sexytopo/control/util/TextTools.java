@@ -106,7 +106,7 @@ public class TextTools {
     public static String formatTo0dpWithComma(Number number) {
         return dp0WithCommaFormatter.format(number);
     }
-    
+
 
     public static String advanceLastNumber(String originatingName) {
 

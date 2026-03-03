@@ -1,0 +1,130 @@
+ I PocketTopo File Formats
+
+17.3.2010 bh
+
+
+PocketTopo Data File (.top)
+
+Version 3
+
+File = {
+	Byte 'T'
+	Byte 'o'
+	Byte 'p'
+	Byte 3  // version
+	Int32 tripCount
+	Trip[tripCount] trips
+	Int32 shotCount
+	Shot[shotCount] shots
+	Int32 refCount
+	Reference[refCount] references
+	Mapping overview
+	Drawing outline
+	Drawing sideview
+}
+
+Trip = {
+	Int64 time  // ticks (100ns units starting at 1.1.1)
+	String comment
+	Int16 declination  // internal angle units (full circle = 2^16)
+}
+
+Shot = {
+	Id from
+	Id to
+	Int32 dist  // mm
+	Int16 azimuth  // internal angle units (full circle = 2^16, north = 0, east = 0x4000)
+	Int16 inclination // internal angle units (full circle = 2^16, up = 0x4000, down = 0xC000)
+	Byte flags  // bit0: flipped shot
+	Byte roll   // roll angle (full circle = 256, disply up = 0, left = 64, down = 128)
+	Int16 tripIndex  // -1: no trip, >=0: trip reference
+	if (flags & 2)
+		String comment
+}
+
+Reference = {
+	Id station
+	Int64 east     // mm
+	Int64 north    // mm
+	Int32 altitude // mm above sea level
+	String comment
+}
+
+Mapping = {  // least recently used scroll position and scale
+	Point origin // middle of screen relative to first reference
+	Int32 scale  // 10..50000
+}
+
+Drawing = {
+	Mapping mapping
+	Element[] elements
+	Byte 0  // end of element list
+}
+
+Element = {
+	Byte id  // element type
+	...
+}
+
+PolygonElement = {
+	Byte 1  // id
+	Int32 pointCount
+	Point[pointCount] points // open polygon
+	Byte color // black = 1, gray = 2, brown = 3, blue = 4; red = 5, green = 6, orange = 7
+}
+
+XSectionElement = {
+	Byte 3  // id
+	Point pos  // drawing position
+	Id station
+	Int32 direction // -1: horizontal, >=0; projection azimuth (internal angle units)
+}
+
+Point = {  // world coordinates relative to first station in file
+	Int32 x  // mm
+	Int32 y  // mm
+}
+
+Id = { // station identification
+	Int32 value  // 0x80000000: undefined, <0: plain numbers + 0x80000001, >=0: major<<16|minor
+}
+
+String = { // .Net string format
+	Byte[] length // unsigned, encoded in 7 bit chunks, little endian, bit7 set in all but the last byte
+	Byte[length]  // UTF8 encoded, 1 to 3 bytes per character, not 0 terminated
+}
+
+All integers little endian.
+
+
+
+-----------------------------------------------
+
+Calibration File (.cal)
+
+Version 1
+
+File = {
+	Byte 'C'
+	Byte 'a'
+	Byte 'l'
+	Byte 1  // version
+	Int32 count
+	Entry[count] entries
+}
+
+Entry = {
+	Int16 gx // raw acceleration sensor values
+	Int16 gy
+	Int16 gz
+	Int16 mx // raw magnetic field sensor values
+	Int16 my
+	Int16 mz
+	Byte group // group identifier: 0: no group, 1: A, 2: B
+	Byte valid // 0: ignored, 1: valid
+}
+
+All integers little endian.
+In normal case all 'valid' bytes are 1 and the 'group' bytes are:
+1,1,1,1,2,2,2,2,1,1,1,1,2,2,2,2,0,0,0,...,0
+

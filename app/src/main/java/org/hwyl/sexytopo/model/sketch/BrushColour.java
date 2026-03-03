@@ -35,5 +35,5 @@ public enum BrushColour {
     public Colour getColour() {
         return colour;
     }
-    
+
 }

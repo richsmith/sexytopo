@@ -170,6 +170,21 @@ public class BasicTestSurveyCreator {
     }
 
 
+    public static Survey createSpanningZeroBoundary() {
+        // Creates a survey where station 2 has incoming leg at 350° and outgoing at 10°
+        // This tests the 0/360 boundary handling for cross-section angle calculation
+        Survey survey = new Survey();
+
+        Leg leg0 = new Leg(5, 350, 0);
+        SurveyUpdater.updateWithNewStation(survey, leg0);
+
+        Leg leg1 = new Leg(5, 10, 0);
+        SurveyUpdater.updateWithNewStation(survey, leg1);
+
+        return survey;
+    }
+
+
     @SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
     public static Survey createStraightNorthWithTrip() {
         Survey survey = new Survey();

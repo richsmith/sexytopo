@@ -107,8 +107,8 @@
         <menu>
             <item android:id="@+id/action_undo_last_leg"
                 android:title="@string/action_undo_last_leg" />
-            <item android:id="@+id/action_link_survey"
-                  android:title="@string/action_link_to_existing_survey"/>
+            <item android:id="@+id/action_find_station"
+                  android:title="@string/action_find_station"/>
             <item android:id="@+id/action_generate_test_survey"
                   android:title="@string/action_generate_test_survey" />
             <item android:id="@+id/action_system_log"

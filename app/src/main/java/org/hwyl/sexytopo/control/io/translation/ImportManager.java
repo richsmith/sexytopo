@@ -4,6 +4,7 @@ import android.content.Context;
 
 import androidx.documentfile.provider.DocumentFile;
 
+import org.hwyl.sexytopo.control.io.thirdparty.pockettopo.PocketTopoImporter;
 import org.hwyl.sexytopo.control.io.thirdparty.pockettopo.PocketTopoTxtImporter;
 import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexImporter;
 import org.hwyl.sexytopo.control.io.thirdparty.therion.TherionImporter;
@@ -22,6 +23,7 @@ public class ImportManager {
         new TherionImporter(),
         new XviImporter(),
         new SurvexImporter(),
+        new PocketTopoImporter(),
         new PocketTopoTxtImporter()
     );
 

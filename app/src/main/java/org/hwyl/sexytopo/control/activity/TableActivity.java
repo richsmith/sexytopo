@@ -81,7 +81,7 @@ public class TableActivity extends SurveyEditorActivity
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(android.content.Context context, Intent intent) {
-                syncTableWithSurvey();
+                syncWithSurvey();
             }
         };
     }
@@ -175,7 +175,7 @@ public class TableActivity extends SurveyEditorActivity
         LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
         broadcastManager.registerReceiver(receiver, new IntentFilter(SexyTopoConstants.SURVEY_UPDATED_EVENT));
 
-        syncTableWithSurvey();
+        syncWithSurvey();
 
         // Measure header widths after layout is complete
         TableLayout headerTable = findViewById(R.id.HeaderTable);
@@ -229,7 +229,8 @@ public class TableActivity extends SurveyEditorActivity
     }
 
 
-    public void syncTableWithSurvey() {
+    @Override
+    public void syncWithSurvey() {
         Survey survey = getSurvey();
         tableRowAdapter.setSurvey(survey);
 
@@ -315,7 +316,7 @@ public class TableActivity extends SurveyEditorActivity
 
     @Override
     protected void invalidateView() {
-        syncTableWithSurvey();
+        syncWithSurvey();
     }
 
     @Override
@@ -340,7 +341,7 @@ public class TableActivity extends SurveyEditorActivity
 
     public void deleteLastLeg(View view) {
         getSurvey().undoAddLeg();
-        syncTableWithSurvey();
+        syncWithSurvey();
     }
 
 
@@ -358,7 +359,7 @@ public class TableActivity extends SurveyEditorActivity
 
         // Reverse the order of stations to show the most recent stations at the top
         java.util.Collections.reverse(stations);
-        
+
         for (Station station : stations) {
             spinnerArray.add(station.getName());
         }
@@ -376,7 +377,7 @@ public class TableActivity extends SurveyEditorActivity
                 Station newStation = getSurvey().getStationByName(selectedName);
 
                 SurveyUpdater.moveLeg(getSurvey(), toMove, newStation);
-                syncTableWithSurvey();
+                syncWithSurvey();
             })
             .setNegativeButton(R.string.cancel, null)
             .show();

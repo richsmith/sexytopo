@@ -57,6 +57,7 @@ public class ContextMenuManager {
         menuActions.put(R.id.action_reverse, activity::onReverse);
         menuActions.put(R.id.action_new_cross_section, activity::onNewCrossSection);
         menuActions.put(R.id.action_start_new_survey, activity::onStartNewSurvey);
+        menuActions.put(R.id.action_link_survey, activity::onLinkSurvey);
         menuActions.put(R.id.action_unlink_survey, activity::onUnlinkSurvey);
         menuActions.put(R.id.action_rename_station, activity::onRenameStation);
         menuActions.put(R.id.action_edit_leg, activity::onEditLeg);
@@ -207,10 +208,17 @@ public class ContextMenuManager {
      * @param leg The specific leg clicked on (or null to infer from station)
      */
     private void configureMenuVisibility(Menu menu, Station station, Survey survey, Leg leg) {
-        // Enable/disable unlink survey based on whether station has connections
+        // Enable/disable link/unlink survey based on whether station has connections
+        MenuItem linkItem = menu.findItem(R.id.action_link_survey);
         MenuItem unlinkItem = menu.findItem(R.id.action_unlink_survey);
-        if (unlinkItem != null && survey != null) {
-            unlinkItem.setEnabled(survey.hasLinkedSurveys(station));
+        if (survey != null) {
+            boolean hasLinks = survey.hasLinkedSurveys(station);
+            if (linkItem != null) {
+                linkItem.setEnabled(!hasLinks);
+            }
+            if (unlinkItem != null) {
+                unlinkItem.setEnabled(hasLinks);
+            }
         }
 
         // Enable/disable comment based on whether this is the origin station

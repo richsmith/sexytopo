@@ -14,7 +14,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
+import org.hwyl.sexytopo.control.activity.SurveyEditorActivity;
 import org.hwyl.sexytopo.control.activity.TableActivity;
+import org.hwyl.sexytopo.control.components.DialogUtils;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.StationNamer;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
@@ -83,6 +85,7 @@ public class LegDialogs {
         // Hide TO field for splays
         if (isSplay) {
             dialogView.findViewById(R.id.toStationLayout).setVisibility(View.GONE);
+            dialogView.findViewById(R.id.toCommentLayout).setVisibility(View.GONE);
         }
 
         // Create validation form
@@ -96,31 +99,10 @@ public class LegDialogs {
             .setNegativeButton(R.string.cancel, null);
 
         final AlertDialog dialog = builder.create();
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setSoftInputMode(
-                    WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-        }
+        DialogUtils.showKeyboardOnDisplay(dialog);
         dialog.show();
 
-        // Set up validation callback
-        form.setOnDidValidateCallback((valid) -> {
-            Button positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
-            if (positiveButton != null) {
-                positiveButton.setEnabled(valid);
-            }
-        });
-
-        // Run initial validation
-        form.validate();
-
-        dialog.setButton(DialogInterface.BUTTON_POSITIVE, tableActivity.getString(R.string.save),
-            (dialogInterface, buttonId) -> {
-                // Validate form first
-                form.validate();
-                if (!form.isValid()) {
-                    return;
-                }
-
+        DialogUtils.enableValidationOnButton(dialog, form, () -> {
                 // Get the leg with measurements and shot direction from form
                 Leg leg = form.getUpdatedLeg();
                 Station fromStation = form.getUpdatedFromStation();
@@ -133,17 +115,25 @@ public class LegDialogs {
                     SurveyUpdater.renameOrigin(survey, newFromStationName);
                 }
 
+                fromStation.setComment(form.getUpdatedFromComment());
+
                 if (isSplay) {
                     // Add splay to from station
                     SurveyUpdater.addLegFromStation(survey, fromStation, leg);
                 } else {
                     // Create new destination station and set it on the leg
                     String toStationName = form.getUpdatedToStationName();
-                    Station newStation = new Station(toStationName);
+                    Station newToStation = new Station(toStationName);
+
+                    String toComment = form.getUpdatedToComment();
+                    if (toComment != null) {
+                        newToStation.setComment(toComment);
+                    }
+
 
                     // Reconstruct leg with destination station (preserving backwards flag from form)
                     leg = new Leg(leg.getDistance(), leg.getAzimuth(), leg.getInclination(),
-                                  newStation, new Leg[]{}, leg.wasShotBackwards());
+                                  newToStation, new Leg[]{}, leg.wasShotBackwards());
 
                     // Add leg to from station using SurveyUpdater
                     // This also sets the active station to the new destination
@@ -161,19 +151,17 @@ public class LegDialogs {
                         createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceDown, LRUD.DOWN, lrudMode);
 
                         // Move active station back to the TO station again
-                        survey.setActiveStation(newStation);
+                        survey.setActiveStation(newToStation);
                     }
                 }
-
-                dialogInterface.dismiss();
 
                 SurveyManager manager = tableActivity.getSurveyManager();
                 manager.broadcastSurveyUpdated();
                 if (!isSplay) {
                     manager.broadcastNewStationCreated();
                 }
-                tableActivity.syncTableWithSurvey();
-            });
+                tableActivity.syncWithSurvey();
+        });
     }
 
 
@@ -196,6 +184,7 @@ public class LegDialogs {
         // Hide to station field for splays
         if (!toEdit.hasDestination()) {
             dialogView.findViewById(R.id.toStationLayout).setVisibility(View.GONE);
+            dialogView.findViewById(R.id.toCommentLayout).setVisibility(View.GONE);
         }
 
         // Create and configure the form for validation
@@ -209,11 +198,7 @@ public class LegDialogs {
             .setNegativeButton(R.string.cancel, null);
 
         final AlertDialog dialog = builder.create();
-
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setSoftInputMode(
-                    WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-        }
+        DialogUtils.showKeyboardOnDisplay(dialog);
         dialog.show();
 
         // Populate fields with current values
@@ -242,27 +227,7 @@ public class LegDialogs {
         ((TextView) (dialog.findViewById(R.id.editInclination)))
                 .setText(Float.toString(editData.getInclination()));
 
-        // Set up validation callback
-        form.setOnDidValidateCallback((valid) -> {
-            Button positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
-            if (positiveButton != null) {
-                positiveButton.setEnabled(valid);
-            }
-        });
-
-        // Run initial validation to enable/disable save button
-        form.validate();
-
-        dialog.setButton(DialogInterface.BUTTON_POSITIVE, activity.getString(R.string.save),
-            (dialogInterface, buttonId) -> {
-
-                // Validate form first
-                form.validate();
-                if (!form.isValid()) {
-                    return;
-                }
-
-                dialogInterface.dismiss();
+        DialogUtils.enableValidationOnButton(dialog, form, () -> {
 
                 // Get the updated leg with measurements and shot direction from form
                 Leg edited = form.getUpdatedLeg();
@@ -286,9 +251,16 @@ public class LegDialogs {
                     }
                 }
 
+                newFromStation.setComment(form.getUpdatedFromComment());
+
                 // 3. Rename destination station if to station name changed (for full legs)
                 if (toEdit.hasDestination()) {
+                    Station newToStation = toEdit.getDestination();
                     String newToStationName = form.getUpdatedToStationName();
+                    String newToComment = form.getUpdatedToComment();
+
+                    newToStation.setComment(newToComment);
+
                     String oldToStationName = toEdit.getDestination().getName();
                     if (!newToStationName.equals(oldToStationName)) {
                         SurveyUpdater.renameStation(survey, edited.getDestination(), newToStationName);
@@ -297,9 +269,9 @@ public class LegDialogs {
 
                 activity.getSurveyManager().broadcastSurveyUpdated();
 
-                // Sync table view if this is a TableActivity
-                if (activity instanceof TableActivity) {
-                    ((TableActivity) activity).syncTableWithSurvey();
+                // Sync view with survey data
+                if (activity instanceof SurveyEditorActivity) {
+                    ((SurveyEditorActivity) activity).syncWithSurvey();
                 }
             });
     }
@@ -338,7 +310,7 @@ public class LegDialogs {
     }
 
 
-    public static void renameStation(final TableActivity activity,
+    public static void renameStation(final SurveyEditorActivity activity,
                                      final Survey survey, final Station toRename) {
         final RenameStationForm form = new RenameStationForm(activity, survey, toRename);
 
@@ -346,7 +318,8 @@ public class LegDialogs {
             String newName = form.stationName.getText().toString();
             try {
                 SurveyUpdater.renameStation(survey, toRename, newName);
-                activity.syncTableWithSurvey();
+                activity.getSurveyManager().broadcastSurveyUpdated();
+                activity.syncWithSurvey();
             } catch (Exception e) {
                 activity.showExceptionAndLog(R.string.manual_rename_error, e);
             }

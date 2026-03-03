@@ -30,7 +30,7 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
     private final Map<TextView, TableCol> fieldToTableCol = new HashMap<>();
     private final Map<View, Integer> viewToPosition = new HashMap<>();
     private final List<Integer> columnWidths = new ArrayList<>();
-    
+
     private final Context context;
     private Survey survey;
     private final OnRowClickListener onRowClickListener;
@@ -89,30 +89,32 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
         Map<TableCol, Object> map = GraphToListTranslator.createMap(entry);
 
         for (TableCol col : TableCol.values()) {
-            if (col == TableCol.COMMENT) {
-                continue;
-            }
-
             String display = map.containsKey(col) ? col.format(map.get(col)) : "?";
             int id = TABLE_COL_TO_ANDROID_ID.get(col);
             TextView textView = holder.itemView.findViewById(id);
-            textView.setText(display);
+
+            if (col == TableCol.FROM || col == TableCol.TO) {
+                Station station = (Station) map.get(col);
+                if (station != null && station.hasComment()) {
+                    textView.setText(display + " 💬");
+                } else {
+                    textView.setText(display);
+                }
+            } else {
+                textView.setText(display);
+            }
 
             // Apply column width if available
             if (!columnWidths.isEmpty()) {
                 TableCol[] cols = TableCol.values();
-                int colIndex = 0;
                 for (int i = 0; i < cols.length; i++) {
-                    if (cols[i] != TableCol.COMMENT) {
-                        if (cols[i] == col) {
-                            if (colIndex < columnWidths.size()) {
-                                android.view.ViewGroup.LayoutParams params = textView.getLayoutParams();
-                                params.width = columnWidths.get(colIndex);
-                                textView.setLayoutParams(params);
-                            }
-                            break;
+                    if (cols[i] == col) {
+                        if (i < columnWidths.size()) {
+                            android.view.ViewGroup.LayoutParams params = textView.getLayoutParams();
+                            params.width = columnWidths.get(i);
+                            textView.setLayoutParams(params);
                         }
-                        colIndex++;
+                        break;
                     }
                 }
             }
@@ -196,10 +198,10 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
         if (station == null) {
             return -1;
         }
-        
+
         for (int i = 0; i < entries.size(); i++) {
             GraphToListTranslator.SurveyListEntry entry = entries.get(i);
-            
+
             // Check if this is the destination station of a leg ("To" column)
             // We want to jump to the row where this station is the destination
             if (entry.getLeg().hasDestination()) {

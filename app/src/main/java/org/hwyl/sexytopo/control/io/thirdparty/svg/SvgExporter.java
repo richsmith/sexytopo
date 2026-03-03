@@ -1,6 +1,7 @@
 package org.hwyl.sexytopo.control.io.thirdparty.svg;
 
 import android.content.Context;
+import android.util.Log;
 import android.util.Xml;
 
 import org.hwyl.sexytopo.R;
@@ -10,6 +11,7 @@ import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.common.Frame;
 import org.hwyl.sexytopo.model.graph.Coord2D;
+import org.hwyl.sexytopo.model.graph.Coord3D;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
@@ -21,6 +23,7 @@ import org.hwyl.sexytopo.model.sketch.Symbol;
 import org.hwyl.sexytopo.model.sketch.SymbolDetail;
 import org.hwyl.sexytopo.model.sketch.TextDetail;
 import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -48,7 +51,8 @@ import javax.xml.transform.stream.StreamResult;
 @SuppressWarnings({"UnnecessaryLocalVariable", "SameParameterValue"})
 public class SvgExporter extends DoubleSketchFileExporter {
 
-    public static final int SCALE = 10;
+    public static final int SCALE = 50;
+    public static final int STATION_FONT = 15;
     public static final int BORDER = 10;
 
 
@@ -104,7 +108,17 @@ public class SvgExporter extends DoubleSketchFileExporter {
 
         xmlSerializer.startTag("", "g");
         xmlSerializer.attribute("", "id", "data");
-        writeSurveyData(xmlSerializer, projection, SCALE);
+
+        xmlSerializer.startTag("", "g");
+        xmlSerializer.attribute("", "id", "centreline");
+        writeCentrelineData(xmlSerializer, projection, SCALE);
+        xmlSerializer.endTag("", "g");
+
+        xmlSerializer.startTag("", "g");
+        xmlSerializer.attribute("", "id", "splays");
+        writeSplayData(xmlSerializer, projection, SCALE);
+        xmlSerializer.endTag("", "g");
+
         xmlSerializer.endTag("", "g");
 
         xmlSerializer.endTag(null, "svg");
@@ -235,23 +249,71 @@ public class SvgExporter extends DoubleSketchFileExporter {
 
     }
 
-     private static void writeSurveyData(XmlSerializer xmlSerializer, Space<Coord2D> projection, int scale)
+    private static void writeCentrelineData(XmlSerializer xmlSerializer, Space<Coord2D> projection, int scale)
             throws IOException {
+        Map<Station, Coord2D> stationMap = projection.getStationMap();
         Map<Leg, Line<Coord2D>> legMap = projection.getLegMap();
         Integer legStrokeWidth = GeneralPreferences.getExportSvgLegStrokeWidth();
-        Integer splayStrokeWidth = GeneralPreferences.getExportSvgSplayStrokeWidth();
-        for (Leg leg : legMap.keySet()) {
-            Line<Coord2D> line = legMap.get(leg);
-            xmlSerializer.startTag("", "polyline");
-            String pointsString = TextTools.join(
-                ",", scale * line.getStart().x, scale * line.getStart().y, scale * line.getEnd().x, scale * line.getEnd().y);
-            xmlSerializer.attribute("", "points", pointsString);
-            xmlSerializer.attribute("", "stroke", "red");
-            Integer strokeWidth = leg.hasDestination() ? legStrokeWidth : splayStrokeWidth;
-            xmlSerializer.attribute("", "stroke-width", strokeWidth.toString());
-            xmlSerializer.attribute("", "fill", "none");
-            xmlSerializer.endTag("", "polyline");
+
+        for (Station station : stationMap.keySet()) {
+            for (Leg leg : station.getOnwardLegs()) {
+                if (leg.hasDestination()) {
+                    Line<Coord2D> line = legMap.get(leg);
+                    Station destination = leg.getDestination();
+                    String legId = station.getName() + "-" + destination.getName();
+                    writeLeg(xmlSerializer, line, legId, scale, legStrokeWidth);
+                }
+            }
         }
+
+        for (Station station : stationMap.keySet()) {
+            Coord2D station2d = stationMap.get(station);
+            writeStation(xmlSerializer, station, station2d, scale);
+        }
+    }
+
+    private static void writeSplayData(XmlSerializer xmlSerializer, Space<Coord2D> projection, int scale)
+            throws IOException {
+        Map<Station, Coord2D> stationMap = projection.getStationMap();
+        Map<Leg, Line<Coord2D>> legMap = projection.getLegMap();
+        Integer splayStrokeWidth = GeneralPreferences.getExportSvgSplayStrokeWidth();
+
+        for (Station station : stationMap.keySet()) {
+            int splayCount = 0;
+            for (Leg leg : station.getOnwardLegs()) {
+                if (!leg.hasDestination()) {
+                    Line<Coord2D> line = legMap.get(leg);
+                    String splayId = String.format("%s-Splay%d", station.getName(), splayCount);
+                    writeLeg(xmlSerializer, line, splayId, scale, splayStrokeWidth);
+                    splayCount++;
+                }
+            }
+        }
+    }
+
+    private static void writeLeg(XmlSerializer xmlSerializer, Line<Coord2D> line, String id, int scale, Integer strokeWidth)
+            throws IOException {
+        xmlSerializer.startTag("", "polyline");
+        xmlSerializer.attribute("", "id", id);
+        String pointsString = TextTools.join(
+                ",", scale * line.getStart().x, scale * line.getStart().y, scale * line.getEnd().x, scale * line.getEnd().y);
+        xmlSerializer.attribute("", "points", pointsString);
+        xmlSerializer.attribute("", "stroke", "red");
+        xmlSerializer.attribute("", "stroke-width", strokeWidth.toString());
+        xmlSerializer.attribute("", "fill", "none");
+        xmlSerializer.endTag("", "polyline");
+    }
+
+    private static void writeStation(XmlSerializer xmlSerializer, Station station, Coord2D coord, int scale)
+            throws IOException {
+        xmlSerializer.startTag("", "text");
+        xmlSerializer.attribute("", "id", station.getName());
+        xmlSerializer.attribute("", "x", String.format("%.5f", scale * coord.x));
+        xmlSerializer.attribute("", "y", String.format("%.5f", scale * coord.y));
+        xmlSerializer.attribute("", "font-size", String.format("%d", STATION_FONT));
+        xmlSerializer.attribute("", "stroke", "black");
+        xmlSerializer.text(station.getName());
+        xmlSerializer.endTag("", "text");
     }
 
 

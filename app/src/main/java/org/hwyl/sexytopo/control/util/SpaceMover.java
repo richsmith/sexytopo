@@ -29,7 +29,7 @@ public class SpaceMover {
                     new Line<>(line.getStart().plus(delta), line.getEnd().plus(delta));
             moved.addLeg(leg, shiftedLine);
         }
-        
+
 
         return moved;
     }
