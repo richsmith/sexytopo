@@ -141,6 +141,7 @@
     <string name="export_successful">Export completed</string>
     <string name="export_failed">Export failed</string>
     <string name="third_party_therion" translatable="false">Therion</string>
+    <string name="third_party_pocket_topo" translatable="false">PocketTopo (.top)</string>
     <string name="third_party_pocket_topo_txt" translatable="false">PocketTopo .txt</string>
     <string name="third_party_survex" translatable="false">Survex</string>
     <string name="third_party_compass" translatable="false">Compass</string>
