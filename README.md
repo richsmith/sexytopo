@@ -88,4 +88,5 @@ I'm primarily supporting Therion and SVG as output formats. SexyTopo will try to
 SexyTopo is primarily aimed at drawing surveys from scratch. SexyTopo will try to import other formats, but functionality is limited. Expect problems.
 + Therion (Therion files produced by SexyTopo and other simple Therion files)
 + Survex (Survex files produced by SexyTopo and other simple Survex files)
++ PocketTopo .top native format
 + PocketTopo .txt export format
