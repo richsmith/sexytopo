@@ -532,6 +532,7 @@
     <!-- Context menu(s) -->
     <string name="menu_context_title">Station</string>
     <string name="menu_leg">Leg</string>
+    <string name="menu_leg_title_dynamic">Leg %1$s to %2$s</string>
     <string name="menu_splay">Splay</string>
     <string name="menu_station">Station</string>
     <string name="menu_station_title_dynamic">Station: %1$s</string>

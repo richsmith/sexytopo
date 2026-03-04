@@ -54,13 +54,11 @@ public class ContextMenuManager {
         menuActions.put(R.id.action_jump_to_elevation, activity::onJumpToElevation);
         menuActions.put(R.id.action_direction_left, activity::onSetDirectionLeft);
         menuActions.put(R.id.action_direction_right, activity::onSetDirectionRight);
-        menuActions.put(R.id.action_reverse, activity::onReverse);
         menuActions.put(R.id.action_new_cross_section, activity::onNewCrossSection);
         menuActions.put(R.id.action_start_new_survey, activity::onStartNewSurvey);
         menuActions.put(R.id.action_link_survey, activity::onLinkSurvey);
         menuActions.put(R.id.action_unlink_survey, activity::onUnlinkSurvey);
         menuActions.put(R.id.action_rename_station, activity::onRenameStation);
-        menuActions.put(R.id.action_edit_leg, activity::onEditLeg);
         menuActions.put(R.id.action_delete_station, activity::onDeleteStation);
         menuActions.put(R.id.action_delete_leg, activity::onDeleteStation);
         // Note: upgrade_splay and downgrade_leg are handled specially in handleMenuItemClick
@@ -227,22 +225,20 @@ public class ContextMenuManager {
             commentItem.setEnabled(station != survey.getOrigin());
         }
 
-        // Enable/disable delete station based on whether this is the from station
-        MenuItem deleteItem = menu.findItem(R.id.action_delete_station);
-        if (deleteItem != null) {
-            deleteItem.setEnabled(leg.hasDestination() && station == leg.getDestination());
-        }
-
         // Configure upgrade/downgrade visibility and submenu title based on leg type
         if (survey != null) {
-            // Use provided leg, or infer from station if not provided
+            // Use provided leg, or infer from station (which we assume is the destination station) if not provided
             Leg referringLeg = (leg != null) ? leg : survey.getReferringLeg(station);
+            currentLeg = referringLeg;
+
             MenuItem upgradeItem = menu.findItem(R.id.action_upgrade_splay);
             MenuItem downgradeItem = menu.findItem(R.id.action_downgrade_leg);
-            MenuItem legSubmenu = menu.findItem(R.id.menu_leg);
+            MenuItem legMenuItem = menu.findItem(R.id.menu_leg);
+            MenuItem stationMenuItem = menu.findItem(R.id.menu_station);
 
             if (referringLeg != null) {
                 boolean isSplay = !referringLeg.hasDestination();
+                Station fromStation = survey.getOriginatingStation(referringLeg);
                 if (upgradeItem != null) {
                     upgradeItem.setVisible(isSplay);
                 }
@@ -253,11 +249,21 @@ public class ContextMenuManager {
                     downgradeItem.setVisible(canDowngrade);
                 }
                 // Set submenu title based on leg type
-                if (legSubmenu != null) {
-                    legSubmenu.setTitle(isSplay ? R.string.menu_splay : R.string.menu_leg);
+                if (legMenuItem != null) {
+                    legMenuItem.setTitle(isSplay ? R.string.menu_splay : R.string.menu_leg);
+                    if (!isSplay) {
+                        android.view.SubMenu legSubMenu = legMenuItem.getSubMenu();
+
+                        String title = referringLeg.wasShotBackwards() ?
+                                context.getString(R.string.menu_leg_title_dynamic, referringLeg.getDestination().getName(), fromStation.getName())
+                                :
+                                context.getString(R.string.menu_leg_title_dynamic, fromStation.getName(), referringLeg.getDestination().getName());
+
+                        legSubMenu.setHeaderTitle(title);
+                    }
                 }
+
                 // Dynamically set the title for the "Station" submenu INTERNAL header
-                MenuItem stationMenuItem = menu.findItem(R.id.menu_station);
                 if (stationMenuItem != null && stationMenuItem.hasSubMenu() && station != null) {
                     android.view.SubMenu stationSubMenu = stationMenuItem.getSubMenu();
 
@@ -266,7 +272,7 @@ public class ContextMenuManager {
 
                     // setHeaderTitle sets the text at the top of the opened submenu
                     stationSubMenu.setHeaderTitle(title);
-}
+                }
             } else {
                 // No referring leg (origin station) - hide both
                 if (upgradeItem != null) {
@@ -276,8 +282,8 @@ public class ContextMenuManager {
                     downgradeItem.setVisible(false);
                 }
                 // Default to "Leg" title
-                if (legSubmenu != null) {
-                    legSubmenu.setTitle(R.string.menu_leg);
+                if (legMenuItem != null) {
+                    legMenuItem.setTitle(R.string.menu_leg);
                 }
             }
         }
@@ -336,6 +342,14 @@ public class ContextMenuManager {
         }
         if (itemId == R.id.action_downgrade_leg && currentLeg != null) {
             activity.onDowngradeLeg(currentLeg);
+            return true;
+        }
+        if (itemId == R.id.action_edit_leg && currentLeg != null) {
+            activity.onEditLeg(currentLeg);
+            return true;
+        }
+        if (itemId == R.id.action_reverse && currentLeg != null) {
+            activity.onReverse(currentLeg);
             return true;
         }
         if ((itemId == R.id.action_delete_leg || itemId == R.id.action_delete_station) && currentLeg != null) {

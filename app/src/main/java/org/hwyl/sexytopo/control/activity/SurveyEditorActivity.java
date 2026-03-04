@@ -83,7 +83,12 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         }
     }
 
-    public void onReverse(Station station) {
+    public void onReverse(Leg leg) {
+        Station station = leg.getDestination();
+        if (station == null) {
+            return;
+        }
+
         SurveyUpdater.reverseLeg(getSurvey(), station);
         getSurveyManager().broadcastSurveyUpdated();
         invalidateView();
@@ -147,9 +152,7 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         // Override in activities that support renaming
     }
 
-    public void onEditLeg(Station station) {
-        // Get the leg that leads to this station
-        Leg leg = getSurvey().getReferringLeg(station);
+    public void onEditLeg(Leg leg) {
         if (leg == null) {
             // This is the origin station, cannot edit
             return;
