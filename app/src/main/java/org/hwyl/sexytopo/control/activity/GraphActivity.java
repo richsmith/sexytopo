@@ -22,8 +22,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.hwyl.sexytopo.R;
@@ -38,6 +41,7 @@ import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.BrushColour;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.Sketch;
+import org.hwyl.sexytopo.model.sketch.SketchLayer;
 import org.hwyl.sexytopo.model.sketch.SketchTool;
 import org.hwyl.sexytopo.model.sketch.Symbol;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -72,6 +76,7 @@ public abstract class GraphActivity extends SurveyEditorActivity
             R.id.buttonSelect,
             R.id.buttonZoomIn,
             R.id.buttonZoomOut,
+            R.id.buttonLayers,
             R.id.buttonMenu
     };
 
@@ -310,6 +315,9 @@ public abstract class GraphActivity extends SurveyEditorActivity
         } else if (itemId == R.id.buttonMenu) {
             openDisplayMenu();
             return true;
+        } else if (itemId == R.id.buttonLayers) {
+            openLayersDialog();
+            return true;
         } else if (itemId == R.id.buttonCentreView) {
             graphView.centreViewOnActiveStation();
             graphView.invalidate();
@@ -517,6 +525,136 @@ public abstract class GraphActivity extends SurveyEditorActivity
     @Override
     public void onRenameStation(Station station) {
         LegDialogs.renameStation(this, getSurvey(), station);
+    }
+
+    private AlertDialog currentLayersDialog;
+    
+    private void openLayersDialog() {
+        // Dismiss any existing dialog first
+        if (currentLayersDialog != null && currentLayersDialog.isShowing()) {
+            currentLayersDialog.dismiss();
+        }
+        
+        Sketch sketch = getSketch(getSurvey());
+        
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+        builder.setTitle(R.string.layers_dialog_title);
+        
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(32, 16, 32, 16);
+        
+        for (SketchLayer layer : sketch.getLayers()) {
+            LinearLayout layerRow = createLayerRow(sketch, layer);
+            layout.addView(layerRow);
+        }
+        
+        // Add layer button
+        ImageButton addButton = new ImageButton(this);
+        addButton.setImageResource(android.R.drawable.ic_input_add);
+        addButton.setContentDescription(getString(R.string.layers_add));
+        addButton.setOnClickListener(v -> {
+            // Fade the current active layer before adding new one
+            SketchLayer currentActive = sketch.getActiveLayer();
+            if (currentActive != null) {
+                currentActive.setVisibility(SketchLayer.Visibility.FADED);
+            }
+            
+            int layerCount = sketch.getLayers().size();
+            SketchLayer newLayer = sketch.addLayer("Layer " + layerCount);
+            sketch.setActiveLayerId(newLayer.getId());
+            graphView.invalidate();
+            openLayersDialog(); // Refresh dialog
+        });
+        
+        LinearLayout addRow = new LinearLayout(this);
+        addRow.setOrientation(LinearLayout.HORIZONTAL);
+        addRow.addView(addButton);
+        layout.addView(addRow);
+        
+        builder.setView(layout);
+        builder.setPositiveButton(android.R.string.ok, (dialog, which) -> {
+            graphView.invalidate();
+        });
+        
+        currentLayersDialog = builder.show();
+    }
+    
+    private LinearLayout createLayerRow(Sketch sketch, SketchLayer layer) {
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setPadding(0, 8, 0, 8);
+        row.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        
+        boolean isActive = (layer.getId() == sketch.getActiveLayerId());
+        
+        // Active indicator / selector
+        ImageButton activeButton = new ImageButton(this);
+        activeButton.setImageResource(isActive ? 
+            android.R.drawable.btn_star_big_on : android.R.drawable.btn_star_big_off);
+        activeButton.setContentDescription(getString(R.string.layers_set_active));
+        activeButton.setOnClickListener(v -> {
+            sketch.setActiveLayerId(layer.getId());
+            graphView.invalidate();
+            openLayersDialog(); // Refresh
+        });
+        row.addView(activeButton);
+        
+        // Layer name
+        android.widget.TextView nameView = new android.widget.TextView(this);
+        nameView.setText(layer.getName());
+        nameView.setPadding(16, 0, 16, 0);
+        nameView.setTextSize(16);
+        // Apply visual indication of visibility state (what it will look like when inactive)
+        // For active layer, show in parentheses style to indicate "this is what it will be"
+        if (layer.getVisibility() == SketchLayer.Visibility.FADED) {
+            nameView.setAlpha(isActive ? 0.7f : 0.5f);
+        } else if (layer.getVisibility() == SketchLayer.Visibility.HIDDEN) {
+            nameView.setAlpha(isActive ? 0.5f : 0.3f);
+            nameView.setPaintFlags(nameView.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
+        }
+        LinearLayout.LayoutParams nameParams = new LinearLayout.LayoutParams(
+            0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+        nameView.setLayoutParams(nameParams);
+        row.addView(nameView);
+        
+        // Fade button (eye with transparency)
+        // Sets the inactive visibility state - can be changed even for active layer
+        ImageButton fadeButton = new ImageButton(this);
+        boolean isFaded = layer.getVisibility() == SketchLayer.Visibility.FADED;
+        fadeButton.setImageResource(android.R.drawable.ic_menu_view);
+        fadeButton.setAlpha(isFaded ? 1.0f : 0.4f);
+        fadeButton.setContentDescription(getString(R.string.layers_visibility_faded));
+        fadeButton.setOnClickListener(v -> {
+            if (isFaded) {
+                layer.setVisibility(SketchLayer.Visibility.SHOWING);
+            } else {
+                layer.setVisibility(SketchLayer.Visibility.FADED);
+            }
+            graphView.invalidate();
+            openLayersDialog();
+        });
+        row.addView(fadeButton);
+        
+        // Hide button (X icon)
+        // Sets the inactive visibility state - can be changed even for active layer
+        ImageButton hideButton = new ImageButton(this);
+        boolean isHidden = layer.getVisibility() == SketchLayer.Visibility.HIDDEN;
+        hideButton.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
+        hideButton.setAlpha(isHidden ? 1.0f : 0.4f);
+        hideButton.setContentDescription(getString(R.string.layers_visibility_hidden));
+        hideButton.setOnClickListener(v -> {
+            if (isHidden) {
+                layer.setVisibility(SketchLayer.Visibility.SHOWING);
+            } else {
+                layer.setVisibility(SketchLayer.Visibility.HIDDEN);
+            }
+            graphView.invalidate();
+            openLayersDialog();
+        });
+        row.addView(hideButton);
+        
+        return row;
     }
 
 }

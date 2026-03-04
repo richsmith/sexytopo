@@ -10,15 +10,26 @@ import org.hwyl.sexytopo.model.survey.Station;
 
 /**
  * Represents a cross-section of a passage at a specified angle on a top-down plan sketch.
+ * Contains its own sketch for drawing the cross-section outline.
  */
 public class CrossSection {
 
     private final Station station;
     private final float angle;
+    private Sketch sketch;
 
     public CrossSection(Station station, float angle) {
         this.station = station;
         this.angle = angle;
+        this.sketch = new Sketch();
+    }
+    
+    public Sketch getSketch() {
+        return sketch;
+    }
+    
+    public void setSketch(Sketch sketch) {
+        this.sketch = sketch;
     }
 
     public Space<Coord2D> getProjection() {

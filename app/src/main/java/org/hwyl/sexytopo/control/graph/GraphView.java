@@ -49,6 +49,7 @@ import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchDetail;
+import org.hwyl.sexytopo.model.sketch.SketchLayer;
 import org.hwyl.sexytopo.model.sketch.SketchTool;
 import org.hwyl.sexytopo.model.sketch.Symbol;
 import org.hwyl.sexytopo.model.sketch.SymbolDetail;
@@ -87,8 +88,6 @@ public class GraphView extends View {
     public static final float MIN_ZOOM = 0.1f;
     public static final float MAX_ZOOM = 500.0f;
 
-    private static final int BOX_SIZE = 10; // every grid box is 10 units square
-
     public static final Colour LEG_COLOUR = Colour.RED;
     public static final Colour LATEST_LEG_COLOUR = Colour.MAGENTA;
     public static final Colour HIGHLIGHT_COLOUR = Colour.GOLD;
@@ -97,6 +96,7 @@ public class GraphView extends View {
 
     public static final int SOLID_ALPHA = 0xff;
     public static final int FADED_ALPHA = 0xff / 5;
+    public static final int LAYER_FADED_GREY = 0xFFAAAAAA; // Grey for faded layers
 
     public static final int STATION_COLOUR = Colour.DARK_RED.intValue;
     public static final int STATION_DIAMETER = 8;
@@ -656,6 +656,13 @@ public class GraphView extends View {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                // Check for cross-section tap first
+                CrossSectionDetail crossSectionDetail = findCrossSectionAtPoint(touchPointOnView);
+                if (crossSectionDetail != null) {
+                    openCrossSectionActivity(crossSectionDetail);
+                    return true;
+                }
+                
                 Station newSelectedStation = checkForStation(touchPointOnView);
 
                 if (newSelectedStation == null) {
@@ -683,6 +690,14 @@ public class GraphView extends View {
         }
 
         return true;
+    }
+    
+    private void openCrossSectionActivity(CrossSectionDetail detail) {
+        String stationName = detail.getCrossSection().getStation().getName();
+        android.content.Intent intent = 
+            org.hwyl.sexytopo.control.activity.CrossSectionActivity.getIntent(
+                getContext(), stationName);
+        getContext().startActivity(intent);
     }
 
 
@@ -714,6 +729,12 @@ public class GraphView extends View {
 
         setSketchTool(previousSketchTool);
         invalidate();
+        
+        // Auto-open the cross-section activity for sketching
+        android.content.Intent intent = 
+            org.hwyl.sexytopo.control.activity.CrossSectionActivity.getIntent(
+                getContext(), station.getName());
+        getContext().startActivity(intent);
 
         return true;
     }
@@ -820,7 +841,7 @@ public class GraphView extends View {
 
     private void drawSurvey(Canvas canvas, Survey survey, Space<Coord2D> projection, int alpha) {
         drawSketch(canvas, activity.getSketch(survey), alpha);
-        drawCrossSections(canvas, sketch.getCrossSectionDetails(), alpha);
+        drawCrossSections(canvas, sketch.getCrossSectionDetailsWithVisibility(), alpha);
         drawSurveyData(survey, canvas, projection, alpha);
     }
 
@@ -872,43 +893,12 @@ public class GraphView extends View {
 
 
     private void drawGrid(Canvas canvas) {
-
-        int tickSizeInMetres = getMinorGridBoxSize();
-        int numberTicksJustBeforeViewpointOffsetX = (int)(viewpointOffset.x / tickSizeInMetres);
-
-        for (int n = numberTicksJustBeforeViewpointOffsetX; true; n++) {
-            float xSurvey = n * tickSizeInMetres;
-            int xView = (int)((xSurvey - viewpointOffset.x) * surveyToViewScale);
-            gridPaint.setStrokeWidth(n % BOX_SIZE == 0 ? 3 : 1);
-            canvas.drawLine(xView, 0, xView, getHeight(), gridPaint);
-            if (xView >= getWidth()) {
-                break;
-            }
-        }
-
-        int numberTicksJustBeforeViewpointOffsetY = (int)(viewpointOffset.y / tickSizeInMetres);
-
-        for (int n = numberTicksJustBeforeViewpointOffsetY; true; n++) {
-            float ySurvey = n * tickSizeInMetres;
-            int yView = (int)((ySurvey - viewpointOffset.y) * surveyToViewScale);
-            gridPaint.setStrokeWidth(n % BOX_SIZE == 0 ? 3 : 1);
-            canvas.drawLine(0, yView, getWidth(), yView, gridPaint);
-            if (yView >= getHeight()) {
-                break;
-            }
-        }
-
+        GridDrawer.drawGrid(canvas, gridPaint, viewpointOffset, surveyToViewScale, 
+                           getWidth(), getHeight());
     }
 
     public int getMinorGridBoxSize() {
-
-        if (surveyToViewScale > 15) {
-            return 1;
-        } else if (surveyToViewScale > 2) {
-            return 10;
-        } else {
-            return 100;
-        }
+        return GridDrawer.getMinorGridBoxSize(surveyToViewScale);
     }
 
     private void drawSurveyData(Survey survey, Canvas canvas, Space<Coord2D> space, int alpha) {
@@ -917,15 +907,20 @@ public class GraphView extends View {
     }
 
     private void drawCrossSections(
-            Canvas canvas, List<CrossSectionDetail> crossSectionDetails, int alpha) {
+            Canvas canvas, List<Sketch.CrossSectionWithVisibility> crossSectionsWithVisibility, int alpha) {
 
         boolean showStationLabels = SketchPreferences.Toggle.SHOW_STATION_LABELS.isOn();
 
-        crossSectionConnectorPaint.setAlpha(alpha);
-
-        List<CrossSectionDetail> badXSections = new ArrayList<>();
-
-        for (CrossSectionDetail sectionDetail : crossSectionDetails) {
+        for (Sketch.CrossSectionWithVisibility csWithVis : crossSectionsWithVisibility) {
+            
+            // Skip non-showing cross-sections (hidden or faded layers)
+            // Note: In future we may want to keep cross-sections visible even when layer is faded
+            if (csWithVis.visibility != SketchLayer.Visibility.SHOWING) {
+                continue;
+            }
+            
+            CrossSectionDetail sectionDetail = csWithVis.detail;
+            int effectiveAlpha = alpha;
 
             if (!couldBeOnScreen(sectionDetail)) {
                 continue;
@@ -933,50 +928,70 @@ public class GraphView extends View {
 
             CrossSection crossSection = sectionDetail.getCrossSection();
             if (crossSection == null) {
-                badXSections.add(sectionDetail);
                 continue;
             }
 
             Station station = crossSection.getStation();
             if (station == null) {
-                badXSections.add(sectionDetail);
                 continue;
             }
 
             Coord2D surveyStationLocation = this.projection.getStationMap().get(station);
             if (surveyStationLocation == null) {
-                badXSections.add(sectionDetail);
                 continue;
             }
 
             Coord2D centreOnSurvey = sectionDetail.getPosition();
             Coord2D centreOnView = surveyCoordsToViewCoords(centreOnSurvey);
-            drawStationCross(
-                    canvas, stationPaint, centreOnView.x, centreOnView.y, STATION_DIAMETER, alpha);
+            
+            // Draw X placeholder icon
+            crossSectionConnectorPaint.setColor(CROSS_SECTION_CONNECTION_COLOUR.intValue);
+            crossSectionConnectorPaint.setAlpha(effectiveAlpha);
+            
+            drawCrossSectionPlaceholder(canvas, centreOnView.x, centreOnView.y, effectiveAlpha);
 
-            String description =
-                    sectionDetail.getCrossSection().getStation().getName() + " X";
             if (showStationLabels) {
-                stationPaint.setAlpha(alpha);
-                canvas.drawText(description, centreOnView.x, centreOnView.y, stationPaint);
+                String description = station.getName();
+                stationPaint.setAlpha(effectiveAlpha);
+                canvas.drawText(description, 
+                    centreOnView.x + CROSS_SECTION_PLACEHOLDER_SIZE + 4, 
+                    centreOnView.y + 4, 
+                    stationPaint);
             }
 
-            Space<Coord2D> projection = sectionDetail.getProjection();
-
-            drawLegs(canvas, projection, alpha);
-
+            // Draw dashed connection line from survey station to placeholder
             Coord2D viewStationLocation = surveyCoordsToViewCoords(surveyStationLocation);
             drawDashedLine(
                     canvas, viewStationLocation, centreOnView,
                     DASHED_LINE_INTERVAL, crossSectionConnectorPaint);
         }
-
-        for (CrossSectionDetail crossSectionDetail : badXSections) {
-            Station station = crossSectionDetail.getCrossSection().getStation();
-            String name = station == null? "Unknown" : station.getName();
-            Log.e("Missing station details for cross section on station " + name + "; removing");
-            crossSectionDetails.remove(crossSectionDetail);
+    }
+    
+    private static final float CROSS_SECTION_PLACEHOLDER_SIZE = 12f;
+    
+    private void drawCrossSectionPlaceholder(Canvas canvas, float x, float y, int alpha) {
+        crossSectionConnectorPaint.setAlpha(alpha);
+        float size = CROSS_SECTION_PLACEHOLDER_SIZE;
+        
+        // Draw X shape
+        canvas.drawLine(x - size, y - size, x + size, y + size, crossSectionConnectorPaint);
+        canvas.drawLine(x - size, y + size, x + size, y - size, crossSectionConnectorPaint);
+        
+        // Draw small circle around the X
+        canvas.drawCircle(x, y, size * 1.2f, crossSectionConnectorPaint);
+    }
+    
+    public CrossSectionDetail findCrossSectionAtPoint(Coord2D touchPointOnView) {
+        float tolerance = SELECTION_SENSITIVITY_IN_PIXELS;
+        Coord2D touchPointOnSurvey = viewCoordsToSurveyCoords(touchPointOnView);
+        
+        for (CrossSectionDetail detail : sketch.getCrossSectionDetails()) {
+            float distance = Space2DUtils.getDistance(detail.getPosition(), touchPointOnSurvey);
+            if (distance * surveyToViewScale < tolerance) {
+                return detail;
+            }
         }
+        return null;
     }
 
 
@@ -1193,26 +1208,50 @@ public class GraphView extends View {
             return;
         }
 
+        // Draw layers from bottom to top, respecting visibility
+        // Active layer is always shown at full color regardless of its visibility setting
+        // (visibility setting represents how it appears when NOT active)
+        int activeLayerId = sketch.getActiveLayerId();
+        
+        for (SketchLayer layer : sketch.getLayers()) {
+            boolean isActive = (layer.getId() == activeLayerId);
+            
+            // Active layer is always visible; others respect their visibility setting
+            if (!isActive && layer.getVisibility() == SketchLayer.Visibility.HIDDEN) {
+                continue;
+            }
+
+            boolean isFaded = !isActive && (layer.getVisibility() == SketchLayer.Visibility.FADED);
+            drawLayer(canvas, layer, alpha, isFaded);
+        }
+    }
+
+    private void drawLayer(Canvas canvas, SketchLayer layer, int alpha, boolean isFaded) {
+
         Colour lastColour = Colour.BLACK;
 
-        drawPaint.setColor(lastColour.intValue);
+        if (isFaded) {
+            drawPaint.setColor(LAYER_FADED_GREY);
+        } else {
+            drawPaint.setColor(lastColour.intValue);
+        }
         drawPaint.setAlpha(alpha);
 
         boolean isDebugMode = activity.isDebugMode();
 
-        for (PathDetail pathDetail : sketch.getPathDetails()) {
+        for (PathDetail pathDetail : layer.getPathDetails()) {
 
             if (!couldBeOnScreen(pathDetail)) {
                 continue;
             }
 
-            // Avoiding constantly updating the paint colour saves approx. 10% of sketch draw time.
-            // Ideally getPathDetails() would return the paths in colour order but HashSets
-            // are unordered collections
-            Colour drawColour = pathDetail.getDrawColour(isDarkModeActive);
-            if (drawColour != lastColour) {
-                lastColour = drawColour;
-                drawPaint.setColor(lastColour.intValue);
+            // For faded layers, use grey; otherwise use the path's colour
+            if (!isFaded) {
+                Colour drawColour = pathDetail.getDrawColour(isDarkModeActive);
+                if (drawColour != lastColour) {
+                    lastColour = drawColour;
+                    drawPaint.setColor(lastColour.intValue);
+                }
             }
 
             List<Coord2D> path = pathDetail.getPath();
@@ -1221,12 +1260,8 @@ public class GraphView extends View {
             float fromX = -1, fromY = -1;
             float[] lines = new float[path.size() * 4];
 
-            // This loop is the slowest part of the draw phase. Pulling out the calculations from
-            // within surveyCoordsToViewCoords saves a not insignificant amount of time by not
-            // constructing many thousands of Coord2D objects (approx. 10% of sketch draw time)
             for (Coord2D point : path) {
                 if (fromX == -1) {
-                    //from = surveyCoordsToViewCoords(point);
                     fromX = (point.x - viewpointOffset.x) * surveyToViewScale;
                     fromY = (point.y - viewpointOffset.y) * surveyToViewScale;
 
@@ -1234,7 +1269,6 @@ public class GraphView extends View {
                         canvas.drawCircle(fromX, fromY, 3, drawPaint);
                     }
                 } else {
-                    //Coord2D to = surveyCoordsToViewCoords(point);
                     float toX = (point.x - viewpointOffset.x) * surveyToViewScale;
                     float toY = (point.y - viewpointOffset.y) * surveyToViewScale;
 
@@ -1257,11 +1291,15 @@ public class GraphView extends View {
 
         labelPaint.setAlpha(alpha);
 
-        for (TextDetail textDetail : sketch.getTextDetails()) {
+        for (TextDetail textDetail : layer.getTextDetails()) {
             Coord2D location = surveyCoordsToViewCoords(textDetail.getPosition());
             float x = location.x, y = location.y;
             String text = textDetail.getText();
-            setDrawColour(labelPaint, textDetail);
+            if (isFaded) {
+                labelPaint.setColor(LAYER_FADED_GREY);
+            } else {
+                setDrawColour(labelPaint, textDetail);
+            }
             labelPaint.setTextSize(textDetail.getSize() * surveyToViewScale);
             for (String line : text.split("\n")) {
                 canvas.drawText(line, x, y, labelPaint);
@@ -1269,7 +1307,7 @@ public class GraphView extends View {
             }
         }
 
-        for (SymbolDetail symbolDetail : sketch.getSymbolDetails()) {
+        for (SymbolDetail symbolDetail : layer.getSymbolDetails()) {
             if (!couldBeOnScreen(symbolDetail)) {
                 continue;
             }
@@ -1287,9 +1325,16 @@ public class GraphView extends View {
             int x = Math.round(location.x - offset), y = Math.round(location.y - offset);
             drawable.setBounds(x, y, x + size, y + size);
             drawable.setAlpha(alpha);
-            Colour drawColour = symbolDetail.getDrawColour(isDarkModeActive);
+
+            int colorFilter;
+            if (isFaded) {
+                colorFilter = LAYER_FADED_GREY;
+            } else {
+                Colour drawColour = symbolDetail.getDrawColour(isDarkModeActive);
+                colorFilter = drawColour.intValue;
+            }
             drawable.setColorFilter(
-                new PorterDuffColorFilter(drawColour.intValue, PorterDuff.Mode.SRC_IN));
+                new PorterDuffColorFilter(colorFilter, PorterDuff.Mode.SRC_IN));
 
             if (symbol.isDirectional()) {
                 RotateDrawable rotateDrawable = new RotateDrawable();
@@ -1300,7 +1345,7 @@ public class GraphView extends View {
                 rotateDrawable.setBounds(x, y, x + size, y + size);
                 rotateDrawable.draw(canvas);
 
-            } else { // skip some calcs for efficiency
+            } else {
                 drawable.draw(canvas);
             }
         }
@@ -1561,6 +1606,15 @@ public class GraphView extends View {
         @Override
         public void onLongPress(MotionEvent motionEvent) {
             Coord2D touchPointOnView = new Coord2D(motionEvent.getX(), motionEvent.getY());
+            
+            // Check for cross-section placeholder first
+            CrossSectionDetail crossSectionDetail = findCrossSectionAtPoint(touchPointOnView);
+            if (crossSectionDetail != null && !menuShownInThisTouch) {
+                showCrossSectionContextMenu(crossSectionDetail);
+                menuShownInThisTouch = true;
+                return;
+            }
+            
             Station matchedStation = checkForStation(touchPointOnView);
             if (matchedStation != null && !menuShownInThisTouch) {
                 showContextMenu(motionEvent, matchedStation);
@@ -1568,7 +1622,21 @@ public class GraphView extends View {
             }
         }
     }
-
-
+    
+    private void showCrossSectionContextMenu(CrossSectionDetail detail) {
+        String stationName = detail.getCrossSection().getStation().getName();
+        String title = getContext().getString(R.string.cross_section_title, stationName);
+        
+        new MaterialAlertDialogBuilder(getContext())
+            .setTitle(title)
+            .setItems(new String[]{getContext().getString(R.string.cross_section_open)}, 
+                (dialog, which) -> {
+                    if (which == 0) {
+                        openCrossSectionActivity(detail);
+                    }
+                })
+            .setNegativeButton(R.string.cancel, null)
+            .show();
+    }
 
 }
