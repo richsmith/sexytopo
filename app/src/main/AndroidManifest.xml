@@ -80,6 +80,15 @@
             android:enabled="true"
             android:exported="false" >
         </service>
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="org.hwyl.sexytopo.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
         <activity
             android:name=".control.activity.DistoXCalibrationActivity"
             android:label="@string/title_activity_calibration">

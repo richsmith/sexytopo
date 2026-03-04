@@ -67,6 +67,7 @@
     <string name="action_file_exit">Exit SexyTopo</string>
     <string name="action_file_import_file">Import File…</string>
     <string name="action_file_import_directory">Import Folder…</string>
+    <string name="action_file_share">Share…</string>
     <string name="action_input">Input Mode</string>
     <string name="action_input_mode_forward">Forward</string>
     <string name="action_input_mode_backward">Backsights</string>
@@ -133,6 +134,10 @@
     <string name="file_unlink_survey_not_found">Could not find survey to unlink</string>
     <string name="file_unlink_survey_no_surveys">No surveys to unlink</string>
     <string name="file_unlink_survey_error">Error unlinking survey</string>
+    <string name="share_type_survey_zip">Share survey files (ZIP)</string>
+    <string name="share_chooser_title">Share survey via</string>
+    <string name="share_failed">Share failed</string>
+    <string name="share_preparing">Preparing survey for sharing…</string>
 
     <!-- Import / Export -->
     <string name="import_successful">"Import complete (not yet saved)"</string>

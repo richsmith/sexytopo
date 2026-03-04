@@ -51,6 +51,7 @@ import org.hwyl.sexytopo.control.io.StartLocation;
 import org.hwyl.sexytopo.control.io.SurveyDirectory;
 import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.control.io.basic.Saver;
+import org.hwyl.sexytopo.control.io.share.SurveyZipSharer;
 import org.hwyl.sexytopo.control.io.translation.Exporter;
 import org.hwyl.sexytopo.control.io.translation.ImportManager;
 import org.hwyl.sexytopo.control.io.translation.SelectableExporters;
@@ -305,6 +306,9 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         } else if (itemId == R.id.action_file_export) {
             confirmToProceedIfNotSaved("requestExportSurvey");
             return true;
+        } else if (itemId == R.id.action_file_share) {
+            requestShareSurvey();
+            return true;
         } else if (itemId == R.id.action_file_exit) {
             confirmToProceedIfNotSaved(R.string.exit_question, "requestExit");
             return true;
@@ -530,6 +534,12 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                     exportSurvey(exporter);
                 });
         builderSingle.show();
+    }
+
+
+    @SuppressLint("UnusedDeclaration")
+    public void requestShareSurvey() {
+        new ShareTask().execute(this);
     }
 
 
@@ -1299,6 +1309,41 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             } else {
                 showSimpleToast(R.string.file_save_survey_error);
             }
+        }
+    }
+
+    private class ShareTask extends AsyncTask<android.content.Context, Void, Uri> {
+
+        private Exception error = null;
+
+        @Override
+        protected void onPreExecute() {
+            showSimpleToast(R.string.share_preparing);
+        }
+
+        @Override
+        protected Uri doInBackground(android.content.Context... contexts) {
+            try {
+                Survey survey = getSurvey();
+                return new SurveyZipSharer().buildShareUri(contexts[0], survey);
+            } catch (Exception e) {
+                error = e;
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Uri uri) {
+            if (uri == null) {
+                showExceptionAndLog(R.string.share_failed,
+                    error != null ? error : new Exception("URI was null"));
+                return;
+            }
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("application/zip");
+            shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(Intent.createChooser(shareIntent, getString(R.string.share_chooser_title)));
         }
     }
 
