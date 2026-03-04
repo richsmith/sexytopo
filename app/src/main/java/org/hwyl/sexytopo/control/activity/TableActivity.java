@@ -257,21 +257,23 @@ public class TableActivity extends SurveyEditorActivity
         Leg leg = entry.getLeg();
         Station fromStation = entry.getFrom();
 
-        // Row-centric: show from station if the FROM station clicked or this is splay
-        // otherwise select the destination station
-        // This matches the tap-to-edit behavior which edits the leg/row
-        Station station = col == TableCol.FROM || !leg.hasDestination() ? fromStation : leg.getDestination();
+        Station station;
 
-        // Create custom title considering backwards shots
+        // Create custom title considering backwards shots & if we have selected FROM/TO
         String customTitle;
         if (leg.hasDestination()) {
-            if (leg.wasShotBackwards()) {
+            if (leg.wasShotBackwards() ^ col == TableCol.FROM) {
+                // If backward shot XOR col is FROM
+                station = fromStation;
                 customTitle = getString(R.string.menu_context_title_leg_from, station.getName());
             } else {
+                // if forward shot XOR col is not FROM
+                station = leg.getDestination();
                 customTitle = getString(R.string.menu_context_title_leg_to, station.getName());
             }
         } else {
-            customTitle = getString(R.string.menu_context_title_splay, fromStation.getName());
+            station = fromStation;
+            customTitle = getString(R.string.menu_context_title_splay, station.getName());
         }
 
         // Highlight the entire row using ViewHolder
