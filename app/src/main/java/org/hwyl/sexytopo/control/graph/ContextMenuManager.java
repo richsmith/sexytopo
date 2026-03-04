@@ -8,10 +8,12 @@ import android.text.style.ForegroundColorSpan;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.PopupMenu;
 
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -165,9 +167,6 @@ public class ContextMenuManager {
      */
     public void showMenu(View anchorView, Station station, Survey survey,
                         String customTitle, Runnable onDismiss, Leg leg) {
-        // Store the leg for action handlers
-        this.currentLeg = leg;
-
         PopupMenu popup = new PopupMenu(context, anchorView);
         popup.inflate(R.menu.station_context);
 
@@ -228,36 +227,36 @@ public class ContextMenuManager {
         // Configure upgrade/downgrade visibility and submenu title based on leg type
         if (survey != null) {
             // Use provided leg, or infer from station (which we assume is the destination station) if not provided
-            Leg referringLeg = (leg != null) ? leg : survey.getReferringLeg(station);
-            currentLeg = referringLeg;
+            // Store it for the action handlers
+            currentLeg = (leg != null) ? leg : survey.getReferringLeg(station);
 
             MenuItem upgradeItem = menu.findItem(R.id.action_upgrade_splay);
             MenuItem downgradeItem = menu.findItem(R.id.action_downgrade_leg);
             MenuItem legMenuItem = menu.findItem(R.id.menu_leg);
             MenuItem stationMenuItem = menu.findItem(R.id.menu_station);
 
-            if (referringLeg != null) {
-                boolean isSplay = !referringLeg.hasDestination();
-                Station fromStation = survey.getOriginatingStation(referringLeg);
+            if (currentLeg != null) {
+                boolean isSplay = !currentLeg.hasDestination();
+                Station fromStation = survey.getOriginatingStation(currentLeg);
                 if (upgradeItem != null) {
                     upgradeItem.setVisible(isSplay);
                 }
                 if (downgradeItem != null) {
                     // Only show downgrade if it's a full leg AND destination has no onward legs
                     boolean canDowngrade = !isSplay &&
-                        referringLeg.getDestination().getOnwardLegs().isEmpty();
+                        currentLeg.getDestination().getOnwardLegs().isEmpty();
                     downgradeItem.setVisible(canDowngrade);
                 }
                 // Set submenu title based on leg type
                 if (legMenuItem != null) {
                     legMenuItem.setTitle(isSplay ? R.string.menu_splay : R.string.menu_leg);
                     if (!isSplay) {
-                        android.view.SubMenu legSubMenu = legMenuItem.getSubMenu();
+                        SubMenu legSubMenu = legMenuItem.getSubMenu();
 
-                        String title = referringLeg.wasShotBackwards() ?
-                                context.getString(R.string.menu_leg_title_dynamic, referringLeg.getDestination().getName(), fromStation.getName())
+                        String title = currentLeg.wasShotBackwards() ?
+                                context.getString(R.string.menu_leg_title_dynamic, currentLeg.getDestination().getName(), fromStation.getName())
                                 :
-                                context.getString(R.string.menu_leg_title_dynamic, fromStation.getName(), referringLeg.getDestination().getName());
+                                context.getString(R.string.menu_leg_title_dynamic, fromStation.getName(), currentLeg.getDestination().getName());
 
                         legSubMenu.setHeaderTitle(title);
                     }
@@ -265,7 +264,7 @@ public class ContextMenuManager {
 
                 // Dynamically set the title for the "Station" submenu INTERNAL header
                 if (stationMenuItem != null && stationMenuItem.hasSubMenu() && station != null) {
-                    android.view.SubMenu stationSubMenu = stationMenuItem.getSubMenu();
+                    SubMenu stationSubMenu = stationMenuItem.getSubMenu();
 
                     // Create the title string (e.g., "Station: A1")
                     String title = context.getString(R.string.menu_station_title_dynamic, station.getName());
@@ -292,10 +291,10 @@ public class ContextMenuManager {
         MenuItem leftItem = menu.findItem(R.id.action_direction_left);
         MenuItem rightItem = menu.findItem(R.id.action_direction_right);
         if (leftItem != null && rightItem != null) {
-            org.hwyl.sexytopo.model.graph.Direction currentDirection =
+            Direction currentDirection =
                 station.getExtendedElevationDirection();
-            leftItem.setChecked(currentDirection == org.hwyl.sexytopo.model.graph.Direction.LEFT);
-            rightItem.setChecked(currentDirection == org.hwyl.sexytopo.model.graph.Direction.RIGHT);
+            leftItem.setChecked(currentDirection == Direction.LEFT);
+            rightItem.setChecked(currentDirection == Direction.RIGHT);
         }
 
         // Configure view-specific menu items using polymorphism
