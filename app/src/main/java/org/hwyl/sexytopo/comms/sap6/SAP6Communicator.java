@@ -22,6 +22,7 @@ public class SAP6Communicator implements Communicator {
     private final CaveBLE caveBLE;
 
     private final SurveyManager datamanager;
+    private boolean _isConnected = false;
 
     private static final int START_CALIBRATION_ID = View.generateViewId();
     private static final int STOP_CALIBRATION_ID = View.generateViewId();
@@ -29,7 +30,6 @@ public class SAP6Communicator implements Communicator {
     private static final int SHOT_ID = View.generateViewId();
     private static final int LASER_OFF_ID = View.generateViewId();
     private static final int DEVICE_OFF_ID = View.generateViewId();
-
 
     private static final Map<Integer, Integer> CUSTOM_COMMANDS = new HashMap<>();
 
@@ -50,7 +50,7 @@ public class SAP6Communicator implements Communicator {
 
     @Override
     public boolean isConnected() {
-        return caveBLE.isConnected();
+        return _isConnected;
     }
 
     @Override
@@ -100,13 +100,16 @@ public class SAP6Communicator implements Communicator {
     public Unit statusCallback(int status, String msg) {
         switch (status) {
             case CaveBLE.CONNECTED:
+                _isConnected = true;
                 Log.device("Connected");
                 break;
             case CaveBLE.DISCONNECTED:
+                _isConnected = false;
                 Log.device("Disconnected");
                 activity.updateConnectionStatus();
                 break;
             case CaveBLE.CONNECTION_FAILED:
+                _isConnected = false;
                 Log.device("Communication error: "+msg);
                 activity.updateConnectionStatus();
         }
