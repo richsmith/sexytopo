@@ -14,5 +14,6 @@
 /build
 /captures
 /local.properties
+/sessions
 bin/
 docs/manual/
