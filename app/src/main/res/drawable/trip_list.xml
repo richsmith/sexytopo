@@ -1,0 +1,29 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Box/Rectangle border -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.5"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M3,3h18v18H3z"/>
+    
+    <!-- List lines with varying lengths, left-aligned with gap from edge -->
+    <!-- Line 1 - longest -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M6,7h12v1.5H6z"/>
+    
+    <!-- Line 2 - short -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M6,11h6v1.5H6z"/>
+    
+    <!-- Line 3 - medium -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M6,15h9v1.5H6z"/>
+</vector>
