@@ -10,6 +10,11 @@
         app:showAsAction="always"
         tools:ignore="AlwaysShowAction"/>
     <item
+        android:id="@+id/action_trip"
+        android:title="@string/action_trip"
+        android:icon="@drawable/trip_list"
+        app:showAsAction="always"/>
+    <item
         android:id="@+id/action_table"
         android:title="@string/action_table"
         android:icon="@drawable/table"
@@ -65,7 +70,7 @@
                 <item android:id="@+id/action_elevation"
                       android:title="@string/action_elevation"
                       tools:ignore="DuplicateIds"/>
-                <item android:id="@+id/action_trip"
+                <item android:id="@+id/action_trip_menu"
                       android:title="@string/action_trip"/>
                 <item android:id="@+id/action_stats"
                       android:title="@string/action_stats"/>

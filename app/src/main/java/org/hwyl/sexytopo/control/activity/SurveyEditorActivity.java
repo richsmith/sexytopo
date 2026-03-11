@@ -11,6 +11,7 @@ import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 
@@ -188,6 +189,20 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         }
 
         SurveyUpdater.upgradeSplay(getSurvey(), leg, InputMode.FORWARD);
+        getSurveyManager().broadcastSurveyUpdated();
+    }
+
+    public void onPromoteToAboveLeg(Leg splay) {
+        if (splay == null || splay.hasDestination()) {
+            return;
+        }
+
+        boolean success = SurveyUpdater.promoteToAboveLeg(getSurvey(), splay);
+        if (success) {
+            Toast.makeText(this, R.string.toast_splay_promoted, Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, R.string.toast_no_leg_above, Toast.LENGTH_SHORT).show();
+        }
         getSurveyManager().broadcastSurveyUpdated();
     }
 

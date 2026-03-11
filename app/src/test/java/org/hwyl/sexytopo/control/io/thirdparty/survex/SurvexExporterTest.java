@@ -27,9 +27,8 @@ public class SurvexExporterTest {
         Survey oneNorth = BasicTestSurveyCreator.createStraightNorthThroughRepeats();
         String content = survexExporter.getContent(oneNorth);
         Assert.assertTrue(content.contains("1\t2\t5.000\t0.00\t0.00"));
-        Assert.assertTrue(content.contains(
-                "{from: 5.000 0.00 0.00, 5.000 0.00 0.00, 5.000 0.00 0.00}"));
-
+        // Promoted leg original readings are output as commented lines
+        Assert.assertTrue(content.contains(";1\t2\t5.000\t0.00\t0.00"));
     }
 
     @Test
