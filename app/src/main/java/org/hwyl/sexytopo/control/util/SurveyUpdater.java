@@ -99,6 +99,105 @@ public class SurveyUpdater {
         survey.setActiveStation(newStation);
     }
 
+    /**
+     * Promote a splay to the leg above it (add it to the promoted legs array).
+     * This is used when the user manually wants to add a splay to an existing
+     * leg to create an averaged leg.
+     *
+     * Searches the parent station's  legs list.
+     *
+     * @param survey The survey containing the legs
+     * @param splay The splay to promote
+     * @return true if successful, false if no compatible leg above was found
+     */
+    public static boolean promoteToAboveLeg(Survey survey, Leg splay) {
+        if (splay.hasDestination()) {
+            return false; // Not a splay
+        }
+
+        // Find the parent station of splay
+        Station parent = findStationWithLeg(survey, splay);
+        if (parent == null) {
+            return false;
+        }
+
+        // Use the chrono-ordered list to find the nearest connected leg above
+        // this splay
+        List<Leg> chronoLegs = survey.getAllLegsInChronoOrder();
+        int splayIndex = chronoLegs.indexOf(splay);
+        if (splayIndex <= 0) {
+            return false; // No leg above
+        }
+
+        Leg legAbove = null;
+        for (int i = splayIndex - 1; i >= 0; i--) {
+            Leg candidate = chronoLegs.get(i);
+            if (candidate.hasDestination() && parent.getOnwardLegs().contains(candidate)) {
+                legAbove = candidate;
+                break;
+            }
+        }
+
+        if (legAbove == null) {
+            return false; // No leg in the parent
+        }
+
+        // If the leg above was shot backwards, mark the splay the same way
+        Leg splayToAdd = splay;
+        if (legAbove.wasShotBackwards() && !splay.wasShotBackwards()) {
+            splayToAdd = new Leg(
+                splay.getDistance(),
+                splay.getAzimuth(),
+                splay.getInclination(),
+                true
+            );
+        }
+
+        // Build the list of all shots for averaging
+        List<Leg> allShots = new java.util.ArrayList<>();
+
+        // Add the original leg (or its promoted shots if it was already averaged)
+        if (legAbove.wasPromoted()) {
+            allShots.addAll(Arrays.asList(legAbove.getPromotedFrom()));
+        } else {
+            allShots.add(legAbove);
+        }
+
+        // Add the splay (with wasShotBackwards inherited if needed)
+        allShots.add(splayToAdd);
+
+        // Calculate the new average from all shots
+        Leg averagedLeg = averageLegs(allShots);
+
+        // Create new leg with updated promoted legs array
+        Leg[] newPromotedFrom = allShots.toArray(new Leg[0]);
+        Leg newLegAbove = Leg.upgradeSplayToConnectedLeg(
+            averagedLeg, legAbove.getDestination(), newPromotedFrom);
+
+        // Replace the old leg with the new one
+        editLeg(survey, legAbove, newLegAbove);
+
+        // Remove the splay from the parent station
+        parent.getOnwardLegs().remove(splay);
+
+        // Remove the splay from the survey record
+        survey.removeLegRecord(splay);
+
+        return true;
+    }
+
+    /**
+     * Find which station contains the given leg in its onward legs.
+     */
+    private static Station findStationWithLeg(Survey survey, Leg leg) {
+        for (Station station : survey.getAllStations()) {
+            if (station.getOnwardLegs().contains(leg)) {
+                return station;
+            }
+        }
+        return null;
+    }
+
     private static synchronized String getNextStationName(Survey survey) {
         return StationNamer.generateNextStationName(survey, survey.getActiveStation());
     }

@@ -232,6 +232,7 @@ public class ContextMenuManager {
             // Use provided leg, or infer from station if not provided
             Leg referringLeg = (leg != null) ? leg : survey.getReferringLeg(station);
             MenuItem upgradeItem = menu.findItem(R.id.action_upgrade_splay);
+            MenuItem promoteToAboveItem = menu.findItem(R.id.action_promote_to_above_leg);
             MenuItem downgradeItem = menu.findItem(R.id.action_downgrade_leg);
             MenuItem legSubmenu = menu.findItem(R.id.menu_leg);
 
@@ -240,6 +241,13 @@ public class ContextMenuManager {
                 if (upgradeItem != null) {
                     upgradeItem.setVisible(isSplay);
                 }
+
+                // Show "Promote to Above Leg" for all splays (simplified for debugging)
+                if (promoteToAboveItem != null) {
+                    // Always show for splays to verify menu item works
+                    promoteToAboveItem.setVisible(isSplay);
+                }
+
                 if (downgradeItem != null) {
                     // Only show downgrade if it's a full leg AND destination has no onward legs
                     boolean canDowngrade = !isSplay &&
@@ -254,6 +262,9 @@ public class ContextMenuManager {
                 // No referring leg (origin station) - hide both
                 if (upgradeItem != null) {
                     upgradeItem.setVisible(false);
+                }
+                if (promoteToAboveItem != null) {
+                    promoteToAboveItem.setVisible(false);
                 }
                 if (downgradeItem != null) {
                     downgradeItem.setVisible(false);
@@ -315,6 +326,10 @@ public class ContextMenuManager {
         // Special handling for actions that need the leg context
         if (itemId == R.id.action_upgrade_splay && currentLeg != null) {
             activity.onUpgradeSplay(currentLeg);
+            return true;
+        }
+        if (itemId == R.id.action_promote_to_above_leg && currentLeg != null) {
+            activity.onPromoteToAboveLeg(currentLeg);
             return true;
         }
         if (itemId == R.id.action_downgrade_leg && currentLeg != null) {
