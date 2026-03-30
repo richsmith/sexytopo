@@ -11,6 +11,10 @@ SexyTopo is an Android app for cave and underground surveying. It communicates w
 
 If these instructions conflict with something in the code, or are incomplete, update the documents.
 
+## Version Control
+
+SexyTopo uses git for version control, and the repo is in GitHub. The main branch is called main.
+
 ## Build & Development Commands
 
 ### Build
