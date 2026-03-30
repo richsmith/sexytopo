@@ -62,6 +62,7 @@
     <string name="action_file_save_as">Guardar Como…</string>
     <string name="action_file_import">Importar</string>
     <string name="action_file_export">Exportar…</string>
+    <string name="action_file_share">Partilhar…</string>
     <string name="action_file_restore_autosave">Restaurar Gravação Automática</string>
     <string name="action_file_exit">Sair do SexyTopo</string>
     <string name="action_file_import_file">Importar Arquivo…</string>
@@ -140,6 +141,10 @@
     <string name="export_successful">Exportação concluída</string>
     <string name="export_failed">Exportação falhada</string>
     <string name="created_with">Criado com %1$s em %2$s</string>
+    <string name="share_type_survey_zip">Partilhar ficheiros de topografia (ZIP)</string>
+    <string name="share_chooser_title">Partilhar topografia via</string>
+    <string name="share_failed">Falha ao partilhar</string>
+    <string name="share_preparing">A preparar topografia para partilha…</string>
 
     <!-- Sketch view -->
     <string name="sketch_toolbar_draw">Modo desenho</string>

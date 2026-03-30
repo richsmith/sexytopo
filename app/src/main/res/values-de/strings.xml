@@ -62,6 +62,7 @@
     <string name="action_file_save_as">Speichern unter</string>
     <string name="action_file_import">Importieren…</string>
     <string name="action_file_export">Exportieren…</string>
+    <string name="action_file_share">Teilen…</string>
     <string name="action_file_restore_autosave">Automatische Sicherung wiederherstellen</string>
     <string name="action_file_exit">SexyTopo Verlassen</string>
     <string name="action_file_import_file">Datei Importieren…</string>
@@ -140,6 +141,10 @@
     <string name="export_successful">Export abgeschlossen</string>
     <string name="export_failed">Export fehlgeschlagen</string>
     <string name="created_with">Erzeugt mit %1$s auf %2$s</string>
+    <string name="share_type_survey_zip">Vermessungsdateien teilen (ZIP)</string>
+    <string name="share_chooser_title">Vermessung teilen über</string>
+    <string name="share_failed">Teilen fehlgeschlagen</string>
+    <string name="share_preparing">Vermessung wird zum Teilen vorbereitet…</string>
 
     <!--  Sketch view  -->
     <string name="sketch_toolbar_draw">Zeichnungs-Modus</string>
