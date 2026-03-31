@@ -15,40 +15,40 @@ public class ThExporter {
 
     public static String getContent(Context context, Survey survey, List<String> th2Files) {
         StringBuilder builder = new StringBuilder();
-        
+
         // Encoding
         builder.append(TherionExporter.getEncodingText()).append("\n\n");
-        
+
         // Survey block
         builder.append("survey ").append(survey.getName()).append("\n");
-        
+
         // Creation comment
         String versionInfo = SexyTopoConstants.APP_NAME + " " + SexyTopoActivity.getVersionName(context);
         builder.append(SurvexTherionUtil.getCreationComment(TherionExporter.COMMENT_CHAR, versionInfo)).append("\n\n");
-        
+
         // Input files
         builder.append(SurvexTherionUtil.getInputText(th2Files)).append("\n\n");
-        
+
         // Metadata (date, instrument, team, explo block)
         builder.append(SurvexTherionUtil.getMetadata(survey, TherionExporter.COMMENT_CHAR, ExportFormat.THERION)).append("\n");
-        
+
         // Centreline block
         builder.append("centreline\n");
         builder.append(SurvexTherionUtil.getCentrelineData(survey, TherionExporter.COMMENT_CHAR, ExportFormat.THERION));
         builder.append(SurvexTherionUtil.getExtendedElevationExtensions(survey, ExportFormat.THERION));
         builder.append("endcentreline\n");
-        
+
         // End survey
         builder.append("endsurvey\n");
-        
+
         return builder.toString();
     }
 
     public static String updateOriginalContent(
             Survey survey, String originalFileContent, List<String> th2Files) {
-        
+
         // Replace centreline block
-        String centrelineText = 
+        String centrelineText =
             "centreline\n" +
             SurvexTherionUtil.getCentrelineData(survey, TherionExporter.COMMENT_CHAR, ExportFormat.THERION) +
             SurvexTherionUtil.getExtendedElevationExtensions(survey, ExportFormat.THERION) +
@@ -62,13 +62,13 @@ public class ThExporter {
         return newContent;
     }
 
-    private static String replaceCentreline(String original, String replacementText) {
+    public static String replaceCentreline(String original, String replacementText) {
         return original.replaceFirst(
                 "(?s)(\\s*?(centreline|centerline)(.*)(endcentreline|endcenterline)\\s*)",
                 replacementText);
     }
 
-    private static String replaceInputsText(String original, String replacementText) {
+    public static String replaceInputsText(String original, String replacementText) {
         return original.replaceFirst("(?m)(^input .*\\n)+", replacementText);
     }
 
