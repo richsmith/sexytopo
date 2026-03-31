@@ -5,6 +5,7 @@ import android.content.Context;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.io.SurveyDirectory;
 import org.hwyl.sexytopo.control.io.SurveyFile;
+import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.survey.Survey;
 
@@ -34,11 +35,20 @@ public abstract class Exporter {
     }
 
     public SurveyDirectory getParentExportDirectory() {
-        SurveyDirectory exportDirectory = SurveyDirectory.EXPORT.get(survey);
+        String folderName = GeneralPreferences.getExportFolderName();
+        if (folderName == null || folderName.trim().isEmpty()) {
+            return SurveyDirectory.TOP.get(survey);
+        }
+        SurveyDirectory.SurveyDirectoryType exportDirectoryType =
+                new SurveyDirectory.SurveyDirectoryType(folderName);
+        SurveyDirectory exportDirectory = exportDirectoryType.get(survey);
         return exportDirectory;
     }
 
     public SurveyDirectory getExportDirectory(SurveyDirectory parentDirectory) {
+        if (!GeneralPreferences.isExportTypeSubfoldersEnabled()) {
+            return parentDirectory;
+        }
         String directoryName = getExportDirectoryName();
         SurveyDirectory.SurveyDirectoryType directoryType =
                 new SurveyDirectory.SurveyDirectoryType(directoryName);

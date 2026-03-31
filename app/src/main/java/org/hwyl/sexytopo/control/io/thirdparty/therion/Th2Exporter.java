@@ -7,6 +7,7 @@ import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.AutoScalableDetail;
+import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.Symbol;
 import org.hwyl.sexytopo.model.sketch.SymbolDetail;
@@ -16,6 +17,7 @@ import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -32,14 +34,149 @@ public class Th2Exporter {
     public static String getContent(
         Survey survey, Projection2D projection, Space<Coord2D> space, String xviFilename,
         Shape innerFrame, Shape outerFrame, float scale) {
+        return getContent(survey, projection, space, xviFilename, innerFrame, outerFrame, scale, 1, true);
+    }
+
+    public static String getContent(
+        Survey survey, Projection2D projection, Space<Coord2D> space, String xviFilename,
+        Shape innerFrame, Shape outerFrame, float scale,
+        int scrapCount, boolean stationsInFirstScrap) {
+
         List<String> sections = new ArrayList<>();
         sections.add(TherionExporter.getEncodingText());
         sections.add(getXviBlock(survey, space, xviFilename, outerFrame));
 
         Sketch sketch = survey.getSketch(projection);
-        String scrapName = getScrapName(survey, projection);
-        sections.add(getScrap(survey, scrapName, projection, sketch, space, innerFrame, scale));
+        String baseName = getBaseScrapName(survey);
+        String scrapSuffix = getScrapSuffix(projection);
+
+        for (int i = 1; i <= scrapCount; i++) {
+            String scrapName = formatScrapName(baseName, scrapSuffix, i, scrapCount);
+            boolean includeStations = (i == 1) && stationsInFirstScrap;
+            boolean includeSketchContent = (i == 1); // sketch content only in first scrap
+            sections.add(getScrap(survey, scrapName, projection, sketch, space, innerFrame, scale,
+                    includeStations, includeSketchContent));
+        }
+
+        // Add cross-section scraps if enabled
+        if (GeneralPreferences.isTherionCrossSectionsEnabled()) {
+            sections.addAll(getCrossSectionScraps(survey, sketch, projection, baseName, scale));
+        }
+
         return TextTools.join("\n\n", sections);
+    }
+
+    private static List<String> getCrossSectionScraps(Survey survey, Sketch sketch,
+                                                       Projection2D projection, String baseName, float scale) {
+        List<String> scraps = new ArrayList<>();
+
+        String xsSuffix = getXsSuffix(projection);
+        List<CrossSectionDetail> crossSections = new ArrayList<>(sketch.getCrossSectionDetails());
+
+        // Sort by station order in survey
+        List<Station> orderedStations = survey.getAllStationsInChronoOrder();
+        crossSections.sort(Comparator.comparingInt(xs ->
+                orderedStations.indexOf(xs.getCrossSection().getStation())));
+
+        for (CrossSectionDetail xsDetail : crossSections) {
+            Station station = xsDetail.getCrossSection().getStation();
+            String scrapName = formatXsScrapName(baseName, xsSuffix, station.getName());
+            scraps.add(getCrossSectionScrap(scrapName, xsDetail, scale));
+        }
+
+        return scraps;
+    }
+
+    private static String getXsSuffix(Projection2D projection) {
+        if (Projection2D.PLAN.equals(projection)) {
+            return GeneralPreferences.getTherionPlanXsSuffix();
+        } else {
+            return GeneralPreferences.getTherionEeXsSuffix();
+        }
+    }
+
+    private static String formatXsScrapName(String baseName, String suffixPattern, String stationName) {
+        String suffix = suffixPattern;
+
+        // Replace # patterns with station name
+        // If station name is numeric, ## and ### can be zero-padded
+        if (suffix.contains("###")) {
+            suffix = replaceHashPattern(suffix, "###", stationName, 3);
+        } else if (suffix.contains("##")) {
+            suffix = replaceHashPattern(suffix, "##", stationName, 2);
+        } else if (suffix.contains("#")) {
+            suffix = suffix.replace("#", stationName);
+        }
+
+        return baseName + suffix;
+    }
+
+    private static String replaceHashPattern(String suffix, String pattern, String stationName, int padLength) {
+        // If station name is numeric, zero-pad it; otherwise just use the name
+        try {
+            int num = Integer.parseInt(stationName);
+            String format = "%0" + padLength + "d";
+            return suffix.replace(pattern, String.format(format, num));
+        } catch (NumberFormatException e) {
+            // Not a number, just replace with the name
+            return suffix.replace(pattern, stationName);
+        }
+    }
+
+    private static String getCrossSectionScrap(String name, CrossSectionDetail xsDetail, float scale) {
+        List<String> lines = new ArrayList<>();
+
+        // Calculate scale parameter: [px1 py1 px2 py2 rx1 ry1 rx2 ry2 m]
+        // Picture points are in export units, real world points are in metres
+        float realWorldRef = 10.0f;  // Reference distance in metres
+        float pictureRef = realWorldRef * scale;  // Corresponding distance in picture units
+        String scaleParam = String.format(java.util.Locale.US, "[0 0 %s %s 0 0 %s %s m]",
+                TextTools.formatTo2dp(pictureRef),
+                TextTools.formatTo2dp(pictureRef),
+                TextTools.formatTo2dp(realWorldRef),
+                TextTools.formatTo2dp(realWorldRef));
+
+        lines.add("scrap " + name + " -projection none -scale " + scaleParam);
+
+        // Add the station point at the cross-section center
+        Station station = xsDetail.getCrossSection().getStation();
+        Coord2D position = xsDetail.getPosition().scale(scale).flipVertically();
+        lines.add(getPoint(position.x, position.y, "station", "-name", station.getName()));
+
+        lines.add("endscrap");
+
+        return TextTools.join("\n\n", lines);
+    }
+
+    private static String getScrapSuffix(Projection2D projection) {
+        if (Projection2D.PLAN.equals(projection)) {
+            return GeneralPreferences.getTherionPlanScrapSuffix();
+        } else {
+            return GeneralPreferences.getTherionEeScrapSuffix();
+        }
+    }
+
+    private static String formatScrapName(String baseName, String suffixPattern, int index, int total) {
+        String suffix = suffixPattern;
+
+        if (total == 1 && !suffix.contains("#")) {
+            // Single scrap, no numbering needed
+            return baseName + suffix;
+        }
+
+        // Handle ## for zero-padded numbers (01, 02, etc.)
+        if (suffix.contains("##")) {
+            String paddedNum = String.format("%02d", index);
+            suffix = suffix.replace("##", paddedNum);
+        } else if (suffix.contains("#")) {
+            // Handle # for simple numbers (1, 2, etc.)
+            suffix = suffix.replace("#", String.valueOf(index));
+        } else if (total > 1) {
+            // No placeholder but multiple scraps - append number
+            suffix = suffix + index;
+        }
+
+        return baseName + suffix;
     }
 
 
@@ -48,24 +185,17 @@ public class Th2Exporter {
 
         List<String> lines = new ArrayList<>();
 
-        // xth_me_area_adjust <Xmin> <Ymin> <Xmax> <Ymax>
-        // Xmin, Ymin and Xmax, Ymax are cartesian coordinates of lower left and upper right
-        // corners of drawing area
         lines.add(getXviLine("xth_me_area_adjust",
             TextTools.formatTo2dp(outerFrame.getLeft()),
             TextTools.formatTo2dp(outerFrame.getBottom()),
             TextTools.formatTo2dp(outerFrame.getRight()),
             TextTools.formatTo2dp(outerFrame.getTop())));
 
-        //  xth_me_image_insert {<Xpos> <visibility> <gamma>} {<Ypos> <root>} {<filename>} 0 {}
-        //  <Xpos> <Ypos> is the position of the 0,0 point of XVI coordinate system
-        //  <visibility> - 0 image is hidden / 1 image is shown
-        //  <gamma> - image gamma
-        //  <root> - root station name. Can be omitted.
-        //  <filename> - name of image file
-        //  0 {} - image identifiers, can be 0 {} for all images
         Station origin = survey.getOrigin();
         Coord2D originPos = space.getStationMap().get(survey.getOrigin());
+        if (originPos == null) {
+            return TextTools.join("\n", lines);
+        }
         float xPos = originPos.x;
         float yPos = originPos.y;
         lines.add(getXviLine("xth_me_image_insert",
@@ -75,30 +205,37 @@ public class Th2Exporter {
             0,
             "{}"));
 
-        // xth_me_area_zoom_to <zoom>
-        // where <zoom> is the default zoom factor, when drawing is open in xtherion.
-        // Should be 25,50,100,200,400.
         lines.add(getXviLine("xth_me_area_zoom_to", 25));
 
         return TextTools.join("\n", lines);
     }
 
-    public static String getScrapName(Survey survey, Projection2D projection) {
-        String name = survey.getName().toLowerCase();
+    public static String getBaseScrapName(Survey survey) {
+        String name = survey.getName();
         name = TextTools.intelligentlySanitise(name);
+        return name;
+    }
+
+    public static String getScrapName(Survey survey, Projection2D projection) {
+        String name = getBaseScrapName(survey);
         String projectionSuffix = projection.getAbbreviation();
         String joiner = "" + TextTools.getJoiner(name);
         return TextTools.join(joiner, name, projectionSuffix);
     }
 
     public static String getScrap(Survey survey, String name, Projection2D projection, Sketch sketch,
-                                  Space<Coord2D> space, Shape frame, float scale) {
+                                  Space<Coord2D> space, Shape frame, float scale,
+                                  boolean includeStations, boolean includeSketchContent) {
         List<String> lines = new ArrayList<>();
         lines.add(getStartScrapCommands(name, projection, frame));
-        lines.addAll(getScrapCommands(survey, sketch, space, scale));
+        lines.addAll(getScrapCommands(survey, sketch, space, scale, includeStations, includeSketchContent));
         lines.add("endscrap");
         return TextTools.join("\n\n", lines);
+    }
 
+    public static String getScrap(Survey survey, String name, Projection2D projection, Sketch sketch,
+                                  Space<Coord2D> space, Shape frame, float scale) {
+        return getScrap(survey, name, projection, sketch, space, frame, scale, true, true);
     }
 
     private static String getStartScrapCommands(String name, Projection2D projection, Shape frame) {
@@ -118,36 +255,45 @@ public class Th2Exporter {
 
     }
 
-    private static List<String> getScrapCommands(Survey survey, Sketch sketch, Space<Coord2D> space, float scale) {
+    private static List<String> getScrapCommands(Survey survey, Sketch sketch, Space<Coord2D> space,
+                                                  float scale, boolean includeStations, boolean includeSketchContent) {
         List<String> commands = new ArrayList<>();
 
-        Map<Station, Coord2D> stationMap = space.getStationMap();
-        List<Station> orderedStations = survey.getAllStationsInChronoOrder();
-        for (Station station : orderedStations) {
-            Coord2D coord = stationMap.get(station).scale(scale);
-            commands.add(getPoint(coord.x, coord.y, "station", "-name", station.getName()));
-        }
-
-        if (GeneralPreferences.isXviExportTextEnabled()) {
-            for (TextDetail textDetail : sketch.getTextDetails()) {
-                Coord2D coord = textDetail.getPosition().scale(scale).flipVertically();
-                commands.add(
-                    getPoint(coord.x, coord.y, "label", "-text \"", textDetail.getText(), "\" -scale",
-                        getScale(textDetail)));
+        if (includeStations) {
+            Map<Station, Coord2D> stationMap = space.getStationMap();
+            List<Station> orderedStations = survey.getAllStationsInChronoOrder();
+            for (Station station : orderedStations) {
+                Coord2D coord = stationMap.get(station);
+                if (coord == null) {
+                    continue;
+                }
+                coord = coord.scale(scale);
+                commands.add(getPoint(coord.x, coord.y, "station", "-name", station.getName()));
             }
         }
 
-        if (GeneralPreferences.isXviExportSymbolsEnabled()) {
-            for (SymbolDetail symbolDetail : sketch.getSymbolDetails()) {
-                Coord2D coord = symbolDetail.getPosition().scale(scale).flipVertically();
-                Symbol symbol = symbolDetail.getSymbol();
-
-                List<String> args = new ArrayList<>();
-                args.add("-scale " + getScale(symbolDetail));
-                if (symbol.isDirectional()) {
-                    args.add("-orientation " + symbolDetail.getAngle());
+        if (includeSketchContent) {
+            if (GeneralPreferences.isXviExportTextEnabled()) {
+                for (TextDetail textDetail : sketch.getTextDetails()) {
+                    Coord2D coord = textDetail.getPosition().scale(scale).flipVertically();
+                    commands.add(
+                        getPoint(coord.x, coord.y, "label", "-text \"", textDetail.getText(), "\" -scale",
+                            getScale(textDetail)));
                 }
-                commands.add(getPoint(coord.x, coord.y, symbolDetail.getSymbol().getTherionName(), args));
+            }
+
+            if (GeneralPreferences.isXviExportSymbolsEnabled()) {
+                for (SymbolDetail symbolDetail : sketch.getSymbolDetails()) {
+                    Coord2D coord = symbolDetail.getPosition().scale(scale).flipVertically();
+                    Symbol symbol = symbolDetail.getSymbol();
+
+                    List<String> args = new ArrayList<>();
+                    args.add("-scale " + getScale(symbolDetail));
+                    if (symbol.isDirectional()) {
+                        args.add("-orientation " + symbolDetail.getAngle());
+                    }
+                    commands.add(getPoint(coord.x, coord.y, symbolDetail.getSymbol().getTherionName(), args));
+                }
             }
         }
 
@@ -166,22 +312,16 @@ public class Th2Exporter {
 
         float sizeInMetres = detail.getSize();
 
-        // These numbers were determined by creating some stal in Therion
-        // at different scales and seeing how big they came out
-
-        // Therion seems to have a small number of sizes available; not sure
-        // if there's any way of handling very big symbols
-
         if (sizeInMetres < 0.45) {
-            return "xs"; // appprox 0.4m
+            return "xs";
         } else if (sizeInMetres < 0.6) {
-            return "s"; // approx 0.5m
+            return "s";
         } else if (sizeInMetres < 0.9) {
-            return "m"; // approx 0.7m
+            return "m";
         } else if (sizeInMetres < 1.3) {
-            return "l"; // approx 1.1m
+            return "l";
         } else {
-            return "xl"; // approx 1.5m
+            return "xl";
         }
     }
 
