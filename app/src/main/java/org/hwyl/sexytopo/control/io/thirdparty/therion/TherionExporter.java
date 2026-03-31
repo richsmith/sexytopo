@@ -47,6 +47,7 @@ public class TherionExporter extends Exporter {
 
         String attribution = getFileAttribution(context);
 
+        // Therion export notes:
         // Therion coordinate system is in traditional graph-style, with positive y going up.
 
         th2Files.clear();
@@ -158,6 +159,9 @@ public class TherionExporter extends Exporter {
 
         Space<Coord2D> space = projectionType.project(survey);
         space = SpaceFlipper.flipVertically(space);
+        // Therion y-coordinates are inverse of SexyTopo's
+        // (it would be more consistent to either do all the processing like scaling and flipping
+        // all at once or all just before using, but we currently have a mix :/)
 
         Sketch sketch = survey.getSketch(projectionType);
 

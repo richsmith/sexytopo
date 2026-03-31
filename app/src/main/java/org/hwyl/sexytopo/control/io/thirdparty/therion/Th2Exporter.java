@@ -185,6 +185,9 @@ public class Th2Exporter {
 
         List<String> lines = new ArrayList<>();
 
+        // xth_me_area_adjust <Xmin> <Ymin> <Xmax> <Ymax>
+        // Xmin, Ymin and Xmax, Ymax are cartesian coordinates of lower left and upper right
+        // corners of drawing area
         lines.add(getXviLine("xth_me_area_adjust",
             TextTools.formatTo2dp(outerFrame.getLeft()),
             TextTools.formatTo2dp(outerFrame.getBottom()),
@@ -198,6 +201,13 @@ public class Th2Exporter {
         }
         float xPos = originPos.x;
         float yPos = originPos.y;
+        //  xth_me_image_insert {<Xpos> <visibility> <gamma>} {<Ypos> <root>} {<filename>} 0 {}
+        //  <Xpos> <Ypos> is the position of the 0,0 point of XVI coordinate system
+        //  <visibility> - 0 image is hidden / 1 image is shown
+        //  <gamma> - image gamma
+        //  <root> - root station name. Can be omitted.
+        //  <filename> - name of image file
+        //  0 {} - image identifiers, can be 0 {} for all images
         lines.add(getXviLine("xth_me_image_insert",
             "{" + xPos + " 1 1.0}",
             "{" + yPos + " " + origin.getName() + "}",
@@ -205,6 +215,9 @@ public class Th2Exporter {
             0,
             "{}"));
 
+        // xth_me_area_zoom_to <zoom>
+        // where <zoom> is the default zoom factor, when drawing is open in xtherion.
+        // Should be 25,50,100,200,400.
         lines.add(getXviLine("xth_me_area_zoom_to", 25));
 
         return TextTools.join("\n", lines);
@@ -312,16 +325,22 @@ public class Th2Exporter {
 
         float sizeInMetres = detail.getSize();
 
+        // These numbers were determined by creating some stal in Therion
+        // at different scales and seeing how big they came out
+
+        // Therion seems to have a small number of sizes available; not sure
+        // if there's any way of handling very big symbols
+
         if (sizeInMetres < 0.45) {
-            return "xs";
+            return "xs"; // appprox 0.4m
         } else if (sizeInMetres < 0.6) {
-            return "s";
+            return "s"; // approx 0.5m
         } else if (sizeInMetres < 0.9) {
-            return "m";
+            return "m"; // approx 0.7m
         } else if (sizeInMetres < 1.3) {
-            return "l";
+            return "l"; // approx 1.1m
         } else {
-            return "xl";
+            return "xl"; // approx 1.5m
         }
     }
 
