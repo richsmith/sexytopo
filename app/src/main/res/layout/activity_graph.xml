@@ -267,6 +267,21 @@
 
             <ImageButton
                 style="@style/ToolbarImageButton"
+                android:id="@+id/buttonLayers"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/toolbar_button_height"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:layout_marginTop="-4dp"
+                android:contentDescription="@string/sketch_toolbar_layers"
+                android:cropToPadding="false"
+                android:hapticFeedbackEnabled="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/layers"
+                android:tooltipText="@string/sketch_toolbar_layers" />
+
+            <ImageButton
+                style="@style/ToolbarImageButton"
                 android:id="@+id/buttonMenu"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/toolbar_button_height"

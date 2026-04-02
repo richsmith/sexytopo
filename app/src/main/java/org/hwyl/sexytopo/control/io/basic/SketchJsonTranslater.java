@@ -11,6 +11,7 @@ import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
+import org.hwyl.sexytopo.model.sketch.SketchLayer;
 import org.hwyl.sexytopo.model.sketch.Symbol;
 import org.hwyl.sexytopo.model.sketch.SymbolDetail;
 import org.hwyl.sexytopo.model.sketch.TextDetail;
@@ -42,6 +43,14 @@ public class SketchJsonTranslater {
     public static final String X_TAG = "x";
     public static final String Y_TAG = "y";
 
+    // Layer-related tags
+    public static final String LAYERS_TAG = "layers";
+    public static final String LAYER_ID_TAG = "id";
+    public static final String LAYER_NAME_TAG = "name";
+    public static final String LAYER_VISIBILITY_TAG = "visibility";
+    public static final String CROSS_SECTION_SKETCH_TAG = "sketch";
+    public static final String ACTIVE_LAYER_ID_TAG = "activeLayerId";
+
 
     public static String translate(Sketch sketch) throws JSONException {
         return toJson(sketch).toString(SexyTopoConstants.JSON_INDENT);
@@ -58,26 +67,43 @@ public class SketchJsonTranslater {
 
         JSONObject json = new JSONObject();
 
+        // Save layers
+        JSONArray layersArray = new JSONArray();
+        for (SketchLayer layer : sketch.getLayers()) {
+            layersArray.put(toJson(layer));
+        }
+        json.put(LAYERS_TAG, layersArray);
+        json.put(ACTIVE_LAYER_ID_TAG, sketch.getActiveLayerId());
+
+        return json;
+    }
+
+    public static JSONObject toJson(SketchLayer layer) throws JSONException {
+        JSONObject json = new JSONObject();
+        json.put(LAYER_ID_TAG, layer.getId());
+        json.put(LAYER_NAME_TAG, layer.getName());
+        json.put(LAYER_VISIBILITY_TAG, layer.getVisibility().toString());
+
         JSONArray pathDetailArray = new JSONArray();
-        for (PathDetail pathDetail : sketch.getPathDetails()) {
+        for (PathDetail pathDetail : layer.getPathDetails()) {
             pathDetailArray.put(toJson(pathDetail));
         }
         json.put(PATHS_TAG, pathDetailArray);
 
         JSONArray textDetailArray = new JSONArray();
-        for (TextDetail textDetail : sketch.getTextDetails()) {
+        for (TextDetail textDetail : layer.getTextDetails()) {
             textDetailArray.put(toJson(textDetail));
         }
         json.put(LABELS_TAG, textDetailArray);
 
         JSONArray symbolDetailArray = new JSONArray();
-        for (SymbolDetail symbolDetail : sketch.getSymbolDetails()) {
+        for (SymbolDetail symbolDetail : layer.getSymbolDetails()) {
             symbolDetailArray.put(toJson(symbolDetail));
         }
         json.put(SYMBOLS_TAG, symbolDetailArray);
 
         JSONArray crossSectionDetailArray = new JSONArray();
-        for (CrossSectionDetail crossSectionDetail : sketch.getCrossSectionDetails()) {
+        for (CrossSectionDetail crossSectionDetail : layer.getCrossSectionDetails()) {
             crossSectionDetailArray.put(toJson(crossSectionDetail));
         }
         json.put(CROSS_SECTIONS_TAG, crossSectionDetailArray);
@@ -89,13 +115,47 @@ public class SketchJsonTranslater {
 
         Sketch sketch = new Sketch();
 
+        // Check if this is the new layer format or legacy format
+        if (json.has(LAYERS_TAG)) {
+            // New layer format
+            try {
+                sketch.getLayers().clear(); // Remove default layer
+                JSONArray layersArray = json.getJSONArray(LAYERS_TAG);
+                List<SketchLayer> layers = new ArrayList<>();
+                for (JSONObject layerJson : IoUtils.toList(layersArray)) {
+                    layers.add(toSketchLayer(survey, layerJson));
+                }
+                sketch.setLayers(layers);
+
+                if (json.has(ACTIVE_LAYER_ID_TAG)) {
+                    int activeLayerId = json.getInt(ACTIVE_LAYER_ID_TAG);
+                    // Set directly without triggering undo history
+                    for (SketchLayer layer : sketch.getLayers()) {
+                        if (layer.getId() == activeLayerId) {
+                            sketch.setActiveLayerId(activeLayerId);
+                            break;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(R.string.file_load_sketch_paths_error, e);
+            }
+        } else {
+            // Legacy format - load into default layer
+            loadLegacyFormat(survey, json, sketch.getActiveLayer());
+        }
+
+        return sketch;
+    }
+
+    private static void loadLegacyFormat(Survey survey, JSONObject json, SketchLayer layer) {
         try {
             JSONArray pathsArray = json.getJSONArray(PATHS_TAG);
             List<PathDetail> pathDetails = new ArrayList<>();
             for (JSONObject object : IoUtils.toList(pathsArray)) {
                 pathDetails.add(toPathDetail(object));
             }
-            sketch.setPathDetails(pathDetails);
+            layer.setPathDetails(pathDetails);
         } catch (Exception e) {
             Log.e(R.string.file_load_sketch_paths_error, e);
         }
@@ -110,7 +170,7 @@ public class SketchJsonTranslater {
                     Log.i(R.string.file_load_symbols_error, e);
                 }
             }
-            sketch.setSymbolDetails(symbolDetails);
+            layer.setSymbolDetails(symbolDetails);
         } catch (Exception e) {
             Log.e(R.string.file_load_symbols_error, e);
         }
@@ -121,7 +181,7 @@ public class SketchJsonTranslater {
             for (JSONObject object : IoUtils.toList(labelsArray)) {
                 textDetails.add(toTextDetail(object));
             }
-            sketch.setTextDetails(textDetails);
+            layer.setTextDetails(textDetails);
         } catch (Exception e) {
             Log.e(R.string.file_load_sketch_labels_error, e);
         }
@@ -132,12 +192,26 @@ public class SketchJsonTranslater {
             for (JSONObject object : IoUtils.toList(crossSectionsArray)) {
                 crossSectionDetails.add(toCrossSectionDetail(survey, object));
             }
-            sketch.setCrossSectionDetails(crossSectionDetails);
+            layer.setCrossSectionDetails(crossSectionDetails);
         } catch (Exception e) {
             Log.e(R.string.file_load_cross_sections_error, e);
         }
+    }
 
-        return sketch;
+    public static SketchLayer toSketchLayer(Survey survey, JSONObject json) throws JSONException {
+        int id = json.getInt(LAYER_ID_TAG);
+        String name = json.getString(LAYER_NAME_TAG);
+        SketchLayer layer = new SketchLayer(id, name);
+
+        if (json.has(LAYER_VISIBILITY_TAG)) {
+            String visibilityStr = json.getString(LAYER_VISIBILITY_TAG);
+            layer.setVisibility(SketchLayer.Visibility.valueOf(visibilityStr));
+        }
+
+        // Load layer content using legacy format loader
+        loadLegacyFormat(survey, json, layer);
+
+        return layer;
     }
 
 
@@ -235,6 +309,18 @@ public class SketchJsonTranslater {
         json.put(STATION_ID_TAG, crossSectionDetail.getCrossSection().getStation().getName());
         json.put(POSITION_TAG, toJson(crossSectionDetail.getPosition()));
         json.put(ANGLE_TAG, crossSectionDetail.getCrossSection().getAngle());
+        
+        // Save the cross-section's sketch (only the first layer's paths for simplicity)
+        Sketch xsSketch = crossSectionDetail.getCrossSection().getSketch();
+        if (xsSketch != null && !xsSketch.getPathDetails().isEmpty()) {
+            JSONObject sketchJson = new JSONObject();
+            JSONArray pathsArray = new JSONArray();
+            for (PathDetail path : xsSketch.getPathDetails()) {
+                pathsArray.put(toJson(path));
+            }
+            sketchJson.put(PATHS_TAG, pathsArray);
+            json.put(CROSS_SECTION_SKETCH_TAG, sketchJson);
+        }
 
         return json;
     }
@@ -249,8 +335,22 @@ public class SketchJsonTranslater {
         String stationdId = json.getString(STATION_ID_TAG);
         Station station = survey.getStationByName(stationdId);
 
-        CrossSectionDetail crossSectionDetail =
-                new CrossSectionDetail(new CrossSection(station, angle), position);
+        CrossSection crossSection = new CrossSection(station, angle);
+        
+        // Load the cross-section's sketch if present
+        if (json.has(CROSS_SECTION_SKETCH_TAG)) {
+            JSONObject sketchJson = json.getJSONObject(CROSS_SECTION_SKETCH_TAG);
+            if (sketchJson.has(PATHS_TAG)) {
+                JSONArray pathsArray = sketchJson.getJSONArray(PATHS_TAG);
+                List<PathDetail> paths = new ArrayList<>();
+                for (JSONObject pathObj : IoUtils.toList(pathsArray)) {
+                    paths.add(toPathDetail(pathObj));
+                }
+                crossSection.getSketch().setPathDetails(paths);
+            }
+        }
+        
+        CrossSectionDetail crossSectionDetail = new CrossSectionDetail(crossSection, position);
 
         return crossSectionDetail;
     }
