@@ -268,6 +268,9 @@
     <string name="device_data_unknown_identifier">Unknown packet identifier</string>
     <string name="device_data_acknowledged_packet">Acknowledged packet</string>
     <string name="device_no_device">no device</string>
+    <string name="device_test_name" translatable="false">[Test Device]</string>
+    <string name="device_test_short_name" translatable="false">Test</string>
+    <string name="action_set_test_instrument">Set Test Instrument</string>
     <string name="device_missing_name">[Missing device]</string>
     <string name="device_missing_short_name">Missing</string>
     <string name="device_unknown_name">[Unknown device]</string>

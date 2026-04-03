@@ -44,6 +44,7 @@ import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.comms.Communicator;
 import org.hwyl.sexytopo.comms.Instrument;
+import org.hwyl.sexytopo.comms.InstrumentType;
 import org.hwyl.sexytopo.comms.missing.NullCommunicator;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SexyTopoPermissions;
@@ -225,9 +226,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         // update Connection menu item state
         MenuItem connectItem = menu.findItem(R.id.action_connect);
         if (connectItem != null) {
-            boolean hasInstrument = !(requestComms() instanceof NullCommunicator);
-            connectItem.setEnabled(hasInstrument);
-            connectItem.setChecked(hasInstrument && requestComms().isConnected());
+            connectItem.setEnabled(hasInstrument());
+            connectItem.setChecked(hasInstrument() && requestComms().isConnected());
         }
 
         // disable Find Station by default
@@ -336,11 +336,17 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             getSurvey().setAutosaved(false);
             getSurveyManager().autosave();
             return true;
-        }else if (itemId == R.id.action_kill_connection) {
+        } else if (itemId == R.id.action_kill_connection) {
             killConnection();
             return true;
         } else if (itemId == R.id.action_force_crash) {
             forceCrash();
+            return true;
+        } else if (itemId == R.id.action_set_test_instrument) {
+            setInstrument(Instrument.getTestInstrument());
+            try {
+                setComms(InstrumentType.TEST.getNewCommunicator(null, null));
+            } catch (Exception ignored) {}
             return true;
         } else if (itemId == R.id.action_connect) {
             toggleConnection();
@@ -486,6 +492,10 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         SexyTopoActivity.instrument = instrument;
     }
 
+    protected boolean hasInstrument() {
+        return !(requestComms() instanceof NullCommunicator);
+    }
+
 
     protected Communicator requestComms() {
         return comms;
@@ -494,7 +504,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     protected void setComms(Communicator communicator) {
         SexyTopoActivity.comms = communicator;
     }
-
 
     protected void startNewSurvey() {
         // Save team from current survey before creating new one
@@ -1208,7 +1217,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     private void toggleConnection() {
         Communicator communicator = requestComms();
 
-        if (communicator instanceof NullCommunicator) {
+        if (!hasInstrument()) {
             showSimpleToast("No instrument connected");
             return;
         }

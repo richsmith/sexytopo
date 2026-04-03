@@ -6,7 +6,7 @@ import androidx.annotation.NonNull;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.comms.Communicator;
-import org.hwyl.sexytopo.comms.InstrumentType;
+import org.hwyl.sexytopo.comms.Instrument;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.activity.DeviceActivity;
 
@@ -64,21 +64,21 @@ public abstract class BleCommunicator implements Communicator, ConnectionObserve
 
     @Override
     public void onDeviceConnecting(@NonNull BluetoothDevice device) {
-        String name = InstrumentType.describe(device);
+        String name = Instrument.describe(device);
         Log.device(R.string.device_ble_connecting_to, name);
     }
 
 
     @Override
     public void onDeviceConnected(@NonNull BluetoothDevice device) {
-        String name = InstrumentType.describe(device);
+        String name = Instrument.describe(device);
         Log.device(R.string.device_ble_connected_to, name);
     }
 
 
     @Override
     public void onDeviceFailedToConnect(@NonNull BluetoothDevice device, int reason) {
-        String name = InstrumentType.describe(device);
+        String name = Instrument.describe(device);
         Log.device(R.string.device_ble_failed_to_connect_to, name);
         activity.updateConnectionStatus();
     }
@@ -86,21 +86,21 @@ public abstract class BleCommunicator implements Communicator, ConnectionObserve
 
     @Override
     public void onDeviceReady(@NonNull BluetoothDevice device) {
-        String name = InstrumentType.describe(device);
+        String name = Instrument.describe(device);
         Log.device(R.string.device_ble_device_ready, name);
     }
 
 
     @Override
     public void onDeviceDisconnecting(@NonNull BluetoothDevice device) {
-        String name = InstrumentType.describe(device);
+        String name = Instrument.describe(device);
         Log.device(R.string.device_ble_device_disconnecting, name);
     }
 
 
     @Override
     public void onDeviceDisconnected(@NonNull BluetoothDevice device, int reason) {
-        String name = InstrumentType.describe(device);
+        String name = Instrument.describe(device);
         Log.device(R.string.device_ble_device_disconnected, name);
         activity.updateConnectionStatus();
     }

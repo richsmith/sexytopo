@@ -129,6 +129,8 @@
         <menu>
             <item android:id="@+id/action_debug_mode"
                 android:title="@string/action_debug_mode" />
+            <item android:id="@+id/action_set_test_instrument"
+                  android:title="@string/action_set_test_instrument"/>
             <item android:id="@+id/action_trigger_autosave"
                 android:title="@string/action_trigger_autosave" />
             <item android:id="@+id/action_kill_connection"

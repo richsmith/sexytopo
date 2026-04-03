@@ -9,7 +9,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.comms.InstrumentType;
+import org.hwyl.sexytopo.comms.Instrument;
 import org.hwyl.sexytopo.comms.distox.CalibrationProtocol;
 import org.hwyl.sexytopo.comms.distox.DistoXProtocol;
 import org.hwyl.sexytopo.comms.distox.MeasurementProtocol;
@@ -298,18 +298,18 @@ public class OldDistoXCommunicator extends Thread {
     }
 
     private static boolean isDistoX(BluetoothDevice device) {
-        String name = InstrumentType.describe(device);
+        String name = Instrument.describe(device);
         return name.toLowerCase().contains(DISTO_X_PREFIX.toLowerCase());
     }
 
     private static boolean isShetland(BluetoothDevice device) {
-        String name = InstrumentType.describe(device);
+        String name = Instrument.describe(device);
         return name.toLowerCase().contains(SHETLAND_PREFIX.toLowerCase());
     }
 
 
     public boolean doesCurrentDistoPreferNonLinearCalibration() {
-        String name = InstrumentType.describe(bluetoothDevice);
+        String name = Instrument.describe(bluetoothDevice);
         if (name.startsWith("DistoX-")) {
             return DistoXType.X310.preferNonLinearCalibration;
         } else if (name.startsWith("DistoX")) {

@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.comms.InstrumentType;
+import org.hwyl.sexytopo.comms.Instrument;
 import org.hwyl.sexytopo.comms.ble.SexyTopoBleManager;
 import org.hwyl.sexytopo.comms.ble.SexyTopoDataHandler;
 import org.hwyl.sexytopo.control.Log;
@@ -290,7 +290,7 @@ public class Bric4Manager extends SexyTopoBleManager {
 
         private void reportError(int code, float data1, float data2, boolean showToUser) {
             Bric4Error error = Bric4Error.fromCode(code);
-            String device = InstrumentType.describe(getBluetoothDevice());
+            String device = Instrument.describe(getBluetoothDevice());
             String shortDescription = SexyTopo.staticGetString(R.string.device_bric_device_reported_error, device, error);
 
             Log.device(shortDescription);

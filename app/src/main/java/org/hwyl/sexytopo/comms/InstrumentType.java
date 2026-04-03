@@ -9,6 +9,7 @@ import org.hwyl.sexytopo.comms.distox.DistoXCommunicator;
 import org.hwyl.sexytopo.comms.distoxble.DistoXBleCommunicator;
 import org.hwyl.sexytopo.comms.fcl.FCLCommunicator;
 import org.hwyl.sexytopo.comms.missing.NullCommunicator;
+import org.hwyl.sexytopo.comms.test.TestCommunicator;
 import org.hwyl.sexytopo.comms.sap5.Sap5Communicator;
 import org.hwyl.sexytopo.comms.sap6.SAP6Communicator;
 import org.hwyl.sexytopo.control.SexyTopo;
@@ -30,6 +31,7 @@ public enum InstrumentType {
     SAP6(R.string.device_sap6_name, R.string.device_sap6_short_name, "SAP6", SAP6Communicator.class),
     FCL(R.string.device_fcl_name, R.string.device_fcl_short_name, "FCL", FCLCommunicator.class),
     DISCOX(R.string.device_discox_name, R.string.device_discox_short_name, "DiscoX", SAP6Communicator.class),
+    TEST(R.string.device_test_name, R.string.device_test_short_name, "SEXY", TestCommunicator.class),
     OTHER(R.string.device_unknown_name, R.string.device_unknown_short_name, "", NullCommunicator.class),
     NONE(R.string.device_missing_name, R.string.device_missing_short_name, "", NullCommunicator.class);
 
@@ -75,8 +77,8 @@ public enum InstrumentType {
         }
 
         for (InstrumentType instrumentType : values()) {
-            if (instrumentType != OTHER && instrumentType != NONE &&
-                    name.toLowerCase().startsWith(instrumentType.prefix.toLowerCase())) {
+            if (instrumentType.isUsable() && instrumentType != TEST &&
+                name.toLowerCase().startsWith(instrumentType.prefix.toLowerCase())) {
                 return instrumentType;
             }
         }
@@ -97,18 +99,11 @@ public enum InstrumentType {
         }
     }
 
-    public static String describe(BluetoothDevice device) {
-        if (device == null) {
-            return SexyTopo.staticGetString(R.string.device_no_device);
-        }
-        try {
-            return device.getName();
-        } catch (SecurityException e) {
-            return SexyTopo.staticGetString(R.string.device_no_permitted_access);
-        }
-    }
-
     public boolean isUsable() {
         return this != NONE && this != OTHER;
+    }
+
+    public boolean isTest() {
+        return this == TEST;
     }
 }

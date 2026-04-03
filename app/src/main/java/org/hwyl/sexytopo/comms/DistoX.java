@@ -20,7 +20,7 @@ public enum DistoX {
     }
 
     public static DistoX fromDevice(BluetoothDevice bluetoothDevice) {
-        return fromName(InstrumentType.describe(bluetoothDevice));
+        return fromName(Instrument.describe(bluetoothDevice));
     }
 
     public static DistoX fromName(String name) {
