@@ -41,18 +41,18 @@ public class SurvexTherionUtil {
 
     public static String getMetadata(Survey survey, char commentChar, ExportFormat format) {
         StringBuilder builder = new StringBuilder();
-        
+
         Trip trip = survey.getTrip();
         if (trip != null) {
             String marker = (format == ExportFormat.SURVEX) ? "*" : "";
             boolean isSurvex = (format == ExportFormat.SURVEX);
-            
+
             // Date
             builder.append(marker).append(formatDate(trip.getDate())).append("\n");
-            
+
             // Instrument line (commented out)
             builder.append(commentChar).append(marker).append("instrument inst \"\"\n");
-            
+
             // Team members (only include if they have roles other than just EXPLORATION for TH)
             for (Trip.TeamEntry entry : trip.getTeam()) {
                 String teamLine = formatMember(entry, format);
@@ -60,17 +60,17 @@ public class SurvexTherionUtil {
                     builder.append(marker).append(teamLine).append("\n");
                 }
             }
-            
+
             // Blank line before explo block
             builder.append("\n");
-            
+
             // Exploration date comment
             if (isSurvex) {
                 builder.append(commentChar).append("*date explored yyyy.mm.dd\n");
             } else {
                 builder.append(commentChar).append("explo-date yyyy.mm.dd\n");
             }
-            
+
             // Explo-team lines for Therion (not commented)
             if (!isSurvex) {
                 for (Trip.TeamEntry entry : trip.getTeam()) {
@@ -79,7 +79,7 @@ public class SurvexTherionUtil {
                     }
                 }
             }
-            
+
             // Trip comments block if any
             if (!trip.getComments().isEmpty()) {
                 builder.append("\n");
@@ -87,7 +87,7 @@ public class SurvexTherionUtil {
                 builder.append(commentMultiline(trip.getComments(), commentChar));
             }
         }
-        
+
         return builder.toString();
     }
 
@@ -105,30 +105,30 @@ public class SurvexTherionUtil {
     }
 
     public static String getCentrelineData(
-            Survey survey, 
+            Survey survey,
             char commentChar,
             ExportFormat format) {
-        
+
         GraphToListTranslator graphToListTranslator = new GraphToListTranslator();
         StringBuilder builder = new StringBuilder();
-        
+
         // Add data declaration line with optional syntax marker
         String marker = (format == ExportFormat.SURVEX) ? "*" : "";
         builder.append(marker).append("data normal from to tape compass clino ignoreall\n");
-        
+
         // Get chronological list of survey entries
         List<GraphToListTranslator.SurveyListEntry> list =
                 graphToListTranslator.toChronoListOfSurveyListEntries(survey);
-        
+
         // Format each entry
         for (GraphToListTranslator.SurveyListEntry entry : list) {
             formatEntry(builder, entry, commentChar, format);
             builder.append("\n");
         }
-        
+
         // Blank line after data block
         builder.append("\n");
-        
+
         return builder.toString();
     }
 
@@ -138,7 +138,7 @@ public class SurvexTherionUtil {
         if (!isSurvex && hasOnlyExplorerRole(member)) {
             return null;
         }
-        
+
         List<String> fields = new ArrayList<>();
         fields.add("team");
         fields.add("\"" + member.name + "\"");
@@ -212,7 +212,7 @@ public class SurvexTherionUtil {
             builder.append("\t").append(commentChar).append(" ");
             formatComment(builder, to.getComment());
         }
-        
+
         // Handle promoted legs - put readings on subsequent lines
         if (leg.wasPromoted()) {
             Leg[] precursors = leg.getPromotedFrom();
@@ -237,7 +237,7 @@ public class SurvexTherionUtil {
         String formatted = comment.replaceAll("(\\r|\\n|\\r\\n)+", "\\\\n");
         builder.append(formatted);
     }
-    
+
     public static String getExtendedElevationExtensions(Survey survey, ExportFormat format) {
         StringBuilder builder = new StringBuilder();
         String marker = (format == ExportFormat.SURVEX) ? "*" : "";

@@ -20,20 +20,20 @@ public class SurvexExporter extends SingleFileExporter {
 
         // Begin survey block
         builder.append("*begin ").append(survey.getName()).append("\n");
-        
+
         // Creation comment (no version info available without Context)
         builder.append(SurvexTherionUtil.getCreationComment(COMMENT_CHAR, "SexyTopo")).append("\n\n");
-        
+
         // Metadata (date, instrument, team, explo block)
         builder.append(SurvexTherionUtil.getMetadata(survey, COMMENT_CHAR, ExportFormat.SURVEX)).append("\n");
-        
+
         // Centreline data
         builder.append(SurvexTherionUtil.getCentrelineData(survey, COMMENT_CHAR, ExportFormat.SURVEX));
-        
+
         // Extended elevation
         builder.append("\n");
         builder.append(SurvexTherionUtil.getExtendedElevationExtensions(survey, ExportFormat.SURVEX));
-        
+
         // End survey block
         builder.append("*end ").append(survey.getName()).append("\n");
 
