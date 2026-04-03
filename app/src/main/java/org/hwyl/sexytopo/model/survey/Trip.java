@@ -61,15 +61,25 @@ public class Trip {
             }
             return result;
         }
+
+        // Helper to check if this team entry has any roles
+        public boolean hasRoles() {
+            return roles != null && !roles.isEmpty();
+        }
     }
 
     private Date date;
     private List<TeamEntry> team = new ArrayList<>();
     private String comments;
+    private String instrument;  // Instrument name/description
+    private Date explorationDate;  // Exploration date field
+    private boolean explorationDateSameAsSurvey = true;  // Default to same as survey
 
 
     public Trip() {
         this.date = new Date();
+        this.instrument = "";  // Default to empty string
+        this.comments = "";  // Default to empty string
     }
 
     public List<TeamEntry> getTeam() {
@@ -98,14 +108,64 @@ public class Trip {
         this.date = date;
     }
 
-    public boolean equalsTripData(Trip trip) {
-        // Note, not "equals" method because the trips could have same data but not the same ID
+    // Instrument methods
+    public String getInstrument() {
+        return instrument;
+    }
 
-        if (! trip.date.equals(date)) {
+    public void setInstrument(String instrument) {
+        this.instrument = instrument;
+    }
+
+    public boolean hasInstrument() {
+        return instrument != null && !instrument.trim().isEmpty();
+    }
+
+    // Exploration date methods
+    public Date getExplorationDate() {
+        return explorationDate;
+    }
+
+    public void setExplorationDate(Date explorationDate) {
+        this.explorationDate = explorationDate;
+    }
+
+    public boolean isExplorationDateSameAsSurvey() {
+        return explorationDateSameAsSurvey;
+    }
+
+    public void setExplorationDateSameAsSurvey(boolean sameAsSurvey) {
+        this.explorationDateSameAsSurvey = sameAsSurvey;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof Trip)) {
             return false;
         }
 
-        if (! trip.comments.equals(comments)) {
+        Trip trip = (Trip) other;
+
+        if (objectsNotEqual(trip.date, date)) {
+            return false;
+        }
+
+        if (objectsNotEqual(trip.comments, comments)) {
+            return false;
+        }
+
+        if (objectsNotEqual(trip.instrument, instrument)) {
+            return false;
+        }
+
+        if (objectsNotEqual(trip.explorationDate, explorationDate)) {
+            return false;
+        }
+
+        if (trip.explorationDateSameAsSurvey != explorationDateSameAsSurvey) {
             return false;
         }
 
@@ -116,12 +176,29 @@ public class Trip {
         for (int i = 0; i < team.size(); i++) {
             TeamEntry otherEntry = trip.team.get(i);
             TeamEntry thisEntry = team.get(i);
-            if (! thisEntry.equals(otherEntry)) {
+            if (!thisEntry.equals(otherEntry)) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + (date != null ? date.hashCode() : 0);
+        result = 31 * result + (comments != null ? comments.hashCode() : 0);
+        result = 31 * result + (instrument != null ? instrument.hashCode() : 0);
+        result = 31 * result + (explorationDate != null ? explorationDate.hashCode() : 0);
+        result = 31 * result + (explorationDateSameAsSurvey ? 1 : 0);
+        result = 31 * result + team.hashCode();
+        return result;
+    }
+
+    private static boolean objectsNotEqual(Object a, Object b) {
+        if (a == null) return b != null;
+        return !a.equals(b);
     }
 
 }

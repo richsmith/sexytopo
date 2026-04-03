@@ -86,7 +86,7 @@ public class XviImporter extends Importer {
 
     public static List<String> parseBlockEntries(String content) {
         List<String> entries = new ArrayList<>();
-        Pattern pattern = Pattern.compile("\\{(.*?)}");
+        Pattern pattern = Pattern.compile("[{](.*?)[}]");
         Matcher matcher = pattern.matcher(content);
         while (matcher.find()) {
             entries.add(matcher.group(1));
@@ -103,8 +103,19 @@ public class XviImporter extends Importer {
         }
 
         String first = tokens.get(0);
+
+        // "connect" entries link two points with a line
         if (first.equals("connect")) {
-            throw new IllegalArgumentException("Not sure what to do with token {" + entry + "}");
+            if (tokens.size() < 5) {
+                throw new IllegalArgumentException("Incomplete connect token: {" + entry + "}");
+            }
+            float x1 = Float.parseFloat(tokens.get(1)) / (float) scale;
+            float y1 = Float.parseFloat(tokens.get(2)) / (float) scale;
+            float x2 = Float.parseFloat(tokens.get(3)) / (float) scale;
+            float y2 = Float.parseFloat(tokens.get(4)) / (float) scale;
+            PathDetail pathDetail = new PathDetail(new Coord2D(x1, -y1), Colour.BLACK);
+            pathDetail.lineTo(new Coord2D(x2, -y2));
+            return pathDetail;
         }
 
         if (tokens.size() % 2 != 1) {

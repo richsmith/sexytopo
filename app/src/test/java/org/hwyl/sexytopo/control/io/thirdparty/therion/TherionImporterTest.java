@@ -1,8 +1,12 @@
 package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
+import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
+import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionImporter;
 import org.hwyl.sexytopo.model.graph.Direction;
+import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
+import org.hwyl.sexytopo.model.survey.Trip;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -275,6 +279,135 @@ public class TherionImporterTest {
 
     private static final List<String> LINES = Arrays.asList(FAKE_TEXT.split("\n"));
 
+    private static final String APPENDED_STYLE_TEXT =
+        "encoding utf-8\n" +
+        "survey BentStalAven\n" +
+        "# Created with SexyTopo 1.10.1 on 2026-02-04\n" +
+        "\n" +
+        "date 2026.01.05\n" +
+        "#instrument inst \"\"\n" +
+        "team \"Will Stuart\" instruments\n" +
+        "team \"Andrew Atkinson\" notes\n" +
+        "\n" +
+        "explo-date 2026.01.05\n" +
+        "explo-team \"Will Stuart\"\n" +
+        "explo-team \"Andrew Atkinson\"\n" +
+        "\n" +
+        "centreline\n" +
+        "data passage station ignoreall\n" +
+        "2\tstn 1 is drilled hole\n" +
+        "3\tdrilled hole\n" +
+        "\n" +
+        "data normal from to tape compass clino ignoreall\n" +
+        "1\t-\t1.677\t271.10\t6.59\n" +
+        "1\t2\t5.541\t253.93\t4.67\n" +
+        "#1\t2\t5.542\t73.95\t-4.64\n" +
+        "#1\t2\t5.541\t73.93\t-4.69\n" +
+        "#1\t2\t5.541\t73.92\t-4.67\n" +
+        "2\t-\t1.371\t140.88\t76.92\n" +
+        "2\t3\t2.151\t242.39\t-27.97\n" +
+        "#2\t3\t2.151\t62.41\t27.97\n" +
+        "#2\t3\t2.152\t62.36\t27.97\n" +
+        "#2\t3\t2.151\t62.39\t27.99\n" +
+        "3\t-\t1.846\t116.92\t85.17\n" +
+        "\n" +
+        "extend start 1\n" +
+        "endcentreline\n" +
+        "endsurvey\n";
+
+    private static final List<String> APPENDED_LINES = Arrays.asList(APPENDED_STYLE_TEXT.split("\n"));
+
+    private static final String INLINE_STYLE_TEXT =
+        "encoding utf-8\n" +
+        "survey BentStalAven\n" +
+        "# Created with SexyTopo 1.9.0 on 2026-01-05\n" +
+        "\n" +
+        "centreline\n" +
+        "date 2026.01.05\n" +
+        "team \"Will Stuart\" instruments assistant\n" +
+        "team \"Andrew Atkinson\" notes assistant\n" +
+        "data normal from to length compass clino\n" +
+        "1\t-\t1.677\t271.10\t6.59\n" +
+        "2\t1\t5.541\t73.93\t-4.67\t\t#  {from: 5.542 73.95 -4.64, 5.541 73.93 -4.69, 5.541 73.92 -4.67} stn 1 is drilled hole\n" +
+        "2\t-\t1.371\t140.88\t76.92\n" +
+        "3\t2\t2.151\t62.39\t27.97\t\t#  {from: 2.151 62.41 27.97, 2.152 62.36 27.97, 2.151 62.39 27.99} drilled hole\n" +
+        "3\t-\t1.846\t116.92\t85.17\n" +
+        "\n" +
+        "extend start 1\n" +
+        "endcentreline\n" +
+        "endsurvey\n";
+
+    private static final List<String> INLINE_LINES = Arrays.asList(INLINE_STYLE_TEXT.split("\n"));
+
+    @Test
+    public void testAppendedStyleImport() throws Exception {
+        Survey survey = new Survey();
+        TherionImporter.updateCentreline(APPENDED_LINES, survey);
+        Assert.assertEquals(3, survey.getAllStations().size());
+
+        Station station1 = survey.getStationByName("1");
+        Assert.assertNotNull(station1);
+        Leg legTo2 = station1.getConnectedOnwardLegs().get(0);
+        Assert.assertTrue(legTo2.wasPromoted());
+        Assert.assertEquals(3, legTo2.getPromotedFrom().length);
+    }
+
+    @Test
+    public void testInlineStyleImport() throws Exception {
+        Survey survey = new Survey();
+        TherionImporter.updateCentreline(INLINE_LINES, survey);
+        Assert.assertEquals(3, survey.getAllStations().size());
+
+        Station station1 = survey.getStationByName("1");
+        Assert.assertNotNull(station1);
+        Leg legTo2 = station1.getConnectedOnwardLegs().get(0);
+        Assert.assertTrue(legTo2.wasPromoted());
+        Assert.assertEquals(3, legTo2.getPromotedFrom().length);
+    }
+
+    @Test
+    public void testAppendedStylePassageComments() throws Exception {
+        Survey survey = new Survey();
+        TherionImporter.updateCentreline(APPENDED_LINES, survey);
+
+        Station station2 = survey.getStationByName("2");
+        Assert.assertNotNull(station2.getComment());
+        Assert.assertTrue(station2.getComment().contains("stn 1 is drilled hole"));
+
+        Station station3 = survey.getStationByName("3");
+        Assert.assertNotNull(station3.getComment());
+        Assert.assertTrue(station3.getComment().contains("drilled hole"));
+    }
+
+    @Test
+    public void testInlineStyleComments() throws Exception {
+        Survey survey = new Survey();
+        TherionImporter.updateCentreline(INLINE_LINES, survey);
+
+        // Backward leg "2  1  ... # ... stn 1 is drilled hole" puts comment on station 2 (the new one)
+        Station station2 = survey.getStationByName("2");
+        Assert.assertNotNull(station2.getComment());
+        Assert.assertTrue(station2.getComment().contains("stn 1 is drilled hole"));
+
+        // Backward leg "3  2  ... # ... drilled hole" puts comment on station 3 (the new one)
+        Station station3 = survey.getStationByName("3");
+        Assert.assertNotNull(station3.getComment());
+        Assert.assertTrue(station3.getComment().contains("drilled hole"));
+    }
+
+    @Test
+    public void testBothStylesProduceSameStationCount() throws Exception {
+        Survey appendedSurvey = new Survey();
+        TherionImporter.updateCentreline(APPENDED_LINES, appendedSurvey);
+
+        Survey inlineSurvey = new Survey();
+        TherionImporter.updateCentreline(INLINE_LINES, inlineSurvey);
+
+        Assert.assertEquals(
+            appendedSurvey.getAllStations().size(),
+            inlineSurvey.getAllStations().size());
+    }
+
     @Test
     public void testBasicBlockExtraction() throws Exception {
         List<String> LINES = Arrays.asList("block", "content", "endblock");
@@ -295,6 +428,196 @@ public class TherionImporterTest {
         TherionImporter.getContentsOfBeginEndBlock(LINES, "block");
     }
 
+
+    @Test
+    public void testAppendedStyleMetadataImport() throws Exception {
+        Trip trip = SurvexTherionImporter.parseMetadata(APPENDED_STYLE_TEXT, SurveyFormat.THERION);
+        Assert.assertNotNull(trip);
+
+        // Date should be 2026.01.05
+        Assert.assertNotNull(trip.getDate());
+
+        // Instrument commented out — should not be set
+        Assert.assertNull(trip.getInstrument());
+        Assert.assertFalse(trip.hasInstrument());
+
+        // Team: Will Stuart (instruments) and Andrew Atkinson (notes)
+        Assert.assertEquals(2, trip.getTeam().size());
+        Assert.assertEquals("Will Stuart", trip.getTeam().get(0).name);
+        Assert.assertTrue(trip.getTeam().get(0).roles.contains(Trip.Role.INSTRUMENTS));
+        Assert.assertEquals("Andrew Atkinson", trip.getTeam().get(1).name);
+        Assert.assertTrue(trip.getTeam().get(1).roles.contains(Trip.Role.BOOK));
+
+        // Explo-team: both should have EXPLORATION role
+        Assert.assertTrue(trip.getTeam().get(0).roles.contains(Trip.Role.EXPLORATION));
+        Assert.assertTrue(trip.getTeam().get(1).roles.contains(Trip.Role.EXPLORATION));
+
+        // Exploration date same as survey
+        Assert.assertTrue(trip.isExplorationDateSameAsSurvey());
+    }
+
+    @Test
+    public void testInlineStyleMetadataImport() throws Exception {
+        Trip trip = SurvexTherionImporter.parseMetadata(INLINE_STYLE_TEXT, SurveyFormat.THERION);
+        Assert.assertNotNull(trip);
+
+        // Date should be present
+        Assert.assertNotNull(trip.getDate());
+
+        // Team: Will Stuart (instruments, assistant) and Andrew Atkinson (notes, assistant)
+        Assert.assertEquals(2, trip.getTeam().size());
+        Assert.assertEquals("Will Stuart", trip.getTeam().get(0).name);
+        Assert.assertTrue(trip.getTeam().get(0).roles.contains(Trip.Role.INSTRUMENTS));
+        Assert.assertEquals("Andrew Atkinson", trip.getTeam().get(1).name);
+        Assert.assertTrue(trip.getTeam().get(1).roles.contains(Trip.Role.BOOK));
+    }
+
+    @Test
+    public void testPocketTopoMetadataImport() throws Exception {
+        Trip trip = SurvexTherionImporter.parseMetadata(FAKE_POCKETTOPO_TEXT, SurveyFormat.THERION);
+        Assert.assertNotNull(trip);
+
+        // Date: 2015.04.2
+        Assert.assertNotNull(trip.getDate());
+
+        // Team: Ruth Allan (instruments), Rich Smith (notes), Paul Fairman (dog)
+        Assert.assertEquals(3, trip.getTeam().size());
+        Assert.assertEquals("Ruth Allan", trip.getTeam().get(0).name);
+        Assert.assertTrue(trip.getTeam().get(0).roles.contains(Trip.Role.INSTRUMENTS));
+        Assert.assertEquals("Rich Smith", trip.getTeam().get(1).name);
+        Assert.assertTrue(trip.getTeam().get(1).roles.contains(Trip.Role.BOOK));
+        Assert.assertEquals("Paul Fairman", trip.getTeam().get(2).name);
+        Assert.assertTrue(trip.getTeam().get(2).roles.contains(Trip.Role.DOG));
+    }
+
+    @Test
+    public void testMetadataImportWithNoMetadata() throws Exception {
+        String noMetadata = "centreline\ndata normal from to tape compass clino\n1\t2\t5.0\t0.0\t0.0\nendcentreline\n";
+        Trip trip = SurvexTherionImporter.parseMetadata(noMetadata, SurveyFormat.THERION);
+        Assert.assertNull(trip);
+    }
+
+    @Test
+    public void testSurvexMetadataImport() throws Exception {
+        String survexText =
+            "*begin TestSurvey\n" +
+            "*date 2026.01.05\n" +
+            "*instrument inst \"DistoX2\"\n" +
+            "*team \"Alice\" instruments\n" +
+            "*team \"Bob\" notes explorer\n" +
+            "\n" +
+            "*date explored 2026.01.10\n" +
+            "*end TestSurvey\n";
+
+        Trip trip = SurvexTherionImporter.parseMetadata(survexText, SurveyFormat.SURVEX);
+        Assert.assertNotNull(trip);
+        Assert.assertNotNull(trip.getDate());
+        Assert.assertEquals("DistoX2", trip.getInstrument());
+
+        Assert.assertEquals(2, trip.getTeam().size());
+        Assert.assertEquals("Alice", trip.getTeam().get(0).name);
+        Assert.assertTrue(trip.getTeam().get(0).roles.contains(Trip.Role.INSTRUMENTS));
+        Assert.assertEquals("Bob", trip.getTeam().get(1).name);
+        Assert.assertTrue(trip.getTeam().get(1).roles.contains(Trip.Role.BOOK));
+        Assert.assertTrue(trip.getTeam().get(1).roles.contains(Trip.Role.EXPLORATION));
+
+        // Exploration date is different from survey date
+        Assert.assertFalse(trip.isExplorationDateSameAsSurvey());
+        Assert.assertNotNull(trip.getExplorationDate());
+    }
+
+    @Test
+    public void testSurvexCommentedInstrument() throws Exception {
+        String survexText =
+            "*date 2026.01.05\n" +
+            ";*instrument inst \"\"\n";
+
+        Trip trip = SurvexTherionImporter.parseMetadata(survexText, SurveyFormat.SURVEX);
+        Assert.assertNotNull(trip);
+        Assert.assertNull(trip.getInstrument());
+        Assert.assertFalse(trip.hasInstrument());
+    }
+
+    // Splays from later stations can appear before the first real leg in
+    // chronologically-ordered exports.  The origin must be set from the first
+    // non-splay leg so that all stations remain reachable in the survey tree.
+    private static final String SPLAYS_BEFORE_LEGS_TEXT =
+        "encoding utf-8\n" +
+        "survey SplaysFirst\n" +
+        "centreline\n" +
+        "data normal from to tape compass clino ignoreall\n" +
+        "3\t-\t1.000\t90.00\t0.00\n" +    // splay from 3 (not yet connected)
+        "3\t-\t2.000\t180.00\t0.00\n" +   // another splay from 3
+        "1\t-\t1.500\t270.00\t5.00\n" +   // splay from 1
+        "1\t2\t5.000\t100.00\t2.00\n" +   // first real leg → origin should be 1
+        "2\t3\t4.000\t200.00\t-3.00\n" +  // connects to 3 (already has splays)
+        "endcentreline\n" +
+        "endsurvey\n";
+
+    private static final List<String> SPLAYS_BEFORE_LEGS_LINES =
+        Arrays.asList(SPLAYS_BEFORE_LEGS_TEXT.split("\n"));
+
+    @Test
+    public void testSplaysBeforeLegsOrigin() throws Exception {
+        Survey survey = new Survey();
+        TherionImporter.updateCentreline(SPLAYS_BEFORE_LEGS_LINES, survey);
+
+        // Origin must be station 1 (first non-splay leg), not station 3 (first splay)
+        Assert.assertEquals("1", survey.getOrigin().getName());
+    }
+
+    @Test
+    public void testSplaysBeforeLegsAllStationsReachable() throws Exception {
+        Survey survey = new Survey();
+        TherionImporter.updateCentreline(SPLAYS_BEFORE_LEGS_LINES, survey);
+
+        // All 3 stations must be reachable from the origin
+        Assert.assertEquals(3, survey.getAllStations().size());
+        Assert.assertNotNull(survey.getStationByName("1"));
+        Assert.assertNotNull(survey.getStationByName("2"));
+        Assert.assertNotNull(survey.getStationByName("3"));
+    }
+
+    @Test
+    public void testSplaysBeforeLegsPreservesSplays() throws Exception {
+        Survey survey = new Survey();
+        TherionImporter.updateCentreline(SPLAYS_BEFORE_LEGS_LINES, survey);
+
+        // Station 3's splays (added before connecting leg) must be preserved
+        Station station3 = survey.getStationByName("3");
+        List<Leg> splays3 = station3.getUnconnectedOnwardLegs();
+        Assert.assertEquals(2, splays3.size());
+
+        // Station 1's splay must also be preserved
+        Station station1 = survey.getStationByName("1");
+        List<Leg> splays1 = station1.getUnconnectedOnwardLegs();
+        Assert.assertEquals(1, splays1.size());
+    }
+
+    @Test
+    public void testChronologicalOrderPreserved() throws Exception {
+        Survey survey = new Survey();
+        TherionImporter.updateCentreline(SPLAYS_BEFORE_LEGS_LINES, survey);
+
+        // File order: 3 splay, 3 splay, 1 splay, 1→2 leg, 2→3 leg
+        List<Leg> chrono = survey.getAllLegsInChronoOrder();
+        Assert.assertEquals(5, chrono.size());
+
+        // First two are splays from station 3
+        Assert.assertFalse(chrono.get(0).hasDestination());
+        Assert.assertFalse(chrono.get(1).hasDestination());
+
+        // Third is splay from station 1
+        Assert.assertFalse(chrono.get(2).hasDestination());
+
+        // Fourth is leg 1→2
+        Assert.assertTrue(chrono.get(3).hasDestination());
+        Assert.assertEquals("2", chrono.get(3).getDestination().getName());
+
+        // Fifth is leg 2→3
+        Assert.assertTrue(chrono.get(4).hasDestination());
+        Assert.assertEquals("3", chrono.get(4).getDestination().getName());
+    }
 
     @Test
     public void testElevationDirectionExtraction() throws Exception {

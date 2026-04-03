@@ -37,7 +37,7 @@ public class SurveyChecker {
         }
 
         if (oneTrip != null) {
-            if (!oneTrip.equalsTripData(twoTrip)) {
+            if (!oneTrip.equals(twoTrip)) {
                 return false;
             }
         }
