@@ -4,9 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.InputType;
 import android.text.TextWatcher;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +12,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -22,9 +19,13 @@ import org.hwyl.sexytopo.comms.Instrument;
 
 import androidx.annotation.NonNull;
 
+import androidx.appcompat.app.AlertDialog;
+
+import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.control.table.TeamMemberForm;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.survey.Trip;
 
@@ -40,6 +41,10 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
     @SuppressLint("SimpleDateFormat")
     public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
+
+    private static final int[] ROLE_CHECKBOX_IDS = {
+        R.id.role_book, R.id.role_instruments, R.id.role_dog, R.id.role_exploration
+    };
 
     private List<Trip.TeamEntry> team = new ArrayList<>();
     ArrayAdapter<Trip.TeamEntry> teamListAdapter;
@@ -182,54 +187,22 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
 
 
     public void requestAddEntry(View view) {
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_trip_team_member, null);
+        TeamMemberForm form = new TeamMemberForm(this, dialogView);
 
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
+        AlertDialog dialog = new MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.trip_dialog_title_add_to_team)
+            .setView(dialogView)
+            .setPositiveButton(R.string.add, null)
+            .setNegativeButton(R.string.cancel, null)
+            .show();
 
-        final EditText nameField = new EditText(this);
-        nameField.setHint(R.string.trip_dialog_add_to_team_name_hint);
-        nameField.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
-        layout.addView(nameField);
-
-        // Create a custom adapter
-        final ArrayAdapter<Trip.Role> arrayAdapter = new ArrayAdapter<>(
-            this, android.R.layout.simple_list_item_multiple_choice, Trip.Role.values()) {
-            @NonNull
-            @Override
-            public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-                View view = super.getView(position, convertView, parent);
-                Trip.Role role = getItem(position);
-                ((TextView) view).setText(role != null ? getString(role.descriptionId) : "");
-                return view;
-            }
-        };
-
-        final ListView roleList = new ListView(this);
-        roleList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        roleList.setAdapter(arrayAdapter);
-        layout.addView(roleList);
-
-        MaterialAlertDialogBuilder builderSingle =
-            new MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.trip_dialog_title_add_to_team)
-                .setView(layout)
-                .setPositiveButton(R.string.add,
-                    (dialog, which) -> {
-                        String name = nameField.getText().toString();
-                        SparseBooleanArray checked = roleList.getCheckedItemPositions();
-                        List<Trip.Role> selectedRoles = new ArrayList<>();
-                        for (int i = 0; i < Trip.Role.values().length; i++) {
-                            if (checked.get(i)) {
-                                selectedRoles.add(Trip.Role.values()[i]);
-                            }
-                        }
-                        addTeamMember(name, selectedRoles);
-                        dialog.dismiss();
-                    })
-                .setNegativeButton(R.string.cancel,
-                    (dialog, which) -> dialog.dismiss());
-
-        builderSingle.show();
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            form.validate();
+            if (!form.isValid()) return;
+            addTeamMember(form.getName(), getCheckedRoles(dialogView));
+            dialog.dismiss();
+        });
     }
 
     public void addTeamMember(String name, List<Trip.Role> roles) {
@@ -356,55 +329,31 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
     public void onClick(View view) {
         final int position = (int) view.getTag();
         Trip.TeamEntry teamEntry = team.get(position);
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
-
-        final EditText nameField = new EditText(this);
-        nameField.setHint(R.string.trip_dialog_add_to_team_name_hint);
-        nameField.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
-        nameField.setText(teamEntry.name);
-        layout.addView(nameField);
-
-        final ArrayAdapter<Trip.Role> arrayAdapter = new ArrayAdapter<>(
-            this,
-            android.R.layout.simple_list_item_multiple_choice);
-        arrayAdapter.addAll(Trip.Role.values());
-        final ListView roleList = new ListView(this);
-
-        roleList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        roleList.setAdapter(arrayAdapter);
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_trip_team_member, null);
+        TeamMemberForm form = new TeamMemberForm(this, dialogView);
+        form.setName(teamEntry.name);
 
         Trip.Role[] allRoles = Trip.Role.values();
         for (int i = 0; i < allRoles.length; i++) {
-            Trip.Role role = allRoles[i];
-            if (teamEntry.roles.contains(role)) {
-                roleList.setItemChecked(i, true);
+            if (teamEntry.roles.contains(allRoles[i])) {
+                ((MaterialCheckBox)
+                    dialogView.findViewById(ROLE_CHECKBOX_IDS[i])).setChecked(true);
             }
         }
 
-        layout.addView(roleList);
+        AlertDialog dialog = new MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.edit)
+            .setView(dialogView)
+            .setPositiveButton(R.string.save, null)
+            .setNegativeButton(R.string.cancel, null)
+            .show();
 
-        MaterialAlertDialogBuilder builderSingle =
-            new MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.edit)
-                .setView(layout)
-                .setPositiveButton(R.string.save,
-                    (dialog, which) -> {
-                        String name = nameField.getText().toString();
-                        SparseBooleanArray checked = roleList.getCheckedItemPositions();
-                        List<Trip.Role> selectedRoles = new ArrayList<>();
-                        for (int i = 0; i < Trip.Role.values().length; i++) {
-                            if (checked.get(i)) {
-                                selectedRoles.add(Trip.Role.values()[i]);
-                            }
-                        }
-                        setTeamMember(position, name, selectedRoles);
-                        dialog.dismiss();
-                    })
-                .setNegativeButton(R.string.cancel,
-                        (dialog, which) -> dialog.dismiss());
-
-        builderSingle.show();
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            form.validate();
+            if (!form.isValid()) return;
+            setTeamMember(position, form.getName(), getCheckedRoles(dialogView));
+            dialog.dismiss();
+        });
     }
 
     private void updateExplorationDateDisplay() {
@@ -430,6 +379,18 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
         }
     }
 
+
+    private List<Trip.Role> getCheckedRoles(View dialogView) {
+        Trip.Role[] allRoles = Trip.Role.values();
+        List<Trip.Role> selectedRoles = new ArrayList<>();
+        for (int i = 0; i < allRoles.length; i++) {
+            if (((MaterialCheckBox)
+                    dialogView.findViewById(ROLE_CHECKBOX_IDS[i])).isChecked()) {
+                selectedRoles.add(allRoles[i]);
+            }
+        }
+        return selectedRoles;
+    }
 
     public class TeamListArrayAdapter extends ArrayAdapter<Trip.TeamEntry> {
 

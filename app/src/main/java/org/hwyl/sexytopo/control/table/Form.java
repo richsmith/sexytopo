@@ -7,6 +7,8 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
+import com.google.android.material.textfield.TextInputLayout;
+
 abstract public class Form {
     private final Context context;
 
@@ -71,5 +73,15 @@ abstract public class Form {
     protected void setError(TextView field, Integer error) {
         CharSequence message = error == null? null : context.getString(error);
         this.setError(field, message);
+    }
+
+    protected void setError(TextInputLayout layout, CharSequence error) {
+        this.valid = this.valid & (error == null);
+        layout.setError(error);
+    }
+
+    protected void setError(TextInputLayout layout, Integer error) {
+        CharSequence message = error == null ? null : context.getString(error);
+        this.setError(layout, message);
     }
 }
