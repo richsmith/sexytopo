@@ -1,23 +1,18 @@
 package org.hwyl.sexytopo.control.activity;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ListView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.hwyl.sexytopo.comms.Instrument;
-
-import androidx.annotation.NonNull;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentManager;
@@ -40,18 +35,16 @@ import java.util.Date;
 import java.util.List;
 
 
-public class TripActivity extends SexyTopoActivity implements View.OnClickListener {
+public class TripActivity extends SexyTopoActivity {
 
     @SuppressLint("SimpleDateFormat")
     public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-
 
     private static final int[] ROLE_CHECKBOX_IDS = {
         R.id.role_book, R.id.role_instruments, R.id.role_dog, R.id.role_exploration
     };
 
     private List<Trip.TeamEntry> team = new ArrayList<>();
-    ArrayAdapter<Trip.TeamEntry> teamListAdapter;
 
 
     @Override
@@ -61,31 +54,19 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
         setupMaterialToolbar();
         applyEdgeToEdgeInsets(R.id.rootLayout, true, true);
 
-        ListView personList = findViewById(R.id.person_list);
-        teamListAdapter = new TeamListArrayAdapter(this, team);
-        personList.setAdapter(teamListAdapter);
-
-
         TextView commentsView = findViewById(R.id.trip_comments);
         commentsView.addTextChangedListener(new TextWatcher() {
-
             @Override
             public void afterTextChanged(Editable s) {}
-
             @Override
-            public void beforeTextChanged(CharSequence s, int start,
-                                          int count, int after) {
-            }
-
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override
-            public void onTextChanged(CharSequence s, int start,
-                                      int before, int count) {
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
                 updateButtonStatus();
                 syncTrip();
             }
         });
 
-        // Instrument field listener
         EditText instrumentField = findViewById(R.id.instrument_field);
         instrumentField.addTextChangedListener(new TextWatcher() {
             @Override
@@ -98,7 +79,6 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
         });
-
     }
 
 
@@ -108,35 +88,20 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
         Trip trip = getSurvey().getTrip();
         if (trip == null) {
             trip = new Trip();
-            getSurvey().setTrip(trip);  // Save it back to survey
+            getSurvey().setTrip(trip);
         }
 
         team = new ArrayList<>(trip.getTeam());
 
-        String comments = trip.getComments();
         TextView commentsField = findViewById(R.id.trip_comments);
-        commentsField.setText(comments);
+        commentsField.setText(trip.getComments());
 
-        Date date = trip.getDate();
-        String formatted = DATE_FORMAT.format(date);
-        TextView dateField = findViewById(R.id.trip_date);
-        dateField.setText(getString(R.string.trip_header,
-            getText(R.string.trip), formatted, getText(R.string.trip_team)));
+EditText instrumentField = findViewById(R.id.instrument_field);
+        instrumentField.setText(trip.hasInstrument() ? trip.getInstrument() : "");
 
-        // Load instrument field
-        EditText instrumentField = findViewById(R.id.instrument_field);
-        if (trip.hasInstrument()) {
-            instrumentField.setText(trip.getInstrument());
-        } else {
-            instrumentField.setText("");
-        }
-
-        // Load exploration date checkbox state (without triggering listener)
         CheckBox sameAsCheckbox = findViewById(R.id.exploration_date_same_as_survey);
-        sameAsCheckbox.setOnCheckedChangeListener(null);  // Temporarily remove listener
+        sameAsCheckbox.setOnCheckedChangeListener(null);
         sameAsCheckbox.setChecked(trip.isExplorationDateSameAsSurvey());
-
-        // Re-attach listener after setting state
         sameAsCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             updateExplorationDateDisplay();
             syncTrip();
@@ -198,7 +163,6 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
             .show();
     }
 
-
     public void requestAddEntry(View view) {
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_trip_team_member, null);
         TeamMemberForm form = new TeamMemberForm(this, dialogView);
@@ -219,16 +183,19 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
     }
 
     public void addTeamMember(String name, List<Trip.Role> roles) {
-        Trip.TeamEntry newTeamEntry = new Trip.TeamEntry(name, roles);
-        team.add(newTeamEntry);
+        team.add(new Trip.TeamEntry(name, roles));
         syncTrip();
         syncListWithTeam();
     }
 
-
     public void setTeamMember(int position, String name, List<Trip.Role> roles) {
-        Trip.TeamEntry newTeamEntry = new Trip.TeamEntry(name, roles);
-        team.set(position, newTeamEntry);
+        team.set(position, new Trip.TeamEntry(name, roles));
+        syncTrip();
+        syncListWithTeam();
+    }
+
+    public void deleteTeamMember(int position) {
+        team.remove(position);
         syncTrip();
         syncListWithTeam();
     }
@@ -243,63 +210,58 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
         startActivity(PlanActivity.class);
     }
 
-
     public void syncListWithTeam() {
-        teamListAdapter = new TeamListArrayAdapter(this, team);
-        ListView personList = findViewById(R.id.person_list);
-        personList.setAdapter(teamListAdapter);
+        LinearLayout container = findViewById(R.id.person_list);
+        container.removeAllViews();
+        LayoutInflater inflater = LayoutInflater.from(this);
+        for (int i = 0; i < team.size(); i++) {
+            final int position = i;
+            Trip.TeamEntry entry = team.get(i);
+            View row = inflater.inflate(R.layout.trip_team_member_item, container, false);
+
+            ((TextView) row.findViewById(R.id.name_field)).setText(entry.name);
+
+            List<String> roleDescriptions = new ArrayList<>();
+            for (Trip.Role role : entry.roles) {
+                roleDescriptions.add(getString(role.descriptionId));
+            }
+            ((TextView) row.findViewById(R.id.role_field))
+                .setText(TextTools.join(", ", roleDescriptions));
+
+            row.setOnClickListener(v -> editTeamMember(position));
+            row.findViewById(R.id.delete_button).setOnClickListener(v -> deleteTeamMember(position));
+
+            container.addView(row);
+        }
         updateButtonStatus();
     }
 
     private void syncTrip() {
         EditText commentsField = findViewById(R.id.trip_comments);
-        String comments = commentsField.getText().toString();
-
         Trip trip = getSurvey().getTrip();
         if (trip == null) {
             trip = new Trip();
         }
         trip.setTeam(team);
-        trip.setComments(comments);
+        trip.setComments(commentsField.getText().toString());
 
-        // Save instrument
         EditText instrumentField = findViewById(R.id.instrument_field);
         trip.setInstrument(instrumentField.getText().toString());
 
-        // Save exploration date settings
         CheckBox sameAsCheckbox = findViewById(R.id.exploration_date_same_as_survey);
         trip.setExplorationDateSameAsSurvey(sameAsCheckbox.isChecked());
 
         getSurvey().setTrip(trip);
     }
 
-
-
-    @SuppressWarnings("UnnecessaryLocalVariable")
-    public void requestDeleteSelected(View view) {
-        TeamListArrayAdapter adapter = getTeamListArrayAdapter();
-        List<Trip.TeamEntry> toKeep = adapter.getUnchecked();
-        team = toKeep;
-        syncTrip();
-        syncListWithTeam();
-    }
-
-
     public void updateButtonStatus() {
-        TeamListArrayAdapter adapter = getTeamListArrayAdapter();
-        List<Trip.TeamEntry> unchecked = adapter.getUnchecked();
-        Button deleteButton = findViewById(R.id.delete_person);
-        deleteButton.setEnabled(unchecked.size() < team.size());
-
-        // Check if any field has data
         boolean hasTeam = !team.isEmpty();
 
         TextView commentsView = findViewById(R.id.trip_comments);
         boolean hasComments = !commentsView.getText().toString().trim().isEmpty();
 
         EditText instrumentField = findViewById(R.id.instrument_field);
-        boolean hasInstrument = instrumentField != null &&
-                                !instrumentField.getText().toString().trim().isEmpty();
+        boolean hasInstrument = !instrumentField.getText().toString().trim().isEmpty();
 
         CheckBox sameAsCheckbox = findViewById(R.id.exploration_date_same_as_survey);
         Trip trip = getSurvey().getTrip();
@@ -308,25 +270,14 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
 
         boolean hasAnyData = hasTeam || hasComments || hasInstrument || hasExploDate;
 
-        Button startButton = findViewById(R.id.set_trip);
-        startButton.setEnabled(hasAnyData);
-
-        Button clearButton = findViewById(R.id.clear_trip);
-        clearButton.setEnabled(hasAnyData);
+        findViewById(R.id.set_trip).setEnabled(hasAnyData);
+        findViewById(R.id.clear_trip).setEnabled(hasAnyData);
 
         Button getInstrumentButton = findViewById(R.id.instrument_get_button);
         getInstrumentButton.setEnabled(hasInstrument());
     }
 
-    private TeamListArrayAdapter getTeamListArrayAdapter() {
-        ListView listView = findViewById(R.id.person_list);
-        return (TeamListArrayAdapter)listView.getAdapter();
-    }
-
-
-    @Override
-    public void onClick(View view) {
-        final int position = (int) view.getTag();
+    private void editTeamMember(int position) {
         Trip.TeamEntry teamEntry = team.get(position);
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_trip_team_member, null);
         TeamMemberForm form = new TeamMemberForm(this, dialogView);
@@ -335,8 +286,7 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
         Trip.Role[] allRoles = Trip.Role.values();
         for (int i = 0; i < allRoles.length; i++) {
             if (teamEntry.roles.contains(allRoles[i])) {
-                ((MaterialCheckBox)
-                    dialogView.findViewById(ROLE_CHECKBOX_IDS[i])).setChecked(true);
+                ((MaterialCheckBox) dialogView.findViewById(ROLE_CHECKBOX_IDS[i])).setChecked(true);
             }
         }
 
@@ -369,77 +319,14 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
         dateLayout.setEnabled(!sameAsSurvey);
     }
 
-
     private List<Trip.Role> getCheckedRoles(View dialogView) {
         Trip.Role[] allRoles = Trip.Role.values();
         List<Trip.Role> selectedRoles = new ArrayList<>();
         for (int i = 0; i < allRoles.length; i++) {
-            if (((MaterialCheckBox)
-                    dialogView.findViewById(ROLE_CHECKBOX_IDS[i])).isChecked()) {
+            if (((MaterialCheckBox) dialogView.findViewById(ROLE_CHECKBOX_IDS[i])).isChecked()) {
                 selectedRoles.add(allRoles[i]);
             }
         }
         return selectedRoles;
-    }
-
-    public class TeamListArrayAdapter extends ArrayAdapter<Trip.TeamEntry> {
-
-        private final Context context;
-        private final boolean[] checked;
-        private final List<Trip.TeamEntry> team;
-
-        public TeamListArrayAdapter(Context context, List<Trip.TeamEntry> team) {
-            super(
-                context,
-                android.R.layout.simple_list_item_multiple_choice,
-                team.toArray(new Trip.TeamEntry[]{}));
-            this.context = context;
-            this.team = team;
-            this.checked = new boolean[team.size()];
-        }
-
-        @NonNull
-        @Override
-        public View getView(final int position, View convertView, @NonNull ViewGroup parent) {
-            // Note: For better performance, consider implementing ViewHolder pattern
-            Trip.TeamEntry teamEntry = getItem(position);
-            if (teamEntry == null) {
-                // Return empty view if teamEntry is null
-                return new View(context);
-            }
-            LayoutInflater inflater = (LayoutInflater) context
-                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View rowView = inflater.inflate(R.layout.trip_team_member_item, parent, false);
-            rowView.setTag(position);
-            TextView nameField = rowView.findViewById(R.id.name_field);
-            nameField.setText(teamEntry.name);
-            TextView roleField = rowView.findViewById(R.id.role_field);
-
-            List<String> roleDescriptions = new ArrayList<>();
-            for (Trip.Role role : teamEntry.roles) {
-                roleDescriptions.add(context.getString(role.descriptionId));
-            }
-            String roles = TextTools.join(", ", roleDescriptions);
-            roleField.setText(roles);
-
-            final CheckBox checkBox = rowView.findViewById(R.id.settings_notification_checkbox);
-            checkBox.setOnClickListener(view -> {
-                checked[position] = checkBox.isChecked();
-                updateButtonStatus();
-            });
-            rowView.setOnClickListener(TripActivity.this);
-            return rowView;
-        }
-
-        public List<Trip.TeamEntry> getUnchecked() {
-            List<Trip.TeamEntry> unchecked = new ArrayList<>();
-            for (int i = 0; i < team.size(); i++) {
-                if (!checked[i]) {
-                    unchecked.add(team.get(i));
-                }
-            }
-            return unchecked;
-        }
-
     }
 }

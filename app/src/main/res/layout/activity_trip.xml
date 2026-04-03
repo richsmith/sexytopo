@@ -35,6 +35,7 @@
             android:background="@color/lightBackground"
             android:padding="16dp">
 
+            <!-- Exploration Date Section -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -48,45 +49,79 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <TextView
-                        android:id="@+id/trip_date"
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/exploration_date_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textAppearance="?attr/textAppearanceBodyLarge"
-                        android:layout_marginBottom="8dp"/>
+                        android:hint="@string/trip_exploration_date_label"
+                        app:endIconMode="custom"
+                        app:endIconDrawable="@drawable/ic_calendar"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
-                    <ListView
-                        android:id="@+id/person_list"
-                        android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:choiceMode="multipleChoice"
-                        android:divider="@android:color/transparent"
-                        android:dividerHeight="4dp"/>
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/exploration_date_field"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:focusable="false"
+                            android:cursorVisible="false"
+                            android:inputType="none"/>
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.checkbox.MaterialCheckBox
+                        android:id="@+id/exploration_date_same_as_survey"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/trip_same_as_survey_date"
+                        android:checked="true"/>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Team Section -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="12dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
                         android:orientation="horizontal"
-                        android:gravity="end">
+                        android:gravity="center_vertical">
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/delete_person"
-                            android:layout_width="wrap_content"
+                        <TextView
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="8dp"
-                            android:text="@string/delete"
-                            android:onClick="requestDeleteSelected"
-                            style="@style/Widget.Material3.Button.OutlinedButton"/>
+                            android:layout_weight="1"
+                            android:text="@string/trip_team"
+                            android:textAppearance="?attr/textAppearanceTitleMedium"/>
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/add_person"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/add"
+                            android:contentDescription="@string/add"
                             android:onClick="requestAddEntry"
-                            style="@style/Widget.Material3.Button"/>
+                            app:icon="@drawable/ic_add"
+                            style="@style/Widget.Material3.Button.IconButton"/>
+
                     </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/person_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"/>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -129,50 +164,6 @@
                         android:onClick="onGetInstrumentClicked"
                         android:enabled="false"
                         style="@style/Widget.Material3.Button.TonalButton"/>
-
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Exploration Date Section -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                app:cardElevation="0dp"
-                app:cardCornerRadius="12dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/exploration_date_layout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/trip_exploration_date_label"
-                        app:endIconMode="custom"
-                        app:endIconDrawable="@drawable/ic_calendar"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/exploration_date_field"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:focusable="false"
-                            android:cursorVisible="false"
-                            android:inputType="none"/>
-
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.checkbox.MaterialCheckBox
-                        android:id="@+id/exploration_date_same_as_survey"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="@string/trip_same_as_survey_date"
-                        android:checked="true"/>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
