@@ -56,4 +56,8 @@
         <item name="cornerSize">6dp</item>
     </style>
 
+    <style name="Widget.App.FloatingActionButton" parent="Widget.Material3.FloatingActionButton.Primary">
+        <item name="shapeAppearance">@style/ShapeAppearance.Material3.Corner.Full</item>
+    </style>
+
 </resources>

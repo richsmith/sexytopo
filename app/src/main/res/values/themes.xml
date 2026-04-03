@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:windowBackground">@color/panelBackground</item>
@@ -9,19 +9,32 @@
 
         <!-- SexyTopo branded colors -->
         <item name="colorPrimary">@color/sexyTopoGreen</item>
-        <item name="colorPrimaryDark">@color/sexyTopoDarkGreen</item>
-        <item name="colorAccent">@color/sexyTopoGreen</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/sexyTopoGreen</item>
+        <item name="colorOnPrimaryContainer">@color/white</item>
         <item name="colorSecondary">@color/sexyTopoGreen</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorSecondaryContainer">@color/sexyTopoGreen</item>
+        <item name="colorOnSecondaryContainer">@color/white</item>
+        <item name="colorTertiary">@color/sexyTopoGreen</item>
+        <item name="colorOnTertiary">@color/white</item>
+        <item name="colorTertiaryContainer">@color/sexyTopoGreen</item>
+        <item name="colorOnTertiaryContainer">@color/white</item>
 
         <!-- Surface colors for menus and popups -->
         <item name="colorSurface">@color/dialogSurface</item>
         <item name="colorOnSurface">@android:color/black</item>
+        <item name="colorSurfaceVariant">@color/dialogSurface</item>
+
+        <!-- FAB styling -->
+        <item name="floatingActionButtonStyle">@style/Widget.App.FloatingActionButton</item>
+
 
         <!-- Material dialog styling -->
         <item name="materialAlertDialogTheme">@style/MaterialAlertDialog.App</item>
     </style>
 
-    <style name="MaterialAlertDialog.App" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+    <style name="MaterialAlertDialog.App" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <item name="shapeAppearanceOverlay">@style/DialogCorners</item>
     </style>
 

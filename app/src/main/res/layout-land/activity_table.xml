@@ -13,7 +13,8 @@
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/panelBackground">
+            android:background="@color/panelBackground"
+            android:elevation="0dp">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar"
@@ -74,7 +75,6 @@
         android:layout_gravity="end|bottom"
         android:layout_marginEnd="@dimen/fab_margin"
         android:contentDescription="@string/manual_add_splay_title"
-        app:fabSize="mini"
         app:srcCompat="@drawable/add_splay" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
