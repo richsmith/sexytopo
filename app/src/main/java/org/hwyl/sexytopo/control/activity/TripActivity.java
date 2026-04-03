@@ -18,6 +18,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.hwyl.sexytopo.comms.Instrument;
+
 import androidx.annotation.NonNull;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -153,6 +155,17 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
         updateExplorationDateDisplay();
     }
 
+    public void onGetInstrumentClicked(View view) {
+        Instrument instrument = getInstrument();
+        if (instrument == null) return;
+        try {
+            String name = instrument.getName();
+            if (name != null) {
+                EditText instrumentField = findViewById(R.id.instrument_field);
+                instrumentField.setText(name);
+            }
+        } catch (SecurityException ignored) {}
+    }
 
     public void requestClear(View view) {
         new MaterialAlertDialogBuilder(this)
@@ -318,8 +331,8 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
         EditText exploDateField = findViewById(R.id.exploration_date_field);
         CheckBox sameAsCheckbox = findViewById(R.id.exploration_date_same_as_survey);
         boolean hasExploDate = exploDateField != null &&
-                               !sameAsCheckbox.isChecked() &&
-                               !exploDateField.getText().toString().trim().isEmpty();
+            !sameAsCheckbox.isChecked() &&
+            !exploDateField.getText().toString().trim().isEmpty();
 
         boolean hasAnyData = hasTeam || hasComments || hasInstrument || hasExploDate;
 
@@ -328,6 +341,9 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
 
         Button clearButton = findViewById(R.id.clear_trip);
         clearButton.setEnabled(hasAnyData);
+
+        Button getInstrumentButton = findViewById(R.id.instrument_get_button);
+        getInstrumentButton.setEnabled(hasInstrument());
     }
 
     private TeamListArrayAdapter getTeamListArrayAdapter() {
