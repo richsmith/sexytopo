@@ -401,7 +401,6 @@
     <string name="trip_instrument_get_button">Get</string>
     <string name="trip_exploration_date_label">Exploration Date</string>
     <string name="trip_same_as_survey_date">Same as survey date</string>
-    <string name="trip_exploration_date_hint">yyyy-mm-dd</string>
 
     <!-- Stats -->
     <string name="stats_title_this_survey">Current Survey</string>

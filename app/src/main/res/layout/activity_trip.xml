@@ -147,26 +147,22 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/trip_exploration_date_label"
-                        android:textAppearance="?attr/textAppearanceBodyLarge"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="8dp"/>
-
                     <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/exploration_date_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/trip_exploration_date_hint"
+                        android:hint="@string/trip_exploration_date_label"
+                        app:endIconMode="custom"
+                        app:endIconDrawable="@drawable/ic_calendar"
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/exploration_date_field"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="date"
-                            android:enabled="false"/>
+                            android:focusable="false"
+                            android:cursorVisible="false"
+                            android:inputType="none"/>
 
                     </com.google.android.material.textfield.TextInputLayout>
 

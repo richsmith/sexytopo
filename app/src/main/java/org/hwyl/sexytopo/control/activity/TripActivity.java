@@ -20,9 +20,13 @@ import org.hwyl.sexytopo.comms.Instrument;
 import androidx.annotation.NonNull;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.FragmentManager;
 
 import com.google.android.material.checkbox.MaterialCheckBox;
+import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.table.TeamMemberForm;
@@ -95,20 +99,6 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
         });
 
-        // Exploration date field listener
-        EditText exploDateField = findViewById(R.id.exploration_date_field);
-        exploDateField.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
-                syncTrip();
-                updateButtonStatus();
-            }
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-        });
-
     }
 
 
@@ -147,13 +137,16 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
         sameAsCheckbox.setChecked(trip.isExplorationDateSameAsSurvey());
 
         // Re-attach listener after setting state
-        EditText exploDateField = findViewById(R.id.exploration_date_field);
         sameAsCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            exploDateField.setEnabled(!isChecked);
             updateExplorationDateDisplay();
             syncTrip();
             updateButtonStatus();
         });
+
+        TextInputLayout exploDateLayout = findViewById(R.id.exploration_date_layout);
+        TextInputEditText exploDateField = findViewById(R.id.exploration_date_field);
+        exploDateField.setOnClickListener(this::onChooseExplorationDateClicked);
+        exploDateLayout.setEndIconOnClickListener(this::onChooseExplorationDateClicked);
 
         syncListWithTeam();
         updateButtonStatus();
@@ -170,6 +163,26 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
                 instrumentField.setText(name);
             }
         } catch (SecurityException ignored) {}
+    }
+
+    public void onChooseExplorationDateClicked(View view) {
+        Trip trip = getSurvey().getTrip();
+        Date initial = trip.getExplorationDate() != null ? trip.getExplorationDate() : trip.getDate();
+
+        MaterialDatePicker<Long> picker = MaterialDatePicker.Builder.datePicker()
+            .setTitleText(R.string.trip_exploration_date_label)
+            .setSelection(initial.getTime())
+            .build();
+
+        picker.addOnPositiveButtonClickListener(selection -> {
+            trip.setExplorationDate(new Date(selection));
+            updateExplorationDateDisplay();
+            syncTrip();
+            updateButtonStatus();
+        });
+
+        FragmentManager fm = getSupportFragmentManager();
+        picker.show(fm, "exploration_date_picker");
     }
 
     public void requestClear(View view) {
@@ -257,19 +270,6 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
         CheckBox sameAsCheckbox = findViewById(R.id.exploration_date_same_as_survey);
         trip.setExplorationDateSameAsSurvey(sameAsCheckbox.isChecked());
 
-        if (!sameAsCheckbox.isChecked()) {
-            EditText exploDateField = findViewById(R.id.exploration_date_field);
-            String exploDateStr = exploDateField.getText().toString();
-            if (!exploDateStr.isEmpty()) {
-                try {
-                    Date exploDate = DATE_FORMAT.parse(exploDateStr);
-                    trip.setExplorationDate(exploDate);
-                } catch (Exception e) {
-                    // Invalid date format - ignore
-                }
-            }
-        }
-
         getSurvey().setTrip(trip);
     }
 
@@ -301,11 +301,10 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
         boolean hasInstrument = instrumentField != null &&
                                 !instrumentField.getText().toString().trim().isEmpty();
 
-        EditText exploDateField = findViewById(R.id.exploration_date_field);
         CheckBox sameAsCheckbox = findViewById(R.id.exploration_date_same_as_survey);
-        boolean hasExploDate = exploDateField != null &&
-            !sameAsCheckbox.isChecked() &&
-            !exploDateField.getText().toString().trim().isEmpty();
+        Trip trip = getSurvey().getTrip();
+        boolean hasExploDate = !sameAsCheckbox.isChecked() &&
+            trip != null && trip.getExplorationDate() != null;
 
         boolean hasAnyData = hasTeam || hasComments || hasInstrument || hasExploDate;
 
@@ -357,26 +356,17 @@ public class TripActivity extends SexyTopoActivity implements View.OnClickListen
     }
 
     private void updateExplorationDateDisplay() {
-        EditText dateField = findViewById(R.id.exploration_date_field);
+        TextInputEditText dateField = findViewById(R.id.exploration_date_field);
+        TextInputLayout dateLayout = findViewById(R.id.exploration_date_layout);
         CheckBox sameAsCheckbox = findViewById(R.id.exploration_date_same_as_survey);
         Trip trip = getSurvey().getTrip();
 
         if (trip == null) return;
 
-        if (sameAsCheckbox.isChecked()) {
-            // Show survey date (disabled field)
-            dateField.setText(DATE_FORMAT.format(trip.getDate()));
-            dateField.setEnabled(false);
-        } else {
-            // Show exploration date (enabled field for editing)
-            Date exploDate = trip.getExplorationDate();
-            if (exploDate != null) {
-                dateField.setText(DATE_FORMAT.format(exploDate));
-            } else {
-                dateField.setText("");
-            }
-            dateField.setEnabled(true);
-        }
+        boolean sameAsSurvey = sameAsCheckbox.isChecked();
+        Date displayDate = sameAsSurvey ? trip.getDate() : trip.getExplorationDate();
+        dateField.setText(displayDate != null ? DATE_FORMAT.format(displayDate) : "");
+        dateLayout.setEnabled(!sameAsSurvey);
     }
 
 
