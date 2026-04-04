@@ -48,6 +48,7 @@ public class TripActivity extends SexyTopoActivity {
     };
 
     private List<Trip.TeamEntry> team = new ArrayList<>();
+    private Trip savedTrip;
 
 
     @Override
@@ -94,6 +95,7 @@ public class TripActivity extends SexyTopoActivity {
             getSurvey().setTrip(trip);
         }
 
+        savedTrip = new Trip(trip);
         team = new ArrayList<>(trip.getTeam());
 
         TextView commentsField = findViewById(R.id.trip_comments);
@@ -222,7 +224,9 @@ EditText instrumentField = findViewById(R.id.instrument_field);
 
     protected void saveSurvey() {
         syncTrip();
+        savedTrip = new Trip(getSurvey().getTrip());
         super.saveSurvey();
+        updateButtonStatus();
     }
 
     public void requestSaveTrip(View view) {
@@ -289,8 +293,10 @@ EditText instrumentField = findViewById(R.id.instrument_field);
             trip != null && trip.getExplorationDate() != null;
 
         boolean hasAnyData = hasTeam || hasComments || hasInstrument || hasExploDate;
+        Trip currentTrip = getSurvey().getTrip();
+        boolean hasChanges = savedTrip == null || !savedTrip.equals(currentTrip);
 
-        findViewById(R.id.set_trip).setEnabled(hasAnyData);
+        findViewById(R.id.set_trip).setEnabled(hasTeam && hasChanges);
         findViewById(R.id.clear_trip).setEnabled(hasAnyData);
 
         Button getInstrumentButton = findViewById(R.id.instrument_get_button);

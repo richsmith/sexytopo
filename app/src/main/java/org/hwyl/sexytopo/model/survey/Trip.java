@@ -82,6 +82,15 @@ public class Trip {
         this.comments = "";  // Default to empty string
     }
 
+    public Trip(Trip other) {
+        this.date = other.date;
+        this.team = new ArrayList<>(other.team);
+        this.comments = other.comments;
+        this.instrument = other.instrument;
+        this.explorationDate = other.explorationDate;
+        this.explorationDateSameAsSurvey = other.explorationDateSameAsSurvey;
+    }
+
     public List<TeamEntry> getTeam() {
         return team;
     }
