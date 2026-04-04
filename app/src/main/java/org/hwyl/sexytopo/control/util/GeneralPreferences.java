@@ -4,6 +4,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import androidx.preference.PreferenceManager;
 
 import org.hwyl.sexytopo.control.Log;
@@ -288,6 +294,32 @@ public class GeneralPreferences {
 
     public static boolean isExportTypeSubfoldersEnabled() {
         return getBoolean("pref_export_type_subfolders", true);
+    }
+
+    // ********** Known Cavers ***********
+
+    private static final String PREF_KNOWN_CAVERS = "pref_known_cavers";
+
+    public static List<String> getKnownCavers() {
+        if (prefs == null) return new ArrayList<>();
+        Set<String> set = prefs.getStringSet(PREF_KNOWN_CAVERS, new HashSet<>());
+        List<String> list = new ArrayList<>(set);
+        Collections.sort(list);
+        return list;
+    }
+
+    public static void addKnownCaver(String name) {
+        if (prefs == null || name == null || name.trim().isEmpty()) return;
+        Set<String> set = new HashSet<>(prefs.getStringSet(PREF_KNOWN_CAVERS, new HashSet<>()));
+        set.add(name.trim());
+        prefs.edit().putStringSet(PREF_KNOWN_CAVERS, set).apply();
+    }
+
+    public static void removeKnownCaver(String name) {
+        if (prefs == null) return;
+        Set<String> set = new HashSet<>(prefs.getStringSet(PREF_KNOWN_CAVERS, new HashSet<>()));
+        set.remove(name);
+        prefs.edit().putStringSet(PREF_KNOWN_CAVERS, set).apply();
     }
 
 }

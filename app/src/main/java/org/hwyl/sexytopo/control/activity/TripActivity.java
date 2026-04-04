@@ -6,6 +6,8 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -25,6 +27,7 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.table.TeamMemberForm;
+import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.survey.Trip;
 
@@ -163,9 +166,24 @@ EditText instrumentField = findViewById(R.id.instrument_field);
             .show();
     }
 
+    private void setupNameAutocomplete(View dialogView) {
+        AutoCompleteTextView nameField = dialogView.findViewById(R.id.name_field);
+        List<String> knownCavers = GeneralPreferences.getKnownCavers();
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+            this, android.R.layout.simple_dropdown_item_1line, knownCavers);
+        nameField.setAdapter(adapter);
+        nameField.setThreshold(0);
+        nameField.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus && !knownCavers.isEmpty()) {
+                nameField.showDropDown();
+            }
+        });
+    }
+
     public void requestAddEntry(View view) {
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_trip_team_member, null);
         TeamMemberForm form = new TeamMemberForm(this, dialogView);
+        setupNameAutocomplete(dialogView);
 
         AlertDialog dialog = new MaterialAlertDialogBuilder(this)
             .setTitle(R.string.trip_dialog_title_add_to_team)
@@ -183,12 +201,14 @@ EditText instrumentField = findViewById(R.id.instrument_field);
     }
 
     public void addTeamMember(String name, List<Trip.Role> roles) {
+        GeneralPreferences.addKnownCaver(name);
         team.add(new Trip.TeamEntry(name, roles));
         syncTrip();
         syncListWithTeam();
     }
 
     public void setTeamMember(int position, String name, List<Trip.Role> roles) {
+        GeneralPreferences.addKnownCaver(name);
         team.set(position, new Trip.TeamEntry(name, roles));
         syncTrip();
         syncListWithTeam();
@@ -281,6 +301,7 @@ EditText instrumentField = findViewById(R.id.instrument_field);
         Trip.TeamEntry teamEntry = team.get(position);
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_trip_team_member, null);
         TeamMemberForm form = new TeamMemberForm(this, dialogView);
+        setupNameAutocomplete(dialogView);
         form.setName(teamEntry.name);
 
         Trip.Role[] allRoles = Trip.Role.values();

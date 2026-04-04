@@ -15,11 +15,13 @@
         android:layout_height="wrap_content"
         android:hint="@string/trip_dialog_add_to_team_name_hint">
 
-        <com.google.android.material.textfield.TextInputEditText
+        <AutoCompleteTextView
             android:id="@+id/name_field"
+            style="@style/Widget.Material3.AutoCompleteTextView.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textCapWords" />
+            android:inputType="textCapWords"
+            android:completionThreshold="1"/>
 
     </com.google.android.material.textfield.TextInputLayout>
 

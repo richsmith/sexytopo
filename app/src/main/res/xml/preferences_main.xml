@@ -27,6 +27,12 @@
         app:fragment="org.hwyl.sexytopo.control.activity.SettingsActivity$ManualDataEntryFragment" />
 
     <Preference
+        android:key="pref_section_team"
+        android:title="@string/settings_team_title"
+        android:summary="@string/settings_team_summary"
+        app:fragment="org.hwyl.sexytopo.control.activity.SettingsActivity$TeamFragment" />
+
+    <Preference
         android:key="pref_section_instruments"
         android:title="@string/settings_instruments_title"
         android:summary="@string/settings_instruments_summary"
