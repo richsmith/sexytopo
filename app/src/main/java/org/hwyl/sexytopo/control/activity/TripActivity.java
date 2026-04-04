@@ -100,8 +100,14 @@ public class TripActivity extends SexyTopoActivity {
         TextView commentsField = findViewById(R.id.trip_comments);
         commentsField.setText(trip.getComments());
 
-EditText instrumentField = findViewById(R.id.instrument_field);
-        instrumentField.setText(trip.hasInstrument() ? trip.getInstrument() : "");
+        EditText instrumentField = findViewById(R.id.instrument_field);
+        if (trip.hasInstrument()) {
+            instrumentField.setText(trip.getInstrument());
+        } else if (hasInstrument()) {
+            Instrument connected = getInstrument();
+            String name = connected.getName();
+            instrumentField.setText(name);
+        }
 
         TextInputLayout exploDateLayout = findViewById(R.id.exploration_date_layout);
         TextInputEditText exploDateField = findViewById(R.id.exploration_date_field);
