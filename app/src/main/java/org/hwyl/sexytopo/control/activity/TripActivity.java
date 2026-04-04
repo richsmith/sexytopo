@@ -282,7 +282,7 @@ public class TripActivity extends SexyTopoActivity {
         Trip currentTrip = getSurvey().getTrip();
         boolean hasChanges = savedTrip == null || !savedTrip.equals(currentTrip);
 
-        findViewById(R.id.set_trip).setEnabled(hasTeam && hasChanges);
+        findViewById(R.id.set_trip).setEnabled(hasAnyData && hasChanges);
         findViewById(R.id.clear_trip).setEnabled(hasAnyData);
 
         Button getInstrumentButton = findViewById(R.id.instrument_get_button);
