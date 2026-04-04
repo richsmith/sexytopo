@@ -51,7 +51,7 @@
     <string name="action_device">Instrumento</string>
     <string name="action_device_connect">Conectar…</string>
     <string name="action_connection">Conexión</string>
-    <string name="action_trip">Salida Actual</string>
+    <string name="action_trip">Salida</string>
     <string name="action_help">Ayuda</string>
     <string name="action_guide">Manual</string>
     <string name="action_about">Acerca de</string>
