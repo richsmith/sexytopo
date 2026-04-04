@@ -71,15 +71,13 @@ public class Trip {
     private Date date;
     private List<TeamEntry> team = new ArrayList<>();
     private String comments;
-    private String instrument;  // Instrument name/description
-    private Date explorationDate;  // Exploration date field
-    private boolean explorationDateSameAsSurvey = true;  // Default to same as survey
+    private String instrument;
 
 
     public Trip() {
         this.date = new Date();
-        this.instrument = "";  // Default to empty string
-        this.comments = "";  // Default to empty string
+        this.instrument = "";
+        this.comments = "";
     }
 
     public Trip(Trip other) {
@@ -87,14 +85,11 @@ public class Trip {
         this.team = new ArrayList<>(other.team);
         this.comments = other.comments;
         this.instrument = other.instrument;
-        this.explorationDate = other.explorationDate;
-        this.explorationDateSameAsSurvey = other.explorationDateSameAsSurvey;
     }
 
     public List<TeamEntry> getTeam() {
         return team;
     }
-
 
     public void setTeam(List<TeamEntry> team) {
         this.team = team;
@@ -108,7 +103,6 @@ public class Trip {
         this.comments = comments;
     }
 
-
     public Date getDate() {
         return date;
     }
@@ -117,7 +111,6 @@ public class Trip {
         this.date = date;
     }
 
-    // Instrument methods
     public String getInstrument() {
         return instrument;
     }
@@ -128,23 +121,6 @@ public class Trip {
 
     public boolean hasInstrument() {
         return instrument != null && !instrument.trim().isEmpty();
-    }
-
-    // Exploration date methods
-    public Date getExplorationDate() {
-        return explorationDate;
-    }
-
-    public void setExplorationDate(Date explorationDate) {
-        this.explorationDate = explorationDate;
-    }
-
-    public boolean isExplorationDateSameAsSurvey() {
-        return explorationDateSameAsSurvey;
-    }
-
-    public void setExplorationDateSameAsSurvey(boolean sameAsSurvey) {
-        this.explorationDateSameAsSurvey = sameAsSurvey;
     }
 
     @Override
@@ -170,14 +146,6 @@ public class Trip {
             return false;
         }
 
-        if (objectsNotEqual(trip.explorationDate, explorationDate)) {
-            return false;
-        }
-
-        if (trip.explorationDateSameAsSurvey != explorationDateSameAsSurvey) {
-            return false;
-        }
-
         if (trip.team.size() != team.size()) {
             return false;
         }
@@ -199,8 +167,6 @@ public class Trip {
         result = 31 * result + (date != null ? date.hashCode() : 0);
         result = 31 * result + (comments != null ? comments.hashCode() : 0);
         result = 31 * result + (instrument != null ? instrument.hashCode() : 0);
-        result = 31 * result + (explorationDate != null ? explorationDate.hashCode() : 0);
-        result = 31 * result + (explorationDateSameAsSurvey ? 1 : 0);
         result = 31 * result + team.hashCode();
         return result;
     }

@@ -533,7 +533,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         newTrip.setTeam(previousTeam);
         newTrip.setInstrument(previousInstrument);
         // Comments cleared (default)
-        // explorationDateSameAsSurvey defaults to true
         survey.setTrip(newTrip);
 
         startActivity(TripActivity.class);

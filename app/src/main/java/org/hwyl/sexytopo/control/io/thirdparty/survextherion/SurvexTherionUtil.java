@@ -62,24 +62,8 @@ public class SurvexTherionUtil {
             // Blank line before explo block
             builder.append("\n");
 
-            // Exploration date handling:
-            // - If "same as survey" is ticked: use survey date as exploration date
-            // - If "same as survey" NOT ticked AND exploration date provided: use exploration date
-            // - If "same as survey" NOT ticked AND no date provided: commented placeholder
-            boolean sameAsSurvey = trip.isExplorationDateSameAsSurvey();
-            Date exploDate = trip.getExplorationDate();
-
-            if (sameAsSurvey) {
-                String formattedDate = formatDate(trip.getDate()).substring(5); // Remove "date " prefix
-                builder.append(marker).append(exploDateKeyword).append(formattedDate).append("\n");
-            } else if (exploDate != null) {
-                String formattedExploDate = formatDate(exploDate).substring(5); // Remove "date " prefix
-                builder.append(marker).append(exploDateKeyword).append(formattedExploDate).append("\n");
-            } else {
-                // No specific date provided - output commented placeholder
-                builder.append(commentChar).append(marker).append(exploDateKeyword)
-                        .append("yyyy.mm.dd\n");
-            }
+            String formattedExploDate = formatDate(trip.getDate()).substring(5); // Remove "date " prefix
+            builder.append(marker).append(exploDateKeyword).append(formattedExploDate).append("\n");
 
             // Explo-team lines
             builder.append(exploTeamLines);

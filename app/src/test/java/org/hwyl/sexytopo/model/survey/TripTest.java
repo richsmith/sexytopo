@@ -19,7 +19,6 @@ public class TripTest {
         ));
         trip.setComments("Test comment");
         trip.setInstrument("DistoX");
-        trip.setExplorationDateSameAsSurvey(true);
         return trip;
     }
 

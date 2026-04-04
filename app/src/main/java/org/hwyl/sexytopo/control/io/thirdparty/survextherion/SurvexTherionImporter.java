@@ -183,7 +183,7 @@ public class SurvexTherionImporter {
         char commentChar = format.getCommentChar();
 
         Date surveyDate = null;
-        Date explorationDate = null;
+        Date explorationDate = null; // explo-date / date explored line
         String instrument = null;
         Map<String, List<Trip.Role>> teamMap = new java.util.LinkedHashMap<>();
         StringBuilder tripComments = new StringBuilder();
@@ -272,8 +272,10 @@ public class SurvexTherionImporter {
 
         Trip trip = new Trip();
 
-        if (surveyDate != null) {
-            trip.setDate(surveyDate);
+        // Prefer exploration date if present, otherwise fall back to survey date
+        Date tripDate = explorationDate != null ? explorationDate : surveyDate;
+        if (tripDate != null) {
+            trip.setDate(tripDate);
         }
 
         trip.setInstrument(instrument);
@@ -284,18 +286,6 @@ public class SurvexTherionImporter {
             teamEntries.add(new Trip.TeamEntry(entry.getKey(), entry.getValue()));
         }
         trip.setTeam(teamEntries);
-
-        // Exploration date
-        if (explorationDate != null) {
-            if (surveyDate != null && isSameDay(surveyDate, explorationDate)) {
-                trip.setExplorationDateSameAsSurvey(true);
-            } else {
-                trip.setExplorationDateSameAsSurvey(false);
-                trip.setExplorationDate(explorationDate);
-            }
-        } else {
-            trip.setExplorationDateSameAsSurvey(false);
-        }
 
         if (tripComments.length() > 0) {
             trip.setComments(tripComments.toString());

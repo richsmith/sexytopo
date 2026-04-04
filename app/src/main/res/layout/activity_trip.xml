@@ -68,14 +68,6 @@
 
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <com.google.android.material.checkbox.MaterialCheckBox
-                        android:id="@+id/exploration_date_same_as_survey"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="@string/trip_same_as_survey_date"
-                        android:checked="true"/>
-
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

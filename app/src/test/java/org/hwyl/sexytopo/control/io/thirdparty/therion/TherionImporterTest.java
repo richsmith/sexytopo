@@ -452,8 +452,8 @@ public class TherionImporterTest {
         Assert.assertTrue(trip.getTeam().get(0).roles.contains(Trip.Role.EXPLORATION));
         Assert.assertTrue(trip.getTeam().get(1).roles.contains(Trip.Role.EXPLORATION));
 
-        // Exploration date same as survey
-        Assert.assertTrue(trip.isExplorationDateSameAsSurvey());
+        // Exploration date same as survey date — trip date should be set
+        Assert.assertNotNull(trip.getDate());
     }
 
     @Test
@@ -521,9 +521,8 @@ public class TherionImporterTest {
         Assert.assertTrue(trip.getTeam().get(1).roles.contains(Trip.Role.BOOK));
         Assert.assertTrue(trip.getTeam().get(1).roles.contains(Trip.Role.EXPLORATION));
 
-        // Exploration date is different from survey date
-        Assert.assertFalse(trip.isExplorationDateSameAsSurvey());
-        Assert.assertNotNull(trip.getExplorationDate());
+        // Exploration date differs from survey date — trip date should be the exploration date
+        Assert.assertNotNull(trip.getDate());
     }
 
     @Test

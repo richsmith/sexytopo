@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -104,23 +103,14 @@ public class TripActivity extends SexyTopoActivity {
 EditText instrumentField = findViewById(R.id.instrument_field);
         instrumentField.setText(trip.hasInstrument() ? trip.getInstrument() : "");
 
-        CheckBox sameAsCheckbox = findViewById(R.id.exploration_date_same_as_survey);
-        sameAsCheckbox.setOnCheckedChangeListener(null);
-        sameAsCheckbox.setChecked(trip.isExplorationDateSameAsSurvey());
-        sameAsCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            updateExplorationDateDisplay();
-            syncTrip();
-            updateButtonStatus();
-        });
-
         TextInputLayout exploDateLayout = findViewById(R.id.exploration_date_layout);
         TextInputEditText exploDateField = findViewById(R.id.exploration_date_field);
-        exploDateField.setOnClickListener(this::onChooseExplorationDateClicked);
-        exploDateLayout.setEndIconOnClickListener(this::onChooseExplorationDateClicked);
+        exploDateField.setOnClickListener(this::onChooseDateClicked);
+        exploDateLayout.setEndIconOnClickListener(this::onChooseDateClicked);
 
         syncListWithTeam();
         updateButtonStatus();
-        updateExplorationDateDisplay();
+        updateDateDisplay();
     }
 
     public void onGetInstrumentClicked(View view) {
@@ -135,24 +125,22 @@ EditText instrumentField = findViewById(R.id.instrument_field);
         } catch (SecurityException ignored) {}
     }
 
-    public void onChooseExplorationDateClicked(View view) {
+    public void onChooseDateClicked(View view) {
         Trip trip = getSurvey().getTrip();
-        Date initial = trip.getExplorationDate() != null ? trip.getExplorationDate() : trip.getDate();
-
         MaterialDatePicker<Long> picker = MaterialDatePicker.Builder.datePicker()
             .setTitleText(R.string.trip_exploration_date_label)
-            .setSelection(initial.getTime())
+            .setSelection(trip.getDate().getTime())
             .build();
 
         picker.addOnPositiveButtonClickListener(selection -> {
-            trip.setExplorationDate(new Date(selection));
-            updateExplorationDateDisplay();
+            trip.setDate(new Date(selection));
+            updateDateDisplay();
             syncTrip();
             updateButtonStatus();
         });
 
         FragmentManager fm = getSupportFragmentManager();
-        picker.show(fm, "exploration_date_picker");
+        picker.show(fm, "date_picker");
     }
 
     public void requestClear(View view) {
@@ -272,9 +260,6 @@ EditText instrumentField = findViewById(R.id.instrument_field);
         EditText instrumentField = findViewById(R.id.instrument_field);
         trip.setInstrument(instrumentField.getText().toString());
 
-        CheckBox sameAsCheckbox = findViewById(R.id.exploration_date_same_as_survey);
-        trip.setExplorationDateSameAsSurvey(sameAsCheckbox.isChecked());
-
         getSurvey().setTrip(trip);
     }
 
@@ -287,12 +272,7 @@ EditText instrumentField = findViewById(R.id.instrument_field);
         EditText instrumentField = findViewById(R.id.instrument_field);
         boolean hasInstrument = !instrumentField.getText().toString().trim().isEmpty();
 
-        CheckBox sameAsCheckbox = findViewById(R.id.exploration_date_same_as_survey);
-        Trip trip = getSurvey().getTrip();
-        boolean hasExploDate = !sameAsCheckbox.isChecked() &&
-            trip != null && trip.getExplorationDate() != null;
-
-        boolean hasAnyData = hasTeam || hasComments || hasInstrument || hasExploDate;
+        boolean hasAnyData = hasTeam || hasComments || hasInstrument;
         Trip currentTrip = getSurvey().getTrip();
         boolean hasChanges = savedTrip == null || !savedTrip.equals(currentTrip);
 
@@ -332,18 +312,11 @@ EditText instrumentField = findViewById(R.id.instrument_field);
         });
     }
 
-    private void updateExplorationDateDisplay() {
+    private void updateDateDisplay() {
         TextInputEditText dateField = findViewById(R.id.exploration_date_field);
-        TextInputLayout dateLayout = findViewById(R.id.exploration_date_layout);
-        CheckBox sameAsCheckbox = findViewById(R.id.exploration_date_same_as_survey);
         Trip trip = getSurvey().getTrip();
-
         if (trip == null) return;
-
-        boolean sameAsSurvey = sameAsCheckbox.isChecked();
-        Date displayDate = sameAsSurvey ? trip.getDate() : trip.getExplorationDate();
-        dateField.setText(displayDate != null ? DATE_FORMAT.format(displayDate) : "");
-        dateLayout.setEnabled(!sameAsSurvey);
+        dateField.setText(DATE_FORMAT.format(trip.getDate()));
     }
 
     private List<Trip.Role> getCheckedRoles(View dialogView) {
