@@ -514,22 +514,22 @@
     <string name="settings_export_svg_section_summary">SVG export options</string>
     <string name="settings_export_therion_title">Therion</string>
     <string name="settings_export_therion_section_summary">Therion export options</string>
-    <string name="settings_therion_plan_suffix_title">Plan file suffix</string>
-    <string name="settings_therion_plan_suffix_summary">Suffix for plan th2/xvi files</string>
-    <string name="settings_therion_ee_suffix_title">Extended elevation file suffix</string>
-    <string name="settings_therion_ee_suffix_summary">Suffix for extended elevation th2/xvi files</string>
-    <string name="settings_therion_xvi_folder_title">XVI folder</string>
-    <string name="settings_therion_xvi_folder_summary">Subfolder for XVI files (blank for same folder)</string>
-    <string name="settings_therion_plan_scrap_suffix_title">Plan scrap suffix</string>
-    <string name="settings_therion_plan_scrap_suffix_summary">Suffix for plan scraps (# = number, ## = 01, 02…)</string>
-    <string name="settings_therion_ee_scrap_suffix_title">Extended elevation scrap suffix</string>
-    <string name="settings_therion_ee_scrap_suffix_summary">Suffix for elevation scraps (# = number, ## = 01, 02…)</string>
-    <string name="settings_therion_cross_sections_title">Add cross-section scraps</string>
-    <string name="settings_therion_cross_sections_summary">Include cross-section scraps in export</string>
-    <string name="settings_therion_plan_xs_suffix_title">Plan cross-section suffix</string>
-    <string name="settings_therion_plan_xs_suffix_summary">Suffix for plan cross-sections (# = station number)</string>
-    <string name="settings_therion_ee_xs_suffix_title">Extended elevation cross-section suffix</string>
-    <string name="settings_therion_ee_xs_suffix_summary">Suffix for extended elevation cross-sections (# = station number)</string>
+    <string name="settings_export_therion_plan_suffix_title">Plan file suffix</string>
+    <string name="settings_export_therion_plan_suffix_summary">Suffix for plan th2/xvi files</string>
+    <string name="settings_export_therion_ee_suffix_title">Extended elevation file suffix</string>
+    <string name="settings_export_therion_ee_suffix_summary">Suffix for extended elevation th2/xvi files</string>
+    <string name="settings_export_therion_xvi_folder_title">XVI folder</string>
+    <string name="settings_export_therion_xvi_folder_summary">Subfolder for XVI files (blank for same folder)</string>
+    <string name="settings_export_therion_plan_scrap_suffix_title">Plan scrap suffix</string>
+    <string name="settings_export_therion_plan_scrap_suffix_summary">Suffix for plan scraps (# = number, ## = 01, 02…)</string>
+    <string name="settings_export_therion_ee_scrap_suffix_title">Extended elevation scrap suffix</string>
+    <string name="settings_export_therion_ee_scrap_suffix_summary">Suffix for elevation scraps (# = number, ## = 01, 02…)</string>
+    <string name="settings_export_therion_cross_sections_title">Add cross-section scraps</string>
+    <string name="settings_export_therion_cross_sections_summary">Include cross-section scraps in export</string>
+    <string name="settings_export_therion_plan_xs_suffix_title">Plan cross-section suffix</string>
+    <string name="settings_export_therion_plan_xs_suffix_summary">Suffix for plan cross-sections (# = station number)</string>
+    <string name="settings_export_therion_ee_xs_suffix_title">Extended elevation cross-section suffix</string>
+    <string name="settings_export_therion_ee_xs_suffix_summary">Suffix for extended elevation cross-sections (# = station number)</string>
     <string name="therion_export_dialog_title">Therion Export Options</string>
     <string name="therion_export_plan_scraps">Plan scraps</string>
     <string name="therion_export_ee_scraps">Elevation scraps</string>
