@@ -106,7 +106,9 @@ Each format is handled by dedicated import/export classes. When adding format su
 - Do not use fully qualified class names - import them properly instead
 - Do not insert comments to show what has just been added - only add comments where it is helpful to inform why something is implemented that way, or to explain something that is complex
 - Use British English in IDs, comments, variable names etc.
-- When adding strings, remember to add translations
+- **Never hardcode user-facing strings in Java/Kotlin code.** All strings must be defined in `app/src/main/res/values/strings.xml` and referenced via `R.string.*` (in code) or `@string/*` (in XML layouts).
+- String names must use the appropriate section prefix to match the relevant section in `strings.xml` (e.g. `action_`, `file_`, etc.). Place new strings in the correct comment-delimited section.
+- When adding strings, add translations to all language files
 - When updating either sketch view (graph view), remember to consider landscape mode
 - When updating either sketch view (graph view), remember to consider landscape mode
 
