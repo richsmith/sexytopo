@@ -256,6 +256,7 @@
     <string name="device_connection_connected">Connected :)</string>
     <string name="device_connection_ready">Ready to receive data</string>
     <string name="device_connection_not_connected">Not connected :(</string>
+    <string name="device_no_instrument_connected">No instrument connected</string>
     <string name="device_connection_connecting">Connecting&#8230;</string>
     <string name="device_connection_stop_requested">Connection close requested</string>
     <string name="device_connection_closing">Closing connection&#8230;</string>
@@ -440,6 +441,8 @@
         <item>Linear</item>
         <item>Non-Linear</item>
     </string-array>
+    <string name="settings_immersive_mode_enabled">Fullscreen mode enabled</string>
+    <string name="settings_immersive_mode_disabled">Fullscreen mode disabled</string>
     <string name="settings_new_station_vibration_title">Vibrate on new station</string>
     <string name="settings_new_station_vibration_summary">Vibrate when new station is created</string>
     <string name="settings_hot_corners_title">Hot corners</string>

@@ -1217,7 +1217,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         Communicator communicator = requestComms();
 
         if (!hasInstrument()) {
-            showSimpleToast("No instrument connected");
+            showSimpleToast(R.string.device_no_instrument_connected);
             return;
         }
 
@@ -1237,9 +1237,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         GeneralPreferences.setImmersiveMode(newImmersiveState);
         applyImmersiveMode(newImmersiveState);
 
-        String message = newImmersiveState ?
-            "Fullscreen mode enabled" : "Fullscreen mode disabled";
-        showSimpleToast(message);
+        showSimpleToast(newImmersiveState ?
+            R.string.settings_immersive_mode_enabled : R.string.settings_immersive_mode_disabled);
     }
 
     /**

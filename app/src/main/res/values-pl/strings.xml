@@ -249,6 +249,7 @@
     <string name="device_connection_connected">Połączono :)</string>
     <string name="device_connection_ready">Gotowy do odbierania danych</string>
     <string name="device_connection_not_connected">Nie połączono :(</string>
+    <string name="device_no_instrument_connected">Brak podłączonego instrumentu</string>
     <string name="device_connection_connecting">Łączenie&#8230;</string>
     <string name="device_connection_stop_requested">Żądanie zamknięcia połączenia</string>
     <string name="device_connection_closing">Zamykanie połączenia&#8230;</string>
@@ -402,6 +403,8 @@
         <item>Liniowy</item>
         <item>Nieliniowy</item>
     </string-array>
+    <string name="settings_immersive_mode_enabled">Tryb pełnoekranowy włączony</string>
+    <string name="settings_immersive_mode_disabled">Tryb pełnoekranowy wyłączony</string>
     <string name="settings_new_station_vibration_title">Wibracja przy nowym stanowisku</string>
     <string name="settings_new_station_vibration_summary">Wibruj po utworzeniu nowego stanowiska</string>
     <string name="settings_hot_corners_title">Aktywne rogi</string>

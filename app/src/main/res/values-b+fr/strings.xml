@@ -249,6 +249,7 @@
     <string name="device_connection_connected">Connecté :)</string>
     <string name="device_connection_ready">Prêt à recevoir des données</string>
     <string name="device_connection_not_connected">Non connecté :(</string>
+    <string name="device_no_instrument_connected">Aucun instrument connecté</string>
     <string name="device_connection_connecting">Connexion&#8230;</string>
     <string name="device_connection_stop_requested">Demande de fermeture de connexion</string>
     <string name="device_connection_closing">Fermeture de la connexion&#8230;</string>
@@ -402,6 +403,8 @@
         <item>Linéaire</item>
         <item>Non linéaire</item>
     </string-array>
+    <string name="settings_immersive_mode_enabled">Mode plein écran activé</string>
+    <string name="settings_immersive_mode_disabled">Mode plein écran désactivé</string>
     <string name="settings_new_station_vibration_title">Vibrer à la nouvelle station</string>
     <string name="settings_new_station_vibration_summary">Vibrer lors de la création d\'une nouvelle station</string>
     <string name="settings_hot_corners_title">Coins actifs</string>

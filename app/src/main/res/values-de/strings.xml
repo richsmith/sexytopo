@@ -249,6 +249,7 @@
     <string name="device_connection_connected">Verbunden :)</string>
     <string name="device_connection_ready">Bereit zum Daten-Empfang</string>
     <string name="device_connection_not_connected">Nicht verbunden :(</string>
+    <string name="device_no_instrument_connected">Kein Instrument verbunden</string>
     <string name="device_connection_connecting">Verbindung wird hergestellt…</string>
     <string name="device_connection_stop_requested">Antrag auf Verbindungsabbruch</string>
     <string name="device_connection_closing">Verbindung wird beendet…</string>
@@ -402,6 +403,8 @@
         <item>Linear</item>
         <item>Nicht-Linear</item>
     </string-array>
+    <string name="settings_immersive_mode_enabled">Vollbildmodus aktiviert</string>
+    <string name="settings_immersive_mode_disabled">Vollbildmodus deaktiviert</string>
     <string name="settings_new_station_vibration_title">Bei neuem Messpunkt vibrieren</string>
     <string name="settings_new_station_vibration_summary">Vibrieren wenn neuer Messpunkt erstellt wird</string>
     <string name="settings_hot_corners_title">Intelligente Ecken</string>
