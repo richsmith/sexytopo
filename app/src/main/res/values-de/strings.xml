@@ -261,6 +261,7 @@
     <string name="device_data_unknown_identifier">Unbekannte Datenpaket-Kennung</string>
     <string name="device_data_acknowledged_packet">Anerkanntes datenpaket</string>
     <string name="device_no_device">Kein Gerät</string>
+    <string name="action_set_test_instrument">Testinstrument festlegen</string>
     <string name="device_missing_name">[Fehlendes Gerät]</string>
     <string name="device_missing_short_name">Fehlend</string>
     <string name="device_unknown_name">[Unbekanntes Gerät]</string>
@@ -354,6 +355,12 @@
     <string name="trip_dialog_title_add_to_team">Zum Team hinzufügen</string>
     <string name="trip_dialog_add_to_team_name_hint">Name</string>
     <string name="trip_dialog_confirm_clear_trip">Tourdaten löschen?</string>
+    <string name="trip_dialog_name_required">Name ist erforderlich</string>
+    <string name="trip_instrument_label">Instrument</string>
+    <string name="trip_instrument_hint">Instrumentenname</string>
+    <string name="trip_instrument_get_button">Holen</string>
+    <string name="trip_exploration_date_label">Erkundungsdatum</string>
+    <string name="trip_same_as_survey_date">Gleich wie Vermessungsdatum</string>
     <string name="trip_comments">Bemerkungen</string>
     <string name="trip_save_trip">Tour speichern</string>
     <string name="trip_role_book">Zeichnung</string>
@@ -375,6 +382,7 @@
 
     <!--  Settings  -->
     <string name="settings_general_title">Allgemeines</string>
+    <string name="settings_general_summary">Farbschema, Ausrichtung, Vibration</string>
     <string name="settings_theme_title">Farbschema</string>
     <string name="settings_theme_summary">Nachtmodus verwenden? (Startet die App neu, Datei vor dem Wechseln speichern!)</string>
     <string-array name="settings_theme_entries">
@@ -398,7 +406,10 @@
     <string name="settings_new_station_vibration_summary">Vibrieren wenn neuer Messpunkt erstellt wird</string>
     <string name="settings_hot_corners_title">Intelligente Ecken</string>
     <string name="settings_hot_corners_summary">Im Zeichenmodus: an den Ecken der Skizze ziehen, um die Ansicht zu verschieben</string>
-    <string name="settings_instruments_title">Werkzeuge</string>
+        <string name="settings_team_title">Team</string>
+    <string name="settings_team_summary">Bekannte Höhlenforscher-Namen verwalten</string>
+<string name="settings_instruments_title">Werkzeuge</string>
+    <string name="settings_instruments_summary">Instrumententoleranz, Kalibrierung</string>
     <string name="settings_max_distance_delta_title">Maximal zulässige Abweichung bei der Distanz (m)</string>
     <string name="settings_max_distance_delta_summary">Maximal zulässiger Fehler bei der Erfassung einer neuen Messstrecke</string>
     <string name="settings_max_angle_delta_title">Maximal zulässige Abweichung beim Neigungswinkel (Grad)</string>
@@ -407,6 +418,7 @@
     <string name="settings_calibration_algorithm_title">DistoX Kalibrierungs-Algorithmus</string>
     <string name="settings_calibration_algorithm_summary">Auswahl des DistoX-Kalibrierungsalgorithmus ausser Kraft setzen</string>
     <string name="settings_sketching_title">Skizzieren</string>
+    <string name="settings_sketching_summary">Zeichenwerkzeuge, Anzeigeoptionen</string>
     <string name="settings_delete_path_fragments_title">Linienteile löschen</string>
     <string name="settings_delete_path_fragments_summary">Im Löschmodus: nur die nächstgelegenen Teile einer Linie löschen (sofern ausgeschaltet, wird die gesamte Linie gelöscht)</string>
     <string name="settings_highlight_latest_leg_title">Aktuelle Messstrecke hervorheben</string>
@@ -430,6 +442,7 @@
     <string name="settings_anti_alias_title">Anti-Alias-Skizzenlinien</string>
     <string name="settings_anti_alias_summary">Anti-Aliasing auf Skizzenlinien usw. anwenden (verbessert die visuelle Darstellung auf Kosten der Rechenleistung)</string>
     <string name="settings_manual_data_entry_title">Manuelle Daten-Eingabe</string>
+    <string name="settings_manual_data_entry_summary">LROU-Felder, Winkelformat</string>
     <string name="settings_key_lrud_fields_title">LROU-Eingaben (Dimensionen)</string>
     <string name="settings_key_lrud_fields_summary">Felder zur Eingabe von LROU-Werten (Links-Rechts-Oben-Unten) für jeden neuen Messpunkt anzeigen</string>
     <string name="settings_lrud_direction_title">LROU-Richtung</string>
@@ -441,6 +454,7 @@
     <string name="settings_key_deg_mins_secs_title">Azimut in Grad/Minuten/Sekunden</string>
     <string name="settings_key_deg_mins_secs_summary">Azimutwerte in Grad/Minuten/Sekunden eingeben (im Gegensatz zur Standardeinstellung in Dezimalwerten)</string>
     <string name="settings_export_title">Exportieren</string>
+    <string name="settings_export_summary">Exportformate und Ordneroptionen</string>
     <string name="settings_export_svg_background_title">SVG-Hintergrund</string>
     <string name="settings_export_svg_background_summary">Optionaler Export mit undurchsichtigem Hintergrund</string>
     <string-array name="settings_export_svg_background_entries">
@@ -457,7 +471,37 @@
     <string name="settings_export_therion_symbols_summary">Symbole beim Exportieren im Therion-Format einschließen</string>
     <string name="settings_export_therion_text_title">Therion-Export Text</string>
     <string name="settings_export_therion_text_summary">Text beim Exportieren im Therion-Format einschließen</string>
+    <string name="settings_export_folder_name_title">Exportordner-Name</string>
+    <string name="settings_export_folder_name_summary">Name des Ordners im Vermessungsordner, in den exportiert wird</string>
+    <string name="settings_export_type_subfolders_title">Exporttyp-Unterordner</string>
+    <string name="settings_export_type_subfolders_summary">Unterordner mit Exporttyp-Namen erstellen (z. B. therion, survex)</string>
+    <string name="settings_export_svg_title">SVG</string>
+    <string name="settings_export_svg_section_summary">SVG-Exportoptionen</string>
+    <string name="settings_export_therion_title">Therion</string>
+    <string name="settings_export_therion_section_summary">Therion-Exportoptionen</string>
+    <string name="settings_export_therion_plan_suffix_title">Planansicht-Dateisuffix</string>
+    <string name="settings_export_therion_plan_suffix_summary">Suffix für Planansicht th2/xvi-Dateien</string>
+    <string name="settings_export_therion_ee_suffix_title">Erweiterter Aufrissdateisuffix</string>
+    <string name="settings_export_therion_ee_suffix_summary">Suffix für erweiterte Aufriss th2/xvi-Dateien</string>
+    <string name="settings_export_therion_xvi_folder_title">XVI-Ordner</string>
+    <string name="settings_export_therion_xvi_folder_summary">Unterordner für XVI-Dateien (leer für gleichen Ordner)</string>
+    <string name="settings_export_therion_plan_scrap_suffix_title">Planansicht-Scrapsuffix</string>
+    <string name="settings_export_therion_plan_scrap_suffix_summary">Suffix für Planansicht-Scraps (# = Zahl, ## = 01, 02…)</string>
+    <string name="settings_export_therion_ee_scrap_suffix_title">Erweiterter Aufrissscrapsuffix</string>
+    <string name="settings_export_therion_ee_scrap_suffix_summary">Suffix für Aufriss-Scraps (# = Zahl, ## = 01, 02…)</string>
+    <string name="settings_export_therion_cross_sections_title">Querschnitt-Scraps hinzufügen</string>
+    <string name="settings_export_therion_cross_sections_summary">Querschnitt-Scraps beim Export einschließen</string>
+    <string name="settings_export_therion_plan_xs_suffix_title">Planansicht-Querschnittsuffix</string>
+    <string name="settings_export_therion_plan_xs_suffix_summary">Suffix für Planansicht-Querschnitte (# = Messpunktnummer)</string>
+    <string name="settings_export_therion_ee_xs_suffix_title">Erweiterter Aufriss-Querschnittsuffix</string>
+    <string name="settings_export_therion_ee_xs_suffix_summary">Suffix für erweiterte Aufriss-Querschnitte (# = Messpunktnummer)</string>
+    <string name="therion_export_dialog_title">Therion-Exportoptionen</string>
+    <string name="therion_export_plan_scraps">Planansicht-Scraps</string>
+    <string name="therion_export_ee_scraps">Aufriss-Scraps</string>
+    <string name="therion_export_stations_in_plan">Messpunkte zum ersten Planansicht-Scrap hinzufügen</string>
+    <string name="therion_export_stations_in_ee">Messpunkte zum ersten Aufriss-Scrap hinzufügen</string>
     <string name="settings_developer_title">Entwickler</string>
+    <string name="settings_developer_summary">Debugging-Optionen</string>
     <string name="settings_key_developer_mode_title"> Entwickler-Modus</string>
     <string name="settings_key_developer_mode_summary">Einträge im Debugging-Menü anzeigen</string>
 
@@ -531,6 +575,8 @@
     <string name="menu_switch_direction">Richtung wechseln</string>
     <string name="menu_navigate">Navigieren</string>
     <string name="menu_survey">Vermessung</string>
+    <string name="menu_survey_start_new_dialog_title">Neue Vermessung starten</string>
+    <string name="menu_survey_start_new_dialog_station_name">Name des Startmesspunkts</string>
     <string name="menu_start_new_survey">Hier neue Vermessung beginnen</string>
     <string name="menu_unlink_survey">Verknüpfung zu anderer Vermessungsdatei lösen</string>
     <string name="menu_comment">Kommentar</string>

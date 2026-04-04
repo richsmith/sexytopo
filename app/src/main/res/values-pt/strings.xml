@@ -261,6 +261,7 @@
     <string name="device_data_unknown_identifier">Identificador de pacote desconhecido</string>
     <string name="device_data_acknowledged_packet">Pacote confirmado</string>
     <string name="device_no_device">nenhum dispositivo</string>
+    <string name="action_set_test_instrument">Definir instrumento de teste</string>
     <string name="device_missing_name">[Dispositivo ausente]</string>
     <string name="device_missing_short_name">Ausente</string>
     <string name="device_unknown_name">[Dispositivo desconhecido]</string>
@@ -354,6 +355,12 @@
     <string name="trip_dialog_title_add_to_team">Adicionar à Equipa</string>
     <string name="trip_dialog_add_to_team_name_hint">Nome</string>
     <string name="trip_dialog_confirm_clear_trip">Limpar Dados da Saída?</string>
+    <string name="trip_dialog_name_required">O nome é obrigatório</string>
+    <string name="trip_instrument_label">Instrumento</string>
+    <string name="trip_instrument_hint">Nome do instrumento</string>
+    <string name="trip_instrument_get_button">Obter</string>
+    <string name="trip_exploration_date_label">Data de exploração</string>
+    <string name="trip_same_as_survey_date">Igual à data da topografia</string>
     <string name="trip_comments">Comentários</string>
     <string name="trip_save_trip">Guardar Saída</string>
     <string name="trip_role_book">Topógrafo (desenho)</string>
@@ -375,6 +382,7 @@
 
     <!-- Settings -->
     <string name="settings_general_title">Geral</string>
+    <string name="settings_general_summary">Tema, orientação, vibração</string>
     <string name="settings_theme_title">Tema</string>
     <string name="settings_theme_summary">Juntar-se ao lado negro? (Reinicia a aplicação, guarde a topografia antes de mudar!)</string>
     <string-array name="settings_theme_entries">
@@ -398,7 +406,10 @@
     <string name="settings_new_station_vibration_summary">Vibrar quando é criada uma nova estação</string>
     <string name="settings_hot_corners_title">Cantos ativos</string>
     <string name="settings_hot_corners_summary">Arrastar dos cantos do esboço para mover a vista nos modos de desenho</string>
-    <string name="settings_instruments_title">Instrumentos</string>
+        <string name="settings_team_title">Equipa</string>
+    <string name="settings_team_summary">Gerir nomes de espeleólogos conhecidos</string>
+<string name="settings_instruments_title">Instrumentos</string>
+    <string name="settings_instruments_summary">Tolerâncias dos instrumentos, calibração</string>
     <string name="settings_max_distance_delta_title">Delta de distância máxima (m)</string>
     <string name="settings_max_distance_delta_summary">Quanto erro é tolerado ao decidir se criar uma nova estação</string>
     <string name="settings_max_angle_delta_title">Delta de ângulo máximo (graus)</string>
@@ -407,6 +418,7 @@
     <string name="settings_calibration_algorithm_title">Algoritmo de calibração Disto-X</string>
     <string name="settings_calibration_algorithm_summary">Sobrepor a escolha do algoritmo de calibração Disto-X</string>
     <string name="settings_sketching_title">Desenho</string>
+    <string name="settings_sketching_summary">Ferramentas de desenho, opções de exibição</string>
     <string name="settings_delete_path_fragments_title">Eliminar fragmentos de linha</string>
     <string name="settings_delete_path_fragments_summary">Eliminar apenas as partes mais próximas de uma linha de esboço no modo de apagar (se desativado, elimina toda a linha)</string>
     <string name="settings_highlight_latest_leg_title">Destacar último trecho</string>
@@ -430,6 +442,7 @@
     <string name="settings_anti_alias_title">Suavizar linhas de esboço</string>
     <string name="settings_anti_alias_summary">Aplicar suavização às linhas de esboço etc. (melhora a visualização à custa de algum desempenho)</string>
     <string name="settings_manual_data_entry_title">Entrada Manual de Dados</string>
+    <string name="settings_manual_data_entry_summary">Campos LRUD, formato de ângulo</string>
     <string name="settings_key_lrud_fields_title">Entradas LRUD</string>
     <string name="settings_key_lrud_fields_summary">Mostrar campos para introduzir LRUD (Esquerda-Direita-Cima-Baixo) para cada nova estação</string>
     <string name="settings_lrud_direction_title">Direção LRUD</string>
@@ -441,6 +454,7 @@
     <string name="settings_key_deg_mins_secs_title">Azimute em graus/minutos/segundos</string>
     <string name="settings_key_deg_mins_secs_summary">Introduzir valores de azimute em graus/minutos/segundos (em vez da predefinição decimal)</string>
     <string name="settings_export_title">Exportação</string>
+    <string name="settings_export_summary">Formatos de exportação e opções de pasta</string>
     <string name="settings_export_svg_background_title">Fundo SVG</string>
     <string name="settings_export_svg_background_summary">Opcionalmente exportar com um fundo opaco</string>
     <string-array name="settings_export_svg_background_entries">
@@ -457,7 +471,37 @@
     <string name="settings_export_therion_symbols_summary">Incluir símbolos ao exportar para formato Therion</string>
     <string name="settings_export_therion_text_title">Texto de exportação Therion</string>
     <string name="settings_export_therion_text_summary">Incluir texto ao exportar para formato Therion</string>
+    <string name="settings_export_folder_name_title">Nome da pasta de exportação</string>
+    <string name="settings_export_folder_name_summary">Nome da pasta dentro da pasta da topografia para exportar</string>
+    <string name="settings_export_type_subfolders_title">Subpastas por tipo de exportação</string>
+    <string name="settings_export_type_subfolders_summary">Criar subpastas com o nome do tipo de exportação (ex. therion, survex)</string>
+    <string name="settings_export_svg_title">SVG</string>
+    <string name="settings_export_svg_section_summary">Opções de exportação SVG</string>
+    <string name="settings_export_therion_title">Therion</string>
+    <string name="settings_export_therion_section_summary">Opções de exportação Therion</string>
+    <string name="settings_export_therion_plan_suffix_title">Sufixo do arquivo de planta</string>
+    <string name="settings_export_therion_plan_suffix_summary">Sufixo para arquivos th2/xvi de planta</string>
+    <string name="settings_export_therion_ee_suffix_title">Sufixo do arquivo de desenvolvimento</string>
+    <string name="settings_export_therion_ee_suffix_summary">Sufixo para arquivos th2/xvi de desenvolvimento</string>
+    <string name="settings_export_therion_xvi_folder_title">Pasta XVI</string>
+    <string name="settings_export_therion_xvi_folder_summary">Subpasta para arquivos XVI (em branco para a mesma pasta)</string>
+    <string name="settings_export_therion_plan_scrap_suffix_title">Sufixo de scrap de planta</string>
+    <string name="settings_export_therion_plan_scrap_suffix_summary">Sufixo para scraps de planta (# = número, ## = 01, 02…)</string>
+    <string name="settings_export_therion_ee_scrap_suffix_title">Sufixo de scrap de desenvolvimento</string>
+    <string name="settings_export_therion_ee_scrap_suffix_summary">Sufixo para scraps de desenvolvimento (# = número, ## = 01, 02…)</string>
+    <string name="settings_export_therion_cross_sections_title">Adicionar scraps de secção transversal</string>
+    <string name="settings_export_therion_cross_sections_summary">Incluir scraps de secção transversal na exportação</string>
+    <string name="settings_export_therion_plan_xs_suffix_title">Sufixo de secção transversal de planta</string>
+    <string name="settings_export_therion_plan_xs_suffix_summary">Sufixo para secções transversais de planta (# = número da estação)</string>
+    <string name="settings_export_therion_ee_xs_suffix_title">Sufixo de secção transversal de desenvolvimento</string>
+    <string name="settings_export_therion_ee_xs_suffix_summary">Sufixo para secções transversais de desenvolvimento (# = número da estação)</string>
+    <string name="therion_export_dialog_title">Opções de exportação Therion</string>
+    <string name="therion_export_plan_scraps">Scraps de planta</string>
+    <string name="therion_export_ee_scraps">Scraps de desenvolvimento</string>
+    <string name="therion_export_stations_in_plan">Adicionar estações ao primeiro scrap de planta</string>
+    <string name="therion_export_stations_in_ee">Adicionar estações ao primeiro scrap de desenvolvimento</string>
     <string name="settings_developer_title">Programador</string>
+    <string name="settings_developer_summary">Opções de depuração</string>
     <string name="settings_key_developer_mode_title">Modo programador</string>
     <string name="settings_key_developer_mode_summary">Mostrar entradas de menu de depuração</string>
 
@@ -537,6 +581,8 @@
     <string name="menu_switch_direction">Mudar Direção</string>
     <string name="menu_navigate">Navegar</string>
     <string name="menu_survey">Topografia</string>
+    <string name="menu_survey_start_new_dialog_title">Iniciar nova topografia</string>
+    <string name="menu_survey_start_new_dialog_station_name">Nome da estação inicial</string>
     <string name="menu_start_new_survey">Iniciar Nova Topografia Aqui</string>
     <string name="menu_unlink_survey">Desligar Topografia Ligada</string>
     <string name="menu_comment">Comentário</string>
