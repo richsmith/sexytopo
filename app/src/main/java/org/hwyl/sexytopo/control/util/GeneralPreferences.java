@@ -184,19 +184,23 @@ public class GeneralPreferences {
     // ********** Sketching ***********
 
     public static boolean isAntialiasingModeOn() {
-        return getBoolean("pref_anti_alias", false);
+        return getBoolean("pref_anti_alias", true);
     }
 
-    public static int getStationCrossDiameterPixels() {
-        return getInt("pref_station_diameter", 16);
+    public static float getSketchLineWidthDp() {
+        return getFloat("pref_sketch_line_width", 1.5f);
     }
 
-    public static int getLegStrokeWidth() {
-        return getInt("pref_leg_width", 3);
+    public static float getStationCrossDiameterDp() {
+        return getFloat("pref_station_diameter", 8f);
     }
 
-    public static int getSplayStrokeWidth() {
-        return getInt("pref_splay_width", 1);
+    public static float getLegStrokeWidthDp() {
+        return getFloat("pref_leg_width", 2f);
+    }
+
+    public static float getSplayStrokeWidthDp() {
+        return getFloat("pref_splay_width", 1f);
     }
 
     public static int getLegendFontSizeSp() {

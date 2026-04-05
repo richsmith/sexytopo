@@ -433,11 +433,13 @@
     <string name="settings_survey_symbol_size_title">Tamanho dos símbolos de topografia</string>
     <string name="settings_survey_symbol_size_summary">Quão grandes desenhar inicialmente os símbolos (dp)</string>
     <string name="settings_leg_width_title">Espessura da linha de trecho</string>
-    <string name="settings_leg_width_summary">Quão espessas desenhar as linhas de trechos</string>
+    <string name="settings_leg_width_summary">Quão espessas desenhar as linhas de trechos (dp)</string>
+    <string name="settings_sketch_line_width_title">Espessura da linha de esboço</string>
+    <string name="settings_sketch_line_width_summary">Quão espessas desenhar as linhas de esboço (dp)</string>
     <string name="settings_splay_width_title">Espessura da linha de raio</string>
-    <string name="settings_splay_width_summary">Quão espessas desenhar as linhas de raios</string>
+    <string name="settings_splay_width_summary">Quão espessas desenhar as linhas de raios (dp)</string>
     <string name="settings_station_diameter_title">Diâmetro da estação</string>
-    <string name="settings_station_diameter_summary">Quão grandes desenhar os símbolos das estações</string>
+    <string name="settings_station_diameter_summary">Quão grandes desenhar os símbolos das estações (dp)</string>
     <string name="settings_station_label_font_size_sp_title">Tamanho da fonte das etiquetas de estação</string>
     <string name="settings_station_label_font_size_sp_summary">Tamanho da fonte das etiquetas das estações</string>
     <string name="settings_legend_font_size_sp_title">Tamanho da fonte da legenda</string>

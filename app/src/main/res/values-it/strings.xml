@@ -433,11 +433,13 @@
     <string name="settings_survey_symbol_size_title">Dimensione simboli rilievo</string>
     <string name="settings_survey_symbol_size_summary">Quanto grandi disegnare inizialmente i simboli (dp)</string>
     <string name="settings_leg_width_title">Spessore linea tratto</string>
-    <string name="settings_leg_width_summary">Quanto spesse disegnare le linee dei tratti</string>
+    <string name="settings_leg_width_summary">Quanto spesse disegnare le linee dei tratti (dp)</string>
+    <string name="settings_sketch_line_width_title">Spessore linea schizzo</string>
+    <string name="settings_sketch_line_width_summary">Quanto spesse disegnare le linee dello schizzo (dp)</string>
     <string name="settings_splay_width_title">Spessore linea splay</string>
-    <string name="settings_splay_width_summary">Quanto spesse disegnare le linee degli splay</string>
+    <string name="settings_splay_width_summary">Quanto spesse disegnare le linee degli splay (dp)</string>
     <string name="settings_station_diameter_title">Diametro stazione</string>
-    <string name="settings_station_diameter_summary">Quanto grandi disegnare i simboli delle stazioni</string>
+    <string name="settings_station_diameter_summary">Quanto grandi disegnare i simboli delle stazioni (dp)</string>
     <string name="settings_station_label_font_size_sp_title">Dimensione carattere etichette stazioni</string>
     <string name="settings_station_label_font_size_sp_summary">Dimensione del carattere delle etichette delle stazioni</string>
     <string name="settings_legend_font_size_sp_title">Dimensione carattere legenda</string>

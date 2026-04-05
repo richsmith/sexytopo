@@ -468,12 +468,14 @@
     <string name="settings_survey_text_tool_font_size_summary">How big to initially draw manually-placed text (sp)</string>
     <string name="settings_survey_symbol_size_title">Survey symbol size</string>
     <string name="settings_survey_symbol_size_summary">How big to initially draw symbols (dp)</string>
+    <string name="settings_sketch_line_width_title">Sketch line thickness</string>
+    <string name="settings_sketch_line_width_summary">How wide to draw sketch lines (dp)</string>
     <string name="settings_leg_width_title">Leg line thickness</string>
-    <string name="settings_leg_width_summary">How wide to draw leg lines</string>
+    <string name="settings_leg_width_summary">How wide to draw leg lines (dp)</string>
     <string name="settings_splay_width_title">Splay line thickness</string>
-    <string name="settings_splay_width_summary">How wide to draw splay lines</string>
+    <string name="settings_splay_width_summary">How wide to draw splay lines (dp)</string>
     <string name="settings_station_diameter_title">Station diameter</string>
-    <string name="settings_station_diameter_summary">How big to draw station symbols</string>
+    <string name="settings_station_diameter_summary">How big to draw station symbols (dp)</string>
     <string name="settings_station_label_font_size_sp_title">Station label font size</string>
     <string name="settings_station_label_font_size_sp_summary">Font size of station labels</string>
     <string name="settings_legend_font_size_sp_title">Legend font size</string>

@@ -433,11 +433,13 @@
     <string name="settings_survey_symbol_size_title">Rozmiar symbolu pomiaru</string>
     <string name="settings_survey_symbol_size_summary">Początkowy rozmiar symboli (dp)</string>
     <string name="settings_leg_width_title">Grubość linii ciągu</string>
-    <string name="settings_leg_width_summary">Grubość rysowania linii ciągów</string>
+    <string name="settings_leg_width_summary">Grubość rysowania linii ciągów (dp)</string>
+    <string name="settings_sketch_line_width_title">Grubość linii szkicu</string>
+    <string name="settings_sketch_line_width_summary">Grubość rysowania linii szkicu (dp)</string>
     <string name="settings_splay_width_title">Grubość linii pomiarów szczegółowych</string>
-    <string name="settings_splay_width_summary">Grubość rysowania linii pomiarów szczegółowych</string>
+    <string name="settings_splay_width_summary">Grubość rysowania linii pomiarów szczegółowych (dp)</string>
     <string name="settings_station_diameter_title">Średnica stanowiska</string>
-    <string name="settings_station_diameter_summary">Rozmiar rysowania symboli stanowisk</string>
+    <string name="settings_station_diameter_summary">Rozmiar rysowania symboli stanowisk (dp)</string>
     <string name="settings_station_label_font_size_sp_title">Rozmiar czcionki etykiety stanowiska</string>
     <string name="settings_station_label_font_size_sp_summary">Rozmiar czcionki etykiet stanowisk</string>
     <string name="settings_legend_font_size_sp_title">Rozmiar czcionki legendy</string>

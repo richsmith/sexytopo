@@ -99,23 +99,28 @@ public class GraphView extends View {
     public static final int FADED_ALPHA = 0xff / 5;
 
     public static final int STATION_COLOUR = Colour.DARK_RED.intValue;
-    public static final int STATION_DIAMETER = 8;
-
-    public static final int STATION_STROKE_WIDTH = 5;
-    public static final int HIGHLIGHT_OUTLINE = 4;
-    private final float DASHED_LINE_INTERVAL = 5;
+    private static final int STATION_STROKE_WIDTH_DP = 2;
+    private static final int DASHED_LINE_INTERVAL_DP = 4;
+    private static final int CROSS_SECTION_CONNECTOR_WIDTH_DP = 2;
+    private static final int CROSS_SECTION_INDICATOR_WIDTH_DP = 2;
 
     public static final int LEGEND_SIZE = 18;
-    public final float LEGEND_TICK_SIZE = 5;
+    private static final int LEGEND_TICK_SIZE_DP = 5;
+    private float legendTickSizePx;
+    private float dashedLineIntervalPx;
 
 
 
-    public static final float DELETE_PATHS_WITHIN_N_PIXELS = 5.0f;
-    public static final float SELECTION_SENSITIVITY_IN_PIXELS = 25.0f;
-    public static final float SNAP_TO_LINE_SENSITIVITY_IN_PIXELS = 25.0f;
+    private static final float DELETE_PATHS_WITHIN_N_DP = 5.0f;
+    private static final float SELECTION_SENSITIVITY_DP = 25.0f;
+    private static final float SNAP_TO_LINE_SENSITIVITY_DP = 25.0f;
     public static final float HOT_CORNER_DISTANCE_PROPORTION = 0.05f;
+    private static final int STATION_LABEL_OFFSET_DP = 10;
 
-    public static final int STATION_LABEL_OFFSET = 10;
+    private float deletePathsWithinPx;
+    private float selectionSensitivityPx;
+    private float snapToLineSensitivityPx;
+    private float stationLabelOffsetPx;
 
     private GraphActivity activity;
 
@@ -187,7 +192,7 @@ public class GraphView extends View {
             crossSectionConnectorPaint, crossSectionIndicatorPaint
     };
 
-    private int stationCrossDiameter;
+    private float stationCrossDiameterPx;
 
 
     public GraphView(Context context, AttributeSet attrs) {
@@ -211,7 +216,8 @@ public class GraphView extends View {
 
         int stationColour = ContextCompat.getColor(activity, R.color.station);
         stationPaint.setColor(stationColour);
-        stationPaint.setStrokeWidth(STATION_STROKE_WIDTH);
+        float stationStrokeWidthPx = dpToPixels(STATION_STROKE_WIDTH_DP);
+        stationPaint.setStrokeWidth(stationStrokeWidthPx);
         int stationLabelFontSizeSp = GeneralPreferences.getStationLabelFontSizeSp();
         float stationLabelFontSizePixels = spToPixels(stationLabelFontSizeSp);
         stationPaint.setTextSize(stationLabelFontSizePixels);
@@ -220,20 +226,20 @@ public class GraphView extends View {
             new PorterDuffColorFilter(stationColour, PorterDuff.Mode.SRC_IN));
 
         highlightPaint.setStyle(Paint.Style.STROKE);
-        highlightPaint.setStrokeWidth(HIGHLIGHT_OUTLINE);
+        highlightPaint.setStrokeWidth(stationStrokeWidthPx * 1.25f);
         int activeStationHighlightColor = androidx.core.content.ContextCompat.getColor(
             getContext(), R.color.activeStationHighlight);
         highlightPaint.setColor(activeStationHighlightColor);
 
         // active legs/splays
-        int legStrokeWidth = GeneralPreferences.getLegStrokeWidth();
+        float legStrokeWidth = dpToPixels(GeneralPreferences.getLegStrokeWidthDp());
         legPaint.setStrokeWidth(legStrokeWidth);
         legPaint.setColor(LEG_COLOUR.intValue);
 
         latestLegPaint.setStrokeWidth(legStrokeWidth);
         latestLegPaint.setColor(LATEST_LEG_COLOUR.intValue);
 
-        int splayStrokeWidth = GeneralPreferences.getSplayStrokeWidth();
+        float splayStrokeWidth = dpToPixels(GeneralPreferences.getSplayStrokeWidthDp());
         splayPaint.setStrokeWidth(splayStrokeWidth);
         splayPaint.setColor(LEG_COLOUR.intValue);
 
@@ -251,7 +257,7 @@ public class GraphView extends View {
         fadedSplayPaint.setAlpha(FADED_ALPHA);
 
         drawPaint.setColor(DEFAULT_SKETCH_COLOUR.intValue);
-        drawPaint.setStrokeWidth(3);
+        drawPaint.setStrokeWidth(dpToPixels(GeneralPreferences.getSketchLineWidthDp()));
         drawPaint.setStyle(Paint.Style.STROKE);
         drawPaint.setStrokeJoin(Paint.Join.ROUND);
         drawPaint.setStrokeCap(Paint.Cap.ROUND);
@@ -269,11 +275,11 @@ public class GraphView extends View {
         legPaint.setTextSize(labelSizePixels);
 
         crossSectionConnectorPaint.setColor(CROSS_SECTION_CONNECTION_COLOUR.intValue);
-        crossSectionConnectorPaint.setStrokeWidth(3);
+        crossSectionConnectorPaint.setStrokeWidth(dpToPixels(CROSS_SECTION_CONNECTOR_WIDTH_DP));
         crossSectionConnectorPaint.setStyle(Paint.Style.STROKE);
 
         crossSectionIndicatorPaint.setColor(STATION_COLOUR);
-        crossSectionIndicatorPaint.setStrokeWidth(2);
+        crossSectionIndicatorPaint.setStrokeWidth(dpToPixels(CROSS_SECTION_INDICATOR_WIDTH_DP));
         crossSectionIndicatorPaint.setStyle(Paint.Style.FILL);
 
         isTwoFingerModeActive = GeneralPreferences.isTwoFingerModeActive();
@@ -282,7 +288,13 @@ public class GraphView extends View {
         hotCornersPaint.setColor(Colour.GREY.intValue);
         hotCornersPaint.setAlpha(FADED_ALPHA);
 
-        stationCrossDiameter = GeneralPreferences.getStationCrossDiameterPixels();
+        stationCrossDiameterPx = dpToPixels(GeneralPreferences.getStationCrossDiameterDp());
+        legendTickSizePx = dpToPixels(LEGEND_TICK_SIZE_DP);
+        dashedLineIntervalPx = dpToPixels(DASHED_LINE_INTERVAL_DP);
+        deletePathsWithinPx = dpToPixels(DELETE_PATHS_WITHIN_N_DP);
+        selectionSensitivityPx = dpToPixels(SELECTION_SENSITIVITY_DP);
+        snapToLineSensitivityPx = dpToPixels(SNAP_TO_LINE_SENSITIVITY_DP);
+        stationLabelOffsetPx = dpToPixels(STATION_LABEL_OFFSET_DP);
 
         commentIcon = BitmapFactory.decodeResource(getResources(), R.drawable.speech_bubble);
         linkIcon = BitmapFactory.decodeResource(getResources(), R.drawable.link);
@@ -489,7 +501,7 @@ public class GraphView extends View {
     }
 
     private Coord2D considerSnapToSketchLine(Coord2D pointTouched) {
-        float deltaInMetres = SNAP_TO_LINE_SENSITIVITY_IN_PIXELS / surveyToViewScale;
+        float deltaInMetres = snapToLineSensitivityPx / surveyToViewScale;
         Coord2D closestPathEnd = sketch.findEligibleSnapPointWithin(pointTouched, deltaInMetres);
         return closestPathEnd; // null if nothing close found
     }
@@ -530,7 +542,7 @@ public class GraphView extends View {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 SketchDetail closestDetail = sketch.findNearestDetailWithin(
-                        touchPointOnSurvey, DELETE_PATHS_WITHIN_N_PIXELS);
+                        touchPointOnSurvey, deletePathsWithinPx);
 
                 // you missed, try again :P
                 if (closestDetail == null) {
@@ -540,7 +552,7 @@ public class GraphView extends View {
                 } else if (deleteLineFragments && closestDetail instanceof PathDetail) {
                     List<SketchDetail> fragments =
                             ((PathDetail)closestDetail).getPathFragmentsOutsideRadius(
-                                    touchPointOnSurvey, DELETE_PATHS_WITHIN_N_PIXELS / 4);
+                                    touchPointOnSurvey, deletePathsWithinPx / 4);
                     sketch.deleteDetail(closestDetail, fragments);
                     invalidate();
 
@@ -688,7 +700,7 @@ public class GraphView extends View {
 
     private Station checkForStation(Coord2D touchPointOnView) {
         float selectionTolerance =
-                SELECTION_SENSITIVITY_IN_PIXELS / surveyToViewScale;
+                selectionSensitivityPx / surveyToViewScale;
         Coord2D touchPointOnSurvey = viewCoordsToSurveyCoords(touchPointOnView);
 
         Station matchedStation = findNearestStationWithinDelta(projection,
@@ -745,6 +757,10 @@ public class GraphView extends View {
         }
     }
 
+
+    private static float dpToPixels(float dp) {
+        return Math.max(1f, SexyTopo.dpToPixels(dp));
+    }
 
     public float spToPixels(float sp) {
         float scaledSizeInPixels =
@@ -952,7 +968,8 @@ public class GraphView extends View {
             Coord2D centreOnSurvey = sectionDetail.getPosition();
             Coord2D centreOnView = surveyCoordsToViewCoords(centreOnSurvey);
             drawStationCross(
-                    canvas, stationPaint, centreOnView.x, centreOnView.y, STATION_DIAMETER, alpha);
+                    canvas, stationPaint, centreOnView.x, centreOnView.y,
+                    Math.round(stationCrossDiameterPx), alpha);
 
             String description =
                     sectionDetail.getCrossSection().getStation().getName() + " X";
@@ -968,7 +985,7 @@ public class GraphView extends View {
             Coord2D viewStationLocation = surveyCoordsToViewCoords(surveyStationLocation);
             drawDashedLine(
                     canvas, viewStationLocation, centreOnView,
-                    DASHED_LINE_INTERVAL, crossSectionConnectorPaint);
+                    dashedLineIntervalPx, crossSectionConnectorPaint);
         }
 
         for (CrossSectionDetail crossSectionDetail : badXSections) {
@@ -1019,7 +1036,7 @@ public class GraphView extends View {
             if (projectionType.isLegInPlane(leg)) {
                 canvas.drawLine(start.x, start.y, end.x, end.y, paint);
 			} else {
-                drawDashedLine(canvas, start, end, DASHED_LINE_INTERVAL, paint);
+                drawDashedLine(canvas, start, end, dashedLineIntervalPx, paint);
             }
         }
     }
@@ -1061,14 +1078,15 @@ public class GraphView extends View {
             int x = (int)(translatedStation.x);
             int y = (int)(translatedStation.y);
 
-            drawStationCross(canvas, stationPaint, x, y, stationCrossDiameter, alpha);
+            int stationCrossDiameterIntPx = Math.round(stationCrossDiameterPx);
+            drawStationCross(canvas, stationPaint, x, y, stationCrossDiameterIntPx, alpha);
 
             if (station == survey.getActiveStation()) {
                 highlightActiveStation(canvas, x, y);
             }
 
-            int spacing = stationCrossDiameter / 2;
-            int nextX = x + stationCrossDiameter;
+            int spacing = stationCrossDiameterIntPx / 2;
+            int nextX = x + stationCrossDiameterIntPx;
 
             if (showStationLabels) {
                 String name = station.getName();
@@ -1077,7 +1095,7 @@ public class GraphView extends View {
                 }
                 canvas.drawText(name,
                         nextX,
-                        y + STATION_LABEL_OFFSET,
+                        y + stationLabelOffsetPx,
                         stationPaint);
                 nextX += Math.round(stationPaint.measureText(name)) + spacing;
             }
@@ -1090,11 +1108,11 @@ public class GraphView extends View {
                 icons.add(linkIcon);
             }
 
-            for (Bitmap icon : icons) {int yTop = y - stationCrossDiameter / 2;
+            for (Bitmap icon : icons) {int yTop = y - stationCrossDiameterIntPx / 2;
                 Rect rect = new Rect(
-                    nextX, yTop, nextX + stationCrossDiameter, yTop + stationCrossDiameter);
+                    nextX, yTop, nextX + stationCrossDiameterIntPx, yTop + stationCrossDiameterIntPx);
                 canvas.drawBitmap(icon, null, rect, iconPaint);
-                nextX += stationCrossDiameter + spacing;
+                nextX += stationCrossDiameterIntPx + spacing;
             }
 
             CrossSectionDetail crossSectionDetail = sketch.getCrossSectionDetail(station);
@@ -1150,8 +1168,8 @@ public class GraphView extends View {
 
     private void highlightActiveStation(Canvas canvas, float x, float y) {
 
-        float diameter = 22;
-        int gap = 6;
+        float diameter = stationCrossDiameterPx * 1.1f;
+        float gap = diameter / 3f;
         float topY = y - (diameter / 2);
         float bottomY = y + (diameter / 2);
         float leftX = x - (diameter / 2);
@@ -1333,9 +1351,9 @@ public class GraphView extends View {
         canvas.drawLine(
                 x, scaleY, x + scaleWidth, scaleY, legendPaint);
         canvas.drawLine(
-                x, scaleY, offsetX, scaleY - LEGEND_TICK_SIZE, legendPaint);
+                x, scaleY, offsetX, scaleY - legendTickSizePx, legendPaint);
         canvas.drawLine(x + scaleWidth, scaleY,
-                x + scaleWidth, scaleY - LEGEND_TICK_SIZE, legendPaint);
+                x + scaleWidth, scaleY - legendTickSizePx, legendPaint);
         String scaleLabel = minorGridSize + "m";
         canvas.drawText(scaleLabel, x + scaleWidth + 0.2f * legendSize, scaleY, legendPaint);
 

@@ -433,11 +433,13 @@
     <string name="settings_survey_symbol_size_title">Taille du symbole de la topographie</string>
     <string name="settings_survey_symbol_size_summary">De quelle taille dessiner les symboles (dp)</string>
     <string name="settings_leg_width_title">Épaisseur de la ligne du segment</string>
-    <string name="settings_leg_width_summary">Quelle épaisseur pour dessiner les lignes des segments</string>
+    <string name="settings_leg_width_summary">Quelle épaisseur pour dessiner les lignes des segments (dp)</string>
+    <string name="settings_sketch_line_width_title">Épaisseur de la ligne de croquis</string>
+    <string name="settings_sketch_line_width_summary">Quelle épaisseur pour dessiner les lignes de croquis (dp)</string>
     <string name="settings_splay_width_title">Épaisseur de la ligne de radiale</string>
-    <string name="settings_splay_width_summary">Quelle épaisseur pour dessiner les lignes des radiales</string>
+    <string name="settings_splay_width_summary">Quelle épaisseur pour dessiner les lignes des radiales (dp)</string>
     <string name="settings_station_diameter_title">Diamètre de la station</string>
-    <string name="settings_station_diameter_summary">Quelle taille pour dessiner les symboles des stations</string>
+    <string name="settings_station_diameter_summary">Quelle taille pour dessiner les symboles des stations (dp)</string>
     <string name="settings_station_label_font_size_sp_title">Taille de la police des noms de station</string>
     <string name="settings_station_label_font_size_sp_summary">Taille de la police des noms des stations</string>
     <string name="settings_legend_font_size_sp_title">Taille de la police de la légende</string>

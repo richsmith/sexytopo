@@ -40,24 +40,31 @@
         android:defaultValue="35"/>
 
     <EditTextPreference
+        android:key="pref_sketch_line_width"
+        android:title="@string/settings_sketch_line_width_title"
+        android:summary="@string/settings_sketch_line_width_summary"
+        android:inputType="numberDecimal"
+        android:defaultValue="1.5"/>
+
+    <EditTextPreference
         android:key="pref_leg_width"
         android:title="@string/settings_leg_width_title"
         android:summary="@string/settings_leg_width_summary"
-        android:inputType="number"
+        android:inputType="numberDecimal"
         android:defaultValue="3"/>
 
     <EditTextPreference
         android:key="pref_splay_width"
         android:title="@string/settings_splay_width_title"
         android:summary="@string/settings_splay_width_summary"
-        android:inputType="number"
+        android:inputType="numberDecimal"
         android:defaultValue="1"/>
 
     <EditTextPreference
         android:key="pref_station_diameter"
         android:title="@string/settings_station_diameter_title"
         android:summary="@string/settings_station_diameter_summary"
-        android:inputType="number"
+        android:inputType="numberDecimal"
         android:defaultValue="16"/>
 
     <EditTextPreference

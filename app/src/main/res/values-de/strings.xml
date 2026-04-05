@@ -433,11 +433,13 @@
     <string name="settings_survey_symbol_size_title">Grösse Vermessungs-Symbol</string>
     <string name="settings_survey_symbol_size_summary">Ausgangsgrösse Symbole (dp)</string>
     <string name="settings_leg_width_title">Liniendicke Messstrecke</string>
-    <string name="settings_leg_width_summary">Wie breit Messstrecken dargestellt werden sollen</string>
+    <string name="settings_leg_width_summary">Wie breit Messstrecken dargestellt werden sollen (dp)</string>
+    <string name="settings_sketch_line_width_title">Liniendicke Zeichnung</string>
+    <string name="settings_sketch_line_width_summary">Wie breit Zeichenlinien dargestellt werden sollen (dp)</string>
     <string name="settings_splay_width_title">Liniendicke Dimensionen und Hilfslinien</string>
-    <string name="settings_splay_width_summary">Wie breit Dimensionen und Hilfslinien dargestellt werden sollen</string>
+    <string name="settings_splay_width_summary">Wie breit Dimensionen und Hilfslinien dargestellt werden sollen (dp)</string>
     <string name="settings_station_diameter_title">Durchmesser Messpunkt</string>
-    <string name="settings_station_diameter_summary">Wie gross Messpunkt-Symbole dargestellt werden sollen</string>
+    <string name="settings_station_diameter_summary">Wie gross Messpunkt-Symbole dargestellt werden sollen (dp)</string>
     <string name="settings_station_label_font_size_sp_title">Grösse der Messpunkt-Beschriftung</string>
     <string name="settings_station_label_font_size_sp_summary">Grösse der Messpunkt-Beschriftung</string>
     <string name="settings_legend_font_size_sp_title">Grösse der Legenden-Beschriftung</string>
