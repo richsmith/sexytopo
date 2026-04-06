@@ -106,7 +106,7 @@ Path simplification is re-applied on load. History stacks are not serialized.
 - **Text:** font size = `textSize * surveyToViewScale`; supports `\n` for multiline
 - **Cross-sections:** `CrossSectionDetail.getProjection()` computes the legs; drawn with dashed connector line to the actual station
 
-Off-screen details are culled via `couldBeOnScreen()` before rendering.
+Off-screen and sub-pixel details are culled via `couldBeVisible()` before rendering.
 
 ## Key Files
 

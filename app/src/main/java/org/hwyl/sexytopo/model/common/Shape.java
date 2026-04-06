@@ -103,6 +103,10 @@ public class Shape {
     }
 
 
+    public boolean couldBeVisibleAtScale(float scale) {
+        return getMaxDimension() * scale >= 1;
+    }
+
     public boolean intersectsRectangle(Coord2D rectangleTopLeft, Coord2D rectangleBottomRight) {
 
         float left1 = rectangleTopLeft.x;

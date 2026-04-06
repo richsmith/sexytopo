@@ -943,7 +943,7 @@ public class GraphView extends View {
 
         for (CrossSectionDetail sectionDetail : crossSectionDetails) {
 
-            if (!couldBeOnScreen(sectionDetail)) {
+            if (!couldBeVisible(sectionDetail)) {
                 continue;
             }
 
@@ -1235,7 +1235,7 @@ public class GraphView extends View {
 
         for (PathDetail pathDetail : sketch.getPathDetails()) {
 
-            if (!couldBeOnScreen(pathDetail)) {
+            if (!couldBeVisible(pathDetail)) {
                 continue;
             }
 
@@ -1303,7 +1303,7 @@ public class GraphView extends View {
         }
 
         for (SymbolDetail symbolDetail : sketch.getSymbolDetails()) {
-            if (!couldBeOnScreen(symbolDetail)) {
+            if (!couldBeVisible(symbolDetail)) {
                 continue;
             }
             Coord2D location = surveyCoordsToViewCoords(symbolDetail.getPosition());
@@ -1417,9 +1417,17 @@ public class GraphView extends View {
     }
 
 
-    private boolean couldBeOnScreen(SketchDetail sketchDetail) {
-        return sketchDetail.intersectsRectangle(
+    /**
+     * Returns true if a sketch detail could be visible in the current view — i.e. its bounding
+     * box intersects the screen area and it is large enough to occupy at least one pixel at the
+     * current zoom level. Details that fail either check can be skipped without drawing.
+     */
+    private boolean couldBeVisible(SketchDetail sketchDetail) {
+        boolean possiblyOnScreen = sketchDetail.intersectsRectangle(
                 viewpointTopLeftOnSurvey, viewpointBottomRightOnSurvey);
+        boolean bigEnough = sketchDetail.couldBeVisibleAtScale(surveyToViewScale);
+
+        return (possiblyOnScreen && bigEnough);
     }
 
 
