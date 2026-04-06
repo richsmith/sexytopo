@@ -7,6 +7,8 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.google.android.material.textfield.TextInputLayout;
+
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.util.InputMode;
@@ -38,6 +40,12 @@ public class EditLegForm extends Form {
     private EditText toCommentField;
 
     private Station lastFromStation;
+
+    private TextInputLayout fromStationLayout;
+    private TextInputLayout toStationLayout;
+    private TextInputLayout distanceLayout;
+    private TextInputLayout azimuthLayout;
+    private TextInputLayout inclinationLayout;
 
     private EditText distanceField;
     private EditText azimuthField;
@@ -95,6 +103,12 @@ public class EditLegForm extends Form {
 
     private void initialiseFields(View dialogView) {
         // Find all view references from the dialog
+        this.fromStationLayout = dialogView.findViewById(R.id.fromStationLayout);
+        this.toStationLayout = dialogView.findViewById(R.id.toStationLayout);
+        this.distanceLayout = dialogView.findViewById(R.id.distanceLayout);
+        this.azimuthLayout = dialogView.findViewById(R.id.azimuth_standard);
+        this.inclinationLayout = dialogView.findViewById(R.id.inclinationLayout);
+
         this.fromStationField = dialogView.findViewById(R.id.editFromStation);
         this.fromCommentField = dialogView.findViewById(R.id.editFromComment);
         this.toStationField = dialogView.findViewById(R.id.editToStation);
@@ -115,6 +129,21 @@ public class EditLegForm extends Form {
         this.distanceField.addTextChangedListener(new TextViewValidationTrigger(this));
         this.azimuthField.addTextChangedListener(new TextViewValidationTrigger(this));
         this.inclinationField.addTextChangedListener(new TextViewValidationTrigger(this));
+
+        // Enable error display once user first interacts with any field
+        android.view.View.OnFocusChangeListener enableErrorsOnTouch = (v, hasFocus) -> {
+            if (!hasFocus) {
+                enableErrors();
+                validate();
+            }
+        };
+        this.fromStationField.setOnFocusChangeListener(enableErrorsOnTouch);
+        if (!isSplay) {
+            this.toStationField.setOnFocusChangeListener(enableErrorsOnTouch);
+        }
+        this.distanceField.setOnFocusChangeListener(enableErrorsOnTouch);
+        this.azimuthField.setOnFocusChangeListener(enableErrorsOnTouch);
+        this.inclinationField.setOnFocusChangeListener(enableErrorsOnTouch);
 
     }
 
@@ -223,7 +252,12 @@ public class EditLegForm extends Form {
             lastFromStation = fromStation;
         }
 
-        setError(fromField, error);
+        TextInputLayout layout = (fromField == fromStationField) ? fromStationLayout : toStationLayout;
+        if (layout != null) {
+            setError(layout, error);
+        } else {
+            setError(fromField, error);
+        }
         return fromStation;
     }
 
@@ -259,26 +293,31 @@ public class EditLegForm extends Form {
             }
         }
 
-        setError(toField, error);
+        TextInputLayout layout = (toField == toStationField) ? toStationLayout : fromStationLayout;
+        if (layout != null) {
+            setError(layout, error);
+        } else {
+            setError(toField, error);
+        }
     }
 
     private void validateDistance() {
         String distanceText = this.distanceField.getText().toString();
         try {
             if (distanceText.isEmpty()) {
-                setError(this.distanceField, R.string.validation_error_cannot_be_blank);
+                setError(this.distanceLayout, R.string.validation_error_cannot_be_blank);
             } else {
                 float distance = Float.parseFloat(distanceText);
                 if (!Leg.isDistanceLegal(distance)) {
-                    setError(this.distanceField,
+                    setError(this.distanceLayout,
                         context.getString(R.string.validation_error_distance_minimum,
                             Leg.MIN_DISTANCE));
                 } else {
-                    setError(this.distanceField, (Integer) null);
+                    setError(this.distanceLayout, (Integer) null);
                 }
             }
         } catch (NumberFormatException e) {
-            setError(this.distanceField, context.getString(R.string.validation_error_must_be_number));
+            setError(this.distanceLayout, context.getString(R.string.validation_error_must_be_number));
         }
     }
 
@@ -286,18 +325,18 @@ public class EditLegForm extends Form {
         String azimuthText = this.azimuthField.getText().toString();
         try {
             if (azimuthText.isEmpty()) {
-                setError(this.azimuthField, context.getString(R.string.validation_error_cannot_be_blank));
+                setError(this.azimuthLayout, context.getString(R.string.validation_error_cannot_be_blank));
             } else {
                 float azimuth = Float.parseFloat(azimuthText);
                 if (!Leg.isAzimuthLegal(azimuth)) {
-                    setError(this.azimuthField,
+                    setError(this.azimuthLayout,
                         context.getString(R.string.validation_error_azimuth_range, Leg.MIN_AZIMUTH, Leg.MAX_AZIMUTH));
                 } else {
-                    setError(this.azimuthField, (Integer) null);
+                    setError(this.azimuthLayout, (Integer) null);
                 }
             }
         } catch (NumberFormatException e) {
-            setError(this.azimuthField, context.getString(R.string.validation_error_must_be_number));
+            setError(this.azimuthLayout, context.getString(R.string.validation_error_must_be_number));
         }
     }
 
@@ -305,18 +344,18 @@ public class EditLegForm extends Form {
         String inclinationText = this.inclinationField.getText().toString();
         try {
             if (inclinationText.isEmpty()) {
-                setError(this.inclinationField, context.getString(R.string.validation_error_cannot_be_blank));
+                setError(this.inclinationLayout, context.getString(R.string.validation_error_cannot_be_blank));
             } else {
                 float inclination = Float.parseFloat(inclinationText);
                 if (!Leg.isInclinationLegal(inclination)) {
-                    setError(this.inclinationField,
+                    setError(this.inclinationLayout,
                         context.getString(R.string.validation_error_inclination_range, Leg.MIN_INCLINATION, Leg.MAX_INCLINATION));
                 } else {
-                    setError(this.inclinationField, (Integer) null);
+                    setError(this.inclinationLayout, (Integer) null);
                 }
             }
         } catch (NumberFormatException e) {
-            setError(this.inclinationField, context.getString(R.string.validation_error_must_be_number));
+            setError(this.inclinationLayout, context.getString(R.string.validation_error_must_be_number));
         }
     }
 

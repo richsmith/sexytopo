@@ -36,12 +36,18 @@ abstract public class Form {
     }
 
     private boolean valid;
+    private boolean showErrors;
     @Nullable private OnDidValidateCallback onDidValidateCallback;
 
     Form(Context context) {
         this.context = context;
         this.valid = true;
+        this.showErrors = false;
         this.onDidValidateCallback = null;
+    }
+
+    public void enableErrors() {
+        this.showErrors = true;
     }
 
     public void setOnDidValidateCallback(@Nullable OnDidValidateCallback callback) {
@@ -67,7 +73,7 @@ abstract public class Form {
         boolean fieldValid = (error == null);
 
         this.valid = this.valid  & fieldValid;
-        field.setError(error);
+        field.setError(showErrors ? error : null);
     }
 
     protected void setError(TextView field, Integer error) {
@@ -77,7 +83,7 @@ abstract public class Form {
 
     protected void setError(TextInputLayout layout, CharSequence error) {
         this.valid = this.valid & (error == null);
-        layout.setError(error);
+        layout.setError(showErrors ? error : null);
     }
 
     protected void setError(TextInputLayout layout, Integer error) {

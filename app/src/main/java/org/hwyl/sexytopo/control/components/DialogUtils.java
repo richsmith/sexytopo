@@ -75,6 +75,7 @@ public class DialogUtils {
         form.validate();
 
         positiveButton.setOnClickListener(v -> {
+            form.enableErrors();
             form.validate();
             if (form.isValid()) {
                 if (onValid != null) {
