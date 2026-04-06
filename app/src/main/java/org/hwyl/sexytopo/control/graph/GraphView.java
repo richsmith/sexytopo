@@ -1180,18 +1180,33 @@ public class GraphView extends View {
         float innerTop = topY + ((diameter - gap) / 2);
         float innerBottom = innerTop + gap;
 
-        // top lines
-        canvas.drawLine(leftX, topY, innerLeft, topY, highlightPaint);
-        canvas.drawLine(innerRight, topY, rightX, topY, highlightPaint);
-        // bottom lines
-        canvas.drawLine(leftX, bottomY, innerLeft, bottomY, highlightPaint);
-        canvas.drawLine(innerRight, bottomY, rightX, bottomY, highlightPaint);
-        // left lines
-        canvas.drawLine(leftX, topY, leftX, innerTop, highlightPaint);
-        canvas.drawLine(leftX, innerBottom, leftX, bottomY, highlightPaint);
-        // right lines
-        canvas.drawLine(rightX, topY, rightX, innerTop, highlightPaint);
-        canvas.drawLine(rightX, innerBottom, rightX, bottomY, highlightPaint);
+        // top-left corner
+        Path topLeft = new Path();
+        topLeft.moveTo(innerLeft, topY);
+        topLeft.lineTo(leftX, topY);
+        topLeft.lineTo(leftX, innerTop);
+        canvas.drawPath(topLeft, highlightPaint);
+
+        // top-right corner
+        Path topRight = new Path();
+        topRight.moveTo(innerRight, topY);
+        topRight.lineTo(rightX, topY);
+        topRight.lineTo(rightX, innerTop);
+        canvas.drawPath(topRight, highlightPaint);
+
+        // bottom-left corner
+        Path bottomLeft = new Path();
+        bottomLeft.moveTo(leftX, innerBottom);
+        bottomLeft.lineTo(leftX, bottomY);
+        bottomLeft.lineTo(innerLeft, bottomY);
+        canvas.drawPath(bottomLeft, highlightPaint);
+
+        // bottom-right corner
+        Path bottomRight = new Path();
+        bottomRight.moveTo(rightX, innerBottom);
+        bottomRight.lineTo(rightX, bottomY);
+        bottomRight.lineTo(innerRight, bottomY);
+        canvas.drawPath(bottomRight, highlightPaint);
     }
 
 
