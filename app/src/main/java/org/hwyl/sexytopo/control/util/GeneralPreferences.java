@@ -192,7 +192,7 @@ public class GeneralPreferences {
     }
 
     public static float getStationCrossDiameterDp() {
-        return getFloat("pref_station_diameter", 8f);
+        return getFloat("pref_station_diameter", 12f);
     }
 
     public static float getLegStrokeWidthDp() {
