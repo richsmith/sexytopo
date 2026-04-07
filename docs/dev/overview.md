@@ -111,7 +111,6 @@ Each format is handled by dedicated import/export classes. When adding format su
 - String names must use the appropriate section prefix to match the relevant section in `strings.xml` (e.g. `action_`, `file_`, etc.). Place new strings in the correct comment-delimited section.
 - When adding strings, add translations to all language files
 - When updating either sketch view (graph view), remember to consider landscape mode
-- When updating either sketch view (graph view), remember to consider landscape mode
 
 ## Testing
 
