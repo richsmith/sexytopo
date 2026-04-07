@@ -562,6 +562,8 @@
     <!-- Context menu(s) -->
     <string name="menu_context_title">Estación</string>
     <string name="menu_leg">Tramo</string>
+    <string name="menu_incoming_leg">Tramo entrante</string>
+    <string name="menu_leg_title_dynamic">Tramo %1$s &#10132; %2$s</string>
     <string name="menu_splay">Radial</string>
     <string name="menu_station">Estación</string>
     <string name="menu_set_active_station">Establecer como Activa</string>
@@ -577,14 +579,15 @@
     <string name="menu_draw_right">Dibujar Derecha</string>
     <string name="menu_move_row">Mover a Estación Diferente</string>
     <string name="menu_jump_to">Saltar</string>
-    <string name="menu_jump_to_station_in_plan">→ Planta</string>
-    <string name="menu_jump_to_station_in_elevation">→ Alzado</string>
+    <string name="menu_jump_to_station_in_plan">&#10132; Planta</string>
+    <string name="menu_jump_to_station_in_elevation">&#10132; Alzado</string>
     <string name="menu_new_cross_section">Nueva Sección Transversal</string>
-    <string name="menu_jump_to_station_in_table">→ Tabla de Datos</string>
+    <string name="menu_jump_to_station_in_table">&#10132; Tabla de Datos</string>
     <string name="menu_delete_station">Eliminar</string>
     <string name="menu_reverse">Invertir</string>
     <string name="menu_switch_direction">Cambiar Dirección</string>
     <string name="menu_navigate">Navegar</string>
+    <string name="menu_links">Enlazar</string>
     <string name="menu_survey">Topografía</string>
     <string name="menu_survey_start_new_dialog_title">Iniciar nueva topografía</string>
     <string name="menu_survey_start_new_dialog_station_name">Nombre de la estación inicial</string>

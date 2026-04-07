@@ -562,6 +562,8 @@
     <!-- Context menu(s) -->
     <string name="menu_context_title">Stanowisko</string>
     <string name="menu_leg">Ciąg</string>
+    <string name="menu_incoming_leg">Ciąg wchodzący</string>
+    <string name="menu_leg_title_dynamic">Ciąg %1$s &#10132; %2$s</string>
     <string name="menu_splay">Pomiar szczegółowy</string>
     <string name="menu_station">Stanowisko</string>
     <string name="menu_set_active_station">Ustaw jako aktywne</string>
@@ -577,14 +579,15 @@
     <string name="menu_draw_right">Rysuj prawo</string>
     <string name="menu_move_row">Przenieś do innego stanowiska</string>
     <string name="menu_jump_to">Przeskocz</string>
-    <string name="menu_jump_to_station_in_plan">→ Plan</string>
-    <string name="menu_jump_to_station_in_elevation">→ Przekrój</string>
+    <string name="menu_jump_to_station_in_plan">&#10132; Plan</string>
+    <string name="menu_jump_to_station_in_elevation">&#10132; Przekrój</string>
     <string name="menu_new_cross_section">Nowy przekrój poprzeczny</string>
-    <string name="menu_jump_to_station_in_table">→ Tabela danych</string>
+    <string name="menu_jump_to_station_in_table">&#10132; Tabela danych</string>
     <string name="menu_delete_station">Usuń</string>
     <string name="menu_reverse">Odwróć</string>
     <string name="menu_switch_direction">Przełącz kierunek</string>
     <string name="menu_navigate">Nawiguj</string>
+    <string name="menu_links">Połączenia</string>
     <string name="menu_survey">Pomiar</string>
     <string name="menu_start_new_survey">Rozpocznij nowy pomiar tutaj</string>
     <string name="menu_unlink_survey">Odłącz połączony pomiar</string>
@@ -592,8 +595,7 @@
     <string name="menu_survey_start_new_dialog_station_name">Nazwa stanowiska początkowego</string>
     <string name="menu_comment">Komentarz</string>
     <string name="menu_toggle_left_right">Przełącz lewo/prawo</string>
-    <string name="menu_context_title_leg_to">Ciąg do %s</string>
-    <string name="menu_context_title_leg_from">Ciąg z %s</string>
+    <string name="menu_context_title_leg">Ciąg %1$s &#10132; %2$s</string>
     <string name="menu_context_title_splay">%s do pomiaru szczegółowego</string>
     <string name="context_this_will_delete">To spowoduje usunięcie:</string>
     <string name="context_jump_to_splay_error">Nie można przeskoczyć do końca pomiaru szczegółowego</string>

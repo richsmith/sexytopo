@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Leg/Splay title (disabled, shows leg description) -->
+    <item
+        android:id="@+id/station_title"
+        android:title="@string/menu_leg"
+        android:enabled="false"/>
+
+    <!-- Leg/Splay actions -->
+    <group android:id="@+id/group_leg_actions">
+        <item
+            android:id="@+id/action_edit_leg"
+            android:title="@string/menu_edit_leg"/>
+
+        <item
+            android:id="@+id/action_reverse"
+            android:title="@string/menu_reverse"/>
+
+        <item
+            android:id="@+id/action_upgrade_splay"
+            android:title="@string/menu_upgrade_splay"
+            android:visible="false"/>
+
+        <item
+            android:id="@+id/action_downgrade_leg"
+            android:title="@string/menu_downgrade_leg"
+            android:visible="false"/>
+    </group>
+
+    <!-- Delete leg separated by divider -->
+    <group android:id="@+id/group_leg_delete">
+        <item
+            android:id="@+id/action_delete_leg"
+            android:title="@string/menu_delete_leg"/>
+    </group>
+
+</menu>

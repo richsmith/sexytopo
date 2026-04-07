@@ -555,10 +555,11 @@
 
     <!-- Context menu(s) -->
     <string name="menu_context_title">Station</string>
-    <string name="menu_context_title_leg_to">Visée vers %s</string>
-    <string name="menu_context_title_leg_from">Visée depuis %s</string>
+    <string name="menu_context_title_leg">Visée %1$s \&#10132; %2$s</string>
     <string name="menu_context_title_splay">%s à Visée rayonnante</string>
     <string name="menu_leg">Visée</string>
+    <string name="menu_incoming_leg">Visée entrante</string>
+    <string name="menu_leg_title_dynamic">Visée %1$s &#10132; %2$s</string>
     <string name="menu_splay">Visée rayonnante</string>
     <string name="menu_station">Station</string>
     <string name="menu_set_active_station">Définir active</string>
@@ -574,14 +575,15 @@
     <string name="menu_draw_right">Dessiner à droite</string>
     <string name="menu_move_row">Changer de station</string>
     <string name="menu_jump_to">Aller à</string>
-    <string name="menu_jump_to_station_in_plan">→ Plan</string>
-    <string name="menu_jump_to_station_in_elevation">→ Élévation</string>
+    <string name="menu_jump_to_station_in_plan">&#10132; Plan</string>
+    <string name="menu_jump_to_station_in_elevation">&#10132; Élévation</string>
     <string name="menu_new_cross_section">Nouvelle coupe transversale</string>
-    <string name="menu_jump_to_station_in_table">→ Tableau de données</string>
+    <string name="menu_jump_to_station_in_table">&#10132; Tableau de données</string>
     <string name="menu_delete_station">Supprimer</string>
     <string name="menu_reverse">Inverser</string>
     <string name="menu_switch_direction">Changer de direction</string>
     <string name="menu_navigate">Naviguer</string>
+    <string name="menu_links">Liens</string>
     <string name="menu_survey">Topographie</string>
     <string name="menu_survey_start_new_dialog_title">Démarrer une nouvelle topographie</string>
     <string name="menu_survey_start_new_dialog_station_name">Nom de la station de départ</string>

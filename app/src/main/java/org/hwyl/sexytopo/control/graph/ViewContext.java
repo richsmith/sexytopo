@@ -13,7 +13,7 @@ public enum ViewContext {
     TABLE {
         @Override
         public void configureViewSpecificItems(Menu menu) {
-            menu.findItem(R.id.action_jump_to_table).setVisible(false);
+            setItemVisible(menu, R.id.action_jump_to_table, false);
             setDirectionSubmenuVisible(menu, false);
             setCrossSectionVisible(menu, false);
         }
@@ -21,7 +21,7 @@ public enum ViewContext {
     PLAN {
         @Override
         public void configureViewSpecificItems(Menu menu) {
-            menu.findItem(R.id.action_jump_to_plan).setVisible(false);
+            setItemVisible(menu, R.id.action_jump_to_plan, false);
             setDirectionSubmenuVisible(menu, false);
             setCrossSectionVisible(menu, true);
         }
@@ -29,7 +29,7 @@ public enum ViewContext {
     ELEVATION {
         @Override
         public void configureViewSpecificItems(Menu menu) {
-            menu.findItem(R.id.action_jump_to_elevation).setVisible(false);
+            setItemVisible(menu, R.id.action_jump_to_elevation, false);
             setDirectionSubmenuVisible(menu, false);
             setCrossSectionVisible(menu, false);
         }
@@ -37,12 +37,19 @@ public enum ViewContext {
     EXTENDED_ELEVATION {
         @Override
         public void configureViewSpecificItems(Menu menu) {
-            menu.findItem(R.id.action_jump_to_elevation).setVisible(false);
+            setItemVisible(menu, R.id.action_jump_to_elevation, false);
             setDirectionSubmenuVisible(menu, true);
         }
     };
 
     public abstract void configureViewSpecificItems(Menu menu);
+
+    protected void setItemVisible(Menu menu, int itemId, boolean visible) {
+        MenuItem item = menu.findItem(itemId);
+        if (item != null) {
+            item.setVisible(visible);
+        }
+    }
 
     protected void setDirectionSubmenuVisible(Menu menu, boolean visible) {
         MenuItem elevationMenu = menu.findItem(R.id.menu_elevation);

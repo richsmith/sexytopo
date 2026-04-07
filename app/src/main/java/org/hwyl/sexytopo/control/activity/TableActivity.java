@@ -257,23 +257,14 @@ public class TableActivity extends SurveyEditorActivity
         Leg leg = entry.getLeg();
         Station fromStation = entry.getFrom();
 
+        // Determine which station was tapped, accounting for backward shots
         Station station;
-
-        // Create custom title considering backwards shots & if we have selected FROM/TO
-        String customTitle;
+        boolean isStationColumn = (col == TableCol.FROM || col == TableCol.TO);
+        boolean tapOnFromStation = (col == TableCol.FROM) ^ leg.wasShotBackwards();
         if (leg.hasDestination()) {
-            if (leg.wasShotBackwards() ^ col == TableCol.FROM) {
-                // If backward shot XOR col is FROM
-                station = fromStation;
-                customTitle = getString(R.string.menu_context_title_leg_from, station.getName());
-            } else {
-                // if forward shot XOR col is not FROM
-                station = leg.getDestination();
-                customTitle = getString(R.string.menu_context_title_leg_to, station.getName());
-            }
+            station = tapOnFromStation ? fromStation : leg.getDestination();
         } else {
             station = fromStation;
-            customTitle = getString(R.string.menu_context_title_splay, station.getName());
         }
 
         // Highlight the entire row using ViewHolder
@@ -282,25 +273,33 @@ public class TableActivity extends SurveyEditorActivity
             clearHighlight();
             highlightedRow = viewHolder.itemView;
 
-            // Get primary color and make it semi-transparent
             android.util.TypedValue typedValue = new android.util.TypedValue();
             getTheme().resolveAttribute(androidx.appcompat.R.attr.colorPrimary, typedValue, true);
             int primaryColor = typedValue.data;
 
             ColorDrawable highlightDrawable = new ColorDrawable(primaryColor);
-            highlightDrawable.setAlpha(51); // 0-255, where 51 is 20% opacity
+            highlightDrawable.setAlpha(51);
 
-            // Set foreground on the row to highlight it (works on API 23+)
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
                 highlightedRow.setForeground(highlightDrawable);
             } else {
-                // Fallback: set background with transparency to show through
-                highlightedRow.setBackgroundColor(primaryColor & 0x33FFFFFF); // 33 = 20% alpha
+                highlightedRow.setBackgroundColor(primaryColor & 0x33FFFFFF);
             }
         }
 
-        // Show menu with custom title and clear highlight on dismiss
-        contextMenuManager.showMenu(view, station, getSurvey(), customTitle, this::clearHighlight, leg);
+        if (isStationColumn) {
+            contextMenuManager.showMenuForStation(view, station, getSurvey(), this::clearHighlight);
+        } else {
+            String customTitle;
+            if (leg.hasDestination()) {
+                String from = leg.wasShotBackwards() ? leg.getDestination().getName() : fromStation.getName();
+                String to = leg.wasShotBackwards() ? fromStation.getName() : leg.getDestination().getName();
+                customTitle = getString(R.string.menu_context_title_leg, from, to);
+            } else {
+                customTitle = getString(R.string.menu_context_title_splay, fromStation.getName());
+            }
+            contextMenuManager.showMenuForLeg(view, station, getSurvey(), customTitle, this::clearHighlight, leg);
+        }
     }
 
     private void clearHighlight() {

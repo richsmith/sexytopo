@@ -1,7 +1,9 @@
 package org.hwyl.sexytopo.control.graph;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Build;
 import android.text.SpannableString;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
@@ -10,6 +12,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.PopupMenu;
 
 import org.hwyl.sexytopo.R;
@@ -62,121 +66,58 @@ public class ContextMenuManager {
         menuActions.put(R.id.action_unlink_survey, activity::onUnlinkSurvey);
         menuActions.put(R.id.action_rename_station, activity::onRenameStation);
         menuActions.put(R.id.action_delete_station, activity::onDeleteStation);
-        menuActions.put(R.id.action_delete_leg, activity::onDeleteStation);
-        // Note: upgrade_splay and downgrade_leg are handled specially in handleMenuItemClick
     }
 
     /**
-     * Show the station context menu at specific coordinates.
+     * Show the station context menu at specific coordinates (used from graph views).
      * Uses a temporary invisible anchor view for precise positioning with PopupMenu.
-     *
-     * @param anchorView View to anchor the menu to (the view that was touched)
-     * @param station Station for this context menu
-     * @param survey Survey context (used to check linked surveys, origin station, etc.)
-     * @param x X coordinate for menu position (relative to anchorView)
-     * @param y Y coordinate for menu position (relative to anchorView)
      */
-    public void showMenu(View anchorView, Station station, org.hwyl.sexytopo.model.survey.Survey survey, int x, int y) {
-        // Use the window's decor view as the parent (it's a FrameLayout that supports free positioning)
-        if (!(context instanceof android.app.Activity)) {
-            // Fallback if context isn't an Activity
-            showMenu(anchorView, station, survey);
+    public void showMenuForStation(View anchorView, Station station, Survey survey, int x, int y) {
+        if (!(context instanceof Activity)) {
+            showMenuForStation(anchorView, station, survey, null);
             return;
         }
 
-        android.app.Activity activity = (android.app.Activity) context;
-        android.view.ViewGroup decorView = (android.view.ViewGroup) activity.getWindow().getDecorView();
+        Activity activityContext = (Activity) context;
+        ViewGroup decorView = (ViewGroup) activityContext.getWindow().getDecorView();
 
-        // Convert coordinates from anchorView-relative to screen coordinates
         int[] location = new int[2];
         anchorView.getLocationOnScreen(location);
 
-        int screenX = location[0] + x;
-        int screenY = location[1] + y;
-
-        // Create an invisible anchor view at the touch location
         View invisibleAnchor = new View(context);
-
-        // Use FrameLayout.LayoutParams for positioning in the decor view
-        android.widget.FrameLayout.LayoutParams params = new android.widget.FrameLayout.LayoutParams(1, 1);
-        params.leftMargin = screenX;
-        params.topMargin = screenY;
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(1, 1);
+        params.leftMargin = location[0] + x;
+        params.topMargin = location[1] + y;
         invisibleAnchor.setLayoutParams(params);
-
         decorView.addView(invisibleAnchor);
 
-        // Create and show PopupMenu anchored to the invisible view
         PopupMenu popup = new PopupMenu(context, invisibleAnchor);
-        popup.inflate(R.menu.station_context);
-
-        configureMenuVisibility(popup.getMenu(), station, survey);
+        popup.inflate(R.menu.context_station);
+        enableGroupDividers(popup);
+        configureMenuVisibility(popup.getMenu(), station, survey, null);
         setStationTitle(popup.getMenu(), station);
 
         popup.setOnMenuItemClickListener(item -> {
             boolean handled = handleMenuItemClick(item, station);
-            // Remove the anchor view when menu is dismissed
             decorView.post(() -> decorView.removeView(invisibleAnchor));
             return handled;
         });
-
-        popup.setOnDismissListener(menu -> {
-            // Remove anchor view if menu dismissed without selection
-            decorView.post(() -> {
-                try {
-                    decorView.removeView(invisibleAnchor);
-                } catch (Exception e) {
-                    // View might already be removed
-                }
-            });
-        });
-
+        popup.setOnDismissListener(menu -> decorView.post(() -> {
+            try {
+                decorView.removeView(invisibleAnchor);
+            } catch (Exception e) {
+                // View might already be removed
+            }
+        }));
         popup.show();
     }
 
-    /**
-     * Show the station context menu anchored to the given view.
-     * @param anchorView View to anchor the menu to
-     * @param station Station for this context menu
-     * @param survey Survey context (used to check linked surveys, origin station, etc.)
-     */
-    public void showMenu(View anchorView, Station station, org.hwyl.sexytopo.model.survey.Survey survey) {
-        showMenu(anchorView, station, survey, null, null);
-    }
-
-    /**
-     * Show the station context menu anchored to the given view with custom title.
-     * @param anchorView View to anchor the menu to
-     * @param station Station for this context menu
-     * @param survey Survey context (used to check linked surveys, origin station, etc.)
-     * @param customTitle Custom title to display (or null to use station name)
-     * @param onDismiss Optional callback when menu is dismissed
-     */
-    public void showMenu(View anchorView, Station station, org.hwyl.sexytopo.model.survey.Survey survey,
-                        String customTitle, Runnable onDismiss) {
-        showMenu(anchorView, station, survey, customTitle, onDismiss, null);
-    }
-
-    /**
-     * Show the station context menu with explicit leg context.
-     * @param anchorView View to anchor the menu to
-     * @param station Station for this context menu
-     * @param survey Survey context
-     * @param customTitle Custom title to display (or null to use station name)
-     * @param onDismiss Optional callback when menu is dismissed
-     * @param leg The specific leg clicked on (or null to infer from station)
-     */
-    public void showMenu(View anchorView, Station station, Survey survey,
-                        String customTitle, Runnable onDismiss, Leg leg) {
+    public void showMenuForStation(View anchorView, Station station, Survey survey, Runnable onDismiss) {
         PopupMenu popup = new PopupMenu(context, anchorView);
-        popup.inflate(R.menu.station_context);
-
-        configureMenuVisibility(popup.getMenu(), station, survey, leg);
-        if (customTitle != null) {
-            setCustomTitle(popup.getMenu(), customTitle);
-        } else {
-            setStationTitle(popup.getMenu(), station);
-        }
-
+        popup.inflate(R.menu.context_station);
+        enableGroupDividers(popup);
+        configureMenuVisibility(popup.getMenu(), station, survey, null);
+        setStationTitle(popup.getMenu(), station);
         popup.setOnMenuItemClickListener(item -> handleMenuItemClick(item, station));
         if (onDismiss != null) {
             popup.setOnDismissListener(menu -> onDismiss.run());
@@ -184,157 +125,111 @@ public class ContextMenuManager {
         popup.show();
     }
 
-    /**
-     * Show the station context menu anchored to the given view (without survey context).
-     * @deprecated Use showMenu(View, Station, Survey) for proper enable/disable logic
-     */
-    @Deprecated
-    public void showMenu(View anchorView, Station station) {
-        showMenu(anchorView, station, null);
+    public void showMenuForLeg(View anchorView, Station station, Survey survey,
+                               String customTitle, Runnable onDismiss, Leg leg) {
+        PopupMenu popup = new PopupMenu(context, anchorView);
+        popup.inflate(R.menu.context_leg);
+        enableGroupDividers(popup);
+        configureMenuVisibility(popup.getMenu(), station, survey, leg);
+        setCustomTitle(popup.getMenu(), customTitle != null ? customTitle : station.getName());
+        popup.setOnMenuItemClickListener(item -> handleMenuItemClick(item, station));
+        if (onDismiss != null) {
+            popup.setOnDismissListener(menu -> onDismiss.run());
+        }
+        popup.show();
     }
 
-    /**
-     * Configure which menu items are visible based on the current view context.
-     */
-    private void configureMenuVisibility(Menu menu, Station station, Survey survey) {
-        configureMenuVisibility(menu, station, survey, null);
+    private void enableGroupDividers(PopupMenu popup) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            popup.getMenu().setGroupDividerEnabled(true);
+        }
     }
 
-    /**
-     * Configure which menu items are visible based on the current view context.
-     * @param leg The specific leg clicked on (or null to infer from station)
-     */
     private void configureMenuVisibility(Menu menu, Station station, Survey survey, Leg leg) {
-        // Enable/disable link/unlink survey based on whether station has connections
+        // Enable/disable link/unlink survey based on whether station has linked surveys
         MenuItem linkItem = menu.findItem(R.id.action_link_survey);
         MenuItem unlinkItem = menu.findItem(R.id.action_unlink_survey);
         if (survey != null) {
             boolean hasLinks = survey.hasLinkedSurveys(station);
-            if (linkItem != null) {
-                linkItem.setEnabled(!hasLinks);
-            }
-            if (unlinkItem != null) {
-                unlinkItem.setEnabled(hasLinks);
-            }
+            if (linkItem != null) linkItem.setEnabled(!hasLinks);
+            if (unlinkItem != null) unlinkItem.setEnabled(hasLinks);
         }
 
-        // Enable/disable comment based on whether this is the origin station
+        // Disable comment for origin station
         MenuItem commentItem = menu.findItem(R.id.action_comment);
         if (commentItem != null && survey != null) {
             commentItem.setEnabled(station != survey.getOrigin());
         }
 
-        // Configure upgrade/downgrade visibility and submenu title based on leg type
         if (survey != null) {
-            // Use provided leg, or infer from station (which we assume is the destination station) if not provided
-            // Store it for the action handlers
             currentLeg = (leg != null) ? leg : survey.getReferringLeg(station);
 
             MenuItem upgradeItem = menu.findItem(R.id.action_upgrade_splay);
             MenuItem downgradeItem = menu.findItem(R.id.action_downgrade_leg);
             MenuItem legMenuItem = menu.findItem(R.id.menu_leg);
-            MenuItem stationMenuItem = menu.findItem(R.id.menu_station);
 
             if (currentLeg != null) {
                 boolean isSplay = !currentLeg.hasDestination();
-                Station fromStation = survey.getOriginatingStation(currentLeg);
-                if (upgradeItem != null) {
-                    upgradeItem.setVisible(isSplay);
-                }
+                if (upgradeItem != null) upgradeItem.setVisible(isSplay);
                 if (downgradeItem != null) {
-                    // Only show downgrade if it's a full leg AND destination has no onward legs
                     boolean canDowngrade = !isSplay &&
                         currentLeg.getDestination().getOnwardLegs().isEmpty();
                     downgradeItem.setVisible(canDowngrade);
                 }
-                // Set submenu title based on leg type
                 if (legMenuItem != null) {
-                    legMenuItem.setTitle(isSplay ? R.string.menu_splay : R.string.menu_leg);
+                    legMenuItem.setTitle(R.string.menu_incoming_leg);
                     if (!isSplay) {
-                        SubMenu legSubMenu = legMenuItem.getSubMenu();
-
-                        String title = currentLeg.wasShotBackwards() ?
-                                context.getString(R.string.menu_leg_title_dynamic, currentLeg.getDestination().getName(), fromStation.getName())
-                                :
-                                context.getString(R.string.menu_leg_title_dynamic, fromStation.getName(), currentLeg.getDestination().getName());
-
-                        legSubMenu.setHeaderTitle(title);
+                        Station fromStation = survey.getOriginatingStation(currentLeg);
+                        String from = currentLeg.wasShotBackwards()
+                                ? currentLeg.getDestination().getName() : fromStation.getName();
+                        String to = currentLeg.wasShotBackwards()
+                                ? fromStation.getName() : currentLeg.getDestination().getName();
+                        legMenuItem.getSubMenu().setHeaderTitle(
+                                context.getString(R.string.menu_leg_title_dynamic, from, to));
                     }
                 }
-
-                // Dynamically set the title for the "Station" submenu INTERNAL header
-                if (stationMenuItem != null && stationMenuItem.hasSubMenu() && station != null) {
-                    SubMenu stationSubMenu = stationMenuItem.getSubMenu();
-
-                    // Create the title string (e.g., "Station: A1")
-                    String title = context.getString(R.string.menu_station_title_dynamic, station.getName());
-
-                    // setHeaderTitle sets the text at the top of the opened submenu
-                    stationSubMenu.setHeaderTitle(title);
-                }
             } else {
-                // No referring leg (origin station) - hide both
-                if (upgradeItem != null) {
-                    upgradeItem.setVisible(false);
-                }
-                if (downgradeItem != null) {
-                    downgradeItem.setVisible(false);
-                }
-                // Default to "Leg" title
-                if (legMenuItem != null) {
-                    legMenuItem.setTitle(R.string.menu_leg);
-                }
+                // Origin station — hide leg submenu and upgrade/downgrade
+                if (upgradeItem != null) upgradeItem.setVisible(false);
+                if (downgradeItem != null) downgradeItem.setVisible(false);
+                if (legMenuItem != null) legMenuItem.setVisible(false);
             }
         }
 
-        // Configure direction radio buttons based on current station direction
+        // Configure direction radio buttons
         MenuItem leftItem = menu.findItem(R.id.action_direction_left);
         MenuItem rightItem = menu.findItem(R.id.action_direction_right);
         if (leftItem != null && rightItem != null) {
-            Direction currentDirection =
-                station.getExtendedElevationDirection();
+            Direction currentDirection = station.getExtendedElevationDirection();
             leftItem.setChecked(currentDirection == Direction.LEFT);
             rightItem.setChecked(currentDirection == Direction.RIGHT);
         }
 
-        // Configure view-specific menu items using polymorphism
-        // Do this last so we can hide anything made visible above
         viewContext.configureViewSpecificItems(menu);
     }
 
-    /**
-     * Set the menu title to show the station name with primary color background.
-     */
     private void setStationTitle(Menu menu, Station station) {
         setCustomTitle(menu, station.getName());
     }
 
-    /**
-     * Set a custom menu title with primary color background.
-     */
     private void setCustomTitle(Menu menu, String title) {
         MenuItem titleItem = menu.findItem(R.id.station_title);
-        if (titleItem != null) {
-            String displayTitle = " " + title + " ";
-            SpannableString spannable = new SpannableString(displayTitle);
+        if (titleItem == null) return;
 
-            TypedValue typedValue = new TypedValue();
-            context.getTheme().resolveAttribute(androidx.appcompat.R.attr.colorPrimary, typedValue, true);
-            int backgroundColor = typedValue.data;
+        String displayTitle = " " + title + " ";
+        SpannableString spannable = new SpannableString(displayTitle);
 
-            spannable.setSpan(new BackgroundColorSpan(backgroundColor), 0, displayTitle.length(), 0);
-            spannable.setSpan(new ForegroundColorSpan(Color.WHITE), 0, displayTitle.length(), 0);
-            titleItem.setTitle(spannable);
-        }
+        TypedValue typedValue = new TypedValue();
+        context.getTheme().resolveAttribute(androidx.appcompat.R.attr.colorPrimary, typedValue, true);
+
+        spannable.setSpan(new BackgroundColorSpan(typedValue.data), 0, displayTitle.length(), 0);
+        spannable.setSpan(new ForegroundColorSpan(Color.WHITE), 0, displayTitle.length(), 0);
+        titleItem.setTitle(spannable);
     }
 
-    /**
-     * Handle menu item clicks and delegate to the appropriate listener method.
-     */
     private boolean handleMenuItemClick(MenuItem item, Station station) {
         int itemId = item.getItemId();
 
-        // Special handling for actions that need the leg context
         if (itemId == R.id.action_upgrade_splay && currentLeg != null) {
             activity.onUpgradeSplay(currentLeg);
             return true;
@@ -351,7 +246,7 @@ public class ContextMenuManager {
             activity.onReverse(currentLeg);
             return true;
         }
-        if ((itemId == R.id.action_delete_leg || itemId == R.id.action_delete_station) && currentLeg != null) {
+        if (itemId == R.id.action_delete_leg && currentLeg != null) {
             activity.onDeleteLeg(currentLeg);
             return true;
         }

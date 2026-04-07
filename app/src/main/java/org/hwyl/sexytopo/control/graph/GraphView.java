@@ -732,7 +732,7 @@ public class GraphView extends View {
 
         // Use activity as listener (it implements ContextMenuManager.StationMenuListener)
         ContextMenuManager menuManager = new ContextMenuManager(getContext(), viewContext, activity);
-        menuManager.showMenu(this, station, survey, (int) event.getX(), (int) event.getY());
+        menuManager.showMenuForStation(this, station, survey, (int) event.getX(), (int) event.getY());
     }
 
     /**
