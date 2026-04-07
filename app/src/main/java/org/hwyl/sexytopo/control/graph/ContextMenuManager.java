@@ -166,15 +166,18 @@ public class ContextMenuManager {
 
             MenuItem upgradeItem = menu.findItem(R.id.action_upgrade_splay);
             MenuItem downgradeItem = menu.findItem(R.id.action_downgrade_leg);
+            MenuItem reverseItem = menu.findItem(R.id.action_reverse);
             MenuItem legMenuItem = menu.findItem(R.id.menu_leg);
 
             if (currentLeg != null) {
                 boolean isSplay = !currentLeg.hasDestination();
                 if (upgradeItem != null) upgradeItem.setVisible(isSplay);
+                if (reverseItem != null) reverseItem.setVisible(!isSplay);
                 if (downgradeItem != null) {
                     boolean canDowngrade = !isSplay &&
                         currentLeg.getDestination().getOnwardLegs().isEmpty();
-                    downgradeItem.setVisible(canDowngrade);
+                    downgradeItem.setVisible(!isSplay);
+                    downgradeItem.setEnabled(canDowngrade);
                 }
                 if (legMenuItem != null) {
                     legMenuItem.setTitle(R.string.menu_incoming_leg);
