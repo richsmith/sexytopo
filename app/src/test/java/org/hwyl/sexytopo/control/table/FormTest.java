@@ -80,6 +80,7 @@ public class FormTest extends TestCase {
         form.phone = Mockito.mock(EditText.class);
         form.validPhone = false;
 
+        form.enableErrors();
         form.validate();
 
         verify(form.name).setError(null);
