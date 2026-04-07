@@ -103,8 +103,8 @@ Each format is handled by dedicated import/export classes. When adding format su
 - **Testing**: JUnit 4 + Mockito; avoid mocks if at all possible, especially mocks for the Android framework
 - **Linting**: `abortOnError` disabled; `UnnecessaryLocalVariable` and `SameParameterValue` warnings disabled
 - **Min API**: 23 (Android 6.0); Compile SDK: 36 (Android 15)
-- Do not use fully qualified class names - import them properly instead
-- Do not insert comments to show what has just been added - only add comments where it is helpful to inform why something is implemented that way, or to explain something that is complex
+- Never use fully qualified class names in the middle of functions - import them properly instead
+- Do not insert comments to show what has just been added - only add comments where it is helpful to inform why something is implemented that way, or to explain something that is complex. A comment to aid understanding can be helpful, but consider if a transitive variable might be a simpler way of explaining.
 - Use British English in IDs, comments, variable names etc.
 - **Never hardcode user-facing strings in Java/Kotlin code.** All strings must be defined in `app/src/main/res/values/strings.xml` and referenced via `R.string.*` (in code) or `@string/*` (in XML layouts).
 - String names must use the appropriate section prefix to match the relevant section in `strings.xml` (e.g. `action_`, `file_`, etc.). Place new strings in the correct comment-delimited section.
