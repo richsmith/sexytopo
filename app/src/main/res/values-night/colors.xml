@@ -32,10 +32,15 @@
     <!-- UI Elements -->
     <color name="grid">@color/md_dark_grid</color>
     <color name="station">@color/md_red</color>
+    <color name="leg">@color/md_dark_red_bright</color>
+    <color name="splay">@color/md_dark_salmon</color>
     <color name="activeStationHighlight">@color/md_amber_300</color>
     <color name="legend">@color/md_grey_200</color>
     <color name="buttonHighlight">@color/md_grey_300</color>
     <color name="error">@color/md_red</color>
+
+    <!-- Graph View Colors -->
+    <color name="crossSectionIndicator">@color/md_red</color>
 
     <!-- Text Colors -->
     <color name="bodyTextColor">@color/md_dark_body_text</color>

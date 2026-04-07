@@ -12,6 +12,12 @@
     <color name="md_black">#000000</color>
     <color name="md_pink">#FFC0CB</color>
     <color name="md_red">#FF0000</color>
+    <color name="md_dark_red">#8B0000</color>
+    <color name="md_light_red">#FF8080</color>
+    <color name="md_magenta">#FF00FF</color>
+    <color name="md_gold">#FFD700</color>
+    <color name="md_silver">#C0C0C0</color>
+    <color name="md_grey">#808080</color>
 
     <!-- Brand Colors -->
     <color name="md_sexy_green">#7FAF7F</color>
@@ -33,6 +39,11 @@
     <color name="md_yellow">#FFD700</color>
     <color name="md_amber_500">#FFC107</color>
     <color name="md_amber_300">#FFD54F</color>
+
+    <!-- Dark Theme Graph Primitives -->
+    <color name="md_dark_red_bright">#FF4444</color>
+    <color name="md_dark_coral">#FF6B6B</color>
+    <color name="md_dark_salmon">#FF8C69</color>
 
     <!-- Dark Theme Specific Primitives -->
     <color name="md_dark_bg">#121212</color>
@@ -90,11 +101,21 @@
 
     <!-- UI Elements -->
     <color name="grid">@color/md_grey_200</color>
-    <color name="station">@color/md_red</color>
+    <color name="station">@color/md_dark_red</color>
     <color name="activeStationHighlight">@color/md_amber_500</color>
     <color name="legend">@color/md_black</color>
     <color name="buttonHighlight">@color/md_white</color>
     <color name="error">@color/md_red</color>
+
+    <!-- Graph View Colors -->
+    <color name="leg">@color/md_red</color>
+    <color name="legLatest">@color/md_magenta</color>
+    <color name="splay">@color/md_light_red</color>
+    <color name="crossSectionConnection">@color/md_silver</color>
+    <color name="sketchDefault">@color/md_black</color>
+    <color name="hotCorner">@color/md_grey</color>
+    <color name="hotCornerActive">@color/md_yellow</color>
+    <color name="crossSectionIndicator">@color/md_dark_red</color>
 
     <!-- Text Colors -->
     <color name="bodyTextColor">@color/md_grey_400</color>

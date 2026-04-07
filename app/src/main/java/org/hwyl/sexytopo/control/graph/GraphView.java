@@ -17,7 +17,6 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
 import androidx.core.content.ContextCompat;
@@ -89,16 +88,8 @@ public class GraphView extends View {
 
     private static final int BOX_SIZE = 10; // every grid box is 10 units square
 
-    public static final Colour LEG_COLOUR = Colour.RED;
-    public static final Colour LATEST_LEG_COLOUR = Colour.MAGENTA;
-    public static final Colour HIGHLIGHT_COLOUR = Colour.GOLD;
-    public static final Colour DEFAULT_SKETCH_COLOUR = Colour.BLACK;
-    public static final Colour CROSS_SECTION_CONNECTION_COLOUR = Colour.SILVER;
-
     public static final int SOLID_ALPHA = 0xff;
     public static final int FADED_ALPHA = 0xff / 5;
-
-    public static final int STATION_COLOUR = Colour.DARK_RED.intValue;
     private static final int STATION_STROKE_WIDTH_DP = 2;
     private static final int DASHED_LINE_INTERVAL_DP = 4;
     private static final int CROSS_SECTION_CONNECTOR_WIDTH_DP = 2;
@@ -232,31 +223,35 @@ public class GraphView extends View {
         highlightPaint.setColor(activeStationHighlightColor);
 
         // active legs/splays
+        int legColour = ContextCompat.getColor(activity, R.color.leg);
+        int latestLegColour = ContextCompat.getColor(activity, R.color.legLatest);
+        int splayColour = ContextCompat.getColor(activity, R.color.splay);
         float legStrokeWidth = dpToPixels(GeneralPreferences.getLegStrokeWidthDp());
         legPaint.setStrokeWidth(legStrokeWidth);
-        legPaint.setColor(LEG_COLOUR.intValue);
+        legPaint.setColor(legColour);
 
         latestLegPaint.setStrokeWidth(legStrokeWidth);
-        latestLegPaint.setColor(LATEST_LEG_COLOUR.intValue);
+        latestLegPaint.setColor(latestLegColour);
 
         float splayStrokeWidth = dpToPixels(GeneralPreferences.getSplayStrokeWidthDp());
         splayPaint.setStrokeWidth(splayStrokeWidth);
-        splayPaint.setColor(LEG_COLOUR.intValue);
+        splayPaint.setColor(splayColour);
 
         // faded legs/splays
         fadedLegPaint.setStrokeWidth(legStrokeWidth);
-        fadedLegPaint.setColor(LEG_COLOUR.intValue);
+        fadedLegPaint.setColor(legColour);
         fadedLegPaint.setAlpha(FADED_ALPHA);
 
         fadedLatestLegPaint.setStrokeWidth(legStrokeWidth);
-        fadedLatestLegPaint.setColor(LATEST_LEG_COLOUR.intValue);
+        fadedLatestLegPaint.setColor(latestLegColour);
         fadedLatestLegPaint.setAlpha(FADED_ALPHA);
 
         fadedSplayPaint.setStrokeWidth(splayStrokeWidth);
-        fadedSplayPaint.setColor(LEG_COLOUR.intValue);
+        fadedSplayPaint.setColor(splayColour);
         fadedSplayPaint.setAlpha(FADED_ALPHA);
 
-        drawPaint.setColor(DEFAULT_SKETCH_COLOUR.intValue);
+        int sketchDefaultColour = ContextCompat.getColor(activity, R.color.sketchDefault);
+        drawPaint.setColor(sketchDefaultColour);
         drawPaint.setStrokeWidth(dpToPixels(GeneralPreferences.getSketchLineWidthDp()));
         drawPaint.setStyle(Paint.Style.STROKE);
         drawPaint.setStrokeJoin(Paint.Join.ROUND);
@@ -269,23 +264,23 @@ public class GraphView extends View {
         legendPaint.setTextSize(legendSizePixels);
 
         int labelColour = ContextCompat.getColor(activity, R.color.station);
-        legPaint.setColor(labelColour);
+        labelPaint.setColor(labelColour);
         int labelSizeSp = GeneralPreferences.getLabelFontSizeSp();
         float labelSizePixels = spToPixels(labelSizeSp);
-        legPaint.setTextSize(labelSizePixels);
+        labelPaint.setTextSize(labelSizePixels);
 
-        crossSectionConnectorPaint.setColor(CROSS_SECTION_CONNECTION_COLOUR.intValue);
+        crossSectionConnectorPaint.setColor(ContextCompat.getColor(activity, R.color.crossSectionConnection));
         crossSectionConnectorPaint.setStrokeWidth(dpToPixels(CROSS_SECTION_CONNECTOR_WIDTH_DP));
         crossSectionConnectorPaint.setStyle(Paint.Style.STROKE);
 
-        crossSectionIndicatorPaint.setColor(STATION_COLOUR);
+        crossSectionIndicatorPaint.setColor(ContextCompat.getColor(activity, R.color.crossSectionIndicator));
         crossSectionIndicatorPaint.setStrokeWidth(dpToPixels(CROSS_SECTION_INDICATOR_WIDTH_DP));
         crossSectionIndicatorPaint.setStyle(Paint.Style.FILL);
 
         isTwoFingerModeActive = GeneralPreferences.isTwoFingerModeActive();
 
         isHotCornersModeActive = GeneralPreferences.isHotCornersModeActive();
-        hotCornersPaint.setColor(Colour.GREY.intValue);
+        hotCornersPaint.setColor(ContextCompat.getColor(activity, R.color.hotCorner));
         hotCornersPaint.setAlpha(FADED_ALPHA);
 
         stationCrossDiameterPx = dpToPixels(GeneralPreferences.getStationCrossDiameterDp());
@@ -1382,7 +1377,7 @@ public class GraphView extends View {
         }
 
         if (currentSketchTool == SketchTool.MODAL_MOVE) {
-            hotCornersPaint.setColor(Colour.YELLOW.intValue);
+            hotCornersPaint.setColor(ContextCompat.getColor(getContext(), R.color.hotCornerActive));
             hotCornersPaint.setAlpha(FADED_ALPHA);
         }
 
@@ -1396,7 +1391,7 @@ public class GraphView extends View {
         canvas.drawRect(bottomRightCorner, hotCornersPaint);
 
         if (currentSketchTool == SketchTool.MODAL_MOVE) {
-            hotCornersPaint.setColor(Colour.GREY.intValue);
+            hotCornersPaint.setColor(ContextCompat.getColor(getContext(), R.color.hotCorner));
             hotCornersPaint.setAlpha(FADED_ALPHA);
         }
 
