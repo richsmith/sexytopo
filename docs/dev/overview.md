@@ -103,6 +103,7 @@ Each format is handled by dedicated import/export classes. When adding format su
 - **Testing**: JUnit 4 + Mockito; avoid mocks if at all possible, especially mocks for the Android framework
 - **Linting**: `abortOnError` disabled; `UnnecessaryLocalVariable` and `SameParameterValue` warnings disabled
 - **Min API**: 23 (Android 6.0); Compile SDK: 36 (Android 15)
+- Always use braces for `if`, `for`, `while` and similar block statements, even for single-line bodies
 - Never use fully qualified class names in the middle of functions - import them properly instead
 - Do not insert comments to show what has just been added - only add comments where it is helpful to inform why something is implemented that way, or to explain something that is complex. A comment to aid understanding can be helpful, but consider if a transitive variable might be a simpler way of explaining.
 - Use British English in IDs, comments, variable names etc.
