@@ -12,6 +12,7 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RotateDrawable;
+import android.text.Editable;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -632,7 +633,11 @@ public class GraphView extends View {
                 MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
                 builder.setView(inputLayout)
                     .setPositiveButton(R.string.ok, (dialog, which) -> {
-                        String text = input.getText().toString();
+                        Editable editable = input.getText();
+                        if (editable == null || editable.length() == 0) {
+                            return;
+                        }
+                        String text = editable.toString();
                         int startingSizeSp = GeneralPreferences.getTextStartingSizeSp();
                         float startingSizePixels = spToPixels(startingSizeSp);
                         float size = startingSizePixels / surveyToViewScale;
@@ -708,6 +713,7 @@ public class GraphView extends View {
     }
 
 
+    /** @noinspection SameReturnValue*/
     private boolean handlePositionCrossSection(MotionEvent event) {
 
         Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
