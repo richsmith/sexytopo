@@ -9,8 +9,11 @@ import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 
 public class SurveyUpdater {
@@ -97,6 +100,59 @@ public class SurveyUpdater {
 
         editLeg(survey, leg, newLeg);
         survey.setActiveStation(newStation);
+    }
+
+    /**
+     * Promote a splay to the leg above it (add it to the promoted legs array).
+     *
+     * Searches the parent station's legs list for the nearest full leg above this splay
+     * in chrono order and averages the splay into it.
+     *
+     * @param survey The survey containing the legs
+     * @param splay The splay to promote
+     * @return true if successful, false if no compatible leg above was found
+     */
+    public static boolean promoteToAboveLeg(Survey survey, Leg splay) {
+        if (splay.hasDestination()) {
+            return false;
+        }
+
+        Leg above = findMostRecentPreviousLeg(survey, splay);
+        if (above == null) {
+            return false;
+        }
+
+        Station parent = survey.getOriginatingStation(splay);
+        Leg newLegAbove = combineSplayWithLeg(splay, above);
+
+        editLeg(survey, above, newLegAbove);
+        parent.getOnwardLegs().remove(splay);
+        survey.removeLegRecord(splay);
+
+        return true;
+    }
+
+    private static Leg findMostRecentPreviousLeg(Survey survey, Leg leg) {
+        List<Leg> chronoLegs = survey.getAllLegsInChronoOrder();
+        List<Leg> before = new ArrayList<>(chronoLegs.subList(0, chronoLegs.indexOf(leg)));
+        Collections.reverse(before);  // have to reverse in-place in old Java :/
+        return before.stream()
+            .filter(candidate -> candidate.hasDestination())
+            .findFirst()
+            .orElse(null);
+    }
+
+    private static Leg combineSplayWithLeg(Leg splay, Leg leg) {
+        if (leg.wasShotBackwards()) {
+            splay = splay.reverse();
+        }
+
+        List<Leg> allShots = new ArrayList<>(
+            Arrays.asList(leg.wasPromoted() ? leg.getPromotedFrom() : new Leg[]{leg}));
+        allShots.add(splay);
+
+        return Leg.upgradeSplayToConnectedLeg(
+            averageLegs(allShots), leg.getDestination(), allShots.toArray(new Leg[0]));
     }
 
     private static synchronized String getNextStationName(Survey survey) {

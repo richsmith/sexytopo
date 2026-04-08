@@ -570,6 +570,9 @@
     <string name="menu_rename_station">Rinomina</string>
     <string name="menu_edit_leg">Modifica</string>
     <string name="menu_upgrade_row">Forza Nuova Stazione</string>
+    <string name="menu_promote_to_above_leg">Aggiungi al tratto sopra</string>
+    <string name="toast_splay_promoted">Splay combinato con il tratto</string>
+    <string name="toast_no_leg_above">Nessun tratto valido da combinare</string>
     <string name="menu_upgrade_splay">Promuovi a Tratto</string>
     <string name="menu_downgrade_leg">Declassa a Splay</string>
     <string name="menu_delete_leg">Elimina</string>

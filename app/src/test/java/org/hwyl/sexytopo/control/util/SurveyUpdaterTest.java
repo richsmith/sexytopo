@@ -377,7 +377,6 @@ public class SurveyUpdaterTest {
         Leg leg = new Leg(5, 90, 10);
         SurveyUpdater.updateWithNewStation(survey, leg);
 
-        Station origin = survey.getOrigin();
         Station station1 = survey.getActiveStation();
         int originalLegCount = survey.getAllLegs().size();
 
@@ -579,6 +578,64 @@ public class SurveyUpdaterTest {
         Assert.assertEquals(1, survey.getAllLegs().size());
         Leg createdLeg = survey.getAllLegs().get(0);
         Assert.assertTrue(createdLeg.hasDestination());
+    }
+
+    @Test
+    public void testPromoteToAboveLegInheritsBackwardsFlag() {
+        Survey survey = new Survey();
+
+        Leg back1 = new Leg(5, 45, 10);
+        Leg back2 = new Leg(5.001f, 45.001f, 10);
+        Leg back3 = new Leg(5, 45, 10.001f);
+        SurveyUpdater.update(survey, back1, InputMode.BACKWARD);
+        SurveyUpdater.update(survey, back2, InputMode.BACKWARD);
+        SurveyUpdater.update(survey, back3, InputMode.BACKWARD);
+
+        Station origin = survey.getOrigin();
+        Leg backwardsLeg = origin.getConnectedOnwardLegs().get(0);
+        Assert.assertTrue(backwardsLeg.wasShotBackwards());
+
+        Leg splay = new Leg(3, 50, 8);
+        origin.addOnwardLeg(splay);
+        survey.addLegRecord(splay);
+
+        boolean success = SurveyUpdater.promoteToAboveLeg(survey, splay);
+        Assert.assertTrue(success);
+
+        Leg updatedLeg = origin.getConnectedOnwardLegs().get(0);
+        Assert.assertTrue(updatedLeg.wasPromoted());
+        Leg[] promotedFrom = updatedLeg.getPromotedFrom();
+        Leg addedShot = promotedFrom[promotedFrom.length - 1];
+        Assert.assertTrue(addedShot.wasShotBackwards());
+    }
+
+    @Test
+    public void testPromoteToAboveLegForwardLegDoesNotSetBackwards() {
+        Survey survey = new Survey();
+
+        Leg fore1 = new Leg(5, 45, 10);
+        Leg fore2 = new Leg(5.001f, 45.001f, 10);
+        Leg fore3 = new Leg(5, 45, 10.001f);
+        SurveyUpdater.update(survey, fore1, InputMode.FORWARD);
+        SurveyUpdater.update(survey, fore2, InputMode.FORWARD);
+        SurveyUpdater.update(survey, fore3, InputMode.FORWARD);
+
+        Station origin = survey.getOrigin();
+        Leg forwardLeg = origin.getConnectedOnwardLegs().get(0);
+        Assert.assertFalse(forwardLeg.wasShotBackwards());
+
+        Leg splay = new Leg(3, 50, 8);
+        origin.addOnwardLeg(splay);
+        survey.addLegRecord(splay);
+
+        boolean success = SurveyUpdater.promoteToAboveLeg(survey, splay);
+        Assert.assertTrue(success);
+
+        Leg updatedLeg = origin.getConnectedOnwardLegs().get(0);
+        Assert.assertTrue(updatedLeg.wasPromoted());
+        Leg[] promotedFrom = updatedLeg.getPromotedFrom();
+        Leg addedShot = promotedFrom[promotedFrom.length - 1];
+        Assert.assertFalse(addedShot.wasShotBackwards());
     }
 
     @Test

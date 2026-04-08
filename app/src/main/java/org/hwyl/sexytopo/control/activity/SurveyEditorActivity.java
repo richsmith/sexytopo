@@ -203,6 +203,20 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         getSurveyManager().broadcastSurveyUpdated();
     }
 
+    public void onPromoteToAboveLeg(Leg splay) {
+        if (splay == null || splay.hasDestination()) {
+            return;
+        }
+
+        boolean success = SurveyUpdater.promoteToAboveLeg(getSurvey(), splay);
+        if (success) {
+            getSurveyManager().broadcastSurveyUpdated();
+            showSimpleToast(R.string.toast_splay_promoted);
+        } else {
+            showSimpleToast(R.string.toast_no_leg_above);
+        }
+    }
+
     /**
      * Set the active station in the current view.
      */

@@ -165,6 +165,7 @@ public class ContextMenuManager {
             currentLeg = (leg != null) ? leg : survey.getReferringLeg(station);
 
             MenuItem upgradeItem = menu.findItem(R.id.action_upgrade_splay);
+            MenuItem promoteItem = menu.findItem(R.id.action_promote_to_above_leg);
             MenuItem downgradeItem = menu.findItem(R.id.action_downgrade_leg);
             MenuItem reverseItem = menu.findItem(R.id.action_reverse);
             MenuItem legMenuItem = menu.findItem(R.id.menu_leg);
@@ -172,6 +173,7 @@ public class ContextMenuManager {
             if (currentLeg != null) {
                 boolean isSplay = !currentLeg.hasDestination();
                 if (upgradeItem != null) upgradeItem.setVisible(isSplay);
+                if (promoteItem != null) promoteItem.setVisible(isSplay);
                 if (reverseItem != null) reverseItem.setVisible(!isSplay);
                 if (downgradeItem != null) {
                     boolean canDowngrade = !isSplay &&
@@ -235,6 +237,10 @@ public class ContextMenuManager {
 
         if (itemId == R.id.action_upgrade_splay && currentLeg != null) {
             activity.onUpgradeSplay(currentLeg);
+            return true;
+        }
+        if (itemId == R.id.action_promote_to_above_leg && currentLeg != null) {
+            activity.onPromoteToAboveLeg(currentLeg);
             return true;
         }
         if (itemId == R.id.action_downgrade_leg && currentLeg != null) {
