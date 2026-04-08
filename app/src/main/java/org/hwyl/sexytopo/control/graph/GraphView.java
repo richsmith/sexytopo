@@ -815,25 +815,13 @@ public class GraphView extends View {
         viewpointTopLeftOnSurvey = viewCoordsToSurveyCoords(Coord2D.ORIGIN);
         viewpointBottomRightOnSurvey = viewCoordsToSurveyCoords(canvasBottomRight);
 
-        if (SketchPreferences.Toggle.SHOW_GRID.isOn()) {
-            drawGrid(canvas);
-        }
-
-        if (SketchPreferences.Toggle.SHOW_CONNECTIONS.isOn()) {
-            drawConnectedSurveys(canvas, projection, FADED_ALPHA);
-        }
-
+        drawGrid(canvas);
+        drawConnectedSurveys(canvas, projection, FADED_ALPHA);
         drawSurvey(canvas, survey, projection, SOLID_ALPHA);
-
         drawLegend(canvas);
-        if (SketchPreferences.Toggle.SHOW_COMPASS.isOn() && projectionType == Projection2D.PLAN) {
-            drawCompass(canvas);
-        }
+        drawCompass(canvas);
         drawHotCorners(canvas);
-
-        if (activity.isDebugMode()) {
-            drawDebuggingInfo(canvas);
-        }
+        drawDebuggingInfo(canvas);
     }
 
     private void drawSurvey(Canvas canvas, Survey survey, Space<Coord2D> projection, int alpha) {
@@ -844,6 +832,10 @@ public class GraphView extends View {
 
 
     private void drawConnectedSurveys(Canvas canvas, Space<Coord2D> projection, int alpha) {
+
+        if (!SketchPreferences.Toggle.SHOW_CONNECTIONS.isOn()) {
+            return;
+        }
 
         if (doTranslatedConnectedSurveysNeedUpdating()) {
             try {
@@ -890,6 +882,10 @@ public class GraphView extends View {
 
 
     private void drawGrid(Canvas canvas) {
+
+        if (!SketchPreferences.Toggle.SHOW_GRID.isOn()) {
+            return;
+        }
 
         int tickSizeInMetres = getMinorGridBoxSize();
         int numberTicksJustBeforeViewpointOffsetX = (int)(viewpointOffset.x / tickSizeInMetres);
@@ -1378,6 +1374,10 @@ public class GraphView extends View {
 
 
     private void drawCompass(Canvas canvas) {
+        if (!SketchPreferences.Toggle.SHOW_COMPASS.isOn() || projectionType != Projection2D.PLAN) {
+            return;
+        }
+
         float textSize = legendPaint.getTextSize();
         Paint.FontMetrics metrics = legendPaint.getFontMetrics();
         float textHeight = metrics.descent - metrics.ascent;
@@ -1431,6 +1431,10 @@ public class GraphView extends View {
     }
 
     private void drawDebuggingInfo(Canvas canvas) {
+        if (!activity.isDebugMode()) {
+            return;
+        }
+
         float offsetX = getWidth() * 0.03f;
         float offsetY = LEGEND_SIZE * 2;
         String label = "x=" + offsetX + " y=" + offsetY +
