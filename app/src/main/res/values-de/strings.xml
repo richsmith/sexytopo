@@ -564,6 +564,9 @@
     <string name="menu_rename_station">Umbenennen</string>
     <string name="menu_edit_leg">Bearbeiten</string>
     <string name="menu_upgrade_row">Neuen Messpunkt erzwingen</string>
+    <string name="menu_promote_to_above_leg">Zur obigen Messung hinzufügen</string>
+    <string name="toast_splay_promoted">Splay mit Messung kombiniert</string>
+    <string name="toast_no_leg_above">Keine gültige Messung zum Kombinieren</string>
     <string name="menu_upgrade_splay">Zu Messstrecke aufwerten</string>
     <string name="menu_downgrade_leg">Zu Splay abwerten</string>
     <string name="menu_delete_leg">Löschen</string>

@@ -566,6 +566,9 @@
     <string name="menu_rename_station">Renommer</string>
     <string name="menu_edit_leg">Modifier</string>
     <string name="menu_upgrade_row">Forcer une nouvelle station</string>
+    <string name="menu_promote_to_above_leg">Ajouter à la visée ci-dessus</string>
+    <string name="toast_splay_promoted">Radiale combinée avec la visée</string>
+    <string name="toast_no_leg_above">Aucune visée valide à combiner</string>
     <string name="menu_upgrade_splay">Convertir en visée directionnelle</string>
     <string name="menu_downgrade_leg">Convertir en visée rayonnante</string>
     <string name="menu_delete_leg">Supprimer</string>

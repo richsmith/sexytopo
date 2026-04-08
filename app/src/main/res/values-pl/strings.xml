@@ -570,6 +570,9 @@
     <string name="menu_rename_station">Zmień nazwę</string>
     <string name="menu_edit_leg">Edytuj</string>
     <string name="menu_upgrade_row">Wymuś nowe stanowisko</string>
+    <string name="menu_promote_to_above_leg">Dodaj do ciągu powyżej</string>
+    <string name="toast_splay_promoted">Pomiar szczegółowy połączony z ciągiem</string>
+    <string name="toast_no_leg_above">Brak prawidłowego ciągu do połączenia</string>
     <string name="menu_upgrade_splay">Podnieś do ciągu</string>
     <string name="menu_downgrade_leg">Obniż do pomiaru szczegółowego</string>
     <string name="menu_delete_leg">Usuń</string>
