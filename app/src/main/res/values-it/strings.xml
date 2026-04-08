@@ -361,7 +361,9 @@
     <string name="trip_instrument_label">Strumento</string>
     <string name="trip_instrument_hint">Nome dello strumento</string>
     <string name="trip_instrument_get_button">Ottieni</string>
+    <string name="trip_survey_date_label">Survey Date</string>
     <string name="trip_exploration_date_label">Data di esplorazione</string>
+    <string name="trip_clear_date">Clear date</string>
     <string name="trip_same_as_survey_date">Uguale alla data del rilievo</string>
     <string name="trip_comments">Commenti</string>
     <string name="trip_save_trip">Salva Uscita</string>

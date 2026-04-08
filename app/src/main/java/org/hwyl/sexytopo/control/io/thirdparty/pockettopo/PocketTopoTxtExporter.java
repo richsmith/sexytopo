@@ -36,7 +36,7 @@ public class PocketTopoTxtExporter extends SingleFileExporter implements Experim
         text += "DATE ";
         if (survey.getTrip() != null) {
             Trip trip = survey.getTrip();
-            Date date = trip.getDate();
+            Date date = trip.getSurveyDate();
             text += TextTools.toIsoDate(date);
         } else {
             text += "1970-01-01\n";

@@ -453,7 +453,7 @@ public class PocketTopoImporterTest {
             Assert.assertTrue(survey.getAllStations().size() > 1);
             Assert.assertTrue(survey.getAllLegs().size() > 0);
             Assert.assertNotNull(survey.getTrip());
-            Assert.assertNotNull(survey.getTrip().getDate());
+            Assert.assertNotNull(survey.getTrip().getSurveyDate());
             Assert.assertTrue(survey.getTrip().getComments().contains("DistoX"));
         }
     }

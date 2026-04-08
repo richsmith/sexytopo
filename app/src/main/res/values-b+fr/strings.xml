@@ -361,7 +361,9 @@
     <string name="trip_instrument_label">Instrument</string>
     <string name="trip_instrument_hint">Nom de l\'instrument</string>
     <string name="trip_instrument_get_button">Obtenir</string>
+    <string name="trip_survey_date_label">Survey Date</string>
     <string name="trip_exploration_date_label">Date d\'exploration</string>
+    <string name="trip_clear_date">Clear date</string>
     <string name="trip_same_as_survey_date">Identique à la date de topographie</string>
     <string name="trip_comments">Commentaires</string>
     <string name="trip_save_trip">Sauvegarder la sortie</string>

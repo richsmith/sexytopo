@@ -434,8 +434,8 @@ public class TherionImporterTest {
         Trip trip = SurvexTherionImporter.parseMetadata(APPENDED_STYLE_TEXT, SurveyFormat.THERION);
         Assert.assertNotNull(trip);
 
-        // Date should be 2026.01.05
-        Assert.assertNotNull(trip.getDate());
+        // Survey date should be 2026.01.05
+        Assert.assertNotNull(trip.getSurveyDate());
 
         // Instrument commented out — should not be set
         Assert.assertNull(trip.getInstrument());
@@ -452,8 +452,9 @@ public class TherionImporterTest {
         Assert.assertTrue(trip.getTeam().get(0).roles.contains(Trip.Role.EXPLORATION));
         Assert.assertTrue(trip.getTeam().get(1).roles.contains(Trip.Role.EXPLORATION));
 
-        // Exploration date same as survey date — trip date should be set
-        Assert.assertNotNull(trip.getDate());
+        // explo-date is same as survey date — linked=false, explorationDate set
+        Assert.assertNotNull(trip.getExplorationDate());
+        Assert.assertFalse(trip.isExplorationDateLinked());
     }
 
     @Test
@@ -461,8 +462,11 @@ public class TherionImporterTest {
         Trip trip = SurvexTherionImporter.parseMetadata(INLINE_STYLE_TEXT, SurveyFormat.THERION);
         Assert.assertNotNull(trip);
 
-        // Date should be present
-        Assert.assertNotNull(trip.getDate());
+        // Survey date should be present
+        Assert.assertNotNull(trip.getSurveyDate());
+        // No explo-date in inline style — should be linked
+        Assert.assertTrue(trip.isExplorationDateLinked());
+        Assert.assertNull(trip.getExplorationDate());
 
         // Team: Will Stuart (instruments, assistant) and Andrew Atkinson (notes, assistant)
         Assert.assertEquals(2, trip.getTeam().size());
@@ -477,8 +481,11 @@ public class TherionImporterTest {
         Trip trip = SurvexTherionImporter.parseMetadata(FAKE_POCKETTOPO_TEXT, SurveyFormat.THERION);
         Assert.assertNotNull(trip);
 
-        // Date: 2015.04.2
-        Assert.assertNotNull(trip.getDate());
+        // Survey date: 2015.04.2
+        Assert.assertNotNull(trip.getSurveyDate());
+        // No explo-date — should be linked
+        Assert.assertTrue(trip.isExplorationDateLinked());
+        Assert.assertNull(trip.getExplorationDate());
 
         // Team: Ruth Allan (instruments), Rich Smith (notes), Paul Fairman (dog)
         Assert.assertEquals(3, trip.getTeam().size());
@@ -511,7 +518,7 @@ public class TherionImporterTest {
 
         Trip trip = SurvexTherionImporter.parseMetadata(survexText, SurveyFormat.SURVEX);
         Assert.assertNotNull(trip);
-        Assert.assertNotNull(trip.getDate());
+        Assert.assertNotNull(trip.getSurveyDate());
         Assert.assertEquals("DistoX2", trip.getInstrument());
 
         Assert.assertEquals(2, trip.getTeam().size());
@@ -521,8 +528,9 @@ public class TherionImporterTest {
         Assert.assertTrue(trip.getTeam().get(1).roles.contains(Trip.Role.BOOK));
         Assert.assertTrue(trip.getTeam().get(1).roles.contains(Trip.Role.EXPLORATION));
 
-        // Exploration date differs from survey date — trip date should be the exploration date
-        Assert.assertNotNull(trip.getDate());
+        // Exploration date differs from survey date — explorationDate set, unlinked
+        Assert.assertNotNull(trip.getExplorationDate());
+        Assert.assertFalse(trip.isExplorationDateLinked());
     }
 
     @Test

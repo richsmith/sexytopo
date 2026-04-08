@@ -68,20 +68,26 @@ public class Trip {
         }
     }
 
-    private Date date;
+    private Date surveyDate;
+    private Date explorationDate;
+    private boolean explorationDateLinked;
     private List<TeamEntry> team = new ArrayList<>();
     private String comments;
     private String instrument;
 
 
     public Trip() {
-        this.date = new Date();
+        this.surveyDate = new Date();
+        this.explorationDate = null;
+        this.explorationDateLinked = true;
         this.instrument = "";
         this.comments = "";
     }
 
     public Trip(Trip other) {
-        this.date = other.date;
+        this.surveyDate = other.surveyDate;
+        this.explorationDate = other.explorationDate;
+        this.explorationDateLinked = other.explorationDateLinked;
         this.team = new ArrayList<>(other.team);
         this.comments = other.comments;
         this.instrument = other.instrument;
@@ -103,12 +109,32 @@ public class Trip {
         this.comments = comments;
     }
 
-    public Date getDate() {
-        return date;
+    public Date getSurveyDate() {
+        return surveyDate;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setSurveyDate(Date surveyDate) {
+        this.surveyDate = surveyDate;
+    }
+
+    public Date getExplorationDate() {
+        return explorationDate;
+    }
+
+    public void setExplorationDate(Date explorationDate) {
+        this.explorationDate = explorationDate;
+    }
+
+    public boolean isExplorationDateLinked() {
+        return explorationDateLinked;
+    }
+
+    public void setExplorationDateLinked(boolean explorationDateLinked) {
+        this.explorationDateLinked = explorationDateLinked;
+    }
+
+    public boolean hasExplorationDate() {
+        return !explorationDateLinked || explorationDate != null;
     }
 
     public String getInstrument() {
@@ -134,7 +160,15 @@ public class Trip {
 
         Trip trip = (Trip) other;
 
-        if (objectsNotEqual(trip.date, date)) {
+        if (objectsNotEqual(trip.surveyDate, surveyDate)) {
+            return false;
+        }
+
+        if (objectsNotEqual(trip.explorationDate, explorationDate)) {
+            return false;
+        }
+
+        if (trip.explorationDateLinked != explorationDateLinked) {
             return false;
         }
 
@@ -164,7 +198,9 @@ public class Trip {
     @Override
     public int hashCode() {
         int result = 17;
-        result = 31 * result + (date != null ? date.hashCode() : 0);
+        result = 31 * result + (surveyDate != null ? surveyDate.hashCode() : 0);
+        result = 31 * result + (explorationDate != null ? explorationDate.hashCode() : 0);
+        result = 31 * result + (explorationDateLinked ? 1 : 0);
         result = 31 * result + (comments != null ? comments.hashCode() : 0);
         result = 31 * result + (instrument != null ? instrument.hashCode() : 0);
         result = 31 * result + team.hashCode();

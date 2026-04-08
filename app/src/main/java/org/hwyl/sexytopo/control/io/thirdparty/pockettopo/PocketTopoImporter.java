@@ -243,7 +243,7 @@ public class PocketTopoImporter extends Importer {
 
         if (!trips.isEmpty()) {
             Trip trip = new Trip();
-            trip.setDate(trips.get(0).date);
+            trip.setSurveyDate(trips.get(0).date);
             trip.setComments(trips.get(0).comment);
             survey.setTrip(trip);
         }

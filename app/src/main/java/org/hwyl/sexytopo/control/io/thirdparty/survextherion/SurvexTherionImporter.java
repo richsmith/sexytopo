@@ -272,10 +272,14 @@ public class SurvexTherionImporter {
 
         Trip trip = new Trip();
 
-        // Prefer exploration date if present, otherwise fall back to survey date
-        Date tripDate = explorationDate != null ? explorationDate : surveyDate;
-        if (tripDate != null) {
-            trip.setDate(tripDate);
+        if (surveyDate != null) {
+            trip.setSurveyDate(surveyDate);
+        }
+        if (explorationDate != null) {
+            trip.setExplorationDate(explorationDate);
+            trip.setExplorationDateLinked(false);
+        } else {
+            trip.setExplorationDateLinked(true);
         }
 
         trip.setInstrument(instrument);
@@ -353,13 +357,6 @@ public class SurvexTherionImporter {
         return rest;
     }
 
-
-    @SuppressWarnings("deprecation")
-    private static boolean isSameDay(Date d1, Date d2) {
-        return d1.getYear() == d2.getYear()
-            && d1.getMonth() == d2.getMonth()
-            && d1.getDate() == d2.getDate();
-    }
 
 
     private static Date parseDate(String dateStr) {

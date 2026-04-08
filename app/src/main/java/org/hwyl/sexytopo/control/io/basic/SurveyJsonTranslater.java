@@ -54,6 +54,8 @@ public class SurveyJsonTranslater {
 
     public static final String TRIP_TAG = "trip";
     public static final String TRIP_DATE_TAG = "tripDate";
+    public static final String SURVEY_DATE_TAG = "surveyDate";
+    public static final String EXPLO_DATE_LINKED_TAG = "exploDateLinked";
     public static final String TEAM_TAG = "team";
     public static final String TEAM_MEMBER_NAME_TAG = "name";
     public static final String TEAM_MEMBER_ROLE_TAG = "role";
@@ -281,8 +283,11 @@ public class SurveyJsonTranslater {
         JSONObject json = new JSONObject();
 
         DateFormat dateFormat = new SimpleDateFormat(DATE_PATTERN);
-        String date = dateFormat.format(trip.getDate());
-        json.put(TRIP_DATE_TAG, date);
+        json.put(SURVEY_DATE_TAG, dateFormat.format(trip.getSurveyDate()));
+        if (trip.getExplorationDate() != null) {
+            json.put(TRIP_DATE_TAG, dateFormat.format(trip.getExplorationDate()));
+        }
+        json.put(EXPLO_DATE_LINKED_TAG, trip.isExplorationDateLinked());
         json.put(COMMENT_TAG, trip.getComments());
 
         JSONArray teamArray = new JSONArray();
@@ -381,9 +386,23 @@ public class SurveyJsonTranslater {
     public static Trip toTrip(JSONObject json) throws JSONException, ParseException {
 
         DateFormat dateFormat = new SimpleDateFormat(DATE_PATTERN);
-        String dateString = json.getString(TRIP_DATE_TAG);
-        Date date = dateFormat.parse(dateString);
-        json.put(TRIP_DATE_TAG, date);
+
+        // Backwards compat: old files only have tripDate; new files have surveyDate
+        Date surveyDate;
+        Date explorationDate = null;
+        boolean exploDateLinked = true;
+
+        if (json.has(SURVEY_DATE_TAG)) {
+            surveyDate = dateFormat.parse(json.getString(SURVEY_DATE_TAG));
+            // tripDate in new files means exploration date
+            if (json.has(TRIP_DATE_TAG)) {
+                explorationDate = dateFormat.parse(json.getString(TRIP_DATE_TAG));
+            }
+            exploDateLinked = json.optBoolean(EXPLO_DATE_LINKED_TAG, true);
+        } else {
+            // Old file format: tripDate is the survey date
+            surveyDate = dateFormat.parse(json.getString(TRIP_DATE_TAG));
+        }
 
         String comments = json.getString(COMMENT_TAG);
 
@@ -402,7 +421,9 @@ public class SurveyJsonTranslater {
         }
 
         Trip trip = new Trip();
-        trip.setDate(date);
+        trip.setSurveyDate(surveyDate);
+        trip.setExplorationDate(explorationDate);
+        trip.setExplorationDateLinked(exploDateLinked);
         trip.setTeam(team);
         trip.setComments(comments);
         return trip;

@@ -47,7 +47,7 @@ public class SurvexTherionUtil {
             String exploDateKeyword = format.getExplorationDateKeyword();
 
             // Date
-            builder.append(marker).append(formatDate(trip.getDate())).append("\n");
+            builder.append(marker).append(formatDate(trip.getSurveyDate())).append("\n");
 
             // Instrument line - commented ONLY if field is empty
             if (trip.hasInstrument()) {
@@ -62,8 +62,11 @@ public class SurvexTherionUtil {
             // Blank line before explo block
             builder.append("\n");
 
-            String formattedExploDate = formatDate(trip.getDate()).substring(5); // Remove "date " prefix
-            builder.append(marker).append(exploDateKeyword).append(formattedExploDate).append("\n");
+            // Explo-date: only emit when unlinked and exploration date is set
+            if (!trip.isExplorationDateLinked() && trip.getExplorationDate() != null) {
+                String formattedExploDate = formatDate(trip.getExplorationDate()).substring(5); // Remove "date " prefix
+                builder.append(marker).append(exploDateKeyword).append(formattedExploDate).append("\n");
+            }
 
             // Explo-team lines
             builder.append(exploTeamLines);

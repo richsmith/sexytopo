@@ -109,10 +109,39 @@ public class TripActivity extends SexyTopoActivity {
             instrumentField.setText(name);
         }
 
+        TextInputLayout surveyDateLayout = findViewById(R.id.survey_date_layout);
+        TextInputEditText surveyDateField = findViewById(R.id.survey_date_field);
+        surveyDateField.setOnClickListener(this::onChooseSurveyDateClicked);
+        surveyDateLayout.setEndIconOnClickListener(this::onChooseSurveyDateClicked);
+
         TextInputLayout exploDateLayout = findViewById(R.id.exploration_date_layout);
         TextInputEditText exploDateField = findViewById(R.id.exploration_date_field);
-        exploDateField.setOnClickListener(this::onChooseDateClicked);
-        exploDateLayout.setEndIconOnClickListener(this::onChooseDateClicked);
+        exploDateField.setOnClickListener(this::onChooseExplorationDateClicked);
+        exploDateLayout.setEndIconOnClickListener(this::onChooseExplorationDateClicked);
+
+        MaterialCheckBox linkedCheckbox = findViewById(R.id.exploration_date_linked_checkbox);
+        linkedCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            Trip t = getSurvey().getTrip();
+            if (t == null) return;
+            t.setExplorationDateLinked(isChecked);
+            if (isChecked) {
+                t.setExplorationDate(null);
+            }
+            syncTrip();
+            updateDateDisplay();
+            updateButtonStatus();
+        });
+
+        Button clearExploButton = findViewById(R.id.clear_exploration_date_button);
+        clearExploButton.setOnClickListener(v -> {
+            Trip t = getSurvey().getTrip();
+            if (t == null) return;
+            t.setExplorationDate(null);
+            t.setExplorationDateLinked(false);
+            syncTrip();
+            updateDateDisplay();
+            updateButtonStatus();
+        });
 
         syncListWithTeam();
         updateButtonStatus();
@@ -131,22 +160,43 @@ public class TripActivity extends SexyTopoActivity {
         } catch (SecurityException ignored) {}
     }
 
-    public void onChooseDateClicked(View view) {
+    public void onChooseSurveyDateClicked(View view) {
         Trip trip = getSurvey().getTrip();
         MaterialDatePicker<Long> picker = MaterialDatePicker.Builder.datePicker()
-            .setTitleText(R.string.trip_exploration_date_label)
-            .setSelection(trip.getDate().getTime())
+            .setTitleText(R.string.trip_survey_date_label)
+            .setSelection(trip.getSurveyDate().getTime())
             .build();
 
         picker.addOnPositiveButtonClickListener(selection -> {
-            trip.setDate(new Date(selection));
+            trip.setSurveyDate(new Date(selection));
             updateDateDisplay();
             syncTrip();
             updateButtonStatus();
         });
 
         FragmentManager fm = getSupportFragmentManager();
-        picker.show(fm, "date_picker");
+        picker.show(fm, "survey_date_picker");
+    }
+
+    public void onChooseExplorationDateClicked(View view) {
+        Trip trip = getSurvey().getTrip();
+        if (trip == null || trip.isExplorationDateLinked()) return;
+
+        Date seed = trip.getExplorationDate() != null ? trip.getExplorationDate() : trip.getSurveyDate();
+        MaterialDatePicker<Long> picker = MaterialDatePicker.Builder.datePicker()
+            .setTitleText(R.string.trip_exploration_date_label)
+            .setSelection(seed.getTime())
+            .build();
+
+        picker.addOnPositiveButtonClickListener(selection -> {
+            trip.setExplorationDate(new Date(selection));
+            updateDateDisplay();
+            syncTrip();
+            updateButtonStatus();
+        });
+
+        FragmentManager fm = getSupportFragmentManager();
+        picker.show(fm, "explo_date_picker");
     }
 
     public void requestClear(View view) {
@@ -156,7 +206,13 @@ public class TripActivity extends SexyTopoActivity {
                 EditText comments = findViewById(R.id.trip_comments);
                 comments.setText("");
                 team.clear();
+                Trip trip = getSurvey().getTrip();
+                if (trip != null) {
+                    trip.setExplorationDate(null);
+                    trip.setExplorationDateLinked(true);
+                }
                 syncListWithTeam();
+                updateDateDisplay();
                 updateButtonStatus();
             }).setNegativeButton(R.string.cancel, null)
             .show();
@@ -278,8 +334,10 @@ public class TripActivity extends SexyTopoActivity {
         EditText instrumentField = findViewById(R.id.instrument_field);
         boolean hasInstrument = !instrumentField.getText().toString().trim().isEmpty();
 
-        boolean hasAnyData = hasTeam || hasComments || hasInstrument;
         Trip currentTrip = getSurvey().getTrip();
+        boolean hasUnlinkedExploDate = currentTrip != null && !currentTrip.isExplorationDateLinked();
+
+        boolean hasAnyData = hasTeam || hasComments || hasInstrument || hasUnlinkedExploDate;
         boolean hasChanges = savedTrip == null || !savedTrip.equals(currentTrip);
 
         findViewById(R.id.set_trip).setEnabled(hasAnyData && hasChanges);
@@ -319,10 +377,50 @@ public class TripActivity extends SexyTopoActivity {
     }
 
     private void updateDateDisplay() {
-        TextInputEditText dateField = findViewById(R.id.exploration_date_field);
         Trip trip = getSurvey().getTrip();
         if (trip == null) return;
-        dateField.setText(DATE_FORMAT.format(trip.getDate()));
+
+        TextInputEditText surveyDateField = findViewById(R.id.survey_date_field);
+        surveyDateField.setText(DATE_FORMAT.format(trip.getSurveyDate()));
+
+        TextInputLayout exploDateLayout = findViewById(R.id.exploration_date_layout);
+        TextInputEditText exploDateField = findViewById(R.id.exploration_date_field);
+        Button clearExploButton = findViewById(R.id.clear_exploration_date_button);
+        MaterialCheckBox linkedCheckbox = findViewById(R.id.exploration_date_linked_checkbox);
+
+        // Update checkbox without triggering the listener
+        linkedCheckbox.setOnCheckedChangeListener(null);
+        linkedCheckbox.setChecked(trip.isExplorationDateLinked());
+        linkedCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            Trip t = getSurvey().getTrip();
+            if (t == null) return;
+            t.setExplorationDateLinked(isChecked);
+            if (isChecked) {
+                t.setExplorationDate(null);
+            }
+            syncTrip();
+            updateDateDisplay();
+            updateButtonStatus();
+        });
+
+        if (trip.isExplorationDateLinked()) {
+            exploDateField.setText(DATE_FORMAT.format(trip.getSurveyDate()));
+            exploDateField.setEnabled(false);
+            exploDateLayout.setEndIconMode(TextInputLayout.END_ICON_NONE);
+            clearExploButton.setVisibility(View.GONE);
+        } else {
+            exploDateField.setEnabled(true);
+            exploDateLayout.setEndIconMode(TextInputLayout.END_ICON_CUSTOM);
+            exploDateLayout.setEndIconDrawable(R.drawable.ic_calendar);
+            exploDateLayout.setEndIconOnClickListener(this::onChooseExplorationDateClicked);
+            exploDateField.setOnClickListener(this::onChooseExplorationDateClicked);
+            if (trip.getExplorationDate() != null) {
+                exploDateField.setText(DATE_FORMAT.format(trip.getExplorationDate()));
+            } else {
+                exploDateField.setText("");
+            }
+            clearExploButton.setVisibility(View.VISIBLE);
+        }
     }
 
     private List<Trip.Role> getCheckedRoles(View dialogView) {

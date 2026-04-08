@@ -361,7 +361,9 @@
     <string name="trip_instrument_label">Instrument</string>
     <string name="trip_instrument_hint">Instrumentenname</string>
     <string name="trip_instrument_get_button">Holen</string>
+    <string name="trip_survey_date_label">Survey Date</string>
     <string name="trip_exploration_date_label">Erkundungsdatum</string>
+    <string name="trip_clear_date">Clear date</string>
     <string name="trip_same_as_survey_date">Gleich wie Vermessungsdatum</string>
     <string name="trip_comments">Bemerkungen</string>
     <string name="trip_save_trip">Tour speichern</string>

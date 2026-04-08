@@ -361,7 +361,9 @@
     <string name="trip_instrument_label">Instrument</string>
     <string name="trip_instrument_hint">Nazwa instrumentu</string>
     <string name="trip_instrument_get_button">Pobierz</string>
+    <string name="trip_survey_date_label">Survey Date</string>
     <string name="trip_exploration_date_label">Data eksploracji</string>
+    <string name="trip_clear_date">Clear date</string>
     <string name="trip_same_as_survey_date">Taka sama jak data pomiaru</string>
     <string name="trip_comments">Komentarze</string>
     <string name="trip_save_trip">Zapisz wyjazd</string>

@@ -400,7 +400,9 @@
     <string name="trip_instrument_label">Instrument</string>
     <string name="trip_instrument_hint">Instrument name</string>
     <string name="trip_instrument_get_button">Get</string>
+    <string name="trip_survey_date_label">Survey Date</string>
     <string name="trip_exploration_date_label">Exploration Date</string>
+    <string name="trip_clear_date">Clear date</string>
     <string name="trip_same_as_survey_date">Same as survey date</string>
 
     <!-- Stats -->

@@ -32,7 +32,7 @@ public class TripTest {
     public void testEqualsIdenticalTrips() {
         Trip a = basicTrip();
         Trip b = basicTrip();
-        a.setDate(b.getDate());
+        a.setSurveyDate(b.getSurveyDate());
         Assert.assertEquals(a, b);
     }
 
@@ -40,7 +40,7 @@ public class TripTest {
     public void testNotEqualDifferentComments() {
         Trip a = basicTrip();
         Trip b = basicTrip();
-        a.setDate(b.getDate());
+        a.setSurveyDate(b.getSurveyDate());
         b.setComments("Different");
         Assert.assertNotEquals(a, b);
     }
@@ -49,7 +49,7 @@ public class TripTest {
     public void testNotEqualDifferentInstrument() {
         Trip a = basicTrip();
         Trip b = basicTrip();
-        a.setDate(b.getDate());
+        a.setSurveyDate(b.getSurveyDate());
         b.setInstrument("SAP5");
         Assert.assertNotEquals(a, b);
     }
@@ -58,7 +58,7 @@ public class TripTest {
     public void testNotEqualDifferentTeamSize() {
         Trip a = basicTrip();
         Trip b = basicTrip();
-        a.setDate(b.getDate());
+        a.setSurveyDate(b.getSurveyDate());
         b.setTeam(Collections.singletonList(
             new Trip.TeamEntry("Alice", Arrays.asList(Trip.Role.BOOK))
         ));
@@ -69,7 +69,7 @@ public class TripTest {
     public void testNotEqualDifferentTeamMemberName() {
         Trip a = basicTrip();
         Trip b = basicTrip();
-        a.setDate(b.getDate());
+        a.setSurveyDate(b.getSurveyDate());
         b.setTeam(Arrays.asList(
             new Trip.TeamEntry("Alice", Arrays.asList(Trip.Role.BOOK)),
             new Trip.TeamEntry("Bob", Arrays.asList(Trip.Role.INSTRUMENTS))
@@ -91,6 +91,62 @@ public class TripTest {
         Trip copy = new Trip(original);
         copy.setComments("Modified");
         Assert.assertNotEquals(original, copy);
+    }
+
+    @Test
+    public void testDefaultLinkedState() {
+        Trip trip = new Trip();
+        Assert.assertTrue(trip.isExplorationDateLinked());
+        Assert.assertNull(trip.getExplorationDate());
+        Assert.assertFalse(trip.hasExplorationDate());
+    }
+
+    @Test
+    public void testUnlinkedWithNoExplorationDate() {
+        Trip trip = new Trip();
+        trip.setExplorationDateLinked(false);
+        Assert.assertFalse(trip.isExplorationDateLinked());
+        Assert.assertNull(trip.getExplorationDate());
+        Assert.assertTrue(trip.hasExplorationDate());
+    }
+
+    @Test
+    public void testUnlinkedWithExplorationDate() {
+        Trip trip = new Trip();
+        trip.setExplorationDateLinked(false);
+        trip.setExplorationDate(new Date(0));
+        Assert.assertFalse(trip.isExplorationDateLinked());
+        Assert.assertNotNull(trip.getExplorationDate());
+        Assert.assertTrue(trip.hasExplorationDate());
+    }
+
+    @Test
+    public void testLinkedTripsEqual() {
+        Trip a = basicTrip();
+        Trip b = basicTrip();
+        a.setSurveyDate(b.getSurveyDate());
+        Assert.assertEquals(a, b);
+    }
+
+    @Test
+    public void testNotEqualWhenLinkedDiffers() {
+        Trip a = basicTrip();
+        Trip b = basicTrip();
+        a.setSurveyDate(b.getSurveyDate());
+        b.setExplorationDateLinked(false);
+        Assert.assertNotEquals(a, b);
+    }
+
+    @Test
+    public void testNotEqualWhenExplorationDateDiffers() {
+        Trip a = basicTrip();
+        Trip b = basicTrip();
+        a.setSurveyDate(b.getSurveyDate());
+        a.setExplorationDateLinked(false);
+        a.setExplorationDate(new Date(1000));
+        b.setExplorationDateLinked(false);
+        b.setExplorationDate(new Date(2000));
+        Assert.assertNotEquals(a, b);
     }
 
 }
