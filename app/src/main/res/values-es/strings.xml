@@ -172,6 +172,7 @@
     <string name="sketch_menu_auto_recentre">Auto-Centrado</string>
     <string name="sketch_menu_redo">Rehacer acción de croquis</string>
     <string name="sketch_menu_show_grid">Papel Cuadriculado</string>
+    <string name="sketch_menu_show_compass">Brújula</string>
     <string name="sketch_menu_snap_to_lines">Ajustar a Líneas</string>
     <string name="sketch_menu_fade_non_active">Atenuar No-Activas</string>
     <string name="sketch_menu_show_station_labels">Etiquetas de Estaciones</string>

@@ -172,6 +172,7 @@
     <string name="sketch_menu_auto_recentre">Auto-Centrar</string>
     <string name="sketch_menu_redo">Refazer ação de esboço</string>
     <string name="sketch_menu_show_grid">Papel Quadriculado</string>
+    <string name="sketch_menu_show_compass">Bússola</string>
     <string name="sketch_menu_snap_to_lines">Ajustar a Linhas</string>
     <string name="sketch_menu_fade_non_active">Esmaecer Não-Ativas</string>
     <string name="sketch_menu_show_station_labels">Etiquetas de Estações</string>

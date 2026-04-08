@@ -142,6 +142,8 @@ public class GraphView extends View {
 
     private Bitmap commentIcon, linkIcon;
 
+    private float compassAzimuthDegrees = 0f;
+
     public SketchTool currentSketchTool = SketchTool.MOVE;
     // used to jump back to the previous tool when using one-use tools
     private SketchTool previousSketchTool = SketchTool.SELECT;
@@ -261,6 +263,8 @@ public class GraphView extends View {
         legendPaint.setColor(legendColour);
         float legendSizeSp = GeneralPreferences.getLegendFontSizeSp();
         float legendSizePixels = spToPixels(legendSizeSp);
+        float strokeWidthPixels = spToPixels(legendSizeSp * 0.1f);
+        legendPaint.setStrokeWidth(strokeWidthPixels);
         legendPaint.setTextSize(legendSizePixels);
 
         int labelColour = ContextCompat.getColor(activity, R.color.station);
@@ -822,6 +826,9 @@ public class GraphView extends View {
         drawSurvey(canvas, survey, projection, SOLID_ALPHA);
 
         drawLegend(canvas);
+        if (SketchPreferences.Toggle.SHOW_COMPASS.isOn() && projectionType == Projection2D.PLAN) {
+            drawCompass(canvas);
+        }
         drawHotCorners(canvas);
 
         if (activity.isDebugMode()) {
@@ -1365,8 +1372,34 @@ public class GraphView extends View {
         canvas.drawLine(x + scaleWidth, scaleY,
                 x + scaleWidth, scaleY - legendTickSizePx, legendPaint);
         String scaleLabel = minorGridSize + "m";
-        canvas.drawText(scaleLabel, x + scaleWidth + 0.2f * legendSize, scaleY, legendPaint);
+        canvas.drawText(scaleLabel, x + scaleWidth + 0.3f * legendSize, scaleY, legendPaint);
 
+    }
+
+
+    private void drawCompass(Canvas canvas) {
+        float textSize = legendPaint.getTextSize();
+        Paint.FontMetrics metrics = legendPaint.getFontMetrics();
+        float textHeight = metrics.descent - metrics.ascent;
+        float offsetX = textSize * 1.25f;   // matches legend x
+        float arrowLength = textSize * 2.5f;
+        float arrowHeadSize = textSize * 0.6f;
+        float cx = offsetX + arrowLength / 2f + textSize;
+        float scaleBarY = getHeight() - textSize * 4f;
+        float cy = scaleBarY - arrowLength / 2f - textHeight;
+
+        canvas.save();
+        canvas.rotate(compassAzimuthDegrees, cx, cy);
+
+        float tipY = cy - arrowLength / 2f;
+        float tailY = cy + arrowLength / 2f;
+
+        canvas.drawLine(cx, tailY, cx, tipY, legendPaint);
+        canvas.drawLine(cx, tipY, cx - arrowHeadSize, tipY + arrowHeadSize, legendPaint);
+        canvas.drawLine(cx, tipY, cx + arrowHeadSize, tipY + arrowHeadSize, legendPaint);
+        canvas.drawText("N", cx - textSize * 0.35f, tipY - textSize * 0.2f, legendPaint);
+
+        canvas.restore();
     }
 
 
@@ -1561,6 +1594,13 @@ public class GraphView extends View {
         currentSketchTool = sketchTool;
     }
 
+
+    public void setCompassAzimuth(float degrees) {
+        compassAzimuthDegrees = degrees;
+        if (SketchPreferences.Toggle.SHOW_COMPASS.isOn() && projectionType == Projection2D.PLAN) {
+            invalidate();
+        }
+    }
 
     public void setCachedStats(float surveyLength, float surveyHeight) {
         this.surveyLength = surveyLength;

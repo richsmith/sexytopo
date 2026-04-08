@@ -172,6 +172,7 @@
     <string name="sketch_menu_auto_recentre">Automatisches Zentrieren</string>
     <string name="sketch_menu_redo">Zeichnen-Befehl wiederholen</string>
     <string name="sketch_menu_show_grid">Raster anzeigen</string>
+    <string name="sketch_menu_show_compass">Kompass</string>
     <string name="sketch_menu_snap_to_lines">Linien fangen</string>
     <string name="sketch_menu_fade_non_active">Nicht-Aktiv-Funktion ausblenden</string>
     <string name="sketch_menu_show_station_labels">Messpunkt-Beschriftungen</string>

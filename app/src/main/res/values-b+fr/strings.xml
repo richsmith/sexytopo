@@ -172,6 +172,7 @@
     <string name="sketch_menu_auto_recentre">Recentrage automatique</string>
     <string name="sketch_menu_redo">Refaire l\'action d\'esquisse</string>
     <string name="sketch_menu_show_grid">Papier millimétré</string>
+    <string name="sketch_menu_show_compass">Boussole</string>
     <string name="sketch_menu_snap_to_lines">Accrocher aux lignes</string>
     <string name="sketch_menu_fade_non_active">Atténuer les éléments non actifs</string>
     <string name="sketch_menu_show_station_labels">Noms des stations</string>

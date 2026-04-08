@@ -51,4 +51,9 @@
         android:title="@string/sketch_menu_show_station_labels"
         android:icon="@android:drawable/ic_menu_preferences"
         android:checkable="true"/>
+    <item
+        android:id="@+id/buttonShowCompass"
+        android:title="@string/sketch_menu_show_compass"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:checkable="true"/>
 </menu>

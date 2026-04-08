@@ -30,7 +30,8 @@ public class SketchPreferences {
         SHOW_SPLAYS(R.id.buttonShowSplays, true),
         SHOW_SKETCH(R.id.buttonShowSketch, true),
         SHOW_STATION_LABELS(R.id.buttonShowStationLabels, true),
-        SHOW_CONNECTIONS(R.id.buttonShowConnections, true);
+        SHOW_CONNECTIONS(R.id.buttonShowConnections, true),
+        SHOW_COMPASS(R.id.buttonShowCompass, true);
 
         private final int controlId;
         private final boolean defaultValue;

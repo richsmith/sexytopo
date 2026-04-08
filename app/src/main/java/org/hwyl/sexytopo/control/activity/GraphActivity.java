@@ -11,6 +11,10 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.HapticFeedbackConstants;
 import android.view.Menu;
@@ -45,7 +49,7 @@ import org.hwyl.sexytopo.model.survey.Survey;
 
 
 public abstract class GraphActivity extends SurveyEditorActivity
-        implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
+        implements View.OnClickListener, PopupMenu.OnMenuItemClickListener, SensorEventListener {
 
     private static final float ZOOM_INCREMENT = 1.1f;
     private static final float ZOOM_DECREMENT = 0.9f;
@@ -81,6 +85,9 @@ public abstract class GraphActivity extends SurveyEditorActivity
 
     private GraphView graphView;
 
+    private SensorManager sensorManager;
+    private Sensor rotationSensor;
+
     private BroadcastReceiver updatedReceiver;
     private BroadcastReceiver createdReceiver;
 
@@ -105,6 +112,11 @@ public abstract class GraphActivity extends SurveyEditorActivity
                 handleAutoRecentre();
             }
         };
+
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        if (sensorManager != null) {
+            rotationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+        }
 
         setContentView(R.layout.activity_graph);
         setupMaterialToolbar();
@@ -136,6 +148,10 @@ public abstract class GraphActivity extends SurveyEditorActivity
     protected void onResume() {
         super.onResume();
 
+        if (SketchPreferences.Toggle.SHOW_COMPASS.isOn()) {
+            registerCompassSensor();
+        }
+
         registerReceivers();
         syncWithSurvey();
 
@@ -149,8 +165,36 @@ public abstract class GraphActivity extends SurveyEditorActivity
 
     public void onPause() {
         super.onPause();
+        unregisterCompassSensor();
         unregisterReceivers();
     }
+
+    private void registerCompassSensor() {
+        if (sensorManager != null && rotationSensor != null) {
+            sensorManager.registerListener(this, rotationSensor, SensorManager.SENSOR_DELAY_UI);
+        }
+    }
+
+    private void unregisterCompassSensor() {
+        if (sensorManager != null) {
+            sensorManager.unregisterListener(this);
+        }
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+            float[] rotMatrix = new float[9];
+            SensorManager.getRotationMatrixFromVector(rotMatrix, event.values);
+            float[] orientation = new float[3];
+            SensorManager.getOrientation(rotMatrix, orientation);
+            float azimuthDeg = (float) Math.toDegrees(orientation[0]);
+            graphView.setCompassAzimuth(azimuthDeg);
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
 
     private void registerReceivers() {
@@ -231,6 +275,16 @@ public abstract class GraphActivity extends SurveyEditorActivity
             return true;
         } else if (itemId == R.id.buttonShowGrid) {
             SketchPreferences.Toggle.SHOW_GRID.set(!item.isChecked());
+            graphView.invalidate();
+            return true;
+        } else if (itemId == R.id.buttonShowCompass) {
+            boolean turningOn = !item.isChecked();
+            SketchPreferences.Toggle.SHOW_COMPASS.set(turningOn);
+            if (turningOn) {
+                registerCompassSensor();
+            } else {
+                unregisterCompassSensor();
+            }
             graphView.invalidate();
             return true;
         } else if (itemId == R.id.buttonFadeNonActive) {
