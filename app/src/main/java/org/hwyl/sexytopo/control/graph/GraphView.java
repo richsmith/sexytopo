@@ -1367,12 +1367,14 @@ public class GraphView extends View {
         float scaleWidth = surveyToViewScale * minorGridSize;
         float scaleOffsetY = offsetY * 2;
         float scaleY = getHeight() - scaleOffsetY;
-        canvas.drawLine(
-                x, scaleY, x + scaleWidth, scaleY, legendPaint);
-        canvas.drawLine(
-                x, scaleY, offsetX, scaleY - legendTickSizePx, legendPaint);
-        canvas.drawLine(x + scaleWidth, scaleY,
-                x + scaleWidth, scaleY - legendTickSizePx, legendPaint);
+        legendPaint.setStyle(Paint.Style.STROKE);
+        Path scalePath = new Path();
+        scalePath.moveTo(x, scaleY - legendTickSizePx);
+        scalePath.lineTo(x, scaleY);
+        scalePath.lineTo(x + scaleWidth, scaleY);
+        scalePath.lineTo(x + scaleWidth, scaleY - legendTickSizePx);
+        canvas.drawPath(scalePath, legendPaint);
+        legendPaint.setStyle(Paint.Style.FILL);
         String scaleLabel = minorGridSize + "m";
         canvas.drawText(scaleLabel, x + scaleWidth + 0.3f * legendSize, scaleY, legendPaint);
 
@@ -1400,9 +1402,15 @@ public class GraphView extends View {
         float tipY = cy - arrowLength / 2f;
         float tailY = cy + arrowLength / 2f;
 
-        canvas.drawLine(cx, tailY, cx, tipY, legendPaint);
-        canvas.drawLine(cx, tipY, cx - arrowHeadSize, tipY + arrowHeadSize, legendPaint);
-        canvas.drawLine(cx, tipY, cx + arrowHeadSize, tipY + arrowHeadSize, legendPaint);
+        legendPaint.setStyle(Paint.Style.STROKE);
+        Path arrowPath = new Path();
+        arrowPath.moveTo(cx - arrowHeadSize, tipY + arrowHeadSize);
+        arrowPath.lineTo(cx, tipY);
+        arrowPath.lineTo(cx + arrowHeadSize, tipY + arrowHeadSize);
+        arrowPath.moveTo(cx, tipY);
+        arrowPath.lineTo(cx, tailY);
+        canvas.drawPath(arrowPath, legendPaint);
+        legendPaint.setStyle(Paint.Style.FILL);
         canvas.drawText("N", cx - textSize * 0.35f, tipY - textSize * 0.2f, legendPaint);
 
         canvas.restore();
