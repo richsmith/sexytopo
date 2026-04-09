@@ -186,8 +186,11 @@ public abstract class GraphActivity extends SurveyEditorActivity
         if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
             float[] rotMatrix = new float[9];
             SensorManager.getRotationMatrixFromVector(rotMatrix, event.values);
+            float[] remapped = new float[9];
+            SensorManager.remapCoordinateSystem(
+                    rotMatrix, SensorManager.AXIS_X, SensorManager.AXIS_Y, remapped);
             float[] orientation = new float[3];
-            SensorManager.getOrientation(rotMatrix, orientation);
+            SensorManager.getOrientation(remapped, orientation);
             float azimuthDeg = (float) Math.toDegrees(orientation[0]);
             graphView.setCompassAzimuth(azimuthDeg);
         }

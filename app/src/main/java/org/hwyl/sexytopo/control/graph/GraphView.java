@@ -1396,7 +1396,7 @@ public class GraphView extends View {
         float cy = scaleBarY - arrowLength / 2f - textHeight;
 
         canvas.save();
-        canvas.rotate(compassAzimuthDegrees, cx, cy);
+        canvas.rotate(-compassAzimuthDegrees, cx, cy);
 
         float tipY = cy - arrowLength / 2f;
         float tailY = cy + arrowLength / 2f;
