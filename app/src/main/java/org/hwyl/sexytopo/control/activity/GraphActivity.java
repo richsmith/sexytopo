@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.view.HapticFeedbackConstants;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
@@ -186,9 +187,29 @@ public abstract class GraphActivity extends SurveyEditorActivity
         if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
             float[] rotMatrix = new float[9];
             SensorManager.getRotationMatrixFromVector(rotMatrix, event.values);
+
+            int axisX = SensorManager.AXIS_X;
+            int axisY = SensorManager.AXIS_Y;
+            int rotation = getWindowManager().getDefaultDisplay().getRotation();
+            switch (rotation) {
+                case Surface.ROTATION_90:
+                    axisX = SensorManager.AXIS_Y;
+                    axisY = SensorManager.AXIS_MINUS_X;
+                    break;
+                case Surface.ROTATION_180:
+                    axisX = SensorManager.AXIS_MINUS_X;
+                    axisY = SensorManager.AXIS_MINUS_Y;
+                    break;
+                case Surface.ROTATION_270:
+                    axisX = SensorManager.AXIS_MINUS_Y;
+                    axisY = SensorManager.AXIS_X;
+                    break;
+                default:
+                    break;
+            }
+
             float[] remapped = new float[9];
-            SensorManager.remapCoordinateSystem(
-                    rotMatrix, SensorManager.AXIS_X, SensorManager.AXIS_Y, remapped);
+            SensorManager.remapCoordinateSystem(rotMatrix, axisX, axisY, remapped);
             float[] orientation = new float[3];
             SensorManager.getOrientation(remapped, orientation);
             float azimuthDeg = (float) Math.toDegrees(orientation[0]);
