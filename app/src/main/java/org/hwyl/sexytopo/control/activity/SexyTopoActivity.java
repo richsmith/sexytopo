@@ -29,6 +29,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuCompat;
+import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -139,7 +140,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     /**
      * Helper method to apply window inset padding to a view for edge-to-edge layout.
-     * Handles both status bar and navigation bar insets.
+     * Handles status bar and navigation bar insets, including side navigation bar insets
+     * that appear in landscape on devices with 3-button navigation.
      * Can be called from onCreate of any activity.
      *
      * @param viewId the ID of the root view to apply insets to
@@ -155,11 +157,15 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             final int bottom = view.getPaddingBottom();
 
             ViewCompat.setOnApplyWindowInsetsListener(view, (v, insets) -> {
-                int topInset = applyTopInset ? insets.getInsets(
-                    WindowInsetsCompat.Type.statusBars()).top : 0;
-                int bottomInset = applyBottomInset ? insets.getInsets(
-                    WindowInsetsCompat.Type.navigationBars()).bottom : 0;
-                v.setPadding(left, top + topInset, right, bottom + bottomInset);
+                Insets statusBars = insets.getInsets(WindowInsetsCompat.Type.statusBars());
+                Insets navigationBars = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
+                int topInset = applyTopInset ? statusBars.top : 0;
+                int bottomInset = applyBottomInset ? navigationBars.bottom : 0;
+                v.setPadding(
+                    left + navigationBars.left,
+                    top + topInset,
+                    right + navigationBars.right,
+                    bottom + bottomInset);
                 return insets;
             });
         }
