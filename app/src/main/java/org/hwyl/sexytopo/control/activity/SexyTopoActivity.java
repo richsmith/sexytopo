@@ -19,7 +19,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -557,24 +556,16 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     @SuppressLint("UnusedDeclaration")
     public void requestExportSurvey() {  // public due to stupid Reflection requirements
 
-        MaterialAlertDialogBuilder builderSingle = new MaterialAlertDialogBuilder(this);
+        String[] names = SelectableExporters.getExportTypeNames(this).toArray(new String[0]);
 
-        builderSingle.setTitle(R.string.export_select_type);
-        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.select_dialog_item);
-
-        arrayAdapter.addAll(SelectableExporters.getExportTypeNames(this));
-        builderSingle.setNegativeButton(R.string.cancel,
-                (dialog, which) -> dialog.dismiss());
-
-        builderSingle.setAdapter(arrayAdapter,
-                (dialog, which) -> {
-                    String name = arrayAdapter.getItem(which);
-                    Exporter exporter = SelectableExporters.fromName(this, name);
-                    exportSurvey(exporter);
-                });
-        builderSingle.show();
+        new MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.export_select_type)
+            .setItems(names, (dialog, which) -> {
+                Exporter exporter = SelectableExporters.fromName(this, names[which]);
+                exportSurvey(exporter);
+            })
+            .setNegativeButton(R.string.cancel, null)
+            .show();
     }
 
 
@@ -923,42 +914,31 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     private void chooseSurveyToUnlink(final Survey survey, final Station station) {
 
-        MaterialAlertDialogBuilder builderSingle = new MaterialAlertDialogBuilder(
-                this);
-
-        builderSingle.setTitle(R.string.file_unlink_survey_dialog_title);
-        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.select_dialog_item);
-
         final Set<SurveyConnection> connections = survey.getSurveysConnectedTo(station);
-        for (SurveyConnection connection : connections) {
-            arrayAdapter.add(connection.otherSurvey.getName());
-        }
+        final String[] names = connections.stream()
+            .map(connection -> connection.otherSurvey.getName())
+            .toArray(String[]::new);
 
-        builderSingle.setNegativeButton(R.string.cancel,
-                (dialog, which) -> dialog.dismiss());
-
-        builderSingle.setAdapter(arrayAdapter,
-                (dialog, which) -> {
-                    String surveyName = arrayAdapter.getItem(which);
-                    try {
-                        for (SurveyConnection connection : connections) {
-                            if (connection.otherSurvey.getName().equals(surveyName)) {
-                                Survey to = connection.otherSurvey;
-                                Station stationTo = connection.stationInOtherSurvey;
-                                unlinkSurveyConnection(survey, station, to, stationTo);
-
-                                return;
-                            }
+        new MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.file_unlink_survey_dialog_title)
+            .setItems(names, (dialog, which) -> {
+                String surveyName = names[which];
+                try {
+                    for (SurveyConnection connection : connections) {
+                        if (connection.otherSurvey.getName().equals(surveyName)) {
+                            Survey to = connection.otherSurvey;
+                            Station stationTo = connection.stationInOtherSurvey;
+                            unlinkSurveyConnection(survey, station, to, stationTo);
+                            return;
                         }
-                        throw new Exception(getString(R.string.file_unlink_survey_not_found));
-
-                    } catch (Exception exception) {
-                        showExceptionAndLog(exception);
                     }
-                });
-        builderSingle.show();
+                    throw new Exception(getString(R.string.file_unlink_survey_not_found));
+                } catch (Exception exception) {
+                    showExceptionAndLog(exception);
+                }
+            })
+            .setNegativeButton(R.string.cancel, null)
+            .show();
     }
 
 

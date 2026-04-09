@@ -3,6 +3,7 @@ package org.hwyl.sexytopo.control.components;
 import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -26,11 +27,11 @@ public class StationAutoCompleteField {
     public StationAutoCompleteField(Context context, Survey survey, String hint) {
         this.survey = survey;
 
-        inputLayout = new TextInputLayout(context);
-        inputLayout.setBoxBackgroundMode(TextInputLayout.BOX_BACKGROUND_OUTLINE);
+        inputLayout = (TextInputLayout) LayoutInflater.from(context)
+                .inflate(R.layout.dialog_station_autocomplete, null, false);
         inputLayout.setHint(hint);
 
-        input = new AutoCompleteTextView(context);
+        input = inputLayout.findViewById(R.id.station_autocomplete);
         String[] stationNames = survey.getAllStations().stream()
             .map(Station::getName)
             .toArray(String[]::new);
@@ -41,9 +42,7 @@ public class StationAutoCompleteField {
             stationNames
         );
         input.setAdapter(adapter);
-        input.setThreshold(1);
         input.setFocusableInTouchMode(true);
-        inputLayout.addView(input);
 
         int paddingH = (int) (24 * context.getResources().getDisplayMetrics().density);
         int paddingV = (int) (20 * context.getResources().getDisplayMetrics().density);
@@ -59,7 +58,7 @@ public class StationAutoCompleteField {
     }
 
     /**
-     * Get the AutoCompleteTextView input field directly.
+     * Get the autocomplete input field directly.
      */
     public AutoCompleteTextView getInput() {
         return input;

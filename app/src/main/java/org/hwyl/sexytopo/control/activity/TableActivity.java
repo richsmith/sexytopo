@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.Toast;
 
@@ -345,45 +344,5 @@ public class TableActivity extends SurveyEditorActivity
         getSurvey().undoAddLeg();
         syncWithSurvey();
     }
-
-
-    @SuppressLint("InflateParams")
-    private void requestMoveLeg(final Leg toMove) {
-        View stationView = getLayoutInflater().inflate(R.layout.select_station_dialog, null);
-
-        List<String> spinnerArray =  new ArrayList<>();
-        List<Station> stations = LegMover.getValidDestinations(getSurvey(), toMove);
-
-        if (stations.isEmpty()) {
-            showSimpleToast(R.string.context_move_leg_no_valid_move);
-            return;
-        }
-
-        // Reverse the order of stations to show the most recent stations at the top
-        java.util.Collections.reverse(stations);
-
-        for (Station station : stations) {
-            spinnerArray.add(station.getName());
-        }
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                this, android.R.layout.simple_spinner_item, spinnerArray);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        final Spinner spinner = stationView.findViewById(R.id.stationSpinner);
-        spinner.setAdapter(adapter);
-
-        new MaterialAlertDialogBuilder(this)
-            .setMessage(R.string.context_move_leg_select_station_title)
-            .setView(stationView)
-            .setPositiveButton(R.string.move, (dialog, which) -> {
-                String selectedName = spinner.getSelectedItem().toString();
-                Station newStation = getSurvey().getStationByName(selectedName);
-
-                SurveyUpdater.moveLeg(getSurvey(), toMove, newStation);
-                syncWithSurvey();
-            })
-            .setNegativeButton(R.string.cancel, null)
-            .show();
-    }
-
 
 }

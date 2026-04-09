@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:hint="@string/trip_dialog_add_to_team_name_hint">
 
-        <AutoCompleteTextView
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
             android:id="@+id/name_field"
             style="@style/Widget.Material3.AutoCompleteTextView.OutlinedBox"
             android:layout_width="match_parent"
@@ -25,26 +25,26 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <com.google.android.material.checkbox.MaterialCheckBox
+    <CheckBox
         android:id="@+id/role_book"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="@string/trip_role_book" />
 
-    <com.google.android.material.checkbox.MaterialCheckBox
+    <CheckBox
         android:id="@+id/role_instruments"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/trip_role_instruments" />
 
-    <com.google.android.material.checkbox.MaterialCheckBox
+    <CheckBox
         android:id="@+id/role_dog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/trip_role_dog" />
 
-    <com.google.android.material.checkbox.MaterialCheckBox
+    <CheckBox
         android:id="@+id/role_exploration"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

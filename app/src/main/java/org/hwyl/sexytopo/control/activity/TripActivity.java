@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -18,7 +19,6 @@ import org.hwyl.sexytopo.comms.Instrument;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentManager;
 
-import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
@@ -119,7 +119,7 @@ public class TripActivity extends SexyTopoActivity {
         exploDateField.setOnClickListener(this::onChooseExplorationDateClicked);
         exploDateLayout.setEndIconOnClickListener(this::onChooseExplorationDateClicked);
 
-        MaterialCheckBox linkedCheckbox = findViewById(R.id.exploration_date_linked_checkbox);
+        CheckBox linkedCheckbox = findViewById(R.id.exploration_date_linked_checkbox);
         linkedCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             Trip t = getSurvey().getTrip();
             if (t == null) return;
@@ -357,7 +357,7 @@ public class TripActivity extends SexyTopoActivity {
         Trip.Role[] allRoles = Trip.Role.values();
         for (int i = 0; i < allRoles.length; i++) {
             if (teamEntry.roles.contains(allRoles[i])) {
-                ((MaterialCheckBox) dialogView.findViewById(ROLE_CHECKBOX_IDS[i])).setChecked(true);
+                ((CheckBox) dialogView.findViewById(ROLE_CHECKBOX_IDS[i])).setChecked(true);
             }
         }
 
@@ -386,7 +386,7 @@ public class TripActivity extends SexyTopoActivity {
         TextInputLayout exploDateLayout = findViewById(R.id.exploration_date_layout);
         TextInputEditText exploDateField = findViewById(R.id.exploration_date_field);
         Button clearExploButton = findViewById(R.id.clear_exploration_date_button);
-        MaterialCheckBox linkedCheckbox = findViewById(R.id.exploration_date_linked_checkbox);
+        CheckBox linkedCheckbox = findViewById(R.id.exploration_date_linked_checkbox);
 
         // Update checkbox without triggering the listener
         linkedCheckbox.setOnCheckedChangeListener(null);
@@ -427,7 +427,7 @@ public class TripActivity extends SexyTopoActivity {
         Trip.Role[] allRoles = Trip.Role.values();
         List<Trip.Role> selectedRoles = new ArrayList<>();
         for (int i = 0; i < allRoles.length; i++) {
-            if (((MaterialCheckBox) dialogView.findViewById(ROLE_CHECKBOX_IDS[i])).isChecked()) {
+            if (((CheckBox) dialogView.findViewById(ROLE_CHECKBOX_IDS[i])).isChecked()) {
                 selectedRoles.add(allRoles[i]);
             }
         }

@@ -2,7 +2,6 @@ package org.hwyl.sexytopo.control.table;
 
 import android.content.Context;
 import android.view.View;
-
 import android.widget.AutoCompleteTextView;
 
 import com.google.android.material.textfield.TextInputLayout;

@@ -88,7 +88,7 @@
 
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <com.google.android.material.button.MaterialButton
+                    <Button
                         android:id="@+id/clear_exploration_date_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -97,7 +97,7 @@
                         android:visibility="gone"
                         style="@style/Widget.Material3.Button.TextButton"/>
 
-                    <com.google.android.material.checkbox.MaterialCheckBox
+                    <CheckBox
                         android:id="@+id/exploration_date_linked_checkbox"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -150,7 +150,7 @@
 
                     </LinearLayout>
 
-                    <com.google.android.material.button.MaterialButton
+                    <Button
                         android:id="@+id/add_person"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -191,7 +191,7 @@
 
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <com.google.android.material.button.MaterialButton
+                    <Button
                         android:id="@+id/instrument_get_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -246,7 +246,7 @@
                 android:gravity="end"
                 android:layout_marginTop="8dp">
 
-                <com.google.android.material.button.MaterialButton
+                <Button
                     android:id="@+id/clear_trip"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -256,7 +256,7 @@
                     android:onClick="requestClear"
                     style="@style/Widget.Material3.Button.OutlinedButton"/>
 
-                <com.google.android.material.button.MaterialButton
+                <Button
                     android:id="@+id/set_trip"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

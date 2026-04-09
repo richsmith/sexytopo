@@ -5,20 +5,23 @@
     android:orientation="vertical"
     android:padding="24dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/therion_export_plan_scraps" />
-
-    <EditText
-        android:id="@+id/planScrapsInput"
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="number"
-        android:text="1"
-        android:importantForAutofill="no" />
+        android:hint="@string/therion_export_plan_scraps">
 
-    <com.google.android.material.checkbox.MaterialCheckBox
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/planScrapsInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:text="1"
+            android:importantForAutofill="no" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <CheckBox
         android:id="@+id/stationsInPlanCheckbox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -32,20 +35,23 @@
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/therion_export_ee_scraps" />
-
-    <EditText
-        android:id="@+id/eeScrapsInput"
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="number"
-        android:text="1"
-        android:importantForAutofill="no" />
+        android:hint="@string/therion_export_ee_scraps">
 
-    <com.google.android.material.checkbox.MaterialCheckBox
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/eeScrapsInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:text="1"
+            android:importantForAutofill="no" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <CheckBox
         android:id="@+id/stationsInEeCheckbox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -627,8 +627,7 @@ public class GraphView extends View {
                 TextInputLayout inputLayout = DialogUtils.createStandardTextInputLayout(
                         getContext(), R.string.sketch_text_hint);
 
-                TextInputEditText input = new TextInputEditText(getContext());
-                inputLayout.addView(input);
+                TextInputEditText input = DialogUtils.getEditText(inputLayout);
 
                 MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
                 builder.setView(inputLayout)

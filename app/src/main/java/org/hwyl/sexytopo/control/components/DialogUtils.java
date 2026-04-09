@@ -3,6 +3,7 @@ package org.hwyl.sexytopo.control.components;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.view.LayoutInflater;
 import android.view.WindowManager;
 import android.widget.Button;
 
@@ -10,8 +11,10 @@ import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
+import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.table.Form;
 
 /**
@@ -31,8 +34,8 @@ public class DialogUtils {
      * @return Configured TextInputLayout
      */
     public static TextInputLayout createStandardTextInputLayout(Context context, @StringRes int hintRes) {
-        TextInputLayout inputLayout = new TextInputLayout(context);
-        inputLayout.setBoxBackgroundMode(TextInputLayout.BOX_BACKGROUND_OUTLINE);
+        TextInputLayout inputLayout = (TextInputLayout) LayoutInflater.from(context)
+                .inflate(R.layout.dialog_text_input, null, false);
         inputLayout.setHint(context.getString(hintRes));
 
         float density = context.getResources().getDisplayMetrics().density;
@@ -41,6 +44,10 @@ public class DialogUtils {
         inputLayout.setPadding(paddingH, paddingV, paddingH, 0);
 
         return inputLayout;
+    }
+
+    public static TextInputEditText getEditText(TextInputLayout inputLayout) {
+        return inputLayout.findViewById(R.id.text_input_edit_text);
     }
 
     /**

@@ -46,9 +46,9 @@
         <item name="android:elevation">2dp</item>
     </style>
 
-    <style name="ContextMenuButton" parent="Widget.AppCompat.Button">
-        <item name="android:background">?attr/colorSurface</item>
+    <style name="ContextMenuButton" parent="Widget.Material3.Button.TextButton">
         <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="backgroundTint">?attr/colorSurface</item>
     </style>
 
     <style name="ShapeAppearance.App.SmallComponent" parent="ShapeAppearance.Material3.SmallComponent">

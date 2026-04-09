@@ -9,7 +9,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 
 import androidx.appcompat.app.AlertDialog;
@@ -111,10 +110,9 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         TextInputLayout inputLayout = DialogUtils.createStandardTextInputLayout(this,
                 R.string.menu_survey_start_new_dialog_station_name);
 
-        TextInputEditText input = new TextInputEditText(this);
+        TextInputEditText input = DialogUtils.getEditText(inputLayout);
         input.setText(station.getName());
         input.selectAll();
-        inputLayout.addView(input);
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setView(inputLayout)
@@ -245,12 +243,11 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         TextInputLayout inputLayout = DialogUtils.createStandardTextInputLayout(this,
                 R.string.context_station_comment_hint);
 
-        TextInputEditText input = new TextInputEditText(this);
+        TextInputEditText input = DialogUtils.getEditText(inputLayout);
         input.setLines(8);
         input.setGravity(Gravity.START | Gravity.TOP);
         input.setText(station.getComment());
         input.setFocusableInTouchMode(true);
-        inputLayout.addView(input);
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setView(inputLayout)
