@@ -23,212 +23,248 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="@color/lightBackground"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingBottom="@dimen/activity_vertical_margin">
+        android:fillViewport="true">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/lightBackground"
+            android:padding="16dp">
 
-    <TableLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:stretchColumns="1">
-        <TableRow
-            android:background="@color/innerPanelBackground">
-            <TextView
-                android:text="@string/stats_title_this_survey"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="start"
-                />
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="@string/stats_length"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="start"
-                />
-            <TextView
-                android:id="@+id/statsFieldLength"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="end"/>
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="@string/stats_vertical_range"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="start"
-                />
-            <TextView
-                android:id="@+id/statsFieldDepth"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="end"/>
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="@string/stats_number_stations"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="start"
-                />
-            <TextView
-                android:id="@+id/statsFieldNumberStations"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="end"/>
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="@string/stats_number_legs"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="start"
-                />
-            <TextView
-                android:id="@+id/statsFieldNumberLegs"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="end"/>
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="@string/stats_number_splays"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="start"
-                />
-            <TextView
-                android:id="@+id/statsFieldNumberSplays"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="end"/>
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="@string/stats_longest_leg"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="start"
-                />
-            <TextView
-                android:id="@+id/statsFieldLongestLeg"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="end"/>
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="@string/stats_shortest_leg"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="start"
-                />
-            <TextView
-                android:id="@+id/statsFieldShortestLeg"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="end"/>
-        </TableRow>
-    </TableLayout>
+            <!-- Current Survey Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="12dp">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-    <TableLayout
-        android:id="@+id/statsAllLinkedSurveys"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:stretchColumns="1">
-        <TableRow
-            android:background="@color/tableBackground">
-            <TextView
-                android:text="@string/stats_title_linked_surveys"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="start"
-                />
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="@string/stats_number_linked_surveys"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="start"
-                />
-            <TextView
-                android:id="@+id/statsFieldNumberLinkedSurveys"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="end"/>
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="@string/stats_length"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="start"
-                />
-            <TextView
-                android:id="@+id/statsFieldLinkedLength"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="end"/>
-        </TableRow>
-        <TableRow android:visibility="gone">
-            <TextView
-                android:text="@string/stats_vertical_range"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="start"
-                />
-            <TextView
-                android:id="@+id/statsFieldLinkedDepth"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="end"/>
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="@string/stats_number_stations"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="start"
-                />
-            <TextView
-                android:id="@+id/statsFieldLinkedNumberStations"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="end"/>
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="@string/stats_number_legs"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="start"
-                />
-            <TextView
-                android:id="@+id/statsFieldLinkedNumberLegs"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="end"/>
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="@string/stats_number_splays"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="start"
-                />
-            <TextView
-                android:id="@+id/statsFieldLinkedNumberSplays"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="end"/>
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="@string/stats_longest_leg"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="start"
-                />
-            <TextView
-                android:id="@+id/statsFieldLinkedLongestLeg"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="end"/>
-        </TableRow>
-        <TableRow>
-            <TextView
-                android:text="@string/stats_shortest_leg"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="start"
-                />
-            <TextView
-                android:id="@+id/statsFieldLinkedShortestLeg"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="end"/>
-        </TableRow>
-    </TableLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/stats_title_this_survey"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        android:textColor="?attr/colorOnSurface"
+                        android:paddingBottom="12dp" />
 
-    </LinearLayout>
+                    <!-- Length -->
+                    <LinearLayout style="@style/StatsRow">
+                        <TextView
+                            style="@style/StatsLabel"
+                            android:text="@string/stats_length" />
+                        <TextView
+                            style="@style/StatsValue"
+                            android:id="@+id/statsFieldLength" />
+                    </LinearLayout>
+
+                    <View style="@style/StatsDivider" />
+
+                    <!-- Vertical Range -->
+                    <LinearLayout style="@style/StatsRow">
+                        <TextView
+                            style="@style/StatsLabel"
+                            android:text="@string/stats_vertical_range" />
+                        <TextView
+                            style="@style/StatsValue"
+                            android:id="@+id/statsFieldDepth" />
+                    </LinearLayout>
+
+                    <View style="@style/StatsDivider" />
+
+                    <!-- Number of Stations -->
+                    <LinearLayout style="@style/StatsRow">
+                        <TextView
+                            style="@style/StatsLabel"
+                            android:text="@string/stats_number_stations" />
+                        <TextView
+                            style="@style/StatsValue"
+                            android:id="@+id/statsFieldNumberStations" />
+                    </LinearLayout>
+
+                    <View style="@style/StatsDivider" />
+
+                    <!-- Number of Legs -->
+                    <LinearLayout style="@style/StatsRow">
+                        <TextView
+                            style="@style/StatsLabel"
+                            android:text="@string/stats_number_legs" />
+                        <TextView
+                            style="@style/StatsValue"
+                            android:id="@+id/statsFieldNumberLegs" />
+                    </LinearLayout>
+
+                    <View style="@style/StatsDivider" />
+
+                    <!-- Number of Splays -->
+                    <LinearLayout style="@style/StatsRow">
+                        <TextView
+                            style="@style/StatsLabel"
+                            android:text="@string/stats_number_splays" />
+                        <TextView
+                            style="@style/StatsValue"
+                            android:id="@+id/statsFieldNumberSplays" />
+                    </LinearLayout>
+
+                    <View style="@style/StatsDivider" />
+
+                    <!-- Longest Leg -->
+                    <LinearLayout style="@style/StatsRow">
+                        <TextView
+                            style="@style/StatsLabel"
+                            android:text="@string/stats_longest_leg" />
+                        <TextView
+                            style="@style/StatsValue"
+                            android:id="@+id/statsFieldLongestLeg" />
+                    </LinearLayout>
+
+                    <View style="@style/StatsDivider" />
+
+                    <!-- Shortest Leg -->
+                    <LinearLayout style="@style/StatsRow">
+                        <TextView
+                            style="@style/StatsLabel"
+                            android:text="@string/stats_shortest_leg" />
+                        <TextView
+                            style="@style/StatsValue"
+                            android:id="@+id/statsFieldShortestLeg" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Linked Surveys Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/statsAllLinkedSurveys"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="12dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/stats_title_linked_surveys"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        android:textColor="?attr/colorOnSurface"
+                        android:paddingBottom="12dp" />
+
+                    <!-- Number of Surveys -->
+                    <LinearLayout style="@style/StatsRow">
+                        <TextView
+                            style="@style/StatsLabel"
+                            android:text="@string/stats_number_linked_surveys" />
+                        <TextView
+                            style="@style/StatsValue"
+                            android:id="@+id/statsFieldNumberLinkedSurveys" />
+                    </LinearLayout>
+
+                    <View style="@style/StatsDivider" />
+
+                    <!-- Length -->
+                    <LinearLayout style="@style/StatsRow">
+                        <TextView
+                            style="@style/StatsLabel"
+                            android:text="@string/stats_length" />
+                        <TextView
+                            style="@style/StatsValue"
+                            android:id="@+id/statsFieldLinkedLength" />
+                    </LinearLayout>
+
+                    <View style="@style/StatsDivider" />
+
+                    <!-- Vertical Range (hidden) -->
+                    <LinearLayout
+                        style="@style/StatsRow"
+                        android:visibility="gone">
+                        <TextView
+                            style="@style/StatsLabel"
+                            android:text="@string/stats_vertical_range" />
+                        <TextView
+                            style="@style/StatsValue"
+                            android:id="@+id/statsFieldLinkedDepth" />
+                    </LinearLayout>
+
+                    <!-- Number of Stations -->
+                    <LinearLayout style="@style/StatsRow">
+                        <TextView
+                            style="@style/StatsLabel"
+                            android:text="@string/stats_number_stations" />
+                        <TextView
+                            style="@style/StatsValue"
+                            android:id="@+id/statsFieldLinkedNumberStations" />
+                    </LinearLayout>
+
+                    <View style="@style/StatsDivider" />
+
+                    <!-- Number of Legs -->
+                    <LinearLayout style="@style/StatsRow">
+                        <TextView
+                            style="@style/StatsLabel"
+                            android:text="@string/stats_number_legs" />
+                        <TextView
+                            style="@style/StatsValue"
+                            android:id="@+id/statsFieldLinkedNumberLegs" />
+                    </LinearLayout>
+
+                    <View style="@style/StatsDivider" />
+
+                    <!-- Number of Splays -->
+                    <LinearLayout style="@style/StatsRow">
+                        <TextView
+                            style="@style/StatsLabel"
+                            android:text="@string/stats_number_splays" />
+                        <TextView
+                            style="@style/StatsValue"
+                            android:id="@+id/statsFieldLinkedNumberSplays" />
+                    </LinearLayout>
+
+                    <View style="@style/StatsDivider" />
+
+                    <!-- Longest Leg -->
+                    <LinearLayout style="@style/StatsRow">
+                        <TextView
+                            style="@style/StatsLabel"
+                            android:text="@string/stats_longest_leg" />
+                        <TextView
+                            style="@style/StatsValue"
+                            android:id="@+id/statsFieldLinkedLongestLeg" />
+                    </LinearLayout>
+
+                    <View style="@style/StatsDivider" />
+
+                    <!-- Shortest Leg -->
+                    <LinearLayout style="@style/StatsRow">
+                        <TextView
+                            style="@style/StatsLabel"
+                            android:text="@string/stats_shortest_leg" />
+                        <TextView
+                            style="@style/StatsValue"
+                            android:id="@+id/statsFieldLinkedShortestLeg" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

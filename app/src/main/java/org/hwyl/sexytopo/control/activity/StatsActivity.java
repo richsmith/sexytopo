@@ -2,8 +2,9 @@ package org.hwyl.sexytopo.control.activity;
 
 import android.os.Bundle;
 import android.view.View;
-import android.widget.TableLayout;
 import android.widget.TextView;
+
+import com.google.android.material.card.MaterialCardView;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.util.SurveyStats;
@@ -59,11 +60,11 @@ public class StatsActivity extends SexyTopoActivity {
 
         int numberSurveys = surveys.size();
 
-        TableLayout tableLayout = findViewById(R.id.statsAllLinkedSurveys);
+        MaterialCardView cardView = findViewById(R.id.statsAllLinkedSurveys);
         if (numberSurveys <= 1) {
-            tableLayout.setVisibility(View.GONE);
+            cardView.setVisibility(View.GONE);
         } else {
-            tableLayout.setVisibility(View.VISIBLE);
+            cardView.setVisibility(View.VISIBLE);
         }
 
         float length = 0;
