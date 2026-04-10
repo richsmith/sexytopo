@@ -142,6 +142,8 @@
 
 <p>A legend at the bottom right of the view provides a scale bar, basic stats, and a reminder of the survey name.</p>
 
+<p>The plan view can optionally display a <strong>compass</strong> in the corner of the screen, showing the direction of North based on your device's orientation sensor. This can be toggled on or off via the quick settings menu (the display menu icon on the toolbar).</p>
+
 <h2 id="menus">Menus</h2>
 <p>SexyTopo provides several menus accessible from the Action Bar ("hamburger" button for extended menus) for managing surveys, configuring behaviour, and accessing various views and tools.</p>
 
@@ -168,6 +170,7 @@
 		</ul>
 	</li>
 	<li><strong>Export</strong> exports the current survey to various formats including Therion and SVG</li>
+	<li><strong>Share</strong> packages the survey (data and sketches) into a ZIP file and opens the Android share dialog, allowing you to send the survey via email, messaging apps, cloud storage, or any other sharing method available on your device</li>
 	<li><strong>Exit</strong> closes the application</li>
 </ul>
 
@@ -176,7 +179,7 @@
 	<li><strong>Table</strong> displays the tabular data view</li>
 	<li><strong>Plan</strong> shows the plan (top-down) sketch view</li>
 	<li><strong>Elevation</strong> shows the extended elevation sketch view</li>
-	<li><strong>Trip</strong> displays trip information and metadata</li>
+	<li><strong>Trip</strong> displays trip information and metadata (see <a href="#trip">Trip</a> section below)</li>
 	<li><strong>Stats</strong> shows survey statistics (length, depth, etc.)</li>
 	<li><strong>Fullscreen</strong> toggles fullscreen mode</li>
 </ul>
@@ -205,7 +208,10 @@
 </ul>
 
 <h3>Settings</h3>
-<p>Opens the settings screen for configuring app preferences, display options, and behaviour.</p>
+<p>Opens the settings screen for configuring app preferences, display options, and behaviour. Notable settings include:</p>
+<ul>
+	<li><strong>LRUD Direction</strong> (under Table settings) controls how Left/Right splays are oriented when entering LRUD data. In <em>Survey</em> mode (default), splays are perpendicular to the bisected angle between the incoming and outgoing legs. In <em>Shot</em> mode, splays are perpendicular to the most recent leg direction. The shot mode is a common alternative convention for measuring LRUDs</li>
+</ul>
 
 <h3>Help Menu</h3>
 <ul>
@@ -230,6 +236,7 @@
 	<li><strong>Edit Leg</strong> modifies the distance, azimuth, and inclination</li>
 	<li><strong>Reverse</strong> inverts the measurement as if taken from target back to origin</li>
 	<li><strong>Upgrade Splay</strong> (splays only) converts a splay to a full leg, creating a new station</li>
+	<li><strong>Add to Leg Above</strong> (splays only) merges the splay's measurements into the most recent full leg, averaging them together. This is useful when you have taken an additional shot along an existing leg and want to incorporate it for better accuracy</li>
 	<li><strong>Downgrade Leg</strong> (legs only) converts a leg to a splay</li>
 	<li><strong>Delete Leg</strong> removes the selected leg or splay</li>
 </ul>
@@ -255,6 +262,22 @@
 	<li><strong>Unlink Survey</strong> removes the link to a connected survey</li>
 </ul>
 
+<h2 id="trip">Trip</h2>
+<p>The Trip view (accessible from View → Trip) records metadata about the current surveying trip. This information is saved with the survey and can be useful for record-keeping and for export to other survey formats.</p>
+
+<h3>Dates</h3>
+<p>Each trip has a <strong>survey date</strong> (when the survey data was collected) and an optional <strong>exploration date</strong> (when the passage was first explored, if different). Tap the date fields or calendar icons to select dates using a date picker. By default the exploration date is linked to the survey date; uncheck the "Linked" checkbox to set a separate exploration date, or use the Clear button to remove it.</p>
+
+<h3>Instrument</h3>
+<p>Records which instrument was used for the trip. If an instrument is currently connected, SexyTopo can auto-fill this field using the "Get Instrument" button.</p>
+
+<h3>Team</h3>
+<p>You can record the members of the survey team and their roles. Tap "Add" to add a team member with a name and one or more roles.</p>
+<p>SexyTopo remembers caver names you have entered previously and offers them as suggestions when adding new team members, so you don't have to type the same names each trip. Tap a team member to edit their details, or use the delete button to remove them.</p>
+
+<h3>Comments</h3>
+<p>A free-text field for any notes about the trip.</p>
+
 <h2 id="file-handling">File Handling</h2>
   <p>SexyTopo stores survey data on your device and provides various options for managing survey files through the File menu.</p>
 
@@ -275,13 +298,13 @@
   <h3>Importing Surveys</h3>
     <p>To import survey data from other software, select an action from File → Import in the menu.</p>
     <ul>
-      <li><strong>Import File</strong> - Imports a single survey file (e.g. a Survex file)</li>
+      <li><strong>Import File</strong> - Imports a single survey file (e.g. a Survex file or a PocketTopo .top file)</li>
       <li><strong>Import Directory</strong> - Imports a survey from a folder, probably containing multiple files (e.g. a Therion survey)</li>
     </ul>
 
   <h3>Exporting Surveys</h3>
     <p>Export allows you to save your survey in various formats for use with other software, sharing, or publishing. Select File → Export and choose your desired format.</p>
-    <p>The exported file or folder will be produced in an <code>Exported</code> folder inside your survey folder with a name of the export selected (e.g. <code>Exported/therion</code>).</p>
+    <p>The exported file or folder will be produced in an <code>Exported</code> folder inside your survey folder with a name of the export selected (e.g. <code>Exported/therion</code>), unless otherwise specificied in Settings.</p>
 
 <h2 id="troubleshooting">Troubleshooting</h2>
   <p>In typical caver fashion, you've probably cajoled someone into lending you their shiny measuring device, completely failed to have a practice with it and assumed you'd just wing it. Now you've found yourself in the sharp end of some crappy hole somewhere realising that you have no idea why your surveying kit doesn't work. Luckily you've found SexyTopo has a help file and you're desperately trying to scan through it looking for some hope. First of all, don't panic...</p>
