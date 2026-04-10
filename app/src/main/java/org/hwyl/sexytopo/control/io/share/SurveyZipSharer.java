@@ -48,11 +48,13 @@ public class SurveyZipSharer implements Shareable {
         entries.put(SurveyFile.withExtension(name, SexyTopoConstants.DATA_EXTENSION),
                     SurveyJsonTranslater.toText(survey, versionName, versionCode));
         entries.put(SurveyFile.withExtension(name, SexyTopoConstants.METADATA_EXTENSION),
-                    MetadataTranslater.translate(survey));
+                    MetadataTranslater.translate(survey, versionName, versionCode));
         entries.put(SurveyFile.withExtension(name, SexyTopoConstants.PLAN_SKETCH_EXTENSION),
-                    SketchJsonTranslater.translate(survey.getPlanSketch()));
+                    SketchJsonTranslater.translate(
+                            survey.getPlanSketch(), survey, versionName, versionCode));
         entries.put(SurveyFile.withExtension(name, SexyTopoConstants.EXT_ELEVATION_SKETCH_EXTENSION),
-                    SketchJsonTranslater.translate(survey.getElevationSketch()));
+                    SketchJsonTranslater.translate(
+                            survey.getElevationSketch(), survey, versionName, versionCode));
         return entries;
     }
 

@@ -28,8 +28,9 @@ public class MetadataTranslater {
     public static final String ACTIVE_STATION_TAG = "active-station";
 
 
-    public static String translate(Survey survey) throws Exception {
-        return toJson(survey).toString(SexyTopoConstants.JSON_INDENT);
+    public static String translate(Survey survey, String versionName, int versionCode)
+            throws Exception {
+        return toJson(survey, versionName, versionCode).toString(SexyTopoConstants.JSON_INDENT);
     }
 
 
@@ -51,9 +52,13 @@ public class MetadataTranslater {
     }
 
 
-    public static JSONObject toJson(Survey survey) throws JSONException {
+    public static JSONObject toJson(Survey survey, String versionName, int versionCode)
+            throws JSONException {
 
         JSONObject json = new JSONObject();
+        json.put(JsonTranslaterConstants.VERSION_NAME_TAG, versionName);
+        json.put(JsonTranslaterConstants.VERSION_CODE_TAG, versionCode);
+        json.put(JsonTranslaterConstants.SURVEY_NAME_TAG, survey.getName());
 
         String activeStationName = survey.getActiveStation().getName();
         json.put(ACTIVE_STATION_TAG, activeStationName);

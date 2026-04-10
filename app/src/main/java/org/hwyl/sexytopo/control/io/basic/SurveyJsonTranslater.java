@@ -31,11 +31,6 @@ public class SurveyJsonTranslater {
 
     public static final String DATE_PATTERN = "yyyy-MM-dd";
 
-    public static final String VERSION_NAME_TAG = "sexyTopoVersionName";
-    public static final String VERSION_CODE_TAG = "sexyTopoVersionCode";
-
-    public static final String SURVEY_NAME_TAG = "name";
-
     public static final String STATIONS_TAG = "stations";
     public static final String STATION_NAME_TAG = "name";
     public static final String DIRECTION_TAG = "eeDirection";
@@ -79,9 +74,9 @@ public class SurveyJsonTranslater {
             throws JSONException {
 
         JSONObject json = new JSONObject();
-        json.put(VERSION_NAME_TAG, versionName);
-        json.put(VERSION_CODE_TAG, versionCode);
-        json.put(SURVEY_NAME_TAG, survey.getName());
+        json.put(JsonTranslaterConstants.VERSION_NAME_TAG, versionName);
+        json.put(JsonTranslaterConstants.VERSION_CODE_TAG, versionCode);
+        json.put(JsonTranslaterConstants.SURVEY_NAME_TAG, survey.getName());
 
         JSONArray stationArray = new JSONArray();
 

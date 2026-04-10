@@ -43,8 +43,11 @@ public class SketchJsonTranslater {
     public static final String Y_TAG = "y";
 
 
-    public static String translate(Sketch sketch) throws JSONException {
-        return toJson(sketch).toString(SexyTopoConstants.JSON_INDENT);
+    public static String translate(
+            Sketch sketch, Survey survey, String versionName, int versionCode)
+            throws JSONException {
+        return toJson(sketch, survey, versionName, versionCode)
+                .toString(SexyTopoConstants.JSON_INDENT);
     }
 
 
@@ -54,9 +57,14 @@ public class SketchJsonTranslater {
     }
 
 
-    public static synchronized JSONObject toJson(Sketch sketch) throws JSONException {
+    public static synchronized JSONObject toJson(
+            Sketch sketch, Survey survey, String versionName, int versionCode)
+            throws JSONException {
 
         JSONObject json = new JSONObject();
+        json.put(JsonTranslaterConstants.VERSION_NAME_TAG, versionName);
+        json.put(JsonTranslaterConstants.VERSION_CODE_TAG, versionCode);
+        json.put(JsonTranslaterConstants.SURVEY_NAME_TAG, survey.getName());
 
         JSONArray pathDetailArray = new JSONArray();
         for (PathDetail pathDetail : sketch.getPathDetails()) {

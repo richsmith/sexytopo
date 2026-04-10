@@ -14,50 +14,67 @@ import java.io.IOException;
 public class Saver {
 
     public static synchronized void save(Context context, Survey survey) throws Exception {
-        saveMetadata(context, survey, SurveyFile.METADATA.get(survey));
-        saveSurveyData(context, survey, SurveyFile.DATA.get(survey));
-        savePlanSketch(context, survey, SurveyFile.SKETCH_PLAN.get(survey));
-        saveElevationSketch(context, survey, SurveyFile.SKETCH_EXT_ELEVATION.get(survey));
+        String versionName = SexyTopoActivity.getVersionName(context);
+        int versionCode = SexyTopoActivity.getVersionCode(context);
+        saveMetadata(context, survey, SurveyFile.METADATA.get(survey), versionName, versionCode);
+        saveSurveyData(context, survey, SurveyFile.DATA.get(survey), versionName, versionCode);
+        savePlanSketch(
+                context, survey, SurveyFile.SKETCH_PLAN.get(survey), versionName, versionCode);
+        saveElevationSketch(
+                context, survey, SurveyFile.SKETCH_EXT_ELEVATION.get(survey),
+                versionName, versionCode);
         survey.setSaved(true);
     }
 
     public static synchronized void autosave(Context context, Survey survey) throws Exception {
-        saveMetadata(context, survey, SurveyFile.METADATA.AUTOSAVE.get(survey));
-        saveSurveyData(context, survey, SurveyFile.DATA.AUTOSAVE.get(survey));
-        savePlanSketch(context, survey, SurveyFile.SKETCH_PLAN.AUTOSAVE.get(survey));
-        saveElevationSketch(context, survey, SurveyFile.SKETCH_EXT_ELEVATION.AUTOSAVE.get(survey));
+        String versionName = SexyTopoActivity.getVersionName(context);
+        int versionCode = SexyTopoActivity.getVersionCode(context);
+        saveMetadata(
+                context, survey, SurveyFile.METADATA.AUTOSAVE.get(survey),
+                versionName, versionCode);
+        saveSurveyData(
+                context, survey, SurveyFile.DATA.AUTOSAVE.get(survey),
+                versionName, versionCode);
+        savePlanSketch(
+                context, survey, SurveyFile.SKETCH_PLAN.AUTOSAVE.get(survey),
+                versionName, versionCode);
+        saveElevationSketch(
+                context, survey, SurveyFile.SKETCH_EXT_ELEVATION.AUTOSAVE.get(survey),
+                versionName, versionCode);
         survey.setAutosaved(true);
     }
 
     private static void saveSurveyData(
-            Context context, Survey survey, SurveyFile surveyFile)
+            Context context, Survey survey, SurveyFile surveyFile,
+            String versionName, int versionCode)
             throws IOException, JSONException {
-        String versionName = SexyTopoActivity.getVersionName(context);
-        int versionCode = SexyTopoActivity.getVersionCode(context);
         String surveyText = SurveyJsonTranslater.toText(survey, versionName, versionCode);
         surveyFile.save(context, surveyText);
     }
 
     private static void savePlanSketch(
-            Context context, Survey survey, SurveyFile surveyFile)
+            Context context, Survey survey, SurveyFile surveyFile,
+            String versionName, int versionCode)
             throws IOException, JSONException {
         Sketch sketch = survey.getPlanSketch();
-        String planText = SketchJsonTranslater.translate(sketch);
+        String planText = SketchJsonTranslater.translate(sketch, survey, versionName, versionCode);
         surveyFile.save(context, planText);
     }
 
     private static void saveElevationSketch(
-            Context context, Survey survey, SurveyFile surveyFile)
+            Context context, Survey survey, SurveyFile surveyFile,
+            String versionName, int versionCode)
             throws IOException, JSONException {
         Sketch sketch = survey.getElevationSketch();
-        String eeText = SketchJsonTranslater.translate(sketch);
+        String eeText = SketchJsonTranslater.translate(sketch, survey, versionName, versionCode);
         surveyFile.save(context, eeText);
     }
 
     private static void saveMetadata(
-            Context context, Survey survey, SurveyFile surveyFile)
+            Context context, Survey survey, SurveyFile surveyFile,
+            String versionName, int versionCode)
             throws Exception {
-        String metadataText = MetadataTranslater.translate(survey);
+        String metadataText = MetadataTranslater.translate(survey, versionName, versionCode);
         surveyFile.save(context, metadataText);
     }
 }
