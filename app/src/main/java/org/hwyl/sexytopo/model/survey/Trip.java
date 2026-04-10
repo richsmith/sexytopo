@@ -88,7 +88,10 @@ public class Trip {
         this.surveyDate = other.surveyDate;
         this.explorationDate = other.explorationDate;
         this.explorationDateLinked = other.explorationDateLinked;
-        this.team = new ArrayList<>(other.team);
+        this.team = new ArrayList<>();
+        for (TeamEntry entry : other.team) {
+            this.team.add(new TeamEntry(entry.name, new ArrayList<>(entry.roles)));
+        }
         this.comments = other.comments;
         this.instrument = other.instrument;
     }
@@ -147,6 +150,17 @@ public class Trip {
 
     public boolean hasInstrument() {
         return instrument != null && !instrument.trim().isEmpty();
+    }
+
+    /**
+     * Creates a new Trip for a follow-on survey, copying team and instrument
+     * but with a fresh date and empty comments.
+     */
+    public Trip toNextTrip() {
+        Trip next = new Trip(this);
+        next.setSurveyDate(new Date());
+        next.setComments("");
+        return next;
     }
 
     @Override

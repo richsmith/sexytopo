@@ -138,6 +138,33 @@ public class TripTest {
     }
 
     @Test
+    public void testToNextTripCopiesTeamAndInstrument() {
+        Trip original = basicTrip();
+        Trip next = original.toNextTrip();
+        Assert.assertEquals(original.getTeam(), next.getTeam());
+        Assert.assertEquals(original.getInstrument(), next.getInstrument());
+    }
+
+    @Test
+    public void testToNextTripHasFreshDateAndEmptyComments() {
+        Trip original = basicTrip();
+        original.setSurveyDate(new Date(0));
+        Trip next = original.toNextTrip();
+        Assert.assertNotEquals(new Date(0), next.getSurveyDate());
+        Assert.assertEquals("", next.getComments());
+    }
+
+    @Test
+    public void testToNextTripTeamIsIndependent() {
+        Trip original = basicTrip();
+        Trip next = original.toNextTrip();
+        next.setTeam(Collections.singletonList(
+            new Trip.TeamEntry("New", Arrays.asList(Trip.Role.BOOK))
+        ));
+        Assert.assertEquals(2, original.getTeam().size());
+    }
+
+    @Test
     public void testNotEqualWhenExplorationDateDiffers() {
         Trip a = basicTrip();
         Trip b = basicTrip();

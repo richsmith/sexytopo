@@ -511,35 +511,17 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
     protected void startNewSurvey() {
-        // Save team from current survey before creating new one
-        Survey previousSurvey = getSurvey();
-        List<Trip.TeamEntry> previousTeam = new ArrayList<>();
-        String previousInstrument = "";
+        startNewSurvey(new Survey());
+    }
 
-        if (previousSurvey != null && previousSurvey.getTrip() != null) {
-            Trip previousTrip = previousSurvey.getTrip();
-            // Copy team members
-            for (Trip.TeamEntry entry : previousTrip.getTeam()) {
-                previousTeam.add(new Trip.TeamEntry(entry.name, new ArrayList<>(entry.roles)));
-            }
-            // Copy instrument
-            if (previousTrip.hasInstrument()) {
-                previousInstrument = previousTrip.getInstrument();
-            }
+    protected void startNewSurvey(Survey survey) {
+        Survey previous = getSurvey();
+        if (previous != null && previous.getTrip() != null) {
+            survey.setTrip(previous.getTrip().toNextTrip());
         }
 
-        // Create new survey
-        Survey survey = new Survey();
         setSurvey(survey);
         Log.i(R.string.file_started_new_survey);
-
-        // Set up new trip with copied data
-        Trip newTrip = new Trip();
-        newTrip.setTeam(previousTeam);
-        newTrip.setInstrument(previousInstrument);
-        // Comments cleared (default)
-        survey.setTrip(newTrip);
-
         startActivity(TripActivity.class);
     }
 
@@ -878,6 +860,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
         Survey newSurvey = new Survey();
         newSurvey.getOrigin().setName(startingStationName);
+
         joinSurveys(currentSurvey, joinPoint, newSurvey, newSurvey.getOrigin());
 
         // Save the original survey so the connection is persisted in both directions
@@ -887,7 +870,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             Log.e("Error saving original survey after linking: " + e.getMessage());
         }
 
-        setSurvey(newSurvey);
+        startNewSurvey(newSurvey);
     }
 
     private void joinSurveys(Survey currentSurvey, Station currentJoinPoint,
