@@ -46,24 +46,28 @@ class CaveBLE(val device: BluetoothDevice,
     private var command: BluetoothGattCharacteristic? = null
     private var dataIn: BluetoothGattCharacteristic? = null
     private var bluetoothGatt: BluetoothGatt? = null
+    private var _isConnected = false
     private val callback = object: BluetoothGattCallback() {
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             val deviceAddress = gatt.device.address
 
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 if (newState == BluetoothProfile.STATE_CONNECTED) {
+                    _isConnected = true
                     bluetoothGatt = gatt
                     Handler(Looper.getMainLooper()).post {
                         bluetoothGatt?.discoverServices()
                     }
                 } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                     Log.w("BluetoothGattCallback", "Successfully disconnected from $deviceAddress")
+                    _isConnected = false
                     gatt.close()
                     statusCallback?.invoke(DISCONNECTED, "Successful disconnection")
                 }
             } else {
                 val msg = "Error $status encountered for $deviceAddress! Disconnecting..."
                 Log.w("BluetoothGattCallback", msg)
+                _isConnected = false
                 gatt.close()
                 statusCallback?.invoke(CONNECTION_FAILED, msg)
             }
@@ -120,9 +124,7 @@ class CaveBLE(val device: BluetoothDevice,
     }
 
     fun isConnected(): Boolean {
-        val bluetoothMgr: BluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-        val devs = bluetoothMgr.getConnectedDevices(BluetoothProfile.GATT)
-        return (device in devs)
+        return _isConnected
     }
 
     fun sendCommand(value: Int) {
