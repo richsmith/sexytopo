@@ -40,6 +40,7 @@
     <string name="title_activity_system_log">Log</string>
     <string name="title_activity_help">Help</string>
     <string name="title_activity_guide">Guide</string>
+    <string name="title_activity_3d">3D</string>
 
     <!-- Action bar menu -->
     <string name="action_table">Table</string>
@@ -53,6 +54,7 @@
     <string name="action_device_connect">Connect…</string>
     <string name="action_connection">Connection</string>
     <string name="action_trip">Trip</string>
+    <string name="action_3d">3D</string>
     <string name="action_help">Help</string>
     <string name="action_guide">Manual</string>
     <string name="action_about">About</string>

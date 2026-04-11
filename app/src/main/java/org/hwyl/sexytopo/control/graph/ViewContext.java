@@ -40,6 +40,13 @@ public enum ViewContext {
             setItemVisible(menu, R.id.action_jump_to_elevation, false);
             setDirectionSubmenuVisible(menu, true);
         }
+    },
+    THREE_D {
+        @Override
+        public void configureViewSpecificItems(Menu menu) {
+            setDirectionSubmenuVisible(menu, false);
+            setCrossSectionVisible(menu, false);
+        }
     };
 
     public abstract void configureViewSpecificItems(Menu menu);

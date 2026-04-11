@@ -267,6 +267,9 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         } else if (itemId == R.id.action_elevation) {
             startActivity(ExtendedElevationActivity.class);
             return true;
+        } else if (itemId == R.id.action_3d) {
+            startActivity(ThreeDViewActivity.class);
+            return true;
         } else if (itemId == R.id.action_stats) {
             startActivity(StatsActivity.class);
             return true;

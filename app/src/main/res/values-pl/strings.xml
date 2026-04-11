@@ -39,6 +39,7 @@
     <string name="title_activity_system_log">Dziennik</string>
     <string name="title_activity_help">Pomoc</string>
     <string name="title_activity_guide">Instrukcja</string>
+    <string name="title_activity_3d">3D</string>
 
     <!-- Action bar menu -->
     <string name="action_table">Tabela</string>
@@ -52,6 +53,7 @@
     <string name="action_device_connect">Połącz…</string>
     <string name="action_connection">Połączenie</string>
     <string name="action_trip">Wyjazd</string>
+    <string name="action_3d">3D</string>
     <string name="action_help">Pomoc</string>
     <string name="action_guide">Podręcznik</string>
     <string name="action_about">O programie</string>

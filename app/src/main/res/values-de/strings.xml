@@ -39,6 +39,7 @@
     <string name="title_activity_system_log">Protokoll-Datei (Log)</string>
     <string name="title_activity_help">Hilfe</string>
     <string name="title_activity_guide">Anleitung</string>
+    <string name="title_activity_3d">3D</string>
 
     <!--  Action bar menu  -->
     <string name="action_table">Tabelle</string>
@@ -52,6 +53,7 @@
     <string name="action_device_connect">Verbinden…</string>
     <string name="action_connection">Verbindung</string>
     <string name="action_trip">Tour</string>
+    <string name="action_3d">3D</string>
     <string name="action_help">Hilfe</string>
     <string name="action_guide">Handbuch</string>
     <string name="action_about">Über</string>

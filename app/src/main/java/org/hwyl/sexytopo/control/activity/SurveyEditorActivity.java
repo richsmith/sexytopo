@@ -66,6 +66,7 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         jumpToStation(station, ExtendedElevationActivity.class);
     }
 
+
     public void onSetDirectionLeft(Station station) {
         if (station.getExtendedElevationDirection() != Direction.LEFT) {
             SurveyUpdater.setDirectionOfSubtree(station, Direction.LEFT);
