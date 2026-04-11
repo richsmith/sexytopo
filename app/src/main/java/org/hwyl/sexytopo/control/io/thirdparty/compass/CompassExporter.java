@@ -12,7 +12,7 @@ import org.hwyl.sexytopo.model.survey.Survey;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -39,7 +39,8 @@ public class CompassExporter extends SingleFileExporter implements Experimental 
     public String getContent(Survey survey) {
         List<GraphToListTranslator.SurveyListEntry> data =
                 graphToListTranslator.toChronoListOfSurveyListEntries(survey);
-        String surveyDate = dateFormat.format(Calendar.getInstance().getTime());
+        Date date = survey.getTrip() != null ? survey.getTrip().getSurveyDate() : new Date();
+        String surveyDate = dateFormat.format(date);
 
         StringBuilder sb = new StringBuilder(1024);
         sb.append("SexyTopo Export\r\n");
