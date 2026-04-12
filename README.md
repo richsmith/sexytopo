@@ -50,6 +50,7 @@ Currently the following:
 * The [Bric5](https://www.caveexploration.org/gear/bric4)
 * The [Friken Cave Laser](https://frikencavelaser.com/)
 * The [DiscoX](https://discox.co.uk/)
+* The [CavwayX1](https://cavedevice.com/)
 * Analogue instruments (if you input the data by hand, though not really recommended)
 
 Please get in touch if think you can help SexyTopo work with any other instruments.

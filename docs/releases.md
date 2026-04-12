@@ -8,6 +8,7 @@
 - Improved context menus: separate leg and station menus, with from/to station awareness (with Damian Ivereigh). This is partly a reversion to previous behaviour, but keeping the unified station menu across different views. 
 - New compass display on plan view (turn-offable in sketch quick settings)
 - Basic survey sharing support through the Android share system
+- Experimental 3D view (a bit of a toy at this point - don't complain about the lack of features!)
 - Drawing engine now uses dp instead of pixels for screen-size scaling
 - Colour tweaks to distinguish different data items in sketch view
 - Sketch items too small to be visible are now culled for performance
