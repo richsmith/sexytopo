@@ -1,0 +1,10 @@
+# Revisions listed here are skipped by `git blame` so that bulk
+# formatting commits don't obscure the original authors.
+#
+# Enable locally with:
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+#
+# GitHub's web UI honours this file automatically.
+
+# Apply Spotless formatting to Java, Kotlin, and XML
+490f477c6ac231e9dc438849eadc51fac68fc463
