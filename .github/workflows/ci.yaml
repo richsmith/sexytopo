@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  pull_request:
 
 jobs:
   build:
@@ -22,8 +23,8 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build with Gradle
-        run: ./gradlew build
+      - name: Check formatting
+        run: ./gradlew spotlessCheck
 
-      - name: Run tests
-        run: ./gradlew test
+      - name: Build and test
+        run: ./gradlew build
