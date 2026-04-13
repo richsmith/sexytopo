@@ -4,18 +4,9 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-
 import androidx.documentfile.provider.DocumentFile;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
-
-import org.hwyl.sexytopo.SexyTopoConstants;
-import org.hwyl.sexytopo.control.io.IoUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -26,16 +17,22 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import org.hwyl.sexytopo.SexyTopoConstants;
+import org.hwyl.sexytopo.control.io.IoUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
- * SexyTopo's Logger. This is a kind of proxy for the standard Android Log so we can
- * capture some of the data for in-app reporting.
+ * SexyTopo's Logger. This is a kind of proxy for the standard Android Log so we can capture some of
+ * the data for in-app reporting.
  */
 @SuppressWarnings("ALL")
 public class Log {
 
     @SuppressLint("StaticFieldLeak") // only use ApplicationContext to avoid memory leak
     private static Context context;
+
     private static LocalBroadcastManager broadcastManager;
     private static boolean hasFilesystemAccess = false;
 
@@ -50,7 +47,6 @@ public class Log {
         DEVICE
     }
 
-
     public static void setContext(Context context) {
         Log.context = context.getApplicationContext();
     }
@@ -59,7 +55,7 @@ public class Log {
         Log.hasFilesystemAccess = hasFilesystemAccess;
     }
 
-    public static synchronized void device(int stringId, Object ... args) {
+    public static synchronized void device(int stringId, Object... args) {
         if (context != null) {
             device(context.getString(stringId, args));
         }
@@ -85,7 +81,7 @@ public class Log {
         save(LogType.SYSTEM);
     }
 
-    private static String getString(int stringId, Object ... args) {
+    private static String getString(int stringId, Object... args) {
         String message;
         if (context == null) {
             message = "[no context to translate]: " + stringId;
@@ -99,9 +95,10 @@ public class Log {
         return message;
     }
 
-    public static void d(int stringId, Object ... args) {
+    public static void d(int stringId, Object... args) {
         d(getString(stringId, args));
     }
+
     public static void d(String message) {
         // currently treating debug and info as the same, but at some point we might get around
         // to treating them differently
@@ -109,7 +106,7 @@ public class Log {
         systemLog(message, false);
     }
 
-    public static void e(int stringId, Object ... args) {
+    public static void e(int stringId, Object... args) {
         e(getString(stringId, args));
     }
 
@@ -118,13 +115,12 @@ public class Log {
         systemLog(message, true);
     }
 
-
     public static void e(Throwable throwable) {
         e("" + throwable.getMessage());
         e(android.util.Log.getStackTraceString(throwable));
     }
 
-    public static void i(int stringId, Object ... args) {
+    public static void i(int stringId, Object... args) {
         i(getString(stringId, args));
     }
 
@@ -132,7 +128,6 @@ public class Log {
         android.util.Log.i(SexyTopoConstants.TAG, message);
         systemLog(message, false);
     }
-
 
     public static void broadcast(String event) {
         Intent intent = new Intent(event);
@@ -145,13 +140,11 @@ public class Log {
             broadcastManager = LocalBroadcastManager.getInstance(context);
         }
         broadcastManager.sendBroadcast(intent);
-
     }
-
 
     public static synchronized List<Message> getLog(LogType logType) {
         try {
-            switch(logType) {
+            switch (logType) {
                 case SYSTEM:
                     return new ArrayList<>(systemLog);
                 case DEVICE:
@@ -165,12 +158,10 @@ public class Log {
         }
     }
 
-
     public static void clearDeviceLog() {
         deviceLog.clear();
         broadcast(SexyTopoConstants.DEVICE_LOG_UPDATED_EVENT);
     }
-
 
     public static void save(LogType logType) {
         if (hasFilesystemAccess) {
@@ -190,13 +181,11 @@ public class Log {
         }
     }
 
-
     public static DocumentFile getLogFile(LogType logType) {
         String filename = logType.toString().toLowerCase() + ".log.json";
         File logFile = new File(context.getFilesDir(), filename);
         return DocumentFile.fromFile(logFile);
     }
-
 
     public static JSONArray marshal(LogType logType) {
         JSONArray marshalled = new JSONArray();
@@ -207,8 +196,8 @@ public class Log {
         return marshalled;
     }
 
-
-    public static void unmarshal(LogType logType, String text) throws ParseException, JSONException {
+    public static void unmarshal(LogType logType, String text)
+            throws ParseException, JSONException {
         JSONArray array = new JSONArray(text);
         Queue<Message> log = new LinkedList<>();
 
@@ -217,11 +206,10 @@ public class Log {
         }
 
         setLog(logType, log);
-
     }
 
     private static void setLog(LogType logType, Queue<Message> log) {
-        switch(logType) {
+        switch (logType) {
             case SYSTEM:
                 systemLog = log;
                 break;
@@ -231,8 +219,7 @@ public class Log {
         }
     }
 
-
-    public final static class Message {
+    public static final class Message {
 
         @SuppressLint("SimpleDateFormat")
         private static final SimpleDateFormat FORMAT =
@@ -249,7 +236,6 @@ public class Log {
         public Message(String message) {
             this(message, false);
         }
-
 
         public Message(Date timestamp, String message, boolean isError) {
             this.text = message;
@@ -306,6 +292,4 @@ public class Log {
             return null;
         }
     }
-
-
 }

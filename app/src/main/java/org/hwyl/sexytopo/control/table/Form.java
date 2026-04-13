@@ -4,12 +4,10 @@ import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.TextView;
-
 import androidx.annotation.Nullable;
-
 import com.google.android.material.textfield.TextInputLayout;
 
-abstract public class Form {
+public abstract class Form {
     private final Context context;
 
     static class TextViewValidationTrigger implements TextWatcher {
@@ -20,7 +18,8 @@ abstract public class Form {
         }
 
         @Override
-        public void beforeTextChanged(CharSequence charSequence, int start, int before, int count) {}
+        public void beforeTextChanged(
+                CharSequence charSequence, int start, int before, int count) {}
 
         @Override
         public void onTextChanged(CharSequence charSequence, int start, int count, int after) {}
@@ -62,22 +61,22 @@ abstract public class Form {
         this.valid = true;
         performValidation();
 
-        if(this.onDidValidateCallback != null) {
+        if (this.onDidValidateCallback != null) {
             this.onDidValidateCallback.onDidValidate(this.valid);
         }
     }
 
-    abstract protected void performValidation();
+    protected abstract void performValidation();
 
     protected void setError(TextView field, CharSequence error) {
         boolean fieldValid = (error == null);
 
-        this.valid = this.valid  & fieldValid;
+        this.valid = this.valid & fieldValid;
         field.setError(showErrors ? error : null);
     }
 
     protected void setError(TextView field, Integer error) {
-        CharSequence message = error == null? null : context.getString(error);
+        CharSequence message = error == null ? null : context.getString(error);
         this.setError(field, message);
     }
 

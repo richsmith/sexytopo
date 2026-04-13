@@ -1,13 +1,11 @@
 package org.hwyl.sexytopo.control.util;
 
+import java.util.List;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.List;
-
 
 public class GraphToListTranslatorTest {
 
@@ -22,5 +20,4 @@ public class GraphToListTranslatorTest {
         GraphToListTranslator.SurveyListEntry last = chronoList.get(chronoList.size() - 1);
         Assert.assertEquals("5", last.getLeg().getDestination().getName());
     }
-
 }

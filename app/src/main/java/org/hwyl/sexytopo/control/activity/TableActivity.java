@@ -1,6 +1,5 @@
 package org.hwyl.sexytopo.control.activity;
 
-import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -9,10 +8,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ArrayAdapter;
 import android.widget.TableLayout;
 import android.widget.Toast;
-
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -20,10 +17,9 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
+import java.util.ArrayList;
+import java.util.List;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.graph.ContextMenuManager;
@@ -32,19 +28,13 @@ import org.hwyl.sexytopo.control.table.LegDialogs;
 import org.hwyl.sexytopo.control.table.TableRowAdapter;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
-import org.hwyl.sexytopo.control.util.LegMover;
-import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.table.TableCol;
 
-import java.util.ArrayList;
-import java.util.List;
-
-
 public class TableActivity extends SurveyEditorActivity
-    implements TableRowAdapter.OnRowClickListener {
+        implements TableRowAdapter.OnRowClickListener {
 
     private final GraphToListTranslator graphToListTranslator = new GraphToListTranslator();
 
@@ -53,7 +43,6 @@ public class TableActivity extends SurveyEditorActivity
     private BroadcastReceiver receiver;
     private ContextMenuManager contextMenuManager;
     private View highlightedRow;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,12 +66,13 @@ public class TableActivity extends SurveyEditorActivity
         // Apply edge-to-edge insets
         setupEdgeToEdge();
 
-        receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(android.content.Context context, Intent intent) {
-                syncWithSurvey();
-            }
-        };
+        receiver =
+                new BroadcastReceiver() {
+                    @Override
+                    public void onReceive(android.content.Context context, Intent intent) {
+                        syncWithSurvey();
+                    }
+                };
     }
 
     private void setupEdgeToEdge() {
@@ -94,57 +84,68 @@ public class TableActivity extends SurveyEditorActivity
         int fabMargin = getResources().getDimensionPixelSize(R.dimen.fab_margin);
         int fabVerticalSpacing = getResources().getDimensionPixelSize(R.dimen.fab_vertical_spacing);
 
-        ViewCompat.setOnApplyWindowInsetsListener(rootLayout, (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            boolean isPortrait = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+        ViewCompat.setOnApplyWindowInsetsListener(
+                rootLayout,
+                (v, insets) -> {
+                    Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+                    boolean isPortrait =
+                            getResources().getConfiguration().orientation
+                                    == Configuration.ORIENTATION_PORTRAIT;
 
-            if (isPortrait) {
-                // Portrait: let content slide behind nav bar, but keep FABs clear
-                rootLayout.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
+                    if (isPortrait) {
+                        // Portrait: let content slide behind nav bar, but keep FABs clear
+                        rootLayout.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
 
-                // Add bottom padding to RecyclerView so content can scroll clear of FABs
-                recyclerView.setPadding(0, 0, 0, systemBars.bottom);
-                recyclerView.setClipToPadding(false);
-            } else {
-                // Landscape: apply all insets as padding to keep everything clear
-                rootLayout.setPadding(
-                    systemBars.left,
-                    systemBars.top,
-                    systemBars.right,
-                    systemBars.bottom
-                );
-                recyclerView.setPadding(0, 0, 0, 0);
-            }
+                        // Add bottom padding to RecyclerView so content can scroll clear of FABs
+                        recyclerView.setPadding(0, 0, 0, systemBars.bottom);
+                        recyclerView.setClipToPadding(false);
+                    } else {
+                        // Landscape: apply all insets as padding to keep everything clear
+                        rootLayout.setPadding(
+                                systemBars.left,
+                                systemBars.top,
+                                systemBars.right,
+                                systemBars.bottom);
+                        recyclerView.setPadding(0, 0, 0, 0);
+                    }
 
-            // Position FABs with margins relative to the padded area
-            fabAddStation.post(() -> {
-                int normalFabSize = fabAddStation.getHeight();
+                    // Position FABs with margins relative to the padded area
+                    fabAddStation.post(
+                            () -> {
+                                int normalFabSize = fabAddStation.getHeight();
 
-                CoordinatorLayout.LayoutParams stationParams =
-                    (CoordinatorLayout.LayoutParams) fabAddStation.getLayoutParams();
-                CoordinatorLayout.LayoutParams splayParams =
-                    (CoordinatorLayout.LayoutParams) fabAddSplay.getLayoutParams();
+                                CoordinatorLayout.LayoutParams stationParams =
+                                        (CoordinatorLayout.LayoutParams)
+                                                fabAddStation.getLayoutParams();
+                                CoordinatorLayout.LayoutParams splayParams =
+                                        (CoordinatorLayout.LayoutParams)
+                                                fabAddSplay.getLayoutParams();
 
-                if (isPortrait) {
-                    stationParams.bottomMargin = systemBars.bottom + fabMargin;
-                    stationParams.rightMargin = fabMargin;
+                                if (isPortrait) {
+                                    stationParams.bottomMargin = systemBars.bottom + fabMargin;
+                                    stationParams.rightMargin = fabMargin;
 
-                    splayParams.bottomMargin = systemBars.bottom + fabMargin + normalFabSize + fabVerticalSpacing;
-                    splayParams.rightMargin = fabMargin;
-                } else {
-                    stationParams.bottomMargin = fabMargin;
-                    stationParams.rightMargin = fabMargin;
+                                    splayParams.bottomMargin =
+                                            systemBars.bottom
+                                                    + fabMargin
+                                                    + normalFabSize
+                                                    + fabVerticalSpacing;
+                                    splayParams.rightMargin = fabMargin;
+                                } else {
+                                    stationParams.bottomMargin = fabMargin;
+                                    stationParams.rightMargin = fabMargin;
 
-                    splayParams.bottomMargin = fabMargin + normalFabSize + fabVerticalSpacing;
-                    splayParams.rightMargin = fabMargin;
-                }
+                                    splayParams.bottomMargin =
+                                            fabMargin + normalFabSize + fabVerticalSpacing;
+                                    splayParams.rightMargin = fabMargin;
+                                }
 
-                fabAddStation.setLayoutParams(stationParams);
-                fabAddSplay.setLayoutParams(splayParams);
-            });
+                                fabAddStation.setLayoutParams(stationParams);
+                                fabAddSplay.setLayoutParams(splayParams);
+                            });
 
-            return WindowInsetsCompat.CONSUMED;
-        });
+                    return WindowInsetsCompat.CONSUMED;
+                });
     }
 
     private int dpToPx(int dp) {
@@ -166,25 +167,30 @@ public class TableActivity extends SurveyEditorActivity
         }
     }
 
-
     @Override
     protected void onResume() {
         super.onResume();
 
         LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
-        broadcastManager.registerReceiver(receiver, new IntentFilter(SexyTopoConstants.SURVEY_UPDATED_EVENT));
+        broadcastManager.registerReceiver(
+                receiver, new IntentFilter(SexyTopoConstants.SURVEY_UPDATED_EVENT));
 
         syncWithSurvey();
 
         // Measure header widths after layout is complete
         TableLayout headerTable = findViewById(R.id.HeaderTable);
-        headerTable.getViewTreeObserver().addOnGlobalLayoutListener(new android.view.ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                headerTable.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                measureAndSyncHeaderWidths();
-            }
-        });
+        headerTable
+                .getViewTreeObserver()
+                .addOnGlobalLayoutListener(
+                        new android.view.ViewTreeObserver.OnGlobalLayoutListener() {
+                            @Override
+                            public void onGlobalLayout() {
+                                headerTable
+                                        .getViewTreeObserver()
+                                        .removeOnGlobalLayoutListener(this);
+                                measureAndSyncHeaderWidths();
+                            }
+                        });
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && bundle.getString(SexyTopoConstants.JUMP_TO_STATION) != null) {
@@ -207,26 +213,27 @@ public class TableActivity extends SurveyEditorActivity
         broadcastManager.unregisterReceiver(receiver);
     }
 
-
     private void jumpToStation(Station station) {
         try {
             int position = tableRowAdapter.getPositionForStation(station);
             if (position >= 0) {
                 // Post to ensure RecyclerView layout is complete
-                recyclerView.post(() -> {
-                    LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-                    if (layoutManager != null) {
-                        // Scroll so target is at the top of the visible area (with small offset for header)
-                        layoutManager.scrollToPositionWithOffset(position, 0);
-                    }
-                });
+                recyclerView.post(
+                        () -> {
+                            LinearLayoutManager layoutManager =
+                                    (LinearLayoutManager) recyclerView.getLayoutManager();
+                            if (layoutManager != null) {
+                                // Scroll so target is at the top of the visible area (with small
+                                // offset for header)
+                                layoutManager.scrollToPositionWithOffset(position, 0);
+                            }
+                        });
             }
         } catch (Exception exception) {
-            String name = station == null? getString(R.string.unknown) : station.getName();
+            String name = station == null ? getString(R.string.unknown) : station.getName();
             showExceptionAndLog(R.string.context_jump_to_station_error, exception, name);
         }
     }
-
 
     @Override
     public void syncWithSurvey() {
@@ -237,8 +244,7 @@ public class TableActivity extends SurveyEditorActivity
                 graphToListTranslator.toChronoListOfSurveyListEntries(survey);
 
         if (tableEntries.isEmpty()) {
-            Toast.makeText(getApplicationContext(), R.string.no_data,
-                    Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), R.string.no_data, Toast.LENGTH_SHORT).show();
         }
 
         tableRowAdapter.setEntries(tableEntries);
@@ -252,7 +258,8 @@ public class TableActivity extends SurveyEditorActivity
     }
 
     @Override
-    public void onRowLongClick(View view, GraphToListTranslator.SurveyListEntry entry, TableCol col) {
+    public void onRowLongClick(
+            View view, GraphToListTranslator.SurveyListEntry entry, TableCol col) {
         Leg leg = entry.getLeg();
         Station fromStation = entry.getFrom();
 
@@ -291,13 +298,20 @@ public class TableActivity extends SurveyEditorActivity
         } else {
             String customTitle;
             if (leg.hasDestination()) {
-                String from = leg.wasShotBackwards() ? leg.getDestination().getName() : fromStation.getName();
-                String to = leg.wasShotBackwards() ? fromStation.getName() : leg.getDestination().getName();
+                String from =
+                        leg.wasShotBackwards()
+                                ? leg.getDestination().getName()
+                                : fromStation.getName();
+                String to =
+                        leg.wasShotBackwards()
+                                ? fromStation.getName()
+                                : leg.getDestination().getName();
                 customTitle = getString(R.string.menu_context_title_leg, from, to);
             } else {
                 customTitle = getString(R.string.menu_context_title_splay, fromStation.getName());
             }
-            contextMenuManager.showMenuForLeg(view, station, getSurvey(), customTitle, this::clearHighlight, leg);
+            contextMenuManager.showMenuForLeg(
+                    view, station, getSurvey(), customTitle, this::clearHighlight, leg);
         }
     }
 
@@ -308,12 +322,12 @@ public class TableActivity extends SurveyEditorActivity
                 highlightedRow.setForeground(null);
             } else {
                 highlightedRow.setBackgroundColor(
-                    androidx.core.content.ContextCompat.getColor(this, android.R.color.transparent));
+                        androidx.core.content.ContextCompat.getColor(
+                                this, android.R.color.transparent));
             }
             highlightedRow = null;
         }
     }
-
 
     @Override
     protected void invalidateView() {
@@ -324,9 +338,6 @@ public class TableActivity extends SurveyEditorActivity
     public void onRenameStation(Station station) {
         LegDialogs.renameStation(this, getSurvey(), station);
     }
-
-
-
 
     private void manuallyAddStation() {
         if (GeneralPreferences.isManualLrudModeOn()) {
@@ -344,5 +355,4 @@ public class TableActivity extends SurveyEditorActivity
         getSurvey().undoAddLeg();
         syncWithSurvey();
     }
-
 }

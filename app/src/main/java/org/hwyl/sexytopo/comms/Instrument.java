@@ -1,7 +1,6 @@
 package org.hwyl.sexytopo.comms;
 
 import android.bluetooth.BluetoothDevice;
-
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.SexyTopo;
 
@@ -70,5 +69,4 @@ public class Instrument {
     public String toString() {
         return describe();
     }
-
 }

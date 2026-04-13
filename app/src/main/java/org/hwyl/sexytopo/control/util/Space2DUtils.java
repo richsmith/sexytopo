@@ -1,5 +1,8 @@
 package org.hwyl.sexytopo.control.util;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import org.hwyl.sexytopo.model.common.Frame;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
@@ -7,11 +10,6 @@ import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 
 public class Space2DUtils {
 
@@ -58,7 +56,6 @@ public class Space2DUtils {
         return (float) Math.sqrt(dx * dx + dy * dy);
     }
 
-
     public static float getDistance(Coord2D a, Coord2D b) {
         return (float) Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2));
     }
@@ -68,7 +65,7 @@ public class Space2DUtils {
         while (newAngle < 0) {
             newAngle += 360;
         }
-         return newAngle % 360;
+        return newAngle % 360;
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -102,8 +99,8 @@ public class Space2DUtils {
     public static float getAngleBetween(Coord2D p0, Coord2D p1) {
         float deltaY = p0.y - p1.y;
         float deltaX = p0.x - p1.x;
-        float radians = (float)Math.atan2(deltaY, deltaX);
-        float angle = (float)Math.toDegrees(radians);
+        float radians = (float) Math.atan2(deltaY, deltaX);
+        float angle = (float) Math.toDegrees(radians);
         return angle;
     }
 
@@ -136,7 +133,8 @@ public class Space2DUtils {
         // If max distance is greater than epsilon, recursively simplify
         if (distMax > epsilon) {
             List<Coord2D> results1 = douglasPeukerIteration(path.subList(0, indexMax + 1), epsilon);
-            List<Coord2D> results2 = douglasPeukerIteration(path.subList(indexMax, pathSize), epsilon);
+            List<Coord2D> results2 =
+                    douglasPeukerIteration(path.subList(indexMax, pathSize), epsilon);
 
             simplifiedPath = new ArrayList<>(results1);
             simplifiedPath.addAll(results2.subList(1, results2.size()));
@@ -162,10 +160,8 @@ public class Space2DUtils {
 
     public static List<Coord2D> simplify(List<Coord2D> path, float epsilon) {
 
-        if (path.isEmpty() || epsilon <= 0)
-            return path;
+        if (path.isEmpty() || epsilon <= 0) return path;
 
         return douglasPeukerIteration(path, epsilon);
     }
-
 }

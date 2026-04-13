@@ -1,11 +1,9 @@
 package org.hwyl.sexytopo.model.survey;
 
-import org.hwyl.sexytopo.R;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
+import org.hwyl.sexytopo.R;
 
 public class Trip {
 
@@ -13,9 +11,11 @@ public class Trip {
         BOOK(R.string.trip_role_book),
         INSTRUMENTS(R.string.trip_role_instruments),
         DOG(R.string.trip_role_dog),
-        EXPLORATION(R.string.trip_role_exploration),;
+        EXPLORATION(R.string.trip_role_exploration),
+        ;
 
         public final int descriptionId;
+
         Role(int descriptionId) {
             this.descriptionId = descriptionId;
         }
@@ -24,6 +24,7 @@ public class Trip {
     public static class TeamEntry {
         public final String name;
         public final List<Role> roles;
+
         public TeamEntry(String name, List<Role> roles) {
             this.name = name;
             this.roles = roles;
@@ -34,8 +35,8 @@ public class Trip {
             if (!(other instanceof TeamEntry)) {
                 return false;
             }
-            TeamEntry otherEntry = (TeamEntry)other;
-            if (! otherEntry.name.equals(name)) {
+            TeamEntry otherEntry = (TeamEntry) other;
+            if (!otherEntry.name.equals(name)) {
                 return false;
             }
 
@@ -74,7 +75,6 @@ public class Trip {
     private List<TeamEntry> team = new ArrayList<>();
     private String comments;
     private String instrument;
-
 
     public Trip() {
         this.surveyDate = new Date();
@@ -153,8 +153,8 @@ public class Trip {
     }
 
     /**
-     * Creates a new Trip for a follow-on survey, copying team and instrument
-     * but with a fresh date and empty comments.
+     * Creates a new Trip for a follow-on survey, copying team and instrument but with a fresh date
+     * and empty comments.
      */
     public Trip toNextTrip() {
         Trip next = new Trip(this);
@@ -225,5 +225,4 @@ public class Trip {
         if (a == null) return b != null;
         return !a.equals(b);
     }
-
 }

@@ -7,10 +7,13 @@ import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.os.Build;
 import android.view.View;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import no.nordicsemi.android.ble.data.Data;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.comms.Instrument;
 import org.hwyl.sexytopo.comms.ble.SexyTopoBleManager;
@@ -20,15 +23,6 @@ import org.hwyl.sexytopo.control.SexyTopo;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.util.NumberTools;
 import org.hwyl.sexytopo.model.survey.Leg;
-
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
-import no.nordicsemi.android.ble.data.Data;
-
-
 
 @SuppressWarnings({"FieldCanBeLocal", "unused"})
 public class Bric4Manager extends SexyTopoBleManager {
@@ -43,7 +37,6 @@ public class Bric4Manager extends SexyTopoBleManager {
     private static final Map<Integer, String> CUSTOM_COMMAND_STRINGS = new HashMap<>();
     private static final Map<Integer, String> COMMAND_ID_TO_COMMAND_STRING = new HashMap<>();
 
-
     static {
         CUSTOM_COMMANDS.put(COMMAND_TAKE_SHOT_ID, R.string.device_bric_command_take_shot);
         CUSTOM_COMMANDS.put(COMMAND_TOGGLE_LASER_ID, R.string.device_bric_command_toggle_laser);
@@ -57,26 +50,26 @@ public class Bric4Manager extends SexyTopoBleManager {
         COMMAND_ID_TO_COMMAND_STRING.put(COMMAND_CLEAR_MEMORY_ID, "clear memory");
     }
 
-    final static UUID DEVICE_INFORMATION_SERVICE_UUID =
+    static final UUID DEVICE_INFORMATION_SERVICE_UUID =
             UUID.fromString("0000180A-0000-1000-8000-00805f9b34fb");
 
-    final static UUID BATTERY_SERVICE_UUID =
+    static final UUID BATTERY_SERVICE_UUID =
             UUID.fromString("0000180F-0000-1000-8000-00805f9b34fb");
 
-    final static UUID MEASUREMENT_SYNC_SERVICE_UUID =
+    static final UUID MEASUREMENT_SYNC_SERVICE_UUID =
             UUID.fromString("000058d0-0000-1000-8000-00805f9b34fb");
-    final static UUID MEASUREMENT_PRIMARY_CHARACTERISTIC_UUID =
+    static final UUID MEASUREMENT_PRIMARY_CHARACTERISTIC_UUID =
             UUID.fromString("000058d1-0000-1000-8000-00805f9b34fb");
-    final static UUID MEASUREMENT_METADATA_CHARACTERISTIC_UUID =
+    static final UUID MEASUREMENT_METADATA_CHARACTERISTIC_UUID =
             UUID.fromString("000058d2-0000-1000-8000-00805f9b34fb");
-    final static UUID MEASUREMENT_ERRORS_CHARACTERISTIC_UUID =
+    static final UUID MEASUREMENT_ERRORS_CHARACTERISTIC_UUID =
             UUID.fromString("000058d3-0000-1000-8000-00805f9b34fb");
-    final static UUID LAST_TIME_CHARACTERISTIC_UUID =
+    static final UUID LAST_TIME_CHARACTERISTIC_UUID =
             UUID.fromString("000058d3-0000-1000-8000-00805f9b34fb");
 
-    final static UUID DEVICE_CONTROL_SERVICE_UUID =
+    static final UUID DEVICE_CONTROL_SERVICE_UUID =
             UUID.fromString("000058e0-0000-1000-8000-00805f9b34fb");
-    final static UUID DEVICE_CONTROL_CHARACTERISTIC_UUID =
+    static final UUID DEVICE_CONTROL_CHARACTERISTIC_UUID =
             UUID.fromString("000058e1-0000-1000-8000-00805f9b34fb");
 
     // Client characteristics
@@ -86,42 +79,37 @@ public class Bric4Manager extends SexyTopoBleManager {
     private BluetoothGattCharacteristic lastTimeCharacteristic;
     private BluetoothGattCharacteristic deviceControlCharacteristic;
 
-
     private final SurveyManager dataManager;
 
-
-    public Bric4Manager(@NonNull final Context context,
-                        SurveyManager dataManager) {
+    public Bric4Manager(@NonNull final Context context, SurveyManager dataManager) {
         super(context);
         this.dataManager = dataManager;
     }
-
 
     @Override
     public boolean isRequiredServiceSupported(@NonNull final BluetoothGatt gatt) {
         final BluetoothGattService measurementService =
                 gatt.getService(MEASUREMENT_SYNC_SERVICE_UUID);
         if (measurementService != null) {
-            measurementPrimaryCharacteristic = measurementService.getCharacteristic(
-                MEASUREMENT_PRIMARY_CHARACTERISTIC_UUID);
-            measurementMetadataCharacteristic = measurementService.getCharacteristic(
-                MEASUREMENT_METADATA_CHARACTERISTIC_UUID);
-            measurementErrorsCharacteristic = measurementService.getCharacteristic(
-                MEASUREMENT_ERRORS_CHARACTERISTIC_UUID);
-            lastTimeCharacteristic = measurementService.getCharacteristic(
-                LAST_TIME_CHARACTERISTIC_UUID);
+            measurementPrimaryCharacteristic =
+                    measurementService.getCharacteristic(MEASUREMENT_PRIMARY_CHARACTERISTIC_UUID);
+            measurementMetadataCharacteristic =
+                    measurementService.getCharacteristic(MEASUREMENT_METADATA_CHARACTERISTIC_UUID);
+            measurementErrorsCharacteristic =
+                    measurementService.getCharacteristic(MEASUREMENT_ERRORS_CHARACTERISTIC_UUID);
+            lastTimeCharacteristic =
+                    measurementService.getCharacteristic(LAST_TIME_CHARACTERISTIC_UUID);
         }
 
-        final BluetoothGattService controlService =
-                gatt.getService(DEVICE_CONTROL_SERVICE_UUID);
+        final BluetoothGattService controlService = gatt.getService(DEVICE_CONTROL_SERVICE_UUID);
         if (controlService != null) {
-            deviceControlCharacteristic = controlService.getCharacteristic(
-                DEVICE_CONTROL_CHARACTERISTIC_UUID);
+            deviceControlCharacteristic =
+                    controlService.getCharacteristic(DEVICE_CONTROL_CHARACTERISTIC_UUID);
         }
 
-        return measurementPrimaryCharacteristic != null &&
-            measurementMetadataCharacteristic != null &&
-            measurementErrorsCharacteristic != null;
+        return measurementPrimaryCharacteristic != null
+                && measurementMetadataCharacteristic != null
+                && measurementErrorsCharacteristic != null;
     }
 
     protected void onServicesInvalidated() {
@@ -140,12 +128,11 @@ public class Bric4Manager extends SexyTopoBleManager {
         setIndicationCallback(measurementErrorsCharacteristic).with(handler);
 
         beginAtomicRequestQueue()
-            .add(enableIndications(measurementPrimaryCharacteristic))
-            .add(enableIndications(measurementMetadataCharacteristic))
-            .add(enableIndications(measurementErrorsCharacteristic))
-            .enqueue();
+                .add(enableIndications(measurementPrimaryCharacteristic))
+                .add(enableIndications(measurementMetadataCharacteristic))
+                .add(enableIndications(measurementErrorsCharacteristic))
+                .enqueue();
     }
-
 
     @Override
     public Map<Integer, Integer> getCustomCommands() {
@@ -168,12 +155,12 @@ public class Bric4Manager extends SexyTopoBleManager {
     public void sendCustomCommand(String command, Integer stringId) {
         byte[] bytes = command.getBytes();
         writeCharacteristic(
-                deviceControlCharacteristic, bytes, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
-            .done(device -> Log.device(stringId))
-            .enqueue();
+                        deviceControlCharacteristic,
+                        bytes,
+                        BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
+                .done(device -> Log.device(stringId))
+                .enqueue();
     }
-
-
 
     private enum State {
         MEASUREMENT,
@@ -182,7 +169,7 @@ public class Bric4Manager extends SexyTopoBleManager {
 
         private State advance() {
             int index = ordinal();
-            int nextIndex = (index + 1) >= values().length? 0 : index + 1;
+            int nextIndex = (index + 1) >= values().length ? 0 : index + 1;
             return values()[nextIndex];
         }
     }
@@ -206,8 +193,7 @@ public class Bric4Manager extends SexyTopoBleManager {
 
             byte[] bytes;
 
-            switch(state) {
-
+            switch (state) {
                 case MEASUREMENT:
                     bytes = data.getValue();
                     if (bytes == null) {
@@ -285,26 +271,24 @@ public class Bric4Manager extends SexyTopoBleManager {
 
             // after each tick, expect the next state
             state = state.advance();
-
         }
 
         private void reportError(int code, float data1, float data2, boolean showToUser) {
             Bric4Error error = Bric4Error.fromCode(code);
             String device = Instrument.describe(getBluetoothDevice());
-            String shortDescription = SexyTopo.staticGetString(R.string.device_bric_device_reported_error, device, error);
+            String shortDescription =
+                    SexyTopo.staticGetString(
+                            R.string.device_bric_device_reported_error, device, error);
 
             Log.device(shortDescription);
 
-            String longDescription = shortDescription +
-                    " (code " + code + " data: " + data1 + "/" + data2 + ")";
+            String longDescription =
+                    shortDescription + " (code " + code + " data: " + data1 + "/" + data2 + ")";
             Log.e(longDescription);
 
             if (showToUser) {
                 SexyTopo.showToast(shortDescription);
             }
         }
-
-
-
     }
 }

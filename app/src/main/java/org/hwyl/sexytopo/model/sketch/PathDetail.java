@@ -1,14 +1,12 @@
 package org.hwyl.sexytopo.model.sketch;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public final class PathDetail extends SketchDetail {
-
 
     private List<Coord2D> path;
 
@@ -45,7 +43,6 @@ public final class PathDetail extends SketchDetail {
         return getClosestDistance(point, getPath());
     }
 
-
     @Override
     public PathDetail translate(Coord2D point) {
         List<Coord2D> newPath = new ArrayList<>();
@@ -64,7 +61,6 @@ public final class PathDetail extends SketchDetail {
         return new PathDetail(newPath, getColour());
     }
 
-
     public List<SketchDetail> getPathFragmentsOutsideRadius(Coord2D targetPoint, double radius) {
         List<SketchDetail> fragments = new ArrayList<>();
 
@@ -78,8 +74,8 @@ public final class PathDetail extends SketchDetail {
 
             Coord2D lastPoint = currentLine.get(currentLine.size() - 1);
 
-            double distance = Space2DUtils.getDistanceFromLine(
-                    targetPoint, lastPoint, currentPoint);
+            double distance =
+                    Space2DUtils.getDistanceFromLine(targetPoint, lastPoint, currentPoint);
             if (distance < radius) {
                 if (currentLine.size() > 1) {
                     PathDetail fragment = new PathDetail(currentLine, getColour());
@@ -99,13 +95,14 @@ public final class PathDetail extends SketchDetail {
         return fragments;
     }
 
-
     private static float getClosestDistance(Coord2D point, List<Coord2D> line) {
         float minDistance = Float.MAX_VALUE;
         for (int i = 0, j = 1; i < (line.size() - 1); i++, j++) {
             try {
-                minDistance = Math.min(minDistance,
-                        Space2DUtils.getDistanceFromLine(point, line.get(i), line.get(j)));
+                minDistance =
+                        Math.min(
+                                minDistance,
+                                Space2DUtils.getDistanceFromLine(point, line.get(i), line.get(j)));
             } catch (Exception exception) {
                 Log.e(exception);
             }

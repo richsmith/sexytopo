@@ -1,10 +1,9 @@
 package org.hwyl.sexytopo.control.io.thirdparty.xvi;
 
-import org.hwyl.sexytopo.model.sketch.AutoScalableDetail;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.hwyl.sexytopo.model.sketch.AutoScalableDetail;
+import org.hwyl.sexytopo.model.sketch.PathDetail;
 
 public abstract class SketchDetailTranslater<T extends AutoScalableDetail> {
 
@@ -20,5 +19,4 @@ public abstract class SketchDetailTranslater<T extends AutoScalableDetail> {
     }
 
     public abstract List<PathDetail> asPathDetails(T sketchDetail);
-
 }

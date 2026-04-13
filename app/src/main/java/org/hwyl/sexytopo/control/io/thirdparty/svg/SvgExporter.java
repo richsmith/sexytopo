@@ -1,9 +1,22 @@
 package org.hwyl.sexytopo.control.io.thirdparty.svg;
 
 import android.content.Context;
-import android.util.Log;
 import android.util.Xml;
-
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.io.basic.ExportFrameFactory;
 import org.hwyl.sexytopo.control.io.translation.DoubleSketchFileExporter;
@@ -11,7 +24,6 @@ import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.common.Frame;
 import org.hwyl.sexytopo.model.graph.Coord2D;
-import org.hwyl.sexytopo.model.graph.Coord3D;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
@@ -29,32 +41,15 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xmlpull.v1.XmlSerializer;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-
-/** @noinspection WrapperTypeMayBePrimitive*/
+/**
+ * @noinspection WrapperTypeMayBePrimitive
+ */
 @SuppressWarnings({"UnnecessaryLocalVariable", "SameParameterValue"})
 public class SvgExporter extends DoubleSketchFileExporter {
 
     public static final int SCALE = 50;
     public static final int STATION_FONT = 15;
     public static final int BORDER = 10;
-
 
     @Override
     public String getContent(Survey survey, Projection2D projectionType) throws Exception {
@@ -65,7 +60,6 @@ public class SvgExporter extends DoubleSketchFileExporter {
         Frame frame = ExportFrameFactory.getExportFrame(survey, projectionType);
         frame = ExportFrameFactory.addBorder(frame);
         frame = frame.scale(SCALE);
-
 
         double svgWidth = frame.getWidth();
         double svgHeight = frame.getHeight();
@@ -79,25 +73,27 @@ public class SvgExporter extends DoubleSketchFileExporter {
 
         xmlSerializer.startDocument("UTF-8", true);
 
-        xmlSerializer.startTag(null,"svg");
+        xmlSerializer.startTag(null, "svg");
 
         xmlSerializer.attribute(null, "width", Double.toString(svgWidth));
         xmlSerializer.attribute(null, "height", Double.toString(svgHeight));
-        xmlSerializer.attribute(null, "viewBox",
-            TextTools.join(" ", svgTopLeftX, svgTopLeftY, svgWidth, svgHeight));
+        xmlSerializer.attribute(
+                null,
+                "viewBox",
+                TextTools.join(" ", svgTopLeftX, svgTopLeftY, svgWidth, svgHeight));
         xmlSerializer.attribute(null, "xmlns", "http://www.w3.org/2000/svg");
 
         Colour background = GeneralPreferences.getExportSvgBackgroundColour();
         if (background != Colour.TRANSPARENT) {
             xmlSerializer.startTag("", "g");
             xmlSerializer.attribute("", "id", "background");
-            xmlSerializer.startTag(null,"rect");
+            xmlSerializer.startTag(null, "rect");
             xmlSerializer.attribute(null, "x", Double.toString(svgTopLeftX));
             xmlSerializer.attribute(null, "y", Double.toString(svgTopLeftY));
             xmlSerializer.attribute(null, "width", Double.toString(svgWidth));
             xmlSerializer.attribute(null, "height", Double.toString(svgHeight));
             xmlSerializer.attribute(null, "fill", background.toString());
-            xmlSerializer.endTag(null,"rect");
+            xmlSerializer.endTag(null, "rect");
             xmlSerializer.endTag("", "g");
         }
 
@@ -131,9 +127,7 @@ public class SvgExporter extends DoubleSketchFileExporter {
         return text;
     }
 
-    /**
-     * Need this because idiot library developers don't provide an option to override escaping
-     */
+    /** Need this because idiot library developers don't provide an option to override escaping */
     public String unescapeTagsHack(String text) {
 
         text = text.replaceAll("&lt;", "<");
@@ -165,32 +159,28 @@ public class SvgExporter extends DoubleSketchFileExporter {
         }
     }
 
-
     private static void writePathDetail(
-            XmlSerializer xmlSerializer, PathDetail pathDetail, int scale)  throws IOException {
+            XmlSerializer xmlSerializer, PathDetail pathDetail, int scale) throws IOException {
         Integer strokeWidth = GeneralPreferences.getExportSvgStrokeWidth();
         List<String> coordStrings = new ArrayList<>();
         for (Coord2D coord2D : pathDetail.getPath()) {
             coordStrings.add(toXmlText(coord2D, scale));
         }
-        xmlSerializer.startTag(null,"polyline");
+        xmlSerializer.startTag(null, "polyline");
         xmlSerializer.attribute(null, "points", TextTools.join(" ", coordStrings));
         xmlSerializer.attribute(null, "stroke", getSvgColour(pathDetail));
         xmlSerializer.attribute(null, "stroke-width", strokeWidth.toString());
         xmlSerializer.attribute(null, "fill", "none");
-        xmlSerializer.endTag(null,"polyline");
+        xmlSerializer.endTag(null, "polyline");
     }
-
-
 
     private static String toXmlText(Coord2D coord2D, int scale) {
         return coord2D.x * scale + "," + coord2D.y * scale;
     }
 
-
     private static void writeTextDetail(
-            XmlSerializer xmlSerializer, TextDetail textDetail, int scale)  throws IOException {
-        xmlSerializer.startTag(null,"text");
+            XmlSerializer xmlSerializer, TextDetail textDetail, int scale) throws IOException {
+        xmlSerializer.startTag(null, "text");
         Coord2D coord2D = textDetail.getPosition();
         double x = coord2D.x * scale;
         double y = coord2D.y * scale;
@@ -199,11 +189,11 @@ public class SvgExporter extends DoubleSketchFileExporter {
         xmlSerializer.attribute(null, "font-size", Float.toString(textDetail.getSize() * scale));
         xmlSerializer.attribute(null, "stroke", getSvgColour(textDetail));
         xmlSerializer.text(textDetail.getText());
-        xmlSerializer.endTag(null,"text");
+        xmlSerializer.endTag(null, "text");
     }
 
     private static void writeSymbolDetail(
-        XmlSerializer xmlSerializer, SymbolDetail symbolDetail, int scale)  throws IOException {
+            XmlSerializer xmlSerializer, SymbolDetail symbolDetail, int scale) throws IOException {
         Symbol symbol = symbolDetail.getSymbol();
         xmlSerializer.startTag("", "use");
         xmlSerializer.attribute("", "href", "#" + symbol.getSvgRefId());
@@ -221,22 +211,27 @@ public class SvgExporter extends DoubleSketchFileExporter {
         xmlSerializer.attribute("", "color", getSvgColour(symbolDetail));
 
         if (symbol.isDirectional()) {
-            xmlSerializer.attribute("", "transform",
-                "rotate(" + symbolDetail.getAngle() + "," + centreX + "," + centreY + ")");
+            xmlSerializer.attribute(
+                    "",
+                    "transform",
+                    "rotate(" + symbolDetail.getAngle() + "," + centreX + "," + centreY + ")");
         }
 
         xmlSerializer.endTag("", "use");
-
     }
 
-    private static void writeSymbolRef(XmlSerializer xmlSerializer, Symbol symbol) throws Exception {
+    private static void writeSymbolRef(XmlSerializer xmlSerializer, Symbol symbol)
+            throws Exception {
         String svgContent = symbol.asRawSvg();
 
         // this is super-hacky and fragile... how to do it properly?
-        String innerSvgContent = svgContent
-            .replace("<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 40 40\">", "")
-            .replace("</svg>", "")
-            .trim();
+        String innerSvgContent =
+                svgContent
+                        .replace(
+                                "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 40 40\">",
+                                "")
+                        .replace("</svg>", "")
+                        .trim();
 
         xmlSerializer.startTag("", "symbol");
         xmlSerializer.attribute("", "id", symbol.getSvgRefId());
@@ -246,11 +241,10 @@ public class SvgExporter extends DoubleSketchFileExporter {
         xmlSerializer.text(innerSvgContent);
 
         xmlSerializer.endTag("", "symbol");
-
     }
 
-    private static void writeCentrelineData(XmlSerializer xmlSerializer, Space<Coord2D> projection, int scale)
-            throws IOException {
+    private static void writeCentrelineData(
+            XmlSerializer xmlSerializer, Space<Coord2D> projection, int scale) throws IOException {
         Map<Station, Coord2D> stationMap = projection.getStationMap();
         Map<Leg, Line<Coord2D>> legMap = projection.getLegMap();
         Integer legStrokeWidth = GeneralPreferences.getExportSvgLegStrokeWidth();
@@ -272,8 +266,8 @@ public class SvgExporter extends DoubleSketchFileExporter {
         }
     }
 
-    private static void writeSplayData(XmlSerializer xmlSerializer, Space<Coord2D> projection, int scale)
-            throws IOException {
+    private static void writeSplayData(
+            XmlSerializer xmlSerializer, Space<Coord2D> projection, int scale) throws IOException {
         Map<Station, Coord2D> stationMap = projection.getStationMap();
         Map<Leg, Line<Coord2D>> legMap = projection.getLegMap();
         Integer splayStrokeWidth = GeneralPreferences.getExportSvgSplayStrokeWidth();
@@ -291,12 +285,22 @@ public class SvgExporter extends DoubleSketchFileExporter {
         }
     }
 
-    private static void writeLeg(XmlSerializer xmlSerializer, Line<Coord2D> line, String id, int scale, Integer strokeWidth)
+    private static void writeLeg(
+            XmlSerializer xmlSerializer,
+            Line<Coord2D> line,
+            String id,
+            int scale,
+            Integer strokeWidth)
             throws IOException {
         xmlSerializer.startTag("", "polyline");
         xmlSerializer.attribute("", "id", id);
-        String pointsString = TextTools.join(
-                ",", scale * line.getStart().x, scale * line.getStart().y, scale * line.getEnd().x, scale * line.getEnd().y);
+        String pointsString =
+                TextTools.join(
+                        ",",
+                        scale * line.getStart().x,
+                        scale * line.getStart().y,
+                        scale * line.getEnd().x,
+                        scale * line.getEnd().y);
         xmlSerializer.attribute("", "points", pointsString);
         xmlSerializer.attribute("", "stroke", "red");
         xmlSerializer.attribute("", "stroke-width", strokeWidth.toString());
@@ -304,7 +308,8 @@ public class SvgExporter extends DoubleSketchFileExporter {
         xmlSerializer.endTag("", "polyline");
     }
 
-    private static void writeStation(XmlSerializer xmlSerializer, Station station, Coord2D coord, int scale)
+    private static void writeStation(
+            XmlSerializer xmlSerializer, Station station, Coord2D coord, int scale)
             throws IOException {
         xmlSerializer.startTag("", "text");
         xmlSerializer.attribute("", "id", station.getName());
@@ -316,7 +321,6 @@ public class SvgExporter extends DoubleSketchFileExporter {
         xmlSerializer.endTag("", "text");
     }
 
-
     @Override
     public String getExportDirectoryName() {
         return "svg";
@@ -326,7 +330,6 @@ public class SvgExporter extends DoubleSketchFileExporter {
     public String getFileExtension() {
         return "svg";
     }
-
 
     @Override
     public String getExportTypeName(Context context) {
@@ -353,7 +356,7 @@ public class SvgExporter extends DoubleSketchFileExporter {
             transformer.transform(new DOMSource(doc), new StreamResult(writer));
             output = writer.toString();
         } catch (Exception e) {
-            output = input;  // not essential...
+            output = input; // not essential...
         }
 
         return output;

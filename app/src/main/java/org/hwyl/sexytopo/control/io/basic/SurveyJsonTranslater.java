@@ -1,7 +1,15 @@
 package org.hwyl.sexytopo.control.io.basic;
 
 import android.widget.Toast;
-
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
@@ -15,17 +23,6 @@ import org.hwyl.sexytopo.model.survey.Trip;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
-
 
 public class SurveyJsonTranslater {
 
@@ -62,13 +59,11 @@ public class SurveyJsonTranslater {
         return toJson(survey, versionName, versionCode).toString(SexyTopoConstants.JSON_INDENT);
     }
 
-
     public static void populateSurvey(Survey survey, String string)
             throws JSONException, ParseException {
         JSONObject json = new JSONObject(string);
         toSurvey(survey, json);
     }
-
 
     public static JSONObject toJson(Survey survey, String versionName, int versionCode)
             throws JSONException {
@@ -98,7 +93,6 @@ public class SurveyJsonTranslater {
 
         return json;
     }
-
 
     public static void toSurvey(Survey survey, JSONObject json) throws ParseException {
 
@@ -136,7 +130,6 @@ public class SurveyJsonTranslater {
         }
     }
 
-
     public static JSONObject toJson(Station station, List<Leg> chronoList) throws JSONException {
 
         JSONObject json = new JSONObject();
@@ -154,7 +147,6 @@ public class SurveyJsonTranslater {
         return json;
     }
 
-
     public static void loadSurveyData(Survey survey, JSONArray json) throws JSONException {
 
         Map<String, Station> namesToStations = new HashMap<>();
@@ -169,8 +161,11 @@ public class SurveyJsonTranslater {
             try {
                 station = toStation(stationObject);
             } catch (Exception exception) {
-                Log.e("Error loading a station; skipping. Exception was: " + exception +
-                        "; text was: " + stationObject);
+                Log.e(
+                        "Error loading a station; skipping. Exception was: "
+                                + exception
+                                + "; text was: "
+                                + stationObject);
                 errors = true;
                 continue;
             }
@@ -209,8 +204,10 @@ public class SurveyJsonTranslater {
 
                     if (leg.hasDestination()) {
                         if (connectedDestinations.contains(leg.getDestination())) {
-                            Log.e("Duplicate connection found for "
-                                    + leg.getDestination().getName() + "; skipping leg");
+                            Log.e(
+                                    "Duplicate connection found for "
+                                            + leg.getDestination().getName()
+                                            + "; skipping leg");
                             errors = true;
                             continue;
                         } else {
@@ -222,8 +219,11 @@ public class SurveyJsonTranslater {
                         survey.setOrigin(station);
                     }
                 } catch (Exception exception) {
-                    Log.e("Error loading a leg. Exception was " + exception +
-                            "; text was " + legObject);
+                    Log.e(
+                            "Error loading a leg. Exception was "
+                                    + exception
+                                    + "; text was "
+                                    + legObject);
                     errors = true;
                     continue;
                 }
@@ -243,14 +243,13 @@ public class SurveyJsonTranslater {
         }
 
         TreeSet<Integer> indices = new TreeSet<>(indexToLegs.keySet());
-        for (int i: indices) {
+        for (int i : indices) {
             Leg leg = indexToLegs.get(i);
             survey.addLegRecord(leg);
         }
 
         survey.checkSurveyIntegrity();
     }
-
 
     public static JSONObject toJson(Leg leg, Integer index) throws JSONException {
         JSONObject json = new JSONObject();
@@ -272,7 +271,6 @@ public class SurveyJsonTranslater {
         return json;
     }
 
-
     public static JSONObject toJson(Trip trip) throws JSONException {
 
         JSONObject json = new JSONObject();
@@ -287,7 +285,7 @@ public class SurveyJsonTranslater {
 
         JSONArray teamArray = new JSONArray();
 
-        for (Trip.TeamEntry teamEntry: trip.getTeam()) {
+        for (Trip.TeamEntry teamEntry : trip.getTeam()) {
             JSONObject teamEntryJson = new JSONObject();
             teamEntryJson.put(TEAM_MEMBER_NAME_TAG, teamEntry.name);
             JSONArray rolesJson = new JSONArray();
@@ -301,7 +299,6 @@ public class SurveyJsonTranslater {
         json.put(TEAM_TAG, teamArray);
         return json;
     }
-
 
     public static Station toStation(JSONObject json) throws JSONException {
 
@@ -335,10 +332,8 @@ public class SurveyJsonTranslater {
         }
     }
 
-
-    public static Leg toLeg(
-            Map<String, Station> namesToStations,
-            JSONObject json) throws JSONException {
+    public static Leg toLeg(Map<String, Station> namesToStations, JSONObject json)
+            throws JSONException {
 
         float distance = (float) json.getDouble(DISTANCE_TAG);
         float azimuth = (float) json.getDouble(AZIMUTH_TAG);
@@ -354,7 +349,9 @@ public class SurveyJsonTranslater {
         } else {
             if (!namesToStations.containsKey(destinationName)) {
                 throw new JSONException(
-                        "Survey file corrupted: station " + destinationName + " missing or out of order");
+                        "Survey file corrupted: station "
+                                + destinationName
+                                + " missing or out of order");
             }
 
             List<Leg> promotedFromList = new ArrayList<>();
@@ -367,16 +364,21 @@ public class SurveyJsonTranslater {
             } catch (Exception ignore) {
                 // not ideal but not the end of the world; we'd probably prefer to have our data
             }
-            Leg[] promotedFrom = promotedFromList.toArray(new Leg[]{});
+            Leg[] promotedFrom = promotedFromList.toArray(new Leg[] {});
 
             Station destination = namesToStations.get(destinationName);
-            leg = new Leg(distance, azimuth, inclination,
-                    destination, promotedFrom, wasShotBackwards);
+            leg =
+                    new Leg(
+                            distance,
+                            azimuth,
+                            inclination,
+                            destination,
+                            promotedFrom,
+                            wasShotBackwards);
         }
 
         return leg;
     }
-
 
     public static Trip toTrip(JSONObject json) throws JSONException, ParseException {
 
@@ -423,5 +425,4 @@ public class SurveyJsonTranslater {
         trip.setComments(comments);
         return trip;
     }
-
 }

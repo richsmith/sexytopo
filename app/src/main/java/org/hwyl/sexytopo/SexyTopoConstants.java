@@ -1,10 +1,8 @@
 package org.hwyl.sexytopo;
 
 import android.annotation.SuppressLint;
-
 import java.text.SimpleDateFormat;
 import java.util.UUID;
-
 
 public class SexyTopoConstants {
 
@@ -36,14 +34,12 @@ public class SexyTopoConstants {
     public static final int REQUEST_CODE_OPEN_CALIBRATION = 1000010;
     public static final int REQUEST_CODE_SAVE_CALIBRATION = 1000011;
 
-
     // ********** Preference refs **********
 
     public static final String PREFERENCE_ACTIVE_SURVEY_URI = "activeSurveyUri";
 
     public static final String GENERAL_PREFS = "generalPrefs";
     public static final String INPUT_MODE_PREFERENCE = "inputMode";
-
 
     // ********** File handling **********
 
@@ -64,17 +60,15 @@ public class SexyTopoConstants {
 
     public static final int JSON_INDENT = 2;
 
-
     // ********** Testing **********
 
     public static final double ALLOWED_DOUBLE_DELTA = 0.0001;
 
-
     // ********** Hardware **********
 
     public static final UUID DISTO_X_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-    public static final UUID SHETLAND_UUID = UUID.fromString("49535343-8841-43f4-a8d4-ecbe34729bb3");
-
+    public static final UUID SHETLAND_UUID =
+            UUID.fromString("49535343-8841-43f4-a8d4-ecbe34729bb3");
 
     // ********** Misc **********
 
@@ -82,7 +76,4 @@ public class SexyTopoConstants {
     public static final String BLANK_STATION_NAME = "-";
     public static final String JUMP_TO_STATION = "jumpToStation";
     public static final String LINK_STATION = "linkStation";
-
-
-
 }

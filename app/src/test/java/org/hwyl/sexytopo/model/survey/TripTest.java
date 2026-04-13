@@ -1,22 +1,19 @@
 package org.hwyl.sexytopo.model.survey;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
-
+import org.junit.Assert;
+import org.junit.Test;
 
 public class TripTest {
 
     private static Trip basicTrip() {
         Trip trip = new Trip();
-        trip.setTeam(Arrays.asList(
-            new Trip.TeamEntry("Rich", Arrays.asList(Trip.Role.BOOK)),
-            new Trip.TeamEntry("Rufus", Arrays.asList(Trip.Role.INSTRUMENTS))
-        ));
+        trip.setTeam(
+                Arrays.asList(
+                        new Trip.TeamEntry("Rich", Arrays.asList(Trip.Role.BOOK)),
+                        new Trip.TeamEntry("Rufus", Arrays.asList(Trip.Role.INSTRUMENTS))));
         trip.setComments("Test comment");
         trip.setInstrument("DistoX");
         return trip;
@@ -59,9 +56,9 @@ public class TripTest {
         Trip a = basicTrip();
         Trip b = basicTrip();
         a.setSurveyDate(b.getSurveyDate());
-        b.setTeam(Collections.singletonList(
-            new Trip.TeamEntry("Alice", Arrays.asList(Trip.Role.BOOK))
-        ));
+        b.setTeam(
+                Collections.singletonList(
+                        new Trip.TeamEntry("Alice", Arrays.asList(Trip.Role.BOOK))));
         Assert.assertNotEquals(a, b);
     }
 
@@ -70,13 +67,12 @@ public class TripTest {
         Trip a = basicTrip();
         Trip b = basicTrip();
         a.setSurveyDate(b.getSurveyDate());
-        b.setTeam(Arrays.asList(
-            new Trip.TeamEntry("Alice", Arrays.asList(Trip.Role.BOOK)),
-            new Trip.TeamEntry("Bob", Arrays.asList(Trip.Role.INSTRUMENTS))
-        ));
+        b.setTeam(
+                Arrays.asList(
+                        new Trip.TeamEntry("Alice", Arrays.asList(Trip.Role.BOOK)),
+                        new Trip.TeamEntry("Bob", Arrays.asList(Trip.Role.INSTRUMENTS))));
         Assert.assertNotEquals(a, b);
     }
-
 
     @Test
     public void testCopyEqualsOriginal() {
@@ -158,9 +154,9 @@ public class TripTest {
     public void testToNextTripTeamIsIndependent() {
         Trip original = basicTrip();
         Trip next = original.toNextTrip();
-        next.setTeam(Collections.singletonList(
-            new Trip.TeamEntry("New", Arrays.asList(Trip.Role.BOOK))
-        ));
+        next.setTeam(
+                Collections.singletonList(
+                        new Trip.TeamEntry("New", Arrays.asList(Trip.Role.BOOK))));
         Assert.assertEquals(2, original.getTeam().size());
     }
 
@@ -175,5 +171,4 @@ public class TripTest {
         b.setExplorationDate(new Date(2000));
         Assert.assertNotEquals(a, b);
     }
-
 }

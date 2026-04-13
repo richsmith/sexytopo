@@ -1,9 +1,7 @@
 package org.hwyl.sexytopo.model.graph;
 
 import org.junit.Assert;
-
 import org.junit.Test;
-
 
 public class Coord3DTest {
 
@@ -13,5 +11,4 @@ public class Coord3DTest {
         Coord3D zeroes = new Coord3D(0, 0, 0);
         Assert.assertEquals(origin, zeroes);
     }
-
 }

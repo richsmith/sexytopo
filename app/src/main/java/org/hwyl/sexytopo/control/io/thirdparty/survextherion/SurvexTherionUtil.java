@@ -1,6 +1,12 @@
 package org.hwyl.sexytopo.control.io.thirdparty.survextherion;
 
 import android.annotation.SuppressLint;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
 import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.survey.Leg;
@@ -8,13 +14,6 @@ import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
 import org.hwyl.sexytopo.model.table.TableCol;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 
 public class SurvexTherionUtil {
 
@@ -36,8 +35,8 @@ public class SurvexTherionUtil {
         return builder.toString();
     }
 
-    public static String getMetadata(Survey survey, SurveyFormat format,
-                                      String teamLines, String exploTeamLines) {
+    public static String getMetadata(
+            Survey survey, SurveyFormat format, String teamLines, String exploTeamLines) {
         StringBuilder builder = new StringBuilder();
 
         Trip trip = survey.getTrip();
@@ -51,7 +50,10 @@ public class SurvexTherionUtil {
 
             // Instrument line - commented ONLY if field is empty
             if (trip.hasInstrument()) {
-                builder.append(marker).append("instrument inst \"").append(trip.getInstrument()).append("\"\n");
+                builder.append(marker)
+                        .append("instrument inst \"")
+                        .append(trip.getInstrument())
+                        .append("\"\n");
             } else {
                 builder.append(commentChar).append(marker).append("instrument inst \"\"\n");
             }
@@ -64,8 +66,12 @@ public class SurvexTherionUtil {
 
             // Explo-date: only emit when unlinked and exploration date is set
             if (!trip.isExplorationDateLinked() && trip.getExplorationDate() != null) {
-                String formattedExploDate = formatDate(trip.getExplorationDate()).substring(5); // Remove "date " prefix
-                builder.append(marker).append(exploDateKeyword).append(formattedExploDate).append("\n");
+                String formattedExploDate =
+                        formatDate(trip.getExplorationDate()).substring(5); // Remove "date " prefix
+                builder.append(marker)
+                        .append(exploDateKeyword)
+                        .append(formattedExploDate)
+                        .append("\n");
             }
 
             // Explo-team lines
@@ -191,8 +197,10 @@ public class SurvexTherionUtil {
                 builder.append(commentChar);
                 builder.append(fromName).append("\t");
                 builder.append(toName).append("\t");
-                builder.append(TableCol.DISTANCE.format(precursor.getDistance(), Locale.UK)).append("\t");
-                builder.append(TableCol.AZIMUTH.format(precursor.getAzimuth(), Locale.UK)).append("\t");
+                builder.append(TableCol.DISTANCE.format(precursor.getDistance(), Locale.UK))
+                        .append("\t");
+                builder.append(TableCol.AZIMUTH.format(precursor.getAzimuth(), Locale.UK))
+                        .append("\t");
                 builder.append(TableCol.INCLINATION.format(precursor.getInclination(), Locale.UK));
             }
         }
@@ -222,7 +230,8 @@ public class SurvexTherionUtil {
         if (lastDirection == null) {
             builder.append(getExtendCommand(station, "start", marker));
         } else if (currentDirection != lastDirection) {
-            builder.append(getExtendCommand(station, currentDirection.name().toLowerCase(), marker));
+            builder.append(
+                    getExtendCommand(station, currentDirection.name().toLowerCase(), marker));
         }
 
         for (Leg leg : station.getConnectedOnwardLegs()) {

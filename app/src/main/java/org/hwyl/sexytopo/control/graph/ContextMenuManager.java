@@ -10,24 +10,21 @@ import android.text.style.ForegroundColorSpan;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.PopupMenu;
-
+import java.util.HashMap;
+import java.util.Map;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * Unified manager for station context menus across all views (table, plan, elevation).
- * Handles menu creation, visibility logic, and provides a consistent interface for actions.
+ * Unified manager for station context menus across all views (table, plan, elevation). Handles menu
+ * creation, visibility logic, and provides a consistent interface for actions.
  */
 public class ContextMenuManager {
 
@@ -47,7 +44,10 @@ public class ContextMenuManager {
     // Store the current leg context for actions that need it
     private Leg currentLeg;
 
-    public ContextMenuManager(Context context, ViewContext viewContext, org.hwyl.sexytopo.control.activity.SurveyEditorActivity activity) {
+    public ContextMenuManager(
+            Context context,
+            ViewContext viewContext,
+            org.hwyl.sexytopo.control.activity.SurveyEditorActivity activity) {
         this.context = context;
         this.viewContext = viewContext;
         this.activity = activity;
@@ -69,8 +69,8 @@ public class ContextMenuManager {
     }
 
     /**
-     * Show the station context menu at specific coordinates (used from graph views).
-     * Uses a temporary invisible anchor view for precise positioning with PopupMenu.
+     * Show the station context menu at specific coordinates (used from graph views). Uses a
+     * temporary invisible anchor view for precise positioning with PopupMenu.
      */
     public void showMenuForStation(View anchorView, Station station, Survey survey, int x, int y) {
         if (!(context instanceof Activity)) {
@@ -97,22 +97,27 @@ public class ContextMenuManager {
         configureMenuVisibility(popup.getMenu(), station, survey, null);
         setStationTitle(popup.getMenu(), station);
 
-        popup.setOnMenuItemClickListener(item -> {
-            boolean handled = handleMenuItemClick(item, station);
-            decorView.post(() -> decorView.removeView(invisibleAnchor));
-            return handled;
-        });
-        popup.setOnDismissListener(menu -> decorView.post(() -> {
-            try {
-                decorView.removeView(invisibleAnchor);
-            } catch (Exception e) {
-                // View might already be removed
-            }
-        }));
+        popup.setOnMenuItemClickListener(
+                item -> {
+                    boolean handled = handleMenuItemClick(item, station);
+                    decorView.post(() -> decorView.removeView(invisibleAnchor));
+                    return handled;
+                });
+        popup.setOnDismissListener(
+                menu ->
+                        decorView.post(
+                                () -> {
+                                    try {
+                                        decorView.removeView(invisibleAnchor);
+                                    } catch (Exception e) {
+                                        // View might already be removed
+                                    }
+                                }));
         popup.show();
     }
 
-    public void showMenuForStation(View anchorView, Station station, Survey survey, Runnable onDismiss) {
+    public void showMenuForStation(
+            View anchorView, Station station, Survey survey, Runnable onDismiss) {
         PopupMenu popup = new PopupMenu(context, anchorView);
         popup.inflate(R.menu.context_station);
         enableGroupDividers(popup);
@@ -125,8 +130,13 @@ public class ContextMenuManager {
         popup.show();
     }
 
-    public void showMenuForLeg(View anchorView, Station station, Survey survey,
-                               String customTitle, Runnable onDismiss, Leg leg) {
+    public void showMenuForLeg(
+            View anchorView,
+            Station station,
+            Survey survey,
+            String customTitle,
+            Runnable onDismiss,
+            Leg leg) {
         PopupMenu popup = new PopupMenu(context, anchorView);
         popup.inflate(R.menu.context_leg);
         enableGroupDividers(popup);
@@ -176,8 +186,8 @@ public class ContextMenuManager {
                 if (promoteItem != null) promoteItem.setVisible(isSplay);
                 if (reverseItem != null) reverseItem.setVisible(!isSplay);
                 if (downgradeItem != null) {
-                    boolean canDowngrade = !isSplay &&
-                        currentLeg.getDestination().getOnwardLegs().isEmpty();
+                    boolean canDowngrade =
+                            !isSplay && currentLeg.getDestination().getOnwardLegs().isEmpty();
                     downgradeItem.setVisible(!isSplay);
                     downgradeItem.setEnabled(canDowngrade);
                 }
@@ -185,12 +195,19 @@ public class ContextMenuManager {
                     legMenuItem.setTitle(R.string.menu_incoming_leg);
                     if (!isSplay) {
                         Station fromStation = survey.getOriginatingStation(currentLeg);
-                        String from = currentLeg.wasShotBackwards()
-                                ? currentLeg.getDestination().getName() : fromStation.getName();
-                        String to = currentLeg.wasShotBackwards()
-                                ? fromStation.getName() : currentLeg.getDestination().getName();
-                        legMenuItem.getSubMenu().setHeaderTitle(
-                                context.getString(R.string.menu_leg_title_dynamic, from, to));
+                        String from =
+                                currentLeg.wasShotBackwards()
+                                        ? currentLeg.getDestination().getName()
+                                        : fromStation.getName();
+                        String to =
+                                currentLeg.wasShotBackwards()
+                                        ? fromStation.getName()
+                                        : currentLeg.getDestination().getName();
+                        legMenuItem
+                                .getSubMenu()
+                                .setHeaderTitle(
+                                        context.getString(
+                                                R.string.menu_leg_title_dynamic, from, to));
                     }
                 }
             } else {
@@ -225,7 +242,8 @@ public class ContextMenuManager {
         SpannableString spannable = new SpannableString(displayTitle);
 
         TypedValue typedValue = new TypedValue();
-        context.getTheme().resolveAttribute(androidx.appcompat.R.attr.colorPrimary, typedValue, true);
+        context.getTheme()
+                .resolveAttribute(androidx.appcompat.R.attr.colorPrimary, typedValue, true);
 
         spannable.setSpan(new BackgroundColorSpan(typedValue.data), 0, displayTitle.length(), 0);
         spannable.setSpan(new ForegroundColorSpan(Color.WHITE), 0, displayTitle.length(), 0);

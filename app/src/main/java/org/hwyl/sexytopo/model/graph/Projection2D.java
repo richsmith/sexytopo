@@ -1,13 +1,11 @@
 package org.hwyl.sexytopo.model.graph;
 
+import java.util.Map;
 import org.hwyl.sexytopo.control.util.Space3DTransformer;
 import org.hwyl.sexytopo.control.util.Space3DTransformerForElevation;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
-
-import java.util.Map;
-
 
 @SuppressWarnings("SuspiciousNameCombination")
 public enum Projection2D {
@@ -55,8 +53,7 @@ public enum Projection2D {
         }
     };
 
-    private static final Space3DTransformer space3DTransformer =
-            new Space3DTransformer();
+    private static final Space3DTransformer space3DTransformer = new Space3DTransformer();
     private static final Space3DTransformerForElevation space3DTransformerForElevation =
             new Space3DTransformerForElevation();
     private final String name;
@@ -84,6 +81,7 @@ public enum Projection2D {
     }
 
     public abstract Coord2D project(Coord3D coord3D);
+
     public abstract boolean isLegInPlane(Leg leg);
 
     public Space<Coord2D> project(Survey survey) {
@@ -110,5 +108,4 @@ public enum Projection2D {
 
         return space2D;
     }
-
 }

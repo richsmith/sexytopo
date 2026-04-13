@@ -1,9 +1,10 @@
 package org.hwyl.sexytopo.model.graph;
 
 public enum Direction {
-    LEFT, RIGHT;
+    LEFT,
+    RIGHT;
 
     public Direction opposite() {
-        return (this == LEFT)? RIGHT : LEFT;
+        return (this == LEFT) ? RIGHT : LEFT;
     }
 }

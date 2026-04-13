@@ -2,17 +2,13 @@ package org.hwyl.sexytopo.comms.distox;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
-
-import org.hwyl.sexytopo.control.Log;
-import org.hwyl.sexytopo.control.SurveyManager;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-
+import org.hwyl.sexytopo.control.Log;
+import org.hwyl.sexytopo.control.SurveyManager;
 
 public abstract class DistoXProtocol {
-
 
     protected enum PacketType {
         MEASUREMENT(0b00000001),
@@ -44,7 +40,6 @@ public abstract class DistoXProtocol {
     public static final int INTER_PACKET_DELAY = 100; // ms; (DISTO repeats every 25 ms for ref)
     public static final int WAIT_BETWEEN_CONNECTION_ATTEMPTS_MS = 5 * 1000;
 
-
     public static final int ADMIN = 0;
 
     public static final int SEQUENCE_BIT_MASK = 0b10000000;
@@ -67,8 +62,8 @@ public abstract class DistoXProtocol {
      */
     public static byte[] createAcknowledgementPacket(byte[] packet) {
         byte[] acknowledgePacket = new byte[1];
-        acknowledgePacket[0] = (byte)
-                ((packet[ADMIN] & SEQUENCE_BIT_MASK) | ACKNOWLEDGEMENT_PACKET_BASE);
+        acknowledgePacket[0] =
+                (byte) ((packet[ADMIN] & SEQUENCE_BIT_MASK) | ACKNOWLEDGEMENT_PACKET_BASE);
 
         return acknowledgePacket;
     }
@@ -80,14 +75,12 @@ public abstract class DistoXProtocol {
         Log.device("Ack'd Packet: " + describeAcknowledgementPacket(acknowledgePacket));
     }
 
-
     protected void writeCommandPacket(DataOutputStream outStream, byte[] packet) throws Exception {
         try {
             outStream.write(packet, 0, packet.length);
         } finally {
             outStream.close();
         }
-
     }
 
     @SuppressWarnings("UnnecessaryLocalVariable")
@@ -97,23 +90,18 @@ public abstract class DistoXProtocol {
         return unsigned;
     }
 
-
     protected static int readDoubleByte(byte[] packet, int lowByteIndex, int highByteIndex) {
         int low = readByte(packet, lowByteIndex);
         int high = readByte(packet, highByteIndex);
         return (high * 256) + low;
     }
 
-
-
     public abstract void go(DataInputStream inStream, DataOutputStream outStream) throws Exception;
 
-
-
     protected byte[] readPacket(DataInputStream inStream) throws IOException {
-        //if (inStream.available() < 1){
+        // if (inStream.available() < 1){
         //    return null;
-        //}
+        // }
         byte[] packet = new byte[8];
         inStream.readFully(packet, 0, 8);
         Log.device("Read packet: " + describePacket(packet));
@@ -130,7 +118,6 @@ public abstract class DistoXProtocol {
         } else if (packet0.length != packet1.length) {
             return false;
         }
-
 
         for (int i = 0; i < packet0.length; i++) {
             if (packet0[i] != packet1[i]) {
@@ -166,10 +153,7 @@ public abstract class DistoXProtocol {
         return String.format("%8s", Integer.toBinaryString(theByte)).replace(' ', '0');
     }
 
-
     public static String describeAcknowledgementPacket(byte[] acknowledgementPacket) {
         return "[" + asBinaryString(acknowledgementPacket[0] & 0xFF) + "]";
     }
-
-
 }

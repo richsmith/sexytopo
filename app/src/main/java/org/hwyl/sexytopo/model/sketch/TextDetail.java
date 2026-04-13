@@ -2,7 +2,6 @@ package org.hwyl.sexytopo.model.sketch;
 
 import org.hwyl.sexytopo.model.graph.Coord2D;
 
-
 public class TextDetail extends SinglePositionDetail implements AutoScalableDetail {
 
     private final String text;
@@ -53,6 +52,4 @@ public class TextDetail extends SinglePositionDetail implements AutoScalableDeta
         float distY = Math.max(0, dy - estimatedHeight / 2);
         return (float) Math.sqrt(distX * distX + distY * distY);
     }
-
-
 }

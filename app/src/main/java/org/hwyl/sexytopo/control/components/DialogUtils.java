@@ -6,20 +6,16 @@ import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.WindowManager;
 import android.widget.Button;
-
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
-
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.table.Form;
 
 /**
- * Utility class providing common dialog styling and setup for SexyTopo.
- * Handles Material Design styling, standard padding, and keyboard management.
+ * Utility class providing common dialog styling and setup for SexyTopo. Handles Material Design
+ * styling, standard padding, and keyboard management.
  */
 public class DialogUtils {
 
@@ -33,9 +29,12 @@ public class DialogUtils {
      * @param hintRes Hint string resource
      * @return Configured TextInputLayout
      */
-    public static TextInputLayout createStandardTextInputLayout(Context context, @StringRes int hintRes) {
-        TextInputLayout inputLayout = (TextInputLayout) LayoutInflater.from(context)
-                .inflate(R.layout.dialog_text_input, null, false);
+    public static TextInputLayout createStandardTextInputLayout(
+            Context context, @StringRes int hintRes) {
+        TextInputLayout inputLayout =
+                (TextInputLayout)
+                        LayoutInflater.from(context)
+                                .inflate(R.layout.dialog_text_input, null, false);
         inputLayout.setHint(context.getString(hintRes));
 
         float density = context.getResources().getDisplayMetrics().density;
@@ -57,15 +56,14 @@ public class DialogUtils {
      */
     public static void showKeyboardOnDisplay(Dialog dialog) {
         if (dialog.getWindow() != null) {
-            dialog.getWindow().setSoftInputMode(
-                    WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+            dialog.getWindow()
+                    .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         }
     }
 
     /**
-     * Enables form validation on a dialog's positive button.
-     * The button is enabled/disabled based on form validity and the dialog
-     * won't dismiss until the form is valid.
+     * Enables form validation on a dialog's positive button. The button is enabled/disabled based
+     * on form validity and the dialog won't dismiss until the form is valid.
      *
      * @param dialog The AlertDialog
      * @param form The form to validate
@@ -81,15 +79,16 @@ public class DialogUtils {
         form.setOnDidValidateCallback(valid -> positiveButton.setEnabled(valid));
         form.validate();
 
-        positiveButton.setOnClickListener(v -> {
-            form.enableErrors();
-            form.validate();
-            if (form.isValid()) {
-                if (onValid != null) {
-                    onValid.run();
-                }
-                dialog.dismiss();
-            }
-        });
+        positiveButton.setOnClickListener(
+                v -> {
+                    form.enableErrors();
+                    form.validate();
+                    if (form.isValid()) {
+                        if (onValid != null) {
+                            onValid.run();
+                        }
+                        dialog.dismiss();
+                    }
+                });
     }
 }

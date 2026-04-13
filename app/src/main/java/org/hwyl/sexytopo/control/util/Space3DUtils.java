@@ -3,7 +3,6 @@ package org.hwyl.sexytopo.control.util;
 import org.hwyl.sexytopo.model.graph.Coord3D;
 import org.hwyl.sexytopo.model.survey.Leg;
 
-
 public class Space3DUtils {
 
     public static Coord3D toCartesian(Coord3D start, Leg leg) {
@@ -21,5 +20,4 @@ public class Space3DUtils {
 
         return new Coord3D(x, y, z);
     }
-
 }

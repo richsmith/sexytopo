@@ -1,7 +1,5 @@
 package org.hwyl.sexytopo.control.calibration;
 
-
-
 public class MutableFloat {
     float value;
 

@@ -6,6 +6,10 @@ import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.SHOT_COMM
 import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.SKETCHLINE_COMMAND;
 import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.STATIONS_COMMAND;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.common.Shape;
 import org.hwyl.sexytopo.model.graph.Coord2D;
@@ -19,20 +23,15 @@ import org.hwyl.sexytopo.model.sketch.TextDetail;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-
 public class XviExporter {
 
-    public static String getContent(Sketch sketch, Space<Coord2D> space, float scale,
-                                    Shape gridFrame) {
+    public static String getContent(
+            Sketch sketch, Space<Coord2D> space, float scale, Shape gridFrame) {
         String text = field(GRIDS_COMMAND, "1 m");
 
         // Combine main survey stations with cross-section stations
-        String stationsText = getStationsText(space, scale) + getCrossSectionStationsText(sketch, scale);
+        String stationsText =
+                getStationsText(space, scale) + getCrossSectionStationsText(sketch, scale);
         text += multilineField(STATIONS_COMMAND, stationsText);
 
         // Combine main survey legs with cross-section splays
@@ -62,9 +61,9 @@ public class XviExporter {
             Space<Coord2D> xsSpace = xsDetail.getProjection();
             for (Map.Entry<Leg, Line<Coord2D>> entry : xsSpace.getLegMap().entrySet()) {
                 Line<Coord2D> line = entry.getValue();
-                Line<Coord2D> flipped = new Line<>(
-                    line.getStart().flipVertically(),
-                    line.getEnd().flipVertically());
+                Line<Coord2D> flipped =
+                        new Line<>(
+                                line.getStart().flipVertically(), line.getEnd().flipVertically());
                 builder.append(getLegText(flipped, scale));
             }
         }
@@ -73,7 +72,7 @@ public class XviExporter {
 
     private static String getStationsText(Space<Coord2D> space, double scale) {
         StringBuilder builder = new StringBuilder();
-        for (Map.Entry<Station, Coord2D> entry: space.getStationMap().entrySet()) {
+        for (Map.Entry<Station, Coord2D> entry : space.getStationMap().entrySet()) {
             builder.append(getStationText(entry.getKey(), entry.getValue(), scale));
         }
         return builder.toString();
@@ -87,7 +86,7 @@ public class XviExporter {
 
     private static String getLegsText(Space<Coord2D> space, double scale) {
         StringBuilder builder = new StringBuilder();
-        for (Line<Coord2D> line: space.getLegMap().values()) {
+        for (Line<Coord2D> line : space.getLegMap().values()) {
             builder.append(getLegText(line, scale));
         }
         return builder.toString();
@@ -125,8 +124,8 @@ public class XviExporter {
         return builder.toString();
     }
 
-    private static String getCrossSectionConnectorText(CrossSectionDetail xsDetail,
-                                                        Space<Coord2D> space, double scale) {
+    private static String getCrossSectionConnectorText(
+            CrossSectionDetail xsDetail, Space<Coord2D> space, double scale) {
         Station station = xsDetail.getCrossSection().getStation();
         Coord2D surveyStationPos = space.getStationMap().get(station);
         if (surveyStationPos == null) {
@@ -149,7 +148,8 @@ public class XviExporter {
         fields.add(pathDetail.getColour().toString());
         for (Coord2D coord2D : pathDetail.getPath()) {
             String x = TextTools.formatTo2dpWithDot(coord2D.x * scale);
-            String y = TextTools.formatTo2dpWithDot((-coord2D.y + 0.0) * scale); // +0.0 to avoid -0.0
+            String y =
+                    TextTools.formatTo2dpWithDot((-coord2D.y + 0.0) * scale); // +0.0 to avoid -0.0
             fields.add(x);
             fields.add(y);
         }
@@ -181,16 +181,17 @@ public class XviExporter {
 
         // Grid is{bottom left x, bottom left y,
         // x1 dist, y1 dist, x2 dist, y2 dist, number of x, number of y}
-        Float[] values = new Float[] {
-            gridFrame.getLeft(), // bottom left x
-            gridFrame.getBottom(), // bottom left y
-            scale, // x1 dist
-            0.0f,  // y1 dist
-            0.0f, // x2 dist
-            scale, // y2 dist
-            numberX,  // x squares
-            numberY  // y squares
-        };
+        Float[] values =
+                new Float[] {
+                    gridFrame.getLeft(), // bottom left x
+                    gridFrame.getBottom(), // bottom left y
+                    scale, // x1 dist
+                    0.0f, // y1 dist
+                    0.0f, // x2 dist
+                    scale, // y2 dist
+                    numberX, // x squares
+                    numberY // y squares
+                };
 
         return TextTools.join(" ", Arrays.asList(values));
     }
@@ -202,6 +203,4 @@ public class XviExporter {
     private static String multilineField(String text, String content) {
         return text + " {\n" + content + "}\n";
     }
-
-
 }

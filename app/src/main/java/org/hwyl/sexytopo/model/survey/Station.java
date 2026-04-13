@@ -1,12 +1,9 @@
 package org.hwyl.sexytopo.model.survey;
 
-import org.hwyl.sexytopo.model.graph.Direction;
-
+import androidx.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.List;
-
-import androidx.annotation.NonNull;
-
+import org.hwyl.sexytopo.model.graph.Direction;
 
 public class Station extends SurveyComponent {
 
@@ -15,8 +12,7 @@ public class Station extends SurveyComponent {
     private String comment = "";
     private Direction extendedElevationDirection = Direction.RIGHT;
 
-    public static final char[] FORBIDDEN_CHARS = new char[]{'\n', '\r'};
-
+    public static final char[] FORBIDDEN_CHARS = new char[] {'\n', '\r'};
 
     public Station(String name) {
         this.name = sanitiseName(name);

@@ -3,19 +3,15 @@ package org.hwyl.sexytopo.control.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
-
+import androidx.preference.PreferenceManager;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import androidx.preference.PreferenceManager;
-
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.table.LRUD;
-
 
 public class GeneralPreferences {
 
@@ -27,7 +23,7 @@ public class GeneralPreferences {
 
     private static String getString(String key, String defaultValue) {
 
-        if (prefs == null) {  // e.g. during tests
+        if (prefs == null) { // e.g. during tests
             return defaultValue;
         }
 
@@ -36,7 +32,7 @@ public class GeneralPreferences {
 
     private static boolean getBoolean(String key, Boolean defaultValue) {
 
-        if (prefs == null) {  // e.g. during tests
+        if (prefs == null) { // e.g. during tests
             return defaultValue;
         }
 
@@ -53,7 +49,7 @@ public class GeneralPreferences {
 
     private static int getInt(String key, Integer defaultValue) {
 
-        if (prefs == null) {  // e.g. during tests
+        if (prefs == null) { // e.g. during tests
             return defaultValue;
         }
 
@@ -75,7 +71,7 @@ public class GeneralPreferences {
 
     private static float getFloat(String key, float defaultValue) {
 
-        if (prefs == null) {  // e.g. during tests
+        if (prefs == null) { // e.g. during tests
             return defaultValue;
         }
 
@@ -112,7 +108,6 @@ public class GeneralPreferences {
         }
     }
 
-
     public static void setActiveSurveyUri(Uri uri) {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("pref_active_survey_uri", uri.toString());
@@ -122,6 +117,7 @@ public class GeneralPreferences {
     public static String getTheme() {
         return getString("pref_theme", "auto");
     }
+
     public static boolean isDevModeOn() {
         return getBoolean("pref_developer_mode", false);
     }
@@ -147,7 +143,6 @@ public class GeneralPreferences {
     public static boolean isHighlightLatestLegModeOn() {
         return getBoolean("pref_highlight_latest_leg", true);
     }
-
 
     // ********** Table ***********
 
@@ -325,5 +320,4 @@ public class GeneralPreferences {
         set.remove(name);
         prefs.edit().putStringSet(PREF_KNOWN_CAVERS, set).apply();
     }
-
 }

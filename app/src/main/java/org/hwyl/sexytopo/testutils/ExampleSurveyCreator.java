@@ -1,5 +1,7 @@
 package org.hwyl.sexytopo.testutils;
 
+import java.util.List;
+import java.util.Random;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Leg;
@@ -7,13 +9,9 @@ import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.table.LRUD;
 
-import java.util.List;
-import java.util.Random;
-
 /**
- * Creates a test survey with a random number of branches and stations.
- * Unlike the other test utils in this package, this is expected to be
- * called from user-facing code, not from tests.
+ * Creates a test survey with a random number of branches and stations. Unlike the other test utils
+ * in this package, this is expected to be called from user-facing code, not from tests.
  */
 public class ExampleSurveyCreator {
 
@@ -39,9 +37,7 @@ public class ExampleSurveyCreator {
         }
 
         return survey;
-
     }
-
 
     public static void createBranch(Survey survey, int numStations) {
 
@@ -57,7 +53,6 @@ public class ExampleSurveyCreator {
             Station newStation = survey.getMostRecentLeg().getDestination();
             createLruds(survey, newStation);
         }
-
     }
 
     public static void createLruds(Survey survey, Station station) {

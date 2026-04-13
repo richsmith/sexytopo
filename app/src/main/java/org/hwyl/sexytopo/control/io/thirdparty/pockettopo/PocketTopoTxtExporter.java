@@ -1,7 +1,11 @@
 package org.hwyl.sexytopo.control.io.thirdparty.pockettopo;
 
 import android.content.Context;
-
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.io.translation.Experimental;
 import org.hwyl.sexytopo.control.io.translation.SingleFileExporter;
@@ -19,15 +23,7 @@ import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
 import org.hwyl.sexytopo.model.table.TableCol;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-
 public class PocketTopoTxtExporter extends SingleFileExporter implements Experimental {
-
 
     public String getContent(Survey survey) {
 
@@ -51,10 +47,8 @@ public class PocketTopoTxtExporter extends SingleFileExporter implements Experim
 
         text += exportExtendedElevation(survey);
 
-
         return text;
     }
-
 
     public static String exportData(Survey survey) {
         GraphToListTranslator graphToListTranslator = new GraphToListTranslator();
@@ -72,7 +66,6 @@ public class PocketTopoTxtExporter extends SingleFileExporter implements Experim
         return builder.toString();
     }
 
-
     public static String exportPlan(Survey survey) {
         String plan = "PLAN\n";
         plan += exportStationCoords(Projection2D.PLAN.project(survey)) + "\n";
@@ -80,14 +73,12 @@ public class PocketTopoTxtExporter extends SingleFileExporter implements Experim
         return plan;
     }
 
-
     public static String exportExtendedElevation(Survey survey) {
         String plan = "ELEVATION\n";
         plan += exportStationCoords(Projection2D.EXTENDED_ELEVATION.project(survey)) + "\n";
         plan += exportSketch(survey.getElevationSketch()) + "\n";
         return plan;
     }
-
 
     public static String exportSketch(Sketch sketch) {
         List<String> lines = new ArrayList<>();
@@ -97,12 +88,10 @@ public class PocketTopoTxtExporter extends SingleFileExporter implements Experim
             for (Coord2D coords : pathDetail.getPath()) {
                 lines.add(coords.x + "\t" + -coords.y);
             }
-
         }
 
         return TextTools.join("\n", lines);
     }
-
 
     public static String exportStationCoords(Space<Coord2D> space) {
         List<String> lines = new ArrayList<>();
@@ -124,28 +113,23 @@ public class PocketTopoTxtExporter extends SingleFileExporter implements Experim
         return TextTools.join("\n", lines);
     }
 
-
     @Override
     public String getFileExtension() {
         return "txt";
     }
-
 
     @Override
     public String getExportTypeName(Context context) {
         return context.getString(R.string.third_party_pocket_topo_txt);
     }
 
-
     @Override
     public String getExportDirectoryName() {
         return "pockettopo-txt";
     }
 
-
     private static void formatEntry(
-            StringBuilder builder,
-            GraphToListTranslator.SurveyListEntry entry) {
+            StringBuilder builder, GraphToListTranslator.SurveyListEntry entry) {
 
         Station from = entry.getFrom();
         String fromName = from.getName();
@@ -211,5 +195,4 @@ public class PocketTopoTxtExporter extends SingleFileExporter implements Experim
         String formatted = comment.replaceAll("(\\r|\\n|\\r\\n)+", "\\\\n");
         builder.append(formatted);
     }
-
 }

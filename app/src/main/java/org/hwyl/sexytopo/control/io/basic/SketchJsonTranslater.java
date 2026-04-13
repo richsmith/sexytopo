@@ -1,5 +1,7 @@
 package org.hwyl.sexytopo.control.io.basic;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
@@ -20,10 +22,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
-
-
 @SuppressWarnings("UnnecessaryLocalVariable")
 public class SketchJsonTranslater {
 
@@ -42,7 +40,6 @@ public class SketchJsonTranslater {
     public static final String X_TAG = "x";
     public static final String Y_TAG = "y";
 
-
     public static String translate(
             Sketch sketch, Survey survey, String versionName, int versionCode)
             throws JSONException {
@@ -50,12 +47,10 @@ public class SketchJsonTranslater {
                 .toString(SexyTopoConstants.JSON_INDENT);
     }
 
-
     public static Sketch translate(Survey survey, String string) throws JSONException {
         JSONObject json = new JSONObject(string);
         return toSketch(survey, json);
     }
-
 
     public static synchronized JSONObject toJson(
             Sketch sketch, Survey survey, String versionName, int versionCode)
@@ -148,7 +143,6 @@ public class SketchJsonTranslater {
         return sketch;
     }
 
-
     public static JSONObject toJson(PathDetail pathDetail) throws JSONException {
 
         JSONObject json = new JSONObject();
@@ -162,7 +156,6 @@ public class SketchJsonTranslater {
 
         return json;
     }
-
 
     public static PathDetail toPathDetail(JSONObject json) throws JSONException {
 
@@ -183,7 +176,6 @@ public class SketchJsonTranslater {
         return pathDetail;
     }
 
-
     public static JSONObject toJson(SymbolDetail symbolDetail) throws JSONException {
 
         JSONObject json = new JSONObject();
@@ -199,20 +191,18 @@ public class SketchJsonTranslater {
         return json;
     }
 
-
     public static SymbolDetail toSymbolDetail(JSONObject json) throws JSONException {
 
         Colour colour = Colour.valueOf(json.getString(COLOUR_TAG));
         Coord2D location = toCoord2D(json.getJSONObject(POSITION_TAG));
         Symbol symbol = Symbol.valueOf(json.getString(SYMBOL_ID_TAG));
 
-        float size = (float)(json.has(SIZE_TAG)? json.getDouble(SIZE_TAG) : 1);
-        float angle = (float)(json.has(ANGLE_TAG)? json.getDouble(ANGLE_TAG) : 0);
+        float size = (float) (json.has(SIZE_TAG) ? json.getDouble(SIZE_TAG) : 1);
+        float angle = (float) (json.has(ANGLE_TAG) ? json.getDouble(ANGLE_TAG) : 0);
 
         SymbolDetail symbolDetail = new SymbolDetail(location, symbol, colour, size, angle);
         return symbolDetail;
     }
-
 
     public static JSONObject toJson(TextDetail textDetail) throws JSONException {
 
@@ -225,17 +215,15 @@ public class SketchJsonTranslater {
         return json;
     }
 
-
     public static TextDetail toTextDetail(JSONObject json) throws JSONException {
         Colour colour = Colour.valueOf(json.getString(COLOUR_TAG));
         Coord2D location = toCoord2D(json.getJSONObject(POSITION_TAG));
         String text = json.getString(TEXT_TAG);
-        float scale = (float)(json.has(SIZE_TAG)? json.getDouble(SIZE_TAG) : 0);
+        float scale = (float) (json.has(SIZE_TAG) ? json.getDouble(SIZE_TAG) : 0);
         TextDetail textDetail = new TextDetail(location, text, colour, scale);
 
         return textDetail;
     }
-
 
     public static JSONObject toJson(CrossSectionDetail crossSectionDetail) throws JSONException {
 
@@ -246,7 +234,6 @@ public class SketchJsonTranslater {
 
         return json;
     }
-
 
     public static CrossSectionDetail toCrossSectionDetail(Survey survey, JSONObject json)
             throws JSONException {
@@ -263,7 +250,6 @@ public class SketchJsonTranslater {
         return crossSectionDetail;
     }
 
-
     public static JSONObject toJson(Coord2D coord) throws JSONException {
         JSONObject json = new JSONObject();
         json.put(X_TAG, coord.x);
@@ -271,10 +257,7 @@ public class SketchJsonTranslater {
         return json;
     }
 
-
     public static Coord2D toCoord2D(JSONObject json) throws JSONException {
-        return new Coord2D((float)json.getDouble(X_TAG), (float)json.getDouble(Y_TAG));
+        return new Coord2D((float) json.getDouble(X_TAG), (float) json.getDouble(Y_TAG));
     }
-
-
 }

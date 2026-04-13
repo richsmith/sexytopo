@@ -1,17 +1,14 @@
 package org.hwyl.sexytopo.control.io.basic;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-
 public class OldStyleLoader {
-
 
     public static void parse(String text, Survey survey) throws Exception {
 
@@ -39,8 +36,8 @@ public class OldStyleLoader {
         }
     }
 
-    private static void addLegToSurvey(Survey survey,
-                                       Map<String, Station> nameToStation, String[] fields, String comment)
+    private static void addLegToSurvey(
+            Survey survey, Map<String, Station> nameToStation, String[] fields, String comment)
             throws Exception {
 
         Station from = retrieveOrCreateStation(nameToStation, fields[0], comment);
@@ -57,14 +54,16 @@ public class OldStyleLoader {
         } else if (stationsSoFar.contains(from) && stationsSoFar.contains(to)) {
             throw new Exception("Duplicate leg encountered");
         } else if (stationsSoFar.contains(from)) { // forward leg
-            Leg leg = (to == Survey.NULL_STATION)?
-                    new Leg(distance, azimuth, inclination) :
-                    new Leg(distance, azimuth, inclination, to, new Leg[]{});
+            Leg leg =
+                    (to == Survey.NULL_STATION)
+                            ? new Leg(distance, azimuth, inclination)
+                            : new Leg(distance, azimuth, inclination, to, new Leg[] {});
             from.addOnwardLeg(leg);
         } else if (stationsSoFar.contains(to)) { // backwards leg
-            Leg leg = (from == Survey.NULL_STATION)?
-                    new Leg(distance, azimuth, inclination) :
-                    new Leg(distance, azimuth, inclination, from, new Leg[]{});
+            Leg leg =
+                    (from == Survey.NULL_STATION)
+                            ? new Leg(distance, azimuth, inclination)
+                            : new Leg(distance, azimuth, inclination, from, new Leg[] {});
             to.addOnwardLeg(leg.reverse());
         }
 
@@ -73,8 +72,8 @@ public class OldStyleLoader {
         survey.setActiveStation(from);
     }
 
-    private static Station retrieveOrCreateStation(Map<String, Station> nameToStation,
-                                                   String name, String comment) {
+    private static Station retrieveOrCreateStation(
+            Map<String, Station> nameToStation, String name, String comment) {
         if (name.equals(SexyTopoConstants.BLANK_STATION_NAME)) {
             return Survey.NULL_STATION;
         } else if (nameToStation.containsKey(name)) {
@@ -86,5 +85,4 @@ public class OldStyleLoader {
             return station;
         }
     }
-
 }

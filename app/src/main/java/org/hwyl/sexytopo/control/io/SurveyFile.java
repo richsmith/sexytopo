@@ -1,15 +1,12 @@
 package org.hwyl.sexytopo.control.io;
 
 import android.content.Context;
-
 import androidx.documentfile.provider.DocumentFile;
-
+import java.io.IOException;
+import java.util.List;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.io.translation.AbstractSurveyFile;
 import org.hwyl.sexytopo.model.survey.Survey;
-
-import java.io.IOException;
-import java.util.List;
 
 @SuppressWarnings("UnnecessaryLocalVariable")
 public class SurveyFile extends AbstractSurveyFile {
@@ -32,10 +29,11 @@ public class SurveyFile extends AbstractSurveyFile {
             if (this == LOG || extension.endsWith(SexyTopoConstants.AUTOSAVE_EXTENSION)) {
                 AUTOSAVE = null;
             } else {
-                AUTOSAVE = new SurveyFileType(
-                    withExtension(extension, SexyTopoConstants.AUTOSAVE_EXTENSION),
-                    "application/octet-stream");  // mime type for no additional extension
-
+                AUTOSAVE =
+                        new SurveyFileType(
+                                withExtension(extension, SexyTopoConstants.AUTOSAVE_EXTENSION),
+                                "application/octet-stream"); // mime type for no additional
+                // extension
             }
         }
 
@@ -50,21 +48,22 @@ public class SurveyFile extends AbstractSurveyFile {
         public SurveyFile get(SurveyDirectory surveyDirectory) {
             return new SurveyFile(surveyDirectory.getSurvey(), surveyDirectory, this);
         }
-
     }
 
     public static final SurveyFileType DATA =
-        new SurveyFileType(SexyTopoConstants.DATA_EXTENSION, SexyTopoConstants.MIME_TYPE_JSON);
+            new SurveyFileType(SexyTopoConstants.DATA_EXTENSION, SexyTopoConstants.MIME_TYPE_JSON);
     public static final SurveyFileType METADATA =
-        new SurveyFileType(SexyTopoConstants.METADATA_EXTENSION, SexyTopoConstants.MIME_TYPE_JSON);
+            new SurveyFileType(
+                    SexyTopoConstants.METADATA_EXTENSION, SexyTopoConstants.MIME_TYPE_JSON);
     public static final SurveyFileType SKETCH_PLAN =
-        new SurveyFileType(
-            SexyTopoConstants.PLAN_SKETCH_EXTENSION, SexyTopoConstants.MIME_TYPE_JSON);
+            new SurveyFileType(
+                    SexyTopoConstants.PLAN_SKETCH_EXTENSION, SexyTopoConstants.MIME_TYPE_JSON);
     public static final SurveyFileType SKETCH_EXT_ELEVATION =
-        new SurveyFileType(
-            SexyTopoConstants.EXT_ELEVATION_SKETCH_EXTENSION, SexyTopoConstants.MIME_TYPE_JSON);
+            new SurveyFileType(
+                    SexyTopoConstants.EXT_ELEVATION_SKETCH_EXTENSION,
+                    SexyTopoConstants.MIME_TYPE_JSON);
     public static final SurveyFileType LOG =
-        new SurveyFileType(SexyTopoConstants.LOG_EXTENSION, SexyTopoConstants.MIME_TYPE_JSON);
+            new SurveyFileType(SexyTopoConstants.LOG_EXTENSION, SexyTopoConstants.MIME_TYPE_JSON);
 
     public static final List<SurveyFileType> ALL_DATA_TYPES =
             List.of(DATA, METADATA, SKETCH_PLAN, SKETCH_EXT_ELEVATION);
@@ -95,11 +94,10 @@ public class SurveyFile extends AbstractSurveyFile {
     }
 
     /**
-     * Combines filename with extension.
-     * - If extension starts with ".", it's appended directly (no extra dot)
-     * - If extension starts with "|", the "|" is removed and extension is appended directly
-     *   (use this for suffixes like "P" that should produce "filenameP.th2")
-     * - Otherwise, a "." separator is added between filename and extension
+     * Combines filename with extension. - If extension starts with ".", it's appended directly (no
+     * extra dot) - If extension starts with "|", the "|" is removed and extension is appended
+     * directly (use this for suffixes like "P" that should produce "filenameP.th2") - Otherwise, a
+     * "." separator is added between filename and extension
      */
     public static String withExtension(String filename, String extension) {
         if (extension.startsWith(".")) {
@@ -136,16 +134,13 @@ public class SurveyFile extends AbstractSurveyFile {
         return documentFile;
     }
 
-
-
     public void save(Context context, String contents) throws IOException {
         parent.ensureExists(context);
         DocumentFile documentFile = getOrCreateDocumentFile(context);
         IoUtils.saveToFile(context, documentFile, contents);
     }
 
-    public String slurp(Context context)
-            throws IOException {
+    public String slurp(Context context) throws IOException {
         DocumentFile file = getDocumentFile(context);
         String content = IoUtils.slurpFile(context, file);
         return content;

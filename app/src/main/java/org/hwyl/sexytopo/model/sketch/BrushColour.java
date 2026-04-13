@@ -2,9 +2,7 @@ package org.hwyl.sexytopo.model.sketch;
 
 import org.hwyl.sexytopo.R;
 
-
 public enum BrushColour {
-
     BLACK(R.id.buttonBlack, Colour.BLACK),
     BROWN(R.id.buttonBrown, Colour.BROWN),
     GREY(R.id.buttonGrey, Colour.GREY),
@@ -25,7 +23,7 @@ public enum BrushColour {
     }
 
     public static BrushColour fromString(String name) {
-        return name == null? DEFAULT : BrushColour.valueOf(name);
+        return name == null ? DEFAULT : BrushColour.valueOf(name);
     }
 
     public int getId() {
@@ -35,5 +33,4 @@ public enum BrushColour {
     public Colour getColour() {
         return colour;
     }
-
 }

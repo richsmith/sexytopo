@@ -2,36 +2,27 @@ package org.hwyl.sexytopo.comms.fcl;
 
 import android.bluetooth.BluetoothDevice;
 import android.view.View;
-
+import java.util.HashMap;
+import java.util.Map;
+import kotlin.Unit;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.comms.Communicator;
-import org.hwyl.sexytopo.comms.fcl.FCLBLE;
-import org.hwyl.sexytopo.comms.fcl.EnhancedLegData;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.DeviceActivity;
 import org.hwyl.sexytopo.model.survey.Leg;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import kotlin.Unit;
-
 /**
- * FCL Enhanced Split Protocol v2.0
- * =============================================
+ * FCL Enhanced Split Protocol v2.0 =============================================
  *
- * Handles communication with FCL cave survey instruments using the enhanced
- * split-packet BLE protocol that overcomes MTU limitations while providing
- * comprehensive shot quality data and environmental monitoring.
+ * <p>Handles communication with FCL cave survey instruments using the enhanced split-packet BLE
+ * protocol that overcomes MTU limitations while providing comprehensive shot quality data and
+ * environmental monitoring.
  *
- * Protocol Features:
- * - Split packet reception: Primary (20 bytes) + Extended (14 bytes)
- * - Real-time shot quality assessment and environmental monitoring
- * - Full 3-axis orientation data with roll angle
- * - Battery and device health monitoring
- * - Magnetic field anomaly detection
- * - Temperature monitoring
+ * <p>Protocol Features: - Split packet reception: Primary (20 bytes) + Extended (14 bytes) -
+ * Real-time shot quality assessment and environmental monitoring - Full 3-axis orientation data
+ * with roll angle - Battery and device health monitoring - Magnetic field anomaly detection -
+ * Temperature monitoring
  */
 public class FCLCommunicator implements Communicator {
 
@@ -58,13 +49,13 @@ public class FCLCommunicator implements Communicator {
         this.datamanager = activity.getSurveyManager();
 
         // Initialize FCLBLE with split protocol callbacks
-        this.fclBLE = new FCLBLE(
-                bluetoothDevice,
-                activity,
-                this::legCallback,
-                this::enhancedLegCallback,
-                this::statusCallback
-        );
+        this.fclBLE =
+                new FCLBLE(
+                        bluetoothDevice,
+                        activity,
+                        this::legCallback,
+                        this::enhancedLegCallback,
+                        this::statusCallback);
     }
 
     @Override
@@ -111,43 +102,46 @@ public class FCLCommunicator implements Communicator {
     }
 
     /**
-     * Basic callback for core survey functionality
-     * This is called for every measurement to maintain compatibility
+     * Basic callback for core survey functionality This is called for every measurement to maintain
+     * compatibility
      */
     public Unit legCallback(float azimuth, float inclination, float distance) {
         // Always create and update survey with basic leg data
         Leg leg = new Leg(distance, azimuth, inclination);
         datamanager.updateSurvey(leg);
 
-        Log.device(String.format("Basic leg: %.1f° %+.1f° %.3fm",
-                azimuth, inclination, distance));
+        Log.device(String.format("Basic leg: %.1f° %+.1f° %.3fm", azimuth, inclination, distance));
 
         return Unit.INSTANCE;
     }
 
     /**
-     * Enhanced callback with comprehensive quality data from split packets
-     * This processes the reconstructed data from primary + extended packets
+     * Enhanced callback with comprehensive quality data from split packets This processes the
+     * reconstructed data from primary + extended packets
      */
     public Unit enhancedLegCallback(EnhancedLegData enhancedData) {
 
         // Core measurement with environmental summary
-        Log.device(String.format("FCL [%d]: %.1f° %+.1f° %.3fm - %s (%.0f%%)",
-                enhancedData.getMeasurementId(),
-                enhancedData.getAzimuth(),
-                enhancedData.getInclination(),
-                enhancedData.getDistance(),
-                enhancedData.getQualityDescription(),
-                enhancedData.getShotQuality() * 100.0f));
+        Log.device(
+                String.format(
+                        "FCL [%d]: %.1f° %+.1f° %.3fm - %s (%.0f%%)",
+                        enhancedData.getMeasurementId(),
+                        enhancedData.getAzimuth(),
+                        enhancedData.getInclination(),
+                        enhancedData.getDistance(),
+                        enhancedData.getQualityDescription(),
+                        enhancedData.getShotQuality() * 100.0f));
 
         // Environmental summary - always show to confirm enhanced data is working
-        Log.device(String.format("   Mag: %.1f/%.1f µT, Dip: %.1f/%.1f°, Batt: %d%%, Roll: %.1f°",
-                enhancedData.getCurrentMagneticField(),
-                enhancedData.getExpectedMagneticField(),
-                enhancedData.getCurrentMagneticDip(),
-                enhancedData.getExpectedMagneticDip(),
-                enhancedData.getBatteryLevel(),
-                enhancedData.getRollAngle()));
+        Log.device(
+                String.format(
+                        "   Mag: %.1f/%.1f µT, Dip: %.1f/%.1f°, Batt: %d%%, Roll: %.1f°",
+                        enhancedData.getCurrentMagneticField(),
+                        enhancedData.getExpectedMagneticField(),
+                        enhancedData.getCurrentMagneticDip(),
+                        enhancedData.getExpectedMagneticDip(),
+                        enhancedData.getBatteryLevel(),
+                        enhancedData.getRollAngle()));
 
         // Critical warnings only
         if (enhancedData.hasLowBattery()) {
@@ -155,8 +149,10 @@ public class FCLCommunicator implements Communicator {
         }
 
         if (enhancedData.hasTemperatureWarning()) {
-            Log.device("WARNING: Temperature extreme (" +
-                    String.format("%.1f°C", enhancedData.getTemperature()) + ")");
+            Log.device(
+                    "WARNING: Temperature extreme ("
+                            + String.format("%.1f°C", enhancedData.getTemperature())
+                            + ")");
         }
 
         if (enhancedData.hasInterferenceWarning()) {
@@ -191,9 +187,7 @@ public class FCLCommunicator implements Communicator {
         return Unit.INSTANCE;
     }
 
-    /**
-     * Status callback for connection state changes
-     */
+    /** Status callback for connection state changes */
     public Unit statusCallback(int status, String msg) {
         switch (status) {
             case FCLBLE.CONNECTED:
@@ -213,30 +207,22 @@ public class FCLCommunicator implements Communicator {
         return Unit.INSTANCE;
     }
 
-    /**
-     * Get protocol description for UI display
-     */
+    /** Get protocol description for UI display */
     public String getProtocolDescription() {
         return "FCL Protocol v2.0";
     }
 
-    /**
-     * Get detailed protocol information
-     */
+    /** Get detailed protocol information */
     public String getProtocolDetails() {
         return "Primary(20B) + Extended(14B) packets with state machine recovery";
     }
 
-    /**
-     * Debug method to log protocol information
-     */
+    /** Debug method to log protocol information */
     public void logProtocolInfo() {
         Log.device("Protocol: FCL Protocol v2.0");
     }
 
-    /**
-     * Get current connection statistics (if needed for debugging)
-     */
+    /** Get current connection statistics (if needed for debugging) */
     public void logConnectionStats() {
         if (isConnected()) {
             Log.device("FCL Connection Status: ACTIVE");

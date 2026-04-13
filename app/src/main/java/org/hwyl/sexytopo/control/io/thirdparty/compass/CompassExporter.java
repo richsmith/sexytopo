@@ -1,7 +1,11 @@
 package org.hwyl.sexytopo.control.io.thirdparty.compass;
 
 import android.content.Context;
-
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.io.translation.Experimental;
 import org.hwyl.sexytopo.control.io.translation.SingleFileExporter;
@@ -10,17 +14,10 @@ import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-
-
 /**
  * Survey exporter which targets the Windows-only software Compass by Fountainware / Larry Fish.
  *
- * Created by driggs on 1/16/16.
+ * <p>Created by driggs on 1/16/16.
  */
 public class CompassExporter extends SingleFileExporter implements Experimental {
 
@@ -29,10 +26,11 @@ public class CompassExporter extends SingleFileExporter implements Experimental 
     private Station currentFrom;
     private int splayCount;
 
-    final public static double METERS_TO_FEET = 3.28084;
+    public static final double METERS_TO_FEET = 3.28084;
 
     /**
      * Export a SexyTopo Survey as a Compass .DAT file.
+     *
      * @param survey
      * @return
      */
@@ -55,23 +53,28 @@ public class CompassExporter extends SingleFileExporter implements Experimental 
         for (GraphToListTranslator.SurveyListEntry entry : data) {
             Leg leg = entry.getLeg();
             Station from = entry.getFrom();
-            String to = leg.hasDestination() ? leg.getDestination().toString() : this.splayStationFrom(from);
-            double dist = leg.getDistance() * METERS_TO_FEET;  // all Compass lengths are decimal feet!
+            String to =
+                    leg.hasDestination()
+                            ? leg.getDestination().toString()
+                            : this.splayStationFrom(from);
+            double dist =
+                    leg.getDistance() * METERS_TO_FEET; // all Compass lengths are decimal feet!
             double azm = leg.getAzimuth();
             double inc = leg.getInclination();
 
-            sb.append(String.format(Locale.US, "%s\t%s\t%.2f\t%.2f\t%.2f\t", from, to, dist, azm, inc));
-            sb.append("-9.99\t-9.99\t-9.99\t-9.99\t");  // LUDR, must be in that order
+            sb.append(
+                    String.format(
+                            Locale.US, "%s\t%s\t%.2f\t%.2f\t%.2f\t", from, to, dist, azm, inc));
+            sb.append("-9.99\t-9.99\t-9.99\t-9.99\t"); // LUDR, must be in that order
             if (!leg.hasDestination()) {
-                sb.append("#|L#");  // exclude splay shots from cave length calculations
+                sb.append("#|L#"); // exclude splay shots from cave length calculations
             }
-            sb.append("\t\t\r\n");  // empty comments field
+            sb.append("\t\t\r\n"); // empty comments field
         }
-        sb.append('\f');  // ASCII formfeed denotes end of survey
+        sb.append('\f'); // ASCII formfeed denotes end of survey
 
         return sb.toString();
     }
-
 
     @Override
     public String getFileExtension() {
@@ -82,21 +85,19 @@ public class CompassExporter extends SingleFileExporter implements Experimental 
         return "text/dat";
     }
 
-
     @Override
     public String getExportTypeName(Context context) {
         return context.getString(R.string.third_party_compass);
     }
-
 
     @Override
     public String getExportDirectoryName() {
         return "compass";
     }
 
-
     /**
      * Produce a unique TO station name for a splay shot (Compass doesn't allow anonymous stations).
+     *
      * @param from
      * @return A station label of, for example, `A53ss003` for the third splay off station A53
      */
@@ -105,7 +106,6 @@ public class CompassExporter extends SingleFileExporter implements Experimental 
             this.currentFrom = from;
             this.splayCount = 0;
         }
-        return String.format(Locale.US,"%sss%03d", from, this.splayCount++);
+        return String.format(Locale.US, "%sss%03d", from, this.splayCount++);
     }
-
 }

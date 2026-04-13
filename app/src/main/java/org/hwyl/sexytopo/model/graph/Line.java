@@ -1,6 +1,5 @@
 package org.hwyl.sexytopo.model.graph;
 
-
 public final class Line<T extends Coord> {
     private final T start;
     private final T end;

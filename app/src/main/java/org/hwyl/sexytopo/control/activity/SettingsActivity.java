@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -16,11 +15,9 @@ import androidx.fragment.app.Fragment;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
-
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 
@@ -38,27 +35,33 @@ public class SettingsActivity extends SexyTopoActivity
 
         // Always start fresh at the main settings page when activity is created
         // Clear any saved fragment state and back stack
-        getSupportFragmentManager().popBackStackImmediate(null,
-                androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        getSupportFragmentManager().beginTransaction()
-            .replace(R.id.settingsFragment, new MainSettingsFragment())
-            .commitNow();
+        getSupportFragmentManager()
+                .popBackStackImmediate(
+                        null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.settingsFragment, new MainSettingsFragment())
+                .commitNow();
 
-        getSupportFragmentManager().addOnBackStackChangedListener(() -> {
-            boolean isAtRoot = getSupportFragmentManager().getBackStackEntryCount() == 0;
-            if (isAtRoot) {
-                setTitle(R.string.title_activity_settings);
-            }
-            if (getSupportActionBar() != null) {
-                getSupportActionBar().setDisplayHomeAsUpEnabled(!isAtRoot);
-            }
-        });
+        getSupportFragmentManager()
+                .addOnBackStackChangedListener(
+                        () -> {
+                            boolean isAtRoot =
+                                    getSupportFragmentManager().getBackStackEntryCount() == 0;
+                            if (isAtRoot) {
+                                setTitle(R.string.title_activity_settings);
+                            }
+                            if (getSupportActionBar() != null) {
+                                getSupportActionBar().setDisplayHomeAsUpEnabled(!isAtRoot);
+                            }
+                        });
 
-        prefListener = (prefs, key) -> {
-            if ("pref_theme".equals(key)) {
-                setTheme();
-            }
-        };
+        prefListener =
+                (prefs, key) -> {
+                    if ("pref_theme".equals(key)) {
+                        setTheme();
+                    }
+                };
     }
 
     @Override
@@ -94,11 +97,14 @@ public class SettingsActivity extends SexyTopoActivity
             return false;
         }
 
-        Fragment fragment = getSupportFragmentManager().getFragmentFactory()
-                .instantiate(getClassLoader(), fragmentClassName);
+        Fragment fragment =
+                getSupportFragmentManager()
+                        .getFragmentFactory()
+                        .instantiate(getClassLoader(), fragmentClassName);
         fragment.setArguments(pref.getExtras());
 
-        getSupportFragmentManager().beginTransaction()
+        getSupportFragmentManager()
+                .beginTransaction()
                 .replace(R.id.settingsFragment, fragment)
                 .addToBackStack(null)
                 .commit();
@@ -159,8 +165,10 @@ public class SettingsActivity extends SexyTopoActivity
     public static class TeamFragment extends Fragment {
         @Nullable
         @Override
-        public View onCreateView(@NonNull LayoutInflater inflater,
-                @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        public View onCreateView(
+                @NonNull LayoutInflater inflater,
+                @Nullable ViewGroup container,
+                @Nullable Bundle savedInstanceState) {
             return inflater.inflate(R.layout.fragment_settings_team, container, false);
         }
 
@@ -169,19 +177,21 @@ public class SettingsActivity extends SexyTopoActivity
             super.onViewCreated(view, savedInstanceState);
             refreshList(view);
 
-            view.findViewById(R.id.add_caver_button).setOnClickListener(v -> {
-                TextInputEditText field = view.findViewById(R.id.new_caver_field);
-                TextInputLayout layout = view.findViewById(R.id.new_caver_layout);
-                String name = field.getText().toString().trim();
-                if (name.isEmpty()) {
-                    layout.setError(getString(R.string.trip_dialog_name_required));
-                    return;
-                }
-                layout.setError(null);
-                GeneralPreferences.addKnownCaver(name);
-                field.setText("");
-                refreshList(view);
-            });
+            view.findViewById(R.id.add_caver_button)
+                    .setOnClickListener(
+                            v -> {
+                                TextInputEditText field = view.findViewById(R.id.new_caver_field);
+                                TextInputLayout layout = view.findViewById(R.id.new_caver_layout);
+                                String name = field.getText().toString().trim();
+                                if (name.isEmpty()) {
+                                    layout.setError(getString(R.string.trip_dialog_name_required));
+                                    return;
+                                }
+                                layout.setError(null);
+                                GeneralPreferences.addKnownCaver(name);
+                                field.setText("");
+                                refreshList(view);
+                            });
         }
 
         private void refreshList(View root) {
@@ -194,40 +204,46 @@ public class SettingsActivity extends SexyTopoActivity
                 row.findViewById(R.id.role_field).setVisibility(View.GONE);
                 row.findViewById(R.id.icon).setVisibility(View.GONE);
                 row.setOnClickListener(v -> showEditDialog(root, name));
-                row.findViewById(R.id.delete_button).setOnClickListener(v -> {
-                    GeneralPreferences.removeKnownCaver(name);
-                    refreshList(root);
-                });
+                row.findViewById(R.id.delete_button)
+                        .setOnClickListener(
+                                v -> {
+                                    GeneralPreferences.removeKnownCaver(name);
+                                    refreshList(root);
+                                });
                 list.addView(row);
             }
         }
 
         private void showEditDialog(View root, String currentName) {
-            View dialogView = LayoutInflater.from(requireContext())
-                .inflate(R.layout.dialog_edit_caver_name, null);
+            View dialogView =
+                    LayoutInflater.from(requireContext())
+                            .inflate(R.layout.dialog_edit_caver_name, null);
             TextInputLayout layout = dialogView.findViewById(R.id.name_input_layout);
             TextInputEditText field = dialogView.findViewById(R.id.name_field);
             field.setText(currentName);
             field.selectAll();
 
-            AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.edit)
-                .setView(dialogView)
-                .setPositiveButton(R.string.save, null)
-                .setNegativeButton(R.string.cancel, null)
-                .show();
+            AlertDialog dialog =
+                    new MaterialAlertDialogBuilder(requireContext())
+                            .setTitle(R.string.edit)
+                            .setView(dialogView)
+                            .setPositiveButton(R.string.save, null)
+                            .setNegativeButton(R.string.cancel, null)
+                            .show();
 
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-                String newName = field.getText().toString().trim();
-                if (newName.isEmpty()) {
-                    layout.setError(getString(R.string.trip_dialog_name_required));
-                    return;
-                }
-                GeneralPreferences.removeKnownCaver(currentName);
-                GeneralPreferences.addKnownCaver(newName);
-                dialog.dismiss();
-                refreshList(root);
-            });
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                    .setOnClickListener(
+                            v -> {
+                                String newName = field.getText().toString().trim();
+                                if (newName.isEmpty()) {
+                                    layout.setError(getString(R.string.trip_dialog_name_required));
+                                    return;
+                                }
+                                GeneralPreferences.removeKnownCaver(currentName);
+                                GeneralPreferences.addKnownCaver(newName);
+                                dialog.dismiss();
+                                refreshList(root);
+                            });
         }
     }
 

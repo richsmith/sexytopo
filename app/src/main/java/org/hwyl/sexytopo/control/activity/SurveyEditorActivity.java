@@ -1,22 +1,12 @@
 package org.hwyl.sexytopo.control.activity;
 
 import android.app.Dialog;
-import android.content.DialogInterface;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.WindowManager;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-
-import androidx.appcompat.app.AlertDialog;
-
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.components.DialogUtils;
 import org.hwyl.sexytopo.control.components.StationSelectorDialog;
@@ -30,8 +20,8 @@ import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 
 /**
- * Abstract base class for activities that allow editing surveys with context menus.
- * Provides standard context menu action implementations.
+ * Abstract base class for activities that allow editing surveys with context menus. Provides
+ * standard context menu action implementations.
  */
 public abstract class SurveyEditorActivity extends SexyTopoActivity {
 
@@ -65,7 +55,6 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
     public void onJumpToElevation(Station station) {
         jumpToStation(station, ExtendedElevationActivity.class);
     }
-
 
     public void onSetDirectionLeft(Station station) {
         if (station.getExtendedElevationDirection() != Direction.LEFT) {
@@ -108,8 +97,9 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
     }
 
     private void showNewSurveyStartStationDialog(Station station) {
-        TextInputLayout inputLayout = DialogUtils.createStandardTextInputLayout(this,
-                R.string.menu_survey_start_new_dialog_station_name);
+        TextInputLayout inputLayout =
+                DialogUtils.createStandardTextInputLayout(
+                        this, R.string.menu_survey_start_new_dialog_station_name);
 
         TextInputEditText input = DialogUtils.getEditText(inputLayout);
         input.setText(station.getName());
@@ -117,14 +107,16 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setView(inputLayout)
-            .setTitle(R.string.menu_survey_start_new_dialog_title)
-            .setPositiveButton(R.string.ok, (dialog, which) -> {
-                String stationName = input.getText().toString().trim();
-                if (!stationName.isEmpty()) {
-                    continueSurvey(station, stationName);
-                }
-            })
-            .setNegativeButton(R.string.cancel, null);
+                .setTitle(R.string.menu_survey_start_new_dialog_title)
+                .setPositiveButton(
+                        R.string.ok,
+                        (dialog, which) -> {
+                            String stationName = input.getText().toString().trim();
+                            if (!stationName.isEmpty()) {
+                                continueSurvey(station, stationName);
+                            }
+                        })
+                .setNegativeButton(R.string.cancel, null);
 
         Dialog dialog = builder.create();
         dialog.show();
@@ -216,33 +208,23 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         }
     }
 
-    /**
-     * Set the active station in the current view.
-     */
+    /** Set the active station in the current view. */
     protected void setActiveStation(Station station) {
         getSurvey().setActiveStation(station);
         getSurveyManager().broadcastSurveyUpdated();
     }
 
-    /**
-     * Invalidate/refresh the current view.
-     * Must be implemented by subclasses.
-     */
+    /** Invalidate/refresh the current view. Must be implemented by subclasses. */
     protected abstract void invalidateView();
 
-    /**
-     * Synchronise the view with the survey data.
-     * Must be implemented by subclasses.
-     */
+    /** Synchronise the view with the survey data. Must be implemented by subclasses. */
     public abstract void syncWithSurvey();
 
-
-    /**
-     * Open the comment dialog for the given station.
-     */
+    /** Open the comment dialog for the given station. */
     protected void openCommentDialog(Station station) {
-        TextInputLayout inputLayout = DialogUtils.createStandardTextInputLayout(this,
-                R.string.context_station_comment_hint);
+        TextInputLayout inputLayout =
+                DialogUtils.createStandardTextInputLayout(
+                        this, R.string.context_station_comment_hint);
 
         TextInputEditText input = DialogUtils.getEditText(inputLayout);
         input.setLines(8);
@@ -252,13 +234,15 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setView(inputLayout)
-            .setTitle(station.getName())
-            .setPositiveButton(R.string.save, (dialog, which) -> {
-                    CharSequence inputText = input.getText();
-                    station.setComment(inputText != null ? inputText.toString() : "");
-                    invalidateView();
-                })
-            .setNegativeButton(R.string.cancel, null);
+                .setTitle(station.getName())
+                .setPositiveButton(
+                        R.string.save,
+                        (dialog, which) -> {
+                            CharSequence inputText = input.getText();
+                            station.setComment(inputText != null ? inputText.toString() : "");
+                            invalidateView();
+                        })
+                .setNegativeButton(R.string.cancel, null);
 
         Dialog dialog = builder.create();
         DialogUtils.showKeyboardOnDisplay(dialog);
@@ -267,8 +251,9 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
     }
 
     /**
-     * Ask the user about deleting the given leg (and any onwards legs
-     * / stations if it's a full leg).
+     * Ask the user about deleting the given leg (and any onwards legs / stations if it's a full
+     * leg).
+     *
      * @noinspection UnusedAssignment
      */
     protected void askAboutDeletingLeg(Leg leg) {
@@ -302,27 +287,28 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         }
 
         new MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.delete_question)
-            .setMessage(message)
-            .setIcon(android.R.drawable.ic_dialog_alert)
-            .setPositiveButton(R.string.delete, (dialog, which) -> {
-                SurveyUpdater.deleteLeg(getSurvey(), fromStation, leg);
-                getSurveyManager().broadcastSurveyUpdated();
-                invalidateView();
-            })
-            .setNegativeButton(R.string.cancel, null)
-            .show();
+                .setTitle(R.string.delete_question)
+                .setMessage(message)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(
+                        R.string.delete,
+                        (dialog, which) -> {
+                            SurveyUpdater.deleteLeg(getSurvey(), fromStation, leg);
+                            getSurveyManager().broadcastSurveyUpdated();
+                            invalidateView();
+                        })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
     }
 
     @Override
     protected void onFindStation() {
         StationSelectorDialog.show(
-            this,
-            getSurvey(),
-            R.string.tool_find_station_dialog_title,
-            R.string.tool_find_station_dialog_hint,
-            R.string.tool_find_station_dialog_navigate,
-            station -> jumpToStation(station, this.getClass())
-        );
+                this,
+                getSurvey(),
+                R.string.tool_find_station_dialog_title,
+                R.string.tool_find_station_dialog_hint,
+                R.string.tool_find_station_dialog_navigate,
+                station -> jumpToStation(station, this.getClass()));
     }
 }

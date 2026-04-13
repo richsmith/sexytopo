@@ -1,18 +1,14 @@
 package org.hwyl.sexytopo.control.io.thirdparty.survex;
 
 import android.content.Context;
-
 import androidx.documentfile.provider.DocumentFile;
-
+import java.util.Map;
 import org.hwyl.sexytopo.control.io.IoUtils;
-import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionImporter;
+import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
 import org.hwyl.sexytopo.control.io.translation.Importer;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
-
-import java.util.Map;
-
 
 public class SurvexImporter extends Importer {
 
@@ -21,7 +17,8 @@ public class SurvexImporter extends Importer {
         String text = IoUtils.slurpFile(context, file);
 
         // Parse passage data first to extract station comments
-        Map<String, String> passageComments = SurvexTherionImporter.parsePassageData(text, SurveyFormat.SURVEX);
+        Map<String, String> passageComments =
+                SurvexTherionImporter.parsePassageData(text, SurveyFormat.SURVEX);
 
         // Parse centreline data
         SurvexTherionImporter.parseCentreline(text, survey);
@@ -38,10 +35,8 @@ public class SurvexImporter extends Importer {
         return survey;
     }
 
-
     @Override
     public boolean canHandleFile(DocumentFile file) {
         return file.getName().endsWith(".svx");
     }
-
 }

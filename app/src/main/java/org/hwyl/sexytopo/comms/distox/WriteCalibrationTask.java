@@ -1,4 +1,3 @@
 package org.hwyl.sexytopo.comms.distox;
 
-public class WriteCalibrationTask {
-}
+public class WriteCalibrationTask {}

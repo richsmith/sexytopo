@@ -11,7 +11,6 @@ import org.hwyl.sexytopo.model.survey.Survey;
 @SuppressWarnings("UnnecessaryLocalVariable")
 public class CrossSectioner {
 
-
     public static CrossSection section(Survey survey, final Station station) {
         float angle = getAngleOfSection(survey, station);
         CrossSection crossSection = new CrossSection(station, angle);
@@ -20,7 +19,7 @@ public class CrossSectioner {
 
     public static float getAngleOfSection(Survey survey, Station station) {
 
-        int numIncomingLegs = station == survey.getOrigin()? 0 : 1;
+        int numIncomingLegs = station == survey.getOrigin() ? 0 : 1;
         int numOutgoingLegs = station.getConnectedOnwardLegs().size();
 
         float angle;
@@ -67,5 +66,4 @@ public class CrossSectioner {
         }
         return ((azimuth1 + azimuth2) / 2) % 360;
     }
-
 }

@@ -2,9 +2,7 @@ package org.hwyl.sexytopo.control.util;
 
 import org.hwyl.sexytopo.R;
 
-
 public enum InputMode {
-
     FORWARD(R.id.action_input_mode_forward),
     BACKWARD(R.id.action_input_mode_backward),
     COMBO(R.id.action_input_mode_combo),

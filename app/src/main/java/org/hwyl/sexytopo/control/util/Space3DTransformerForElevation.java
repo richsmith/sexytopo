@@ -7,14 +7,11 @@ import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 
-
-public class Space3DTransformerForElevation  extends Space3DTransformer {
-
+public class Space3DTransformerForElevation extends Space3DTransformer {
 
     protected void update(Space<Coord3D> space, Station station, Coord3D coord3D) {
         update(space, station, coord3D, 0);
     }
-
 
     protected void update(Space<Coord3D> space, Station station, Coord3D coord3D, float rotation) {
         space.addStation(station, coord3D);
@@ -26,7 +23,6 @@ public class Space3DTransformerForElevation  extends Space3DTransformer {
             }
         }
     }
-
 
     protected void updateLeg(Space<Coord3D> space, Leg leg, Coord3D start) {
 
@@ -46,7 +42,6 @@ public class Space3DTransformerForElevation  extends Space3DTransformer {
             update(space, leg.getDestination(), end, delta);
         }
     }
-
 
     protected void updateSplay(Space<Coord3D> space, Leg leg, Coord3D start, float rotation) {
         Leg adjustedLeg = leg.rotate(rotation);

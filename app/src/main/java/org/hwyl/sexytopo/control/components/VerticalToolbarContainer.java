@@ -6,16 +6,14 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 /**
- * Container that displays its single child rotated 90 degrees so that a
- * normally horizontal view (e.g. a MaterialToolbar) appears as a vertical bar.
+ * Container that displays its single child rotated 90 degrees so that a normally horizontal view
+ * (e.g. a MaterialToolbar) appears as a vertical bar.
  *
- * The child is measured as if it were laid out horizontally: the container's
- * height is passed to the child as its width constraint, and the container's
- * width is passed to the child as its height constraint. The child is then
- * rotated 90 degrees counter-clockwise and translated so that its original
- * right edge lands at the top of the container. This means the last items in
- * the child (e.g. the toolbar's menu action buttons and overflow icon) end up
- * at the top of the vertical bar.
+ * <p>The child is measured as if it were laid out horizontally: the container's height is passed to
+ * the child as its width constraint, and the container's width is passed to the child as its height
+ * constraint. The child is then rotated 90 degrees counter-clockwise and translated so that its
+ * original right edge lands at the top of the container. This means the last items in the child
+ * (e.g. the toolbar's menu action buttons and overflow icon) end up at the top of the vertical bar.
  */
 public class VerticalToolbarContainer extends FrameLayout {
 
@@ -39,10 +37,11 @@ public class VerticalToolbarContainer extends FrameLayout {
 
         // Measure each child with width/height constraints swapped so the child
         // lays itself out as if it had the container's height as its width.
-        int childWidthSpec = MeasureSpec.makeMeasureSpec(
-            containerHeight, MeasureSpec.getMode(heightMeasureSpec));
-        int childHeightSpec = MeasureSpec.makeMeasureSpec(
-            containerWidth, MeasureSpec.getMode(widthMeasureSpec));
+        int childWidthSpec =
+                MeasureSpec.makeMeasureSpec(
+                        containerHeight, MeasureSpec.getMode(heightMeasureSpec));
+        int childHeightSpec =
+                MeasureSpec.makeMeasureSpec(containerWidth, MeasureSpec.getMode(widthMeasureSpec));
 
         for (int i = 0; i < count; i++) {
             View child = getChildAt(i);
@@ -52,8 +51,8 @@ public class VerticalToolbarContainer extends FrameLayout {
         }
 
         setMeasuredDimension(
-            resolveSize(containerWidth, widthMeasureSpec),
-            resolveSize(containerHeight, heightMeasureSpec));
+                resolveSize(containerWidth, widthMeasureSpec),
+                resolveSize(containerHeight, heightMeasureSpec));
     }
 
     @Override

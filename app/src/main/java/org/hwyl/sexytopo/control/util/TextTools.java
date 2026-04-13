@@ -2,10 +2,6 @@ package org.hwyl.sexytopo.control.util;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-
-import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
-
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -15,30 +11,31 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-
+import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
 
 public class TextTools {
 
-    final static DecimalFormat dp0WithCommaFormatter = new DecimalFormat("#,##0");
-    final static DecimalFormat dp2WithCommaFormatter = new DecimalFormat("#,##0.00");
-    final static DecimalFormat dp2WithoutCommaFormatter = new DecimalFormat("##0.00");
-    final static DecimalFormat dp2WithoutCommaFormatterUk =
-        new DecimalFormat("##0.00", new DecimalFormatSymbols(Locale.UK));
+    static final DecimalFormat dp0WithCommaFormatter = new DecimalFormat("#,##0");
+    static final DecimalFormat dp2WithCommaFormatter = new DecimalFormat("#,##0.00");
+    static final DecimalFormat dp2WithoutCommaFormatter = new DecimalFormat("##0.00");
+    static final DecimalFormat dp2WithoutCommaFormatterUk =
+            new DecimalFormat("##0.00", new DecimalFormatSymbols(Locale.UK));
 
-    final static Character[] PROBLEMATIC = {' ', '\t', '\n', '\r', ':'};
-    final static Character DEFAULT_JOINER = '-';
+    static final Character[] PROBLEMATIC = {' ', '\t', '\n', '\r', ':'};
+    static final Character DEFAULT_JOINER = '-';
 
     @SuppressLint("SimpleDateFormat")
-    public final static DateFormat ISO_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-
+    public static final DateFormat ISO_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     public static String pluralise(int n, String noun) {
-        return n + " " + ((n == 1)? noun : noun + "s");
+        return n + " " + ((n == 1) ? noun : noun + "s");
     }
 
     public static Character getJoiner(String text) {
-        return text.contains("_")? '_' : DEFAULT_JOINER;
+        return text.contains("_") ? '_' : DEFAULT_JOINER;
     }
+
     public static String intelligentlySanitise(String text) {
         Character joiner = getJoiner(text);
         for (Character c : PROBLEMATIC) {
@@ -47,7 +44,7 @@ public class TextTools {
         return text;
     }
 
-    public static String joinAll(String joiner, Object ... list) {
+    public static String joinAll(String joiner, Object... list) {
 
         if (list.length == 1 && list[0] instanceof Collection) {
             throw new IllegalArgumentException("Wrong method called; should be join()");
@@ -66,12 +63,10 @@ public class TextTools {
         return sb.toString();
     }
 
-
-    public static String join(String joiner, Object ... items) {
+    public static String join(String joiner, Object... items) {
         List<Object> list = Arrays.asList(items);
         return join(joiner, list);
     }
-
 
     public static String join(String joiner, List<?> list) {
         StringBuilder sb = new StringBuilder();
@@ -107,7 +102,6 @@ public class TextTools {
         return dp0WithCommaFormatter.format(number);
     }
 
-
     public static String advanceLastNumber(String originatingName) {
 
         if (originatingName.isEmpty()) {
@@ -128,7 +122,7 @@ public class TextTools {
                 firstDigitChar = i;
             }
 
-            if (! Character.isDigit(c) && firstDigitChar > -1) {
+            if (!Character.isDigit(c) && firstDigitChar > -1) {
                 break;
             }
         }
@@ -155,15 +149,16 @@ public class TextTools {
         return text.split("\\r?\\n");
     }
 
-
     public static String toIsoDate(Date date) {
         return ISO_DATE_FORMAT.format(date);
     }
 
     public static String getFileAttribution(Context context) {
         String date = TextTools.toIsoDate(new Date());
-        String app = context.getString(R.string.app_name) +
-                " " + SexyTopoActivity.getVersionName(context);
+        String app =
+                context.getString(R.string.app_name)
+                        + " "
+                        + SexyTopoActivity.getVersionName(context);
         return context.getString(R.string.created_with, app, date);
     }
 }

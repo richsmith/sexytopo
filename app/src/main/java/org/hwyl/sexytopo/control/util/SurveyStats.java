@@ -1,14 +1,12 @@
 package org.hwyl.sexytopo.control.util;
 
+import java.util.List;
+import java.util.Map;
 import org.hwyl.sexytopo.model.graph.Coord3D;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
-
-import java.util.List;
-import java.util.Map;
-
 
 public class SurveyStats {
 
@@ -95,14 +93,13 @@ public class SurveyStats {
         return rangeArray[1] - rangeArray[0];
     }
 
-
     public static float[] calcHeightRangeArray(Survey survey) {
         Space3DTransformer transformer = new Space3DTransformer();
         Space<Coord3D> space = transformer.transformTo3D(survey);
         Map<Station, Coord3D> stationsToCoords = space.getStationMap();
 
         if (stationsToCoords.size() <= 1) {
-            return new float[]{0, 0};
+            return new float[] {0, 0};
         }
 
         float min = Float.MAX_VALUE, max = Float.MIN_VALUE;
@@ -111,8 +108,6 @@ public class SurveyStats {
             min = Math.min(min, point.z);
         }
 
-        return new float[]{min, max};
+        return new float[] {min, max};
     }
-
-
 }

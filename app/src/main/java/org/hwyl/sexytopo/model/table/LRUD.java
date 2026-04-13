@@ -8,8 +8,8 @@ import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 /**
- * Handles LRUD splays, a convenience provided for users of the manual entry feature. LRUDs
- * (Left, Right, Up, Down) are splays that are calculated/estimated from only the distance given.
+ * Handles LRUD splays, a convenience provided for users of the manual entry feature. LRUDs (Left,
+ * Right, Up, Down) are splays that are calculated/estimated from only the distance given.
  */
 public enum LRUD {
     LEFT {

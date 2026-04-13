@@ -1,5 +1,11 @@
 package org.hwyl.sexytopo.control.io.thirdparty.pockettopo;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.survey.Leg;
@@ -8,26 +14,14 @@ import org.hwyl.sexytopo.model.survey.Survey;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-
-
 public class PocketTopoImporterTest {
 
     /**
      * Build a minimal valid .top file as a byte array for testing.
      *
-     * Contains:
-     * - 1 trip (date=epoch, empty comment, declination=0)
-     * - 2 shots: station 0.0 -> 0.1 (3.5m, 90°, 0°), and a splay from 0.1
-     * - 0 references
-     * - empty overview mapping
-     * - empty plan drawing
-     * - empty elevation drawing
+     * <p>Contains: - 1 trip (date=epoch, empty comment, declination=0) - 2 shots: station 0.0 ->
+     * 0.1 (3.5m, 90°, 0°), and a splay from 0.1 - 0 references - empty overview mapping - empty
+     * plan drawing - empty elevation drawing
      */
     private static byte[] buildMinimalTopFile() throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -52,9 +46,9 @@ public class PocketTopoImporterTest {
         // Shot 0: station 0.0 -> 0.1, dist=3500mm, azimuth=east(0x4000), incl=0, no flags
         writeInt32(out, 0x00000000); // from = 0.0
         writeInt32(out, 0x00000001); // to = 0.1
-        writeInt32(out, 3500);       // dist = 3500mm = 3.5m
+        writeInt32(out, 3500); // dist = 3500mm = 3.5m
         writeInt16(out, (short) 0x4000); // azimuth = east = 90°
-        writeInt16(out, (short) 0);      // inclination = 0°
+        writeInt16(out, (short) 0); // inclination = 0°
         out.write(0); // flags
         out.write(0); // roll
         writeInt16(out, (short) 0); // tripIndex
@@ -62,8 +56,8 @@ public class PocketTopoImporterTest {
         // Shot 1: splay from 0.1, dist=2000mm, azimuth=north(0), incl=+45°
         writeInt32(out, 0x00000001); // from = 0.1
         writeInt32(out, 0x80000000); // to = undefined (splay)
-        writeInt32(out, 2000);       // dist = 2000mm = 2.0m
-        writeInt16(out, (short) 0);  // azimuth = north = 0°
+        writeInt32(out, 2000); // dist = 2000mm = 2.0m
+        writeInt16(out, (short) 0); // azimuth = north = 0°
         // +45° = 0x4000/2 = 0x2000
         writeInt16(out, (short) 0x2000); // inclination = +45°
         out.write(0); // flags
@@ -85,9 +79,9 @@ public class PocketTopoImporterTest {
         // 1 polygon element
         out.write(1); // element id = polygon
         writeInt32(out, 2); // pointCount
-        writeInt32(out, 1000);  // point0 x = 1000mm = 1.0m
+        writeInt32(out, 1000); // point0 x = 1000mm = 1.0m
         writeInt32(out, -2000); // point0 y = -2000mm = -2.0m
-        writeInt32(out, 3000);  // point1 x = 3000mm = 3.0m
+        writeInt32(out, 3000); // point1 x = 3000mm = 3.0m
         writeInt32(out, -4000); // point1 y = -4000mm = -4.0m
         out.write(3); // colour = brown
         out.write(0); // end of elements
@@ -101,13 +95,14 @@ public class PocketTopoImporterTest {
         return out.toByteArray();
     }
 
-    /**
-     * Build a .top file with a shot that has a comment (flags bit 1 set).
-     */
+    /** Build a .top file with a shot that has a comment (flags bit 1 set). */
     private static byte[] buildTopFileWithShotComment() throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        out.write('T'); out.write('o'); out.write('p'); out.write(3);
+        out.write('T');
+        out.write('o');
+        out.write('p');
+        out.write(3);
 
         // 0 trips
         writeInt32(out, 0);
@@ -116,9 +111,9 @@ public class PocketTopoImporterTest {
         writeInt32(out, 1);
         writeInt32(out, 0x00000000); // from = 0.0
         writeInt32(out, 0x00000001); // to = 0.1
-        writeInt32(out, 5000);       // 5m
-        writeInt16(out, (short) 0);  // azimuth = north
-        writeInt16(out, (short) 0);  // inclination = level
+        writeInt32(out, 5000); // 5m
+        writeInt16(out, (short) 0); // azimuth = north
+        writeInt16(out, (short) 0); // inclination = level
         out.write(2); // flags = bit1 set (has comment)
         out.write(0); // roll
         writeInt16(out, (short) -1); // tripIndex = -1 (no trip)
@@ -131,14 +126,20 @@ public class PocketTopoImporterTest {
         writeInt32(out, 0);
 
         // Overview mapping
-        writeInt32(out, 0); writeInt32(out, 0); writeInt32(out, 1000);
+        writeInt32(out, 0);
+        writeInt32(out, 0);
+        writeInt32(out, 1000);
 
         // Empty plan drawing
-        writeInt32(out, 0); writeInt32(out, 0); writeInt32(out, 1000);
+        writeInt32(out, 0);
+        writeInt32(out, 0);
+        writeInt32(out, 1000);
         out.write(0);
 
         // Empty elevation drawing
-        writeInt32(out, 0); writeInt32(out, 0); writeInt32(out, 1000);
+        writeInt32(out, 0);
+        writeInt32(out, 0);
+        writeInt32(out, 1000);
         out.write(0);
 
         return out.toByteArray();
@@ -163,18 +164,17 @@ public class PocketTopoImporterTest {
         writeInt32(out, (int) ((value >> 32) & 0xFFFFFFFFL));
     }
 
-
     // --- Tests ---
 
     @Test(expected = IOException.class)
     public void testBadHeaderThrows() throws IOException {
-        byte[] data = new byte[]{'B', 'a', 'd', 3};
+        byte[] data = new byte[] {'B', 'a', 'd', 3};
         PocketTopoImporter.parseSurvey(new ByteArrayInputStream(data));
     }
 
     @Test(expected = IOException.class)
     public void testWrongVersionThrows() throws IOException {
-        byte[] data = new byte[]{'T', 'o', 'p', 2};
+        byte[] data = new byte[] {'T', 'o', 'p', 2};
         PocketTopoImporter.parseSurvey(new ByteArrayInputStream(data));
     }
 
@@ -279,41 +279,59 @@ public class PocketTopoImporterTest {
 
     // --- Triple-shot / promotedFrom tests ---
 
-    /**
-     * Build a .top file with 3 repeat shots between the same station pair (triple-shot).
-     */
+    /** Build a .top file with 3 repeat shots between the same station pair (triple-shot). */
     private static byte[] buildTripleShotTopFile() throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        out.write('T'); out.write('o'); out.write('p'); out.write(3);
+        out.write('T');
+        out.write('o');
+        out.write('p');
+        out.write(3);
         writeInt32(out, 0); // 0 trips
 
         writeInt32(out, 3); // 3 shots, all from 0.0 → 0.1
 
         // Shot 0: 5.000m, 90°, 0°
-        writeInt32(out, 0x00000000); writeInt32(out, 0x00000001);
+        writeInt32(out, 0x00000000);
+        writeInt32(out, 0x00000001);
         writeInt32(out, 5000);
         writeInt16(out, (short) 0x4000); // 90°
         writeInt16(out, (short) 0);
-        out.write(0); out.write(0); writeInt16(out, (short) -1);
+        out.write(0);
+        out.write(0);
+        writeInt16(out, (short) -1);
 
         // Shot 1: 5.010m, 90.1°, 0.5°
-        writeInt32(out, 0x00000000); writeInt32(out, 0x00000001);
+        writeInt32(out, 0x00000000);
+        writeInt32(out, 0x00000001);
         writeInt32(out, 5010);
         writeInt16(out, (short) 0x4001); // ~90.005°
         writeInt16(out, (short) 0x0024); // ~0.5°
-        out.write(0); out.write(0); writeInt16(out, (short) -1);
+        out.write(0);
+        out.write(0);
+        writeInt16(out, (short) -1);
 
         // Shot 2: 4.990m, 89.9°, -0.5°
-        writeInt32(out, 0x00000000); writeInt32(out, 0x00000001);
+        writeInt32(out, 0x00000000);
+        writeInt32(out, 0x00000001);
         writeInt32(out, 4990);
         writeInt16(out, (short) 0x3FFF); // ~89.995°
         writeInt16(out, (short) 0xFFDC); // ~-0.5°
-        out.write(0); out.write(0); writeInt16(out, (short) -1);
+        out.write(0);
+        out.write(0);
+        writeInt16(out, (short) -1);
 
         writeInt32(out, 0); // 0 references
-        writeInt32(out, 0); writeInt32(out, 0); writeInt32(out, 1000);
-        writeInt32(out, 0); writeInt32(out, 0); writeInt32(out, 1000); out.write(0);
-        writeInt32(out, 0); writeInt32(out, 0); writeInt32(out, 1000); out.write(0);
+        writeInt32(out, 0);
+        writeInt32(out, 0);
+        writeInt32(out, 1000);
+        writeInt32(out, 0);
+        writeInt32(out, 0);
+        writeInt32(out, 1000);
+        out.write(0);
+        writeInt32(out, 0);
+        writeInt32(out, 0);
+        writeInt32(out, 1000);
+        out.write(0);
 
         return out.toByteArray();
     }
@@ -368,13 +386,16 @@ public class PocketTopoImporterTest {
     // --- Out-of-order shot tests ---
 
     /**
-     * Build a .top file where shots are NOT in tree-traversal order.
-     * Shot order: splay from 0.0, connected 0.1→0.2, connected 0.0→0.1
-     * The connected shot from 0.1→0.2 comes BEFORE 0.1 is created.
+     * Build a .top file where shots are NOT in tree-traversal order. Shot order: splay from 0.0,
+     * connected 0.1→0.2, connected 0.0→0.1 The connected shot from 0.1→0.2 comes BEFORE 0.1 is
+     * created.
      */
     private static byte[] buildOutOfOrderTopFile() throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        out.write('T'); out.write('o'); out.write('p'); out.write(3);
+        out.write('T');
+        out.write('o');
+        out.write('p');
+        out.write(3);
         writeInt32(out, 0); // 0 trips
 
         writeInt32(out, 3); // 3 shots
@@ -382,34 +403,48 @@ public class PocketTopoImporterTest {
         // Shot 0: splay from 0.0
         writeInt32(out, 0x00000000); // from = 0.0
         writeInt32(out, 0x80000000); // to = undefined (splay)
-        writeInt32(out, 1500);       // 1.5m
+        writeInt32(out, 1500); // 1.5m
         writeInt16(out, (short) 0x4000); // east
         writeInt16(out, (short) 0);
-        out.write(0); out.write(0); writeInt16(out, (short) -1);
+        out.write(0);
+        out.write(0);
+        writeInt16(out, (short) -1);
 
         // Shot 1: connected 0.1 → 0.2 (0.1 doesn't exist yet!)
         writeInt32(out, 0x00000001); // from = 0.1
         writeInt32(out, 0x00000002); // to = 0.2
-        writeInt32(out, 4000);       // 4m
-        writeInt16(out, (short) 0);  // north
+        writeInt32(out, 4000); // 4m
+        writeInt16(out, (short) 0); // north
         writeInt16(out, (short) 0);
-        out.write(0); out.write(0); writeInt16(out, (short) -1);
+        out.write(0);
+        out.write(0);
+        writeInt16(out, (short) -1);
 
         // Shot 2: connected 0.0 → 0.1 (this creates 0.1)
         writeInt32(out, 0x00000000); // from = 0.0
         writeInt32(out, 0x00000001); // to = 0.1
-        writeInt32(out, 3000);       // 3m
+        writeInt32(out, 3000); // 3m
         writeInt16(out, (short) 0x8000); // south
         writeInt16(out, (short) 0);
-        out.write(0); out.write(0); writeInt16(out, (short) -1);
+        out.write(0);
+        out.write(0);
+        writeInt16(out, (short) -1);
 
         writeInt32(out, 0); // 0 references
         // Overview mapping
-        writeInt32(out, 0); writeInt32(out, 0); writeInt32(out, 1000);
+        writeInt32(out, 0);
+        writeInt32(out, 0);
+        writeInt32(out, 1000);
         // Empty plan drawing
-        writeInt32(out, 0); writeInt32(out, 0); writeInt32(out, 1000); out.write(0);
+        writeInt32(out, 0);
+        writeInt32(out, 0);
+        writeInt32(out, 1000);
+        out.write(0);
         // Empty elevation drawing
-        writeInt32(out, 0); writeInt32(out, 0); writeInt32(out, 1000); out.write(0);
+        writeInt32(out, 0);
+        writeInt32(out, 0);
+        writeInt32(out, 1000);
+        out.write(0);
 
         return out.toByteArray();
     }

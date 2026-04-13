@@ -1,9 +1,7 @@
 package org.hwyl.sexytopo.control.io.translation;
 
 import android.content.Context;
-
 import androidx.documentfile.provider.DocumentFile;
-
 import org.hwyl.sexytopo.control.io.SurveyDirectory;
 import org.hwyl.sexytopo.model.survey.Survey;
 
@@ -22,5 +20,4 @@ public abstract class AbstractSurveyFile {
         DocumentFile documentFile = getDocumentFile(context);
         return documentFile != null && documentFile.exists();
     }
-
 }

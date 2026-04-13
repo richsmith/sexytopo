@@ -1,11 +1,9 @@
 package org.hwyl.sexytopo.control.util;
 
+import java.util.List;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
-
-import java.util.List;
-
 
 public class LegMover {
 
@@ -32,7 +30,5 @@ public class LegMover {
         for (Leg onwardLeg : station.getConnectedOnwardLegs()) {
             removeDownstreamStations(onwardLeg, stations);
         }
-
     }
-
 }

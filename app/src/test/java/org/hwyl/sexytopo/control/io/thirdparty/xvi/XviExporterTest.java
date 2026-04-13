@@ -12,7 +12,6 @@ import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
 import org.junit.Assert;
 import org.junit.Test;
 
-
 public class XviExporterTest {
 
     @Test

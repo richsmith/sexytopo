@@ -3,38 +3,34 @@ package org.hwyl.sexytopo.control.threed;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
-
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+import java.util.Map;
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
 import org.hwyl.sexytopo.model.graph.Coord3D;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
-import java.util.Map;
-
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
-
-
 public class SurveyRenderer implements GLSurfaceView.Renderer {
 
     private static final String VERTEX_SHADER_CODE =
-        "uniform mat4 uMVPMatrix;" +
-        "attribute vec4 vPosition;" +
-        "void main() {" +
-        "  gl_Position = uMVPMatrix * vPosition;" +
-        "  gl_PointSize = 8.0;" +
-        "}";
+            "uniform mat4 uMVPMatrix;"
+                    + "attribute vec4 vPosition;"
+                    + "void main() {"
+                    + "  gl_Position = uMVPMatrix * vPosition;"
+                    + "  gl_PointSize = 8.0;"
+                    + "}";
 
     private static final String FRAGMENT_SHADER_CODE =
-        "precision mediump float;" +
-        "uniform vec4 vColor;" +
-        "void main() {" +
-        "  gl_FragColor = vColor;" +
-        "}";
+            "precision mediump float;"
+                    + "uniform vec4 vColor;"
+                    + "void main() {"
+                    + "  gl_FragColor = vColor;"
+                    + "}";
 
     private static final float INITIAL_CAMERA_DISTANCE = 50f;
     private static final float MIN_CAMERA_DISTANCE = 1f;
@@ -111,7 +107,8 @@ public class SurveyRenderer implements GLSurfaceView.Renderer {
 
     public void zoomBy(float factor) {
         cameraDistance *= factor;
-        cameraDistance = Math.max(MIN_CAMERA_DISTANCE, Math.min(MAX_CAMERA_DISTANCE, cameraDistance));
+        cameraDistance =
+                Math.max(MIN_CAMERA_DISTANCE, Math.min(MAX_CAMERA_DISTANCE, cameraDistance));
     }
 
     public void panBy(float dx, float dy) {
@@ -171,7 +168,7 @@ public class SurveyRenderer implements GLSurfaceView.Renderer {
     @Override
     public void onDrawFrame(GL10 gl) {
         GLES20.glClearColor(
-            backgroundColour[0], backgroundColour[1], backgroundColour[2], backgroundColour[3]);
+                backgroundColour[0], backgroundColour[1], backgroundColour[2], backgroundColour[3]);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
         if (space == null) {
@@ -185,21 +182,20 @@ public class SurveyRenderer implements GLSurfaceView.Renderer {
 
         // Camera position (spherical coordinates)
         // Survey data uses Z-up, so camera orbits around Z axis
-        float eyeX = cameraDistance * (float)(Math.sin(cameraAngleX) * Math.sin(cameraAngleY));
-        float eyeY = cameraDistance * (float)(Math.sin(cameraAngleX) * Math.cos(cameraAngleY));
-        float eyeZ = cameraDistance * (float)(Math.cos(cameraAngleX));
+        float eyeX = cameraDistance * (float) (Math.sin(cameraAngleX) * Math.sin(cameraAngleY));
+        float eyeY = cameraDistance * (float) (Math.sin(cameraAngleX) * Math.cos(cameraAngleY));
+        float eyeZ = cameraDistance * (float) (Math.cos(cameraAngleX));
 
-        Matrix.setLookAtM(viewMatrix, 0,
-            eyeX, eyeY, eyeZ,
-            0, 0, 0,
-            0, 0, 1);
+        Matrix.setLookAtM(viewMatrix, 0, eyeX, eyeY, eyeZ, 0, 0, 0, 0, 0, 1);
 
         // Model matrix: translate to centre the survey and apply pan
         Matrix.setIdentityM(modelMatrix, 0);
-        Matrix.translateM(modelMatrix, 0,
-            -centreX + cameraPanX,
-            -centreY + cameraPanY,
-            -centreZ + cameraPanZ);
+        Matrix.translateM(
+                modelMatrix,
+                0,
+                -centreX + cameraPanX,
+                -centreY + cameraPanY,
+                -centreZ + cameraPanZ);
 
         // MVP = Projection * View * Model
         Matrix.multiplyMM(tempMatrix, 0, viewMatrix, 0, modelMatrix, 0);

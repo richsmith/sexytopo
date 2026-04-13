@@ -2,14 +2,11 @@ package org.hwyl.sexytopo.comms.distox;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-
-import org.hwyl.sexytopo.SexyTopoConstants;
-import org.hwyl.sexytopo.control.Log;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
+import org.hwyl.sexytopo.SexyTopoConstants;
+import org.hwyl.sexytopo.control.Log;
 
 public class DistoXSocket {
 
@@ -25,14 +22,16 @@ public class DistoXSocket {
         outputStream = bluetoothSocket.getOutputStream();
     }
 
-    private BluetoothSocket connect() throws Exception{
+    private BluetoothSocket connect() throws Exception {
         try {
             Log.device("Connecting...");
-            BluetoothSocket bluetoothSocket = bluetoothDevice.createInsecureRfcommSocketToServiceRecord(
-                    SexyTopoConstants.DISTO_X_UUID);
-            bluetoothSocket.connect(); // blocks until connection is complete or fails with an exception
+            BluetoothSocket bluetoothSocket =
+                    bluetoothDevice.createInsecureRfcommSocketToServiceRecord(
+                            SexyTopoConstants.DISTO_X_UUID);
+            bluetoothSocket
+                    .connect(); // blocks until connection is complete or fails with an exception
             return bluetoothSocket;
-        } catch(Exception exception) {
+        } catch (Exception exception) {
             String message = exception.getMessage();
             if (message != null && message.contains("socket might closed or timeout")) {
                 Log.device("Unable to create classic socket, trying fallback...");
@@ -40,18 +39,19 @@ public class DistoXSocket {
                 bluetoothSocket.connect();
                 return bluetoothSocket;
             } else {
-                throw(exception);
+                throw (exception);
             }
-
         }
     }
 
     @SuppressWarnings("UnnecessaryLocalVariable")
     private BluetoothSocket createFallbackSocket() throws Exception {
-        BluetoothSocket socket = (BluetoothSocket)
-                bluetoothDevice.getClass()
-                        .getMethod("createRfcommSocket", new Class[]{int.class})
-                        .invoke(bluetoothDevice, 1);
+        BluetoothSocket socket =
+                (BluetoothSocket)
+                        bluetoothDevice
+                                .getClass()
+                                .getMethod("createRfcommSocket", new Class[] {int.class})
+                                .invoke(bluetoothDevice, 1);
         return socket;
     }
 
@@ -67,7 +67,7 @@ public class DistoXSocket {
         return outputStream;
     }
 
-    public void close() throws IOException{
+    public void close() throws IOException {
         bluetoothSocket.close();
     }
 }

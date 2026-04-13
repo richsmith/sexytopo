@@ -1,10 +1,7 @@
 package org.hwyl.sexytopo.model.graph;
 
-
 import android.annotation.SuppressLint;
-
 import org.hwyl.sexytopo.control.util.NumberTools;
-
 
 @SuppressWarnings("unused")
 public final class Coord2D extends Coord {
@@ -44,8 +41,7 @@ public final class Coord2D extends Coord {
 
     public Coord2D normalise() {
         float mag = this.mag();
-        if (mag > 0)
-            return this.scale(1/mag);
+        if (mag > 0) return this.scale(1 / mag);
         return this;
     }
 
@@ -63,9 +59,9 @@ public final class Coord2D extends Coord {
         if (object == null || getClass() != object.getClass()) {
             return false;
         } else {
-            Coord2D coord2D = (Coord2D)object;
-            return NumberTools.isWithinDelta(coord2D.x, x) &&
-                    NumberTools.isWithinDelta(coord2D.y, y);
+            Coord2D coord2D = (Coord2D) object;
+            return NumberTools.isWithinDelta(coord2D.x, x)
+                    && NumberTools.isWithinDelta(coord2D.y, y);
         }
     }
 
@@ -73,6 +69,6 @@ public final class Coord2D extends Coord {
     public int hashCode() {
         float result = x;
         result = 31 * result + y;
-        return (int)result;
+        return (int) result;
     }
 }

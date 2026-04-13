@@ -1,13 +1,11 @@
 package org.hwyl.sexytopo.testutils;
 
+import java.text.DecimalFormat;
+import java.util.List;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
-
-import java.text.DecimalFormat;
-import java.util.List;
-
 
 public class SurveyChecker {
 
@@ -45,11 +43,11 @@ public class SurveyChecker {
         return true;
     }
 
-
     public static boolean areEqual(Station one, Station two) {
-        if ((!one.getName().equals(two.getName())) ||
-            (!one.getComment().equals(two.getComment())) ||
-            (!(one.getExtendedElevationDirection() != two.getExtendedElevationDirection()))) {
+        if ((!one.getName().equals(two.getName()))
+                || (!one.getComment().equals(two.getComment()))
+                || (!(one.getExtendedElevationDirection()
+                        != two.getExtendedElevationDirection()))) {
 
             return false;
         }
@@ -69,5 +67,4 @@ public class SurveyChecker {
 
         return true;
     }
-
 }

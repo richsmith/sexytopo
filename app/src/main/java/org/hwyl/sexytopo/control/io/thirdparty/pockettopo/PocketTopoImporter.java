@@ -1,10 +1,16 @@
 package org.hwyl.sexytopo.control.io.thirdparty.pockettopo;
 
 import android.content.Context;
-
 import androidx.documentfile.provider.DocumentFile;
-
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import org.hwyl.sexytopo.control.io.translation.Importer;
+import org.hwyl.sexytopo.control.util.Space2DUtils;
+import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.sketch.Colour;
@@ -15,27 +21,16 @@ import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
 
-import org.hwyl.sexytopo.control.util.Space2DUtils;
-import org.hwyl.sexytopo.control.util.SurveyUpdater;
-
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-
 /**
- * Import for the native PocketTopo binary .top file format (version 3).
- * See docs/PocketTopoFileFormat.txt for the format specification.
+ * Import for the native PocketTopo binary .top file format (version 3). See
+ * docs/PocketTopoFileFormat.txt for the format specification.
  */
 public class PocketTopoImporter extends Importer {
 
     @Override
     public Survey toSurvey(Context context, DocumentFile file) throws Exception {
         try (InputStream raw = context.getContentResolver().openInputStream(file.getUri());
-             BufferedInputStream in = new BufferedInputStream(raw)) {
+                BufferedInputStream in = new BufferedInputStream(raw)) {
             return parseSurvey(in);
         }
     }
@@ -44,7 +39,6 @@ public class PocketTopoImporter extends Importer {
     public boolean canHandleFile(DocumentFile file) {
         return file.isFile() && file.getName() != null && file.getName().endsWith("top");
     }
-
 
     static Survey parseSurvey(InputStream in) throws IOException {
         readAndVerifyHeader(in);
@@ -66,7 +60,6 @@ public class PocketTopoImporter extends Importer {
 
         return survey;
     }
-
 
     // --- Internal data classes ---
 
@@ -104,7 +97,6 @@ public class PocketTopoImporter extends Importer {
         List<Coord2D> points = new ArrayList<>();
     }
 
-
     // --- Header ---
 
     private static void readAndVerifyHeader(InputStream in) throws IOException {
@@ -114,11 +106,15 @@ public class PocketTopoImporter extends Importer {
         int version = PocketTopoFile.readByte(in);
         if (t != 'T' || o != 'o' || p != 'p' || version != 3) {
             throw new IOException(
-                "Not a valid PocketTopo file (expected header 'Top\\3', got '"
-                + (char) t + (char) o + (char) p + "'\\" + version + ")");
+                    "Not a valid PocketTopo file (expected header 'Top\\3', got '"
+                            + (char) t
+                            + (char) o
+                            + (char) p
+                            + "'\\"
+                            + version
+                            + ")");
         }
     }
-
 
     // --- Reading structured data ---
 
@@ -219,22 +215,21 @@ public class PocketTopoImporter extends Importer {
     private static void skipXSection(InputStream in) throws IOException {
         PocketTopoFile.readInt32(in); // pos x
         PocketTopoFile.readInt32(in); // pos y
-        PocketTopoFile.readId(in);    // station
+        PocketTopoFile.readId(in); // station
         PocketTopoFile.readInt32(in); // direction
     }
-
 
     // --- Survey building ---
 
     /**
      * Build a Survey from parsed shot data.
      *
-     * Uses multi-pass processing because shots in .top files are stored in recording
-     * order, not tree-traversal order. A shot referencing a "from" station that hasn't
-     * been created yet is deferred to a later pass.
+     * <p>Uses multi-pass processing because shots in .top files are stored in recording order, not
+     * tree-traversal order. A shot referencing a "from" station that hasn't been created yet is
+     * deferred to a later pass.
      *
-     * Adds legs directly to stations rather than using SurveyUpdater, to avoid
-     * triple-shot detection creating unwanted auto-named stations during import.
+     * <p>Adds legs directly to stations rather than using SurveyUpdater, to avoid triple-shot
+     * detection creating unwanted auto-named stations during import.
      */
     private static Survey buildSurvey(
             List<TripData> trips, List<ShotData> shots, List<ReferenceData> references) {
@@ -276,8 +271,7 @@ public class PocketTopoImporter extends Importer {
                 }
 
                 Station fromStation = survey.getStationByName(shot.from);
-                Station toStation = (shot.to != null)
-                        ? survey.getStationByName(shot.to) : null;
+                Station toStation = (shot.to != null) ? survey.getStationByName(shot.to) : null;
 
                 if (shot.to == null) {
                     // Splay leg — needs "from" station to exist
@@ -303,15 +297,22 @@ public class PocketTopoImporter extends Importer {
                     newStation.setExtendedElevationDirection(
                             shot.flipped ? Direction.LEFT : Direction.RIGHT);
 
-                    Leg averaged = (originalLegs.size() > 1)
-                            ? SurveyUpdater.averageLegs(originalLegs)
-                            : originalLegs.get(0);
-                    Leg[] promotedFrom = (originalLegs.size() > 1)
-                            ? originalLegs.toArray(new Leg[0])
-                            : new Leg[]{};
+                    Leg averaged =
+                            (originalLegs.size() > 1)
+                                    ? SurveyUpdater.averageLegs(originalLegs)
+                                    : originalLegs.get(0);
+                    Leg[] promotedFrom =
+                            (originalLegs.size() > 1)
+                                    ? originalLegs.toArray(new Leg[0])
+                                    : new Leg[] {};
 
-                    Leg leg = new Leg(averaged.getDistance(), averaged.getAzimuth(),
-                            averaged.getInclination(), newStation, promotedFrom);
+                    Leg leg =
+                            new Leg(
+                                    averaged.getDistance(),
+                                    averaged.getAzimuth(),
+                                    averaged.getInclination(),
+                                    newStation,
+                                    promotedFrom);
                     fromStation.addOnwardLeg(leg);
                     survey.addLegRecord(leg);
                     survey.setActiveStation(newStation);
@@ -330,18 +331,25 @@ public class PocketTopoImporter extends Importer {
                     newStation.setExtendedElevationDirection(
                             shot.flipped ? Direction.LEFT : Direction.RIGHT);
 
-                    Leg averaged = (originalLegs.size() > 1)
-                            ? SurveyUpdater.averageLegs(originalLegs)
-                            : originalLegs.get(0);
-                    Leg[] promotedFrom = (originalLegs.size() > 1)
-                            ? originalLegs.toArray(new Leg[0])
-                            : new Leg[]{};
+                    Leg averaged =
+                            (originalLegs.size() > 1)
+                                    ? SurveyUpdater.averageLegs(originalLegs)
+                                    : originalLegs.get(0);
+                    Leg[] promotedFrom =
+                            (originalLegs.size() > 1)
+                                    ? originalLegs.toArray(new Leg[0])
+                                    : new Leg[] {};
 
-                    float forwardAzimuth = Space2DUtils.adjustAngle(
-                            averaged.getAzimuth(), 180);
+                    float forwardAzimuth = Space2DUtils.adjustAngle(averaged.getAzimuth(), 180);
                     float forwardInclination = -averaged.getInclination();
-                    Leg leg = new Leg(averaged.getDistance(), forwardAzimuth,
-                            forwardInclination, newStation, promotedFrom, true);
+                    Leg leg =
+                            new Leg(
+                                    averaged.getDistance(),
+                                    forwardAzimuth,
+                                    forwardInclination,
+                                    newStation,
+                                    promotedFrom,
+                                    true);
                     toStation.addOnwardLeg(leg);
                     survey.addLegRecord(leg);
                     survey.setActiveStation(newStation);
@@ -371,8 +379,8 @@ public class PocketTopoImporter extends Importer {
     }
 
     /**
-     * Collect all unprocessed shots with the same (from, to) station pair,
-     * convert to splay Legs, and mark them as processed.
+     * Collect all unprocessed shots with the same (from, to) station pair, convert to splay Legs,
+     * and mark them as processed.
      */
     private static List<Leg> collectRepeatLegs(
             List<ShotData> shots, boolean[] processed, ShotData target) {

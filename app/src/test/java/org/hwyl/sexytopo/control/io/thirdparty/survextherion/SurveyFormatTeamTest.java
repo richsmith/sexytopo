@@ -1,14 +1,12 @@
 package org.hwyl.sexytopo.control.io.thirdparty.survextherion;
 
-import org.hwyl.sexytopo.model.survey.Trip;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
+import org.hwyl.sexytopo.model.survey.Trip;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class SurveyFormatTeamTest {
 
@@ -17,8 +15,7 @@ public class SurveyFormatTeamTest {
     @Test
     public void testSurvexParseExploTeamLineReturnsFalse() {
         Map<String, List<Trip.Role>> teamMap = new LinkedHashMap<>();
-        boolean consumed = SurveyFormat.SURVEX.parseExploTeamLine(
-                "explo-team \"Alice\"", teamMap);
+        boolean consumed = SurveyFormat.SURVEX.parseExploTeamLine("explo-team \"Alice\"", teamMap);
         Assert.assertFalse(consumed);
         Assert.assertTrue(teamMap.isEmpty());
     }
@@ -26,8 +23,7 @@ public class SurveyFormatTeamTest {
     @Test
     public void testTherionParseExploTeamLine() {
         Map<String, List<Trip.Role>> teamMap = new LinkedHashMap<>();
-        boolean consumed = SurveyFormat.THERION.parseExploTeamLine(
-                "explo-team \"Alice\"", teamMap);
+        boolean consumed = SurveyFormat.THERION.parseExploTeamLine("explo-team \"Alice\"", teamMap);
         Assert.assertTrue(consumed);
         Assert.assertTrue(teamMap.containsKey("Alice"));
         List<Trip.Role> roles = teamMap.get("Alice");
@@ -53,8 +49,7 @@ public class SurveyFormatTeamTest {
     @Test
     public void testTherionParseExploTeamLineIgnoresNonMatch() {
         Map<String, List<Trip.Role>> teamMap = new LinkedHashMap<>();
-        boolean consumed = SurveyFormat.THERION.parseExploTeamLine(
-                "team \"Alice\" notes", teamMap);
+        boolean consumed = SurveyFormat.THERION.parseExploTeamLine("team \"Alice\" notes", teamMap);
         Assert.assertFalse(consumed);
         Assert.assertTrue(teamMap.isEmpty());
     }

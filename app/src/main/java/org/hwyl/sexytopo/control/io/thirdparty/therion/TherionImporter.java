@@ -1,30 +1,26 @@
 package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
 import android.content.Context;
-
 import androidx.documentfile.provider.DocumentFile;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.io.FilenameUtils;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.io.IoUtils;
-import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionImporter;
+import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
 import org.hwyl.sexytopo.control.io.thirdparty.xvi.XviImporter;
 import org.hwyl.sexytopo.control.io.translation.Importer;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
-import org.hwyl.sexytopo.model.survey.Trip;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
+import org.hwyl.sexytopo.model.survey.Trip;
 
 public class TherionImporter extends Importer {
 
@@ -89,13 +85,14 @@ public class TherionImporter extends Importer {
         List<String> block = getContentsOfBeginEndBlock(lines, "centreline");
 
         String blockText = TextTools.join("\n", block);
-        Map<String, String> passageComments = SurvexTherionImporter.parsePassageData(blockText, SurveyFormat.THERION);
+        Map<String, String> passageComments =
+                SurvexTherionImporter.parsePassageData(blockText, SurveyFormat.THERION);
 
         List<String> sanitisedCentrelineData = new ArrayList<>();
         List<String> sanitisedElevationDirectionData = new ArrayList<>();
 
         boolean inNormalDataBlock = false;
-        for (String line: block) {
+        for (String line : block) {
             String trimmed = line.trim();
             if (trimmed.equals("")) {
                 continue;
@@ -180,7 +177,8 @@ public class TherionImporter extends Importer {
                     foundEndBlock = true;
                     break;
                 } else {
-                    throw new Exception("End block tag " + endTag + " encountered before block start");
+                    throw new Exception(
+                            "End block tag " + endTag + " encountered before block start");
                 }
 
             } else if (!foundStartBlock) {
@@ -198,5 +196,4 @@ public class TherionImporter extends Importer {
 
         return contents;
     }
-
 }

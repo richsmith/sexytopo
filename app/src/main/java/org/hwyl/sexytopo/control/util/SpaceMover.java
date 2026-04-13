@@ -1,13 +1,11 @@
 package org.hwyl.sexytopo.control.util;
 
+import java.util.Map;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
-
-import java.util.Map;
-
 
 public class SpaceMover {
 
@@ -21,7 +19,6 @@ public class SpaceMover {
             moved.addStation(station, point.plus(delta));
         }
 
-
         Map<Leg, Line<Coord2D>> legMap = space.getLegMap();
         for (Leg leg : legMap.keySet()) {
             Line<Coord2D> line = space.getLegMap().get(leg);
@@ -29,7 +26,6 @@ public class SpaceMover {
                     new Line<>(line.getStart().plus(delta), line.getEnd().plus(delta));
             moved.addLeg(leg, shiftedLine);
         }
-
 
         return moved;
     }

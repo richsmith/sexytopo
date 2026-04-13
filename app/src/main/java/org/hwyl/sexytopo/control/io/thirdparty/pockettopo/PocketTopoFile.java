@@ -1,17 +1,15 @@
 package org.hwyl.sexytopo.control.io.thirdparty.pockettopo;
 
-import org.hwyl.sexytopo.model.sketch.Colour;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
-
+import org.hwyl.sexytopo.model.sketch.Colour;
 
 /**
- * Utility class for reading PocketTopo .top binary file primitives
- * and performing format-specific unit conversions.
+ * Utility class for reading PocketTopo .top binary file primitives and performing format-specific
+ * unit conversions.
  *
- * See docs/PocketTopoFileFormat.txt for the format specification.
+ * <p>See docs/PocketTopoFileFormat.txt for the format specification.
  */
 public class PocketTopoFile {
 
@@ -22,7 +20,6 @@ public class PocketTopoFile {
     // .NET ticks are 100ns units from 1 Jan 0001
     static final long TICKS_AT_EPOCH = 621355968000000000L;
     static final long TICKS_PER_MILLISECOND = 10000L;
-
 
     // --- Binary reading methods ---
 
@@ -55,8 +52,8 @@ public class PocketTopoFile {
     }
 
     /**
-     * Read a .NET binary-encoded string: 7-bit encoded length prefix + UTF-8 content.
-     * Length is encoded in 7-bit chunks, little endian, with bit 7 set in all but the last byte.
+     * Read a .NET binary-encoded string: 7-bit encoded length prefix + UTF-8 content. Length is
+     * encoded in 7-bit chunks, little endian, with bit 7 set in all but the last byte.
      */
     public static String readString(InputStream in) throws IOException {
         int length = 0;
@@ -86,12 +83,11 @@ public class PocketTopoFile {
         return new String(bytes, "UTF-8");
     }
 
-
     // --- Station ID handling ---
 
     /**
-     * Read a station ID from the stream and convert to a human-readable name.
-     * Returns null for undefined stations (splays).
+     * Read a station ID from the stream and convert to a human-readable name. Returns null for
+     * undefined stations (splays).
      */
     public static String readId(InputStream in) throws IOException {
         int value = readInt32(in);
@@ -101,10 +97,9 @@ public class PocketTopoFile {
     /**
      * Convert a raw PocketTopo station ID value to a station name string.
      *
-     * From the format spec:
-     *   0x80000000: undefined (splay)
-     *   < 0: plain numbers, station number = value - 0x80000001 (unsigned arithmetic)
-     *   >= 0: major.minor format, major = value >> 16, minor = value & 0xFFFF
+     * <p>From the format spec: 0x80000000: undefined (splay) < 0: plain numbers, station number =
+     * value - 0x80000001 (unsigned arithmetic) >= 0: major.minor format, major = value >> 16, minor
+     * = value & 0xFFFF
      */
     static String idToName(int value) {
         if (value == UNDEFINED_ID) {
@@ -119,13 +114,11 @@ public class PocketTopoFile {
         }
     }
 
-
     // --- Unit conversions ---
 
     /**
-     * Convert PocketTopo internal angle units to degrees for azimuth (bearing).
-     * Full circle = 2^16 = 65536. North = 0, East = 0x4000 (90°).
-     * Uses unsigned interpretation (0–360°).
+     * Convert PocketTopo internal angle units to degrees for azimuth (bearing). Full circle = 2^16
+     * = 65536. North = 0, East = 0x4000 (90°). Uses unsigned interpretation (0–360°).
      */
     public static float azimuthToDegrees(short rawAngle) {
         int unsigned = rawAngle & 0xFFFF;
@@ -133,9 +126,8 @@ public class PocketTopoFile {
     }
 
     /**
-     * Convert PocketTopo internal angle units to degrees for inclination.
-     * Full circle = 2^16. Up = 0x4000 (+90°), Down = 0xC000 (-90°).
-     * Uses signed interpretation (-180° to +180°).
+     * Convert PocketTopo internal angle units to degrees for inclination. Full circle = 2^16. Up =
+     * 0x4000 (+90°), Down = 0xC000 (-90°). Uses signed interpretation (-180° to +180°).
      */
     public static float inclinationToDegrees(short rawAngle) {
         return (rawAngle * 360.0f) / FULL_CIRCLE;
@@ -153,19 +145,27 @@ public class PocketTopoFile {
     }
 
     /**
-     * Convert PocketTopo colour byte to SexyTopo Colour.
-     * PocketTopo: black=1, gray=2, brown=3, blue=4, red=5, green=6, orange=7
+     * Convert PocketTopo colour byte to SexyTopo Colour. PocketTopo: black=1, gray=2, brown=3,
+     * blue=4, red=5, green=6, orange=7
      */
     public static Colour topoColourToColour(int colourByte) {
         switch (colourByte) {
-            case 1: return Colour.BLACK;
-            case 2: return Colour.GREY;
-            case 3: return Colour.BROWN;
-            case 4: return Colour.BLUE;
-            case 5: return Colour.RED;
-            case 6: return Colour.GREEN;
-            case 7: return Colour.ORANGE;
-            default: return Colour.BLACK;
+            case 1:
+                return Colour.BLACK;
+            case 2:
+                return Colour.GREY;
+            case 3:
+                return Colour.BROWN;
+            case 4:
+                return Colour.BLUE;
+            case 5:
+                return Colour.RED;
+            case 6:
+                return Colour.GREEN;
+            case 7:
+                return Colour.ORANGE;
+            default:
+                return Colour.BLACK;
         }
     }
 }

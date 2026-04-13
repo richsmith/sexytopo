@@ -1,10 +1,8 @@
 package org.hwyl.sexytopo.model.survey;
 
+import androidx.annotation.NonNull;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.table.TableCol;
-
-import androidx.annotation.NonNull;
-
 
 @SuppressWarnings("UnnecessaryLocalVariable")
 public class Leg extends SurveyComponent {
@@ -22,37 +20,34 @@ public class Leg extends SurveyComponent {
     private final Leg[] promotedFrom;
     private final boolean wasShotBackwards;
 
-    private final static Leg[] NO_LEGS = new Leg[]{};
+    private static final Leg[] NO_LEGS = new Leg[] {};
 
-    public final static Leg EMPTY_LEG = new Leg(0, 0, 0);
+    public static final Leg EMPTY_LEG = new Leg(0, 0, 0);
 
-    public Leg(float distance,
-               float azimuth,
-               float inclination) {
+    public Leg(float distance, float azimuth, float inclination) {
         this(distance, azimuth, inclination, false);
     }
 
-    public Leg(float distance,
-               float azimuth,
-               float inclination,
-               boolean wasShotBackwards) {
+    public Leg(float distance, float azimuth, float inclination, boolean wasShotBackwards) {
         this(distance, azimuth, inclination, Survey.NULL_STATION, NO_LEGS, wasShotBackwards);
     }
 
-    public Leg(float distance,
-               float azimuth,
-               float inclination,
-               Station destination,
-               Leg[] promotedFrom) {
+    public Leg(
+            float distance,
+            float azimuth,
+            float inclination,
+            Station destination,
+            Leg[] promotedFrom) {
         this(distance, azimuth, inclination, destination, promotedFrom, false);
     }
 
-    public Leg(float distance,
-               float azimuth,
-               float inclination,
-               Station destination,
-               Leg[] promotedFrom,
-               boolean wasShotBackwards) {
+    public Leg(
+            float distance,
+            float azimuth,
+            float inclination,
+            Station destination,
+            Leg[] promotedFrom,
+            boolean wasShotBackwards) {
 
         if (destination == null) {
             throw new IllegalArgumentException("Destination of leg should not be null");
@@ -78,12 +73,16 @@ public class Leg extends SurveyComponent {
         this.destination = destination;
         this.promotedFrom = promotedFrom;
         this.wasShotBackwards = wasShotBackwards;
-
     }
 
     public Leg(Leg leg, Station destination) {
-        this(leg.distance, leg.azimuth, leg.inclination, destination,
-                leg.promotedFrom, leg.wasShotBackwards);
+        this(
+                leg.distance,
+                leg.azimuth,
+                leg.inclination,
+                destination,
+                leg.promotedFrom,
+                leg.wasShotBackwards);
     }
 
     public static Leg toFullLeg(Leg splay, Station destination) {
@@ -92,19 +91,28 @@ public class Leg extends SurveyComponent {
 
     public static Leg upgradeSplayToConnectedLeg(
             Leg splay, Station destination, Leg[] promotedFrom) {
-        Leg leg = new Leg(
-                splay.distance, splay.azimuth, splay.inclination,
-                destination, promotedFrom, splay.wasShotBackwards);
+        Leg leg =
+                new Leg(
+                        splay.distance,
+                        splay.azimuth,
+                        splay.inclination,
+                        destination,
+                        promotedFrom,
+                        splay.wasShotBackwards);
         return leg;
-
     }
 
     public Leg reverse() {
         float adjustedAzimuth = Space2DUtils.adjustAngle(getAzimuth(), 180);
         if (hasDestination()) {
-            Leg leg = new Leg(
-                    distance, adjustedAzimuth, -1 * inclination, destination,
-                    promotedFrom, !wasShotBackwards);
+            Leg leg =
+                    new Leg(
+                            distance,
+                            adjustedAzimuth,
+                            -1 * inclination,
+                            destination,
+                            promotedFrom,
+                            !wasShotBackwards);
             return leg;
         } else {
             return new Leg(distance, adjustedAzimuth, -1 * inclination, !wasShotBackwards);
@@ -118,8 +126,12 @@ public class Leg extends SurveyComponent {
 
     public Leg adjustAzimuth(float newAzimuth) {
         if (hasDestination()) {
-            return new Leg(getDistance(), newAzimuth, getInclination(),
-                    getDestination(), getPromotedFrom());
+            return new Leg(
+                    getDistance(),
+                    newAzimuth,
+                    getInclination(),
+                    getDestination(),
+                    getPromotedFrom());
         } else {
             return new Leg(getDistance(), newAzimuth, getInclination());
         }
@@ -127,8 +139,13 @@ public class Leg extends SurveyComponent {
 
     public Leg asBacksight(Station destination) {
         float backAzimuth = Space2DUtils.adjustAngle(getAzimuth(), 180.0f);
-        Leg leg = new Leg(getDistance(), backAzimuth, -1 * getInclination(),
-                destination, getPromotedFrom());
+        Leg leg =
+                new Leg(
+                        getDistance(),
+                        backAzimuth,
+                        -1 * getInclination(),
+                        destination,
+                        getPromotedFrom());
         return leg;
     }
 
@@ -186,13 +203,14 @@ public class Leg extends SurveyComponent {
 
     @NonNull
     public String toString() {
-        return
-            "(D" + TableCol.DISTANCE.format(distance) +
-            " A" + TableCol.AZIMUTH.format(azimuth) +
-            " I" + TableCol.INCLINATION.format(inclination) +
-            (hasDestination()? (" -> " + destination.getName()) : "") +
-            (wasShotBackwards? "< ": "") +
-            ")";
+        return "(D"
+                + TableCol.DISTANCE.format(distance)
+                + " A"
+                + TableCol.AZIMUTH.format(azimuth)
+                + " I"
+                + TableCol.INCLINATION.format(inclination)
+                + (hasDestination() ? (" -> " + destination.getName()) : "")
+                + (wasShotBackwards ? "< " : "")
+                + ")";
     }
-
 }

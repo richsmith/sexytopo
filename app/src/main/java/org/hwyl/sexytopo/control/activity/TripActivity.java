@@ -13,29 +13,23 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import org.hwyl.sexytopo.comms.Instrument;
-
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentManager;
-
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-
-import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.control.table.TeamMemberForm;
-import org.hwyl.sexytopo.control.util.GeneralPreferences;
-import org.hwyl.sexytopo.control.util.TextTools;
-import org.hwyl.sexytopo.model.survey.Trip;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
+import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.comms.Instrument;
+import org.hwyl.sexytopo.control.table.TeamMemberForm;
+import org.hwyl.sexytopo.control.util.GeneralPreferences;
+import org.hwyl.sexytopo.control.util.TextTools;
+import org.hwyl.sexytopo.model.survey.Trip;
 
 public class TripActivity extends SexyTopoActivity {
 
@@ -49,7 +43,6 @@ public class TripActivity extends SexyTopoActivity {
     private List<Trip.TeamEntry> team = new ArrayList<>();
     private Trip savedTrip;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,32 +51,39 @@ public class TripActivity extends SexyTopoActivity {
         applyEdgeToEdgeInsets(R.id.rootLayout, true, true);
 
         TextView commentsView = findViewById(R.id.trip_comments);
-        commentsView.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {}
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                updateButtonStatus();
-                syncTrip();
-            }
-        });
+        commentsView.addTextChangedListener(
+                new TextWatcher() {
+                    @Override
+                    public void afterTextChanged(Editable s) {}
+
+                    @Override
+                    public void beforeTextChanged(
+                            CharSequence s, int start, int count, int after) {}
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        updateButtonStatus();
+                        syncTrip();
+                    }
+                });
 
         EditText instrumentField = findViewById(R.id.instrument_field);
-        instrumentField.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
-                syncTrip();
-                updateButtonStatus();
-            }
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-        });
-    }
+        instrumentField.addTextChangedListener(
+                new TextWatcher() {
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        syncTrip();
+                        updateButtonStatus();
+                    }
 
+                    @Override
+                    public void beforeTextChanged(
+                            CharSequence s, int start, int count, int after) {}
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {}
+                });
+    }
 
     @Override
     protected void onResume() {
@@ -120,28 +120,30 @@ public class TripActivity extends SexyTopoActivity {
         exploDateLayout.setEndIconOnClickListener(this::onChooseExplorationDateClicked);
 
         CheckBox linkedCheckbox = findViewById(R.id.exploration_date_linked_checkbox);
-        linkedCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            Trip t = getSurvey().getTrip();
-            if (t == null) return;
-            t.setExplorationDateLinked(isChecked);
-            if (isChecked) {
-                t.setExplorationDate(null);
-            }
-            syncTrip();
-            updateDateDisplay();
-            updateButtonStatus();
-        });
+        linkedCheckbox.setOnCheckedChangeListener(
+                (buttonView, isChecked) -> {
+                    Trip t = getSurvey().getTrip();
+                    if (t == null) return;
+                    t.setExplorationDateLinked(isChecked);
+                    if (isChecked) {
+                        t.setExplorationDate(null);
+                    }
+                    syncTrip();
+                    updateDateDisplay();
+                    updateButtonStatus();
+                });
 
         Button clearExploButton = findViewById(R.id.clear_exploration_date_button);
-        clearExploButton.setOnClickListener(v -> {
-            Trip t = getSurvey().getTrip();
-            if (t == null) return;
-            t.setExplorationDate(null);
-            t.setExplorationDateLinked(false);
-            syncTrip();
-            updateDateDisplay();
-            updateButtonStatus();
-        });
+        clearExploButton.setOnClickListener(
+                v -> {
+                    Trip t = getSurvey().getTrip();
+                    if (t == null) return;
+                    t.setExplorationDate(null);
+                    t.setExplorationDateLinked(false);
+                    syncTrip();
+                    updateDateDisplay();
+                    updateButtonStatus();
+                });
 
         syncListWithTeam();
         updateButtonStatus();
@@ -157,22 +159,25 @@ public class TripActivity extends SexyTopoActivity {
                 EditText instrumentField = findViewById(R.id.instrument_field);
                 instrumentField.setText(name);
             }
-        } catch (SecurityException ignored) {}
+        } catch (SecurityException ignored) {
+        }
     }
 
     public void onChooseSurveyDateClicked(View view) {
         Trip trip = getSurvey().getTrip();
-        MaterialDatePicker<Long> picker = MaterialDatePicker.Builder.datePicker()
-            .setTitleText(R.string.trip_survey_date_label)
-            .setSelection(trip.getSurveyDate().getTime())
-            .build();
+        MaterialDatePicker<Long> picker =
+                MaterialDatePicker.Builder.datePicker()
+                        .setTitleText(R.string.trip_survey_date_label)
+                        .setSelection(trip.getSurveyDate().getTime())
+                        .build();
 
-        picker.addOnPositiveButtonClickListener(selection -> {
-            trip.setSurveyDate(new Date(selection));
-            updateDateDisplay();
-            syncTrip();
-            updateButtonStatus();
-        });
+        picker.addOnPositiveButtonClickListener(
+                selection -> {
+                    trip.setSurveyDate(new Date(selection));
+                    updateDateDisplay();
+                    syncTrip();
+                    updateButtonStatus();
+                });
 
         FragmentManager fm = getSupportFragmentManager();
         picker.show(fm, "survey_date_picker");
@@ -182,18 +187,23 @@ public class TripActivity extends SexyTopoActivity {
         Trip trip = getSurvey().getTrip();
         if (trip == null || trip.isExplorationDateLinked()) return;
 
-        Date seed = trip.getExplorationDate() != null ? trip.getExplorationDate() : trip.getSurveyDate();
-        MaterialDatePicker<Long> picker = MaterialDatePicker.Builder.datePicker()
-            .setTitleText(R.string.trip_exploration_date_label)
-            .setSelection(seed.getTime())
-            .build();
+        Date seed =
+                trip.getExplorationDate() != null
+                        ? trip.getExplorationDate()
+                        : trip.getSurveyDate();
+        MaterialDatePicker<Long> picker =
+                MaterialDatePicker.Builder.datePicker()
+                        .setTitleText(R.string.trip_exploration_date_label)
+                        .setSelection(seed.getTime())
+                        .build();
 
-        picker.addOnPositiveButtonClickListener(selection -> {
-            trip.setExplorationDate(new Date(selection));
-            updateDateDisplay();
-            syncTrip();
-            updateButtonStatus();
-        });
+        picker.addOnPositiveButtonClickListener(
+                selection -> {
+                    trip.setExplorationDate(new Date(selection));
+                    updateDateDisplay();
+                    syncTrip();
+                    updateButtonStatus();
+                });
 
         FragmentManager fm = getSupportFragmentManager();
         picker.show(fm, "explo_date_picker");
@@ -201,35 +211,39 @@ public class TripActivity extends SexyTopoActivity {
 
     public void requestClear(View view) {
         new MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.trip_dialog_confirm_clear_trip)
-            .setPositiveButton(R.string.clear, (dialog, whichButton) -> {
-                EditText comments = findViewById(R.id.trip_comments);
-                comments.setText("");
-                team.clear();
-                Trip trip = getSurvey().getTrip();
-                if (trip != null) {
-                    trip.setExplorationDate(null);
-                    trip.setExplorationDateLinked(true);
-                }
-                syncListWithTeam();
-                updateDateDisplay();
-                updateButtonStatus();
-            }).setNegativeButton(R.string.cancel, null)
-            .show();
+                .setTitle(R.string.trip_dialog_confirm_clear_trip)
+                .setPositiveButton(
+                        R.string.clear,
+                        (dialog, whichButton) -> {
+                            EditText comments = findViewById(R.id.trip_comments);
+                            comments.setText("");
+                            team.clear();
+                            Trip trip = getSurvey().getTrip();
+                            if (trip != null) {
+                                trip.setExplorationDate(null);
+                                trip.setExplorationDateLinked(true);
+                            }
+                            syncListWithTeam();
+                            updateDateDisplay();
+                            updateButtonStatus();
+                        })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
     }
 
     private void setupNameAutocomplete(View dialogView) {
         AutoCompleteTextView nameField = dialogView.findViewById(R.id.name_field);
         List<String> knownCavers = GeneralPreferences.getKnownCavers();
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-            this, android.R.layout.simple_dropdown_item_1line, knownCavers);
+        ArrayAdapter<String> adapter =
+                new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, knownCavers);
         nameField.setAdapter(adapter);
         nameField.setThreshold(0);
-        nameField.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus && !knownCavers.isEmpty()) {
-                nameField.showDropDown();
-            }
-        });
+        nameField.setOnFocusChangeListener(
+                (v, hasFocus) -> {
+                    if (hasFocus && !knownCavers.isEmpty()) {
+                        nameField.showDropDown();
+                    }
+                });
     }
 
     public void requestAddEntry(View view) {
@@ -237,19 +251,22 @@ public class TripActivity extends SexyTopoActivity {
         TeamMemberForm form = new TeamMemberForm(this, dialogView);
         setupNameAutocomplete(dialogView);
 
-        AlertDialog dialog = new MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.trip_dialog_title_add_to_team)
-            .setView(dialogView)
-            .setPositiveButton(R.string.add, null)
-            .setNegativeButton(R.string.cancel, null)
-            .show();
+        AlertDialog dialog =
+                new MaterialAlertDialogBuilder(this)
+                        .setTitle(R.string.trip_dialog_title_add_to_team)
+                        .setView(dialogView)
+                        .setPositiveButton(R.string.add, null)
+                        .setNegativeButton(R.string.cancel, null)
+                        .show();
 
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-            form.validate();
-            if (!form.isValid()) return;
-            addTeamMember(form.getName(), getCheckedRoles(dialogView));
-            dialog.dismiss();
-        });
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                .setOnClickListener(
+                        v -> {
+                            form.validate();
+                            if (!form.isValid()) return;
+                            addTeamMember(form.getName(), getCheckedRoles(dialogView));
+                            dialog.dismiss();
+                        });
     }
 
     public void addTeamMember(String name, List<Trip.Role> roles) {
@@ -300,10 +317,11 @@ public class TripActivity extends SexyTopoActivity {
                 roleDescriptions.add(getString(role.descriptionId));
             }
             ((TextView) row.findViewById(R.id.role_field))
-                .setText(TextTools.join(", ", roleDescriptions));
+                    .setText(TextTools.join(", ", roleDescriptions));
 
             row.setOnClickListener(v -> editTeamMember(position));
-            row.findViewById(R.id.delete_button).setOnClickListener(v -> deleteTeamMember(position));
+            row.findViewById(R.id.delete_button)
+                    .setOnClickListener(v -> deleteTeamMember(position));
 
             container.addView(row);
         }
@@ -335,7 +353,8 @@ public class TripActivity extends SexyTopoActivity {
         boolean hasInstrument = !instrumentField.getText().toString().trim().isEmpty();
 
         Trip currentTrip = getSurvey().getTrip();
-        boolean hasUnlinkedExploDate = currentTrip != null && !currentTrip.isExplorationDateLinked();
+        boolean hasUnlinkedExploDate =
+                currentTrip != null && !currentTrip.isExplorationDateLinked();
 
         boolean hasAnyData = hasTeam || hasComments || hasInstrument || hasUnlinkedExploDate;
         boolean hasChanges = savedTrip == null || !savedTrip.equals(currentTrip);
@@ -361,19 +380,22 @@ public class TripActivity extends SexyTopoActivity {
             }
         }
 
-        AlertDialog dialog = new MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.edit)
-            .setView(dialogView)
-            .setPositiveButton(R.string.save, null)
-            .setNegativeButton(R.string.cancel, null)
-            .show();
+        AlertDialog dialog =
+                new MaterialAlertDialogBuilder(this)
+                        .setTitle(R.string.edit)
+                        .setView(dialogView)
+                        .setPositiveButton(R.string.save, null)
+                        .setNegativeButton(R.string.cancel, null)
+                        .show();
 
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-            form.validate();
-            if (!form.isValid()) return;
-            setTeamMember(position, form.getName(), getCheckedRoles(dialogView));
-            dialog.dismiss();
-        });
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                .setOnClickListener(
+                        v -> {
+                            form.validate();
+                            if (!form.isValid()) return;
+                            setTeamMember(position, form.getName(), getCheckedRoles(dialogView));
+                            dialog.dismiss();
+                        });
     }
 
     private void updateDateDisplay() {
@@ -391,17 +413,18 @@ public class TripActivity extends SexyTopoActivity {
         // Update checkbox without triggering the listener
         linkedCheckbox.setOnCheckedChangeListener(null);
         linkedCheckbox.setChecked(trip.isExplorationDateLinked());
-        linkedCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            Trip t = getSurvey().getTrip();
-            if (t == null) return;
-            t.setExplorationDateLinked(isChecked);
-            if (isChecked) {
-                t.setExplorationDate(null);
-            }
-            syncTrip();
-            updateDateDisplay();
-            updateButtonStatus();
-        });
+        linkedCheckbox.setOnCheckedChangeListener(
+                (buttonView, isChecked) -> {
+                    Trip t = getSurvey().getTrip();
+                    if (t == null) return;
+                    t.setExplorationDateLinked(isChecked);
+                    if (isChecked) {
+                        t.setExplorationDate(null);
+                    }
+                    syncTrip();
+                    updateDateDisplay();
+                    updateButtonStatus();
+                });
 
         if (trip.isExplorationDateLinked()) {
             exploDateField.setText(DATE_FORMAT.format(trip.getSurveyDate()));

@@ -1,10 +1,9 @@
 package org.hwyl.sexytopo.control.io.thirdparty.survex;
 
 import android.content.Context;
-
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
+import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
 import org.hwyl.sexytopo.control.io.translation.SingleFileExporter;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
@@ -24,12 +23,14 @@ public class SurvexExporter extends SingleFileExporter {
         builder.append("*begin ").append(survey.getName()).append("\n");
 
         // Creation comment (no version info available without Context)
-        builder.append(SurvexTherionUtil.getCreationComment(
-                SurveyFormat.SURVEX.getCommentChar(), "SexyTopo")).append("\n\n");
+        builder.append(
+                        SurvexTherionUtil.getCreationComment(
+                                SurveyFormat.SURVEX.getCommentChar(), "SexyTopo"))
+                .append("\n\n");
 
         // Metadata
-        builder.append(SurvexTherionUtil.getMetadata(
-                survey, SurveyFormat.SURVEX, teamLines, "")).append("\n");
+        builder.append(SurvexTherionUtil.getMetadata(survey, SurveyFormat.SURVEX, teamLines, ""))
+                .append("\n");
 
         // Station comments data block
         builder.append(SurvexTherionUtil.getStationCommentsData(survey, SurveyFormat.SURVEX));
@@ -39,7 +40,8 @@ public class SurvexExporter extends SingleFileExporter {
 
         // Extended elevation
         builder.append("\n");
-        builder.append(SurvexTherionUtil.getExtendedElevationExtensions(survey, SurveyFormat.SURVEX));
+        builder.append(
+                SurvexTherionUtil.getExtendedElevationExtensions(survey, SurveyFormat.SURVEX));
 
         // End survey block
         builder.append("*end ").append(survey.getName()).append("\n");
@@ -83,10 +85,15 @@ public class SurvexExporter extends SingleFileExporter {
 
     private static String getRoleDescription(Trip.Role role) {
         switch (role) {
-            case BOOK: return "notes";
-            case INSTRUMENTS: return "instruments";
-            case EXPLORATION: return "explorer";
-            case DOG: default: return "assistant";
+            case BOOK:
+                return "notes";
+            case INSTRUMENTS:
+                return "instruments";
+            case EXPLORATION:
+                return "explorer";
+            case DOG:
+            default:
+                return "assistant";
         }
     }
 }

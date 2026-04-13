@@ -7,14 +7,11 @@ import org.hwyl.sexytopo.model.survey.Survey;
 import org.junit.Assert;
 import org.junit.Test;
 
-
 public class SurvexImporterTest {
-
 
     @Test
     public void testBasicImport() throws Exception {
-        final String testContent =
-                "1\t2\t5.0\t0.0\t0.0";
+        final String testContent = "1\t2\t5.0\t0.0\t0.0";
         Survey survey = new Survey();
         SurvexTherionImporter.parseCentreline(testContent, survey);
         Assert.assertEquals(2, survey.getAllStations().size());

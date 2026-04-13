@@ -5,9 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.io.basic.Saver;
@@ -16,11 +17,6 @@ import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.calibration.CalibrationReading;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Survey;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 
 @SuppressWarnings("UnnecessaryLocalVariable")
 public class SurveyManager {
@@ -44,16 +40,13 @@ public class SurveyManager {
 
     private List<CalibrationReading> calibrationReadings = new ArrayList<>();
 
-
     public SurveyManager(Context Context) {
         this.context = Context;
     }
 
-
     public void updateSurvey(Leg leg) {
         updateSurvey(Collections.singletonList(leg));
     }
-
 
     public void updateSurvey(List<Leg> legs) {
 
@@ -73,19 +66,19 @@ public class SurveyManager {
 
             autosave();
         }
-
     }
 
     public void autosave() {
         new AutosaveTask().execute(context);
     }
 
-
     public InputMode getInputMode() {
-        SharedPreferences preferences = context.getSharedPreferences(
-                SexyTopoConstants.GENERAL_PREFS, android.content.Context.MODE_PRIVATE);
-        String modeName = preferences.getString(
-                SexyTopoConstants.INPUT_MODE_PREFERENCE, InputMode.FORWARD.name());
+        SharedPreferences preferences =
+                context.getSharedPreferences(
+                        SexyTopoConstants.GENERAL_PREFS, android.content.Context.MODE_PRIVATE);
+        String modeName =
+                preferences.getString(
+                        SexyTopoConstants.INPUT_MODE_PREFERENCE, InputMode.FORWARD.name());
         InputMode inputMode = InputMode.valueOf(modeName);
         return inputMode;
     }
@@ -127,7 +120,6 @@ public class SurveyManager {
         return calibrationReadings;
     }
 
-
     public void setCalibrationReadings(List<CalibrationReading> calibrationReadings) {
         this.calibrationReadings = calibrationReadings;
     }
@@ -141,7 +133,6 @@ public class SurveyManager {
             calibrationReadings.remove(calibrationReadings.size() - 1);
         }
     }
-
 
     private static class AutosaveTask extends AsyncTask<Context, Void, Void> {
 
@@ -162,5 +153,4 @@ public class SurveyManager {
             }
         }
     }
-
 }

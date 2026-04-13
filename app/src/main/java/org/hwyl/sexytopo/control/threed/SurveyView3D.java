@@ -5,7 +5,6 @@ import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
-
 public class SurveyView3D extends GLSurfaceView {
 
     private SurveyRenderer renderer;
@@ -77,9 +76,11 @@ public class SurveyView3D extends GLSurfaceView {
 
                     if (previousSpacing > 10f && spacing > 10f) {
                         float spacingDelta = Math.abs(spacing - previousSpacing);
-                        float midDelta = (float) Math.sqrt(
-                            (midX - previousX) * (midX - previousX) +
-                            (midY - previousY) * (midY - previousY));
+                        float midDelta =
+                                (float)
+                                        Math.sqrt(
+                                                (midX - previousX) * (midX - previousX)
+                                                        + (midY - previousY) * (midY - previousY));
 
                         if (spacingDelta > midDelta) {
                             // Predominantly a pinch — zoom

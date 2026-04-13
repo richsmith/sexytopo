@@ -6,11 +6,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
-
 import androidx.appcompat.app.AlertDialog;
-
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
@@ -25,42 +22,34 @@ import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.table.LRUD;
 
-/**
- * Utility class for creating and managing leg/station/splay dialogs.
- */
+/** Utility class for creating and managing leg/station/splay dialogs. */
 public class LegDialogs {
 
     private LegDialogs() {}
 
-
     public static void addStation(final TableActivity tableActivity, final Survey survey) {
         showAddLegDialog(
-            tableActivity,
-            survey,
-            R.layout.leg_edit_dialog_unified,
-            R.string.manual_add_station_title,
-            false, // not a splay
-            false  // no LRUDs
-        );
+                tableActivity,
+                survey,
+                R.layout.leg_edit_dialog_unified,
+                R.string.manual_add_station_title,
+                false, // not a splay
+                false // no LRUDs
+                );
     }
-
-
 
     public static void addSplay(final TableActivity tableActivity, final Survey survey) {
         showAddLegDialog(
-            tableActivity,
-            survey,
-            R.layout.leg_edit_dialog_unified,
-            R.string.manual_add_splay_title,
-            true, // is a splay
-            false // no LRUDs
-        );
+                tableActivity,
+                survey,
+                R.layout.leg_edit_dialog_unified,
+                R.string.manual_add_splay_title,
+                true, // is a splay
+                false // no LRUDs
+                );
     }
 
-
-    /**
-     * Unified helper method for showing add leg/station/splay dialogs
-     */
+    /** Unified helper method for showing add leg/station/splay dialogs */
     private static void showAddLegDialog(
             final TableActivity tableActivity,
             final Survey survey,
@@ -70,7 +59,8 @@ public class LegDialogs {
             boolean includeLruds) {
 
         Station activeStation = survey.getActiveStation();
-        String defaultToName = isSplay ? null : StationNamer.generateNextStationName(survey, activeStation);
+        String defaultToName =
+                isSplay ? null : StationNamer.generateNextStationName(survey, activeStation);
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(tableActivity);
         LayoutInflater inflater = tableActivity.getLayoutInflater();
@@ -89,86 +79,120 @@ public class LegDialogs {
         }
 
         // Create validation form
-        final EditLegForm form = new EditLegForm(
-            tableActivity, survey, activeStation, defaultToName, isSplay, dialogView);
+        final EditLegForm form =
+                new EditLegForm(
+                        tableActivity, survey, activeStation, defaultToName, isSplay, dialogView);
 
-        builder
-            .setView(dialogView)
-            .setTitle(titleResId)
-            .setPositiveButton(R.string.save, null)
-            .setNegativeButton(R.string.cancel, null);
+        builder.setView(dialogView)
+                .setTitle(titleResId)
+                .setPositiveButton(R.string.save, null)
+                .setNegativeButton(R.string.cancel, null);
 
         final AlertDialog dialog = builder.create();
         DialogUtils.showKeyboardOnDisplay(dialog);
         dialog.show();
 
-        DialogUtils.enableValidationOnButton(dialog, form, () -> {
-                // Get the leg with measurements and shot direction from form
-                Leg leg = form.getUpdatedLeg();
-                Station fromStation = form.getUpdatedFromStation();
+        DialogUtils.enableValidationOnButton(
+                dialog,
+                form,
+                () -> {
+                    // Get the leg with measurements and shot direction from form
+                    Leg leg = form.getUpdatedLeg();
+                    Station fromStation = form.getUpdatedFromStation();
 
-                // Get the new station names from the form
-                String newFromStationName = form.getUpdatedFromStationName();
-                String oldFromStationName = fromStation.getName();
-                if (!newFromStationName.equals(oldFromStationName) && survey.isOrigin(fromStation)) {
-                    // Just rename the origin station
-                    SurveyUpdater.renameOrigin(survey, newFromStationName);
-                }
-
-                fromStation.setComment(form.getUpdatedFromComment());
-
-                if (isSplay) {
-                    // Add splay to from station
-                    SurveyUpdater.addLegFromStation(survey, fromStation, leg);
-                } else {
-                    // Create new destination station and set it on the leg
-                    String toStationName = form.getUpdatedToStationName();
-                    Station newToStation = new Station(toStationName);
-
-                    String toComment = form.getUpdatedToComment();
-                    if (toComment != null) {
-                        newToStation.setComment(toComment);
+                    // Get the new station names from the form
+                    String newFromStationName = form.getUpdatedFromStationName();
+                    String oldFromStationName = fromStation.getName();
+                    if (!newFromStationName.equals(oldFromStationName)
+                            && survey.isOrigin(fromStation)) {
+                        // Just rename the origin station
+                        SurveyUpdater.renameOrigin(survey, newFromStationName);
                     }
 
+                    fromStation.setComment(form.getUpdatedFromComment());
 
-                    // Reconstruct leg with destination station (preserving backwards flag from form)
-                    leg = new Leg(leg.getDistance(), leg.getAzimuth(), leg.getInclination(),
-                                  newToStation, new Leg[]{}, leg.wasShotBackwards());
+                    if (isSplay) {
+                        // Add splay to from station
+                        SurveyUpdater.addLegFromStation(survey, fromStation, leg);
+                    } else {
+                        // Create new destination station and set it on the leg
+                        String toStationName = form.getUpdatedToStationName();
+                        Station newToStation = new Station(toStationName);
 
-                    // Add leg to from station using SurveyUpdater
-                    // This also sets the active station to the new destination
-                    SurveyUpdater.addLegFromStation(survey, fromStation, leg);
+                        String toComment = form.getUpdatedToComment();
+                        if (toComment != null) {
+                            newToStation.setComment(toComment);
+                        }
 
-                    // Add LRUDs if requested
-                    if (includeLruds) {
-                        // Restore the active station back to the FROM station
-                        survey.setActiveStation(fromStation);
+                        // Reconstruct leg with destination station (preserving backwards flag from
+                        // form)
+                        leg =
+                                new Leg(
+                                        leg.getDistance(),
+                                        leg.getAzimuth(),
+                                        leg.getInclination(),
+                                        newToStation,
+                                        new Leg[] {},
+                                        leg.wasShotBackwards());
 
-                        LRUD.Mode lrudMode = GeneralPreferences.getLrudMode();
-                        createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceLeft, LRUD.LEFT, lrudMode);
-                        createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceRight, LRUD.RIGHT, lrudMode);
-                        createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceUp, LRUD.UP, lrudMode);
-                        createLrudIfPresent(survey, fromStation, dialog, R.id.editDistanceDown, LRUD.DOWN, lrudMode);
+                        // Add leg to from station using SurveyUpdater
+                        // This also sets the active station to the new destination
+                        SurveyUpdater.addLegFromStation(survey, fromStation, leg);
 
-                        // Move active station back to the TO station again
-                        survey.setActiveStation(newToStation);
+                        // Add LRUDs if requested
+                        if (includeLruds) {
+                            // Restore the active station back to the FROM station
+                            survey.setActiveStation(fromStation);
+
+                            LRUD.Mode lrudMode = GeneralPreferences.getLrudMode();
+                            createLrudIfPresent(
+                                    survey,
+                                    fromStation,
+                                    dialog,
+                                    R.id.editDistanceLeft,
+                                    LRUD.LEFT,
+                                    lrudMode);
+                            createLrudIfPresent(
+                                    survey,
+                                    fromStation,
+                                    dialog,
+                                    R.id.editDistanceRight,
+                                    LRUD.RIGHT,
+                                    lrudMode);
+                            createLrudIfPresent(
+                                    survey,
+                                    fromStation,
+                                    dialog,
+                                    R.id.editDistanceUp,
+                                    LRUD.UP,
+                                    lrudMode);
+                            createLrudIfPresent(
+                                    survey,
+                                    fromStation,
+                                    dialog,
+                                    R.id.editDistanceDown,
+                                    LRUD.DOWN,
+                                    lrudMode);
+
+                            // Move active station back to the TO station again
+                            survey.setActiveStation(newToStation);
+                        }
                     }
-                }
 
-                SurveyManager manager = tableActivity.getSurveyManager();
-                manager.broadcastSurveyUpdated();
-                if (!isSplay) {
-                    manager.broadcastNewStationCreated();
-                }
-                tableActivity.syncWithSurvey();
-        });
+                    SurveyManager manager = tableActivity.getSurveyManager();
+                    manager.broadcastSurveyUpdated();
+                    if (!isSplay) {
+                        manager.broadcastNewStationCreated();
+                    }
+                    tableActivity.syncWithSurvey();
+                });
     }
 
-
-    public static void editLeg(final SexyTopoActivity activity,
-                               final Survey survey,
-                               final Station fromStation,
-                               final Leg toEdit) {
+    public static void editLeg(
+            final SexyTopoActivity activity,
+            final Survey survey,
+            final Station fromStation,
+            final Leg toEdit) {
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(activity);
         LayoutInflater inflater = activity.getLayoutInflater();
@@ -188,21 +212,22 @@ public class LegDialogs {
         }
 
         // Create and configure the form for validation
-        final EditLegForm form = new EditLegForm(
-            activity, survey, fromStation, toEdit, dialogView);
+        final EditLegForm form = new EditLegForm(activity, survey, fromStation, toEdit, dialogView);
 
-        builder
-            .setView(dialogView)
-            .setTitle(toEdit.hasDestination() ? R.string.manual_edit_leg_title : R.string.manual_edit_splay_title)
-            .setPositiveButton(R.string.save, null)
-            .setNegativeButton(R.string.cancel, null);
+        builder.setView(dialogView)
+                .setTitle(
+                        toEdit.hasDestination()
+                                ? R.string.manual_edit_leg_title
+                                : R.string.manual_edit_splay_title)
+                .setPositiveButton(R.string.save, null)
+                .setNegativeButton(R.string.cancel, null);
 
         final AlertDialog dialog = builder.create();
         DialogUtils.showKeyboardOnDisplay(dialog);
         dialog.show();
 
         // Populate fields with current values
-        Leg editData = toEdit.wasShotBackwards()? toEdit.reverse() : toEdit;
+        Leg editData = toEdit.wasShotBackwards() ? toEdit.reverse() : toEdit;
         ((TextView) (dialog.findViewById(R.id.editDistance)))
                 .setText(Float.toString(editData.getDistance()));
 
@@ -227,78 +252,84 @@ public class LegDialogs {
         ((TextView) (dialog.findViewById(R.id.editInclination)))
                 .setText(Float.toString(editData.getInclination()));
 
-        DialogUtils.enableValidationOnButton(dialog, form, () -> {
+        DialogUtils.enableValidationOnButton(
+                dialog,
+                form,
+                () -> {
 
-                // Get the updated leg with measurements and shot direction from form
-                Leg edited = form.getUpdatedLeg();
+                    // Get the updated leg with measurements and shot direction from form
+                    Leg edited = form.getUpdatedLeg();
 
-                // Get the new station names from the form
-                Station newFromStation = form.getUpdatedFromStation();
-                String newFromStationName = form.getUpdatedFromStationName();
-                String oldFromStationName = fromStation.getName();
+                    // Get the new station names from the form
+                    Station newFromStation = form.getUpdatedFromStation();
+                    String newFromStationName = form.getUpdatedFromStationName();
+                    String oldFromStationName = fromStation.getName();
 
-                // Apply changes in the correct order:
-                // 1. First, edit the leg measurements
-                SurveyUpdater.editLeg(survey, toEdit, edited);
+                    // Apply changes in the correct order:
+                    // 1. First, edit the leg measurements
+                    SurveyUpdater.editLeg(survey, toEdit, edited);
 
-                // 2. Move leg (or rename origin station) if from station changed
-                if (!newFromStationName.equals(oldFromStationName)) {
-                    if (newFromStation == fromStation && survey.isOrigin(newFromStation)) {
-                        // If the station hasn't changed and it is the origin, then just rename the origin
-                        SurveyUpdater.renameOrigin(survey, newFromStationName);
-                    } else {
-                        SurveyUpdater.moveLeg(survey, edited, newFromStation);
+                    // 2. Move leg (or rename origin station) if from station changed
+                    if (!newFromStationName.equals(oldFromStationName)) {
+                        if (newFromStation == fromStation && survey.isOrigin(newFromStation)) {
+                            // If the station hasn't changed and it is the origin, then just rename
+                            // the origin
+                            SurveyUpdater.renameOrigin(survey, newFromStationName);
+                        } else {
+                            SurveyUpdater.moveLeg(survey, edited, newFromStation);
+                        }
                     }
-                }
 
-                newFromStation.setComment(form.getUpdatedFromComment());
+                    newFromStation.setComment(form.getUpdatedFromComment());
 
-                // 3. Rename destination station if to station name changed (for full legs)
-                if (toEdit.hasDestination()) {
-                    Station newToStation = toEdit.getDestination();
-                    String newToStationName = form.getUpdatedToStationName();
-                    String newToComment = form.getUpdatedToComment();
+                    // 3. Rename destination station if to station name changed (for full legs)
+                    if (toEdit.hasDestination()) {
+                        Station newToStation = toEdit.getDestination();
+                        String newToStationName = form.getUpdatedToStationName();
+                        String newToComment = form.getUpdatedToComment();
 
-                    newToStation.setComment(newToComment);
+                        newToStation.setComment(newToComment);
 
-                    String oldToStationName = toEdit.getDestination().getName();
-                    if (!newToStationName.equals(oldToStationName)) {
-                        SurveyUpdater.renameStation(survey, edited.getDestination(), newToStationName);
+                        String oldToStationName = toEdit.getDestination().getName();
+                        if (!newToStationName.equals(oldToStationName)) {
+                            SurveyUpdater.renameStation(
+                                    survey, edited.getDestination(), newToStationName);
+                        }
                     }
-                }
 
-                activity.getSurveyManager().broadcastSurveyUpdated();
+                    activity.getSurveyManager().broadcastSurveyUpdated();
 
-                // Sync view with survey data
-                if (activity instanceof SurveyEditorActivity) {
-                    ((SurveyEditorActivity) activity).syncWithSurvey();
-                }
-            });
+                    // Sync view with survey data
+                    if (activity instanceof SurveyEditorActivity) {
+                        ((SurveyEditorActivity) activity).syncWithSurvey();
+                    }
+                });
     }
-
 
     public static void addStationWithLruds(final TableActivity tableActivity, final Survey survey) {
         showAddLegDialog(
-            tableActivity,
-            survey,
-            R.layout.leg_edit_dialog_unified_with_lruds,
-            R.string.manual_add_station_title,
-            false, // not a splay
-            true   // include LRUDs
-        );
+                tableActivity,
+                survey,
+                R.layout.leg_edit_dialog_unified_with_lruds,
+                R.string.manual_add_station_title,
+                false, // not a splay
+                true // include LRUDs
+                );
     }
 
-
-    private static void createLrudIfPresent(Survey survey, Station station,
-                                            AlertDialog dialog, int fieldId,
-                                            LRUD direction, LRUD.Mode lrudMode) {
+    private static void createLrudIfPresent(
+            Survey survey,
+            Station station,
+            AlertDialog dialog,
+            int fieldId,
+            LRUD direction,
+            LRUD.Mode lrudMode) {
         Float value = getFieldValue(dialog, fieldId);
         if (value != null) {
             Leg leg = direction.createSplay(survey, station, lrudMode, value);
             SurveyUpdater.update(survey, leg);
         }
     }
-
 
     private static Float getFieldValue(AlertDialog dialog, int id) {
         try {
@@ -309,51 +340,54 @@ public class LegDialogs {
         }
     }
 
-
-    public static void renameStation(final SurveyEditorActivity activity,
-                                     final Survey survey, final Station toRename) {
+    public static void renameStation(
+            final SurveyEditorActivity activity, final Survey survey, final Station toRename) {
         final RenameStationForm form = new RenameStationForm(activity, survey, toRename);
 
-        Runnable renameAction = () -> {
-            String newName = form.stationName.getText().toString();
-            try {
-                SurveyUpdater.renameStation(survey, toRename, newName);
-                activity.getSurveyManager().broadcastSurveyUpdated();
-                activity.syncWithSurvey();
-            } catch (Exception e) {
-                activity.showExceptionAndLog(R.string.manual_rename_error, e);
-            }
-        };
+        Runnable renameAction =
+                () -> {
+                    String newName = form.stationName.getText().toString();
+                    try {
+                        SurveyUpdater.renameStation(survey, toRename, newName);
+                        activity.getSurveyManager().broadcastSurveyUpdated();
+                        activity.syncWithSurvey();
+                    } catch (Exception e) {
+                        activity.showExceptionAndLog(R.string.manual_rename_error, e);
+                    }
+                };
 
-        AlertDialog dialog = new MaterialAlertDialogBuilder(activity)
-            .setTitle(R.string.manual_rename_station_title)
-            .setView(form.stationNameLayout)
-            .setPositiveButton(R.string.rename, (ignore, buttonId) -> renameAction.run())
-            .setNegativeButton(R.string.cancel, null)
-            .create();
+        AlertDialog dialog =
+                new MaterialAlertDialogBuilder(activity)
+                        .setTitle(R.string.manual_rename_station_title)
+                        .setView(form.stationNameLayout)
+                        .setPositiveButton(
+                                R.string.rename, (ignore, buttonId) -> renameAction.run())
+                        .setNegativeButton(R.string.cancel, null)
+                        .create();
 
-        form.stationName.setOnEditorActionListener((view, actionId, event) -> {
-            form.validate();
+        form.stationName.setOnEditorActionListener(
+                (view, actionId, event) -> {
+                    form.validate();
 
-            if (form.isValid()) {
-                renameAction.run();
-                dialog.dismiss();
-                return true;
-            } else {
-                return false;
-            }
-        });
+                    if (form.isValid()) {
+                        renameAction.run();
+                        dialog.dismiss();
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
 
-        form.setOnDidValidateCallback((valid) -> {
-            Button positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
-            positiveButton.setEnabled(valid);
-        });
+        form.setOnDidValidateCallback(
+                (valid) -> {
+                    Button positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+                    positiveButton.setEnabled(valid);
+                });
 
         if (dialog.getWindow() != null) {
-            dialog.getWindow().setSoftInputMode(
-                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+            dialog.getWindow()
+                    .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         }
         dialog.show();
     }
-
 }

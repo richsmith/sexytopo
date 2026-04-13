@@ -6,15 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.storage.StorageManager;
-
 import androidx.documentfile.provider.DocumentFile;
-
-import org.hwyl.sexytopo.SexyTopoConstants;
-import org.hwyl.sexytopo.model.survey.Survey;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +18,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
+import org.hwyl.sexytopo.SexyTopoConstants;
+import org.hwyl.sexytopo.model.survey.Survey;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 @SuppressWarnings("UnnecessaryLocalVariable")
 public class IoUtils {
@@ -40,7 +36,6 @@ public class IoUtils {
         return directory.listFiles().length == 0;
     }
 
-
     public static boolean isSurveyDirectory(DocumentFile directory) {
         DocumentFile[] files = directory.listFiles();
         for (DocumentFile file : files) {
@@ -51,7 +46,6 @@ public class IoUtils {
         }
         return false;
     }
-
 
     public static boolean wasSurveyImported(Context context, Survey survey) {
         SurveyDirectory importSourceDirectory = SurveyDirectory.IMPORT_SOURCE.get(survey);
@@ -69,7 +63,6 @@ public class IoUtils {
         return map;
     }
 
-
     public static List<JSONObject> toList(JSONArray array) throws JSONException {
         List<JSONObject> list = new ArrayList<>();
         for (int i = 0; i < array.length(); i++) {
@@ -86,11 +79,9 @@ public class IoUtils {
         return list;
     }
 
-
     public static String getPath(File directory, String filename) {
         return directory.getPath() + File.separator + filename;
     }
-
 
     public static Uri getParentUri(Survey survey) {
         Uri uri = null;
@@ -121,7 +112,7 @@ public class IoUtils {
         return uri;
     }
 
-    public static String slurpFile(Context context, DocumentFile file) throws IOException{
+    public static String slurpFile(Context context, DocumentFile file) throws IOException {
         ContentResolver contentResolver = context.getContentResolver();
 
         try (InputStream inputStream = contentResolver.openInputStream(file.getUri())) {
@@ -136,8 +127,8 @@ public class IoUtils {
         }
     }
 
-    public static synchronized void saveToFile(Context context, DocumentFile documentFile, String contents)
-        throws IOException {
+    public static synchronized void saveToFile(
+            Context context, DocumentFile documentFile, String contents) throws IOException {
         Uri uri = documentFile.getUri();
         try (OutputStream outputStream = context.getContentResolver().openOutputStream(uri, "wt")) {
             if (outputStream == null) {

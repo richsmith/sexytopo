@@ -1,14 +1,12 @@
 package org.hwyl.sexytopo.model.table;
 
 import org.hwyl.sexytopo.SexyTopoConstants;
-import org.junit.Assert;
-
-import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
+import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
+import org.junit.Assert;
 import org.junit.Test;
-
 
 public class LrudTest {
 

@@ -8,9 +8,7 @@ import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 
-/**
- * Represents a cross-section of a passage at a specified angle on a top-down plan sketch.
- */
+/** Represents a cross-section of a passage at a specified angle on a top-down plan sketch. */
 public class CrossSection {
 
     private final Station station;

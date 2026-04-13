@@ -13,11 +13,9 @@ public class CalibrationReading {
     private int gx, gy, gz;
     private int mx, my, mz;
 
-
     public CalibrationReading() {
         state = State.UPDATE_ACCELERATION;
     }
-
 
     public void updateAccelerationValues(int gx, int gy, int gz) {
         checkStateIs(State.UPDATE_ACCELERATION);
@@ -27,7 +25,6 @@ public class CalibrationReading {
         state = State.UPDATE_MAGNETIC;
     }
 
-
     public void updateMagneticValues(int mx, int my, int mz) {
         checkStateIs(State.UPDATE_MAGNETIC);
         this.mx = mx;
@@ -36,14 +33,12 @@ public class CalibrationReading {
         state = State.COMPLETE;
     }
 
-
     private void checkStateIs(State expected) {
         if (state != expected) {
             throw new IllegalStateException(
                     "Calibration state error: state is " + state + " but should be " + expected);
         }
     }
-
 
     public State getState() {
         return state;
@@ -53,11 +48,9 @@ public class CalibrationReading {
         return gx;
     }
 
-
     public int getGy() {
         return gy;
     }
-
 
     public int getGz() {
         return gz;
@@ -67,11 +60,9 @@ public class CalibrationReading {
         return mx;
     }
 
-
     public int getMy() {
         return my;
     }
-
 
     public int getMz() {
         return mz;

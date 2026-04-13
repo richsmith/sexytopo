@@ -1,54 +1,65 @@
 package org.hwyl.sexytopo.control.io.thirdparty.survextherion;
 
-import org.hwyl.sexytopo.model.survey.Trip;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.hwyl.sexytopo.model.survey.Trip;
 
 public enum SurveyFormat {
-
     SURVEX {
         @Override
-        public char getCommentChar() { return ';'; }
+        public char getCommentChar() {
+            return ';';
+        }
 
         @Override
-        public String getCommandChar() { return "*"; }
+        public String getCommandChar() {
+            return "*";
+        }
 
         @Override
-        public String getSplayStationName() { return ".."; }
+        public String getSplayStationName() {
+            return "..";
+        }
 
         @Override
-        public String getExplorationDateKeyword() { return "date explored "; }
+        public String getExplorationDateKeyword() {
+            return "date explored ";
+        }
 
         @Override
-        public boolean parseExploTeamLine(
-                String effective, Map<String, List<Trip.Role>> teamMap) {
+        public boolean parseExploTeamLine(String effective, Map<String, List<Trip.Role>> teamMap) {
             return false;
         }
     },
 
     THERION {
         @Override
-        public char getCommentChar() { return '#'; }
+        public char getCommentChar() {
+            return '#';
+        }
 
         @Override
-        public String getCommandChar() { return ""; }
+        public String getCommandChar() {
+            return "";
+        }
 
         @Override
-        public String getSplayStationName() { return "-"; }
+        public String getSplayStationName() {
+            return "-";
+        }
 
         @Override
-        public String getExplorationDateKeyword() { return "explo-date "; }
+        public String getExplorationDateKeyword() {
+            return "explo-date ";
+        }
 
         @Override
-        public boolean parseExploTeamLine(
-                String effective, Map<String, List<Trip.Role>> teamMap) {
+        public boolean parseExploTeamLine(String effective, Map<String, List<Trip.Role>> teamMap) {
             if (!effective.startsWith("explo-team ")) {
                 return false;
             }
-            String name = SurvexTherionImporter.extractQuotedValue(
-                    effective, "explo-team ");
+            String name = SurvexTherionImporter.extractQuotedValue(effective, "explo-team ");
             if (!name.isEmpty()) {
                 List<Trip.Role> roles = teamMap.get(name);
                 if (roles == null) {
@@ -67,20 +78,23 @@ public enum SurveyFormat {
 
     public abstract String getCommandChar();
 
-    /** Splay station name:  Survex ".." Therion "-"*/
+    /** Splay station name: Survex ".." Therion "-" */
     public abstract String getSplayStationName();
 
     /** Exploration date keyword: "date explored "- Survex, "explo-date "- Therion */
     public abstract String getExplorationDateKeyword();
 
     /**
-     * Try to parse a team-related line during import.
-     * Returns true if the line was consumed (e.g. explo-team in Therion).
+     * Try to parse a team-related line during import. Returns true if the line was consumed (e.g.
+     * explo-team in Therion).
      */
     public abstract boolean parseExploTeamLine(
             String effective, Map<String, List<Trip.Role>> teamMap);
 
-    /** Commented-out instrument prefix: ";*instrument inst " for Survex, "#instrument inst " for Therion */
+    /**
+     * Commented-out instrument prefix: ";*instrument inst " for Survex, "#instrument inst " for
+     * Therion
+     */
     public String getCommentedInstrumentPrefix() {
         return getCommentChar() + getCommandChar() + "instrument inst ";
     }

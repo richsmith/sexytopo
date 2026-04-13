@@ -2,9 +2,10 @@ package org.hwyl.sexytopo.control.io.basic;
 
 import android.content.Context;
 import android.net.Uri;
-
 import androidx.documentfile.provider.DocumentFile;
-
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.io.IoUtils;
@@ -13,33 +14,27 @@ import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.json.JSONException;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
-
 public class Loader {
-
 
     public static Survey loadSurvey(Context context, DocumentFile directory) throws Exception {
         return loadSurvey(context, directory, false);
     }
 
-
     public static Survey loadAutosave(Context context, DocumentFile directory) throws Exception {
         return loadSurvey(context, directory, true);
     }
 
-
-    public static Survey loadSurvey(Context context, DocumentFile directory, boolean restoreAutosave)
-            throws Exception {
+    public static Survey loadSurvey(
+            Context context, DocumentFile directory, boolean restoreAutosave) throws Exception {
         Set<Uri> surveyUrisNotToLoad = new HashSet<>();
         return loadSurvey(context, directory, surveyUrisNotToLoad, restoreAutosave);
     }
 
-
-    public static Survey loadSurvey(Context context, DocumentFile directory,
-                                    Set<Uri> surveyUrisNotToLoad, boolean restoreAutosave)
+    public static Survey loadSurvey(
+            Context context,
+            DocumentFile directory,
+            Set<Uri> surveyUrisNotToLoad,
+            boolean restoreAutosave)
             throws Exception {
 
         if (!IoUtils.isSurveyDirectory(directory)) {
@@ -56,8 +51,8 @@ public class Loader {
         return survey;
     }
 
-    private static void loadMetadata(Context context, Survey survey,
-                                     Set< Uri> surveyUrisNotToLoad, boolean restoreAutosave)
+    private static void loadMetadata(
+            Context context, Survey survey, Set<Uri> surveyUrisNotToLoad, boolean restoreAutosave)
             throws Exception {
 
         SurveyFile surveyFile = SurveyFile.METADATA.get(survey);
@@ -70,9 +65,7 @@ public class Loader {
         }
     }
 
-
-    private static void loadSurveyData(
-            Context context, Survey survey, boolean restoreAutosave)
+    private static void loadSurveyData(Context context, Survey survey, boolean restoreAutosave)
             throws Exception {
         SurveyFile surveyFile = SurveyFile.DATA.get(survey);
         surveyFile = considerSwappingForAutosave(context, surveyFile, restoreAutosave);
@@ -82,7 +75,6 @@ public class Loader {
             SurveyJsonTranslater.populateSurvey(survey, text);
         }
     }
-
 
     private static void loadSketches(Context context, Survey survey, boolean restoreAutosave)
             throws IOException, JSONException {
@@ -106,9 +98,7 @@ public class Loader {
     }
 
     private static SurveyFile considerSwappingForAutosave(
-            Context context,
-            SurveyFile surveyFile,
-            boolean restoreAutosave) {
+            Context context, SurveyFile surveyFile, boolean restoreAutosave) {
 
         if (restoreAutosave) {
             SurveyFile autosaveVersion = surveyFile.getAutosaveVersion();
@@ -119,6 +109,4 @@ public class Loader {
 
         return surveyFile;
     }
-
-
 }

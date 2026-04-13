@@ -6,8 +6,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Unit tests for EditLegForm.
- * Note: These tests focus on the core leg creation logic without UI dependencies.
+ * Unit tests for EditLegForm. Note: These tests focus on the core leg creation logic without UI
+ * dependencies.
  */
 public class EditLegFormTest {
 
@@ -26,14 +26,12 @@ public class EditLegFormTest {
 
         // 2. Then caller creates the destination and reconstructs the leg
         Station newStation = new Station("2");
-        Leg legWithDest = new Leg(distance, azimuth, inclination, newStation, new Leg[]{});
+        Leg legWithDest = new Leg(distance, azimuth, inclination, newStation, new Leg[] {});
         Assert.assertTrue(legWithDest.hasDestination());
         Assert.assertEquals(newStation, legWithDest.getDestination());
     }
 
-    /**
-     * Test that splays can be created without destinations.
-     */
+    /** Test that splays can be created without destinations. */
     @Test
     public void testSplayCreationWithoutDestination() {
         Leg splay = new Leg(3.5f, 90.0f, 0.0f);
@@ -45,12 +43,11 @@ public class EditLegFormTest {
     public void testCannotCreateLegWithNullDestinationDirectly() {
         try {
             // Trying to create a full leg (non-splay) with null destination should fail
-            new Leg(5.0f, 0.0f, 0.0f, null, new Leg[]{});
+            new Leg(5.0f, 0.0f, 0.0f, null, new Leg[] {});
             Assert.fail("Should have thrown IllegalArgumentException");
         } catch (IllegalArgumentException e) {
             // Expected - destination should not be null for full legs
             Assert.assertTrue(e.getMessage().contains("Destination"));
         }
     }
-
 }

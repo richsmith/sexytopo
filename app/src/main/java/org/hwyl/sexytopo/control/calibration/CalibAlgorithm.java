@@ -1,10 +1,8 @@
 package org.hwyl.sexytopo.control.calibration;
 
-
 /**
- * Calibration algorithm by Beat Heeb as written for PocketTopo.
- * Translated into Java from C#. Any mistakes are probably mine.
- * Kindly made available for use in SexyTopo by Beat Heeb.
+ * Calibration algorithm by Beat Heeb as written for PocketTopo. Translated into Java from C#. Any
+ * mistakes are probably mine. Kindly made available for use in SexyTopo by Beat Heeb.
  */
 @SuppressWarnings("SuspiciousNameCombination")
 public class CalibAlgorithm {
@@ -15,24 +13,22 @@ public class CalibAlgorithm {
     private static final float EPS = 1.0E-6F;
     private static final int MAX_IT = 200;
 
-    //result
+    // result
     public static Matrix aG, aM;
     public static Vector bG, bM;
     public static Vector nl; // nonlinearity coefficients
 
-
-    public static void AddValues(int gx, int gy, int gz, int mx, int my, int mz,
-                                 Vector[] g, Vector[] m, int idx) {
+    public static void AddValues(
+            int gx, int gy, int gz, int mx, int my, int mz, Vector[] g, Vector[] m, int idx) {
         g[idx] = new Vector(gx / FV, gy / FV, gz / FV);
         m[idx] = new Vector(mx / FV, my / FV, mz / FV);
     }
 
-
     // helpers
     public static Vector[] OptVectors(Vector gr, Vector mr, float alpha) {
-        Vector no = Vector.Normalized(gr.crossProduct(mr));  // plane normal
-        float s = (float)Math.sin(alpha);
-        float c = (float)Math.cos(alpha);
+        Vector no = Vector.Normalized(gr.crossProduct(mr)); // plane normal
+        float s = (float) Math.sin(alpha);
+        float c = (float) Math.cos(alpha);
         Vector gx = Vector.Normalized(mr.times(c).plus((mr.crossProduct(no)).times(s)).plus(gr));
         Vector mx = (gx.times(c)).plus((no.crossProduct(gx)).times(s));
         return new Vector[] {gx, mx};
@@ -41,16 +37,17 @@ public class CalibAlgorithm {
     public static Vector[] TurnVectors(Vector gxp, Vector mxp, Vector gr, Vector mr) {
         float s = gr.z * gxp.y - gr.y * gxp.z + mr.z * mxp.y - mr.y * mxp.z;
         float c = gr.y * gxp.y + gr.z * gxp.z + mr.y * mxp.y + mr.z * mxp.z;
-        float a = (float)Math.atan2(s, c);
+        float a = (float) Math.atan2(s, c);
         Vector gx = gxp.TurnX(a);
         Vector mx = mxp.TurnX(a);
-        return new Vector[]{gx, mx};
+        return new Vector[] {gx, mx};
     }
 
-
     private static Object[] CheckOverflow(Matrix m, Vector v) {
-        float max = Math.max(Matrix.MaxDiff(m, Matrix.getZero()) * FM,
-                Vector.MaxDiff(v, Vector.getZero()) * FV);
+        float max =
+                Math.max(
+                        Matrix.MaxDiff(m, Matrix.getZero()) * FM,
+                        Vector.MaxDiff(v, Vector.getZero()) * FV);
         if (max > Short.MAX_VALUE) {
             m = m.times((Short.MAX_VALUE / max));
             v = v.times((Short.MAX_VALUE / max));
@@ -78,8 +75,8 @@ public class CalibAlgorithm {
         Vector[] mr = new Vector[num];
         Vector[] gx = new Vector[num];
         Vector[] mx = new Vector[num];
-        Vector[] gl = new Vector[num];  // linearized g values
-        Matrix[] gs = new Matrix[num];  // Diag(g^2 - 1/2)
+        Vector[] gl = new Vector[num]; // linearized g values
+        Matrix[] gs = new Matrix[num]; // Diag(g^2 - 1/2)
         Matrix aG0, aM0;
         float invNum = 1.0F / num;
         Vector sumG = Vector.getZero();
@@ -103,7 +100,7 @@ public class CalibAlgorithm {
             gs[i].y.y = g[i].y * g[i].y - 0.5F;
             gs[i].z.z = g[i].z * g[i].z - 0.5F;
         }
-        float alpha = (float)Math.atan2(sa, ca);
+        float alpha = (float) Math.atan2(sa, ca);
         Vector avG = sumG.times(invNum); // average g
         Vector avM = sumM.times(invNum); // average m
         Matrix invG = Matrix.Inverse(sumG2.minus(sumG.outerProduct(avG)));
@@ -116,7 +113,7 @@ public class CalibAlgorithm {
         do {
             // get gr & mr from g, m, aG, aM, bG, & bM
             for (int i = 0; i < num; i++) {
-                gr[i] = (aG.times(gl[i])).plus(bG);  // gl instead of g !
+                gr[i] = (aG.times(gl[i])).plus(bG); // gl instead of g !
                 mr[i] = (aM.times(m[i])).plus(bM);
             }
             sa = ca = 0;
@@ -129,7 +126,8 @@ public class CalibAlgorithm {
                     for (; i < first + 4; i++) {
                         // match gr & mr to first gr & mr
                         Vector[] vectors = TurnVectors(gr[i], mr[i], gr[first], mr[first]);
-                        Vector gt = vectors[0]; Vector mt = vectors[1];
+                        Vector gt = vectors[0];
+                        Vector mt = vectors[1];
                         grp = grp.plus(gt);
                         mrp = mrp.plus(mt);
                     }
@@ -143,8 +141,8 @@ public class CalibAlgorithm {
                     for (i = first; i < first + 4; i++) {
                         // get optimal gx & mx from matched gx & mx
                         Vector[] turnVectors = TurnVectors(gxp, mxp, gr[i], mr[i]);
-                        gx[i] = turnVectors[0]; mx[i] = turnVectors[1];
-
+                        gx[i] = turnVectors[0];
+                        mx[i] = turnVectors[1];
                     }
                     i--;
                 } else { // individual sample
@@ -156,7 +154,7 @@ public class CalibAlgorithm {
                     ca += mr[i].times(gx[i]);
                 }
             }
-            alpha = (float)Math.atan2(sa, ca);
+            alpha = (float) Math.atan2(sa, ca);
             // get aG & aM from g, m, gx, & mx
             Vector avGx = Vector.getZero();
             Vector avMx = Vector.getZero();
@@ -165,11 +163,14 @@ public class CalibAlgorithm {
             for (int i = 0; i < num; i++) {
                 avGx = avGx.plus(gx[i]);
                 avMx = avMx.plus(mx[i]);
-                sumGxG = sumGxG.plus(gx[i].outerProduct(gl[i])); // outer product // gl instead of g !
+                sumGxG =
+                        sumGxG.plus(
+                                gx[i].outerProduct(gl[i])); // outer product // gl instead of g !
                 sumMxM = sumMxM.plus(mx[i].outerProduct(m[i]));
             }
             // get new aG & aM
-            aG0 = aG; aM0 = aM;
+            aG0 = aG;
+            aM0 = aM;
             avGx = avGx.times(invNum); // average gx
             avMx = avMx.times(invNum);
             aG = (sumGxG.minus(avGx.outerProduct(sumG))).times(invG);
@@ -209,10 +210,12 @@ public class CalibAlgorithm {
             it++;
         } while (it < MAX_IT && Math.max(Matrix.MaxDiff(aG, aG0), Matrix.MaxDiff(aM, aM0)) > EPS);
         Object[] overflow = CheckOverflow(aG, bG);
-        aG = (Matrix)overflow[0]; bG = (Vector)overflow[1];
+        aG = (Matrix) overflow[0];
+        bG = (Vector) overflow[1];
 
         Object[] overflow2 = CheckOverflow(aM, bM);
-        aM = (Matrix)overflow2[0]; bM = (Vector)overflow2[1];
+        aM = (Matrix) overflow2[0];
+        bM = (Vector) overflow2[1];
 
         delta.value = 0;
         for (int i = 0; i < num; i++) {
@@ -220,15 +223,14 @@ public class CalibAlgorithm {
             Vector dm = mx[i].minus(mr[i]);
             delta.value += (dg.times(dg)) + (dm.times(dm));
         }
-        delta.value = (float)Math.sqrt(delta.value / num) * 100;
+        delta.value = (float) Math.sqrt(delta.value / num) * 100;
         return it;
     }
 
-
     private static void PutCoeff(byte[] data, int index, float value) {
         int coeff = Math.round(value);
-        data[index] = (byte)coeff;
-        data[index + 1] = (byte)(coeff >> 8);
+        data[index] = (byte) coeff;
+        data[index + 1] = (byte) (coeff >> 8);
     }
 
     /*
@@ -264,13 +266,11 @@ public class CalibAlgorithm {
             int nlx = Math.round(nl.x * FN);
             int nly = Math.round(nl.y * FN);
             int nlz = Math.round(nl.z * FN);
-            data[48] = (byte)(nlx - 1);
-            data[49] = (byte)(nly - 1);
-            data[50] = (byte)(nlz - 1);
-            data[51] = (byte)0xFF;
+            data[48] = (byte) (nlx - 1);
+            data[49] = (byte) (nly - 1);
+            data[50] = (byte) (nlz - 1);
+            data[51] = (byte) 0xFF;
         }
         return data;
     }
-
-
 }

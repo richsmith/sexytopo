@@ -1,16 +1,8 @@
 package org.hwyl.sexytopo.model.survey;
 
 import android.net.Uri;
-
 import androidx.annotation.NonNull;
 import androidx.documentfile.provider.DocumentFile;
-
-import org.hwyl.sexytopo.control.util.StationNamer;
-import org.hwyl.sexytopo.control.util.SurveyTools;
-import org.hwyl.sexytopo.control.util.Wrapper;
-import org.hwyl.sexytopo.model.graph.Projection2D;
-import org.hwyl.sexytopo.model.sketch.Sketch;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,14 +10,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-
+import org.hwyl.sexytopo.control.util.StationNamer;
+import org.hwyl.sexytopo.control.util.SurveyTools;
+import org.hwyl.sexytopo.control.util.Wrapper;
+import org.hwyl.sexytopo.model.graph.Projection2D;
+import org.hwyl.sexytopo.model.sketch.Sketch;
 
 public class Survey {
 
     public static final Station NULL_STATION = new Station("-");
     public static final String DEFAULT_NAME = "Unsaved Survey";
 
-    public static final char[] FORBIDDEN_CHARS = new char[]{':', '.', '\n', '\r', '/', '\\'};
+    public static final char[] FORBIDDEN_CHARS = new char[] {':', '.', '\n', '\r', '/', '\\'};
 
     private String name;
 
@@ -77,7 +73,7 @@ public class Survey {
     }
 
     public Uri getUri() {
-        return directory == null? null : getDirectory().getUri();
+        return directory == null ? null : getDirectory().getUri();
     }
 
     public void setActiveStation(Station activeStation) {
@@ -117,7 +113,7 @@ public class Survey {
     }
 
     public Leg getMostRecentLeg() {
-        return legsInChronoOrder.empty()? null : legsInChronoOrder.peek();
+        return legsInChronoOrder.empty() ? null : legsInChronoOrder.peek();
     }
 
     public void setPlanSketch(Sketch planSketch) {
@@ -145,7 +141,6 @@ public class Survey {
             throw new IllegalArgumentException("Unknown projection: " + projection);
         }
     }
-
 
     public Station getOrigin() {
         return origin;
@@ -179,7 +174,6 @@ public class Survey {
         int numberOfLegs = legsInChronoOrder.size();
         int start = Math.max(0, numberOfLegs - n);
         return legsInChronoOrder.subList(start, numberOfLegs);
-
     }
 
     public List<Leg> getAllLegsInChronoOrder() {
@@ -196,7 +190,6 @@ public class Survey {
         return stations;
     }
 
-
     public static List<Station> getAllStations(Station root) {
 
         List<Station> stations = new ArrayList<>();
@@ -209,7 +202,6 @@ public class Survey {
 
         return stations;
     }
-
 
     public void connect(Station joinInThisSurvey, Survey survey, Station joinInOtherSurvey) {
 
@@ -233,7 +225,6 @@ public class Survey {
         connections.add(connection);
     }
 
-
     public void disconnect(Station joinInThisSurvey, Survey otherSurvey) throws Exception {
         Set<SurveyConnection> connections = getSurveysConnectedTo(joinInThisSurvey);
 
@@ -247,9 +238,7 @@ public class Survey {
             }
         }
         throw new Exception("tried to disconnect unconnected survey");
-
     }
-
 
     public boolean isConnectedTo(Survey other) {
         for (Station station : getConnectedSurveys().keySet()) {
@@ -276,7 +265,6 @@ public class Survey {
         return stationsToSurveyConnections;
     }
 
-
     public Set<Survey> getRecursiveConnectedSurveys() {
         Set<Survey> allSurveys = new HashSet<>();
         getRecursiveConnectedSurveys(allSurveys, this);
@@ -302,7 +290,6 @@ public class Survey {
         }
         return connections;
     }
-
 
     public boolean hasLinkedSurveys(Station station) {
         return stationsToSurveyConnections.containsKey(station);
@@ -345,7 +332,6 @@ public class Survey {
         return origin;
     }
 
-
     public void addLegRecord(Leg leg) {
         legsInChronoOrder.push(leg);
     }
@@ -356,7 +342,6 @@ public class Survey {
         legsInChronoOrder.remove(oldIndex);
         checkSurveyIntegrity();
     }
-
 
     public void removeLegRecord(Leg leg) {
         legsInChronoOrder.remove(leg);
@@ -370,35 +355,33 @@ public class Survey {
 
         final Wrapper wrapper = new Wrapper();
         SurveyTools.traverseLegs(
-            this,
-            (origin, leg) -> {
-                if (leg.getDestination() == station) {
-                    wrapper.value = leg;
-                    return true;
-                } else {
-                    return false;
-                }
-            });
-        return (Leg)(wrapper.value);
+                this,
+                (origin, leg) -> {
+                    if (leg.getDestination() == station) {
+                        wrapper.value = leg;
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
+        return (Leg) (wrapper.value);
     }
-
 
     public Station getOriginatingStation(final Leg leg) {
         final Wrapper wrapper = new Wrapper();
         SurveyTools.traverseStations(
-            this,
-            station -> {
-                if (station.getOnwardLegs().contains(leg)) {
-                    wrapper.value = station;
-                    return true;
-                } else {
-                    return false;
-                }
-            });
+                this,
+                station -> {
+                    if (station.getOnwardLegs().contains(leg)) {
+                        wrapper.value = station;
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
 
-        return (Station)(wrapper.value);
+        return (Station) (wrapper.value);
     }
-
 
     public void undoAddLeg() {
 
@@ -408,16 +391,15 @@ public class Survey {
 
         final Leg toDelete = legsInChronoOrder.pop();
         SurveyTools.traverseLegs(
-            this,
-            (origin, leg) -> {
-                if (leg == toDelete) {
-                    origin.getOnwardLegs().remove(toDelete);
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        );
+                this,
+                (origin, leg) -> {
+                    if (leg == toDelete) {
+                        origin.getOnwardLegs().remove(toDelete);
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
 
         if (toDelete.hasDestination()) {
             checkSurveyIntegrity();
@@ -429,29 +411,26 @@ public class Survey {
     public Station getStationByName(final String name) {
         final Wrapper wrapper = new Wrapper();
         SurveyTools.traverseStations(
-            this,
-            station -> {
-                if (station.getName().equals(name)) {
-                    wrapper.value = station;
-                    return true;
-                } else {
-                    return false;
-                }
-            });
+                this,
+                station -> {
+                    if (station.getName().equals(name)) {
+                        wrapper.value = station;
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
 
-        return (Station)(wrapper.value);
+        return (Station) (wrapper.value);
     }
-
 
     public Trip getTrip() {
         return trip;
     }
 
-
     public void setTrip(Trip trip) {
         this.trip = trip;
     }
-
 
     @Override
     public boolean equals(Object object) {
@@ -462,16 +441,14 @@ public class Survey {
             return false;
         }
 
-        Survey other = (Survey)object;
+        Survey other = (Survey) object;
         Uri uri = getUri();
         Uri otherUri = other.getUri();
         if (uri == null || otherUri == null) {
             return false;
         }
         return uri.equals(otherUri);
-
     }
-
 
     @Override
     public int hashCode() {
@@ -487,7 +464,4 @@ public class Survey {
     public String toString() {
         return "[Survey " + getName() + "]";
     }
-
-
-
 }

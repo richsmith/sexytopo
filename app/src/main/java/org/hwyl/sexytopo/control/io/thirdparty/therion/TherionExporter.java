@@ -1,7 +1,9 @@
 package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
 import android.content.Context;
-
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.io.SurveyDirectory;
 import org.hwyl.sexytopo.control.io.SurveyFile;
@@ -17,11 +19,6 @@ import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Survey;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class TherionExporter extends Exporter {
 
@@ -66,8 +63,13 @@ public class TherionExporter extends Exporter {
         SurveyFile th2PlanFile = getOutputFile(th2PlanType);
         SurveyFile xviPlanFile = getXviOutputFile(context, xviPlanType, xviFolder);
 
-        handleProjection(context, survey, Projection2D.PLAN,
-                th2PlanFile, xviPlanFile, originalTh2PlanFileContent,
+        handleProjection(
+                context,
+                survey,
+                Projection2D.PLAN,
+                th2PlanFile,
+                xviPlanFile,
+                originalTh2PlanFileContent,
                 exportOptions.getPlanScrapCount(),
                 exportOptions.isStationsInFirstPlanScrap(),
                 xviFolder);
@@ -77,8 +79,13 @@ public class TherionExporter extends Exporter {
         SurveyFile th2EeFile = getOutputFile(th2EeType);
         SurveyFile xviEeFile = getXviOutputFile(context, xviEeType, xviFolder);
 
-        handleProjection(context, survey, Projection2D.EXTENDED_ELEVATION,
-                th2EeFile, xviEeFile, originalTh2EeFileContent,
+        handleProjection(
+                context,
+                survey,
+                Projection2D.EXTENDED_ELEVATION,
+                th2EeFile,
+                xviEeFile,
+                originalTh2EeFileContent,
                 exportOptions.getEeScrapCount(),
                 exportOptions.isStationsInFirstEeScrap(),
                 xviFolder);
@@ -119,7 +126,8 @@ public class TherionExporter extends Exporter {
         }
     }
 
-    private SurveyFile getXviOutputFile(Context context, SurveyFile.SurveyFileType fileType, String xviFolder) {
+    private SurveyFile getXviOutputFile(
+            Context context, SurveyFile.SurveyFileType fileType, String xviFolder) {
         if (xviFolder == null || xviFolder.trim().isEmpty()) {
             return getOutputFile(fileType);
         }
@@ -141,7 +149,6 @@ public class TherionExporter extends Exporter {
         }
         return xviFolder + "/" + xviFilename;
     }
-
 
     private void handleProjection(
             Context context,
@@ -180,9 +187,17 @@ public class TherionExporter extends Exporter {
 
         String xviPathForTh2 = getXviPathForTh2(xviFile.getFilename(), xviFolder);
 
-        String content = Th2Exporter.getContent(
-            survey, projectionType, space, xviPathForTh2, innerFrame, outerFrame, scale,
-            scrapCount, stationsInFirstScrap);
+        String content =
+                Th2Exporter.getContent(
+                        survey,
+                        projectionType,
+                        space,
+                        xviPathForTh2,
+                        innerFrame,
+                        outerFrame,
+                        scale,
+                        scrapCount,
+                        stationsInFirstScrap);
         th2File.save(context, content);
 
         String xviContent = XviExporter.getContent(sketch, space, scale, gridFrame);
@@ -191,18 +206,15 @@ public class TherionExporter extends Exporter {
         th2Files.add(th2File.getFilename());
     }
 
-
     @Override
     public String getExportTypeName(Context context) {
         return context.getString(R.string.third_party_therion);
     }
 
-
     @Override
     protected String getExportDirectoryName() {
         return "therion";
     }
-
 
     public static String getEncodingText() {
         return "encoding utf-8";
@@ -217,7 +229,6 @@ public class TherionExporter extends Exporter {
         return scale;
     }
 
-
     private void readOriginalFilesIfPresent(Context context, Survey survey) {
         // Code currently sacrificed on the altar of trying to get SexyTopo working
         // with scoped storage :/
@@ -226,5 +237,4 @@ public class TherionExporter extends Exporter {
     private String getFileAttribution(Context context) {
         return COMMENT_CHAR + " " + TextTools.getFileAttribution(context) + "\n\n";
     }
-
 }

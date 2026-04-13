@@ -2,18 +2,15 @@ package org.hwyl.sexytopo.comms.sap6;
 
 import android.bluetooth.BluetoothDevice;
 import android.view.View;
-
+import java.util.HashMap;
+import java.util.Map;
+import kotlin.Unit;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.comms.Communicator;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.DeviceActivity;
 import org.hwyl.sexytopo.model.survey.Leg;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import kotlin.Unit;
 
 public class SAP6Communicator implements Communicator {
 
@@ -44,7 +41,8 @@ public class SAP6Communicator implements Communicator {
 
     public SAP6Communicator(DeviceActivity activity, BluetoothDevice bluetoothDevice) {
         this.activity = activity;
-        this.caveBLE = new CaveBLE(bluetoothDevice, activity, this::legCallback, this::statusCallback);
+        this.caveBLE =
+                new CaveBLE(bluetoothDevice, activity, this::legCallback, this::statusCallback);
         this.datamanager = activity.getSurveyManager();
     }
 
@@ -91,7 +89,9 @@ public class SAP6Communicator implements Communicator {
     }
 
     public Unit legCallback(float azimuth, float inclination, float roll, float distance) {
-        Log.device(String.format("Leg received: %05.1f %+04.1f %.3fm", azimuth, inclination, distance));
+        Log.device(
+                String.format(
+                        "Leg received: %05.1f %+04.1f %.3fm", azimuth, inclination, distance));
         Leg leg = new Leg(distance, azimuth, inclination);
         datamanager.updateSurvey(leg);
         return Unit.INSTANCE;
@@ -110,7 +110,7 @@ public class SAP6Communicator implements Communicator {
                 break;
             case CaveBLE.CONNECTION_FAILED:
                 _isConnected = false;
-                Log.device("Communication error: "+msg);
+                Log.device("Communication error: " + msg);
                 activity.updateConnectionStatus();
         }
         return Unit.INSTANCE;

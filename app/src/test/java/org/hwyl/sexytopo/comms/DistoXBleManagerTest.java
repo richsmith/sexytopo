@@ -11,7 +11,5 @@ public class DistoXBleManagerTest {
         Byte command = 0x30;
         Byte[] packet = DistoXBleManager.createWriteCommandPacket(command);
         Assert.assertEquals(9, packet.length);
-
     }
-
 }

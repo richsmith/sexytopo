@@ -5,13 +5,10 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
 import android.widget.Toast;
-
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
-
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.model.sketch.Symbol;
-
 
 public class SexyTopo extends Application {
 
@@ -28,7 +25,7 @@ public class SexyTopo extends Application {
         super.onCreate();
 
         defaultHandler = Thread.getDefaultUncaughtExceptionHandler();
-        Thread.setDefaultUncaughtExceptionHandler (this::handleUncaughtException);
+        Thread.setDefaultUncaughtExceptionHandler(this::handleUncaughtException);
 
         context = getApplicationContext();
         GeneralPreferences.initialise(context);
@@ -39,7 +36,7 @@ public class SexyTopo extends Application {
         Symbol.setResources(resources);
     }
 
-    public void handleUncaughtException (Thread thread, Throwable e) {
+    public void handleUncaughtException(Thread thread, Throwable e) {
         FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
         crashlytics.recordException(e);
         Log.e(e);
@@ -47,7 +44,7 @@ public class SexyTopo extends Application {
     }
 
     public static String staticGetString(int id, Object... formatArgs) {
-        if (resources == null) {  // e.g. during tests
+        if (resources == null) { // e.g. during tests
             return Integer.toString(id);
         }
         return resources.getString(id, formatArgs);
@@ -62,8 +59,9 @@ public class SexyTopo extends Application {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 
-    public static float dpToPixels(float dp){
-        return dp * ((float)
-            resources.getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+    public static float dpToPixels(float dp) {
+        return dp
+                * ((float) resources.getDisplayMetrics().densityDpi
+                        / DisplayMetrics.DENSITY_DEFAULT);
     }
 }

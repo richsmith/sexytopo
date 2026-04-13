@@ -4,9 +4,12 @@ import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.GRID_COMM
 import static org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants.SKETCHLINE_COMMAND;
 
 import android.content.Context;
-
 import androidx.documentfile.provider.DocumentFile;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.io.translation.Importer;
 import org.hwyl.sexytopo.model.graph.Coord2D;
@@ -14,13 +17,6 @@ import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Survey;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 
 @SuppressWarnings("UnnecessaryLocalVariable")
 public class XviImporter extends Importer {
@@ -49,11 +45,9 @@ public class XviImporter extends Importer {
         return sketch;
     }
 
-
     public boolean canHandleFile(DocumentFile file) {
         return file.isFile() && !file.isDirectory() && file.getName().endsWith("xvi");
     }
-
 
     public Grid parseGrid(String contents) throws Exception {
 
@@ -71,8 +65,8 @@ public class XviImporter extends Importer {
         return grid;
     }
 
-
-    public static List<PathDetail> parseSketchlineBlock(double scale, String contents) throws Exception {
+    public static List<PathDetail> parseSketchlineBlock(double scale, String contents)
+            throws Exception {
         String sketchBlock = getBlockContents(contents, SKETCHLINE_COMMAND);
         List<String> entries = parseBlockEntries(sketchBlock);
         List<PathDetail> pathDetails = new ArrayList<>();
@@ -82,7 +76,6 @@ public class XviImporter extends Importer {
         }
         return pathDetails;
     }
-
 
     public static List<String> parseBlockEntries(String content) {
         List<String> entries = new ArrayList<>();
@@ -94,8 +87,8 @@ public class XviImporter extends Importer {
         return entries;
     }
 
-
-    public static PathDetail parseSketchEntry(double scale, String entry) throws IllegalArgumentException {
+    public static PathDetail parseSketchEntry(double scale, String entry)
+            throws IllegalArgumentException {
         List<String> tokens = Arrays.asList(entry.split(" "));
 
         if (tokens.size() <= 1) {
@@ -127,7 +120,7 @@ public class XviImporter extends Importer {
         Colour colour = Colour.valueOf(first.toUpperCase());
 
         List<Coord2D> points = new ArrayList<>(tokens.size() - 1);
-        for (int i = 1; i < tokens.size();) {
+        for (int i = 1; i < tokens.size(); ) {
             float x = Float.parseFloat(tokens.get(i++));
             float y = Float.parseFloat(tokens.get(i++));
 
@@ -145,7 +138,6 @@ public class XviImporter extends Importer {
 
         return pathDetail;
     }
-
 
     @SuppressWarnings("UnnecessaryLabelOnContinueStatement")
     public static String getBlockContents(String text, String command) throws Exception {
@@ -180,7 +172,7 @@ public class XviImporter extends Importer {
             int openBraces = 1;
             int startOfContent = i;
 
-            for(; i < text.length(); i++) {
+            for (; i < text.length(); i++) {
                 if (text.charAt(i) == '{') {
                     openBraces++;
                 } else if (text.charAt(i) == '}') {
@@ -192,11 +184,9 @@ public class XviImporter extends Importer {
                     String content = text.substring(startOfContent, endOfContent);
                     return content;
                 }
-
             }
 
             throw new Exception("Malformed text: could not match braces");
-
         }
 
         throw new Exception("Could not match command in text");
@@ -204,6 +194,7 @@ public class XviImporter extends Importer {
 
     static class Grid {
         final double x, y, dx, dy, nx, ny;
+
         Grid(double x, double y, double dx, double dy, double nx, double ny) {
             this.x = x;
             this.y = y;
@@ -213,7 +204,4 @@ public class XviImporter extends Importer {
             this.ny = ny;
         }
     }
-
 }
-
-

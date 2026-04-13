@@ -2,9 +2,7 @@ package org.hwyl.sexytopo.comms;
 
 import android.bluetooth.BluetoothDevice;
 
-/**
- * DistoX subtype.
- */
+/** DistoX subtype. */
 public enum DistoX {
     A3("A3", false),
     X310("X310", true),

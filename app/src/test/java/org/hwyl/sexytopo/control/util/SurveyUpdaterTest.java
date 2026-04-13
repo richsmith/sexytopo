@@ -2,6 +2,8 @@ package org.hwyl.sexytopo.control.util;
 
 import static org.hwyl.sexytopo.SexyTopoConstants.ALLOWED_DOUBLE_DELTA;
 
+import java.util.Arrays;
+import java.util.List;
 import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -9,10 +11,6 @@ import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.List;
-
 
 public class SurveyUpdaterTest {
 
@@ -46,8 +44,7 @@ public class SurveyUpdaterTest {
         SurveyUpdater.editLeg(survey, leg, newEdit);
 
         Assert.assertEquals(1, survey.getAllLegs().size());
-        Assert.assertEquals(6, survey.getAllLegs().get(0).getDistance(),
-                ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(6, survey.getAllLegs().get(0).getDistance(), ALLOWED_DOUBLE_DELTA);
     }
 
     @Test
@@ -60,8 +57,7 @@ public class SurveyUpdaterTest {
         SurveyUpdater.editLeg(survey, leg, newEdit);
 
         Assert.assertEquals(1, survey.getAllLegs().size());
-        Assert.assertEquals(6, survey.getAllLegs().get(0).getDistance(),
-                ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(6, survey.getAllLegs().get(0).getDistance(), ALLOWED_DOUBLE_DELTA);
     }
 
     @Test
@@ -78,31 +74,37 @@ public class SurveyUpdaterTest {
 
     @Test
     public void testAreLegsAboutTheSame() {
-        Assert.assertTrue(SurveyUpdater.areLegsAboutTheSame(Arrays.asList(
-                new Leg(10, 159.5f, 0),
-                new Leg(10, 160.0f, 0),
-                new Leg(10, 160.5f, 0)
-        )));
-        Assert.assertFalse(SurveyUpdater.areLegsAboutTheSame(Arrays.asList(
-                new Leg(10, 119.5f, 0),
-                new Leg(10, 110.0f, 0),
-                new Leg(10, 110.5f, 0)
-        )));
-        Assert.assertFalse(SurveyUpdater.areLegsAboutTheSame(Arrays.asList(
-                new Leg(10, 349.5f, 0),
-                new Leg(10, 10.0f, 0),
-                new Leg(10, 10.5f, 0)
-        )));
-        Assert.assertTrue(SurveyUpdater.areLegsAboutTheSame(Arrays.asList(
-                new Leg(10, 359.5f, 0),
-                new Leg(10, 0.0f, 0),
-                new Leg(10, 0.5f, 0)
-        )));
-        Assert.assertFalse(SurveyUpdater.areLegsAboutTheSame(Arrays.asList(
-                new Leg(10.0f, 90.0f, 5.0f),   // First: 90°
-                new Leg(10.1f, 270.0f, 4.0f), // Second: 270° (opposite direction)
-                new Leg(9.9f, 85.0f, 6.0f)    // Third: 85° (close to first)
-        )));
+        Assert.assertTrue(
+                SurveyUpdater.areLegsAboutTheSame(
+                        Arrays.asList(
+                                new Leg(10, 159.5f, 0),
+                                new Leg(10, 160.0f, 0),
+                                new Leg(10, 160.5f, 0))));
+        Assert.assertFalse(
+                SurveyUpdater.areLegsAboutTheSame(
+                        Arrays.asList(
+                                new Leg(10, 119.5f, 0),
+                                new Leg(10, 110.0f, 0),
+                                new Leg(10, 110.5f, 0))));
+        Assert.assertFalse(
+                SurveyUpdater.areLegsAboutTheSame(
+                        Arrays.asList(
+                                new Leg(10, 349.5f, 0),
+                                new Leg(10, 10.0f, 0),
+                                new Leg(10, 10.5f, 0))));
+        Assert.assertTrue(
+                SurveyUpdater.areLegsAboutTheSame(
+                        Arrays.asList(
+                                new Leg(10, 359.5f, 0),
+                                new Leg(10, 0.0f, 0),
+                                new Leg(10, 0.5f, 0))));
+        Assert.assertFalse(
+                SurveyUpdater.areLegsAboutTheSame(
+                        Arrays.asList(
+                                new Leg(10.0f, 90.0f, 5.0f), // First: 90°
+                                new Leg(10.1f, 270.0f, 4.0f), // Second: 270° (opposite direction)
+                                new Leg(9.9f, 85.0f, 6.0f) // Third: 85° (close to first)
+                                )));
     }
 
     // InputMode tests
@@ -179,7 +181,7 @@ public class SurveyUpdaterTest {
     public void testUpdateWithNewStationWithExistingDestination() {
         Survey survey = new Survey();
         Station customStation = new Station("Custom");
-        Leg leg = new Leg(5, 90, 10, customStation, new Leg[]{});
+        Leg leg = new Leg(5, 90, 10, customStation, new Leg[] {});
 
         SurveyUpdater.updateWithNewStation(survey, leg);
 
@@ -429,11 +431,7 @@ public class SurveyUpdaterTest {
 
     @Test
     public void testAverageLegsSimple() {
-        List<Leg> legs = Arrays.asList(
-                new Leg(10, 90, 10),
-                new Leg(11, 90, 12),
-                new Leg(9, 90, 8)
-        );
+        List<Leg> legs = Arrays.asList(new Leg(10, 90, 10), new Leg(11, 90, 12), new Leg(9, 90, 8));
 
         Leg averaged = SurveyUpdater.averageLegs(legs);
 
@@ -444,11 +442,7 @@ public class SurveyUpdaterTest {
 
     @Test
     public void testAverageLegsAcrossAzimuthBoundary() {
-        List<Leg> legs = Arrays.asList(
-                new Leg(10, 359, 0),
-                new Leg(10, 1, 0),
-                new Leg(10, 0, 0)
-        );
+        List<Leg> legs = Arrays.asList(new Leg(10, 359, 0), new Leg(10, 1, 0), new Leg(10, 0, 0));
 
         Leg averaged = SurveyUpdater.averageLegs(legs);
 
@@ -514,11 +508,7 @@ public class SurveyUpdaterTest {
     @Test
     public void testBulkUpdateWithList() {
         Survey survey = new Survey();
-        List<Leg> legs = Arrays.asList(
-                new Leg(5, 0, 0),
-                new Leg(5, 0, 0),
-                new Leg(5, 0, 0)
-        );
+        List<Leg> legs = Arrays.asList(new Leg(5, 0, 0), new Leg(5, 0, 0), new Leg(5, 0, 0));
 
         boolean stationCreated = SurveyUpdater.update(survey, legs);
 
@@ -531,31 +521,19 @@ public class SurveyUpdaterTest {
 
     @Test
     public void testAreLegsAboutTheSameWithDistanceTolerance() {
-        List<Leg> withinTolerance = Arrays.asList(
-                new Leg(10.0f, 90, 0),
-                new Leg(10.01f, 90, 0)
-        );
+        List<Leg> withinTolerance = Arrays.asList(new Leg(10.0f, 90, 0), new Leg(10.01f, 90, 0));
         Assert.assertTrue(SurveyUpdater.areLegsAboutTheSame(withinTolerance));
 
-        List<Leg> outsideTolerance = Arrays.asList(
-                new Leg(10.0f, 90, 0),
-                new Leg(15.0f, 90, 0)
-        );
+        List<Leg> outsideTolerance = Arrays.asList(new Leg(10.0f, 90, 0), new Leg(15.0f, 90, 0));
         Assert.assertFalse(SurveyUpdater.areLegsAboutTheSame(outsideTolerance));
     }
 
     @Test
     public void testAreLegsAboutTheSameWithInclinationTolerance() {
-        List<Leg> withinTolerance = Arrays.asList(
-                new Leg(10, 90, 0),
-                new Leg(10, 90, 0.5f)
-        );
+        List<Leg> withinTolerance = Arrays.asList(new Leg(10, 90, 0), new Leg(10, 90, 0.5f));
         Assert.assertTrue(SurveyUpdater.areLegsAboutTheSame(withinTolerance));
 
-        List<Leg> outsideTolerance = Arrays.asList(
-                new Leg(10, 90, 0),
-                new Leg(10, 90, 45)
-        );
+        List<Leg> outsideTolerance = Arrays.asList(new Leg(10, 90, 0), new Leg(10, 90, 45));
         Assert.assertFalse(SurveyUpdater.areLegsAboutTheSame(outsideTolerance));
     }
 
@@ -654,5 +632,4 @@ public class SurveyUpdaterTest {
         Assert.assertTrue(stationCreated);
         Assert.assertEquals(2, survey.getAllStations().size());
     }
-
 }

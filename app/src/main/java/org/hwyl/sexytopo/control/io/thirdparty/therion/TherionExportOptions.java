@@ -1,8 +1,6 @@
 package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
-/**
- * Options for Therion export, typically set via a dialog before export.
- */
+/** Options for Therion export, typically set via a dialog before export. */
 public class TherionExportOptions {
 
     private int planScrapCount = 1;
@@ -10,11 +8,13 @@ public class TherionExportOptions {
     private boolean stationsInFirstPlanScrap = true;
     private boolean stationsInFirstEeScrap = true;
 
-    public TherionExportOptions() {
-    }
+    public TherionExportOptions() {}
 
-    public TherionExportOptions(int planScrapCount, int eeScrapCount,
-                                boolean stationsInFirstPlanScrap, boolean stationsInFirstEeScrap) {
+    public TherionExportOptions(
+            int planScrapCount,
+            int eeScrapCount,
+            boolean stationsInFirstPlanScrap,
+            boolean stationsInFirstEeScrap) {
         this.planScrapCount = planScrapCount;
         this.eeScrapCount = eeScrapCount;
         this.stationsInFirstPlanScrap = stationsInFirstPlanScrap;

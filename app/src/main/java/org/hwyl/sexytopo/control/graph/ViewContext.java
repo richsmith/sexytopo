@@ -2,12 +2,11 @@ package org.hwyl.sexytopo.control.graph;
 
 import android.view.Menu;
 import android.view.MenuItem;
-
 import org.hwyl.sexytopo.R;
 
 /**
- * Represents the different view contexts where station context menus can be displayed.
- * Each context configures menu visibility differently.
+ * Represents the different view contexts where station context menus can be displayed. Each context
+ * configures menu visibility differently.
  */
 public enum ViewContext {
     TABLE {

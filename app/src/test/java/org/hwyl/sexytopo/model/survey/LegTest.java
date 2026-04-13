@@ -69,7 +69,7 @@ public class LegTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testNullDestinationThrowsException() {
-        new Leg(1.0f, 0.0f, 0.0f, null, new Leg[]{});
+        new Leg(1.0f, 0.0f, 0.0f, null, new Leg[] {});
     }
 
     @Test
@@ -150,7 +150,7 @@ public class LegTest {
     @Test
     public void testLegWithDestination() {
         Station destination = new Station("A1");
-        Leg leg = new Leg(5.0f, 45.0f, 30.0f, destination, new Leg[]{});
+        Leg leg = new Leg(5.0f, 45.0f, 30.0f, destination, new Leg[] {});
         Assert.assertTrue(leg.hasDestination());
         Assert.assertEquals(destination, leg.getDestination());
     }
@@ -159,7 +159,7 @@ public class LegTest {
     public void testPromotedLegTracksOriginals() {
         Leg splay1 = new Leg(5.0f, 45.0f, 30.0f);
         Leg splay2 = new Leg(4.8f, 46.0f, 29.0f);
-        Leg[] promotedFrom = new Leg[]{splay1, splay2};
+        Leg[] promotedFrom = new Leg[] {splay1, splay2};
 
         Station destination = new Station("A1");
         Leg promoted = new Leg(5.0f, 45.0f, 30.0f, destination, promotedFrom);
@@ -180,7 +180,7 @@ public class LegTest {
         Leg splay = new Leg(5.0f, 45.0f, 30.0f, true);
         Station destination = new Station("A1");
 
-        Leg upgraded = Leg.upgradeSplayToConnectedLeg(splay, destination, new Leg[]{});
+        Leg upgraded = Leg.upgradeSplayToConnectedLeg(splay, destination, new Leg[] {});
 
         Assert.assertTrue(upgraded.hasDestination());
         Assert.assertEquals(destination, upgraded.getDestination());
@@ -193,7 +193,7 @@ public class LegTest {
     @Test
     public void testToSplayRemovesDestination() {
         Station destination = new Station("A1");
-        Leg leg = new Leg(5.0f, 45.0f, 30.0f, destination, new Leg[]{}, true);
+        Leg leg = new Leg(5.0f, 45.0f, 30.0f, destination, new Leg[] {}, true);
 
         Leg splay = leg.toSplay();
 

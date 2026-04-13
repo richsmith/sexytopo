@@ -5,18 +5,11 @@ public class Matrix {
     public final Vector x, y, z;
 
     public static Matrix getZero() {
-        return new Matrix(
-            Vector.getZero(),
-            Vector.getZero(),
-            Vector.getZero()
-        );
+        return new Matrix(Vector.getZero(), Vector.getZero(), Vector.getZero());
     }
 
     public static Matrix getOne() {
-        return new Matrix(
-            new Vector(1, 0, 0),
-            new Vector(0, 1, 0),
-            new Vector(0, 0, 1));
+        return new Matrix(new Vector(1, 0, 0), new Vector(0, 1, 0), new Vector(0, 0, 1));
     }
 
     public Matrix(Vector x, Vector y, Vector z) {
@@ -76,20 +69,31 @@ public class Matrix {
     public static Matrix Transposed(Matrix m) {
         m = new Matrix(m);
         float t;
-        t = m.x.y; m.x.y = m.y.x; m.y.x = t;
-        t = m.x.z; m.x.z = m.z.x; m.z.x = t;
-        t = m.y.z; m.y.z = m.z.y; m.z.y = t;
+        t = m.x.y;
+        m.x.y = m.y.x;
+        m.y.x = t;
+        t = m.x.z;
+        m.x.z = m.z.x;
+        m.z.x = t;
+        t = m.y.z;
+        m.y.z = m.z.y;
+        m.z.y = t;
         return m;
     }
 
     public static Matrix Inverse(Matrix m) {
         m = Transposed(m);
-        Matrix ad = new Matrix(m.y.crossProduct(m.z), m.z.crossProduct(m.x), m.x.crossProduct(m.y)); // adjugate
+        Matrix ad =
+                new Matrix(
+                        m.y.crossProduct(m.z),
+                        m.z.crossProduct(m.x),
+                        m.x.crossProduct(m.y)); // adjugate
         return ad.times(1 / m.x.times(ad.x)); // adjugate * 1/determinant
     }
 
     public static float MaxDiff(Matrix a, Matrix b) {
-        return Math.max(Vector.MaxDiff(a.x, b.x), Math.max(Vector.MaxDiff(a.y, b.y), Vector.MaxDiff(a.z, b.z)));
+        return Math.max(
+                Vector.MaxDiff(a.x, b.x),
+                Math.max(Vector.MaxDiff(a.y, b.y), Vector.MaxDiff(a.z, b.z)));
     }
-
 }

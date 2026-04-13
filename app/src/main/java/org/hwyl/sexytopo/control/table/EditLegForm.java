@@ -6,9 +6,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
-
 import com.google.android.material.textfield.TextInputLayout;
-
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.util.InputMode;
@@ -35,7 +33,6 @@ public class EditLegForm extends Form {
     private EditText graphFromStationField;
     private EditText graphToStationField;
 
-
     private EditText fromCommentField;
     private EditText toCommentField;
 
@@ -61,10 +58,9 @@ public class EditLegForm extends Form {
 
     private boolean isInitialising;
 
-    /**
-     * Constructor for editing an existing leg
-     */
-    public EditLegForm(Context context, Survey survey, Station fromStation, Leg legToEdit, View dialogView) {
+    /** Constructor for editing an existing leg */
+    public EditLegForm(
+            Context context, Survey survey, Station fromStation, Leg legToEdit, View dialogView) {
         super(context);
         this.context = context;
         this.survey = survey;
@@ -76,17 +72,20 @@ public class EditLegForm extends Form {
         this.initialise(dialogView);
     }
 
-    /**
-     * Constructor for adding a new leg (no existing leg to edit)
-     */
-    public EditLegForm(Context context, Survey survey, Station fromStation, String defaultToName,
-                       boolean isSplay, View dialogView) {
+    /** Constructor for adding a new leg (no existing leg to edit) */
+    public EditLegForm(
+            Context context,
+            Survey survey,
+            Station fromStation,
+            String defaultToName,
+            boolean isSplay,
+            View dialogView) {
         super(context);
         this.context = context;
         this.survey = survey;
         this.originalFromStation = fromStation;
         this.lastFromStation = fromStation;
-        this.originalLeg = null;  // No original leg when adding
+        this.originalLeg = null; // No original leg when adding
         this.defaultToName = defaultToName;
         this.isSplay = isSplay;
 
@@ -131,12 +130,13 @@ public class EditLegForm extends Form {
         this.inclinationField.addTextChangedListener(new TextViewValidationTrigger(this));
 
         // Enable error display once user first interacts with any field
-        android.view.View.OnFocusChangeListener enableErrorsOnTouch = (v, hasFocus) -> {
-            if (!hasFocus) {
-                enableErrors();
-                validate();
-            }
-        };
+        android.view.View.OnFocusChangeListener enableErrorsOnTouch =
+                (v, hasFocus) -> {
+                    if (!hasFocus) {
+                        enableErrors();
+                        validate();
+                    }
+                };
         this.fromStationField.setOnFocusChangeListener(enableErrorsOnTouch);
         if (!isSplay) {
             this.toStationField.setOnFocusChangeListener(enableErrorsOnTouch);
@@ -144,7 +144,6 @@ public class EditLegForm extends Form {
         this.distanceField.setOnFocusChangeListener(enableErrorsOnTouch);
         this.azimuthField.setOnFocusChangeListener(enableErrorsOnTouch);
         this.inclinationField.setOnFocusChangeListener(enableErrorsOnTouch);
-
     }
 
     private void initialiseInputMode(View dialogView) {
@@ -152,45 +151,53 @@ public class EditLegForm extends Form {
             View inputModeContainer = dialogView.findViewById(R.id.inputModeContainer);
             inputModeContainer.setVisibility(View.VISIBLE);
 
-            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-                context, R.array.leg_edit_input_mode_options, android.R.layout.simple_spinner_item);
+            ArrayAdapter<CharSequence> adapter =
+                    ArrayAdapter.createFromResource(
+                            context,
+                            R.array.leg_edit_input_mode_options,
+                            android.R.layout.simple_spinner_item);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             this.inputModeSpinner.setAdapter(adapter);
 
             // Set initial selection
             this.inputModeSpinner.setSelection(
-                inputMode == InputMode.FORWARD ? SPINNER_FORWARD : SPINNER_BACKWARD);
+                    inputMode == InputMode.FORWARD ? SPINNER_FORWARD : SPINNER_BACKWARD);
 
             // Set up spinner listener to update display when selection changes
-            this.inputModeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    InputMode newMode = position == SPINNER_FORWARD ?
-                        InputMode.FORWARD : InputMode.BACKWARD;
-                    boolean isChange = inputMode != newMode;
+            this.inputModeSpinner.setOnItemSelectedListener(
+                    new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(
+                                AdapterView<?> parent, View view, int position, long id) {
+                            InputMode newMode =
+                                    position == SPINNER_FORWARD
+                                            ? InputMode.FORWARD
+                                            : InputMode.BACKWARD;
+                            boolean isChange = inputMode != newMode;
 
-                    if (isChange) {
-                        inputMode = newMode;
+                            if (isChange) {
+                                inputMode = newMode;
 
-                        if (!isInitialising) {
-                            swapStationDisplay();
+                                if (!isInitialising) {
+                                    swapStationDisplay();
+                                }
+                                validate();
+                            }
                         }
-                        validate();
-                    }
-                }
 
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-                    // Do nothing
-                }
-            });
+                        @Override
+                        public void onNothingSelected(AdapterView<?> parent) {
+                            // Do nothing
+                        }
+                    });
         }
     }
 
     @Override
     protected void performValidation() {
         // Validate stations
-        EditText graphFromField = inputMode == InputMode.BACKWARD ? toStationField : fromStationField;
+        EditText graphFromField =
+                inputMode == InputMode.BACKWARD ? toStationField : fromStationField;
         EditText graphToField = inputMode == InputMode.BACKWARD ? fromStationField : toStationField;
 
         Station fromStation = validateGraphFromField(graphFromField);
@@ -222,7 +229,9 @@ public class EditLegForm extends Form {
             if (isRenamingStation) {
                 Station existing = survey.getStationByName(fromName);
                 if (existing == null) {
-                    fromStation=survey.getOrigin(); // Send back the origin station so that it can be renamed
+                    fromStation =
+                            survey.getOrigin(); // Send back the origin station so that it can be
+                    // renamed
                 } else {
                     error = R.string.validation_error_station_name_not_unique;
                 }
@@ -241,7 +250,7 @@ public class EditLegForm extends Form {
         }
 
         // Has the from station changed
-        if (fromStation!=null && fromStation != lastFromStation) {
+        if (fromStation != null && fromStation != lastFromStation) {
             // Update the comment to the new station
             String fromComment = "";
             if (fromStation.hasComment()) {
@@ -252,7 +261,8 @@ public class EditLegForm extends Form {
             lastFromStation = fromStation;
         }
 
-        TextInputLayout layout = (fromField == fromStationField) ? fromStationLayout : toStationLayout;
+        TextInputLayout layout =
+                (fromField == fromStationField) ? fromStationLayout : toStationLayout;
         if (layout != null) {
             setError(layout, error);
         } else {
@@ -262,7 +272,7 @@ public class EditLegForm extends Form {
     }
 
     private void validateGraphToField(Station fromStation, EditText toField) {
-        String fromName = fromStation == null? null : fromStation.getName();
+        String fromName = fromStation == null ? null : fromStation.getName();
         String toName = toField.getText().toString();
 
         Integer error = null;
@@ -309,15 +319,18 @@ public class EditLegForm extends Form {
             } else {
                 float distance = Float.parseFloat(distanceText);
                 if (!Leg.isDistanceLegal(distance)) {
-                    setError(this.distanceLayout,
-                        context.getString(R.string.validation_error_distance_minimum,
-                            Leg.MIN_DISTANCE));
+                    setError(
+                            this.distanceLayout,
+                            context.getString(
+                                    R.string.validation_error_distance_minimum, Leg.MIN_DISTANCE));
                 } else {
                     setError(this.distanceLayout, (Integer) null);
                 }
             }
         } catch (NumberFormatException e) {
-            setError(this.distanceLayout, context.getString(R.string.validation_error_must_be_number));
+            setError(
+                    this.distanceLayout,
+                    context.getString(R.string.validation_error_must_be_number));
         }
     }
 
@@ -325,18 +338,26 @@ public class EditLegForm extends Form {
         String azimuthText = this.azimuthField.getText().toString();
         try {
             if (azimuthText.isEmpty()) {
-                setError(this.azimuthLayout, context.getString(R.string.validation_error_cannot_be_blank));
+                setError(
+                        this.azimuthLayout,
+                        context.getString(R.string.validation_error_cannot_be_blank));
             } else {
                 float azimuth = Float.parseFloat(azimuthText);
                 if (!Leg.isAzimuthLegal(azimuth)) {
-                    setError(this.azimuthLayout,
-                        context.getString(R.string.validation_error_azimuth_range, Leg.MIN_AZIMUTH, Leg.MAX_AZIMUTH));
+                    setError(
+                            this.azimuthLayout,
+                            context.getString(
+                                    R.string.validation_error_azimuth_range,
+                                    Leg.MIN_AZIMUTH,
+                                    Leg.MAX_AZIMUTH));
                 } else {
                     setError(this.azimuthLayout, (Integer) null);
                 }
             }
         } catch (NumberFormatException e) {
-            setError(this.azimuthLayout, context.getString(R.string.validation_error_must_be_number));
+            setError(
+                    this.azimuthLayout,
+                    context.getString(R.string.validation_error_must_be_number));
         }
     }
 
@@ -344,24 +365,30 @@ public class EditLegForm extends Form {
         String inclinationText = this.inclinationField.getText().toString();
         try {
             if (inclinationText.isEmpty()) {
-                setError(this.inclinationLayout, context.getString(R.string.validation_error_cannot_be_blank));
+                setError(
+                        this.inclinationLayout,
+                        context.getString(R.string.validation_error_cannot_be_blank));
             } else {
                 float inclination = Float.parseFloat(inclinationText);
                 if (!Leg.isInclinationLegal(inclination)) {
-                    setError(this.inclinationLayout,
-                        context.getString(R.string.validation_error_inclination_range, Leg.MIN_INCLINATION, Leg.MAX_INCLINATION));
+                    setError(
+                            this.inclinationLayout,
+                            context.getString(
+                                    R.string.validation_error_inclination_range,
+                                    Leg.MIN_INCLINATION,
+                                    Leg.MAX_INCLINATION));
                 } else {
                     setError(this.inclinationLayout, (Integer) null);
                 }
             }
         } catch (NumberFormatException e) {
-            setError(this.inclinationLayout, context.getString(R.string.validation_error_must_be_number));
+            setError(
+                    this.inclinationLayout,
+                    context.getString(R.string.validation_error_must_be_number));
         }
     }
 
-    /**
-     * Update the station display based on current shot direction
-     */
+    /** Update the station display based on current shot direction */
     private void swapStationDisplay() {
         String fromText = graphFromStationField.getText().toString();
         String toText = graphToStationField.getText().toString();
@@ -374,15 +401,14 @@ public class EditLegForm extends Form {
             graphFromStationField = fromStationField;
             graphToStationField = toStationField; // not used for splay but probably safer to set
         } else {
-            graphFromStationField = inputMode == InputMode.BACKWARD ? toStationField : fromStationField;
-            graphToStationField = inputMode == InputMode.BACKWARD ? fromStationField : toStationField;
+            graphFromStationField =
+                    inputMode == InputMode.BACKWARD ? toStationField : fromStationField;
+            graphToStationField =
+                    inputMode == InputMode.BACKWARD ? fromStationField : toStationField;
         }
-
     }
 
-    /**
-     * Initialise the station display based on current data
-     */
+    /** Initialise the station display based on current data */
     private void initialiseStationDisplay() {
         mapGraphFields();
         String fromComment = "";
@@ -431,7 +457,9 @@ public class EditLegForm extends Form {
             float degrees = Float.parseFloat(azimuthDegreesField.getText().toString());
             float minutes = Float.parseFloat(azimuthMinutesField.getText().toString());
             float seconds = Float.parseFloat(azimuthSecondsField.getText().toString());
-            return degrees + (minutes * (1.0f / 60.0f)) + (seconds * (1.0f / 60.0f) * (1.0f / 60.0f));
+            return degrees
+                    + (minutes * (1.0f / 60.0f))
+                    + (seconds * (1.0f / 60.0f) * (1.0f / 60.0f));
         } else {
             // Standard decimal mode
             return Float.parseFloat(this.azimuthField.getText().toString());
@@ -443,7 +471,7 @@ public class EditLegForm extends Form {
         if (fromStation == null && survey.isOrigin(originalFromStation)) {
             // As a special case if we can't find the from station and we are
             // at the origin, we must be wanting to rename it - so return the origin
-            return(originalFromStation);
+            return (originalFromStation);
         }
         return fromStation;
     }
@@ -454,6 +482,7 @@ public class EditLegForm extends Form {
         }
         return toStationField.getText().toString();
     }
+
     private String getToComment() {
         if (toCommentField != null) {
             return toCommentField.getText().toString();
@@ -468,12 +497,11 @@ public class EditLegForm extends Form {
         return null;
     }
 
-
     /**
-     * Create a Leg object from the form data with measurements and shot direction.
-     * For editing: preserves the existing destination station object.
-     * For adding: creates a splay-like leg (caller must create destination and reconstruct).
-     * Should only be called after validation passes.
+     * Create a Leg object from the form data with measurements and shot direction. For editing:
+     * preserves the existing destination station object. For adding: creates a splay-like leg
+     * (caller must create destination and reconstruct). Should only be called after validation
+     * passes.
      */
     public Leg getUpdatedLeg() {
         float distance = getDistance();
@@ -486,7 +514,7 @@ public class EditLegForm extends Form {
         } else if (originalLeg != null && originalLeg.hasDestination()) {
             // For editing: reuse existing destination station object
             Station destination = originalLeg.getDestination();
-            leg = new Leg(distance, azimuth, inclination, destination, new Leg[]{});
+            leg = new Leg(distance, azimuth, inclination, destination, new Leg[] {});
         } else {
             // For adding a new station: create a temporary splay-like leg
             // Caller will reconstruct with proper destination station
@@ -501,10 +529,7 @@ public class EditLegForm extends Form {
         return leg;
     }
 
-    /**
-     * Get the from station for the leg.
-     * Should only be called after validation passes.
-     */
+    /** Get the from station for the leg. Should only be called after validation passes. */
     public Station getUpdatedFromStation() {
         return getFromStation();
     }
@@ -512,18 +537,19 @@ public class EditLegForm extends Form {
     public String getUpdatedFromStationName() {
         return getFromStationName();
     }
+
     public String getUpdatedFromComment() {
         return getFromComment();
     }
 
     /**
-     * Get the to station name for the leg.
-     * Returns null for splays.
-     * Should only be called after validation passes.
+     * Get the to station name for the leg. Returns null for splays. Should only be called after
+     * validation passes.
      */
     public String getUpdatedToStationName() {
         return isSplay ? null : getToStationName();
     }
+
     public String getUpdatedToComment() {
         return isSplay ? null : getToComment();
     }

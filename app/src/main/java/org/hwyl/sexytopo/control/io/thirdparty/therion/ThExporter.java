@@ -1,15 +1,13 @@
 package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
 import android.content.Context;
-
+import java.util.List;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
-import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
+import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
-
-import java.util.List;
 
 public class ThExporter {
 
@@ -23,9 +21,12 @@ public class ThExporter {
         builder.append("survey ").append(survey.getName()).append("\n");
 
         // Creation comment
-        String versionInfo = SexyTopoConstants.APP_NAME + " " + SexyTopoActivity.getVersionName(context);
-        builder.append(SurvexTherionUtil.getCreationComment(
-                SurveyFormat.THERION.getCommentChar(), versionInfo)).append("\n\n");
+        String versionInfo =
+                SexyTopoConstants.APP_NAME + " " + SexyTopoActivity.getVersionName(context);
+        builder.append(
+                        SurvexTherionUtil.getCreationComment(
+                                SurveyFormat.THERION.getCommentChar(), versionInfo))
+                .append("\n\n");
 
         // Input files
         builder.append(SurvexTherionUtil.getInputText(th2Files)).append("\n\n");
@@ -38,15 +39,17 @@ public class ThExporter {
             teamLines = formatTeamLines(trip);
             exploTeamLines = formatExploTeamLines(trip);
         }
-        builder.append(SurvexTherionUtil.getMetadata(
-                survey, SurveyFormat.THERION,
-                teamLines, exploTeamLines)).append("\n");
+        builder.append(
+                        SurvexTherionUtil.getMetadata(
+                                survey, SurveyFormat.THERION, teamLines, exploTeamLines))
+                .append("\n");
 
         // Centreline block
         builder.append("centreline\n");
         builder.append(SurvexTherionUtil.getStationCommentsData(survey, SurveyFormat.THERION));
         builder.append(SurvexTherionUtil.getCentrelineData(survey, SurveyFormat.THERION));
-        builder.append(SurvexTherionUtil.getExtendedElevationExtensions(survey, SurveyFormat.THERION));
+        builder.append(
+                SurvexTherionUtil.getExtendedElevationExtensions(survey, SurveyFormat.THERION));
         builder.append("endcentreline\n");
 
         // End survey
@@ -60,11 +63,12 @@ public class ThExporter {
 
         // Replace centreline block
         String centrelineText =
-            "centreline\n" +
-            SurvexTherionUtil.getStationCommentsData(survey, SurveyFormat.THERION) +
-            SurvexTherionUtil.getCentrelineData(survey, SurveyFormat.THERION) +
-            SurvexTherionUtil.getExtendedElevationExtensions(survey, SurveyFormat.THERION) +
-            "endcentreline\n";
+                "centreline\n"
+                        + SurvexTherionUtil.getStationCommentsData(survey, SurveyFormat.THERION)
+                        + SurvexTherionUtil.getCentrelineData(survey, SurveyFormat.THERION)
+                        + SurvexTherionUtil.getExtendedElevationExtensions(
+                                survey, SurveyFormat.THERION)
+                        + "endcentreline\n";
         String newContent = replaceCentreline(originalFileContent, centrelineText);
 
         // Replace input statements
@@ -106,9 +110,13 @@ public class ThExporter {
 
     private static String getRoleDescription(Trip.Role role) {
         switch (role) {
-            case BOOK: return "notes";
-            case INSTRUMENTS: return "instruments";
-            case DOG: default: return "assistant";
+            case BOOK:
+                return "notes";
+            case INSTRUMENTS:
+                return "instruments";
+            case DOG:
+            default:
+                return "assistant";
         }
     }
 
@@ -122,8 +130,7 @@ public class ThExporter {
     }
 
     private static boolean hasOnlyExplorerRole(Trip.TeamEntry entry) {
-        return entry.roles.size() == 1
-                && entry.roles.contains(Trip.Role.EXPLORATION);
+        return entry.roles.size() == 1 && entry.roles.contains(Trip.Role.EXPLORATION);
     }
 
     static String replaceCentreline(String original, String replacementText) {
@@ -135,5 +142,4 @@ public class ThExporter {
     static String replaceInputsText(String original, String replacementText) {
         return original.replaceFirst("(?m)(^input .*\\n)+", replacementText);
     }
-
 }

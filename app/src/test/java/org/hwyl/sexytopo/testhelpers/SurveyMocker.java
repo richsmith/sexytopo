@@ -1,9 +1,7 @@
 package org.hwyl.sexytopo.testhelpers;
 
 import android.net.Uri;
-
 import androidx.documentfile.provider.DocumentFile;
-
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.mockito.Mockito;
 

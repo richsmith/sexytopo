@@ -3,9 +3,7 @@ package org.hwyl.sexytopo.control.activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-
 import androidx.documentfile.provider.DocumentFile;
-
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.NewStationNotificationService;
@@ -13,7 +11,6 @@ import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.io.SurveyFile;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.model.survey.Survey;
-
 
 public class StartUpActivity extends SexyTopoActivity {
 
@@ -23,7 +20,6 @@ public class StartUpActivity extends SexyTopoActivity {
         setContentView(R.layout.activity_start_up);
         applyEdgeToEdgeInsets(R.id.rootLayout, true, true);
     }
-
 
     @Override
     protected void onStart() {
@@ -53,7 +49,6 @@ public class StartUpActivity extends SexyTopoActivity {
         finish();
     }
 
-
     protected void initialiseSurvey() {
         try {
             DocumentFile activeSurveyDirectory = tryToFindActiveSurveyDirectory();
@@ -77,7 +72,6 @@ public class StartUpActivity extends SexyTopoActivity {
                 startNewSurvey();
             }
         }
-
     }
 
     public DocumentFile tryToFindActiveSurveyDirectory() {
@@ -101,7 +95,6 @@ public class StartUpActivity extends SexyTopoActivity {
         if (!IoUtils.doesDirectoryExist(this, activeSurveyUri)) {
             Log.e(R.string.file_load_survey_error);
             return null;
-
         }
 
         Log.i(R.string.file_active_survey, surveyDirectory.getName());
@@ -131,5 +124,4 @@ public class StartUpActivity extends SexyTopoActivity {
 
         return shouldRestoreAutosave;
     }
-
 }

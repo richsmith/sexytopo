@@ -8,14 +8,10 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.os.Vibrator;
-
-import androidx.preference.PreferenceManager;
-
-import com.google.firebase.crashlytics.FirebaseCrashlytics;
-
-import org.hwyl.sexytopo.SexyTopoConstants;
-
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.preference.PreferenceManager;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
+import org.hwyl.sexytopo.SexyTopoConstants;
 
 public class NewStationNotificationService extends Service {
 
@@ -25,12 +21,13 @@ public class NewStationNotificationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        BroadcastReceiver receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                update();
-            }
-        };
+        BroadcastReceiver receiver =
+                new BroadcastReceiver() {
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        update();
+                    }
+                };
 
         try {
             LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
@@ -57,11 +54,9 @@ public class NewStationNotificationService extends Service {
         broadcastManager.unregisterReceiver(receiver);
     }
 
-
     private void update() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean vibrateOnNewStation =
-                preferences.getBoolean("pref_vibrate_on_new_station", false);
+        boolean vibrateOnNewStation = preferences.getBoolean("pref_vibrate_on_new_station", false);
 
         if (vibrateOnNewStation) {
             Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
@@ -70,5 +65,4 @@ public class NewStationNotificationService extends Service {
             }
         }
     }
-
 }

@@ -2,15 +2,12 @@ package org.hwyl.sexytopo.comms.distox;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
-
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.model.survey.Leg;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-
 
 public class MeasurementProtocol extends DistoXProtocol {
 
@@ -24,8 +21,7 @@ public class MeasurementProtocol extends DistoXProtocol {
 
     public static final int DISTANCE_BIT_MASK = 0b01000000;
 
-
-    protected byte[] previousPacket = new byte[]{};
+    protected byte[] previousPacket = new byte[] {};
 
     protected int duplicateCount = 0;
 
@@ -34,7 +30,6 @@ public class MeasurementProtocol extends DistoXProtocol {
         super(context, bluetoothDevice, dataManager);
     }
 
-
     public static Leg parseDataPacket(byte[] packet) {
 
         int d0 = packet[ADMIN] & DISTANCE_BIT_MASK;
@@ -42,8 +37,7 @@ public class MeasurementProtocol extends DistoXProtocol {
         int d2 = readByte(packet, DISTANCE_HIGH_BYTE);
         float distance = (d0 * 1024 + d2 * 256 + d1) / 1000.0f;
 
-        float azimuth_reading =
-                readDoubleByte(packet, AZIMUTH_LOW_BYTE, AZIMUTH_HIGH_BYTE);
+        float azimuth_reading = readDoubleByte(packet, AZIMUTH_LOW_BYTE, AZIMUTH_HIGH_BYTE);
         float azimuth = azimuth_reading * 180.0f / 32768.0f;
 
         float inclinationReading =
@@ -55,7 +49,6 @@ public class MeasurementProtocol extends DistoXProtocol {
 
         return new Leg(distance, azimuth, inclination);
     }
-
 
     public void go(DataInputStream inStream, DataOutputStream outStream) throws Exception {
 
@@ -81,7 +74,5 @@ public class MeasurementProtocol extends DistoXProtocol {
         }
 
         previousPacket = packet;
-
     }
-
 }

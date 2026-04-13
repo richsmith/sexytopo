@@ -1,24 +1,20 @@
-
 package org.hwyl.sexytopo.comms.distox;
-
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.content.Context;
-
-import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.control.Log;
-import org.hwyl.sexytopo.control.SurveyManager;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 import static org.hwyl.sexytopo.comms.distox.DistoXProtocol.WAIT_BETWEEN_CONNECTION_ATTEMPTS_MS;
 import static org.hwyl.sexytopo.control.activity.DeviceActivity.DISTO_X_PREFIX;
 import static org.hwyl.sexytopo.control.activity.DeviceActivity.SHETLAND_PREFIX;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.Context;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.control.Log;
+import org.hwyl.sexytopo.control.SurveyManager;
 
 public class DistoXThread extends Thread {
 
@@ -27,7 +23,6 @@ public class DistoXThread extends Thread {
         MEASUREMENT,
         CALIBRATION
     }
-
 
     private DistoXProtocol currentProtocol = NullProtocol.INSTANCE;
     private DistoXProtocol requestedProtocol = null;
@@ -45,7 +40,6 @@ public class DistoXThread extends Thread {
 
     private boolean keepAlive;
 
-
     public DistoXThread(Context context, SurveyManager dataManager) {
         this.context = context;
         this.dataManager = dataManager;
@@ -53,30 +47,26 @@ public class DistoXThread extends Thread {
 
     public void setMode(Mode mode) {
 
-        switch(mode) {
+        switch (mode) {
             case NULL:
                 requestedProtocol = NullProtocol.INSTANCE;
                 break;
             case MEASUREMENT:
-                requestedProtocol =
-                        new MeasurementProtocol(context, bluetoothDevice, dataManager);
+                requestedProtocol = new MeasurementProtocol(context, bluetoothDevice, dataManager);
                 break;
             case CALIBRATION:
-                requestedProtocol =
-                        new CalibrationProtocol(context, bluetoothDevice, dataManager);
+                requestedProtocol = new CalibrationProtocol(context, bluetoothDevice, dataManager);
                 break;
             default:
                 Log.e(R.string.device_distox_unknown_protocol);
         }
     }
 
-
     public void startCalibration() {
         setMode(Mode.NULL);
         oneOff(new StartCalibrationProtocol(context, bluetoothDevice, dataManager));
         setMode(Mode.CALIBRATION);
     }
-
 
     public void stopCalibration() {
         setMode(Mode.NULL);
@@ -108,8 +98,6 @@ public class DistoXThread extends Thread {
         return writeCalibration;
     }
 
-
-
     public void requestStart(Mode mode) {
 
         setMode(mode);
@@ -131,13 +119,11 @@ public class DistoXThread extends Thread {
         keepAlive = false;
     }
 
-
     public void run() {
 
         Log.device("Started communication thread");
 
-
-        while(keepAlive) {
+        while (keepAlive) {
 
             if (requestedProtocol != null) {
                 currentProtocol = requestedProtocol;
@@ -170,7 +156,6 @@ public class DistoXThread extends Thread {
         disconnect();
     }
 
-
     private synchronized void communicate(DistoXProtocol protocol) {
 
         try {
@@ -178,7 +163,7 @@ public class DistoXThread extends Thread {
             // (this is where all the work is done)
             protocol.go(inStream, outStream);
 
-        } catch(IOException e) {
+        } catch (IOException e) {
             String message = e.getMessage();
             if (message == null) {
                 message = "unknown";
@@ -192,24 +177,22 @@ public class DistoXThread extends Thread {
                 disconnect();
             }
 
-        } catch(Exception exception){
+        } catch (Exception exception) {
             Log.e(exception);
             Log.device("General device error: " + exception);
             disconnect();
         }
     }
 
-
     private void oneOff(DistoXProtocol protocol) {
         oneOffProtocol = protocol;
         requestInterrupt(); // need to interrupt any reads in progress or we'll be waiting forever
     }
 
-
     @SuppressWarnings("BusyWait")
     public void tryToConnectUntilConnected() {
 
-        while(keepAlive && !isConnected()) {
+        while (keepAlive && !isConnected()) {
             tryToConnectIfNotConnected();
 
             if (!isConnected()) {
@@ -220,7 +203,6 @@ public class DistoXThread extends Thread {
                 }
             }
         }
-
     }
 
     public void tryToConnectIfNotConnected() {
@@ -233,8 +215,8 @@ public class DistoXThread extends Thread {
             socket = new DistoXSocket(bluetoothDevice);
             inStream = new DataInputStream(socket.getInputStream());
             outStream = new DataOutputStream(socket.getOutputStream());
-        } catch(Exception e) {
-                Log.device("Failed to create socket: " + e.getMessage());
+        } catch (Exception e) {
+            Log.device("Failed to create socket: " + e.getMessage());
         } finally {
             if (isConnected()) {
                 Log.device(context.getString(R.string.device_connection_connected));
@@ -242,9 +224,7 @@ public class DistoXThread extends Thread {
                 Log.device(context.getString(R.string.device_connection_not_connected));
             }
         }
-
     }
-
 
     public void disconnect() {
         try {
@@ -266,7 +246,6 @@ public class DistoXThread extends Thread {
         }
     }
 
-
     private static BluetoothDevice getDistoX() {
         Set<BluetoothDevice> distoXes = getPairedDistos();
 
@@ -274,9 +253,8 @@ public class DistoXThread extends Thread {
             throw new IllegalStateException(distoXes.size() + " DistoXes paired");
         }
 
-        return distoXes.toArray(new BluetoothDevice[]{})[0];
+        return distoXes.toArray(new BluetoothDevice[] {})[0];
     }
-
 
     private static Set<BluetoothDevice> getPairedDistos() throws SecurityException {
 
@@ -305,9 +283,7 @@ public class DistoXThread extends Thread {
         return name.toLowerCase().contains(SHETLAND_PREFIX.toLowerCase());
     }
 
-
     public boolean isConnected() {
         return (socket != null) && socket.isConnected();
     }
-
 }

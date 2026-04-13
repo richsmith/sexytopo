@@ -1,18 +1,14 @@
-
 package org.hwyl.sexytopo.comms.distox;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.view.View;
-
+import java.util.HashMap;
+import java.util.Map;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.activity.DeviceActivity;
 import org.hwyl.sexytopo.control.activity.DistoXCalibrationActivity;
 import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
-
-import java.util.HashMap;
-import java.util.Map;
-
 
 public class DistoXCommunicator implements DistoXStyleCommunicator {
 
@@ -24,7 +20,6 @@ public class DistoXCommunicator implements DistoXStyleCommunicator {
     private static final int SHOT_ID = View.generateViewId();
     private static final int LASER_OFF_ID = View.generateViewId();
     private static final int DISTO_X_OFF_ID = View.generateViewId();
-
 
     private static final Map<Integer, Integer> CUSTOM_COMMANDS = new HashMap<>();
 
@@ -38,11 +33,9 @@ public class DistoXCommunicator implements DistoXStyleCommunicator {
 
     protected DistoXThread thread;
 
-    public DistoXCommunicator(
-            DeviceActivity activity, BluetoothDevice bluetoothDevice) {
+    public DistoXCommunicator(DeviceActivity activity, BluetoothDevice bluetoothDevice) {
         this.activity = activity;
         this.bluetoothDevice = bluetoothDevice;
-
     }
 
     @Override
@@ -59,10 +52,10 @@ public class DistoXCommunicator implements DistoXStyleCommunicator {
 
         Thread.State commsState = thread.getState();
         if (commsState == Thread.State.NEW) {
-           thread.requestStart(DistoXThread.Mode.MEASUREMENT);
-       } else {
-           thread.setMode(DistoXThread.Mode.MEASUREMENT);
-       }
+            thread.requestStart(DistoXThread.Mode.MEASUREMENT);
+        } else {
+            thread.setMode(DistoXThread.Mode.MEASUREMENT);
+        }
     }
 
     protected DistoXThread getNewCommsThread(SexyTopoActivity activity) {
@@ -127,7 +120,4 @@ public class DistoXCommunicator implements DistoXStyleCommunicator {
         WriteCalibrationProtocol writeCalibrationProtocol = thread.writeCalibration(coeffs);
         return writeCalibrationProtocol;
     }
-
-
-
 }

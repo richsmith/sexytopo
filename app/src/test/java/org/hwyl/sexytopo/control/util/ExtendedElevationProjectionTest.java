@@ -1,7 +1,6 @@
 package org.hwyl.sexytopo.control.util;
 
-import org.junit.Assert;
-
+import java.util.Map;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Projection2D;
@@ -10,10 +9,8 @@ import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
+import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.Map;
-
 
 public class ExtendedElevationProjectionTest {
 
@@ -32,7 +29,6 @@ public class ExtendedElevationProjectionTest {
         Assert.assertEquals(expected, twoCoord);
     }
 
-
     @Test
     public void testProject5MNorthReversed() {
 
@@ -48,7 +44,6 @@ public class ExtendedElevationProjectionTest {
         Coord2D expected = new Coord2D(-5, 0);
         Assert.assertEquals(expected, twoCoord);
     }
-
 
     @Test
     public void testProject5MDown() {
@@ -74,7 +69,6 @@ public class ExtendedElevationProjectionTest {
         Map<Station, Coord2D> stationMap = space.getStationMap();
         Map<Leg, Line<Coord2D>> legMap = space.getLegMap();
 
-
         Station two = survey.getStationByName("2");
         Coord2D twoCoord = stationMap.get(two);
         Coord2D expected = new Coord2D(5, 0);
@@ -92,5 +86,4 @@ public class ExtendedElevationProjectionTest {
         assert splayRightLine != null;
         Assert.assertEquals(expected, splayRightLine.getEnd());
     }
-
 }

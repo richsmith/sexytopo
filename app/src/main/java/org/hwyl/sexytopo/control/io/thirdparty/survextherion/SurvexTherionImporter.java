@@ -1,12 +1,5 @@
 package org.hwyl.sexytopo.control.io.thirdparty.survextherion;
 
-import org.hwyl.sexytopo.SexyTopoConstants;
-import org.hwyl.sexytopo.control.Log;
-import org.hwyl.sexytopo.model.survey.Leg;
-import org.hwyl.sexytopo.model.survey.Station;
-import org.hwyl.sexytopo.model.survey.Survey;
-import org.hwyl.sexytopo.model.survey.Trip;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,24 +8,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.hwyl.sexytopo.SexyTopoConstants;
+import org.hwyl.sexytopo.control.Log;
+import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.Station;
+import org.hwyl.sexytopo.model.survey.Survey;
+import org.hwyl.sexytopo.model.survey.Trip;
 
-
-/**
- * Shared importer for Survex and Therion data.
- */
+/** Shared importer for Survex and Therion data. */
 public class SurvexTherionImporter {
 
     public static final Pattern COMMENT_INSTRUCTION_REGEX = Pattern.compile("([{].*?[}])");
 
-
     /**
      * Parse centreline data from Survex/Therion format.
      *
-     * Handles:
-     * - Forward and backward legs (detects based on station order)
-     * - Promoted legs in inline{} format: {from: d1 a1 i1, d2 a2 i2, ...}
-     * - Promoted legs in commented new lines format (below main leg)
-     * - Both Survex (;) and Therion (#) comment styles
+     * <p>Handles: - Forward and backward legs (detects based on station order) - Promoted legs in
+     * inline{} format: {from: d1 a1 i1, d2 a2 i2, ...} - Promoted legs in commented new lines
+     * format (below main leg) - Both Survex (;) and Therion (#) comment styles
      *
      * @param text The centreline data text
      * @param survey The survey to populate
@@ -69,8 +62,8 @@ public class SurvexTherionImporter {
                 String[] fields = line.trim().split("\\s+");
 
                 // Check for commented new lines promoted legs in subsequent lines
-                List<Leg> commentedNewLineLegs = parseCommentedNewLinePromotedLegs(
-                    lines, lineIndex, fields[0], fields[1]);
+                List<Leg> commentedNewLineLegs =
+                        parseCommentedNewLinePromotedLegs(lines, lineIndex, fields[0], fields[1]);
 
                 addLegToSurvey(survey, nameToStation, fields, comment, commentedNewLineLegs);
 
@@ -80,13 +73,11 @@ public class SurvexTherionImporter {
         }
     }
 
-
     /**
      * Parse passage data section to extract station comments.
      *
-     * Supports:
-     * - Therion: "data passage station ignoreall"
-     * - Survex:  "*data passage station ignoreall"
+     * <p>Supports: - Therion: "data passage station ignoreall" - Survex: "*data passage station
+     * ignoreall"
      *
      * @param text The full file text (may contain multiple sections)
      * @param format the file format being parsed (SURVEX or THERION)
@@ -113,8 +104,9 @@ public class SurvexTherionImporter {
             }
 
             // Exit passage block on any other data command
-            if (inPassageBlock && trimmed.startsWith(dataCommandPrefix)
-                && !trimmed.startsWith(dataPassagePrefix)) {
+            if (inPassageBlock
+                    && trimmed.startsWith(dataCommandPrefix)
+                    && !trimmed.startsWith(dataPassagePrefix)) {
                 inPassageBlock = false;
                 continue;
             }
@@ -122,8 +114,10 @@ public class SurvexTherionImporter {
             // If in passage block, parse station and comment
             if (inPassageBlock) {
                 // Skip comment lines and command lines
-                if (trimmed.startsWith(";") || trimmed.startsWith("#") ||
-                    trimmed.startsWith("*") || trimmed.startsWith("extend")) {
+                if (trimmed.startsWith(";")
+                        || trimmed.startsWith("#")
+                        || trimmed.startsWith("*")
+                        || trimmed.startsWith("extend")) {
                     continue;
                 }
 
@@ -141,13 +135,12 @@ public class SurvexTherionImporter {
         return passageComments;
     }
 
-
     /**
      * Merge passage data comments with existing station comments.
      *
-     * If a station has both a passage comment and a leg-line comment,
+     * <p>If a station has both a passage comment and a leg-line comment,
      *
-     * Format: <passage comment> :: <leg-line comment>
+     * <p>Format: <passage comment> :: <leg-line comment>
      *
      * @param survey The survey with stations
      * @param passageComments Map of station name to passage comment
@@ -177,7 +170,6 @@ public class SurvexTherionImporter {
             }
         }
     }
-
 
     public static Trip parseMetadata(String text, SurveyFormat format) {
         char commentChar = format.getCommentChar();
@@ -298,7 +290,6 @@ public class SurvexTherionImporter {
         return trip;
     }
 
-
     private static void parseTeamLine(String line, Map<String, List<Trip.Role>> teamMap) {
         // line: team "Name" role1 role2
         String afterTeam = line.substring(5).trim();
@@ -331,7 +322,6 @@ public class SurvexTherionImporter {
         }
     }
 
-
     private static Trip.Role parseRole(String roleStr) {
         switch (roleStr.toLowerCase()) {
             case "notes":
@@ -348,7 +338,6 @@ public class SurvexTherionImporter {
         }
     }
 
-
     static String extractQuotedValue(String line, String prefix) {
         String rest = line.substring(prefix.length()).trim();
         if (rest.startsWith("\"") && rest.endsWith("\"")) {
@@ -356,8 +345,6 @@ public class SurvexTherionImporter {
         }
         return rest;
     }
-
-
 
     private static Date parseDate(String dateStr) {
         try {
@@ -369,10 +356,12 @@ public class SurvexTherionImporter {
         }
     }
 
-
     private static void addLegToSurvey(
-            Survey survey, Map<String, Station> nameToStation, String[] fields,
-            String comment, List<Leg> commentedNewLineLegs) {
+            Survey survey,
+            Map<String, Station> nameToStation,
+            String[] fields,
+            String comment,
+            List<Leg> commentedNewLineLegs) {
 
         String fromName = fields[0];
         String toName = fields[1];
@@ -460,15 +449,14 @@ public class SurvexTherionImporter {
         survey.setActiveStation(legFrom);
     }
 
-
     /**
      * Detect if a leg was shot backwards.
      *
-     * A leg is backward if the FROM station is new (not seen before).
-     * Detection is based on POSITION (from/to), not station names/numbers.
+     * <p>A leg is backward if the FROM station is new (not seen before). Detection is based on
+     * POSITION (from/to), not station names/numbers.
      */
-    private static boolean isBackwardLeg(String fromName, String toName,
-                                        Map<String, Station> seenStations) {
+    private static boolean isBackwardLeg(
+            String fromName, String toName, Map<String, Station> seenStations) {
         boolean fromIsNew = !seenStations.containsKey(fromName);
         boolean toIsNew = !seenStations.containsKey(toName);
 
@@ -486,16 +474,12 @@ public class SurvexTherionImporter {
         return fromIsNew;
     }
 
-
     /**
      * Parse promoted legs from commented new lines format.
      *
-     * These are shots on commented lines that come AFTER the main leg line.
+     * <p>These are shots on commented lines that come AFTER the main leg line.
      *
-     * Example:
-     * 1  2  5.541  253.93  4.67
-     * #1 2  5.542  73.95   -4.64
-     * #1 2  5.541  73.93   -4.69
+     * <p>Example: 1 2 5.541 253.93 4.67 #1 2 5.542 73.95 -4.64 #1 2 5.541 73.93 -4.69
      */
     private static List<Leg> parseCommentedNewLinePromotedLegs(
             String[] lines, int startIndex, String expectedFrom, String expectedTo) {
@@ -516,9 +500,9 @@ public class SurvexTherionImporter {
             String[] fields = content.split("\\s+");
 
             // Check if this is a matching shot
-            if (fields.length >= 5 &&
-                fields[0].equals(expectedFrom) &&
-                fields[1].equals(expectedTo)) {
+            if (fields.length >= 5
+                    && fields[0].equals(expectedFrom)
+                    && fields[1].equals(expectedTo)) {
 
                 try {
                     float distance = Float.parseFloat(fields[2]);
@@ -537,7 +521,6 @@ public class SurvexTherionImporter {
         return shots;
     }
 
-
     private static String extractCommentInstructions(String comment) {
         Matcher matcher = COMMENT_INSTRUCTION_REGEX.matcher(comment);
         if (matcher.find()) {
@@ -546,7 +529,6 @@ public class SurvexTherionImporter {
             return "";
         }
     }
-
 
     private static String extractCommentFromLine(String line) {
         String comment = "";
@@ -563,32 +545,27 @@ public class SurvexTherionImporter {
         return comment;
     }
 
-
     /**
      * Parse promoted legs from inline{} format.
      *
-     * Example: {from: 5.542 73.95 -4.64, 5.541 73.93 -4.69, 5.541 73.92 -4.67}
+     * <p>Example: {from: 5.542 73.95 -4.64, 5.541 73.93 -4.69, 5.541 73.92 -4.67}
      */
     private static Leg[] parseInlinePromotedLegs(String commentInstructions) {
         try {
             return parse(commentInstructions);
         } catch (Exception exception) {
             Log.e(exception);
-            return new Leg[]{};
+            return new Leg[] {};
         }
     }
-
 
     private static Leg[] parse(String instructions) throws Exception {
 
         if (instructions.equals("")) {
-            return new Leg[]{};
+            return new Leg[] {};
         }
 
-        instructions = instructions
-                .replaceFirst("\\{", "")
-                .replaceFirst("\\}", "")
-                .trim();
+        instructions = instructions.replaceFirst("\\{", "").replaceFirst("\\}", "").trim();
 
         String[] components = instructions.split(":", 2);
         if (components.length < 2) {
@@ -605,9 +582,8 @@ public class SurvexTherionImporter {
             throw new Exception("Unknown tag: " + tag);
         }
 
-        return legs.toArray(new Leg[]{});
+        return legs.toArray(new Leg[] {});
     }
-
 
     private static List<Leg> parseFrom(String text) throws Exception {
         List<Leg> legs = new ArrayList<>();
@@ -618,7 +594,6 @@ public class SurvexTherionImporter {
         }
         return legs;
     }
-
 
     private static Leg parseLeg(String text) throws Exception {
         String[] fields = text.trim().split("\\s+");
@@ -631,5 +606,4 @@ public class SurvexTherionImporter {
 
         return new Leg(distance, azimuth, inclination);
     }
-
 }

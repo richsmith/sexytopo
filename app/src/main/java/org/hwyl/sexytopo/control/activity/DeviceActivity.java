@@ -14,11 +14,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
-
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
+import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Set;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.comms.Communicator;
@@ -27,13 +28,7 @@ import org.hwyl.sexytopo.comms.InstrumentType;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.util.LogUpdateReceiver;
 
-import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.Set;
-
-
 public class DeviceActivity extends SexyTopoActivity {
-
 
     public static final String DISTO_X_PREFIX = "DistoX";
     public static final String SHETLAND_PREFIX = "Shetland";
@@ -46,7 +41,6 @@ public class DeviceActivity extends SexyTopoActivity {
     private DeviceLogUpdateReceiver logUpdateReceiver;
     private StateChangeReceiver stateChangeReceiver;
     private ScanReceiver scanReceiver;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,10 +74,8 @@ public class DeviceActivity extends SexyTopoActivity {
         logFilter = new IntentFilter();
         logFilter.addAction(SexyTopoConstants.DEVICE_LOG_UPDATED_EVENT);
 
-
         logUpdateReceiver = new DeviceLogUpdateReceiver();
     }
-
 
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
@@ -105,7 +97,6 @@ public class DeviceActivity extends SexyTopoActivity {
         }
     }
 
-
     @Override
     protected void onPause() {
         super.onPause();
@@ -118,7 +109,6 @@ public class DeviceActivity extends SexyTopoActivity {
             Log.e("Error unregistering receiver: " + exception.getMessage());
         }
     }
-
 
     private void updateStatuses() {
         updateBluetooth();
@@ -137,7 +127,6 @@ public class DeviceActivity extends SexyTopoActivity {
                 (buttonView, isChecked) -> toggleConnection(buttonView));
     }
 
-
     public void startConnection() {
         try {
             updateComms();
@@ -146,7 +135,6 @@ public class DeviceActivity extends SexyTopoActivity {
         } catch (Exception exception) {
             showExceptionAndLog(exception);
         }
-
     }
 
     public void stopConnection() {
@@ -155,9 +143,9 @@ public class DeviceActivity extends SexyTopoActivity {
         try {
             requestComms().requestDisconnect();
         } catch (Exception e) {
-            Log.device(R.string.device_connection_closing_error, e.getMessage());        }
+            Log.device(R.string.device_connection_closing_error, e.getMessage());
+        }
     }
-
 
     private BluetoothAdapter getBluetoothAdapter() {
         if (bluetoothAdapter == null) {
@@ -171,7 +159,6 @@ public class DeviceActivity extends SexyTopoActivity {
         }
         return bluetoothAdapter;
     }
-
 
     @SuppressWarnings("RedundantIfStatement")
     private void updateBluetooth() {
@@ -199,9 +186,8 @@ public class DeviceActivity extends SexyTopoActivity {
         findViewById(R.id.unpairButton).setEnabled(bluetoothSwitch.isChecked());
     }
 
-
     public void toggleBluetooth(View view) throws SecurityException {
-        SwitchCompat bluetoothSwitch = (SwitchCompat)view;
+        SwitchCompat bluetoothSwitch = (SwitchCompat) view;
         if (bluetoothSwitch.isChecked()) {
             BluetoothAdapter.getDefaultAdapter().enable();
         } else {
@@ -210,9 +196,8 @@ public class DeviceActivity extends SexyTopoActivity {
         updateBluetooth();
     }
 
-
     public void toggleConnection(View view) {
-        SwitchCompat connectionSwitch = (SwitchCompat)view;
+        SwitchCompat connectionSwitch = (SwitchCompat) view;
         if (connectionSwitch.isChecked()) {
             Log.device(getString(R.string.device_connection_requested));
             startConnection();
@@ -222,12 +207,10 @@ public class DeviceActivity extends SexyTopoActivity {
         }
     }
 
-
     // TODO need some way of calling this
     public void clearLog(View view) {
         Log.clearDeviceLog();
     }
-
 
     public void requestPair(View view) throws SecurityException {
 
@@ -252,15 +235,12 @@ public class DeviceActivity extends SexyTopoActivity {
         }
     }
 
-
-
     public void requestUnpair(View view) {
         BluetoothDevice device = getPairedDevice();
         stopConnection();
         unpair(device);
         updatePairedStatus();
     }
-
 
     private void updatePairedStatus() throws SecurityException {
 
@@ -272,7 +252,10 @@ public class DeviceActivity extends SexyTopoActivity {
         Button unpairButton = findViewById(R.id.unpairButton);
 
         TextView deviceList = findViewById(R.id.deviceList);
-        int textColor = device == null ? ContextCompat.getColor(this, android.R.color.darker_gray) : ContextCompat.getColor(this, R.color.red);
+        int textColor =
+                device == null
+                        ? ContextCompat.getColor(this, android.R.color.darker_gray)
+                        : ContextCompat.getColor(this, R.color.red);
         deviceList.setTextColor(textColor);
         if (isPaired) {
             pairButton.setEnabled(false);
@@ -302,8 +285,6 @@ public class DeviceActivity extends SexyTopoActivity {
         connectionSwitch.setChecked(isActuallyConnected);
     }
 
-
-
     private void unpair(BluetoothDevice device) throws SecurityException {
 
         if (device == null) {
@@ -313,7 +294,7 @@ public class DeviceActivity extends SexyTopoActivity {
         try {
             Log.device(R.string.device_pairing_unpairing_device, device.getName());
             Method method = device.getClass().getMethod("removeBond", (Class[]) null);
-            method.invoke(device, (Object[])null);
+            method.invoke(device, (Object[]) null);
             updateComms();
             Log.device(R.string.device_pairing_unpairing_success);
         } catch (Exception e) {
@@ -350,7 +331,6 @@ public class DeviceActivity extends SexyTopoActivity {
         }
     }
 
-
     private static void pair(BluetoothDevice device) throws SecurityException {
         try {
             Log.device(R.string.device_pairing_attempt, device.getName());
@@ -359,7 +339,6 @@ public class DeviceActivity extends SexyTopoActivity {
         } catch (Exception e) {
             Log.device(R.string.device_pairing_error, e.getMessage());
         }
-
     }
 
     private BluetoothDevice getPairedDevice() {
@@ -385,7 +364,6 @@ public class DeviceActivity extends SexyTopoActivity {
 
         return null;
     }
-
 
     private class StateChangeReceiver extends BroadcastReceiver {
 
@@ -429,7 +407,6 @@ public class DeviceActivity extends SexyTopoActivity {
         }
     }
 
-
     private class DeviceLogUpdateReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -440,7 +417,7 @@ public class DeviceActivity extends SexyTopoActivity {
             TextView logView = findViewById(R.id.deviceLog);
             final ScrollView scrollView = findViewById(R.id.scrollView);
             LogUpdateReceiver.update(Log.LogType.DEVICE, scrollView, logView);
-            scrollView.postDelayed(() -> scrollView.fullScroll(ScrollView.FOCUS_DOWN),1000);
+            scrollView.postDelayed(() -> scrollView.fullScroll(ScrollView.FOCUS_DOWN), 1000);
         }
     }
 }

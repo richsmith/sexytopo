@@ -7,10 +7,12 @@ import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.os.Build;
 import android.view.View;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import no.nordicsemi.android.ble.data.Data;
 import org.apache.commons.lang3.ArrayUtils;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.comms.ble.SexyTopoBleManager;
@@ -18,12 +20,6 @@ import org.hwyl.sexytopo.comms.ble.SexyTopoDataHandler;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.model.survey.Leg;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
-import no.nordicsemi.android.ble.data.Data;
 
 public class CavwayX1Manager extends SexyTopoBleManager {
 
@@ -47,10 +43,12 @@ public class CavwayX1Manager extends SexyTopoBleManager {
     private static final int COMMAND_LASER_TRIGGER = View.generateViewId();
 
     private static final Map<Integer, Integer> CUSTOM_COMMANDS = new HashMap<>();
+
     static {
-        CUSTOM_COMMANDS.put(COMMAND_ENTER_CALIBRATION_MODE, R.string.device_cavway_x1_calibration_on);
-        CUSTOM_COMMANDS.put(COMMAND_QUIT_CALIBRATION_MODE,
-            R.string.device_cavway_x1_calibration_off);
+        CUSTOM_COMMANDS.put(
+                COMMAND_ENTER_CALIBRATION_MODE, R.string.device_cavway_x1_calibration_on);
+        CUSTOM_COMMANDS.put(
+                COMMAND_QUIT_CALIBRATION_MODE, R.string.device_cavway_x1_calibration_off);
         CUSTOM_COMMANDS.put(COMMAND_LASER_ON, R.string.device_command_laser_on);
         CUSTOM_COMMANDS.put(COMMAND_LASER_TRIGGER, R.string.device_command_take_shot);
         CUSTOM_COMMANDS.put(COMMAND_LASER_OFF, R.string.device_command_laser_off);
@@ -59,6 +57,7 @@ public class CavwayX1Manager extends SexyTopoBleManager {
 
     // Mapping from UI command to the actual byte command for the device
     private static final Map<Integer, Integer> CUSTOM_COMMAND_TO_COMMAND_BYTE = new HashMap<>();
+
     static {
         CUSTOM_COMMAND_TO_COMMAND_BYTE.put(COMMAND_QUIT_CALIBRATION_MODE, 0x30);
         CUSTOM_COMMAND_TO_COMMAND_BYTE.put(COMMAND_ENTER_CALIBRATION_MODE, 0x31);
@@ -68,8 +67,8 @@ public class CavwayX1Manager extends SexyTopoBleManager {
         CUSTOM_COMMAND_TO_COMMAND_BYTE.put(COMMAND_LASER_TRIGGER, 0x38);
     }
 
-    private static final Byte[] WRITE_HEADER = new Byte[]{0x64, 0x61, 0x74, 0x61, 0x3a};
-    private static final Byte[] WRITE_FOOTER = new Byte[]{0x0d, 0x0a};
+    private static final Byte[] WRITE_HEADER = new Byte[] {0x64, 0x61, 0x74, 0x61, 0x3a};
+    private static final Byte[] WRITE_FOOTER = new Byte[] {0x0d, 0x0a};
 
     private final SurveyManager dataManager;
 
@@ -115,14 +114,25 @@ public class CavwayX1Manager extends SexyTopoBleManager {
     }
 
     private static Byte[] createWriteCommandPacket(Byte commandByte) {
-        Byte[] payload = new Byte[]{commandByte};
-        Byte[] payloadLength = new Byte[]{0x01};
+        Byte[] payload = new Byte[] {commandByte};
+        Byte[] payloadLength = new Byte[] {0x01};
 
-        Byte[] packet = new Byte[WRITE_HEADER.length + payloadLength.length + payload.length + WRITE_FOOTER.length];
+        Byte[] packet =
+                new Byte
+                        [WRITE_HEADER.length
+                                + payloadLength.length
+                                + payload.length
+                                + WRITE_FOOTER.length];
         System.arraycopy(WRITE_HEADER, 0, packet, 0, WRITE_HEADER.length);
         System.arraycopy(payloadLength, 0, packet, WRITE_HEADER.length, payloadLength.length);
-        System.arraycopy(payload, 0, packet, WRITE_HEADER.length + payloadLength.length, payload.length);
-        System.arraycopy(WRITE_FOOTER, 0, packet, WRITE_HEADER.length + payloadLength.length + payload.length, WRITE_FOOTER.length);
+        System.arraycopy(
+                payload, 0, packet, WRITE_HEADER.length + payloadLength.length, payload.length);
+        System.arraycopy(
+                WRITE_FOOTER,
+                0,
+                packet,
+                WRITE_HEADER.length + payloadLength.length + payload.length,
+                WRITE_FOOTER.length);
 
         return packet;
     }
@@ -130,7 +140,9 @@ public class CavwayX1Manager extends SexyTopoBleManager {
     private void writePacket(Byte[] packet, int stringId) {
         byte[] packetBytes = ArrayUtils.toPrimitive(packet);
         writeCharacteristic(
-                writeCharacteristic, packetBytes, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
+                        writeCharacteristic,
+                        packetBytes,
+                        BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
                 .done(device -> Log.device(stringId))
                 .enqueue();
     }
@@ -196,17 +208,28 @@ public class CavwayX1Manager extends SexyTopoBleManager {
             // ACK value is fixed as Byte[1] | 0x55
             byte ackByte = (byte) (flags | 0x55);
 
-            // The Cavway protocol for sending commands/acks seems to use the same header/footer structure
+            // The Cavway protocol for sending commands/acks seems to use the same header/footer
+            // structure
             // for everything except data queries. The ACK payload is a single byte.
-            Byte[] payload = new Byte[]{ackByte};
-            Byte[] payloadLength = new Byte[]{0x01};
+            Byte[] payload = new Byte[] {ackByte};
+            Byte[] payloadLength = new Byte[] {0x01};
 
-            Byte[] packet = new Byte[
-                WRITE_HEADER.length + payloadLength.length + payload.length + WRITE_FOOTER.length];
+            Byte[] packet =
+                    new Byte
+                            [WRITE_HEADER.length
+                                    + payloadLength.length
+                                    + payload.length
+                                    + WRITE_FOOTER.length];
             System.arraycopy(WRITE_HEADER, 0, packet, 0, WRITE_HEADER.length);
             System.arraycopy(payloadLength, 0, packet, WRITE_HEADER.length, payloadLength.length);
-            System.arraycopy(payload, 0, packet, WRITE_HEADER.length + payloadLength.length, payload.length);
-            System.arraycopy(WRITE_FOOTER, 0, packet, WRITE_HEADER.length + payloadLength.length + payload.length, WRITE_FOOTER.length);
+            System.arraycopy(
+                    payload, 0, packet, WRITE_HEADER.length + payloadLength.length, payload.length);
+            System.arraycopy(
+                    WRITE_FOOTER,
+                    0,
+                    packet,
+                    WRITE_HEADER.length + payloadLength.length + payload.length,
+                    WRITE_FOOTER.length);
 
             writePacket(packet, R.string.device_data_acknowledged_packet);
         }

@@ -1,9 +1,5 @@
 package org.hwyl.sexytopo.control.io.thirdparty.pockettopo;
 
-import org.hwyl.sexytopo.model.sketch.Colour;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,7 +7,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
-
+import org.hwyl.sexytopo.model.sketch.Colour;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class PocketTopoFileTest {
 
@@ -19,13 +17,13 @@ public class PocketTopoFileTest {
 
     @Test
     public void testReadByte() throws IOException {
-        InputStream in = new ByteArrayInputStream(new byte[]{(byte) 0xAB});
+        InputStream in = new ByteArrayInputStream(new byte[] {(byte) 0xAB});
         Assert.assertEquals(0xAB, PocketTopoFile.readByte(in));
     }
 
     @Test(expected = IOException.class)
     public void testReadByteThrowsOnEmpty() throws IOException {
-        InputStream in = new ByteArrayInputStream(new byte[]{});
+        InputStream in = new ByteArrayInputStream(new byte[] {});
         PocketTopoFile.readByte(in);
     }
 
@@ -33,21 +31,21 @@ public class PocketTopoFileTest {
 
     @Test
     public void testReadInt16Zero() throws IOException {
-        InputStream in = new ByteArrayInputStream(new byte[]{0x00, 0x00});
+        InputStream in = new ByteArrayInputStream(new byte[] {0x00, 0x00});
         Assert.assertEquals(0, PocketTopoFile.readInt16(in));
     }
 
     @Test
     public void testReadInt16LittleEndian() throws IOException {
         // 0x0102 little-endian = 02 01
-        InputStream in = new ByteArrayInputStream(new byte[]{0x02, 0x01});
+        InputStream in = new ByteArrayInputStream(new byte[] {0x02, 0x01});
         Assert.assertEquals(0x0102, PocketTopoFile.readInt16(in));
     }
 
     @Test
     public void testReadInt16Negative() throws IOException {
         // -1 = 0xFFFF little-endian = FF FF
-        InputStream in = new ByteArrayInputStream(new byte[]{(byte) 0xFF, (byte) 0xFF});
+        InputStream in = new ByteArrayInputStream(new byte[] {(byte) 0xFF, (byte) 0xFF});
         Assert.assertEquals(-1, PocketTopoFile.readInt16(in));
     }
 
@@ -55,22 +53,23 @@ public class PocketTopoFileTest {
 
     @Test
     public void testReadInt32Zero() throws IOException {
-        InputStream in = new ByteArrayInputStream(new byte[]{0x00, 0x00, 0x00, 0x00});
+        InputStream in = new ByteArrayInputStream(new byte[] {0x00, 0x00, 0x00, 0x00});
         Assert.assertEquals(0, PocketTopoFile.readInt32(in));
     }
 
     @Test
     public void testReadInt32LittleEndian() throws IOException {
         // 0x01020304 little-endian = 04 03 02 01
-        InputStream in = new ByteArrayInputStream(new byte[]{0x04, 0x03, 0x02, 0x01});
+        InputStream in = new ByteArrayInputStream(new byte[] {0x04, 0x03, 0x02, 0x01});
         Assert.assertEquals(0x01020304, PocketTopoFile.readInt32(in));
     }
 
     @Test
     public void testReadInt32Negative() throws IOException {
         // -1 = 0xFFFFFFFF
-        InputStream in = new ByteArrayInputStream(new byte[]{
-                (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF});
+        InputStream in =
+                new ByteArrayInputStream(
+                        new byte[] {(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF});
         Assert.assertEquals(-1, PocketTopoFile.readInt32(in));
     }
 
@@ -78,16 +77,18 @@ public class PocketTopoFileTest {
 
     @Test
     public void testReadInt64Zero() throws IOException {
-        InputStream in = new ByteArrayInputStream(new byte[]{
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00});
+        InputStream in =
+                new ByteArrayInputStream(
+                        new byte[] {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00});
         Assert.assertEquals(0L, PocketTopoFile.readInt64(in));
     }
 
     @Test
     public void testReadInt64LittleEndian() throws IOException {
         // 0x0000000100000002 little-endian = 02 00 00 00 01 00 00 00
-        InputStream in = new ByteArrayInputStream(new byte[]{
-                0x02, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00});
+        InputStream in =
+                new ByteArrayInputStream(
+                        new byte[] {0x02, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00});
         Assert.assertEquals(0x0000000100000002L, PocketTopoFile.readInt64(in));
     }
 
@@ -95,14 +96,14 @@ public class PocketTopoFileTest {
 
     @Test
     public void testReadStringEmpty() throws IOException {
-        InputStream in = new ByteArrayInputStream(new byte[]{0x00});
+        InputStream in = new ByteArrayInputStream(new byte[] {0x00});
         Assert.assertEquals("", PocketTopoFile.readString(in));
     }
 
     @Test
     public void testReadStringShort() throws IOException {
         // length=3, "abc"
-        InputStream in = new ByteArrayInputStream(new byte[]{0x03, 0x61, 0x62, 0x63});
+        InputStream in = new ByteArrayInputStream(new byte[] {0x03, 0x61, 0x62, 0x63});
         Assert.assertEquals("abc", PocketTopoFile.readString(in));
     }
 
@@ -243,8 +244,9 @@ public class PocketTopoFileTest {
         cal.set(2005, Calendar.JULY, 1, 0, 0, 0);
         cal.set(Calendar.MILLISECOND, 0);
         long expectedMillis = cal.getTimeInMillis();
-        long ticks = PocketTopoFile.TICKS_AT_EPOCH
-                + (expectedMillis * PocketTopoFile.TICKS_PER_MILLISECOND);
+        long ticks =
+                PocketTopoFile.TICKS_AT_EPOCH
+                        + (expectedMillis * PocketTopoFile.TICKS_PER_MILLISECOND);
 
         Date date = PocketTopoFile.ticksToDate(ticks);
         Calendar result = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
@@ -301,21 +303,21 @@ public class PocketTopoFileTest {
     @Test
     public void testReadIdUndefined() throws IOException {
         // 0x80000000 little-endian = 00 00 00 80
-        InputStream in = new ByteArrayInputStream(new byte[]{0x00, 0x00, 0x00, (byte) 0x80});
+        InputStream in = new ByteArrayInputStream(new byte[] {0x00, 0x00, 0x00, (byte) 0x80});
         Assert.assertNull(PocketTopoFile.readId(in));
     }
 
     @Test
     public void testReadIdMajorMinor() throws IOException {
         // 1.0 = 0x00010000 little-endian = 00 00 01 00
-        InputStream in = new ByteArrayInputStream(new byte[]{0x00, 0x00, 0x01, 0x00});
+        InputStream in = new ByteArrayInputStream(new byte[] {0x00, 0x00, 0x01, 0x00});
         Assert.assertEquals("1.0", PocketTopoFile.readId(in));
     }
 
     @Test
     public void testReadIdPlainNumber() throws IOException {
         // Station 0 = 0x80000001 little-endian = 01 00 00 80
-        InputStream in = new ByteArrayInputStream(new byte[]{0x01, 0x00, 0x00, (byte) 0x80});
+        InputStream in = new ByteArrayInputStream(new byte[] {0x01, 0x00, 0x00, (byte) 0x80});
         Assert.assertEquals("0", PocketTopoFile.readId(in));
     }
 }

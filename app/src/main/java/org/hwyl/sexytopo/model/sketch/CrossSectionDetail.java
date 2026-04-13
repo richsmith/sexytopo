@@ -5,7 +5,6 @@ import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Space;
 
-
 public class CrossSectionDetail extends SinglePositionDetail {
 
     private final CrossSection crossSection;

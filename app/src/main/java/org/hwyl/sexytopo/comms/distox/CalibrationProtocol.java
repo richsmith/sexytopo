@@ -2,15 +2,12 @@ package org.hwyl.sexytopo.comms.distox;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
-
-import org.hwyl.sexytopo.control.Log;
-import org.hwyl.sexytopo.control.SurveyManager;
-import org.hwyl.sexytopo.model.calibration.CalibrationReading;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-
+import org.hwyl.sexytopo.control.Log;
+import org.hwyl.sexytopo.control.SurveyManager;
+import org.hwyl.sexytopo.model.calibration.CalibrationReading;
 
 public class CalibrationProtocol extends DistoXProtocol {
 
@@ -35,12 +32,10 @@ public class CalibrationProtocol extends DistoXProtocol {
     private CalibrationReading calibrationReading = null;
     private int accelerationDuplicated = 0, magneticDuplicated = 0;
 
-
     public CalibrationProtocol(
             Context context, BluetoothDevice bluetoothDevice, SurveyManager dataManager) {
         super(context, bluetoothDevice, dataManager);
     }
-
 
     @Override
     public void go(DataInputStream inStream, DataOutputStream outStream) throws Exception {
@@ -57,13 +52,10 @@ public class CalibrationProtocol extends DistoXProtocol {
 
         acknowledge(outStream, packet);
 
-
         PacketType packetType = PacketType.getType(packet);
-        switch(packetType) {
-
+        switch (packetType) {
             case CALIBRATION_ACCELERATION:
-                if (calibrationReading.getState() ==
-                        CalibrationReading.State.UPDATE_ACCELERATION) {
+                if (calibrationReading.getState() == CalibrationReading.State.UPDATE_ACCELERATION) {
                     updateAccelerationSensorReading(packet, calibrationReading);
                     accelerationDuplicated = 0;
                 } else {
@@ -73,8 +65,7 @@ public class CalibrationProtocol extends DistoXProtocol {
                 break;
 
             case CALIBRATION_MAGNETIC:
-                if (calibrationReading.getState() ==
-                        CalibrationReading.State.UPDATE_MAGNETIC) {
+                if (calibrationReading.getState() == CalibrationReading.State.UPDATE_MAGNETIC) {
                     updateMagneticSensorReading(packet, calibrationReading);
                     magneticDuplicated = 0;
                 } else {
@@ -95,17 +86,13 @@ public class CalibrationProtocol extends DistoXProtocol {
         }
     }
 
-
     private void checkExcessiveDuplication(
-            int count, DataInputStream inStream, DataOutputStream outStream)
-            throws IOException{
+            int count, DataInputStream inStream, DataOutputStream outStream) throws IOException {
         if (count >= 5) {
             inStream.close();
             outStream.close();
         }
-
     }
-
 
     public static void updateAccelerationSensorReading(byte[] packet, CalibrationReading reading) {
         int gx = readDoubleByte(packet, ACCELERATION_GX_LOW_BYTE, ACCELERATION_GX_HIGH_BYTE);
@@ -114,7 +101,6 @@ public class CalibrationProtocol extends DistoXProtocol {
         reading.updateAccelerationValues(gx, gy, gz);
     }
 
-
     public static void updateMagneticSensorReading(byte[] packet, CalibrationReading reading) {
         int mx = readDoubleByte(packet, MAGNETIC_MX_LOW_BYTE, MAGNETIC_MX_HIGH_BYTE);
         int my = readDoubleByte(packet, MAGNETIC_MY_LOW_BYTE, MAGNETIC_MY_HIGH_BYTE);
@@ -122,16 +108,13 @@ public class CalibrationProtocol extends DistoXProtocol {
         reading.updateMagneticValues(mx, my, mz);
     }
 
-
     public static int readDoubleByte(byte[] packet, int lowByteIndex, int highByteIndex) {
         int low = packet[lowByteIndex] & 0xff;
         int high = packet[highByteIndex] & 0xff;
         int combined = (high * 256) + low;
 
-        if (combined > 32768)
-            combined -= 65536;
+        if (combined > 32768) combined -= 65536;
 
         return combined;
     }
-
 }

@@ -5,7 +5,6 @@ import org.hwyl.sexytopo.model.survey.Leg;
 import org.junit.Assert;
 import org.junit.Test;
 
-
 public class Space3DUtilsTest {
 
     @Test

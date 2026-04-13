@@ -2,9 +2,7 @@ package org.hwyl.sexytopo.comms.distox;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
-
 import org.hwyl.sexytopo.control.SurveyManager;
-
 
 public class LaserOffProtocol extends CommandProtocol {
 
@@ -14,5 +12,4 @@ public class LaserOffProtocol extends CommandProtocol {
             Context context, BluetoothDevice bluetoothDevice, SurveyManager dataManager) {
         super(context, bluetoothDevice, dataManager, LASER_OFF);
     }
-
 }

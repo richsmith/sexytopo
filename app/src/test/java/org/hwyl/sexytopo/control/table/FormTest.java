@@ -4,11 +4,8 @@ import static org.mockito.Mockito.verify;
 
 import android.content.Context;
 import android.widget.EditText;
-
 import androidx.annotation.Nullable;
-
 import junit.framework.TestCase;
-
 import org.mockito.Mockito;
 
 public class FormTest extends TestCase {
@@ -50,20 +47,21 @@ public class FormTest extends TestCase {
         public void onDidValidate(Boolean valid) {
             this.value = valid;
         }
-    };
+    }
+    ;
 
     private final MockForm form = new MockForm();
 
     public void testValidateWithValidFields() {
         form.validate();
-        assert(form.isValid());
+        assert (form.isValid());
     }
 
     public void testValidateWithSingleInvalidField() {
         form.validName = false;
 
         form.validate();
-        assert(!form.isValid());
+        assert (!form.isValid());
     }
 
     public void testValidateWithMultipleInvalidFields() {
@@ -71,7 +69,7 @@ public class FormTest extends TestCase {
         form.validPhone = false;
 
         form.validate();
-        assert(!form.isValid());
+        assert (!form.isValid());
     }
 
     public void testDelegatesSetErrorToFields() {
@@ -92,7 +90,7 @@ public class FormTest extends TestCase {
         form.setOnDidValidateCallback(callback);
         form.validate();
 
-        assert(Boolean.TRUE.equals(callback.value));
+        assert (Boolean.TRUE.equals(callback.value));
     }
 
     public void testCallsOnDidValidateCallbackWithInvalidForm() {
@@ -102,6 +100,6 @@ public class FormTest extends TestCase {
         form.validPhone = false;
         form.validate();
 
-        assert(Boolean.FALSE.equals(callback.value));
+        assert (Boolean.FALSE.equals(callback.value));
     }
 }

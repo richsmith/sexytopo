@@ -2,7 +2,6 @@ package org.hwyl.sexytopo.model.sketch;
 
 import org.hwyl.sexytopo.R;
 
-
 public enum SketchTool {
     MOVE(R.id.buttonMove, false, false),
     DRAW(R.id.buttonDraw, true, false),
@@ -27,7 +26,7 @@ public enum SketchTool {
     }
 
     public static SketchTool fromString(String name) {
-        return name == null? DEFAULT : SketchTool.valueOf(name);
+        return name == null ? DEFAULT : SketchTool.valueOf(name);
     }
 
     public int getId() {

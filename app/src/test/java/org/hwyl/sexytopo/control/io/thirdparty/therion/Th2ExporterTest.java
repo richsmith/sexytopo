@@ -10,7 +10,6 @@ import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
 import org.junit.Assert;
 import org.junit.Test;
 
-
 public class Th2ExporterTest {
 
     @Test
@@ -21,9 +20,9 @@ public class Th2ExporterTest {
         Frame exportFrame = ExportFrameFactory.getExportFrame(survey, projection);
         Space<Coord2D> space = projection.project(survey);
         exportFrame = exportFrame.scale(scale);
-        String th2 = Th2Exporter.getContent(survey, projection, space, "filename.xvi",
-            exportFrame, exportFrame, scale);
+        String th2 =
+                Th2Exporter.getContent(
+                        survey, projection, space, "filename.xvi", exportFrame, exportFrame, scale);
         Assert.assertTrue(th2.contains("##XTHERION##"));
     }
-
 }

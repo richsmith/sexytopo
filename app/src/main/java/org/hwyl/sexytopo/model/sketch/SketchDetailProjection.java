@@ -13,7 +13,7 @@ public class SketchDetailProjection extends SketchDetail {
 
     public static SketchDetailProjection create(Space<Coord2D> projection) {
         SketchDetailProjection detail = new SketchDetailProjection();
-        for (Leg leg: projection.getLegMap().keySet()) {
+        for (Leg leg : projection.getLegMap().keySet()) {
             Line<Coord2D> line = projection.getLegMap().get(leg);
             detail.updateBoundingBox(line.getStart());
             detail.updateBoundingBox(line.getEnd());
@@ -33,5 +33,7 @@ public class SketchDetailProjection extends SketchDetail {
     }
 
     @Override
-    public SketchDetail scale(float scale) { throw new UnsupportedOperationException(); }
+    public SketchDetail scale(float scale) {
+        throw new UnsupportedOperationException();
+    }
 }

@@ -3,7 +3,6 @@ package org.hwyl.sexytopo.control.util;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 
-
 public class StationRotator {
 
     public static Station rotate(Station station, float angle) {

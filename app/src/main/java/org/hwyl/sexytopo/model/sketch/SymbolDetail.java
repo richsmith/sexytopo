@@ -1,9 +1,7 @@
 package org.hwyl.sexytopo.model.sketch;
 
 import android.graphics.drawable.Drawable;
-
 import org.hwyl.sexytopo.model.graph.Coord2D;
-
 
 public class SymbolDetail extends SinglePositionDetail implements AutoScalableDetail {
 
@@ -13,11 +11,7 @@ public class SymbolDetail extends SinglePositionDetail implements AutoScalableDe
 
     private final Drawable drawable;
 
-    public SymbolDetail(Coord2D location,
-                        Symbol symbol,
-                        Colour colour,
-                        float size,
-                        float angle) {
+    public SymbolDetail(Coord2D location, Symbol symbol, Colour colour, float size, float angle) {
 
         super(colour, location);
         this.symbol = symbol;
@@ -26,7 +20,6 @@ public class SymbolDetail extends SinglePositionDetail implements AutoScalableDe
 
         this.drawable = symbol.createDrawable();
     }
-
 
     public Symbol getSymbol() {
         return symbol;
@@ -47,13 +40,13 @@ public class SymbolDetail extends SinglePositionDetail implements AutoScalableDe
     @Override
     public SymbolDetail translate(Coord2D point) {
         return new SymbolDetail(
-            getPosition().plus(point), getSymbol(), getColour(), getSize(), getAngle());
+                getPosition().plus(point), getSymbol(), getColour(), getSize(), getAngle());
     }
 
     @Override
     public SymbolDetail scale(float scale) {
         return new SymbolDetail(
-            getPosition(), getSymbol(), getColour(), getSize() * scale, getAngle());
+                getPosition(), getSymbol(), getColour(), getSize() * scale, getAngle());
     }
 
     @Override
@@ -71,5 +64,4 @@ public class SymbolDetail extends SinglePositionDetail implements AutoScalableDe
         // Otherwise, return distance from edge
         return distance - radius;
     }
-
 }

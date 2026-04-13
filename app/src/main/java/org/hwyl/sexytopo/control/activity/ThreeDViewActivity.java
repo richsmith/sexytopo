@@ -6,9 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.TypedValue;
-
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.threed.SurveyRenderer;
@@ -18,19 +16,19 @@ import org.hwyl.sexytopo.model.graph.Coord3D;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.survey.Survey;
 
-
 public class ThreeDViewActivity extends SexyTopoActivity {
 
     private SurveyView3D surveyView3D;
     private SurveyRenderer renderer;
     private final Space3DTransformer transformer = new Space3DTransformer();
 
-    private final BroadcastReceiver surveyUpdateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            updateSurveyData();
-        }
-    };
+    private final BroadcastReceiver surveyUpdateReceiver =
+            new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    updateSurveyData();
+                }
+            };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,9 +48,10 @@ public class ThreeDViewActivity extends SexyTopoActivity {
     protected void onResume() {
         super.onResume();
         surveyView3D.onResume();
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-            surveyUpdateReceiver,
-            new IntentFilter(SexyTopoConstants.SURVEY_UPDATED_EVENT));
+        LocalBroadcastManager.getInstance(this)
+                .registerReceiver(
+                        surveyUpdateReceiver,
+                        new IntentFilter(SexyTopoConstants.SURVEY_UPDATED_EVENT));
         updateSurveyData();
     }
 

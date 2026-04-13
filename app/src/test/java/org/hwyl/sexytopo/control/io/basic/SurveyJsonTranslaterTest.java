@@ -1,11 +1,10 @@
 package org.hwyl.sexytopo.control.io.basic;
 
-import org.hwyl.sexytopo.testutils.ExampleSurveyCreator;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
+import org.hwyl.sexytopo.testutils.ExampleSurveyCreator;
 import org.hwyl.sexytopo.testutils.SurveyChecker;
 import org.junit.Test;
-
 
 public class SurveyJsonTranslaterTest {
 
@@ -29,7 +28,6 @@ public class SurveyJsonTranslaterTest {
 
         SurveyChecker.areEqual(survey, newSurvey);
     }
-
 
     @Test
     public void testSlightlyBiggerSurveyIsParsed() throws Exception {

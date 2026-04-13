@@ -2,7 +2,6 @@ package org.hwyl.sexytopo.control.activity;
 
 import android.os.Bundle;
 import android.webkit.WebView;
-
 import org.hwyl.sexytopo.R;
 
 public class GuideActivity extends SexyTopoActivity {
@@ -18,6 +17,4 @@ public class GuideActivity extends SexyTopoActivity {
         webView.getSettings().setJavaScriptEnabled(true);
         webView.loadUrl("file:///android_asset/guide/index.html");
     }
-
-
 }

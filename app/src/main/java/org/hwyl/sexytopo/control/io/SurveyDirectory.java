@@ -2,9 +2,7 @@ package org.hwyl.sexytopo.control.io;
 
 import android.content.Context;
 import android.net.Uri;
-
 import androidx.documentfile.provider.DocumentFile;
-
 import org.hwyl.sexytopo.control.io.translation.AbstractSurveyFile;
 import org.hwyl.sexytopo.model.survey.Survey;
 
@@ -24,7 +22,7 @@ public class SurveyDirectory extends AbstractSurveyFile {
 
         public SurveyDirectory get(Survey survey) {
             if (this == TOP) {
-                return new SurveyDirectory(survey, null,this);
+                return new SurveyDirectory(survey, null, this);
             } else {
                 return new SurveyDirectory(survey, this);
             }
@@ -35,15 +33,12 @@ public class SurveyDirectory extends AbstractSurveyFile {
         }
     }
 
-    public static final SurveyDirectoryType TOP =
-            new SurveyDirectoryType(".");
+    public static final SurveyDirectoryType TOP = new SurveyDirectoryType(".");
     public static final SurveyDirectoryType IMPORT_SOURCE =
             new SurveyDirectoryType("Import Source");
-    public static final SurveyDirectoryType EXPORT =
-            new SurveyDirectoryType("Exported");
+    public static final SurveyDirectoryType EXPORT = new SurveyDirectoryType("Exported");
 
     private final SurveyDirectoryType surveyDirectoryType;
-
 
     private SurveyDirectory(Survey survey, SurveyDirectoryType surveyDirectoryType) {
         this(survey, TOP.get(survey), surveyDirectoryType);
@@ -55,7 +50,6 @@ public class SurveyDirectory extends AbstractSurveyFile {
         this.parent = parent;
         this.surveyDirectoryType = surveyDirectoryType;
     }
-
 
     public DocumentFile getTopDocumentFile(Context context) {
         Uri uri = survey.getUri();
@@ -97,5 +91,4 @@ public class SurveyDirectory extends AbstractSurveyFile {
         }
         getOrCreateDocumentFile(context);
     }
-
 }

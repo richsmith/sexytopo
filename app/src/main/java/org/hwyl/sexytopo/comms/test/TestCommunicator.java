@@ -2,17 +2,14 @@ package org.hwyl.sexytopo.comms.test;
 
 import android.bluetooth.BluetoothDevice;
 import android.view.View;
-
+import java.util.HashMap;
+import java.util.Map;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.comms.Communicator;
 import org.hwyl.sexytopo.control.SexyTopo;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.DeviceActivity;
 import org.hwyl.sexytopo.model.survey.Leg;
-
-import java.util.HashMap;
-import java.util.Map;
-
 
 public class TestCommunicator implements Communicator {
 
