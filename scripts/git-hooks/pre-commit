@@ -1,0 +1,28 @@
+#!/bin/sh
+#
+# Runs Spotless on staged Java/Kotlin/XML files before each commit.
+# Reformatted files are re-staged automatically so the commit includes
+# the formatted versions.
+#
+# Install once per clone with:
+#   git config core.hooksPath scripts/git-hooks
+
+set -e
+
+# Collect staged files Spotless cares about.
+staged=$(git diff --cached --name-only --diff-filter=ACMR \
+    | grep -E '^app/src/.*\.(java|kt|xml)$' || true)
+
+if [ -z "$staged" ]; then
+    exit 0
+fi
+
+echo "Running spotlessApply on staged files..."
+./gradlew --quiet spotlessApply
+
+# Re-stage anything Spotless changed among the originally-staged files.
+echo "$staged" | while IFS= read -r file; do
+    if [ -n "$file" ] && [ -f "$file" ]; then
+        git add -- "$file"
+    fi
+done
