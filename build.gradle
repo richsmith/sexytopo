@@ -4,9 +4,11 @@ buildscript {
     ext.kotlin_version = '1.3.0'
     repositories {
         mavenCentral()
+        gradlePluginPortal()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:8.13.2'
+        classpath 'com.diffplug.spotless:spotless-plugin-gradle:6.25.0'
     }
 }
 
@@ -49,6 +51,30 @@ allprojects {
     }
 }
 
-tasks.register('clean', Delete) {
+apply plugin: 'com.diffplug.spotless'
+
+tasks.named('clean', Delete) {
     delete rootProject.buildDir
+}
+
+spotless {
+    java {
+        target 'app/src/**/*.java'
+        googleJavaFormat('1.22.0').aosp().reflowLongStrings()
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    kotlin {
+        target 'app/src/**/*.kt'
+        ktlint('1.3.1').editorConfigOverride([
+            'ktlint_standard_value-parameter-comment': 'disabled',
+            'ktlint_standard_property-naming': 'disabled',
+        ])
+    }
+    format 'xml', {
+        target 'app/src/**/*.xml'
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
 }
