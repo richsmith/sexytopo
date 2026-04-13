@@ -24,7 +24,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Check formatting
-        run: ./gradlew spotlessCheck
+        run: make check
 
       - name: Build and test
-        run: ./gradlew build
+        run: make build
