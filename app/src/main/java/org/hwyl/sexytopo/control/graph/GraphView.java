@@ -549,7 +549,7 @@ public class GraphView extends View {
                     List<SketchDetail> fragments =
                             ((PathDetail) closestDetail)
                                     .getPathFragmentsOutsideRadius(
-                                            touchPointOnSurvey, deleteToleranceInMetres / 4);
+                                            touchPointOnSurvey, deleteToleranceInMetres);
                     sketch.deleteDetail(closestDetail, fragments);
                     invalidate();
 
