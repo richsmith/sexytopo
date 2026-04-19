@@ -50,6 +50,11 @@ public class SymbolDetail extends SinglePositionDetail implements AutoScalableDe
     }
 
     @Override
+    public boolean couldBeVisibleAtScale(float scale) {
+        return size * scale >= 1;
+    }
+
+    @Override
     public float getDistanceFrom(Coord2D point) {
         // Check if point is within the symbol's radius
         float radius = size / 2;
