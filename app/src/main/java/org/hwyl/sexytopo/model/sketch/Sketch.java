@@ -9,6 +9,8 @@ import org.hwyl.sexytopo.model.survey.Station;
 
 public class Sketch extends Shape {
 
+    public static final float DEFAULT_XSECTION_SCALE = 0.5f;
+
     private List<PathDetail> pathDetails = new ArrayList<>();
     private List<SymbolDetail> symbolDetails = new ArrayList<>();
     private List<TextDetail> textDetails = new ArrayList<>();
@@ -19,6 +21,8 @@ public class Sketch extends Shape {
 
     private PathDetail activePath;
     private Colour activeColour = Colour.BLACK;
+
+    private float crossSectionScale = DEFAULT_XSECTION_SCALE;
 
     private boolean isSaved = true;
 
@@ -99,6 +103,14 @@ public class Sketch extends Shape {
 
     public void setActiveColour(Colour colour) {
         this.activeColour = colour;
+    }
+
+    public float getCrossSectionScale() {
+        return crossSectionScale;
+    }
+
+    public void setCrossSectionScale(float crossSectionScale) {
+        this.crossSectionScale = crossSectionScale;
     }
 
     public void undo() {

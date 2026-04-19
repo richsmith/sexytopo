@@ -122,7 +122,14 @@
         android:title="@string/action_settings"
         android:visible="true"
         android:orderInCategory="100"
-        app:showAsAction="never" />
+        app:showAsAction="never">
+        <menu>
+            <item android:id="@+id/action_settings_system"
+                android:title="@string/action_settings_system"/>
+            <item android:id="@+id/action_settings_survey"
+                android:title="@string/action_settings_survey"/>
+        </menu>
+    </item>
     <item android:id="@+id/action_dev_menu"
           android:title="@string/action_dev"
           android:visible="false"

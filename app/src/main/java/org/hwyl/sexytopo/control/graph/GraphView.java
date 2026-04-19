@@ -1276,7 +1276,9 @@ public class GraphView extends View {
         }
 
         Space<Coord2D> rawProjection = crossSection.getProjection();
-        Space<Coord2D> sectionProjection = Space2DUtils.translate(rawProjection, centreOnSurvey);
+        float xsScale = survey.getPlanSketch().getCrossSectionScale();
+        Space<Coord2D> scaledProjection = rawProjection.scale(xsScale);
+        Space<Coord2D> sectionProjection = Space2DUtils.translate(scaledProjection, centreOnSurvey);
         drawLegs(canvas, sectionProjection, alpha);
 
         drawCrossSectionSubSketch(canvas, sectionDetail, centreOnSurvey, alpha);
@@ -1327,7 +1329,8 @@ public class GraphView extends View {
     private void drawCrossSectionSubSketch(
             Canvas canvas, CrossSectionDetail sectionDetail, Coord2D centreOnSurvey, int alpha) {
 
-        Sketch subSketch = sectionDetail.getSketch().translate(centreOnSurvey);
+        float xsScale = survey.getPlanSketch().getCrossSectionScale();
+        Sketch subSketch = sectionDetail.getSketch().scale(xsScale).translate(centreOnSurvey);
         drawSketch(canvas, subSketch, alpha);
     }
 
@@ -1364,9 +1367,15 @@ public class GraphView extends View {
     /** Draw a rectangular border around the cross-section's full extent (legs + sub-sketch). */
     private RectF drawCrossSectionBorder(
             Canvas canvas, CrossSectionDetail sectionDetail, Coord2D dragDelta) {
-        Coord2D topLeft = surveyCoordsToViewCoords(sectionDetail.getTopLeft().plus(dragDelta));
-        Coord2D bottomRight =
-                surveyCoordsToViewCoords(sectionDetail.getBottomRight().plus(dragDelta));
+        float xsScale = survey.getPlanSketch().getCrossSectionScale();
+        Coord2D centre = sectionDetail.getPosition().plus(dragDelta);
+        Coord2D origin = sectionDetail.getPosition();
+        Coord2D scaledTopLeft =
+                centre.plus(sectionDetail.getTopLeft().minus(origin).scale(xsScale));
+        Coord2D scaledBottomRight =
+                centre.plus(sectionDetail.getBottomRight().minus(origin).scale(xsScale));
+        Coord2D topLeft = surveyCoordsToViewCoords(scaledTopLeft);
+        Coord2D bottomRight = surveyCoordsToViewCoords(scaledBottomRight);
         float contentWidth = bottomRight.x - topLeft.x;
         float contentHeight = bottomRight.y - topLeft.y;
         float scaledPadding =

@@ -50,6 +50,8 @@
     <string name="action_file">File</string>
     <string name="action_stats">Stats</string>
     <string name="action_settings">Settings</string>
+    <string name="action_settings_system">System</string>
+    <string name="action_settings_survey">Survey</string>
     <string name="action_dev">Dev</string>
     <string name="action_device">Instrument</string>
     <string name="action_device_connect">Connect…</string>
@@ -425,6 +427,8 @@
     <string name="stats_shortest_leg">Shortest Leg (m)</string>
 
     <!-- Settings -->
+    <string name="settings_survey_title">Survey Settings</string>
+    <string name="settings_survey_cross_section_scale">Cross-section scale</string>
     <string name="settings_general_title">General</string>
     <string name="settings_general_summary">Theme, orientation, vibration</string>
     <string name="settings_sketching_summary">Drawing tools, display options</string>
