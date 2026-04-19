@@ -567,12 +567,17 @@
     <!-- Context menu(s) -->
     <string name="menu_context_title">Estação</string>
     <string name="menu_leg">Trecho</string>
+    <string name="menu_incoming_leg">Trecho de entrada</string>
+    <string name="menu_leg_title_dynamic">Trecho %1$s &#10132; %2$s</string>
     <string name="menu_splay">Raio</string>
     <string name="menu_station">Estação</string>
     <string name="menu_set_active_station">Definir como Ativa</string>
     <string name="menu_rename_station">Renomear</string>
     <string name="menu_edit_leg">Editar</string>
     <string name="menu_upgrade_row">Forçar Nova Estação</string>
+    <string name="menu_promote_to_above_leg">Adicionar ao trecho acima</string>
+    <string name="toast_splay_promoted">Raio combinado com trecho</string>
+    <string name="toast_no_leg_above">Nenhum trecho válido para combinar</string>
     <string name="menu_upgrade_splay">Promover a Trecho</string>
     <string name="menu_downgrade_leg">Degradar a Raio</string>
     <string name="menu_delete_leg">Eliminar</string>
@@ -591,14 +596,14 @@
     <string name="menu_switch_direction">Mudar Direção</string>
     <string name="menu_navigate">Navegar</string>
     <string name="menu_survey">Topografia</string>
+    <string name="menu_links">Ligações</string>
     <string name="menu_survey_start_new_dialog_title">Iniciar nova topografia</string>
     <string name="menu_survey_start_new_dialog_station_name">Nome da estação inicial</string>
     <string name="menu_start_new_survey">Iniciar Nova Topografia Aqui</string>
     <string name="menu_unlink_survey">Desligar Topografia Ligada</string>
     <string name="menu_comment">Comentário</string>
     <string name="menu_toggle_left_right">Alternar Esquerda/Direita</string>
-    <string name="menu_context_title_leg_to">Trecho para %s</string>
-    <string name="menu_context_title_leg_from">Trecho de %s</string>
+    <string name="menu_context_title_leg">Trecho %1$s &#10132; %2$s</string>
     <string name="menu_context_title_splay">%s para Raio</string>
     <string name="context_this_will_delete">Isto eliminará:</string>
     <string name="context_jump_to_splay_error">Não é possível saltar para uma extremidade de raio</string>

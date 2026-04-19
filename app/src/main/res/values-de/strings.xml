@@ -536,6 +536,12 @@
     <string name="validation_error_azimuth_range">Muss zwischen %1$f und %2$f liegen</string>
     <string name="validation_error_inclination_range">Muss zwischen %1$f und %2$f liegen</string>
 
+    <!-- Input mode for leg editing -->
+    <string-array name="leg_edit_input_mode_options">
+        <item>@string/action_input_mode_forward</item>
+        <item>@string/action_input_mode_backward</item>
+    </string-array>
+
     <!--  Survey symbols  -->
     <string name="symbol_text">Text</string>
     <string name="symbol_entrance">Eingang</string>
