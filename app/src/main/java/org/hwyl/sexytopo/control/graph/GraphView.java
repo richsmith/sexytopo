@@ -95,13 +95,13 @@ public class GraphView extends View {
     private float legendTickSizePx;
     private float dashedLineIntervalPx;
 
-    private static final float DELETE_PATHS_WITHIN_N_DP = 5.0f;
+    private static final float DELETE_DETAILS_WITHIN_N_DP = 5.0f;
     private static final float SELECTION_SENSITIVITY_DP = 25.0f;
     private static final float SNAP_TO_LINE_SENSITIVITY_DP = 25.0f;
     public static final float HOT_CORNER_DISTANCE_PROPORTION = 0.05f;
     private static final int STATION_LABEL_OFFSET_DP = 10;
 
-    private float deletePathsWithinPx;
+    private float deleteDetailsWithinPx;
     private float selectionSensitivityPx;
     private float snapToLineSensitivityPx;
     private float stationLabelOffsetPx;
@@ -291,7 +291,7 @@ public class GraphView extends View {
         stationCrossDiameterPx = dpToPixels(GeneralPreferences.getStationCrossDiameterDp());
         legendTickSizePx = dpToPixels(LEGEND_TICK_SIZE_DP);
         dashedLineIntervalPx = dpToPixels(DASHED_LINE_INTERVAL_DP);
-        deletePathsWithinPx = dpToPixels(DELETE_PATHS_WITHIN_N_DP);
+        deleteDetailsWithinPx = dpToPixels(DELETE_DETAILS_WITHIN_N_DP);
         selectionSensitivityPx = dpToPixels(SELECTION_SENSITIVITY_DP);
         snapToLineSensitivityPx = dpToPixels(SNAP_TO_LINE_SENSITIVITY_DP);
         stationLabelOffsetPx = dpToPixels(STATION_LABEL_OFFSET_DP);
@@ -533,10 +533,12 @@ public class GraphView extends View {
 
         boolean deleteLineFragments = GeneralPreferences.isDeletePathFragmentsModeOn();
 
+        float deleteToleranceInMetres = deleteDetailsWithinPx / surveyToViewScale;
+
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 SketchDetail closestDetail =
-                        sketch.findNearestDetailWithin(touchPointOnSurvey, deletePathsWithinPx);
+                        sketch.findNearestDetailWithin(touchPointOnSurvey, deleteToleranceInMetres);
 
                 // you missed, try again :P
                 if (closestDetail == null) {
@@ -547,7 +549,7 @@ public class GraphView extends View {
                     List<SketchDetail> fragments =
                             ((PathDetail) closestDetail)
                                     .getPathFragmentsOutsideRadius(
-                                            touchPointOnSurvey, deletePathsWithinPx / 4);
+                                            touchPointOnSurvey, deleteToleranceInMetres / 4);
                     sketch.deleteDetail(closestDetail, fragments);
                     invalidate();
 
