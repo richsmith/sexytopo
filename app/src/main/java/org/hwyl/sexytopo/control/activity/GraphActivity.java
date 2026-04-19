@@ -40,6 +40,7 @@ import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.BrushColour;
 import org.hwyl.sexytopo.model.sketch.Colour;
+import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchTool;
 import org.hwyl.sexytopo.model.sketch.Symbol;
@@ -311,6 +312,10 @@ public abstract class GraphActivity extends SurveyEditorActivity
             SketchPreferences.Toggle.SHOW_SPLAYS.set(!item.isChecked());
             graphView.invalidate();
             return true;
+        } else if (itemId == R.id.buttonShowXSections) {
+            SketchPreferences.Toggle.SHOW_X_SECTIONS.set(!item.isChecked());
+            graphView.invalidate();
+            return true;
         } else if (itemId == R.id.buttonShowSketch) {
             SketchPreferences.Toggle.SHOW_SKETCH.set(!item.isChecked());
             setSketchButtonsStatus();
@@ -575,6 +580,32 @@ public abstract class GraphActivity extends SurveyEditorActivity
     @Override
     public void onNewCrossSection(Station station) {
         graphView.handleNewCrossSection(station);
+    }
+
+    @Override
+    public void onDeleteCrossSection(Station station) {
+        Sketch planSketch = getSurvey().getPlanSketch();
+        CrossSectionDetail detail = planSketch.getCrossSectionDetail(station);
+        if (detail == null) {
+            return;
+        }
+        planSketch.deleteDetail(detail);
+        getSurveyManager().broadcastSurveyUpdated();
+        invalidateView();
+    }
+
+    @Override
+    public void onRotateCrossSection(Station station) {
+        graphView.handleRotateCrossSection(station);
+    }
+
+    @Override
+    public void onEditCrossSection(Station station) {
+        CrossSectionDetail detail = getSurvey().getPlanSketch().getCrossSectionDetail(station);
+        if (detail == null) {
+            return;
+        }
+        graphView.launchCrossSectionEditor(detail);
     }
 
     @Override

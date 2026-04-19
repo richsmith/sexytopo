@@ -22,8 +22,8 @@ public class TextDetail extends SinglePositionDetail implements AutoScalableDeta
     }
 
     @Override
-    public TextDetail translate(Coord2D point) {
-        return new TextDetail(getPosition().plus(point), getText(), getColour(), getSize());
+    public TextDetail translate(Coord2D translation) {
+        return new TextDetail(getPosition().plus(translation), getText(), getColour(), getSize());
     }
 
     @Override

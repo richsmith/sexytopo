@@ -30,7 +30,9 @@ public abstract class SketchDetail extends Shape {
 
     public abstract float getDistanceFrom(Coord2D point);
 
-    public abstract SketchDetail translate(Coord2D point);
+    @Override
+    public abstract SketchDetail translate(Coord2D translation);
 
+    @Override
     public abstract SketchDetail scale(float scale);
 }

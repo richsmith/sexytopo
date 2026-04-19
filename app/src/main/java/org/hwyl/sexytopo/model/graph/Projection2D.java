@@ -31,7 +31,8 @@ public enum Projection2D {
         }
 
         public boolean isLegInPlane(Leg leg) {
-            return true;
+            float azimuth = leg.getAzimuth();
+            return azimuth < 45 || azimuth > 315 || (135 < azimuth && azimuth < 225);
         }
     },
     ELEVATION_EW("Elevation EW", "elev_ew") {
@@ -40,7 +41,8 @@ public enum Projection2D {
         }
 
         public boolean isLegInPlane(Leg leg) {
-            return true;
+            float azimuth = leg.getAzimuth();
+            return (45 < azimuth && azimuth < 135) || (225 < azimuth && azimuth < 315);
         }
     },
     EXTENDED_ELEVATION("Extended Elevation", "ee") {
@@ -50,6 +52,16 @@ public enum Projection2D {
 
         public boolean isLegInPlane(Leg leg) {
             return true;
+        }
+    },
+    CROSS_SECTION("Cross Section", "xs") {
+        public Coord2D project(Coord3D coord3D) {
+            // By convention we normalise an X-section to be an EW projection
+            return ELEVATION_EW.project(coord3D);
+        }
+
+        public boolean isLegInPlane(Leg leg) {
+            return ELEVATION_EW.isLegInPlane(leg);
         }
     };
 

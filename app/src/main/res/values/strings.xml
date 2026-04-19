@@ -34,6 +34,7 @@
     <string name="title_activity_table">Table</string>
     <string name="title_activity_plan">Plan</string>
     <string name="title_activity_elevation">Elevation</string>
+    <string name="title_activity_cross_section">Cross-Section</string>
     <string name="title_activity_calibration">Calibration</string>
     <string name="title_activity_survey">Stats</string>
     <string name="title_activity_settings">Settings</string>
@@ -87,6 +88,8 @@
     <string name="action_trigger_autosave">Trigger Autosave</string>
     <string name="action_kill_connection">Kill Comms Thread (Danger!)</string>
     <string name="action_force_crash">Force Crash (Danger!)</string>
+    <string name="action_xsection_done">Done</string>
+    <string name="action_xsection_cancel">Cancel</string>
 
     <!-- File handling -->
     <string name="file_started_new_survey">Started new survey</string>
@@ -185,11 +188,13 @@
     <string name="sketch_menu_snap_to_lines">Snap to Lines</string>
     <string name="sketch_menu_fade_non_active">Fade Non-Active</string>
     <string name="sketch_menu_show_station_labels">Station Labels</string>
+    <string name="sketch_menu_show_xsections">Cross-Sections</string>
     <string name="sketch_menu_show_splays">Show Splays</string>
     <string name="sketch_menu_show_sketch">Show Sketch</string>
     <string name="sketch_menu_show_connect">Linked Surveys</string>
     <string name="sketch_menu_back_measurements">Reverse Legs</string>
     <string name="sketch_position_cross_section_instruction">Select where to draw cross-section</string>
+    <string name="sketch_rotate_cross_section_instruction">Drag from the station to set cross-section direction</string>
     <string name="sketch_symbol_orientation_education">Drag to set symbol direction</string>
     <string name="sketch_text_hint">Enter text</string>
 
@@ -623,7 +628,11 @@
     <string name="menu_jump_to">Jump</string>
     <string name="menu_jump_to_station_in_plan">&#10132; Plan</string>
     <string name="menu_jump_to_station_in_elevation">&#10132; Elevation</string>
-    <string name="menu_new_cross_section">New Cross-Section</string>
+    <string name="menu_xsection">Cross-Section</string>
+    <string name="menu_xsection_create">New Cross-Section</string>
+    <string name="menu_xsection_delete">Delete Cross-Section</string>
+    <string name="menu_xsection_edit">Edit Sketch</string>
+    <string name="menu_xsection_set_direction">Set Direction</string>
     <string name="menu_jump_to_station_in_table">&#10132; Data Table</string>
     <string name="menu_delete_station">Delete</string>
     <string name="menu_reverse">Reverse</string>

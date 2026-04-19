@@ -88,6 +88,18 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         // Override in activities that support adding cross-sections
     }
 
+    public void onDeleteCrossSection(Station station) {
+        // Default: not applicable in some views
+    }
+
+    public void onEditCrossSection(Station station) {
+        // Default: not applicable in some views
+    }
+
+    public void onRotateCrossSection(Station station) {
+        // Default: not applicable in some views
+    }
+
     public void onStartNewSurvey(Station station) {
         if (!getSurvey().isSaved()) {
             showSimpleToast(R.string.file_cannot_extend_unsaved_survey);

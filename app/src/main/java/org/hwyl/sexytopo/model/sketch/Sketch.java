@@ -68,6 +68,9 @@ public class Sketch extends Shape {
     }
 
     public void finishPath() {
+        if (activePath == null) {
+            return;
+        }
         float epsilon = Space2DUtils.simplificationEpsilon(activePath);
         activePath.setPath(Space2DUtils.simplify(activePath.getPath(), epsilon));
         updateBoundingBox(activePath);
@@ -228,8 +231,19 @@ public class Sketch extends Shape {
 
     public void addCrossSection(CrossSection crossSection, Coord2D touchPointOnSurvey) {
         CrossSectionDetail sectionDetail = new CrossSectionDetail(crossSection, touchPointOnSurvey);
+        addCrossSection(sectionDetail);
+    }
+
+    public void addCrossSection(CrossSectionDetail sectionDetail) {
         crossSectionDetails.add(sectionDetail);
         addSketchDetail(sectionDetail);
+    }
+
+    public void replaceCrossSectionDetail(
+            CrossSectionDetail oldDetail, CrossSectionDetail newDetail) {
+        List<SketchDetail> replacements = new ArrayList<>();
+        replacements.add(newDetail);
+        deleteDetail(oldDetail, replacements);
     }
 
     public List<CrossSectionDetail> getCrossSectionDetails() {
@@ -252,30 +266,63 @@ public class Sketch extends Shape {
         return null;
     }
 
-    public Sketch getTranslatedCopy(Coord2D point) {
+    @Override
+    public Sketch translate(Coord2D translation) {
         Sketch sketch = new Sketch();
 
         List<PathDetail> newPathDetails = new ArrayList<>();
         for (PathDetail pathDetail : pathDetails) {
-            newPathDetails.add(pathDetail.translate(point));
+            newPathDetails.add(pathDetail.translate(translation));
         }
         sketch.setPathDetails(newPathDetails);
 
         List<SymbolDetail> newSymbolDetails = new ArrayList<>();
         for (SymbolDetail symbolDetail : symbolDetails) {
-            newSymbolDetails.add(symbolDetail.translate(point));
+            newSymbolDetails.add(symbolDetail.translate(translation));
         }
         sketch.setSymbolDetails(newSymbolDetails);
 
         List<TextDetail> newTextDetails = new ArrayList<>();
         for (TextDetail textDetail : textDetails) {
-            newTextDetails.add(textDetail.translate(point));
+            newTextDetails.add(textDetail.translate(translation));
         }
         sketch.setTextDetails(newTextDetails);
 
         List<CrossSectionDetail> newCrossSectionDetails = new ArrayList<>();
         for (CrossSectionDetail crossSectionDetail : crossSectionDetails) {
-            newCrossSectionDetails.add(crossSectionDetail.translate(point));
+            newCrossSectionDetails.add(crossSectionDetail.translate(translation));
+        }
+        sketch.setCrossSectionDetails(newCrossSectionDetails);
+
+        return sketch;
+    }
+
+    @Override
+    public Sketch scale(float scale) {
+        Sketch sketch = new Sketch();
+
+        List<PathDetail> newPathDetails = new ArrayList<>();
+        for (PathDetail pathDetail : pathDetails) {
+            newPathDetails.add(pathDetail.scale(scale));
+        }
+        sketch.setPathDetails(newPathDetails);
+
+        List<SymbolDetail> newSymbolDetails = new ArrayList<>();
+        for (SymbolDetail symbolDetail : symbolDetails) {
+            newSymbolDetails.add(symbolDetail.scale(scale));
+        }
+        sketch.setSymbolDetails(newSymbolDetails);
+
+        List<TextDetail> newTextDetails = new ArrayList<>();
+        for (TextDetail textDetail : textDetails) {
+            newTextDetails.add(textDetail.scale(scale));
+        }
+        sketch.setTextDetails(newTextDetails);
+
+        List<CrossSectionDetail> newCrossSectionDetails = new ArrayList<>();
+        for (CrossSectionDetail crossSectionDetail : crossSectionDetails) {
+            SketchDetail scaled = crossSectionDetail.scale(scale);
+            newCrossSectionDetails.add((CrossSectionDetail) scaled);
         }
         sketch.setCrossSectionDetails(newCrossSectionDetails);
 

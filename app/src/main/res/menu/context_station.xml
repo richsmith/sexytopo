@@ -18,11 +18,6 @@
             android:title="@string/menu_rename_station"/>
 
         <item
-            android:id="@+id/action_new_cross_section"
-            android:title="@string/menu_new_cross_section"
-            android:visible="false"/>
-
-        <item
             android:id="@+id/action_comment"
             android:title="@string/menu_comment"/>
 
@@ -62,6 +57,30 @@
                     android:id="@+id/action_unlink_survey"
                     android:title="@string/menu_unlink_survey"
                     android:enabled="false"/>
+            </menu>
+        </item>
+
+        <!-- Cross-Section sub-menu (shown only in PLAN view) -->
+        <item
+            android:id="@+id/menu_xsection"
+            android:title="@string/menu_xsection"
+            android:visible="false">
+            <menu>
+                <item
+                    android:id="@+id/action_xsection_create"
+                    android:title="@string/menu_xsection_create"/>
+
+                <item
+                    android:id="@+id/action_xsection_edit"
+                    android:title="@string/menu_xsection_edit"/>
+
+                <item
+                    android:id="@+id/action_xsection_set_direction"
+                    android:title="@string/menu_xsection_set_direction"/>
+
+                <item
+                    android:id="@+id/action_xsection_delete"
+                    android:title="@string/menu_xsection_delete"/>
             </menu>
         </item>
 

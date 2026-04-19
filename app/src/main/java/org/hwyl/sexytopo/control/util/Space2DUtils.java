@@ -69,31 +69,31 @@ public class Space2DUtils {
     }
 
     @SuppressWarnings("ConstantConditions")
-    public static Space<Coord2D> transform(Space<Coord2D> space, Coord2D point) {
+    public static Space<Coord2D> translate(Space<Coord2D> space, Coord2D translation) {
 
         Space<Coord2D> newSpace = new Space<>();
 
         Map<Station, Coord2D> stations = space.getStationMap();
         for (Station station : stations.keySet()) {
             Coord2D coord = stations.get(station);
-            Coord2D newCoord = coord.plus(point);
+            Coord2D newCoord = coord.plus(translation);
             newSpace.addStation(station, newCoord);
         }
 
         Map<Leg, Line<Coord2D>> legs = space.getLegMap();
         for (Leg leg : legs.keySet()) {
             Line<Coord2D> line = legs.get(leg);
-            Line<Coord2D> newLine = transformLine(line, point);
+            Line<Coord2D> newLine = translateLine(line, translation);
             newSpace.addLeg(leg, newLine);
         }
 
         return newSpace;
     }
 
-    public static Line<Coord2D> transformLine(Line<Coord2D> line, Coord2D point) {
+    public static Line<Coord2D> translateLine(Line<Coord2D> line, Coord2D translation) {
         Coord2D start = line.getStart();
         Coord2D end = line.getEnd();
-        return new Line<>(start.plus(point), end.plus(point));
+        return new Line<>(start.plus(translation), end.plus(translation));
     }
 
     public static float getAngleBetween(Coord2D p0, Coord2D p1) {

@@ -32,6 +32,11 @@
         android:icon="@android:drawable/ic_menu_preferences"
         android:checkable="true"/>
     <item
+        android:id="@+id/buttonShowXSections"
+        android:title="@string/sketch_menu_show_xsections"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:checkable="true"/>
+    <item
         android:id="@+id/buttonShowSketch"
         android:title="@string/sketch_menu_show_sketch"
         android:icon="@android:drawable/ic_menu_preferences"

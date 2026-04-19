@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_cross_section_cancel"
+        android:icon="@drawable/ic_cancel"
+        android:title="@string/action_xsection_cancel"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_cross_section_done"
+        android:icon="@drawable/ic_done"
+        android:title="@string/action_xsection_done"
+        app:showAsAction="always" />
+
+</menu>

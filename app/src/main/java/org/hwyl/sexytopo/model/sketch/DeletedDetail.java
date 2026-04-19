@@ -30,8 +30,8 @@ public class DeletedDetail extends SketchDetail {
     }
 
     @Override
-    public SketchDetail translate(Coord2D point) {
-        return new DeletedDetail(deletedDetail.translate(point));
+    public SketchDetail translate(Coord2D translation) {
+        return new DeletedDetail(deletedDetail.translate(translation));
     }
 
     @Override
