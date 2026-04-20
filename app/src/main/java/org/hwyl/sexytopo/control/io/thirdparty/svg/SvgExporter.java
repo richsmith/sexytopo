@@ -21,6 +21,7 @@ import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.io.basic.ExportFrameFactory;
 import org.hwyl.sexytopo.control.io.translation.DoubleSketchFileExporter;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
+import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.common.Frame;
 import org.hwyl.sexytopo.model.graph.Coord2D;
@@ -28,6 +29,7 @@ import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.Colour;
+import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchDetail;
@@ -103,6 +105,11 @@ public class SvgExporter extends DoubleSketchFileExporter {
         xmlSerializer.endTag("", "g");
 
         xmlSerializer.startTag("", "g");
+        xmlSerializer.attribute("", "id", "cross-sections");
+        writeCrossSections(xmlSerializer, sketch, projection, SCALE);
+        xmlSerializer.endTag("", "g");
+
+        xmlSerializer.startTag("", "g");
         xmlSerializer.attribute("", "id", "data");
 
         xmlSerializer.startTag("", "g");
@@ -156,6 +163,55 @@ public class SvgExporter extends DoubleSketchFileExporter {
 
         for (SymbolDetail symbolDetail : sketch.getSymbolDetails()) {
             writeSymbolDetail(xmlSerializer, symbolDetail, scale);
+        }
+    }
+
+    private static void writeCrossSections(
+            XmlSerializer xmlSerializer, Sketch sketch, Space<Coord2D> projection, int scale)
+            throws Exception {
+        float xsScale = sketch.getCrossSectionScale();
+        for (CrossSectionDetail xsDetail : sketch.getCrossSectionDetails()) {
+            Station station = xsDetail.getCrossSection().getStation();
+
+            xmlSerializer.startTag("", "g");
+            xmlSerializer.attribute("", "id", "xs-" + station.getName());
+
+            // Write scaled projection legs (splays)
+            Space<Coord2D> rawProjection = xsDetail.getCrossSection().getProjection();
+            Space<Coord2D> scaledProjection = rawProjection.scale(xsScale);
+            Space<Coord2D> translatedProjection =
+                    Space2DUtils.translate(scaledProjection, xsDetail.getPosition());
+            Integer splayStrokeWidth = GeneralPreferences.getExportSvgSplayStrokeWidth();
+            for (Line<Coord2D> line : translatedProjection.getLegMap().values()) {
+                xmlSerializer.startTag("", "polyline");
+                String points =
+                        TextTools.join(
+                                ",",
+                                scale * line.getStart().x,
+                                scale * line.getStart().y,
+                                scale * line.getEnd().x,
+                                scale * line.getEnd().y);
+                xmlSerializer.attribute("", "points", points);
+                xmlSerializer.attribute("", "stroke", "red");
+                xmlSerializer.attribute("", "stroke-width", splayStrokeWidth.toString());
+                xmlSerializer.attribute("", "fill", "none");
+                xmlSerializer.endTag("", "polyline");
+            }
+
+            // Write sub-sketch paths scaled and translated to position
+            Sketch subSketch =
+                    xsDetail.getSketch().scale(xsScale).translate(xsDetail.getPosition());
+            for (PathDetail pathDetail : subSketch.getPathDetails()) {
+                writePathDetail(xmlSerializer, pathDetail, scale);
+            }
+            for (TextDetail textDetail : subSketch.getTextDetails()) {
+                writeTextDetail(xmlSerializer, textDetail, scale);
+            }
+            for (SymbolDetail symbolDetail : subSketch.getSymbolDetails()) {
+                writeSymbolDetail(xmlSerializer, symbolDetail, scale);
+            }
+
+            xmlSerializer.endTag("", "g");
         }
     }
 
