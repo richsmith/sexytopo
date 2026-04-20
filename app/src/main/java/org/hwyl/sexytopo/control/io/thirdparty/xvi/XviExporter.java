@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.common.Shape;
 import org.hwyl.sexytopo.model.graph.Coord2D;
@@ -44,9 +45,10 @@ public class XviExporter {
     }
 
     private static String getCrossSectionStationsText(Sketch sketch, float scale) {
+        float xsScale = sketch.getCrossSectionScale();
         StringBuilder builder = new StringBuilder();
         for (CrossSectionDetail xsDetail : sketch.getCrossSectionDetails()) {
-            Space<Coord2D> xsSpace = xsDetail.getProjection();
+            Space<Coord2D> xsSpace = getScaledProjection(xsDetail, xsScale);
             for (Map.Entry<Station, Coord2D> entry : xsSpace.getStationMap().entrySet()) {
                 Coord2D flipped = entry.getValue().flipVertically();
                 builder.append(getStationText(entry.getKey(), flipped, scale));
@@ -56,9 +58,10 @@ public class XviExporter {
     }
 
     private static String getCrossSectionLegsText(Sketch sketch, float scale) {
+        float xsScale = sketch.getCrossSectionScale();
         StringBuilder builder = new StringBuilder();
         for (CrossSectionDetail xsDetail : sketch.getCrossSectionDetails()) {
-            Space<Coord2D> xsSpace = xsDetail.getProjection();
+            Space<Coord2D> xsSpace = getScaledProjection(xsDetail, xsScale);
             for (Map.Entry<Leg, Line<Coord2D>> entry : xsSpace.getLegMap().entrySet()) {
                 Line<Coord2D> line = entry.getValue();
                 Line<Coord2D> flipped =
@@ -68,6 +71,12 @@ public class XviExporter {
             }
         }
         return builder.toString();
+    }
+
+    private static Space<Coord2D> getScaledProjection(CrossSectionDetail xsDetail, float xsScale) {
+        Space<Coord2D> rawProjection = xsDetail.getCrossSection().getProjection();
+        Space<Coord2D> scaledProjection = rawProjection.scale(xsScale);
+        return Space2DUtils.translate(scaledProjection, xsDetail.getPosition());
     }
 
     private static String getStationsText(Space<Coord2D> space, double scale) {
