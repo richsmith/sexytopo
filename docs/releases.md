@@ -1,3 +1,7 @@
+# 2026-04-19 1.11.1
+- Fix a bug causing symbols to be hidden
+- Fix a bug causing deletion radius to be badly calculated
+
 # 2026-04-11 1.11.0
 - Extensive Therion file and scrap naming improvements with cross-section handling (thanks Andrew Atkinson)
 - Connection lines and splays in XVI export (thanks Andrew Atkinson)

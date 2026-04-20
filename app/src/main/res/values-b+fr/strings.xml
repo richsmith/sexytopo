@@ -536,6 +536,12 @@
     <string name="validation_error_azimuth_range">Doit être entre %1$f et %2$f</string>
     <string name="validation_error_inclination_range">Doit être entre %1$f et %2$f</string>
 
+    <!-- Input mode for leg editing -->
+    <string-array name="leg_edit_input_mode_options">
+        <item>@string/action_input_mode_forward</item>
+        <item>@string/action_input_mode_backward</item>
+    </string-array>
+
     <!-- Survey symbols -->
     <string name="symbol_text">Texte</string>
     <string name="symbol_entrance">Entrée</string>
@@ -560,7 +566,7 @@
 
     <!-- Context menu(s) -->
     <string name="menu_context_title">Station</string>
-    <string name="menu_context_title_leg">Visée %1$s \&#10132; %2$s</string>
+    <string name="menu_context_title_leg">Visée %1$s &#10132; %2$s</string>
     <string name="menu_context_title_splay">%s à Visée rayonnante</string>
     <string name="menu_leg">Visée</string>
     <string name="menu_incoming_leg">Visée entrante</string>

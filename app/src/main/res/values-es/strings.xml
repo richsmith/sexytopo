@@ -603,8 +603,7 @@
     <string name="menu_unlink_survey">Desenlazar Topografía Enlazada</string>
     <string name="menu_comment">Comentario</string>
     <string name="menu_toggle_left_right">Alternar Izquierda/Derecha</string>
-    <string name="menu_context_title_leg_to">Tramo a %s</string>
-    <string name="menu_context_title_leg_from">Tramo desde %s</string>
+    <string name="menu_context_title_leg">Tramo %1$s &#10132; %2$s</string>
     <string name="menu_context_title_splay">%s a Radial</string>
     <string name="context_this_will_delete">Esto eliminará:</string>
     <string name="context_jump_to_splay_error">No se puede saltar a un extremo de radial</string>
