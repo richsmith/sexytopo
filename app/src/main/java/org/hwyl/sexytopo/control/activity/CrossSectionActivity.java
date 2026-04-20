@@ -72,8 +72,7 @@ public class CrossSectionActivity extends GraphActivity {
     }
 
     private static Sketch buildWorkingSketch(Sketch source) {
-        Sketch working = new Sketch();
-        working.setPathDetails(new ArrayList<>(source.getPathDetails()));
+        Sketch working = new Sketch(source);
         return working;
     }
 

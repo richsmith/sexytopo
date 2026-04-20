@@ -26,6 +26,17 @@ public class Sketch extends Shape {
 
     private boolean isSaved = true;
 
+    public Sketch() {}
+
+    public Sketch(Sketch sketch) {
+        // shallow copies are OK here because paths are immutable
+        setPathDetails(new ArrayList<>(sketch.getPathDetails()));
+        setSymbolDetails(new ArrayList<>(sketch.getSymbolDetails()));
+        setTextDetails(new ArrayList<>(sketch.getTextDetails()));
+        setCrossSectionDetails(new ArrayList<>(sketch.getCrossSectionDetails()));
+        this.crossSectionScale = sketch.crossSectionScale;
+    }
+
     public boolean isSaved() {
         return isSaved;
     }
