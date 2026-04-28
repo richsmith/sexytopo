@@ -14,15 +14,10 @@ Start with `overview.md`.
 This project uses [Spotless](https://github.com/diffplug/spotless) with
 google-java-format (AOSP style) for Java and ktlint for Kotlin.
 
-- `./gradlew spotlessApply` — format all files
-- `./gradlew spotlessCheck` — verify formatting (used in CI)
+- `./gradlew spotlessApply` (or `make format`) — format all files
+- `./gradlew spotlessCheck` (or `make check`) — verify formatting (used in CI)
 
-A pre-commit hook at `scripts/git-hooks/pre-commit` runs `spotlessApply`
-on staged files automatically. Enable it once per clone with:
-
-```
-git config core.hooksPath scripts/git-hooks
-```
+CI runs `make check` on every PR, so misformatted code can't merge.
 
 ## Documentation maintenance
 

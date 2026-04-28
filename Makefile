@@ -1,10 +1,9 @@
 GRADLE := ./gradlew
 
-.PHONY: help setup format check test build clean install lint apk release bump
+.PHONY: help format check test build clean install lint apk release bump
 
 help:
 	@echo "Common targets:"
-	@echo "  make setup     Enable the git pre-commit hook (run once per clone)"
 	@echo "  make format    Apply Spotless formatting to Java/Kotlin/XML"
 	@echo "  make check     Verify formatting without modifying files"
 	@echo "  make test      Run unit tests"
@@ -16,17 +15,13 @@ help:
 	@echo "  make bump      Bump patch version, commit, and tag a release"
 	@echo "  make clean     Remove build artefacts"
 
-setup:
-	git config core.hooksPath scripts/git-hooks
-	@echo "Pre-commit hook enabled. Spotless will auto-format staged files before each commit."
-
 format:
 	$(GRADLE) spotlessApply
 
 check:
 	$(GRADLE) spotlessCheck
 
-test:
+test: check
 	$(GRADLE) test
 
 lint:
