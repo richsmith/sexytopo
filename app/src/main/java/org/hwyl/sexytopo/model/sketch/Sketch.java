@@ -237,11 +237,19 @@ public class Sketch extends Shape {
     }
 
     public SketchDetail findNearestDetailWithin(Coord2D point, float delta) {
+        return findNearestVisibleDetailWithin(point, delta, Float.MAX_VALUE);
+    }
+
+    public SketchDetail findNearestVisibleDetailWithin(
+            Coord2D point, float delta, float viewScale) {
 
         SketchDetail closest = null;
         float minDistance = Float.MAX_VALUE;
 
         for (SketchDetail detail : allSketchDetails()) {
+            if (!detail.couldBeVisibleAtScale(viewScale)) {
+                continue;
+            }
             float distance = detail.getDistanceFrom(point);
             if (distance < delta && distance < minDistance) {
                 closest = detail;

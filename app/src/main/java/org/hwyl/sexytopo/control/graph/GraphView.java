@@ -608,14 +608,15 @@ public class GraphView extends View {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 SketchDetail closestDetail =
-                        sketch.findNearestDetailWithin(touchPointOnSurvey, deleteToleranceInMetres);
+                        sketch.findNearestVisibleDetailWithin(
+                                touchPointOnSurvey, deleteToleranceInMetres, surveyToViewScale);
 
-                // you missed, try again :P
                 if (closestDetail == null) {
+                    // you missed, try again :P
                     return true;
 
-                    // you got part of the line
                 } else if (deleteLineFragments && closestDetail instanceof PathDetail) {
+                    // you got part of the line
                     List<SketchDetail> fragments =
                             ((PathDetail) closestDetail)
                                     .getPathFragmentsOutsideRadius(
@@ -623,8 +624,8 @@ public class GraphView extends View {
                     sketch.deleteDetail(closestDetail, fragments);
                     invalidate();
 
-                    // bullseye!
                 } else {
+                    // bullseye!
                     sketch.deleteDetail(closestDetail);
                     invalidate();
                 }
