@@ -9,7 +9,7 @@ import org.hwyl.sexytopo.model.survey.Station;
 
 public class Sketch extends Shape {
 
-    public static final float DEFAULT_XSECTION_SCALE = 0.5f;
+    public static final float DEFAULT_XSECTION_SCALE = 1.0f;
 
     private List<PathDetail> pathDetails = new ArrayList<>();
     private List<SymbolDetail> symbolDetails = new ArrayList<>();
