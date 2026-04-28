@@ -145,7 +145,7 @@ public class CrossSectionActivity extends GraphActivity {
         CrossSectionDetail updated =
                 new CrossSectionDetail(crossSection, position, persistedSubSketch);
 
-        getSurvey().getPlanSketch().replaceCrossSectionDetail(originalDetail, updated);
+        getSurvey().getPlanSketch().swapCrossSectionDetail(originalDetail, updated);
         finish();
     }
 

@@ -270,11 +270,28 @@ public class Sketch extends Shape {
         addSketchDetail(sectionDetail);
     }
 
+    /**
+     * Replace a cross-section detail as an undoable operation on this sketch's undo stack. Use this
+     * for plan-level edits like move and rotate.
+     */
     public void replaceCrossSectionDetail(
             CrossSectionDetail oldDetail, CrossSectionDetail newDetail) {
         List<SketchDetail> replacements = new ArrayList<>();
         replacements.add(newDetail);
         deleteDetail(oldDetail, replacements);
+    }
+
+    /**
+     * Swap a cross-section detail without creating an undo entry. Use this when committing
+     * sub-sketch edits from the cross-section editor — the editor has its own undo stack, and the
+     * commit should not be reversible from the plan's undo.
+     */
+    public void swapCrossSectionDetail(CrossSectionDetail oldDetail, CrossSectionDetail newDetail) {
+        int index = crossSectionDetails.indexOf(oldDetail);
+        if (index >= 0) {
+            crossSectionDetails.set(index, newDetail);
+        }
+        setSaved(false);
     }
 
     public List<CrossSectionDetail> getCrossSectionDetails() {
