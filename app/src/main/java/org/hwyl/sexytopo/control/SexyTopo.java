@@ -60,6 +60,9 @@ public class SexyTopo extends Application {
     }
 
     public static float dpToPixels(float dp) {
+        if (resources == null) { // e.g. during tests
+            return dp;
+        }
         return dp
                 * ((float) resources.getDisplayMetrics().densityDpi
                         / DisplayMetrics.DENSITY_DEFAULT);
