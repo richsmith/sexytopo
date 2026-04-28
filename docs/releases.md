@@ -1,3 +1,6 @@
+# 2026-04-28 1.11.2
+- Fix a bug causing cross-sections to be initially hidden
+
 # 2026-04-19 1.11.1
 - Fix a bug causing symbols to be hidden
 - Fix a bug causing deletion radius to be badly calculated
