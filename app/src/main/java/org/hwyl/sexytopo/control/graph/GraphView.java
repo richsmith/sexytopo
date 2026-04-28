@@ -611,8 +611,8 @@ public class GraphView extends View {
                         sketch.findNearestVisibleDetailWithin(
                                 touchPointOnSurvey, deleteToleranceInMetres, surveyToViewScale);
 
-                if (closestDetail == null) {
-                    // you missed, try again :P
+                if (closestDetail == null || closestDetail instanceof CrossSectionDetail) {
+                    // missed, or hit a cross-section (use context menu to delete those)
                     return true;
 
                 } else if (deleteLineFragments && closestDetail instanceof PathDetail) {
