@@ -89,11 +89,4 @@ public class CrossSectionDetail extends SinglePositionDetail {
     public CrossSectionDetail translate(Coord2D translation) {
         return new CrossSectionDetail(getCrossSection(), getPosition().plus(translation), sketch);
     }
-
-    @Override
-    public boolean couldBeVisibleAtScale(float scale) {
-        // Bounding box is only populated lazily in getProjection(), so the
-        // generic min-size cull would hide freshly placed cross-sections.
-        return true;
-    }
 }
