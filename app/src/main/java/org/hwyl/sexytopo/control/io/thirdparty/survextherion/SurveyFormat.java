@@ -99,7 +99,11 @@ public enum SurveyFormat {
         return getCommentChar() + getCommandChar() + "instrument insts ";
     }
 
-    /** Data passage / dimensions prefix: "*data passage" for Survex, "data dimensions" for Therion */
+    /**
+     * passage data
+     * *data passage" for Survex,
+     * data dimensions" for Therion
+     */
     public String getDataPassagePrefix() {
         // Survex uses "passage", Therion uses "dimensions"
         if (this == SURVEX) {

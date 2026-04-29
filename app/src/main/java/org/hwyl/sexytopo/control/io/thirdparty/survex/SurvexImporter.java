@@ -8,8 +8,8 @@ import java.util.Map;
 import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionImporter;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
-import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.control.io.translation.Importer;
+import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
 
