@@ -51,11 +51,11 @@ public class SurvexTherionUtil {
             // Instrument line - commented ONLY if field is empty
             if (trip.hasInstrument()) {
                 builder.append(marker)
-                        .append("instrument inst \"")
+                        .append("instrument insts \"")
                         .append(trip.getInstrument())
                         .append("\"\n");
             } else {
-                builder.append(commentChar).append(marker).append("instrument inst \"\"\n");
+                builder.append(commentChar).append(marker).append("instrument insts \"\"\n");
             }
 
             // Team members
@@ -101,11 +101,17 @@ public class SurvexTherionUtil {
             return "";
         }
 
-        // Output the data passage block
-        builder.append(marker).append("data passage station ignoreall\n");
+        // Output the data passage/dimensions block.
+        // Header varies slightly by format:
+        //   Survex:  *data passage station left right up down ignoreall
+        //   Therion: data dimensions station left right up down ignoreall
+        builder.append(format.getDataPassagePrefix())
+                .append(" station left right up down ignoreall\n");
 
         for (Station station : stationsWithComments) {
             builder.append(station.getName()).append("\t");
+            // LRUD placeholders are unused for now, required by the format
+            builder.append("-\t-\t-\t-\t");
             formatComment(builder, station.getComment());
             builder.append("\n");
         }
