@@ -125,6 +125,46 @@ public class ThExporterTest {
         Assert.assertTrue(metadata.contains("#instrument insts \"\""));
     }
 
+    @Test
+    public void testTherionMetadataExploDateLinkedUsesSurveyDate() {
+        Survey survey = new Survey();
+        Trip trip = new Trip();
+        trip.setExplorationDateLinked(true); // default, but explicit for clarity
+        survey.setTrip(trip);
+
+        String metadata = SurvexTherionUtil.getMetadata(survey, SurveyFormat.THERION, "", "");
+
+        Assert.assertTrue(metadata.contains("explo-date "));
+        Assert.assertFalse(metadata.contains("#explo-date "));
+    }
+
+    @Test
+    public void testTherionMetadataExploDateUnlinkedWithDateSet() {
+        Survey survey = new Survey();
+        Trip trip = new Trip();
+        trip.setExplorationDateLinked(false);
+        trip.setExplorationDate(new java.util.Date(0)); // 1970.01.01
+        survey.setTrip(trip);
+
+        String metadata = SurvexTherionUtil.getMetadata(survey, SurveyFormat.THERION, "", "");
+
+        Assert.assertTrue(metadata.contains("explo-date 1970.01.01"));
+        Assert.assertFalse(metadata.contains("#explo-date "));
+    }
+
+    @Test
+    public void testTherionMetadataExploDateUnlinkedEmptyUsesCommentedPlaceholder() {
+        Survey survey = new Survey();
+        Trip trip = new Trip();
+        trip.setExplorationDateLinked(false);
+        trip.setExplorationDate(null);
+        survey.setTrip(trip);
+
+        String metadata = SurvexTherionUtil.getMetadata(survey, SurveyFormat.THERION, "", "");
+
+        Assert.assertTrue(metadata.contains("#explo-date "));
+    }
+
     private static Trip.TeamEntry entry(String name, Trip.Role... roles) {
         return new Trip.TeamEntry(name, Arrays.asList(roles));
     }

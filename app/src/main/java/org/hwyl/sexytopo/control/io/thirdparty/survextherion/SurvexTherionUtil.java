@@ -64,13 +64,28 @@ public class SurvexTherionUtil {
             // Blank line before explo block
             builder.append("\n");
 
-            // Explo-date: only emit when unlinked and exploration date is set
-            if (!trip.isExplorationDateLinked() && trip.getExplorationDate() != null) {
+            // Explo-date: three cases:
+            //   1. Linked to survey date -> use survey date
+            //   2. Unlinked and date set -> use the explicit exploration date
+            //   3. Unlinked and date empty -> commented-out placeholder (like blank instrument)
+            if (trip.isExplorationDateLinked()) {
+                String formattedExploDate =
+                        formatDate(trip.getSurveyDate()).substring(5); // Remove "date " prefix
+                builder.append(marker)
+                        .append(exploDateKeyword)
+                        .append(formattedExploDate)
+                        .append("\n");
+            } else if (trip.getExplorationDate() != null) {
                 String formattedExploDate =
                         formatDate(trip.getExplorationDate()).substring(5); // Remove "date " prefix
                 builder.append(marker)
                         .append(exploDateKeyword)
                         .append(formattedExploDate)
+                        .append("\n");
+            } else {
+                builder.append(commentChar)
+                        .append(marker)
+                        .append(exploDateKeyword)
                         .append("\n");
             }
 
