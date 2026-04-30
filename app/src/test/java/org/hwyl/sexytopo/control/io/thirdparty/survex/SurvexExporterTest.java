@@ -78,6 +78,32 @@ public class SurvexExporterTest {
         Assert.assertTrue(result.contains("assistant"));
     }
 
+    @Test
+    public void testExportIncludesInstrumentWhenPresent() {
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Trip trip = new Trip();
+        trip.setInstrument("DistoX2");
+        survey.setTrip(trip);
+
+        String content = survexExporter.getContent(survey);
+
+        Assert.assertTrue(content.contains("*instrument insts \"DistoX2\""));
+    }
+
+    @Test
+    public void testExportUsesCommentedEmptyInstrumentWhenBlank() {
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Trip trip = new Trip();
+        trip.setInstrument("   ");
+        survey.setTrip(trip);
+
+        String content = survexExporter.getContent(survey);
+
+        Assert.assertTrue(content.contains(";*instrument insts \"\""));
+    }
+
     private static Trip.TeamEntry entry(String name, Trip.Role... roles) {
         return new Trip.TeamEntry(name, Arrays.asList(roles));
     }
