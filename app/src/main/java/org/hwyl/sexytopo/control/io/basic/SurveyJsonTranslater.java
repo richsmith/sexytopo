@@ -51,6 +51,7 @@ public class SurveyJsonTranslater {
     public static final String TEAM_TAG = "team";
     public static final String TEAM_MEMBER_NAME_TAG = "name";
     public static final String TEAM_MEMBER_ROLE_TAG = "role";
+    public static final String INSTRUMENT_TAG = "instrument";
 
     private static boolean errors; // whether any partial errors were encountered
 
@@ -282,6 +283,7 @@ public class SurveyJsonTranslater {
         }
         json.put(EXPLO_DATE_LINKED_TAG, trip.isExplorationDateLinked());
         json.put(COMMENT_TAG, trip.getComments());
+        json.put(INSTRUMENT_TAG, trip.getInstrument());
 
         JSONArray teamArray = new JSONArray();
 
@@ -423,6 +425,7 @@ public class SurveyJsonTranslater {
         trip.setExplorationDateLinked(exploDateLinked);
         trip.setTeam(team);
         trip.setComments(comments);
+        trip.setInstrument(json.optString(INSTRUMENT_TAG, ""));
         return trip;
     }
 }

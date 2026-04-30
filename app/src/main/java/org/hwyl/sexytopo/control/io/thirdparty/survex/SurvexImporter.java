@@ -2,11 +2,14 @@ package org.hwyl.sexytopo.control.io.thirdparty.survex;
 
 import android.content.Context;
 import androidx.documentfile.provider.DocumentFile;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionImporter;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
 import org.hwyl.sexytopo.control.io.translation.Importer;
+import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
 
@@ -20,8 +23,10 @@ public class SurvexImporter extends Importer {
         Map<String, String> passageComments =
                 SurvexTherionImporter.parsePassageData(text, SurveyFormat.SURVEX);
 
-        // Parse centreline data
-        SurvexTherionImporter.parseCentreline(text, survey);
+        // Parse centreline data from the normal data block only.
+        // This avoids trying to parse passage rows (e.g. "1 - - - - comment") as shots.
+        String centrelineText = extractNormalDataBlock(text, SurveyFormat.SURVEX);
+        SurvexTherionImporter.parseCentreline(centrelineText, survey);
 
         // Merge passage comments with station comments
         SurvexTherionImporter.mergePassageComments(survey, passageComments);
@@ -38,5 +43,29 @@ public class SurvexImporter extends Importer {
     @Override
     public boolean canHandleFile(DocumentFile file) {
         return file.getName().endsWith(".svx");
+    }
+
+    private static String extractNormalDataBlock(String text, SurveyFormat format) {
+        String[] lines = text.split("\n");
+        List<String> normalDataLines = new ArrayList<>();
+
+        String dataCommandPrefix = format.getCommandChar() + "data ";
+        String dataNormalPrefix = format.getCommandChar() + "data normal";
+        boolean inNormalDataBlock = false;
+
+        for (String line : lines) {
+            String trimmed = line.trim();
+
+            if (trimmed.startsWith(dataCommandPrefix)) {
+                inNormalDataBlock = trimmed.startsWith(dataNormalPrefix);
+                continue;
+            }
+
+            if (inNormalDataBlock) {
+                normalDataLines.add(line);
+            }
+        }
+
+        return TextTools.join("\n", normalDataLines);
     }
 }
