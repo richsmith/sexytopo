@@ -83,6 +83,13 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         invalidateView();
     }
 
+    public void onCrossOutLeg(Leg leg) {
+        leg.setCrossedOut(!leg.isCrossedOut());
+        getSurvey().setSaved(false);
+        getSurveyManager().broadcastSurveyUpdated();
+        invalidateView();
+    }
+
     public void onNewCrossSection(Station station) {
         // Default: not applicable in some views
         // Override in activities that support adding cross-sections

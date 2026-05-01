@@ -182,26 +182,36 @@ public class SurvexTherionUtil {
             toName = format.getSplayStationName();
         }
 
+        // Prefix the main leg line with the comment character if it is crossed out
+        char commentChar = format.getCommentChar();
+        if (leg.isCrossedOut()) {
+            builder.append(commentChar);
+        }
+
         formatField(builder, fromName);
         formatField(builder, toName);
         formatField(builder, TableCol.DISTANCE.format(leg.getDistance(), Locale.UK));
         formatField(builder, TableCol.AZIMUTH.format(leg.getAzimuth(), Locale.UK));
         formatField(builder, TableCol.INCLINATION.format(leg.getInclination(), Locale.UK));
 
-        // Handle promoted legs - put readings on subsequent lines
+        // Handle promoted legs - put readings on subsequent lines.
+        // If the parent leg is crossed out, precursors get two comment chars instead of one.
         if (leg.wasPromoted()) {
-            char commentChar = format.getCommentChar();
+            String precursorPrefix = leg.isCrossedOut()
+                    ? String.valueOf(commentChar) + commentChar
+                    : String.valueOf(commentChar);
             Leg[] precursors = leg.getPromotedFrom();
             for (Leg precursor : precursors) {
                 builder.append("\n");
-                builder.append(commentChar);
+                builder.append(precursorPrefix);
                 builder.append(fromName).append("\t");
                 builder.append(toName).append("\t");
                 builder.append(TableCol.DISTANCE.format(precursor.getDistance(), Locale.UK))
                         .append("\t");
                 builder.append(TableCol.AZIMUTH.format(precursor.getAzimuth(), Locale.UK))
                         .append("\t");
-                builder.append(TableCol.INCLINATION.format(precursor.getInclination(), Locale.UK));
+                builder.append(
+                        TableCol.INCLINATION.format(precursor.getInclination(), Locale.UK));
             }
         }
     }

@@ -19,6 +19,7 @@ public class Leg extends SurveyComponent {
     private final Station destination;
     private final Leg[] promotedFrom;
     private final boolean wasShotBackwards;
+    private boolean crossedOut = false;
 
     private static final Leg[] NO_LEGS = new Leg[] {};
 
@@ -199,6 +200,14 @@ public class Leg extends SurveyComponent {
 
     public static boolean isInclinationLegal(float inclination) {
         return MIN_INCLINATION <= inclination && inclination <= MAX_INCLINATION;
+    }
+
+    public boolean isCrossedOut() {
+        return crossedOut;
+    }
+
+    public void setCrossedOut(boolean crossedOut) {
+        this.crossedOut = crossedOut;
     }
 
     @NonNull

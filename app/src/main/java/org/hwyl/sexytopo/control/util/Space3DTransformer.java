@@ -30,6 +30,15 @@ public class Space3DTransformer {
     }
 
     protected synchronized void update(Space<Coord3D> space, Leg leg, Coord3D start) {
+        if (leg.isCrossedOut()) {
+            // Don't add the leg to the graph, but still traverse connected stations
+            // so the rest of the survey tree remains reachable (destination plots at
+            // the same position as the originating station)
+            if (leg.hasDestination()) {
+                update(space, leg.getDestination(), start);
+            }
+            return;
+        }
         Coord3D end = transform(start, leg);
         Line<Coord3D> line = new Line<>(start, end);
         space.addLeg(leg, line);

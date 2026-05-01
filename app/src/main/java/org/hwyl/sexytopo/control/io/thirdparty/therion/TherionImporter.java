@@ -110,6 +110,11 @@ public class TherionImporter extends Importer {
 
             if (trimmed.startsWith("extend")) {
                 sanitisedElevationDirectionData.add(trimmed);
+            } else if (trimmed.startsWith("#") || trimmed.startsWith(";")) {
+                // Pass through single-commented lines that look like crossed-out data legs,
+                // and double-commented precursor lines for crossed-out promoted legs.
+                // parseCentreline will decide what to do with each.
+                sanitisedCentrelineData.add(trimmed);
             } else {
                 sanitisedCentrelineData.add(trimmed);
             }

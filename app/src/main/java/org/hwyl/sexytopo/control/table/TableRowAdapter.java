@@ -1,6 +1,7 @@
 package org.hwyl.sexytopo.control.table;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -149,6 +150,13 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
                 textView.setTypeface(Typeface.DEFAULT_BOLD);
             } else {
                 textView.setTypeface(Typeface.DEFAULT);
+            }
+
+            // Strikethrough for crossed-out legs
+            if (entry.getLeg().isCrossedOut()) {
+                textView.setPaintFlags(textView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            } else {
+                textView.setPaintFlags(textView.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
             }
 
             // Set alignment based on column type

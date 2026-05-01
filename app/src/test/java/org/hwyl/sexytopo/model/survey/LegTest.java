@@ -238,4 +238,32 @@ public class LegTest {
         Assert.assertFalse(Leg.isInclinationLegal(-90.1f));
         Assert.assertFalse(Leg.isInclinationLegal(90.1f));
     }
+
+    @Test
+    public void testIsCrossedOutDefaultsFalse() {
+        Leg leg = new Leg(5.0f, 45.0f, 30.0f);
+        Assert.assertFalse(leg.isCrossedOut());
+    }
+
+    @Test
+    public void testSetCrossedOutTrue() {
+        Leg leg = new Leg(5.0f, 45.0f, 30.0f);
+        leg.setCrossedOut(true);
+        Assert.assertTrue(leg.isCrossedOut());
+    }
+
+    @Test
+    public void testSetCrossedOutCanBeToggled() {
+        Leg leg = new Leg(5.0f, 45.0f, 30.0f);
+        leg.setCrossedOut(true);
+        leg.setCrossedOut(false);
+        Assert.assertFalse(leg.isCrossedOut());
+    }
+
+    @Test
+    public void testCrossedOutDefaultsFalseForLegWithDestination() {
+        Station destination = new Station("A1");
+        Leg leg = new Leg(5.0f, 45.0f, 30.0f, destination, new Leg[] {});
+        Assert.assertFalse(leg.isCrossedOut());
+    }
 }
