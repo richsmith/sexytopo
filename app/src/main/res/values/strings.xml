@@ -424,6 +424,8 @@
     <string name="settings_general_summary">Theme, orientation, vibration</string>
     <string name="settings_sketching_summary">Drawing tools, display options</string>
     <string name="settings_export_summary">Export formats and folder options</string>
+    <string name="settings_key_manual_readings_title">Manual Readings</string>
+    <string name="settings_key_manual_readings_summary">Enter legs and splays manually</string>
     <string name="settings_manual_data_entry_summary">LRUD fields, angle format</string>
     <string name="settings_instruments_summary">Instrument tolerances, calibration</string>
     <string name="settings_developer_summary">Debugging options</string>
