@@ -219,28 +219,49 @@ public class SurvexTherionUtil {
     public static String getExtendedElevationExtensions(Survey survey, SurveyFormat format) {
         StringBuilder builder = new StringBuilder();
         String marker = format.getCommandChar();
-        generateExtendCommandsFromStation(builder, survey.getOrigin(), null, marker);
+        generateExtendCommandsFromStation(builder, survey.getOrigin(), null, null, marker);
         return builder.toString();
     }
 
     private static void generateExtendCommandsFromStation(
-            StringBuilder builder, Station station, Direction lastDirection, String marker) {
+            StringBuilder builder,
+            Station station,
+            Station fromStation,
+            Direction lastDirection,
+            String marker) {
 
         Direction currentDirection = station.getExtendedElevationDirection();
-        if (lastDirection == null) {
-            builder.append(getExtendCommand(station, "start", marker));
-        } else if (currentDirection != lastDirection) {
-            builder.append(
-                    getExtendCommand(station, currentDirection.name().toLowerCase(), marker));
-        }
 
-        for (Leg leg : station.getConnectedOnwardLegs()) {
-            generateExtendCommandsFromStation(
-                    builder, leg.getDestination(), station.getExtendedElevationDirection(), marker);
+        if (currentDirection == Direction.VERTICAL) {
+            // VERTICAL is leg-scoped: emit a two-station "extend vertical <from> <to>" command.
+            // The direction seen by child stations is not changed — pass lastDirection forward
+            // unchanged so the survey continues in the same left/right direction after the
+            // vertical leg.
+            builder.append(getExtendCommand(fromStation, station, "vertical", marker));
+            for (Leg leg : station.getConnectedOnwardLegs()) {
+                generateExtendCommandsFromStation(
+                        builder, leg.getDestination(), station, lastDirection, marker);
+            }
+        } else {
+            if (lastDirection == null) {
+                builder.append(getExtendCommand(station, "start", marker));
+            } else if (currentDirection != lastDirection) {
+                builder.append(
+                        getExtendCommand(station, currentDirection.name().toLowerCase(), marker));
+            }
+            for (Leg leg : station.getConnectedOnwardLegs()) {
+                generateExtendCommandsFromStation(
+                        builder, leg.getDestination(), station, currentDirection, marker);
+            }
         }
     }
 
     private static String getExtendCommand(Station station, String direction, String marker) {
         return marker + "extend " + direction + " " + station.getName() + "\n";
+    }
+
+    private static String getExtendCommand(
+            Station from, Station to, String direction, String marker) {
+        return marker + "extend " + direction + " " + from.getName() + " " + to.getName() + "\n";
     }
 }

@@ -72,6 +72,15 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         }
     }
 
+    public void onSetDirectionVertical(Station station) {
+        if (station.getExtendedElevationDirection() != Direction.VERTICAL) {
+            // Only affect this one station's incoming leg — do NOT propagate to the subtree
+            station.setExtendedElevationDirection(Direction.VERTICAL);
+            getSurveyManager().broadcastSurveyUpdated();
+            invalidateView();
+        }
+    }
+
     public void onReverse(Leg leg) {
         Station station = leg.getDestination();
         if (station == null) {

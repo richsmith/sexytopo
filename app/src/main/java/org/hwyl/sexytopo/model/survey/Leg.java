@@ -137,6 +137,19 @@ public class Leg extends SurveyComponent {
         }
     }
 
+    public Leg adjustAzimuthAndInclination(float newAzimuth, float newInclination) {
+        if (hasDestination()) {
+            return new Leg(
+                    getDistance(),
+                    newAzimuth,
+                    newInclination,
+                    getDestination(),
+                    getPromotedFrom());
+        } else {
+            return new Leg(getDistance(), newAzimuth, newInclination);
+        }
+    }
+
     public Leg asBacksight(Station destination) {
         float backAzimuth = Space2DUtils.adjustAngle(getAzimuth(), 180.0f);
         Leg leg =

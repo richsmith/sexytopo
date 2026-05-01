@@ -26,8 +26,26 @@ public class Space3DTransformerForElevation extends Space3DTransformer {
 
     protected void updateLeg(Space<Coord3D> space, Leg leg, Coord3D start) {
 
+        Direction direction = leg.getDestination().getExtendedElevationDirection();
+
+        if (direction == Direction.VERTICAL) {
+            // Render only the true vertical component of this leg: keep x and y identical to the
+            // start (zero horizontal displacement on screen) and shift z by r*sin(inclination),
+            // which is the actual height change. This correctly preserves the station's altitude
+            // without inflating it the way forcing inclination to ±90° would.
+            float dz = leg.getDistance()
+                    * (float) Math.sin(Math.toRadians(leg.getInclination()));
+            Coord3D end = new Coord3D(start.x, start.y, start.z + dz);
+            space.addLeg(leg, new Line<>(start, end));
+            if (leg.hasDestination()) {
+                // delta=0: subsequent legs are not rotated by this vertical leg's azimuth
+                update(space, leg.getDestination(), end, 0);
+            }
+            return;
+        }
+
         Leg adjustedLeg;
-        if (leg.getDestination().getExtendedElevationDirection() == Direction.LEFT) {
+        if (direction == Direction.LEFT) {
             adjustedLeg = leg.adjustAzimuth(180);
         } else {
             adjustedLeg = leg.adjustAzimuth(0);

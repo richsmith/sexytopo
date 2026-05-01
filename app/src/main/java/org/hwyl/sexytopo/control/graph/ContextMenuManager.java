@@ -60,6 +60,7 @@ public class ContextMenuManager {
         menuActions.put(R.id.action_jump_to_elevation, activity::onJumpToElevation);
         menuActions.put(R.id.action_direction_left, activity::onSetDirectionLeft);
         menuActions.put(R.id.action_direction_right, activity::onSetDirectionRight);
+        menuActions.put(R.id.action_direction_vertical, activity::onSetDirectionVertical);
         menuActions.put(R.id.action_new_cross_section, activity::onNewCrossSection);
         menuActions.put(R.id.action_start_new_survey, activity::onStartNewSurvey);
         menuActions.put(R.id.action_link_survey, activity::onLinkSurvey);
@@ -221,10 +222,14 @@ public class ContextMenuManager {
         // Configure direction radio buttons
         MenuItem leftItem = menu.findItem(R.id.action_direction_left);
         MenuItem rightItem = menu.findItem(R.id.action_direction_right);
+        MenuItem verticalItem = menu.findItem(R.id.action_direction_vertical);
         if (leftItem != null && rightItem != null) {
             Direction currentDirection = station.getExtendedElevationDirection();
             leftItem.setChecked(currentDirection == Direction.LEFT);
             rightItem.setChecked(currentDirection == Direction.RIGHT);
+            if (verticalItem != null) {
+                verticalItem.setChecked(currentDirection == Direction.VERTICAL);
+            }
         }
 
         viewContext.configureViewSpecificItems(menu);

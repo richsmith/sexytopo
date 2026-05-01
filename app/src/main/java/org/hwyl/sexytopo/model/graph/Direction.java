@@ -2,9 +2,12 @@ package org.hwyl.sexytopo.model.graph;
 
 public enum Direction {
     LEFT,
-    RIGHT;
+    RIGHT,
+    VERTICAL;
 
     public Direction opposite() {
-        return (this == LEFT) ? RIGHT : LEFT;
+        if (this == LEFT) return RIGHT;
+        if (this == RIGHT) return LEFT;
+        return VERTICAL;
     }
 }
