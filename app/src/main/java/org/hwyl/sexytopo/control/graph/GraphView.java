@@ -42,6 +42,7 @@ import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Coord2D;
+import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
@@ -87,6 +88,7 @@ public class GraphView extends View {
     public static final int FADED_ALPHA = 0xff / 5;
     private static final int STATION_STROKE_WIDTH_DP = 2;
     private static final int DASHED_LINE_INTERVAL_DP = 4;
+    private static final int VERTICAL_LEG_DASH_INTERVAL_DP = 8;
     private static final int CROSS_SECTION_CONNECTOR_WIDTH_DP = 2;
     private static final int CROSS_SECTION_INDICATOR_WIDTH_DP = 2;
 
@@ -94,6 +96,7 @@ public class GraphView extends View {
     private static final int LEGEND_TICK_SIZE_DP = 5;
     private float legendTickSizePx;
     private float dashedLineIntervalPx;
+    private float verticalLegDashIntervalPx;
 
     private static final float DELETE_DETAILS_WITHIN_N_DP = 5.0f;
     private static final float SELECTION_SENSITIVITY_DP = 25.0f;
@@ -291,6 +294,7 @@ public class GraphView extends View {
         stationCrossDiameterPx = dpToPixels(GeneralPreferences.getStationCrossDiameterDp());
         legendTickSizePx = dpToPixels(LEGEND_TICK_SIZE_DP);
         dashedLineIntervalPx = dpToPixels(DASHED_LINE_INTERVAL_DP);
+        verticalLegDashIntervalPx = dpToPixels(VERTICAL_LEG_DASH_INTERVAL_DP);
         deleteDetailsWithinPx = dpToPixels(DELETE_DETAILS_WITHIN_N_DP);
         selectionSensitivityPx = dpToPixels(SELECTION_SENSITIVITY_DP);
         snapToLineSensitivityPx = dpToPixels(SNAP_TO_LINE_SENSITIVITY_DP);
@@ -1034,7 +1038,11 @@ public class GraphView extends View {
                 paint = fade ? fadedLegPaint : legPaint;
             }
 
-            if (projectionType.isLegInPlane(leg)) {
+            if (projectionType == Projection2D.EXTENDED_ELEVATION
+                    && leg.hasDestination()
+                    && leg.getDestination().getExtendedElevationDirection() == Direction.VERTICAL) {
+                drawDashedLine(canvas, start, end, verticalLegDashIntervalPx, paint);
+            } else if (projectionType.isLegInPlane(leg)) {
                 canvas.drawLine(start.x, start.y, end.x, end.y, paint);
             } else {
                 drawDashedLine(canvas, start, end, dashedLineIntervalPx, paint);
