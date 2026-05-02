@@ -63,6 +63,9 @@ public class TableActivity extends SurveyEditorActivity
         findViewById(R.id.fabAddStation).setOnClickListener(v -> manuallyAddStation());
         findViewById(R.id.fabAddSplay).setOnClickListener(v -> manuallyAddSplay());
 
+        // Show or hide manual reading FABs based on preference
+        updateManualReadingsFabVisibility();
+
         // Apply edge-to-edge insets
         setupEdgeToEdge();
 
@@ -170,6 +173,9 @@ public class TableActivity extends SurveyEditorActivity
     @Override
     protected void onResume() {
         super.onResume();
+
+        // Re-apply manual readings FAB visibility in case setting changed
+        updateManualReadingsFabVisibility();
 
         LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
         broadcastManager.registerReceiver(
@@ -337,6 +343,12 @@ public class TableActivity extends SurveyEditorActivity
     @Override
     public void onRenameStation(Station station) {
         LegDialogs.renameStation(this, getSurvey(), station);
+    }
+
+    private void updateManualReadingsFabVisibility() {
+        int visibility = GeneralPreferences.isManualReadingsEnabled() ? View.VISIBLE : View.GONE;
+        findViewById(R.id.fabAddStation).setVisibility(visibility);
+        findViewById(R.id.fabAddSplay).setVisibility(visibility);
     }
 
     private void manuallyAddStation() {
