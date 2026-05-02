@@ -292,11 +292,7 @@ public class TableActivity extends SurveyEditorActivity
             ColorDrawable highlightDrawable = new ColorDrawable(primaryColor);
             highlightDrawable.setAlpha(51);
 
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                highlightedRow.setForeground(highlightDrawable);
-            } else {
-                highlightedRow.setBackgroundColor(primaryColor & 0x33FFFFFF);
-            }
+            highlightedRow.setForeground(highlightDrawable);
         }
 
         if (isStationColumn) {
