@@ -375,7 +375,12 @@ public class Th2Exporter {
 
                 String xsScrapName = stationNameToXsScrapName.get(station.getName());
                 if (xsScrapName != null) {
-                    commands.add(getPoint(coord.x, coord.y, "section", "-scrap", xsScrapName));
+                    // The section anchor goes at the position the user placed the cross-section
+                    // on the plan. Flip y to match the plan space.
+                    CrossSectionDetail xsDetail = sketch.getCrossSectionDetail(station);
+                    Coord2D xsCoord = xsDetail.getPosition().flipVertically().scale(scale);
+                    commands.add(
+                            getPoint(xsCoord.x, xsCoord.y, "section", "-scrap", xsScrapName));
                 }
             }
         }
