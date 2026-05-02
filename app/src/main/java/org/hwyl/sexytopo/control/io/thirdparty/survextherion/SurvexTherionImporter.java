@@ -76,8 +76,9 @@ public class SurvexTherionImporter {
     /**
      * Parse passage data section to extract station comments.
      *
-     * <p>Supports: - Therion: "data passage station ignoreall" - Survex: "*data passage station
-     * ignoreall"
+     * <p>Supports:
+     * - Therion: "data dimensions station left right up down ignoreall"
+     * - Survex: "*data passage station left right up down ignoreall"
      *
      * @param text The full file text (may contain multiple sections)
      * @param format the file format being parsed (SURVEX or THERION)
@@ -201,10 +202,10 @@ public class SurvexTherionImporter {
                 continue;
             }
 
-            // Instrument: "instrument inst \"name\""
+            // Instrument: "instrument insts \"name\""
             // Commented out instrument are ignored
-            if (effective.startsWith("instrument inst ")) {
-                instrument = extractQuotedValue(effective, "instrument inst ");
+            if (effective.startsWith("instrument insts ")) {
+                instrument = extractQuotedValue(effective, "instrument insts ");
                 foundAnyMetadata = true;
                 continue;
             }

@@ -92,16 +92,25 @@ public enum SurveyFormat {
             String effective, Map<String, List<Trip.Role>> teamMap);
 
     /**
-     * Commented-out instrument prefix: ";*instrument inst " for Survex, "#instrument inst " for
+     * Commented-out instrument prefix: ";*instrument insts " for Survex, "#instrument insts " for
      * Therion
      */
     public String getCommentedInstrumentPrefix() {
-        return getCommentChar() + getCommandChar() + "instrument inst ";
+        return getCommentChar() + getCommandChar() + "instrument insts ";
     }
 
-    /** Data passage prefix: "*data passage" for Survex, "data passage" for Therion */
+    /**
+     * passage data
+     * *data passage" for Survex,
+     * data dimensions" for Therion
+     */
     public String getDataPassagePrefix() {
-        return getCommandChar() + "data passage";
+        // Survex uses "passage", Therion uses "dimensions"
+        if (this == SURVEX) {
+            return getCommandChar() + "data passage";
+        } else {
+            return getCommandChar() + "data dimensions";
+        }
     }
 
     /** Strip command prefix from a line: removes leading "*" for Survex, no-op for Therion */
