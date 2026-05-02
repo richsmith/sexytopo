@@ -611,6 +611,8 @@
     <string name="menu_edit_leg">Edit</string>
     <string name="menu_upgrade_row">Force New Station</string>
     <string name="menu_promote_to_above_leg">Add to Leg Above</string>
+    <string name="menu_cross_out">Cross Out</string>
+    <string name="menu_uncross_out">Uncross Out</string>
     <string name="toast_splay_promoted">Splay combined with leg</string>
     <string name="toast_no_leg_above">No valid leg to combine with</string>
     <string name="menu_upgrade_splay">Upgrade to Leg</string>

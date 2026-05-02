@@ -40,6 +40,7 @@ public class SurveyJsonTranslater {
     public static final String PROMOTED_FROM_TAG = "promotedFrom";
     public static final String DESTINATION_TAG = "destination";
     public static final String WAS_SHOT_BACKWARDS_TAG = "wasShotBackwards";
+    public static final String IS_CROSSED_OUT_TAG = "isCrossedOut";
     public static final String INDEX_TAG = "index";
 
     public static final String ACTIVE_STATION_TAG = "activeStation";
@@ -258,6 +259,7 @@ public class SurveyJsonTranslater {
         json.put(INCLINATION_TAG, leg.getInclination());
         json.put(DESTINATION_TAG, leg.getDestination().getName());
         json.put(WAS_SHOT_BACKWARDS_TAG, leg.wasShotBackwards());
+        json.put(IS_CROSSED_OUT_TAG, leg.isCrossedOut());
         if (index != null) {
             json.put(INDEX_TAG, index);
         }
@@ -339,6 +341,7 @@ public class SurveyJsonTranslater {
         float azimuth = (float) json.getDouble(AZIMUTH_TAG);
         float inclination = (float) json.getDouble(INCLINATION_TAG);
         boolean wasShotBackwards = json.getBoolean(WAS_SHOT_BACKWARDS_TAG);
+        boolean isCrossedOut = json.optBoolean(IS_CROSSED_OUT_TAG, false);
 
         String destinationName = json.getString(DESTINATION_TAG);
 
@@ -377,6 +380,7 @@ public class SurveyJsonTranslater {
                             wasShotBackwards);
         }
 
+        leg.setCrossedOut(isCrossedOut);
         return leg;
     }
 

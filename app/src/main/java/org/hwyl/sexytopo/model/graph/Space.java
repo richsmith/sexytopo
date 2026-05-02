@@ -25,6 +25,7 @@ public class Space<T extends Coord> {
         legs.put(leg, line);
     }
 
+    @SuppressWarnings("unchecked")
     public Space<T> scale(float scale) {
 
         Space<T> scaled = new Space<>();

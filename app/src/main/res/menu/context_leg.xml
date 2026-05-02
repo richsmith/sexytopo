@@ -28,6 +28,10 @@
             android:visible="false"/>
 
         <item
+            android:id="@+id/action_cross_out_leg"
+            android:title="@string/menu_cross_out"/>
+
+        <item
             android:id="@+id/action_downgrade_leg"
             android:title="@string/menu_downgrade_leg"
             android:visible="false"/>

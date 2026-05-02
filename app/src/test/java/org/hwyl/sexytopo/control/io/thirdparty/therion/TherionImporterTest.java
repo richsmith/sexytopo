@@ -649,4 +649,30 @@ public class TherionImporterTest {
         Direction stationFiveDirection = stationFive.getExtendedElevationDirection();
         Assert.assertEquals(Direction.RIGHT, stationFiveDirection);
     }
+
+    @Test
+    public void testCrossedOutLegSurvivesUpdateCentreline() throws Exception {
+        List<String> lines = Arrays.asList(
+                "centreline",
+                "data normal from to tape compass clino",
+                "#0\t1\t5.0\t0.0\t0.0",
+                "endcentreline");
+        Survey survey = new Survey();
+        TherionImporter.updateCentreline(lines, survey);
+        Assert.assertEquals(1, survey.getAllLegs().size());
+        Assert.assertTrue(survey.getAllLegs().get(0).isCrossedOut());
+    }
+
+    @Test
+    public void testCrossedOutSplaySurvivesUpdateCentreline() throws Exception {
+        List<String> lines = Arrays.asList(
+                "centreline",
+                "data normal from to tape compass clino",
+                "#0\t-\t5.0\t90.0\t0.0",
+                "endcentreline");
+        Survey survey = new Survey();
+        TherionImporter.updateCentreline(lines, survey);
+        Assert.assertEquals(1, survey.getAllLegs().size());
+        Assert.assertTrue(survey.getAllLegs().get(0).isCrossedOut());
+    }
 }

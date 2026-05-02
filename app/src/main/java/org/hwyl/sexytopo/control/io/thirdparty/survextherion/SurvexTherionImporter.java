@@ -44,28 +44,40 @@ public class SurvexTherionImporter {
                 continue;
             }
 
-            // Skip pure comment lines (but not lines with data and comments)
+            // Detect crossed-out legs: a single comment char followed by 5+ data fields.
+            // Double comment chars (;;/##) are promoted-from precursors — leave those to
+            // parseCommentedNewLinePromotedLegs.
+            boolean isCrossedOut = false;
             if (trimmed.startsWith(";") || trimmed.startsWith("#")) {
-                // Don't skip if it looks like commented new lines promoted leg
-                String[] parts = trimmed.substring(1).trim().split("\\s+");
-                if (parts.length < 5) {
-                    continue; // Just a comment, skip it
+                boolean isDouble = trimmed.length() > 1
+                        && trimmed.charAt(1) == trimmed.charAt(0);
+                if (isDouble) {
+                    continue; // Double-commented precursor line — skip here
                 }
-                // Might be commented new lines promoted leg, let it fall through
-                continue;
+                String afterComment = trimmed.substring(1).trim();
+                String[] parts = afterComment.split("\\s+");
+                if (parts.length >= 5 && looksLikeDataLine(parts)) {
+                    // Single-commented data line — a crossed-out leg
+                    isCrossedOut = true;
+                    line = afterComment; // strip the leading comment char for field parsing
+                    trimmed = afterComment;
+                } else {
+                    continue; // Plain comment, skip
+                }
             }
 
             try {
                 // Extract comment - support both ; (Survex) and # (Therion)
                 String comment = extractCommentFromLine(line);
 
-                String[] fields = line.trim().split("\\s+");
+                String[] fields = trimmed.split("\\s+");
 
                 // Check for commented new lines promoted legs in subsequent lines
                 List<Leg> commentedNewLineLegs =
                         parseCommentedNewLinePromotedLegs(lines, lineIndex, fields[0], fields[1]);
 
-                addLegToSurvey(survey, nameToStation, fields, comment, commentedNewLineLegs);
+                addLegToSurvey(survey, nameToStation, fields, comment, commentedNewLineLegs,
+                        isCrossedOut);
 
             } catch (Exception exception) {
                 throw new Exception("Error importing this line: " + line);
@@ -361,7 +373,8 @@ public class SurvexTherionImporter {
             Map<String, Station> nameToStation,
             String[] fields,
             String comment,
-            List<Leg> commentedNewLineLegs) {
+            List<Leg> commentedNewLineLegs,
+            boolean crossedOut) {
 
         String fromName = fields[0];
         String toName = fields[1];
@@ -444,6 +457,7 @@ public class SurvexTherionImporter {
             }
         }
 
+        leg.setCrossedOut(crossedOut);
         legFrom.addOnwardLeg(leg);
         survey.addLegRecord(leg);
         survey.setActiveStation(legFrom);
@@ -495,8 +509,15 @@ public class SurvexTherionImporter {
                 break;
             }
 
-            // Remove the comment character and parse
-            String content = line.substring(1).trim();
+            // Remove one or two leading comment characters.
+            // Precursors of a normal leg have one (;/# ); precursors of a crossed-out
+            // leg have two (;;/##). Strip them both the same way — we just need the data.
+            String content;
+            if (line.length() > 1 && line.charAt(1) == line.charAt(0)) {
+                content = line.substring(2).trim();
+            } else {
+                content = line.substring(1).trim();
+            }
             String[] fields = content.split("\\s+");
 
             // Check if this is a matching shot
@@ -519,6 +540,21 @@ public class SurvexTherionImporter {
         }
 
         return shots;
+    }
+
+    /**
+     * Returns true if the first five elements of parts look like a data line:
+     * fields[0] and [1] are non-numeric (station names), fields[2..4] are floats.
+     */
+    private static boolean looksLikeDataLine(String[] parts) {
+        try {
+            Float.parseFloat(parts[2]);
+            Float.parseFloat(parts[3]);
+            Float.parseFloat(parts[4]);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     private static String extractCommentInstructions(String comment) {
