@@ -83,10 +83,7 @@ public class SurvexTherionUtil {
                         .append(formattedExploDate)
                         .append("\n");
             } else {
-                builder.append(commentChar)
-                        .append(marker)
-                        .append(exploDateKeyword)
-                        .append("\n");
+                builder.append(commentChar).append(marker).append(exploDateKeyword).append("\n");
             }
 
             // Explo-team lines

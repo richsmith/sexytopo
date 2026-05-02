@@ -1,7 +1,7 @@
 package org.hwyl.sexytopo.control.io.basic;
 
-import org.hwyl.sexytopo.model.survey.Trip;
 import org.hwyl.sexytopo.model.survey.Survey;
+import org.hwyl.sexytopo.model.survey.Trip;
 import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
 import org.hwyl.sexytopo.testutils.ExampleSurveyCreator;
 import org.hwyl.sexytopo.testutils.SurveyChecker;

@@ -77,8 +77,11 @@ public class SurvexTherionImporter {
      * Parse passage data section to extract station comments.
      *
      * <p>Supports:
-     * - Therion: "data dimensions station left right up down ignoreall"
-     * - Survex: "*data passage station left right up down ignoreall"
+     *
+     * <ul>
+     *   <li>Therion: "data dimensions station left right up down ignoreall"
+     *   <li>Survex: "*data passage station left right up down ignoreall"
+     * </ul>
      *
      * @param text The full file text (may contain multiple sections)
      * @param format the file format being parsed (SURVEX or THERION)

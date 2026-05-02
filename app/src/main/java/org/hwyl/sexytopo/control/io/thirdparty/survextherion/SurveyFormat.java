@@ -101,8 +101,9 @@ public enum SurveyFormat {
 
     /**
      * passage data
-     * *data passage" for Survex,
-     * data dimensions" for Therion
+     * <ul>
+     * <li>*data passage for Survex</li>
+     * <li>data dimensions for Therion</li>
      */
     public String getDataPassagePrefix() {
         // Survex uses "passage", Therion uses "dimensions"
