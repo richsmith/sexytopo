@@ -19,6 +19,29 @@ public class EditLegForm extends Form {
     private static final int SPINNER_FORWARD = 0;
     private static final int SPINNER_BACKWARD = 1;
 
+    /**
+     * A TextWatcher that, in addition to triggering validation, enables range-error display
+     * as soon as the watched field contains any non-empty text. This lets out-of-range errors
+     * appear immediately while the user is typing, without showing a "cannot be blank" error
+     * on an untouched field.
+     */
+    private static class RangeValidationTrigger extends TextViewValidationTrigger {
+        private final android.widget.EditText field;
+
+        RangeValidationTrigger(Form form, android.widget.EditText field) {
+            super(form);
+            this.field = field;
+        }
+
+        @Override
+        public void afterTextChanged(android.text.Editable editable) {
+            if (field.getText().length() > 0) {
+                form.enableRangeErrors();
+            }
+            super.afterTextChanged(editable);
+        }
+    }
+
     private final Context context;
     private final Survey survey;
     private String defaultToName;
@@ -126,10 +149,10 @@ public class EditLegForm extends Form {
             this.toStationField.addTextChangedListener(new TextViewValidationTrigger(this));
         }
         this.distanceField.addTextChangedListener(new TextViewValidationTrigger(this));
-        this.azimuthField.addTextChangedListener(new TextViewValidationTrigger(this));
-        this.inclinationField.addTextChangedListener(new TextViewValidationTrigger(this));
+        this.azimuthField.addTextChangedListener(new RangeValidationTrigger(this, this.azimuthField));
+        this.inclinationField.addTextChangedListener(new RangeValidationTrigger(this, this.inclinationField));
 
-        // Enable error display once user first interacts with any field
+        // Enable error display once the user leaves a field for the first time.
         android.view.View.OnFocusChangeListener enableErrorsOnTouch =
                 (v, hasFocus) -> {
                     if (!hasFocus) {
@@ -344,14 +367,14 @@ public class EditLegForm extends Form {
             } else {
                 float azimuth = Float.parseFloat(azimuthText);
                 if (!Leg.isAzimuthLegal(azimuth)) {
-                    setError(
+                    setRangeError(
                             this.azimuthLayout,
                             context.getString(
                                     R.string.validation_error_azimuth_range,
                                     Leg.MIN_AZIMUTH,
                                     Leg.MAX_AZIMUTH));
                 } else {
-                    setError(this.azimuthLayout, (Integer) null);
+                    setRangeError(this.azimuthLayout, (Integer) null);
                 }
             }
         } catch (NumberFormatException e) {
@@ -371,14 +394,14 @@ public class EditLegForm extends Form {
             } else {
                 float inclination = Float.parseFloat(inclinationText);
                 if (!Leg.isInclinationLegal(inclination)) {
-                    setError(
+                    setRangeError(
                             this.inclinationLayout,
                             context.getString(
                                     R.string.validation_error_inclination_range,
                                     Leg.MIN_INCLINATION,
                                     Leg.MAX_INCLINATION));
                 } else {
-                    setError(this.inclinationLayout, (Integer) null);
+                    setRangeError(this.inclinationLayout, (Integer) null);
                 }
             }
         } catch (NumberFormatException e) {

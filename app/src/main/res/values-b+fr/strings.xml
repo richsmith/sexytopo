@@ -532,9 +532,9 @@
     <string name="validation_error_same_as_from_station">Ne peut pas être identique à la station d\'origine</string>
     <string name="validation_error_station_name_not_unique">Le nom de la station doit être unique</string>
     <string name="validation_error_must_be_number">Doit être un nombre</string>
-    <string name="validation_error_distance_minimum">Doit être >= %1$f</string>
-    <string name="validation_error_azimuth_range">Doit être entre %1$f et %2$f</string>
-    <string name="validation_error_inclination_range">Doit être entre %1$f et %2$f</string>
+    <string name="validation_error_distance_minimum">Doit être >= %1$d</string>
+    <string name="validation_error_azimuth_range">Doit être entre %1$d et %2$d</string>
+    <string name="validation_error_inclination_range">Doit être entre %1$d et %2$d</string>
 
     <!-- Input mode for leg editing -->
     <string-array name="leg_edit_input_mode_options">

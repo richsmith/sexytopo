@@ -532,9 +532,9 @@
     <string name="validation_error_same_as_from_station">Nie może być takie samo jak stanowisko początkowe</string>
     <string name="validation_error_station_name_not_unique">Nazwa stanowiska musi być unikalna</string>
     <string name="validation_error_must_be_number">Musi być liczbą</string>
-    <string name="validation_error_distance_minimum">Musi być >= %1$f</string>
-    <string name="validation_error_azimuth_range">Musi być %1$f-%2$f</string>
-    <string name="validation_error_inclination_range">Musi być od %1$f do %2$f</string>
+    <string name="validation_error_distance_minimum">Musi być >= %1$d</string>
+    <string name="validation_error_azimuth_range">Musi być %1$d-%2$d</string>
+    <string name="validation_error_inclination_range">Musi być od %1$d do %2$d</string>
 
     <!-- Input mode for leg editing -->
     <string-array name="leg_edit_input_mode_options">

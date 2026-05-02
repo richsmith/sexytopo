@@ -532,9 +532,9 @@
     <string name="validation_error_same_as_from_station">Kann nicht derselbe wie der Ursprungsmesspunkt sein</string>
     <string name="validation_error_station_name_not_unique">Messpunktname muss eindeutig sein</string>
     <string name="validation_error_must_be_number">Muss eine Zahl sein</string>
-    <string name="validation_error_distance_minimum">Muss >= %1$f sein</string>
-    <string name="validation_error_azimuth_range">Muss zwischen %1$f und %2$f liegen</string>
-    <string name="validation_error_inclination_range">Muss zwischen %1$f und %2$f liegen</string>
+    <string name="validation_error_distance_minimum">Muss >= %1$d sein</string>
+    <string name="validation_error_azimuth_range">Muss zwischen %1$d und %2$d liegen</string>
+    <string name="validation_error_inclination_range">Muss zwischen %1$d und %2$d liegen</string>
 
     <!-- Input mode for leg editing -->
     <string-array name="leg_edit_input_mode_options">
