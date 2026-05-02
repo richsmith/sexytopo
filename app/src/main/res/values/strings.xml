@@ -78,6 +78,8 @@
     <string name="action_view">View</string>
     <string name="action_fullscreen">Fullscreen</string>
     <string name="action_tools">Tools</string>
+    <string name="action_add_leg">Add Leg…</string>
+    <string name="action_add_splay">Add Splay…</string>
     <string name="action_undo_last_leg">Undo last reading</string>
     <string name="action_find_station">Find Station…</string>
     <string name="action_link_to_existing_survey">Link to an Existing Survey</string>

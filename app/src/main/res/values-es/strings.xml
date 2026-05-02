@@ -77,6 +77,8 @@
     <string name="action_view">Vista</string>
     <string name="action_fullscreen">Pantalla Completa</string>
     <string name="action_tools">Herramientas</string>
+    <string name="action_add_leg">Añadir Tramo…</string>
+    <string name="action_add_splay">Añadir Radial…</string>
     <string name="action_undo_last_leg">Deshacer última lectura</string>
     <string name="action_find_station">Buscar Estación…</string>
     <string name="action_link_to_existing_survey">Enlazar a una Topografía Existente</string>

@@ -64,6 +64,7 @@ import org.hwyl.sexytopo.control.io.thirdparty.therion.TherionExporter;
 import org.hwyl.sexytopo.control.io.translation.Exporter;
 import org.hwyl.sexytopo.control.io.translation.ImportManager;
 import org.hwyl.sexytopo.control.io.translation.SelectableExporters;
+import org.hwyl.sexytopo.control.table.LegDialogs;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -231,6 +232,16 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             findStationItem.setEnabled(false);
         }
 
+        // disable manual add Leg / Splay by default — only meaningful inside a survey-editor view
+        MenuItem addLegItem = menu.findItem(R.id.action_add_leg);
+        if (addLegItem != null) {
+            addLegItem.setEnabled(false);
+        }
+        MenuItem addSplayItem = menu.findItem(R.id.action_add_splay);
+        if (addSplayItem != null) {
+            addSplayItem.setEnabled(false);
+        }
+
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -318,6 +329,16 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             return true;
         } else if (itemId == R.id.action_find_station) {
             onFindStation();
+            return true;
+        } else if (itemId == R.id.action_add_leg) {
+            if (GeneralPreferences.isManualLrudModeOn()) {
+                LegDialogs.addStationWithLruds(this, getSurvey());
+            } else {
+                LegDialogs.addStation(this, getSurvey());
+            }
+            return true;
+        } else if (itemId == R.id.action_add_splay) {
+            LegDialogs.addSplay(this, getSurvey());
             return true;
         } else if (itemId == R.id.action_system_log) {
             startActivity(SystemLogActivity.class);

@@ -12,7 +12,6 @@ import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
 import org.hwyl.sexytopo.control.activity.SurveyEditorActivity;
-import org.hwyl.sexytopo.control.activity.TableActivity;
 import org.hwyl.sexytopo.control.components.DialogUtils;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.StationNamer;
@@ -27,9 +26,9 @@ public class LegDialogs {
 
     private LegDialogs() {}
 
-    public static void addStation(final TableActivity tableActivity, final Survey survey) {
+    public static void addStation(final SexyTopoActivity activity, final Survey survey) {
         showAddLegDialog(
-                tableActivity,
+                activity,
                 survey,
                 R.layout.leg_edit_dialog_unified,
                 R.string.manual_add_station_title,
@@ -38,9 +37,9 @@ public class LegDialogs {
                 );
     }
 
-    public static void addSplay(final TableActivity tableActivity, final Survey survey) {
+    public static void addSplay(final SexyTopoActivity activity, final Survey survey) {
         showAddLegDialog(
-                tableActivity,
+                activity,
                 survey,
                 R.layout.leg_edit_dialog_unified,
                 R.string.manual_add_splay_title,
@@ -51,7 +50,7 @@ public class LegDialogs {
 
     /** Unified helper method for showing add leg/station/splay dialogs */
     private static void showAddLegDialog(
-            final TableActivity tableActivity,
+            final SexyTopoActivity activity,
             final Survey survey,
             int layoutResId,
             int titleResId,
@@ -62,8 +61,8 @@ public class LegDialogs {
         String defaultToName =
                 isSplay ? null : StationNamer.generateNextStationName(survey, activeStation);
 
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(tableActivity);
-        LayoutInflater inflater = tableActivity.getLayoutInflater();
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(activity);
+        LayoutInflater inflater = activity.getLayoutInflater();
         final View dialogView = inflater.inflate(layoutResId, null);
 
         boolean usingDegMinsSecs = GeneralPreferences.isDegMinsSecsModeOn();
@@ -81,7 +80,7 @@ public class LegDialogs {
         // Create validation form
         final EditLegForm form =
                 new EditLegForm(
-                        tableActivity, survey, activeStation, defaultToName, isSplay, dialogView);
+                        activity, survey, activeStation, defaultToName, isSplay, dialogView);
 
         builder.setView(dialogView)
                 .setTitle(titleResId)
@@ -179,12 +178,14 @@ public class LegDialogs {
                         }
                     }
 
-                    SurveyManager manager = tableActivity.getSurveyManager();
+                    SurveyManager manager = activity.getSurveyManager();
                     manager.broadcastSurveyUpdated();
                     if (!isSplay) {
                         manager.broadcastNewStationCreated();
                     }
-                    tableActivity.syncWithSurvey();
+                    if (activity instanceof SurveyEditorActivity) {
+                        ((SurveyEditorActivity) activity).syncWithSurvey();
+                    }
                 });
     }
 
@@ -306,9 +307,9 @@ public class LegDialogs {
                 });
     }
 
-    public static void addStationWithLruds(final TableActivity tableActivity, final Survey survey) {
+    public static void addStationWithLruds(final SexyTopoActivity activity, final Survey survey) {
         showAddLegDialog(
-                tableActivity,
+                activity,
                 survey,
                 R.layout.leg_edit_dialog_unified_with_lruds,
                 R.string.manual_add_station_title,

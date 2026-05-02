@@ -32,6 +32,14 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         if (findStationItem != null) {
             findStationItem.setEnabled(true);
         }
+        MenuItem addLegItem = menu.findItem(R.id.action_add_leg);
+        if (addLegItem != null) {
+            addLegItem.setEnabled(true);
+        }
+        MenuItem addSplayItem = menu.findItem(R.id.action_add_splay);
+        if (addSplayItem != null) {
+            addSplayItem.setEnabled(true);
+        }
         return true;
     }
 
