@@ -77,6 +77,8 @@
     <string name="action_view">Widok</string>
     <string name="action_fullscreen">Pełny ekran</string>
     <string name="action_tools">Narzędzia</string>
+    <string name="action_add_leg">Dodaj ciąg…</string>
+    <string name="action_add_splay">Dodaj pomiar szczegółowy…</string>
     <string name="action_undo_last_leg">Cofnij ostatni pomiar</string>
     <string name="action_find_station">Znajdź stanowisko…</string>
     <string name="action_link_to_existing_survey">Połącz z istniejącym pomiarem</string>

@@ -172,12 +172,6 @@ public class ContextMenuManager {
             }
         }
 
-        // Disable comment for origin station
-        MenuItem commentItem = menu.findItem(R.id.action_comment);
-        if (commentItem != null && survey != null) {
-            commentItem.setEnabled(station != survey.getOrigin());
-        }
-
         if (survey != null) {
             currentLeg = (leg != null) ? leg : survey.getReferringLeg(station);
 

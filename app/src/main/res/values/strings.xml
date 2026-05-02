@@ -81,6 +81,8 @@
     <string name="action_view">View</string>
     <string name="action_fullscreen">Fullscreen</string>
     <string name="action_tools">Tools</string>
+    <string name="action_add_leg">Add Leg…</string>
+    <string name="action_add_splay">Add Splay…</string>
     <string name="action_undo_last_leg">Undo last reading</string>
     <string name="action_find_station">Find Station…</string>
     <string name="action_link_to_existing_survey">Link to an Existing Survey</string>
@@ -497,6 +499,8 @@
     <string name="settings_anti_alias_title">Anti-alias sketch lines</string>
     <string name="settings_anti_alias_summary">Apply antialiasing to sketch lines etc. (improves visual display at the cost of some performance)</string>
     <string name="settings_manual_data_entry_title">Manual Data Entry</string>
+    <string name="settings_manual_data_controls_title">Manual Data Controls</string>
+    <string name="settings_manual_data_controls_summary">Enable display of floating action buttons for manually entering legs or splays in Table View</string>
     <string name="settings_key_lrud_fields_title">LRUD entries</string>
     <string name="settings_key_lrud_fields_summary">Show fields for entering LRUDs (Left-Right-Up-Down) for each new station</string>
     <string name="settings_lrud_direction_title">LRUD direction</string>

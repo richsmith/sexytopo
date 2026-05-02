@@ -77,6 +77,8 @@
     <string name="action_view">Affichage</string>
     <string name="action_fullscreen">Plein écran</string>
     <string name="action_tools">Outils</string>
+    <string name="action_add_leg">Ajouter un segment…</string>
+    <string name="action_add_splay">Ajouter une radiale…</string>
     <string name="action_undo_last_leg">Annuler la dernière lecture</string>
     <string name="action_find_station">Rechercher une station…</string>
     <string name="action_link_to_existing_survey">Joindre à une topographie existante</string>

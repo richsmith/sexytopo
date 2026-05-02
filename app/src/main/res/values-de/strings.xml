@@ -77,6 +77,8 @@
     <string name="action_view">Ansicht</string>
     <string name="action_fullscreen">Vollbild</string>
     <string name="action_tools">Werkzeuge</string>
+    <string name="action_add_leg">Messstrecke hinzufügen…</string>
+    <string name="action_add_splay">Splay hinzufügen…</string>
     <string name="action_undo_last_leg">Letzte Messung rückgängig machen</string>
     <string name="action_find_station">Station finden…</string>
     <string name="action_link_to_existing_survey">Mit einer bestehenden Vermessungsdatei verknüpfen</string>

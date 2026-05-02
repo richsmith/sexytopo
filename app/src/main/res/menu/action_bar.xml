@@ -108,14 +108,24 @@
         android:title="@string/action_tools"
         app:showAsAction="never">
         <menu>
-            <item android:id="@+id/action_undo_last_leg"
-                android:title="@string/action_undo_last_leg" />
-            <item android:id="@+id/action_find_station"
-                  android:title="@string/action_find_station"/>
-            <item android:id="@+id/action_generate_test_survey"
-                  android:title="@string/action_generate_test_survey" />
-            <item android:id="@+id/action_system_log"
-                  android:title="@string/action_system_log" />
+            <group android:id="@+id/tools_group_edit">
+                <item android:id="@+id/action_undo_last_leg"
+                      android:title="@string/action_undo_last_leg"/>
+                <item android:id="@+id/action_find_station"
+                      android:title="@string/action_find_station"/>
+            </group>
+            <group android:id="@+id/tools_group_manual_entry">
+                <item android:id="@+id/action_add_leg"
+                      android:title="@string/action_add_leg"/>
+                <item android:id="@+id/action_add_splay"
+                      android:title="@string/action_add_splay"/>
+            </group>
+            <group android:id="@+id/tools_group_diagnostics">
+                <item android:id="@+id/action_generate_test_survey"
+                      android:title="@string/action_generate_test_survey"/>
+                <item android:id="@+id/action_system_log"
+                      android:title="@string/action_system_log"/>
+            </group>
         </menu>
     </item>
     <item android:id="@+id/action_settings"

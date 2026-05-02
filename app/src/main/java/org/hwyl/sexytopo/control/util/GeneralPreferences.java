@@ -146,6 +146,10 @@ public class GeneralPreferences {
 
     // ********** Table ***********
 
+    public static boolean isManualControlsEnabled() {
+        return getBoolean("pref_manual_controls", true);
+    }
+
     public static boolean isManualLrudModeOn() {
         return getBoolean("pref_lrud_fields", false);
     }

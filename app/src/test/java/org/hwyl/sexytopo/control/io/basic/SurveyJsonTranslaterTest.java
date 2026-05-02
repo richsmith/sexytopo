@@ -1,9 +1,12 @@
 package org.hwyl.sexytopo.control.io.basic;
 
 import org.hwyl.sexytopo.model.survey.Survey;
+import org.hwyl.sexytopo.model.survey.Trip;
 import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
 import org.hwyl.sexytopo.testutils.ExampleSurveyCreator;
 import org.hwyl.sexytopo.testutils.SurveyChecker;
+import org.json.JSONObject;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class SurveyJsonTranslaterTest {
@@ -60,5 +63,17 @@ public class SurveyJsonTranslaterTest {
         SurveyJsonTranslater.populateSurvey(survey, text);
 
         SurveyChecker.areEqual(survey, newSurvey);
+    }
+
+    @Test
+    public void testTripInstrumentRoundTrip() throws Exception {
+        Trip trip = new Trip();
+        trip.setInstrument("DistoX BLE");
+
+        JSONObject json = SurveyJsonTranslater.toJson(trip);
+        Trip loaded = SurveyJsonTranslater.toTrip(json);
+
+        Assert.assertEquals("DistoX BLE", loaded.getInstrument());
+        Assert.assertTrue(loaded.hasInstrument());
     }
 }

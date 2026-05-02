@@ -77,6 +77,8 @@
     <string name="action_view">Vista</string>
     <string name="action_fullscreen">Schermo Intero</string>
     <string name="action_tools">Strumenti</string>
+    <string name="action_add_leg">Aggiungi Tratto…</string>
+    <string name="action_add_splay">Aggiungi Splay…</string>
     <string name="action_undo_last_leg">Annulla ultima lettura</string>
     <string name="action_find_station">Trova Stazione…</string>
     <string name="action_link_to_existing_survey">Collega a un Rilievo Esistente</string>

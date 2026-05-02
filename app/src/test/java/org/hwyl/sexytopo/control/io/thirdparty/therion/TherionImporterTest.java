@@ -282,8 +282,9 @@ public class TherionImporterTest {
                     + "survey BentStalAven\n"
                     + "# Created with SexyTopo 1.10.1 on 2026-02-04\n"
                     + "\n"
+                    + "centreline\n"
                     + "date 2026.01.05\n"
-                    + "#instrument inst \"\"\n"
+                    + "#instrument insts \"\"\n"
                     + "team \"Will Stuart\" instruments\n"
                     + "team \"Andrew Atkinson\" notes\n"
                     + "\n"
@@ -291,10 +292,9 @@ public class TherionImporterTest {
                     + "explo-team \"Will Stuart\"\n"
                     + "explo-team \"Andrew Atkinson\"\n"
                     + "\n"
-                    + "centreline\n"
-                    + "data passage station ignoreall\n"
-                    + "2\tstn 1 is drilled hole\n"
-                    + "3\tdrilled hole\n"
+                    + "data dimensions station left right up down ignoreall\n"
+                    + "2\t-\t-\t-\t-\tstn 1 is drilled hole\n"
+                    + "3\t-\t-\t-\t-\tdrilled hole\n"
                     + "\n"
                     + "data normal from to tape compass clino ignoreall\n"
                     + "1\t-\t1.677\t271.10\t6.59\n"
@@ -513,7 +513,7 @@ public class TherionImporterTest {
         String survexText =
                 "*begin TestSurvey\n"
                         + "*date 2026.01.05\n"
-                        + "*instrument inst \"DistoX2\"\n"
+                        + "*instrument insts \"DistoX2\"\n"
                         + "*team \"Alice\" instruments\n"
                         + "*team \"Bob\" notes explorer\n"
                         + "\n"
@@ -539,7 +539,7 @@ public class TherionImporterTest {
 
     @Test
     public void testSurvexCommentedInstrument() throws Exception {
-        String survexText = "*date 2026.01.05\n" + ";*instrument inst \"\"\n";
+        String survexText = "*date 2026.01.05\n" + ";*instrument insts \"\"\n";
 
         Trip trip = SurvexTherionImporter.parseMetadata(survexText, SurveyFormat.SURVEX);
         Assert.assertNotNull(trip);
