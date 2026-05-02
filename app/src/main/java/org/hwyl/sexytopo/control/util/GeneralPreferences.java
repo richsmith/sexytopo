@@ -146,8 +146,8 @@ public class GeneralPreferences {
 
     // ********** Table ***********
 
-    public static boolean isManualReadingsEnabled() {
-        return getBoolean("pref_manual_readings", true);
+    public static boolean isManualControlsEnabled() {
+        return getBoolean("pref_manual_controls", true);
     }
 
     public static boolean isManualLrudModeOn() {

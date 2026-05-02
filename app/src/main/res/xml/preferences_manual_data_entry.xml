@@ -2,9 +2,9 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <CheckBoxPreference
-        android:key="pref_manual_readings"
-        android:title="@string/settings_key_manual_readings_title"
-        android:summary="@string/settings_key_manual_readings_summary"
+        android:key="pref_manual_controls"
+        android:title="@string/settings_manual_data_controls_title"
+        android:summary="@string/settings_manual_data_controls_summary"
         android:defaultValue="true"/>
 
     <CheckBoxPreference

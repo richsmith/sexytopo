@@ -424,8 +424,6 @@
     <string name="settings_general_summary">Theme, orientation, vibration</string>
     <string name="settings_sketching_summary">Drawing tools, display options</string>
     <string name="settings_export_summary">Export formats and folder options</string>
-    <string name="settings_key_manual_readings_title">Manual Readings</string>
-    <string name="settings_key_manual_readings_summary">Enter legs and splays manually</string>
     <string name="settings_manual_data_entry_summary">LRUD fields, angle format</string>
     <string name="settings_instruments_summary">Instrument tolerances, calibration</string>
     <string name="settings_developer_summary">Debugging options</string>
@@ -490,6 +488,8 @@
     <string name="settings_anti_alias_title">Anti-alias sketch lines</string>
     <string name="settings_anti_alias_summary">Apply antialiasing to sketch lines etc. (improves visual display at the cost of some performance)</string>
     <string name="settings_manual_data_entry_title">Manual Data Entry</string>
+    <string name="settings_manual_data_controls_title">Manual Data Controls</string>
+    <string name="settings_manual_data_controls_summary">Enable display of floating action buttons for manually entering legs or splays in Table View</string>
     <string name="settings_key_lrud_fields_title">LRUD entries</string>
     <string name="settings_key_lrud_fields_summary">Show fields for entering LRUDs (Left-Right-Up-Down) for each new station</string>
     <string name="settings_lrud_direction_title">LRUD direction</string>

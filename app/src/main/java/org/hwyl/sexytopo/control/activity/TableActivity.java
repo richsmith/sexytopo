@@ -342,7 +342,7 @@ public class TableActivity extends SurveyEditorActivity
     }
 
     private void updateManualReadingsFabVisibility() {
-        int visibility = GeneralPreferences.isManualReadingsEnabled() ? View.VISIBLE : View.GONE;
+        int visibility = GeneralPreferences.isManualControlsEnabled() ? View.VISIBLE : View.GONE;
         findViewById(R.id.fabAddStation).setVisibility(visibility);
         findViewById(R.id.fabAddSplay).setVisibility(visibility);
     }
