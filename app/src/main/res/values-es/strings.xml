@@ -534,7 +534,7 @@
     <string name="validation_error_must_be_number">Debe ser un número</string>
     <string name="validation_error_distance_minimum">Debe ser >= %1$d</string>
     <string name="validation_error_azimuth_range">Debe ser %1$d-%2$d</string>
-    <string name="validation_error_inclination_range">Debe ser de %1$d a %2$d</string>
+    <string name="validation_error_inclination_range">Debe ser de -90 a 90 o de 270 a 360</string>
 
     <!-- Input mode for leg editing -->
     <string-array name="leg_edit_input_mode_options">

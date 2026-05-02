@@ -22,7 +22,9 @@ public enum Projection2D {
         }
 
         public boolean isLegInPlane(Leg leg) {
-            return -45 < leg.getInclination() && leg.getInclination() < 45;
+            float inc = leg.getInclination();
+            return (-45 < inc && inc < 45)
+                    || (Leg.MIN_THEODOLITE_INC + 45 <= inc && inc <= Leg.MAX_THEODOLITE_INC);
         }
     },
     ELEVATION_NS("Elevation NS", "elev_ns") {

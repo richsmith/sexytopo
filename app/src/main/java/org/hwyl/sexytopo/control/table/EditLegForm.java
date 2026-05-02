@@ -396,10 +396,7 @@ public class EditLegForm extends Form {
                 if (!Leg.isInclinationLegal(inclination)) {
                     setRangeError(
                             this.inclinationLayout,
-                            context.getString(
-                                    R.string.validation_error_inclination_range,
-                                    Leg.MIN_INCLINATION,
-                                    Leg.MAX_INCLINATION));
+                            context.getString(R.string.validation_error_inclination_range));
                 } else {
                     setRangeError(this.inclinationLayout, (Integer) null);
                 }

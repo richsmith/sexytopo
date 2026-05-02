@@ -12,6 +12,8 @@ public class Leg extends SurveyComponent {
     public static final int MAX_AZIMUTH = 360;
     public static final int MIN_INCLINATION = -90;
     public static final int MAX_INCLINATION = 90;
+    public static final int MIN_THEODOLITE_INC = 270;
+    public static final int MAX_THEODOLITE_INC = 360;
 
     private final float distance; // in metres
     private final float azimuth;
@@ -198,7 +200,8 @@ public class Leg extends SurveyComponent {
     }
 
     public static boolean isInclinationLegal(float inclination) {
-        return MIN_INCLINATION <= inclination && inclination <= MAX_INCLINATION;
+        return (MIN_INCLINATION <= inclination && inclination <= MAX_INCLINATION)
+                || (MIN_THEODOLITE_INC <= inclination && inclination <= MAX_THEODOLITE_INC);
     }
 
     @NonNull
