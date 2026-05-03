@@ -10,6 +10,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.util.InputMode;
+import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.SurveyTools;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -67,6 +68,14 @@ public class EditLegForm extends Form {
     private TextInputLayout azimuthLayout;
     private TextInputLayout inclinationLayout;
 
+    // TextInputLayout wrappers for DMS minutes/seconds fields, used to show range errors
+    private TextInputLayout azimuthMinutesLayout;
+    private TextInputLayout azimuthSecondsLayout;
+    private TextInputLayout inclinationMinutesLayout;
+    private TextInputLayout inclinationSecondsLayout;
+    private TextInputLayout azimuthDegreesLayout;
+    private TextInputLayout inclinationDegreesLayout;
+
     private EditText distanceField;
     private EditText azimuthField;
     private EditText inclinationField;
@@ -75,6 +84,9 @@ public class EditLegForm extends Form {
     private EditText azimuthDegreesField;
     private EditText azimuthMinutesField;
     private EditText azimuthSecondsField;
+    private EditText inclinationDegreesField;
+    private EditText inclinationMinutesField;
+    private EditText inclinationSecondsField;
 
     private Spinner inputModeSpinner;
     private InputMode inputMode = InputMode.FORWARD;
@@ -130,6 +142,12 @@ public class EditLegForm extends Form {
         this.distanceLayout = dialogView.findViewById(R.id.distanceLayout);
         this.azimuthLayout = dialogView.findViewById(R.id.azimuth_standard);
         this.inclinationLayout = dialogView.findViewById(R.id.inclinationLayout);
+        this.azimuthMinutesLayout = dialogView.findViewById(R.id.editAzimuthMinutesLayout);
+        this.azimuthSecondsLayout = dialogView.findViewById(R.id.editAzimuthSecondsLayout);
+        this.inclinationMinutesLayout = dialogView.findViewById(R.id.editInclinationMinutesLayout);
+        this.inclinationSecondsLayout = dialogView.findViewById(R.id.editInclinationSecondsLayout);
+        this.azimuthDegreesLayout = dialogView.findViewById(R.id.editAzimuthDegreesLayout);
+        this.inclinationDegreesLayout = dialogView.findViewById(R.id.editInclinationDegreesLayout);
 
         this.fromStationField = dialogView.findViewById(R.id.editFromStation);
         this.fromCommentField = dialogView.findViewById(R.id.editFromComment);
@@ -141,6 +159,9 @@ public class EditLegForm extends Form {
         this.azimuthDegreesField = dialogView.findViewById(R.id.editAzimuthDegrees);
         this.azimuthMinutesField = dialogView.findViewById(R.id.editAzimuthMinutes);
         this.azimuthSecondsField = dialogView.findViewById(R.id.editAzimuthSeconds);
+        this.inclinationDegreesField = dialogView.findViewById(R.id.editInclinationDegrees);
+        this.inclinationMinutesField = dialogView.findViewById(R.id.editInclinationMinutes);
+        this.inclinationSecondsField = dialogView.findViewById(R.id.editInclinationSeconds);
         this.inputModeSpinner = dialogView.findViewById(R.id.inputModeSpinner);
 
         // Set up validation listeners
@@ -151,6 +172,17 @@ public class EditLegForm extends Form {
         this.distanceField.addTextChangedListener(new TextViewValidationTrigger(this));
         this.azimuthField.addTextChangedListener(new RangeValidationTrigger(this, this.azimuthField));
         this.inclinationField.addTextChangedListener(new RangeValidationTrigger(this, this.inclinationField));
+
+        if (GeneralPreferences.isDegMinsSecsModeOn()) {
+            this.azimuthDegreesField.addTextChangedListener(new TextViewValidationTrigger(this));
+            this.azimuthMinutesField.addTextChangedListener(new TextViewValidationTrigger(this));
+            this.azimuthSecondsField.addTextChangedListener(new TextViewValidationTrigger(this));
+        }
+        if (GeneralPreferences.isIncDegMinsSecsModeOn()) {
+            this.inclinationDegreesField.addTextChangedListener(new TextViewValidationTrigger(this));
+            this.inclinationMinutesField.addTextChangedListener(new TextViewValidationTrigger(this));
+            this.inclinationSecondsField.addTextChangedListener(new TextViewValidationTrigger(this));
+        }
 
         // Enable error display once the user leaves a field for the first time.
         android.view.View.OnFocusChangeListener enableErrorsOnTouch =
@@ -358,6 +390,14 @@ public class EditLegForm extends Form {
     }
 
     private void validateAzimuth() {
+        if (GeneralPreferences.isDegMinsSecsModeOn()) {
+            validateAzimuthDms();
+        } else {
+            validateAzimuthDecimal();
+        }
+    }
+
+    private void validateAzimuthDecimal() {
         String azimuthText = this.azimuthField.getText().toString();
         try {
             if (azimuthText.isEmpty()) {
@@ -384,7 +424,47 @@ public class EditLegForm extends Form {
         }
     }
 
+    private void validateAzimuthDms() {
+        // Degrees is required; missing minutes/seconds are treated as zero.
+        if (azimuthDegreesField.getText().toString().isEmpty()) {
+            this.valid = false;
+            return;
+        }
+        // Degrees has content - enable range error display, mirroring what
+        // RangeValidationTrigger does for the decimal azimuth field.
+        enableRangeErrors();
+        boolean dmsValid = validateMinsSecsField(azimuthMinutesLayout, azimuthMinutesField)
+                & validateMinsSecsField(azimuthSecondsLayout, azimuthSecondsField);
+        if (!dmsValid) return;
+
+        // Compute decimal equivalent and range-check it, showing error on degrees layout
+        try {
+            float azimuth = getAzimuth();
+            if (!Leg.isAzimuthLegal(azimuth)) {
+                setRangeError(
+                        this.azimuthDegreesLayout,
+                        context.getString(
+                                R.string.validation_error_azimuth_range,
+                                Leg.MIN_AZIMUTH,
+                                Leg.MAX_AZIMUTH));
+            } else {
+                setRangeError(this.azimuthDegreesLayout, (Integer) null);
+            }
+        } catch (NumberFormatException e) {
+            // Degrees field contains a partial value (e.g. just "-"), not yet parseable
+            this.valid = false;
+        }
+    }
+
     private void validateInclination() {
+        if (GeneralPreferences.isIncDegMinsSecsModeOn()) {
+            validateInclinationDms();
+        } else {
+            validateInclinationDecimal();
+        }
+    }
+
+    private void validateInclinationDecimal() {
         String inclinationText = this.inclinationField.getText().toString();
         try {
             if (inclinationText.isEmpty()) {
@@ -405,6 +485,70 @@ public class EditLegForm extends Form {
             setError(
                     this.inclinationLayout,
                     context.getString(R.string.validation_error_must_be_number));
+        }
+    }
+
+    private void validateInclinationDms() {
+        // Degrees is required; missing minutes/seconds are treated as zero.
+        if (inclinationDegreesField.getText().toString().isEmpty()) {
+            this.valid = false;
+            return;
+        }
+        // Degrees has content - enable range error display, mirroring what
+        // RangeValidationTrigger does for the decimal inclination field.
+        enableRangeErrors();
+        boolean dmsValid = validateMinsSecsField(inclinationMinutesLayout, inclinationMinutesField)
+                & validateMinsSecsField(inclinationSecondsLayout, inclinationSecondsField);
+        if (!dmsValid) return;
+
+        // Compute decimal equivalent and range-check it, showing error on degrees layout.
+        // Wrap in try/catch to handle partial input such as a lone "-" which is not yet
+        // parseable as a float but is a valid intermediate state while typing a negative value.
+        try {
+            float inclination = getInclination();
+            if (!Leg.isInclinationLegal(inclination)) {
+                setRangeError(
+                        this.inclinationDegreesLayout,
+                        context.getString(R.string.validation_error_inclination_range));
+            } else {
+                setRangeError(this.inclinationDegreesLayout, (Integer) null);
+            }
+        } catch (NumberFormatException e) {
+            // Degrees field contains a partial value (e.g. just "-"), not yet parseable
+            this.valid = false;
+        }
+    }
+
+    /**
+     * Validates a minutes or seconds field. Blank is accepted (treated as zero).
+     * If non-blank, the value must be a whole number in the range 0-59.
+     * Sets an error on the layout and marks the form invalid if not.
+     * Returns true if the field is valid (or blank), false otherwise.
+     * Uses bitwise & rather than && in callers so both fields are always evaluated
+     * and both errors shown at once rather than stopping at the first failure.
+     */
+    private boolean validateMinsSecsField(TextInputLayout layout, EditText field) {
+        String text = field.getText().toString();
+        if (text.isEmpty()) {
+            setError(layout, (Integer) null);
+            return true;
+        }
+        // Must be a whole number (no decimal point)
+        if (text.contains(".")) {
+            setError(layout, context.getString(R.string.validation_error_must_be_whole_number));
+            return false;
+        }
+        try {
+            int value = Integer.parseInt(text);
+            if (value < 0 || value > 59) {
+                setError(layout, context.getString(R.string.validation_error_mins_secs_range));
+                return false;
+            }
+            setError(layout, (Integer) null);
+            return true;
+        } catch (NumberFormatException e) {
+            setError(layout, context.getString(R.string.validation_error_must_be_whole_number));
+            return false;
         }
     }
 
@@ -468,15 +612,32 @@ public class EditLegForm extends Form {
     }
 
     private float getInclination() {
-        return Float.parseFloat(this.inclinationField.getText().toString());
+        // Check if we're using deg/min/sec mode by checking if those fields have values
+        if (inclinationDegreesField != null && inclinationDegreesField.getText().length() > 0) {
+            float degrees = Float.parseFloat(inclinationDegreesField.getText().toString());
+            String minsText = inclinationMinutesField.getText().toString();
+            String secsText = inclinationSecondsField.getText().toString();
+            float minutes = minsText.isEmpty() ? 0.0f : Float.parseFloat(minsText);
+            float seconds = secsText.isEmpty() ? 0.0f : Float.parseFloat(secsText);
+            // The sign of the degrees component determines the direction of the inclination.
+            // Minutes and seconds are always positive and added in the same direction.
+            float sign = degrees < 0 ? -1.0f : 1.0f;
+            return degrees + sign * (minutes * (1.0f / 60.0f)
+                    + seconds * (1.0f / 60.0f) * (1.0f / 60.0f));
+        } else {
+            // Standard decimal mode
+            return Float.parseFloat(this.inclinationField.getText().toString());
+        }
     }
 
     private float getAzimuth() {
         // Check if we're using deg/min/sec mode by checking if those fields have values
         if (azimuthDegreesField != null && azimuthDegreesField.getText().length() > 0) {
             float degrees = Float.parseFloat(azimuthDegreesField.getText().toString());
-            float minutes = Float.parseFloat(azimuthMinutesField.getText().toString());
-            float seconds = Float.parseFloat(azimuthSecondsField.getText().toString());
+            String minsText = azimuthMinutesField.getText().toString();
+            String secsText = azimuthSecondsField.getText().toString();
+            float minutes = minsText.isEmpty() ? 0.0f : Float.parseFloat(minsText);
+            float seconds = secsText.isEmpty() ? 0.0f : Float.parseFloat(secsText);
             return degrees
                     + (minutes * (1.0f / 60.0f))
                     + (seconds * (1.0f / 60.0f) * (1.0f / 60.0f));

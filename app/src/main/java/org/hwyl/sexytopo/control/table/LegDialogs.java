@@ -69,7 +69,12 @@ public class LegDialogs {
         boolean usingDegMinsSecs = GeneralPreferences.isDegMinsSecsModeOn();
         if (usingDegMinsSecs) {
             dialogView.findViewById(R.id.azimuth_standard).setVisibility(View.GONE);
-            dialogView.findViewById(R.id.azimuth_deg_mins_secs).setVisibility(View.VISIBLE);
+            dialogView.findViewById(R.id.azimuth_dms_container).setVisibility(View.VISIBLE);
+        }
+
+        if (GeneralPreferences.isIncDegMinsSecsModeOn()) {
+            dialogView.findViewById(R.id.inclinationLayout).setVisibility(View.GONE);
+            dialogView.findViewById(R.id.inclination_dms_container).setVisibility(View.VISIBLE);
         }
 
         // Hide TO field for splays
@@ -202,7 +207,12 @@ public class LegDialogs {
 
         if (usingDegMinsSecs) {
             dialogView.findViewById(R.id.azimuth_standard).setVisibility(View.GONE);
-            dialogView.findViewById(R.id.azimuth_deg_mins_secs).setVisibility(View.VISIBLE);
+            dialogView.findViewById(R.id.azimuth_dms_container).setVisibility(View.VISIBLE);
+        }
+
+        if (GeneralPreferences.isIncDegMinsSecsModeOn()) {
+            dialogView.findViewById(R.id.inclinationLayout).setVisibility(View.GONE);
+            dialogView.findViewById(R.id.inclination_dms_container).setVisibility(View.VISIBLE);
         }
 
         // Hide to station field for splays

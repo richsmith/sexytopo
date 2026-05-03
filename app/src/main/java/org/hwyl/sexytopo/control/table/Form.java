@@ -34,7 +34,7 @@ public abstract class Form {
         void onDidValidate(Boolean valid);
     }
 
-    private boolean valid;
+    protected boolean valid;
     private boolean showErrors;
     private boolean showRangeErrors;
     @Nullable private OnDidValidateCallback onDidValidateCallback;

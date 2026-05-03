@@ -463,6 +463,9 @@
     </string-array>
     <string name="settings_key_deg_mins_secs_title">Azimut in Grad/Minuten/Sekunden</string>
     <string name="settings_key_deg_mins_secs_summary">Azimutwerte in Grad/Minuten/Sekunden eingeben (im Gegensatz zur Standardeinstellung in Dezimalwerten)</string>
+    <string name="manual_edit_inclination_deg_mins_secs">Neigung (° \' \")</string>
+    <string name="settings_key_inc_deg_mins_secs_title">Neigung in Grad/Minuten/Sekunden</string>
+    <string name="settings_key_inc_deg_mins_secs_summary">Neigungswerte in Grad/Minuten/Sekunden eingeben (im Gegensatz zur Standardeinstellung in Dezimalwerten)</string>
     <string name="settings_export_title">Exportieren</string>
     <string name="settings_export_summary">Exportformate und Ordneroptionen</string>
     <string name="settings_export_svg_background_title">SVG-Hintergrund</string>
@@ -535,6 +538,8 @@
     <string name="validation_error_distance_minimum">Muss >= %1$d sein</string>
     <string name="validation_error_azimuth_range">Muss zwischen %1$d und %2$d liegen</string>
     <string name="validation_error_inclination_range">Muss zwischen -90 und 90 oder zwischen 270 und 360 liegen</string>
+    <string name="validation_error_must_be_whole_number">Muss eine ganze Zahl sein</string>
+    <string name="validation_error_mins_secs_range">Muss zwischen 0 und 59 liegen</string>
 
     <!-- Input mode for leg editing -->
     <string-array name="leg_edit_input_mode_options">

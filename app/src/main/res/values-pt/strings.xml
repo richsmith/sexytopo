@@ -463,6 +463,9 @@
     </string-array>
     <string name="settings_key_deg_mins_secs_title">Azimute em graus/minutos/segundos</string>
     <string name="settings_key_deg_mins_secs_summary">Introduzir valores de azimute em graus/minutos/segundos (em vez da predefinição decimal)</string>
+    <string name="manual_edit_inclination_deg_mins_secs">Inclinação (&#176; \' \")</string>
+    <string name="settings_key_inc_deg_mins_secs_title">Inclinação em graus/minutos/segundos</string>
+    <string name="settings_key_inc_deg_mins_secs_summary">Introduzir valores de inclinação em graus/minutos/segundos (em vez da predefinição decimal)</string>
     <string name="settings_export_title">Exportação</string>
     <string name="settings_export_summary">Formatos de exportação e opções de pasta</string>
     <string name="settings_export_svg_background_title">Fundo SVG</string>
@@ -535,6 +538,8 @@
     <string name="validation_error_distance_minimum">Deve ser >= %1$d</string>
     <string name="validation_error_azimuth_range">Deve ser %1$d-%2$d</string>
     <string name="validation_error_inclination_range">Deve ser de -90 a 90 ou de 270 a 360</string>
+    <string name="validation_error_must_be_whole_number">Deve ser um número inteiro</string>
+    <string name="validation_error_mins_secs_range">Deve ser de 0 a 59</string>
 
     <!-- Input mode for leg editing -->
     <string-array name="leg_edit_input_mode_options">
