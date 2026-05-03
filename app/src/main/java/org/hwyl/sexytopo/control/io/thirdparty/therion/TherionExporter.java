@@ -11,7 +11,6 @@ import org.hwyl.sexytopo.control.io.basic.ExportFrameFactory;
 import org.hwyl.sexytopo.control.io.thirdparty.xvi.XviExporter;
 import org.hwyl.sexytopo.control.io.translation.Exporter;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
-import org.hwyl.sexytopo.control.util.SpaceFlipper;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.common.Frame;
 import org.hwyl.sexytopo.model.graph.Coord2D;
@@ -164,11 +163,8 @@ public class TherionExporter extends Exporter {
 
         float scale = getScale();
 
+        // Survey-frame coords throughout — the Th2 / XVI exporters flip y at their emit sites.
         Space<Coord2D> space = projectionType.project(survey);
-        space = SpaceFlipper.flipVertically(space);
-        // Therion y-coordinates are inverse of SexyTopo's
-        // (it would be more consistent to either do all the processing like scaling and flipping
-        // all at once or all just before using, but we currently have a mix :/)
 
         Sketch sketch = survey.getSketch(projectionType);
 

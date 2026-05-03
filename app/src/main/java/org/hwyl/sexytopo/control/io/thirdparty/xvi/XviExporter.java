@@ -36,14 +36,14 @@ public class XviExporter {
         XviContent content = new XviContent();
 
         // First the main survey
-        addSketch(content, space, sketch, scale, false);
+        addSketch(content, space, sketch, scale);
 
         // Then the same for each sketch, once translated and scaled
         float xsScale = sketch.getCrossSectionScale();
         for (CrossSectionDetail xsDetail : sketch.getCrossSectionDetails()) {
             Space<Coord2D> xsSpace = getScaledProjection(xsDetail, xsScale);
             Sketch xsSketch = xsDetail.getSketch().scale(xsScale).translate(xsDetail.getPosition());
-            addSketch(content, xsSpace, xsSketch, scale, true);
+            addSketch(content, xsSpace, xsSketch, scale);
             addCrossSectionConnection(content, xsDetail, space, scale);
         }
 
@@ -57,27 +57,17 @@ public class XviExporter {
     }
 
     /**
-     * @param flipY whether station/leg coords need their y flipped before output. The main plan
-     *     space is already flipped upstream; the cross-section projection isn't.
+     * Inputs are in survey-frame metres (y north-positive). The XVI emit-helpers (getStationText
+     * / getLegText / getPathDetailText) handle the y-flip on the way out — keep that the only
+     * place flipping happens.
      */
     private static void addSketch(
-            XviContent content,
-            Space<Coord2D> space,
-            Sketch sketch,
-            double scale,
-            boolean flipY) {
+            XviContent content, Space<Coord2D> space, Sketch sketch, double scale) {
         for (Map.Entry<Station, Coord2D> entry : space.getStationMap().entrySet()) {
-            Coord2D coord = flipY ? entry.getValue().flipVertically() : entry.getValue();
-            content.stations.add(getStationText(entry.getKey(), coord, scale));
+            content.stations.add(getStationText(entry.getKey(), entry.getValue(), scale));
         }
         for (Line<Coord2D> line : space.getLegMap().values()) {
-            Line<Coord2D> coords =
-                    flipY
-                            ? new Line<>(
-                                    line.getStart().flipVertically(),
-                                    line.getEnd().flipVertically())
-                            : line;
-            content.shots.add(getLegText(coords, scale));
+            content.shots.add(getLegText(line, scale));
         }
         for (PathDetail pathDetail : sketch.getPathDetails()) {
             content.sketchLines.add(getPathDetailText(pathDetail, scale));
@@ -111,17 +101,17 @@ public class XviExporter {
 
     private static String getStationText(Station station, Coord2D coords, double scale) {
         String x = TextTools.formatTo2dpWithDot(coords.x * scale);
-        String y = TextTools.formatTo2dpWithDot(coords.y * scale);
+        String y = TextTools.formatTo2dpWithDot(-coords.y * scale);
         return field("\t", TextTools.joinAll(" ", x, y, station.getName()));
     }
 
     private static String getLegText(Line<Coord2D> line, double scale) {
         Coord2D start = line.getStart();
         String startX = TextTools.formatTo2dpWithDot(start.x * scale);
-        String startY = TextTools.formatTo2dpWithDot(start.y * scale);
+        String startY = TextTools.formatTo2dpWithDot(-start.y * scale);
         Coord2D end = line.getEnd();
         String endX = TextTools.formatTo2dpWithDot(end.x * scale);
-        String endY = TextTools.formatTo2dpWithDot(end.y * scale);
+        String endY = TextTools.formatTo2dpWithDot(-end.y * scale);
         return field("\t", TextTools.joinAll(" ", startX, startY, endX, endY));
     }
 
@@ -132,14 +122,12 @@ public class XviExporter {
         if (surveyStationPos == null) {
             return "";
         }
-
-        // Cross-section position (flip Y for XVI coordinate system)
-        Coord2D xsPos = xsDetail.getPosition().flipVertically();
+        Coord2D xsPos = xsDetail.getPosition();
 
         String x1 = TextTools.formatTo2dpWithDot(surveyStationPos.x * scale);
-        String y1 = TextTools.formatTo2dpWithDot(surveyStationPos.y * scale);
+        String y1 = TextTools.formatTo2dpWithDot(-surveyStationPos.y * scale);
         String x2 = TextTools.formatTo2dpWithDot(xsPos.x * scale);
-        String y2 = TextTools.formatTo2dpWithDot(xsPos.y * scale);
+        String y2 = TextTools.formatTo2dpWithDot(-xsPos.y * scale);
 
         return field("\t", TextTools.joinAll(" ", "connect", x1, y1, x2, y2));
     }

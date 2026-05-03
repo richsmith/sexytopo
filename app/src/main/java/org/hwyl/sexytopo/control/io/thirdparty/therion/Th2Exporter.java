@@ -245,8 +245,9 @@ public class Th2Exporter {
         if (originPos == null) {
             return TextTools.join("\n", lines);
         }
+        // Survey-frame y is north-positive; XVI/Therion canvas y is down — flip on emit.
         float xPos = originPos.x;
-        float yPos = originPos.y;
+        float yPos = -originPos.y;
         //  xth_me_image_insert {<Xpos> <visibility> <gamma>} {<Ypos> <root>} {<filename>} 0 {}
         //  <Xpos> <Ypos> is the position of the 0,0 point of XVI coordinate system
         //  <visibility> - 0 image is hidden / 1 image is shown
@@ -365,13 +366,13 @@ public class Th2Exporter {
                 if (coord == null) {
                     continue;
                 }
-                coord = coord.scale(scale);
+                // Inputs are survey-frame (y north-positive); Therion canvas is y-down so flip
+                // when emitting. Same convention used for sketch content and section anchors.
+                coord = coord.flipVertically().scale(scale);
                 commands.add(getPoint(coord.x, coord.y, "station", "-name", station.getName()));
 
                 String xsScrapName = stationNameToXsScrapName.get(station.getName());
                 if (xsScrapName != null) {
-                    // The section anchor goes at the position the user placed the cross-section
-                    // on the plan. Flip y to match the plan space.
                     CrossSectionDetail xsDetail = sketch.getCrossSectionDetail(station);
                     Coord2D xsCoord = xsDetail.getPosition().flipVertically().scale(scale);
                     commands.add(getPoint(xsCoord.x, xsCoord.y, "section", "-scrap", xsScrapName));
