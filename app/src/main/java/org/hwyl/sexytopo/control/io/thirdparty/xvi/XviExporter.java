@@ -21,54 +21,84 @@ import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SymbolDetail;
 import org.hwyl.sexytopo.model.sketch.TextDetail;
-import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 
 public class XviExporter {
 
+    private static final class XviContent {
+        final List<String> stations = new ArrayList<>();
+        final List<String> shots = new ArrayList<>();
+        final List<String> sketchLines = new ArrayList<>();
+    }
+
     public static String getContent(
             Sketch sketch, Space<Coord2D> space, float scale, Shape gridFrame) {
+        XviContent content = new XviContent();
+
+        // First the main survey
+        addSketch(content, space, sketch, scale, false);
+
+        // Then the same for each sketch, once translated and scaled
+        float xsScale = sketch.getCrossSectionScale();
+        for (CrossSectionDetail xsDetail : sketch.getCrossSectionDetails()) {
+            Space<Coord2D> xsSpace = getScaledProjection(xsDetail, xsScale);
+            Sketch xsSketch = xsDetail.getSketch().scale(xsScale).translate(xsDetail.getPosition());
+            addSketch(content, xsSpace, xsSketch, scale, true);
+            addCrossSectionConnection(content, xsDetail, space, scale);
+        }
+
         String text = field(GRIDS_COMMAND, "1 m");
+        text += multilineField(STATIONS_COMMAND, joinAll(content.stations));
+        text += multilineField(SHOT_COMMAND, joinAll(content.shots));
+        text += multilineField(SKETCHLINE_COMMAND, joinAll(content.sketchLines));
 
-        // Combine main survey stations with cross-section stations
-        String stationsText =
-                getStationsText(space, scale) + getCrossSectionStationsText(sketch, scale);
-        text += multilineField(STATIONS_COMMAND, stationsText);
-
-        // Combine main survey legs with cross-section splays
-        String legsText = getLegsText(space, scale) + getCrossSectionLegsText(sketch, scale);
-        text += multilineField(SHOT_COMMAND, legsText);
-
-        text += multilineField(SKETCHLINE_COMMAND, getSketchLinesText(sketch, space, scale));
         text += field(GRID_COMMAND, getGridText(gridFrame, scale));
         return text;
     }
 
-    private static String getCrossSectionStationsText(Sketch sketch, float scale) {
-        float xsScale = sketch.getCrossSectionScale();
-        StringBuilder builder = new StringBuilder();
-        for (CrossSectionDetail xsDetail : sketch.getCrossSectionDetails()) {
-            Space<Coord2D> xsSpace = getScaledProjection(xsDetail, xsScale);
-            for (Map.Entry<Station, Coord2D> entry : xsSpace.getStationMap().entrySet()) {
-                Coord2D flipped = entry.getValue().flipVertically();
-                builder.append(getStationText(entry.getKey(), flipped, scale));
-            }
+    /**
+     * @param flipY whether station/leg coords need their y flipped before output. The main plan
+     *     space is already flipped upstream; the cross-section projection isn't.
+     */
+    private static void addSketch(
+            XviContent content,
+            Space<Coord2D> space,
+            Sketch sketch,
+            double scale,
+            boolean flipY) {
+        for (Map.Entry<Station, Coord2D> entry : space.getStationMap().entrySet()) {
+            Coord2D coord = flipY ? entry.getValue().flipVertically() : entry.getValue();
+            content.stations.add(getStationText(entry.getKey(), coord, scale));
         }
-        return builder.toString();
+        for (Line<Coord2D> line : space.getLegMap().values()) {
+            Line<Coord2D> coords =
+                    flipY
+                            ? new Line<>(
+                                    line.getStart().flipVertically(),
+                                    line.getEnd().flipVertically())
+                            : line;
+            content.shots.add(getLegText(coords, scale));
+        }
+        for (PathDetail pathDetail : sketch.getPathDetails()) {
+            content.sketchLines.add(getPathDetailText(pathDetail, scale));
+        }
+        for (TextDetail textDetail : sketch.getTextDetails()) {
+            content.sketchLines.add(getTextDetailAsPathsText(textDetail, scale));
+        }
+        for (SymbolDetail symbolDetail : sketch.getSymbolDetails()) {
+            content.sketchLines.add(getSymbolDetailAsPathsText(symbolDetail, scale));
+        }
     }
 
-    private static String getCrossSectionLegsText(Sketch sketch, float scale) {
-        float xsScale = sketch.getCrossSectionScale();
+    private static void addCrossSectionConnection(
+            XviContent content, CrossSectionDetail xsDetail, Space<Coord2D> space, double scale) {
+        content.sketchLines.add(getCrossSectionConnectorText(xsDetail, space, scale));
+    }
+
+    private static String joinAll(List<String> parts) {
         StringBuilder builder = new StringBuilder();
-        for (CrossSectionDetail xsDetail : sketch.getCrossSectionDetails()) {
-            Space<Coord2D> xsSpace = getScaledProjection(xsDetail, xsScale);
-            for (Map.Entry<Leg, Line<Coord2D>> entry : xsSpace.getLegMap().entrySet()) {
-                Line<Coord2D> line = entry.getValue();
-                Line<Coord2D> flipped =
-                        new Line<>(
-                                line.getStart().flipVertically(), line.getEnd().flipVertically());
-                builder.append(getLegText(flipped, scale));
-            }
+        for (String part : parts) {
+            builder.append(part);
         }
         return builder.toString();
     }
@@ -79,26 +109,10 @@ public class XviExporter {
         return Space2DUtils.translate(scaledProjection, xsDetail.getPosition());
     }
 
-    private static String getStationsText(Space<Coord2D> space, double scale) {
-        StringBuilder builder = new StringBuilder();
-        for (Map.Entry<Station, Coord2D> entry : space.getStationMap().entrySet()) {
-            builder.append(getStationText(entry.getKey(), entry.getValue(), scale));
-        }
-        return builder.toString();
-    }
-
     private static String getStationText(Station station, Coord2D coords, double scale) {
         String x = TextTools.formatTo2dpWithDot(coords.x * scale);
         String y = TextTools.formatTo2dpWithDot(coords.y * scale);
         return field("\t", TextTools.joinAll(" ", x, y, station.getName()));
-    }
-
-    private static String getLegsText(Space<Coord2D> space, double scale) {
-        StringBuilder builder = new StringBuilder();
-        for (Line<Coord2D> line : space.getLegMap().values()) {
-            builder.append(getLegText(line, scale));
-        }
-        return builder.toString();
     }
 
     private static String getLegText(Line<Coord2D> line, double scale) {
@@ -109,28 +123,6 @@ public class XviExporter {
         String endX = TextTools.formatTo2dpWithDot(end.x * scale);
         String endY = TextTools.formatTo2dpWithDot(end.y * scale);
         return field("\t", TextTools.joinAll(" ", startX, startY, endX, endY));
-    }
-
-    private static String getSketchLinesText(Sketch sketch, Space<Coord2D> space, double scale) {
-        StringBuilder builder = new StringBuilder();
-        for (PathDetail pathDetail : sketch.getPathDetails()) {
-            builder.append(getPathDetailText(pathDetail, scale));
-        }
-
-        for (TextDetail textDetail : sketch.getTextDetails()) {
-            builder.append(getTextDetailAsPathsText(textDetail, scale));
-        }
-
-        for (SymbolDetail symbolDetail : sketch.getSymbolDetails()) {
-            builder.append(getSymbolDetailAsPathsText(symbolDetail, scale));
-        }
-
-        // Add connector lines from cross-section stations to their survey stations
-        for (CrossSectionDetail xsDetail : sketch.getCrossSectionDetails()) {
-            builder.append(getCrossSectionConnectorText(xsDetail, space, scale));
-        }
-
-        return builder.toString();
     }
 
     private static String getCrossSectionConnectorText(

@@ -43,6 +43,21 @@ public class CrossSectioner {
         return angle;
     }
 
+    /**
+     * Furthest horizontal-plane distance any splay reaches from the station. Returns 0 if the
+     * station has no splays (or only purely vertical ones).
+     */
+    public static float getHorizontalRadius(Station station) {
+        return (float)
+                station.getUnconnectedOnwardLegs().stream()
+                        .mapToDouble(
+                                splay ->
+                                        splay.getDistance()
+                                                * Math.cos(Math.toRadians(splay.getInclination())))
+                        .max()
+                        .orElse(0);
+    }
+
     private static float getIncomingAzimuth(Survey survey, Station station) {
         try {
             return survey.getReferringLeg(station).getAzimuth();

@@ -187,11 +187,6 @@ public class Th2Exporter {
                         TextTools.formatTo2dp(realWorldRef));
 
         lines.add("scrap " + name + " -projection none -scale " + scaleParam);
-
-        // Station point at the cross-section origin
-        Station station = xsDetail.getCrossSection().getStation();
-        lines.add(getPoint(0, 0, "station", "-name", station.getName()));
-
         lines.add("endscrap");
 
         return TextTools.join("\n\n", lines);
@@ -379,8 +374,7 @@ public class Th2Exporter {
                     // on the plan. Flip y to match the plan space.
                     CrossSectionDetail xsDetail = sketch.getCrossSectionDetail(station);
                     Coord2D xsCoord = xsDetail.getPosition().flipVertically().scale(scale);
-                    commands.add(
-                            getPoint(xsCoord.x, xsCoord.y, "section", "-scrap", xsScrapName));
+                    commands.add(getPoint(xsCoord.x, xsCoord.y, "section", "-scrap", xsScrapName));
                 }
             }
         }
