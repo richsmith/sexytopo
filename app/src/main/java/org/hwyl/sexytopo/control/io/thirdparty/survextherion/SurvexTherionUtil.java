@@ -206,6 +206,11 @@ public class SurvexTherionUtil {
         formatField(builder, TableCol.AZIMUTH.format(leg.getAzimuth(), Locale.UK));
         formatField(builder, TableCol.INCLINATION.format(leg.getInclination(), Locale.UK));
 
+        // Append comment on the active data line if present (Cases 1 & 2)
+        if (leg.hasComment()) {
+            builder.append(flattenComment(leg.getComment()));
+        }
+
         // Handle promoted legs - put readings on subsequent lines
         if (leg.wasPromoted()) {
             char commentChar = format.getCommentChar();
@@ -220,8 +225,17 @@ public class SurvexTherionUtil {
                 builder.append(TableCol.AZIMUTH.format(precursor.getAzimuth(), Locale.UK))
                         .append("\t");
                 builder.append(TableCol.INCLINATION.format(precursor.getInclination(), Locale.UK));
+
+                // Append precursor splay comment if present (Case 3)
+                if (precursor.hasComment()) {
+                    builder.append("\t").append(flattenComment(precursor.getComment()));
+                }
             }
         }
+    }
+
+    private static String flattenComment(String comment) {
+        return comment.replaceAll("(\\r|\\n|\\r\\n)+", "\\\\n");
     }
 
     private static void formatField(StringBuilder builder, Object value) {
