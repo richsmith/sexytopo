@@ -7,4 +7,7 @@
     <!-- FAB spacing -->
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="fab_vertical_spacing">16dp</dimen>
+
+    <!-- Table comment indicator column: fixed width just large enough for one emoji at 14sp with 2dp padding -->
+    <dimen name="table_comment_col_width">28dp</dimen>
 </resources>

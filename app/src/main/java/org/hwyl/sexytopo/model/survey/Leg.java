@@ -206,6 +206,10 @@ public class Leg extends SurveyComponent {
         return comment;
     }
 
+    public boolean hasComment() {
+        return !comment.isEmpty();
+    }
+
     public void setComment(String comment) {
         this.comment = (comment != null) ? comment : "";
     }
