@@ -606,6 +606,8 @@
     <string name="menu_start_new_survey">Commencer une nouvelle topographie ici</string>
     <string name="menu_unlink_survey">Dissocier la topographie liée</string>
     <string name="menu_comment">Commentaire</string>
+    <string name="menu_comment_leg">Leg comment</string>
+    <string name="menu_comment_splay">Splay comment</string>
     <string name="menu_toggle_left_right">Basculer Gauche/Droite</string>
     <string name="context_this_will_delete">Cela supprimera :</string>
     <string name="context_jump_to_splay_error">Impossible de se rendre à l\'extrémité d\'une radiale</string>

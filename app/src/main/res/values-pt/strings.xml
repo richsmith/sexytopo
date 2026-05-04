@@ -604,6 +604,8 @@
     <string name="menu_start_new_survey">Iniciar Nova Topografia Aqui</string>
     <string name="menu_unlink_survey">Desligar Topografia Ligada</string>
     <string name="menu_comment">Comentário</string>
+    <string name="menu_comment_leg">Leg comment</string>
+    <string name="menu_comment_splay">Splay comment</string>
     <string name="menu_toggle_left_right">Alternar Esquerda/Direita</string>
     <string name="menu_context_title_leg">Trecho %1$s &#10132; %2$s</string>
     <string name="menu_context_title_splay">%s para Raio</string>
