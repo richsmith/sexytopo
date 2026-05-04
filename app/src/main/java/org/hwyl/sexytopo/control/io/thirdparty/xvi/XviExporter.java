@@ -57,9 +57,9 @@ public class XviExporter {
     }
 
     /**
-     * Inputs are in survey-frame metres (y north-positive). The XVI emit-helpers (getStationText
-     * / getLegText / getPathDetailText) handle the y-flip on the way out — keep that the only
-     * place flipping happens.
+     * Inputs are in survey-frame metres (y north-positive). The XVI emit-helpers (getStationText /
+     * getLegText / getPathDetailText) handle the y-flip on the way out — keep that the only place
+     * flipping happens.
      */
     private static void addSketch(
             XviContent content, Space<Coord2D> space, Sketch sketch, double scale) {
