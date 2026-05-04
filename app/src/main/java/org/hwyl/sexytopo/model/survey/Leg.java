@@ -21,6 +21,7 @@ public class Leg extends SurveyComponent {
     private final Station destination;
     private final Leg[] promotedFrom;
     private final boolean wasShotBackwards;
+    private String comment = "";
 
     private static final Leg[] NO_LEGS = new Leg[] {};
 
@@ -220,6 +221,14 @@ public class Leg extends SurveyComponent {
         int minutes = (int) (remainder * 60);
         float seconds = ((remainder * 60) - minutes) * 60;
         return new float[] {degrees, minutes, seconds};
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = (comment != null) ? comment : "";
     }
 
     @NonNull
