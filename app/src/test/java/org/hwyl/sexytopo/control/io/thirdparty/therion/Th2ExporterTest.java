@@ -14,7 +14,7 @@ public class Th2ExporterTest {
 
     @Test
     public void testHappyPath() {
-        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Survey survey = BasicTestSurveyCreator.createWithCrossSections();
         float scale = TherionExporter.getScale();
         Projection2D projection = Projection2D.PLAN;
         Frame exportFrame = ExportFrameFactory.getExportFrame(survey, projection);
