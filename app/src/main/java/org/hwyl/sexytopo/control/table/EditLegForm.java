@@ -9,8 +9,8 @@ import android.widget.Spinner;
 import com.google.android.material.textfield.TextInputLayout;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
-import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
+import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.control.util.SurveyTools;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -21,10 +21,10 @@ public class EditLegForm extends Form {
     private static final int SPINNER_BACKWARD = 1;
 
     /**
-     * A TextWatcher that, in addition to triggering validation, enables range-error display
-     * as soon as the watched field contains any non-empty text. This lets out-of-range errors
-     * appear immediately while the user is typing, without showing a "cannot be blank" error
-     * on an untouched field.
+     * A TextWatcher that, in addition to triggering validation, enables range-error display as soon
+     * as the watched field contains any non-empty text. This lets out-of-range errors appear
+     * immediately while the user is typing, without showing a "cannot be blank" error on an
+     * untouched field.
      */
     private static class RangeValidationTrigger extends TextViewValidationTrigger {
         private final android.widget.EditText field;
@@ -170,8 +170,10 @@ public class EditLegForm extends Form {
             this.toStationField.addTextChangedListener(new TextViewValidationTrigger(this));
         }
         this.distanceField.addTextChangedListener(new TextViewValidationTrigger(this));
-        this.azimuthField.addTextChangedListener(new RangeValidationTrigger(this, this.azimuthField));
-        this.inclinationField.addTextChangedListener(new RangeValidationTrigger(this, this.inclinationField));
+        this.azimuthField.addTextChangedListener(
+                new RangeValidationTrigger(this, this.azimuthField));
+        this.inclinationField.addTextChangedListener(
+                new RangeValidationTrigger(this, this.inclinationField));
 
         if (GeneralPreferences.isDegMinsSecsModeOn()) {
             this.azimuthDegreesField.addTextChangedListener(new TextViewValidationTrigger(this));
@@ -179,9 +181,12 @@ public class EditLegForm extends Form {
             this.azimuthSecondsField.addTextChangedListener(new TextViewValidationTrigger(this));
         }
         if (GeneralPreferences.isIncDegMinsSecsModeOn()) {
-            this.inclinationDegreesField.addTextChangedListener(new TextViewValidationTrigger(this));
-            this.inclinationMinutesField.addTextChangedListener(new TextViewValidationTrigger(this));
-            this.inclinationSecondsField.addTextChangedListener(new TextViewValidationTrigger(this));
+            this.inclinationDegreesField.addTextChangedListener(
+                    new TextViewValidationTrigger(this));
+            this.inclinationMinutesField.addTextChangedListener(
+                    new TextViewValidationTrigger(this));
+            this.inclinationSecondsField.addTextChangedListener(
+                    new TextViewValidationTrigger(this));
         }
 
         // Enable error display once the user leaves a field for the first time.
@@ -433,8 +438,9 @@ public class EditLegForm extends Form {
         // Degrees has content - enable range error display, mirroring what
         // RangeValidationTrigger does for the decimal azimuth field.
         enableRangeErrors();
-        boolean dmsValid = validateMinsSecsField(azimuthMinutesLayout, azimuthMinutesField)
-                & validateMinsSecsField(azimuthSecondsLayout, azimuthSecondsField);
+        boolean dmsValid =
+                validateMinsSecsField(azimuthMinutesLayout, azimuthMinutesField)
+                        & validateMinsSecsField(azimuthSecondsLayout, azimuthSecondsField);
         if (!dmsValid) return;
 
         // Compute decimal equivalent and range-check it, showing error on degrees layout
@@ -497,8 +503,9 @@ public class EditLegForm extends Form {
         // Degrees has content - enable range error display, mirroring what
         // RangeValidationTrigger does for the decimal inclination field.
         enableRangeErrors();
-        boolean dmsValid = validateMinsSecsField(inclinationMinutesLayout, inclinationMinutesField)
-                & validateMinsSecsField(inclinationSecondsLayout, inclinationSecondsField);
+        boolean dmsValid =
+                validateMinsSecsField(inclinationMinutesLayout, inclinationMinutesField)
+                        & validateMinsSecsField(inclinationSecondsLayout, inclinationSecondsField);
         if (!dmsValid) return;
 
         // Compute decimal equivalent and range-check it, showing error on degrees layout.
@@ -520,12 +527,11 @@ public class EditLegForm extends Form {
     }
 
     /**
-     * Validates a minutes or seconds field. Blank is accepted (treated as zero).
-     * If non-blank, the value must be a whole number in the range 0-59.
-     * Sets an error on the layout and marks the form invalid if not.
-     * Returns true if the field is valid (or blank), false otherwise.
-     * Uses bitwise & rather than && in callers so both fields are always evaluated
-     * and both errors shown at once rather than stopping at the first failure.
+     * Validates a minutes or seconds field. Blank is accepted (treated as zero). If non-blank, the
+     * value must be a whole number in the range 0-59. Sets an error on the layout and marks the
+     * form invalid if not. Returns true if the field is valid (or blank), false otherwise. Uses
+     * bitwise & rather than && in callers so both fields are always evaluated and both errors shown
+     * at once rather than stopping at the first failure.
      */
     private boolean validateMinsSecsField(TextInputLayout layout, EditText field) {
         String text = field.getText().toString();
@@ -622,8 +628,8 @@ public class EditLegForm extends Form {
             // The sign of the degrees component determines the direction of the inclination.
             // Minutes and seconds are always positive and added in the same direction.
             float sign = degrees < 0 ? -1.0f : 1.0f;
-            return degrees + sign * (minutes * (1.0f / 60.0f)
-                    + seconds * (1.0f / 60.0f) * (1.0f / 60.0f));
+            return degrees
+                    + sign * (minutes * (1.0f / 60.0f) + seconds * (1.0f / 60.0f) * (1.0f / 60.0f));
         } else {
             // Standard decimal mode
             return Float.parseFloat(this.inclinationField.getText().toString());
