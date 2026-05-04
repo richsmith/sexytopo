@@ -162,7 +162,9 @@ public class TableActivity extends SurveyEditorActivity
 
         if (headerTable.getChildCount() > 0) {
             android.widget.TableRow headerRow = (android.widget.TableRow) headerTable.getChildAt(0);
-            for (int i = 0; i < headerRow.getChildCount(); i++) {
+            for (int i = 0;
+                    i < headerRow.getChildCount() - 1;
+                    i++) { // exclude fixed-width comment column
                 View cell = headerRow.getChildAt(i);
                 widths.add(cell.getWidth());
             }

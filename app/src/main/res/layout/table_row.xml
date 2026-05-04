@@ -5,4 +5,5 @@
 <TextView android:id="@+id/tableRowDistance" style="@style/BodyText" android:layout_weight="1" android:singleLine="true" android:ellipsize="end" />
 <TextView android:id="@+id/tableRowAzimuth" style="@style/BodyText" android:layout_weight="1" android:singleLine="true" android:ellipsize="end" />
 <TextView android:id="@+id/tableRowInclination" style="@style/BodyText" android:layout_weight="1" android:singleLine="true" android:ellipsize="end" />
+<TextView android:id="@+id/tableRowComment" style="@style/BodyText" android:layout_width="@dimen/table_comment_col_width" android:layout_weight="0" android:padding="2dp" android:gravity="center" android:contentDescription="@string/comment_indicator_description" />
 </TableRow>
