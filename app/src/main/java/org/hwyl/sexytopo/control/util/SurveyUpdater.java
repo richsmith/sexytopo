@@ -147,8 +147,11 @@ public class SurveyUpdater {
                         Arrays.asList(leg.wasPromoted() ? leg.getPromotedFrom() : new Leg[] {leg}));
         allShots.add(splay);
 
-        return Leg.upgradeSplayToConnectedLeg(
-                averageLegs(allShots), leg.getDestination(), allShots.toArray(new Leg[0]));
+        Leg newLeg =
+                Leg.upgradeSplayToConnectedLeg(
+                        averageLegs(allShots), leg.getDestination(), allShots.toArray(new Leg[0]));
+        newLeg.setComment(leg.getComment());
+        return newLeg;
     }
 
     private static synchronized String getNextStationName(Survey survey) {

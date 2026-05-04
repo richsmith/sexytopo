@@ -100,6 +100,7 @@ public class Leg extends SurveyComponent {
                         destination,
                         promotedFrom,
                         splay.wasShotBackwards);
+        leg.setComment(splay.getComment());
         return leg;
     }
 
