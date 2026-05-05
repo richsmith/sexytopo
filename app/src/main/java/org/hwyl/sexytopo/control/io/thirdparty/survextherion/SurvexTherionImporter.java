@@ -2,6 +2,7 @@ package org.hwyl.sexytopo.control.io.thirdparty.survextherion;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -56,16 +57,36 @@ public class SurvexTherionImporter {
             }
 
             try {
-                // Extract comment - support both ; (Survex) and # (Therion)
-                String comment = extractCommentFromLine(line);
+                String[] allTokens = trimmed.split("\\s+");
 
-                String[] fields = line.trim().split("\\s+");
+                // A valid leg line must have at least 5 tokens:
+                // from to distance azimuth inclination
+                if (allTokens.length < 5) {
+                    continue;
+                }
+
+                String[] legFields = Arrays.copyOfRange(allTokens, 0, 5);
+
+                // Any tokens after the 5 leg fields form the comment tail.
+                // The tail may optionally start with a comment character (# or ;) which is
+                // stripped — both "1 2 3.0 45.0 0.0 # My Chamber" and
+                // "1 2 3.0 45.0 0.0 My Chamber" are valid and produce the same comment.
+                String comment = "";
+                if (allTokens.length > 5) {
+                    String tail =
+                            String.join(" ", Arrays.copyOfRange(allTokens, 5, allTokens.length));
+                    if (tail.startsWith(";") || tail.startsWith("#")) {
+                        tail = tail.substring(1).trim();
+                    }
+                    comment = tail;
+                }
 
                 // Check for commented new lines promoted legs in subsequent lines
                 List<Leg> commentedNewLineLegs =
-                        parseCommentedNewLinePromotedLegs(lines, lineIndex, fields[0], fields[1]);
+                        parseCommentedNewLinePromotedLegs(
+                                lines, lineIndex, legFields[0], legFields[1]);
 
-                addLegToSurvey(survey, nameToStation, fields, comment, commentedNewLineLegs);
+                addLegToSurvey(survey, nameToStation, legFields, comment, commentedNewLineLegs);
 
             } catch (Exception exception) {
                 throw new Exception("Error importing this line: " + line);
@@ -532,21 +553,6 @@ public class SurvexTherionImporter {
         } else {
             return "";
         }
-    }
-
-    private static String extractCommentFromLine(String line) {
-        String comment = "";
-
-        // Try semicolon first (Survex style)
-        if (line.contains(";")) {
-            comment = line.substring(line.indexOf(";") + 1).trim();
-        }
-        // Try hash (Therion style)
-        else if (line.contains("#")) {
-            comment = line.substring(line.indexOf("#") + 1).trim();
-        }
-
-        return comment;
     }
 
     /**
