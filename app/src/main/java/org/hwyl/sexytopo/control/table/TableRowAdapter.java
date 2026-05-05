@@ -188,6 +188,40 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
                         return true;
                     });
         }
+
+        // Bind comment indicator column
+        TextView commentView = holder.itemView.findViewById(R.id.tableRowComment);
+        if (commentView != null) {
+            commentView.setText(entry.getLeg().hasComment() ? "💬" : "");
+
+            // Match row background colour to the data columns
+            if (isActiveStation(map.get(TableCol.FROM)) || isActiveStation(map.get(TableCol.TO))) {
+                int bgColor = ContextCompat.getColor(context, R.color.tableHighlight);
+                commentView.setBackgroundColor(bgColor);
+            } else if (position % 2 == 0) {
+                int bgColor = ContextCompat.getColor(context, R.color.tableBackground);
+                commentView.setBackgroundColor(bgColor);
+            } else {
+                int bgColor = ContextCompat.getColor(context, R.color.tableBackgroundAlt);
+                commentView.setBackgroundColor(bgColor);
+            }
+
+            // Match bold/normal typeface to the data columns
+            if (entry.getLeg().hasDestination()) {
+                commentView.setTypeface(Typeface.DEFAULT_BOLD);
+            } else {
+                commentView.setTypeface(Typeface.DEFAULT);
+            }
+
+            // Long-press on comment cell also triggers the row context menu
+            commentView.setOnLongClickListener(
+                    v -> {
+                        if (onRowClickListener != null) {
+                            onRowClickListener.onRowLongClick(v, entry, TableCol.FROM);
+                        }
+                        return true;
+                    });
+        }
     }
 
     public void setColumnWidths(List<Integer> widths) {

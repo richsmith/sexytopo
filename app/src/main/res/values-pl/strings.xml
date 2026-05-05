@@ -604,6 +604,9 @@
     <string name="menu_survey_start_new_dialog_title">Rozpocznij nowy pomiar</string>
     <string name="menu_survey_start_new_dialog_station_name">Nazwa stanowiska początkowego</string>
     <string name="menu_comment">Komentarz</string>
+    <string name="menu_comment_leg">Leg comment</string>
+    <string name="menu_comment_splay">Splay comment</string>
+    <string name="comment_indicator_description">Has comment</string>
     <string name="menu_toggle_left_right">Przełącz lewo/prawo</string>
     <string name="menu_context_title_leg">Ciąg %1$s &#10132; %2$s</string>
     <string name="menu_context_title_splay">%s do pomiaru szczegółowego</string>

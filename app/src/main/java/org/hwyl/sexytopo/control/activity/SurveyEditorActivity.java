@@ -52,6 +52,10 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         openCommentDialog(station);
     }
 
+    public void onCommentLeg(Leg leg) {
+        openLegCommentDialog(leg);
+    }
+
     public void onJumpToTable(Station station) {
         jumpToStation(station, TableActivity.class);
     }
@@ -248,6 +252,39 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
                         (dialog, which) -> {
                             CharSequence inputText = input.getText();
                             station.setComment(inputText != null ? inputText.toString() : "");
+                            invalidateView();
+                        })
+                .setNegativeButton(R.string.cancel, null);
+
+        Dialog dialog = builder.create();
+        DialogUtils.showKeyboardOnDisplay(dialog);
+        dialog.show();
+        input.requestFocus();
+    }
+
+    /** Open the comment dialog for the given leg or splay. */
+    protected void openLegCommentDialog(Leg leg) {
+        boolean isSplay = !leg.hasDestination();
+        int hintRes = isSplay ? R.string.menu_comment_splay : R.string.menu_comment_leg;
+        int titleRes = isSplay ? R.string.menu_comment_splay : R.string.menu_comment_leg;
+
+        TextInputLayout inputLayout = DialogUtils.createStandardTextInputLayout(this, hintRes);
+
+        TextInputEditText input = DialogUtils.getEditText(inputLayout);
+        input.setLines(8);
+        input.setGravity(Gravity.START | Gravity.TOP);
+        input.setText(leg.getComment());
+        input.setFocusableInTouchMode(true);
+
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+        builder.setView(inputLayout)
+                .setTitle(titleRes)
+                .setPositiveButton(
+                        R.string.save,
+                        (dialog, which) -> {
+                            CharSequence inputText = input.getText();
+                            leg.setComment(inputText != null ? inputText.toString() : "");
+                            getSurveyManager().broadcastSurveyUpdated();
                             invalidateView();
                         })
                 .setNegativeButton(R.string.cancel, null);

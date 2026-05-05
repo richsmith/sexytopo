@@ -185,6 +185,12 @@ public class ContextMenuManager {
                     downgradeItem.setVisible(!isSplay);
                     downgradeItem.setEnabled(canDowngrade);
                 }
+
+                MenuItem commentLegItem = menu.findItem(R.id.action_comment_leg);
+                if (commentLegItem != null) {
+                    commentLegItem.setTitle(
+                            isSplay ? R.string.menu_comment_splay : R.string.menu_comment_leg);
+                }
                 if (legMenuItem != null) {
                     legMenuItem.setTitle(R.string.menu_incoming_leg);
                     if (!isSplay) {
@@ -269,6 +275,10 @@ public class ContextMenuManager {
         }
         if (itemId == R.id.action_delete_leg && currentLeg != null) {
             activity.onDeleteLeg(currentLeg);
+            return true;
+        }
+        if (itemId == R.id.action_comment_leg && currentLeg != null) {
+            activity.onCommentLeg(currentLeg);
             return true;
         }
 

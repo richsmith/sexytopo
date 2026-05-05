@@ -259,6 +259,7 @@ public class SurveyJsonTranslater {
         json.put(INCLINATION_TAG, leg.getInclination());
         json.put(DESTINATION_TAG, leg.getDestination().getName());
         json.put(WAS_SHOT_BACKWARDS_TAG, leg.wasShotBackwards());
+        json.put(COMMENT_TAG, leg.getComment());
         if (index != null) {
             json.put(INDEX_TAG, index);
         }
@@ -379,6 +380,7 @@ public class SurveyJsonTranslater {
                             wasShotBackwards);
         }
 
+        leg.setComment(json.optString(COMMENT_TAG, ""));
         return leg;
     }
 

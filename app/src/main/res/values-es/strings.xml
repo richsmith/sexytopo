@@ -604,6 +604,9 @@
     <string name="menu_start_new_survey">Iniciar Nueva Topografía Aquí</string>
     <string name="menu_unlink_survey">Desenlazar Topografía Enlazada</string>
     <string name="menu_comment">Comentario</string>
+    <string name="menu_comment_leg">Leg comment</string>
+    <string name="menu_comment_splay">Splay comment</string>
+    <string name="comment_indicator_description">Has comment</string>
     <string name="menu_toggle_left_right">Alternar Izquierda/Derecha</string>
     <string name="menu_context_title_leg">Tramo %1$s &#10132; %2$s</string>
     <string name="menu_context_title_splay">%s a Radial</string>

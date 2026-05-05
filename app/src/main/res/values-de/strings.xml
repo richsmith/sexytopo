@@ -604,6 +604,9 @@
     <string name="menu_start_new_survey">Hier neue Vermessung beginnen</string>
     <string name="menu_unlink_survey">Verknüpfung zu anderer Vermessungsdatei lösen</string>
     <string name="menu_comment">Kommentar</string>
+    <string name="menu_comment_leg">Leg comment</string>
+    <string name="menu_comment_splay">Splay comment</string>
+    <string name="comment_indicator_description">Has comment</string>
     <string name="menu_toggle_left_right">Links/Rechts umschalten</string>
     <string name="menu_context_title_leg">Messung %1$s &#10132; %2$s</string>
     <string name="menu_context_title_splay">Splay %s &#10132;</string>

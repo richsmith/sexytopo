@@ -19,6 +19,7 @@ public class Leg extends SurveyComponent {
     private final Station destination;
     private final Leg[] promotedFrom;
     private final boolean wasShotBackwards;
+    private String comment = "";
 
     private static final Leg[] NO_LEGS = new Leg[] {};
 
@@ -99,6 +100,7 @@ public class Leg extends SurveyComponent {
                         destination,
                         promotedFrom,
                         splay.wasShotBackwards);
+        leg.setComment(splay.getComment());
         return leg;
     }
 
@@ -199,6 +201,18 @@ public class Leg extends SurveyComponent {
 
     public static boolean isInclinationLegal(float inclination) {
         return MIN_INCLINATION <= inclination && inclination <= MAX_INCLINATION;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public boolean hasComment() {
+        return !comment.isEmpty();
+    }
+
+    public void setComment(String comment) {
+        this.comment = (comment != null) ? comment : "";
     }
 
     @NonNull

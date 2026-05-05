@@ -31,6 +31,10 @@
             android:id="@+id/action_downgrade_leg"
             android:title="@string/menu_downgrade_leg"
             android:visible="false"/>
+
+        <item
+            android:id="@+id/action_comment_leg"
+            android:title="@string/menu_comment_leg"/>
     </group>
 
     <!-- Delete leg separated by divider -->
