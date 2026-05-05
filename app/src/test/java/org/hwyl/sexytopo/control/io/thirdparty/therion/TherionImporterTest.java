@@ -649,4 +649,52 @@ public class TherionImporterTest {
         Direction stationFiveDirection = stationFive.getExtendedElevationDirection();
         Assert.assertEquals(Direction.RIGHT, stationFiveDirection);
     }
+
+    // --- Leg comment tests (Therion format) ---
+
+    @Test
+    public void testTherionLegCommentWithHashAppliedToToStation() throws Exception {
+        // Therion data normal: hash comment character
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline("1\t2\t5.0\t45.0\t-5.0\t# Grand Gallery", survey);
+        Assert.assertEquals("Grand Gallery", survey.getStationByName("2").getComment());
+    }
+
+    @Test
+    public void testTherionLegCommentWithoutCommentCharAppliedToToStation() throws Exception {
+        // Bare comment with no comment character — the bug case
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline("1\t2\t3.34\t34.0\t-4.0\tsome comment here", survey);
+        Assert.assertEquals("some comment here", survey.getStationByName("2").getComment());
+    }
+
+    @Test
+    public void testTherionLegCommentWithSemicolonAppliedToToStation() throws Exception {
+        // Survex-style semicolon also valid in shared parser
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline("1\t2\t5.0\t45.0\t-5.0\t; Boulder Choke", survey);
+        Assert.assertEquals("Boulder Choke", survey.getStationByName("2").getComment());
+    }
+
+    @Test
+    public void testTherionLegWithNoCommentLeavesStationCommentEmpty() throws Exception {
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline("1\t2\t5.0\t45.0\t-5.0", survey);
+        Station s = survey.getStationByName("2");
+        Assert.assertTrue(s.getComment() == null || s.getComment().isEmpty());
+    }
+
+    @Test
+    public void testTherionPassageAndLegCommentsAreConcatenated() throws Exception {
+        // Leg comment is set first via parseCentreline, then passage comment is merged
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline("1\t2\t5.0\t45.0\t-5.0\tChamber", survey);
+
+        java.util.Map<String, String> passageComments = new java.util.HashMap<>();
+        passageComments.put("2", "Large Hall");
+        SurvexTherionImporter.mergePassageComments(survey, passageComments);
+
+        // passage comment first, then leg comment
+        Assert.assertEquals("Large Hall :: Chamber", survey.getStationByName("2").getComment());
+    }
 }
