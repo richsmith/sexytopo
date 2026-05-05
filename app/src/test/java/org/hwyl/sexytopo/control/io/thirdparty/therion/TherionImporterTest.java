@@ -697,4 +697,63 @@ public class TherionImporterTest {
         // passage comment first, then leg comment
         Assert.assertEquals("Large Hall :: Chamber", survey.getStationByName("2").getComment());
     }
+
+    // --- Version-gated leg comment routing (Therion path) ---
+
+    @Test
+    public void testTherionLegCommentGoesToLegWhenVersionAfterCutoff() throws Exception {
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(
+                "1\t2\t5.0\t45.0\t-5.0\tGrand Gallery", survey, /* useLegComments= */ true);
+        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Assert.assertEquals("Grand Gallery", leg.getComment());
+        Assert.assertTrue(
+                survey.getStationByName("2").getComment() == null
+                        || survey.getStationByName("2").getComment().isEmpty());
+    }
+
+    @Test
+    public void testTherionLegCommentGoesToStationWhenVersionAtCutoff() throws Exception {
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(
+                "1\t2\t5.0\t45.0\t-5.0\tGrand Gallery", survey, /* useLegComments= */ false);
+        Assert.assertEquals("Grand Gallery", survey.getStationByName("2").getComment());
+        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Assert.assertTrue(leg.getComment() == null || leg.getComment().isEmpty());
+    }
+
+    @Test
+    public void testTherionLegCommentGoesToLegWhenNoVersionHeader() throws Exception {
+        // No SexyTopo header → useLegComments = true
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(
+                "1\t2\t5.0\t45.0\t-5.0\tGrand Gallery", survey, /* useLegComments= */ true);
+        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Assert.assertEquals("Grand Gallery", leg.getComment());
+    }
+
+    @Test
+    public void testTherionPromotedLegPrecursorCommentImportedOnLeg() throws Exception {
+        // Therion uses # as comment character on precursor lines
+        final String text =
+                "1\t2\t5.541\t253.93\t4.67\n" + "# 1\t2\t5.542\t73.95\t-4.64\tBack sight\n";
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(text, survey, /* useLegComments= */ true);
+        Leg mainLeg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Assert.assertEquals(1, mainLeg.getPromotedFrom().length);
+        Assert.assertEquals("Back sight", mainLeg.getPromotedFrom()[0].getComment());
+    }
+
+    @Test
+    public void testTherionPromotedLegPrecursorCommentIgnoredInLegacyMode() throws Exception {
+        final String text =
+                "1\t2\t5.541\t253.93\t4.67\n" + "# 1\t2\t5.542\t73.95\t-4.64\tBack sight\n";
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(text, survey, /* useLegComments= */ false);
+        Leg mainLeg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Assert.assertEquals(1, mainLeg.getPromotedFrom().length);
+        Assert.assertTrue(
+                mainLeg.getPromotedFrom()[0].getComment() == null
+                        || mainLeg.getPromotedFrom()[0].getComment().isEmpty());
+    }
 }
