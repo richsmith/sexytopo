@@ -23,8 +23,7 @@ public class SexyTopoVersion {
      * cutoff (i.e. 1.11.3+) use the new leg-comment import path. Files at or before this version,
      * use the legacy station-comment path.
      */
-    public static final SexyTopoVersion LEG_COMMENTS_VERSION_CUTOFF =
-            new SexyTopoVersion(1, 11, 2);
+    public static final SexyTopoVersion LEG_COMMENTS_VERSION_CUTOFF = new SexyTopoVersion(1, 11, 2);
 
     private static final String HEADER_MARKER = "Created with SexyTopo ";
 
