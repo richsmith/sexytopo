@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
-import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -234,58 +233,4 @@ public class SurvexTherionUtil {
         builder.append(formatted);
     }
 
-    public static String getExtendedElevationExtensions(Survey survey, SurveyFormat format) {
-        StringBuilder builder = new StringBuilder();
-        String marker = format.getCommandChar();
-        generateExtendCommandsFromStation(builder, survey.getOrigin(), null, marker);
-        return builder.toString();
-    }
-
-    private static void generateExtendCommandsFromStation(
-            StringBuilder builder, Station station, Direction lastDirection, String marker) {
-
-        Direction currentDirection = station.getExtendedElevationDirection();
-        if (lastDirection == null) {
-            builder.append(getExtendCommand(station, "start", marker));
-        } else if (currentDirection != lastDirection) {
-            builder.append(
-                    getExtendCommand(station, currentDirection.name().toLowerCase(), marker));
-        }
-
-        for (Leg leg : station.getConnectedOnwardLegs()) {
-            generateExtendCommandsFromStation(
-                    builder, leg.getDestination(), station.getExtendedElevationDirection(), marker);
-        }
-    }
-
-    private static String getExtendCommand(Station station, String direction, String marker) {
-        return marker + "extend " + direction + " " + station.getName() + "\n";
-    }
-
-    public static String getEspecExtendedElevationExtensions(Survey survey) {
-        StringBuilder builder = new StringBuilder();
-        generateEspecExtendCommandsFromStation(builder, survey.getOrigin(), null);
-        return builder.toString();
-    }
-
-    private static void generateEspecExtendCommandsFromStation(
-            StringBuilder builder, Station station, Direction lastDirection) {
-
-        Direction currentDirection = station.getExtendedElevationDirection();
-        if (lastDirection == null) {
-            builder.append(getEspecExtendCommand(station, "start"));
-        } else if (currentDirection != lastDirection) {
-            String keyword = currentDirection == Direction.LEFT ? "eleft" : "eright";
-            builder.append(getEspecExtendCommand(station, keyword));
-        }
-
-        for (Leg leg : station.getConnectedOnwardLegs()) {
-            generateEspecExtendCommandsFromStation(
-                    builder, leg.getDestination(), station.getExtendedElevationDirection());
-        }
-    }
-
-    private static String getEspecExtendCommand(Station station, String keyword) {
-        return "*" + keyword + " " + station.getName() + "\n";
-    }
 }

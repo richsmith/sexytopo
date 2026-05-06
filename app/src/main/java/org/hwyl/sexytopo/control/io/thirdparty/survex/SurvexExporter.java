@@ -7,6 +7,9 @@ import org.hwyl.sexytopo.control.io.SurveyFile;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
 import org.hwyl.sexytopo.control.io.translation.SingleFileExporter;
+import org.hwyl.sexytopo.model.graph.Direction;
+import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
 
@@ -65,7 +68,30 @@ public class SurvexExporter extends SingleFileExporter {
     }
 
     public String getEspecContent(Survey survey) {
-        return SurvexTherionUtil.getEspecExtendedElevationExtensions(survey);
+        StringBuilder builder = new StringBuilder();
+        generateEspecExtendCommandsFromStation(builder, survey.getOrigin(), null);
+        return builder.toString();
+    }
+
+    private static void generateEspecExtendCommandsFromStation(
+            StringBuilder builder, Station station, Direction lastDirection) {
+
+        Direction currentDirection = station.getExtendedElevationDirection();
+        if (lastDirection == null) {
+            builder.append(getEspecExtendCommand(station, "start"));
+        } else if (currentDirection != lastDirection) {
+            String keyword = currentDirection == Direction.LEFT ? "eleft" : "eright";
+            builder.append(getEspecExtendCommand(station, keyword));
+        }
+
+        for (Leg leg : station.getConnectedOnwardLegs()) {
+            generateEspecExtendCommandsFromStation(
+                    builder, leg.getDestination(), station.getExtendedElevationDirection());
+        }
+    }
+
+    private static String getEspecExtendCommand(Station station, String keyword) {
+        return "*" + keyword + " " + station.getName() + "\n";
     }
 
     @Override
