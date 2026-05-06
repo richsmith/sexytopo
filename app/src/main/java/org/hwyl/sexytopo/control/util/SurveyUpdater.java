@@ -474,28 +474,20 @@ public class SurveyUpdater {
      *
      * <p>If the active (parent) station has direction VERTICAL, that means the leg into it was a
      * one-off vertical rendering. The new station should instead continue in the direction of the
-     * grandparent station (Option A), so that the survey resumes its prior horizontal direction
-     * after the vertical leg. If no grandparent exists (active is origin), fall back to RIGHT.
+     * nearest non-vertical ancestor, so that the survey resumes its prior horizontal direction
+     * after any number of consecutive vertical legs. If no non-vertical ancestor exists, fall back
+     * to RIGHT.
      */
     private static Direction resolveInheritedDirection(Survey survey, Station activeStation) {
         Direction activeDirection = activeStation.getExtendedElevationDirection();
         if (activeDirection != Direction.VERTICAL) {
             return activeDirection;
         }
-        // Walk up one level to find the grandparent station's direction
         Leg referringLeg = survey.getReferringLeg(activeStation);
         if (referringLeg == null) {
             return Direction.RIGHT; // origin station — nothing above it
         }
-        Station grandparent = survey.getOriginatingStation(referringLeg);
-        if (grandparent == null) {
-            return Direction.RIGHT;
-        }
-        Direction grandparentDirection = grandparent.getExtendedElevationDirection();
-        // If the grandparent is also VERTICAL, keep climbing until we find a real direction
-        // or exhaust the chain — but for simplicity one level is sufficient for typical caves.
-        return (grandparentDirection == Direction.VERTICAL)
-                ? Direction.RIGHT
-                : grandparentDirection;
+        Station parent = survey.getOriginatingStation(referringLeg);
+        return resolveInheritedDirection(survey, parent);
     }
 }

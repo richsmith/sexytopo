@@ -9,111 +9,121 @@ import org.junit.Test;
 
 public class SurveyUpdaterInheritedDirectionTest {
 
-    private static final Leg DUMMY_LEG = new Leg(5, 0, 0);
+    // Three identical splays are required to trigger createNewStationIfTripleShot,
+    // which is the only path that calls resolveInheritedDirection.
+    private static final Leg SPLAY = new Leg(5, 0, 0);
 
     /**
-     * Builds a linear survey with the given number of legs and returns it.
-     * Station names will be "1" (origin), "2", "3", ...
+     * Adds a new station via three matching splays, which triggers the triple-shot path and causes
+     * resolveInheritedDirection to be called. Returns the newly-created station.
      */
-    private Survey buildLinearSurvey(int legCount) {
-        Survey survey = new Survey();
-        for (int i = 0; i < legCount; i++) {
-            SurveyUpdater.updateWithNewStation(survey, DUMMY_LEG);
-        }
-        return survey;
+    private Station addStationViaTripleShot(Survey survey) {
+        Station before = survey.getActiveStation();
+        SurveyUpdater.update(survey, SPLAY);
+        SurveyUpdater.update(survey, SPLAY);
+        SurveyUpdater.update(survey, SPLAY);
+        Station after = survey.getActiveStation();
+        Assert.assertNotSame("Triple shot should have created a new station", before, after);
+        return after;
     }
 
     // --- Non-vertical parent ---
 
     @Test
     public void testNonVerticalParentInheritsOwnDirection() {
-        Survey survey = buildLinearSurvey(1);
-        survey.getStationByName("2").setExtendedElevationDirection(Direction.LEFT);
+        Survey survey = new Survey();
+        survey.getOrigin().setExtendedElevationDirection(Direction.LEFT);
 
-        SurveyUpdater.updateWithNewStation(survey, DUMMY_LEG);
+        Station newStation = addStationViaTripleShot(survey);
 
-        Station newStation = survey.getStationByName("3");
         Assert.assertEquals(Direction.LEFT, newStation.getExtendedElevationDirection());
     }
 
     @Test
     public void testRightParentInheritsRight() {
-        Survey survey = buildLinearSurvey(1);
-        survey.getStationByName("2").setExtendedElevationDirection(Direction.RIGHT);
+        Survey survey = new Survey();
+        survey.getOrigin().setExtendedElevationDirection(Direction.RIGHT);
 
-        SurveyUpdater.updateWithNewStation(survey, DUMMY_LEG);
+        Station newStation = addStationViaTripleShot(survey);
 
-        Station newStation = survey.getStationByName("3");
         Assert.assertEquals(Direction.RIGHT, newStation.getExtendedElevationDirection());
     }
 
     // --- Single vertical parent ---
 
     @Test
-    public void testVerticalParentInheritsFromGrandparent() {
-        // Origin("1") = RIGHT, station "2" = VERTICAL → new station "3" should inherit RIGHT
-        Survey survey = buildLinearSurvey(1);
-        survey.getStationByName("2").setExtendedElevationDirection(Direction.VERTICAL);
+    public void testVerticalParentInheritsRightFromGrandparent() {
+        // Origin = RIGHT, then add station via triple-shot, mark it VERTICAL,
+        // then add another station — should inherit RIGHT from origin.
+        Survey survey = new Survey();
+        survey.getOrigin().setExtendedElevationDirection(Direction.RIGHT);
 
-        SurveyUpdater.updateWithNewStation(survey, DUMMY_LEG);
+        Station firstStation = addStationViaTripleShot(survey);
+        firstStation.setExtendedElevationDirection(Direction.VERTICAL);
 
-        Station newStation = survey.getStationByName("3");
-        Assert.assertEquals(Direction.RIGHT, newStation.getExtendedElevationDirection());
+        Station secondStation = addStationViaTripleShot(survey);
+
+        Assert.assertEquals(Direction.RIGHT, secondStation.getExtendedElevationDirection());
     }
 
     @Test
     public void testVerticalParentInheritsLeftFromGrandparent() {
-        // Origin("1") = LEFT, station "2" = VERTICAL → new station "3" should inherit LEFT
-        Survey survey = buildLinearSurvey(1);
+        // Origin = LEFT, then add station via triple-shot, mark it VERTICAL,
+        // then add another station — should inherit LEFT from origin.
+        Survey survey = new Survey();
         survey.getOrigin().setExtendedElevationDirection(Direction.LEFT);
-        survey.getStationByName("2").setExtendedElevationDirection(Direction.VERTICAL);
 
-        SurveyUpdater.updateWithNewStation(survey, DUMMY_LEG);
+        Station firstStation = addStationViaTripleShot(survey);
+        firstStation.setExtendedElevationDirection(Direction.VERTICAL);
 
-        Station newStation = survey.getStationByName("3");
-        Assert.assertEquals(Direction.LEFT, newStation.getExtendedElevationDirection());
+        Station secondStation = addStationViaTripleShot(survey);
+
+        Assert.assertEquals(Direction.LEFT, secondStation.getExtendedElevationDirection());
     }
 
     // --- Multiple consecutive vertical parents (the case the old code got wrong) ---
 
     @Test
-    public void testTwoConsecutiveVerticalsInheritsFromGreatGrandparent() {
-        // "1"=RIGHT, "2"=VERTICAL, "3"=VERTICAL → new station "4" should climb to "1" and get RIGHT
-        Survey survey = buildLinearSurvey(2);
-        survey.getStationByName("2").setExtendedElevationDirection(Direction.VERTICAL);
-        survey.getStationByName("3").setExtendedElevationDirection(Direction.VERTICAL);
+    public void testTwoConsecutiveVerticalsInheritsRightFromGreatGrandparent() {
+        Survey survey = new Survey();
+        survey.getOrigin().setExtendedElevationDirection(Direction.RIGHT);
 
-        SurveyUpdater.updateWithNewStation(survey, DUMMY_LEG);
+        Station firstStation = addStationViaTripleShot(survey);
+        firstStation.setExtendedElevationDirection(Direction.VERTICAL);
 
-        Station newStation = survey.getStationByName("4");
-        Assert.assertEquals(Direction.RIGHT, newStation.getExtendedElevationDirection());
+        Station secondStation = addStationViaTripleShot(survey);
+        secondStation.setExtendedElevationDirection(Direction.VERTICAL);
+
+        Station thirdStation = addStationViaTripleShot(survey);
+
+        Assert.assertEquals(Direction.RIGHT, thirdStation.getExtendedElevationDirection());
     }
 
     @Test
     public void testTwoConsecutiveVerticalsInheritsLeftFromGreatGrandparent() {
-        // "1"=LEFT, "2"=VERTICAL, "3"=VERTICAL → new station "4" should climb to "1" and get LEFT
-        Survey survey = buildLinearSurvey(2);
+        Survey survey = new Survey();
         survey.getOrigin().setExtendedElevationDirection(Direction.LEFT);
-        survey.getStationByName("2").setExtendedElevationDirection(Direction.VERTICAL);
-        survey.getStationByName("3").setExtendedElevationDirection(Direction.VERTICAL);
 
-        SurveyUpdater.updateWithNewStation(survey, DUMMY_LEG);
+        Station firstStation = addStationViaTripleShot(survey);
+        firstStation.setExtendedElevationDirection(Direction.VERTICAL);
 
-        Station newStation = survey.getStationByName("4");
-        Assert.assertEquals(Direction.LEFT, newStation.getExtendedElevationDirection());
+        Station secondStation = addStationViaTripleShot(survey);
+        secondStation.setExtendedElevationDirection(Direction.VERTICAL);
+
+        Station thirdStation = addStationViaTripleShot(survey);
+
+        Assert.assertEquals(Direction.LEFT, thirdStation.getExtendedElevationDirection());
     }
 
     // --- Vertical at origin (edge case) ---
 
     @Test
     public void testVerticalOriginFallsBackToRight() {
-        // Origin itself is VERTICAL — no ancestor to inherit from, should fall back to RIGHT
         Survey survey = new Survey();
         survey.getOrigin().setExtendedElevationDirection(Direction.VERTICAL);
 
-        SurveyUpdater.updateWithNewStation(survey, DUMMY_LEG);
+        Station newStation = addStationViaTripleShot(survey);
 
-        Station newStation = survey.getStationByName("2");
         Assert.assertEquals(Direction.RIGHT, newStation.getExtendedElevationDirection());
     }
 }
