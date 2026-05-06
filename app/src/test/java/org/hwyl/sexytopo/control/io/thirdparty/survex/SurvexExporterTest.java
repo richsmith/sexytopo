@@ -3,6 +3,7 @@ package org.hwyl.sexytopo.control.io.thirdparty.survex;
 import java.util.Arrays;
 import java.util.Collections;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
+import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
 import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
