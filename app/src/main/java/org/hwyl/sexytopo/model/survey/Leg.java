@@ -140,11 +140,7 @@ public class Leg extends SurveyComponent {
     public Leg adjustAzimuthAndInclination(float newAzimuth, float newInclination) {
         if (hasDestination()) {
             return new Leg(
-                    getDistance(),
-                    newAzimuth,
-                    newInclination,
-                    getDestination(),
-                    getPromotedFrom());
+                    getDistance(), newAzimuth, newInclination, getDestination(), getPromotedFrom());
         } else {
             return new Leg(getDistance(), newAzimuth, newInclination);
         }

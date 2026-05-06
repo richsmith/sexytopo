@@ -180,7 +180,8 @@ public class SurveyUpdater {
         if (areLegsAboutTheSame(lastNLegs)) {
 
             Station newStation = new Station(getNextStationName(survey));
-            newStation.setExtendedElevationDirection(resolveInheritedDirection(survey, activeStation));
+            newStation.setExtendedElevationDirection(
+                    resolveInheritedDirection(survey, activeStation));
 
             Leg newLeg = averageLegs(lastNLegs);
             newLeg =
@@ -236,7 +237,8 @@ public class SurveyUpdater {
 
         if (areLegsBacksights(fore, back)) {
             Station newStation = new Station(getNextStationName(survey));
-            newStation.setExtendedElevationDirection(resolveInheritedDirection(survey, activeStation));
+            newStation.setExtendedElevationDirection(
+                    resolveInheritedDirection(survey, activeStation));
 
             Leg newLeg = averageBacksights(fore, back);
             newLeg = Leg.toFullLeg(newLeg, newStation);
@@ -492,6 +494,8 @@ public class SurveyUpdater {
         Direction grandparentDirection = grandparent.getExtendedElevationDirection();
         // If the grandparent is also VERTICAL, keep climbing until we find a real direction
         // or exhaust the chain — but for simplicity one level is sufficient for typical caves.
-        return (grandparentDirection == Direction.VERTICAL) ? Direction.RIGHT : grandparentDirection;
+        return (grandparentDirection == Direction.VERTICAL)
+                ? Direction.RIGHT
+                : grandparentDirection;
     }
 }
