@@ -69,6 +69,37 @@ public class Space3DUtilsTest {
         assertEquals(Coord3D.ORIGIN, result);
     }
 
+    @Test
+    public void testVerticalLegStraightUp() {
+        Leg up1MLeg = new Leg(1, 0, 90);
+        Coord3D result = Space3DUtils.toCartesianVertical(Coord3D.ORIGIN, up1MLeg);
+        assertEquals(new Coord3D(0, 0, 1), result);
+    }
+
+    @Test
+    public void testVerticalLegStraightDown() {
+        Leg down1MLeg = new Leg(1, 0, -90);
+        Coord3D result = Space3DUtils.toCartesianVertical(Coord3D.ORIGIN, down1MLeg);
+        assertEquals(new Coord3D(0, 0, -1), result);
+    }
+
+    @Test
+    public void testVerticalLegInclinedPreservesXY() {
+        Leg inclinedLeg = new Leg(10, 45, 30);
+        Coord3D result = Space3DUtils.toCartesianVertical(Coord3D.ORIGIN, inclinedLeg);
+        // x and y must remain zero regardless of azimuth
+        Assert.assertEquals(0, result.x, 0.0001);
+        Assert.assertEquals(0, result.y, 0.0001);
+    }
+
+    @Test
+    public void testVerticalLegInclinedCorrectZ() {
+        Leg inclinedLeg = new Leg(10, 45, 30);
+        Coord3D result = Space3DUtils.toCartesianVertical(Coord3D.ORIGIN, inclinedLeg);
+        // z = 10 * sin(30°) = 5
+        Assert.assertEquals(5.0, result.z, 0.0001);
+    }
+
     private void assertEquals(Coord3D zero, Coord3D one) {
 
         double x0 = zero.x;
