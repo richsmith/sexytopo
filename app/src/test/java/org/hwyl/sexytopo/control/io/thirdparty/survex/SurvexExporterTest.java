@@ -3,7 +3,6 @@ package org.hwyl.sexytopo.control.io.thirdparty.survex;
 import java.util.Arrays;
 import java.util.Collections;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
-import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
 import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -180,8 +179,8 @@ public class SurvexExporterTest {
         String espec = survexExporter.getEspecContent(survey);
 
         Assert.assertTrue(
-                "espec must contain '*extend start' for the origin station",
-                espec.contains("*extend start " + originName));
+                "espec must contain '*start' for the origin station",
+                espec.contains("*start " + originName));
     }
 
     @Test
@@ -195,8 +194,8 @@ public class SurvexExporterTest {
         String espec = survexExporter.getEspecContent(survey);
 
         Assert.assertTrue(
-                "espec must contain '*extend left' for a station whose direction changed to left",
-                espec.contains("*extend left " + changedStation.getName()));
+                "espec must contain '*eleft' for a station whose direction changed to left",
+                espec.contains("*eleft " + changedStation.getName()));
     }
 
     @Test
@@ -206,16 +205,15 @@ public class SurvexExporterTest {
         // Set intermediate station to LEFT so that a subsequent RIGHT is a change
         Station intermediate = survey.getOrigin().getConnectedOnwardLegs().get(0).getDestination();
         intermediate.setExtendedElevationDirection(Direction.LEFT);
-        // The active (last) station should remain RIGHT (the default), producing a right command
+        // The active (last) station should remain RIGHT (the default), producing an eright command
         Station lastStation = survey.getActiveStation();
         lastStation.setExtendedElevationDirection(Direction.RIGHT);
 
         String espec = survexExporter.getEspecContent(survey);
 
         Assert.assertTrue(
-                "espec must contain '*extend right' for a station whose direction changed back to"
-                        + " right",
-                espec.contains("*extend right " + lastStation.getName()));
+                "espec must contain '*eright' for a station whose direction changed back to right",
+                espec.contains("*eright " + lastStation.getName()));
     }
 
     @Test
@@ -227,12 +225,10 @@ public class SurvexExporterTest {
 
         String espec = survexExporter.getEspecContent(survey);
 
-        // Should have the start line
-        Assert.assertTrue(espec.contains("*extend start " + originName));
-        // Should have no left or right lines (no direction changes)
+        Assert.assertTrue(espec.contains("*start " + originName));
         Assert.assertFalse(
                 "espec must not emit stations whose direction has not changed",
-                espec.contains("*extend right") || espec.contains("*extend left"));
+                espec.contains("*eleft") || espec.contains("*eright"));
     }
 
     @Test

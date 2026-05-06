@@ -65,7 +65,7 @@ public class SurvexExporter extends SingleFileExporter {
     }
 
     public String getEspecContent(Survey survey) {
-        return SurvexTherionUtil.getExtendedElevationExtensions(survey, SurveyFormat.SURVEX);
+        return SurvexTherionUtil.getEspecExtendedElevationExtensions(survey);
     }
 
     @Override

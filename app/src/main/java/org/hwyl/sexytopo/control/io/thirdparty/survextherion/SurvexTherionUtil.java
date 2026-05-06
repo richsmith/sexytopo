@@ -261,4 +261,31 @@ public class SurvexTherionUtil {
     private static String getExtendCommand(Station station, String direction, String marker) {
         return marker + "extend " + direction + " " + station.getName() + "\n";
     }
+
+    public static String getEspecExtendedElevationExtensions(Survey survey) {
+        StringBuilder builder = new StringBuilder();
+        generateEspecExtendCommandsFromStation(builder, survey.getOrigin(), null);
+        return builder.toString();
+    }
+
+    private static void generateEspecExtendCommandsFromStation(
+            StringBuilder builder, Station station, Direction lastDirection) {
+
+        Direction currentDirection = station.getExtendedElevationDirection();
+        if (lastDirection == null) {
+            builder.append(getEspecExtendCommand(station, "start"));
+        } else if (currentDirection != lastDirection) {
+            String keyword = currentDirection == Direction.LEFT ? "eleft" : "eright";
+            builder.append(getEspecExtendCommand(station, keyword));
+        }
+
+        for (Leg leg : station.getConnectedOnwardLegs()) {
+            generateEspecExtendCommandsFromStation(
+                    builder, leg.getDestination(), station.getExtendedElevationDirection());
+        }
+    }
+
+    private static String getEspecExtendCommand(Station station, String keyword) {
+        return "*" + keyword + " " + station.getName() + "\n";
+    }
 }
