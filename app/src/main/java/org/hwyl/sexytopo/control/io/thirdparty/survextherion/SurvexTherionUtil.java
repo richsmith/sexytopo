@@ -232,5 +232,4 @@ public class SurvexTherionUtil {
         String formatted = comment.replaceAll("(\\r|\\n|\\r\\n)+", "\\\\n");
         builder.append(formatted);
     }
-
 }
