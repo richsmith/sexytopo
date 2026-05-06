@@ -200,8 +200,11 @@ public class ThExporterTest {
     @Test
     public void testTherionExtendContainsExtendRightForRightStation() {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        // Set stations 2 and 3 to LEFT so the direction change back to RIGHT occurs at station 4
         Station intermediate = survey.getOrigin().getConnectedOnwardLegs().get(0).getDestination();
         intermediate.setExtendedElevationDirection(Direction.LEFT);
+        Station intermediate2 = intermediate.getConnectedOnwardLegs().get(0).getDestination();
+        intermediate2.setExtendedElevationDirection(Direction.LEFT);
         Station lastStation = survey.getActiveStation();
         lastStation.setExtendedElevationDirection(Direction.RIGHT);
 

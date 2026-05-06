@@ -203,9 +203,11 @@ public class SurvexExporterTest {
     public void testGetEspecContentContainsExtendRightWhenStationSetToRight() {
         SurvexExporter survexExporter = new SurvexExporter();
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
-        // Set intermediate station to LEFT so that a subsequent RIGHT is a change
+        // Set stations 2 and 3 to LEFT so the direction change back to RIGHT occurs at station 4
         Station intermediate = survey.getOrigin().getConnectedOnwardLegs().get(0).getDestination();
         intermediate.setExtendedElevationDirection(Direction.LEFT);
+        Station intermediate2 = intermediate.getConnectedOnwardLegs().get(0).getDestination();
+        intermediate2.setExtendedElevationDirection(Direction.LEFT);
         // The active (last) station should remain RIGHT (the default), producing an eright command
         Station lastStation = survey.getActiveStation();
         lastStation.setExtendedElevationDirection(Direction.RIGHT);
