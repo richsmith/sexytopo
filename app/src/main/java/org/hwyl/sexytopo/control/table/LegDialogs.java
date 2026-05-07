@@ -242,25 +242,30 @@ public class LegDialogs {
                 .setText(Float.toString(editData.getDistance()));
 
         if (usingDegMinsSecs) {
-            float azimuth = editData.getAzimuth();
-            int degrees = (int) azimuth;
-            float remainder = azimuth - degrees;
-            int minutes = (int) (remainder * 60);
-            float seconds = ((remainder * 60) - minutes) * 60;
-
+            float[] azimuthDms = Leg.decomposeToDms(editData.getAzimuth());
             ((TextView) (dialog.findViewById(R.id.editAzimuthDegrees)))
-                    .setText(Integer.toString(degrees));
+                    .setText(Integer.toString((int) azimuthDms[0]));
             ((TextView) (dialog.findViewById(R.id.editAzimuthMinutes)))
-                    .setText(Integer.toString(minutes));
+                    .setText(Integer.toString((int) azimuthDms[1]));
             ((TextView) (dialog.findViewById(R.id.editAzimuthSeconds)))
-                    .setText(Float.toString(seconds));
+                    .setText(Float.toString(azimuthDms[2]));
         } else {
             ((TextView) (dialog.findViewById(R.id.editAzimuth)))
                     .setText(Float.toString(editData.getAzimuth()));
         }
 
-        ((TextView) (dialog.findViewById(R.id.editInclination)))
-                .setText(Float.toString(editData.getInclination()));
+        if (GeneralPreferences.isIncDegMinsSecsModeOn()) {
+            float[] inclinationDms = Leg.decomposeToDms(editData.getInclination());
+            ((TextView) (dialog.findViewById(R.id.editInclinationDegrees)))
+                    .setText(Integer.toString((int) inclinationDms[0]));
+            ((TextView) (dialog.findViewById(R.id.editInclinationMinutes)))
+                    .setText(Integer.toString((int) inclinationDms[1]));
+            ((TextView) (dialog.findViewById(R.id.editInclinationSeconds)))
+                    .setText(Float.toString(inclinationDms[2]));
+        } else {
+            ((TextView) (dialog.findViewById(R.id.editInclination)))
+                    .setText(Float.toString(editData.getInclination()));
+        }
 
         DialogUtils.enableValidationOnButton(
                 dialog,

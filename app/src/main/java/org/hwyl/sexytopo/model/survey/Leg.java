@@ -204,6 +204,24 @@ public class Leg extends SurveyComponent {
                 || (MIN_THEODOLITE_INC <= inclination && inclination <= MAX_THEODOLITE_INC);
     }
 
+    /**
+     * Decomposes a decimal-degrees value into degrees, minutes, and seconds.
+     *
+     * <p>The sign of the original value is preserved on the degrees component only. Minutes and
+     * seconds are always positive
+     *
+     * @param decimalDegrees the value to decompose
+     * @return a three-element array {@code [degrees, minutes, seconds]} where {@code degrees}
+     *     carries the sign and {@code minutes}/{@code seconds} are non-negative
+     */
+    public static float[] decomposeToDms(float decimalDegrees) {
+        int degrees = (int) decimalDegrees;
+        float remainder = Math.abs(decimalDegrees - degrees);
+        int minutes = (int) (remainder * 60);
+        float seconds = ((remainder * 60) - minutes) * 60;
+        return new float[] {degrees, minutes, seconds};
+    }
+
     @NonNull
     public String toString() {
         return "(D"
