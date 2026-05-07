@@ -149,4 +149,47 @@ public class EditLegFormTest {
         float recomposed = dms[0] + sign * (dms[1] / 60.0f + dms[2] / 3600.0f);
         Assert.assertEquals(original, recomposed, DELTA);
     }
+
+    // ---- legal range boundary tests ----
+
+    @Test
+    public void testInclinationAtPlusNinetyIsLegal() {
+        Assert.assertTrue(Leg.isInclinationLegal(90.0f));
+    }
+
+    @Test
+    public void testInclinationAtMinusNinetyIsLegal() {
+        Assert.assertTrue(Leg.isInclinationLegal(-90.0f));
+    }
+
+    @Test
+    public void testInclinationAboveNinetyIsIllegal() {
+        Assert.assertFalse(Leg.isInclinationLegal(90.001f));
+    }
+
+    @Test
+    public void testAzimuthAt360IsIllegal() {
+        Assert.assertFalse(Leg.isAzimuthLegal(360.0f));
+    }
+
+    @Test
+    public void testAzimuthAt359Point9IsLegal() {
+        Assert.assertTrue(Leg.isAzimuthLegal(359.9f));
+    }
+
+    @Test
+    public void testDmsRecompositionOfNinetyIsExact() {
+        float[] dms = Leg.decomposeToDms(90.0f);
+        Assert.assertEquals(90, (int) dms[0]);
+        Assert.assertEquals(0, (int) dms[1]);
+        Assert.assertEquals(0.0f, dms[2], DELTA);
+    }
+
+    @Test
+    public void testDmsRecompositionOfMinusNinetyIsExact() {
+        float[] dms = Leg.decomposeToDms(-90.0f);
+        Assert.assertEquals(-90, (int) dms[0]);
+        Assert.assertEquals(0, (int) dms[1]);
+        Assert.assertEquals(0.0f, dms[2], DELTA);
+    }
 }

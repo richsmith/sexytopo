@@ -541,6 +541,7 @@
     <string name="validation_error_must_be_whole_number">Musi być liczbą całkowitą</string>
     <string name="validation_error_mins_secs_range">Musi być od 0 do 59</string>
     <string name="validation_error_secs_range">Musi być od 0 do mniej niż 60</string>
+    <string name="validation_error_must_be_zero_for_90">Musi być 0 dla ±90°</string>
 
     <!-- Input mode for leg editing -->
     <string-array name="leg_edit_input_mode_options">

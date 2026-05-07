@@ -574,6 +574,7 @@
     <string name="validation_error_must_be_whole_number">Must be a whole number</string>
     <string name="validation_error_mins_secs_range">Must be 0 to 59</string>
     <string name="validation_error_secs_range">Must be 0 to less than 60</string>
+    <string name="validation_error_must_be_zero_for_90">Must be 0 for ±90°</string>
 
     <!-- Input mode for leg editing -->
     <string-array name="leg_edit_input_mode_options">

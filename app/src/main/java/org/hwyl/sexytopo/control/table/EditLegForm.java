@@ -204,6 +204,15 @@ public class EditLegForm extends Form {
         this.distanceField.setOnFocusChangeListener(enableErrorsOnTouch);
         this.azimuthField.setOnFocusChangeListener(enableErrorsOnTouch);
         this.inclinationField.setOnFocusChangeListener(enableErrorsOnTouch);
+
+        if (GeneralPreferences.isDegMinsSecsModeOn()) {
+            this.azimuthMinutesField.setOnFocusChangeListener(enableErrorsOnTouch);
+            this.azimuthSecondsField.setOnFocusChangeListener(enableErrorsOnTouch);
+        }
+        if (GeneralPreferences.isIncDegMinsSecsModeOn()) {
+            this.inclinationMinutesField.setOnFocusChangeListener(enableErrorsOnTouch);
+            this.inclinationSecondsField.setOnFocusChangeListener(enableErrorsOnTouch);
+        }
     }
 
     private void initialiseInputMode(View dialogView) {
@@ -438,27 +447,42 @@ public class EditLegForm extends Form {
         // Degrees has content - enable range error display, mirroring what
         // RangeValidationTrigger does for the decimal azimuth field.
         enableRangeErrors();
-        boolean dmsValid =
-                validateMinutesField(azimuthMinutesLayout, azimuthMinutesField)
+        boolean ignored =
+                validateAzimuthDegreesField()
+                        & validateMinutesField(azimuthMinutesLayout, azimuthMinutesField)
                         & validateSecondsField(azimuthSecondsLayout, azimuthSecondsField);
-        if (!dmsValid) return;
+    }
 
-        // Compute decimal equivalent and range-check it, showing error on degrees layout
+    /**
+     * Validates the azimuth degrees field independently. The value must be a whole number in [0,
+     * 359]. Sets a range error on {@code azimuthDegreesLayout} and marks the form invalid if out of
+     * range. Returns true if valid, false otherwise.
+     */
+    private boolean validateAzimuthDegreesField() {
+        String text = azimuthDegreesField.getText().toString();
+        if (text.contains(".")) {
+            setError(
+                    azimuthDegreesLayout,
+                    context.getString(R.string.validation_error_must_be_whole_number));
+            return false;
+        }
         try {
-            float azimuth = getAzimuth();
-            if (!Leg.isAzimuthLegal(azimuth)) {
+            int degrees = Integer.parseInt(text);
+            if (degrees < Leg.MIN_AZIMUTH || degrees >= Leg.MAX_AZIMUTH) {
                 setRangeError(
-                        this.azimuthDegreesLayout,
+                        azimuthDegreesLayout,
                         context.getString(
                                 R.string.validation_error_azimuth_range,
                                 Leg.MIN_AZIMUTH,
                                 Leg.MAX_AZIMUTH));
-            } else {
-                setRangeError(this.azimuthDegreesLayout, (Integer) null);
+                return false;
             }
+            setRangeError(azimuthDegreesLayout, (Integer) null);
+            return true;
         } catch (NumberFormatException e) {
-            // Degrees field contains a partial value (e.g. just "-"), not yet parseable
+            // Partial input such as a lone "-"; not yet parseable, suppress error display
             this.valid = false;
+            return false;
         }
     }
 
@@ -503,26 +527,98 @@ public class EditLegForm extends Form {
         // Degrees has content - enable range error display, mirroring what
         // RangeValidationTrigger does for the decimal inclination field.
         enableRangeErrors();
-        boolean dmsValid =
-                validateMinutesField(inclinationMinutesLayout, inclinationMinutesField)
-                        & validateSecondsField(inclinationSecondsLayout, inclinationSecondsField);
-        if (!dmsValid) return;
+        boolean ignored =
+                validateInclinationDegreesField()
+                        & validateInclinationMinutesField()
+                        & validateInclinationSecondsField();
+    }
 
-        // Compute decimal equivalent and range-check it, showing error on degrees layout.
-        // Wrap in try/catch to handle partial input such as a lone "-" which is not yet
-        // parseable as a float but is a valid intermediate state while typing a negative value.
+    /**
+     * Validates the inclination degrees field independently. The value must be a whole number in
+     * [−90, 90] or [270, 360] (theodolite range). Sets a range error on {@code
+     * inclinationDegreesLayout} and marks the form invalid if out of range. Returns true if valid,
+     * false otherwise.
+     */
+    private boolean validateInclinationDegreesField() {
+        String text = inclinationDegreesField.getText().toString();
+        if (text.contains(".")) {
+            setError(
+                    inclinationDegreesLayout,
+                    context.getString(R.string.validation_error_must_be_whole_number));
+            return false;
+        }
         try {
-            float inclination = getInclination();
-            if (!Leg.isInclinationLegal(inclination)) {
+            int degrees = Integer.parseInt(text);
+            boolean inNormalRange =
+                    degrees >= Leg.MIN_INCLINATION && degrees <= Leg.MAX_INCLINATION;
+            boolean inTheodoliteRange =
+                    degrees >= Leg.MIN_THEODOLITE_INC && degrees <= Leg.MAX_THEODOLITE_INC;
+            if (!inNormalRange && !inTheodoliteRange) {
                 setRangeError(
-                        this.inclinationDegreesLayout,
+                        inclinationDegreesLayout,
                         context.getString(R.string.validation_error_inclination_range));
-            } else {
-                setRangeError(this.inclinationDegreesLayout, (Integer) null);
+                return false;
             }
+            setRangeError(inclinationDegreesLayout, (Integer) null);
+            return true;
         } catch (NumberFormatException e) {
-            // Degrees field contains a partial value (e.g. just "-"), not yet parseable
+            // Partial input such as a lone "-"; not yet parseable, suppress error display
             this.valid = false;
+            return false;
+        }
+    }
+
+    /**
+     * Validates the inclination minutes field. Applies the standard 0–59 whole-number check, plus
+     * an additional constraint: if the degrees field contains ±90, minutes must be 0 or blank since
+     * as a minute or second value would take it out of range.
+     */
+    private boolean validateInclinationMinutesField() {
+        if (isAtInclinationBoundary() && !isZeroOrBlank(inclinationMinutesField)) {
+            setError(
+                    inclinationMinutesLayout,
+                    context.getString(R.string.validation_error_must_be_zero_for_90));
+            return false;
+        }
+        return validateMinutesField(inclinationMinutesLayout, inclinationMinutesField);
+    }
+
+    /**
+     * Validates the inclination seconds field. Applies the standard 0–59.99 check, plus an
+     * additional constraint: if the degrees field contains ±90, seconds must be 0 or blank.
+     */
+    private boolean validateInclinationSecondsField() {
+        if (isAtInclinationBoundary() && !isZeroOrBlank(inclinationSecondsField)) {
+            setError(
+                    inclinationSecondsLayout,
+                    context.getString(R.string.validation_error_must_be_zero_for_90));
+            return false;
+        }
+        return validateSecondsField(inclinationSecondsLayout, inclinationSecondsField);
+    }
+
+    /**
+     * Returns true if the inclination degrees field contains exactly 90 or −90, indicating that the
+     * reading is at the vertical boundary and minutes/seconds must be zero.
+     */
+    private boolean isAtInclinationBoundary() {
+        String text = inclinationDegreesField.getText().toString();
+        return text.equals("90") || text.equals("-90");
+    }
+
+    /**
+     * Returns true if the given field is blank or contains a value that is numerically zero (e.g.
+     * "0", "0.0", "00"). Used to enforce the ±90° boundary constraint.
+     */
+    private boolean isZeroOrBlank(EditText field) {
+        String text = field.getText().toString();
+        if (text.isEmpty()) {
+            return true;
+        }
+        try {
+            return Float.parseFloat(text) == 0.0f;
+        } catch (NumberFormatException e) {
+            return false;
         }
     }
 
