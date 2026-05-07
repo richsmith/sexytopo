@@ -35,7 +35,7 @@ public class ExampleSurveyCreator {
     // number of stations to get a cross-section when requested
     private static final float X_SECTION_FRACTION = 0.25f;
 
-    /** Probability that any given station gets a symbol nearby when {@code addSymbols} is on. */
+    /** Probability that any given station gets a symbol nearby when addSymbols is on. */
     private static final float SYMBOL_PROBABILITY = 0.5f;
 
     /** Maximum offset (metres) of a generated symbol from its station. */
@@ -43,6 +43,9 @@ public class ExampleSurveyCreator {
 
     /** Default symbol size (metres). Lands in the "small" Therion size bucket. */
     private static final float SYMBOL_SIZE = 0.5f;
+
+    /** Maximum sideways jitter on a freehand sub-segment, as a fraction of segment length. */
+    private static final float FREEHAND_JITTER = 0.03f;
 
     public static Survey create() {
         return create(10, 5, false, false, false);
@@ -76,6 +79,10 @@ public class ExampleSurveyCreator {
 
         for (int i = 0; i < numBranches; i++) {
             List<Station> stations = survey.getAllStations();
+            stations.remove(survey.getOrigin());
+            if (stations.isEmpty()) {
+                break;
+            }
             Station active = getRandom(stations);
             survey.setActiveStation(active);
             createBranch(survey, 3);
@@ -154,10 +161,10 @@ public class ExampleSurveyCreator {
     }
 
     /**
-     * Walk the survey tree from {@code from}, extending {@code path} with {@code lineTo} along each
-     * linear segment. At a branch, recurse with a fresh path per child starting at the shared
-     * parent wall point. {@code path} is null at the very start (a new path is opened for the first
-     * leg) and at every recursion entry into a branch.
+     * Walk the survey tree from `from`, extending `path` with `lineTo` along each linear segment.
+     * At a branch, recurse with a fresh path per child starting at the shared parent wall point.
+     * `path` is null at the very start (a new path is opened for the first leg) and at every
+     * recursion entry into a branch.
      */
     private static void drawWallChain(
             Survey survey,
@@ -184,7 +191,7 @@ public class ExampleSurveyCreator {
             if (path == null) {
                 path = plan.startNewPath(fromWall);
             }
-            path.lineTo(childWall);
+            toFreehand(path, fromWall, childWall);
             drawWallChain(survey, plan, stationPositions, wallPoints, child, side, path);
         } else {
             for (Leg leg : onward) {
@@ -196,10 +203,32 @@ public class ExampleSurveyCreator {
                     continue;
                 }
                 PathDetail branch = plan.startNewPath(fromWall);
-                branch.lineTo(childWall);
+                toFreehand(branch, fromWall, childWall);
                 drawWallChain(survey, plan, stationPositions, wallPoints, child, side, branch);
             }
         }
+    }
+
+    /**
+     * Append the segment `from`->`to` to `path` as 6-12 straight sub-segments, with each interior
+     * joint nudged in a small random direction. `from` is assumed to be already on the path; only
+     * the interior points and `to` are appended. Endpoints stay exact so adjacent segments still
+     * meet at stations.
+     */
+    private static PathDetail toFreehand(PathDetail path, Coord2D from, Coord2D to) {
+        int subSegments = 6 + random.nextInt(7);
+        Coord2D delta = to.minus(from);
+        float length = delta.mag();
+        float maxOffset = length * FREEHAND_JITTER;
+        for (int i = 1; i < subSegments; i++) {
+            float t = (float) i / subSegments;
+            Coord2D straight = from.plus(delta.scale(t));
+            float dx = (random.nextFloat() * 2 - 1) * maxOffset;
+            float dy = (random.nextFloat() * 2 - 1) * maxOffset;
+            path.lineTo(straight.add(dx, dy));
+        }
+        path.lineTo(to);
+        return path;
     }
 
     /**
@@ -218,9 +247,9 @@ public class ExampleSurveyCreator {
         Sketch sub = xsDetail.getSketch();
         PathDetail path = sub.startNewPath(endpoints.get(0));
         for (int i = 1; i < endpoints.size(); i++) {
-            path.lineTo(endpoints.get(i));
+            toFreehand(path, endpoints.get(i - 1), endpoints.get(i));
         }
-        path.lineTo(endpoints.get(0));
+        toFreehand(path, endpoints.get(endpoints.size() - 1), endpoints.get(0));
     }
 
     private static Coord2D wallPoint(
