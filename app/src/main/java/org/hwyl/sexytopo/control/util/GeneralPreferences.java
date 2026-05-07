@@ -162,6 +162,10 @@ public class GeneralPreferences {
         return getBoolean("pref_deg_mins_secs", false);
     }
 
+    public static boolean isIncDegMinsSecsModeOn() {
+        return getBoolean("pref_inc_deg_mins_secs", false);
+    }
+
     // ********** Surveying ***********
 
     public static float getMaxDistanceDelta() {

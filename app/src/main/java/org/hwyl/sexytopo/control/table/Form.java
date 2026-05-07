@@ -11,7 +11,7 @@ public abstract class Form {
     private final Context context;
 
     static class TextViewValidationTrigger implements TextWatcher {
-        private final Form form;
+        final Form form;
 
         TextViewValidationTrigger(Form form) {
             this.form = form;
@@ -34,19 +34,25 @@ public abstract class Form {
         void onDidValidate(Boolean valid);
     }
 
-    private boolean valid;
+    protected boolean valid;
     private boolean showErrors;
+    private boolean showRangeErrors;
     @Nullable private OnDidValidateCallback onDidValidateCallback;
 
     Form(Context context) {
         this.context = context;
         this.valid = true;
         this.showErrors = false;
+        this.showRangeErrors = false;
         this.onDidValidateCallback = null;
     }
 
     public void enableErrors() {
         this.showErrors = true;
+    }
+
+    public void enableRangeErrors() {
+        this.showRangeErrors = true;
     }
 
     public void setOnDidValidateCallback(@Nullable OnDidValidateCallback callback) {
@@ -88,5 +94,15 @@ public abstract class Form {
     protected void setError(TextInputLayout layout, Integer error) {
         CharSequence message = error == null ? null : context.getString(error);
         this.setError(layout, message);
+    }
+
+    protected void setRangeError(TextInputLayout layout, CharSequence error) {
+        this.valid = this.valid & (error == null);
+        layout.setError(showRangeErrors ? error : null);
+    }
+
+    protected void setRangeError(TextInputLayout layout, Integer error) {
+        CharSequence message = error == null ? null : context.getString(error);
+        this.setRangeError(layout, message);
     }
 }

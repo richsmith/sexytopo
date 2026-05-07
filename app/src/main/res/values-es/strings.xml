@@ -465,6 +465,9 @@
     </string-array>
     <string name="settings_key_deg_mins_secs_title">Azimut en grados/minutos/segundos</string>
     <string name="settings_key_deg_mins_secs_summary">Ingresar valores de azimut en grados/minutos/segundos (en lugar del predeterminado decimal)</string>
+    <string name="manual_edit_inclination_deg_mins_secs">Inclinación (&#176; \' \")</string>
+    <string name="settings_key_inc_deg_mins_secs_title">Inclinación en grados/minutos/segundos</string>
+    <string name="settings_key_inc_deg_mins_secs_summary">Ingresar valores de inclinación en grados/minutos/segundos (en lugar del predeterminado decimal)</string>
     <string name="settings_export_title">Exportación</string>
     <string name="settings_export_summary">Formatos de exportación y opciones de carpeta</string>
     <string name="settings_export_svg_background_title">Fondo SVG</string>
@@ -534,9 +537,13 @@
     <string name="validation_error_same_as_from_station">No puede ser la misma que la estación de origen</string>
     <string name="validation_error_station_name_not_unique">El nombre de estación debe ser único</string>
     <string name="validation_error_must_be_number">Debe ser un número</string>
-    <string name="validation_error_distance_minimum">Debe ser >= %1$f</string>
-    <string name="validation_error_azimuth_range">Debe ser %1$f-%2$f</string>
-    <string name="validation_error_inclination_range">Debe ser de %1$f a %2$f</string>
+    <string name="validation_error_distance_minimum">Debe ser >= %1$d</string>
+    <string name="validation_error_azimuth_range">Debe ser %1$d-%2$d</string>
+    <string name="validation_error_inclination_range">Debe ser de -90 a 90 o de 270 a 360</string>
+    <string name="validation_error_must_be_whole_number">Debe ser un número entero</string>
+    <string name="validation_error_mins_secs_range">Debe ser de 0 a 59</string>
+    <string name="validation_error_secs_range">Debe ser de 0 a menos de 60</string>
+    <string name="validation_error_must_be_zero_for_90">Debe ser 0 para ±90°</string>
 
     <!-- Input mode for leg editing -->
     <string-array name="leg_edit_input_mode_options">

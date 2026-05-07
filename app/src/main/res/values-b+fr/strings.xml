@@ -465,6 +465,9 @@
     </string-array>
     <string name="settings_key_deg_mins_secs_title">Azimut en degrés/minutes/secondes</string>
     <string name="settings_key_deg_mins_secs_summary">Entrer les valeurs d\'azimut en degrés/minutes/secondes (au lieu du mode décimal par défaut)</string>
+    <string name="manual_edit_inclination_deg_mins_secs">Inclinaison (&#176; \' \")</string>
+    <string name="settings_key_inc_deg_mins_secs_title">Inclinaison en degrés/minutes/secondes</string>
+    <string name="settings_key_inc_deg_mins_secs_summary">Entrer les valeurs d\'inclinaison en degrés/minutes/secondes (au lieu du mode décimal par défaut)</string>
     <string name="settings_export_title">Exporter</string>
     <string name="settings_export_summary">Formats d\'export et options de dossier</string>
     <string name="settings_export_svg_background_title">Arrière-plan SVG</string>
@@ -534,9 +537,13 @@
     <string name="validation_error_same_as_from_station">Ne peut pas être identique à la station d\'origine</string>
     <string name="validation_error_station_name_not_unique">Le nom de la station doit être unique</string>
     <string name="validation_error_must_be_number">Doit être un nombre</string>
-    <string name="validation_error_distance_minimum">Doit être >= %1$f</string>
-    <string name="validation_error_azimuth_range">Doit être entre %1$f et %2$f</string>
-    <string name="validation_error_inclination_range">Doit être entre %1$f et %2$f</string>
+    <string name="validation_error_distance_minimum">Doit être >= %1$d</string>
+    <string name="validation_error_azimuth_range">Doit être entre %1$d et %2$d</string>
+    <string name="validation_error_inclination_range">Doit être entre -90 et 90 ou entre 270 et 360</string>
+    <string name="validation_error_must_be_whole_number">Doit être un nombre entier</string>
+    <string name="validation_error_mins_secs_range">Doit être compris entre 0 et 59</string>
+    <string name="validation_error_secs_range">Doit être compris entre 0 et moins de 60</string>
+    <string name="validation_error_must_be_zero_for_90">Doit être 0 pour ±90°</string>
 
     <!-- Input mode for leg editing -->
     <string-array name="leg_edit_input_mode_options">
