@@ -20,4 +20,14 @@ public class Space3DUtils {
 
         return new Coord3D(x, y, z);
     }
+
+    /**
+     * Converts a leg to its endpoint treating it as purely vertical: x and y are unchanged from the
+     * start, and z shifts by r*sin(inclination). This preserves the true altitude change without
+     * any horizontal displacement on screen.
+     */
+    public static Coord3D toCartesianVertical(Coord3D start, Leg leg) {
+        float dz = leg.getDistance() * (float) Math.sin(Math.toRadians(leg.getInclination()));
+        return new Coord3D(start.x, start.y, start.z + dz);
+    }
 }

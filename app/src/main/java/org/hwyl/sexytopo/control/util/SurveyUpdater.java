@@ -180,7 +180,8 @@ public class SurveyUpdater {
         if (areLegsAboutTheSame(lastNLegs)) {
 
             Station newStation = new Station(getNextStationName(survey));
-            newStation.setExtendedElevationDirection(activeStation.getExtendedElevationDirection());
+            newStation.setExtendedElevationDirection(
+                    resolveInheritedDirection(survey, activeStation));
 
             Leg newLeg = averageLegs(lastNLegs);
             newLeg =
@@ -236,7 +237,8 @@ public class SurveyUpdater {
 
         if (areLegsBacksights(fore, back)) {
             Station newStation = new Station(getNextStationName(survey));
-            newStation.setExtendedElevationDirection(activeStation.getExtendedElevationDirection());
+            newStation.setExtendedElevationDirection(
+                    resolveInheritedDirection(survey, activeStation));
 
             Leg newLeg = averageBacksights(fore, back);
             newLeg = Leg.toFullLeg(newLeg, newStation);
@@ -465,5 +467,27 @@ public class SurveyUpdater {
             Station destination = leg.getDestination();
             setDirectionOfSubtree(destination, direction);
         }
+    }
+
+    /**
+     * Resolves the direction that a newly-created station should inherit from its parent.
+     *
+     * <p>If the active (parent) station has direction VERTICAL, that means the leg into it was a
+     * one-off vertical rendering. The new station should instead continue in the direction of the
+     * nearest non-vertical ancestor, so that the survey resumes its prior horizontal direction
+     * after any number of consecutive vertical legs. If no non-vertical ancestor exists, fall back
+     * to RIGHT.
+     */
+    private static Direction resolveInheritedDirection(Survey survey, Station activeStation) {
+        Direction activeDirection = activeStation.getExtendedElevationDirection();
+        if (activeDirection != Direction.VERTICAL) {
+            return activeDirection;
+        }
+        Leg referringLeg = survey.getReferringLeg(activeStation);
+        if (referringLeg == null) {
+            return Direction.RIGHT; // origin station — nothing above it
+        }
+        Station parent = survey.getOriginatingStation(referringLeg);
+        return resolveInheritedDirection(survey, parent);
     }
 }

@@ -622,6 +622,7 @@
     <string name="menu_elevation">Elevation</string>
     <string name="menu_draw_left">Draw Left</string>
     <string name="menu_draw_right">Draw Right</string>
+    <string name="menu_draw_vertical">Draw Vertical</string>
     <string name="menu_move_row">Move to Different Station</string>
     <string name="menu_jump_to">Jump</string>
     <string name="menu_jump_to_station_in_plan">&#10132; Plan</string>

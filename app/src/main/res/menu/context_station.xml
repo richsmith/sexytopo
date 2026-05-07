@@ -83,6 +83,11 @@
                         android:id="@+id/action_direction_right"
                         android:title="@string/menu_draw_right"
                         android:checkable="true"/>
+
+                    <item
+                        android:id="@+id/action_direction_vertical"
+                        android:title="@string/menu_draw_vertical"
+                        android:checkable="true"/>
                 </group>
             </menu>
         </item>

@@ -42,6 +42,7 @@ import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Coord2D;
+import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
@@ -1034,7 +1035,11 @@ public class GraphView extends View {
                 paint = fade ? fadedLegPaint : legPaint;
             }
 
-            if (projectionType.isLegInPlane(leg)) {
+            if (projectionType == Projection2D.EXTENDED_ELEVATION
+                    && leg.hasDestination()
+                    && leg.getDestination().getExtendedElevationDirection() == Direction.VERTICAL) {
+                drawDashedLine(canvas, start, end, dashedLineIntervalPx, paint);
+            } else if (projectionType.isLegInPlane(leg)) {
                 canvas.drawLine(start.x, start.y, end.x, end.y, paint);
             } else {
                 drawDashedLine(canvas, start, end, dashedLineIntervalPx, paint);
