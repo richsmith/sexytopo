@@ -19,9 +19,6 @@ import org.robolectric.RuntimeEnvironment;
 /**
  * Dumps an SVG export of a fixture survey so it can be inspected in a browser or vector editor
  * without needing to dig files out of the emulator.
- *
- * <p>Run via: {@code make export-svg} (or {@code ./gradlew :app:exportSvgFixtures}). Output lands
- * in {@code app/build/exports/<fixture>/}.
  */
 @RunWith(RobolectricTestRunner.class)
 public class SvgFixtureExporter {
