@@ -84,3 +84,45 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit-ktx:1.3.0'
     androidTestImplementation 'androidx.test:rules:1.7.0'
 }
+
+// Dumps full export bundles for fixture surveys to app/build/exports/, so they can be
+// opened in their target tools for manual testing without needing to dig files out of
+// the emulator.
+//
+// Implemented as focused unit-test invocations so they inherit AGP's Android stub runtime
+// + Robolectric (the fixture builders use android.util.Log etc.).
+afterEvaluate {
+    def exportTaskNames = gradle.startParameter.taskNames
+    def runningTherion = exportTaskNames.any { it.endsWith('exportTherionFixtures') }
+    def runningSvg = exportTaskNames.any { it.endsWith('exportSvgFixtures') }
+    if (runningTherion || runningSvg) {
+        tasks.named('testDebugUnitTest').configure {
+            filter {
+                if (runningTherion) {
+                    includeTestsMatching 'org.hwyl.sexytopo.tools.TherionFixtureExporter'
+                }
+                if (runningSvg) {
+                    includeTestsMatching 'org.hwyl.sexytopo.tools.SvgFixtureExporter'
+                }
+            }
+            outputs.upToDateWhen { false }
+        }
+    }
+    def exportsDir = layout.buildDirectory.dir('exports')
+    tasks.register('exportTherionFixtures') {
+        group = 'verification'
+        description = 'Write Therion export bundles for fixture surveys to build/exports/.'
+        dependsOn 'testDebugUnitTest'
+        doLast {
+            println "Therion fixture bundles written to ${exportsDir.get()}/"
+        }
+    }
+    tasks.register('exportSvgFixtures') {
+        group = 'verification'
+        description = 'Write SVG export bundles for fixture surveys to build/exports/.'
+        dependsOn 'testDebugUnitTest'
+        doLast {
+            println "SVG fixture bundles written to ${exportsDir.get()}/"
+        }
+    }
+}
