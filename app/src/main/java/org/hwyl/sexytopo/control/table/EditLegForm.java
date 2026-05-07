@@ -439,8 +439,8 @@ public class EditLegForm extends Form {
         // RangeValidationTrigger does for the decimal azimuth field.
         enableRangeErrors();
         boolean dmsValid =
-                validateMinsSecsField(azimuthMinutesLayout, azimuthMinutesField)
-                        & validateMinsSecsField(azimuthSecondsLayout, azimuthSecondsField);
+                validateMinutesField(azimuthMinutesLayout, azimuthMinutesField)
+                        & validateSecondsField(azimuthSecondsLayout, azimuthSecondsField);
         if (!dmsValid) return;
 
         // Compute decimal equivalent and range-check it, showing error on degrees layout
@@ -504,8 +504,8 @@ public class EditLegForm extends Form {
         // RangeValidationTrigger does for the decimal inclination field.
         enableRangeErrors();
         boolean dmsValid =
-                validateMinsSecsField(inclinationMinutesLayout, inclinationMinutesField)
-                        & validateMinsSecsField(inclinationSecondsLayout, inclinationSecondsField);
+                validateMinutesField(inclinationMinutesLayout, inclinationMinutesField)
+                        & validateSecondsField(inclinationSecondsLayout, inclinationSecondsField);
         if (!dmsValid) return;
 
         // Compute decimal equivalent and range-check it, showing error on degrees layout.
@@ -527,19 +527,16 @@ public class EditLegForm extends Form {
     }
 
     /**
-     * Validates a minutes or seconds field. Blank is accepted (treated as zero). If non-blank, the
-     * value must be a whole number in the range 0-59. Sets an error on the layout and marks the
-     * form invalid if not. Returns true if the field is valid (or blank), false otherwise. Uses
-     * bitwise & rather than && in callers so both fields are always evaluated and both errors shown
-     * at once rather than stopping at the first failure.
+     * Validates a minutes field. Blank is accepted (treated as zero). If non-blank, the value must
+     * be a whole number in the range 0–59. Sets an error on the layout and marks the form invalid
+     * if not. Returns true if the field is valid (or blank), false otherwise.
      */
-    private boolean validateMinsSecsField(TextInputLayout layout, EditText field) {
+    private boolean validateMinutesField(TextInputLayout layout, EditText field) {
         String text = field.getText().toString();
         if (text.isEmpty()) {
             setError(layout, (Integer) null);
             return true;
         }
-        // Must be a whole number (no decimal point)
         if (text.contains(".")) {
             setError(layout, context.getString(R.string.validation_error_must_be_whole_number));
             return false;
@@ -554,6 +551,32 @@ public class EditLegForm extends Form {
             return true;
         } catch (NumberFormatException e) {
             setError(layout, context.getString(R.string.validation_error_must_be_whole_number));
+            return false;
+        }
+    }
+
+    /**
+     * Validates a seconds field. Blank is accepted (treated as zero). If non-blank, the value must
+     * be a non-negative number less than 60; decimal values (e.g. {@code 30.5}) are permitted. Sets
+     * an error on the layout and marks the form invalid if not. Returns true if the field is valid
+     * (or blank), false otherwise.
+     */
+    private boolean validateSecondsField(TextInputLayout layout, EditText field) {
+        String text = field.getText().toString();
+        if (text.isEmpty()) {
+            setError(layout, (Integer) null);
+            return true;
+        }
+        try {
+            float value = Float.parseFloat(text);
+            if (value < 0 || value >= 60) {
+                setError(layout, context.getString(R.string.validation_error_secs_range));
+                return false;
+            }
+            setError(layout, (Integer) null);
+            return true;
+        } catch (NumberFormatException e) {
+            setError(layout, context.getString(R.string.validation_error_must_be_number));
             return false;
         }
     }

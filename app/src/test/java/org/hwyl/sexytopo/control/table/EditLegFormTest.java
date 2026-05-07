@@ -116,4 +116,37 @@ public class EditLegFormTest {
         Assert.assertEquals(0, (int) dms[1]);
         Assert.assertEquals(0.0f, dms[2], DELTA);
     }
+
+    // ---- decimal seconds tests ----
+
+    @Test
+    public void testDmsDecompositionProducesDecimalSeconds() {
+        // 45° 30' 30.5" = 45 + 30/60 + 30.5/3600 = 45.508472...°
+        float input = 45.0f + 30.0f / 60.0f + 30.5f / 3600.0f;
+        float[] dms = Leg.decomposeToDms(input);
+        Assert.assertEquals(45, (int) dms[0]);
+        Assert.assertEquals(30, (int) dms[1]);
+        // seconds should be non-integer (≈ 30.5)
+        Assert.assertTrue("Expected fractional seconds", dms[2] > 30.0f && dms[2] < 31.0f);
+    }
+
+    @Test
+    public void testDmsRoundTripWithDecimalSeconds() {
+        // Build a value whose seconds component is fractional
+        float original = 45.0f + 30.0f / 60.0f + 30.5f / 3600.0f;
+        float[] dms = Leg.decomposeToDms(original);
+        float sign = dms[0] < 0 ? -1.0f : 1.0f;
+        float recomposed = dms[0] + sign * (dms[1] / 60.0f + dms[2] / 3600.0f);
+        Assert.assertEquals(original, recomposed, DELTA);
+    }
+
+    @Test
+    public void testNegativeDmsRoundTripWithDecimalSeconds() {
+        // Negative inclination with fractional seconds: -12° 15' 45.75"
+        float original = -(12.0f + 15.0f / 60.0f + 45.75f / 3600.0f);
+        float[] dms = Leg.decomposeToDms(original);
+        float sign = dms[0] < 0 ? -1.0f : 1.0f;
+        float recomposed = dms[0] + sign * (dms[1] / 60.0f + dms[2] / 3600.0f);
+        Assert.assertEquals(original, recomposed, DELTA);
+    }
 }

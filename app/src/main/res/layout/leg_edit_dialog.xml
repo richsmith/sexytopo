@@ -101,7 +101,7 @@
                 android:id="@+id/editAzimuthSeconds"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="number"/>
+                android:inputType="numberDecimal"/>
         </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
     </LinearLayout>
@@ -184,7 +184,7 @@
                 android:id="@+id/editInclinationSeconds"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="number"/>
+                android:inputType="numberDecimal"/>
         </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
     </LinearLayout>

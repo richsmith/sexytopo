@@ -540,6 +540,7 @@
     <string name="validation_error_inclination_range">Musi być od -90 do 90 lub od 270 do 360</string>
     <string name="validation_error_must_be_whole_number">Musi być liczbą całkowitą</string>
     <string name="validation_error_mins_secs_range">Musi być od 0 do 59</string>
+    <string name="validation_error_secs_range">Musi być od 0 do mniej niż 60</string>
 
     <!-- Input mode for leg editing -->
     <string-array name="leg_edit_input_mode_options">
