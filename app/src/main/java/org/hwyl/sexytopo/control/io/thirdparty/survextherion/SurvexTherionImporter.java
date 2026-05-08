@@ -519,7 +519,8 @@ public class SurvexTherionImporter {
      * Detect if a leg was shot backwards.
      *
      * <p>A leg is backward if the FROM station is new (not seen before). Detection is based on
-     * POSITION (from/to), not station names/numbers.
+     * POSITION (from/to), not station names/numbers. Loop closures (both stations already known)
+     * are not supported by SexyTopo.
      */
     private static boolean isBackwardLeg(
             String fromName, String toName, Map<String, Station> seenStations) {
@@ -532,7 +533,7 @@ public class SurvexTherionImporter {
         }
 
         if (!fromIsNew && !toIsNew) {
-            // Both exist - this is a loop/connection, assume forward
+            // Both exist - not valid in SexyTopo (no loop closures), assume forward
             return false;
         }
 

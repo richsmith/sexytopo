@@ -80,17 +80,6 @@ public class SurvexImporterTest {
     }
 
     @Test
-    public void testLegCommentAppliedToFromStationOnBackwardLeg() throws Exception {
-        // Station 1 is established first; leg "2 1 ..." is backward so comment goes on station 2
-        Survey survey = new Survey();
-        SurvexTherionImporter.parseCentreline(
-                "1\t2\t5.0\t0.0\t0.0\n2\t1\t3.0\t90.0\t0.0\tThe Squeeze", survey);
-        // "2 1" is backward (1 already exists, 2 is new in from position)
-        // comment should go on station 2 (the newer station, in the from position here)
-        Assert.assertEquals("The Squeeze", survey.getStationByName("2").getComment());
-    }
-
-    @Test
     public void testPassageAndLegCommentsAreConcatenated() throws Exception {
         // Leg comment sets station comment, then passage comment is merged on top
         Survey survey = new Survey();
