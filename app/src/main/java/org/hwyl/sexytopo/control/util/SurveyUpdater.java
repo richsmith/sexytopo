@@ -343,8 +343,18 @@ public class SurveyUpdater {
                     "Cannot downgrade leg to splay: destination station has onward legs");
         }
 
-        Leg newSplay = leg.toSplay();
-        editLeg(survey, leg, newSplay);
+        if (leg.wasPromoted()) {
+            Station originatingStation = survey.getOriginatingStation(leg);
+            Leg[] promotedFrom = leg.getPromotedFrom();
+            editLeg(survey, leg, promotedFrom[0].toSplay());
+            for (int i = 1; i < promotedFrom.length; i++) {
+                Leg splay = promotedFrom[i].toSplay();
+                originatingStation.getOnwardLegs().add(splay);
+                survey.addLegRecord(splay);
+            }
+        } else {
+            editLeg(survey, leg, leg.toSplay());
+        }
 
         survey.checkSurveyIntegrity();
         survey.setSaved(false);
