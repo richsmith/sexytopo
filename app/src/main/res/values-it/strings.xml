@@ -583,6 +583,13 @@
     <string name="menu_upgrade_splay">Promuovi a Tratto</string>
     <string name="menu_downgrade_leg">Declassa a Splay</string>
     <string name="menu_delete_leg">Elimina</string>
+    <string name="menu_show_readings">Mostra misurazioni</string>
+    <string name="readings_action_downgrade">Declassa misurazione</string>
+    <string name="readings_action_edit">Modifica misurazione</string>
+    <string name="readings_action_delete">Elimina misurazione</string>
+    <string name="dialog_reading_action_title">Misura %1$d del Leg %2$s &#10132; %3$s</string>
+    <string name="reading_shot">misurazione</string>
+    <string name="dialog_readings_close">Chiudi</string>
     <string name="menu_delete_splay">Elimina Splay</string>
     <string name="menu_elevation">Elevazione</string>
     <string name="menu_draw_left">Disegna Sinistra</string>

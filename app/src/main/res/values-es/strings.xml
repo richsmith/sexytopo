@@ -583,6 +583,13 @@
     <string name="menu_upgrade_splay">Promover a Tramo</string>
     <string name="menu_downgrade_leg">Degradar a Radial</string>
     <string name="menu_delete_leg">Eliminar</string>
+    <string name="menu_show_readings">Ver mediciones</string>
+    <string name="readings_action_downgrade">Bajar categoría</string>
+    <string name="readings_action_edit">Editar medición</string>
+    <string name="readings_action_delete">Eliminar medición</string>
+    <string name="dialog_reading_action_title">Medición %1$d de Leg %2$s &#10132; %3$s</string>
+    <string name="reading_shot">medición</string>
+    <string name="dialog_readings_close">Cerrar</string>
     <string name="menu_delete_splay">Eliminar Radial</string>
     <string name="menu_elevation">Alzado</string>
     <string name="menu_draw_left">Dibujar Izquierda</string>

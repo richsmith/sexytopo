@@ -583,6 +583,13 @@
     <string name="menu_upgrade_splay">Promover a Trecho</string>
     <string name="menu_downgrade_leg">Degradar a Raio</string>
     <string name="menu_delete_leg">Eliminar</string>
+    <string name="menu_show_readings">Ver leituras</string>
+    <string name="readings_action_downgrade">Rebaixar leitura</string>
+    <string name="readings_action_edit">Editar leitura</string>
+    <string name="readings_action_delete">Eliminar leitura</string>
+    <string name="dialog_reading_action_title">Leitura %1$d do Leg %2$s &#10132; %3$s</string>
+    <string name="reading_shot">leitura</string>
+    <string name="dialog_readings_close">Fechar</string>
     <string name="menu_delete_splay">Eliminar Raio</string>
     <string name="menu_elevation">Elevação</string>
     <string name="menu_draw_left">Desenhar Esquerda</string>

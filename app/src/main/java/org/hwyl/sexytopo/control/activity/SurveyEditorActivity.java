@@ -11,6 +11,7 @@ import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.components.DialogUtils;
 import org.hwyl.sexytopo.control.components.StationSelectorDialog;
 import org.hwyl.sexytopo.control.table.LegDialogs;
+import org.hwyl.sexytopo.control.table.LegReadingsDialog;
 import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
@@ -165,6 +166,27 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
 
         // Call the unified edit leg dialog
         LegDialogs.editLeg(this, getSurvey(), fromStation, leg);
+    }
+
+    public void onShowReadings(Leg leg) {
+        if (leg == null || !leg.wasPromoted() || leg.getPromotedFrom().length <= 1) {
+            return;
+        }
+
+        Station fromStation = getSurvey().getOriginatingStation(leg);
+        if (fromStation == null) {
+            return;
+        }
+
+        LegReadingsDialog.show(
+                this,
+                getSurvey(),
+                fromStation,
+                leg,
+                () -> {
+                    getSurveyManager().broadcastSurveyUpdated();
+                    invalidateView();
+                });
     }
 
     public void onDeleteStation(Station station) {

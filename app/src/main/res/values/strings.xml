@@ -617,6 +617,13 @@
     <string name="toast_no_leg_above">No valid leg to combine with</string>
     <string name="menu_upgrade_splay">Upgrade to Leg</string>
     <string name="menu_downgrade_leg">Downgrade to Splay</string>
+    <string name="menu_show_readings">Show readings</string>
+    <string name="readings_action_downgrade">Downgrade reading</string>
+    <string name="readings_action_edit">Edit reading</string>
+    <string name="readings_action_delete">Delete reading</string>
+    <string name="dialog_reading_action_title">Shot %1$d of Leg %2$s &#10132; %3$s</string>
+    <string name="reading_shot">shot</string>
+    <string name="dialog_readings_close">Close</string>
     <string name="menu_delete_leg">Delete</string>
     <string name="menu_delete_splay">Delete Splay</string>
     <string name="menu_elevation">Elevation</string>

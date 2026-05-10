@@ -585,6 +585,13 @@
     <string name="menu_upgrade_splay">Convertir en visée directionnelle</string>
     <string name="menu_downgrade_leg">Convertir en visée rayonnante</string>
     <string name="menu_delete_leg">Supprimer</string>
+    <string name="menu_show_readings">Afficher les mesures</string>
+    <string name="readings_action_downgrade">Déclasser la mesure</string>
+    <string name="readings_action_edit">Modifier la mesure</string>
+    <string name="readings_action_delete">Supprimer la mesure</string>
+    <string name="dialog_reading_action_title">Mesure %1$d du Leg %2$s &#10132; %3$s</string>
+    <string name="reading_shot">mesure</string>
+    <string name="dialog_readings_close">Fermer</string>
     <string name="menu_delete_splay">Supprimer la radiale</string>
     <string name="menu_elevation">Élévation</string>
     <string name="menu_draw_left">Dessiner à gauche</string>

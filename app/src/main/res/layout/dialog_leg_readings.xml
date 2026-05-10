@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!-- Fixed header row matching the main table style -->
+    <TableLayout
+        android:id="@+id/readingsHeaderTable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stretchColumns="*">
+
+        <TableRow style="@style/HeaderRow">
+            <TextView
+                style="@style/HeaderText"
+                android:layout_weight="1"
+                android:text="@string/table_head_distance" />
+
+            <TextView
+                style="@style/HeaderText"
+                android:layout_weight="1"
+                android:text="@string/table_head_azimuth" />
+
+            <TextView
+                style="@style/HeaderText"
+                android:layout_weight="1"
+                android:text="@string/table_head_elevation" />
+        </TableRow>
+    </TableLayout>
+
+    <!-- Scrollable readings rows -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="true">
+
+        <TableLayout
+            android:id="@+id/readingsTable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:stretchColumns="*" />
+
+    </ScrollView>
+
+</LinearLayout>

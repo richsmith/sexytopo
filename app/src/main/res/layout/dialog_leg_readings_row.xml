@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableRow android:id="@+id/readingsRow"
+    style="@style/BodyRow"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <TextView
+        android:id="@+id/readingsRowDistance"
+        style="@style/BodyText"
+        android:layout_weight="1"
+        android:gravity="end|center_vertical"
+        android:singleLine="true" />
+
+    <TextView
+        android:id="@+id/readingsRowAzimuth"
+        style="@style/BodyText"
+        android:layout_weight="1"
+        android:gravity="end|center_vertical"
+        android:singleLine="true" />
+
+    <TextView
+        android:id="@+id/readingsRowInclination"
+        style="@style/BodyText"
+        android:layout_weight="1"
+        android:gravity="end|center_vertical"
+        android:singleLine="true" />
+
+</TableRow>

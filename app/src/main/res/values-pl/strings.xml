@@ -583,6 +583,13 @@
     <string name="menu_upgrade_splay">Podnieś do ciągu</string>
     <string name="menu_downgrade_leg">Obniż do pomiaru szczegółowego</string>
     <string name="menu_delete_leg">Usuń</string>
+    <string name="menu_show_readings">Pokaż odczyty</string>
+    <string name="readings_action_downgrade">Obniż odczyt</string>
+    <string name="readings_action_edit">Edytuj odczyt</string>
+    <string name="readings_action_delete">Usuń odczyt</string>
+    <string name="dialog_reading_action_title">Odczyt %1$d Nogi %2$s &#10132; %3$s</string>
+    <string name="reading_shot">odczyt</string>
+    <string name="dialog_readings_close">Zamknij</string>
     <string name="menu_delete_splay">Usuń pomiar szczegółowy</string>
     <string name="menu_elevation">Przekrój</string>
     <string name="menu_draw_left">Rysuj lewo</string>
