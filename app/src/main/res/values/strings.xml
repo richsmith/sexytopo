@@ -161,6 +161,12 @@
     <string name="third_party_compass" translatable="false">Compass</string>
     <string name="third_party_svg" translatable="false">SVG</string>
     <string name="created_with">Created with %1$s on %2$s</string>
+    <string name="therion_export_dialog_title">Therion Export Options</string>
+    <string name="therion_export_plan_scraps">Plan scraps</string>
+    <string name="therion_export_ee_scraps">Elevation scraps</string>
+    <string name="therion_export_stations_in_plan">Add stations to first plan scrap</string>
+    <string name="therion_export_stations_in_ee">Add stations to first elevation scrap</string>
+    <string name="svg_export_dialog_title">SVG Export Options</string>
 
     <!-- Sketch view -->
     <string name="sketch_toolbar_draw">Draw mode</string>
@@ -512,7 +518,17 @@
     <string name="settings_key_deg_mins_secs_title">Azimuth as degrees/minutes/seconds</string>
     <string name="settings_key_deg_mins_secs_summary">Enter azimuth values in deg/mins/secs (as opposed to the default of decimal)</string>
     <string name="settings_export_title">Export</string>
-    <string name="settings_export_svg_background_title">SVG background</string>
+    <string name="settings_export_therion_symbols_title">Export symbols</string>
+    <string name="settings_export_therion_symbols_summary">Include symbols when exporting</string>
+    <string name="settings_export_therion_text_title">Export text</string>
+    <string name="settings_export_therion_text_summary">Include text when exporting</string>
+    <string name="settings_export_folder_name_title">Export folder name</string>
+    <string name="settings_export_folder_name_summary">Name of the folder within the survey folder to export to</string>
+    <string name="settings_export_type_subfolders_title">Export type subfolders</string>
+    <string name="settings_export_type_subfolders_summary">Create subfolders named after export type (e.g. therion, survex)</string>
+    <string name="settings_export_svg_title">SVG</string>
+    <string name="settings_export_svg_section_summary">SVG export options</string>
+    <string name="settings_export_svg_background_title">Background</string>
     <string name="settings_export_svg_background_summary">Optionally export with an opaque background</string>
     <string-array name="settings_export_svg_background_entries">
         <item>Transparent</item>
@@ -524,16 +540,28 @@
     <string name="settings_export_svg_leg_width_summary">How wide to draw leg lines in SVG export</string>
     <string name="settings_export_svg_splay_width_title">SVG splay width</string>
     <string name="settings_export_svg_splay_width_summary">How wide to draw splay lines in SVG export</string>
-    <string name="settings_export_therion_symbols_title">Export symbols</string>
-    <string name="settings_export_therion_symbols_summary">Include symbols when exporting</string>
-    <string name="settings_export_therion_text_title">Export text</string>
-    <string name="settings_export_therion_text_summary">Include text when exporting</string>
-    <string name="settings_export_folder_name_title">Export folder name</string>
-    <string name="settings_export_folder_name_summary">Name of the folder within the survey folder to export to</string>
-    <string name="settings_export_type_subfolders_title">Export type subfolders</string>
-    <string name="settings_export_type_subfolders_summary">Create subfolders named after export type (e.g. therion, survex)</string>
-    <string name="settings_export_svg_title">SVG</string>
-    <string name="settings_export_svg_section_summary">SVG export options</string>
+    <string name="settings_export_svg_legend_title">Show legend</string>
+    <string name="settings_export_svg_legend_summary">Include a legend strip with title, date, stats etc.</string>
+    <string name="settings_export_svg_north_arrow_title">Show north arrow</string>
+    <string name="settings_export_svg_north_arrow_summary">Add a north arrow to the legend on plan exports</string>
+    <string name="settings_export_svg_scale_bar_title">Show scale bar</string>
+    <string name="settings_export_svg_scale_bar_summary">Add a scale bar to the legend</string>
+    <string name="settings_export_svg_team_title">Show survey team</string>
+    <string name="settings_export_svg_team_summary">Show a list of the surveyors</string>
+    <string name="settings_export_svg_cross_sections_title">Export cross-sections</string>
+    <string name="settings_export_svg_cross_sections_summary">Include cross-section sketches in SVG export</string>
+    <string name="settings_export_svg_symbols_title">Export symbols</string>
+    <string name="settings_export_svg_symbols_summary">Include symbols in SVG export</string>
+    <string name="settings_export_svg_centreline_title">Show centreline</string>
+    <string name="settings_export_svg_centreline_summary">Draw the survey centreline (legs) in SVG export</string>
+    <string name="settings_export_svg_stations_title">Show station labels</string>
+    <string name="settings_export_svg_stations_summary">Draw station name labels in SVG export</string>
+    <string name="settings_export_svg_splays_title">Show splays</string>
+    <string name="settings_export_svg_splays_summary">Draw splay shots (LRUD lines) in SVG export</string>
+    <string name="settings_export_svg_grid_title">Show grid</string>
+    <string name="settings_export_svg_grid_summary">Draw a background grid behind the survey</string>
+    <string name="settings_export_svg_tagline_title">Show tagline</string>
+    <string name="settings_export_svg_tagline_summary">Provide proper credit to SexyTopo</string>
     <string name="settings_export_therion_title">Therion</string>
     <string name="settings_export_therion_section_summary">Therion export options</string>
     <string name="settings_export_therion_plan_suffix_title">Plan file suffix</string>
@@ -552,11 +580,6 @@
     <string name="settings_export_therion_plan_xs_suffix_summary">Suffix for plan cross-sections (# = station number)</string>
     <string name="settings_export_therion_ee_xs_suffix_title">Extended elevation cross-section suffix</string>
     <string name="settings_export_therion_ee_xs_suffix_summary">Suffix for extended elevation cross-sections (# = station number)</string>
-    <string name="therion_export_dialog_title">Therion Export Options</string>
-    <string name="therion_export_plan_scraps">Plan scraps</string>
-    <string name="therion_export_ee_scraps">Elevation scraps</string>
-    <string name="therion_export_stations_in_plan">Add stations to first plan scrap</string>
-    <string name="therion_export_stations_in_ee">Add stations to first elevation scrap</string>
     <string name="settings_developer_title">Developer</string>
     <string name="settings_key_developer_mode_title">Developer mode</string>
     <string name="settings_key_developer_mode_summary">Show debugging menu entries</string>

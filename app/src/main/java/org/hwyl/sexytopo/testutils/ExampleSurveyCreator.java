@@ -1,7 +1,10 @@
 package org.hwyl.sexytopo.testutils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +25,7 @@ import org.hwyl.sexytopo.model.sketch.Symbol;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
+import org.hwyl.sexytopo.model.survey.Trip;
 import org.hwyl.sexytopo.model.table.LRUD;
 
 /**
@@ -46,6 +50,43 @@ public class ExampleSurveyCreator {
 
     /** Maximum sideways jitter on a freehand sub-segment, as a fraction of segment length. */
     private static final float FREEHAND_JITTER = 0.03f;
+
+    /** Pulled from the Authors / Thanks sections of about_text.xml. */
+    private static final List<String> CREDITED_NAMES =
+            Arrays.asList(
+                    "Rich Smith",
+                    "Dan Workman",
+                    "Phil Underwood",
+                    "Siwei Tian",
+                    "Olly Legg",
+                    "Michael Glazer",
+                    "Thomas Holder",
+                    "Damian Ivereigh",
+                    "Andrew Atkinson",
+                    "Beat Heeb",
+                    "Ruth Allan",
+                    "Tom Foord",
+                    "Hellie Brooke",
+                    "David Powlesland",
+                    "Kris Fausnight");
+
+    /** Builds a trip with today's date and a random three-person team drawn from the credits. */
+    public static Trip createExampleTrip() {
+        Trip trip = new Trip();
+        trip.setSurveyDate(new Date());
+        trip.setTeam(pickRandomTeam(3));
+        return trip;
+    }
+
+    public static List<Trip.TeamEntry> pickRandomTeam(int size) {
+        List<String> pool = new ArrayList<>(CREDITED_NAMES);
+        Collections.shuffle(pool, random);
+        List<Trip.TeamEntry> team = new ArrayList<>();
+        for (int i = 0; i < Math.min(size, pool.size()); i++) {
+            team.add(new Trip.TeamEntry(pool.get(i), Collections.emptyList()));
+        }
+        return team;
+    }
 
     public static Survey create() {
         return create(10, 5, false, false, false);

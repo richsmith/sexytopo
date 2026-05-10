@@ -3,6 +3,7 @@
 - Therion export improvements (thanks Andrew Atkinson)
 - Setting for turning on/off floating buttons on Table view (thanks Andrew Atkinson)
 - Added "Add Leg" and "Add Splay" to the Tools menu
+- SVG export improvements, including an optional legend and scale bar
 
 # 2026-04-28 1.11.2
 - Fix a bug causing cross-sections to be initially hidden

@@ -1,6 +1,5 @@
 package org.hwyl.sexytopo.tools;
 
-import androidx.preference.PreferenceManager;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -25,29 +24,27 @@ public class SvgFixtureExporter {
 
     @Test
     public void writeFixtures() throws Exception {
-        // Default app pref is "transparent"; override to white so the SVG is easier to view in
-        // a browser (transparent on dark themes makes the sketch invisible).
         GeneralPreferences.initialise(RuntimeEnvironment.getApplication());
-        PreferenceManager.getDefaultSharedPreferences(RuntimeEnvironment.getApplication())
-                .edit()
-                .putString("pref_export_svg_background", "white")
-                .apply();
 
         File outputRoot = new File("build/exports");
         ensureDir(outputRoot);
 
-        String name = "example";
+        String displayName = "Smith's Folly";
+        String fileName = "example";
         Survey survey = ExampleSurveyCreator.create(10, 5, true, true, true);
-        renameSurvey(survey, name);
-        File dir = new File(outputRoot, name);
+        renameSurvey(survey, displayName);
+        survey.setTrip(ExampleSurveyCreator.createExampleTrip());
+        File dir = new File(outputRoot, fileName);
         ensureDir(dir);
 
         SvgExporter exporter = new SvgExporter();
-        write(new File(dir, name + ".plan.svg"), exporter.getContent(survey, Projection2D.PLAN));
         write(
-                new File(dir, name + ".ee.svg"),
+                new File(dir, fileName + ".plan.svg"),
+                exporter.getContent(survey, Projection2D.PLAN));
+        write(
+                new File(dir, fileName + ".ee.svg"),
                 exporter.getContent(survey, Projection2D.EXTENDED_ELEVATION));
-        System.out.println("Wrote " + name + " SVG bundle to " + dir.getAbsolutePath());
+        System.out.println("Wrote " + displayName + " SVG bundle to " + dir.getAbsolutePath());
     }
 
     private static void write(File file, String content) throws IOException {

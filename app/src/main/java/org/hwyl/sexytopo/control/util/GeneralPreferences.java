@@ -230,7 +230,7 @@ public class GeneralPreferences {
 
     // ********** Export ***********
     public static Colour getExportSvgBackgroundColour() {
-        String colour = getString("pref_export_svg_background", "transparent");
+        String colour = getString("pref_export_svg_background", "white");
         Log.i("Colour is " + colour);
         if (colour.equalsIgnoreCase("transparent")) {
             return Colour.TRANSPARENT;
@@ -249,6 +249,54 @@ public class GeneralPreferences {
 
     public static int getExportSvgSplayStrokeWidth() {
         return getInt("pref_export_svg_splay_width", 1);
+    }
+
+    public static boolean isExportSvgLegendEnabled() {
+        return getBoolean("pref_export_svg_legend", true);
+    }
+
+    public static boolean isExportSvgNorthArrowEnabled() {
+        return getBoolean("pref_export_svg_north_arrow", true);
+    }
+
+    public static boolean isExportSvgScaleBarEnabled() {
+        return getBoolean("pref_export_svg_scale_bar", true);
+    }
+
+    public static boolean isExportSvgTeamEnabled() {
+        return getBoolean("pref_export_svg_team", true);
+    }
+
+    public static boolean isExportSvgCrossSectionsEnabled() {
+        return getBoolean("pref_export_svg_cross_sections", true);
+    }
+
+    public static boolean isExportSvgSymbolsEnabled() {
+        return getBoolean("pref_export_svg_symbols", true);
+    }
+
+    public static boolean isExportSvgCentrelineEnabled() {
+        return getBoolean("pref_export_svg_centreline", true);
+    }
+
+    public static boolean isExportSvgStationsEnabled() {
+        return getBoolean("pref_export_svg_stations", true);
+    }
+
+    public static boolean isExportSvgSplaysEnabled() {
+        return getBoolean("pref_export_svg_splays", true);
+    }
+
+    public static boolean isExportSvgGridEnabled() {
+        return getBoolean("pref_export_svg_grid", true);
+    }
+
+    public static boolean isExportSvgTaglineEnabled() {
+        return getBoolean("pref_export_svg_tagline", true);
+    }
+
+    public static SharedPreferences getRawPreferences() {
+        return prefs;
     }
 
     public static boolean isXviExportSymbolsEnabled() {
