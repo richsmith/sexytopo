@@ -21,15 +21,15 @@ public class EditLegForm extends Form {
     private static final int SPINNER_BACKWARD = 1;
 
     /**
-     * A TextWatcher that, in addition to triggering validation, enables range-error display as soon
+     * A TextWatcher that, in addition to triggering validation, enables live-error display as soon
      * as the watched field contains any non-empty text. This lets out-of-range errors appear
      * immediately while the user is typing, without showing a "cannot be blank" error on an
      * untouched field.
      */
-    private static class RangeValidationTrigger extends TextViewValidationTrigger {
+    private static class LiveErrorTrigger extends TextViewValidationTrigger {
         private final android.widget.EditText field;
 
-        RangeValidationTrigger(Form form, android.widget.EditText field) {
+        LiveErrorTrigger(Form form, android.widget.EditText field) {
             super(form);
             this.field = field;
         }
@@ -37,7 +37,7 @@ public class EditLegForm extends Form {
         @Override
         public void afterTextChanged(android.text.Editable editable) {
             if (field.getText().length() > 0) {
-                form.enableRangeErrors();
+                form.enableLiveErrors();
             }
             super.afterTextChanged(editable);
         }
@@ -68,7 +68,7 @@ public class EditLegForm extends Form {
     private TextInputLayout azimuthLayout;
     private TextInputLayout inclinationLayout;
 
-    // TextInputLayout wrappers for DMS minutes/seconds fields, used to show range errors
+    // TextInputLayout wrappers for DMS minutes/seconds fields, used to show live errors
     private TextInputLayout azimuthMinutesLayout;
     private TextInputLayout azimuthSecondsLayout;
     private TextInputLayout inclinationMinutesLayout;
@@ -170,10 +170,9 @@ public class EditLegForm extends Form {
             this.toStationField.addTextChangedListener(new TextViewValidationTrigger(this));
         }
         this.distanceField.addTextChangedListener(new TextViewValidationTrigger(this));
-        this.azimuthField.addTextChangedListener(
-                new RangeValidationTrigger(this, this.azimuthField));
+        this.azimuthField.addTextChangedListener(new LiveErrorTrigger(this, this.azimuthField));
         this.inclinationField.addTextChangedListener(
-                new RangeValidationTrigger(this, this.inclinationField));
+                new LiveErrorTrigger(this, this.inclinationField));
 
         if (GeneralPreferences.isDegMinsSecsModeOn()) {
             this.azimuthDegreesField.addTextChangedListener(new TextViewValidationTrigger(this));
@@ -421,14 +420,14 @@ public class EditLegForm extends Form {
             } else {
                 float azimuth = Float.parseFloat(azimuthText);
                 if (!Leg.isAzimuthLegal(azimuth)) {
-                    setRangeError(
+                    setLiveError(
                             this.azimuthLayout,
                             context.getString(
                                     R.string.validation_error_azimuth_range,
                                     Leg.MIN_AZIMUTH,
                                     Leg.MAX_AZIMUTH));
                 } else {
-                    setRangeError(this.azimuthLayout, (Integer) null);
+                    setLiveError(this.azimuthLayout, (Integer) null);
                 }
             }
         } catch (NumberFormatException e) {
@@ -444,9 +443,9 @@ public class EditLegForm extends Form {
             this.valid = false;
             return;
         }
-        // Degrees has content - enable range error display, mirroring what
-        // RangeValidationTrigger does for the decimal azimuth field.
-        enableRangeErrors();
+        // Degrees has content - enable live error display, mirroring what
+        // LiveErrorTrigger does for the decimal azimuth field.
+        enableLiveErrors();
         boolean ignored =
                 validateAzimuthDegreesField()
                         & validateMinutesField(azimuthMinutesLayout, azimuthMinutesField)
@@ -454,36 +453,20 @@ public class EditLegForm extends Form {
     }
 
     /**
-     * Validates the azimuth degrees field independently. The value must be a whole number in [0,
-     * 359]. Sets a range error on {@code azimuthDegreesLayout} and marks the form invalid if out of
-     * range. Returns true if valid, false otherwise.
+     * Validates the azimuth degrees field independently. The value must be in [0, 359]. The field's
+     * inputType="number" guarantees a parseable integer.
      */
     private boolean validateAzimuthDegreesField() {
-        String text = azimuthDegreesField.getText().toString();
-        if (text.contains(".")) {
-            setError(
-                    azimuthDegreesLayout,
-                    context.getString(R.string.validation_error_must_be_whole_number));
-            return false;
-        }
-        try {
-            int degrees = Integer.parseInt(text);
-            if (degrees < Leg.MIN_AZIMUTH || degrees >= Leg.MAX_AZIMUTH) {
-                setRangeError(
-                        azimuthDegreesLayout,
-                        context.getString(
-                                R.string.validation_error_azimuth_range,
-                                Leg.MIN_AZIMUTH,
-                                Leg.MAX_AZIMUTH));
-                return false;
-            }
-            setRangeError(azimuthDegreesLayout, (Integer) null);
+        int degrees = Integer.parseInt(azimuthDegreesField.getText().toString());
+        if (Leg.MIN_AZIMUTH <= degrees && degrees < Leg.MAX_AZIMUTH) {
+            setLiveError(azimuthDegreesLayout, (Integer) null);
             return true;
-        } catch (NumberFormatException e) {
-            // Partial input such as a lone "-"; not yet parseable, suppress error display
-            this.valid = false;
-            return false;
         }
+        setLiveError(
+                azimuthDegreesLayout,
+                context.getString(
+                        R.string.validation_error_azimuth_range, Leg.MIN_AZIMUTH, Leg.MAX_AZIMUTH));
+        return false;
     }
 
     private void validateInclination() {
@@ -504,11 +487,11 @@ public class EditLegForm extends Form {
             } else {
                 float inclination = Float.parseFloat(inclinationText);
                 if (!Leg.isInclinationLegal(inclination)) {
-                    setRangeError(
+                    setLiveError(
                             this.inclinationLayout,
                             context.getString(R.string.validation_error_inclination_range));
                 } else {
-                    setRangeError(this.inclinationLayout, (Integer) null);
+                    setLiveError(this.inclinationLayout, (Integer) null);
                 }
             }
         } catch (NumberFormatException e) {
@@ -524,9 +507,9 @@ public class EditLegForm extends Form {
             this.valid = false;
             return;
         }
-        // Degrees has content - enable range error display, mirroring what
-        // RangeValidationTrigger does for the decimal inclination field.
-        enableRangeErrors();
+        // Degrees has content - enable live error display, mirroring what
+        // LiveErrorTrigger does for the decimal inclination field.
+        enableLiveErrors();
         boolean ignored =
                 validateInclinationDegreesField()
                         & validateInclinationMinutesField()
@@ -534,32 +517,23 @@ public class EditLegForm extends Form {
     }
 
     /**
-     * Validates the inclination degrees field independently. The value must be a whole number in
-     * [−90, 90] or [270, 360] (theodolite range). Sets a range error on {@code
-     * inclinationDegreesLayout} and marks the form invalid if out of range. Returns true if valid,
-     * false otherwise.
+     * Validates the inclination degrees field independently. The value must be in [-90, 90] or
+     * [270, 360] (theodolite range).
      */
     private boolean validateInclinationDegreesField() {
-        String text = inclinationDegreesField.getText().toString();
-        if (text.contains(".")) {
-            setError(
-                    inclinationDegreesLayout,
-                    context.getString(R.string.validation_error_must_be_whole_number));
-            return false;
-        }
         try {
-            int degrees = Integer.parseInt(text);
+            int degrees = Integer.parseInt(inclinationDegreesField.getText().toString());
             boolean inNormalRange =
                     degrees >= Leg.MIN_INCLINATION && degrees <= Leg.MAX_INCLINATION;
             boolean inTheodoliteRange =
                     degrees >= Leg.MIN_THEODOLITE_INC && degrees <= Leg.MAX_THEODOLITE_INC;
             if (!inNormalRange && !inTheodoliteRange) {
-                setRangeError(
+                setLiveError(
                         inclinationDegreesLayout,
                         context.getString(R.string.validation_error_inclination_range));
                 return false;
             }
-            setRangeError(inclinationDegreesLayout, (Integer) null);
+            setLiveError(inclinationDegreesLayout, (Integer) null);
             return true;
         } catch (NumberFormatException e) {
             // Partial input such as a lone "-"; not yet parseable, suppress error display
@@ -624,8 +598,8 @@ public class EditLegForm extends Form {
 
     /**
      * Validates a minutes field. Blank is accepted (treated as zero). If non-blank, the value must
-     * be a whole number in the range 0–59. Sets an error on the layout and marks the form invalid
-     * if not. Returns true if the field is valid (or blank), false otherwise.
+     * be in the range 0-59. The field's inputType="number" guarantees a parseable non-negative
+     * integer.
      */
     private boolean validateMinutesField(TextInputLayout layout, EditText field) {
         String text = field.getText().toString();
@@ -633,22 +607,13 @@ public class EditLegForm extends Form {
             setError(layout, (Integer) null);
             return true;
         }
-        if (text.contains(".")) {
-            setError(layout, context.getString(R.string.validation_error_must_be_whole_number));
+        int value = Integer.parseInt(text);
+        if (value > 59) {
+            setError(layout, context.getString(R.string.validation_error_mins_secs_range));
             return false;
         }
-        try {
-            int value = Integer.parseInt(text);
-            if (value < 0 || value > 59) {
-                setError(layout, context.getString(R.string.validation_error_mins_secs_range));
-                return false;
-            }
-            setError(layout, (Integer) null);
-            return true;
-        } catch (NumberFormatException e) {
-            setError(layout, context.getString(R.string.validation_error_must_be_whole_number));
-            return false;
-        }
+        setError(layout, (Integer) null);
+        return true;
     }
 
     /**

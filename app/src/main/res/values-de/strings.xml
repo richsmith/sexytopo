@@ -538,7 +538,6 @@
     <string name="validation_error_distance_minimum">Muss >= %1$d sein</string>
     <string name="validation_error_azimuth_range">Muss zwischen %1$d und %2$d liegen</string>
     <string name="validation_error_inclination_range">Muss zwischen -90 und 90 oder zwischen 270 und 360 liegen</string>
-    <string name="validation_error_must_be_whole_number">Muss eine ganze Zahl sein</string>
     <string name="validation_error_mins_secs_range">Muss zwischen 0 und 59 liegen</string>
     <string name="validation_error_secs_range">Muss zwischen 0 und weniger als 60 liegen</string>
     <string name="validation_error_must_be_zero_for_90">Muss 0 sein für ±90°</string>

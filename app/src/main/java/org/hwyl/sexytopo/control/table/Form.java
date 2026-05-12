@@ -36,14 +36,14 @@ public abstract class Form {
 
     protected boolean valid;
     private boolean showErrors;
-    private boolean showRangeErrors;
+    private boolean showLiveErrors;
     @Nullable private OnDidValidateCallback onDidValidateCallback;
 
     Form(Context context) {
         this.context = context;
         this.valid = true;
         this.showErrors = false;
-        this.showRangeErrors = false;
+        this.showLiveErrors = false;
         this.onDidValidateCallback = null;
     }
 
@@ -51,8 +51,8 @@ public abstract class Form {
         this.showErrors = true;
     }
 
-    public void enableRangeErrors() {
-        this.showRangeErrors = true;
+    public void enableLiveErrors() {
+        this.showLiveErrors = true;
     }
 
     public void setOnDidValidateCallback(@Nullable OnDidValidateCallback callback) {
@@ -96,13 +96,13 @@ public abstract class Form {
         this.setError(layout, message);
     }
 
-    protected void setRangeError(TextInputLayout layout, CharSequence error) {
+    protected void setLiveError(TextInputLayout layout, CharSequence error) {
         this.valid = this.valid & (error == null);
-        layout.setError(showRangeErrors ? error : null);
+        layout.setError(showLiveErrors ? error : null);
     }
 
-    protected void setRangeError(TextInputLayout layout, Integer error) {
+    protected void setLiveError(TextInputLayout layout, Integer error) {
         CharSequence message = error == null ? null : context.getString(error);
-        this.setRangeError(layout, message);
+        this.setLiveError(layout, message);
     }
 }
