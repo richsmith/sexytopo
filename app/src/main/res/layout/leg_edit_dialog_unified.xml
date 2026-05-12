@@ -17,6 +17,7 @@
             android:layout_marginBottom="12dp"
             android:orientation="horizontal"
             android:gravity="center_vertical"
+            android:baselineAligned="false"
             android:visibility="gone">
             <TextView
                 android:layout_width="wrap_content"
@@ -35,6 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:baselineAligned="false"
             android:layout_marginTop="8dp">
 
             <com.google.android.material.textfield.TextInputLayout
@@ -75,6 +77,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:baselineAligned="false"
             android:layout_marginTop="8dp">
 
             <com.google.android.material.textfield.TextInputLayout
@@ -143,18 +146,32 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <LinearLayout
-            android:id="@+id/azimuth_deg_mins_secs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:orientation="horizontal"
-            android:visibility="gone">
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:id="@+id/azimuth_dms_container">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/manual_edit_azimuth_deg_mins_secs"
+                android:layout_marginBottom="4dp"
+                android:textSize="14sp"/>
+            <LinearLayout
+                android:id="@+id/azimuth_deg_mins_secs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:baselineAligned="false">
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/editAzimuthDegreesLayout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginEnd="4dp"
                 android:hint="@string/deg"
+                app:errorEnabled="true"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editAzimuthDegrees"
@@ -166,9 +183,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:id="@+id/editAzimuthMinutesLayout"
                 android:layout_marginStart="4dp"
                 android:layout_marginEnd="4dp"
                 android:hint="@string/min"
+                app:errorEnabled="true"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editAzimuthMinutes"
@@ -180,15 +199,18 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:id="@+id/editAzimuthSecondsLayout"
                 android:layout_marginStart="4dp"
                 android:hint="@string/sec"
+                app:errorEnabled="true"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editAzimuthSeconds"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="number"/>
+                    android:inputType="numberDecimal"/>
             </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
         </LinearLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -205,6 +227,74 @@
                 android:layout_height="wrap_content"
                 android:inputType="numberDecimal|numberSigned"/>
         </com.google.android.material.textfield.TextInputLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:id="@+id/inclination_dms_container">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/manual_edit_inclination_deg_mins_secs"
+                android:layout_marginBottom="4dp"
+                android:textSize="14sp"/>
+            <LinearLayout
+                android:id="@+id/inclination_deg_mins_secs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:baselineAligned="false">
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/editInclinationDegreesLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="4dp"
+                android:hint="@string/deg"
+                app:errorEnabled="true"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editInclinationDegrees"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberSigned"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/editInclinationMinutesLayout"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:hint="@string/min"
+                app:errorEnabled="true"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editInclinationMinutes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/editInclinationSecondsLayout"
+                android:layout_marginStart="4dp"
+                android:hint="@string/sec"
+                app:errorEnabled="true"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editInclinationSeconds"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>

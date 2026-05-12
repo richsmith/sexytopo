@@ -12,6 +12,8 @@ public class Leg extends SurveyComponent {
     public static final int MAX_AZIMUTH = 360;
     public static final int MIN_INCLINATION = -90;
     public static final int MAX_INCLINATION = 90;
+    public static final int MIN_THEODOLITE_INC = 270;
+    public static final int MAX_THEODOLITE_INC = 360;
 
     private final float distance; // in metres
     private final float azimuth;
@@ -198,7 +200,26 @@ public class Leg extends SurveyComponent {
     }
 
     public static boolean isInclinationLegal(float inclination) {
-        return MIN_INCLINATION <= inclination && inclination <= MAX_INCLINATION;
+        return (MIN_INCLINATION <= inclination && inclination <= MAX_INCLINATION)
+                || (MIN_THEODOLITE_INC <= inclination && inclination <= MAX_THEODOLITE_INC);
+    }
+
+    /**
+     * Decomposes a decimal-degrees value into degrees, minutes, and seconds.
+     *
+     * <p>The sign of the original value is preserved on the degrees component only. Minutes and
+     * seconds are always positive
+     *
+     * @param decimalDegrees the value to decompose
+     * @return a three-element array {@code [degrees, minutes, seconds]} where {@code degrees}
+     *     carries the sign and {@code minutes}/{@code seconds} are non-negative
+     */
+    public static float[] decomposeToDms(float decimalDegrees) {
+        int degrees = (int) decimalDegrees;
+        float remainder = Math.abs(decimalDegrees - degrees);
+        int minutes = (int) (remainder * 60);
+        float seconds = ((remainder * 60) - minutes) * 60;
+        return new float[] {degrees, minutes, seconds};
     }
 
     @NonNull
