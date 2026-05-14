@@ -446,10 +446,9 @@ public class EditLegForm extends Form {
         // Degrees has content - enable live error display, mirroring what
         // LiveErrorTrigger does for the decimal azimuth field.
         enableLiveErrors();
-        boolean ignored =
-                validateAzimuthDegreesField()
-                        & validateMinutesField(azimuthMinutesLayout, azimuthMinutesField)
-                        & validateSecondsField(azimuthSecondsLayout, azimuthSecondsField);
+        validateAzimuthDegreesField();
+        validateMinutesField(azimuthMinutesLayout, azimuthMinutesField);
+        validateSecondsField(azimuthSecondsLayout, azimuthSecondsField);
     }
 
     /**
@@ -510,10 +509,9 @@ public class EditLegForm extends Form {
         // Degrees has content - enable live error display, mirroring what
         // LiveErrorTrigger does for the decimal inclination field.
         enableLiveErrors();
-        boolean ignored =
-                validateInclinationDegreesField()
-                        & validateInclinationMinutesField()
-                        & validateInclinationSecondsField();
+        validateInclinationDegreesField();
+        validateInclinationMinutesField();
+        validateInclinationSecondsField();
     }
 
     /**
