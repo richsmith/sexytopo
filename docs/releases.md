@@ -4,6 +4,8 @@
 - Setting for turning on/off floating buttons on Table view (thanks Andrew Atkinson)
 - Added "Add Leg" and "Add Splay" to the Tools menu
 - SVG export improvements, including an optional legend and scale bar
+- Toggleable option to mark water as automatically blue
+- Data import improvements: better error reporting & allow theolidite readings (thanks Andrew Atkinson)
 
 # 2026-04-28 1.11.2
 - Fix a bug causing cross-sections to be initially hidden

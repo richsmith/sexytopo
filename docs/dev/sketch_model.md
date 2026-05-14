@@ -67,6 +67,7 @@ When erasing a path fragment (rather than the whole path), `replacements` contai
 
 `Symbol` is an enum of 26 cave symbols (stalactite, entrance, water flow, etc.). Each has:
 - `isDirectional()` — directional symbols (entrance, gradient, etc.) take an angle; non-directional ones are placed immediately
+- `isWater()` — true for water flow; when the "Blue Water" toggle in the drawing pop-up menu is on, `Sketch.addSymbolDetail` records `Colour.BLUE` on the new SymbolDetail instead of the active colour
 - `therionName` — used by the Therion exporter
 - `svgFilename` — SVG asset used by the SVG exporter
 - `createDrawable()` — creates a mutable `Drawable` for rendering
