@@ -333,6 +333,9 @@ public abstract class GraphActivity extends SurveyEditorActivity
             SketchPreferences.Toggle.AUTO_RECENTRE.set(!item.isChecked());
             graphView.invalidate();
             return true;
+        } else if (itemId == R.id.buttonBlueWater) {
+            SketchPreferences.Toggle.BLUE_WATER.set(!item.isChecked());
+            return true;
         } else {
             return handleAction(itemId);
         }

@@ -61,4 +61,9 @@
         android:title="@string/sketch_menu_show_compass"
         android:icon="@android:drawable/ic_menu_preferences"
         android:checkable="true"/>
+    <item
+        android:id="@+id/buttonBlueWater"
+        android:title="@string/sketch_menu_blue_water"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:checkable="true"/>
 </menu>

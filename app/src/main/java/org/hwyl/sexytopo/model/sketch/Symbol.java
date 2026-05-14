@@ -184,6 +184,10 @@ public enum Symbol {
         return isDirectional;
     }
 
+    public boolean isWater() {
+        return this == WATER_FLOW;
+    }
+
     public String getTherionName() {
         return therionName;
     }

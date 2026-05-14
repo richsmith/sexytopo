@@ -2,6 +2,7 @@ package org.hwyl.sexytopo.model.sketch;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.common.Shape;
 import org.hwyl.sexytopo.model.graph.Coord2D;
@@ -103,7 +104,11 @@ public class Sketch extends Shape {
     }
 
     public void addSymbolDetail(Coord2D location, Symbol symbol, float size, float angle) {
-        SymbolDetail symbolDetail = new SymbolDetail(location, symbol, activeColour, size, angle);
+        Colour colour = activeColour;
+        if (symbol.isWater() && SketchPreferences.Toggle.BLUE_WATER.isOn()) {
+            colour = Colour.BLUE;
+        }
+        SymbolDetail symbolDetail = new SymbolDetail(location, symbol, colour, size, angle);
         symbolDetails.add(symbolDetail);
         addSketchDetail(symbolDetail);
     }
