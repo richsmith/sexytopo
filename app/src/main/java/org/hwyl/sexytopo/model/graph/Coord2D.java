@@ -4,7 +4,7 @@ import android.annotation.SuppressLint;
 import org.hwyl.sexytopo.control.util.NumberTools;
 
 @SuppressWarnings("unused")
-public final class Coord2D extends Coord {
+public final class Coord2D extends Coord<Coord2D> {
 
     public static final Coord2D ORIGIN = new Coord2D(0, 0);
 

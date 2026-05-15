@@ -48,7 +48,6 @@ public class FormTest extends TestCase {
             this.value = valid;
         }
     }
-    ;
 
     private final MockForm form = new MockForm();
 
