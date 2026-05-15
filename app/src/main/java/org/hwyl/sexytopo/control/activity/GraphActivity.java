@@ -15,6 +15,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.HapticFeedbackConstants;
 import android.view.Menu;
@@ -410,13 +411,13 @@ public abstract class GraphActivity extends SurveyEditorActivity
         // ********** Handle special symbol logic **********
 
         if (itemId == R.id.buttonSymbol) {
-            // Open the symbol toolbar if the symbol tool is selected twice
-            // (also open it the first time ever selected to teach the user that it's there)
-            if (!symbolToolbarOpenedOnce || alreadySelectedTool == SketchTool.SYMBOL) {
+            boolean wasAlreadyInSymbolMode = alreadySelectedTool == SketchTool.SYMBOL;
+            selectSketchTool(SketchTool.SYMBOL);
+            // Open the symbol toolbar the first time ever (to teach the user it's there)
+            // and toggle it whenever the symbol tool is tapped while already active.
+            if (!symbolToolbarOpenedOnce || wasAlreadyInSymbolMode) {
                 symbolToolbarOpenedOnce = true;
                 toggleSymbolToolbar();
-            } else { // else standard sketch tool selection
-                selectSketchTool(SketchTool.SYMBOL);
             }
             return true;
         }
@@ -448,6 +449,10 @@ public abstract class GraphActivity extends SurveyEditorActivity
         Menu menu = popup.getMenu();
         popup.getMenuInflater().inflate(R.menu.drawing, menu);
         popup.setOnMenuItemClickListener(this);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            menu.setGroupDividerEnabled(true);
+        }
 
         for (SketchPreferences.Toggle toggle : SketchPreferences.Toggle.values()) {
             int controlId = toggle.getControlId();
