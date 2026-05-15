@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -94,10 +95,11 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
             int id = TABLE_COL_TO_ANDROID_ID.get(col);
             TextView textView = holder.itemView.findViewById(id);
 
-            if (col == TableCol.FROM || col == TableCol.TO) {
+            boolean isFullLeg = entry.getLeg().hasDestination();
+            if (isFullLeg && (col == TableCol.FROM || col == TableCol.TO)) {
                 Station station = (Station) map.get(col);
                 if (station != null && station.hasComment()) {
-                    textView.setText(display + " 💬");
+                    textView.setText(display + " " + SexyTopoConstants.COMMENT_MARKER);
                 } else {
                     textView.setText(display);
                 }
