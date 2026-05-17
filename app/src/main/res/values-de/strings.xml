@@ -218,7 +218,8 @@
     <string name="manual_edit_to_station">Zur Station</string>
     <string name="manual_edit_to_station_error">Ungültige Zielstation</string>
     <string name="manual_edit_shot_backwards">⬅ Rückwärts gemessen</string>
-    <string name="manual_edit_comment">Kommentar</string>
+    <string name="manual_edit_station_comment">Messpunkt-Kommentar</string>
+    <string name="manual_edit_leg_comment">Messstrecken-Kommentar</string>
     <string name="manual_rename_station_title">Messpunkt umbenennen</string>
     <string name="manual_rename_station_hint">Stationsname</string>
     <string name="manual_rename_error">Umbenennen fehlgeschlagen</string>

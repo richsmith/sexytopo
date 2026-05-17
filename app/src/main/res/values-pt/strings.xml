@@ -218,7 +218,8 @@
     <string name="manual_edit_to_station">Para a estação</string>
     <string name="manual_edit_to_station_error">Estação de destino inválida</string>
     <string name="manual_edit_shot_backwards">⬅ Leitura para trás</string>
-    <string name="manual_edit_comment">Comentário</string>
+    <string name="manual_edit_station_comment">Comentário da estação</string>
+    <string name="manual_edit_leg_comment">Comentário do trecho</string>
     <string name="manual_rename_station_title">Renomear Estação</string>
     <string name="manual_rename_station_hint">Nome da estação</string>
     <string name="manual_rename_error">Falha ao renomear</string>

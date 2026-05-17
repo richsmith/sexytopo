@@ -218,7 +218,8 @@
     <string name="manual_edit_to_station">Alla stazione</string>
     <string name="manual_edit_to_station_error">Stazione di arrivo non valida</string>
     <string name="manual_edit_shot_backwards">⬅ Lettura all\'indietro</string>
-    <string name="manual_edit_comment">Commento</string>
+    <string name="manual_edit_station_comment">Commento della stazione</string>
+    <string name="manual_edit_leg_comment">Commento del tratto</string>
     <string name="manual_rename_station_title">Rinomina Stazione</string>
     <string name="manual_rename_station_hint">Nome stazione</string>
     <string name="manual_rename_error">Rinomina fallita</string>

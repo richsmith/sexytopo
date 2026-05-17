@@ -60,7 +60,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:layout_marginStart="8dp"
-                android:hint="@string/manual_edit_comment"
+                android:hint="@string/manual_edit_station_comment"
                 app:errorEnabled="true"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
@@ -100,7 +100,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:layout_marginStart="8dp"
-                android:hint="@string/manual_edit_comment"
+                android:hint="@string/manual_edit_station_comment"
                 app:errorEnabled="true"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
