@@ -59,6 +59,7 @@ public class EditLegForm extends Form {
 
     private EditText fromCommentField;
     private EditText toCommentField;
+    private EditText legCommentField;
 
     private Station lastFromStation;
 
@@ -153,6 +154,7 @@ public class EditLegForm extends Form {
         this.fromCommentField = dialogView.findViewById(R.id.editFromComment);
         this.toStationField = dialogView.findViewById(R.id.editToStation);
         this.toCommentField = dialogView.findViewById(R.id.editToComment);
+        this.legCommentField = dialogView.findViewById(R.id.editLegComment);
         this.distanceField = dialogView.findViewById(R.id.editDistance);
         this.azimuthField = dialogView.findViewById(R.id.editAzimuth);
         this.inclinationField = dialogView.findViewById(R.id.editInclination);
@@ -686,6 +688,10 @@ public class EditLegForm extends Form {
             graphToStationField.setText(toName);
             toCommentField.setText(toComment);
         }
+
+        if (legCommentField != null && originalLeg != null) {
+            legCommentField.setText(originalLeg.getComment());
+        }
     }
 
     private String getFromStationName() {
@@ -821,5 +827,12 @@ public class EditLegForm extends Form {
 
     public String getUpdatedToComment() {
         return isSplay ? null : getToComment();
+    }
+
+    public String getUpdatedLegComment() {
+        if (legCommentField != null) {
+            return legCommentField.getText().toString();
+        }
+        return "";
     }
 }
