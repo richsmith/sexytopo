@@ -1,19 +1,18 @@
 package org.hwyl.sexytopo.control.io.thirdparty.survextherion;
 
 import androidx.annotation.NonNull;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Parses and compares SexyTopo version numbers embedded in exported file headers.
  *
- * <p>The header format written by the exporter is:
+ * <p>Scans comment lines (those starting with {@code #} for Therion or {@code ;} for Survex) for a
+ * token of the form {@code SexyTopo X.Y.Z}. Surrounding wording is irrelevant; data lines are
+ * ignored so a station or trip name containing the word "SexyTopo" cannot be mistaken for a version
+ * stamp.
  *
- * <pre>
- *   # Created with SexyTopo 1.11.3 on 2025-03-01   (Therion)
- *   ; Created with SexyTopo 1.11.3 on 2025-03-01   (Survex)
- * </pre>
- *
- * <p>Files with no SexyTopo header (third-party files) return {@code null} from {@link
- * #extractFromText(String)}.
+ * <p>Files with no such token return null from extractFromText.
  */
 public class SexyTopoVersion {
 
@@ -25,7 +24,8 @@ public class SexyTopoVersion {
      */
     public static final SexyTopoVersion LEG_COMMENTS_VERSION_CUTOFF = new SexyTopoVersion(1, 11, 2);
 
-    private static final String HEADER_MARKER = "Created with SexyTopo ";
+    private static final Pattern VERSION_PATTERN =
+            Pattern.compile("SexyTopo\\s+(\\d+)\\.(\\d+)\\.(\\d+)");
 
     private final int major;
     private final int minor;
@@ -38,55 +38,29 @@ public class SexyTopoVersion {
     }
 
     /**
-     * Scan the first lines of a file for a SexyTopo version header and parse the version.
+     * Scan comment lines in the file text for a {@code SexyTopo X.Y.Z} token and parse the version.
      *
      * @param text full file text
-     * @return parsed version, or {@code null} if no SexyTopo header is found or it cannot be parsed
+     * @return parsed version, or null if no SexyTopo token is found in any comment line
      */
     public static SexyTopoVersion extractFromText(String text) {
+        if (text == null) {
+            return null;
+        }
         for (String line : text.split("\n")) {
             String trimmed = line.trim();
-            // Strip leading comment character (# or ;) then look for the marker
-            String stripped =
-                    (trimmed.startsWith("#") || trimmed.startsWith(";"))
-                            ? trimmed.substring(1).trim()
-                            : trimmed;
-
-            int markerIndex = stripped.indexOf(HEADER_MARKER);
-            if (markerIndex < 0) {
+            if (!trimmed.startsWith("#") && !trimmed.startsWith(";")) {
                 continue;
             }
-
-            // Version token is the word immediately after the marker
-            String afterMarker = stripped.substring(markerIndex + HEADER_MARKER.length()).trim();
-            String[] tokens = afterMarker.split("\\s+");
-            if (tokens.length == 0) {
-                return null;
+            Matcher matcher = VERSION_PATTERN.matcher(trimmed);
+            if (matcher.find()) {
+                return new SexyTopoVersion(
+                        Integer.parseInt(matcher.group(1)),
+                        Integer.parseInt(matcher.group(2)),
+                        Integer.parseInt(matcher.group(3)));
             }
-
-            return parse(tokens[0]);
         }
         return null;
-    }
-
-    /**
-     * Parse a dotted version string such as {@code "1.11.3"}.
-     *
-     * @return parsed version, or {@code null} if the string is not a valid version
-     */
-    static SexyTopoVersion parse(String versionString) {
-        String[] parts = versionString.split("\\.");
-        if (parts.length != 3) {
-            return null;
-        }
-        try {
-            int major = Integer.parseInt(parts[0]);
-            int minor = Integer.parseInt(parts[1]);
-            int patch = Integer.parseInt(parts[2]);
-            return new SexyTopoVersion(major, minor, patch);
-        } catch (NumberFormatException e) {
-            return null;
-        }
     }
 
     /**

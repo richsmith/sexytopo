@@ -45,20 +45,40 @@ public class SexyTopoVersionTest {
         Assert.assertEquals("2.0.1", version.toString());
     }
 
-    // --- parse ---
-
     @Test
-    public void testParseValidVersion() {
-        SexyTopoVersion v = SexyTopoVersion.parse("1.11.3");
-        Assert.assertNotNull(v);
-        Assert.assertEquals("1.11.3", v.toString());
+    public void testVersionExtractedWithoutCreatedWithPrefix() {
+        // Surrounding wording is irrelevant — only the "SexyTopo X.Y.Z" token matters
+        String text = "; Exported by SexyTopo 1.12.0\n*begin test\n";
+        SexyTopoVersion version = SexyTopoVersion.extractFromText(text);
+        Assert.assertNotNull(version);
+        Assert.assertEquals("1.12.0", version.toString());
     }
 
     @Test
-    public void testParseInvalidVersionReturnsNull() {
-        Assert.assertNull(SexyTopoVersion.parse("1.11"));
-        Assert.assertNull(SexyTopoVersion.parse("not-a-version"));
-        Assert.assertNull(SexyTopoVersion.parse("1.a.3"));
+    public void testVersionTokenOnDataLineIsIgnored() {
+        // A SexyTopo X.Y.Z token outside a comment line must not be treated as a version stamp
+        String text = "*begin SexyTopo 9.9.9\n1 2 5.0 0.0 0.0\n";
+        Assert.assertNull(SexyTopoVersion.extractFromText(text));
+    }
+
+    @Test
+    public void testVersionTokenInTherionCommentIsExtracted() {
+        String text = "survey test\n   # SexyTopo 2.0.1\ncentreline\n";
+        SexyTopoVersion version = SexyTopoVersion.extractFromText(text);
+        Assert.assertNotNull(version);
+        Assert.assertEquals("2.0.1", version.toString());
+    }
+
+    @Test
+    public void testIncompleteVersionTokenIsIgnored() {
+        // "SexyTopo 1.11" has no patch component — not a match
+        String text = "# Created with SexyTopo 1.11 on 2025-03-01\n";
+        Assert.assertNull(SexyTopoVersion.extractFromText(text));
+    }
+
+    @Test
+    public void testNullTextReturnsNull() {
+        Assert.assertNull(SexyTopoVersion.extractFromText(null));
     }
 
     // --- isAfter ---
