@@ -586,7 +586,7 @@ public class GraphView extends View {
                         touchPointOnView.minus(actionDownPointOnView).scale(1 / surveyToViewScale);
                 viewpointOffset = actionDownViewpointOffset.minus(surveyDelta);
                 invalidate();
-                // fall through
+            // fall through
             case MotionEvent.ACTION_UP:
                 break;
             default:

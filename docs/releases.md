@@ -1,4 +1,5 @@
 # Unreleased
+- Selectable leg agreement method, with endpoint-distance and pairwise options that handle steep legs correctly (#321)
 - Allow commenting on first station (thanks Andrew Atkinson)
 - Therion export improvements (thanks Andrew Atkinson)
 - Setting for turning on/off floating buttons on Table view (thanks Andrew Atkinson)

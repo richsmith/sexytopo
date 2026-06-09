@@ -226,6 +226,7 @@
 <ul>
 	<li><strong>LRUD Direction</strong> (under Table settings) controls how Left/Right splays are oriented when entering LRUD data. In <em>Survey</em> mode (default), splays are perpendicular to the bisected angle between the incoming and outgoing legs. In <em>Shot</em> mode, splays are perpendicular to the most recent leg direction. The shot mode is a common alternative convention for measuring LRUDs</li>
 	<li><strong>Manual Data Entry</strong> Show or hide various tools for manual data entry. Included entry using Degrees, Minutes,Seconds</li>
+	<li><strong>Leg agreement method</strong> (under Instruments settings) controls how SexyTopo decides whether three repeated readings are close enough to form a new leg. <em>Angular deltas</em> (default) compares distance, azimuth and inclination separately; this is the original behaviour but can wrongly reject genuinely-repeated steep legs, where a small change in position causes a large change in compass bearing. <em>Endpoint distance</em> instead checks that the readings' endpoints all fall within a set distance of each other (the default of 0.1&nbsp;m keeps all readings within BCRA grade&nbsp;5), and <em>Pairwise vectors</em> (the method used by TopoDroid) measures the gap between the readings' endpoints relative to their length, so the permitted difference scales with leg length. The endpoint and pairwise methods cope correctly with steep legs. Each method has its own tolerance setting.</li>
 </ul>
 
 <h3>Help Menu</h3>

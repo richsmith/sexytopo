@@ -168,12 +168,25 @@ public class GeneralPreferences {
 
     // ********** Surveying ***********
 
+    public static String getLegAmalgamationAlgorithm() {
+        return getString("pref_leg_amalgamation_algorithm", "angular");
+    }
+
     public static float getMaxDistanceDelta() {
         return getFloat("pref_max_distance_delta", 0.05f);
     }
 
     public static float getMaxAngleDelta() {
         return getFloat("pref_max_angle_delta", 1.7f);
+    }
+
+    public static float getMaxEndpointDelta() {
+        // Default to the BCRA Grade 5 cell size: all readings should fall within 0.1m of each other
+        return getFloat("pref_max_endpoint_delta", 0.1f);
+    }
+
+    public static float getMaxPairwiseError() {
+        return getFloat("pref_max_pairwise_error", 0.05f);
     }
 
     public static boolean isHotCornersModeActive() {

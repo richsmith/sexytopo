@@ -410,6 +410,11 @@
         <item>Lineal</item>
         <item>No Lineal</item>
     </string-array>
+    <string-array name="settings_leg_amalgamation_algorithm_entries">
+        <item>Deltas angulares: comparar distancia, azimut e inclinación por separado; promediar por separado</item>
+        <item>Distancia entre extremos: comparar cuánto se separan los puntos finales; promediar como vectores</item>
+        <item>Vectores por pares: comparar la separación entre extremos en relación con la longitud del tramo; promediar como vectores</item>
+    </string-array>
     <string name="settings_immersive_mode_enabled">Modo pantalla completa activado</string>
     <string name="settings_immersive_mode_disabled">Modo pantalla completa desactivado</string>
     <string name="settings_new_station_vibration_title">Vibrar en nueva estación</string>
@@ -421,9 +426,15 @@
 <string name="settings_instruments_title">Instrumentos</string>
     <string name="settings_instruments_summary">Tolerancias de instrumentos, calibración</string>
     <string name="settings_max_distance_delta_title">Delta de distancia máxima (m)</string>
-    <string name="settings_max_distance_delta_summary">Cuánto error se tolera al decidir si crear una nueva estación</string>
+    <string name="settings_max_distance_delta_summary">Método angular: cuánto pueden diferir las mediciones de distancia al decidir si crear una nueva estación</string>
     <string name="settings_max_angle_delta_title">Delta de ángulo máximo (grados)</string>
-    <string name="settings_max_angle_delta_summary">Cuánto error se tolera al decidir si crear una nueva estación</string>
+    <string name="settings_max_angle_delta_summary">Método angular: cuánto pueden diferir las mediciones de azimut o inclinación al decidir si crear una nueva estación</string>
+    <string name="settings_leg_amalgamation_algorithm_title">Método de concordancia de tramos</string>
+    <string name="settings_leg_amalgamation_algorithm_summary">Cómo se determina que las mediciones repetidas son lo bastante próximas para formar un tramo</string>
+    <string name="settings_max_endpoint_delta_title">Distancia máxima entre extremos (m)</string>
+    <string name="settings_max_endpoint_delta_summary">Método de distancia entre extremos: cuánto pueden separarse los extremos de las mediciones al decidir si crear una nueva estación. El valor predeterminado de 0.1 mantiene todas las mediciones dentro de una celda de BCRA Grade 5.</string>
+    <string name="settings_max_pairwise_error_title">Error máximo por pares</string>
+    <string name="settings_max_pairwise_error_summary">Método de vectores por pares: el error relativo que se tolera entre mediciones (0.05 = aproximadamente 2.5%) al decidir si crear una nueva estación</string>
     <string name="settings_calibration_title">Calibración</string>
     <string name="settings_calibration_algorithm_title">Algoritmo de calibración Disto-X</string>
     <string name="settings_calibration_algorithm_summary">Anular la elección del algoritmo de calibración Disto-X</string>

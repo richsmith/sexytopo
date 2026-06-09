@@ -464,6 +464,11 @@
         <item>Linear</item>
         <item>Non-Linear</item>
     </string-array>
+    <string-array name="settings_leg_amalgamation_algorithm_entries">
+        <item>Angular deltas: compare distance, azimuth &amp; inclination separately; average separately</item>
+        <item>Endpoint distance: compare how far apart end points are; average as vectors</item>
+        <item>Pairwise vectors: compare end-point gap relative to leg length; average as vectors</item>
+    </string-array>
     <string name="settings_immersive_mode_enabled">Fullscreen mode enabled</string>
     <string name="settings_immersive_mode_disabled">Fullscreen mode disabled</string>
     <string name="settings_new_station_vibration_title">Vibrate on new station</string>
@@ -473,10 +478,16 @@
     <string name="settings_team_title">Team</string>
     <string name="settings_team_summary">Manage known caver names</string>
     <string name="settings_instruments_title">Instruments</string>
+    <string name="settings_leg_amalgamation_algorithm_title">Leg agreement method</string>
+    <string name="settings_leg_amalgamation_algorithm_summary">How repeated readings are judged close enough to form a leg</string>
     <string name="settings_max_distance_delta_title">Max distance delta (m)</string>
-    <string name="settings_max_distance_delta_summary">How much error tolerated when deciding whether to create a new station</string>
+    <string name="settings_max_distance_delta_summary">Angular method: how much the distance readings may differ when deciding whether to create a new station</string>
     <string name="settings_max_angle_delta_title">Max angle delta (degrees)</string>
-    <string name="settings_max_angle_delta_summary">How much error tolerated when deciding whether to create a new station</string>
+    <string name="settings_max_angle_delta_summary">Angular method: how much the azimuth or inclination readings may differ when deciding whether to create a new station</string>
+    <string name="settings_max_endpoint_delta_title">Max endpoint distance (m)</string>
+    <string name="settings_max_endpoint_delta_summary">Endpoint method: how far apart the reading endpoints may be when deciding whether to create a new station. The default of 0.1 keeps all readings within one BCRA Grade 5 cell.</string>
+    <string name="settings_max_pairwise_error_title">Max pairwise error</string>
+    <string name="settings_max_pairwise_error_summary">Pairwise vectors method: the relative error tolerated between readings (0.05 = roughly 2.5%) when deciding whether to create a new station</string>
     <string name="settings_calibration_title">Calibration</string>
     <string name="settings_calibration_algorithm_title">Disto-X calibration algorithm</string>
     <string name="settings_calibration_algorithm_summary">Override Disto-X calibration algorithm choice</string>

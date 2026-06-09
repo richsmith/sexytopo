@@ -410,6 +410,11 @@
         <item>Lineare</item>
         <item>Non-Lineare</item>
     </string-array>
+    <string-array name="settings_leg_amalgamation_algorithm_entries">
+        <item>Delta angolari: confronta distanza, azimut e inclinazione separatamente; media separatamente</item>
+        <item>Distanza tra estremi: confronta quanto sono distanti i punti estremi; media come vettori</item>
+        <item>Vettori a coppie: confronta lo scarto tra gli estremi rispetto alla lunghezza del tratto; media come vettori</item>
+    </string-array>
     <string name="settings_immersive_mode_enabled">Modalità schermo intero attivata</string>
     <string name="settings_immersive_mode_disabled">Modalità schermo intero disattivata</string>
     <string name="settings_new_station_vibration_title">Vibrazione per nuova stazione</string>
@@ -421,9 +426,15 @@
 <string name="settings_instruments_title">Strumenti</string>
     <string name="settings_instruments_summary">Tolleranze degli strumenti, calibrazione</string>
     <string name="settings_max_distance_delta_title">Delta distanza massima (m)</string>
-    <string name="settings_max_distance_delta_summary">Quanto errore è tollerato per decidere se creare una nuova stazione</string>
+    <string name="settings_max_distance_delta_summary">Metodo angolare: quanto possono differire le letture di distanza per decidere se creare una nuova stazione</string>
     <string name="settings_max_angle_delta_title">Delta angolo massimo (gradi)</string>
-    <string name="settings_max_angle_delta_summary">Quanto errore è tollerato per decidere se creare una nuova stazione</string>
+    <string name="settings_max_angle_delta_summary">Metodo angolare: quanto possono differire le letture di azimut o inclinazione per decidere se creare una nuova stazione</string>
+    <string name="settings_leg_amalgamation_algorithm_title">Metodo di concordanza del tratto</string>
+    <string name="settings_leg_amalgamation_algorithm_summary">Come si valuta se letture ripetute sono abbastanza simili da formare un tratto</string>
+    <string name="settings_max_endpoint_delta_title">Distanza massima tra estremi (m)</string>
+    <string name="settings_max_endpoint_delta_summary">Metodo della distanza tra estremi: quanto possono essere distanti gli estremi delle letture per decidere se creare una nuova stazione. Il valore predefinito di 0.1 mantiene tutte le letture entro una cella di Grado 5 BCRA.</string>
+    <string name="settings_max_pairwise_error_title">Errore massimo a coppie</string>
+    <string name="settings_max_pairwise_error_summary">Metodo dei vettori a coppie: l\'errore relativo tollerato tra le letture (0.05 = circa il 2.5%) per decidere se creare una nuova stazione</string>
     <string name="settings_calibration_title">Calibrazione</string>
     <string name="settings_calibration_algorithm_title">Algoritmo di calibrazione Disto-X</string>
     <string name="settings_calibration_algorithm_summary">Sovrascrivi la scelta dell\'algoritmo di calibrazione Disto-X</string>

@@ -410,6 +410,11 @@
         <item>Liniowy</item>
         <item>Nieliniowy</item>
     </string-array>
+    <string-array name="settings_leg_amalgamation_algorithm_entries">
+        <item>Delty kątowe: porównuj odległość, azymut i nachylenie osobno; uśredniaj osobno</item>
+        <item>Odległość punktów końcowych: porównuj, jak daleko od siebie są punkty końcowe; uśredniaj jako wektory</item>
+        <item>Wektory parami: porównuj odstęp punktów końcowych względem długości ciągu; uśredniaj jako wektory</item>
+    </string-array>
     <string name="settings_immersive_mode_enabled">Tryb pełnoekranowy włączony</string>
     <string name="settings_immersive_mode_disabled">Tryb pełnoekranowy wyłączony</string>
     <string name="settings_new_station_vibration_title">Wibracja przy nowym stanowisku</string>
@@ -421,9 +426,15 @@
 <string name="settings_instruments_title">Instrumenty</string>
     <string name="settings_instruments_summary">Tolerancje instrumentów, kalibracja</string>
     <string name="settings_max_distance_delta_title">Maks. delta odległości (m)</string>
-    <string name="settings_max_distance_delta_summary">Dopuszczalny błąd przy decydowaniu, czy utworzyć nowe stanowisko</string>
+    <string name="settings_max_distance_delta_summary">Metoda kątowa: o ile mogą różnić się pomiary odległości przy decydowaniu, czy utworzyć nowe stanowisko</string>
     <string name="settings_max_angle_delta_title">Maks. delta kąta (stopnie)</string>
-    <string name="settings_max_angle_delta_summary">Dopuszczalny błąd przy decydowaniu, czy utworzyć nowe stanowisko</string>
+    <string name="settings_max_angle_delta_summary">Metoda kątowa: o ile mogą różnić się pomiary azymutu lub nachylenia przy decydowaniu, czy utworzyć nowe stanowisko</string>
+    <string name="settings_leg_amalgamation_algorithm_title">Metoda zgodności ciągu</string>
+    <string name="settings_leg_amalgamation_algorithm_summary">Jak oceniane jest, czy powtórzone pomiary są wystarczająco zbliżone, aby utworzyć ciąg</string>
+    <string name="settings_max_endpoint_delta_title">Maks. odległość punktów końcowych (m)</string>
+    <string name="settings_max_endpoint_delta_summary">Metoda punktów końcowych: jak daleko od siebie mogą być punkty końcowe pomiarów przy decydowaniu, czy utworzyć nowe stanowisko. Domyślna wartość 0.1 utrzymuje wszystkie pomiary w obrębie jednej komórki BCRA Grade 5.</string>
+    <string name="settings_max_pairwise_error_title">Maks. błąd parami</string>
+    <string name="settings_max_pairwise_error_summary">Metoda wektorów parami: dopuszczalny błąd względny między pomiarami (0.05 = około 2.5%) przy decydowaniu, czy utworzyć nowe stanowisko</string>
     <string name="settings_calibration_title">Kalibracja</string>
     <string name="settings_calibration_algorithm_title">Algorytm kalibracji Disto-X</string>
     <string name="settings_calibration_algorithm_summary">Nadpisz wybór algorytmu kalibracji Disto-X</string>

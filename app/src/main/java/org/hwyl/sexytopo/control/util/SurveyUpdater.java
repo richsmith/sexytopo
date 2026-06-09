@@ -8,6 +8,7 @@ import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SexyTopo;
+import org.hwyl.sexytopo.control.util.amalgamation.LegAmalgamationAlgorithm;
 import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -368,31 +369,7 @@ public class SurveyUpdater {
             }
         }
 
-        float minDistance = Float.POSITIVE_INFINITY, maxDistance = Float.NEGATIVE_INFINITY;
-        float minAzimuth = Float.POSITIVE_INFINITY, maxAzimuth = Float.NEGATIVE_INFINITY;
-        float minInclination = Float.POSITIVE_INFINITY, maxInclination = Float.NEGATIVE_INFINITY;
-        float offsetAzimuth = 540 - legs.get(0).getAzimuth();
-
-        for (Leg leg : legs) {
-            minDistance = Math.min(leg.getDistance(), minDistance);
-            maxDistance = Math.max(leg.getDistance(), maxDistance);
-            float shiftedAzimuth = (leg.getAzimuth() + offsetAzimuth) % 360;
-            minAzimuth = Math.min(shiftedAzimuth, minAzimuth);
-            maxAzimuth = Math.max(shiftedAzimuth, maxAzimuth);
-            minInclination = Math.min(leg.getInclination(), minInclination);
-            maxInclination = Math.max(leg.getInclination(), maxInclination);
-        }
-
-        float distanceDiff = maxDistance - minDistance;
-        float azimuthDiff = maxAzimuth - minAzimuth;
-        float inclinationDiff = maxInclination - minInclination;
-
-        float maxDistanceDelta = GeneralPreferences.getMaxDistanceDelta();
-        float maxAngleDelta = GeneralPreferences.getMaxAngleDelta();
-
-        return distanceDiff <= maxDistanceDelta
-                && azimuthDiff <= maxAngleDelta
-                && inclinationDiff <= maxAngleDelta;
+        return LegAmalgamationAlgorithm.getActive().areReadingsCompatible(legs);
     }
 
     public static boolean areLegsBacksights(Leg fore, Leg back) {
@@ -402,48 +379,13 @@ public class SurveyUpdater {
     }
 
     public static Leg averageLegs(List<Leg> repeats) {
-        int count = repeats.size();
-        float distance = 0.0f, inclination = 0.0f;
-        float[] azimuths = new float[count];
-        for (int i = 0; i < count; i++) {
-            Leg leg = repeats.get(i);
-            distance += leg.getDistance();
-            inclination += leg.getInclination();
-            azimuths[i] = leg.getAzimuth();
-        }
-        distance /= count;
-        inclination /= count;
-        return new Leg(distance, averageAzimuths(azimuths), inclination);
+        return LegAmalgamationAlgorithm.getActive().average(repeats);
     }
 
     public static Leg averageBacksights(Leg fore, Leg back) {
         // Given a foresight and backsight which may not exactly agree, produce an averaged
         // foresight
         return averageLegs(Arrays.asList(fore, back.asBacksight()));
-    }
-
-    /** Average some azimuth values together, even if they span the 360/0 boundary */
-    private static float averageAzimuths(float[] azimuths) {
-        // Azimuth values jump at the 360/0 boundary, so we must be careful to ensure that
-        // values {359, 1} average to 0 rather than the incorrect value 180
-        float sum = 0.0f;
-        float min = Leg.MAX_AZIMUTH, max = Leg.MIN_AZIMUTH;
-        for (float azimuth : azimuths) {
-            if (azimuth < min) {
-                min = azimuth;
-            }
-            if (azimuth > max) {
-                max = azimuth;
-            }
-        }
-        boolean splitOverZero = max - min > 180;
-        float[] correctedAzms = new float[azimuths.length];
-        for (int i = 0; i < azimuths.length; i++) {
-            correctedAzms[i] =
-                    (splitOverZero && azimuths[i] < 180) ? azimuths[i] + 360 : azimuths[i];
-            sum += correctedAzms[i];
-        }
-        return (sum / correctedAzms.length) % 360;
     }
 
     public static void reverseLeg(final Survey survey, final Station toReverse) {

@@ -68,6 +68,23 @@ public class Space2DUtils {
         return newAngle % 360;
     }
 
+    /** Average azimuth values together, handling the 360/0 boundary correctly */
+    public static float averageAzimuths(float... azimuths) {
+        // Azimuth values jump at the 360/0 boundary, so we must be careful to ensure that
+        // values {359, 1} average to 0 rather than the incorrect value 180
+        float min = Float.POSITIVE_INFINITY, max = Float.NEGATIVE_INFINITY;
+        for (float azimuth : azimuths) {
+            min = Math.min(azimuth, min);
+            max = Math.max(azimuth, max);
+        }
+        boolean splitOverZero = max - min > 180;
+        float sum = 0.0f;
+        for (float azimuth : azimuths) {
+            sum += (splitOverZero && azimuth < 180) ? azimuth + 360 : azimuth;
+        }
+        return (sum / azimuths.length) % 360;
+    }
+
     @SuppressWarnings("ConstantConditions")
     public static Space<Coord2D> translate(Space<Coord2D> space, Coord2D translation) {
 

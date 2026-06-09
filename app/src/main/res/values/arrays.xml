@@ -15,6 +15,11 @@
         <item>linear</item>
         <item>nonlinear</item>
     </string-array>
+    <string-array name="settings_leg_amalgamation_algorithm_values">
+        <item>angular</item>
+        <item>cartesian</item>
+        <item>pairwise</item>
+    </string-array>
     <string-array name="settings_export_svg_background_values">
         <item>transparent</item>
         <item>white</item>
