@@ -60,7 +60,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:layout_marginStart="8dp"
-                android:hint="@string/manual_edit_comment"
+                android:hint="@string/manual_edit_station_comment"
                 app:errorEnabled="true"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
@@ -101,7 +101,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:layout_marginStart="8dp"
-                android:hint="@string/manual_edit_comment"
+                android:hint="@string/manual_edit_station_comment"
                 app:errorEnabled="true"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
@@ -295,6 +295,20 @@
             </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
         </LinearLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/legCommentLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="@string/manual_edit_leg_comment"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editLegComment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"/>
+        </com.google.android.material.textfield.TextInputLayout>
 
     </LinearLayout>
 </ScrollView>

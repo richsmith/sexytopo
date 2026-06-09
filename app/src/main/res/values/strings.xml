@@ -239,7 +239,8 @@
     <string name="manual_edit_to_station">To</string>
     <string name="manual_edit_to_station_error">Invalid to station</string>
     <string name="manual_edit_shot_backwards">⬅ Shot backwards</string>
-    <string name="manual_edit_comment">Comment</string>
+    <string name="manual_edit_station_comment">Station comment</string>
+    <string name="manual_edit_leg_comment">Leg comment</string>
     <string name="manual_rename_station_title">Rename Station</string>
     <string name="manual_rename_station_hint">Station name</string>
     <string name="manual_rename_error">Rename failed</string>
@@ -693,6 +694,8 @@
     <string name="menu_survey_start_new_dialog_title">Start new survey</string>
     <string name="menu_survey_start_new_dialog_station_name">Starting station name</string>
     <string name="menu_comment">Comment</string>
+    <string name="menu_comment_leg">Leg comment</string>
+    <string name="menu_comment_splay">Splay comment</string>
     <string name="menu_toggle_left_right">Toggle Left/Right</string>
     <string name="menu_context_title_leg">Leg %1$s &#10132; %2$s</string>
     <string name="menu_context_title_splay">Splay %s &#10132;</string>

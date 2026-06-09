@@ -102,6 +102,7 @@ public class LegDialogs {
                 () -> {
                     // Get the leg with measurements and shot direction from form
                     Leg leg = form.getUpdatedLeg();
+                    leg.setComment(form.getUpdatedLegComment());
                     Station fromStation = form.getUpdatedFromStation();
 
                     // Get the new station names from the form
@@ -130,6 +131,7 @@ public class LegDialogs {
 
                         // Reconstruct leg with destination station (preserving backwards flag from
                         // form)
+                        String legComment = leg.getComment();
                         leg =
                                 new Leg(
                                         leg.getDistance(),
@@ -138,6 +140,7 @@ public class LegDialogs {
                                         newToStation,
                                         new Leg[] {},
                                         leg.wasShotBackwards());
+                        leg.setComment(legComment);
 
                         // Add leg to from station using SurveyUpdater
                         // This also sets the active station to the new destination
@@ -275,6 +278,7 @@ public class LegDialogs {
 
                     // Get the updated leg with measurements and shot direction from form
                     Leg edited = form.getUpdatedLeg();
+                    edited.setComment(form.getUpdatedLegComment());
 
                     // Get the new station names from the form
                     Station newFromStation = form.getUpdatedFromStation();

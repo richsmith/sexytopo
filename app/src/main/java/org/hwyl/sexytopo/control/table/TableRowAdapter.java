@@ -103,6 +103,8 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
                 } else {
                     textView.setText(display);
                 }
+            } else if (col == TableCol.DISTANCE && entry.getLeg().hasComment()) {
+                textView.setText(SexyTopoConstants.COMMENT_MARKER + " " + display);
             } else {
                 textView.setText(display);
             }

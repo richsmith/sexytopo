@@ -218,7 +218,8 @@
     <string name="manual_edit_to_station">Do</string>
     <string name="manual_edit_to_station_error">Nieprawidłowe stanowisko końcowe</string>
     <string name="manual_edit_shot_backwards">⬅ Pomiar wsteczny</string>
-    <string name="manual_edit_comment">Komentarz</string>
+    <string name="manual_edit_station_comment">Komentarz stanowiska</string>
+    <string name="manual_edit_leg_comment">Komentarz ciągu</string>
     <string name="manual_rename_station_title">Zmień nazwę stanowiska</string>
     <string name="manual_rename_station_hint">Nazwa stanowiska</string>
     <string name="manual_rename_error">Zmiana nazwy nie powiodła się</string>
@@ -621,6 +622,8 @@
     <string name="menu_survey_start_new_dialog_title">Rozpocznij nowy pomiar</string>
     <string name="menu_survey_start_new_dialog_station_name">Nazwa stanowiska początkowego</string>
     <string name="menu_comment">Komentarz</string>
+    <string name="menu_comment_leg">Komentarz ciągu</string>
+    <string name="menu_comment_splay">Komentarz pomiaru szczegółowego</string>
     <string name="menu_toggle_left_right">Przełącz lewo/prawo</string>
     <string name="menu_context_title_leg">Ciąg %1$s &#10132; %2$s</string>
     <string name="menu_context_title_splay">%s do pomiaru szczegółowego</string>

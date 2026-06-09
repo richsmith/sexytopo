@@ -218,7 +218,8 @@
     <string name="manual_edit_to_station">Hasta estación</string>
     <string name="manual_edit_to_station_error">Estación de destino no válida</string>
     <string name="manual_edit_shot_backwards">⬅ Lectura hacia atrás</string>
-    <string name="manual_edit_comment">Comentario</string>
+    <string name="manual_edit_station_comment">Comentario de la estación</string>
+    <string name="manual_edit_leg_comment">Comentario del tramo</string>
     <string name="manual_rename_station_title">Renombrar Estación</string>
     <string name="manual_rename_station_hint">Nombre de estación</string>
     <string name="manual_rename_error">Renombrado fallido</string>
@@ -621,6 +622,8 @@
     <string name="menu_start_new_survey">Iniciar Nueva Topografía Aquí</string>
     <string name="menu_unlink_survey">Desenlazar Topografía Enlazada</string>
     <string name="menu_comment">Comentario</string>
+    <string name="menu_comment_leg">Comentario del tramo</string>
+    <string name="menu_comment_splay">Comentario del radial</string>
     <string name="menu_toggle_left_right">Alternar Izquierda/Derecha</string>
     <string name="menu_context_title_leg">Tramo %1$s &#10132; %2$s</string>
     <string name="menu_context_title_splay">%s a Radial</string>

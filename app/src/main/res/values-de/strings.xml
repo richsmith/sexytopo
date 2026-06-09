@@ -218,7 +218,8 @@
     <string name="manual_edit_to_station">Zur Station</string>
     <string name="manual_edit_to_station_error">Ungültige Zielstation</string>
     <string name="manual_edit_shot_backwards">⬅ Rückwärts gemessen</string>
-    <string name="manual_edit_comment">Kommentar</string>
+    <string name="manual_edit_station_comment">Messpunkt-Kommentar</string>
+    <string name="manual_edit_leg_comment">Messstrecken-Kommentar</string>
     <string name="manual_rename_station_title">Messpunkt umbenennen</string>
     <string name="manual_rename_station_hint">Stationsname</string>
     <string name="manual_rename_error">Umbenennen fehlgeschlagen</string>
@@ -621,6 +622,8 @@
     <string name="menu_start_new_survey">Hier neue Vermessung beginnen</string>
     <string name="menu_unlink_survey">Verknüpfung zu anderer Vermessungsdatei lösen</string>
     <string name="menu_comment">Kommentar</string>
+    <string name="menu_comment_leg">Messstrecken-Kommentar</string>
+    <string name="menu_comment_splay">Peilung-Kommentar</string>
     <string name="menu_toggle_left_right">Links/Rechts umschalten</string>
     <string name="menu_context_title_leg">Messung %1$s &#10132; %2$s</string>
     <string name="menu_context_title_splay">Splay %s &#10132;</string>

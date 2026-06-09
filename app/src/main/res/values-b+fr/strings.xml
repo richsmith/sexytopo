@@ -218,7 +218,8 @@
     <string name="manual_edit_to_station">Station d\'arrivée</string>
     <string name="manual_edit_to_station_error">Station d\'arrivée invalide</string>
     <string name="manual_edit_shot_backwards">⬅ Tir en arrière</string>
-    <string name="manual_edit_comment">Commentaire</string>
+    <string name="manual_edit_station_comment">Commentaire de la station</string>
+    <string name="manual_edit_leg_comment">Commentaire du segment</string>
     <string name="manual_rename_station_title">Renommer la station</string>
     <string name="manual_rename_station_hint">Nom de la station</string>
     <string name="manual_rename_error">Échec du renommage</string>
@@ -623,6 +624,8 @@
     <string name="menu_start_new_survey">Commencer une nouvelle topographie ici</string>
     <string name="menu_unlink_survey">Dissocier la topographie liée</string>
     <string name="menu_comment">Commentaire</string>
+    <string name="menu_comment_leg">Commentaire du segment</string>
+    <string name="menu_comment_splay">Commentaire de la radiale</string>
     <string name="menu_toggle_left_right">Basculer Gauche/Droite</string>
     <string name="context_this_will_delete">Cela supprimera :</string>
     <string name="context_jump_to_splay_error">Impossible de se rendre à l\'extrémité d\'une radiale</string>
