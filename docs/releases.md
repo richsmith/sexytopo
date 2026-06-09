@@ -1,11 +1,12 @@
 # Unreleased
-- Selectable leg agreement method, with endpoint-distance and pairwise options that handle steep legs correctly (#321)
+- Inclination now always shows + or - in table
+- Selectable leg combination method, with endpoint-distance and pairwise options that handle steep legs correctly (#321)
 - Allow commenting on first station (thanks Andrew Atkinson)
 - Therion export improvements (thanks Andrew Atkinson)
 - Setting for turning on/off floating buttons on Table view (thanks Andrew Atkinson)
 - Added "Add Leg" and "Add Splay" to the Tools menu
 - SVG export improvements, including an optional legend and scale bar
-- Toggleable option to mark water as automatically blue
+- Toggleable option to automatically sketch water as blue
 - Data import improvements: better error reporting & allow theolidite readings (thanks Andrew Atkinson)
 
 # 2026-04-28 1.11.2
