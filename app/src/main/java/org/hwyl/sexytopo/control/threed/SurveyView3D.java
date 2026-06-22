@@ -83,7 +83,8 @@ public class SurveyView3D extends GLSurfaceView {
                                                 (midX - previousX) * (midX - previousX)
                                                         + (midY - previousY) * (midY - previousY));
 
-                        if (spacingDelta > midDelta && SketchPreferences.Toggle.PINCH_TO_ZOOM.isOn()) {
+                        if (spacingDelta > midDelta
+                                && SketchPreferences.Toggle.PINCH_TO_ZOOM.isOn()) {
                             // Predominantly a pinch — zoom
                             float scaleFactor = previousSpacing / spacing;
                             renderer.zoomBy(scaleFactor);
