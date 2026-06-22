@@ -30,6 +30,11 @@
             android:title="@string/sketch_menu_blue_water"
             android:icon="@android:drawable/ic_menu_preferences"
             android:checkable="true"/>
+        <item
+            android:id="@+id/buttonPinchToZoom"
+            android:title="@string/sketch_menu_pinch_to_zoom"
+            android:icon="@android:drawable/ic_menu_preferences"
+            android:checkable="true"/>
     </group>
     <group android:id="@+id/drawingMenuDisplayToggles"
         android:checkableBehavior="all">

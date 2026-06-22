@@ -178,6 +178,7 @@
     <string name="sketch_menu_show_grid">Carta Millimetrata</string>
     <string name="sketch_menu_show_compass">Bussola</string>
     <string name="sketch_menu_snap_to_lines">Aggancia alle Linee</string>
+    <string name="sketch_menu_pinch_to_zoom">Zoom con pizzico</string>
     <string name="sketch_menu_fade_non_active">Sfuma Non-Attive</string>
     <string name="sketch_menu_show_station_labels">Etichette Stazioni</string>
     <string name="sketch_menu_show_splays">Mostra Splay</string>

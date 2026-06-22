@@ -1,13 +1,14 @@
 # Unreleased
-- Inclination now always shows + or - in table
-- Selectable leg combination method, with endpoint-distance and pairwise options that handle steep legs correctly (#321)
-- Allow commenting on first station (thanks Andrew Atkinson)
-- Therion export improvements (thanks Andrew Atkinson)
-- Setting for turning on/off floating buttons on Table view (thanks Andrew Atkinson)
-- Added "Add Leg" and "Add Splay" to the Tools menu
-- SVG export improvements, including an optional legend and scale bar
-- Toggleable option to automatically sketch water as blue
 - Data import improvements: better error reporting & allow theolidite readings (thanks Andrew Atkinson)
+- Toggleable option to automatically sketch water as blue
+- SVG export improvements, including an optional legend and scale bar
+- Added "Add Leg" and "Add Splay" to the Tools menu
+- Setting for turning on/off floating buttons on Table view (thanks Andrew Atkinson)
+- Therion export improvements (thanks Andrew Atkinson)
+- Allow commenting on first station (thanks Andrew Atkinson)
+- Selectable leg combination method, with endpoint-distance and pairwise options that handle steep legs correctly (#321)
+- Inclination now always shows + or - in table
+- Pinch-to-zoom now turn-offable
 
 # 2026-04-28 1.11.2
 - Fix a bug causing cross-sections to be initially hidden

@@ -337,6 +337,9 @@ public abstract class GraphActivity extends SurveyEditorActivity
         } else if (itemId == R.id.buttonBlueWater) {
             SketchPreferences.Toggle.BLUE_WATER.set(!item.isChecked());
             return true;
+        } else if (itemId == R.id.buttonPinchToZoom) {
+            SketchPreferences.Toggle.PINCH_TO_ZOOM.set(!item.isChecked());
+            return true;
         } else {
             return handleAction(itemId);
         }

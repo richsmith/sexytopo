@@ -2110,6 +2110,9 @@ public class GraphView extends View {
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
+            if (!SketchPreferences.Toggle.PINCH_TO_ZOOM.isOn()) {
+                return false;
+            }
 
             if (currentSketchTool != SketchTool.PINCH_TO_ZOOM) {
                 setSketchTool(SketchTool.PINCH_TO_ZOOM);
