@@ -11,7 +11,6 @@ import org.hwyl.sexytopo.control.graph.CrossSectionView;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
-import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
@@ -140,12 +139,11 @@ public class CrossSectionActivity extends GraphActivity {
         persistedSubSketch.setPathDetails(
                 new ArrayList<PathDetail>(workingSketch.getPathDetails()));
 
-        CrossSection crossSection = originalDetail.getCrossSection();
-        Coord2D position = originalDetail.getPosition();
-        CrossSectionDetail updated =
-                new CrossSectionDetail(crossSection, position, persistedSubSketch);
-
-        getSurvey().getPlanSketch().swapCrossSectionDetail(originalDetail, updated);
+        // Mutate the live detail in place rather than swapping in a new instance: this keeps the
+        // detail's identity stable so the plan's undo/redo stacks don't end up referencing a
+        // stale copy. The editor owns its own undo, so committing is not plan-undoable.
+        originalDetail.setSketch(persistedSubSketch);
+        getSurvey().getPlanSketch().setSaved(false);
         finish();
     }
 

@@ -286,19 +286,6 @@ public class Sketch extends Shape {
         deleteDetail(oldDetail, replacements);
     }
 
-    /**
-     * Swap a cross-section detail without creating an undo entry. Use this when committing
-     * sub-sketch edits from the cross-section editor — the editor has its own undo stack, and the
-     * commit should not be reversible from the plan's undo.
-     */
-    public void swapCrossSectionDetail(CrossSectionDetail oldDetail, CrossSectionDetail newDetail) {
-        int index = crossSectionDetails.indexOf(oldDetail);
-        if (index >= 0) {
-            crossSectionDetails.set(index, newDetail);
-        }
-        setSaved(false);
-    }
-
     public List<CrossSectionDetail> getCrossSectionDetails() {
         return crossSectionDetails;
     }

@@ -617,12 +617,24 @@ public class GraphView extends View {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                // A press anywhere on a cross-section's body deletes it. This is hit-tested
+                // separately because findNearestVisibleDetailWithin only measures distance to a
+                // cross-section's centre point, not its whole body.
+                if (SketchPreferences.Toggle.SHOW_X_SECTIONS.isOn()) {
+                    CrossSectionDetail crossSection = findCrossSectionBodyAt(touchPointOnSurvey);
+                    if (crossSection != null) {
+                        sketch.deleteDetail(crossSection);
+                        invalidate();
+                        return true;
+                    }
+                }
+
                 SketchDetail closestDetail =
                         sketch.findNearestVisibleDetailWithin(
                                 touchPointOnSurvey, deleteToleranceInMetres, surveyToViewScale);
 
-                if (closestDetail == null || closestDetail instanceof CrossSectionDetail) {
-                    // missed, or hit a cross-section (use context menu to delete those)
+                if (closestDetail == null) {
+                    // you missed, try again :P
                     return true;
 
                 } else if (deleteLineFragments && closestDetail instanceof PathDetail) {
@@ -877,7 +889,7 @@ public class GraphView extends View {
             return false; // special case: can't tap on invisible X-sections
         }
         if (currentSketchTool == SketchTool.ERASE) {
-            return false; // special case: user might be deleting the X-section
+            return false; // let handleErase deal with deleting cross-sections
         }
         if (currentSketchTool.isModal() || currentSketchTool == SketchTool.MOVE_CROSS_SECTION) {
             return false; // a handle drag, pan or pinch is in progress; let it run

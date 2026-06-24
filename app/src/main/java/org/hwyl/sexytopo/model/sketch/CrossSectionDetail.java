@@ -13,7 +13,9 @@ public class CrossSectionDetail extends SinglePositionDetail {
     private static final float MIN_VISIBLE_PIXELS = SexyTopo.dpToPixels(8);
 
     private final CrossSection crossSection;
-    private final Sketch sketch;
+
+    // The sub-sketch is the one mutable aspect of a cross-section detail:
+    private Sketch sketch;
 
     public CrossSectionDetail(CrossSection crossSection, Coord2D position) {
         this(crossSection, position, new Sketch());
@@ -55,6 +57,12 @@ public class CrossSectionDetail extends SinglePositionDetail {
 
     public Sketch getSketch() {
         return sketch;
+    }
+
+    /** Replace the sub-sketch in place when committing an edit from the cross-section editor. */
+    public void setSketch(Sketch sketch) {
+        this.sketch = sketch;
+        refreshBoundingBox();
     }
 
     public Space<Coord2D> getProjection() {

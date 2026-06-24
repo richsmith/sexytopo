@@ -16,6 +16,8 @@ SketchDetail (abstract)
 
 All `SketchDetail` subclasses are **immutable** — colour and geometry cannot be changed in place. To "edit" an element you delete it and add a new one.
 
+The one exception is a `CrossSectionDetail`'s sub-sketch: committing an edit from the cross-section editor replaces it in place (`CrossSectionDetail.setSketch`). This is deliberate — it keeps the detail's identity stable so references held by the plan's undo/redo stacks don't go stale. Geometry changes to a cross-section (move, rotate) still follow the immutable delete-and-add pattern and remain undoable.
+
 ## The Sketch Container
 
 `Sketch` holds:
