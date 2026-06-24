@@ -78,6 +78,11 @@ public class GraphView extends View {
     private Coord2D actionDownPointOnView = Coord2D.ORIGIN;
     private Coord2D actionDownViewpointOffset = Coord2D.ORIGIN;
 
+    // The cross-section whose body was pressed at the start of the current touch gesture. While
+    // set, the gesture is consumed by the cross-section (and not drawn onto the main sketch); a
+    // clean tap opens its editor on ACTION_UP.
+    private CrossSectionDetail crossSectionBodyPressed = null;
+
     // ratio of metres on the survey to pixels on the view
     // zooming in increases this, zooming out decreases it
     private float surveyToViewScale = 60.0f;
@@ -155,6 +160,10 @@ public class GraphView extends View {
 
     // Flag to prevent double menu opening during this touch sequence
     private boolean menuShownInThisTouch = false;
+    // Flag: this touch sequence landed on a cross-section body, so it opens the editor rather
+    // than drawing onto the main sketch over it.
+    private boolean crossSectionTappedInThisTouch = false;
+
     private Symbol currentSymbol = Symbol.getDefault();
 
     // a bit hacky but I can't think of a better way to do this
@@ -386,9 +395,10 @@ public class GraphView extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
-        // Reset menu flag at start of new touch sequence
+        // Reset per-touch flags at start of new touch sequence
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             menuShownInThisTouch = false;
+            crossSectionTappedInThisTouch = false;
         }
 
         scaleGestureDetector.onTouchEvent(event);
@@ -869,20 +879,23 @@ public class GraphView extends View {
         if (currentSketchTool == SketchTool.ERASE) {
             return false; // special case: user might be deleting the X-section
         }
-        if (event.getAction() != MotionEvent.ACTION_UP) {
-            return false; // ignore drags etc.
+        if (currentSketchTool.isModal() || currentSketchTool == SketchTool.MOVE_CROSS_SECTION) {
+            return false; // a handle drag, pan or pinch is in progress; let it run
         }
-        Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
-        if (!touchPointOnView.equals(actionDownPointOnView)) {
-            return false;
+
+        // Open the editor as soon as a press lands on a cross-section body, before any stroke can
+        // start on the main sketch over it. The remaining events of this gesture are swallowed.
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            Coord2D touchOnSurvey =
+                    viewCoordsToSurveyCoords(new Coord2D(event.getX(), event.getY()));
+            CrossSectionDetail tapped = findCrossSectionBodyAt(touchOnSurvey);
+            if (tapped != null) {
+                launchCrossSectionEditor(tapped);
+                crossSectionTappedInThisTouch = true;
+            }
+            return crossSectionTappedInThisTouch;
         }
-        Coord2D touchOnSurvey = viewCoordsToSurveyCoords(touchPointOnView);
-        CrossSectionDetail tapped = findCrossSectionBodyAt(touchOnSurvey);
-        if (tapped == null) {
-            return false;
-        }
-        launchCrossSectionEditor(tapped);
-        return true;
+        return crossSectionTappedInThisTouch;
     }
 
     private void showContextMenu(MotionEvent event, final Station station) {
