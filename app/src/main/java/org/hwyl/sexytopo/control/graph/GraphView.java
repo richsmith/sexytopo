@@ -113,7 +113,7 @@ public class GraphView extends View {
     private float legendTickSizePx;
     private float dashedLineIntervalPx;
 
-    private static final float DELETE_DETAILS_WITHIN_N_DP = 5.0f;
+    private static final float DELETE_DETAILS_WITHIN_N_DP = 10.0f;
     private static final float SELECTION_SENSITIVITY_DP = 25.0f;
     private static final float SNAP_TO_LINE_SENSITIVITY_DP = 25.0f;
     public static final float HOT_CORNER_DISTANCE_PROPORTION = 0.05f;
