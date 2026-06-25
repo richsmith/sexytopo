@@ -888,6 +888,9 @@ public class GraphView extends View {
         if (!SketchPreferences.Toggle.SHOW_X_SECTIONS.isOn()) {
             return false; // special case: can't tap on invisible X-sections
         }
+        if (currentSketchTool == SketchTool.MOVE) {
+            return false; // MOVE just pans; don't open the cross-section view on a tap
+        }
         if (currentSketchTool == SketchTool.ERASE) {
             return false; // let handleErase deal with deleting cross-sections
         }
