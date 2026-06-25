@@ -176,8 +176,8 @@
     <string name="sketch_toolbar_colour_blue">Blau</string>
     <string name="sketch_toolbar_colour_purple">Violett</string>
     <string name="sketch_toolbar_symbol_close">Werkzeugleiste Symbole schliessen</string>
-    <string name="sketch_menu_delete_last_leg">Letzten Dateneintrag rückgängig machen</string>
-    <string name="sketch_menu_centre_view">Aktives Objekt in Bildschirmmitte anzeigen</string>
+    <string name="sketch_menu_delete_last_leg">Letzte Messung rückgängig</string>
+    <string name="sketch_menu_centre_view">Auf Aktives zentrieren</string>
     <string name="sketch_menu_auto_recentre">Automatisches Zentrieren</string>
     <string name="sketch_menu_redo">Zeichnen-Befehl wiederholen</string>
     <string name="sketch_menu_show_grid">Raster anzeigen</string>
@@ -185,13 +185,13 @@
     <string name="sketch_menu_blue_water">Auto-Blauwasser</string>
     <string name="sketch_menu_snap_to_lines">Linien fangen</string>
     <string name="sketch_menu_pinch_to_zoom">Zoom durch Kneifen</string>
-    <string name="sketch_menu_fade_non_active">Nicht-Aktiv-Funktion ausblenden</string>
+    <string name="sketch_menu_fade_non_active">Inaktive ausblenden</string>
     <string name="sketch_menu_show_station_labels">Messpunkt-Beschriftungen</string>
     <string name="sketch_menu_show_xsections">Querschnitte</string>
-    <string name="sketch_menu_show_splays">Dimensionen und Hilfslinien anzeigen</string>
+    <string name="sketch_menu_show_splays">Hilfslinien anzeigen</string>
     <string name="sketch_menu_show_sketch">Skizze anzeigen</string>
     <string name="sketch_menu_show_connect">Verknüpfte Vermessungsdateien</string>
-    <string name="sketch_menu_back_measurements">Rückwärtsgerichtete Messstrecken</string>
+    <string name="sketch_menu_back_measurements">Messstrecken umkehren</string>
     <string name="sketch_position_cross_section_instruction">Ort zum Zeichnen eines Querschnitts auswählen</string>
     <string name="sketch_rotate_cross_section_instruction">Von der Station ziehen, um die Querschnittsrichtung festzulegen</string>
     <string name="sketch_symbol_orientation_education"> Ziehen, um die Richtung des Symbols festzulegen</string>

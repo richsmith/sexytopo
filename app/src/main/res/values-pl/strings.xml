@@ -184,7 +184,7 @@
     <string name="sketch_menu_show_compass">Kompas</string>
     <string name="sketch_menu_blue_water">Auto niebieska woda</string>
     <string name="sketch_menu_snap_to_lines">Przyciąganie do linii</string>
-    <string name="sketch_menu_pinch_to_zoom">Powiększanie gestem szczypania</string>
+    <string name="sketch_menu_pinch_to_zoom">Zoom szczypaniem</string>
     <string name="sketch_menu_fade_non_active">Przyciemnij nieaktywne</string>
     <string name="sketch_menu_show_station_labels">Etykiety stanowisk</string>
     <string name="sketch_menu_show_xsections">Przekroje</string>

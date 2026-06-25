@@ -176,7 +176,7 @@
     <string name="sketch_toolbar_colour_blue">Bleu</string>
     <string name="sketch_toolbar_colour_purple">Violet</string>
     <string name="sketch_toolbar_symbol_close">Fermer la barre d\'outils des symboles</string>
-    <string name="sketch_menu_delete_last_leg">Annuler le dernièr segement</string>
+    <string name="sketch_menu_delete_last_leg">Annuler le dernier segment</string>
     <string name="sketch_menu_centre_view">Centrer sur l\'actif</string>
     <string name="sketch_menu_auto_recentre">Recentrage automatique</string>
     <string name="sketch_menu_redo">Refaire l\'action d\'esquisse</string>
@@ -185,7 +185,7 @@
     <string name="sketch_menu_blue_water">Eau bleue auto</string>
     <string name="sketch_menu_snap_to_lines">Accrocher aux lignes</string>
     <string name="sketch_menu_pinch_to_zoom">Zoom par pincement</string>
-    <string name="sketch_menu_fade_non_active">Atténuer les éléments non actifs</string>
+    <string name="sketch_menu_fade_non_active">Atténuer les inactifs</string>
     <string name="sketch_menu_show_station_labels">Noms des stations</string>
     <string name="sketch_menu_show_xsections">Coupes</string>
     <string name="sketch_menu_show_splays">Afficher les radiales</string>
