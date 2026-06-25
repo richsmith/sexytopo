@@ -112,7 +112,20 @@ Each format is handled by dedicated import/export classes. When adding format su
 - **Never hardcode user-facing strings in Java/Kotlin code.** All strings must be defined in `app/src/main/res/values/strings.xml` and referenced via `R.string.*` (in code) or `@string/*` (in XML layouts).
 - String names must use the appropriate section prefix to match the relevant section in `strings.xml` (e.g. `action_`, `file_`, etc.). Place new strings in the correct comment-delimited section.
 - `sketch_menu_*` strings are labels for the sketch quick menu (the toggle overflow in graph view), so keep them **brief** — a word or two that fits a compact menu row. This applies to translations too: don't expand a short English label into a long phrase. Prefer the most concise natural rendering in each language (e.g. drop articles, abbreviate where idiomatic).
-- When adding strings, add translations to all language files. Supported locales: `values-de` (German), `values-b+fr` (French), `values-es` (Spanish), `values-it` (Italian), `values-pl` (Polish), `values-pt` (Portuguese). A missing key falls back to the default English, so audit coverage with `make check-translations` (use `python3 scripts/check_translations.py --stubs` for copy-paste stubs pre-filled with the English value). Keys marked `translatable="false"` are excluded. Preserve placeholders (`%s`, `%1$s`, `\n`, `<xliff:g>`) exactly in translations.
+- When adding strings, add translations to all language files. Supported locales: `values-de` (German), `values-fr` (French), `values-es` (Spanish), `values-it` (Italian), `values-pl` (Polish), `values-pt` (Portuguese). A missing key falls back to the default English, so audit coverage with `make check-translations` (a good release-process gate). To fill gaps in bulk, write a JSON file mapping each key to its translations by locale and apply it:
+
+  ```json
+  {
+    "menu_xsection": {"de": "Querschnitt", "fr": "Coupe", "es": "Sección transversal", "it": "Sezione", "pl": "Przekrój", "pt": "Secção transversal"}
+  }
+  ```
+
+  ```
+  python3 scripts/apply_translations.py translations.json
+  ./gradlew spotlessApply
+  ```
+
+  Locale keys are `de fr es it pl pt`. Values are plain text — the script handles Android escaping (apostrophe, `&`, `<`, `>`) and inserts each string in the right place, mirroring the default's section ordering. Any key/locale may be omitted; already-present keys are skipped, so re-running is safe. Keys marked `translatable="false"` are excluded from the audit. Preserve placeholders (`%s`, `%1$s`, `\n`, `<xliff:g>`) exactly in translations.
 - When updating either sketch view (graph view), remember to consider landscape mode
 
 ## Testing
