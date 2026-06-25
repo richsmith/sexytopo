@@ -34,6 +34,7 @@ SexyTopo uses git for version control, and the repo is in GitHub. The main branc
 ### Linting & Code Quality
 ```bash
 ./gradlew lint           # Run Android lint checks
+make check-translations  # Report strings missing from locale strings.xml files
 ```
 
 ### Clean
@@ -110,7 +111,8 @@ Each format is handled by dedicated import/export classes. When adding format su
 - Use British English in IDs, comments, variable names etc.
 - **Never hardcode user-facing strings in Java/Kotlin code.** All strings must be defined in `app/src/main/res/values/strings.xml` and referenced via `R.string.*` (in code) or `@string/*` (in XML layouts).
 - String names must use the appropriate section prefix to match the relevant section in `strings.xml` (e.g. `action_`, `file_`, etc.). Place new strings in the correct comment-delimited section.
-- When adding strings, add translations to all language files
+- `sketch_menu_*` strings are labels for the sketch quick menu (the toggle overflow in graph view), so keep them **brief** — a word or two that fits a compact menu row. This applies to translations too: don't expand a short English label into a long phrase. Prefer the most concise natural rendering in each language (e.g. drop articles, abbreviate where idiomatic).
+- When adding strings, add translations to all language files. Supported locales: `values-de` (German), `values-b+fr` (French), `values-es` (Spanish), `values-it` (Italian), `values-pl` (Polish), `values-pt` (Portuguese). A missing key falls back to the default English, so audit coverage with `make check-translations` (use `python3 scripts/check_translations.py --stubs` for copy-paste stubs pre-filled with the English value). Keys marked `translatable="false"` are excluded. Preserve placeholders (`%s`, `%1$s`, `\n`, `<xliff:g>`) exactly in translations.
 - When updating either sketch view (graph view), remember to consider landscape mode
 
 ## Testing

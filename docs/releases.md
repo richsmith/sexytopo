@@ -1,4 +1,5 @@
 # Unreleased
+- Separate cross-section editing view which also allows moving of sections and orientation adjustment
 - Data import improvements: better error reporting & allow theolidite readings (thanks Andrew Atkinson)
 - Toggleable option to automatically sketch water as blue
 - SVG export improvements, including an optional legend and scale bar
@@ -9,6 +10,8 @@
 - Selectable leg combination method, with endpoint-distance and pairwise options that handle steep legs correctly (#321)
 - Inclination now always shows + or - in table
 - Pinch-to-zoom now turn-offable
+- Made deletion of details easier
+- Fix a bug stopping deletion of text details
 
 # 2026-04-28 1.11.2
 - Fix a bug causing cross-sections to be initially hidden
