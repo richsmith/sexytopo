@@ -1,4 +1,4 @@
-# Unreleased
+# 2026-06-25 1.12.0
 - Separate cross-section editing view which also allows moving of sections and orientation adjustment
 - Data import improvements: better error reporting & allow theolidite readings (thanks Andrew Atkinson)
 - Toggleable option to automatically sketch water as blue
