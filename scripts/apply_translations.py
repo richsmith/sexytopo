@@ -9,8 +9,7 @@ locale (the locale suffix used in res/values-<locale>):
       "settings_survey_title": {"de": "Vermessungseinstellungen", ...}
     }
 
-Locales: de, fr, es, it, pl, pt ("fr" maps to the values-b+fr directory). Any
-key or locale may be omitted; only the
+Locales: de, fr, es, it, pl, pt. Any key or locale may be omitted; only the
 translations present are applied. Values are plain natural-language text — the
 script handles Android escaping (apostrophe -> \\', and XML &, <, >).
 
@@ -34,11 +33,7 @@ from pathlib import Path
 RES = Path("app/src/main/res")
 DEFAULT = RES / "values" / "strings.xml"
 
-LOCALES = ["de", "b+fr", "es", "it", "pl", "pt"]
-
-# Friendly aliases for locale keys in the JSON, so callers can write the plain
-# language code rather than the res/values directory suffix.
-LOCALE_ALIASES = {"fr": "b+fr"}
+LOCALES = ["de", "fr", "es", "it", "pl", "pt"]
 
 
 def escape(value: str) -> str:
@@ -63,7 +58,6 @@ def transpose(by_key: dict[str, dict[str, str]]) -> dict[str, dict[str, str]]:
     by_locale: dict[str, dict[str, str]] = {}
     for key, locales in by_key.items():
         for locale, value in locales.items():
-            locale = LOCALE_ALIASES.get(locale, locale)
             by_locale.setdefault(locale, {})[key] = value
     return by_locale
 
