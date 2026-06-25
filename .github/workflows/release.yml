@@ -51,3 +51,19 @@ jobs:
           name: SexyTopo ${{ github.ref_name }}
           body_path: notes.md
           files: sexytopo-*.apk
+
+      - name: Prepare Play Store release notes
+        run: |
+          mkdir -p whatsnew
+          # Play limits the "what's new" text to 500 characters; truncate to be safe.
+          head -c 500 notes.md > whatsnew/whatsnew-en-US
+
+      - name: Publish to Play Store
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: org.hwyl.sexytopo
+          releaseFiles: sexytopo-${{ github.ref_name }}.apk
+          track: production
+          status: completed
+          whatsNewDirectory: whatsnew

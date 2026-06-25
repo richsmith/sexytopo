@@ -140,6 +140,22 @@ Example patterns:
 - Use Mockito for dependency injection in model tests
 - Return default values in unit tests (`unitTests.returnDefaultValues = true`)
 
+## Release & Deployment
+
+Releasing is driven by git tags. The flow is:
+
+1. Run `make bump` (`scripts/bump.py`) to bump `versionName` and `versionCode` in `app/build.gradle`. This only edits the file — no git operations. Use `make bump-minor` for a minor bump, or `make bump VERSION=N.N.N` for an explicit version. The `versionCode` increment is what keeps each Play upload unique, so nothing in CI needs to manage it.
+2. Add release notes under a new `# <date> <version>` heading in `docs/releases.md` (matching the bumped version).
+3. Run `make publish` (`scripts/publish.py`): it checks `docs/releases.md` has an entry for the current version, commits `build.gradle` + `releases.md`, and creates the tag. It does not push.
+4. `git push && git push --tags`.
+
+Pushing a tag matching `N.N.N` triggers `.github/workflows/release.yml`, which:
+
+- builds and signs the release APK,
+- extracts the notes for that version (`scripts/extract_release_notes.py`),
+- creates a GitHub Release with the APK attached,
+- **publishes the signed APK to the Play Store production track** (live to all users).
+
 ## Dependencies & External Tools
 
 - **Gradle**
