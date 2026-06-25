@@ -1,6 +1,6 @@
 GRADLE := ./gradlew
 
-.PHONY: help format check test build clean install lint apk release bump export-therion export-svg
+.PHONY: help format check test build clean install lint apk release bump export-therion export-svg check-translations
 
 help:
 	@echo "Common targets:"
@@ -15,6 +15,7 @@ help:
 	@echo "  make bump      Bump patch version, commit, and tag a release"
 	@echo "  make export-therion  Dump a Therion bundle to app/build/exports/example/"
 	@echo "  make export-svg      Dump SVG plan + EE to app/build/exports/example/"
+	@echo "  make check-translations  Report strings missing from locale strings.xml files"
 	@echo "  make clean     Remove build artefacts"
 
 format:
@@ -49,6 +50,9 @@ export-therion:
 
 export-svg:
 	$(GRADLE) :app:exportSvgFixtures
+
+check-translations:
+	python3 scripts/check_translations.py
 
 clean:
 	$(GRADLE) clean
