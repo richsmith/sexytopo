@@ -33,6 +33,7 @@
     <string name="title_activity_table">Tabla</string>
     <string name="title_activity_plan">Planta</string>
     <string name="title_activity_elevation">Alzado</string>
+    <string name="title_activity_cross_section">Sección transversal</string>
     <string name="title_activity_calibration">Calibración</string>
     <string name="title_activity_survey">Estadísticas</string>
     <string name="title_activity_settings">Ajustes</string>
@@ -48,6 +49,8 @@
     <string name="action_file">Archivo</string>
     <string name="action_stats">Estadísticas</string>
     <string name="action_settings">Ajustes</string>
+    <string name="action_settings_system">Sistema</string>
+    <string name="action_settings_survey">Topografía</string>
     <string name="action_dev">Desarrollo</string>
     <string name="action_device">Instrumento</string>
     <string name="action_device_connect">Conectar…</string>
@@ -88,6 +91,8 @@
     <string name="action_trigger_autosave">Activar Autoguardado</string>
     <string name="action_kill_connection">Matar Hilo de Comunicación (¡Peligro!)</string>
     <string name="action_force_crash">Forzar Fallo (¡Peligro!)</string>
+    <string name="action_xsection_done">Hecho</string>
+    <string name="action_xsection_cancel">Cancelar</string>
 
     <!-- File handling -->
     <string name="file_started_new_survey">Nueva topografía iniciada</string>
@@ -182,11 +187,13 @@
     <string name="sketch_menu_pinch_to_zoom">Zoom por pellizco</string>
     <string name="sketch_menu_fade_non_active">Atenuar No-Activas</string>
     <string name="sketch_menu_show_station_labels">Etiquetas de Estaciones</string>
+    <string name="sketch_menu_show_xsections">Secciones</string>
     <string name="sketch_menu_show_splays">Mostrar Radiales</string>
     <string name="sketch_menu_show_sketch">Mostrar Croquis</string>
     <string name="sketch_menu_show_connect">Topografías Enlazadas</string>
     <string name="sketch_menu_back_measurements">Tramos Inversos</string>
     <string name="sketch_position_cross_section_instruction">Seleccionar dónde dibujar la sección transversal</string>
+    <string name="sketch_rotate_cross_section_instruction">Arrastra desde la estación para fijar la dirección de la sección</string>
     <string name="sketch_symbol_orientation_education">Arrastrar para establecer la dirección del símbolo</string>
     <string name="sketch_text_hint">Introducir texto</string>
 
@@ -390,6 +397,8 @@
     <string name="stats_number_splays">Número de Radiales</string>
     <string name="stats_longest_leg">Tramo Más Largo (m)</string>
     <string name="stats_shortest_leg">Tramo Más Corto (m)</string>
+    <string name="settings_survey_title">Ajustes de topografía</string>
+    <string name="settings_survey_cross_section_scale">Escala de secciones</string>
 
     <!-- Settings -->
     <string name="settings_general_title">General</string>
@@ -468,6 +477,8 @@
     <string name="settings_anti_alias_title">Suavizar líneas de croquis</string>
     <string name="settings_anti_alias_summary">Aplicar suavizado a las líneas de croquis, etc. (mejora la visualización a costa de cierto rendimiento)</string>
     <string name="settings_manual_data_entry_title">Entrada Manual de Datos</string>
+    <string name="settings_manual_data_controls_title">Controles manuales</string>
+    <string name="settings_manual_data_controls_summary">Mostrar botones flotantes para introducir manualmente tramos o radiales en la vista de tabla</string>
     <string name="settings_manual_data_entry_summary">Campos LRUD, formato de ángulo</string>
     <string name="settings_key_lrud_fields_title">Entradas LRUD</string>
     <string name="settings_key_lrud_fields_summary">Mostrar campos para ingresar LRUD (Izquierda-Derecha-Arriba-Abajo) para cada nueva estación</string>
@@ -496,6 +507,28 @@
     <string name="settings_export_svg_leg_width_summary">Qué tan gruesas dibujar las líneas de tramos en la exportación SVG</string>
     <string name="settings_export_svg_splay_width_title">Ancho de radial SVG</string>
     <string name="settings_export_svg_splay_width_summary">Qué tan gruesas dibujar las líneas de radiales en la exportación SVG</string>
+    <string name="settings_export_svg_legend_title">Mostrar leyenda</string>
+    <string name="settings_export_svg_legend_summary">Incluir una franja de leyenda con título, fecha, estadísticas, etc.</string>
+    <string name="settings_export_svg_north_arrow_title">Mostrar flecha norte</string>
+    <string name="settings_export_svg_north_arrow_summary">Añadir una flecha norte a la leyenda en exportaciones de planta</string>
+    <string name="settings_export_svg_scale_bar_title">Mostrar barra de escala</string>
+    <string name="settings_export_svg_scale_bar_summary">Añadir una barra de escala a la leyenda</string>
+    <string name="settings_export_svg_team_title">Mostrar equipo</string>
+    <string name="settings_export_svg_team_summary">Mostrar una lista de los topógrafos</string>
+    <string name="settings_export_svg_cross_sections_title">Exportar secciones</string>
+    <string name="settings_export_svg_cross_sections_summary">Incluir bocetos de secciones en la exportación SVG</string>
+    <string name="settings_export_svg_symbols_title">Exportar símbolos</string>
+    <string name="settings_export_svg_symbols_summary">Incluir símbolos en la exportación SVG</string>
+    <string name="settings_export_svg_centreline_title">Mostrar poligonal</string>
+    <string name="settings_export_svg_centreline_summary">Dibujar la poligonal (tramos) en la exportación SVG</string>
+    <string name="settings_export_svg_stations_title">Mostrar etiquetas de estación</string>
+    <string name="settings_export_svg_stations_summary">Dibujar las etiquetas de nombre de estación en la exportación SVG</string>
+    <string name="settings_export_svg_splays_title">Mostrar radiales</string>
+    <string name="settings_export_svg_splays_summary">Dibujar los radiales (líneas LRUD) en la exportación SVG</string>
+    <string name="settings_export_svg_grid_title">Mostrar cuadrícula</string>
+    <string name="settings_export_svg_grid_summary">Dibujar una cuadrícula de fondo tras la topografía</string>
+    <string name="settings_export_svg_tagline_title">Mostrar eslogan</string>
+    <string name="settings_export_svg_tagline_summary">Dar el crédito adecuado a SexyTopo</string>
     <string name="settings_export_therion_symbols_title">Símbolos de exportación Therion</string>
     <string name="settings_export_therion_symbols_summary">Incluir símbolos al exportar a formato Therion</string>
     <string name="settings_export_therion_text_title">Texto de exportación Therion</string>
@@ -529,6 +562,7 @@
     <string name="therion_export_ee_scraps">Scraps de desarrollo</string>
     <string name="therion_export_stations_in_plan">Añadir estaciones al primer scrap de planta</string>
     <string name="therion_export_stations_in_ee">Añadir estaciones al primer scrap de desarrollo</string>
+    <string name="svg_export_dialog_title">Opciones de exportación SVG</string>
     <string name="settings_developer_title">Desarrollador</string>
     <string name="settings_developer_summary">Opciones de depuración</string>
     <string name="settings_key_developer_mode_title">Modo desarrollador</string>
@@ -611,6 +645,11 @@
     <string name="menu_jump_to">Saltar</string>
     <string name="menu_jump_to_station_in_plan">&#10132; Planta</string>
     <string name="menu_jump_to_station_in_elevation">&#10132; Alzado</string>
+    <string name="menu_xsection">Sección transversal</string>
+    <string name="menu_xsection_create">Nueva sección</string>
+    <string name="menu_xsection_delete">Eliminar sección</string>
+    <string name="menu_xsection_edit">Editar boceto</string>
+    <string name="menu_xsection_set_direction">Fijar dirección</string>
     <string name="menu_new_cross_section">Nueva Sección Transversal</string>
     <string name="menu_jump_to_station_in_table">&#10132; Tabla de Datos</string>
     <string name="menu_delete_station">Eliminar</string>

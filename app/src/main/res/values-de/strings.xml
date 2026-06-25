@@ -33,6 +33,7 @@
     <string name="title_activity_table">Tabelle</string>
     <string name="title_activity_plan">Grundriss</string>
     <string name="title_activity_elevation">Seitenriss</string>
+    <string name="title_activity_cross_section">Querschnitt</string>
     <string name="title_activity_calibration">Kalibrierung</string>
     <string name="title_activity_survey">Statistik</string>
     <string name="title_activity_settings">Einstellungen</string>
@@ -48,6 +49,8 @@
     <string name="action_file">Datei</string>
     <string name="action_stats">Statistik</string>
     <string name="action_settings">Einstellungen</string>
+    <string name="action_settings_system">System</string>
+    <string name="action_settings_survey">Vermessung</string>
     <string name="action_dev">Dev</string>
     <string name="action_device">Messgerät</string>
     <string name="action_device_connect">Verbinden…</string>
@@ -88,6 +91,8 @@
     <string name="action_trigger_autosave">Automatische Speicherung auslösen</string>
     <string name="action_kill_connection">Lösch-Kommandoabfolge (Achtung!)</string>
     <string name="action_force_crash">Absturz herbeiführen (Achtung!)</string>
+    <string name="action_xsection_done">Fertig</string>
+    <string name="action_xsection_cancel">Abbrechen</string>
 
     <!--  File handling  -->
     <string name="file_started_new_survey">Neue Vermessung angelegt</string>
@@ -182,11 +187,13 @@
     <string name="sketch_menu_pinch_to_zoom">Zoom durch Kneifen</string>
     <string name="sketch_menu_fade_non_active">Nicht-Aktiv-Funktion ausblenden</string>
     <string name="sketch_menu_show_station_labels">Messpunkt-Beschriftungen</string>
+    <string name="sketch_menu_show_xsections">Querschnitte</string>
     <string name="sketch_menu_show_splays">Dimensionen und Hilfslinien anzeigen</string>
     <string name="sketch_menu_show_sketch">Skizze anzeigen</string>
     <string name="sketch_menu_show_connect">Verknüpfte Vermessungsdateien</string>
     <string name="sketch_menu_back_measurements">Rückwärtsgerichtete Messstrecken</string>
     <string name="sketch_position_cross_section_instruction">Ort zum Zeichnen eines Querschnitts auswählen</string>
+    <string name="sketch_rotate_cross_section_instruction">Von der Station ziehen, um die Querschnittsrichtung festzulegen</string>
     <string name="sketch_symbol_orientation_education"> Ziehen, um die Richtung des Symbols festzulegen</string>
     <string name="sketch_text_hint">Text eingeben</string>
 
@@ -390,6 +397,8 @@
     <string name="stats_number_splays">Anzahl Dimensionen und Hilfslinien</string>
     <string name="stats_longest_leg">Längste Messstrecke (m)</string>
     <string name="stats_shortest_leg">Kürzeste Messstrecke (m)</string>
+    <string name="settings_survey_title">Vermessungseinstellungen</string>
+    <string name="settings_survey_cross_section_scale">Querschnittsmaßstab</string>
 
     <!--  Settings  -->
     <string name="settings_general_title">Allgemeines</string>
@@ -468,6 +477,8 @@
     <string name="settings_anti_alias_title">Anti-Alias-Skizzenlinien</string>
     <string name="settings_anti_alias_summary">Anti-Aliasing auf Skizzenlinien usw. anwenden (verbessert die visuelle Darstellung auf Kosten der Rechenleistung)</string>
     <string name="settings_manual_data_entry_title">Manuelle Daten-Eingabe</string>
+    <string name="settings_manual_data_controls_title">Manuelle Dateneingabe</string>
+    <string name="settings_manual_data_controls_summary">Schaltflächen zum manuellen Eingeben von Strecken oder Splays in der Tabellenansicht anzeigen</string>
     <string name="settings_manual_data_entry_summary">LROU-Felder, Winkelformat</string>
     <string name="settings_key_lrud_fields_title">LROU-Eingaben (Dimensionen)</string>
     <string name="settings_key_lrud_fields_summary">Felder zur Eingabe von LROU-Werten (Links-Rechts-Oben-Unten) für jeden neuen Messpunkt anzeigen</string>
@@ -496,6 +507,28 @@
     <string name="settings_export_svg_leg_width_summary">Wie breit Messstrecken im SVG-Export dargestellt werden sollen</string>
     <string name="settings_export_svg_splay_width_title">SVG-Dimensions-Strichstärke</string>
     <string name="settings_export_svg_splay_width_summary">Wie breit Dimensionen im SVG-Export dargestellt werden sollen</string>
+    <string name="settings_export_svg_legend_title">Legende anzeigen</string>
+    <string name="settings_export_svg_legend_summary">Legendenstreifen mit Titel, Datum, Statistik usw. einbeziehen</string>
+    <string name="settings_export_svg_north_arrow_title">Nordpfeil anzeigen</string>
+    <string name="settings_export_svg_north_arrow_summary">Nordpfeil in der Legende bei Grundrissexporten hinzufügen</string>
+    <string name="settings_export_svg_scale_bar_title">Maßstabsleiste anzeigen</string>
+    <string name="settings_export_svg_scale_bar_summary">Maßstabsleiste zur Legende hinzufügen</string>
+    <string name="settings_export_svg_team_title">Vermessungsteam anzeigen</string>
+    <string name="settings_export_svg_team_summary">Liste der Vermesser anzeigen</string>
+    <string name="settings_export_svg_cross_sections_title">Querschnitte exportieren</string>
+    <string name="settings_export_svg_cross_sections_summary">Querschnittsskizzen in den SVG-Export einbeziehen</string>
+    <string name="settings_export_svg_symbols_title">Symbole exportieren</string>
+    <string name="settings_export_svg_symbols_summary">Symbole in den SVG-Export einbeziehen</string>
+    <string name="settings_export_svg_centreline_title">Polygon anzeigen</string>
+    <string name="settings_export_svg_centreline_summary">Vermessungspolygon (Strecken) im SVG-Export zeichnen</string>
+    <string name="settings_export_svg_stations_title">Stationsbeschriftungen anzeigen</string>
+    <string name="settings_export_svg_stations_summary">Stationsnamen-Beschriftungen im SVG-Export zeichnen</string>
+    <string name="settings_export_svg_splays_title">Splays anzeigen</string>
+    <string name="settings_export_svg_splays_summary">Splayschüsse (LRUD-Linien) im SVG-Export zeichnen</string>
+    <string name="settings_export_svg_grid_title">Raster anzeigen</string>
+    <string name="settings_export_svg_grid_summary">Hintergrundraster hinter der Vermessung zeichnen</string>
+    <string name="settings_export_svg_tagline_title">Slogan anzeigen</string>
+    <string name="settings_export_svg_tagline_summary">SexyTopo angemessen würdigen</string>
     <string name="settings_export_therion_symbols_title">Therion-Export Symbole</string>
     <string name="settings_export_therion_symbols_summary">Symbole beim Exportieren im Therion-Format einschließen</string>
     <string name="settings_export_therion_text_title">Therion-Export Text</string>
@@ -529,6 +562,7 @@
     <string name="therion_export_ee_scraps">Aufriss-Scraps</string>
     <string name="therion_export_stations_in_plan">Messpunkte zum ersten Planansicht-Scrap hinzufügen</string>
     <string name="therion_export_stations_in_ee">Messpunkte zum ersten Aufriss-Scrap hinzufügen</string>
+    <string name="svg_export_dialog_title">SVG-Exportoptionen</string>
     <string name="settings_developer_title">Entwickler</string>
     <string name="settings_developer_summary">Debugging-Optionen</string>
     <string name="settings_key_developer_mode_title"> Entwickler-Modus</string>
@@ -611,6 +645,11 @@
     <string name="menu_jump_to">Springen</string>
     <string name="menu_jump_to_station_in_plan">&#10132; Grundriss</string>
     <string name="menu_jump_to_station_in_elevation">&#10132; Seitenriss</string>
+    <string name="menu_xsection">Querschnitt</string>
+    <string name="menu_xsection_create">Neuer Querschnitt</string>
+    <string name="menu_xsection_delete">Querschnitt löschen</string>
+    <string name="menu_xsection_edit">Skizze bearbeiten</string>
+    <string name="menu_xsection_set_direction">Richtung festlegen</string>
     <string name="menu_new_cross_section">Neuer Querschnitt</string>
     <string name="menu_jump_to_station_in_table">&#10132; Daten-Tabelle</string>
     <string name="menu_delete_station">Löschen</string>

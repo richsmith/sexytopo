@@ -33,6 +33,7 @@
     <string name="title_activity_table">Tabela</string>
     <string name="title_activity_plan">Plan</string>
     <string name="title_activity_elevation">Przekrój</string>
+    <string name="title_activity_cross_section">Przekrój</string>
     <string name="title_activity_calibration">Kalibracja</string>
     <string name="title_activity_survey">Statystyki</string>
     <string name="title_activity_settings">Ustawienia</string>
@@ -48,6 +49,8 @@
     <string name="action_file">Plik</string>
     <string name="action_stats">Statystyki</string>
     <string name="action_settings">Ustawienia</string>
+    <string name="action_settings_system">System</string>
+    <string name="action_settings_survey">Pomiar</string>
     <string name="action_dev">Dev</string>
     <string name="action_device">Instrument</string>
     <string name="action_device_connect">Połącz…</string>
@@ -88,6 +91,8 @@
     <string name="action_trigger_autosave">Wywołaj autozapis</string>
     <string name="action_kill_connection">Zakończ połączenie (Niebezpieczne!)</string>
     <string name="action_force_crash">Wymuś awarię (Niebezpieczne!)</string>
+    <string name="action_xsection_done">Gotowe</string>
+    <string name="action_xsection_cancel">Anuluj</string>
 
     <!-- File handling -->
     <string name="file_started_new_survey">Rozpoczęto nowy pomiar</string>
@@ -182,11 +187,13 @@
     <string name="sketch_menu_pinch_to_zoom">Powiększanie gestem szczypania</string>
     <string name="sketch_menu_fade_non_active">Przyciemnij nieaktywne</string>
     <string name="sketch_menu_show_station_labels">Etykiety stanowisk</string>
+    <string name="sketch_menu_show_xsections">Przekroje</string>
     <string name="sketch_menu_show_splays">Pokaż pomiary szczegółowe</string>
     <string name="sketch_menu_show_sketch">Pokaż szkic</string>
     <string name="sketch_menu_show_connect">Połączone pomiary</string>
     <string name="sketch_menu_back_measurements">Odwrócone ciągi</string>
     <string name="sketch_position_cross_section_instruction">Wybierz miejsce narysowania przekroju</string>
+    <string name="sketch_rotate_cross_section_instruction">Przeciągnij od stacji, aby ustawić kierunek przekroju</string>
     <string name="sketch_symbol_orientation_education">Przeciągnij, aby ustawić kierunek symbolu</string>
     <string name="sketch_text_hint">Wprowadź tekst</string>
 
@@ -390,6 +397,8 @@
     <string name="stats_number_splays">Liczba pomiarów szczegółowych</string>
     <string name="stats_longest_leg">Najdłuższy ciąg (m)</string>
     <string name="stats_shortest_leg">Najkrótszy ciąg (m)</string>
+    <string name="settings_survey_title">Ustawienia pomiaru</string>
+    <string name="settings_survey_cross_section_scale">Skala przekrojów</string>
 
     <!-- Settings -->
     <string name="settings_general_title">Ogólne</string>
@@ -468,6 +477,8 @@
     <string name="settings_anti_alias_title">Wygładzanie linii szkicu</string>
     <string name="settings_anti_alias_summary">Zastosuj wygładzanie do linii szkicu itp. (poprawia wygląd kosztem wydajności)</string>
     <string name="settings_manual_data_entry_title">Ręczne wprowadzanie danych</string>
+    <string name="settings_manual_data_controls_title">Ręczne wprowadzanie</string>
+    <string name="settings_manual_data_controls_summary">Pokaż przyciski do ręcznego wprowadzania odcinków lub promieni w widoku tabeli</string>
     <string name="settings_manual_data_entry_summary">Pola LRUD, format kąta</string>
     <string name="settings_key_lrud_fields_title">Wpisy LRUD</string>
     <string name="settings_key_lrud_fields_summary">Pokaż pola do wprowadzania LRUD (Lewo-Prawo-Góra-Dół) dla każdego nowego stanowiska</string>
@@ -496,6 +507,28 @@
     <string name="settings_export_svg_leg_width_summary">Grubość rysowania linii ciągów w eksporcie SVG</string>
     <string name="settings_export_svg_splay_width_title">Szerokość pomiarów szczegółowych SVG</string>
     <string name="settings_export_svg_splay_width_summary">Grubość rysowania linii pomiarów szczegółowych w eksporcie SVG</string>
+    <string name="settings_export_svg_legend_title">Pokaż legendę</string>
+    <string name="settings_export_svg_legend_summary">Dołącz pasek legendy z tytułem, datą, statystykami itp.</string>
+    <string name="settings_export_svg_north_arrow_title">Pokaż strzałkę północy</string>
+    <string name="settings_export_svg_north_arrow_summary">Dodaj strzałkę północy do legendy w eksportach rzutu</string>
+    <string name="settings_export_svg_scale_bar_title">Pokaż podziałkę</string>
+    <string name="settings_export_svg_scale_bar_summary">Dodaj podziałkę do legendy</string>
+    <string name="settings_export_svg_team_title">Pokaż zespół</string>
+    <string name="settings_export_svg_team_summary">Pokaż listę mierniczych</string>
+    <string name="settings_export_svg_cross_sections_title">Eksportuj przekroje</string>
+    <string name="settings_export_svg_cross_sections_summary">Dołącz szkice przekrojów do eksportu SVG</string>
+    <string name="settings_export_svg_symbols_title">Eksportuj symbole</string>
+    <string name="settings_export_svg_symbols_summary">Dołącz symbole do eksportu SVG</string>
+    <string name="settings_export_svg_centreline_title">Pokaż ciąg</string>
+    <string name="settings_export_svg_centreline_summary">Rysuj ciąg pomiarowy (odcinki) w eksporcie SVG</string>
+    <string name="settings_export_svg_stations_title">Pokaż etykiety stacji</string>
+    <string name="settings_export_svg_stations_summary">Rysuj etykiety nazw stacji w eksporcie SVG</string>
+    <string name="settings_export_svg_splays_title">Pokaż promienie</string>
+    <string name="settings_export_svg_splays_summary">Rysuj promienie (linie LRUD) w eksporcie SVG</string>
+    <string name="settings_export_svg_grid_title">Pokaż siatkę</string>
+    <string name="settings_export_svg_grid_summary">Rysuj siatkę w tle pomiaru</string>
+    <string name="settings_export_svg_tagline_title">Pokaż podpis</string>
+    <string name="settings_export_svg_tagline_summary">Odpowiednio podziękuj SexyTopo</string>
     <string name="settings_export_therion_symbols_title">Symbole eksportu Therion</string>
     <string name="settings_export_therion_symbols_summary">Uwzględnij symbole podczas eksportu do formatu Therion</string>
     <string name="settings_export_therion_text_title">Tekst eksportu Therion</string>
@@ -529,6 +562,7 @@
     <string name="therion_export_ee_scraps">Scrapy przekroju rozwinięcia</string>
     <string name="therion_export_stations_in_plan">Dodaj stacje do pierwszego scrapu planu</string>
     <string name="therion_export_stations_in_ee">Dodaj stacje do pierwszego scrapu przekroju rozwinięcia</string>
+    <string name="svg_export_dialog_title">Opcje eksportu SVG</string>
     <string name="settings_developer_title">Deweloper</string>
     <string name="settings_developer_summary">Opcje debugowania</string>
     <string name="settings_key_developer_mode_title">Tryb dewelopera</string>
@@ -611,6 +645,11 @@
     <string name="menu_jump_to">Przeskocz</string>
     <string name="menu_jump_to_station_in_plan">&#10132; Plan</string>
     <string name="menu_jump_to_station_in_elevation">&#10132; Przekrój</string>
+    <string name="menu_xsection">Przekrój</string>
+    <string name="menu_xsection_create">Nowy przekrój</string>
+    <string name="menu_xsection_delete">Usuń przekrój</string>
+    <string name="menu_xsection_edit">Edytuj szkic</string>
+    <string name="menu_xsection_set_direction">Ustaw kierunek</string>
     <string name="menu_new_cross_section">Nowy przekrój poprzeczny</string>
     <string name="menu_jump_to_station_in_table">&#10132; Tabela danych</string>
     <string name="menu_delete_station">Usuń</string>
