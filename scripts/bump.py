@@ -31,6 +31,11 @@ def bump_patch(version: str) -> str:
     return f"{major}.{minor}.{patch + 1}"
 
 
+def bump_minor(version: str) -> str:
+    major, minor, _patch = parse_version(version)
+    return f"{major}.{minor + 1}.0"
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Bump version, commit app/build.gradle and docs/releases.md, and tag."
@@ -39,7 +44,14 @@ def main() -> None:
         "version", nargs="?", type=valid_version, metavar="N.N.N",
         help="new version number (default: bump patch version)"
     )
+    parser.add_argument(
+        "--minor", action="store_true",
+        help="bump the minor version (resets patch to 0) instead of the patch version"
+    )
     args = parser.parse_args()
+
+    if args.minor and args.version:
+        die("pass either an explicit version or --minor, not both")
 
     if not BUILD_GRADLE.exists():
         die("run this script from the repo root")
@@ -56,7 +68,12 @@ def main() -> None:
     current_code = int(code_match.group(1))
     new_code = current_code + 1
 
-    new_version = args.version if args.version else bump_patch(current_name)
+    if args.version:
+        new_version = args.version
+    elif args.minor:
+        new_version = bump_minor(current_name)
+    else:
+        new_version = bump_patch(current_name)
 
     # Warn if new version is not greater than current
     try:
