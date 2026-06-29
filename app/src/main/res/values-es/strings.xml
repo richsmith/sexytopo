@@ -458,6 +458,8 @@
     <string name="settings_highlight_latest_leg_summary">Mostrar la medición más reciente en morado</string>
     <string name="settings_two_finger_movement_title">Movimiento con dos dedos (experimental)</string>
     <string name="settings_two_finger_movement_summary">Dos dedos mueven la pantalla incluso cuando se dibuja, etc.</string>
+    <string name="settings_legacy_cross_sections_title">Usar secciones transversales clásicas</string>
+    <string name="settings_legacy_cross_sections_summary">Mostrar las secciones transversales como una proyección simple sin marco editable; desactiva tocar para editar.</string>
     <string name="settings_survey_text_tool_font_size_title">Tamaño de etiqueta de herramienta de texto</string>
     <string name="settings_survey_text_tool_font_size_summary">Qué tan grande dibujar inicialmente el texto colocado manualmente (sp)</string>
     <string name="settings_survey_symbol_size_title">Tamaño de símbolos de topografía</string>

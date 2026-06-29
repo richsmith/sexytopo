@@ -458,6 +458,8 @@
     <string name="settings_highlight_latest_leg_summary">Afficher la dernière mesure en violet</string>
     <string name="settings_two_finger_movement_title">Déplacement à deux doigts (expérimental)</string>
     <string name="settings_two_finger_movement_summary">Deux doigts déplacent l\'écran même en dessinant, etc.</string>
+    <string name="settings_legacy_cross_sections_title">Utiliser les coupes classiques</string>
+    <string name="settings_legacy_cross_sections_summary">Afficher les coupes comme une simple projection sans cadre modifiable ; désactive l\'appui pour modifier.</string>
     <string name="settings_survey_text_tool_font_size_title">Taille de la police de l\'outil texte</string>
     <string name="settings_survey_text_tool_font_size_summary">Quelle taille dessiner le texte placé manuellement (sp)</string>
     <string name="settings_survey_symbol_size_title">Taille du symbole de la topographie</string>

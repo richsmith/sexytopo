@@ -500,6 +500,8 @@
     <string name="settings_highlight_latest_leg_summary">Show most recent measurement in purple</string>
     <string name="settings_two_finger_movement_title">Two-finger movement (experimental)</string>
     <string name="settings_two_finger_movement_summary">Two fingers move the screen even when drawing etc.</string>
+    <string name="settings_legacy_cross_sections_title">Use legacy cross-sections</string>
+    <string name="settings_legacy_cross_sections_summary">Show cross-sections as a simple projection without the editable frame; disables tap-to-edit.</string>
     <string name="settings_survey_text_tool_font_size_title">Text tool label size</string>
     <string name="settings_survey_text_tool_font_size_summary">How big to initially draw manually-placed text (sp)</string>
     <string name="settings_survey_symbol_size_title">Survey symbol size</string>

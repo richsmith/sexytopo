@@ -17,6 +17,7 @@ import android.widget.PopupMenu;
 import java.util.HashMap;
 import java.util.Map;
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -257,6 +258,10 @@ public class ContextMenuManager {
                 createItem.setEnabled(!hasCrossSection);
             }
             if (editItem != null) {
+                // The editor activity only exists in the new mode; hide Edit for legacy
+                // cross-sections.
+                boolean legacyCrossSections = GeneralPreferences.isLegacyCrossSectionsOn();
+                editItem.setVisible(!legacyCrossSections);
                 editItem.setEnabled(hasCrossSection);
             }
             if (setDirectionItem != null) {

@@ -25,6 +25,12 @@
         android:summary="@string/settings_two_finger_movement_summary"
         android:defaultValue="false"/>
 
+    <CheckBoxPreference
+        android:key="pref_legacy_cross_sections"
+        android:title="@string/settings_legacy_cross_sections_title"
+        android:summary="@string/settings_legacy_cross_sections_summary"
+        android:defaultValue="false"/>
+
     <EditTextPreference
         android:key="pref_survey_text_tool_font_size"
         android:title="@string/settings_survey_text_tool_font_size_title"
@@ -65,7 +71,7 @@
         android:title="@string/settings_station_diameter_title"
         android:summary="@string/settings_station_diameter_summary"
         android:inputType="numberDecimal"
-        android:defaultValue="16"/>
+        android:defaultValue="10"/>
 
     <EditTextPreference
         android:key="pref_station_label_font_size_sp"

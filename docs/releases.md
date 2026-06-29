@@ -1,5 +1,5 @@
 # 2026-06-25 1.12.0
-- Separate cross-section editing view which also allows moving of sections and orientation adjustment
+- Separate cross-section editing view which also allows moving of sections and orientation adjustment (legacy behaviour can be mostly restored in Settings)
 - Data import improvements: better error reporting & allow theolidite readings (thanks Andrew Atkinson)
 - Toggleable option to automatically sketch water as blue
 - SVG export improvements, including an optional legend and scale bar
@@ -12,6 +12,7 @@
 - Pinch-to-zoom now turn-offable
 - Made deletion of details easier
 - Fix a bug stopping deletion of text details
+- Guard against leaving sketch artefacts (dots etc.) on long-pressing to open menu
 
 # 2026-04-28 1.11.2
 - Fix a bug causing cross-sections to be initially hidden

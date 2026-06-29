@@ -458,6 +458,8 @@
     <string name="settings_highlight_latest_leg_summary">Mostra la misurazione più recente in viola</string>
     <string name="settings_two_finger_movement_title">Movimento a due dita (sperimentale)</string>
     <string name="settings_two_finger_movement_summary">Due dita spostano lo schermo anche durante il disegno ecc.</string>
+    <string name="settings_legacy_cross_sections_title">Usa sezioni trasversali classiche</string>
+    <string name="settings_legacy_cross_sections_summary">Mostra le sezioni trasversali come una semplice proiezione senza cornice modificabile; disattiva il tocco per modificare.</string>
     <string name="settings_survey_text_tool_font_size_title">Dimensione etichetta strumento testo</string>
     <string name="settings_survey_text_tool_font_size_summary">Quanto grande disegnare inizialmente il testo posizionato manualmente (sp)</string>
     <string name="settings_survey_symbol_size_title">Dimensione simboli rilievo</string>

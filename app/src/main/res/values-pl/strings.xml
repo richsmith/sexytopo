@@ -458,6 +458,8 @@
     <string name="settings_highlight_latest_leg_summary">Pokaż najnowszy pomiar na fioletowo</string>
     <string name="settings_two_finger_movement_title">Ruch dwoma palcami (eksperymentalne)</string>
     <string name="settings_two_finger_movement_summary">Dwa palce przesuwają ekran nawet podczas rysowania itp.</string>
+    <string name="settings_legacy_cross_sections_title">Użyj klasycznych przekrojów</string>
+    <string name="settings_legacy_cross_sections_summary">Pokaż przekroje jako prostą projekcję bez edytowalnej ramki; wyłącza dotknięcie, aby edytować.</string>
     <string name="settings_survey_text_tool_font_size_title">Rozmiar etykiety narzędzia tekstu</string>
     <string name="settings_survey_text_tool_font_size_summary">Początkowy rozmiar ręcznie umieszczonego tekstu (sp)</string>
     <string name="settings_survey_symbol_size_title">Rozmiar symbolu pomiaru</string>

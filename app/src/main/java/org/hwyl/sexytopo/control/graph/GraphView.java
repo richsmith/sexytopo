@@ -506,6 +506,9 @@ public class GraphView extends View {
     }
 
     private boolean isCrossSectionMoveSelection(MotionEvent event) {
+        if (GeneralPreferences.isLegacyCrossSectionsOn()) {
+            return false; // no drag handle is drawn for legacy cross-sections
+        }
         boolean currentlyActive = currentSketchTool == SketchTool.MOVE_CROSS_SECTION;
         boolean isDown = event.getAction() == MotionEvent.ACTION_DOWN;
         boolean hitAHandle = findCrossSectionHandleAt(event.getX(), event.getY()) != null;
@@ -892,6 +895,9 @@ public class GraphView extends View {
     private boolean handleCrossSectionBodyTap(MotionEvent event) {
         if (!SketchPreferences.Toggle.SHOW_X_SECTIONS.isOn()) {
             return false; // special case: can't tap on invisible X-sections
+        }
+        if (GeneralPreferences.isLegacyCrossSectionsOn()) {
+            return false; // in legacy mode there is no frame to tap
         }
         if (currentSketchTool == SketchTool.MOVE) {
             return false; // MOVE just pans; don't open the cross-section view on a tap
@@ -1317,11 +1323,24 @@ public class GraphView extends View {
         Space<Coord2D> sectionProjection = Space2DUtils.translate(scaledProjection, centreOnSurvey);
         drawLegs(canvas, sectionProjection, alpha);
 
+        Coord2D viewStationLocation = surveyCoordsToViewCoords(surveyStationLocation);
+
+        if (GeneralPreferences.isLegacyCrossSectionsOn()) {
+            // Legacy cross-sections: just the projected legs and a connector running to the centre,
+            // with no editable frame, sub-sketch or drag handle.
+            drawDashedLine(
+                    canvas,
+                    viewStationLocation,
+                    centreOnView,
+                    dashedLineIntervalPx,
+                    crossSectionConnectorPaint);
+            return true;
+        }
+
         drawCrossSectionSubSketch(canvas, sectionDetail, centreOnSurvey, alpha);
 
         RectF borderRect = drawCrossSectionBorder(canvas, sectionDetail, dragDelta);
 
-        Coord2D viewStationLocation = surveyCoordsToViewCoords(surveyStationLocation);
         Coord2D connectorEnd =
                 clipSegmentToRectBoundary(viewStationLocation, centreOnView, borderRect);
         if (connectorEnd != null) {

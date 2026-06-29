@@ -458,6 +458,8 @@
     <string name="settings_highlight_latest_leg_summary">Letzte Messung in violett anzeigen</string>
     <string name="settings_two_finger_movement_title">Touch-Gesten (experimentell)</string>
     <string name="settings_two_finger_movement_summary">Touch-Gesten auch beim Zeichnen zulassen</string>
+    <string name="settings_legacy_cross_sections_title">Klassische Querschnitte verwenden</string>
+    <string name="settings_legacy_cross_sections_summary">Querschnitte als einfache Projektion ohne bearbeitbaren Rahmen anzeigen; deaktiviert das Antippen zum Bearbeiten.</string>
     <string name="settings_survey_text_tool_font_size_title">Beschriftungsgrösse Textfeld</string>
     <string name="settings_survey_text_tool_font_size_summary">Ausgangsgrösse von manuell platziertem Text (sp)</string>
     <string name="settings_survey_symbol_size_title">Grösse Vermessungs-Symbol</string>

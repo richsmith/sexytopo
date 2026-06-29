@@ -197,6 +197,10 @@ public class GeneralPreferences {
         return getBoolean("pref_two_finger_movement", false);
     }
 
+    public static boolean isLegacyCrossSectionsOn() {
+        return getBoolean("pref_legacy_cross_sections", false);
+    }
+
     // ********** Sketching ***********
 
     public static boolean isAntialiasingModeOn() {
@@ -208,7 +212,7 @@ public class GeneralPreferences {
     }
 
     public static float getStationCrossDiameterDp() {
-        return getFloat("pref_station_diameter", 8f);
+        return getFloat("pref_station_diameter", 10f);
     }
 
     public static float getLegStrokeWidthDp() {
