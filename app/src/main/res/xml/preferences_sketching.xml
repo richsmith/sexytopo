@@ -57,7 +57,7 @@
         android:title="@string/settings_leg_width_title"
         android:summary="@string/settings_leg_width_summary"
         android:inputType="numberDecimal"
-        android:defaultValue="3"/>
+        android:defaultValue="2"/>
 
     <EditTextPreference
         android:key="pref_splay_width"

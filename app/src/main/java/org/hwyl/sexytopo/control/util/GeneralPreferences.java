@@ -216,7 +216,7 @@ public class GeneralPreferences {
     }
 
     public static float getLegStrokeWidthDp() {
-        return getFloat("pref_leg_width", 1.5f);
+        return getFloat("pref_leg_width", 2.0f);
     }
 
     public static float getSplayStrokeWidthDp() {
