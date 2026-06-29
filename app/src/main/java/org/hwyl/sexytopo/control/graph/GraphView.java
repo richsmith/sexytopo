@@ -433,6 +433,12 @@ public class GraphView extends View {
             return true;
         }
 
+        // Once a long-press has opened the station context menu, the rest of this touch is
+        // consumed: it shouldn't also act as a sketch gesture (e.g. leaving a stray mark).
+        if (menuShownInThisTouch) {
+            return true;
+        }
+
         switch (currentSketchTool) {
             case MOVE:
                 return handleMove(event);
@@ -676,12 +682,9 @@ public class GraphView extends View {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                if (currentSymbol.isDirectional()) {
-                    actionDownPointOnView = touchPointOnView;
-                } else {
-                    sketch.addSymbolDetail(touchPointOnSurvey, currentSymbol, size, 0);
-                }
-                invalidate();
+                // Only record the start point; the symbol is placed on ACTION_UP so a long-press
+                // that opens a station menu doesn't also leave a symbol behind.
+                actionDownPointOnView = touchPointOnView;
                 return true;
 
             case MotionEvent.ACTION_UP:
@@ -696,8 +699,10 @@ public class GraphView extends View {
                     if (distance < 5) {
                         activity.showSimpleToast(R.string.sketch_symbol_orientation_education);
                     }
-                    invalidate();
+                } else {
+                    sketch.addSymbolDetail(touchPointOnSurvey, currentSymbol, size, 0);
                 }
+                invalidate();
                 return true;
 
             default:
@@ -2164,6 +2169,9 @@ public class GraphView extends View {
             Coord2D touchPointOnView = new Coord2D(motionEvent.getX(), motionEvent.getY());
             Station matchedStation = checkForStation(touchPointOnView);
             if (matchedStation != null && !menuShownInThisTouch) {
+                if (currentSketchTool == SketchTool.DRAW) {
+                    sketch.abandonActivePath();
+                }
                 showContextMenu(motionEvent, matchedStation);
                 menuShownInThisTouch = true;
             }

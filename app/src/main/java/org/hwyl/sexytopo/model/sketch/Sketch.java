@@ -71,8 +71,9 @@ public class Sketch extends Shape {
 
     public PathDetail startNewPath(Coord2D start) {
         activePath = new PathDetail(start, activeColour);
+        // Registered in the undo history only on finishPath, so an unfinished path can be
+        // abandoned without leaving a trace.
         pathDetails.add(activePath);
-        addSketchDetail(activePath);
         return activePath;
     }
 
@@ -83,13 +84,23 @@ public class Sketch extends Shape {
         updateBoundingBox(sketchDetail);
     }
 
+    // Drops the in-progress path without committing it to the sketch or undo history.
+    public void abandonActivePath() {
+        if (activePath == null) {
+            return;
+        }
+        pathDetails.remove(activePath);
+        activePath = null;
+        recalculateBoundingBox();
+    }
+
     public void finishPath() {
         if (activePath == null) {
             return;
         }
         float epsilon = Space2DUtils.simplificationEpsilon(activePath);
         activePath.setPath(Space2DUtils.simplify(activePath.getPath(), epsilon));
-        updateBoundingBox(activePath);
+        addSketchDetail(activePath);
         activePath = null;
     }
 
