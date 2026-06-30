@@ -4,8 +4,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
+import org.hwyl.sexytopo.model.graph.Direction;
+import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
+import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -163,6 +166,53 @@ public class ThExporterTest {
         String metadata = SurvexTherionUtil.getMetadata(survey, SurveyFormat.THERION, "", "");
 
         Assert.assertTrue(metadata.contains("#explo-date "));
+    }
+
+    // -------------------------------------------------------------------------
+    // Therion extend commands: extend start/left/right
+    // -------------------------------------------------------------------------
+
+    @Test
+    public void testTherionExtendContainsExtendStartForOrigin() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        String originName = survey.getOrigin().getName();
+
+        String content = ThExporter.getExtendedElevationExtensions(survey);
+
+        Assert.assertTrue(
+                "Therion output must contain 'extend start' for the origin station",
+                content.contains("extend start " + originName));
+    }
+
+    @Test
+    public void testTherionExtendContainsExtendLeftForLeftStation() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Station changedStation = survey.getActiveStation();
+        changedStation.setExtendedElevationDirection(Direction.LEFT);
+
+        String content = ThExporter.getExtendedElevationExtensions(survey);
+
+        Assert.assertTrue(
+                "Therion output must contain 'extend left' for a station changed to left",
+                content.contains("extend left " + changedStation.getName()));
+    }
+
+    @Test
+    public void testTherionExtendContainsExtendRightForRightStation() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        // Set stations 2 and 3 to LEFT so the direction change back to RIGHT occurs at station 4
+        Station intermediate = survey.getOrigin().getConnectedOnwardLegs().get(0).getDestination();
+        intermediate.setExtendedElevationDirection(Direction.LEFT);
+        Station intermediate2 = intermediate.getConnectedOnwardLegs().get(0).getDestination();
+        intermediate2.setExtendedElevationDirection(Direction.LEFT);
+        Station lastStation = survey.getActiveStation();
+        lastStation.setExtendedElevationDirection(Direction.RIGHT);
+
+        String content = ThExporter.getExtendedElevationExtensions(survey);
+
+        Assert.assertTrue(
+                "Therion output must contain 'extend right' for a station changed back to right",
+                content.contains("extend right " + lastStation.getName()));
     }
 
     private static Trip.TeamEntry entry(String name, Trip.Role... roles) {
