@@ -17,3 +17,9 @@
 /sessions
 bin/
 docs/manual/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
