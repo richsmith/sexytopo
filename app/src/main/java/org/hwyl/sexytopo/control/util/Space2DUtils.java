@@ -61,11 +61,11 @@ public class Space2DUtils {
     }
 
     public static float adjustAngle(float angle, float delta) {
-        float newAngle = angle + delta;
-        while (newAngle < 0) {
+        float newAngle = (angle + delta) % 360;
+        if (newAngle < 0) {
             newAngle += 360;
         }
-        return newAngle % 360;
+        return newAngle;
     }
 
     /** Average azimuth values together, handling the 360/0 boundary correctly */
