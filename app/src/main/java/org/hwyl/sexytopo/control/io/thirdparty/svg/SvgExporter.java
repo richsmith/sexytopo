@@ -858,8 +858,8 @@ public class SvgExporter extends DoubleSketchFileExporter {
             throws IOException {
         xmlSerializer.startTag("", "text");
         xmlSerializer.attribute("", "id", station.getName());
-        xmlSerializer.attribute("", "x", String.format("%.5f", scale * coord.x));
-        xmlSerializer.attribute("", "y", String.format("%.5f", scale * coord.y));
+        xmlSerializer.attribute("", "x", String.format(Locale.ROOT, "%.5f", scale * coord.x));
+        xmlSerializer.attribute("", "y", String.format(Locale.ROOT, "%.5f", scale * coord.y));
         xmlSerializer.attribute("", "font-size", String.format("%d", STATION_FONT));
         xmlSerializer.attribute("", "stroke", "black");
         xmlSerializer.text(station.getName());
