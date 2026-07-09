@@ -1,3 +1,6 @@
+# 2026-07-08 1.12.2
+- Fix accidantal omission of bug from 1.12.1
+
 # 2026-07-08 1.12.1
 - Fix SVG export writing station label coordinates broken in some locales
 
