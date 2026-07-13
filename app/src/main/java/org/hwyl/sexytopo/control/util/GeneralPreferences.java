@@ -162,7 +162,15 @@ public class GeneralPreferences {
         return getBoolean("pref_deg_mins_secs", false);
     }
 
+    public static boolean isIncDegMinsSecsModeOn() {
+        return getBoolean("pref_inc_deg_mins_secs", false);
+    }
+
     // ********** Surveying ***********
+
+    public static String getLegAmalgamationAlgorithm() {
+        return getString("pref_leg_amalgamation_algorithm", "angular");
+    }
 
     public static float getMaxDistanceDelta() {
         return getFloat("pref_max_distance_delta", 0.05f);
@@ -172,12 +180,25 @@ public class GeneralPreferences {
         return getFloat("pref_max_angle_delta", 1.7f);
     }
 
+    public static float getMaxEndpointDelta() {
+        // Default to the BCRA Grade 5 cell size: all readings should fall within 0.1m of each other
+        return getFloat("pref_max_endpoint_delta", 0.1f);
+    }
+
+    public static float getMaxPairwiseError() {
+        return getFloat("pref_max_pairwise_error", 0.05f);
+    }
+
     public static boolean isHotCornersModeActive() {
         return getBoolean("pref_hot_corners", true);
     }
 
     public static boolean isTwoFingerModeActive() {
         return getBoolean("pref_two_finger_movement", false);
+    }
+
+    public static boolean isLegacyCrossSectionsOn() {
+        return getBoolean("pref_legacy_cross_sections", false);
     }
 
     // ********** Sketching ***********
@@ -191,11 +212,11 @@ public class GeneralPreferences {
     }
 
     public static float getStationCrossDiameterDp() {
-        return getFloat("pref_station_diameter", 8f);
+        return getFloat("pref_station_diameter", 10f);
     }
 
     public static float getLegStrokeWidthDp() {
-        return getFloat("pref_leg_width", 1.5f);
+        return getFloat("pref_leg_width", 2.0f);
     }
 
     public static float getSplayStrokeWidthDp() {
@@ -230,7 +251,7 @@ public class GeneralPreferences {
 
     // ********** Export ***********
     public static Colour getExportSvgBackgroundColour() {
-        String colour = getString("pref_export_svg_background", "transparent");
+        String colour = getString("pref_export_svg_background", "white");
         Log.i("Colour is " + colour);
         if (colour.equalsIgnoreCase("transparent")) {
             return Colour.TRANSPARENT;
@@ -249,6 +270,54 @@ public class GeneralPreferences {
 
     public static int getExportSvgSplayStrokeWidth() {
         return getInt("pref_export_svg_splay_width", 1);
+    }
+
+    public static boolean isExportSvgLegendEnabled() {
+        return getBoolean("pref_export_svg_legend", true);
+    }
+
+    public static boolean isExportSvgNorthArrowEnabled() {
+        return getBoolean("pref_export_svg_north_arrow", true);
+    }
+
+    public static boolean isExportSvgScaleBarEnabled() {
+        return getBoolean("pref_export_svg_scale_bar", true);
+    }
+
+    public static boolean isExportSvgTeamEnabled() {
+        return getBoolean("pref_export_svg_team", true);
+    }
+
+    public static boolean isExportSvgCrossSectionsEnabled() {
+        return getBoolean("pref_export_svg_cross_sections", true);
+    }
+
+    public static boolean isExportSvgSymbolsEnabled() {
+        return getBoolean("pref_export_svg_symbols", true);
+    }
+
+    public static boolean isExportSvgCentrelineEnabled() {
+        return getBoolean("pref_export_svg_centreline", true);
+    }
+
+    public static boolean isExportSvgStationsEnabled() {
+        return getBoolean("pref_export_svg_stations", true);
+    }
+
+    public static boolean isExportSvgSplaysEnabled() {
+        return getBoolean("pref_export_svg_splays", true);
+    }
+
+    public static boolean isExportSvgGridEnabled() {
+        return getBoolean("pref_export_svg_grid", true);
+    }
+
+    public static boolean isExportSvgTaglineEnabled() {
+        return getBoolean("pref_export_svg_tagline", true);
+    }
+
+    public static SharedPreferences getRawPreferences() {
+        return prefs;
     }
 
     public static boolean isXviExportSymbolsEnabled() {

@@ -55,6 +55,11 @@
             android:windowSoftInputMode="adjustNothing" >
         </activity>
         <activity
+            android:name=".control.activity.CrossSectionActivity"
+            android:label="@string/title_activity_cross_section"
+            android:windowSoftInputMode="adjustNothing" >
+        </activity>
+        <activity
             android:name=".control.activity.DeviceActivity"
             android:label="@string/title_activity_device" >
         </activity>

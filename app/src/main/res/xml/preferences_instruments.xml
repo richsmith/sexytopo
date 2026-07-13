@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <ListPreference
+        android:key="pref_leg_amalgamation_algorithm"
+        android:title="@string/settings_leg_amalgamation_algorithm_title"
+        android:summary="@string/settings_leg_amalgamation_algorithm_summary"
+        android:entries="@array/settings_leg_amalgamation_algorithm_entries"
+        android:entryValues="@array/settings_leg_amalgamation_algorithm_values"
+        android:defaultValue="angular" />
+
     <EditTextPreference
         android:key="pref_max_distance_delta"
         android:inputType="numberDecimal"
@@ -14,6 +22,20 @@
         android:title="@string/settings_max_angle_delta_title"
         android:summary="@string/settings_max_angle_delta_summary"
         android:defaultValue="1.7"/>
+
+    <EditTextPreference
+        android:key="pref_max_endpoint_delta"
+        android:inputType="numberDecimal"
+        android:title="@string/settings_max_endpoint_delta_title"
+        android:summary="@string/settings_max_endpoint_delta_summary"
+        android:defaultValue="0.1"/>
+
+    <EditTextPreference
+        android:key="pref_max_pairwise_error"
+        android:inputType="numberDecimal"
+        android:title="@string/settings_max_pairwise_error_title"
+        android:summary="@string/settings_max_pairwise_error_summary"
+        android:defaultValue="0.05"/>
 
     <ListPreference
         android:key="pref_calibration_algorithm"

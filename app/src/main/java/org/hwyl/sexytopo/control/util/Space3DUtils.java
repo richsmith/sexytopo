@@ -20,4 +20,27 @@ public class Space3DUtils {
 
         return new Coord3D(x, y, z);
     }
+
+    public static float getDistance(Coord3D a, Coord3D b) {
+        float dx = a.x - b.x;
+        float dy = a.y - b.y;
+        float dz = a.z - b.z;
+        return (float) Math.sqrt((dx * dx) + (dy * dy) + (dz * dz));
+    }
+
+    public static Leg toLeg(Coord3D vector) {
+        float x = vector.x, y = vector.y, z = vector.z;
+
+        float distance = (float) Math.sqrt((x * x) + (y * y) + (z * z));
+
+        float azimuth = (float) Math.toDegrees(Math.atan2(x, y));
+        if (azimuth < 0) {
+            azimuth += 360;
+        }
+
+        float horizontal = (float) Math.sqrt((x * x) + (y * y));
+        float inclination = (float) Math.toDegrees(Math.atan2(z, horizontal));
+
+        return new Leg(distance, azimuth, inclination);
+    }
 }

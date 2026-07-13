@@ -19,8 +19,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -36,6 +34,8 @@ import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.documentfile.provider.DocumentFile;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -52,6 +52,7 @@ import org.hwyl.sexytopo.comms.missing.NullCommunicator;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SexyTopoPermissions;
 import org.hwyl.sexytopo.control.SurveyManager;
+import org.hwyl.sexytopo.control.components.DialogUtils;
 import org.hwyl.sexytopo.control.components.StationSelectorDialog;
 import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.io.StartLocation;
@@ -59,14 +60,13 @@ import org.hwyl.sexytopo.control.io.SurveyDirectory;
 import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.control.io.basic.Saver;
 import org.hwyl.sexytopo.control.io.share.SurveyZipSharer;
-import org.hwyl.sexytopo.control.io.thirdparty.therion.TherionExportOptions;
-import org.hwyl.sexytopo.control.io.thirdparty.therion.TherionExporter;
 import org.hwyl.sexytopo.control.io.translation.Exporter;
 import org.hwyl.sexytopo.control.io.translation.ImportManager;
 import org.hwyl.sexytopo.control.io.translation.SelectableExporters;
 import org.hwyl.sexytopo.control.table.LegDialogs;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.InputMode;
+import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.SurveyConnection;
@@ -276,8 +276,11 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         } else if (itemId == R.id.action_trip) {
             startActivity(TripActivity.class);
             return true;
-        } else if (itemId == R.id.action_settings) {
+        } else if (itemId == R.id.action_settings_system) {
             startActivity(SettingsActivity.class);
+            return true;
+        } else if (itemId == R.id.action_settings_survey) {
+            openSurveySettingsDialog();
             return true;
         } else if (itemId == R.id.action_help) {
             startActivity(GuideActivity.class);
@@ -541,6 +544,36 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                         .setNeutralButton(R.string.ok, null)
                         .setView(messageView);
         builder.create().show();
+    }
+
+    private void openSurveySettingsDialog() {
+        Sketch planSketch = getSurvey().getPlanSketch();
+
+        TextInputLayout inputLayout =
+                DialogUtils.createStandardTextInputLayout(
+                        this, R.string.settings_survey_cross_section_scale);
+        TextInputEditText editText = DialogUtils.getEditText(inputLayout);
+        editText.setInputType(
+                android.text.InputType.TYPE_CLASS_NUMBER
+                        | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        editText.setText(String.valueOf(planSketch.getCrossSectionScale()));
+
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.settings_survey_title)
+                .setView(inputLayout)
+                .setPositiveButton(
+                        R.string.ok,
+                        (dialog, which) -> {
+                            try {
+                                float scale = Float.parseFloat(editText.getText().toString());
+                                planSketch.setCrossSectionScale(scale);
+                                planSketch.setSaved(false);
+                            } catch (NumberFormatException e) {
+                                // ignore invalid input
+                            }
+                        })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
     }
 
     @SuppressLint("UnusedDeclaration")
@@ -1009,49 +1042,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
     protected void exportSurvey(Exporter exporter) {
-        if (exporter instanceof TherionExporter) {
-            showTherionExportDialog((TherionExporter) exporter);
-        } else {
-            doExport(exporter);
-        }
-    }
-
-    private void showTherionExportDialog(TherionExporter exporter) {
-        View dialogView = getLayoutInflater().inflate(R.layout.dialog_therion_export, null);
-
-        EditText planScrapsInput = dialogView.findViewById(R.id.planScrapsInput);
-        EditText eeScrapsInput = dialogView.findViewById(R.id.eeScrapsInput);
-        CheckBox stationsInPlanCheckbox = dialogView.findViewById(R.id.stationsInPlanCheckbox);
-        CheckBox stationsInEeCheckbox = dialogView.findViewById(R.id.stationsInEeCheckbox);
-
-        new MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.therion_export_dialog_title)
-                .setView(dialogView)
-                .setPositiveButton(
-                        R.string.ok,
-                        (dialog, which) -> {
-                            int planScraps = parseIntSafe(planScrapsInput.getText().toString(), 1);
-                            int eeScraps = parseIntSafe(eeScrapsInput.getText().toString(), 1);
-                            boolean stationsInPlan = stationsInPlanCheckbox.isChecked();
-                            boolean stationsInEe = stationsInEeCheckbox.isChecked();
-
-                            TherionExportOptions options =
-                                    new TherionExportOptions(
-                                            planScraps, eeScraps, stationsInPlan, stationsInEe);
-                            exporter.setExportOptions(options);
-                            doExport(exporter);
-                        })
-                .setNegativeButton(R.string.cancel, null)
-                .show();
-    }
-
-    private int parseIntSafe(String value, int defaultValue) {
-        try {
-            int parsed = Integer.parseInt(value.trim());
-            return Math.max(1, parsed);
-        } catch (NumberFormatException e) {
-            return defaultValue;
-        }
+        exporter.showOptionsDialog(this, () -> doExport(exporter));
     }
 
     private void doExport(Exporter exporter) {

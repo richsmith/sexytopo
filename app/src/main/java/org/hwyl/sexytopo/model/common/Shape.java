@@ -5,7 +5,7 @@ import org.hwyl.sexytopo.model.graph.Coord2D;
 /**
  * Cartesisan shapes for use in SexyTopo. SexyTopo uses screen coords: y axis increases downwards.
  */
-public class Shape {
+public abstract class Shape {
 
     protected float left;
     protected float right;
@@ -108,6 +108,12 @@ public class Shape {
 
         return (right >= left1 && left <= right1) && (top <= bottom1 && bottom >= top1);
     }
+
+    /** Return a copy of this shape with the given translation applied. */
+    public abstract Shape translate(Coord2D translation);
+
+    /** Return a copy of this shape scaled around the origin by the given factor. */
+    public abstract Shape scale(float scale);
 
     public void flipVertically() {
         // This is a bit hacky! Provided for flipping the Y axis for e.g. Therion export.

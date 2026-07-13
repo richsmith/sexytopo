@@ -1,6 +1,11 @@
 package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
+import android.app.Activity;
 import android.content.Context;
+import android.view.View;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +16,6 @@ import org.hwyl.sexytopo.control.io.basic.ExportFrameFactory;
 import org.hwyl.sexytopo.control.io.thirdparty.xvi.XviExporter;
 import org.hwyl.sexytopo.control.io.translation.Exporter;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
-import org.hwyl.sexytopo.control.util.SpaceFlipper;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.common.Frame;
 import org.hwyl.sexytopo.model.graph.Coord2D;
@@ -164,11 +168,8 @@ public class TherionExporter extends Exporter {
 
         float scale = getScale();
 
+        // Survey-frame coords throughout — the Th2 / XVI exporters flip y at their emit sites.
         Space<Coord2D> space = projectionType.project(survey);
-        space = SpaceFlipper.flipVertically(space);
-        // Therion y-coordinates are inverse of SexyTopo's
-        // (it would be more consistent to either do all the processing like scaling and flipping
-        // all at once or all just before using, but we currently have a mix :/)
 
         Sketch sketch = survey.getSketch(projectionType);
 
@@ -204,6 +205,46 @@ public class TherionExporter extends Exporter {
         xviFile.save(context, xviContent);
 
         th2Files.add(th2File.getFilename());
+    }
+
+    @Override
+    public void showOptionsDialog(Context context, Runnable onReady) {
+        Activity activity = (Activity) context;
+        View dialogView =
+                activity.getLayoutInflater().inflate(R.layout.dialog_therion_export, null);
+
+        EditText planScrapsInput = dialogView.findViewById(R.id.planScrapsInput);
+        EditText eeScrapsInput = dialogView.findViewById(R.id.eeScrapsInput);
+        CheckBox stationsInPlanCheckbox = dialogView.findViewById(R.id.stationsInPlanCheckbox);
+        CheckBox stationsInEeCheckbox = dialogView.findViewById(R.id.stationsInEeCheckbox);
+
+        new MaterialAlertDialogBuilder(context)
+                .setTitle(R.string.therion_export_dialog_title)
+                .setView(dialogView)
+                .setPositiveButton(
+                        R.string.ok,
+                        (dialog, which) -> {
+                            int planScraps = parseIntSafe(planScrapsInput.getText().toString(), 1);
+                            int eeScraps = parseIntSafe(eeScrapsInput.getText().toString(), 1);
+                            boolean stationsInPlan = stationsInPlanCheckbox.isChecked();
+                            boolean stationsInEe = stationsInEeCheckbox.isChecked();
+
+                            exportOptions =
+                                    new TherionExportOptions(
+                                            planScraps, eeScraps, stationsInPlan, stationsInEe);
+                            onReady.run();
+                        })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    private static int parseIntSafe(String value, int defaultValue) {
+        try {
+            int parsed = Integer.parseInt(value.trim());
+            return Math.max(1, parsed);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
     }
 
     @Override

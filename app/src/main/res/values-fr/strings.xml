@@ -33,6 +33,7 @@
     <string name="title_activity_table">Tableau</string>
     <string name="title_activity_plan">Plan</string>
     <string name="title_activity_elevation">Élévation</string>
+    <string name="title_activity_cross_section">Coupe</string>
     <string name="title_activity_calibration">Calibration</string>
     <string name="title_activity_survey">Statistiques</string>
     <string name="title_activity_settings">Paramètres</string>
@@ -48,6 +49,8 @@
     <string name="action_file">Fichier</string>
     <string name="action_stats">Statistiques</string>
     <string name="action_settings">Paramètres</string>
+    <string name="action_settings_system">Système</string>
+    <string name="action_settings_survey">Levé</string>
     <string name="action_dev">Développement</string>
     <string name="action_device">Outils</string>
     <string name="action_device_connect">Connecter…</string>
@@ -88,6 +91,8 @@
     <string name="action_trigger_autosave">Déclencher la sauvegarde automatique</string>
     <string name="action_kill_connection">Terminer la communication (danger!)</string>
     <string name="action_force_crash">Forcer la fermeture (danger!)</string>
+    <string name="action_xsection_done">Terminé</string>
+    <string name="action_xsection_cancel">Annuler</string>
 
     <!-- File handling -->
     <string name="file_started_new_survey">Nouvelle topographie démarrée</string>
@@ -171,20 +176,24 @@
     <string name="sketch_toolbar_colour_blue">Bleu</string>
     <string name="sketch_toolbar_colour_purple">Violet</string>
     <string name="sketch_toolbar_symbol_close">Fermer la barre d\'outils des symboles</string>
-    <string name="sketch_menu_delete_last_leg">Annuler le dernièr segement</string>
+    <string name="sketch_menu_delete_last_leg">Annuler le dernier segment</string>
     <string name="sketch_menu_centre_view">Centrer sur l\'actif</string>
     <string name="sketch_menu_auto_recentre">Recentrage automatique</string>
     <string name="sketch_menu_redo">Refaire l\'action d\'esquisse</string>
     <string name="sketch_menu_show_grid">Papier millimétré</string>
     <string name="sketch_menu_show_compass">Boussole</string>
+    <string name="sketch_menu_blue_water">Eau bleue auto</string>
     <string name="sketch_menu_snap_to_lines">Accrocher aux lignes</string>
-    <string name="sketch_menu_fade_non_active">Atténuer les éléments non actifs</string>
+    <string name="sketch_menu_pinch_to_zoom">Zoom par pincement</string>
+    <string name="sketch_menu_fade_non_active">Atténuer les inactifs</string>
     <string name="sketch_menu_show_station_labels">Noms des stations</string>
+    <string name="sketch_menu_show_xsections">Coupes</string>
     <string name="sketch_menu_show_splays">Afficher les radiales</string>
     <string name="sketch_menu_show_sketch">Afficher l\'esquisse</string>
     <string name="sketch_menu_show_connect">Topographies liées</string>
     <string name="sketch_menu_back_measurements">Inverser les segments</string>
     <string name="sketch_position_cross_section_instruction">Sélectionnez où dessiner la coupe transversale</string>
+    <string name="sketch_rotate_cross_section_instruction">Faites glisser depuis la station pour définir la direction de la coupe</string>
     <string name="sketch_symbol_orientation_education">Faites glisser pour définir la direction du symbole</string>
     <string name="sketch_text_hint">Entrer le texte</string>
 
@@ -218,7 +227,8 @@
     <string name="manual_edit_to_station">Station d\'arrivée</string>
     <string name="manual_edit_to_station_error">Station d\'arrivée invalide</string>
     <string name="manual_edit_shot_backwards">⬅ Tir en arrière</string>
-    <string name="manual_edit_comment">Commentaire</string>
+    <string name="manual_edit_station_comment">Commentaire de la station</string>
+    <string name="manual_edit_leg_comment">Commentaire du segment</string>
     <string name="manual_rename_station_title">Renommer la station</string>
     <string name="manual_rename_station_hint">Nom de la station</string>
     <string name="manual_rename_error">Échec du renommage</string>
@@ -387,6 +397,8 @@
     <string name="stats_number_splays">Nombre de radiales</string>
     <string name="stats_longest_leg">Segment le plus long (m)</string>
     <string name="stats_shortest_leg">Segment le plus court (m)</string>
+    <string name="settings_survey_title">Paramètres du levé</string>
+    <string name="settings_survey_cross_section_scale">Échelle des coupes</string>
 
     <!-- Settings -->
     <string name="settings_general_title">Général</string>
@@ -410,6 +422,11 @@
         <item>Linéaire</item>
         <item>Non linéaire</item>
     </string-array>
+    <string-array name="settings_leg_amalgamation_algorithm_entries">
+        <item>Deltas angulaires : comparer distance, azimut &amp; inclinaison séparément ; moyenner séparément</item>
+        <item>Distance des extrémités : comparer l\'écart entre les points d\'extrémité ; moyenner comme des vecteurs</item>
+        <item>Vecteurs par paires : comparer l\'écart des extrémités par rapport à la longueur du segment ; moyenner comme des vecteurs</item>
+    </string-array>
     <string name="settings_immersive_mode_enabled">Mode plein écran activé</string>
     <string name="settings_immersive_mode_disabled">Mode plein écran désactivé</string>
     <string name="settings_new_station_vibration_title">Vibrer à la nouvelle station</string>
@@ -421,9 +438,15 @@
 <string name="settings_instruments_title">Outils</string>
     <string name="settings_instruments_summary">Tolérances des instruments, calibration</string>
     <string name="settings_max_distance_delta_title">Delta de distance max (m)</string>
-    <string name="settings_max_distance_delta_summary">Erreur maximale tolérée pour décider de créer une nouvelle station</string>
+    <string name="settings_max_distance_delta_summary">Méthode angulaire : de combien les mesures de distance peuvent différer pour décider de créer une nouvelle station</string>
     <string name="settings_max_angle_delta_title">Delta d\'angle max (degrés)</string>
-    <string name="settings_max_angle_delta_summary">Erreur maximale tolérée pour décider de créer une nouvelle station</string>
+    <string name="settings_max_angle_delta_summary">Méthode angulaire : de combien les mesures d\'azimut ou d\'inclinaison peuvent différer pour décider de créer une nouvelle station</string>
+    <string name="settings_leg_amalgamation_algorithm_title">Méthode d\'accord des segments</string>
+    <string name="settings_leg_amalgamation_algorithm_summary">Comment les mesures répétées sont jugées suffisamment proches pour former un segment</string>
+    <string name="settings_max_endpoint_delta_title">Distance d\'extrémité max (m)</string>
+    <string name="settings_max_endpoint_delta_summary">Méthode des extrémités : à quelle distance les extrémités des mesures peuvent se trouver pour décider de créer une nouvelle station. La valeur par défaut de 0.1 maintient toutes les mesures dans une même cellule BCRA Grade 5.</string>
+    <string name="settings_max_pairwise_error_title">Erreur par paires max</string>
+    <string name="settings_max_pairwise_error_summary">Méthode des vecteurs par paires : l\'erreur relative tolérée entre les mesures (0.05 = environ 2.5%) pour décider de créer une nouvelle station</string>
     <string name="settings_calibration_title">Calibration</string>
     <string name="settings_calibration_algorithm_title">Algorithme de calibration Disto-X</string>
     <string name="settings_calibration_algorithm_summary">Remplacer le choix de l\'algorithme de calibration du Disto-X</string>
@@ -435,6 +458,8 @@
     <string name="settings_highlight_latest_leg_summary">Afficher la dernière mesure en violet</string>
     <string name="settings_two_finger_movement_title">Déplacement à deux doigts (expérimental)</string>
     <string name="settings_two_finger_movement_summary">Deux doigts déplacent l\'écran même en dessinant, etc.</string>
+    <string name="settings_legacy_cross_sections_title">Utiliser les coupes classiques</string>
+    <string name="settings_legacy_cross_sections_summary">Afficher les coupes comme une simple projection sans cadre modifiable ; désactive l\'appui pour modifier.</string>
     <string name="settings_survey_text_tool_font_size_title">Taille de la police de l\'outil texte</string>
     <string name="settings_survey_text_tool_font_size_summary">Quelle taille dessiner le texte placé manuellement (sp)</string>
     <string name="settings_survey_symbol_size_title">Taille du symbole de la topographie</string>
@@ -454,6 +479,8 @@
     <string name="settings_anti_alias_title">Lisser les lignes de l\'esquisse</string>
     <string name="settings_anti_alias_summary">Appliquer un lissage aux lignes d\'esquisse, etc. (améliore l\'affichage visuel au détriment de certaines performances)</string>
     <string name="settings_manual_data_entry_title">Saisie manuelle des données</string>
+    <string name="settings_manual_data_controls_title">Saisie manuelle</string>
+    <string name="settings_manual_data_controls_summary">Afficher des boutons flottants pour saisir manuellement visées ou antennes dans la vue tableau</string>
     <string name="settings_manual_data_entry_summary">Champs LRUD, format d\'angle</string>
     <string name="settings_key_lrud_fields_title">Champs LRUD</string>
     <string name="settings_key_lrud_fields_summary">Afficher les champs pour entrer les LRUD (Gauche-Droite-Haut-Bas) pour chaque nouvelle station</string>
@@ -465,6 +492,9 @@
     </string-array>
     <string name="settings_key_deg_mins_secs_title">Azimut en degrés/minutes/secondes</string>
     <string name="settings_key_deg_mins_secs_summary">Entrer les valeurs d\'azimut en degrés/minutes/secondes (au lieu du mode décimal par défaut)</string>
+    <string name="manual_edit_inclination_deg_mins_secs">Inclinaison (&#176; \' \")</string>
+    <string name="settings_key_inc_deg_mins_secs_title">Inclinaison en degrés/minutes/secondes</string>
+    <string name="settings_key_inc_deg_mins_secs_summary">Entrer les valeurs d\'inclinaison en degrés/minutes/secondes (au lieu du mode décimal par défaut)</string>
     <string name="settings_export_title">Exporter</string>
     <string name="settings_export_summary">Formats d\'export et options de dossier</string>
     <string name="settings_export_svg_background_title">Arrière-plan SVG</string>
@@ -479,6 +509,28 @@
     <string name="settings_export_svg_leg_width_summary">Quelle largeur pour dessiner les segments dans l\'export SVG</string>
     <string name="settings_export_svg_splay_width_title">Largeur du trait des radiales SVG</string>
     <string name="settings_export_svg_splay_width_summary">Quelle largeur pour dessiner les radiales dans l\'export SVG</string>
+    <string name="settings_export_svg_legend_title">Afficher la légende</string>
+    <string name="settings_export_svg_legend_summary">Inclure un cartouche avec titre, date, statistiques, etc.</string>
+    <string name="settings_export_svg_north_arrow_title">Afficher la flèche nord</string>
+    <string name="settings_export_svg_north_arrow_summary">Ajouter une flèche nord au cartouche sur les exports en plan</string>
+    <string name="settings_export_svg_scale_bar_title">Afficher l\'échelle</string>
+    <string name="settings_export_svg_scale_bar_summary">Ajouter une échelle graphique au cartouche</string>
+    <string name="settings_export_svg_team_title">Afficher l\'équipe</string>
+    <string name="settings_export_svg_team_summary">Afficher la liste des topographes</string>
+    <string name="settings_export_svg_cross_sections_title">Exporter les coupes</string>
+    <string name="settings_export_svg_cross_sections_summary">Inclure les croquis de coupe dans l\'export SVG</string>
+    <string name="settings_export_svg_symbols_title">Exporter les symboles</string>
+    <string name="settings_export_svg_symbols_summary">Inclure les symboles dans l\'export SVG</string>
+    <string name="settings_export_svg_centreline_title">Afficher le cheminement</string>
+    <string name="settings_export_svg_centreline_summary">Dessiner le cheminement (visées) dans l\'export SVG</string>
+    <string name="settings_export_svg_stations_title">Afficher les étiquettes de station</string>
+    <string name="settings_export_svg_stations_summary">Dessiner les étiquettes de nom de station dans l\'export SVG</string>
+    <string name="settings_export_svg_splays_title">Afficher les antennes</string>
+    <string name="settings_export_svg_splays_summary">Dessiner les antennes (lignes LRUD) dans l\'export SVG</string>
+    <string name="settings_export_svg_grid_title">Afficher la grille</string>
+    <string name="settings_export_svg_grid_summary">Dessiner une grille de fond derrière le levé</string>
+    <string name="settings_export_svg_tagline_title">Afficher la signature</string>
+    <string name="settings_export_svg_tagline_summary">Créditer correctement SexyTopo</string>
     <string name="settings_export_therion_symbols_title">Exportation Therion des symboles</string>
     <string name="settings_export_therion_symbols_summary">Inclure les symboles lors de l\'exportation au format Therion</string>
     <string name="settings_export_therion_text_title">Exportation Therion du texte</string>
@@ -512,6 +564,7 @@
     <string name="therion_export_ee_scraps">Scraps développés</string>
     <string name="therion_export_stations_in_plan">Ajouter les stations au premier scrap de plan</string>
     <string name="therion_export_stations_in_ee">Ajouter les stations au premier scrap développé</string>
+    <string name="svg_export_dialog_title">Options d\'export SVG</string>
     <string name="settings_developer_title">Développeur</string>
     <string name="settings_developer_summary">Options de débogage</string>
     <string name="settings_key_developer_mode_title">Mode développeur</string>
@@ -534,9 +587,12 @@
     <string name="validation_error_same_as_from_station">Ne peut pas être identique à la station d\'origine</string>
     <string name="validation_error_station_name_not_unique">Le nom de la station doit être unique</string>
     <string name="validation_error_must_be_number">Doit être un nombre</string>
-    <string name="validation_error_distance_minimum">Doit être >= %1$f</string>
-    <string name="validation_error_azimuth_range">Doit être entre %1$f et %2$f</string>
-    <string name="validation_error_inclination_range">Doit être entre %1$f et %2$f</string>
+    <string name="validation_error_distance_minimum">Doit être >= %1$d</string>
+    <string name="validation_error_azimuth_range">Doit être entre %1$d et %2$d</string>
+    <string name="validation_error_inclination_range">Doit être entre -90 et 90 ou entre 270 et 360</string>
+    <string name="validation_error_mins_secs_range">Doit être compris entre 0 et 59</string>
+    <string name="validation_error_secs_range">Doit être compris entre 0 et moins de 60</string>
+    <string name="validation_error_must_be_zero_for_90">Doit être 0 pour ±90°</string>
 
     <!-- Input mode for leg editing -->
     <string-array name="leg_edit_input_mode_options">
@@ -593,6 +649,11 @@
     <string name="menu_jump_to">Aller à</string>
     <string name="menu_jump_to_station_in_plan">&#10132; Plan</string>
     <string name="menu_jump_to_station_in_elevation">&#10132; Élévation</string>
+    <string name="menu_xsection">Coupe</string>
+    <string name="menu_xsection_create">Nouvelle coupe</string>
+    <string name="menu_xsection_delete">Supprimer la coupe</string>
+    <string name="menu_xsection_edit">Modifier le croquis</string>
+    <string name="menu_xsection_set_direction">Définir la direction</string>
     <string name="menu_new_cross_section">Nouvelle coupe transversale</string>
     <string name="menu_jump_to_station_in_table">&#10132; Tableau de données</string>
     <string name="menu_delete_station">Supprimer</string>
@@ -606,6 +667,8 @@
     <string name="menu_start_new_survey">Commencer une nouvelle topographie ici</string>
     <string name="menu_unlink_survey">Dissocier la topographie liée</string>
     <string name="menu_comment">Commentaire</string>
+    <string name="menu_comment_leg">Commentaire du segment</string>
+    <string name="menu_comment_splay">Commentaire de la radiale</string>
     <string name="menu_toggle_left_right">Basculer Gauche/Droite</string>
     <string name="context_this_will_delete">Cela supprimera :</string>
     <string name="context_jump_to_splay_error">Impossible de se rendre à l\'extrémité d\'une radiale</string>

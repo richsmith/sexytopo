@@ -68,7 +68,12 @@ public class LegDialogs {
         boolean usingDegMinsSecs = GeneralPreferences.isDegMinsSecsModeOn();
         if (usingDegMinsSecs) {
             dialogView.findViewById(R.id.azimuth_standard).setVisibility(View.GONE);
-            dialogView.findViewById(R.id.azimuth_deg_mins_secs).setVisibility(View.VISIBLE);
+            dialogView.findViewById(R.id.azimuth_dms_container).setVisibility(View.VISIBLE);
+        }
+
+        if (GeneralPreferences.isIncDegMinsSecsModeOn()) {
+            dialogView.findViewById(R.id.inclinationLayout).setVisibility(View.GONE);
+            dialogView.findViewById(R.id.inclination_dms_container).setVisibility(View.VISIBLE);
         }
 
         // Hide TO field for splays
@@ -97,6 +102,7 @@ public class LegDialogs {
                 () -> {
                     // Get the leg with measurements and shot direction from form
                     Leg leg = form.getUpdatedLeg();
+                    leg.setComment(form.getUpdatedLegComment());
                     Station fromStation = form.getUpdatedFromStation();
 
                     // Get the new station names from the form
@@ -125,6 +131,7 @@ public class LegDialogs {
 
                         // Reconstruct leg with destination station (preserving backwards flag from
                         // form)
+                        String legComment = leg.getComment();
                         leg =
                                 new Leg(
                                         leg.getDistance(),
@@ -133,6 +140,7 @@ public class LegDialogs {
                                         newToStation,
                                         new Leg[] {},
                                         leg.wasShotBackwards());
+                        leg.setComment(legComment);
 
                         // Add leg to from station using SurveyUpdater
                         // This also sets the active station to the new destination
@@ -203,7 +211,12 @@ public class LegDialogs {
 
         if (usingDegMinsSecs) {
             dialogView.findViewById(R.id.azimuth_standard).setVisibility(View.GONE);
-            dialogView.findViewById(R.id.azimuth_deg_mins_secs).setVisibility(View.VISIBLE);
+            dialogView.findViewById(R.id.azimuth_dms_container).setVisibility(View.VISIBLE);
+        }
+
+        if (GeneralPreferences.isIncDegMinsSecsModeOn()) {
+            dialogView.findViewById(R.id.inclinationLayout).setVisibility(View.GONE);
+            dialogView.findViewById(R.id.inclination_dms_container).setVisibility(View.VISIBLE);
         }
 
         // Hide to station field for splays
@@ -233,25 +246,30 @@ public class LegDialogs {
                 .setText(Float.toString(editData.getDistance()));
 
         if (usingDegMinsSecs) {
-            float azimuth = editData.getAzimuth();
-            int degrees = (int) azimuth;
-            float remainder = azimuth - degrees;
-            int minutes = (int) (remainder * 60);
-            float seconds = ((remainder * 60) - minutes) * 60;
-
+            float[] azimuthDms = Leg.decomposeToDms(editData.getAzimuth());
             ((TextView) (dialog.findViewById(R.id.editAzimuthDegrees)))
-                    .setText(Integer.toString(degrees));
+                    .setText(Integer.toString((int) azimuthDms[0]));
             ((TextView) (dialog.findViewById(R.id.editAzimuthMinutes)))
-                    .setText(Integer.toString(minutes));
+                    .setText(Integer.toString((int) azimuthDms[1]));
             ((TextView) (dialog.findViewById(R.id.editAzimuthSeconds)))
-                    .setText(Float.toString(seconds));
+                    .setText(Float.toString(azimuthDms[2]));
         } else {
             ((TextView) (dialog.findViewById(R.id.editAzimuth)))
                     .setText(Float.toString(editData.getAzimuth()));
         }
 
-        ((TextView) (dialog.findViewById(R.id.editInclination)))
-                .setText(Float.toString(editData.getInclination()));
+        if (GeneralPreferences.isIncDegMinsSecsModeOn()) {
+            float[] inclinationDms = Leg.decomposeToDms(editData.getInclination());
+            ((TextView) (dialog.findViewById(R.id.editInclinationDegrees)))
+                    .setText(Integer.toString((int) inclinationDms[0]));
+            ((TextView) (dialog.findViewById(R.id.editInclinationMinutes)))
+                    .setText(Integer.toString((int) inclinationDms[1]));
+            ((TextView) (dialog.findViewById(R.id.editInclinationSeconds)))
+                    .setText(Float.toString(inclinationDms[2]));
+        } else {
+            ((TextView) (dialog.findViewById(R.id.editInclination)))
+                    .setText(Float.toString(editData.getInclination()));
+        }
 
         DialogUtils.enableValidationOnButton(
                 dialog,
@@ -260,6 +278,7 @@ public class LegDialogs {
 
                     // Get the updated leg with measurements and shot direction from form
                     Leg edited = form.getUpdatedLeg();
+                    edited.setComment(form.getUpdatedLegComment());
 
                     // Get the new station names from the form
                     Station newFromStation = form.getUpdatedFromStation();

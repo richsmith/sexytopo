@@ -14,54 +14,34 @@
             android:title="@string/menu_set_active_station"/>
 
         <item
-            android:id="@+id/action_rename_station"
-            android:title="@string/menu_rename_station"/>
-
-        <item
-            android:id="@+id/action_new_cross_section"
-            android:title="@string/menu_new_cross_section"
-            android:visible="false"/>
-
-        <item
             android:id="@+id/action_comment"
             android:title="@string/menu_comment"/>
 
-        <!-- Navigate sub-menu -->
         <item
-            android:id="@+id/menu_navigate"
-            android:title="@string/menu_navigate">
+            android:id="@+id/action_rename_station"
+            android:title="@string/menu_rename_station"/>
+
+        <!-- Cross-Section sub-menu (shown only in PLAN view) -->
+        <item
+            android:id="@+id/menu_xsection"
+            android:title="@string/menu_xsection"
+            android:visible="false">
             <menu>
                 <item
-                    android:id="@+id/action_jump_to_table"
-                    android:title="@string/menu_jump_to_station_in_table"/>
+                    android:id="@+id/action_xsection_create"
+                    android:title="@string/menu_xsection_create"/>
 
                 <item
-                    android:id="@+id/action_jump_to_plan"
-                    android:title="@string/menu_jump_to_station_in_plan"/>
+                    android:id="@+id/action_xsection_edit"
+                    android:title="@string/menu_xsection_edit"/>
 
                 <item
-                    android:id="@+id/action_jump_to_elevation"
-                    android:title="@string/menu_jump_to_station_in_elevation"/>
-            </menu>
-        </item>
-
-        <!-- Links (survey) sub-menu -->
-        <item
-            android:id="@+id/menu_survey"
-            android:title="@string/menu_links">
-            <menu>
-                <item
-                    android:id="@+id/action_start_new_survey"
-                    android:title="@string/menu_start_new_survey"/>
+                    android:id="@+id/action_xsection_set_direction"
+                    android:title="@string/menu_xsection_set_direction"/>
 
                 <item
-                    android:id="@+id/action_link_survey"
-                    android:title="@string/action_link_to_existing_survey"/>
-
-                <item
-                    android:id="@+id/action_unlink_survey"
-                    android:title="@string/menu_unlink_survey"
-                    android:enabled="false"/>
+                    android:id="@+id/action_xsection_delete"
+                    android:title="@string/menu_xsection_delete"/>
             </menu>
         </item>
 
@@ -115,6 +95,10 @@
                         android:id="@+id/action_downgrade_leg"
                         android:title="@string/menu_downgrade_leg"
                         android:visible="false"/>
+
+                    <item
+                        android:id="@+id/action_comment_leg"
+                        android:title="@string/menu_comment_leg"/>
                 </group>
 
                 <!-- Delete leg separated by divider -->
@@ -123,6 +107,45 @@
                         android:id="@+id/action_delete_leg"
                         android:title="@string/menu_delete_leg"/>
                 </group>
+            </menu>
+        </item>
+
+        <!-- Navigate sub-menu -->
+        <item
+            android:id="@+id/menu_navigate"
+            android:title="@string/menu_navigate">
+            <menu>
+                <item
+                    android:id="@+id/action_jump_to_table"
+                    android:title="@string/menu_jump_to_station_in_table"/>
+
+                <item
+                    android:id="@+id/action_jump_to_plan"
+                    android:title="@string/menu_jump_to_station_in_plan"/>
+
+                <item
+                    android:id="@+id/action_jump_to_elevation"
+                    android:title="@string/menu_jump_to_station_in_elevation"/>
+            </menu>
+        </item>
+
+        <!-- Links (survey) sub-menu -->
+        <item
+            android:id="@+id/menu_survey"
+            android:title="@string/menu_links">
+            <menu>
+                <item
+                    android:id="@+id/action_start_new_survey"
+                    android:title="@string/menu_start_new_survey"/>
+
+                <item
+                    android:id="@+id/action_link_survey"
+                    android:title="@string/action_link_to_existing_survey"/>
+
+                <item
+                    android:id="@+id/action_unlink_survey"
+                    android:title="@string/menu_unlink_survey"
+                    android:enabled="false"/>
             </menu>
         </item>
     </group>

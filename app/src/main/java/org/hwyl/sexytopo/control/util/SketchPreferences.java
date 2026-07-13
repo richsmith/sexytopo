@@ -27,8 +27,11 @@ public class SketchPreferences {
         SHOW_SPLAYS(R.id.buttonShowSplays, true),
         SHOW_SKETCH(R.id.buttonShowSketch, true),
         SHOW_STATION_LABELS(R.id.buttonShowStationLabels, true),
+        SHOW_X_SECTIONS(R.id.buttonShowXSections, true),
         SHOW_CONNECTIONS(R.id.buttonShowConnections, true),
-        SHOW_COMPASS(R.id.buttonShowCompass, true);
+        SHOW_COMPASS(R.id.buttonShowCompass, true),
+        BLUE_WATER(R.id.buttonBlueWater, true),
+        PINCH_TO_ZOOM(R.id.buttonPinchToZoom, true);
 
         private final int controlId;
         private final boolean defaultValue;

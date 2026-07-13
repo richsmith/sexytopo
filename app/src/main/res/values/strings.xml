@@ -34,6 +34,7 @@
     <string name="title_activity_table">Table</string>
     <string name="title_activity_plan">Plan</string>
     <string name="title_activity_elevation">Elevation</string>
+    <string name="title_activity_cross_section">Cross-Section</string>
     <string name="title_activity_calibration">Calibration</string>
     <string name="title_activity_survey">Stats</string>
     <string name="title_activity_settings">Settings</string>
@@ -49,6 +50,8 @@
     <string name="action_file">File</string>
     <string name="action_stats">Stats</string>
     <string name="action_settings">Settings</string>
+    <string name="action_settings_system">System</string>
+    <string name="action_settings_survey">Survey</string>
     <string name="action_dev">Dev</string>
     <string name="action_device">Instrument</string>
     <string name="action_device_connect">Connect…</string>
@@ -89,6 +92,8 @@
     <string name="action_trigger_autosave">Trigger Autosave</string>
     <string name="action_kill_connection">Kill Comms Thread (Danger!)</string>
     <string name="action_force_crash">Force Crash (Danger!)</string>
+    <string name="action_xsection_done">Done</string>
+    <string name="action_xsection_cancel">Cancel</string>
 
     <!-- File handling -->
     <string name="file_started_new_survey">Started new survey</string>
@@ -156,6 +161,12 @@
     <string name="third_party_compass" translatable="false">Compass</string>
     <string name="third_party_svg" translatable="false">SVG</string>
     <string name="created_with">Created with %1$s on %2$s</string>
+    <string name="therion_export_dialog_title">Therion Export Options</string>
+    <string name="therion_export_plan_scraps">Plan scraps</string>
+    <string name="therion_export_ee_scraps">Elevation scraps</string>
+    <string name="therion_export_stations_in_plan">Add stations to first plan scrap</string>
+    <string name="therion_export_stations_in_ee">Add stations to first elevation scrap</string>
+    <string name="svg_export_dialog_title">SVG Export Options</string>
 
     <!-- Sketch view -->
     <string name="sketch_toolbar_draw">Draw mode</string>
@@ -184,14 +195,18 @@
     <string name="sketch_menu_redo">Redo sketch action</string>
     <string name="sketch_menu_show_grid">Graph Paper</string>
     <string name="sketch_menu_show_compass">Compass</string>
+    <string name="sketch_menu_blue_water">Auto-Blue Water</string>
+    <string name="sketch_menu_pinch_to_zoom">Pinch to Zoom</string>
     <string name="sketch_menu_snap_to_lines">Snap to Lines</string>
     <string name="sketch_menu_fade_non_active">Fade Non-Active</string>
     <string name="sketch_menu_show_station_labels">Station Labels</string>
+    <string name="sketch_menu_show_xsections">Cross-Sections</string>
     <string name="sketch_menu_show_splays">Show Splays</string>
     <string name="sketch_menu_show_sketch">Show Sketch</string>
     <string name="sketch_menu_show_connect">Linked Surveys</string>
     <string name="sketch_menu_back_measurements">Reverse Legs</string>
     <string name="sketch_position_cross_section_instruction">Select where to draw cross-section</string>
+    <string name="sketch_rotate_cross_section_instruction">Drag from the station to set cross-section direction</string>
     <string name="sketch_symbol_orientation_education">Drag to set symbol direction</string>
     <string name="sketch_text_hint">Enter text</string>
 
@@ -225,7 +240,8 @@
     <string name="manual_edit_to_station">To</string>
     <string name="manual_edit_to_station_error">Invalid to station</string>
     <string name="manual_edit_shot_backwards">⬅ Shot backwards</string>
-    <string name="manual_edit_comment">Comment</string>
+    <string name="manual_edit_station_comment">Station comment</string>
+    <string name="manual_edit_leg_comment">Leg comment</string>
     <string name="manual_rename_station_title">Rename Station</string>
     <string name="manual_rename_station_hint">Station name</string>
     <string name="manual_rename_error">Rename failed</string>
@@ -422,6 +438,8 @@
     <string name="stats_shortest_leg">Shortest Leg (m)</string>
 
     <!-- Settings -->
+    <string name="settings_survey_title">Survey Settings</string>
+    <string name="settings_survey_cross_section_scale">Cross-section scale</string>
     <string name="settings_general_title">General</string>
     <string name="settings_general_summary">Theme, orientation, vibration</string>
     <string name="settings_sketching_summary">Drawing tools, display options</string>
@@ -448,6 +466,11 @@
         <item>Linear</item>
         <item>Non-Linear</item>
     </string-array>
+    <string-array name="settings_leg_amalgamation_algorithm_entries">
+        <item>Angular deltas: compare distance, azimuth &amp; inclination separately; average separately</item>
+        <item>Endpoint distance: compare how far apart end points are; average as vectors</item>
+        <item>Pairwise vectors: compare end-point gap relative to leg length; average as vectors</item>
+    </string-array>
     <string name="settings_immersive_mode_enabled">Fullscreen mode enabled</string>
     <string name="settings_immersive_mode_disabled">Fullscreen mode disabled</string>
     <string name="settings_new_station_vibration_title">Vibrate on new station</string>
@@ -457,10 +480,16 @@
     <string name="settings_team_title">Team</string>
     <string name="settings_team_summary">Manage known caver names</string>
     <string name="settings_instruments_title">Instruments</string>
+    <string name="settings_leg_amalgamation_algorithm_title">Leg agreement method</string>
+    <string name="settings_leg_amalgamation_algorithm_summary">How repeated readings are judged close enough to form a leg</string>
     <string name="settings_max_distance_delta_title">Max distance delta (m)</string>
-    <string name="settings_max_distance_delta_summary">How much error tolerated when deciding whether to create a new station</string>
+    <string name="settings_max_distance_delta_summary">Angular method: how much the distance readings may differ when deciding whether to create a new station</string>
     <string name="settings_max_angle_delta_title">Max angle delta (degrees)</string>
-    <string name="settings_max_angle_delta_summary">How much error tolerated when deciding whether to create a new station</string>
+    <string name="settings_max_angle_delta_summary">Angular method: how much the azimuth or inclination readings may differ when deciding whether to create a new station</string>
+    <string name="settings_max_endpoint_delta_title">Max endpoint distance (m)</string>
+    <string name="settings_max_endpoint_delta_summary">Endpoint method: how far apart the reading endpoints may be when deciding whether to create a new station. The default of 0.1 keeps all readings within one BCRA Grade 5 cell.</string>
+    <string name="settings_max_pairwise_error_title">Max pairwise error</string>
+    <string name="settings_max_pairwise_error_summary">Pairwise vectors method: the relative error tolerated between readings (0.05 = roughly 2.5%) when deciding whether to create a new station</string>
     <string name="settings_calibration_title">Calibration</string>
     <string name="settings_calibration_algorithm_title">Disto-X calibration algorithm</string>
     <string name="settings_calibration_algorithm_summary">Override Disto-X calibration algorithm choice</string>
@@ -471,6 +500,8 @@
     <string name="settings_highlight_latest_leg_summary">Show most recent measurement in purple</string>
     <string name="settings_two_finger_movement_title">Two-finger movement (experimental)</string>
     <string name="settings_two_finger_movement_summary">Two fingers move the screen even when drawing etc.</string>
+    <string name="settings_legacy_cross_sections_title">Use legacy cross-sections</string>
+    <string name="settings_legacy_cross_sections_summary">Show cross-sections as a simple projection without the editable frame; disables tap-to-edit.</string>
     <string name="settings_survey_text_tool_font_size_title">Text tool label size</string>
     <string name="settings_survey_text_tool_font_size_summary">How big to initially draw manually-placed text (sp)</string>
     <string name="settings_survey_symbol_size_title">Survey symbol size</string>
@@ -502,8 +533,21 @@
     </string-array>
     <string name="settings_key_deg_mins_secs_title">Azimuth as degrees/minutes/seconds</string>
     <string name="settings_key_deg_mins_secs_summary">Enter azimuth values in deg/mins/secs (as opposed to the default of decimal)</string>
+    <string name="manual_edit_inclination_deg_mins_secs">Inclination (&#176; \' \")</string>
+    <string name="settings_key_inc_deg_mins_secs_title">Inclination as degrees/minutes/seconds</string>
+    <string name="settings_key_inc_deg_mins_secs_summary">Enter inclination values in deg/mins/secs (as opposed to the default of decimal)</string>
     <string name="settings_export_title">Export</string>
-    <string name="settings_export_svg_background_title">SVG background</string>
+    <string name="settings_export_therion_symbols_title">Export symbols</string>
+    <string name="settings_export_therion_symbols_summary">Include symbols when exporting</string>
+    <string name="settings_export_therion_text_title">Export text</string>
+    <string name="settings_export_therion_text_summary">Include text when exporting</string>
+    <string name="settings_export_folder_name_title">Export folder name</string>
+    <string name="settings_export_folder_name_summary">Name of the folder within the survey folder to export to</string>
+    <string name="settings_export_type_subfolders_title">Export type subfolders</string>
+    <string name="settings_export_type_subfolders_summary">Create subfolders named after export type (e.g. therion, survex)</string>
+    <string name="settings_export_svg_title">SVG</string>
+    <string name="settings_export_svg_section_summary">SVG export options</string>
+    <string name="settings_export_svg_background_title">Background</string>
     <string name="settings_export_svg_background_summary">Optionally export with an opaque background</string>
     <string-array name="settings_export_svg_background_entries">
         <item>Transparent</item>
@@ -515,16 +559,28 @@
     <string name="settings_export_svg_leg_width_summary">How wide to draw leg lines in SVG export</string>
     <string name="settings_export_svg_splay_width_title">SVG splay width</string>
     <string name="settings_export_svg_splay_width_summary">How wide to draw splay lines in SVG export</string>
-    <string name="settings_export_therion_symbols_title">Export symbols</string>
-    <string name="settings_export_therion_symbols_summary">Include symbols when exporting</string>
-    <string name="settings_export_therion_text_title">Export text</string>
-    <string name="settings_export_therion_text_summary">Include text when exporting</string>
-    <string name="settings_export_folder_name_title">Export folder name</string>
-    <string name="settings_export_folder_name_summary">Name of the folder within the survey folder to export to</string>
-    <string name="settings_export_type_subfolders_title">Export type subfolders</string>
-    <string name="settings_export_type_subfolders_summary">Create subfolders named after export type (e.g. therion, survex)</string>
-    <string name="settings_export_svg_title">SVG</string>
-    <string name="settings_export_svg_section_summary">SVG export options</string>
+    <string name="settings_export_svg_legend_title">Show legend</string>
+    <string name="settings_export_svg_legend_summary">Include a legend strip with title, date, stats etc.</string>
+    <string name="settings_export_svg_north_arrow_title">Show north arrow</string>
+    <string name="settings_export_svg_north_arrow_summary">Add a north arrow to the legend on plan exports</string>
+    <string name="settings_export_svg_scale_bar_title">Show scale bar</string>
+    <string name="settings_export_svg_scale_bar_summary">Add a scale bar to the legend</string>
+    <string name="settings_export_svg_team_title">Show survey team</string>
+    <string name="settings_export_svg_team_summary">Show a list of the surveyors</string>
+    <string name="settings_export_svg_cross_sections_title">Export cross-sections</string>
+    <string name="settings_export_svg_cross_sections_summary">Include cross-section sketches in SVG export</string>
+    <string name="settings_export_svg_symbols_title">Export symbols</string>
+    <string name="settings_export_svg_symbols_summary">Include symbols in SVG export</string>
+    <string name="settings_export_svg_centreline_title">Show centreline</string>
+    <string name="settings_export_svg_centreline_summary">Draw the survey centreline (legs) in SVG export</string>
+    <string name="settings_export_svg_stations_title">Show station labels</string>
+    <string name="settings_export_svg_stations_summary">Draw station name labels in SVG export</string>
+    <string name="settings_export_svg_splays_title">Show splays</string>
+    <string name="settings_export_svg_splays_summary">Draw splay shots (LRUD lines) in SVG export</string>
+    <string name="settings_export_svg_grid_title">Show grid</string>
+    <string name="settings_export_svg_grid_summary">Draw a background grid behind the survey</string>
+    <string name="settings_export_svg_tagline_title">Show tagline</string>
+    <string name="settings_export_svg_tagline_summary">Provide proper credit to SexyTopo</string>
     <string name="settings_export_therion_title">Therion</string>
     <string name="settings_export_therion_section_summary">Therion export options</string>
     <string name="settings_export_therion_plan_suffix_title">Plan file suffix</string>
@@ -543,11 +599,6 @@
     <string name="settings_export_therion_plan_xs_suffix_summary">Suffix for plan cross-sections (# = station number)</string>
     <string name="settings_export_therion_ee_xs_suffix_title">Extended elevation cross-section suffix</string>
     <string name="settings_export_therion_ee_xs_suffix_summary">Suffix for extended elevation cross-sections (# = station number)</string>
-    <string name="therion_export_dialog_title">Therion Export Options</string>
-    <string name="therion_export_plan_scraps">Plan scraps</string>
-    <string name="therion_export_ee_scraps">Elevation scraps</string>
-    <string name="therion_export_stations_in_plan">Add stations to first plan scrap</string>
-    <string name="therion_export_stations_in_ee">Add stations to first elevation scrap</string>
     <string name="settings_developer_title">Developer</string>
     <string name="settings_key_developer_mode_title">Developer mode</string>
     <string name="settings_key_developer_mode_summary">Show debugging menu entries</string>
@@ -569,9 +620,12 @@
     <string name="validation_error_same_as_from_station">Cannot be the same as from station</string>
     <string name="validation_error_station_name_not_unique">Station name must be unique</string>
     <string name="validation_error_must_be_number">Must be a number</string>
-    <string name="validation_error_distance_minimum">Must be >= %1$f</string>
-    <string name="validation_error_azimuth_range">Must be %1$f-%2$f</string>
-    <string name="validation_error_inclination_range">Must be %1$f to %2$f</string>
+    <string name="validation_error_distance_minimum">Must be >= %1$d</string>
+    <string name="validation_error_azimuth_range">Must be %1$d-%2$d</string>
+    <string name="validation_error_inclination_range">Must be -90 to 90 or 270 to 360</string>
+    <string name="validation_error_mins_secs_range">Must be 0 to 59</string>
+    <string name="validation_error_secs_range">Must be 0 to less than 60</string>
+    <string name="validation_error_must_be_zero_for_90">Must be 0 for ±90°</string>
 
     <!-- Input mode for leg editing -->
     <string-array name="leg_edit_input_mode_options">
@@ -626,7 +680,11 @@
     <string name="menu_jump_to">Jump</string>
     <string name="menu_jump_to_station_in_plan">&#10132; Plan</string>
     <string name="menu_jump_to_station_in_elevation">&#10132; Elevation</string>
-    <string name="menu_new_cross_section">New Cross-Section</string>
+    <string name="menu_xsection">Cross-Section</string>
+    <string name="menu_xsection_create">New Cross-Section</string>
+    <string name="menu_xsection_delete">Delete Cross-Section</string>
+    <string name="menu_xsection_edit">Edit Sketch</string>
+    <string name="menu_xsection_set_direction">Set Direction</string>
     <string name="menu_jump_to_station_in_table">&#10132; Data Table</string>
     <string name="menu_delete_station">Delete</string>
     <string name="menu_reverse">Reverse</string>
@@ -639,6 +697,8 @@
     <string name="menu_survey_start_new_dialog_title">Start new survey</string>
     <string name="menu_survey_start_new_dialog_station_name">Starting station name</string>
     <string name="menu_comment">Comment</string>
+    <string name="menu_comment_leg">Leg comment</string>
+    <string name="menu_comment_splay">Splay comment</string>
     <string name="menu_toggle_left_right">Toggle Left/Right</string>
     <string name="menu_context_title_leg">Leg %1$s &#10132; %2$s</string>
     <string name="menu_context_title_splay">Splay %s &#10132;</string>

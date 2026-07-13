@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
-"""Tag a release: bumps versionName/versionCode in app/build.gradle, commits, and tags."""
+"""Bump versionName/versionCode in app/build.gradle.
+
+This only edits the file; it does not commit, tag, or push. Run scripts/publish.py
+afterwards to commit and tag the release.
+"""
 
 import argparse
 import re
-import subprocess
 import sys
 from pathlib import Path
 
 BUILD_GRADLE = Path("app/build.gradle")
-RELEASES_MD = Path("docs/releases.md")
 
 
 def die(msg: str) -> None:
@@ -31,32 +33,49 @@ def bump_patch(version: str) -> str:
     return f"{major}.{minor}.{patch + 1}"
 
 
+def bump_minor(version: str) -> str:
+    major, minor, _patch = parse_version(version)
+    return f"{major}.{minor + 1}.0"
+
+
+def read_versions(gradle: str) -> tuple[str, int]:
+    name_match = re.search(r'versionName "([^"]+)"', gradle)
+    code_match = re.search(r"versionCode (\d+)", gradle)
+    if not name_match or not code_match:
+        die("could not parse versionName/versionCode from app/build.gradle")
+    return name_match.group(1), int(code_match.group(1))
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Bump version, commit app/build.gradle and docs/releases.md, and tag."
+        description="Bump versionName/versionCode in app/build.gradle (no git operations)."
     )
     parser.add_argument(
         "version", nargs="?", type=valid_version, metavar="N.N.N",
         help="new version number (default: bump patch version)"
     )
+    parser.add_argument(
+        "--minor", action="store_true",
+        help="bump the minor version (resets patch to 0) instead of the patch version"
+    )
     args = parser.parse_args()
+
+    if args.minor and args.version:
+        die("pass either an explicit version or --minor, not both")
 
     if not BUILD_GRADLE.exists():
         die("run this script from the repo root")
 
     gradle = BUILD_GRADLE.read_text()
-
-    # Extract current versionName and versionCode
-    name_match = re.search(r'versionName "([^"]+)"', gradle)
-    code_match = re.search(r"versionCode (\d+)", gradle)
-    if not name_match or not code_match:
-        die("could not parse versionName/versionCode from app/build.gradle")
-
-    current_name = name_match.group(1)
-    current_code = int(code_match.group(1))
+    current_name, current_code = read_versions(gradle)
     new_code = current_code + 1
 
-    new_version = args.version if args.version else bump_patch(current_name)
+    if args.version:
+        new_version = args.version
+    elif args.minor:
+        new_version = bump_minor(current_name)
+    else:
+        new_version = bump_patch(current_name)
 
     # Warn if new version is not greater than current
     try:
@@ -67,31 +86,18 @@ def main() -> None:
     except ValueError:
         pass  # current version may not be N.N.N format; skip comparison
 
-    # Check releases.md has an entry for this version
-    if new_version not in RELEASES_MD.read_text():
-        die(
-            f"no entry found for {new_version} in {RELEASES_MD}\n"
-            "Add release notes before running this script."
-        )
-
-    sys.stdout.write(
-        f"Releasing {current_name} -> {new_version}  (versionCode {current_code} -> {new_code})\n"
-    )
-
-    # Patch build.gradle
     gradle = gradle.replace(
         f'versionName "{current_name}"', f'versionName "{new_version}"'
     )
     gradle = gradle.replace(f"versionCode {current_code}", f"versionCode {new_code}")
     BUILD_GRADLE.write_text(gradle)
 
-    # Commit both files and tag
-    subprocess.run(["git", "add", str(BUILD_GRADLE), str(RELEASES_MD)], check=True)
-    subprocess.run(["git", "commit", "-m", f"Release {new_version}"], check=True)
-    subprocess.run(["git", "tag", new_version], check=True)
-
-    sys.stdout.write(f"\nDone. Commit and tag '{new_version}' created.\n")
-    sys.stdout.write("Push with:  git push && git push --tags\n")
+    sys.stdout.write(
+        f"Bumped {current_name} -> {new_version}  (versionCode {current_code} -> {new_code})\n"
+    )
+    sys.stdout.write(
+        "Add release notes to docs/releases.md, then run 'make publish' to commit and tag.\n"
+    )
 
 
 if __name__ == "__main__":

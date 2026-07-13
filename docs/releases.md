@@ -1,8 +1,24 @@
-# Unreleased
-- Allow commenting on first station (thanks Andrew Atkinson)
-- Therion export improvements (thanks Andrew Atkinson)
-- Setting for turning on/off floating buttons on Table view (thanks Andrew Atkinson)
+# 2026-07-08 1.12.2
+- Fix accidantal omission of bug from 1.12.1
+
+# 2026-07-08 1.12.1
+- Fix SVG export writing station label coordinates broken in some locales
+
+# 2026-06-30 1.12.0
+- Separate cross-section editing view which also allows moving of sections and orientation adjustment (legacy behaviour can be mostly restored in Settings)
+- Data import improvements: better error reporting & allow theolidite readings (thanks Andrew Atkinson)
+- Toggleable option to automatically sketch water as blue
+- SVG export improvements, including an optional legend and scale bar
 - Added "Add Leg" and "Add Splay" to the Tools menu
+- Setting for turning on/off floating buttons on Table view (thanks Andrew Atkinson)
+- Therion export improvements (thanks Andrew Atkinson)
+- Allow commenting on first station (thanks Andrew Atkinson)
+- Selectable leg combination method, with endpoint-distance and pairwise options that handle steep legs correctly (#321)
+- Inclination now always shows + or - in table
+- Pinch-to-zoom now turn-offable
+- Made deletion of details easier
+- Fix a bug stopping deletion of text details
+- Guard against leaving sketch artefacts (dots etc.) on long-pressing to open menu
 
 # 2026-04-28 1.11.2
 - Fix a bug causing cross-sections to be initially hidden

@@ -33,6 +33,7 @@
     <string name="title_activity_table">Tabela</string>
     <string name="title_activity_plan">Plan</string>
     <string name="title_activity_elevation">Przekrój</string>
+    <string name="title_activity_cross_section">Przekrój</string>
     <string name="title_activity_calibration">Kalibracja</string>
     <string name="title_activity_survey">Statystyki</string>
     <string name="title_activity_settings">Ustawienia</string>
@@ -48,6 +49,8 @@
     <string name="action_file">Plik</string>
     <string name="action_stats">Statystyki</string>
     <string name="action_settings">Ustawienia</string>
+    <string name="action_settings_system">System</string>
+    <string name="action_settings_survey">Pomiar</string>
     <string name="action_dev">Dev</string>
     <string name="action_device">Instrument</string>
     <string name="action_device_connect">Połącz…</string>
@@ -88,6 +91,8 @@
     <string name="action_trigger_autosave">Wywołaj autozapis</string>
     <string name="action_kill_connection">Zakończ połączenie (Niebezpieczne!)</string>
     <string name="action_force_crash">Wymuś awarię (Niebezpieczne!)</string>
+    <string name="action_xsection_done">Gotowe</string>
+    <string name="action_xsection_cancel">Anuluj</string>
 
     <!-- File handling -->
     <string name="file_started_new_survey">Rozpoczęto nowy pomiar</string>
@@ -177,14 +182,18 @@
     <string name="sketch_menu_redo">Ponów akcję szkicu</string>
     <string name="sketch_menu_show_grid">Siatka</string>
     <string name="sketch_menu_show_compass">Kompas</string>
+    <string name="sketch_menu_blue_water">Auto niebieska woda</string>
     <string name="sketch_menu_snap_to_lines">Przyciąganie do linii</string>
+    <string name="sketch_menu_pinch_to_zoom">Zoom szczypaniem</string>
     <string name="sketch_menu_fade_non_active">Przyciemnij nieaktywne</string>
     <string name="sketch_menu_show_station_labels">Etykiety stanowisk</string>
+    <string name="sketch_menu_show_xsections">Przekroje</string>
     <string name="sketch_menu_show_splays">Pokaż pomiary szczegółowe</string>
     <string name="sketch_menu_show_sketch">Pokaż szkic</string>
     <string name="sketch_menu_show_connect">Połączone pomiary</string>
     <string name="sketch_menu_back_measurements">Odwrócone ciągi</string>
     <string name="sketch_position_cross_section_instruction">Wybierz miejsce narysowania przekroju</string>
+    <string name="sketch_rotate_cross_section_instruction">Przeciągnij od stacji, aby ustawić kierunek przekroju</string>
     <string name="sketch_symbol_orientation_education">Przeciągnij, aby ustawić kierunek symbolu</string>
     <string name="sketch_text_hint">Wprowadź tekst</string>
 
@@ -218,7 +227,8 @@
     <string name="manual_edit_to_station">Do</string>
     <string name="manual_edit_to_station_error">Nieprawidłowe stanowisko końcowe</string>
     <string name="manual_edit_shot_backwards">⬅ Pomiar wsteczny</string>
-    <string name="manual_edit_comment">Komentarz</string>
+    <string name="manual_edit_station_comment">Komentarz stanowiska</string>
+    <string name="manual_edit_leg_comment">Komentarz ciągu</string>
     <string name="manual_rename_station_title">Zmień nazwę stanowiska</string>
     <string name="manual_rename_station_hint">Nazwa stanowiska</string>
     <string name="manual_rename_error">Zmiana nazwy nie powiodła się</string>
@@ -387,6 +397,8 @@
     <string name="stats_number_splays">Liczba pomiarów szczegółowych</string>
     <string name="stats_longest_leg">Najdłuższy ciąg (m)</string>
     <string name="stats_shortest_leg">Najkrótszy ciąg (m)</string>
+    <string name="settings_survey_title">Ustawienia pomiaru</string>
+    <string name="settings_survey_cross_section_scale">Skala przekrojów</string>
 
     <!-- Settings -->
     <string name="settings_general_title">Ogólne</string>
@@ -410,6 +422,11 @@
         <item>Liniowy</item>
         <item>Nieliniowy</item>
     </string-array>
+    <string-array name="settings_leg_amalgamation_algorithm_entries">
+        <item>Delty kątowe: porównuj odległość, azymut i nachylenie osobno; uśredniaj osobno</item>
+        <item>Odległość punktów końcowych: porównuj, jak daleko od siebie są punkty końcowe; uśredniaj jako wektory</item>
+        <item>Wektory parami: porównuj odstęp punktów końcowych względem długości ciągu; uśredniaj jako wektory</item>
+    </string-array>
     <string name="settings_immersive_mode_enabled">Tryb pełnoekranowy włączony</string>
     <string name="settings_immersive_mode_disabled">Tryb pełnoekranowy wyłączony</string>
     <string name="settings_new_station_vibration_title">Wibracja przy nowym stanowisku</string>
@@ -421,9 +438,15 @@
 <string name="settings_instruments_title">Instrumenty</string>
     <string name="settings_instruments_summary">Tolerancje instrumentów, kalibracja</string>
     <string name="settings_max_distance_delta_title">Maks. delta odległości (m)</string>
-    <string name="settings_max_distance_delta_summary">Dopuszczalny błąd przy decydowaniu, czy utworzyć nowe stanowisko</string>
+    <string name="settings_max_distance_delta_summary">Metoda kątowa: o ile mogą różnić się pomiary odległości przy decydowaniu, czy utworzyć nowe stanowisko</string>
     <string name="settings_max_angle_delta_title">Maks. delta kąta (stopnie)</string>
-    <string name="settings_max_angle_delta_summary">Dopuszczalny błąd przy decydowaniu, czy utworzyć nowe stanowisko</string>
+    <string name="settings_max_angle_delta_summary">Metoda kątowa: o ile mogą różnić się pomiary azymutu lub nachylenia przy decydowaniu, czy utworzyć nowe stanowisko</string>
+    <string name="settings_leg_amalgamation_algorithm_title">Metoda zgodności ciągu</string>
+    <string name="settings_leg_amalgamation_algorithm_summary">Jak oceniane jest, czy powtórzone pomiary są wystarczająco zbliżone, aby utworzyć ciąg</string>
+    <string name="settings_max_endpoint_delta_title">Maks. odległość punktów końcowych (m)</string>
+    <string name="settings_max_endpoint_delta_summary">Metoda punktów końcowych: jak daleko od siebie mogą być punkty końcowe pomiarów przy decydowaniu, czy utworzyć nowe stanowisko. Domyślna wartość 0.1 utrzymuje wszystkie pomiary w obrębie jednej komórki BCRA Grade 5.</string>
+    <string name="settings_max_pairwise_error_title">Maks. błąd parami</string>
+    <string name="settings_max_pairwise_error_summary">Metoda wektorów parami: dopuszczalny błąd względny między pomiarami (0.05 = około 2.5%) przy decydowaniu, czy utworzyć nowe stanowisko</string>
     <string name="settings_calibration_title">Kalibracja</string>
     <string name="settings_calibration_algorithm_title">Algorytm kalibracji Disto-X</string>
     <string name="settings_calibration_algorithm_summary">Nadpisz wybór algorytmu kalibracji Disto-X</string>
@@ -435,6 +458,8 @@
     <string name="settings_highlight_latest_leg_summary">Pokaż najnowszy pomiar na fioletowo</string>
     <string name="settings_two_finger_movement_title">Ruch dwoma palcami (eksperymentalne)</string>
     <string name="settings_two_finger_movement_summary">Dwa palce przesuwają ekran nawet podczas rysowania itp.</string>
+    <string name="settings_legacy_cross_sections_title">Użyj klasycznych przekrojów</string>
+    <string name="settings_legacy_cross_sections_summary">Pokaż przekroje jako prostą projekcję bez edytowalnej ramki; wyłącza dotknięcie, aby edytować.</string>
     <string name="settings_survey_text_tool_font_size_title">Rozmiar etykiety narzędzia tekstu</string>
     <string name="settings_survey_text_tool_font_size_summary">Początkowy rozmiar ręcznie umieszczonego tekstu (sp)</string>
     <string name="settings_survey_symbol_size_title">Rozmiar symbolu pomiaru</string>
@@ -454,6 +479,8 @@
     <string name="settings_anti_alias_title">Wygładzanie linii szkicu</string>
     <string name="settings_anti_alias_summary">Zastosuj wygładzanie do linii szkicu itp. (poprawia wygląd kosztem wydajności)</string>
     <string name="settings_manual_data_entry_title">Ręczne wprowadzanie danych</string>
+    <string name="settings_manual_data_controls_title">Ręczne wprowadzanie</string>
+    <string name="settings_manual_data_controls_summary">Pokaż przyciski do ręcznego wprowadzania odcinków lub promieni w widoku tabeli</string>
     <string name="settings_manual_data_entry_summary">Pola LRUD, format kąta</string>
     <string name="settings_key_lrud_fields_title">Wpisy LRUD</string>
     <string name="settings_key_lrud_fields_summary">Pokaż pola do wprowadzania LRUD (Lewo-Prawo-Góra-Dół) dla każdego nowego stanowiska</string>
@@ -465,6 +492,9 @@
     </string-array>
     <string name="settings_key_deg_mins_secs_title">Azymut jako stopnie/minuty/sekundy</string>
     <string name="settings_key_deg_mins_secs_summary">Wprowadź wartości azymutu w stopniach/minutach/sekundach (w przeciwieństwie do domyślnego dziesiętnego)</string>
+    <string name="manual_edit_inclination_deg_mins_secs">Nachylenie (&#176; \' \")</string>
+    <string name="settings_key_inc_deg_mins_secs_title">Nachylenie jako stopnie/minuty/sekundy</string>
+    <string name="settings_key_inc_deg_mins_secs_summary">Wprowadź wartości nachylenia w stopniach/minutach/sekundach (w przeciwieństwie do domyślnego dziesiętnego)</string>
     <string name="settings_export_title">Eksport</string>
     <string name="settings_export_summary">Formaty eksportu i opcje folderu</string>
     <string name="settings_export_svg_background_title">Tło SVG</string>
@@ -479,6 +509,28 @@
     <string name="settings_export_svg_leg_width_summary">Grubość rysowania linii ciągów w eksporcie SVG</string>
     <string name="settings_export_svg_splay_width_title">Szerokość pomiarów szczegółowych SVG</string>
     <string name="settings_export_svg_splay_width_summary">Grubość rysowania linii pomiarów szczegółowych w eksporcie SVG</string>
+    <string name="settings_export_svg_legend_title">Pokaż legendę</string>
+    <string name="settings_export_svg_legend_summary">Dołącz pasek legendy z tytułem, datą, statystykami itp.</string>
+    <string name="settings_export_svg_north_arrow_title">Pokaż strzałkę północy</string>
+    <string name="settings_export_svg_north_arrow_summary">Dodaj strzałkę północy do legendy w eksportach rzutu</string>
+    <string name="settings_export_svg_scale_bar_title">Pokaż podziałkę</string>
+    <string name="settings_export_svg_scale_bar_summary">Dodaj podziałkę do legendy</string>
+    <string name="settings_export_svg_team_title">Pokaż zespół</string>
+    <string name="settings_export_svg_team_summary">Pokaż listę mierniczych</string>
+    <string name="settings_export_svg_cross_sections_title">Eksportuj przekroje</string>
+    <string name="settings_export_svg_cross_sections_summary">Dołącz szkice przekrojów do eksportu SVG</string>
+    <string name="settings_export_svg_symbols_title">Eksportuj symbole</string>
+    <string name="settings_export_svg_symbols_summary">Dołącz symbole do eksportu SVG</string>
+    <string name="settings_export_svg_centreline_title">Pokaż ciąg</string>
+    <string name="settings_export_svg_centreline_summary">Rysuj ciąg pomiarowy (odcinki) w eksporcie SVG</string>
+    <string name="settings_export_svg_stations_title">Pokaż etykiety stacji</string>
+    <string name="settings_export_svg_stations_summary">Rysuj etykiety nazw stacji w eksporcie SVG</string>
+    <string name="settings_export_svg_splays_title">Pokaż promienie</string>
+    <string name="settings_export_svg_splays_summary">Rysuj promienie (linie LRUD) w eksporcie SVG</string>
+    <string name="settings_export_svg_grid_title">Pokaż siatkę</string>
+    <string name="settings_export_svg_grid_summary">Rysuj siatkę w tle pomiaru</string>
+    <string name="settings_export_svg_tagline_title">Pokaż podpis</string>
+    <string name="settings_export_svg_tagline_summary">Odpowiednio podziękuj SexyTopo</string>
     <string name="settings_export_therion_symbols_title">Symbole eksportu Therion</string>
     <string name="settings_export_therion_symbols_summary">Uwzględnij symbole podczas eksportu do formatu Therion</string>
     <string name="settings_export_therion_text_title">Tekst eksportu Therion</string>
@@ -512,6 +564,7 @@
     <string name="therion_export_ee_scraps">Scrapy przekroju rozwinięcia</string>
     <string name="therion_export_stations_in_plan">Dodaj stacje do pierwszego scrapu planu</string>
     <string name="therion_export_stations_in_ee">Dodaj stacje do pierwszego scrapu przekroju rozwinięcia</string>
+    <string name="svg_export_dialog_title">Opcje eksportu SVG</string>
     <string name="settings_developer_title">Deweloper</string>
     <string name="settings_developer_summary">Opcje debugowania</string>
     <string name="settings_key_developer_mode_title">Tryb dewelopera</string>
@@ -534,9 +587,12 @@
     <string name="validation_error_same_as_from_station">Nie może być takie samo jak stanowisko początkowe</string>
     <string name="validation_error_station_name_not_unique">Nazwa stanowiska musi być unikalna</string>
     <string name="validation_error_must_be_number">Musi być liczbą</string>
-    <string name="validation_error_distance_minimum">Musi być >= %1$f</string>
-    <string name="validation_error_azimuth_range">Musi być %1$f-%2$f</string>
-    <string name="validation_error_inclination_range">Musi być od %1$f do %2$f</string>
+    <string name="validation_error_distance_minimum">Musi być >= %1$d</string>
+    <string name="validation_error_azimuth_range">Musi być %1$d-%2$d</string>
+    <string name="validation_error_inclination_range">Musi być od -90 do 90 lub od 270 do 360</string>
+    <string name="validation_error_mins_secs_range">Musi być od 0 do 59</string>
+    <string name="validation_error_secs_range">Musi być od 0 do mniej niż 60</string>
+    <string name="validation_error_must_be_zero_for_90">Musi być 0 dla ±90°</string>
 
     <!-- Input mode for leg editing -->
     <string-array name="leg_edit_input_mode_options">
@@ -591,6 +647,11 @@
     <string name="menu_jump_to">Przeskocz</string>
     <string name="menu_jump_to_station_in_plan">&#10132; Plan</string>
     <string name="menu_jump_to_station_in_elevation">&#10132; Przekrój</string>
+    <string name="menu_xsection">Przekrój</string>
+    <string name="menu_xsection_create">Nowy przekrój</string>
+    <string name="menu_xsection_delete">Usuń przekrój</string>
+    <string name="menu_xsection_edit">Edytuj szkic</string>
+    <string name="menu_xsection_set_direction">Ustaw kierunek</string>
     <string name="menu_new_cross_section">Nowy przekrój poprzeczny</string>
     <string name="menu_jump_to_station_in_table">&#10132; Tabela danych</string>
     <string name="menu_delete_station">Usuń</string>
@@ -604,6 +665,8 @@
     <string name="menu_survey_start_new_dialog_title">Rozpocznij nowy pomiar</string>
     <string name="menu_survey_start_new_dialog_station_name">Nazwa stanowiska początkowego</string>
     <string name="menu_comment">Komentarz</string>
+    <string name="menu_comment_leg">Komentarz ciągu</string>
+    <string name="menu_comment_splay">Komentarz pomiaru szczegółowego</string>
     <string name="menu_toggle_left_right">Przełącz lewo/prawo</string>
     <string name="menu_context_title_leg">Ciąg %1$s &#10132; %2$s</string>
     <string name="menu_context_title_splay">%s do pomiaru szczegółowego</string>

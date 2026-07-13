@@ -33,6 +33,7 @@
     <string name="title_activity_table">Tabelle</string>
     <string name="title_activity_plan">Grundriss</string>
     <string name="title_activity_elevation">Seitenriss</string>
+    <string name="title_activity_cross_section">Querschnitt</string>
     <string name="title_activity_calibration">Kalibrierung</string>
     <string name="title_activity_survey">Statistik</string>
     <string name="title_activity_settings">Einstellungen</string>
@@ -48,6 +49,8 @@
     <string name="action_file">Datei</string>
     <string name="action_stats">Statistik</string>
     <string name="action_settings">Einstellungen</string>
+    <string name="action_settings_system">System</string>
+    <string name="action_settings_survey">Vermessung</string>
     <string name="action_dev">Dev</string>
     <string name="action_device">Messgerät</string>
     <string name="action_device_connect">Verbinden…</string>
@@ -88,6 +91,8 @@
     <string name="action_trigger_autosave">Automatische Speicherung auslösen</string>
     <string name="action_kill_connection">Lösch-Kommandoabfolge (Achtung!)</string>
     <string name="action_force_crash">Absturz herbeiführen (Achtung!)</string>
+    <string name="action_xsection_done">Fertig</string>
+    <string name="action_xsection_cancel">Abbrechen</string>
 
     <!--  File handling  -->
     <string name="file_started_new_survey">Neue Vermessung angelegt</string>
@@ -171,20 +176,24 @@
     <string name="sketch_toolbar_colour_blue">Blau</string>
     <string name="sketch_toolbar_colour_purple">Violett</string>
     <string name="sketch_toolbar_symbol_close">Werkzeugleiste Symbole schliessen</string>
-    <string name="sketch_menu_delete_last_leg">Letzten Dateneintrag rückgängig machen</string>
-    <string name="sketch_menu_centre_view">Aktives Objekt in Bildschirmmitte anzeigen</string>
+    <string name="sketch_menu_delete_last_leg">Letzte Messung rückgängig</string>
+    <string name="sketch_menu_centre_view">Auf Aktives zentrieren</string>
     <string name="sketch_menu_auto_recentre">Automatisches Zentrieren</string>
     <string name="sketch_menu_redo">Zeichnen-Befehl wiederholen</string>
     <string name="sketch_menu_show_grid">Raster anzeigen</string>
     <string name="sketch_menu_show_compass">Kompass</string>
+    <string name="sketch_menu_blue_water">Auto-Blauwasser</string>
     <string name="sketch_menu_snap_to_lines">Linien fangen</string>
-    <string name="sketch_menu_fade_non_active">Nicht-Aktiv-Funktion ausblenden</string>
+    <string name="sketch_menu_pinch_to_zoom">Zoom durch Kneifen</string>
+    <string name="sketch_menu_fade_non_active">Inaktive ausblenden</string>
     <string name="sketch_menu_show_station_labels">Messpunkt-Beschriftungen</string>
-    <string name="sketch_menu_show_splays">Dimensionen und Hilfslinien anzeigen</string>
+    <string name="sketch_menu_show_xsections">Querschnitte</string>
+    <string name="sketch_menu_show_splays">Hilfslinien anzeigen</string>
     <string name="sketch_menu_show_sketch">Skizze anzeigen</string>
     <string name="sketch_menu_show_connect">Verknüpfte Vermessungsdateien</string>
-    <string name="sketch_menu_back_measurements">Rückwärtsgerichtete Messstrecken</string>
+    <string name="sketch_menu_back_measurements">Messstrecken umkehren</string>
     <string name="sketch_position_cross_section_instruction">Ort zum Zeichnen eines Querschnitts auswählen</string>
+    <string name="sketch_rotate_cross_section_instruction">Von der Station ziehen, um die Querschnittsrichtung festzulegen</string>
     <string name="sketch_symbol_orientation_education"> Ziehen, um die Richtung des Symbols festzulegen</string>
     <string name="sketch_text_hint">Text eingeben</string>
 
@@ -218,7 +227,8 @@
     <string name="manual_edit_to_station">Zur Station</string>
     <string name="manual_edit_to_station_error">Ungültige Zielstation</string>
     <string name="manual_edit_shot_backwards">⬅ Rückwärts gemessen</string>
-    <string name="manual_edit_comment">Kommentar</string>
+    <string name="manual_edit_station_comment">Messpunkt-Kommentar</string>
+    <string name="manual_edit_leg_comment">Messstrecken-Kommentar</string>
     <string name="manual_rename_station_title">Messpunkt umbenennen</string>
     <string name="manual_rename_station_hint">Stationsname</string>
     <string name="manual_rename_error">Umbenennen fehlgeschlagen</string>
@@ -387,6 +397,8 @@
     <string name="stats_number_splays">Anzahl Dimensionen und Hilfslinien</string>
     <string name="stats_longest_leg">Längste Messstrecke (m)</string>
     <string name="stats_shortest_leg">Kürzeste Messstrecke (m)</string>
+    <string name="settings_survey_title">Vermessungseinstellungen</string>
+    <string name="settings_survey_cross_section_scale">Querschnittsmaßstab</string>
 
     <!--  Settings  -->
     <string name="settings_general_title">Allgemeines</string>
@@ -410,6 +422,11 @@
         <item>Linear</item>
         <item>Nicht-Linear</item>
     </string-array>
+    <string-array name="settings_leg_amalgamation_algorithm_entries">
+        <item>Winkeldifferenzen: Distanz, Azimut &amp; Neigung getrennt vergleichen; getrennt mitteln</item>
+        <item>Endpunktabstand: vergleichen, wie weit die Endpunkte voneinander entfernt sind; als Vektoren mitteln</item>
+        <item>Paarweise Vektoren: Endpunktabstand im Verhältnis zur Streckenlänge vergleichen; als Vektoren mitteln</item>
+    </string-array>
     <string name="settings_immersive_mode_enabled">Vollbildmodus aktiviert</string>
     <string name="settings_immersive_mode_disabled">Vollbildmodus deaktiviert</string>
     <string name="settings_new_station_vibration_title">Bei neuem Messpunkt vibrieren</string>
@@ -421,9 +438,15 @@
 <string name="settings_instruments_title">Werkzeuge</string>
     <string name="settings_instruments_summary">Instrumententoleranz, Kalibrierung</string>
     <string name="settings_max_distance_delta_title">Maximal zulässige Abweichung bei der Distanz (m)</string>
-    <string name="settings_max_distance_delta_summary">Maximal zulässiger Fehler bei der Erfassung einer neuen Messstrecke</string>
+    <string name="settings_max_distance_delta_summary">Winkelmethode: wie stark die Distanzmessungen abweichen dürfen, wenn entschieden wird, ob eine neue Station erstellt wird</string>
     <string name="settings_max_angle_delta_title">Maximal zulässige Abweichung beim Neigungswinkel (Grad)</string>
-    <string name="settings_max_angle_delta_summary">Maximal zulässiger Fehler bei der Erfassung einer neuen Messstrecke</string>
+    <string name="settings_max_angle_delta_summary">Winkelmethode: wie stark die Azimut- oder Neigungsmessungen abweichen dürfen, wenn entschieden wird, ob eine neue Station erstellt wird</string>
+    <string name="settings_leg_amalgamation_algorithm_title">Methode zur Streckenübereinstimmung</string>
+    <string name="settings_leg_amalgamation_algorithm_summary">Wie beurteilt wird, ob wiederholte Messungen nah genug sind, um eine Messstrecke zu bilden</string>
+    <string name="settings_max_endpoint_delta_title">Maximaler Endpunktabstand (m)</string>
+    <string name="settings_max_endpoint_delta_summary">Endpunktmethode: wie weit die Endpunkte der Messungen voneinander entfernt sein dürfen, wenn entschieden wird, ob eine neue Station erstellt wird. Der Standardwert von 0.1 hält alle Messungen innerhalb einer BCRA Grade 5-Zelle.</string>
+    <string name="settings_max_pairwise_error_title">Maximaler paarweiser Fehler</string>
+    <string name="settings_max_pairwise_error_summary">Methode der paarweisen Vektoren: die zwischen Messungen tolerierte relative Abweichung (0.05 = etwa 2.5%), wenn entschieden wird, ob eine neue Station erstellt wird</string>
     <string name="settings_calibration_title">Kalibrierung</string>
     <string name="settings_calibration_algorithm_title">DistoX Kalibrierungs-Algorithmus</string>
     <string name="settings_calibration_algorithm_summary">Auswahl des DistoX-Kalibrierungsalgorithmus ausser Kraft setzen</string>
@@ -435,6 +458,8 @@
     <string name="settings_highlight_latest_leg_summary">Letzte Messung in violett anzeigen</string>
     <string name="settings_two_finger_movement_title">Touch-Gesten (experimentell)</string>
     <string name="settings_two_finger_movement_summary">Touch-Gesten auch beim Zeichnen zulassen</string>
+    <string name="settings_legacy_cross_sections_title">Klassische Querschnitte verwenden</string>
+    <string name="settings_legacy_cross_sections_summary">Querschnitte als einfache Projektion ohne bearbeitbaren Rahmen anzeigen; deaktiviert das Antippen zum Bearbeiten.</string>
     <string name="settings_survey_text_tool_font_size_title">Beschriftungsgrösse Textfeld</string>
     <string name="settings_survey_text_tool_font_size_summary">Ausgangsgrösse von manuell platziertem Text (sp)</string>
     <string name="settings_survey_symbol_size_title">Grösse Vermessungs-Symbol</string>
@@ -454,6 +479,8 @@
     <string name="settings_anti_alias_title">Anti-Alias-Skizzenlinien</string>
     <string name="settings_anti_alias_summary">Anti-Aliasing auf Skizzenlinien usw. anwenden (verbessert die visuelle Darstellung auf Kosten der Rechenleistung)</string>
     <string name="settings_manual_data_entry_title">Manuelle Daten-Eingabe</string>
+    <string name="settings_manual_data_controls_title">Manuelle Dateneingabe</string>
+    <string name="settings_manual_data_controls_summary">Schaltflächen zum manuellen Eingeben von Strecken oder Splays in der Tabellenansicht anzeigen</string>
     <string name="settings_manual_data_entry_summary">LROU-Felder, Winkelformat</string>
     <string name="settings_key_lrud_fields_title">LROU-Eingaben (Dimensionen)</string>
     <string name="settings_key_lrud_fields_summary">Felder zur Eingabe von LROU-Werten (Links-Rechts-Oben-Unten) für jeden neuen Messpunkt anzeigen</string>
@@ -465,6 +492,9 @@
     </string-array>
     <string name="settings_key_deg_mins_secs_title">Azimut in Grad/Minuten/Sekunden</string>
     <string name="settings_key_deg_mins_secs_summary">Azimutwerte in Grad/Minuten/Sekunden eingeben (im Gegensatz zur Standardeinstellung in Dezimalwerten)</string>
+    <string name="manual_edit_inclination_deg_mins_secs">Neigung (° \' \")</string>
+    <string name="settings_key_inc_deg_mins_secs_title">Neigung in Grad/Minuten/Sekunden</string>
+    <string name="settings_key_inc_deg_mins_secs_summary">Neigungswerte in Grad/Minuten/Sekunden eingeben (im Gegensatz zur Standardeinstellung in Dezimalwerten)</string>
     <string name="settings_export_title">Exportieren</string>
     <string name="settings_export_summary">Exportformate und Ordneroptionen</string>
     <string name="settings_export_svg_background_title">SVG-Hintergrund</string>
@@ -479,6 +509,28 @@
     <string name="settings_export_svg_leg_width_summary">Wie breit Messstrecken im SVG-Export dargestellt werden sollen</string>
     <string name="settings_export_svg_splay_width_title">SVG-Dimensions-Strichstärke</string>
     <string name="settings_export_svg_splay_width_summary">Wie breit Dimensionen im SVG-Export dargestellt werden sollen</string>
+    <string name="settings_export_svg_legend_title">Legende anzeigen</string>
+    <string name="settings_export_svg_legend_summary">Legendenstreifen mit Titel, Datum, Statistik usw. einbeziehen</string>
+    <string name="settings_export_svg_north_arrow_title">Nordpfeil anzeigen</string>
+    <string name="settings_export_svg_north_arrow_summary">Nordpfeil in der Legende bei Grundrissexporten hinzufügen</string>
+    <string name="settings_export_svg_scale_bar_title">Maßstabsleiste anzeigen</string>
+    <string name="settings_export_svg_scale_bar_summary">Maßstabsleiste zur Legende hinzufügen</string>
+    <string name="settings_export_svg_team_title">Vermessungsteam anzeigen</string>
+    <string name="settings_export_svg_team_summary">Liste der Vermesser anzeigen</string>
+    <string name="settings_export_svg_cross_sections_title">Querschnitte exportieren</string>
+    <string name="settings_export_svg_cross_sections_summary">Querschnittsskizzen in den SVG-Export einbeziehen</string>
+    <string name="settings_export_svg_symbols_title">Symbole exportieren</string>
+    <string name="settings_export_svg_symbols_summary">Symbole in den SVG-Export einbeziehen</string>
+    <string name="settings_export_svg_centreline_title">Polygon anzeigen</string>
+    <string name="settings_export_svg_centreline_summary">Vermessungspolygon (Strecken) im SVG-Export zeichnen</string>
+    <string name="settings_export_svg_stations_title">Stationsbeschriftungen anzeigen</string>
+    <string name="settings_export_svg_stations_summary">Stationsnamen-Beschriftungen im SVG-Export zeichnen</string>
+    <string name="settings_export_svg_splays_title">Splays anzeigen</string>
+    <string name="settings_export_svg_splays_summary">Splayschüsse (LRUD-Linien) im SVG-Export zeichnen</string>
+    <string name="settings_export_svg_grid_title">Raster anzeigen</string>
+    <string name="settings_export_svg_grid_summary">Hintergrundraster hinter der Vermessung zeichnen</string>
+    <string name="settings_export_svg_tagline_title">Slogan anzeigen</string>
+    <string name="settings_export_svg_tagline_summary">SexyTopo angemessen würdigen</string>
     <string name="settings_export_therion_symbols_title">Therion-Export Symbole</string>
     <string name="settings_export_therion_symbols_summary">Symbole beim Exportieren im Therion-Format einschließen</string>
     <string name="settings_export_therion_text_title">Therion-Export Text</string>
@@ -512,6 +564,7 @@
     <string name="therion_export_ee_scraps">Aufriss-Scraps</string>
     <string name="therion_export_stations_in_plan">Messpunkte zum ersten Planansicht-Scrap hinzufügen</string>
     <string name="therion_export_stations_in_ee">Messpunkte zum ersten Aufriss-Scrap hinzufügen</string>
+    <string name="svg_export_dialog_title">SVG-Exportoptionen</string>
     <string name="settings_developer_title">Entwickler</string>
     <string name="settings_developer_summary">Debugging-Optionen</string>
     <string name="settings_key_developer_mode_title"> Entwickler-Modus</string>
@@ -534,9 +587,12 @@
     <string name="validation_error_same_as_from_station">Kann nicht derselbe wie der Ursprungsmesspunkt sein</string>
     <string name="validation_error_station_name_not_unique">Messpunktname muss eindeutig sein</string>
     <string name="validation_error_must_be_number">Muss eine Zahl sein</string>
-    <string name="validation_error_distance_minimum">Muss >= %1$f sein</string>
-    <string name="validation_error_azimuth_range">Muss zwischen %1$f und %2$f liegen</string>
-    <string name="validation_error_inclination_range">Muss zwischen %1$f und %2$f liegen</string>
+    <string name="validation_error_distance_minimum">Muss >= %1$d sein</string>
+    <string name="validation_error_azimuth_range">Muss zwischen %1$d und %2$d liegen</string>
+    <string name="validation_error_inclination_range">Muss zwischen -90 und 90 oder zwischen 270 und 360 liegen</string>
+    <string name="validation_error_mins_secs_range">Muss zwischen 0 und 59 liegen</string>
+    <string name="validation_error_secs_range">Muss zwischen 0 und weniger als 60 liegen</string>
+    <string name="validation_error_must_be_zero_for_90">Muss 0 sein für ±90°</string>
 
     <!-- Input mode for leg editing -->
     <string-array name="leg_edit_input_mode_options">
@@ -591,6 +647,11 @@
     <string name="menu_jump_to">Springen</string>
     <string name="menu_jump_to_station_in_plan">&#10132; Grundriss</string>
     <string name="menu_jump_to_station_in_elevation">&#10132; Seitenriss</string>
+    <string name="menu_xsection">Querschnitt</string>
+    <string name="menu_xsection_create">Neuer Querschnitt</string>
+    <string name="menu_xsection_delete">Querschnitt löschen</string>
+    <string name="menu_xsection_edit">Skizze bearbeiten</string>
+    <string name="menu_xsection_set_direction">Richtung festlegen</string>
     <string name="menu_new_cross_section">Neuer Querschnitt</string>
     <string name="menu_jump_to_station_in_table">&#10132; Daten-Tabelle</string>
     <string name="menu_delete_station">Löschen</string>
@@ -604,6 +665,8 @@
     <string name="menu_start_new_survey">Hier neue Vermessung beginnen</string>
     <string name="menu_unlink_survey">Verknüpfung zu anderer Vermessungsdatei lösen</string>
     <string name="menu_comment">Kommentar</string>
+    <string name="menu_comment_leg">Messstrecken-Kommentar</string>
+    <string name="menu_comment_splay">Peilung-Kommentar</string>
     <string name="menu_toggle_left_right">Links/Rechts umschalten</string>
     <string name="menu_context_title_leg">Messung %1$s &#10132; %2$s</string>
     <string name="menu_context_title_splay">Splay %s &#10132;</string>

@@ -20,6 +20,15 @@ public abstract class Exporter {
 
     public abstract void run(Context context, Survey survey) throws Exception;
 
+    /**
+     * Show an options dialog before exporting; default is a no-op that proceeds immediately.
+     * Override to collect export-specific configuration. Implementations must invoke onReady on the
+     * positive path (and may skip it on cancel).
+     */
+    public void showOptionsDialog(Context context, Runnable onReady) {
+        onReady.run();
+    }
+
     public abstract String getExportTypeName(Context context);
 
     public String getExportTypeDescription(Context context) {

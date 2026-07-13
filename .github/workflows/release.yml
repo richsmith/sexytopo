@@ -13,16 +13,16 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'adopt'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Build release APK
         run: ./gradlew assembleRelease
@@ -51,3 +51,19 @@ jobs:
           name: SexyTopo ${{ github.ref_name }}
           body_path: notes.md
           files: sexytopo-*.apk
+
+      - name: Prepare Play Store release notes
+        run: |
+          mkdir -p whatsnew
+          # Play limits the "what's new" text to 500 characters; truncate to be safe.
+          head -c 500 notes.md > whatsnew/whatsnew-en-US
+
+      - name: Publish to Play Store
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: org.hwyl.sexytopo
+          releaseFiles: sexytopo-${{ github.ref_name }}.apk
+          tracks: production
+          status: completed
+          whatsNewDirectory: whatsnew

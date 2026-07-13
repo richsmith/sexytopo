@@ -17,6 +17,7 @@ import android.widget.PopupMenu;
 import java.util.HashMap;
 import java.util.Map;
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -60,7 +61,10 @@ public class ContextMenuManager {
         menuActions.put(R.id.action_jump_to_elevation, activity::onJumpToElevation);
         menuActions.put(R.id.action_direction_left, activity::onSetDirectionLeft);
         menuActions.put(R.id.action_direction_right, activity::onSetDirectionRight);
-        menuActions.put(R.id.action_new_cross_section, activity::onNewCrossSection);
+        menuActions.put(R.id.action_xsection_create, activity::onNewCrossSection);
+        menuActions.put(R.id.action_xsection_edit, activity::onEditCrossSection);
+        menuActions.put(R.id.action_xsection_set_direction, activity::onRotateCrossSection);
+        menuActions.put(R.id.action_xsection_delete, activity::onDeleteCrossSection);
         menuActions.put(R.id.action_start_new_survey, activity::onStartNewSurvey);
         menuActions.put(R.id.action_link_survey, activity::onLinkSurvey);
         menuActions.put(R.id.action_unlink_survey, activity::onUnlinkSurvey);
@@ -161,8 +165,12 @@ public class ContextMenuManager {
         MenuItem unlinkItem = menu.findItem(R.id.action_unlink_survey);
         if (survey != null) {
             boolean hasLinks = survey.hasLinkedSurveys(station);
-            if (linkItem != null) linkItem.setEnabled(!hasLinks);
-            if (unlinkItem != null) unlinkItem.setEnabled(hasLinks);
+            if (linkItem != null) {
+                linkItem.setEnabled(!hasLinks);
+            }
+            if (unlinkItem != null) {
+                unlinkItem.setEnabled(hasLinks);
+            }
         }
 
         if (survey != null) {
@@ -176,14 +184,26 @@ public class ContextMenuManager {
 
             if (currentLeg != null) {
                 boolean isSplay = !currentLeg.hasDestination();
-                if (upgradeItem != null) upgradeItem.setVisible(isSplay);
-                if (promoteItem != null) promoteItem.setVisible(isSplay);
-                if (reverseItem != null) reverseItem.setVisible(!isSplay);
+                if (upgradeItem != null) {
+                    upgradeItem.setVisible(isSplay);
+                }
+                if (promoteItem != null) {
+                    promoteItem.setVisible(isSplay);
+                }
+                if (reverseItem != null) {
+                    reverseItem.setVisible(!isSplay);
+                }
                 if (downgradeItem != null) {
                     boolean canDowngrade =
                             !isSplay && currentLeg.getDestination().getOnwardLegs().isEmpty();
                     downgradeItem.setVisible(!isSplay);
                     downgradeItem.setEnabled(canDowngrade);
+                }
+
+                MenuItem commentLegItem = menu.findItem(R.id.action_comment_leg);
+                if (commentLegItem != null) {
+                    commentLegItem.setTitle(
+                            isSplay ? R.string.menu_comment_splay : R.string.menu_comment_leg);
                 }
                 if (legMenuItem != null) {
                     legMenuItem.setTitle(R.string.menu_incoming_leg);
@@ -206,9 +226,15 @@ public class ContextMenuManager {
                 }
             } else {
                 // Origin station — hide leg submenu and upgrade/downgrade
-                if (upgradeItem != null) upgradeItem.setVisible(false);
-                if (downgradeItem != null) downgradeItem.setVisible(false);
-                if (legMenuItem != null) legMenuItem.setVisible(false);
+                if (upgradeItem != null) {
+                    upgradeItem.setVisible(false);
+                }
+                if (downgradeItem != null) {
+                    downgradeItem.setVisible(false);
+                }
+                if (legMenuItem != null) {
+                    legMenuItem.setVisible(false);
+                }
             }
         }
 
@@ -219,6 +245,31 @@ public class ContextMenuManager {
             Direction currentDirection = station.getExtendedElevationDirection();
             leftItem.setChecked(currentDirection == Direction.LEFT);
             rightItem.setChecked(currentDirection == Direction.RIGHT);
+        }
+
+        // Cross-section submenu: enable/disable based on whether one exists at this station.
+        if (survey != null) {
+            boolean hasCrossSection = survey.getPlanSketch().getCrossSectionDetail(station) != null;
+            MenuItem createItem = menu.findItem(R.id.action_xsection_create);
+            MenuItem editItem = menu.findItem(R.id.action_xsection_edit);
+            MenuItem setDirectionItem = menu.findItem(R.id.action_xsection_set_direction);
+            MenuItem deleteItem = menu.findItem(R.id.action_xsection_delete);
+            if (createItem != null) {
+                createItem.setEnabled(!hasCrossSection);
+            }
+            if (editItem != null) {
+                // The editor activity only exists in the new mode; hide Edit for legacy
+                // cross-sections.
+                boolean legacyCrossSections = GeneralPreferences.isLegacyCrossSectionsOn();
+                editItem.setVisible(!legacyCrossSections);
+                editItem.setEnabled(hasCrossSection);
+            }
+            if (setDirectionItem != null) {
+                setDirectionItem.setEnabled(hasCrossSection);
+            }
+            if (deleteItem != null) {
+                deleteItem.setEnabled(hasCrossSection);
+            }
         }
 
         viewContext.configureViewSpecificItems(menu);
@@ -269,6 +320,10 @@ public class ContextMenuManager {
         }
         if (itemId == R.id.action_delete_leg && currentLeg != null) {
             activity.onDeleteLeg(currentLeg);
+            return true;
+        }
+        if (itemId == R.id.action_comment_leg && currentLeg != null) {
+            activity.onCommentLeg(currentLeg);
             return true;
         }
 

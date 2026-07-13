@@ -7,7 +7,73 @@
         android:summary="@string/settings_export_svg_background_summary"
         android:entries="@array/settings_export_svg_background_entries"
         android:entryValues="@array/settings_export_svg_background_values"
-        android:defaultValue="transparent" />
+        android:defaultValue="white" />
+
+    <CheckBoxPreference
+        android:key="pref_export_svg_legend"
+        android:title="@string/settings_export_svg_legend_title"
+        android:summary="@string/settings_export_svg_legend_summary"
+        android:defaultValue="true" />
+
+    <CheckBoxPreference
+        android:key="pref_export_svg_north_arrow"
+        android:title="@string/settings_export_svg_north_arrow_title"
+        android:summary="@string/settings_export_svg_north_arrow_summary"
+        android:defaultValue="true" />
+
+    <CheckBoxPreference
+        android:key="pref_export_svg_scale_bar"
+        android:title="@string/settings_export_svg_scale_bar_title"
+        android:summary="@string/settings_export_svg_scale_bar_summary"
+        android:defaultValue="true" />
+
+    <CheckBoxPreference
+        android:key="pref_export_svg_team"
+        android:title="@string/settings_export_svg_team_title"
+        android:summary="@string/settings_export_svg_team_summary"
+        android:defaultValue="true" />
+
+    <CheckBoxPreference
+        android:key="pref_export_svg_cross_sections"
+        android:title="@string/settings_export_svg_cross_sections_title"
+        android:summary="@string/settings_export_svg_cross_sections_summary"
+        android:defaultValue="true" />
+
+    <CheckBoxPreference
+        android:key="pref_export_svg_symbols"
+        android:title="@string/settings_export_svg_symbols_title"
+        android:summary="@string/settings_export_svg_symbols_summary"
+        android:defaultValue="true" />
+
+    <CheckBoxPreference
+        android:key="pref_export_svg_centreline"
+        android:title="@string/settings_export_svg_centreline_title"
+        android:summary="@string/settings_export_svg_centreline_summary"
+        android:defaultValue="true" />
+
+    <CheckBoxPreference
+        android:key="pref_export_svg_stations"
+        android:title="@string/settings_export_svg_stations_title"
+        android:summary="@string/settings_export_svg_stations_summary"
+        android:defaultValue="true" />
+
+    <CheckBoxPreference
+        android:key="pref_export_svg_splays"
+        android:title="@string/settings_export_svg_splays_title"
+        android:summary="@string/settings_export_svg_splays_summary"
+        android:defaultValue="true" />
+
+    <CheckBoxPreference
+        android:key="pref_export_svg_grid"
+        android:title="@string/settings_export_svg_grid_title"
+        android:summary="@string/settings_export_svg_grid_summary"
+        android:defaultValue="false" />
+
+    <CheckBoxPreference
+        android:key="pref_export_svg_tagline"
+        android:title="@string/settings_export_svg_tagline_title"
+        android:summary="@string/settings_export_svg_tagline_summary"
+        android:defaultValue="true" />
 
     <EditTextPreference
         android:key="pref_export_svg_stroke_width"

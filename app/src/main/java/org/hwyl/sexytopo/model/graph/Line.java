@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.model.graph;
 
-public final class Line<T extends Coord> {
+public final class Line<T extends Coord<T>> {
     private final T start;
     private final T end;
 
@@ -22,6 +22,6 @@ public final class Line<T extends Coord> {
     }
 
     public Line<T> scale(float scale) {
-        return new Line<>((T) start.scale(scale), (T) end.scale(scale));
+        return new Line<>(start.scale(scale), end.scale(scale));
     }
 }
