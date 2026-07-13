@@ -188,11 +188,13 @@ public class SurvexTherionUtil {
             GraphToListTranslator.SurveyListEntry entry,
             SurveyFormat format) {
 
-        Station from = entry.getFrom();
+        GraphToListTranslator.AsTakenReading reading =
+                GraphToListTranslator.toAsTakenReading(entry);
+        Station from = reading.getFrom();
         String fromName = from.getName();
 
-        Leg leg = entry.getLeg();
-        Station to = leg.getDestination();
+        Leg leg = reading.getLeg();
+        Station to = reading.getTo();
         String toName = to.getName();
 
         // Replace splay station name with format-specific syntax
