@@ -117,9 +117,12 @@ public class Leg extends SurveyComponent {
                             destination,
                             promotedFrom,
                             !wasShotBackwards);
+            leg.setComment(comment);
             return leg;
         } else {
-            return new Leg(distance, adjustedAzimuth, -1 * inclination, !wasShotBackwards);
+            Leg leg = new Leg(distance, adjustedAzimuth, -1 * inclination, !wasShotBackwards);
+            leg.setComment(comment);
+            return leg;
         }
     }
 
@@ -150,6 +153,7 @@ public class Leg extends SurveyComponent {
                         -1 * getInclination(),
                         destination,
                         getPromotedFrom());
+        leg.setComment(comment);
         return leg;
     }
 
