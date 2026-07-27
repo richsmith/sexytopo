@@ -1,3 +1,6 @@
+# 2026-07-08 1.12.3
+- Fix Survex and Therion backwards leg bug (thanks Andrew Atkinson)
+
 # 2026-07-08 1.12.2
 - Fix accidantal omission of bug from 1.12.1
 
