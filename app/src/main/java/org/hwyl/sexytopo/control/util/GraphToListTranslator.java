@@ -44,24 +44,62 @@ public class GraphToListTranslator {
 
     public static Map<TableCol, Object> createMap(SurveyListEntry entry) {
 
-        Station from = entry.getFrom();
-        Leg leg = entry.getLeg();
+        AsTakenReading reading = toAsTakenReading(entry);
+        Leg leg = reading.getLeg();
 
         Map<TableCol, Object> map = new HashMap<>();
-
-        if (leg.wasShotBackwards()) {
-            map.put(TableCol.FROM, leg.getDestination());
-            map.put(TableCol.TO, from);
-            leg = leg.asBacksight();
-        } else {
-            map.put(TableCol.FROM, from);
-            map.put(TableCol.TO, leg.getDestination());
-        }
+        map.put(TableCol.FROM, reading.getFrom());
+        map.put(TableCol.TO, reading.getTo());
         map.put(TableCol.DISTANCE, leg.getDistance());
         map.put(TableCol.AZIMUTH, leg.getAzimuth());
         map.put(TableCol.INCLINATION, leg.getInclination());
 
         return map;
+    }
+
+    /**
+     * Returns the from-station, to-station, and leg reading exactly as they were physically taken.
+     *
+     * <p>A leg with {@code wasShotBackwards() == true} is stored with its azimuth/inclination as
+     * read at the far station, but attached to the graph in the opposite direction to how it was
+     * shot. This normalises that back to the as-taken from/to/azimuth/inclination, so every output
+     * (table display, third-party format export, etc) shows and exports the same reading a surveyor
+     * record in their notes.
+     */
+    public static AsTakenReading toAsTakenReading(SurveyListEntry entry) {
+        Station from = entry.getFrom();
+        Leg leg = entry.getLeg();
+
+        if (leg.wasShotBackwards()) {
+            Station to = leg.getDestination();
+            return new AsTakenReading(to, from, leg.asBacksight());
+        } else {
+            return new AsTakenReading(from, leg.getDestination(), leg);
+        }
+    }
+
+    public static class AsTakenReading {
+        private final Station from;
+        private final Station to;
+        private final Leg leg;
+
+        public AsTakenReading(Station from, Station to, Leg leg) {
+            this.from = from;
+            this.to = to;
+            this.leg = leg;
+        }
+
+        public Station getFrom() {
+            return from;
+        }
+
+        public Station getTo() {
+            return to;
+        }
+
+        public Leg getLeg() {
+            return leg;
+        }
     }
 
     public static class SurveyListEntry {

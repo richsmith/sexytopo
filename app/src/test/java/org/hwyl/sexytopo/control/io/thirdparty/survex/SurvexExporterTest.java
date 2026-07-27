@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
+import org.hwyl.sexytopo.control.util.SurveyUpdater;
+import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
@@ -21,6 +23,22 @@ public class SurvexExporterTest {
         Assert.assertTrue(content.contains("1\t2\t5.000\t0.00\t0.00"));
         Assert.assertTrue(content.contains("2\t3\t5.000\t0.00\t0.00"));
         Assert.assertTrue(content.contains("3\t4\t5.000\t0.00\t0.00"));
+    }
+
+    @Test
+    public void testBackwardsLegExportedAsTaken() {
+        // Regression test: a leg shot backwards must be exported with the stations and
+        // reading as they were physically taken, not as they are stored internally.
+        // Internally stored: 1 -> 2, azimuth 225, inclination -10.
+        // As taken: from 2 to 1, azimuth 45, inclination 10.
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createEmptySurvey();
+        SurveyUpdater.updateWithNewStation(survey, new Leg(5, 225, -10, true));
+
+        String content = survexExporter.getContent(survey);
+
+        Assert.assertTrue(content.contains("2\t1\t5.000\t45.00\t10.00"));
+        Assert.assertFalse(content.contains("1\t2\t5.000\t225.00\t-10.00"));
     }
 
     @Test
