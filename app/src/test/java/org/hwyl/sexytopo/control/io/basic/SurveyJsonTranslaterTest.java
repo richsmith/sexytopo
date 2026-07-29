@@ -76,4 +76,36 @@ public class SurveyJsonTranslaterTest {
         Assert.assertEquals("DistoX BLE", loaded.getInstrument());
         Assert.assertTrue(loaded.hasInstrument());
     }
+
+    @Test
+    public void testTripCopyrightAndLicenseRoundTrip() throws Exception {
+        Trip trip = new Trip();
+        trip.setCopyright("Jane Caver");
+        trip.setLicense("CC BY 4.0");
+
+        JSONObject json = SurveyJsonTranslater.toJson(trip);
+        Trip loaded = SurveyJsonTranslater.toTrip(json);
+
+        Assert.assertEquals("Jane Caver", loaded.getCopyright());
+        Assert.assertEquals("CC BY 4.0", loaded.getLicense());
+        Assert.assertTrue(loaded.hasCopyright());
+        Assert.assertTrue(loaded.hasLicense());
+    }
+
+    @Test
+    public void testOldTripJsonWithoutCopyrightOrLicenseDefaultsToEmptyStrings() throws Exception {
+        Trip trip = new Trip();
+        trip.setInstrument("DistoX BLE");
+
+        JSONObject json = SurveyJsonTranslater.toJson(trip);
+        json.remove(SurveyJsonTranslater.COPYRIGHT_TAG);
+        json.remove(SurveyJsonTranslater.LICENSE_TAG);
+
+        Trip loaded = SurveyJsonTranslater.toTrip(json);
+
+        Assert.assertEquals("", loaded.getCopyright());
+        Assert.assertEquals("", loaded.getLicense());
+        Assert.assertFalse(loaded.hasCopyright());
+        Assert.assertFalse(loaded.hasLicense());
+    }
 }

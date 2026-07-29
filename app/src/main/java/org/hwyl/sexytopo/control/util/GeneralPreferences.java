@@ -5,13 +5,18 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import androidx.preference.PreferenceManager;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.model.sketch.Colour;
+import org.hwyl.sexytopo.model.survey.LicenseOption;
 import org.hwyl.sexytopo.model.table.LRUD;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class GeneralPreferences {
 
@@ -392,5 +397,193 @@ public class GeneralPreferences {
         Set<String> set = new HashSet<>(prefs.getStringSet(PREF_KNOWN_CAVERS, new HashSet<>()));
         set.remove(name);
         prefs.edit().putStringSet(PREF_KNOWN_CAVERS, set).apply();
+    }
+
+    // ********** License Options ***********
+
+    private static final String PREF_LICENSE_OPTIONS = "pref_license_options";
+    private static final String LICENSE_NAME_TAG = "name";
+    private static final String LICENSE_DEFAULT_TAG = "default";
+    private static final String FALLBACK_DEFAULT_LICENSE_NAME = "GPLv3.0+";
+
+    private static List<LicenseOption> defaultLicenseOptions() {
+        return new ArrayList<>(
+                Arrays.asList(
+                        new LicenseOption(FALLBACK_DEFAULT_LICENSE_NAME, true),
+                        new LicenseOption("CC0", false),
+                        new LicenseOption("CC BY 4.0", false),
+                        new LicenseOption("CC BY SA 4.0", false),
+                        new LicenseOption("CC BY SA NC 4.0", false),
+                        new LicenseOption("All rights reserved", false)));
+    }
+
+    public static List<LicenseOption> getLicenseOptions() {
+        if (prefs == null) return defaultLicenseOptions();
+
+        String json = prefs.getString(PREF_LICENSE_OPTIONS, null);
+        if (json == null) return defaultLicenseOptions();
+
+        try {
+            return licenseOptionsFromJson(json);
+        } catch (JSONException exception) {
+            Log.e("Could not load license options: " + exception);
+            return defaultLicenseOptions();
+        }
+    }
+
+    public static void setLicenseOptions(List<LicenseOption> options) {
+        if (prefs == null) return;
+        try {
+            String json = licenseOptionsToJson(options).toString();
+            prefs.edit().putString(PREF_LICENSE_OPTIONS, json).apply();
+        } catch (JSONException exception) {
+            Log.e("Could not save license options: " + exception);
+        }
+    }
+
+    /** Returns the name of the license option currently flagged as the default. */
+    public static String getDefaultLicenseName() {
+        for (LicenseOption option : getLicenseOptions()) {
+            if (option.isDefault()) {
+                return option.getName();
+            }
+        }
+        return FALLBACK_DEFAULT_LICENSE_NAME;
+    }
+
+    /**
+     * Adds a new license option. If the list is currently empty, the new option becomes the
+     * default; otherwise it is added as a non-default option.
+     */
+    public static void addLicenseOption(String name) {
+        if (name == null || name.trim().isEmpty()) return;
+        setLicenseOptions(withAdded(getLicenseOptions(), name.trim()));
+    }
+
+    /**
+     * Removes the license option with the given name. If it was the default and other options
+     * remain, the first remaining option is promoted to be the new default, so a default is always
+     * present as long as the list is not empty.
+     */
+    public static void removeLicenseOption(String name) {
+        if (name == null) return;
+        setLicenseOptions(withRemoved(getLicenseOptions(), name));
+    }
+
+    /** Renames a license option, preserving its position in the list and its default flag. */
+    public static void renameLicenseOption(String oldName, String newName) {
+        if (oldName == null || newName == null || newName.trim().isEmpty()) return;
+        setLicenseOptions(withRenamed(getLicenseOptions(), oldName, newName.trim()));
+    }
+
+    /**
+     * Flags the license option with the given name as the default, and un-flags every other option.
+     * Does nothing if no option with that name exists.
+     */
+    public static void setDefaultLicenseOption(String name) {
+        if (name == null) return;
+        setLicenseOptions(withDefaultSet(getLicenseOptions(), name));
+    }
+
+    /**
+     * Pure list transformation backing {@link #addLicenseOption(String)}, kept separate so it can
+     * be unit tested without a SharedPreferences-backed Context.
+     */
+    public static List<LicenseOption> withAdded(List<LicenseOption> options, String trimmedName) {
+        List<LicenseOption> result = new ArrayList<>(options);
+        result.add(new LicenseOption(trimmedName, result.isEmpty()));
+        return result;
+    }
+
+    /**
+     * Pure list transformation backing {@link #removeLicenseOption(String)}, kept separate so it
+     * can be unit tested without a SharedPreferences-backed Context.
+     */
+    public static List<LicenseOption> withRemoved(List<LicenseOption> options, String name) {
+        boolean removedWasDefault = false;
+        List<LicenseOption> remaining = new ArrayList<>();
+        for (LicenseOption option : options) {
+            if (option.getName().equals(name)) {
+                removedWasDefault = option.isDefault();
+            } else {
+                remaining.add(option);
+            }
+        }
+
+        if (removedWasDefault && !remaining.isEmpty() && !hasDefault(remaining)) {
+            remaining.set(0, remaining.get(0).withDefault(true));
+        }
+        return remaining;
+    }
+
+    /**
+     * Pure list transformation backing {@link #renameLicenseOption(String, String)}, kept separate
+     * so it can be unit tested without a SharedPreferences-backed Context.
+     */
+    public static List<LicenseOption> withRenamed(
+            List<LicenseOption> options, String oldName, String trimmedNewName) {
+        List<LicenseOption> result = new ArrayList<>(options);
+        for (int i = 0; i < result.size(); i++) {
+            if (result.get(i).getName().equals(oldName)) {
+                result.set(i, result.get(i).withName(trimmedNewName));
+                break;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Pure list transformation backing {@link #setDefaultLicenseOption(String)}, kept separate so
+     * it can be unit tested without a SharedPreferences-backed Context. Does nothing (returns an
+     * unchanged copy) if no option with the given name exists.
+     */
+    public static List<LicenseOption> withDefaultSet(List<LicenseOption> options, String name) {
+        if (!hasOption(options, name)) {
+            return new ArrayList<>(options);
+        }
+
+        List<LicenseOption> result = new ArrayList<>();
+        for (LicenseOption option : options) {
+            result.add(option.withDefault(option.getName().equals(name)));
+        }
+        return result;
+    }
+
+    private static boolean hasDefault(List<LicenseOption> options) {
+        for (LicenseOption option : options) {
+            if (option.isDefault()) return true;
+        }
+        return false;
+    }
+
+    private static boolean hasOption(List<LicenseOption> options, String name) {
+        for (LicenseOption option : options) {
+            if (option.getName().equals(name)) return true;
+        }
+        return false;
+    }
+
+    public static JSONArray licenseOptionsToJson(List<LicenseOption> options) throws JSONException {
+        JSONArray array = new JSONArray();
+        for (LicenseOption option : options) {
+            JSONObject json = new JSONObject();
+            json.put(LICENSE_NAME_TAG, option.getName());
+            json.put(LICENSE_DEFAULT_TAG, option.isDefault());
+            array.put(json);
+        }
+        return array;
+    }
+
+    public static List<LicenseOption> licenseOptionsFromJson(String jsonString)
+            throws JSONException {
+        JSONArray array = new JSONArray(jsonString);
+        List<LicenseOption> options = new ArrayList<>();
+        for (int i = 0; i < array.length(); i++) {
+            JSONObject json = array.getJSONObject(i);
+            String name = json.getString(LICENSE_NAME_TAG);
+            boolean isDefault = json.optBoolean(LICENSE_DEFAULT_TAG, false);
+            options.add(new LicenseOption(name, isDefault));
+        }
+        return options;
     }
 }

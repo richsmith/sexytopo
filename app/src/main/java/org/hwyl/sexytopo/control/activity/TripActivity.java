@@ -1,6 +1,7 @@
 package org.hwyl.sexytopo.control.activity;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -11,8 +12,10 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Filter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentManager;
 import com.google.android.material.datepicker.MaterialDatePicker;
@@ -29,6 +32,7 @@ import org.hwyl.sexytopo.comms.Instrument;
 import org.hwyl.sexytopo.control.table.TeamMemberForm;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.TextTools;
+import org.hwyl.sexytopo.model.survey.LicenseOption;
 import org.hwyl.sexytopo.model.survey.Trip;
 
 public class TripActivity extends SexyTopoActivity {
@@ -83,6 +87,40 @@ public class TripActivity extends SexyTopoActivity {
                     @Override
                     public void onTextChanged(CharSequence s, int start, int before, int count) {}
                 });
+
+        EditText copyrightField = findViewById(R.id.trip_copyright);
+        copyrightField.addTextChangedListener(
+                new TextWatcher() {
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        syncTrip();
+                        updateButtonStatus();
+                    }
+
+                    @Override
+                    public void beforeTextChanged(
+                            CharSequence s, int start, int count, int after) {}
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {}
+                });
+
+        AutoCompleteTextView licenseField = findViewById(R.id.trip_license);
+        licenseField.addTextChangedListener(
+                new TextWatcher() {
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        syncTrip();
+                        updateButtonStatus();
+                    }
+
+                    @Override
+                    public void beforeTextChanged(
+                            CharSequence s, int start, int count, int after) {}
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {}
+                });
     }
 
     @Override
@@ -107,6 +145,17 @@ public class TripActivity extends SexyTopoActivity {
             Instrument connected = getInstrument();
             String name = connected.getName();
             instrumentField.setText(name);
+        }
+
+        EditText copyrightField = findViewById(R.id.trip_copyright);
+        copyrightField.setText(trip.getCopyright());
+
+        setupLicenseAutocomplete();
+        AutoCompleteTextView licenseField = findViewById(R.id.trip_license);
+        if (trip.hasLicense()) {
+            licenseField.setText(trip.getLicense());
+        } else {
+            licenseField.setText(GeneralPreferences.getDefaultLicenseName());
         }
 
         TextInputLayout surveyDateLayout = findViewById(R.id.survey_date_layout);
@@ -217,6 +266,10 @@ public class TripActivity extends SexyTopoActivity {
                         (dialog, whichButton) -> {
                             EditText comments = findViewById(R.id.trip_comments);
                             comments.setText("");
+                            EditText copyright = findViewById(R.id.trip_copyright);
+                            copyright.setText("");
+                            AutoCompleteTextView license = findViewById(R.id.trip_license);
+                            license.setText(GeneralPreferences.getDefaultLicenseName());
                             team.clear();
                             Trip trip = getSurvey().getTrip();
                             if (trip != null) {
@@ -229,6 +282,78 @@ public class TripActivity extends SexyTopoActivity {
                         })
                 .setNegativeButton(R.string.cancel, null)
                 .show();
+    }
+
+    private void setupLicenseAutocomplete() {
+        AutoCompleteTextView licenseField = findViewById(R.id.trip_license);
+        List<String> licenseNames = new ArrayList<>();
+        for (LicenseOption option : GeneralPreferences.getLicenseOptions()) {
+            licenseNames.add(option.getName());
+        }
+
+        // The stock ArrayAdapter filters its suggestions against the text that is already in the
+        // field. Since this field is pre-filled with the default license, that would narrow the
+        // dropdown down to only the matching entry. A non-filtering
+        // adapter keeps the full configured list showing regardless of the current text, while
+        // the field itself stays editable, free text works.
+        ArrayAdapter<String> adapter =
+                new NonFilteringArrayAdapter(
+                        this, android.R.layout.simple_dropdown_item_1line, licenseNames);
+        licenseField.setAdapter(adapter);
+        licenseField.setThreshold(0);
+
+        View.OnClickListener showFullDropdown =
+                v -> {
+                    if (!licenseNames.isEmpty()) {
+                        licenseField.showDropDown();
+                    }
+                };
+        // Tapping the field re-opens the list even if it's already focused (e.g. after the
+        // dropdown was previously dismissed), and gaining focus opens it the first time.
+        licenseField.setOnClickListener(showFullDropdown);
+        licenseField.setOnFocusChangeListener(
+                (v, hasFocus) -> {
+                    if (hasFocus && !licenseNames.isEmpty()) {
+                        licenseField.showDropDown();
+                    }
+                });
+    }
+
+    /**
+     * An ArrayAdapter whose suggestion list is not narrowed by the current text of the field it's
+     * attached to. Used for the License field so the full configured list is always offered, even
+     * though the field is pre-filled with a default value.
+     */
+    private static class NonFilteringArrayAdapter extends ArrayAdapter<String> {
+
+        private final List<String> items;
+
+        private final Filter noOpFilter =
+                new Filter() {
+                    @Override
+                    protected FilterResults performFiltering(CharSequence constraint) {
+                        FilterResults results = new FilterResults();
+                        results.values = items;
+                        results.count = items.size();
+                        return results;
+                    }
+
+                    @Override
+                    protected void publishResults(CharSequence constraint, FilterResults results) {
+                        // Deliberately do nothing: the backing data set (and therefore the
+                        // dropdown contents) never changes in response to typed text.
+                    }
+                };
+
+        NonFilteringArrayAdapter(Context context, int resource, List<String> items) {
+            super(context, resource, items);
+            this.items = items;
+        }
+
+        @Override
+        public @NonNull Filter getFilter() {
+            return noOpFilter;
+        }
     }
 
     private void setupNameAutocomplete(View dialogView) {
@@ -340,6 +465,12 @@ public class TripActivity extends SexyTopoActivity {
         EditText instrumentField = findViewById(R.id.instrument_field);
         trip.setInstrument(instrumentField.getText().toString());
 
+        EditText copyrightField = findViewById(R.id.trip_copyright);
+        trip.setCopyright(copyrightField.getText().toString());
+
+        AutoCompleteTextView licenseField = findViewById(R.id.trip_license);
+        trip.setLicense(licenseField.getText().toString());
+
         getSurvey().setTrip(trip);
     }
 
@@ -352,11 +483,18 @@ public class TripActivity extends SexyTopoActivity {
         EditText instrumentField = findViewById(R.id.instrument_field);
         boolean hasInstrument = !instrumentField.getText().toString().trim().isEmpty();
 
+        EditText copyrightField = findViewById(R.id.trip_copyright);
+        boolean hasCopyright = !copyrightField.getText().toString().trim().isEmpty();
+
         Trip currentTrip = getSurvey().getTrip();
         boolean hasUnlinkedExploDate =
                 currentTrip != null && !currentTrip.isExplorationDateLinked();
 
-        boolean hasAnyData = hasTeam || hasComments || hasInstrument || hasUnlinkedExploDate;
+        // License is deliberately not checked here, like surveyDate - it is always
+        // pre-filled with a default value, so including it would make the buttons permanently
+        // enabled even on an otherwise blank trip.
+        boolean hasAnyData =
+                hasTeam || hasComments || hasInstrument || hasCopyright || hasUnlinkedExploDate;
         boolean hasChanges = savedTrip == null || !savedTrip.equals(currentTrip);
 
         findViewById(R.id.set_trip).setEnabled(hasAnyData && hasChanges);

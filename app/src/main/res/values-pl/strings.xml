@@ -380,6 +380,8 @@
     <string name="trip_clear_date">Clear date</string>
     <string name="trip_same_as_survey_date">Taka sama jak data pomiaru</string>
     <string name="trip_comments">Komentarze</string>
+    <string name="trip_copyright_label">Copyright</string>
+    <string name="trip_license_label">Licencja</string>
     <string name="trip_save_trip">Zapisz wyjazd</string>
     <string name="trip_role_book">Dokumentacja (rysowanie)</string>
     <string name="trip_role_instruments">Instrumenty</string>
@@ -435,6 +437,11 @@
     <string name="settings_hot_corners_summary">Przeciągaj z rogów szkicu, aby przesunąć widok w trybach rysowania</string>
         <string name="settings_team_title">Zespół</string>
     <string name="settings_team_summary">Zarządzaj nazwami znanych grotołazów</string>
+    <string name="settings_copyright_title">Copyright</string>
+    <string name="settings_copyright_summary">Edytuj wybór licencji</string>
+    <string name="settings_license_new_hint">Nazwa licencji</string>
+    <string name="settings_license_name_required">Nazwa licencji jest wymagana</string>
+    <string name="settings_license_default_label">Domyślna</string>
 <string name="settings_instruments_title">Instrumenty</string>
     <string name="settings_instruments_summary">Tolerancje instrumentów, kalibracja</string>
     <string name="settings_max_distance_delta_title">Maks. delta odległości (m)</string>

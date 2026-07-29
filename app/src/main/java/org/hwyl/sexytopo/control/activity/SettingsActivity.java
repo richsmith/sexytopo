@@ -2,10 +2,14 @@ package org.hwyl.sexytopo.control.activity;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Editable;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -20,6 +24,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
+import org.hwyl.sexytopo.model.survey.LicenseOption;
 
 public class SettingsActivity extends SexyTopoActivity
         implements PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
@@ -244,6 +249,126 @@ public class SettingsActivity extends SexyTopoActivity
                                 dialog.dismiss();
                                 refreshList(root);
                             });
+        }
+    }
+
+    public static class CopyrightFragment extends Fragment {
+        @Nullable
+        @Override
+        public View onCreateView(
+                @NonNull LayoutInflater inflater,
+                @Nullable ViewGroup container,
+                @Nullable Bundle savedInstanceState) {
+            return inflater.inflate(R.layout.fragment_settings_copyright, container, false);
+        }
+
+        @Override
+        public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+            super.onViewCreated(view, savedInstanceState);
+            refreshList(view);
+
+            view.findViewById(R.id.add_license_button)
+                    .setOnClickListener(
+                            v -> {
+                                TextInputEditText field = view.findViewById(R.id.new_license_field);
+                                TextInputLayout layout = view.findViewById(R.id.new_license_layout);
+                                String name = getTrimmedText(field);
+                                if (name.isEmpty()) {
+                                    layout.setError(
+                                            getString(R.string.settings_license_name_required));
+                                    return;
+                                }
+                                layout.setError(null);
+                                GeneralPreferences.addLicenseOption(name);
+                                field.setText("");
+                                refreshList(view);
+                            });
+        }
+
+        private void refreshList(View root) {
+            LinearLayout list = root.findViewById(R.id.licenses_list);
+            list.removeAllViews();
+            LayoutInflater inflater = LayoutInflater.from(requireContext());
+            for (LicenseOption option : GeneralPreferences.getLicenseOptions()) {
+                String name = option.getName();
+                View row = inflater.inflate(R.layout.license_option_item, list, false);
+
+                ((TextView) row.findViewById(R.id.license_name_field)).setText(name);
+                row.setOnClickListener(v -> showEditDialog(root, name));
+
+                CheckBox defaultCheckbox = row.findViewById(R.id.license_default_checkbox);
+                defaultCheckbox.setChecked(option.isDefault());
+                CompoundButton.OnCheckedChangeListener defaultListener =
+                        new CompoundButton.OnCheckedChangeListener() {
+                            @Override
+                            public void onCheckedChanged(
+                                    @NonNull CompoundButton buttonView, boolean isChecked) {
+                                if (isChecked) {
+                                    GeneralPreferences.setDefaultLicenseOption(name);
+                                    refreshList(root);
+                                } else {
+                                    // A default must always be selected; re-check this box
+                                    // rather than allowing the list to end up with no default
+                                    // at all. Detach first so this doesn't re-trigger itself.
+                                    defaultCheckbox.setOnCheckedChangeListener(null);
+                                    defaultCheckbox.setChecked(true);
+                                    defaultCheckbox.setOnCheckedChangeListener(this);
+                                }
+                            }
+                        };
+                defaultCheckbox.setOnCheckedChangeListener(defaultListener);
+
+                Button deleteButton = row.findViewById(R.id.delete_license_button);
+                deleteButton.setOnClickListener(
+                        v -> {
+                            GeneralPreferences.removeLicenseOption(name);
+                            refreshList(root);
+                        });
+
+                list.addView(row);
+            }
+        }
+
+        private void showEditDialog(View root, String currentName) {
+            View dialogView =
+                    LayoutInflater.from(requireContext())
+                            .inflate(R.layout.dialog_edit_license_name, null);
+            TextInputLayout layout = dialogView.findViewById(R.id.license_name_input_layout);
+            TextInputEditText field = dialogView.findViewById(R.id.license_name_field);
+            field.setText(currentName);
+            field.selectAll();
+
+            AlertDialog dialog =
+                    new MaterialAlertDialogBuilder(requireContext())
+                            .setTitle(R.string.edit)
+                            .setView(dialogView)
+                            .setPositiveButton(R.string.save, null)
+                            .setNegativeButton(R.string.cancel, null)
+                            .show();
+
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                    .setOnClickListener(
+                            v -> {
+                                String newName = getTrimmedText(field);
+                                if (newName.isEmpty()) {
+                                    layout.setError(
+                                            getString(R.string.settings_license_name_required));
+                                    return;
+                                }
+                                GeneralPreferences.renameLicenseOption(currentName, newName);
+                                dialog.dismiss();
+                                refreshList(root);
+                            });
+        }
+
+        /**
+         * Returns the field's text, trimmed, or "" if the field has no text at all. {@link
+         * TextInputEditText#getText()} is nullable, even though in practice it won't be null for an
+         * already-inflated field; this keeps the null-check in one place.
+         */
+        private static String getTrimmedText(TextInputEditText field) {
+            Editable text = field.getText();
+            return text == null ? "" : text.toString().trim();
         }
     }
 

@@ -1,13 +1,16 @@
 package org.hwyl.sexytopo.control.activity;
 
+import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.RootMatchers.isPlatformPopup;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
+import static org.hamcrest.Matchers.is;
 
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.filters.LargeTest;
@@ -38,5 +41,22 @@ public class TripActivityTest {
         onView(withText(R.string.action_view)).perform(click());
         onView(withText(R.string.action_trip)).perform(click());
         onView(withId(R.id.rootLayout)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void licenseFieldShowsFullSuggestionListEvenWhenPrefilled() {
+        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
+        onView(withText(R.string.action_view)).perform(click());
+        onView(withText(R.string.action_trip)).perform(click());
+
+        // The License field is pre-filled with the default license (GPLv3.0+) when
+        // screen opens. Tapping it should still offer every configured license, not just the
+        // one matching entry - confirming the field doesn't fall back to stock ArrayAdapter
+        // filtering behaviour.
+        onView(withId(R.id.trip_license)).perform(click());
+
+        onData(is("All rights reserved")).inRoot(isPlatformPopup()).check(matches(isDisplayed()));
+        onData(is("CC0")).inRoot(isPlatformPopup()).check(matches(isDisplayed()));
+        onData(is("GPLv3.0+")).inRoot(isPlatformPopup()).check(matches(isDisplayed()));
     }
 }

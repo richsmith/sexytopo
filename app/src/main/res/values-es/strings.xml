@@ -380,6 +380,8 @@
     <string name="trip_clear_date">Clear date</string>
     <string name="trip_same_as_survey_date">Igual que la fecha de topografía</string>
     <string name="trip_comments">Comentarios</string>
+    <string name="trip_copyright_label">Copyright</string>
+    <string name="trip_license_label">Licencia</string>
     <string name="trip_save_trip">Guardar Salida</string>
     <string name="trip_role_book">Topógrafo (dibujo)</string>
     <string name="trip_role_instruments">Instrumentos</string>
@@ -435,6 +437,11 @@
     <string name="settings_hot_corners_summary">Arrastra desde las esquinas del croquis para mover la vista en modos de dibujo</string>
         <string name="settings_team_title">Equipo</string>
     <string name="settings_team_summary">Gestionar nombres de espeleólogos conocidos</string>
+    <string name="settings_copyright_title">Copyright</string>
+    <string name="settings_copyright_summary">Editar la elección de licencia</string>
+    <string name="settings_license_new_hint">Nombre de la licencia</string>
+    <string name="settings_license_name_required">El nombre de la licencia es obligatorio</string>
+    <string name="settings_license_default_label">Predeterminada</string>
 <string name="settings_instruments_title">Instrumentos</string>
     <string name="settings_instruments_summary">Tolerancias de instrumentos, calibración</string>
     <string name="settings_max_distance_delta_title">Delta de distancia máxima (m)</string>

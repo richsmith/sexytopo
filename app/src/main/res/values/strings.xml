@@ -412,6 +412,8 @@
     <string name="trip_dialog_name_required">Name is required</string>
     <string name="trip_dialog_confirm_clear_trip">Clear Trip Data?</string>
     <string name="trip_comments">Comments</string>
+    <string name="trip_copyright_label">Copyright</string>
+    <string name="trip_license_label">License</string>
     <string name="trip_save_trip">Save Trip</string>
     <string name="trip_role_book">Book (drawing)</string>
     <string name="trip_role_instruments">Instruments</string>
@@ -479,6 +481,11 @@
     <string name="settings_hot_corners_summary">Drag from the corners of the sketch to move the view in drawing modes</string>
     <string name="settings_team_title">Team</string>
     <string name="settings_team_summary">Manage known caver names</string>
+    <string name="settings_copyright_title">Copyright</string>
+    <string name="settings_copyright_summary">Edit the license choice</string>
+    <string name="settings_license_new_hint">License name</string>
+    <string name="settings_license_name_required">License name is required</string>
+    <string name="settings_license_default_label">Default</string>
     <string name="settings_instruments_title">Instruments</string>
     <string name="settings_leg_amalgamation_algorithm_title">Leg agreement method</string>
     <string name="settings_leg_amalgamation_algorithm_summary">How repeated readings are judged close enough to form a leg</string>

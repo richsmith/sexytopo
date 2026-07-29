@@ -75,6 +75,8 @@ public class Trip {
     private List<TeamEntry> team = new ArrayList<>();
     private String comments;
     private String instrument;
+    private String copyright;
+    private String license;
 
     public Trip() {
         this.surveyDate = new Date();
@@ -82,6 +84,8 @@ public class Trip {
         this.explorationDateLinked = true;
         this.instrument = "";
         this.comments = "";
+        this.copyright = "";
+        this.license = "";
     }
 
     public Trip(Trip other) {
@@ -94,6 +98,8 @@ public class Trip {
         }
         this.comments = other.comments;
         this.instrument = other.instrument;
+        this.copyright = other.copyright;
+        this.license = other.license;
     }
 
     public List<TeamEntry> getTeam() {
@@ -152,9 +158,33 @@ public class Trip {
         return instrument != null && !instrument.trim().isEmpty();
     }
 
+    public String getCopyright() {
+        return copyright;
+    }
+
+    public void setCopyright(String copyright) {
+        this.copyright = copyright;
+    }
+
+    public boolean hasCopyright() {
+        return copyright != null && !copyright.trim().isEmpty();
+    }
+
+    public String getLicense() {
+        return license;
+    }
+
+    public void setLicense(String license) {
+        this.license = license;
+    }
+
+    public boolean hasLicense() {
+        return license != null && !license.trim().isEmpty();
+    }
+
     /**
-     * Creates a new Trip for a follow-on survey, copying team and instrument but with a fresh date
-     * and empty comments.
+     * Creates a new Trip for a follow-on survey, copying team, instrument, copyright and license
+     * but with a fresh date and empty comments.
      */
     public Trip toNextTrip() {
         Trip next = new Trip(this);
@@ -194,6 +224,14 @@ public class Trip {
             return false;
         }
 
+        if (objectsNotEqual(trip.copyright, copyright)) {
+            return false;
+        }
+
+        if (objectsNotEqual(trip.license, license)) {
+            return false;
+        }
+
         if (trip.team.size() != team.size()) {
             return false;
         }
@@ -217,6 +255,8 @@ public class Trip {
         result = 31 * result + (explorationDateLinked ? 1 : 0);
         result = 31 * result + (comments != null ? comments.hashCode() : 0);
         result = 31 * result + (instrument != null ? instrument.hashCode() : 0);
+        result = 31 * result + (copyright != null ? copyright.hashCode() : 0);
+        result = 31 * result + (license != null ? license.hashCode() : 0);
         result = 31 * result + team.hashCode();
         return result;
     }
