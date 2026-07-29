@@ -35,7 +35,7 @@ res/            Android resources (strings, layouts, images)
 | `Survey` | Main data container (active station, legs, sketches, undo stack) |
 | `Leg` | Immutable measurement (distance, azimuth, inclination) |
 | `Station` | Named point in cave |
-| `Sketch` | Drawing canvas (plan/elevation) with path/symbol/text details |
+| `Sketch` | Drawing canvas (plan/elevation) with path/area/symbol/text details |
 | `SurveyManager` | Singleton holding current survey, manages autosave |
 | `InstrumentType` | Enum mapping device names to Communicator classes |
 | `Communicator` | Interface for device-specific communication |

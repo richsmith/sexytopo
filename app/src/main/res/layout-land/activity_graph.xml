@@ -101,6 +101,18 @@
             android:scaleType="fitCenter"
             android:src="@drawable/text"
             android:tooltipText="@string/sketch_toolbar_symbol" />
+        <ImageButton
+            style="@style/ToolbarImageButton"
+            android:layout_marginTop="-4dp"
+            android:layout_weight="0.2"
+            android:src="@drawable/area_water"
+            android:tooltipText="@string/sketch_toolbar_area"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:scaleType="fitCenter"
+            android:id="@+id/buttonArea"
+            android:hapticFeedbackEnabled="true"
+            />
 
         <ImageButton
             style="@style/ToolbarImageButton"
@@ -149,18 +161,6 @@
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonUndo"
-            android:hapticFeedbackEnabled="true"
-            />
-        <ImageButton
-            style="@style/ToolbarImageButton"
-            android:layout_marginTop="-4dp"
-            android:layout_weight="0.2"
-            android:src="@drawable/redo"
-            android:tooltipText="@string/sketch_toolbar_redo"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/toolbar_button_height"
-            android:scaleType="fitCenter"
-            android:id="@+id/buttonRedo"
             android:hapticFeedbackEnabled="true"
             />
         <ImageButton

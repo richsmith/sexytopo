@@ -46,7 +46,8 @@ public class SketchPreferences {
         }
 
         public Boolean isOn() {
-            return prefs.getBoolean(this.toString(), defaultValue);
+            // prefs is only null outside a running app (i.e. unit tests)
+            return prefs == null ? defaultValue : prefs.getBoolean(this.toString(), defaultValue);
         }
 
         public int getControlId() {

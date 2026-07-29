@@ -42,6 +42,7 @@ import org.hwyl.sexytopo.control.components.DialogUtils;
 import org.hwyl.sexytopo.control.util.CohenSutherlandAlgorithm;
 import org.hwyl.sexytopo.control.util.CrossSectioner;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
+import org.hwyl.sexytopo.control.util.PolygonUtils;
 import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.control.util.TextTools;
@@ -49,6 +50,8 @@ import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
+import org.hwyl.sexytopo.model.sketch.AreaDetail;
+import org.hwyl.sexytopo.model.sketch.AreaType;
 import org.hwyl.sexytopo.model.sketch.BrushColour;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
@@ -113,6 +116,9 @@ public class GraphView extends View {
     private float legendTickSizePx;
     private float dashedLineIntervalPx;
 
+    private static final float AREA_HATCHING_SPACING_DP = 8.0f;
+    private static final float AREA_HATCHING_WIDTH_DP = 1.0f;
+
     private static final float DELETE_DETAILS_WITHIN_N_DP = 10.0f;
     private static final float SELECTION_SENSITIVITY_DP = 25.0f;
     private static final float SNAP_TO_LINE_SENSITIVITY_DP = 25.0f;
@@ -166,6 +172,9 @@ public class GraphView extends View {
 
     private Symbol currentSymbol = Symbol.getDefault();
 
+    // Only water areas exist for now; a field so an area type picker can slot in later.
+    private final AreaType currentAreaType = AreaType.WATER;
+
     // a bit hacky but I can't think of a better way to do this
     private String stationNameBeingCrossSectioned = null;
 
@@ -196,6 +205,7 @@ public class GraphView extends View {
     private final Paint fadedSplayPaint = new Paint();
 
     private final Paint drawPaint = new Paint();
+    private final Paint areaPaint = new Paint();
     private final Paint labelPaint = new Paint();
     private final Paint highlightPaint = new Paint();
     private final Paint legendPaint = new Paint();
@@ -218,6 +228,7 @@ public class GraphView extends View {
                 fadedLatestLegPaint,
                 fadedSplayPaint,
                 drawPaint,
+                areaPaint,
                 labelPaint,
                 legendPaint,
                 crossSectionConnectorPaint,
@@ -298,6 +309,10 @@ public class GraphView extends View {
         drawPaint.setStyle(Paint.Style.STROKE);
         drawPaint.setStrokeJoin(Paint.Join.ROUND);
         drawPaint.setStrokeCap(Paint.Cap.ROUND);
+
+        areaPaint.setStyle(Paint.Style.STROKE);
+        areaPaint.setStrokeJoin(Paint.Join.ROUND);
+        areaPaint.setStrokeCap(Paint.Cap.ROUND);
 
         int legendColour = ContextCompat.getColor(activity, R.color.legend);
         legendPaint.setColor(legendColour);
@@ -446,6 +461,8 @@ public class GraphView extends View {
                 return handleMove(event);
             case DRAW:
                 return handleDraw(event);
+            case AREA:
+                return handleDrawArea(event);
             case ERASE:
                 return handleErase(event);
             case SYMBOL:
@@ -585,6 +602,39 @@ public class GraphView extends View {
         return true;
     }
 
+    private boolean handleDrawArea(MotionEvent event) {
+
+        Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
+        Coord2D surveyCoords = viewCoordsToSurveyCoords(touchPointOnView);
+
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                actionDownPointOnView = touchPointOnView;
+                sketch.startNewArea(surveyCoords, currentAreaType);
+                break;
+
+            case MotionEvent.ACTION_MOVE:
+                if (sketch.getActivePath() == null) {
+                    // shouldn't be null, but just in case...
+                    sketch.startNewArea(surveyCoords, currentAreaType);
+                } else {
+                    sketch.getActivePath().lineTo(surveyCoords);
+                }
+                invalidate();
+                break;
+
+            case MotionEvent.ACTION_UP:
+                sketch.finishArea(currentAreaType);
+                invalidate();
+                break;
+
+            default:
+                return false;
+        }
+
+        return true;
+    }
+
     private Coord2D considerSnapToSketchLine(Coord2D pointTouched) {
         float deltaInMetres = snapToLineSensitivityPx / surveyToViewScale;
         Coord2D closestPathEnd = sketch.findEligibleSnapPointWithin(pointTouched, deltaInMetres);
@@ -655,6 +705,14 @@ public class GraphView extends View {
                     sketch.deleteDetail(closestDetail, fragments);
                     invalidate();
 
+                } else if (deleteLineFragments && closestDetail instanceof AreaDetail) {
+                    // carve a notch out of the area; this can split it into several areas
+                    eraseFromArea(
+                            (AreaDetail) closestDetail,
+                            touchPointOnSurvey,
+                            deleteToleranceInMetres);
+                    invalidate();
+
                 } else {
                     // bullseye!
                     sketch.deleteDetail(closestDetail);
@@ -669,6 +727,27 @@ public class GraphView extends View {
         }
 
         return true;
+    }
+
+    /**
+     * Erase a disc from an area as an undoable operation. Whatever survives comes back as
+     * replacement areas: possibly one shrunken polygon, possibly several if the notch split it,
+     * possibly none if the disc swallowed it. Falls back to deleting the whole area if the geometry
+     * op fails.
+     */
+    private void eraseFromArea(AreaDetail areaDetail, Coord2D touchPointOnSurvey, float radius) {
+        List<List<Coord2D>> remaining =
+                PolygonUtils.subtract(areaDetail.getPolygon(), touchPointOnSurvey, radius);
+        if (remaining == null) {
+            sketch.deleteDetail(areaDetail);
+            return;
+        }
+        List<SketchDetail> replacements = new ArrayList<>();
+        for (List<Coord2D> polygon : remaining) {
+            replacements.add(
+                    new AreaDetail(polygon, areaDetail.getAreaType(), areaDetail.getColour()));
+        }
+        sketch.deleteDetail(areaDetail, replacements);
     }
 
     private boolean handleSymbol(MotionEvent event) {
@@ -1764,6 +1843,8 @@ public class GraphView extends View {
             return;
         }
 
+        drawAreas(canvas, sketch, alpha);
+
         Colour lastColour = Colour.BLACK;
 
         drawPaint.setColor(lastColour.intValue);
@@ -1874,6 +1955,60 @@ public class GraphView extends View {
             } else { // skip some calcs for efficiency
                 drawable.draw(canvas);
             }
+        }
+    }
+
+    /**
+     * Draw the sketch's areas: each polygon is outlined and filled with horizontal parallel lines.
+     * The hatching is anchored to survey space so it doesn't crawl when the view is panned.
+     */
+    private void drawAreas(Canvas canvas, Sketch sketch, int alpha) {
+
+        for (AreaDetail areaDetail : sketch.getAreaDetails()) {
+
+            if (!couldBeVisible(areaDetail)) {
+                continue;
+            }
+
+            Path outline = new Path();
+            boolean first = true;
+            for (Coord2D point : areaDetail.getPolygon()) {
+                float x = (point.x - viewpointOffset.x) * surveyToViewScale;
+                float y = (point.y - viewpointOffset.y) * surveyToViewScale;
+                if (first) {
+                    outline.moveTo(x, y);
+                    first = false;
+                } else {
+                    outline.lineTo(x, y);
+                }
+            }
+            outline.close();
+
+            Colour colour = areaDetail.getDrawColour(isDarkModeActive);
+            areaPaint.setColor(colour.intValue);
+            areaPaint.setAlpha(alpha);
+
+            areaPaint.setStrokeWidth(drawPaint.getStrokeWidth());
+            canvas.drawPath(outline, areaPaint);
+
+            areaPaint.setStrokeWidth(dpToPixels(AREA_HATCHING_WIDTH_DP));
+            float spacingInMetres = dpToPixels(AREA_HATCHING_SPACING_DP) / surveyToViewScale;
+
+            float top = Math.max(areaDetail.getTop(), viewpointTopLeftOnSurvey.y);
+            float bottom = Math.min(areaDetail.getBottom(), viewpointBottomRightOnSurvey.y);
+            float left = Math.max(areaDetail.getLeft(), viewpointTopLeftOnSurvey.x);
+            float right = Math.min(areaDetail.getRight(), viewpointBottomRightOnSurvey.x);
+            float leftOnView = (left - viewpointOffset.x) * surveyToViewScale;
+            float rightOnView = (right - viewpointOffset.x) * surveyToViewScale;
+
+            canvas.save();
+            canvas.clipPath(outline);
+            float firstY = (float) Math.ceil(top / spacingInMetres) * spacingInMetres;
+            for (float ySurvey = firstY; ySurvey < bottom; ySurvey += spacingInMetres) {
+                float yOnView = (ySurvey - viewpointOffset.y) * surveyToViewScale;
+                canvas.drawLine(leftOnView, yOnView, rightOnView, yOnView, areaPaint);
+            }
+            canvas.restore();
         }
     }
 
@@ -2188,7 +2323,7 @@ public class GraphView extends View {
             Coord2D touchPointOnView = new Coord2D(motionEvent.getX(), motionEvent.getY());
             Station matchedStation = checkForStation(touchPointOnView);
             if (matchedStation != null && !menuShownInThisTouch) {
-                if (currentSketchTool == SketchTool.DRAW) {
+                if (currentSketchTool == SketchTool.DRAW || currentSketchTool == SketchTool.AREA) {
                     sketch.abandonActivePath();
                 }
                 showContextMenu(motionEvent, matchedStation);

@@ -231,6 +231,20 @@
                 android:scaleType="fitCenter"
                 android:src="@drawable/text"
                 android:tooltipText="@string/sketch_toolbar_symbol" />
+            <ImageButton
+                style="@style/ToolbarImageButton"
+                android:id="@+id/buttonArea"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/toolbar_button_height"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:layout_marginTop="-4dp"
+                android:contentDescription="@string/sketch_toolbar_area"
+                android:cropToPadding="false"
+                android:hapticFeedbackEnabled="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/area_water"
+                android:tooltipText="@string/sketch_toolbar_area" />
 
             <ImageButton
                 style="@style/ToolbarImageButton"
@@ -295,20 +309,6 @@
                 android:src="@drawable/undo"
                 android:tooltipText="@string/sketch_toolbar_undo" />
 
-            <ImageButton
-                style="@style/ToolbarImageButton"
-                android:id="@+id/buttonRedo"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/toolbar_button_height"
-                android:layout_columnWeight="1"
-                android:layout_margin="0dp"
-                android:layout_marginTop="-4dp"
-                android:contentDescription="@string/sketch_toolbar_symbol"
-                android:cropToPadding="false"
-                android:hapticFeedbackEnabled="true"
-                android:scaleType="fitCenter"
-                android:src="@drawable/redo"
-                android:tooltipText="@string/sketch_toolbar_symbol" />
 
             <ImageButton
                 style="@style/ToolbarImageButton"

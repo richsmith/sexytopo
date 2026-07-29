@@ -38,6 +38,7 @@ import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
+import org.hwyl.sexytopo.model.sketch.AreaDetail;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
@@ -63,6 +64,10 @@ public class SvgExporter extends DoubleSketchFileExporter {
     public static final int SCALE = 50;
     public static final int STATION_FONT = 15;
     public static final int BORDER = 10;
+
+    // Spacing of the parallel hatch lines used to fill areas, roughly matching the app's
+    // on-screen rendering at default zoom.
+    public static final double AREA_HATCH_SPACING_METRES = 0.15;
 
     private SvgExportOptions exportOptions;
 
@@ -159,6 +164,11 @@ public class SvgExporter extends DoubleSketchFileExporter {
             xmlSerializer.attribute("", "id", "grid");
             writeGrid(xmlSerializer, contentFrame, SCALE);
             xmlSerializer.endTag("", "g");
+        }
+
+        Set<String> hatchColours = collectAreaHatchColours(sketch, options.isShowCrossSections());
+        if (!hatchColours.isEmpty()) {
+            writeAreaHatchPatterns(xmlSerializer, hatchColours, SCALE);
         }
 
         xmlSerializer.startTag("", "g");
@@ -630,6 +640,11 @@ public class SvgExporter extends DoubleSketchFileExporter {
             }
         }
 
+        // areas go first so their hatching sits underneath drawn lines
+        for (AreaDetail areaDetail : sketch.getAreaDetails()) {
+            writeAreaDetail(xmlSerializer, areaDetail, scale);
+        }
+
         for (PathDetail pathDetail : sketch.getPathDetails()) {
             writePathDetail(xmlSerializer, pathDetail, scale);
         }
@@ -684,6 +699,9 @@ public class SvgExporter extends DoubleSketchFileExporter {
             // Write sub-sketch paths scaled and translated to position
             Sketch subSketch =
                     xsDetail.getSketch().scale(xsScale).translate(xsDetail.getPosition());
+            for (AreaDetail areaDetail : subSketch.getAreaDetails()) {
+                writeAreaDetail(xmlSerializer, areaDetail, scale);
+            }
             for (PathDetail pathDetail : subSketch.getPathDetails()) {
                 writePathDetail(xmlSerializer, pathDetail, scale);
             }
@@ -698,6 +716,75 @@ public class SvgExporter extends DoubleSketchFileExporter {
 
             xmlSerializer.endTag("", "g");
         }
+    }
+
+    /**
+     * The set of SVG colours needed for area hatch patterns, across the main sketch and (if they
+     * are being exported) the cross-section sub-sketches.
+     */
+    private static Set<String> collectAreaHatchColours(Sketch sketch, boolean showCrossSections) {
+        Set<String> colours = new HashSet<>();
+        for (AreaDetail areaDetail : sketch.getAreaDetails()) {
+            colours.add(getSvgColour(areaDetail));
+        }
+        if (showCrossSections) {
+            for (CrossSectionDetail xsDetail : sketch.getCrossSectionDetails()) {
+                for (AreaDetail areaDetail : xsDetail.getSketch().getAreaDetails()) {
+                    colours.add(getSvgColour(areaDetail));
+                }
+            }
+        }
+        return colours;
+    }
+
+    /**
+     * One horizontal-line hatch pattern per colour in use; area polygons reference these by id as
+     * their fill.
+     */
+    private static void writeAreaHatchPatterns(
+            XmlSerializer xmlSerializer, Set<String> colours, int scale) throws IOException {
+
+        double spacing = AREA_HATCH_SPACING_METRES * scale;
+        int hatchStrokeWidth = Math.max(1, GeneralPreferences.getExportSvgStrokeWidth() / 2);
+
+        xmlSerializer.startTag("", "defs");
+        for (String colour : colours) {
+            xmlSerializer.startTag("", "pattern");
+            xmlSerializer.attribute("", "id", getAreaHatchPatternId(colour));
+            xmlSerializer.attribute("", "patternUnits", "userSpaceOnUse");
+            xmlSerializer.attribute("", "width", Double.toString(spacing));
+            xmlSerializer.attribute("", "height", Double.toString(spacing));
+            xmlSerializer.startTag("", "line");
+            xmlSerializer.attribute("", "x1", "0");
+            xmlSerializer.attribute("", "y1", Double.toString(spacing / 2));
+            xmlSerializer.attribute("", "x2", Double.toString(spacing));
+            xmlSerializer.attribute("", "y2", Double.toString(spacing / 2));
+            xmlSerializer.attribute("", "stroke", colour);
+            xmlSerializer.attribute("", "stroke-width", Integer.toString(hatchStrokeWidth));
+            xmlSerializer.endTag("", "line");
+            xmlSerializer.endTag("", "pattern");
+        }
+        xmlSerializer.endTag("", "defs");
+    }
+
+    private static String getAreaHatchPatternId(String colour) {
+        return "area-hatch-" + colour.toLowerCase(Locale.ROOT);
+    }
+
+    private static void writeAreaDetail(
+            XmlSerializer xmlSerializer, AreaDetail areaDetail, int scale) throws IOException {
+        Integer strokeWidth = GeneralPreferences.getExportSvgStrokeWidth();
+        List<String> coordStrings = new ArrayList<>();
+        for (Coord2D coord2D : areaDetail.getPolygon()) {
+            coordStrings.add(toXmlText(coord2D, scale));
+        }
+        String colour = getSvgColour(areaDetail);
+        xmlSerializer.startTag(null, "polygon");
+        xmlSerializer.attribute(null, "points", TextTools.join(" ", coordStrings));
+        xmlSerializer.attribute(null, "stroke", colour);
+        xmlSerializer.attribute(null, "stroke-width", strokeWidth.toString());
+        xmlSerializer.attribute(null, "fill", "url(#" + getAreaHatchPatternId(colour) + ")");
+        xmlSerializer.endTag(null, "polygon");
     }
 
     private static void writePathDetail(

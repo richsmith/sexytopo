@@ -57,10 +57,10 @@ public abstract class GraphActivity extends SurveyEditorActivity
     private static final int[] SKETCH_BUTTON_IDS =
             new int[] {
                 R.id.buttonDraw,
+                R.id.buttonArea,
                 R.id.buttonErase,
                 R.id.buttonSymbol,
                 R.id.buttonUndo,
-                R.id.buttonRedo,
                 R.id.buttonBlack,
                 R.id.buttonBrown,
                 R.id.buttonGrey,

@@ -7,6 +7,7 @@ A `Survey` contains two `Sketch` objects: one for the plan view and one for the 
 ```
 SketchDetail (abstract)
 ├── PathDetail          — a drawn line (list of Coord2D points)
+├── AreaDetail          — a filled polygon region (e.g. water), typed by AreaType
 ├── SinglePositionDetail (abstract)
 │   ├── SymbolDetail    — a cave symbol at a fixed location
 │   ├── TextDetail      — a text label
@@ -22,6 +23,7 @@ The one exception is a `CrossSectionDetail`'s sub-sketch: committing an edit fro
 
 `Sketch` holds:
 - `List<PathDetail> pathDetails`
+- `List<AreaDetail> areaDetails`
 - `List<SymbolDetail> symbolDetails`
 - `List<TextDetail> textDetails`
 - `List<CrossSectionDetail> crossSectionDetails`
@@ -39,6 +41,16 @@ Path drawing is a multi-step operation driven by touch events in `GraphView`:
 2. `activePath.lineTo(Coord2D)` — called repeatedly on touch move
 3. `sketch.finishPath()` — moves `activePath` into `pathDetails` and applies point simplification (`Space2DUtils.simplify()`)
 
+## Drawing an Area
+
+An area (currently only water) is sketched like a path — `sketch.startNewArea(Coord2D, AreaType)` creates the `activePath`, `lineTo` extends it — but `sketch.finishArea(AreaType)` closes the outline into a polygon and adds an `AreaDetail` instead of a path. Degenerate outlines (fewer than 3 points after simplification) are discarded.
+
+If the new polygon overlaps existing areas of the same type *and* colour, they are all merged into one via `PolygonUtils.union` as a single undoable operation. When the "Blue Water" toggle is on, new water areas record `Colour.BLUE` (mirroring the water symbol behaviour).
+
+`PolygonUtils` (control/util) implements polygon union/subtraction on top of `android.graphics.Path` boolean ops, recovering polygons by sampling the result contours with `PathMeasure`. The polygon model can't represent holes, so hole contours are dropped (filled in). Note this means `PolygonUtils` is a no-op under plain JUnit (stubbed framework); merge behaviour degrades to a plain add there.
+
+Areas are exported to SVG as `<polygon>` elements filled with a per-colour horizontal-line `<pattern>` (see SvgExporter), and to Therion th2 as a closed `line border:invisible` plus an `area water` command referencing it (see Th2Exporter). The XVI tracing background deliberately omits areas — the th2 carries them as first-class editable objects, so baking them into the background would just duplicate them. The PocketTopo exporter does not emit areas.
+
 ## Adding Other Elements
 
 ```java
@@ -55,7 +67,7 @@ Every add clears the redo stack and sets `isSaved = false`.
 sketch.deleteDetail(SketchDetail toDelete, List<SketchDetail> replacements)
 ```
 
-When erasing a path fragment (rather than the whole path), `replacements` contains the surviving path segments. The deleted detail is wrapped in a `DeletedDetail` and pushed onto `sketchHistory`.
+When erasing a path fragment (rather than the whole path), `replacements` contains the surviving path segments. Erasing part of an area similarly subtracts a disc from the polygon; the survivors (possibly two or more polygons if the notch split it) become the replacements. The deleted detail(s) are wrapped in a `DeletedDetail` and pushed onto `sketchHistory`. `deleteDetails` deletes several details in one undoable step (used when merging areas).
 
 ## Undo / Redo
 
@@ -95,6 +107,7 @@ Sketch coordinates are in **survey space** (metres). `GraphView` converts to scr
 | Key | Contents |
 |-----|----------|
 | `"paths"` | array of `{colour, points:[{x,y}...]}` |
+| `"areas"` | array of `{area-type, colour, points:[{x,y}...]}` (absent in pre-area files) |
 | `"symbols"` | array of `{location, symbol-id, colour, size, angle}` |
 | `"labels"` | array of `{location, text, colour, size}` |
 | `"x-sections"` | array of `{station-id, location, angle}` |
@@ -104,6 +117,7 @@ Path simplification is re-applied on load. History stacks are not serialized.
 ## Rendering Overview
 
 `GraphView.drawSketch()` iterates each detail collection:
+- **Areas:** drawn first (underneath lines): polygon outline plus horizontal parallel-line hatching, clipped to the polygon and anchored to survey space so it doesn't crawl when panning
 - **Paths:** sorted by colour (to minimize paint changes), then batched into `float[]` arrays for `canvas.drawLines()`
 - **Symbols:** rendered as scaled, optionally rotated `Drawable` objects with a colour filter
 - **Text:** font size = `textSize * surveyToViewScale`; supports `\n` for multiline
@@ -117,6 +131,9 @@ Off-screen and sub-pixel details are culled via `couldBeVisible()` before render
 |------|---------|
 | `model/sketch/Sketch.java` | Main container |
 | `model/sketch/PathDetail.java` | Path/line element |
+| `model/sketch/AreaDetail.java` | Filled polygon region element |
+| `model/sketch/AreaType.java` | Area type enum (currently just WATER) |
+| `control/util/PolygonUtils.java` | Polygon union/subtraction (Path ops) |
 | `model/sketch/SymbolDetail.java` | Symbol element |
 | `model/sketch/TextDetail.java` | Text label element |
 | `model/sketch/CrossSectionDetail.java` | Cross-section element |

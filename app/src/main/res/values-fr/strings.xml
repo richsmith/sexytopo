@@ -157,6 +157,7 @@
 
     <!-- Sketch view -->
     <string name="sketch_toolbar_draw">Mode dessin</string>
+    <string name="sketch_toolbar_area">Outil zone</string>
     <string name="sketch_toolbar_move">Mode déplacement</string>
     <string name="sketch_toolbar_eraser">Gomme</string>
     <string name="sketch_toolbar_text">Outil texte</string>

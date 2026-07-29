@@ -157,6 +157,7 @@
 
     <!-- Sketch view -->
     <string name="sketch_toolbar_draw">Tryb rysowania</string>
+    <string name="sketch_toolbar_area">Narzędzie obszaru</string>
     <string name="sketch_toolbar_move">Tryb przesuwania</string>
     <string name="sketch_toolbar_eraser">Gumka</string>
     <string name="sketch_toolbar_text">Narzędzie tekstu</string>

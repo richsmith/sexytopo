@@ -5,6 +5,7 @@ import org.hwyl.sexytopo.R;
 public enum SketchTool {
     MOVE(R.id.buttonMove, false, false),
     DRAW(R.id.buttonDraw, true, false),
+    AREA(R.id.buttonArea, true, false),
     ERASE(R.id.buttonErase, false, false),
     SYMBOL(R.id.buttonSymbol, true, false),
     TEXT(387348957, true, false),

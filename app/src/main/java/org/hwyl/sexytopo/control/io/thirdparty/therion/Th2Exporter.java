@@ -14,6 +14,7 @@ import org.hwyl.sexytopo.model.common.Shape;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
+import org.hwyl.sexytopo.model.sketch.AreaDetail;
 import org.hwyl.sexytopo.model.sketch.AutoScalableDetail;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
@@ -396,6 +397,11 @@ public class Th2Exporter {
                 }
             }
 
+            List<AreaDetail> areaDetails = sketch.getAreaDetails();
+            for (int i = 0; i < areaDetails.size(); i++) {
+                commands.add(getArea(areaDetails.get(i), i + 1, scale));
+            }
+
             if (GeneralPreferences.isXviExportSymbolsEnabled()) {
                 for (SymbolDetail symbolDetail : sketch.getSymbolDetails()) {
                     Coord2D coord = symbolDetail.getPosition().scale(scale).flipVertically();
@@ -417,6 +423,32 @@ public class Th2Exporter {
         }
 
         return commands;
+    }
+
+    /**
+     * An area is expressed in Therion as a closed border line plus an area command referencing it
+     * by id. The border uses the invisible subtype since it is just a construction aid, not a drawn
+     * wall.
+     */
+    private static String getArea(AreaDetail areaDetail, int index, float scale) {
+        String therionName = areaDetail.getAreaType().getTherionName();
+        String id = therionName + index;
+
+        List<String> lines = new ArrayList<>();
+        lines.add("line border:invisible -id " + id + " -close on");
+        List<Coord2D> polygon = areaDetail.getPolygon();
+        for (Coord2D point : polygon) {
+            Coord2D coord = point.scale(scale).flipVertically();
+            lines.add("  " + coord.x + " " + coord.y);
+        }
+        // xtherion expects the start point repeated to close the loop
+        Coord2D first = polygon.get(0).scale(scale).flipVertically();
+        lines.add("  " + first.x + " " + first.y);
+        lines.add("endline");
+        lines.add("area " + therionName);
+        lines.add("  " + id);
+        lines.add("endarea");
+        return TextTools.join("\n", lines);
     }
 
     private static String getPoint(float x, float y, String name, String... args) {

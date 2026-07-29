@@ -157,6 +157,7 @@
 
     <!--  Sketch view  -->
     <string name="sketch_toolbar_draw">Zeichnungs-Modus</string>
+    <string name="sketch_toolbar_area">Flächenwerkzeug</string>
     <string name="sketch_toolbar_move">Verschieben-Modus</string>
     <string name="sketch_toolbar_eraser">Radiergummi</string>
     <string name="sketch_toolbar_text">Text-Werkzeug</string>

@@ -1,7 +1,9 @@
 package org.hwyl.sexytopo.model.sketch;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import org.hwyl.sexytopo.control.util.PolygonUtils;
 import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.common.Shape;
@@ -13,6 +15,7 @@ public class Sketch extends Shape {
     public static final float DEFAULT_XSECTION_SCALE = 1.0f;
 
     private List<PathDetail> pathDetails = new ArrayList<>();
+    private List<AreaDetail> areaDetails = new ArrayList<>();
     private List<SymbolDetail> symbolDetails = new ArrayList<>();
     private List<TextDetail> textDetails = new ArrayList<>();
     private List<CrossSectionDetail> crossSectionDetails = new ArrayList<>();
@@ -32,6 +35,7 @@ public class Sketch extends Shape {
     public Sketch(Sketch sketch) {
         // shallow copies are OK here because paths are immutable
         setPathDetails(new ArrayList<>(sketch.getPathDetails()));
+        setAreaDetails(new ArrayList<>(sketch.getAreaDetails()));
         setSymbolDetails(new ArrayList<>(sketch.getSymbolDetails()));
         setTextDetails(new ArrayList<>(sketch.getTextDetails()));
         setCrossSectionDetails(new ArrayList<>(sketch.getCrossSectionDetails()));
@@ -49,6 +53,15 @@ public class Sketch extends Shape {
     public void setPathDetails(List<PathDetail> pathDetails) {
         this.pathDetails = pathDetails;
         recalculateBoundingBox();
+    }
+
+    public void setAreaDetails(List<AreaDetail> areaDetails) {
+        this.areaDetails = areaDetails;
+        recalculateBoundingBox();
+    }
+
+    public List<AreaDetail> getAreaDetails() {
+        return areaDetails;
     }
 
     public void setSymbolDetails(List<SymbolDetail> symbolDetails) {
@@ -104,6 +117,78 @@ public class Sketch extends Shape {
         activePath = null;
     }
 
+    /**
+     * Start sketching the outline of a new area. The outline is drawn like a normal path (so it
+     * renders as the user drags) and is turned into a polygon by finishArea.
+     */
+    public PathDetail startNewArea(Coord2D start, AreaType areaType) {
+        Colour colour = activeColour;
+        if (areaType.isWater() && SketchPreferences.Toggle.BLUE_WATER.isOn()) {
+            colour = Colour.BLUE;
+        }
+        activePath = new PathDetail(start, colour);
+        pathDetails.add(activePath);
+        return activePath;
+    }
+
+    /**
+     * Close the outline being sketched into a polygon and add it as an area. If it overlaps any
+     * existing areas of the same type and colour, they are all merged into one (as a single
+     * undoable operation).
+     */
+    public void finishArea(AreaType areaType) {
+        if (activePath == null) {
+            return;
+        }
+        PathDetail outlinePath = activePath;
+        abandonActivePath();
+
+        float epsilon = Space2DUtils.simplificationEpsilon(outlinePath);
+        List<Coord2D> outline = Space2DUtils.simplify(outlinePath.getPath(), epsilon);
+        if (outline.size() < 3) {
+            return; // too small to form a polygon; treat as an accidental tap
+        }
+
+        addAreaDetail(new AreaDetail(outline, areaType, outlinePath.getColour()));
+    }
+
+    public void addAreaDetail(AreaDetail newArea) {
+
+        List<SketchDetail> overlapping = new ArrayList<>();
+        for (AreaDetail existing : areaDetails) {
+            if (existing.getAreaType() == newArea.getAreaType()
+                    && existing.getColour() == newArea.getColour()
+                    && existing.intersectsRectangle(newArea.getTopLeft(), newArea.getBottomRight())
+                    && PolygonUtils.overlap(existing.getPolygon(), newArea.getPolygon())) {
+                overlapping.add(existing);
+            }
+        }
+
+        List<SketchDetail> merged = null;
+        if (!overlapping.isEmpty()) {
+            List<List<Coord2D>> polygons = new ArrayList<>();
+            polygons.add(newArea.getPolygon());
+            for (SketchDetail detail : overlapping) {
+                polygons.add(((AreaDetail) detail).getPolygon());
+            }
+            List<List<Coord2D>> union = PolygonUtils.union(polygons);
+            if (union != null && !union.isEmpty()) {
+                merged = new ArrayList<>();
+                for (List<Coord2D> polygon : union) {
+                    merged.add(new AreaDetail(polygon, newArea.getAreaType(), newArea.getColour()));
+                }
+            }
+        }
+
+        if (merged == null) {
+            // nothing to merge with (or the merge failed): just add the new area as-is
+            areaDetails.add(newArea);
+            addSketchDetail(newArea);
+        } else {
+            deleteDetails(overlapping, merged);
+        }
+    }
+
     public void addTextDetail(Coord2D location, String text, float size) {
         TextDetail textDetail = new TextDetail(location, text, activeColour, size);
         textDetails.add(textDetail);
@@ -146,7 +231,9 @@ public class Sketch extends Shape {
 
             if (toUndo instanceof DeletedDetail) {
                 DeletedDetail deletedDetail = (DeletedDetail) toUndo;
-                restoreDetailToSketch(deletedDetail.getDeletedDetail());
+                for (SketchDetail sketchDetail : deletedDetail.getDeletedDetails()) {
+                    restoreDetailToSketch(sketchDetail);
+                }
                 for (SketchDetail sketchDetail : deletedDetail.getReplacementDetails()) {
                     removeDetailFromSketch(sketchDetail);
                 }
@@ -164,7 +251,9 @@ public class Sketch extends Shape {
 
             if (toRedo instanceof DeletedDetail) {
                 DeletedDetail deletedDetail = (DeletedDetail) toRedo;
-                removeDetailFromSketch(deletedDetail.getDeletedDetail());
+                for (SketchDetail sketchDetail : deletedDetail.getDeletedDetails()) {
+                    removeDetailFromSketch(sketchDetail);
+                }
                 for (SketchDetail sketchDetail : deletedDetail.getReplacementDetails()) {
                     restoreDetailToSketch(sketchDetail);
                 }
@@ -181,9 +270,20 @@ public class Sketch extends Shape {
     }
 
     public void deleteDetail(SketchDetail sketchDetail, List<SketchDetail> replacementDetails) {
-        DeletedDetail deletedDetail = new DeletedDetail(sketchDetail, replacementDetails);
+        deleteDetails(Collections.singletonList(sketchDetail), replacementDetails);
+    }
+
+    /**
+     * Delete several details in one undoable step, optionally replacing them with others (e.g.
+     * areas merged into one).
+     */
+    public void deleteDetails(
+            List<SketchDetail> sketchDetails, List<SketchDetail> replacementDetails) {
+        DeletedDetail deletedDetail = new DeletedDetail(sketchDetails, replacementDetails);
         addSketchDetail(deletedDetail);
-        removeDetailFromSketch(sketchDetail);
+        for (SketchDetail sketchDetail : sketchDetails) {
+            removeDetailFromSketch(sketchDetail);
+        }
         for (SketchDetail replacementDetail : replacementDetails) {
             restoreDetailToSketch(replacementDetail);
         }
@@ -194,6 +294,8 @@ public class Sketch extends Shape {
         // undo history etc. whereas this actually removes the data
         if (sketchDetail instanceof PathDetail) {
             pathDetails.remove(sketchDetail);
+        } else if (sketchDetail instanceof AreaDetail) {
+            areaDetails.remove(sketchDetail);
         } else if (sketchDetail instanceof SymbolDetail) {
             symbolDetails.remove(sketchDetail);
         } else if (sketchDetail instanceof TextDetail) {
@@ -208,6 +310,8 @@ public class Sketch extends Shape {
     public void restoreDetailToSketch(SketchDetail sketchDetail) {
         if (sketchDetail instanceof PathDetail) {
             pathDetails.add((PathDetail) sketchDetail);
+        } else if (sketchDetail instanceof AreaDetail) {
+            areaDetails.add((AreaDetail) sketchDetail);
         } else if (sketchDetail instanceof SymbolDetail) {
             symbolDetails.add((SymbolDetail) sketchDetail);
         } else if (sketchDetail instanceof TextDetail) {
@@ -246,6 +350,7 @@ public class Sketch extends Shape {
     private List<SketchDetail> allSketchDetails() {
         List<SketchDetail> all = new ArrayList<>();
         all.addAll(pathDetails);
+        all.addAll(areaDetails);
         all.addAll(symbolDetails);
         all.addAll(textDetails);
         all.addAll(crossSectionDetails);
@@ -327,6 +432,12 @@ public class Sketch extends Shape {
         }
         sketch.setPathDetails(newPathDetails);
 
+        List<AreaDetail> newAreaDetails = new ArrayList<>();
+        for (AreaDetail areaDetail : areaDetails) {
+            newAreaDetails.add(areaDetail.translate(translation));
+        }
+        sketch.setAreaDetails(newAreaDetails);
+
         List<SymbolDetail> newSymbolDetails = new ArrayList<>();
         for (SymbolDetail symbolDetail : symbolDetails) {
             newSymbolDetails.add(symbolDetail.translate(translation));
@@ -357,6 +468,12 @@ public class Sketch extends Shape {
             newPathDetails.add(pathDetail.scale(scale));
         }
         sketch.setPathDetails(newPathDetails);
+
+        List<AreaDetail> newAreaDetails = new ArrayList<>();
+        for (AreaDetail areaDetail : areaDetails) {
+            newAreaDetails.add(areaDetail.scale(scale));
+        }
+        sketch.setAreaDetails(newAreaDetails);
 
         List<SymbolDetail> newSymbolDetails = new ArrayList<>();
         for (SymbolDetail symbolDetail : symbolDetails) {

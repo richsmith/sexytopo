@@ -8,6 +8,8 @@ import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.graph.Coord2D;
+import org.hwyl.sexytopo.model.sketch.AreaDetail;
+import org.hwyl.sexytopo.model.sketch.AreaType;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
@@ -26,6 +28,8 @@ import org.json.JSONObject;
 public class SketchJsonTranslater {
 
     public static final String PATHS_TAG = "paths";
+    public static final String AREAS_TAG = "areas";
+    public static final String AREA_TYPE_TAG = "area-type";
     public static final String POINTS_TAG = "points";
     public static final String COLOUR_TAG = "colour";
     public static final String SYMBOLS_TAG = "symbols";
@@ -70,6 +74,12 @@ public class SketchJsonTranslater {
         }
         json.put(PATHS_TAG, pathDetailArray);
 
+        JSONArray areaDetailArray = new JSONArray();
+        for (AreaDetail areaDetail : sketch.getAreaDetails()) {
+            areaDetailArray.put(toJson(areaDetail));
+        }
+        json.put(AREAS_TAG, areaDetailArray);
+
         JSONArray textDetailArray = new JSONArray();
         for (TextDetail textDetail : sketch.getTextDetails()) {
             textDetailArray.put(toJson(textDetail));
@@ -106,6 +116,20 @@ public class SketchJsonTranslater {
                 pathDetails.add(toPathDetail(object));
             }
             sketch.setPathDetails(pathDetails);
+        } catch (Exception e) {
+            Log.e(R.string.file_load_sketch_paths_error, e);
+        }
+
+        try {
+            // older sketch files predate areas
+            if (json.has(AREAS_TAG)) {
+                JSONArray areasArray = json.getJSONArray(AREAS_TAG);
+                List<AreaDetail> areaDetails = new ArrayList<>();
+                for (JSONObject object : IoUtils.toList(areasArray)) {
+                    areaDetails.add(toAreaDetail(object));
+                }
+                sketch.setAreaDetails(areaDetails);
+            }
         } catch (Exception e) {
             Log.e(R.string.file_load_sketch_paths_error, e);
         }
@@ -188,6 +212,35 @@ public class SketchJsonTranslater {
         pathDetail.setPath(simplifiedPath);
 
         return pathDetail;
+    }
+
+    public static JSONObject toJson(AreaDetail areaDetail) throws JSONException {
+
+        JSONObject json = new JSONObject();
+        json.put(AREA_TYPE_TAG, areaDetail.getAreaType().toString());
+        json.put(COLOUR_TAG, areaDetail.getColour().toString());
+
+        JSONArray points = new JSONArray();
+        for (Coord2D coord : areaDetail.getPolygon()) {
+            points.put(toJson(coord));
+        }
+        json.put(POINTS_TAG, points);
+
+        return json;
+    }
+
+    public static AreaDetail toAreaDetail(JSONObject json) throws JSONException {
+
+        AreaType areaType = AreaType.valueOf(json.getString(AREA_TYPE_TAG));
+        Colour colour = Colour.valueOf(json.getString(COLOUR_TAG));
+
+        JSONArray array = json.getJSONArray(POINTS_TAG);
+        List<Coord2D> polygon = new ArrayList<>();
+        for (JSONObject object : IoUtils.toList(array)) {
+            polygon.add(toCoord2D(object));
+        }
+
+        return new AreaDetail(polygon, areaType, colour);
     }
 
     public static JSONObject toJson(SymbolDetail symbolDetail) throws JSONException {
@@ -276,6 +329,7 @@ public class SketchJsonTranslater {
 
     private static boolean isSketchEmpty(Sketch sketch) {
         return sketch.getPathDetails().isEmpty()
+                && sketch.getAreaDetails().isEmpty()
                 && sketch.getSymbolDetails().isEmpty()
                 && sketch.getTextDetails().isEmpty();
     }
@@ -288,6 +342,12 @@ public class SketchJsonTranslater {
             pathDetailArray.put(toJson(pathDetail));
         }
         json.put(PATHS_TAG, pathDetailArray);
+
+        JSONArray areaDetailArray = new JSONArray();
+        for (AreaDetail areaDetail : sketch.getAreaDetails()) {
+            areaDetailArray.put(toJson(areaDetail));
+        }
+        json.put(AREAS_TAG, areaDetailArray);
 
         JSONArray textDetailArray = new JSONArray();
         for (TextDetail textDetail : sketch.getTextDetails()) {
@@ -316,6 +376,19 @@ public class SketchJsonTranslater {
                     pathDetails.add(toPathDetail(object));
                 }
                 sketch.setPathDetails(pathDetails);
+            }
+        } catch (Exception e) {
+            Log.e(R.string.file_load_sketch_paths_error, e);
+        }
+
+        try {
+            if (json.has(AREAS_TAG)) {
+                JSONArray areasArray = json.getJSONArray(AREAS_TAG);
+                List<AreaDetail> areaDetails = new ArrayList<>();
+                for (JSONObject object : IoUtils.toList(areasArray)) {
+                    areaDetails.add(toAreaDetail(object));
+                }
+                sketch.setAreaDetails(areaDetails);
             }
         } catch (Exception e) {
             Log.e(R.string.file_load_sketch_paths_error, e);
