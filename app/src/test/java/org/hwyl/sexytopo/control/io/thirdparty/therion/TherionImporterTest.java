@@ -2,13 +2,16 @@ package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
 import java.util.Arrays;
 import java.util.List;
+import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexExporter;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionImporter;
+import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
 import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
+import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -545,6 +548,93 @@ public class TherionImporterTest {
         Assert.assertNotNull(trip);
         Assert.assertNull(trip.getInstrument());
         Assert.assertFalse(trip.hasInstrument());
+    }
+
+    @Test
+    public void testSurvexCopyrightAndLicenseImport() throws Exception {
+        String survexText =
+                "*date 2026.01.05\n" + "*copyright 2026 \"Caver Jane\" ;\"CC BY 4.0\"\n";
+
+        Trip trip = SurvexTherionImporter.parseMetadata(survexText, SurveyFormat.SURVEX);
+        Assert.assertNotNull(trip);
+        Assert.assertEquals("Caver Jane", trip.getCopyright());
+        Assert.assertEquals("CC BY 4.0", trip.getLicense());
+    }
+
+    @Test
+    public void testTherionCopyrightAndLicenseImport() throws Exception {
+        String therionText = "date 2026.01.05\n" + "copyright 2026 \"Caver Jane\" #\"CC BY 4.0\"\n";
+
+        Trip trip = SurvexTherionImporter.parseMetadata(therionText, SurveyFormat.THERION);
+        Assert.assertNotNull(trip);
+        Assert.assertEquals("Caver Jane", trip.getCopyright());
+        Assert.assertEquals("CC BY 4.0", trip.getLicense());
+    }
+
+    @Test
+    public void testCopyrightWithoutLicenseImport() throws Exception {
+        String survexText = "*date 2026.01.05\n" + "*copyright 2026 \"Caver Jane\"\n";
+
+        Trip trip = SurvexTherionImporter.parseMetadata(survexText, SurveyFormat.SURVEX);
+        Assert.assertNotNull(trip);
+        Assert.assertEquals("Caver Jane", trip.getCopyright());
+        Assert.assertFalse(trip.hasLicense());
+    }
+
+    @Test
+    public void testLicenseWithoutCopyrightImport() throws Exception {
+        String survexText = "*date 2026.01.05\n" + "*copyright 2026 \"\" ;\"CC BY 4.0\"\n";
+
+        Trip trip = SurvexTherionImporter.parseMetadata(survexText, SurveyFormat.SURVEX);
+        Assert.assertNotNull(trip);
+        Assert.assertFalse(trip.hasCopyright());
+        Assert.assertEquals("CC BY 4.0", trip.getLicense());
+    }
+
+    @Test
+    public void testNoCopyrightLineLeavesDefaultsImport() throws Exception {
+        String survexText = "*date 2026.01.05\n" + "*instrument insts \"DistoX2\"\n";
+
+        Trip trip = SurvexTherionImporter.parseMetadata(survexText, SurveyFormat.SURVEX);
+        Assert.assertNotNull(trip);
+        Assert.assertFalse(trip.hasCopyright());
+        Assert.assertFalse(trip.hasLicense());
+    }
+
+    @Test
+    public void testCopyrightLicenseRoundTripSurvex() throws Exception {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Trip trip = new Trip();
+        trip.setCopyright("Caver Jane");
+        trip.setLicense("CC BY 4.0");
+        survey.setTrip(trip);
+
+        String content = new SurvexExporter().getContent(survey);
+        Trip imported = SurvexTherionImporter.parseMetadata(content, SurveyFormat.SURVEX);
+
+        Assert.assertNotNull(imported);
+        Assert.assertEquals("Caver Jane", imported.getCopyright());
+        Assert.assertEquals("CC BY 4.0", imported.getLicense());
+    }
+
+    @Test
+    public void testCopyrightLicenseRoundTripTherion() throws Exception {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Trip trip = new Trip();
+        trip.setCopyright("Caver Jane");
+        trip.setLicense("CC BY 4.0");
+        survey.setTrip(trip);
+
+        String centrelineText =
+                "centreline\n"
+                        + SurvexTherionUtil.getCopyrightLine(survey, SurveyFormat.THERION)
+                        + SurvexTherionUtil.getMetadata(survey, SurveyFormat.THERION, "", "")
+                        + "\nendcentreline\n";
+        Trip imported = SurvexTherionImporter.parseMetadata(centrelineText, SurveyFormat.THERION);
+
+        Assert.assertNotNull(imported);
+        Assert.assertEquals("Caver Jane", imported.getCopyright());
+        Assert.assertEquals("CC BY 4.0", imported.getLicense());
     }
 
     // Splays from later stations can appear before the first real leg in

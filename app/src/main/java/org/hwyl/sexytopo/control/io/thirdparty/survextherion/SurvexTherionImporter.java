@@ -22,6 +22,15 @@ public class SurvexTherionImporter {
     public static final Pattern COMMENT_INSTRUCTION_REGEX = Pattern.compile("([{].*?[}])");
 
     /**
+     * Matches a copyright/license line as produced by {@code SurvexTherionUtil.getCopyrightLine}:
+     * {@code copyright <year> "<copyright text>" [;#]"<license text>"}, where the trailing
+     * comment-char/license portion is optional. Group 1 is the copyright text, group 2 is the
+     * license text (may be {@code null} if no license was present).
+     */
+    private static final Pattern COPYRIGHT_LINE_REGEX =
+            Pattern.compile("copyright\\s+\\S+\\s+\"([^\"]*)\"(?:\\s*[;#]\"([^\"]*)\")?");
+
+    /**
      * Parse centreline data from Survex/Therion format.
      *
      * <p>Handles: - Forward and backward legs (detects based on station order) - Promoted legs in
@@ -231,6 +240,8 @@ public class SurvexTherionImporter {
         Date surveyDate = null;
         Date explorationDate = null; // explo-date / date explored line
         String instrument = null;
+        String copyright = null;
+        String license = null;
         Map<String, List<Trip.Role>> teamMap = new java.util.LinkedHashMap<>();
         StringBuilder tripComments = new StringBuilder();
         boolean foundAnyMetadata = false;
@@ -265,6 +276,23 @@ public class SurvexTherionImporter {
             // Commented-out instrument line — explicitly clear
             if (trimmed.startsWith(format.getCommentedInstrumentPrefix())) {
                 instrument = null;
+                foundAnyMetadata = true;
+                continue;
+            }
+
+            // Copyright / license: "copyright <year> \"<copyright>\" [;#]\"<license>\""
+            if (effective.startsWith("copyright ")) {
+                Matcher copyrightMatcher = COPYRIGHT_LINE_REGEX.matcher(effective);
+                if (copyrightMatcher.find()) {
+                    String copyrightText = copyrightMatcher.group(1);
+                    if (copyrightText != null && !copyrightText.isEmpty()) {
+                        copyright = copyrightText;
+                    }
+                    String licenseText = copyrightMatcher.group(2);
+                    if (licenseText != null && !licenseText.isEmpty()) {
+                        license = licenseText;
+                    }
+                }
                 foundAnyMetadata = true;
                 continue;
             }
@@ -329,6 +357,13 @@ public class SurvexTherionImporter {
         }
 
         trip.setInstrument(instrument);
+
+        if (copyright != null) {
+            trip.setCopyright(copyright);
+        }
+        if (license != null) {
+            trip.setLicense(license);
+        }
 
         // Build team list
         List<Trip.TeamEntry> teamEntries = new ArrayList<>();
