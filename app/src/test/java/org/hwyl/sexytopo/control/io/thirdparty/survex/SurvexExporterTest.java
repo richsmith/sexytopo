@@ -164,6 +164,74 @@ public class SurvexExporterTest {
         Assert.assertTrue(metadata.contains(";*date explored "));
     }
 
+    @Test
+    public void testCreationCommentThenCopyrightOrder() {
+        // Regression test: the created-with comment must be the first line inside the
+        // survey block, with the copyright/license line immediately after it.
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Trip trip = new Trip();
+        trip.setCopyright("Caver Jane");
+        trip.setLicense("CC BY 4.0");
+        survey.setTrip(trip);
+
+        String content = survexExporter.getContent(survey);
+        String[] lines = content.split("\n");
+
+        Assert.assertTrue(lines[0].startsWith("*begin "));
+        Assert.assertTrue(lines[1].startsWith("; Created with SexyTopo"));
+
+        String expectedCopyrightLine =
+                SurvexTherionUtil.getCopyrightLine(survey, SurveyFormat.SURVEX).trim();
+        Assert.assertEquals(expectedCopyrightLine, lines[2]);
+    }
+
+    @Test
+    public void testCreationCommentImmediatelyAfterBeginWhenNoCopyright() {
+        // The creation comment's position must not depend on whether a copyright/license
+        // is set.
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Trip trip = new Trip();
+        survey.setTrip(trip);
+
+        String content = survexExporter.getContent(survey);
+        String[] lines = content.split("\n");
+
+        Assert.assertTrue(lines[0].startsWith("*begin "));
+        Assert.assertTrue(lines[1].startsWith("; Created with SexyTopo"));
+    }
+
+    @Test
+    public void testBlankLineSeparatesHeaderFromMetadata() {
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Trip trip = new Trip();
+        trip.setCopyright("Caver Jane");
+        trip.setLicense("CC BY 4.0");
+        survey.setTrip(trip);
+
+        String content = survexExporter.getContent(survey);
+        String[] lines = content.split("\n");
+
+        // lines[0] = *begin, lines[1] = creation comment, lines[2] = copyright,
+        // lines[3] must be blank, separating the header from the metadata block.
+        Assert.assertEquals("", lines[3]);
+        Assert.assertTrue(lines[4].startsWith("*date "));
+    }
+
+    @Test
+    public void testNoCopyrightLineWhenTripHasNeitherCopyrightNorLicense() {
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Trip trip = new Trip();
+        survey.setTrip(trip);
+
+        String content = survexExporter.getContent(survey);
+
+        Assert.assertFalse(content.contains("*copyright"));
+    }
+
     private static Trip.TeamEntry entry(String name, Trip.Role... roles) {
         return new Trip.TeamEntry(name, Arrays.asList(roles));
     }

@@ -34,6 +34,9 @@ public class ThExporter {
         // Centreline block
         builder.append("centreline\n");
 
+        // Copyright / license (if the trip has either set)
+        builder.append(SurvexTherionUtil.getCopyrightLine(survey, SurveyFormat.THERION));
+
         // Metadata (inside centreline)
         String teamLines = "";
         String exploTeamLines = "";
@@ -76,6 +79,7 @@ public class ThExporter {
 
         String centrelineText =
                 "centreline\n"
+                        + SurvexTherionUtil.getCopyrightLine(survey, SurveyFormat.THERION)
                         + metadataText
                         + "\n"
                         + SurvexTherionUtil.getStationCommentsData(survey, SurveyFormat.THERION)
@@ -149,7 +153,7 @@ public class ThExporter {
 
     static String replaceCentreline(String original, String replacementText) {
         return original.replaceFirst(
-                "(?s)(\\s*?(centreline|centerline)(.*)(endcentreline|endcenterline)\\s*)",
+                "(?s)((centreline|centerline)(.*)(endcentreline|endcenterline)\\s*)",
                 replacementText);
     }
 

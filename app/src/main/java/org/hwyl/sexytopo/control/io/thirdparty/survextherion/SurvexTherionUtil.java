@@ -100,6 +100,51 @@ public class SurvexTherionUtil {
         return builder.toString();
     }
 
+    /**
+     * Returns the {@code *copyright <year> "<copyright>" ;"<license>"} line (Survex) or the
+     * equivalent {@code copyright <year> "<copyright>" #"<license>"} line (Therion) for the
+     * survey's trip, or "" if there's no trip, or the trip has neither a copyright nor a license
+     * set.
+     *
+     * <p>The copyright text is always quoted, and is rendered as an empty pair of quotes if blank.
+     * The license (also quoted) is only appended, as a trailing comment, if it is set; if there's
+     * no license, the line ends after the copyright text.
+     */
+    public static String getCopyrightLine(Survey survey, SurveyFormat format) {
+        Trip trip = survey.getTrip();
+        if (trip == null || (!trip.hasCopyright() && !trip.hasLicense())) {
+            return "";
+        }
+
+        String marker = format.getCommandChar();
+        char commentChar = format.getCommentChar();
+        String copyrightText = trip.hasCopyright() ? trip.getCopyright() : "";
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(marker)
+                .append("copyright ")
+                .append(formatYear(trip.getSurveyDate()))
+                .append(" \"")
+                .append(copyrightText)
+                .append("\"");
+
+        if (trip.hasLicense()) {
+            builder.append(" ")
+                    .append(commentChar)
+                    .append("\"")
+                    .append(trip.getLicense())
+                    .append("\"");
+        }
+
+        builder.append("\n");
+        return builder.toString();
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private static String formatYear(Date date) {
+        return new SimpleDateFormat("yyyy").format(date);
+    }
+
     public static String getStationCommentsData(Survey survey, SurveyFormat format) {
 
         StringBuilder builder = new StringBuilder();
