@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
+import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -123,7 +124,7 @@ public class SurvexTherionUtil {
         StringBuilder builder = new StringBuilder();
         builder.append(marker)
                 .append("copyright ")
-                .append(formatYear(trip.getSurveyDate()))
+                .append(TextTools.formatYear(trip.getSurveyDate()))
                 .append(" \"")
                 .append(copyrightText)
                 .append("\"");
@@ -138,11 +139,6 @@ public class SurvexTherionUtil {
 
         builder.append("\n");
         return builder.toString();
-    }
-
-    @SuppressLint("SimpleDateFormat")
-    private static String formatYear(Date date) {
-        return new SimpleDateFormat("yyyy").format(date);
     }
 
     public static String getStationCommentsData(Survey survey, SurveyFormat format) {

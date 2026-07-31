@@ -538,6 +538,8 @@
     <string name="settings_export_svg_grid_summary">Dibujar una cuadrícula de fondo tras la topografía</string>
     <string name="settings_export_svg_tagline_title">Mostrar eslogan</string>
     <string name="settings_export_svg_tagline_summary">Dar el crédito adecuado a SexyTopo</string>
+    <string name="settings_export_svg_copyright_title">Mostrar copyright/licencia en la leyenda</string>
+    <string name="settings_export_svg_copyright_summary">El copyright y la licencia siempre se guardan en el archivo; esto también muestra una línea de crédito en la leyenda</string>
     <string name="settings_export_therion_symbols_title">Símbolos de exportación Therion</string>
     <string name="settings_export_therion_symbols_summary">Incluir símbolos al exportar a formato Therion</string>
     <string name="settings_export_therion_text_title">Texto de exportación Therion</string>

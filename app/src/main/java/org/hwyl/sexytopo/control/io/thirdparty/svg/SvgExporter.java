@@ -81,7 +81,8 @@ public class SvgExporter extends DoubleSketchFileExporter {
                             GeneralPreferences.isExportSvgStationsEnabled(),
                             GeneralPreferences.isExportSvgSplaysEnabled(),
                             GeneralPreferences.isExportSvgGridEnabled(),
-                            GeneralPreferences.isExportSvgTaglineEnabled());
+                            GeneralPreferences.isExportSvgTaglineEnabled(),
+                            GeneralPreferences.isExportSvgCopyrightEnabled());
         }
         return exportOptions;
     }
@@ -139,6 +140,16 @@ public class SvgExporter extends DoubleSketchFileExporter {
                 "viewBox",
                 TextTools.join(" ", svgTopLeftX, svgTopLeftY, svgWidth, svgHeight));
         xmlSerializer.attribute(null, "xmlns", "http://www.w3.org/2000/svg");
+
+        Trip trip = survey.getTrip();
+        if (trip != null && (trip.hasCopyright() || trip.hasLicense())) {
+            xmlSerializer.startTag(null, "title");
+            xmlSerializer.text(survey.getName());
+            xmlSerializer.endTag(null, "title");
+            xmlSerializer.startTag(null, "desc");
+            xmlSerializer.text(formatCopyrightLine(trip));
+            xmlSerializer.endTag(null, "desc");
+        }
 
         Colour background = options.isWhiteBackground() ? Colour.WHITE : Colour.TRANSPARENT;
         if (background != Colour.TRANSPARENT) {
@@ -348,6 +359,12 @@ public class SvgExporter extends DoubleSketchFileExporter {
             }
         }
         bodyLines.add(formatStatsLine(survey));
+        if (options.isShowCopyright()) {
+            String copyrightLine = formatCopyrightLine(trip);
+            if (!copyrightLine.isEmpty()) {
+                bodyLines.add(copyrightLine);
+            }
+        }
 
         double barLengthMetres = pickScaleBarLength(surveyWidthMetres);
         return new LegendModel(
@@ -534,6 +551,31 @@ public class SvgExporter extends DoubleSketchFileExporter {
             }
         }
         return TextTools.join(", ", names);
+    }
+
+    /**
+     * Formats a trip's copyright and license as a single line, e.g. "© 2026 Caver Jane — CC BY
+     * 4.0". Either part may be omitted if not set; returns an empty string if neither is set.
+     */
+    private static String formatCopyrightLine(Trip trip) {
+        if (trip == null) {
+            return "";
+        }
+        StringBuilder builder = new StringBuilder();
+        if (trip.hasCopyright()) {
+            builder.append("\u00A9 ");
+            if (trip.getSurveyDate() != null) {
+                builder.append(TextTools.formatYear(trip.getSurveyDate())).append(" ");
+            }
+            builder.append(trip.getCopyright());
+        }
+        if (trip.hasLicense()) {
+            if (builder.length() > 0) {
+                builder.append(" — ");
+            }
+            builder.append(trip.getLicense());
+        }
+        return builder.toString();
     }
 
     private static String formatStatsLine(Survey survey) {
@@ -902,6 +944,7 @@ public class SvgExporter extends DoubleSketchFileExporter {
         CheckBox splaysCheckbox = dialogView.findViewById(R.id.svgSplaysCheckbox);
         CheckBox gridCheckbox = dialogView.findViewById(R.id.svgGridCheckbox);
         CheckBox taglineCheckbox = dialogView.findViewById(R.id.svgTaglineCheckbox);
+        CheckBox copyrightCheckbox = dialogView.findViewById(R.id.svgCopyrightCheckbox);
 
         String[] backgroundValues =
                 context.getResources()
@@ -920,6 +963,7 @@ public class SvgExporter extends DoubleSketchFileExporter {
         splaysCheckbox.setChecked(GeneralPreferences.isExportSvgSplaysEnabled());
         gridCheckbox.setChecked(GeneralPreferences.isExportSvgGridEnabled());
         taglineCheckbox.setChecked(GeneralPreferences.isExportSvgTaglineEnabled());
+        copyrightCheckbox.setChecked(GeneralPreferences.isExportSvgCopyrightEnabled());
 
         new MaterialAlertDialogBuilder(context)
                 .setTitle(R.string.svg_export_dialog_title)
@@ -941,6 +985,7 @@ public class SvgExporter extends DoubleSketchFileExporter {
                             boolean splays = splaysCheckbox.isChecked();
                             boolean grid = gridCheckbox.isChecked();
                             boolean tagline = taglineCheckbox.isChecked();
+                            boolean copyright = copyrightCheckbox.isChecked();
                             exportOptions =
                                     new SvgExportOptions(
                                             white,
@@ -954,7 +999,8 @@ public class SvgExporter extends DoubleSketchFileExporter {
                                             stations,
                                             splays,
                                             grid,
-                                            tagline);
+                                            tagline,
+                                            copyright);
                             saveOptions(
                                     selectedBackground,
                                     legend,
@@ -967,7 +1013,8 @@ public class SvgExporter extends DoubleSketchFileExporter {
                                     stations,
                                     splays,
                                     grid,
-                                    tagline);
+                                    tagline,
+                                    copyright);
                             onReady.run();
                         })
                 .setNegativeButton(R.string.cancel, null)
@@ -995,7 +1042,8 @@ public class SvgExporter extends DoubleSketchFileExporter {
             boolean stations,
             boolean splays,
             boolean grid,
-            boolean tagline) {
+            boolean tagline,
+            boolean copyright) {
         SharedPreferences prefs = GeneralPreferences.getRawPreferences();
         if (prefs == null) {
             return;
@@ -1013,6 +1061,7 @@ public class SvgExporter extends DoubleSketchFileExporter {
                 .putBoolean("pref_export_svg_splays", splays)
                 .putBoolean("pref_export_svg_grid", grid)
                 .putBoolean("pref_export_svg_tagline", tagline)
+                .putBoolean("pref_export_svg_copyright", copyright)
                 .apply();
     }
 

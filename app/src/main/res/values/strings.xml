@@ -588,6 +588,8 @@
     <string name="settings_export_svg_grid_summary">Draw a background grid behind the survey</string>
     <string name="settings_export_svg_tagline_title">Show tagline</string>
     <string name="settings_export_svg_tagline_summary">Provide proper credit to SexyTopo</string>
+    <string name="settings_export_svg_copyright_title">Show copyright/license in legend</string>
+    <string name="settings_export_svg_copyright_summary">Copyright and license are always saved in the file; this also displays a credit line in the legend</string>
     <string name="settings_export_therion_title">Therion</string>
     <string name="settings_export_therion_section_summary">Therion export options</string>
     <string name="settings_export_therion_plan_suffix_title">Plan file suffix</string>

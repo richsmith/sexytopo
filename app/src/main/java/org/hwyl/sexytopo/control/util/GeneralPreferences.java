@@ -321,6 +321,10 @@ public class GeneralPreferences {
         return getBoolean("pref_export_svg_tagline", true);
     }
 
+    public static boolean isExportSvgCopyrightEnabled() {
+        return getBoolean("pref_export_svg_copyright", true);
+    }
+
     public static SharedPreferences getRawPreferences() {
         return prefs;
     }

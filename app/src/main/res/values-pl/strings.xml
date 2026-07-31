@@ -538,6 +538,8 @@
     <string name="settings_export_svg_grid_summary">Rysuj siatkę w tle pomiaru</string>
     <string name="settings_export_svg_tagline_title">Pokaż podpis</string>
     <string name="settings_export_svg_tagline_summary">Odpowiednio podziękuj SexyTopo</string>
+    <string name="settings_export_svg_copyright_title">Pokaż copyright/licencję w legendzie</string>
+    <string name="settings_export_svg_copyright_summary">Copyright i licencja są zawsze zapisywane w pliku; to dodatkowo pokazuje informację w legendzie</string>
     <string name="settings_export_therion_symbols_title">Symbole eksportu Therion</string>
     <string name="settings_export_therion_symbols_summary">Uwzględnij symbole podczas eksportu do formatu Therion</string>
     <string name="settings_export_therion_text_title">Tekst eksportu Therion</string>

@@ -538,6 +538,8 @@
     <string name="settings_export_svg_grid_summary">Desenhar uma grelha de fundo atrás do levantamento</string>
     <string name="settings_export_svg_tagline_title">Mostrar slogan</string>
     <string name="settings_export_svg_tagline_summary">Dar o devido crédito ao SexyTopo</string>
+    <string name="settings_export_svg_copyright_title">Mostrar copyright/licença na legenda</string>
+    <string name="settings_export_svg_copyright_summary">O copyright e a licença são sempre guardados no arquivo; isto também mostra uma linha de crédito na legenda</string>
     <string name="settings_export_therion_symbols_title">Símbolos de exportação Therion</string>
     <string name="settings_export_therion_symbols_summary">Incluir símbolos ao exportar para formato Therion</string>
     <string name="settings_export_therion_text_title">Texto de exportação Therion</string>
