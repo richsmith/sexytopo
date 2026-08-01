@@ -47,6 +47,13 @@ public class TripActivity extends SexyTopoActivity {
     private List<Trip.TeamEntry> team = new ArrayList<>();
     private Trip savedTrip;
 
+    // Suppresses syncTrip() calls triggered by TextWatchers firing as a side effect of the
+    // setText(...) calls in onResume()'s field population - without this, populating an
+    // earlier field (e.g. comments) fires its watcher, which calls syncTrip(), which reads
+    // every field's *current* text including ones not yet populated this cycle, clobbering
+    // them with stale values before they ever get set.
+    private boolean isPopulatingFields = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,6 +73,9 @@ public class TripActivity extends SexyTopoActivity {
 
                     @Override
                     public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        if (isPopulatingFields) {
+                            return;
+                        }
                         updateButtonStatus();
                         syncTrip();
                     }
@@ -76,6 +86,9 @@ public class TripActivity extends SexyTopoActivity {
                 new TextWatcher() {
                     @Override
                     public void afterTextChanged(Editable s) {
+                        if (isPopulatingFields) {
+                            return;
+                        }
                         syncTrip();
                         updateButtonStatus();
                     }
@@ -93,6 +106,9 @@ public class TripActivity extends SexyTopoActivity {
                 new TextWatcher() {
                     @Override
                     public void afterTextChanged(Editable s) {
+                        if (isPopulatingFields) {
+                            return;
+                        }
                         syncTrip();
                         updateButtonStatus();
                     }
@@ -110,6 +126,9 @@ public class TripActivity extends SexyTopoActivity {
                 new TextWatcher() {
                     @Override
                     public void afterTextChanged(Editable s) {
+                        if (isPopulatingFields) {
+                            return;
+                        }
                         syncTrip();
                         updateButtonStatus();
                     }
@@ -130,32 +149,44 @@ public class TripActivity extends SexyTopoActivity {
         if (trip == null) {
             trip = new Trip();
             getSurvey().setTrip(trip);
+
+            // Seed a brand new trip with the configured default license, so what's shown on
+            // screen is also what actually gets persisted/exported, rather than just a display
+            // hint. This only runs once, for a genuinely new trip - it must not re-apply on
+            // every visit to an existing trip, since a blank license there could mean "the user
+            // deliberately wants no license" (or the trip was imported with none), not "never
+            // decided".
+            trip.setLicense(GeneralPreferences.getDefaultLicenseName());
         }
 
         savedTrip = new Trip(trip);
         team = new ArrayList<>(trip.getTeam());
 
-        TextView commentsField = findViewById(R.id.trip_comments);
-        commentsField.setText(trip.getComments());
+        isPopulatingFields = true;
+        try {
+            TextView commentsField = findViewById(R.id.trip_comments);
+            commentsField.setText(trip.getComments());
 
-        EditText instrumentField = findViewById(R.id.instrument_field);
-        if (trip.hasInstrument()) {
-            instrumentField.setText(trip.getInstrument());
-        } else if (hasInstrument()) {
-            Instrument connected = getInstrument();
-            String name = connected.getName();
-            instrumentField.setText(name);
-        }
+            EditText instrumentField = findViewById(R.id.instrument_field);
+            if (trip.hasInstrument()) {
+                instrumentField.setText(trip.getInstrument());
+            } else if (hasInstrument()) {
+                try {
+                    Instrument connected = getInstrument();
+                    String name = connected.getName();
+                    instrumentField.setText(name);
+                } catch (SecurityException ignored) {
+                }
+            }
 
-        EditText copyrightField = findViewById(R.id.trip_copyright);
-        copyrightField.setText(trip.getCopyright());
+            EditText copyrightField = findViewById(R.id.trip_copyright);
+            copyrightField.setText(trip.getCopyright());
 
-        setupLicenseAutocomplete();
-        AutoCompleteTextView licenseField = findViewById(R.id.trip_license);
-        if (trip.hasLicense()) {
+            setupLicenseAutocomplete();
+            AutoCompleteTextView licenseField = findViewById(R.id.trip_license);
             licenseField.setText(trip.getLicense());
-        } else {
-            licenseField.setText(GeneralPreferences.getDefaultLicenseName());
+        } finally {
+            isPopulatingFields = false;
         }
 
         TextInputLayout surveyDateLayout = findViewById(R.id.survey_date_layout);
@@ -490,9 +521,9 @@ public class TripActivity extends SexyTopoActivity {
         boolean hasUnlinkedExploDate =
                 currentTrip != null && !currentTrip.isExplorationDateLinked();
 
-        // License is deliberately not checked here, like surveyDate - it is always
-        // pre-filled with a default value, so including it would make the buttons permanently
-        // enabled even on an otherwise blank trip.
+        // License is deliberately not checked here, like surveyDate - a new trip is seeded
+        // with a default license (see onResume), so including it would make the buttons
+        // permanently enabled even on an otherwise blank new trip.
         boolean hasAnyData =
                 hasTeam || hasComments || hasInstrument || hasCopyright || hasUnlinkedExploDate;
         boolean hasChanges = savedTrip == null || !savedTrip.equals(currentTrip);
