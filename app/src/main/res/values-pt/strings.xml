@@ -442,6 +442,9 @@
     <string name="settings_license_new_hint">Nome da licença</string>
     <string name="settings_license_name_required">O nome da licença é obrigatório</string>
     <string name="settings_license_default_label">Predefinida</string>
+    <string name="license_choice_title">Escolher uma licença predefinida</string>
+    <string name="license_choice_message">Por favor, escolha uma licença para a utilização futura do levantamento. Esta tornar-se-á a predefinida e pode ser substituída em Saída. A GPLv3.0+ é recomendada para dados de levantamento e é a mesma licença sob a qual o SexyTopo é publicado</string>
+    <string name="license_choice_confirm_button">Confirmar</string>
 <string name="settings_instruments_title">Instrumentos</string>
     <string name="settings_instruments_summary">Tolerâncias dos instrumentos, calibração</string>
     <string name="settings_max_distance_delta_title">Delta de distância máxima (m)</string>

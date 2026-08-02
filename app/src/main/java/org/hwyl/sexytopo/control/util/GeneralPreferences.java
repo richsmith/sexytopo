@@ -455,6 +455,21 @@ public class GeneralPreferences {
         return FALLBACK_DEFAULT_LICENSE_NAME;
     }
 
+    private static final String PREF_LICENSE_DEFAULT_CONFIRMED = "pref_license_default_confirmed";
+
+    /**
+     * Checks whether the user has been through the one-time first-run screen that asks them to
+     * choose a default license, rather than been silently applied on their behalf.
+     */
+    public static boolean isLicenseDefaultConfirmed() {
+        return getBoolean(PREF_LICENSE_DEFAULT_CONFIRMED, false);
+    }
+
+    public static void setLicenseDefaultConfirmed(boolean confirmed) {
+        if (prefs == null) return;
+        prefs.edit().putBoolean(PREF_LICENSE_DEFAULT_CONFIRMED, confirmed).apply();
+    }
+
     /**
      * Adds a new license option. If the list is currently empty, the new option becomes the
      * default; otherwise it is added as a non-default option.

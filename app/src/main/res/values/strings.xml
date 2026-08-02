@@ -486,6 +486,9 @@
     <string name="settings_license_new_hint">License name</string>
     <string name="settings_license_name_required">License name is required</string>
     <string name="settings_license_default_label">Default</string>
+    <string name="license_choice_title">Choose a Default License</string>
+    <string name="license_choice_message">Please pick a license for the future use of the survey. This will become the default and can be written over in Trip. GPLv3.0+ is encouraged for survey data and is the same license that Sexytopo is published under</string>
+    <string name="license_choice_confirm_button">Confirm</string>
     <string name="settings_instruments_title">Instruments</string>
     <string name="settings_leg_amalgamation_algorithm_title">Leg agreement method</string>
     <string name="settings_leg_amalgamation_algorithm_summary">How repeated readings are judged close enough to form a leg</string>

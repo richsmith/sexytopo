@@ -442,6 +442,9 @@
     <string name="settings_license_new_hint">Lizenzname</string>
     <string name="settings_license_name_required">Lizenzname ist erforderlich</string>
     <string name="settings_license_default_label">Standard</string>
+    <string name="license_choice_title">Standardlizenz wählen</string>
+    <string name="license_choice_message">Bitte wählen Sie eine Lizenz für die zukünftige Nutzung der Vermessung. Diese wird zur Standardlizenz und kann in der Tour überschrieben werden. GPLv3.0+ wird für Vermessungsdaten empfohlen und ist dieselbe Lizenz, unter der SexyTopo veröffentlicht wird</string>
+    <string name="license_choice_confirm_button">Bestätigen</string>
 <string name="settings_instruments_title">Werkzeuge</string>
     <string name="settings_instruments_summary">Instrumententoleranz, Kalibrierung</string>
     <string name="settings_max_distance_delta_title">Maximal zulässige Abweichung bei der Distanz (m)</string>

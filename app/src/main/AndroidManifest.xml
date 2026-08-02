@@ -103,6 +103,10 @@
             android:label="@string/action_trip">
         </activity>
         <activity
+            android:name=".control.activity.LicenseChoiceActivity"
+            android:label="@string/license_choice_title">
+        </activity>
+        <activity
             android:name=".control.activity.ThreeDViewActivity"
             android:label="@string/title_activity_3d" >
         </activity>

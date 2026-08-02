@@ -37,6 +37,11 @@ public class GeneralPreferencesLicenseTest {
     }
 
     @Test
+    public void testIsLicenseDefaultConfirmedFalseByDefault() {
+        Assert.assertFalse(GeneralPreferences.isLicenseDefaultConfirmed());
+    }
+
+    @Test
     public void testLicenseOptionsToJsonAndFromJsonRoundTrip() throws Exception {
         List<LicenseOption> options =
                 Arrays.asList(new LicenseOption("CC0", false), new LicenseOption("GPLv3.0+", true));
