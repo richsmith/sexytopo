@@ -3,6 +3,7 @@ package org.hwyl.sexytopo.model.sketch;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.hwyl.sexytopo.control.util.PolygonUtils;
 import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
@@ -25,6 +26,7 @@ public class Sketch extends Shape {
 
     private PathDetail activePath;
     private Colour activeColour = Colour.BLACK;
+    private LineType activeLineType = LineType.GENERAL;
 
     private float crossSectionScale = DEFAULT_XSECTION_SCALE;
 
@@ -83,7 +85,7 @@ public class Sketch extends Shape {
     }
 
     public PathDetail startNewPath(Coord2D start) {
-        activePath = new PathDetail(start, activeColour);
+        activePath = new PathDetail(start, activeColour, activeLineType);
         // Registered in the undo history only on finishPath, so an unfinished path can be
         // abandoned without leaving a trace.
         pathDetails.add(activePath);
@@ -135,6 +137,10 @@ public class Sketch extends Shape {
      * Close the outline being sketched into a polygon and add it as an area. If it overlaps any
      * existing areas of the same type and colour, they are all merged into one (as a single
      * undoable operation).
+     *
+     * <p>A stroke that crosses itself is resolved to its outer edge, so an accidental overshoot
+     * where the outline closes doesn't leave a stray hole behind. Such a stroke can also enclose
+     * two separate lobes, in which case each becomes its own area.
      */
     public void finishArea(AreaType areaType) {
         if (activePath == null) {
@@ -149,7 +155,17 @@ public class Sketch extends Shape {
             return; // too small to form a polygon; treat as an accidental tap
         }
 
-        addAreaDetail(new AreaDetail(outline, areaType, outlinePath.getColour()));
+        List<PolygonUtils.Region> regions = PolygonUtils.normalise(outline);
+        if (regions == null || regions.isEmpty()) {
+            // the geometry op failed or gave us nothing back; rather than silently lose the
+            // user's stroke, fall back to using it as drawn
+            addAreaDetail(new AreaDetail(outline, areaType, outlinePath.getColour()));
+            return;
+        }
+
+        for (PolygonUtils.Region region : regions) {
+            addAreaDetail(new AreaDetail(region.getOutline(), areaType, outlinePath.getColour()));
+        }
     }
 
     public void addAreaDetail(AreaDetail newArea) {
@@ -159,24 +175,24 @@ public class Sketch extends Shape {
             if (existing.getAreaType() == newArea.getAreaType()
                     && existing.getColour() == newArea.getColour()
                     && existing.intersectsRectangle(newArea.getTopLeft(), newArea.getBottomRight())
-                    && PolygonUtils.overlap(existing.getPolygon(), newArea.getPolygon())) {
+                    && PolygonUtils.overlap(existing.toRegion(), newArea.toRegion())) {
                 overlapping.add(existing);
             }
         }
 
         List<SketchDetail> merged = null;
         if (!overlapping.isEmpty()) {
-            List<List<Coord2D>> polygons = new ArrayList<>();
-            polygons.add(newArea.getPolygon());
+            List<PolygonUtils.Region> regions = new ArrayList<>();
+            regions.add(newArea.toRegion());
             for (SketchDetail detail : overlapping) {
-                polygons.add(((AreaDetail) detail).getPolygon());
+                regions.add(((AreaDetail) detail).toRegion());
             }
-            List<List<Coord2D>> union = PolygonUtils.union(polygons);
+            List<PolygonUtils.Region> union = PolygonUtils.union(regions);
             if (union != null && !union.isEmpty()) {
-                merged = new ArrayList<>();
-                for (List<Coord2D> polygon : union) {
-                    merged.add(new AreaDetail(polygon, newArea.getAreaType(), newArea.getColour()));
-                }
+                merged =
+                        union.stream()
+                                .map(region -> (SketchDetail) newArea.withRegion(region))
+                                .collect(Collectors.toList());
             }
         }
 
@@ -215,6 +231,37 @@ public class Sketch extends Shape {
 
     public void setActiveColour(Colour colour) {
         this.activeColour = colour;
+    }
+
+    public void setActiveLineType(LineType lineType) {
+        this.activeLineType = lineType;
+    }
+
+    /**
+     * The most recently added path with a semantic line type, or null if there isn't one. Used by
+     * the "Flip Last Line" tool (orientation is meaningless for general lines).
+     */
+    public PathDetail getMostRecentSemanticPath() {
+        for (int i = pathDetails.size() - 1; i >= 0; i--) {
+            PathDetail pathDetail = pathDetails.get(i);
+            if (pathDetail.getLineType().isSemantic()) {
+                return pathDetail;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Reverses the point order of a path (flipping which side its ticks fall on) as a single
+     * undoable operation. Since details are immutable this is a delete-and-replace.
+     */
+    public PathDetail flipPathDetail(PathDetail pathDetail) {
+        List<Coord2D> reversedPoints = new ArrayList<>(pathDetail.getPath());
+        Collections.reverse(reversedPoints);
+        PathDetail flipped =
+                new PathDetail(reversedPoints, pathDetail.getColour(), pathDetail.getLineType());
+        deleteDetail(pathDetail, Collections.singletonList((SketchDetail) flipped));
+        return flipped;
     }
 
     public float getCrossSectionScale() {

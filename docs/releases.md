@@ -1,3 +1,10 @@
+# Unreleased
+- New area sketching tool for marking regions of water: sketch around a region to fill it with parallel lines; overlapping areas of the same kind merge, and erasing can split an area in two (the redo button has moved to the quick settings menu to make room)
+- Areas can have holes: erase into the middle of one to leave an unfilled island, or draw a ring of water (e.g. four overlapping "walls") and the enclosed courtyard stays empty
+- SVG export includes water areas as hatch-filled shapes, holes included
+- Therion export includes water areas as invisible border lines with an area command, one border per hole
+- Sketch lines can now be given a semantic type (wall, presumed wall, pit edge, chimney, slope): tap the draw tool while it is selected to open the line type toolbar; typed lines render with their conventional ornamentation and export to Therion as first-class lines (e.g. line wall)
+
 # 2026-07-08 1.12.3
 - Fix Survex and Therion backwards leg bug (thanks Andrew Atkinson)
 

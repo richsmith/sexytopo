@@ -26,12 +26,14 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SexyTopo;
@@ -42,6 +44,7 @@ import org.hwyl.sexytopo.control.components.DialogUtils;
 import org.hwyl.sexytopo.control.util.CohenSutherlandAlgorithm;
 import org.hwyl.sexytopo.control.util.CrossSectioner;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
+import org.hwyl.sexytopo.control.util.LineOrienter;
 import org.hwyl.sexytopo.control.util.PolygonUtils;
 import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
@@ -56,6 +59,7 @@ import org.hwyl.sexytopo.model.sketch.BrushColour;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
+import org.hwyl.sexytopo.model.sketch.LineType;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchDetail;
@@ -205,6 +209,13 @@ public class GraphView extends View {
     private final Paint fadedSplayPaint = new Paint();
 
     private final Paint drawPaint = new Paint();
+    // one paint per semantic line type (stroke width and ornamentation baked in)
+    private final Map<LineType, Paint> lineTypePaints = new EnumMap<>(LineType.class);
+    // scratch object reused when drawing typed paths, to avoid per-frame allocation
+    private final Path typedPathScratch = new Path();
+    // the red interior-side marker on the last-drawn wall (a plain stroke — the wall paints'
+    // path effects must not apply to it)
+    private final Paint wallInsideTickPaint = new Paint();
     private final Paint areaPaint = new Paint();
     private final Paint labelPaint = new Paint();
     private final Paint highlightPaint = new Paint();
@@ -309,6 +320,24 @@ public class GraphView extends View {
         drawPaint.setStyle(Paint.Style.STROKE);
         drawPaint.setStrokeJoin(Paint.Join.ROUND);
         drawPaint.setStrokeCap(Paint.Cap.ROUND);
+
+        wallInsideTickPaint.set(drawPaint);
+        wallInsideTickPaint.setColor(Colour.RED.intValue);
+
+        // Path effects only render on a hardware-accelerated canvas from API 28, so on older
+        // devices semantic lines fall back to a plain stroke (still distinguished by width).
+        boolean pathEffectsSupported =
+                android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P;
+        float density = dpToPixels(1);
+        lineTypePaints.clear();
+        for (LineType lineType : LineType.values()) {
+            Paint paint = new Paint(drawPaint);
+            paint.setStrokeWidth(drawPaint.getStrokeWidth() * lineType.getStrokeWidthFactor());
+            if (pathEffectsSupported) {
+                paint.setPathEffect(lineType.createPathEffect(density));
+            }
+            lineTypePaints.put(lineType, paint);
+        }
 
         areaPaint.setStyle(Paint.Style.STROKE);
         areaPaint.setStrokeJoin(Paint.Join.ROUND);
@@ -592,6 +621,7 @@ public class GraphView extends View {
                         invalidate();
                     }
                 }
+                orientActivePathIfRequired();
                 sketch.finishPath();
                 break;
 
@@ -633,6 +663,20 @@ public class GraphView extends View {
         }
 
         return true;
+    }
+
+    /**
+     * Wall-kind lines get their point order normalised on completion so the passage interior is on
+     * a consistent side, whichever way the user drew the stroke (see LineOrienter).
+     */
+    private void orientActivePathIfRequired() {
+        PathDetail activePath = sketch.getActivePath();
+        if (activePath == null
+                || !activePath.getLineType().isAutoOriented()
+                || projection == null) {
+            return;
+        }
+        LineOrienter.orientToInterior(activePath.getPath(), projection.getStationMap().values());
     }
 
     private Coord2D considerSnapToSketchLine(Coord2D pointTouched) {
@@ -731,22 +775,21 @@ public class GraphView extends View {
 
     /**
      * Erase a disc from an area as an undoable operation. Whatever survives comes back as
-     * replacement areas: possibly one shrunken polygon, possibly several if the notch split it,
-     * possibly none if the disc swallowed it. Falls back to deleting the whole area if the geometry
-     * op fails.
+     * replacement areas: possibly one shrunken region, possibly one with a new hole if the user
+     * erased into the middle of it, possibly several if the notch split it, possibly none if the
+     * disc swallowed it. Falls back to deleting the whole area if the geometry op fails.
      */
     private void eraseFromArea(AreaDetail areaDetail, Coord2D touchPointOnSurvey, float radius) {
-        List<List<Coord2D>> remaining =
-                PolygonUtils.subtract(areaDetail.getPolygon(), touchPointOnSurvey, radius);
+        List<PolygonUtils.Region> remaining =
+                PolygonUtils.subtract(areaDetail.toRegion(), touchPointOnSurvey, radius);
         if (remaining == null) {
             sketch.deleteDetail(areaDetail);
             return;
         }
-        List<SketchDetail> replacements = new ArrayList<>();
-        for (List<Coord2D> polygon : remaining) {
-            replacements.add(
-                    new AreaDetail(polygon, areaDetail.getAreaType(), areaDetail.getColour()));
-        }
+        List<SketchDetail> replacements =
+                remaining.stream()
+                        .map(region -> (SketchDetail) areaDetail.withRegion(region))
+                        .collect(Collectors.toList());
         sketch.deleteDetail(areaDetail, replacements);
     }
 
@@ -1852,9 +1895,19 @@ public class GraphView extends View {
 
         boolean isDebugMode = activity.isDebugMode();
 
+        PathDetail wallPathToMark = findWallPathToMark(sketch);
+
         for (PathDetail pathDetail : sketch.getPathDetails()) {
 
             if (!couldBeVisible(pathDetail)) {
+                continue;
+            }
+
+            if (pathDetail.getLineType() != LineType.GENERAL) {
+                drawTypedPath(canvas, pathDetail, alpha);
+                if (pathDetail == wallPathToMark) {
+                    drawWallInsideTick(canvas, pathDetail, alpha);
+                }
                 continue;
             }
 
@@ -1959,8 +2012,112 @@ public class GraphView extends View {
     }
 
     /**
-     * Draw the sketch's areas: each polygon is outlined and filled with horizontal parallel lines.
-     * The hatching is anchored to survey space so it doesn't crawl when the view is panned.
+     * Semantic lines are drawn individually via drawPath so their type's ornamentation (dashes,
+     * tick stamps) can apply. The path is built in view space, so the ornamentation keeps a
+     * constant on-screen size across zoom levels rather than scaling with the survey.
+     */
+    private void drawTypedPath(Canvas canvas, PathDetail pathDetail, int alpha) {
+        Paint paint = lineTypePaints.get(pathDetail.getLineType());
+        if (paint == null) { // paints not initialised yet
+            paint = drawPaint;
+        }
+        paint.setColor(pathDetail.getDrawColour(isDarkModeActive).intValue);
+        paint.setAlpha(alpha);
+
+        typedPathScratch.rewind();
+        boolean first = true;
+        for (Coord2D point : pathDetail.getPath()) {
+            float x = (point.x - viewpointOffset.x) * surveyToViewScale;
+            float y = (point.y - viewpointOffset.y) * surveyToViewScale;
+            if (first) {
+                typedPathScratch.moveTo(x, y);
+                first = false;
+            } else {
+                typedPathScratch.lineTo(x, y);
+            }
+        }
+        canvas.drawPath(typedPathScratch, paint);
+    }
+
+    /**
+     * The wall-kind line whose interior-side marker should be shown: the most recently drawn one,
+     * excluding a stroke still in progress (the marker hopping along a growing line is
+     * disconcerting, and orientation isn't decided until the stroke finishes anyway). Ticked types
+     * need no marker — their ornamentation already shows their orientation.
+     */
+    private PathDetail findWallPathToMark(Sketch sketch) {
+        if (!SketchPreferences.Toggle.SHOW_WALL_INSIDE_TICK.isOn()) {
+            return null;
+        }
+        List<PathDetail> pathDetails = sketch.getPathDetails();
+        for (int i = pathDetails.size() - 1; i >= 0; i--) {
+            PathDetail candidate = pathDetails.get(i);
+            if (candidate.getLineType().isAutoOriented() && candidate != sketch.getActivePath()) {
+                return candidate;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * A slim red arrowhead at the midpoint of the last-drawn wall, pointing to the side SexyTopo
+     * believes is the passage interior. Red and arrow-shaped so it reads as UI feedback rather than
+     * a drawing artefact; it is never exported. If it points the wrong way, Tools -> Flip Last Line
+     * corrects the wall.
+     */
+    private void drawWallInsideTick(Canvas canvas, PathDetail pathDetail, int alpha) {
+        List<Coord2D> points = pathDetail.getPath();
+        if (points.size() < 2) {
+            return;
+        }
+        int midIndex = points.size() / 2;
+        Coord2D from = points.get(midIndex - 1);
+        Coord2D to = points.get(midIndex);
+
+        float fromX = (from.x - viewpointOffset.x) * surveyToViewScale;
+        float fromY = (from.y - viewpointOffset.y) * surveyToViewScale;
+        float toX = (to.x - viewpointOffset.x) * surveyToViewScale;
+        float toY = (to.y - viewpointOffset.y) * surveyToViewScale;
+
+        float dx = toX - fromX, dy = toY - fromY;
+        float length = (float) Math.sqrt(dx * dx + dy * dy);
+        if (length < 0.001f) {
+            return;
+        }
+
+        // interior normal: the direction rotated +90 degrees, matching LineOrienter's canonical
+        // side (positive cross product of direction with the vector to the interior)
+        float nx = -dy / length, ny = dx / length;
+        // tangent along the wall, for the arrowhead's narrow base
+        float tx = dx / length, ty = dy / length;
+
+        float midX = (fromX + toX) / 2, midY = (fromY + toY) / 2;
+        float arrowLength = dpToPixels(8);
+        float halfBaseWidth = dpToPixels(2.5f);
+
+        // slim arrowhead: tip out in the passage, narrow base astride the wall's midpoint
+        float tipX = midX + nx * arrowLength, tipY = midY + ny * arrowLength;
+
+        wallInsideTickPaint.setAlpha(alpha);
+        canvas.drawLine(
+                tipX,
+                tipY,
+                midX + tx * halfBaseWidth,
+                midY + ty * halfBaseWidth,
+                wallInsideTickPaint);
+        canvas.drawLine(
+                tipX,
+                tipY,
+                midX - tx * halfBaseWidth,
+                midY - ty * halfBaseWidth,
+                wallInsideTickPaint);
+    }
+
+    /**
+     * Draw the sketch's areas: each region is outlined and filled with horizontal parallel lines.
+     * Holes are drawn as further contours of the same path under the even-odd fill rule, so they
+     * are outlined too but left unhatched. The hatching is anchored to survey space so it doesn't
+     * crawl when the view is panned.
      */
     private void drawAreas(Canvas canvas, Sketch sketch, int alpha) {
 
@@ -1971,18 +2128,21 @@ public class GraphView extends View {
             }
 
             Path outline = new Path();
-            boolean first = true;
-            for (Coord2D point : areaDetail.getPolygon()) {
-                float x = (point.x - viewpointOffset.x) * surveyToViewScale;
-                float y = (point.y - viewpointOffset.y) * surveyToViewScale;
-                if (first) {
-                    outline.moveTo(x, y);
-                    first = false;
-                } else {
-                    outline.lineTo(x, y);
+            outline.setFillType(Path.FillType.EVEN_ODD);
+            for (List<Coord2D> contour : areaDetail.getContours()) {
+                boolean first = true;
+                for (Coord2D point : contour) {
+                    float x = (point.x - viewpointOffset.x) * surveyToViewScale;
+                    float y = (point.y - viewpointOffset.y) * surveyToViewScale;
+                    if (first) {
+                        outline.moveTo(x, y);
+                        first = false;
+                    } else {
+                        outline.lineTo(x, y);
+                    }
                 }
+                outline.close();
             }
-            outline.close();
 
             Colour colour = areaDetail.getDrawColour(isDarkModeActive);
             areaPaint.setColor(colour.intValue);
@@ -2265,6 +2425,10 @@ public class GraphView extends View {
 
     public void setBrushColour(BrushColour brushColour) {
         sketch.setActiveColour(brushColour.getColour());
+    }
+
+    public void setLineType(LineType lineType) {
+        sketch.setActiveLineType(lineType);
     }
 
     public void setCurrentSymbol(Symbol symbol) {

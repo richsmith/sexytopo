@@ -2,13 +2,24 @@ package org.hwyl.sexytopo.model.sketch;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import org.hwyl.sexytopo.control.util.PolygonUtils;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class SketchTest {
+
+    private static List<Coord2D> rectangleContour(
+            float left, float top, float width, float height) {
+        return Arrays.asList(
+                new Coord2D(left, top),
+                new Coord2D(left + width, top),
+                new Coord2D(left + width, top + height),
+                new Coord2D(left, top + height));
+    }
 
     private static AreaDetail squareArea(float left, float top, float size) {
         List<Coord2D> polygon =
@@ -18,6 +29,81 @@ public class SketchTest {
                         new Coord2D(left + size, top + size),
                         new Coord2D(left, top + size));
         return new AreaDetail(new ArrayList<>(polygon), AreaType.WATER, Colour.BLUE);
+    }
+
+    @Test
+    public void testStartNewPathUsesActiveLineType() {
+        Sketch sketch = new Sketch();
+        sketch.setActiveLineType(LineType.WALL);
+        PathDetail pathDetail = sketch.startNewPath(Coord2D.ORIGIN);
+        Assert.assertEquals(LineType.WALL, pathDetail.getLineType());
+
+        sketch.setActiveLineType(LineType.GENERAL);
+        PathDetail plain = sketch.startNewPath(new Coord2D(1, 1));
+        Assert.assertEquals(LineType.GENERAL, plain.getLineType());
+    }
+
+    @Test
+    public void testEraserFragmentsKeepLineType() {
+        List<Coord2D> points =
+                Arrays.asList(
+                        new Coord2D(0, 0),
+                        new Coord2D(2, 0),
+                        new Coord2D(4, 0),
+                        new Coord2D(6, 0),
+                        new Coord2D(8, 0));
+        PathDetail pathDetail = new PathDetail(new ArrayList<>(points), Colour.BLACK, LineType.PIT);
+
+        // erase through the middle, splitting the path in two
+        List<SketchDetail> fragments =
+                pathDetail.getPathFragmentsOutsideRadius(new Coord2D(4, 0), 0.5);
+
+        Assert.assertEquals(2, fragments.size());
+        for (SketchDetail fragment : fragments) {
+            Assert.assertEquals(LineType.PIT, ((PathDetail) fragment).getLineType());
+        }
+    }
+
+    @Test
+    public void testFlipPathDetailReversesPointsAsSingleUndoStep() {
+        Sketch sketch = new Sketch();
+        sketch.setActiveLineType(LineType.PIT);
+        PathDetail original = sketch.startNewPath(new Coord2D(0, 0));
+        original.lineTo(new Coord2D(5, 0));
+        original.lineTo(new Coord2D(10, 0));
+        sketch.finishPath();
+
+        PathDetail flipped = sketch.flipPathDetail(original);
+
+        Assert.assertEquals(1, sketch.getPathDetails().size());
+        Assert.assertSame(flipped, sketch.getPathDetails().get(0));
+        Assert.assertEquals(10f, flipped.getPath().get(0).x, 0.0001f);
+        Assert.assertEquals(LineType.PIT, flipped.getLineType());
+
+        sketch.undo();
+        Assert.assertEquals(1, sketch.getPathDetails().size());
+        Assert.assertSame(original, sketch.getPathDetails().get(0));
+
+        sketch.redo();
+        Assert.assertSame(flipped, sketch.getPathDetails().get(0));
+    }
+
+    @Test
+    public void testGetMostRecentSemanticPathSkipsGeneralLines() {
+        Sketch sketch = new Sketch();
+        Assert.assertNull(sketch.getMostRecentSemanticPath());
+
+        sketch.setActiveLineType(LineType.WALL);
+        PathDetail wall = sketch.startNewPath(new Coord2D(0, 0));
+        wall.lineTo(new Coord2D(1, 0));
+        sketch.finishPath();
+
+        sketch.setActiveLineType(LineType.GENERAL);
+        PathDetail scribble = sketch.startNewPath(new Coord2D(5, 5));
+        scribble.lineTo(new Coord2D(6, 5));
+        sketch.finishPath();
+
+        Assert.assertSame(wall, sketch.getMostRecentSemanticPath());
     }
 
     @Test
@@ -90,6 +176,22 @@ public class SketchTest {
     }
 
     @Test
+    public void testFinishAreaNeverSilentlyLosesTheStroke() {
+        // finishArea normalises the outline through android.graphics.Path, which is stubbed here
+        // (and could in principle fail on a device). Either way the user's stroke must still
+        // become an area rather than vanishing.
+        Sketch sketch = new Sketch();
+        sketch.startNewArea(new Coord2D(0, 0), AreaType.WATER);
+        sketch.getActivePath().lineTo(new Coord2D(4, 0));
+        sketch.getActivePath().lineTo(new Coord2D(4, 4));
+        sketch.getActivePath().lineTo(new Coord2D(0, 4));
+        sketch.finishArea(AreaType.WATER);
+
+        Assert.assertEquals(1, sketch.getAreaDetails().size());
+        Assert.assertFalse(sketch.getAreaDetails().get(0).hasHoles());
+    }
+
+    @Test
     public void testFinishAreaDiscardsDegenerateOutline() {
         Sketch sketch = new Sketch();
         sketch.startNewArea(new Coord2D(0, 0), AreaType.WATER);
@@ -100,6 +202,62 @@ public class SketchTest {
         Assert.assertEquals(0, sketch.getPathDetails().size());
         sketch.undo(); // must not blow up or resurrect anything
         Assert.assertEquals(0, sketch.getAreaDetails().size());
+    }
+
+    @Test
+    public void testAreaWithHolesSurvivesUndoRedo() {
+        // a ring of water (e.g. built from four walls) must come back intact, holes and all
+        Sketch sketch = new Sketch();
+        AreaDetail ring =
+                new AreaDetail(
+                        new ArrayList<>(rectangleContour(0, 0, 10, 10)),
+                        Collections.singletonList(new ArrayList<>(rectangleContour(2, 2, 6, 6))),
+                        AreaType.WATER,
+                        Colour.BLUE);
+        sketch.addAreaDetail(ring);
+
+        sketch.undo();
+        Assert.assertEquals(0, sketch.getAreaDetails().size());
+
+        sketch.redo();
+        Assert.assertEquals(1, sketch.getAreaDetails().size());
+        AreaDetail restored = sketch.getAreaDetails().get(0);
+        Assert.assertEquals(1, restored.getHoles().size());
+        Assert.assertTrue(PolygonUtils.contains(restored.getHoles().get(0), new Coord2D(5, 5)));
+    }
+
+    @Test
+    public void testAreaWithHolesTranslatesAndScalesItsHoles() {
+        AreaDetail ring =
+                new AreaDetail(
+                        new ArrayList<>(rectangleContour(0, 0, 10, 10)),
+                        Collections.singletonList(new ArrayList<>(rectangleContour(2, 2, 6, 6))),
+                        AreaType.WATER,
+                        Colour.BLUE);
+
+        AreaDetail moved = ring.translate(new Coord2D(100, 0));
+        Assert.assertEquals(1, moved.getHoles().size());
+        Assert.assertEquals(102f, moved.getHoles().get(0).get(0).x, 0.0001f);
+
+        AreaDetail scaled = ring.scale(2);
+        Assert.assertEquals(1, scaled.getHoles().size());
+        Assert.assertEquals(4f, scaled.getHoles().get(0).get(0).x, 0.0001f);
+    }
+
+    @Test
+    public void testAreaCanBeGrabbedByItsHoleRim() {
+        // tapping the edge of a hole should find the area, not fall through to whatever is behind
+        AreaDetail ring =
+                new AreaDetail(
+                        new ArrayList<>(rectangleContour(0, 0, 10, 10)),
+                        Collections.singletonList(new ArrayList<>(rectangleContour(2, 2, 6, 6))),
+                        AreaType.WATER,
+                        Colour.BLUE);
+
+        // just inside the hole's left edge
+        Assert.assertEquals(0.1f, ring.getDistanceFrom(new Coord2D(2.1f, 5)), 0.0001f);
+        // the middle of the hole is far from every boundary
+        Assert.assertEquals(3f, ring.getDistanceFrom(new Coord2D(5, 5)), 0.0001f);
     }
 
     @Test

@@ -3,24 +3,37 @@
     android:height="40dp"
     android:viewportWidth="40"
     android:viewportHeight="40">
+  <!-- An irregular pool outline: lobed and lopsided, with a shallow inlet on the left and a
+       bulge lower right, so it reads as a hand-sketched region rather than a geometric shape.
+       The hatch lines are fitted to the outline at each height. -->
   <path
       android:strokeWidth="2.5"
-      android:pathData="M20,7 C28.5,6 34.5,11.5 34,19.5 C33.5,27.5 28,33.5 19.5,33.5 C11,33.5 6,28 6,20.5 C6,12.5 11.5,8 20,7 Z"
+      android:pathData="M15,3.5 C24,1.5 32,5 36,10.5 C39,15 37,21 35.5,26 C34,31.5 29,36.5 23,37 C17,37.5 12,35 8,31 C4.5,27 2.5,22 3.5,16.5 C4.5,11 7,5.5 15,3.5 Z"
       android:fillColor="#00000000"
       android:strokeColor="#000"/>
   <path
       android:strokeWidth="2"
-      android:pathData="M9.5,15 L31.5,15"
+      android:pathData="M7.5,10 L34,10"
       android:fillColor="#00000000"
       android:strokeColor="#000"/>
   <path
       android:strokeWidth="2"
-      android:pathData="M7.5,21 L32.5,21"
+      android:pathData="M5,16 L36,16"
       android:fillColor="#00000000"
       android:strokeColor="#000"/>
   <path
       android:strokeWidth="2"
-      android:pathData="M10,27 L30.5,27"
+      android:pathData="M5,22 L35,22"
+      android:fillColor="#00000000"
+      android:strokeColor="#000"/>
+  <path
+      android:strokeWidth="2"
+      android:pathData="M7.5,28 L33.5,28"
+      android:fillColor="#00000000"
+      android:strokeColor="#000"/>
+  <path
+      android:strokeWidth="2"
+      android:pathData="M13,34 L29,34"
       android:fillColor="#00000000"
       android:strokeColor="#000"/>
 </vector>

@@ -1,6 +1,8 @@
 package org.hwyl.sexytopo.control.io.thirdparty.svg;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.model.graph.Coord2D;
@@ -38,7 +40,7 @@ public class SvgExporterAreaTest {
     }
 
     @Test
-    public void testAreaExportsAsHatchedPolygon() throws Exception {
+    public void testAreaExportsAsHatchedPath() throws Exception {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         addWaterArea(survey.getPlanSketch());
 
@@ -46,10 +48,34 @@ public class SvgExporterAreaTest {
 
         Assert.assertTrue(content.contains("<pattern"));
         Assert.assertTrue(content.contains("id=\"area-hatch-blue\""));
-        Assert.assertTrue(content.contains("<polygon"));
         Assert.assertTrue(content.contains("fill=\"url(#area-hatch-blue)\""));
         // 4 vertices at SCALE 50: (50,50) (200,50) (200,150) (50,150)
-        Assert.assertTrue(content.contains("50.0,50.0 200.0,50.0 200.0,150.0 50.0,150.0"));
+        Assert.assertTrue(
+                content.contains("M 50.0,50.0 L 200.0,50.0 L 200.0,150.0 L 50.0,150.0 Z"));
+    }
+
+    @Test
+    public void testAreaWithHoleExportsAsEvenOddPathWithTwoSubpaths() throws Exception {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+
+        List<Coord2D> outline =
+                Arrays.asList(
+                        new Coord2D(0, 0), new Coord2D(4, 0), new Coord2D(4, 4), new Coord2D(0, 4));
+        List<Coord2D> hole =
+                Arrays.asList(
+                        new Coord2D(1, 1), new Coord2D(3, 1), new Coord2D(3, 3), new Coord2D(1, 3));
+        AreaDetail areaDetail =
+                new AreaDetail(
+                        outline, Collections.singletonList(hole), AreaType.WATER, Colour.BLUE);
+        survey.getPlanSketch().setAreaDetails(Collections.singletonList(areaDetail));
+
+        String content = new SvgExporter().getContent(survey, Projection2D.PLAN);
+
+        Assert.assertTrue(content.contains("fill-rule=\"evenodd\""));
+        // outline subpath followed by the hole subpath, both closed
+        Assert.assertTrue(content.contains("M 0.0,0.0 L 200.0,0.0 L 200.0,200.0 L 0.0,200.0 Z"));
+        Assert.assertTrue(
+                content.contains("M 50.0,50.0 L 150.0,50.0 L 150.0,150.0 L 50.0,150.0 Z"));
     }
 
     @Test

@@ -41,6 +41,7 @@ import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.AreaDetail;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
+import org.hwyl.sexytopo.model.sketch.LineType;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchDetail;
@@ -771,33 +772,60 @@ public class SvgExporter extends DoubleSketchFileExporter {
         return "area-hatch-" + colour.toLowerCase(Locale.ROOT);
     }
 
+    /**
+     * An area is written as a path rather than a polygon so that holes can be expressed: each
+     * contour becomes a closed subpath, and the even-odd fill rule leaves the holes unfilled.
+     */
     private static void writeAreaDetail(
             XmlSerializer xmlSerializer, AreaDetail areaDetail, int scale) throws IOException {
         Integer strokeWidth = GeneralPreferences.getExportSvgStrokeWidth();
-        List<String> coordStrings = new ArrayList<>();
-        for (Coord2D coord2D : areaDetail.getPolygon()) {
-            coordStrings.add(toXmlText(coord2D, scale));
-        }
         String colour = getSvgColour(areaDetail);
-        xmlSerializer.startTag(null, "polygon");
-        xmlSerializer.attribute(null, "points", TextTools.join(" ", coordStrings));
+        xmlSerializer.startTag(null, "path");
+        xmlSerializer.attribute(null, "d", getAreaPathData(areaDetail, scale));
+        xmlSerializer.attribute(null, "fill-rule", "evenodd");
         xmlSerializer.attribute(null, "stroke", colour);
         xmlSerializer.attribute(null, "stroke-width", strokeWidth.toString());
         xmlSerializer.attribute(null, "fill", "url(#" + getAreaHatchPatternId(colour) + ")");
-        xmlSerializer.endTag(null, "polygon");
+        xmlSerializer.endTag(null, "path");
     }
 
+    private static String getAreaPathData(AreaDetail areaDetail, int scale) {
+        List<String> subpaths = new ArrayList<>();
+        for (List<Coord2D> contour : areaDetail.getContours()) {
+            List<String> coordStrings = new ArrayList<>();
+            for (Coord2D coord2D : contour) {
+                coordStrings.add(toXmlText(coord2D, scale));
+            }
+            subpaths.add("M " + TextTools.join(" L ", coordStrings) + " Z");
+        }
+        return TextTools.join(" ", subpaths);
+    }
+
+    /**
+     * Semantic line types get a class attribute naming the type, a scaled stroke width and (for
+     * dashed types) a dash array. Tick ornamentation is not reproduced in SVG yet.
+     */
     private static void writePathDetail(
             XmlSerializer xmlSerializer, PathDetail pathDetail, int scale) throws IOException {
-        Integer strokeWidth = GeneralPreferences.getExportSvgStrokeWidth();
+        int strokeWidth = GeneralPreferences.getExportSvgStrokeWidth();
+        LineType lineType = pathDetail.getLineType();
+        strokeWidth = Math.round(strokeWidth * lineType.getStrokeWidthFactor());
         List<String> coordStrings = new ArrayList<>();
         for (Coord2D coord2D : pathDetail.getPath()) {
             coordStrings.add(toXmlText(coord2D, scale));
         }
         xmlSerializer.startTag(null, "polyline");
+        if (lineType.isSemantic()) {
+            xmlSerializer.attribute(
+                    null, "class", lineType.toString().toLowerCase(Locale.ROOT).replace("_", "-"));
+        }
         xmlSerializer.attribute(null, "points", TextTools.join(" ", coordStrings));
         xmlSerializer.attribute(null, "stroke", getSvgColour(pathDetail));
-        xmlSerializer.attribute(null, "stroke-width", strokeWidth.toString());
+        xmlSerializer.attribute(null, "stroke-width", Integer.toString(strokeWidth));
+        String dashArray = lineType.getSvgDashArray(scale);
+        if (dashArray != null) {
+            xmlSerializer.attribute(null, "stroke-dasharray", dashArray);
+        }
         xmlSerializer.attribute(null, "fill", "none");
         xmlSerializer.endTag(null, "polyline");
     }

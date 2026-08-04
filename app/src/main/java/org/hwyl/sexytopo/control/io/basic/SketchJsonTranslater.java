@@ -13,6 +13,7 @@ import org.hwyl.sexytopo.model.sketch.AreaType;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
+import org.hwyl.sexytopo.model.sketch.LineType;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.Symbol;
@@ -30,6 +31,8 @@ public class SketchJsonTranslater {
     public static final String PATHS_TAG = "paths";
     public static final String AREAS_TAG = "areas";
     public static final String AREA_TYPE_TAG = "area-type";
+    public static final String LINE_TYPE_TAG = "line-type";
+    public static final String HOLES_TAG = "holes";
     public static final String POINTS_TAG = "points";
     public static final String COLOUR_TAG = "colour";
     public static final String SYMBOLS_TAG = "symbols";
@@ -186,6 +189,11 @@ public class SketchJsonTranslater {
         JSONObject json = new JSONObject();
         json.put(COLOUR_TAG, pathDetail.getColour().toString());
 
+        // general paths omit the tag (and predate it), keeping old and new files alike
+        if (pathDetail.getLineType() != LineType.GENERAL) {
+            json.put(LINE_TYPE_TAG, pathDetail.getLineType().toString());
+        }
+
         JSONArray points = new JSONArray();
         for (Coord2D coord : pathDetail.getPath()) {
             points.put(toJson(coord));
@@ -198,6 +206,7 @@ public class SketchJsonTranslater {
     public static PathDetail toPathDetail(JSONObject json) throws JSONException {
 
         Colour colour = Colour.valueOf(json.getString(COLOUR_TAG));
+        LineType lineType = LineType.fromString(json.optString(LINE_TYPE_TAG, null));
 
         JSONArray array = json.getJSONArray(POINTS_TAG);
         List<Coord2D> path = new ArrayList<>();
@@ -205,7 +214,7 @@ public class SketchJsonTranslater {
             path.add(toCoord2D(object));
         }
 
-        PathDetail pathDetail = new PathDetail(path, colour);
+        PathDetail pathDetail = new PathDetail(path, colour, lineType);
 
         float epsilon = Space2DUtils.simplificationEpsilon(pathDetail);
         List<Coord2D> simplifiedPath = Space2DUtils.simplify(path, epsilon);
@@ -220,13 +229,25 @@ public class SketchJsonTranslater {
         json.put(AREA_TYPE_TAG, areaDetail.getAreaType().toString());
         json.put(COLOUR_TAG, areaDetail.getColour().toString());
 
-        JSONArray points = new JSONArray();
-        for (Coord2D coord : areaDetail.getPolygon()) {
-            points.put(toJson(coord));
+        json.put(POINTS_TAG, toJson(areaDetail.getOutline()));
+
+        if (areaDetail.hasHoles()) {
+            JSONArray holes = new JSONArray();
+            for (List<Coord2D> hole : areaDetail.getHoles()) {
+                holes.put(toJson(hole));
+            }
+            json.put(HOLES_TAG, holes);
         }
-        json.put(POINTS_TAG, points);
 
         return json;
+    }
+
+    private static JSONArray toJson(List<Coord2D> contour) throws JSONException {
+        JSONArray points = new JSONArray();
+        for (Coord2D coord : contour) {
+            points.put(toJson(coord));
+        }
+        return points;
     }
 
     public static AreaDetail toAreaDetail(JSONObject json) throws JSONException {
@@ -234,13 +255,26 @@ public class SketchJsonTranslater {
         AreaType areaType = AreaType.valueOf(json.getString(AREA_TYPE_TAG));
         Colour colour = Colour.valueOf(json.getString(COLOUR_TAG));
 
-        JSONArray array = json.getJSONArray(POINTS_TAG);
-        List<Coord2D> polygon = new ArrayList<>();
-        for (JSONObject object : IoUtils.toList(array)) {
-            polygon.add(toCoord2D(object));
+        List<Coord2D> outline = toContour(json.getJSONArray(POINTS_TAG));
+
+        // areas written before holes were supported have no holes tag
+        List<List<Coord2D>> holes = new ArrayList<>();
+        if (json.has(HOLES_TAG)) {
+            JSONArray holesArray = json.getJSONArray(HOLES_TAG);
+            for (int i = 0; i < holesArray.length(); i++) {
+                holes.add(toContour(holesArray.getJSONArray(i)));
+            }
         }
 
-        return new AreaDetail(polygon, areaType, colour);
+        return new AreaDetail(outline, holes, areaType, colour);
+    }
+
+    private static List<Coord2D> toContour(JSONArray array) throws JSONException {
+        List<Coord2D> contour = new ArrayList<>();
+        for (JSONObject object : IoUtils.toList(array)) {
+            contour.add(toCoord2D(object));
+        }
+        return contour;
     }
 
     public static JSONObject toJson(SymbolDetail symbolDetail) throws JSONException {

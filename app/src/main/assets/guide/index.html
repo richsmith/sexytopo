@@ -130,7 +130,7 @@
 <ul>
 	<li><strong>Colours</strong> set the current sketching colour</li>
 	<li><strong>Move</strong> enters view mode</li>
-	<li><strong>Draw</strong> enters sketch mode</li>
+	<li><strong>Draw</strong> enters sketch mode (tap again to open line type selection, see below)</li>
 	<li><strong>Area</strong> enters area mode for marking regions such as water (see below)</li>
 	<li><strong>Symbol</strong> enters symbol mode (tap again to open symbol/text selection option)</li>
 	<li><strong>Erase</strong> deletes sketch features</li>
@@ -142,7 +142,9 @@
 
 <p><strong>Redo</strong> (cancelling the last undo) is available from the quick settings menu.</p>
 
-<p>The <strong>Area</strong> tool marks a region of the sketch as a feature — currently water, such as a pool or sump. Sketch roughly around the region you want to mark and SexyTopo will close the outline into an area, drawn with parallel lines across it. Sketching an area overlapping an existing area of the same kind extends it, so a large region can be built up from several strokes. Erasing part of an area cuts a notch out of it, which may split it into separate areas (with the "Delete line fragments" setting off, erasing deletes the whole area instead). With the "Auto-Blue Water" quick setting on, new water areas are always drawn in blue regardless of the selected colour.</p>
+<p>The <strong>Draw</strong> tool normally sketches a plain freehand line, but a line can instead be given a meaning: wall, presumed wall, pit edge, chimney, or slope. Tapping the draw tool while it is already selected opens a toolbar of line types; the chosen type applies to lines you draw from then on. Typed lines are drawn with their conventional cave-surveying appearance — walls are bold, presumed walls dashed, pit edges ticked, and so on — and are exported to Therion as proper semantic lines (e.g. <i>line wall</i>) rather than just background tracing, which makes the resulting files much more useful for drawing up. Walls work out for themselves which side of the line the passage is on, so you can draw them in either direction. Tick marks on pit edges, chimneys and slopes fall on one side of the line depending on which direction you draw it in (SexyTopo can't know which side the drop is), so if the ticks come out on the wrong side, use Tools&nbsp;&rarr;&nbsp;Flip Last Line (or undo and draw the line the other way). The most recently drawn wall shows a slim red arrow pointing to the side SexyTopo has taken to be the inside of the passage — if that's wrong, Flip Last Line corrects it. The marker is only ever a visual aid (it is not part of the sketch and is never exported) and can be hidden via the "Wall Inside Marker" quick setting.</p>
+
+<p>The <strong>Area</strong> tool marks a region of the sketch as a feature — currently water, such as a pool or sump. Sketch roughly around the region you want to mark and SexyTopo will close the outline into an area, drawn with parallel lines across it. Sketching an area overlapping an existing area of the same kind extends it, so a large region can be built up from several strokes. Erasing part of an area cuts a notch out of it, which may split it into separate areas (with the "Delete line fragments" setting off, erasing deletes the whole area instead). Erasing into the middle of an area leaves a hole — useful for a dry island in a pool — and building a ring of water, for example by sketching four overlapping walls, leaves the enclosed space empty rather than filling it in. If a single stroke crosses over itself, SexyTopo takes its outer edge, so an accidental overlap where you close the outline won't leave a stray hole behind. With the "Auto-Blue Water" quick setting on, new water areas are always drawn in blue regardless of the selected colour.</p>
 
 <p>A legend at the bottom right of the view provides a scale bar, basic stats, and a reminder of the survey name.</p>
 
