@@ -383,6 +383,7 @@
     <string name="trip_copyright_label">Titolare del copyright</string>
     <string name="trip_licence_label">Licenza</string>
     <string name="trip_licence_none">Nessuna licenza</string>
+    <string name="trip_licence_required_helper">Scegli una licenza prima di salvare, o \"Nessuna licenza\" se non ne vuoi una</string>
     <string name="trip_licence_recommended_suffix">%1$s [Consigliata]</string>
     <string name="trip_save_trip">Salva Uscita</string>
     <string name="trip_role_book">Rilievo (disegno)</string>

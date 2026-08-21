@@ -383,6 +383,7 @@
     <string name="trip_copyright_label">Właściciel praw autorskich</string>
     <string name="trip_licence_label">Licencja</string>
     <string name="trip_licence_none">Brak licencji</string>
+    <string name="trip_licence_required_helper">Wybierz licencję przed zapisaniem lub \"Brak licencji\", jeśli nie chcesz żadnej</string>
     <string name="trip_licence_recommended_suffix">%1$s [Zalecana]</string>
     <string name="trip_save_trip">Zapisz wyjazd</string>
     <string name="trip_role_book">Dokumentacja (rysowanie)</string>

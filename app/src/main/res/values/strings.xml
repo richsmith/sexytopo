@@ -415,6 +415,7 @@
     <string name="trip_copyright_label">Copyright holder</string>
     <string name="trip_licence_label">Licence</string>
     <string name="trip_licence_none">No licence</string>
+    <string name="trip_licence_required_helper">Pick a licence before saving, or \"No licence\" if you don\'t want one</string>
     <string name="trip_licence_recommended_suffix">%1$s [Recommended]</string>
     <string name="trip_save_trip">Save Trip</string>
     <string name="trip_role_book">Book (drawing)</string>

@@ -592,6 +592,15 @@ public class TripActivity extends SexyTopoActivity {
         boolean hasChanges = savedTrip == null || !savedTrip.equals(currentTrip);
 
         findViewById(R.id.set_trip).setEnabled(hasAnyData && hasChanges && isLicenceChosen);
+
+        // Say why Save is disabled, but only when the licence is the one thing blocking it -
+        // otherwise the button is disabled for a reason the user can already see (nothing
+        // entered yet, or nothing changed since the last save) and the prompt would be noise.
+        TextInputLayout licenceLayout = findViewById(R.id.trip_licence_layout);
+        licenceLayout.setHelperText(
+                hasAnyData && hasChanges && !isLicenceChosen
+                        ? getString(R.string.trip_licence_required_helper)
+                        : null);
         findViewById(R.id.clear_trip).setEnabled(hasAnyData);
 
         Button getInstrumentButton = findViewById(R.id.instrument_get_button);

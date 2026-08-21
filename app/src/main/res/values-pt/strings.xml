@@ -383,6 +383,7 @@
     <string name="trip_copyright_label">Titular do copyright</string>
     <string name="trip_licence_label">Licença</string>
     <string name="trip_licence_none">Sem licença</string>
+    <string name="trip_licence_required_helper">Escolha uma licença antes de guardar, ou \"Sem licença\" se não quiser nenhuma</string>
     <string name="trip_licence_recommended_suffix">%1$s [Recomendada]</string>
     <string name="trip_save_trip">Guardar Saída</string>
     <string name="trip_role_book">Topógrafo (desenho)</string>

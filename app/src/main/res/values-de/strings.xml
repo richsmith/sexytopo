@@ -383,6 +383,7 @@
     <string name="trip_copyright_label">Rechteinhaber</string>
     <string name="trip_licence_label">Lizenz</string>
     <string name="trip_licence_none">Keine Lizenz</string>
+    <string name="trip_licence_required_helper">Vor dem Speichern eine Lizenz wählen, oder \"Keine Lizenz\", wenn keine gewünscht ist</string>
     <string name="trip_licence_recommended_suffix">%1$s [Empfohlen]</string>
     <string name="trip_save_trip">Tour speichern</string>
     <string name="trip_role_book">Zeichnung</string>
