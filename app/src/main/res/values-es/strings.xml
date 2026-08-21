@@ -442,9 +442,6 @@
     <string name="settings_licence_new_hint">Nombre de la licencia</string>
     <string name="settings_licence_name_required">El nombre de la licencia es obligatorio</string>
     <string name="settings_licence_default_label">Predeterminada</string>
-    <string name="licence_choice_title">Elegir una licencia predeterminada</string>
-    <string name="licence_choice_message">Por favor, elige una licencia para el uso futuro de la topografía. Esta se convertirá en la predeterminada y se puede sobrescribir en Salida. Se recomienda GPLv3.0+ para datos topográficos y es la misma licencia bajo la que se publica SexyTopo</string>
-    <string name="licence_choice_confirm_button">Confirmar</string>
 <string name="settings_instruments_title">Instrumentos</string>
     <string name="settings_instruments_summary">Tolerancias de instrumentos, calibración</string>
     <string name="settings_max_distance_delta_title">Delta de distancia máxima (m)</string>

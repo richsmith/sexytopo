@@ -442,9 +442,6 @@
     <string name="settings_licence_new_hint">Nazwa licencji</string>
     <string name="settings_licence_name_required">Nazwa licencji jest wymagana</string>
     <string name="settings_licence_default_label">Domyślna</string>
-    <string name="licence_choice_title">Wybierz domyślną licencję</string>
-    <string name="licence_choice_message">Wybierz licencję do przyszłego wykorzystania pomiaru. Stanie się ona domyślna i można ją nadpisać w Wyjeździe. GPLv3.0+ jest zalecana dla danych pomiarowych i jest tą samą licencją, na której opublikowano SexyTopo</string>
-    <string name="licence_choice_confirm_button">Potwierdź</string>
 <string name="settings_instruments_title">Instrumenty</string>
     <string name="settings_instruments_summary">Tolerancje instrumentów, kalibracja</string>
     <string name="settings_max_distance_delta_title">Maks. delta odległości (m)</string>

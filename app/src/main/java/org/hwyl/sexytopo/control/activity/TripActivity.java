@@ -2,7 +2,6 @@ package org.hwyl.sexytopo.control.activity;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -16,8 +15,6 @@ import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentManager;
@@ -56,36 +53,6 @@ public class TripActivity extends SexyTopoActivity {
     // every field's *current* text including ones not yet populated this cycle, clobbering
     // them with stale values before they ever get set.
     private boolean isPopulatingFields = false;
-
-    // Launches the one-time first-run licence choice screen (see GeneralPreferences.
-    // isLicenceDefaultConfirmed) when a brand new trip needs a default licence but nobody has
-    // chosen one yet. Once the user confirms a choice there, it's applied to the licence field
-    // here rather than in onResume()'s normal population pass, since that pass has already run
-    // by the time this callback fires.
-    private final ActivityResultLauncher<Intent> licenceChoiceLauncher =
-            registerForActivityResult(
-                    new ActivityResultContracts.StartActivityForResult(),
-                    result -> {
-                        Trip trip = getSurvey().getTrip();
-                        if (trip == null) {
-                            return;
-                        }
-
-                        String chosenLicence = GeneralPreferences.getDefaultLicenceName();
-                        trip.setLicence(chosenLicence);
-                        if (savedTrip != null) {
-                            savedTrip.setLicence(chosenLicence);
-                        }
-
-                        AutoCompleteTextView licenceField = findViewById(R.id.trip_licence);
-                        isPopulatingFields = true;
-                        try {
-                            licenceField.setText(trip.getLicence());
-                        } finally {
-                            isPopulatingFields = false;
-                        }
-                        updateButtonStatus();
-                    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -189,23 +156,7 @@ public class TripActivity extends SexyTopoActivity {
             // every visit to an existing trip, since a blank licence there could mean "the user
             // deliberately wants no licence" (or the trip was imported with none), not "never
             // decided".
-            if (GeneralPreferences.isLicenceDefaultConfirmed()) {
-                trip.setLicence(GeneralPreferences.getDefaultLicenceName());
-            } else {
-                // First run: nobody has chosen a default licence yet - ask, rather than
-                // silently applying one on their behalf. The licence field is left as-is for
-                // this pass and gets filled in once the user has made their choice, in
-                // licenceChoiceLauncher's callback above.
-                //
-                // Deferred via post(): launching a new Activity synchronously mid-onResume(),
-                // before this window has finished attaching, is unreliable and can be silently
-                // dropped. Posting it ensures TripActivity has fully become visible first.
-                View root = findViewById(R.id.rootLayout);
-                root.post(
-                        () ->
-                                licenceChoiceLauncher.launch(
-                                        new Intent(this, LicenceChoiceActivity.class)));
-            }
+            trip.setLicence(GeneralPreferences.getDefaultLicenceName());
         }
 
         savedTrip = new Trip(trip);
