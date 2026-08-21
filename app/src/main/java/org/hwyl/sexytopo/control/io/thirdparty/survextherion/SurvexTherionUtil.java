@@ -102,31 +102,31 @@ public class SurvexTherionUtil {
     }
 
     /**
-     * Returns the {@code *copyright <year> "<copyright>" ;"<licence>"} line (Survex) or the
-     * equivalent {@code copyright <year> "<copyright>" #"<licence>"} line (Therion) for the
-     * survey's trip, or "" if there's no trip, or the trip has neither a copyright nor a licence
-     * set.
+     * Returns the copyright line for the survey's trip - *copyright {year} "{holder}" ;"{licence}"
+     * for Survex, or the same without the leading * and with # as the comment character for
+     * Therion. Returns "" if there's no trip, or the trip has neither a copyright holder nor a
+     * licence set.
      *
-     * <p>The copyright text is always quoted, and is rendered as an empty pair of quotes if blank.
-     * The licence (also quoted) is only appended, as a trailing comment, if it is set; if there's
-     * no licence, the line ends after the copyright text.
+     * <p>The holder is always quoted, and is rendered as an empty pair of quotes if blank. The
+     * licence (also quoted) is only appended, as a trailing comment, if it is set; if there's no
+     * licence, the line ends after the holder.
      */
     public static String getCopyrightLine(Survey survey, SurveyFormat format) {
         Trip trip = survey.getTrip();
-        if (trip == null || (!trip.hasCopyright() && !trip.hasLicence())) {
+        if (trip == null || (!trip.hasCopyrightHolder() && !trip.hasLicence())) {
             return "";
         }
 
         String marker = format.getCommandChar();
         char commentChar = format.getCommentChar();
-        String copyrightText = trip.hasCopyright() ? trip.getCopyright() : "";
+        String holder = trip.hasCopyrightHolder() ? trip.getCopyrightHolder() : "";
 
         StringBuilder builder = new StringBuilder();
         builder.append(marker)
                 .append("copyright ")
                 .append(TextTools.formatYear(trip.getSurveyDate()))
                 .append(" \"")
-                .append(copyrightText)
+                .append(holder)
                 .append("\"");
 
         if (trip.hasLicence()) {

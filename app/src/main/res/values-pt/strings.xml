@@ -380,8 +380,10 @@
     <string name="trip_clear_date">Clear date</string>
     <string name="trip_same_as_survey_date">Igual à data da topografia</string>
     <string name="trip_comments">Comentários</string>
-    <string name="trip_copyright_label">Copyright</string>
+    <string name="trip_copyright_label">Titular do copyright</string>
     <string name="trip_licence_label">Licença</string>
+    <string name="trip_licence_none">Sem licença</string>
+    <string name="trip_licence_recommended_suffix">%1$s [Recomendada]</string>
     <string name="trip_save_trip">Guardar Saída</string>
     <string name="trip_role_book">Topógrafo (desenho)</string>
     <string name="trip_role_instruments">Instrumentos</string>
@@ -438,10 +440,9 @@
         <string name="settings_team_title">Equipa</string>
     <string name="settings_team_summary">Gerir nomes de espeleólogos conhecidos</string>
     <string name="settings_copyright_title">Copyright</string>
-    <string name="settings_copyright_summary">Editar a escolha da licença</string>
+    <string name="settings_copyright_summary">Gerir as opções de licença</string>
     <string name="settings_licence_new_hint">Nome da licença</string>
     <string name="settings_licence_name_required">O nome da licença é obrigatório</string>
-    <string name="settings_licence_default_label">Predefinida</string>
 <string name="settings_instruments_title">Instrumentos</string>
     <string name="settings_instruments_summary">Tolerâncias dos instrumentos, calibração</string>
     <string name="settings_max_distance_delta_title">Delta de distância máxima (m)</string>

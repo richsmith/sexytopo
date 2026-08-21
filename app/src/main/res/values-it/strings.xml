@@ -380,8 +380,10 @@
     <string name="trip_clear_date">Clear date</string>
     <string name="trip_same_as_survey_date">Uguale alla data del rilievo</string>
     <string name="trip_comments">Commenti</string>
-    <string name="trip_copyright_label">Copyright</string>
+    <string name="trip_copyright_label">Titolare del copyright</string>
     <string name="trip_licence_label">Licenza</string>
+    <string name="trip_licence_none">Nessuna licenza</string>
+    <string name="trip_licence_recommended_suffix">%1$s [Consigliata]</string>
     <string name="trip_save_trip">Salva Uscita</string>
     <string name="trip_role_book">Rilievo (disegno)</string>
     <string name="trip_role_instruments">Strumenti</string>
@@ -438,10 +440,9 @@
         <string name="settings_team_title">Squadra</string>
     <string name="settings_team_summary">Gestisci i nomi dei cavernicoli conosciuti</string>
     <string name="settings_copyright_title">Copyright</string>
-    <string name="settings_copyright_summary">Modifica la scelta della licenza</string>
+    <string name="settings_copyright_summary">Gestisci le opzioni di licenza</string>
     <string name="settings_licence_new_hint">Nome della licenza</string>
     <string name="settings_licence_name_required">Il nome della licenza è obbligatorio</string>
-    <string name="settings_licence_default_label">Predefinita</string>
 <string name="settings_instruments_title">Strumenti</string>
     <string name="settings_instruments_summary">Tolleranze degli strumenti, calibrazione</string>
     <string name="settings_max_distance_delta_title">Delta distanza massima (m)</string>

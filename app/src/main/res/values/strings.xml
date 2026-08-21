@@ -412,9 +412,10 @@
     <string name="trip_dialog_name_required">Name is required</string>
     <string name="trip_dialog_confirm_clear_trip">Clear Trip Data?</string>
     <string name="trip_comments">Comments</string>
-    <string name="trip_copyright_label">Copyright</string>
+    <string name="trip_copyright_label">Copyright holder</string>
     <string name="trip_licence_label">Licence</string>
     <string name="trip_licence_none">No licence</string>
+    <string name="trip_licence_recommended_suffix">%1$s [Recommended]</string>
     <string name="trip_save_trip">Save Trip</string>
     <string name="trip_role_book">Book (drawing)</string>
     <string name="trip_role_instruments">Instruments</string>
@@ -483,10 +484,9 @@
     <string name="settings_team_title">Team</string>
     <string name="settings_team_summary">Manage known caver names</string>
     <string name="settings_copyright_title">Copyright</string>
-    <string name="settings_copyright_summary">Edit the licence choice</string>
+    <string name="settings_copyright_summary">Manage licence options</string>
     <string name="settings_licence_new_hint">Licence name</string>
     <string name="settings_licence_name_required">Licence name is required</string>
-    <string name="settings_licence_default_label">Default</string>
     <string name="settings_instruments_title">Instruments</string>
     <string name="settings_leg_amalgamation_algorithm_title">Leg agreement method</string>
     <string name="settings_leg_amalgamation_algorithm_summary">How repeated readings are judged close enough to form a leg</string>

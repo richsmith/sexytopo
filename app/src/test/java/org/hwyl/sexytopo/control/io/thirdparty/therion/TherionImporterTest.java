@@ -557,7 +557,7 @@ public class TherionImporterTest {
 
         Trip trip = SurvexTherionImporter.parseMetadata(survexText, SurveyFormat.SURVEX);
         Assert.assertNotNull(trip);
-        Assert.assertEquals("Caver Jane", trip.getCopyright());
+        Assert.assertEquals("Caver Jane", trip.getCopyrightHolder());
         Assert.assertEquals("CC BY 4.0", trip.getLicence());
     }
 
@@ -567,7 +567,7 @@ public class TherionImporterTest {
 
         Trip trip = SurvexTherionImporter.parseMetadata(therionText, SurveyFormat.THERION);
         Assert.assertNotNull(trip);
-        Assert.assertEquals("Caver Jane", trip.getCopyright());
+        Assert.assertEquals("Caver Jane", trip.getCopyrightHolder());
         Assert.assertEquals("CC BY 4.0", trip.getLicence());
     }
 
@@ -577,7 +577,7 @@ public class TherionImporterTest {
 
         Trip trip = SurvexTherionImporter.parseMetadata(survexText, SurveyFormat.SURVEX);
         Assert.assertNotNull(trip);
-        Assert.assertEquals("Caver Jane", trip.getCopyright());
+        Assert.assertEquals("Caver Jane", trip.getCopyrightHolder());
         Assert.assertFalse(trip.hasLicence());
     }
 
@@ -587,7 +587,7 @@ public class TherionImporterTest {
 
         Trip trip = SurvexTherionImporter.parseMetadata(survexText, SurveyFormat.SURVEX);
         Assert.assertNotNull(trip);
-        Assert.assertFalse(trip.hasCopyright());
+        Assert.assertFalse(trip.hasCopyrightHolder());
         Assert.assertEquals("CC BY 4.0", trip.getLicence());
     }
 
@@ -597,7 +597,7 @@ public class TherionImporterTest {
 
         Trip trip = SurvexTherionImporter.parseMetadata(survexText, SurveyFormat.SURVEX);
         Assert.assertNotNull(trip);
-        Assert.assertFalse(trip.hasCopyright());
+        Assert.assertFalse(trip.hasCopyrightHolder());
         Assert.assertFalse(trip.hasLicence());
     }
 
@@ -605,7 +605,7 @@ public class TherionImporterTest {
     public void testCopyrightLicenceRoundTripSurvex() throws Exception {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         Trip trip = new Trip();
-        trip.setCopyright("Caver Jane");
+        trip.setCopyrightHolder("Caver Jane");
         trip.setLicence("CC BY 4.0");
         survey.setTrip(trip);
 
@@ -613,7 +613,7 @@ public class TherionImporterTest {
         Trip imported = SurvexTherionImporter.parseMetadata(content, SurveyFormat.SURVEX);
 
         Assert.assertNotNull(imported);
-        Assert.assertEquals("Caver Jane", imported.getCopyright());
+        Assert.assertEquals("Caver Jane", imported.getCopyrightHolder());
         Assert.assertEquals("CC BY 4.0", imported.getLicence());
     }
 
@@ -621,7 +621,7 @@ public class TherionImporterTest {
     public void testCopyrightLicenceRoundTripTherion() throws Exception {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         Trip trip = new Trip();
-        trip.setCopyright("Caver Jane");
+        trip.setCopyrightHolder("Caver Jane");
         trip.setLicence("CC BY 4.0");
         survey.setTrip(trip);
 
@@ -633,7 +633,7 @@ public class TherionImporterTest {
         Trip imported = SurvexTherionImporter.parseMetadata(centrelineText, SurveyFormat.THERION);
 
         Assert.assertNotNull(imported);
-        Assert.assertEquals("Caver Jane", imported.getCopyright());
+        Assert.assertEquals("Caver Jane", imported.getCopyrightHolder());
         Assert.assertEquals("CC BY 4.0", imported.getLicence());
     }
 

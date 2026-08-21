@@ -32,7 +32,7 @@ import org.hwyl.sexytopo.comms.Instrument;
 import org.hwyl.sexytopo.control.table.TeamMemberForm;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.TextTools;
-import org.hwyl.sexytopo.model.survey.LicenceOption;
+import org.hwyl.sexytopo.model.survey.Licence;
 import org.hwyl.sexytopo.model.survey.Trip;
 
 public class TripActivity extends SexyTopoActivity {
@@ -108,8 +108,8 @@ public class TripActivity extends SexyTopoActivity {
                     public void onTextChanged(CharSequence s, int start, int before, int count) {}
                 });
 
-        EditText copyrightField = findViewById(R.id.trip_copyright);
-        copyrightField.addTextChangedListener(
+        EditText copyrightHolderField = findViewById(R.id.trip_copyright_holder);
+        copyrightHolderField.addTextChangedListener(
                 new TextWatcher() {
                     @Override
                     public void afterTextChanged(Editable s) {
@@ -169,7 +169,7 @@ public class TripActivity extends SexyTopoActivity {
             // for a genuinely new trip - it must not re-apply on every visit to an existing
             // trip, since a blank licence there could mean "the user deliberately wants no
             // licence" (or the trip was imported with none), not "never decided".
-            trip.setLicence(GeneralPreferences.getDefaultLicenceName());
+            trip.setLicence(GeneralPreferences.getLastLicence());
         }
 
         savedTrip = new Trip(trip);
@@ -192,16 +192,18 @@ public class TripActivity extends SexyTopoActivity {
                 }
             }
 
-            EditText copyrightField = findViewById(R.id.trip_copyright);
-            copyrightField.setText(trip.getCopyright());
+            EditText copyrightHolderField = findViewById(R.id.trip_copyright_holder);
+            copyrightHolderField.setText(trip.getCopyrightHolder());
 
             setupLicenceAutocomplete();
             AutoCompleteTextView licenceField = findViewById(R.id.trip_licence);
             licenceField.setText(trip.getLicence());
 
-            // A trip that already carries a licence has had the question answered for it, so
-            // don't make the user re-pick one just to be able to save an unrelated edit.
-            isLicenceChosen = trip.hasLicence();
+            // The licence question counts as answered if this trip already carries a licence, or
+            // if the user has previously chosen one - including when that choice was "no
+            // licence", which is remembered as such and leaves the field legitimately blank.
+            // Either way, don't make them re-pick just to save an unrelated edit.
+            isLicenceChosen = trip.hasLicence() || GeneralPreferences.hasLastLicence();
         } finally {
             isPopulatingFields = false;
         }
@@ -314,8 +316,8 @@ public class TripActivity extends SexyTopoActivity {
                         (dialog, whichButton) -> {
                             EditText comments = findViewById(R.id.trip_comments);
                             comments.setText("");
-                            EditText copyright = findViewById(R.id.trip_copyright);
-                            copyright.setText("");
+                            EditText copyrightHolder = findViewById(R.id.trip_copyright_holder);
+                            copyrightHolder.setText("");
                             AutoCompleteTextView licence = findViewById(R.id.trip_licence);
                             licence.setText("");
                             isLicenceChosen = false;
@@ -335,14 +337,15 @@ public class TripActivity extends SexyTopoActivity {
 
     private void setupLicenceAutocomplete() {
         AutoCompleteTextView licenceField = findViewById(R.id.trip_licence);
-        List<String> licenceNames = new ArrayList<>();
-        for (LicenceOption option : GeneralPreferences.getLicenceOptions()) {
-            // The "no licence" option is stored as an empty name, which would show as a blank
-            // row in the dropdown; give it a readable label instead.
-            licenceNames.add(
-                    option.getName().isEmpty()
-                            ? getString(R.string.trip_licence_none)
-                            : option.getName());
+
+        // Two parallel lists: what each row shows, and what picking it puts in the field. They
+        // differ where a row is decorated - the "no licence" option is stored under an empty
+        // name that would otherwise show as a blank row, and the recommended licence is
+        // labelled as such - so the decoration never leaks into the saved licence.
+        List<String> storedNames = GeneralPreferences.getLicenceNames();
+        List<String> displayLabels = new ArrayList<>();
+        for (String name : storedNames) {
+            displayLabels.add(licenceDisplayLabel(name));
         }
 
         // The stock ArrayAdapter filters its suggestions against the text that is already in the
@@ -352,26 +355,23 @@ public class TripActivity extends SexyTopoActivity {
         // editable, so free text works.
         ArrayAdapter<String> adapter =
                 new NonFilteringArrayAdapter(
-                        this, android.R.layout.simple_dropdown_item_1line, licenceNames);
+                        this, android.R.layout.simple_dropdown_item_1line, displayLabels);
         licenceField.setAdapter(adapter);
         licenceField.setThreshold(0);
 
         // Picking from the dropdown counts as answering the licence question, including when the
-        // answer is "no licence" - which clears the field, since that is how it's stored.
+        // answer is "no licence" - which leaves the field empty, since that is how it's stored.
         licenceField.setOnItemClickListener(
                 (parent, view, position, id) -> {
                     isLicenceChosen = true;
-                    if (getString(R.string.trip_licence_none)
-                            .equals(parent.getItemAtPosition(position))) {
-                        licenceField.setText(GeneralPreferences.NO_LICENCE_NAME);
-                    }
+                    licenceField.setText(storedNames.get(position));
                     syncTrip();
                     updateButtonStatus();
                 });
 
         View.OnClickListener showFullDropdown =
                 v -> {
-                    if (!licenceNames.isEmpty()) {
+                    if (!displayLabels.isEmpty()) {
                         licenceField.showDropDown();
                     }
                 };
@@ -380,10 +380,25 @@ public class TripActivity extends SexyTopoActivity {
         licenceField.setOnClickListener(showFullDropdown);
         licenceField.setOnFocusChangeListener(
                 (v, hasFocus) -> {
-                    if (hasFocus && !licenceNames.isEmpty()) {
+                    if (hasFocus && !displayLabels.isEmpty()) {
                         licenceField.showDropDown();
                     }
                 });
+    }
+
+    /**
+     * How a licence option is shown in a list, as opposed to how it is stored: the "no licence"
+     * option gets a readable label in place of its empty name, and the recommended licence is
+     * tagged as such. Every other name is shown as-is.
+     */
+    private String licenceDisplayLabel(String storedName) {
+        if (storedName.isEmpty()) {
+            return getString(R.string.trip_licence_none);
+        }
+        if (storedName.equals(Licence.RECOMMENDED.getName())) {
+            return getString(R.string.trip_licence_recommended_suffix, storedName);
+        }
+        return storedName;
     }
 
     /**
@@ -491,12 +506,11 @@ public class TripActivity extends SexyTopoActivity {
     public void requestSaveTrip(View view) {
         syncTrip();
 
-        // Remember this trip's licence as the choice to carry over to the next new trip. This
-        // covers free text as well as options picked from the dropdown; a licence typed here
-        // isn't added to the configured list, so only a recognised option becomes the stored
-        // default, but "no licence" is always remembered as such.
+        // Remember this trip's licence as the choice to carry over to the next new trip, and,
+        // if it isn't one of the defaults, add it to the list offered in future - the same way
+        // a caver's name is remembered once it's been used.
         AutoCompleteTextView licenceField = findViewById(R.id.trip_licence);
-        GeneralPreferences.setDefaultLicenceOption(licenceField.getText().toString());
+        GeneralPreferences.setLastLicence(licenceField.getText().toString());
 
         startActivity(PlanActivity.class);
     }
@@ -540,8 +554,8 @@ public class TripActivity extends SexyTopoActivity {
         EditText instrumentField = findViewById(R.id.instrument_field);
         trip.setInstrument(instrumentField.getText().toString());
 
-        EditText copyrightField = findViewById(R.id.trip_copyright);
-        trip.setCopyright(copyrightField.getText().toString());
+        EditText copyrightHolderField = findViewById(R.id.trip_copyright_holder);
+        trip.setCopyrightHolder(copyrightHolderField.getText().toString());
 
         AutoCompleteTextView licenceField = findViewById(R.id.trip_licence);
         trip.setLicence(licenceField.getText().toString());
@@ -558,8 +572,8 @@ public class TripActivity extends SexyTopoActivity {
         EditText instrumentField = findViewById(R.id.instrument_field);
         boolean hasInstrument = !instrumentField.getText().toString().trim().isEmpty();
 
-        EditText copyrightField = findViewById(R.id.trip_copyright);
-        boolean hasCopyright = !copyrightField.getText().toString().trim().isEmpty();
+        EditText copyrightHolderField = findViewById(R.id.trip_copyright_holder);
+        boolean hasCopyrightHolder = !copyrightHolderField.getText().toString().trim().isEmpty();
 
         Trip currentTrip = getSurvey().getTrip();
         boolean hasUnlinkedExploDate =
@@ -570,7 +584,11 @@ public class TripActivity extends SexyTopoActivity {
         // permanently enabled even on an otherwise blank new trip. It gates saving separately,
         // via isLicenceChosen.
         boolean hasAnyData =
-                hasTeam || hasComments || hasInstrument || hasCopyright || hasUnlinkedExploDate;
+                hasTeam
+                        || hasComments
+                        || hasInstrument
+                        || hasCopyrightHolder
+                        || hasUnlinkedExploDate;
         boolean hasChanges = savedTrip == null || !savedTrip.equals(currentTrip);
 
         findViewById(R.id.set_trip).setEnabled(hasAnyData && hasChanges && isLicenceChosen);

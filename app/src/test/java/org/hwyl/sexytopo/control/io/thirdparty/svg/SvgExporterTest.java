@@ -31,7 +31,7 @@ public class SvgExporterTest {
     @Test
     public void testCopyrightAndLicenceAppearInLegendAndDesc() throws Exception {
         Trip trip = new Trip();
-        trip.setCopyright("Caver Jane");
+        trip.setCopyrightHolder("Caver Jane");
         trip.setLicence("CC BY 4.0");
         Survey survey = surveyWithTrip(trip);
 
@@ -51,7 +51,7 @@ public class SvgExporterTest {
         prefs.edit().putBoolean("pref_export_svg_copyright", false).apply();
 
         Trip trip = new Trip();
-        trip.setCopyright("Caver Jane");
+        trip.setCopyrightHolder("Caver Jane");
         trip.setLicence("CC BY 4.0");
         Survey survey = surveyWithTrip(trip);
 
@@ -80,7 +80,7 @@ public class SvgExporterTest {
     @Test
     public void testCopyrightOnlyOmitsLicenceText() throws Exception {
         Trip trip = new Trip();
-        trip.setCopyright("Caver Jane");
+        trip.setCopyrightHolder("Caver Jane");
         Survey survey = surveyWithTrip(trip);
 
         String content = new SvgExporter().getContent(survey, Projection2D.PLAN);
@@ -106,7 +106,7 @@ public class SvgExporterTest {
     public void testCopyrightIncludesYearAfterSymbol() throws Exception {
         Trip trip = new Trip();
         trip.setSurveyDate(new SimpleDateFormat("yyyy-MM-dd").parse("2024-06-15"));
-        trip.setCopyright("Caver Jane");
+        trip.setCopyrightHolder("Caver Jane");
         trip.setLicence("CC BY 4.0");
         Survey survey = surveyWithTrip(trip);
 
@@ -119,7 +119,7 @@ public class SvgExporterTest {
     public void testCopyrightYearOmittedWhenSurveyDateNull() throws Exception {
         Trip trip = new Trip();
         trip.setSurveyDate(null);
-        trip.setCopyright("Caver Jane");
+        trip.setCopyrightHolder("Caver Jane");
         Survey survey = surveyWithTrip(trip);
 
         String content = new SvgExporter().getContent(survey, Projection2D.PLAN);

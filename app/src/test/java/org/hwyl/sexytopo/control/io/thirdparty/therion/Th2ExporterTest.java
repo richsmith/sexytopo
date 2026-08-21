@@ -35,7 +35,7 @@ public class Th2ExporterTest {
         // scraps, so this exercises both getScrap() and getCrossSectionScrap().
         Survey survey = BasicTestSurveyCreator.createWithCrossSections();
         Trip trip = new Trip();
-        trip.setCopyright("Caver Jane");
+        trip.setCopyrightHolder("Caver Jane");
         trip.setLicence("CC BY 4.0");
         survey.setTrip(trip);
 

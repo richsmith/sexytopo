@@ -5,18 +5,14 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import androidx.preference.PreferenceManager;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.model.sketch.Colour;
-import org.hwyl.sexytopo.model.survey.LicenceOption;
+import org.hwyl.sexytopo.model.survey.Licence;
 import org.hwyl.sexytopo.model.table.LRUD;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class GeneralPreferences {
 
@@ -403,209 +399,81 @@ public class GeneralPreferences {
         prefs.edit().putStringSet(PREF_KNOWN_CAVERS, set).apply();
     }
 
-    // ********** Licence Options ***********
+    // ********** Licences ***********
 
-    private static final String PREF_LICENCE_OPTIONS = "pref_licence_options";
-    private static final String LICENCE_NAME_TAG = "name";
-    private static final String LICENCE_DEFAULT_TAG = "default";
+    // The licence chosen for the most recent trip, seeded onto the next new trip so a caver
+    // surveying under one licence doesn't have to re-pick it every time. Absent until the user
+    // has actually chosen one, so no licence is ever applied without having been picked; the
+    // empty string is a real value here, meaning "no licence" was deliberately chosen.
+    private static final String PREF_LAST_LICENCE = "pref_last_licence";
+
+    // Licences the user has actually used that aren't among the defaults - free text typed into
+    // the Trip screen, or names carried in on imported surveys. Kept so they're offered again,
+    // exactly like known cavers.
+    private static final String PREF_USED_LICENCES = "pref_used_licences";
 
     /**
-     * The name of the "no licence" option: a deliberate choice to leave the survey unlicensed, as
-     * opposed to simply not having decided yet. It is stored as the empty string, so it needs no
-     * special-casing on export - a trip with this licence behaves exactly like one with none.
-     * TripActivity displays it under a friendlier label.
+     * The licences to offer, in order: the defaults, followed by any others the user has used,
+     * sorted. "No licence" is offered last, since it's the fallback rather than a suggestion.
      */
-    public static final String NO_LICENCE_NAME = "";
-
-    private static List<LicenceOption> defaultLicenceOptions() {
-        return new ArrayList<>(
-                Arrays.asList(
-                        new LicenceOption("GPLv3.0+", false),
-                        new LicenceOption("CC0", false),
-                        new LicenceOption("CC BY 4.0", false),
-                        new LicenceOption("CC BY SA 4.0", false),
-                        new LicenceOption("CC BY SA NC 4.0", false),
-                        new LicenceOption("All rights reserved", false),
-                        new LicenceOption(NO_LICENCE_NAME, false)));
+    public static List<String> getLicenceNames() {
+        List<String> names = new ArrayList<>(Licence.getDefaultNames());
+        names.addAll(getUsedLicences());
+        names.add(Licence.NONE);
+        return names;
     }
 
-    public static List<LicenceOption> getLicenceOptions() {
-        if (prefs == null) return defaultLicenceOptions();
-
-        String json = prefs.getString(PREF_LICENCE_OPTIONS, null);
-        if (json == null) return defaultLicenceOptions();
-
-        try {
-            return licenceOptionsFromJson(json);
-        } catch (JSONException exception) {
-            Log.e("Could not load licence options: " + exception);
-            return defaultLicenceOptions();
-        }
+    /** The non-default licences the user has previously used, sorted for a stable ordering. */
+    public static List<String> getUsedLicences() {
+        if (prefs == null) return new ArrayList<>();
+        Set<String> set = prefs.getStringSet(PREF_USED_LICENCES, new HashSet<>());
+        List<String> list = new ArrayList<>(set);
+        Collections.sort(list);
+        return list;
     }
 
-    public static void setLicenceOptions(List<LicenceOption> options) {
+    /**
+     * Records a licence as used, so it's offered again in future. Defaults are already offered and
+     * so aren't stored; neither is "no licence", which is always offered last.
+     */
+    public static void addUsedLicence(String name) {
+        if (prefs == null || name == null) return;
+        String trimmed = name.trim();
+        if (trimmed.isEmpty() || Licence.isDefault(trimmed)) return;
+        Set<String> set = new HashSet<>(prefs.getStringSet(PREF_USED_LICENCES, new HashSet<>()));
+        set.add(trimmed);
+        prefs.edit().putStringSet(PREF_USED_LICENCES, set).apply();
+    }
+
+    public static void removeUsedLicence(String name) {
         if (prefs == null) return;
-        try {
-            String json = licenceOptionsToJson(options).toString();
-            prefs.edit().putString(PREF_LICENCE_OPTIONS, json).apply();
-        } catch (JSONException exception) {
-            Log.e("Could not save licence options: " + exception);
-        }
+        Set<String> set = new HashSet<>(prefs.getStringSet(PREF_USED_LICENCES, new HashSet<>()));
+        set.remove(name);
+        prefs.edit().putStringSet(PREF_USED_LICENCES, set).apply();
     }
 
     /**
-     * Returns the name of the licence option currently flagged as the default, or "" if none is -
-     * which is the case until the user picks one, so that no licence is ever applied to a survey
-     * without them having chosen it.
+     * Whether the user has ever chosen a licence. Until they have, new trips start with a blank
+     * licence field and the Trip screen asks them to pick one.
      */
-    public static String getDefaultLicenceName() {
-        for (LicenceOption option : getLicenceOptions()) {
-            if (option.isDefault()) {
-                return option.getName();
-            }
-        }
-        return NO_LICENCE_NAME;
+    public static boolean hasLastLicence() {
+        return prefs != null && prefs.contains(PREF_LAST_LICENCE);
     }
 
     /**
-     * Adds a new licence option. It is always added as a non-default option: a default is only ever
-     * set by the user explicitly choosing one, never as a side effect of editing the list.
+     * The licence chosen for the most recent trip, or "" if none has been chosen yet - which is
+     * also what's returned when the last choice was "no licence".
      */
-    public static void addLicenceOption(String name) {
-        if (name == null || name.trim().isEmpty()) return;
-        setLicenceOptions(withAdded(getLicenceOptions(), name.trim()));
+    public static String getLastLicence() {
+        if (prefs == null) return Licence.NONE;
+        return prefs.getString(PREF_LAST_LICENCE, Licence.NONE);
     }
 
-    /**
-     * Removes the licence option with the given name. If it was the default, the list is simply
-     * left with no default rather than promoting a replacement - which would amount to picking a
-     * licence on the user's behalf.
-     */
-    public static void removeLicenceOption(String name) {
-        if (name == null) return;
-        setLicenceOptions(withRemoved(getLicenceOptions(), name));
-    }
-
-    /** Renames a licence option, preserving its position in the list and its default flag. */
-    public static void renameLicenceOption(String oldName, String newName) {
-        if (oldName == null || newName == null || newName.trim().isEmpty()) return;
-        setLicenceOptions(withRenamed(getLicenceOptions(), oldName, newName.trim()));
-    }
-
-    /**
-     * Flags the licence option with the given name as the default, and un-flags every other option.
-     * Does nothing if no option with that name exists.
-     */
-    public static void setDefaultLicenceOption(String name) {
-        if (name == null) return;
-        setLicenceOptions(withDefaultSet(getLicenceOptions(), name));
-    }
-
-    /**
-     * Un-flags whatever option is currently the default, leaving the list with none - so new trips
-     * start with a blank licence and the user is asked to pick one.
-     */
-    public static void clearDefaultLicenceOption() {
-        setLicenceOptions(withDefaultCleared(getLicenceOptions()));
-    }
-
-    /**
-     * Pure list transformation backing {@link #clearDefaultLicenceOption()}, kept separate so it
-     * can be unit tested without a SharedPreferences-backed Context.
-     */
-    public static List<LicenceOption> withDefaultCleared(List<LicenceOption> options) {
-        List<LicenceOption> result = new ArrayList<>();
-        for (LicenceOption option : options) {
-            result.add(option.withDefault(false));
-        }
-        return result;
-    }
-
-    /**
-     * Pure list transformation backing {@link #addLicenceOption(String)}, kept separate so it can
-     * be unit tested without a SharedPreferences-backed Context.
-     */
-    public static List<LicenceOption> withAdded(List<LicenceOption> options, String trimmedName) {
-        List<LicenceOption> result = new ArrayList<>(options);
-        result.add(new LicenceOption(trimmedName, false));
-        return result;
-    }
-
-    /**
-     * Pure list transformation backing {@link #removeLicenceOption(String)}, kept separate so it
-     * can be unit tested without a SharedPreferences-backed Context.
-     */
-    public static List<LicenceOption> withRemoved(List<LicenceOption> options, String name) {
-        List<LicenceOption> remaining = new ArrayList<>();
-        for (LicenceOption option : options) {
-            if (!option.getName().equals(name)) {
-                remaining.add(option);
-            }
-        }
-        return remaining;
-    }
-
-    /**
-     * Pure list transformation backing {@link #renameLicenceOption(String, String)}, kept separate
-     * so it can be unit tested without a SharedPreferences-backed Context.
-     */
-    public static List<LicenceOption> withRenamed(
-            List<LicenceOption> options, String oldName, String trimmedNewName) {
-        List<LicenceOption> result = new ArrayList<>(options);
-        for (int i = 0; i < result.size(); i++) {
-            if (result.get(i).getName().equals(oldName)) {
-                result.set(i, result.get(i).withName(trimmedNewName));
-                break;
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Pure list transformation backing {@link #setDefaultLicenceOption(String)}, kept separate so
-     * it can be unit tested without a SharedPreferences-backed Context. Does nothing (returns an
-     * unchanged copy) if no option with the given name exists.
-     */
-    public static List<LicenceOption> withDefaultSet(List<LicenceOption> options, String name) {
-        if (!hasOption(options, name)) {
-            return new ArrayList<>(options);
-        }
-
-        List<LicenceOption> result = new ArrayList<>();
-        for (LicenceOption option : options) {
-            result.add(option.withDefault(option.getName().equals(name)));
-        }
-        return result;
-    }
-
-    private static boolean hasOption(List<LicenceOption> options, String name) {
-        for (LicenceOption option : options) {
-            if (option.getName().equals(name)) return true;
-        }
-        return false;
-    }
-
-    public static JSONArray licenceOptionsToJson(List<LicenceOption> options) throws JSONException {
-        JSONArray array = new JSONArray();
-        for (LicenceOption option : options) {
-            JSONObject json = new JSONObject();
-            json.put(LICENCE_NAME_TAG, option.getName());
-            json.put(LICENCE_DEFAULT_TAG, option.isDefault());
-            array.put(json);
-        }
-        return array;
-    }
-
-    public static List<LicenceOption> licenceOptionsFromJson(String jsonString)
-            throws JSONException {
-        JSONArray array = new JSONArray(jsonString);
-        List<LicenceOption> options = new ArrayList<>();
-        for (int i = 0; i < array.length(); i++) {
-            JSONObject json = array.getJSONObject(i);
-            String name = json.getString(LICENCE_NAME_TAG);
-            boolean isDefault = json.optBoolean(LICENCE_DEFAULT_TAG, false);
-            options.add(new LicenceOption(name, isDefault));
-        }
-        return options;
+    /** Remembers a licence as the latest choice, and adds it to the offered list if it's new. */
+    public static void setLastLicence(String name) {
+        if (prefs == null || name == null) return;
+        String trimmed = name.trim();
+        prefs.edit().putString(PREF_LAST_LICENCE, trimmed).apply();
+        addUsedLicence(trimmed);
     }
 }

@@ -171,7 +171,7 @@ public class SurvexExporterTest {
         SurvexExporter survexExporter = new SurvexExporter();
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         Trip trip = new Trip();
-        trip.setCopyright("Caver Jane");
+        trip.setCopyrightHolder("Caver Jane");
         trip.setLicence("CC BY 4.0");
         survey.setTrip(trip);
 
@@ -207,7 +207,7 @@ public class SurvexExporterTest {
         SurvexExporter survexExporter = new SurvexExporter();
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         Trip trip = new Trip();
-        trip.setCopyright("Caver Jane");
+        trip.setCopyrightHolder("Caver Jane");
         trip.setLicence("CC BY 4.0");
         survey.setTrip(trip);
 

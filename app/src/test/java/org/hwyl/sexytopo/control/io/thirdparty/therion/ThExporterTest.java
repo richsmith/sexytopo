@@ -205,7 +205,7 @@ public class ThExporterTest {
     public void testCopyrightLineIsImmediatelyAfterCentreline() {
         Survey survey = new Survey();
         Trip trip = new Trip();
-        trip.setCopyright("Caver Jane");
+        trip.setCopyrightHolder("Caver Jane");
         trip.setLicence("CC BY 4.0");
         survey.setTrip(trip);
 

@@ -7,9 +7,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -24,7 +21,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
-import org.hwyl.sexytopo.model.survey.LicenceOption;
+import org.hwyl.sexytopo.model.survey.Licence;
 
 public class SettingsActivity extends SexyTopoActivity
         implements PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
@@ -279,58 +276,43 @@ public class SettingsActivity extends SexyTopoActivity
                                     return;
                                 }
                                 layout.setError(null);
-                                GeneralPreferences.addLicenceOption(name);
+                                GeneralPreferences.addUsedLicence(name);
                                 field.setText("");
                                 refreshList(view);
                             });
         }
 
+        /**
+         * Lists the licences on offer: the built-in defaults first, shown greyed out since they
+         * can't be edited or removed, then the user's own, which can.
+         */
         private void refreshList(View root) {
             LinearLayout list = root.findViewById(R.id.licences_list);
             list.removeAllViews();
             LayoutInflater inflater = LayoutInflater.from(requireContext());
-            for (LicenceOption option : GeneralPreferences.getLicenceOptions()) {
-                String name = option.getName();
+
+            for (String name : Licence.getDefaultNames()) {
                 View row = inflater.inflate(R.layout.licence_option_item, list, false);
+                TextView nameField = row.findViewById(R.id.licence_name_field);
+                nameField.setText(
+                        name.equals(Licence.RECOMMENDED.getName())
+                                ? getString(R.string.trip_licence_recommended_suffix, name)
+                                : name);
+                nameField.setEnabled(false);
+                row.findViewById(R.id.delete_licence_button).setVisibility(View.GONE);
+                list.addView(row);
+            }
 
-                // The "no licence" option is stored under an empty name; show it with a
-                // readable label, and don't let it be renamed or deleted - it's a fixed choice
-                // rather than one of the user's own entries.
-                boolean isNoLicence = name.isEmpty();
-                ((TextView) row.findViewById(R.id.licence_name_field))
-                        .setText(isNoLicence ? getString(R.string.trip_licence_none) : name);
-                if (!isNoLicence) {
-                    row.setOnClickListener(v -> showEditDialog(root, name));
-                }
-
-                CheckBox defaultCheckbox = row.findViewById(R.id.licence_default_checkbox);
-                defaultCheckbox.setChecked(option.isDefault());
-                CompoundButton.OnCheckedChangeListener defaultListener =
-                        new CompoundButton.OnCheckedChangeListener() {
-                            @Override
-                            public void onCheckedChanged(
-                                    @NonNull CompoundButton buttonView, boolean isChecked) {
-                                if (isChecked) {
-                                    GeneralPreferences.setDefaultLicenceOption(name);
-                                } else {
-                                    // Unchecking leaves no default, which is a valid state: new
-                                    // trips then start with a blank licence and the user is
-                                    // asked to pick one.
-                                    GeneralPreferences.clearDefaultLicenceOption();
-                                }
-                                refreshList(root);
-                            }
-                        };
-                defaultCheckbox.setOnCheckedChangeListener(defaultListener);
-
-                Button deleteButton = row.findViewById(R.id.delete_licence_button);
-                deleteButton.setVisibility(isNoLicence ? View.GONE : View.VISIBLE);
-                deleteButton.setOnClickListener(
-                        v -> {
-                            GeneralPreferences.removeLicenceOption(name);
-                            refreshList(root);
-                        });
-
+            for (String name : GeneralPreferences.getUsedLicences()) {
+                View row = inflater.inflate(R.layout.licence_option_item, list, false);
+                ((TextView) row.findViewById(R.id.licence_name_field)).setText(name);
+                row.setOnClickListener(v -> showEditDialog(root, name));
+                row.findViewById(R.id.delete_licence_button)
+                        .setOnClickListener(
+                                v -> {
+                                    GeneralPreferences.removeUsedLicence(name);
+                                    refreshList(root);
+                                });
                 list.addView(row);
             }
         }
@@ -361,7 +343,8 @@ public class SettingsActivity extends SexyTopoActivity
                                             getString(R.string.settings_licence_name_required));
                                     return;
                                 }
-                                GeneralPreferences.renameLicenceOption(currentName, newName);
+                                GeneralPreferences.removeUsedLicence(currentName);
+                                GeneralPreferences.addUsedLicence(newName);
                                 dialog.dismiss();
                                 refreshList(root);
                             });

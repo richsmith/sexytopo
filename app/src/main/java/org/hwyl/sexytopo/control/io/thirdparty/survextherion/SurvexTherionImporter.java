@@ -22,10 +22,10 @@ public class SurvexTherionImporter {
     public static final Pattern COMMENT_INSTRUCTION_REGEX = Pattern.compile("([{].*?[}])");
 
     /**
-     * Matches a copyright/licence line as produced by {@code SurvexTherionUtil.getCopyrightLine}:
-     * {@code copyright <year> "<copyright text>" [;#]"<licence text>"}, where the trailing
-     * comment-char/licence portion is optional. Group 1 is the copyright text, group 2 is the
-     * licence text (may be {@code null} if no licence was present).
+     * Matches a copyright/licence line as produced by SurvexTherionUtil.getCopyrightLine: copyright
+     * {year} "{holder}" [;#]"{licence}", where the trailing comment-char/licence portion is
+     * optional. Group 1 is the copyright holder, group 2 is the licence (null if no licence was
+     * present).
      */
     private static final Pattern COPYRIGHT_LINE_REGEX =
             Pattern.compile("copyright\\s+\\S+\\s+\"([^\"]*)\"(?:\\s*[;#]\"([^\"]*)\")?");
@@ -203,7 +203,7 @@ public class SurvexTherionImporter {
      *
      * <p>If a station has both a passage comment and a leg-line comment,
      *
-     * <p>Format: <passage comment> :: <leg-line comment>
+     * <p>Format: {passage comment} :: {leg-line comment}
      *
      * @param survey The survey with stations
      * @param passageComments Map of station name to passage comment
@@ -240,7 +240,7 @@ public class SurvexTherionImporter {
         Date surveyDate = null;
         Date explorationDate = null; // explo-date / date explored line
         String instrument = null;
-        String copyright = null;
+        String copyrightHolder = null;
         String licence = null;
         Map<String, List<Trip.Role>> teamMap = new java.util.LinkedHashMap<>();
         StringBuilder tripComments = new StringBuilder();
@@ -280,13 +280,13 @@ public class SurvexTherionImporter {
                 continue;
             }
 
-            // Copyright / licence: "copyright <year> \"<copyright>\" [;#]\"<licence>\""
+            // Copyright / licence: "copyright <year> \"<holder>\" [;#]\"<licence>\""
             if (effective.startsWith("copyright ")) {
                 Matcher copyrightMatcher = COPYRIGHT_LINE_REGEX.matcher(effective);
                 if (copyrightMatcher.find()) {
-                    String copyrightText = copyrightMatcher.group(1);
-                    if (copyrightText != null && !copyrightText.isEmpty()) {
-                        copyright = copyrightText;
+                    String holderText = copyrightMatcher.group(1);
+                    if (holderText != null && !holderText.isEmpty()) {
+                        copyrightHolder = holderText;
                     }
                     String licenceText = copyrightMatcher.group(2);
                     if (licenceText != null && !licenceText.isEmpty()) {
@@ -358,8 +358,8 @@ public class SurvexTherionImporter {
 
         trip.setInstrument(instrument);
 
-        if (copyright != null) {
-            trip.setCopyright(copyright);
+        if (copyrightHolder != null) {
+            trip.setCopyrightHolder(copyrightHolder);
         }
         if (licence != null) {
             trip.setLicence(licence);

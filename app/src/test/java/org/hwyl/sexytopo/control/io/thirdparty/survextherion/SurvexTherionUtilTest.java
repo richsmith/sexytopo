@@ -74,7 +74,7 @@ public class SurvexTherionUtilTest {
         Survey survey = new Survey();
         Trip trip = new Trip();
         trip.setSurveyDate(dateForYear(year));
-        trip.setCopyright(copyright);
+        trip.setCopyrightHolder(copyright);
         trip.setLicence(licence);
         survey.setTrip(trip);
         return survey;

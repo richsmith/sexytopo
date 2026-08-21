@@ -227,7 +227,7 @@
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
                         <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/trip_copyright"
+                            android:id="@+id/trip_copyright_holder"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:maxLines="1"

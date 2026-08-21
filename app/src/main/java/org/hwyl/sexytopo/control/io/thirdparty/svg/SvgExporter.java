@@ -142,7 +142,7 @@ public class SvgExporter extends DoubleSketchFileExporter {
         xmlSerializer.attribute(null, "xmlns", "http://www.w3.org/2000/svg");
 
         Trip trip = survey.getTrip();
-        if (trip != null && (trip.hasCopyright() || trip.hasLicence())) {
+        if (trip != null && (trip.hasCopyrightHolder() || trip.hasLicence())) {
             xmlSerializer.startTag(null, "title");
             xmlSerializer.text(survey.getName());
             xmlSerializer.endTag(null, "title");
@@ -554,20 +554,21 @@ public class SvgExporter extends DoubleSketchFileExporter {
     }
 
     /**
-     * Formats a trip's copyright and licence as a single line, e.g. "© 2026 Caver Jane — CC BY
-     * 4.0". Either part may be omitted if not set; returns an empty string if neither is set.
+     * Formats a trip's copyright holder and licence as a single line, e.g. "© 2026 Caver Jane — CC
+     * BY 4.0". The © and year are added here, so the holder is just the name. Either part may be
+     * omitted if not set; returns an empty string if neither is set.
      */
     private static String formatCopyrightLine(Trip trip) {
         if (trip == null) {
             return "";
         }
         StringBuilder builder = new StringBuilder();
-        if (trip.hasCopyright()) {
+        if (trip.hasCopyrightHolder()) {
             builder.append("\u00A9 ");
             if (trip.getSurveyDate() != null) {
                 builder.append(TextTools.formatYear(trip.getSurveyDate())).append(" ");
             }
-            builder.append(trip.getCopyright());
+            builder.append(trip.getCopyrightHolder());
         }
         if (trip.hasLicence()) {
             if (builder.length() > 0) {
