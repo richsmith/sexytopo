@@ -242,6 +242,12 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             addSplayItem.setEnabled(false);
         }
 
+        // disable Flip Last Line by default — only meaningful in a sketch view
+        MenuItem flipLastLineItem = menu.findItem(R.id.action_flip_last_line);
+        if (flipLastLineItem != null) {
+            flipLastLineItem.setEnabled(false);
+        }
+
         return super.onPrepareOptionsMenu(menu);
     }
 

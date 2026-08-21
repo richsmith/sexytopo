@@ -26,7 +26,7 @@ public class Sketch extends Shape {
 
     private PathDetail activePath;
     private Colour activeColour = Colour.BLACK;
-    private LineType activeLineType = LineType.GENERAL;
+    private LineType activeLineType = LineType.SKETCH;
 
     private float crossSectionScale = DEFAULT_XSECTION_SCALE;
 
@@ -85,7 +85,15 @@ public class Sketch extends Shape {
     }
 
     public PathDetail startNewPath(Coord2D start) {
-        activePath = new PathDetail(start, activeColour, activeLineType);
+        return startNewPath(start, PathDetail.DEFAULT_ORNAMENT_SIZE);
+    }
+
+    /**
+     * Starts a new path, recording the ornament size (in survey metres) new lines should use —
+     * derived by the caller from the current zoom, as symbol sizes are.
+     */
+    public PathDetail startNewPath(Coord2D start, float ornamentSize) {
+        activePath = new PathDetail(start, activeColour, activeLineType, ornamentSize);
         // Registered in the undo history only on finishPath, so an unfinished path can be
         // abandoned without leaving a trace.
         pathDetails.add(activePath);
@@ -259,7 +267,11 @@ public class Sketch extends Shape {
         List<Coord2D> reversedPoints = new ArrayList<>(pathDetail.getPath());
         Collections.reverse(reversedPoints);
         PathDetail flipped =
-                new PathDetail(reversedPoints, pathDetail.getColour(), pathDetail.getLineType());
+                new PathDetail(
+                        reversedPoints,
+                        pathDetail.getColour(),
+                        pathDetail.getLineType(),
+                        pathDetail.getOrnamentSize());
         deleteDetail(pathDetail, Collections.singletonList((SketchDetail) flipped));
         return flipped;
     }
@@ -426,6 +438,22 @@ public class Sketch extends Shape {
         }
 
         return closest;
+    }
+
+    /**
+     * The area whose filled part covers this point, or null if there isn't one. Used by the eraser,
+     * which needs to find an area the user has tapped the middle of — too far from the boundary for
+     * findNearestVisibleDetailWithin to pick it up. The last matching area wins, matching the draw
+     * order so the topmost one is returned.
+     */
+    public AreaDetail findAreaContaining(Coord2D point) {
+        AreaDetail found = null;
+        for (AreaDetail areaDetail : areaDetails) {
+            if (areaDetail.contains(point)) {
+                found = areaDetail;
+            }
+        }
+        return found;
     }
 
     public void addCrossSection(CrossSection crossSection, Coord2D touchPointOnSurvey) {

@@ -209,8 +209,12 @@ public class GraphView extends View {
     private final Paint fadedSplayPaint = new Paint();
 
     private final Paint drawPaint = new Paint();
-    // one paint per semantic line type (stroke width and ornamentation baked in)
+    // one paint per semantic line type (stroke width and ornamentation baked in), alongside the
+    // on-screen ornament size each paint's effect was last built for, so the effect is only
+    // rebuilt when that changes (i.e. on zoom, or moving between lines drawn at different zooms)
     private final Map<LineType, Paint> lineTypePaints = new EnumMap<>(LineType.class);
+    private final Map<LineType, Float> lineTypePaintOrnamentSizePixels =
+            new EnumMap<>(LineType.class);
     // scratch object reused when drawing typed paths, to avoid per-frame allocation
     private final Path typedPathScratch = new Path();
     // the red interior-side marker on the last-drawn wall (a plain stroke — the wall paints'
@@ -324,20 +328,13 @@ public class GraphView extends View {
         wallInsideTickPaint.set(drawPaint);
         wallInsideTickPaint.setColor(Colour.RED.intValue);
 
-        // Path effects only render on a hardware-accelerated canvas from API 28, so on older
-        // devices semantic lines fall back to a plain stroke (still distinguished by width).
-        boolean pathEffectsSupported =
-                android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P;
-        float density = dpToPixels(1);
         lineTypePaints.clear();
         for (LineType lineType : LineType.values()) {
             Paint paint = new Paint(drawPaint);
             paint.setStrokeWidth(drawPaint.getStrokeWidth() * lineType.getStrokeWidthFactor());
-            if (pathEffectsSupported) {
-                paint.setPathEffect(lineType.createPathEffect(density));
-            }
             lineTypePaints.put(lineType, paint);
         }
+        lineTypePaintOrnamentSizePixels.clear();
 
         areaPaint.setStyle(Paint.Style.STROKE);
         areaPaint.setStrokeJoin(Paint.Join.ROUND);
@@ -598,13 +595,13 @@ public class GraphView extends View {
                         start = snappedStart;
                     }
                 }
-                sketch.startNewPath(start);
+                sketch.startNewPath(start, getOrnamentSizeForNewLine());
                 break;
 
             case MotionEvent.ACTION_MOVE:
                 if (sketch.getActivePath() == null) {
                     // shouldn't be null, but just in case...
-                    sketch.startNewPath(surveyCoords);
+                    sketch.startNewPath(surveyCoords, getOrnamentSizeForNewLine());
                 } else {
                     sketch.getActivePath().lineTo(surveyCoords);
                 }
@@ -666,14 +663,23 @@ public class GraphView extends View {
     }
 
     /**
+     * The ornament size (in survey metres) to record on a line drawn now: a fixed on-screen size
+     * converted at the current zoom, exactly as a symbol's size is chosen. Drawing zoomed in
+     * therefore gives finer ticks than drawing zoomed out, and either way the ornamentation is then
+     * fixed relative to the cave.
+     */
+    private float getOrnamentSizeForNewLine() {
+        float sizePixels = SexyTopo.dpToPixels(GeneralPreferences.getLineOrnamentSizeDp());
+        return sizePixels / surveyToViewScale;
+    }
+
+    /**
      * Wall-kind lines get their point order normalised on completion so the passage interior is on
      * a consistent side, whichever way the user drew the stroke (see LineOrienter).
      */
     private void orientActivePathIfRequired() {
         PathDetail activePath = sketch.getActivePath();
-        if (activePath == null
-                || !activePath.getLineType().isAutoOriented()
-                || projection == null) {
+        if (activePath == null || !activePath.getLineType().isWall() || projection == null) {
             return;
         }
         LineOrienter.orientToInterior(activePath.getPath(), projection.getStationMap().values());
@@ -720,48 +726,16 @@ public class GraphView extends View {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                // A press anywhere on a cross-section's body deletes it. This is hit-tested
-                // separately because findNearestVisibleDetailWithin only measures distance to a
-                // cross-section's centre point, not its whole body.
-                if (SketchPreferences.Toggle.SHOW_X_SECTIONS.isOn()) {
-                    CrossSectionDetail crossSection = findCrossSectionBodyAt(touchPointOnSurvey);
-                    if (crossSection != null) {
-                        sketch.deleteDetail(crossSection);
-                        invalidate();
-                        return true;
-                    }
-                }
-
-                SketchDetail closestDetail =
-                        sketch.findNearestVisibleDetailWithin(
-                                touchPointOnSurvey, deleteToleranceInMetres, surveyToViewScale);
-
-                if (closestDetail == null) {
+                SketchDetail tapped = findDetailTapped(touchPointOnSurvey, deleteToleranceInMetres);
+                if (tapped == null) {
                     // you missed, try again :P
                     return true;
-
-                } else if (deleteLineFragments && closestDetail instanceof PathDetail) {
-                    // you got part of the line
-                    List<SketchDetail> fragments =
-                            ((PathDetail) closestDetail)
-                                    .getPathFragmentsOutsideRadius(
-                                            touchPointOnSurvey, deleteToleranceInMetres);
-                    sketch.deleteDetail(closestDetail, fragments);
-                    invalidate();
-
-                } else if (deleteLineFragments && closestDetail instanceof AreaDetail) {
-                    // carve a notch out of the area; this can split it into several areas
-                    eraseFromArea(
-                            (AreaDetail) closestDetail,
-                            touchPointOnSurvey,
-                            deleteToleranceInMetres);
-                    invalidate();
-
-                } else {
-                    // bullseye!
-                    sketch.deleteDetail(closestDetail);
-                    invalidate();
                 }
+                eraseDetail(
+                        tapped, touchPointOnSurvey, deleteToleranceInMetres, deleteLineFragments);
+                invalidate();
+                break;
+
             case MotionEvent.ACTION_MOVE:
             case MotionEvent.ACTION_UP:
                 break;
@@ -771,6 +745,64 @@ public class GraphView extends View {
         }
 
         return true;
+    }
+
+    /**
+     * Work out which sketch detail the user has just tapped, or null if they missed everything.
+     * This only decides what was hit; what to do about it is up to the caller.
+     *
+     * <p>Details are tried in order of how specifically the tap identifies them. Whatever lies
+     * nearest the tap wins first, so a line drawn across an area is still picked out when the user
+     * aims at the line. Cross-sections come next: a press anywhere on the body counts, which is a
+     * bigger target than a point and so shouldn't pre-empt something the user aimed at precisely.
+     * Last comes an area under the finger, which covers tapping the middle of one — too far from
+     * its boundary for the distance test to reach, and otherwise unhittable.
+     */
+    private SketchDetail findDetailTapped(Coord2D touchPointOnSurvey, float toleranceInMetres) {
+
+        SketchDetail nearest =
+                sketch.findNearestVisibleDetailWithin(
+                        touchPointOnSurvey, toleranceInMetres, surveyToViewScale);
+        if (nearest != null) {
+            return nearest;
+        }
+
+        if (SketchPreferences.Toggle.SHOW_X_SECTIONS.isOn()) {
+            CrossSectionDetail crossSection = findCrossSectionBodyAt(touchPointOnSurvey);
+            if (crossSection != null) {
+                return crossSection;
+            }
+        }
+
+        return sketch.findAreaContaining(touchPointOnSurvey);
+    }
+
+    /**
+     * Delete a tapped detail. With "delete line fragments" on, lines and areas are cut into rather
+     * than removed whole; everything else is deleted outright.
+     */
+    private void eraseDetail(
+            SketchDetail detail,
+            Coord2D touchPointOnSurvey,
+            float toleranceInMetres,
+            boolean deleteLineFragments) {
+
+        if (deleteLineFragments && detail instanceof PathDetail) {
+            // you got part of the line
+            List<SketchDetail> fragments =
+                    ((PathDetail) detail)
+                            .getPathFragmentsOutsideRadius(touchPointOnSurvey, toleranceInMetres);
+            sketch.deleteDetail(detail, fragments);
+
+        } else if (deleteLineFragments && detail instanceof AreaDetail) {
+            // carve a notch out of the area; this can split it into several areas, or punch a
+            // hole if the user is erasing in the middle of one
+            eraseFromArea((AreaDetail) detail, touchPointOnSurvey, toleranceInMetres);
+
+        } else {
+            // bullseye!
+            sketch.deleteDetail(detail);
+        }
     }
 
     /**
@@ -1903,7 +1935,7 @@ public class GraphView extends View {
                 continue;
             }
 
-            if (pathDetail.getLineType() != LineType.GENERAL) {
+            if (pathDetail.getLineType() != LineType.SKETCH) {
                 drawTypedPath(canvas, pathDetail, alpha);
                 if (pathDetail == wallPathToMark) {
                     drawWallInsideTick(canvas, pathDetail, alpha);
@@ -2017,9 +2049,12 @@ public class GraphView extends View {
      * constant on-screen size across zoom levels rather than scaling with the survey.
      */
     private void drawTypedPath(Canvas canvas, PathDetail pathDetail, int alpha) {
-        Paint paint = lineTypePaints.get(pathDetail.getLineType());
+        LineType lineType = pathDetail.getLineType();
+        Paint paint = lineTypePaints.get(lineType);
         if (paint == null) { // paints not initialised yet
             paint = drawPaint;
+        } else {
+            updateOrnamentation(paint, pathDetail);
         }
         paint.setColor(pathDetail.getDrawColour(isDarkModeActive).intValue);
         paint.setAlpha(alpha);
@@ -2040,6 +2075,28 @@ public class GraphView extends View {
     }
 
     /**
+     * Rebuilds a line type's path effect if the line's ornament size on screen differs from the one
+     * the cached effect was built for. Ornament sizes are survey-space, so this happens on zoom and
+     * when moving between lines drawn at different zoom levels — not on every frame.
+     *
+     * <p>Path effects only render on a hardware-accelerated canvas from API 28, so on older devices
+     * semantic lines keep a plain stroke (still distinguished by width).
+     */
+    private void updateOrnamentation(Paint paint, PathDetail pathDetail) {
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.P) {
+            return;
+        }
+        LineType lineType = pathDetail.getLineType();
+        float ornamentSizePixels = pathDetail.getOrnamentSize() * surveyToViewScale;
+        Float builtFor = lineTypePaintOrnamentSizePixels.get(lineType);
+        if (builtFor != null && builtFor == ornamentSizePixels) {
+            return;
+        }
+        paint.setPathEffect(lineType.createPathEffect(ornamentSizePixels, paint.getStrokeWidth()));
+        lineTypePaintOrnamentSizePixels.put(lineType, ornamentSizePixels);
+    }
+
+    /**
      * The wall-kind line whose interior-side marker should be shown: the most recently drawn one,
      * excluding a stroke still in progress (the marker hopping along a growing line is
      * disconcerting, and orientation isn't decided until the stroke finishes anyway). Ticked types
@@ -2052,7 +2109,7 @@ public class GraphView extends View {
         List<PathDetail> pathDetails = sketch.getPathDetails();
         for (int i = pathDetails.size() - 1; i >= 0; i--) {
             PathDetail candidate = pathDetails.get(i);
-            if (candidate.getLineType().isAutoOriented() && candidate != sketch.getActivePath()) {
+            if (candidate.getLineType().isWall() && candidate != sketch.getActivePath()) {
                 return candidate;
             }
         }

@@ -57,6 +57,12 @@
         android:defaultValue="true"/>
 
     <CheckBoxPreference
+        android:key="pref_therion_export_lines"
+        android:title="@string/settings_export_therion_lines_title"
+        android:summary="@string/settings_export_therion_lines_summary"
+        android:defaultValue="true"/>
+
+    <CheckBoxPreference
         android:key="pref_therion_export_text"
         android:title="@string/settings_export_therion_text_title"
         android:summary="@string/settings_export_therion_text_summary"

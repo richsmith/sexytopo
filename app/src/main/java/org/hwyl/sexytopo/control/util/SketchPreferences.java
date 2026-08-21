@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.model.sketch.BrushColour;
+import org.hwyl.sexytopo.model.sketch.LineType;
 import org.hwyl.sexytopo.model.sketch.SketchTool;
 import org.hwyl.sexytopo.model.sketch.Symbol;
 
@@ -14,6 +15,7 @@ public class SketchPreferences {
     private static final String SKETCH_TOOL_PREFERENCE_KEY = "pref_sketch_sketch_tool";
     private static final String BRUSH_COLOUR_PREFERENCE_KEY = "pref_sketch_brush_colour";
     private static final String SYMBOL_PREFERENCE_KEY = "pref_sketch_symbol";
+    private static final String LINE_TYPE_PREFERENCE_KEY = "pref_sketch_line_type";
 
     /**
      * Toggle-able display options set throught the sketch pop-up menu. We have a lot of these, so
@@ -27,6 +29,7 @@ public class SketchPreferences {
         SHOW_SPLAYS(R.id.buttonShowSplays, true),
         SHOW_SKETCH(R.id.buttonShowSketch, true),
         SHOW_STATION_LABELS(R.id.buttonShowStationLabels, true),
+        SHOW_WALL_INSIDE_TICK(R.id.buttonShowWallInsideTick, true),
         SHOW_X_SECTIONS(R.id.buttonShowXSections, true),
         SHOW_CONNECTIONS(R.id.buttonShowConnections, true),
         SHOW_COMPASS(R.id.buttonShowCompass, true),
@@ -103,5 +106,15 @@ public class SketchPreferences {
         String selected = prefs.getString(SYMBOL_PREFERENCE_KEY, null);
         Symbol symbol = Symbol.fromString(selected);
         return symbol;
+    }
+
+    public static void setSelectedLineType(LineType lineType) {
+        setString(LINE_TYPE_PREFERENCE_KEY, lineType.toString());
+    }
+
+    public static LineType getSelectedLineType() {
+        String selected = prefs.getString(LINE_TYPE_PREFERENCE_KEY, null);
+        LineType lineType = LineType.fromString(selected);
+        return lineType;
     }
 }

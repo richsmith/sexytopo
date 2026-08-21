@@ -27,6 +27,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import androidx.appcompat.content.res.AppCompatResources;
+import androidx.appcompat.widget.TooltipCompat;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import org.apache.commons.lang3.ArrayUtils;
@@ -42,6 +44,8 @@ import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.BrushColour;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
+import org.hwyl.sexytopo.model.sketch.LineType;
+import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchTool;
 import org.hwyl.sexytopo.model.sketch.Symbol;
@@ -94,6 +98,7 @@ public abstract class GraphActivity extends SurveyEditorActivity
     private int buttonHighlightColour = Colour.RED.intValue;
 
     private boolean symbolToolbarOpenedOnce = false;
+    private boolean lineTypeToolbarOpenedOnce = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,6 +163,7 @@ public abstract class GraphActivity extends SurveyEditorActivity
         intialiseActivity();
         initialiseGraphView();
         initialiseSymbolToolbar();
+        initialiseLineTypeToolbar();
         initialiseTools();
 
         setSketchButtonsStatus();
@@ -283,6 +289,41 @@ public abstract class GraphActivity extends SurveyEditorActivity
         handleAction(id);
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        MenuItem flipLastLineItem = menu.findItem(R.id.action_flip_last_line);
+        if (flipLastLineItem != null) {
+            flipLastLineItem.setEnabled(true);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_flip_last_line) {
+            flipLastLine();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Reverses the most recently drawn typed line, flipping which side its ticks fall on. Meant for
+     * the case where a pit or chimney came out ticked on the wrong side: one menu tap fixes it
+     * instead of undoing and redrawing the other way.
+     */
+    private void flipLastLine() {
+        Sketch sketch = getSketch(getSurvey());
+        PathDetail toFlip = sketch.getMostRecentSemanticPath();
+        if (toFlip == null) {
+            showSimpleToast(R.string.tools_flip_last_line_none);
+            return;
+        }
+        sketch.flipPathDetail(toFlip);
+        graphView.invalidate();
+    }
+
     public boolean onMenuItemClick(MenuItem item) {
         int itemId = item.getItemId();
 
@@ -324,6 +365,10 @@ public abstract class GraphActivity extends SurveyEditorActivity
             return true;
         } else if (itemId == R.id.buttonShowStationLabels) {
             SketchPreferences.Toggle.SHOW_STATION_LABELS.set(!item.isChecked());
+            graphView.invalidate();
+            return true;
+        } else if (itemId == R.id.buttonShowWallInsideTick) {
+            SketchPreferences.Toggle.SHOW_WALL_INSIDE_TICK.set(!item.isChecked());
             graphView.invalidate();
             return true;
         } else if (itemId == R.id.buttonShowConnections) {
@@ -420,6 +465,7 @@ public abstract class GraphActivity extends SurveyEditorActivity
             // and toggle it whenever the symbol tool is tapped while already active.
             if (!symbolToolbarOpenedOnce || wasAlreadyInSymbolMode) {
                 symbolToolbarOpenedOnce = true;
+                setLineTypeToolbarOpen(false);
                 toggleSymbolToolbar();
             }
             return true;
@@ -429,6 +475,29 @@ public abstract class GraphActivity extends SurveyEditorActivity
             if (itemId == symbol.getButtonViewId()) {
                 selectSketchTool(SketchTool.SYMBOL);
                 selectSymbol(symbol);
+                return true;
+            }
+        }
+
+        // ********** Handle special line type logic **********
+
+        if (itemId == R.id.buttonDraw) {
+            boolean wasAlreadyInDrawMode = alreadySelectedTool == SketchTool.DRAW;
+            selectSketchTool(SketchTool.DRAW);
+            // Mirrors the symbol toolbar: open the first time ever, then toggle whenever the
+            // draw tool is tapped while already active.
+            if (!lineTypeToolbarOpenedOnce || wasAlreadyInDrawMode) {
+                lineTypeToolbarOpenedOnce = true;
+                setSymbolToolbarOpen(false);
+                toggleLineTypeToolbar();
+            }
+            return true;
+        }
+
+        for (LineType lineType : LineType.values()) {
+            if (itemId == lineType.getButtonViewId()) {
+                selectSketchTool(SketchTool.DRAW);
+                selectLineType(lineType);
                 return true;
             }
         }
@@ -486,6 +555,59 @@ public abstract class GraphActivity extends SurveyEditorActivity
         buttonPanel.invalidate();
     }
 
+    private void initialiseLineTypeToolbar() {
+        LinearLayout buttonPanel = findViewById(R.id.lineTypeToolbarButtonPanel);
+        buttonPanel.removeAllViews();
+
+        int heightDp = Math.round(getResources().getDimension(R.dimen.toolbar_button_height));
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(heightDp, heightDp);
+
+        for (LineType lineType : LineType.values()) {
+            ImageButton button = new ImageButton(this);
+            button.setId(lineType.getButtonViewId());
+            button.setLayoutParams(params);
+            button.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            button.setImageResource(lineType.getDrawableId());
+            button.setContentDescription(getString(lineType.getStringId()));
+            TooltipCompat.setTooltipText(button, getString(lineType.getStringId()));
+            button.setOnClickListener(this);
+            buttonPanel.addView(button);
+        }
+        buttonPanel.invalidate();
+    }
+
+    private void toggleLineTypeToolbar() {
+        View toolbar = findViewById(R.id.lineTypeToolbar);
+        boolean isVisible = toolbar.getVisibility() == View.VISIBLE;
+        setLineTypeToolbarOpen(!isVisible);
+    }
+
+    private void setLineTypeToolbarOpen(boolean setOpen) {
+        View toolbar = findViewById(R.id.lineTypeToolbar);
+        toolbar.setVisibility(setOpen ? View.VISIBLE : View.GONE);
+    }
+
+    private void selectLineType(LineType lineType) {
+        SketchPreferences.setSelectedLineType(lineType);
+
+        for (LineType l : LineType.values()) {
+            ImageButton button = findViewById(l.getButtonViewId());
+            button.getBackground().clearColorFilter();
+        }
+
+        ImageButton selectedLineTypeButton = findViewById(lineType.getButtonViewId());
+        selectedLineTypeButton
+                .getBackground()
+                .setColorFilter(buttonHighlightColour, PorterDuff.Mode.SRC_ATOP);
+
+        ImageButton drawButton = findViewById(R.id.buttonDraw);
+        drawButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        drawButton.setImageDrawable(
+                addSelectionBorder(AppCompatResources.getDrawable(this, lineType.getDrawableId())));
+
+        graphView.setLineType(lineType);
+    }
+
     private void toggleSymbolToolbar() {
         View toolbar = getSymbolToolbar();
         boolean isVisible = toolbar.getVisibility() == View.VISIBLE;
@@ -516,20 +638,34 @@ public abstract class GraphActivity extends SurveyEditorActivity
 
         ImageButton symbolButton = findViewById(R.id.buttonSymbol);
         symbolButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        symbolButton.setImageDrawable(addSelectionBorder(symbol.createDrawable()));
 
+        graphView.setCurrentSymbol(symbol);
+    }
+
+    /**
+     * Wraps a toolbar drawable in the border used to show what is currently selected on the draw
+     * and symbol buttons.
+     *
+     * <p>The border is given an explicit size rather than being allowed to take the size of the
+     * drawable it wraps, so that the box stays the same whatever is selected.
+     */
+    private Drawable addSelectionBorder(Drawable drawable) {
         ShapeDrawable border =
                 new ShapeDrawable(
                         new RoundRectShape(new float[] {5, 5, 5, 5, 5, 5, 5, 5}, null, null));
-        border.getPaint().setColor(Color.BLACK); // Set border color
-        border.getPaint().setStyle(Paint.Style.STROKE); // Set to be a border (not filled)
-        border.getPaint().setStrokeWidth(10); // Set border width
+        border.getPaint().setColor(Color.BLACK);
+        border.getPaint().setStyle(Paint.Style.STROKE);
+        border.getPaint().setStrokeWidth(10);
 
-        Drawable drawable = symbol.createDrawable();
-        Drawable[] layers = {drawable, border};
-        LayerDrawable layerDrawable = new LayerDrawable(layers);
-        symbolButton.setImageDrawable(layerDrawable);
+        int size = Math.round(getResources().getDimension(R.dimen.toolbar_button_height));
+        border.setIntrinsicWidth(size);
+        border.setIntrinsicHeight(size);
 
-        graphView.setCurrentSymbol(symbol);
+        LayerDrawable layers = new LayerDrawable(new Drawable[] {drawable, border});
+        layers.setLayerSize(0, size, size);
+        layers.setLayerSize(1, size, size);
+        return layers;
     }
 
     private void initialiseTools() {
@@ -542,6 +678,9 @@ public abstract class GraphActivity extends SurveyEditorActivity
         Symbol.setResources(getResources());
         Symbol selectedSymbol = SketchPreferences.getSelectedSymbol();
         selectSymbol(selectedSymbol);
+
+        LineType selectedLineType = SketchPreferences.getSelectedLineType();
+        selectLineType(selectedLineType);
     }
 
     private void selectSketchTool(SketchTool toSelect) {

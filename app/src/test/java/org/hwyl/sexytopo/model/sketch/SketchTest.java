@@ -38,9 +38,9 @@ public class SketchTest {
         PathDetail pathDetail = sketch.startNewPath(Coord2D.ORIGIN);
         Assert.assertEquals(LineType.WALL, pathDetail.getLineType());
 
-        sketch.setActiveLineType(LineType.GENERAL);
+        sketch.setActiveLineType(LineType.SKETCH);
         PathDetail plain = sketch.startNewPath(new Coord2D(1, 1));
-        Assert.assertEquals(LineType.GENERAL, plain.getLineType());
+        Assert.assertEquals(LineType.SKETCH, plain.getLineType());
     }
 
     @Test
@@ -89,6 +89,39 @@ public class SketchTest {
     }
 
     @Test
+    public void testOrnamentSizeSurvivesFragmentingFlippingAndScaling() {
+        List<Coord2D> points =
+                Arrays.asList(
+                        new Coord2D(0, 0),
+                        new Coord2D(2, 0),
+                        new Coord2D(4, 0),
+                        new Coord2D(6, 0),
+                        new Coord2D(8, 0));
+        PathDetail pathDetail =
+                new PathDetail(new ArrayList<>(points), Colour.BLACK, LineType.PIT, 0.5f);
+
+        // erasing keeps the size on each surviving fragment
+        List<SketchDetail> fragments =
+                pathDetail.getPathFragmentsOutsideRadius(new Coord2D(4, 0), 0.5);
+        Assert.assertEquals(2, fragments.size());
+        for (SketchDetail fragment : fragments) {
+            Assert.assertEquals(0.5f, ((PathDetail) fragment).getOrnamentSize(), 0.0001f);
+        }
+
+        // flipping keeps it too
+        Sketch sketch = new Sketch();
+        sketch.restoreDetailToSketch(pathDetail);
+        PathDetail flipped = sketch.flipPathDetail(pathDetail);
+        Assert.assertEquals(0.5f, flipped.getOrnamentSize(), 0.0001f);
+
+        // but geometric scaling scales it, as it is a survey-space size (cf. symbols)
+        PathDetail scaled = pathDetail.scale(2f);
+        Assert.assertEquals(1.0f, scaled.getOrnamentSize(), 0.0001f);
+        PathDetail translated = pathDetail.translate(new Coord2D(3, 3));
+        Assert.assertEquals(0.5f, translated.getOrnamentSize(), 0.0001f);
+    }
+
+    @Test
     public void testGetMostRecentSemanticPathSkipsGeneralLines() {
         Sketch sketch = new Sketch();
         Assert.assertNull(sketch.getMostRecentSemanticPath());
@@ -98,7 +131,7 @@ public class SketchTest {
         wall.lineTo(new Coord2D(1, 0));
         sketch.finishPath();
 
-        sketch.setActiveLineType(LineType.GENERAL);
+        sketch.setActiveLineType(LineType.SKETCH);
         PathDetail scribble = sketch.startNewPath(new Coord2D(5, 5));
         scribble.lineTo(new Coord2D(6, 5));
         sketch.finishPath();
@@ -258,6 +291,52 @@ public class SketchTest {
         Assert.assertEquals(0.1f, ring.getDistanceFrom(new Coord2D(2.1f, 5)), 0.0001f);
         // the middle of the hole is far from every boundary
         Assert.assertEquals(3f, ring.getDistanceFrom(new Coord2D(5, 5)), 0.0001f);
+    }
+
+    @Test
+    public void testAreaContainsIgnoresHoles() {
+        AreaDetail ring =
+                new AreaDetail(
+                        new ArrayList<>(rectangleContour(0, 0, 10, 10)),
+                        Collections.singletonList(new ArrayList<>(rectangleContour(2, 2, 6, 6))),
+                        AreaType.WATER,
+                        Colour.BLUE);
+
+        Assert.assertTrue("point in the filled ring", ring.contains(new Coord2D(1, 5)));
+        Assert.assertFalse("point in the courtyard", ring.contains(new Coord2D(5, 5)));
+        Assert.assertFalse("point outside entirely", ring.contains(new Coord2D(20, 5)));
+    }
+
+    @Test
+    public void testFindAreaContainingFindsAreaTappedInTheMiddle() {
+        // the case the eraser was missing: a tap deep inside a large area, far from any boundary
+        Sketch sketch = new Sketch();
+        AreaDetail pool =
+                new AreaDetail(
+                        new ArrayList<>(rectangleContour(0, 0, 100, 100)),
+                        AreaType.WATER,
+                        Colour.BLUE);
+        sketch.addAreaDetail(pool);
+
+        Assert.assertSame(pool, sketch.findAreaContaining(new Coord2D(50, 50)));
+        Assert.assertNull(sketch.findAreaContaining(new Coord2D(150, 50)));
+    }
+
+    @Test
+    public void testFindAreaContainingSkipsAreaWhoseHoleIsTapped() {
+        // tapping the courtyard of a ring must not find the ring: that space isn't part of it
+        Sketch sketch = new Sketch();
+        AreaDetail ring =
+                new AreaDetail(
+                        new ArrayList<>(rectangleContour(0, 0, 100, 100)),
+                        Collections.singletonList(
+                                new ArrayList<>(rectangleContour(20, 20, 60, 60))),
+                        AreaType.WATER,
+                        Colour.BLUE);
+        sketch.addAreaDetail(ring);
+
+        Assert.assertNull(sketch.findAreaContaining(new Coord2D(50, 50)));
+        Assert.assertSame(ring, sketch.findAreaContaining(new Coord2D(10, 50)));
     }
 
     @Test

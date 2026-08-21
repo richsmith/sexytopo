@@ -1,0 +1,13 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="40dp"
+    android:viewportWidth="40"
+    android:viewportHeight="40">
+  <!-- A wall: the same freehand curve as the plain line but with a bold stroke. -->
+  <path
+      android:strokeWidth="3.5"
+      android:pathData="M4,26 C12,18 18,28 26,20 C30,16 33,14 36,13"
+      android:fillColor="#00000000"
+      android:strokeColor="#000"
+      android:strokeLineCap="round"/>
+</vector>

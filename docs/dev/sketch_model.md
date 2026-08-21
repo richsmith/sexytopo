@@ -29,7 +29,7 @@ The one exception is a `CrossSectionDetail`'s sub-sketch: committing an edit fro
 - `List<CrossSectionDetail> crossSectionDetails`
 - `PathDetail activePath` — the path currently being drawn (null when not drawing)
 - `Colour activeColour` — colour applied to new elements (default: BLACK)
-- `LineType activeLineType` — line type applied to new paths (default: GENERAL)
+- `LineType activeLineType` — line type applied to new paths (default: SKETCH)
 - `List<SketchDetail> sketchHistory` / `undoneHistory` — undo/redo stacks
 
 The undo/redo stacks are **not persisted** — only the current state is saved to disk.
@@ -44,13 +44,17 @@ Path drawing is a multi-step operation driven by touch events in `GraphView`:
 
 ### Line Types
 
-`LineType` types a path as GENERAL (a plain freehand line, the historical behaviour) or as a semantic cave feature: WALL, PRESUMED_WALL, PIT, CHIMNEY or SLOPE. The active line type is picked from a toolbar that opens when the draw tool is tapped while already selected (mirroring the symbol toolbar), and is persisted in `SketchPreferences`. Eraser fragments keep the type of the path they came from. There is no retype operation yet — changing a line's type means redrawing it.
+`LineType` types a path as SKETCH (a plain freehand line, the historical behaviour) or as a semantic cave feature: WALL, PRESUMED_WALL, PIT or CHIMNEY. The active line type is picked from a toolbar that opens when the draw tool is tapped while already selected (mirroring the symbol toolbar), and is persisted in `SketchPreferences`. Eraser fragments keep the type of the path they came from. There is no retype operation yet — changing a line's type means redrawing it.
 
-Each type describes its own appearance: a stroke width factor plus an optional path effect. Ornamented types (pit/slope/chimney ticks) use a small stamp path repeated along the line via `PathDashPathEffect` — the TopoDroid approach — so drawing them is a plain `drawPath` call with a per-type `Paint`. Where a type needs both dashes and ticks, the gaps are built into the stamp rather than composing effects.
+Each type is defined entirely by its constructor arguments — stroke width factor, optional dash pattern, optional tick stamp, wall-ness — so adding a type needs no logic changes and there are no switch statements over the enum. Ornamented types (pit/chimney ticks) use a small stamp path repeated along the line via `PathDashPathEffect` — the TopoDroid approach — so drawing them is a plain `drawPath` call with a per-type `Paint`. Where a type needs both dashes and ticks, the gaps are built into the stamp rather than composing effects.
+
+Therion's `slope` was considered and left out for now: its hachures alternate long and short, and a real slope also carries an `-l-size` extent parameter, so it needs more than `LineType` can currently express.
+
+Stamp and dash measurements are multiples of the path's **ornament size** (`PathDetail.getOrnamentSize`), a survey-space quantity in metres fixed when the line is drawn — a fixed dp size (the "Line ornament size" preference) converted at the zoom in force at the time, exactly as `SymbolDetail`'s size is chosen. So ornamentation is anchored to the cave: it stays put over the rock and scales with everything else when zooming, instead of crawling along the line. Drawing zoomed in gives finer ticks than drawing zoomed out, and `PathDetail.scale` scales the ornament size with the geometry (as symbols do), so cross-section sub-sketches stay consistent. The size round-trips through JSON as `ornament-size` (written only for typed lines, defaulted on load) and is used by the SVG exporter's dash array, but **not** by th2 — Therion applies its own styling to line commands.
 
 Lines are oriented by point order (Therion's convention: the side matters for walls and ticked types). Wall-kind lines are auto-oriented when the stroke is finished: `LineOrienter` infers the passage-interior side from the survey centreline (per-segment nearest-station votes, weighted by length) and reverses the stored point order if needed, so the data is canonical whichever way the user drew it. Ticked types can't be inferred — only the user knows which side the drop is — so they keep the drawn direction, with live tick rendering as feedback. Tools → Flip Last Line reverses the most recently drawn semantic line (`Sketch.flipPathDetail`, a delete-and-replace so it's one undo step). The most recently drawn wall-kind line gets a slim red arrowhead at its midpoint pointing to the side taken to be the passage interior, so a wrong auto-orientation guess is visible immediately; it is feedback only — never exported, not shown on a stroke in progress, and toggled by the "Wall Inside Marker" quick setting. Ticked types get no marker since their ornamentation already shows their orientation.
 
-Two rendering caveats: path effects only work on a hardware-accelerated canvas from API 28, so older devices fall back to a plain stroke (the width factor still applies); and effects are applied to the view-space path, so ornamentation keeps a constant on-screen size across zoom levels.
+Two rendering caveats: path effects only work on a hardware-accelerated canvas from API 28, so older devices fall back to a plain stroke (the width factor still applies); and zoomed far enough out the ornamentation would render as a smear, so below a minimum on-screen advance the effect is dropped and the line drawn as a plain stroke. `GraphView` caches one `Paint` per type alongside the on-screen ornament size its effect was built for, rebuilding only when that changes (i.e. on zoom, or between lines drawn at different zooms) rather than every frame.
 
 On export, semantic lines become first-class Therion `line wall` / `line pit` etc. commands in the th2 — Therion draws the ornamentation itself. This can be turned off with the "Export typed lines" Therion export setting. Unlike areas, semantic lines also stay in the XVI tracing background (all paths do), so the tracing is always a complete record of the sketch whether or not th2 line export is on; the duplication is harmless since the XVI is only a background reference. SVG gets a class attribute naming the type plus the width factor and (for dashed types) a dash array; tick ornamentation is not reproduced in SVG yet.
 
@@ -133,7 +137,7 @@ Sketch coordinates are in **survey space** (metres). `GraphView` converts to scr
 
 | Key | Contents |
 |-----|----------|
-| `"paths"` | array of `{colour, line-type, points:[{x,y}...]}` (`line-type` omitted for GENERAL, as in pre-line-type files) |
+| `"paths"` | array of `{colour, line-type, points:[{x,y}...]}` (`line-type` omitted for SKETCH, as in pre-line-type files) |
 | `"areas"` | array of `{area-type, colour, points:[{x,y}...], holes:[[{x,y}...]...]}` (absent in pre-area files; `holes` omitted when the area has none) |
 | `"symbols"` | array of `{location, symbol-id, colour, size, angle}` |
 | `"labels"` | array of `{location, text, colour, size}` |
@@ -145,7 +149,7 @@ Path simplification is re-applied on load. History stacks are not serialized.
 
 `GraphView.drawSketch()` iterates each detail collection:
 - **Areas:** drawn first (underneath lines): each contour is outlined, and horizontal parallel-line hatching is clipped to the region (an even-odd `Path`, so holes are outlined but left unhatched) and anchored to survey space so it doesn't crawl when panning
-- **Paths:** GENERAL paths are sorted by colour (to minimize paint changes), then batched into `float[]` arrays for `canvas.drawLines()`; semantic lines are drawn individually via `canvas.drawPath()` with their type's paint so dashes and tick stamps can apply
+- **Paths:** SKETCH paths are sorted by colour (to minimize paint changes), then batched into `float[]` arrays for `canvas.drawLines()`; semantic lines are drawn individually via `canvas.drawPath()` with their type's paint so dashes and tick stamps can apply
 - **Symbols:** rendered as scaled, optionally rotated `Drawable` objects with a colour filter
 - **Text:** font size = `textSize * surveyToViewScale`; supports `\n` for multiline
 - **Cross-sections:** `CrossSectionDetail.getProjection()` computes the legs; drawn with dashed connector line to the actual station

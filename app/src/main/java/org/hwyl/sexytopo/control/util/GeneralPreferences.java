@@ -243,6 +243,10 @@ public class GeneralPreferences {
         return getInt("pref_survey_symbol_size", 25);
     }
 
+    public static int getLineOrnamentSizeDp() {
+        return getInt("pref_survey_line_ornament_size", 12);
+    }
+
     // ********** Calibration ***********
 
     public static String getCalibrationAlgorithm() {
@@ -326,6 +330,10 @@ public class GeneralPreferences {
 
     public static boolean isXviExportTextEnabled() {
         return getBoolean("pref_therion_export_text", true);
+    }
+
+    public static boolean isTherionLineExportEnabled() {
+        return getBoolean("pref_therion_export_lines", true);
     }
 
     public static String getTherionPlanSuffix() {

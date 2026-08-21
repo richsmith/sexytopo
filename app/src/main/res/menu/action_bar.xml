@@ -111,6 +111,8 @@
             <group android:id="@+id/tools_group_edit">
                 <item android:id="@+id/action_undo_last_leg"
                       android:title="@string/action_undo_last_leg"/>
+                <item android:id="@+id/action_flip_last_line"
+                      android:title="@string/action_flip_last_line"/>
                 <item android:id="@+id/action_find_station"
                       android:title="@string/action_find_station"/>
             </group>

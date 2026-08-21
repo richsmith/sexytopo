@@ -1,0 +1,26 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="40dp"
+    android:viewportWidth="40"
+    android:viewportHeight="40">
+  <!-- A presumed wall: the wall curve broken into dashes (VectorDrawable has no dash
+       support, so the gaps are drawn as separate segments). -->
+  <path
+      android:strokeWidth="3"
+      android:pathData="M4,26 C7,23 10,22 13,23.5"
+      android:fillColor="#00000000"
+      android:strokeColor="#000"
+      android:strokeLineCap="round"/>
+  <path
+      android:strokeWidth="3"
+      android:pathData="M18,25 C21,24.5 24,22 26,20"
+      android:fillColor="#00000000"
+      android:strokeColor="#000"
+      android:strokeLineCap="round"/>
+  <path
+      android:strokeWidth="3"
+      android:pathData="M30,17 C32,15.5 34,14 36,13"
+      android:fillColor="#00000000"
+      android:strokeColor="#000"
+      android:strokeLineCap="round"/>
+</vector>

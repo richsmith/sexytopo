@@ -84,6 +84,8 @@
     <string name="action_add_leg">Add Leg…</string>
     <string name="action_add_splay">Add Splay…</string>
     <string name="action_undo_last_leg">Undo last reading</string>
+    <string name="action_flip_last_line">Flip last line</string>
+    <string name="tools_flip_last_line_none">No typed line to flip</string>
     <string name="action_find_station">Find Station…</string>
     <string name="action_link_to_existing_survey">Link to an Existing Survey</string>
     <string name="action_system_log">System Log</string>
@@ -190,6 +192,11 @@
     <string name="sketch_toolbar_colour_blue">Blue</string>
     <string name="sketch_toolbar_colour_purple">Purple</string>
     <string name="sketch_toolbar_symbol_close">Close symbol toolbar</string>
+    <string name="line_type_sketch">Sketch line</string>
+    <string name="line_type_wall">Wall</string>
+    <string name="line_type_presumed_wall">Presumed wall</string>
+    <string name="line_type_pit">Pit edge</string>
+    <string name="line_type_chimney">Chimney</string>
     <string name="sketch_menu_delete_last_leg">Undo Last Reading</string>
     <string name="sketch_menu_centre_view">Centre on Active</string>
     <string name="sketch_menu_auto_recentre">Auto-Recentre</string>
@@ -201,6 +208,7 @@
     <string name="sketch_menu_snap_to_lines">Snap to Lines</string>
     <string name="sketch_menu_fade_non_active">Fade Non-Active</string>
     <string name="sketch_menu_show_station_labels">Station Labels</string>
+    <string name="sketch_menu_show_wall_inside_tick">Wall Inside Marker</string>
     <string name="sketch_menu_show_xsections">Cross-Sections</string>
     <string name="sketch_menu_show_splays">Show Splays</string>
     <string name="sketch_menu_show_sketch">Show Sketch</string>
@@ -507,6 +515,8 @@
     <string name="settings_survey_text_tool_font_size_summary">How big to initially draw manually-placed text (sp)</string>
     <string name="settings_survey_symbol_size_title">Survey symbol size</string>
     <string name="settings_survey_symbol_size_summary">How big to initially draw symbols (dp)</string>
+    <string name="settings_survey_line_ornament_size_title">Line ornament size</string>
+    <string name="settings_survey_line_ornament_size_summary">How big to initially draw the ticks and dashes on wall, pit and chimney lines (dp)</string>
     <string name="settings_sketch_line_width_title">Sketch line thickness</string>
     <string name="settings_sketch_line_width_summary">How wide to draw sketch lines (dp)</string>
     <string name="settings_leg_width_title">Leg line thickness</string>
@@ -540,6 +550,8 @@
     <string name="settings_export_title">Export</string>
     <string name="settings_export_therion_symbols_title">Export symbols</string>
     <string name="settings_export_therion_symbols_summary">Include symbols when exporting</string>
+    <string name="settings_export_therion_lines_title">Export typed lines</string>
+    <string name="settings_export_therion_lines_summary">Include lines with a type (wall, pit etc.) as Therion line commands when exporting</string>
     <string name="settings_export_therion_text_title">Export text</string>
     <string name="settings_export_therion_text_summary">Include text when exporting</string>
     <string name="settings_export_folder_name_title">Export folder name</string>

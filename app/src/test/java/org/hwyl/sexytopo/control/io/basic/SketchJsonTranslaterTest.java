@@ -151,15 +151,40 @@ public class SketchJsonTranslaterTest {
     }
 
     @Test
+    public void testOrnamentSizeRoundTrip() throws Exception {
+        List<Coord2D> points = Arrays.asList(new Coord2D(0, 0), new Coord2D(2, 0));
+        PathDetail pathDetail = new PathDetail(points, Colour.BLACK, LineType.PIT, 0.35f);
+
+        JSONObject json = SketchJsonTranslater.toJson(pathDetail);
+        PathDetail restored = SketchJsonTranslater.toPathDetail(json);
+
+        Assert.assertEquals(0.35f, restored.getOrnamentSize(), 0.0001f);
+    }
+
+    @Test
+    public void testTypedPathWithoutOrnamentSizeTagGetsDefault() throws Exception {
+        // typed lines written before ornament sizes existed have no "ornament-size" key
+        List<Coord2D> points = Arrays.asList(new Coord2D(0, 0), new Coord2D(2, 0));
+        JSONObject json =
+                SketchJsonTranslater.toJson(
+                        new PathDetail(points, Colour.BLACK, LineType.PIT, 0.35f));
+        json.remove(SketchJsonTranslater.ORNAMENT_SIZE_TAG);
+
+        PathDetail restored = SketchJsonTranslater.toPathDetail(json);
+        Assert.assertEquals(PathDetail.DEFAULT_ORNAMENT_SIZE, restored.getOrnamentSize(), 0.0001f);
+    }
+
+    @Test
     public void testGeneralPathOmitsLineTypeTag() throws Exception {
         // paths written before line types existed have no "line-type" key, so general paths
         // are written the same way to keep old and new files alike
         List<Coord2D> points = Arrays.asList(new Coord2D(0, 0), new Coord2D(2, 0));
         JSONObject json = SketchJsonTranslater.toJson(new PathDetail(points, Colour.BLACK));
         Assert.assertFalse(json.has(SketchJsonTranslater.LINE_TYPE_TAG));
+        Assert.assertFalse(json.has(SketchJsonTranslater.ORNAMENT_SIZE_TAG));
 
         PathDetail restored = SketchJsonTranslater.toPathDetail(json);
-        Assert.assertEquals(LineType.GENERAL, restored.getLineType());
+        Assert.assertEquals(LineType.SKETCH, restored.getLineType());
     }
 
     @Test

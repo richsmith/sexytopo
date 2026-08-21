@@ -34,15 +34,31 @@
             android:layout_weight="1"/>
 
         <HorizontalScrollView
+            android:id="@+id/lineTypeToolbar"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/sexyTopoDarkGreen"
+            android:visibility="gone">
+            <LinearLayout
+                android:orientation="horizontal"
+                android:id="@+id/lineTypeToolbarButtonPanel"
+                android:weightSum="1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+            </LinearLayout>
+
+        </HorizontalScrollView>
+
+        <HorizontalScrollView
             android:id="@+id/symbolToolbar"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:background="@color/sexyTopoDarkGreen"
             android:visibility="gone">
             <LinearLayout
                 android:orientation="horizontal"
                 android:id="@+id/symbolToolbarButtonPanel"
                 android:weightSum="1"
-                android:background="@color/sexyTopoDarkGreen"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
             </LinearLayout>
@@ -209,6 +225,7 @@
                 android:layout_margin="0dp"
                 android:layout_marginTop="-4dp"
                 android:contentDescription="@string/sketch_toolbar_draw"
+                android:padding="10dp"
                 android:cropToPadding="false"
                 android:hapticFeedbackEnabled="true"
                 android:scaleType="fitCenter"

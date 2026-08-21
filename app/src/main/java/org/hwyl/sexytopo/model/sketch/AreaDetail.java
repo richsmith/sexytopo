@@ -77,10 +77,25 @@ public final class AreaDetail extends SketchDetail {
     }
 
     /**
-     * Distance from the region's boundary (not its interior); a point well inside the area is
-     * considered far from it, which stops e.g. the eraser grabbing an area when the user taps in
-     * the middle of it. Hole edges count as boundary, so an area can be grabbed by the rim of one
+     * Whether a point lies in the filled part of this area — inside the outline, but not inside one
      * of its holes.
+     *
+     * <p>This is separate from getDistanceFrom, which measures distance to the boundary only. A
+     * point deep inside a large area is far from its boundary, so callers that want to act on the
+     * area under the user's finger need this instead.
+     */
+    public boolean contains(Coord2D point) {
+        if (!PolygonUtils.contains(outline, point)) {
+            return false;
+        }
+        return holes.stream().noneMatch(hole -> PolygonUtils.contains(hole, point));
+    }
+
+    /**
+     * Distance from the region's boundary (not its interior); a point well inside the area is
+     * considered far from it, which stops an area outranking a line drawn on top of it when the
+     * user taps near that line. Hole edges count as boundary, so an area can be grabbed by the rim
+     * of one of its holes.
      */
     @Override
     public float getDistanceFrom(Coord2D point) {
