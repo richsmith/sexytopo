@@ -44,6 +44,36 @@ public class SvgExporterTest {
     }
 
     @Test
+    public void testSymbolMarkupSurvivesAndLeavesNoMarkersBehind() throws Exception {
+        Survey survey = surveyWithTrip(new Trip());
+
+        String content = new SvgExporter().getContent(survey, Projection2D.PLAN);
+
+        // The sentinels fencing the symbol markup are consumed by the un-escaping, so none of
+        // them can reach the file.
+        Assert.assertFalse(content.contains("SEXYTOPO_RAW"));
+    }
+
+    @Test
+    public void testAngleBracketsInCopyrightHolderStayEscaped() throws Exception {
+        // Regression test: the whole document used to have &lt;/&gt; rewritten back to raw
+        // angle brackets, so a holder like this produced unparseable XML.
+        Trip trip = new Trip();
+        trip.setCopyrightHolder("Jane <jane@example.com>");
+        Survey survey = surveyWithTrip(trip);
+
+        String content = new SvgExporter().getContent(survey, Projection2D.PLAN);
+
+        Assert.assertTrue(content.contains("Jane &lt;jane@example.com&gt;"));
+        Assert.assertFalse(content.contains("Jane <jane@example.com>"));
+
+        // Must still parse as XML.
+        javax.xml.parsers.DocumentBuilderFactory.newInstance()
+                .newDocumentBuilder()
+                .parse(new org.xml.sax.InputSource(new java.io.StringReader(content)));
+    }
+
+    @Test
     public void testCopyrightLineWrittenWithoutASurveyDate() throws Exception {
         Trip trip = new Trip();
         trip.setCopyrightHolder("Caver Jane");

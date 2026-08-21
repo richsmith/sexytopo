@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
@@ -218,18 +220,37 @@ public class SvgExporter extends DoubleSketchFileExporter {
         xmlSerializer.endDocument();
 
         String text = writer.toString();
-        text = unescapeTagsHack(text);
+        text = unescapeSymbolMarkup(text);
         text = prettyPrintXML(text);
 
         return text;
     }
 
-    /** Need this because idiot library developers don't provide an option to override escaping */
-    public String unescapeTagsHack(String text) {
+    // Sentinels fencing off pre-rendered symbol markup that must not stay escaped. They are
+    // written as text, so the serializer escapes them along with everything else and they can't
+    // collide with anything the user typed.
+    private static final String RAW_MARKUP_START = "@@SEXYTOPO_RAW_START@@";
+    private static final String RAW_MARKUP_END = "@@SEXYTOPO_RAW_END@@";
 
-        text = text.replaceAll("&lt;", "<");
-        text = text.replaceAll("&gt;", ">");
-        return text;
+    private static final Pattern RAW_MARKUP_REGION =
+            Pattern.compile(
+                    Pattern.quote(RAW_MARKUP_START) + "(.*?)" + Pattern.quote(RAW_MARKUP_END),
+                    Pattern.DOTALL);
+
+    /**
+     * Un-escapes the pre-rendered symbol markup, which the serializer has no way to write raw. Only
+     * the fenced regions are touched, so a &lt; or &gt; in a station name, comment or copyright
+     * holder stays escaped and the document stays well-formed.
+     */
+    public String unescapeSymbolMarkup(String text) {
+        Matcher matcher = RAW_MARKUP_REGION.matcher(text);
+        StringBuilder result = new StringBuilder();
+        while (matcher.find()) {
+            String markup = matcher.group(1).replace("&lt;", "<").replace("&gt;", ">");
+            matcher.appendReplacement(result, Matcher.quoteReplacement(markup));
+        }
+        matcher.appendTail(result);
+        return result.toString();
     }
 
     /** Pre-computed legend layout: knows its total height so the frame can be expanded for it. */
@@ -823,7 +844,10 @@ public class SvgExporter extends DoubleSketchFileExporter {
         xmlSerializer.attribute("", "viewBox", "0 0 40 40");
 
         xmlSerializer.flush();
-        xmlSerializer.text(innerSvgContent);
+        // The serializer escapes everything written as text, but this is real markup that has to
+        // survive as markup. Fence it so it - and only it - can be unescaped afterwards; see
+        // unescapeSymbolMarkup.
+        xmlSerializer.text(RAW_MARKUP_START + innerSvgContent + RAW_MARKUP_END);
 
         xmlSerializer.endTag("", "symbol");
     }
