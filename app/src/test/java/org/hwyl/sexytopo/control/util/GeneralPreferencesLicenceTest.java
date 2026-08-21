@@ -15,25 +15,27 @@ public class GeneralPreferencesLicenceTest {
     public void testGetLicenceOptionsReturnsSeedDefaultsWhenNoPrefs() {
         List<LicenceOption> options = GeneralPreferences.getLicenceOptions();
 
-        Assert.assertEquals(6, options.size());
+        Assert.assertEquals(7, options.size());
         Assert.assertEquals("GPLv3.0+", options.get(0).getName());
         Assert.assertEquals("CC0", options.get(1).getName());
         Assert.assertEquals("CC BY 4.0", options.get(2).getName());
         Assert.assertEquals("CC BY SA 4.0", options.get(3).getName());
         Assert.assertEquals("CC BY SA NC 4.0", options.get(4).getName());
         Assert.assertEquals("All rights reserved", options.get(5).getName());
-        Assert.assertTrue(options.get(0).isDefault());
-
-        int defaultCount = 0;
-        for (LicenceOption option : options) {
-            if (option.isDefault()) defaultCount++;
-        }
-        Assert.assertEquals(1, defaultCount);
+        Assert.assertEquals(GeneralPreferences.NO_LICENCE_NAME, options.get(6).getName());
     }
 
     @Test
-    public void testGetDefaultLicenceNameReturnsGplv3WhenUnset() {
-        Assert.assertEquals("GPLv3.0+", GeneralPreferences.getDefaultLicenceName());
+    public void testNoOptionIsDefaultUntilOneIsChosen() {
+        for (LicenceOption option : GeneralPreferences.getLicenceOptions()) {
+            Assert.assertFalse(option.isDefault());
+        }
+    }
+
+    @Test
+    public void testGetDefaultLicenceNameIsBlankWhenNoneChosen() {
+        Assert.assertEquals(
+                GeneralPreferences.NO_LICENCE_NAME, GeneralPreferences.getDefaultLicenceName());
     }
 
     @Test
@@ -70,15 +72,15 @@ public class GeneralPreferencesLicenceTest {
     }
 
     @Test
-    public void testWithAddedToEmptyListBecomesDefault() {
+    public void testWithAddedToEmptyListDoesNotBecomeDefault() {
         List<LicenceOption> result = GeneralPreferences.withAdded(new ArrayList<>(), "CC0");
 
         Assert.assertEquals(1, result.size());
-        Assert.assertTrue(result.get(0).isDefault());
+        Assert.assertFalse(result.get(0).isDefault());
     }
 
     @Test
-    public void testWithRemovedPromotesFirstRemainingWhenDefaultRemoved() {
+    public void testWithRemovedLeavesNoDefaultWhenDefaultRemoved() {
         List<LicenceOption> options =
                 Arrays.asList(
                         new LicenceOption("CC0", false),
@@ -89,8 +91,33 @@ public class GeneralPreferencesLicenceTest {
 
         Assert.assertEquals(2, result.size());
         Assert.assertEquals("CC0", result.get(0).getName());
-        Assert.assertTrue(result.get(0).isDefault());
+        Assert.assertFalse(result.get(0).isDefault());
         Assert.assertFalse(result.get(1).isDefault());
+    }
+
+    @Test
+    public void testWithDefaultClearedUnflagsEverything() {
+        List<LicenceOption> options =
+                Arrays.asList(new LicenceOption("CC0", true), new LicenceOption("GPLv3.0+", false));
+
+        List<LicenceOption> result = GeneralPreferences.withDefaultCleared(options);
+
+        Assert.assertEquals(2, result.size());
+        Assert.assertFalse(result.get(0).isDefault());
+        Assert.assertFalse(result.get(1).isDefault());
+    }
+
+    @Test
+    public void testNoLicenceCanBeSetAsTheDefault() {
+        List<LicenceOption> result =
+                GeneralPreferences.withDefaultSet(
+                        GeneralPreferences.getLicenceOptions(), GeneralPreferences.NO_LICENCE_NAME);
+
+        for (LicenceOption option : result) {
+            Assert.assertEquals(
+                    option.getName().equals(GeneralPreferences.NO_LICENCE_NAME),
+                    option.isDefault());
+        }
     }
 
     @Test

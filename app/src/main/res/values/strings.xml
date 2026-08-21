@@ -414,6 +414,7 @@
     <string name="trip_comments">Comments</string>
     <string name="trip_copyright_label">Copyright</string>
     <string name="trip_licence_label">Licence</string>
+    <string name="trip_licence_none">No licence</string>
     <string name="trip_save_trip">Save Trip</string>
     <string name="trip_role_book">Book (drawing)</string>
     <string name="trip_role_instruments">Instruments</string>

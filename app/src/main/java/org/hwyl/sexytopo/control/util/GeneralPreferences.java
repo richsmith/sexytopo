@@ -408,17 +408,25 @@ public class GeneralPreferences {
     private static final String PREF_LICENCE_OPTIONS = "pref_licence_options";
     private static final String LICENCE_NAME_TAG = "name";
     private static final String LICENCE_DEFAULT_TAG = "default";
-    private static final String FALLBACK_DEFAULT_LICENCE_NAME = "GPLv3.0+";
+
+    /**
+     * The name of the "no licence" option: a deliberate choice to leave the survey unlicensed, as
+     * opposed to simply not having decided yet. It is stored as the empty string, so it needs no
+     * special-casing on export - a trip with this licence behaves exactly like one with none.
+     * TripActivity displays it under a friendlier label.
+     */
+    public static final String NO_LICENCE_NAME = "";
 
     private static List<LicenceOption> defaultLicenceOptions() {
         return new ArrayList<>(
                 Arrays.asList(
-                        new LicenceOption(FALLBACK_DEFAULT_LICENCE_NAME, true),
+                        new LicenceOption("GPLv3.0+", false),
                         new LicenceOption("CC0", false),
                         new LicenceOption("CC BY 4.0", false),
                         new LicenceOption("CC BY SA 4.0", false),
                         new LicenceOption("CC BY SA NC 4.0", false),
-                        new LicenceOption("All rights reserved", false)));
+                        new LicenceOption("All rights reserved", false),
+                        new LicenceOption(NO_LICENCE_NAME, false)));
     }
 
     public static List<LicenceOption> getLicenceOptions() {
@@ -445,19 +453,23 @@ public class GeneralPreferences {
         }
     }
 
-    /** Returns the name of the licence option currently flagged as the default. */
+    /**
+     * Returns the name of the licence option currently flagged as the default, or "" if none is -
+     * which is the case until the user picks one, so that no licence is ever applied to a survey
+     * without them having chosen it.
+     */
     public static String getDefaultLicenceName() {
         for (LicenceOption option : getLicenceOptions()) {
             if (option.isDefault()) {
                 return option.getName();
             }
         }
-        return FALLBACK_DEFAULT_LICENCE_NAME;
+        return NO_LICENCE_NAME;
     }
 
     /**
-     * Adds a new licence option. If the list is currently empty, the new option becomes the
-     * default; otherwise it is added as a non-default option.
+     * Adds a new licence option. It is always added as a non-default option: a default is only ever
+     * set by the user explicitly choosing one, never as a side effect of editing the list.
      */
     public static void addLicenceOption(String name) {
         if (name == null || name.trim().isEmpty()) return;
@@ -465,9 +477,9 @@ public class GeneralPreferences {
     }
 
     /**
-     * Removes the licence option with the given name. If it was the default and other options
-     * remain, the first remaining option is promoted to be the new default, so a default is always
-     * present as long as the list is not empty.
+     * Removes the licence option with the given name. If it was the default, the list is simply
+     * left with no default rather than promoting a replacement - which would amount to picking a
+     * licence on the user's behalf.
      */
     public static void removeLicenceOption(String name) {
         if (name == null) return;
@@ -490,12 +502,32 @@ public class GeneralPreferences {
     }
 
     /**
+     * Un-flags whatever option is currently the default, leaving the list with none - so new trips
+     * start with a blank licence and the user is asked to pick one.
+     */
+    public static void clearDefaultLicenceOption() {
+        setLicenceOptions(withDefaultCleared(getLicenceOptions()));
+    }
+
+    /**
+     * Pure list transformation backing {@link #clearDefaultLicenceOption()}, kept separate so it
+     * can be unit tested without a SharedPreferences-backed Context.
+     */
+    public static List<LicenceOption> withDefaultCleared(List<LicenceOption> options) {
+        List<LicenceOption> result = new ArrayList<>();
+        for (LicenceOption option : options) {
+            result.add(option.withDefault(false));
+        }
+        return result;
+    }
+
+    /**
      * Pure list transformation backing {@link #addLicenceOption(String)}, kept separate so it can
      * be unit tested without a SharedPreferences-backed Context.
      */
     public static List<LicenceOption> withAdded(List<LicenceOption> options, String trimmedName) {
         List<LicenceOption> result = new ArrayList<>(options);
-        result.add(new LicenceOption(trimmedName, result.isEmpty()));
+        result.add(new LicenceOption(trimmedName, false));
         return result;
     }
 
@@ -504,18 +536,11 @@ public class GeneralPreferences {
      * can be unit tested without a SharedPreferences-backed Context.
      */
     public static List<LicenceOption> withRemoved(List<LicenceOption> options, String name) {
-        boolean removedWasDefault = false;
         List<LicenceOption> remaining = new ArrayList<>();
         for (LicenceOption option : options) {
-            if (option.getName().equals(name)) {
-                removedWasDefault = option.isDefault();
-            } else {
+            if (!option.getName().equals(name)) {
                 remaining.add(option);
             }
-        }
-
-        if (removedWasDefault && !remaining.isEmpty() && !hasDefault(remaining)) {
-            remaining.set(0, remaining.get(0).withDefault(true));
         }
         return remaining;
     }
@@ -551,13 +576,6 @@ public class GeneralPreferences {
             result.add(option.withDefault(option.getName().equals(name)));
         }
         return result;
-    }
-
-    private static boolean hasDefault(List<LicenceOption> options) {
-        for (LicenceOption option : options) {
-            if (option.isDefault()) return true;
-        }
-        return false;
     }
 
     private static boolean hasOption(List<LicenceOption> options, String name) {

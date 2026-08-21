@@ -44,15 +44,15 @@ public class TripActivityTest {
     }
 
     @Test
-    public void licenceFieldShowsFullSuggestionListEvenWhenPrefilled() {
+    public void licenceFieldShowsFullSuggestionList() {
         openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
         onView(withText(R.string.action_view)).perform(click());
         onView(withText(R.string.action_trip)).perform(click());
 
-        // The Licence field is pre-filled with the default licence (GPLv3.0+) when
-        // screen opens. Tapping it should still offer every configured licence, not just the
-        // one matching entry - confirming the field doesn't fall back to stock ArrayAdapter
-        // filtering behaviour.
+        // Tapping the Licence field should offer every configured licence, whatever text the
+        // field already holds (it can be pre-filled with the licence carried over from the last
+        // trip) - confirming the field doesn't fall back to stock ArrayAdapter filtering
+        // behaviour, which would narrow the list down to just the matching entries.
         onView(withId(R.id.trip_licence)).perform(click());
 
         onData(is("All rights reserved")).inRoot(isPlatformPopup()).check(matches(isDisplayed()));

@@ -54,6 +54,13 @@ public class TripActivity extends SexyTopoActivity {
     // them with stale values before they ever get set.
     private boolean isPopulatingFields = false;
 
+    // Whether the licence question has been answered for the trip currently on screen - either
+    // because it was loaded with a licence already set, or because the user has picked one (or
+    // explicitly picked "no licence") this session. Until it has, the Save button stays disabled,
+    // nudging the user into making a choice rather than leaving it blank by default. A blank
+    // licence is a perfectly valid answer; it just has to be chosen rather than defaulted into.
+    private boolean isLicenceChosen = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -129,6 +136,12 @@ public class TripActivity extends SexyTopoActivity {
                         if (isPopulatingFields) {
                             return;
                         }
+                        // Typing a licence by hand answers the question just as picking one from
+                        // the dropdown does. Clearing the field by hand does not: an empty field
+                        // is the un-answered state, and "no licence" is chosen from the dropdown.
+                        if (!s.toString().trim().isEmpty()) {
+                            isLicenceChosen = true;
+                        }
                         syncTrip();
                         updateButtonStatus();
                     }
@@ -150,12 +163,12 @@ public class TripActivity extends SexyTopoActivity {
             trip = new Trip();
             getSurvey().setTrip(trip);
 
-            // Seed a brand new trip with the configured default licence, so what's shown on
-            // screen is also what actually gets persisted/exported, rather than just a display
-            // hint. This only ever runs once, for a genuinely new trip - it must not re-apply on
-            // every visit to an existing trip, since a blank licence there could mean "the user
-            // deliberately wants no licence" (or the trip was imported with none), not "never
-            // decided".
+            // Seed a brand new trip with the licence the user chose last time, so it carries
+            // over between trips. Until they have chosen one this is blank, so no licence is
+            // ever applied to a survey without having been picked. This only ever runs once,
+            // for a genuinely new trip - it must not re-apply on every visit to an existing
+            // trip, since a blank licence there could mean "the user deliberately wants no
+            // licence" (or the trip was imported with none), not "never decided".
             trip.setLicence(GeneralPreferences.getDefaultLicenceName());
         }
 
@@ -185,6 +198,10 @@ public class TripActivity extends SexyTopoActivity {
             setupLicenceAutocomplete();
             AutoCompleteTextView licenceField = findViewById(R.id.trip_licence);
             licenceField.setText(trip.getLicence());
+
+            // A trip that already carries a licence has had the question answered for it, so
+            // don't make the user re-pick one just to be able to save an unrelated edit.
+            isLicenceChosen = trip.hasLicence();
         } finally {
             isPopulatingFields = false;
         }
@@ -300,7 +317,8 @@ public class TripActivity extends SexyTopoActivity {
                             EditText copyright = findViewById(R.id.trip_copyright);
                             copyright.setText("");
                             AutoCompleteTextView licence = findViewById(R.id.trip_licence);
-                            licence.setText(GeneralPreferences.getDefaultLicenceName());
+                            licence.setText("");
+                            isLicenceChosen = false;
                             team.clear();
                             Trip trip = getSurvey().getTrip();
                             if (trip != null) {
@@ -319,19 +337,37 @@ public class TripActivity extends SexyTopoActivity {
         AutoCompleteTextView licenceField = findViewById(R.id.trip_licence);
         List<String> licenceNames = new ArrayList<>();
         for (LicenceOption option : GeneralPreferences.getLicenceOptions()) {
-            licenceNames.add(option.getName());
+            // The "no licence" option is stored as an empty name, which would show as a blank
+            // row in the dropdown; give it a readable label instead.
+            licenceNames.add(
+                    option.getName().isEmpty()
+                            ? getString(R.string.trip_licence_none)
+                            : option.getName());
         }
 
         // The stock ArrayAdapter filters its suggestions against the text that is already in the
-        // field. Since this field is pre-filled with the default licence, that would narrow the
-        // dropdown down to only the matching entry. A non-filtering
-        // adapter keeps the full configured list showing regardless of the current text, while
-        // the field itself stays editable, free text works.
+        // field, which would narrow the dropdown down to only the entries matching whatever has
+        // been typed or carried over from the last trip. A non-filtering adapter keeps the full
+        // configured list showing regardless of the current text, while the field itself stays
+        // editable, so free text works.
         ArrayAdapter<String> adapter =
                 new NonFilteringArrayAdapter(
                         this, android.R.layout.simple_dropdown_item_1line, licenceNames);
         licenceField.setAdapter(adapter);
         licenceField.setThreshold(0);
+
+        // Picking from the dropdown counts as answering the licence question, including when the
+        // answer is "no licence" - which clears the field, since that is how it's stored.
+        licenceField.setOnItemClickListener(
+                (parent, view, position, id) -> {
+                    isLicenceChosen = true;
+                    if (getString(R.string.trip_licence_none)
+                            .equals(parent.getItemAtPosition(position))) {
+                        licenceField.setText(GeneralPreferences.NO_LICENCE_NAME);
+                    }
+                    syncTrip();
+                    updateButtonStatus();
+                });
 
         View.OnClickListener showFullDropdown =
                 v -> {
@@ -454,6 +490,14 @@ public class TripActivity extends SexyTopoActivity {
 
     public void requestSaveTrip(View view) {
         syncTrip();
+
+        // Remember this trip's licence as the choice to carry over to the next new trip. This
+        // covers free text as well as options picked from the dropdown; a licence typed here
+        // isn't added to the configured list, so only a recognised option becomes the stored
+        // default, but "no licence" is always remembered as such.
+        AutoCompleteTextView licenceField = findViewById(R.id.trip_licence);
+        GeneralPreferences.setDefaultLicenceOption(licenceField.getText().toString());
+
         startActivity(PlanActivity.class);
     }
 
@@ -521,14 +565,15 @@ public class TripActivity extends SexyTopoActivity {
         boolean hasUnlinkedExploDate =
                 currentTrip != null && !currentTrip.isExplorationDateLinked();
 
-        // Licence is deliberately not checked here, like surveyDate - a new trip is seeded
-        // with a default licence (see onResume), so including it would make the buttons
-        // permanently enabled even on an otherwise blank new trip.
+        // Licence is deliberately not part of hasAnyData, like surveyDate - it can be seeded
+        // from the previous choice (see onResume), so including it would make the buttons
+        // permanently enabled even on an otherwise blank new trip. It gates saving separately,
+        // via isLicenceChosen.
         boolean hasAnyData =
                 hasTeam || hasComments || hasInstrument || hasCopyright || hasUnlinkedExploDate;
         boolean hasChanges = savedTrip == null || !savedTrip.equals(currentTrip);
 
-        findViewById(R.id.set_trip).setEnabled(hasAnyData && hasChanges);
+        findViewById(R.id.set_trip).setEnabled(hasAnyData && hasChanges && isLicenceChosen);
         findViewById(R.id.clear_trip).setEnabled(hasAnyData);
 
         Button getInstrumentButton = findViewById(R.id.instrument_get_button);
