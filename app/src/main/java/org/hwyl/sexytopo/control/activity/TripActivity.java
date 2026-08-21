@@ -18,6 +18,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentManager;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
@@ -127,6 +128,13 @@ public class TripActivity extends SexyTopoActivity {
                     @Override
                     public void onTextChanged(CharSequence s, int start, int before, int count) {}
                 });
+
+        findViewById(R.id.licence_hint_dismiss)
+                .setOnClickListener(
+                        v -> {
+                            GeneralPreferences.setLicenceHintDismissed(true);
+                            updateLicenceHintCard();
+                        });
 
         AutoCompleteTextView licenceField = findViewById(R.id.trip_licence);
         licenceField.addTextChangedListener(
@@ -361,6 +369,16 @@ public class TripActivity extends SexyTopoActivity {
         List<String> knownCavers = GeneralPreferences.getKnownCavers();
         holderField.setAdapter(
                 new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, knownCavers));
+    }
+
+    /**
+     * Shows the card pitching open licences, unless the user has dismissed it or has already chosen
+     * a licence - there's nothing to persuade them of once they have.
+     */
+    private void updateLicenceHintCard() {
+        MaterialCardView card = findViewById(R.id.licence_hint_card);
+        boolean show = !isLicenceChosen && !GeneralPreferences.isLicenceHintDismissed();
+        card.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     private void setupLicenceAutocomplete() {
@@ -627,6 +645,7 @@ public class TripActivity extends SexyTopoActivity {
         boolean hasChanges = savedTrip == null || !savedTrip.equals(currentTrip);
 
         findViewById(R.id.set_trip).setEnabled(hasAnyData && hasChanges && isLicenceChosen);
+        updateLicenceHintCard();
 
         // Say why Save is disabled, but only when the licence is the one thing blocking it -
         // otherwise the button is disabled for a reason the user can already see (nothing

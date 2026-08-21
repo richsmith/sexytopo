@@ -430,6 +430,19 @@ public class GeneralPreferences {
     // exactly like known cavers.
     private static final String PREF_USED_LICENCES = "pref_used_licences";
 
+    // Whether the user has dismissed the card pitching open licences on the Trip screen. Once
+    // dismissed it stays dismissed - it's a one-off nudge, not a recurring nag.
+    private static final String PREF_LICENCE_HINT_DISMISSED = "pref_licence_hint_dismissed";
+
+    public static boolean isLicenceHintDismissed() {
+        return getBoolean(PREF_LICENCE_HINT_DISMISSED, false);
+    }
+
+    public static void setLicenceHintDismissed(boolean dismissed) {
+        if (prefs == null) return;
+        prefs.edit().putBoolean(PREF_LICENCE_HINT_DISMISSED, dismissed).apply();
+    }
+
     /**
      * The licences to offer, in order: the defaults, followed by any others the user has used,
      * sorted. "No licence" is offered last, since it's the fallback rather than a suggestion.

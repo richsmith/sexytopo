@@ -237,6 +237,58 @@
 
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <!-- Dismissable pitch for picking an open licence; hidden for good once
+                         dismissed, or once the user has chosen a licence. -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/licence_hint_card"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:visibility="gone"
+                        app:cardElevation="0dp"
+                        app:cardCornerRadius="12dp"
+                        app:strokeWidth="1dp"
+                        app:cardBackgroundColor="?attr/colorSurfaceVariant">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:padding="12dp">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/trip_licence_hint_title"
+                                    android:textAppearance="?attr/textAppearanceTitleSmall"/>
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:text="@string/trip_licence_hint_body"
+                                    android:textAppearance="?attr/textAppearanceBodySmall"/>
+
+                            </LinearLayout>
+
+                            <Button
+                                android:id="@+id/licence_hint_dismiss"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="4dp"
+                                android:contentDescription="@string/trip_licence_hint_dismiss"
+                                app:icon="@drawable/ic_close"
+                                style="@style/Widget.Material3.Button.IconButton"/>
+
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/trip_licence_layout"
                         android:layout_width="match_parent"

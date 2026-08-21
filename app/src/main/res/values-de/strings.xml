@@ -383,7 +383,10 @@
     <string name="trip_copyright_label">Rechteinhaber</string>
     <string name="trip_licence_label">Lizenz</string>
     <string name="trip_licence_none">Keine Lizenz</string>
-    <string name="trip_licence_required_helper">Vor dem Speichern eine Lizenz wählen, oder \"Keine Lizenz\", wenn keine gewünscht ist</string>
+    <string name="trip_licence_hint_title">Bitte erwäge eine offene Lizenz für deine Vermessungsdaten</string>
+    <string name="trip_licence_hint_body">Eine freie Lizenz erlaubt es anderen Höhlenforschern, deine Arbeit zu nutzen und darauf aufzubauen, so wie du es mit ihrer kannst - Daten, die überprüft und weiterverwendet werden können, sind wertvoller und werden mit der Zeit besser, zum gegenseitigen Nutzen. SexyTopo ist aus demselben Grund frei und quelloffen.</string>
+    <string name="trip_licence_hint_dismiss">Ausblenden</string>
+    <string name="trip_licence_required_helper">Vor dem Speichern eine Lizenz wählen, oder \"Keine Lizenz\", wenn ausdrücklich keine gewünscht ist</string>
     <string name="trip_licence_recommended_suffix">%1$s [Empfohlen]</string>
     <string name="trip_save_trip">Tour speichern</string>
     <string name="trip_role_book">Zeichnung</string>

@@ -383,7 +383,10 @@
     <string name="trip_copyright_label">Titular del copyright</string>
     <string name="trip_licence_label">Licencia</string>
     <string name="trip_licence_none">Sin licencia</string>
-    <string name="trip_licence_required_helper">Elige una licencia antes de guardar, o \"Sin licencia\" si no quieres ninguna</string>
+    <string name="trip_licence_hint_title">Considera una licencia abierta para tus datos topográficos</string>
+    <string name="trip_licence_hint_body">Una licencia libre permite a otros espeleólogos usar tu trabajo y desarrollarlo, igual que tú puedes hacer con el suyo: los datos que se pueden verificar y reutilizar son más valiosos y mejoran con el tiempo, en beneficio mutuo. SexyTopo es libre y de código abierto por la misma razón.</string>
+    <string name="trip_licence_hint_dismiss">Descartar</string>
+    <string name="trip_licence_required_helper">Elige una licencia antes de guardar, o \"Sin licencia\" si expresamente no quieres ninguna</string>
     <string name="trip_licence_recommended_suffix">%1$s [Recomendada]</string>
     <string name="trip_save_trip">Guardar Salida</string>
     <string name="trip_role_book">Topógrafo (dibujo)</string>

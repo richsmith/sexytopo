@@ -415,7 +415,10 @@
     <string name="trip_copyright_label">Copyright holder</string>
     <string name="trip_licence_label">Licence</string>
     <string name="trip_licence_none">No licence</string>
-    <string name="trip_licence_required_helper">Pick a licence before saving, or \"No licence\" if you don\'t want one</string>
+    <string name="trip_licence_hint_title">Please consider an open licence for your survey data</string>
+    <string name="trip_licence_hint_body">A free licence lets other cavers use and build on your work, as you can with theirs - data that can be verified and reused is more valuable and gets better over time, for mutual benefit. SexyTopo is free and open source for the same reason.</string>
+    <string name="trip_licence_hint_dismiss">Dismiss</string>
+    <string name="trip_licence_required_helper">Pick a licence before saving, or \"No licence\" if you explicitly don\'t want one</string>
     <string name="trip_licence_recommended_suffix">%1$s [Recommended]</string>
     <string name="trip_save_trip">Save Trip</string>
     <string name="trip_role_book">Book (drawing)</string>
