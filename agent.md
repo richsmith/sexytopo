@@ -9,6 +9,18 @@ Agent / developer documentation for this project lives in `docs/dev/`:
 
 Start with `overview.md`.
 
+## Committing
+
+**Never commit without being asked to.** Make changes in the working tree and
+leave them there; the user decides when something gets committed.
+
+Permission to commit is granted once, for one commit. An instruction like
+"commit that" applies only to the work in front of you at that moment — it is
+not standing permission to commit later changes. Ask again each time.
+
+The same goes for anything else that publishes work outward: pushing, creating
+or updating pull requests, and pushing tags all need an explicit request.
+
 ## Code formatting
 
 This project uses [Spotless](https://github.com/diffplug/spotless) with
