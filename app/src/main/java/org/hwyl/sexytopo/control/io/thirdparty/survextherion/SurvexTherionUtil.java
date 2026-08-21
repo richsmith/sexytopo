@@ -121,13 +121,16 @@ public class SurvexTherionUtil {
         char commentChar = format.getCommentChar();
         String holder = trip.hasCopyrightHolder() ? trip.getCopyrightHolder() : "";
 
+        // The year is normally always present, since a trip is created with today's date, but
+        // an imported survey can leave it unset; omit it rather than writing an empty slot.
+        String year = TextTools.formatYear(trip.getSurveyDate());
+
         StringBuilder builder = new StringBuilder();
-        builder.append(marker)
-                .append("copyright ")
-                .append(TextTools.formatYear(trip.getSurveyDate()))
-                .append(" \"")
-                .append(holder)
-                .append("\"");
+        builder.append(marker).append("copyright ");
+        if (!year.isEmpty()) {
+            builder.append(year).append(" ");
+        }
+        builder.append("\"").append(holder).append("\"");
 
         if (trip.hasLicence()) {
             builder.append(" ")

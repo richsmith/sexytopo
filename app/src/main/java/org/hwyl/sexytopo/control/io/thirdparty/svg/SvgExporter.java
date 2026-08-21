@@ -565,8 +565,9 @@ public class SvgExporter extends DoubleSketchFileExporter {
         StringBuilder builder = new StringBuilder();
         if (trip.hasCopyrightHolder()) {
             builder.append("\u00A9 ");
-            if (trip.getSurveyDate() != null) {
-                builder.append(TextTools.formatYear(trip.getSurveyDate())).append(" ");
+            String year = TextTools.formatYear(trip.getSurveyDate());
+            if (!year.isEmpty()) {
+                builder.append(year).append(" ");
             }
             builder.append(trip.getCopyrightHolder());
         }

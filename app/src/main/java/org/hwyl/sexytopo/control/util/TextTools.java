@@ -156,8 +156,9 @@ public class TextTools {
         return ISO_DATE_FORMAT.format(date);
     }
 
+    /** The year of the given date, or "" if there isn't one. */
     public static String formatYear(Date date) {
-        return YEAR_FORMAT.format(date);
+        return date == null ? "" : YEAR_FORMAT.format(date);
     }
 
     public static String getFileAttribution(Context context) {

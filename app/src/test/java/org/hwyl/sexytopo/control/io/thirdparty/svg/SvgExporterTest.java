@@ -44,6 +44,18 @@ public class SvgExporterTest {
     }
 
     @Test
+    public void testCopyrightLineWrittenWithoutASurveyDate() throws Exception {
+        Trip trip = new Trip();
+        trip.setCopyrightHolder("Caver Jane");
+        trip.setSurveyDate(null);
+        Survey survey = surveyWithTrip(trip);
+
+        String content = new SvgExporter().getContent(survey, Projection2D.PLAN);
+
+        Assert.assertTrue(content.contains("Caver Jane"));
+    }
+
+    @Test
     public void testCopyrightLineOmittedFromLegendButDescStillPresentWhenOptionDisabled()
             throws Exception {
         SharedPreferences prefs = GeneralPreferences.getRawPreferences();

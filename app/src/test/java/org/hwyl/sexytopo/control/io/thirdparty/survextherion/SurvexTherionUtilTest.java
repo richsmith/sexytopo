@@ -10,6 +10,21 @@ import org.junit.Test;
 public class SurvexTherionUtilTest {
 
     @Test
+    public void testCopyrightLineWithoutASurveyDateOmitsTheYear() {
+        // Regression test: this used to NPE, since formatYear was called unguarded here while
+        // the SVG exporter guarded it. An imported survey can arrive with no date.
+        Survey survey = new Survey();
+        Trip trip = new Trip();
+        trip.setCopyrightHolder("Caver Jane");
+        trip.setSurveyDate(null);
+        survey.setTrip(trip);
+
+        String line = SurvexTherionUtil.getCopyrightLine(survey, SurveyFormat.SURVEX);
+
+        Assert.assertEquals("*copyright \"Caver Jane\"\n", line);
+    }
+
+    @Test
     public void testSurvexLineWithBothCopyrightAndLicence() {
         Survey survey = surveyWithTrip("Caver Jane", "CC BY 4.0", 2026);
 
