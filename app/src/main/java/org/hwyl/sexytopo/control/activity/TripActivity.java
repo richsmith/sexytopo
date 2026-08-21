@@ -35,7 +35,7 @@ import org.hwyl.sexytopo.comms.Instrument;
 import org.hwyl.sexytopo.control.table.TeamMemberForm;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.TextTools;
-import org.hwyl.sexytopo.model.survey.LicenseOption;
+import org.hwyl.sexytopo.model.survey.LicenceOption;
 import org.hwyl.sexytopo.model.survey.Trip;
 
 public class TripActivity extends SexyTopoActivity {
@@ -57,12 +57,12 @@ public class TripActivity extends SexyTopoActivity {
     // them with stale values before they ever get set.
     private boolean isPopulatingFields = false;
 
-    // Launches the one-time first-run license choice screen (see GeneralPreferences.
-    // isLicenseDefaultConfirmed) when a brand new trip needs a default license but nobody has
-    // chosen one yet. Once the user confirms a choice there, it's applied to the license field
+    // Launches the one-time first-run licence choice screen (see GeneralPreferences.
+    // isLicenceDefaultConfirmed) when a brand new trip needs a default licence but nobody has
+    // chosen one yet. Once the user confirms a choice there, it's applied to the licence field
     // here rather than in onResume()'s normal population pass, since that pass has already run
     // by the time this callback fires.
-    private final ActivityResultLauncher<Intent> licenseChoiceLauncher =
+    private final ActivityResultLauncher<Intent> licenceChoiceLauncher =
             registerForActivityResult(
                     new ActivityResultContracts.StartActivityForResult(),
                     result -> {
@@ -71,16 +71,16 @@ public class TripActivity extends SexyTopoActivity {
                             return;
                         }
 
-                        String chosenLicense = GeneralPreferences.getDefaultLicenseName();
-                        trip.setLicense(chosenLicense);
+                        String chosenLicence = GeneralPreferences.getDefaultLicenceName();
+                        trip.setLicence(chosenLicence);
                         if (savedTrip != null) {
-                            savedTrip.setLicense(chosenLicense);
+                            savedTrip.setLicence(chosenLicence);
                         }
 
-                        AutoCompleteTextView licenseField = findViewById(R.id.trip_license);
+                        AutoCompleteTextView licenceField = findViewById(R.id.trip_licence);
                         isPopulatingFields = true;
                         try {
-                            licenseField.setText(trip.getLicense());
+                            licenceField.setText(trip.getLicence());
                         } finally {
                             isPopulatingFields = false;
                         }
@@ -154,8 +154,8 @@ public class TripActivity extends SexyTopoActivity {
                     public void onTextChanged(CharSequence s, int start, int before, int count) {}
                 });
 
-        AutoCompleteTextView licenseField = findViewById(R.id.trip_license);
-        licenseField.addTextChangedListener(
+        AutoCompleteTextView licenceField = findViewById(R.id.trip_licence);
+        licenceField.addTextChangedListener(
                 new TextWatcher() {
                     @Override
                     public void afterTextChanged(Editable s) {
@@ -183,19 +183,19 @@ public class TripActivity extends SexyTopoActivity {
             trip = new Trip();
             getSurvey().setTrip(trip);
 
-            // Seed a brand new trip with the configured default license, so what's shown on
+            // Seed a brand new trip with the configured default licence, so what's shown on
             // screen is also what actually gets persisted/exported, rather than just a display
             // hint. This only ever runs once, for a genuinely new trip - it must not re-apply on
-            // every visit to an existing trip, since a blank license there could mean "the user
-            // deliberately wants no license" (or the trip was imported with none), not "never
+            // every visit to an existing trip, since a blank licence there could mean "the user
+            // deliberately wants no licence" (or the trip was imported with none), not "never
             // decided".
-            if (GeneralPreferences.isLicenseDefaultConfirmed()) {
-                trip.setLicense(GeneralPreferences.getDefaultLicenseName());
+            if (GeneralPreferences.isLicenceDefaultConfirmed()) {
+                trip.setLicence(GeneralPreferences.getDefaultLicenceName());
             } else {
-                // First run: nobody has chosen a default license yet - ask, rather than
-                // silently applying one on their behalf. The license field is left as-is for
+                // First run: nobody has chosen a default licence yet - ask, rather than
+                // silently applying one on their behalf. The licence field is left as-is for
                 // this pass and gets filled in once the user has made their choice, in
-                // licenseChoiceLauncher's callback above.
+                // licenceChoiceLauncher's callback above.
                 //
                 // Deferred via post(): launching a new Activity synchronously mid-onResume(),
                 // before this window has finished attaching, is unreliable and can be silently
@@ -203,8 +203,8 @@ public class TripActivity extends SexyTopoActivity {
                 View root = findViewById(R.id.rootLayout);
                 root.post(
                         () ->
-                                licenseChoiceLauncher.launch(
-                                        new Intent(this, LicenseChoiceActivity.class)));
+                                licenceChoiceLauncher.launch(
+                                        new Intent(this, LicenceChoiceActivity.class)));
             }
         }
 
@@ -231,9 +231,9 @@ public class TripActivity extends SexyTopoActivity {
             EditText copyrightField = findViewById(R.id.trip_copyright);
             copyrightField.setText(trip.getCopyright());
 
-            setupLicenseAutocomplete();
-            AutoCompleteTextView licenseField = findViewById(R.id.trip_license);
-            licenseField.setText(trip.getLicense());
+            setupLicenceAutocomplete();
+            AutoCompleteTextView licenceField = findViewById(R.id.trip_licence);
+            licenceField.setText(trip.getLicence());
         } finally {
             isPopulatingFields = false;
         }
@@ -348,8 +348,8 @@ public class TripActivity extends SexyTopoActivity {
                             comments.setText("");
                             EditText copyright = findViewById(R.id.trip_copyright);
                             copyright.setText("");
-                            AutoCompleteTextView license = findViewById(R.id.trip_license);
-                            license.setText(GeneralPreferences.getDefaultLicenseName());
+                            AutoCompleteTextView licence = findViewById(R.id.trip_licence);
+                            licence.setText(GeneralPreferences.getDefaultLicenceName());
                             team.clear();
                             Trip trip = getSurvey().getTrip();
                             if (trip != null) {
@@ -364,44 +364,44 @@ public class TripActivity extends SexyTopoActivity {
                 .show();
     }
 
-    private void setupLicenseAutocomplete() {
-        AutoCompleteTextView licenseField = findViewById(R.id.trip_license);
-        List<String> licenseNames = new ArrayList<>();
-        for (LicenseOption option : GeneralPreferences.getLicenseOptions()) {
-            licenseNames.add(option.getName());
+    private void setupLicenceAutocomplete() {
+        AutoCompleteTextView licenceField = findViewById(R.id.trip_licence);
+        List<String> licenceNames = new ArrayList<>();
+        for (LicenceOption option : GeneralPreferences.getLicenceOptions()) {
+            licenceNames.add(option.getName());
         }
 
         // The stock ArrayAdapter filters its suggestions against the text that is already in the
-        // field. Since this field is pre-filled with the default license, that would narrow the
+        // field. Since this field is pre-filled with the default licence, that would narrow the
         // dropdown down to only the matching entry. A non-filtering
         // adapter keeps the full configured list showing regardless of the current text, while
         // the field itself stays editable, free text works.
         ArrayAdapter<String> adapter =
                 new NonFilteringArrayAdapter(
-                        this, android.R.layout.simple_dropdown_item_1line, licenseNames);
-        licenseField.setAdapter(adapter);
-        licenseField.setThreshold(0);
+                        this, android.R.layout.simple_dropdown_item_1line, licenceNames);
+        licenceField.setAdapter(adapter);
+        licenceField.setThreshold(0);
 
         View.OnClickListener showFullDropdown =
                 v -> {
-                    if (!licenseNames.isEmpty()) {
-                        licenseField.showDropDown();
+                    if (!licenceNames.isEmpty()) {
+                        licenceField.showDropDown();
                     }
                 };
         // Tapping the field re-opens the list even if it's already focused (e.g. after the
         // dropdown was previously dismissed), and gaining focus opens it the first time.
-        licenseField.setOnClickListener(showFullDropdown);
-        licenseField.setOnFocusChangeListener(
+        licenceField.setOnClickListener(showFullDropdown);
+        licenceField.setOnFocusChangeListener(
                 (v, hasFocus) -> {
-                    if (hasFocus && !licenseNames.isEmpty()) {
-                        licenseField.showDropDown();
+                    if (hasFocus && !licenceNames.isEmpty()) {
+                        licenceField.showDropDown();
                     }
                 });
     }
 
     /**
      * An ArrayAdapter whose suggestion list is not narrowed by the current text of the field it's
-     * attached to. Used for the License field so the full configured list is always offered, even
+     * attached to. Used for the Licence field so the full configured list is always offered, even
      * though the field is pre-filled with a default value.
      */
     private static class NonFilteringArrayAdapter extends ArrayAdapter<String> {
@@ -548,8 +548,8 @@ public class TripActivity extends SexyTopoActivity {
         EditText copyrightField = findViewById(R.id.trip_copyright);
         trip.setCopyright(copyrightField.getText().toString());
 
-        AutoCompleteTextView licenseField = findViewById(R.id.trip_license);
-        trip.setLicense(licenseField.getText().toString());
+        AutoCompleteTextView licenceField = findViewById(R.id.trip_licence);
+        trip.setLicence(licenceField.getText().toString());
 
         getSurvey().setTrip(trip);
     }
@@ -570,8 +570,8 @@ public class TripActivity extends SexyTopoActivity {
         boolean hasUnlinkedExploDate =
                 currentTrip != null && !currentTrip.isExplorationDateLinked();
 
-        // License is deliberately not checked here, like surveyDate - a new trip is seeded
-        // with a default license (see onResume), so including it would make the buttons
+        // Licence is deliberately not checked here, like surveyDate - a new trip is seeded
+        // with a default licence (see onResume), so including it would make the buttons
         // permanently enabled even on an otherwise blank new trip.
         boolean hasAnyData =
                 hasTeam || hasComments || hasInstrument || hasCopyright || hasUnlinkedExploDate;

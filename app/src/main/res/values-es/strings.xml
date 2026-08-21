@@ -381,7 +381,7 @@
     <string name="trip_same_as_survey_date">Igual que la fecha de topografía</string>
     <string name="trip_comments">Comentarios</string>
     <string name="trip_copyright_label">Copyright</string>
-    <string name="trip_license_label">Licencia</string>
+    <string name="trip_licence_label">Licencia</string>
     <string name="trip_save_trip">Guardar Salida</string>
     <string name="trip_role_book">Topógrafo (dibujo)</string>
     <string name="trip_role_instruments">Instrumentos</string>
@@ -439,12 +439,12 @@
     <string name="settings_team_summary">Gestionar nombres de espeleólogos conocidos</string>
     <string name="settings_copyright_title">Copyright</string>
     <string name="settings_copyright_summary">Editar la elección de licencia</string>
-    <string name="settings_license_new_hint">Nombre de la licencia</string>
-    <string name="settings_license_name_required">El nombre de la licencia es obligatorio</string>
-    <string name="settings_license_default_label">Predeterminada</string>
-    <string name="license_choice_title">Elegir una licencia predeterminada</string>
-    <string name="license_choice_message">Por favor, elige una licencia para el uso futuro de la topografía. Esta se convertirá en la predeterminada y se puede sobrescribir en Salida. Se recomienda GPLv3.0+ para datos topográficos y es la misma licencia bajo la que se publica SexyTopo</string>
-    <string name="license_choice_confirm_button">Confirmar</string>
+    <string name="settings_licence_new_hint">Nombre de la licencia</string>
+    <string name="settings_licence_name_required">El nombre de la licencia es obligatorio</string>
+    <string name="settings_licence_default_label">Predeterminada</string>
+    <string name="licence_choice_title">Elegir una licencia predeterminada</string>
+    <string name="licence_choice_message">Por favor, elige una licencia para el uso futuro de la topografía. Esta se convertirá en la predeterminada y se puede sobrescribir en Salida. Se recomienda GPLv3.0+ para datos topográficos y es la misma licencia bajo la que se publica SexyTopo</string>
+    <string name="licence_choice_confirm_button">Confirmar</string>
 <string name="settings_instruments_title">Instrumentos</string>
     <string name="settings_instruments_summary">Tolerancias de instrumentos, calibración</string>
     <string name="settings_max_distance_delta_title">Delta de distancia máxima (m)</string>

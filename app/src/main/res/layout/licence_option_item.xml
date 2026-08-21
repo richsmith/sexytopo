@@ -9,21 +9,21 @@
     android:paddingBottom="4dp">
 
     <TextView
-        android:id="@+id/license_name_field"
+        android:id="@+id/licence_name_field"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:textAppearance="?attr/textAppearanceBodyLarge"/>
 
     <CheckBox
-        android:id="@+id/license_default_checkbox"
+        android:id="@+id/licence_default_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:text="@string/settings_license_default_label"/>
+        android:text="@string/settings_licence_default_label"/>
 
     <Button
-        android:id="@+id/delete_license_button"
+        android:id="@+id/delete_licence_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"

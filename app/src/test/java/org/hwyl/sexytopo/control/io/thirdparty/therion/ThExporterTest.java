@@ -206,7 +206,7 @@ public class ThExporterTest {
         Survey survey = new Survey();
         Trip trip = new Trip();
         trip.setCopyright("Caver Jane");
-        trip.setLicense("CC BY 4.0");
+        trip.setLicence("CC BY 4.0");
         survey.setTrip(trip);
 
         String updated =
@@ -222,7 +222,7 @@ public class ThExporterTest {
     }
 
     @Test
-    public void testNoCopyrightLineWhenTripHasNeitherCopyrightNorLicense() {
+    public void testNoCopyrightLineWhenTripHasNeitherCopyrightNorLicence() {
         Survey survey = new Survey();
         Trip trip = new Trip();
         survey.setTrip(trip);

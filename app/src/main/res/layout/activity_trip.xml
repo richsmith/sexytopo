@@ -239,11 +239,11 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:hint="@string/trip_license_label"
+                        android:hint="@string/trip_licence_label"
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
                         <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                            android:id="@+id/trip_license"
+                            android:id="@+id/trip_licence"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             style="@style/Widget.Material3.AutoCompleteTextView.OutlinedBox"

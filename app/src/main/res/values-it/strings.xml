@@ -381,7 +381,7 @@
     <string name="trip_same_as_survey_date">Uguale alla data del rilievo</string>
     <string name="trip_comments">Commenti</string>
     <string name="trip_copyright_label">Copyright</string>
-    <string name="trip_license_label">Licenza</string>
+    <string name="trip_licence_label">Licenza</string>
     <string name="trip_save_trip">Salva Uscita</string>
     <string name="trip_role_book">Rilievo (disegno)</string>
     <string name="trip_role_instruments">Strumenti</string>
@@ -439,12 +439,12 @@
     <string name="settings_team_summary">Gestisci i nomi dei cavernicoli conosciuti</string>
     <string name="settings_copyright_title">Copyright</string>
     <string name="settings_copyright_summary">Modifica la scelta della licenza</string>
-    <string name="settings_license_new_hint">Nome della licenza</string>
-    <string name="settings_license_name_required">Il nome della licenza è obbligatorio</string>
-    <string name="settings_license_default_label">Predefinita</string>
-    <string name="license_choice_title">Scegli una licenza predefinita</string>
-    <string name="license_choice_message">Scegli una licenza per l\'uso futuro del rilievo. Questa diventerà quella predefinita e può essere sovrascritta in Uscita. GPLv3.0+ è consigliata per i dati di rilievo ed è la stessa licenza con cui SexyTopo è pubblicato</string>
-    <string name="license_choice_confirm_button">Conferma</string>
+    <string name="settings_licence_new_hint">Nome della licenza</string>
+    <string name="settings_licence_name_required">Il nome della licenza è obbligatorio</string>
+    <string name="settings_licence_default_label">Predefinita</string>
+    <string name="licence_choice_title">Scegli una licenza predefinita</string>
+    <string name="licence_choice_message">Scegli una licenza per l\'uso futuro del rilievo. Questa diventerà quella predefinita e può essere sovrascritta in Uscita. GPLv3.0+ è consigliata per i dati di rilievo ed è la stessa licenza con cui SexyTopo è pubblicato</string>
+    <string name="licence_choice_confirm_button">Conferma</string>
 <string name="settings_instruments_title">Strumenti</string>
     <string name="settings_instruments_summary">Tolleranze degli strumenti, calibrazione</string>
     <string name="settings_max_distance_delta_title">Delta distanza massima (m)</string>

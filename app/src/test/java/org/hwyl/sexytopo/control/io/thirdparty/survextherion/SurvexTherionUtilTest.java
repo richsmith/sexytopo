@@ -10,7 +10,7 @@ import org.junit.Test;
 public class SurvexTherionUtilTest {
 
     @Test
-    public void testSurvexLineWithBothCopyrightAndLicense() {
+    public void testSurvexLineWithBothCopyrightAndLicence() {
         Survey survey = surveyWithTrip("Caver Jane", "CC BY 4.0", 2026);
 
         String line = SurvexTherionUtil.getCopyrightLine(survey, SurveyFormat.SURVEX);
@@ -19,7 +19,7 @@ public class SurvexTherionUtilTest {
     }
 
     @Test
-    public void testTherionLineWithBothCopyrightAndLicense() {
+    public void testTherionLineWithBothCopyrightAndLicence() {
         Survey survey = surveyWithTrip("Caver Jane", "CC BY 4.0", 2026);
 
         String line = SurvexTherionUtil.getCopyrightLine(survey, SurveyFormat.THERION);
@@ -37,7 +37,7 @@ public class SurvexTherionUtilTest {
     }
 
     @Test
-    public void testLicenseOnlyFillsCopyrightWithEmptyQuotes() {
+    public void testLicenceOnlyFillsCopyrightWithEmptyQuotes() {
         Survey survey = surveyWithTrip("", "CC BY 4.0", 2026);
 
         String line = SurvexTherionUtil.getCopyrightLine(survey, SurveyFormat.THERION);
@@ -46,7 +46,7 @@ public class SurvexTherionUtilTest {
     }
 
     @Test
-    public void testNeitherCopyrightNorLicenseSetReturnsEmptyString() {
+    public void testNeitherCopyrightNorLicenceSetReturnsEmptyString() {
         Survey survey = surveyWithTrip("", "", 2026);
 
         Assert.assertEquals("", SurvexTherionUtil.getCopyrightLine(survey, SurveyFormat.SURVEX));
@@ -70,12 +70,12 @@ public class SurvexTherionUtilTest {
         Assert.assertEquals("copyright 1998 \"Caver Jane\"\n", line);
     }
 
-    private static Survey surveyWithTrip(String copyright, String license, int year) {
+    private static Survey surveyWithTrip(String copyright, String licence, int year) {
         Survey survey = new Survey();
         Trip trip = new Trip();
         trip.setSurveyDate(dateForYear(year));
         trip.setCopyright(copyright);
-        trip.setLicense(license);
+        trip.setLicence(licence);
         survey.setTrip(trip);
         return survey;
     }

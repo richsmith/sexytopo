@@ -381,7 +381,7 @@
     <string name="trip_same_as_survey_date">Gleich wie Vermessungsdatum</string>
     <string name="trip_comments">Bemerkungen</string>
     <string name="trip_copyright_label">Copyright</string>
-    <string name="trip_license_label">Lizenz</string>
+    <string name="trip_licence_label">Lizenz</string>
     <string name="trip_save_trip">Tour speichern</string>
     <string name="trip_role_book">Zeichnung</string>
     <string name="trip_role_instruments">Vermessung</string>
@@ -439,12 +439,12 @@
     <string name="settings_team_summary">Bekannte Höhlenforscher-Namen verwalten</string>
     <string name="settings_copyright_title">Copyright</string>
     <string name="settings_copyright_summary">Lizenzwahl bearbeiten</string>
-    <string name="settings_license_new_hint">Lizenzname</string>
-    <string name="settings_license_name_required">Lizenzname ist erforderlich</string>
-    <string name="settings_license_default_label">Standard</string>
-    <string name="license_choice_title">Standardlizenz wählen</string>
-    <string name="license_choice_message">Bitte wählen Sie eine Lizenz für die zukünftige Nutzung der Vermessung. Diese wird zur Standardlizenz und kann in der Tour überschrieben werden. GPLv3.0+ wird für Vermessungsdaten empfohlen und ist dieselbe Lizenz, unter der SexyTopo veröffentlicht wird</string>
-    <string name="license_choice_confirm_button">Bestätigen</string>
+    <string name="settings_licence_new_hint">Lizenzname</string>
+    <string name="settings_licence_name_required">Lizenzname ist erforderlich</string>
+    <string name="settings_licence_default_label">Standard</string>
+    <string name="licence_choice_title">Standardlizenz wählen</string>
+    <string name="licence_choice_message">Bitte wählen Sie eine Lizenz für die zukünftige Nutzung der Vermessung. Diese wird zur Standardlizenz und kann in der Tour überschrieben werden. GPLv3.0+ wird für Vermessungsdaten empfohlen und ist dieselbe Lizenz, unter der SexyTopo veröffentlicht wird</string>
+    <string name="licence_choice_confirm_button">Bestätigen</string>
 <string name="settings_instruments_title">Werkzeuge</string>
     <string name="settings_instruments_summary">Instrumententoleranz, Kalibrierung</string>
     <string name="settings_max_distance_delta_title">Maximal zulässige Abweichung bei der Distanz (m)</string>

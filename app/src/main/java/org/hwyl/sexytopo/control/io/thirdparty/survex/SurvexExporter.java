@@ -28,7 +28,7 @@ public class SurvexExporter extends SingleFileExporter {
                                 SurveyFormat.SURVEX.getCommentChar(), "SexyTopo"))
                 .append("\n");
 
-        // Copyright / license (if the trip has either set)
+        // Copyright / licence (if the trip has either set)
         builder.append(SurvexTherionUtil.getCopyrightLine(survey, SurveyFormat.SURVEX));
         builder.append("\n");
 

@@ -36,7 +36,7 @@ public class Th2ExporterTest {
         Survey survey = BasicTestSurveyCreator.createWithCrossSections();
         Trip trip = new Trip();
         trip.setCopyright("Caver Jane");
-        trip.setLicense("CC BY 4.0");
+        trip.setLicence("CC BY 4.0");
         survey.setTrip(trip);
 
         float scale = TherionExporter.getScale();
@@ -67,7 +67,7 @@ public class Th2ExporterTest {
     }
 
     @Test
-    public void testNoCopyrightLineWhenTripHasNeitherCopyrightNorLicense() {
+    public void testNoCopyrightLineWhenTripHasNeitherCopyrightNorLicence() {
         Survey survey = BasicTestSurveyCreator.createWithCrossSections();
         // No trip set at all, matching a survey that has never used this feature.
 

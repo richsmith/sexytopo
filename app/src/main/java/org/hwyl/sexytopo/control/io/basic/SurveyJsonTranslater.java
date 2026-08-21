@@ -53,7 +53,7 @@ public class SurveyJsonTranslater {
     public static final String TEAM_MEMBER_ROLE_TAG = "role";
     public static final String INSTRUMENT_TAG = "instrument";
     public static final String COPYRIGHT_TAG = "copyright";
-    public static final String LICENSE_TAG = "license";
+    public static final String LICENCE_TAG = "licence";
 
     private static boolean errors; // whether any partial errors were encountered
 
@@ -290,7 +290,7 @@ public class SurveyJsonTranslater {
         json.put(COMMENT_TAG, trip.getComments());
         json.put(INSTRUMENT_TAG, trip.getInstrument());
         json.put(COPYRIGHT_TAG, trip.getCopyright());
-        json.put(LICENSE_TAG, trip.getLicense());
+        json.put(LICENCE_TAG, trip.getLicence());
 
         JSONArray teamArray = new JSONArray();
 
@@ -435,7 +435,7 @@ public class SurveyJsonTranslater {
         trip.setComments(comments);
         trip.setInstrument(json.optString(INSTRUMENT_TAG, ""));
         trip.setCopyright(json.optString(COPYRIGHT_TAG, ""));
-        trip.setLicense(json.optString(LICENSE_TAG, ""));
+        trip.setLicence(json.optString(LICENCE_TAG, ""));
         return trip;
     }
 }

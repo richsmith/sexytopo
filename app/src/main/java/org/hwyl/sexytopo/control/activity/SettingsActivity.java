@@ -24,7 +24,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
-import org.hwyl.sexytopo.model.survey.LicenseOption;
+import org.hwyl.sexytopo.model.survey.LicenceOption;
 
 public class SettingsActivity extends SexyTopoActivity
         implements PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
@@ -267,36 +267,36 @@ public class SettingsActivity extends SexyTopoActivity
             super.onViewCreated(view, savedInstanceState);
             refreshList(view);
 
-            view.findViewById(R.id.add_license_button)
+            view.findViewById(R.id.add_licence_button)
                     .setOnClickListener(
                             v -> {
-                                TextInputEditText field = view.findViewById(R.id.new_license_field);
-                                TextInputLayout layout = view.findViewById(R.id.new_license_layout);
+                                TextInputEditText field = view.findViewById(R.id.new_licence_field);
+                                TextInputLayout layout = view.findViewById(R.id.new_licence_layout);
                                 String name = getTrimmedText(field);
                                 if (name.isEmpty()) {
                                     layout.setError(
-                                            getString(R.string.settings_license_name_required));
+                                            getString(R.string.settings_licence_name_required));
                                     return;
                                 }
                                 layout.setError(null);
-                                GeneralPreferences.addLicenseOption(name);
+                                GeneralPreferences.addLicenceOption(name);
                                 field.setText("");
                                 refreshList(view);
                             });
         }
 
         private void refreshList(View root) {
-            LinearLayout list = root.findViewById(R.id.licenses_list);
+            LinearLayout list = root.findViewById(R.id.licences_list);
             list.removeAllViews();
             LayoutInflater inflater = LayoutInflater.from(requireContext());
-            for (LicenseOption option : GeneralPreferences.getLicenseOptions()) {
+            for (LicenceOption option : GeneralPreferences.getLicenceOptions()) {
                 String name = option.getName();
-                View row = inflater.inflate(R.layout.license_option_item, list, false);
+                View row = inflater.inflate(R.layout.licence_option_item, list, false);
 
-                ((TextView) row.findViewById(R.id.license_name_field)).setText(name);
+                ((TextView) row.findViewById(R.id.licence_name_field)).setText(name);
                 row.setOnClickListener(v -> showEditDialog(root, name));
 
-                CheckBox defaultCheckbox = row.findViewById(R.id.license_default_checkbox);
+                CheckBox defaultCheckbox = row.findViewById(R.id.licence_default_checkbox);
                 defaultCheckbox.setChecked(option.isDefault());
                 CompoundButton.OnCheckedChangeListener defaultListener =
                         new CompoundButton.OnCheckedChangeListener() {
@@ -304,7 +304,7 @@ public class SettingsActivity extends SexyTopoActivity
                             public void onCheckedChanged(
                                     @NonNull CompoundButton buttonView, boolean isChecked) {
                                 if (isChecked) {
-                                    GeneralPreferences.setDefaultLicenseOption(name);
+                                    GeneralPreferences.setDefaultLicenceOption(name);
                                     refreshList(root);
                                 } else {
                                     // A default must always be selected; re-check this box
@@ -318,10 +318,10 @@ public class SettingsActivity extends SexyTopoActivity
                         };
                 defaultCheckbox.setOnCheckedChangeListener(defaultListener);
 
-                Button deleteButton = row.findViewById(R.id.delete_license_button);
+                Button deleteButton = row.findViewById(R.id.delete_licence_button);
                 deleteButton.setOnClickListener(
                         v -> {
-                            GeneralPreferences.removeLicenseOption(name);
+                            GeneralPreferences.removeLicenceOption(name);
                             refreshList(root);
                         });
 
@@ -332,9 +332,9 @@ public class SettingsActivity extends SexyTopoActivity
         private void showEditDialog(View root, String currentName) {
             View dialogView =
                     LayoutInflater.from(requireContext())
-                            .inflate(R.layout.dialog_edit_license_name, null);
-            TextInputLayout layout = dialogView.findViewById(R.id.license_name_input_layout);
-            TextInputEditText field = dialogView.findViewById(R.id.license_name_field);
+                            .inflate(R.layout.dialog_edit_licence_name, null);
+            TextInputLayout layout = dialogView.findViewById(R.id.licence_name_input_layout);
+            TextInputEditText field = dialogView.findViewById(R.id.licence_name_field);
             field.setText(currentName);
             field.selectAll();
 
@@ -352,10 +352,10 @@ public class SettingsActivity extends SexyTopoActivity
                                 String newName = getTrimmedText(field);
                                 if (newName.isEmpty()) {
                                     layout.setError(
-                                            getString(R.string.settings_license_name_required));
+                                            getString(R.string.settings_licence_name_required));
                                     return;
                                 }
-                                GeneralPreferences.renameLicenseOption(currentName, newName);
+                                GeneralPreferences.renameLicenceOption(currentName, newName);
                                 dialog.dismiss();
                                 refreshList(root);
                             });

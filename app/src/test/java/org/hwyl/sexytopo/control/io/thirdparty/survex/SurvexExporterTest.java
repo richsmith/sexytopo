@@ -167,12 +167,12 @@ public class SurvexExporterTest {
     @Test
     public void testCreationCommentThenCopyrightOrder() {
         // Regression test: the created-with comment must be the first line inside the
-        // survey block, with the copyright/license line immediately after it.
+        // survey block, with the copyright/licence line immediately after it.
         SurvexExporter survexExporter = new SurvexExporter();
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         Trip trip = new Trip();
         trip.setCopyright("Caver Jane");
-        trip.setLicense("CC BY 4.0");
+        trip.setLicence("CC BY 4.0");
         survey.setTrip(trip);
 
         String content = survexExporter.getContent(survey);
@@ -188,7 +188,7 @@ public class SurvexExporterTest {
 
     @Test
     public void testCreationCommentImmediatelyAfterBeginWhenNoCopyright() {
-        // The creation comment's position must not depend on whether a copyright/license
+        // The creation comment's position must not depend on whether a copyright/licence
         // is set.
         SurvexExporter survexExporter = new SurvexExporter();
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
@@ -208,7 +208,7 @@ public class SurvexExporterTest {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         Trip trip = new Trip();
         trip.setCopyright("Caver Jane");
-        trip.setLicense("CC BY 4.0");
+        trip.setLicence("CC BY 4.0");
         survey.setTrip(trip);
 
         String content = survexExporter.getContent(survey);
@@ -221,7 +221,7 @@ public class SurvexExporterTest {
     }
 
     @Test
-    public void testNoCopyrightLineWhenTripHasNeitherCopyrightNorLicense() {
+    public void testNoCopyrightLineWhenTripHasNeitherCopyrightNorLicence() {
         SurvexExporter survexExporter = new SurvexExporter();
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         Trip trip = new Trip();

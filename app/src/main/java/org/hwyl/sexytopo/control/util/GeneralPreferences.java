@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.model.sketch.Colour;
-import org.hwyl.sexytopo.model.survey.LicenseOption;
+import org.hwyl.sexytopo.model.survey.LicenceOption;
 import org.hwyl.sexytopo.model.table.LRUD;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -403,125 +403,125 @@ public class GeneralPreferences {
         prefs.edit().putStringSet(PREF_KNOWN_CAVERS, set).apply();
     }
 
-    // ********** License Options ***********
+    // ********** Licence Options ***********
 
-    private static final String PREF_LICENSE_OPTIONS = "pref_license_options";
-    private static final String LICENSE_NAME_TAG = "name";
-    private static final String LICENSE_DEFAULT_TAG = "default";
-    private static final String FALLBACK_DEFAULT_LICENSE_NAME = "GPLv3.0+";
+    private static final String PREF_LICENCE_OPTIONS = "pref_licence_options";
+    private static final String LICENCE_NAME_TAG = "name";
+    private static final String LICENCE_DEFAULT_TAG = "default";
+    private static final String FALLBACK_DEFAULT_LICENCE_NAME = "GPLv3.0+";
 
-    private static List<LicenseOption> defaultLicenseOptions() {
+    private static List<LicenceOption> defaultLicenceOptions() {
         return new ArrayList<>(
                 Arrays.asList(
-                        new LicenseOption(FALLBACK_DEFAULT_LICENSE_NAME, true),
-                        new LicenseOption("CC0", false),
-                        new LicenseOption("CC BY 4.0", false),
-                        new LicenseOption("CC BY SA 4.0", false),
-                        new LicenseOption("CC BY SA NC 4.0", false),
-                        new LicenseOption("All rights reserved", false)));
+                        new LicenceOption(FALLBACK_DEFAULT_LICENCE_NAME, true),
+                        new LicenceOption("CC0", false),
+                        new LicenceOption("CC BY 4.0", false),
+                        new LicenceOption("CC BY SA 4.0", false),
+                        new LicenceOption("CC BY SA NC 4.0", false),
+                        new LicenceOption("All rights reserved", false)));
     }
 
-    public static List<LicenseOption> getLicenseOptions() {
-        if (prefs == null) return defaultLicenseOptions();
+    public static List<LicenceOption> getLicenceOptions() {
+        if (prefs == null) return defaultLicenceOptions();
 
-        String json = prefs.getString(PREF_LICENSE_OPTIONS, null);
-        if (json == null) return defaultLicenseOptions();
+        String json = prefs.getString(PREF_LICENCE_OPTIONS, null);
+        if (json == null) return defaultLicenceOptions();
 
         try {
-            return licenseOptionsFromJson(json);
+            return licenceOptionsFromJson(json);
         } catch (JSONException exception) {
-            Log.e("Could not load license options: " + exception);
-            return defaultLicenseOptions();
+            Log.e("Could not load licence options: " + exception);
+            return defaultLicenceOptions();
         }
     }
 
-    public static void setLicenseOptions(List<LicenseOption> options) {
+    public static void setLicenceOptions(List<LicenceOption> options) {
         if (prefs == null) return;
         try {
-            String json = licenseOptionsToJson(options).toString();
-            prefs.edit().putString(PREF_LICENSE_OPTIONS, json).apply();
+            String json = licenceOptionsToJson(options).toString();
+            prefs.edit().putString(PREF_LICENCE_OPTIONS, json).apply();
         } catch (JSONException exception) {
-            Log.e("Could not save license options: " + exception);
+            Log.e("Could not save licence options: " + exception);
         }
     }
 
-    /** Returns the name of the license option currently flagged as the default. */
-    public static String getDefaultLicenseName() {
-        for (LicenseOption option : getLicenseOptions()) {
+    /** Returns the name of the licence option currently flagged as the default. */
+    public static String getDefaultLicenceName() {
+        for (LicenceOption option : getLicenceOptions()) {
             if (option.isDefault()) {
                 return option.getName();
             }
         }
-        return FALLBACK_DEFAULT_LICENSE_NAME;
+        return FALLBACK_DEFAULT_LICENCE_NAME;
     }
 
-    private static final String PREF_LICENSE_DEFAULT_CONFIRMED = "pref_license_default_confirmed";
+    private static final String PREF_LICENCE_DEFAULT_CONFIRMED = "pref_licence_default_confirmed";
 
     /**
      * Checks whether the user has been through the one-time first-run screen that asks them to
-     * choose a default license, rather than been silently applied on their behalf.
+     * choose a default licence, rather than been silently applied on their behalf.
      */
-    public static boolean isLicenseDefaultConfirmed() {
-        return getBoolean(PREF_LICENSE_DEFAULT_CONFIRMED, false);
+    public static boolean isLicenceDefaultConfirmed() {
+        return getBoolean(PREF_LICENCE_DEFAULT_CONFIRMED, false);
     }
 
-    public static void setLicenseDefaultConfirmed(boolean confirmed) {
+    public static void setLicenceDefaultConfirmed(boolean confirmed) {
         if (prefs == null) return;
-        prefs.edit().putBoolean(PREF_LICENSE_DEFAULT_CONFIRMED, confirmed).apply();
+        prefs.edit().putBoolean(PREF_LICENCE_DEFAULT_CONFIRMED, confirmed).apply();
     }
 
     /**
-     * Adds a new license option. If the list is currently empty, the new option becomes the
+     * Adds a new licence option. If the list is currently empty, the new option becomes the
      * default; otherwise it is added as a non-default option.
      */
-    public static void addLicenseOption(String name) {
+    public static void addLicenceOption(String name) {
         if (name == null || name.trim().isEmpty()) return;
-        setLicenseOptions(withAdded(getLicenseOptions(), name.trim()));
+        setLicenceOptions(withAdded(getLicenceOptions(), name.trim()));
     }
 
     /**
-     * Removes the license option with the given name. If it was the default and other options
+     * Removes the licence option with the given name. If it was the default and other options
      * remain, the first remaining option is promoted to be the new default, so a default is always
      * present as long as the list is not empty.
      */
-    public static void removeLicenseOption(String name) {
+    public static void removeLicenceOption(String name) {
         if (name == null) return;
-        setLicenseOptions(withRemoved(getLicenseOptions(), name));
+        setLicenceOptions(withRemoved(getLicenceOptions(), name));
     }
 
-    /** Renames a license option, preserving its position in the list and its default flag. */
-    public static void renameLicenseOption(String oldName, String newName) {
+    /** Renames a licence option, preserving its position in the list and its default flag. */
+    public static void renameLicenceOption(String oldName, String newName) {
         if (oldName == null || newName == null || newName.trim().isEmpty()) return;
-        setLicenseOptions(withRenamed(getLicenseOptions(), oldName, newName.trim()));
+        setLicenceOptions(withRenamed(getLicenceOptions(), oldName, newName.trim()));
     }
 
     /**
-     * Flags the license option with the given name as the default, and un-flags every other option.
+     * Flags the licence option with the given name as the default, and un-flags every other option.
      * Does nothing if no option with that name exists.
      */
-    public static void setDefaultLicenseOption(String name) {
+    public static void setDefaultLicenceOption(String name) {
         if (name == null) return;
-        setLicenseOptions(withDefaultSet(getLicenseOptions(), name));
+        setLicenceOptions(withDefaultSet(getLicenceOptions(), name));
     }
 
     /**
-     * Pure list transformation backing {@link #addLicenseOption(String)}, kept separate so it can
+     * Pure list transformation backing {@link #addLicenceOption(String)}, kept separate so it can
      * be unit tested without a SharedPreferences-backed Context.
      */
-    public static List<LicenseOption> withAdded(List<LicenseOption> options, String trimmedName) {
-        List<LicenseOption> result = new ArrayList<>(options);
-        result.add(new LicenseOption(trimmedName, result.isEmpty()));
+    public static List<LicenceOption> withAdded(List<LicenceOption> options, String trimmedName) {
+        List<LicenceOption> result = new ArrayList<>(options);
+        result.add(new LicenceOption(trimmedName, result.isEmpty()));
         return result;
     }
 
     /**
-     * Pure list transformation backing {@link #removeLicenseOption(String)}, kept separate so it
+     * Pure list transformation backing {@link #removeLicenceOption(String)}, kept separate so it
      * can be unit tested without a SharedPreferences-backed Context.
      */
-    public static List<LicenseOption> withRemoved(List<LicenseOption> options, String name) {
+    public static List<LicenceOption> withRemoved(List<LicenceOption> options, String name) {
         boolean removedWasDefault = false;
-        List<LicenseOption> remaining = new ArrayList<>();
-        for (LicenseOption option : options) {
+        List<LicenceOption> remaining = new ArrayList<>();
+        for (LicenceOption option : options) {
             if (option.getName().equals(name)) {
                 removedWasDefault = option.isDefault();
             } else {
@@ -536,12 +536,12 @@ public class GeneralPreferences {
     }
 
     /**
-     * Pure list transformation backing {@link #renameLicenseOption(String, String)}, kept separate
+     * Pure list transformation backing {@link #renameLicenceOption(String, String)}, kept separate
      * so it can be unit tested without a SharedPreferences-backed Context.
      */
-    public static List<LicenseOption> withRenamed(
-            List<LicenseOption> options, String oldName, String trimmedNewName) {
-        List<LicenseOption> result = new ArrayList<>(options);
+    public static List<LicenceOption> withRenamed(
+            List<LicenceOption> options, String oldName, String trimmedNewName) {
+        List<LicenceOption> result = new ArrayList<>(options);
         for (int i = 0; i < result.size(); i++) {
             if (result.get(i).getName().equals(oldName)) {
                 result.set(i, result.get(i).withName(trimmedNewName));
@@ -552,56 +552,56 @@ public class GeneralPreferences {
     }
 
     /**
-     * Pure list transformation backing {@link #setDefaultLicenseOption(String)}, kept separate so
+     * Pure list transformation backing {@link #setDefaultLicenceOption(String)}, kept separate so
      * it can be unit tested without a SharedPreferences-backed Context. Does nothing (returns an
      * unchanged copy) if no option with the given name exists.
      */
-    public static List<LicenseOption> withDefaultSet(List<LicenseOption> options, String name) {
+    public static List<LicenceOption> withDefaultSet(List<LicenceOption> options, String name) {
         if (!hasOption(options, name)) {
             return new ArrayList<>(options);
         }
 
-        List<LicenseOption> result = new ArrayList<>();
-        for (LicenseOption option : options) {
+        List<LicenceOption> result = new ArrayList<>();
+        for (LicenceOption option : options) {
             result.add(option.withDefault(option.getName().equals(name)));
         }
         return result;
     }
 
-    private static boolean hasDefault(List<LicenseOption> options) {
-        for (LicenseOption option : options) {
+    private static boolean hasDefault(List<LicenceOption> options) {
+        for (LicenceOption option : options) {
             if (option.isDefault()) return true;
         }
         return false;
     }
 
-    private static boolean hasOption(List<LicenseOption> options, String name) {
-        for (LicenseOption option : options) {
+    private static boolean hasOption(List<LicenceOption> options, String name) {
+        for (LicenceOption option : options) {
             if (option.getName().equals(name)) return true;
         }
         return false;
     }
 
-    public static JSONArray licenseOptionsToJson(List<LicenseOption> options) throws JSONException {
+    public static JSONArray licenceOptionsToJson(List<LicenceOption> options) throws JSONException {
         JSONArray array = new JSONArray();
-        for (LicenseOption option : options) {
+        for (LicenceOption option : options) {
             JSONObject json = new JSONObject();
-            json.put(LICENSE_NAME_TAG, option.getName());
-            json.put(LICENSE_DEFAULT_TAG, option.isDefault());
+            json.put(LICENCE_NAME_TAG, option.getName());
+            json.put(LICENCE_DEFAULT_TAG, option.isDefault());
             array.put(json);
         }
         return array;
     }
 
-    public static List<LicenseOption> licenseOptionsFromJson(String jsonString)
+    public static List<LicenceOption> licenceOptionsFromJson(String jsonString)
             throws JSONException {
         JSONArray array = new JSONArray(jsonString);
-        List<LicenseOption> options = new ArrayList<>();
+        List<LicenceOption> options = new ArrayList<>();
         for (int i = 0; i < array.length(); i++) {
             JSONObject json = array.getJSONObject(i);
-            String name = json.getString(LICENSE_NAME_TAG);
-            boolean isDefault = json.optBoolean(LICENSE_DEFAULT_TAG, false);
-            options.add(new LicenseOption(name, isDefault));
+            String name = json.getString(LICENCE_NAME_TAG);
+            boolean isDefault = json.optBoolean(LICENCE_DEFAULT_TAG, false);
+            options.add(new LicenceOption(name, isDefault));
         }
         return options;
     }

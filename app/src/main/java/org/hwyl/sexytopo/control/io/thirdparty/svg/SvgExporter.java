@@ -142,7 +142,7 @@ public class SvgExporter extends DoubleSketchFileExporter {
         xmlSerializer.attribute(null, "xmlns", "http://www.w3.org/2000/svg");
 
         Trip trip = survey.getTrip();
-        if (trip != null && (trip.hasCopyright() || trip.hasLicense())) {
+        if (trip != null && (trip.hasCopyright() || trip.hasLicence())) {
             xmlSerializer.startTag(null, "title");
             xmlSerializer.text(survey.getName());
             xmlSerializer.endTag(null, "title");
@@ -554,7 +554,7 @@ public class SvgExporter extends DoubleSketchFileExporter {
     }
 
     /**
-     * Formats a trip's copyright and license as a single line, e.g. "© 2026 Caver Jane — CC BY
+     * Formats a trip's copyright and licence as a single line, e.g. "© 2026 Caver Jane — CC BY
      * 4.0". Either part may be omitted if not set; returns an empty string if neither is set.
      */
     private static String formatCopyrightLine(Trip trip) {
@@ -569,11 +569,11 @@ public class SvgExporter extends DoubleSketchFileExporter {
             }
             builder.append(trip.getCopyright());
         }
-        if (trip.hasLicense()) {
+        if (trip.hasLicence()) {
             if (builder.length() > 0) {
                 builder.append(" — ");
             }
-            builder.append(trip.getLicense());
+            builder.append(trip.getLicence());
         }
         return builder.toString();
     }

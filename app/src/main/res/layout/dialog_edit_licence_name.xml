@@ -9,14 +9,14 @@
     android:paddingBottom="8dp">
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/license_name_input_layout"
+        android:id="@+id/licence_name_input_layout"
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/settings_license_new_hint">
+        android:hint="@string/settings_licence_new_hint">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/license_name_field"
+            android:id="@+id/licence_name_field"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="text"/>

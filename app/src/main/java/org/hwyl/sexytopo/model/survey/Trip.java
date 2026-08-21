@@ -76,7 +76,7 @@ public class Trip {
     private String comments;
     private String instrument;
     private String copyright;
-    private String license;
+    private String licence;
 
     public Trip() {
         this.surveyDate = new Date();
@@ -85,7 +85,7 @@ public class Trip {
         this.instrument = "";
         this.comments = "";
         this.copyright = "";
-        this.license = "";
+        this.licence = "";
     }
 
     public Trip(Trip other) {
@@ -99,7 +99,7 @@ public class Trip {
         this.comments = other.comments;
         this.instrument = other.instrument;
         this.copyright = other.copyright;
-        this.license = other.license;
+        this.licence = other.licence;
     }
 
     public List<TeamEntry> getTeam() {
@@ -170,20 +170,20 @@ public class Trip {
         return copyright != null && !copyright.trim().isEmpty();
     }
 
-    public String getLicense() {
-        return license;
+    public String getLicence() {
+        return licence;
     }
 
-    public void setLicense(String license) {
-        this.license = license;
+    public void setLicence(String licence) {
+        this.licence = licence;
     }
 
-    public boolean hasLicense() {
-        return license != null && !license.trim().isEmpty();
+    public boolean hasLicence() {
+        return licence != null && !licence.trim().isEmpty();
     }
 
     /**
-     * Creates a new Trip for a follow-on survey, copying team, instrument, copyright and license
+     * Creates a new Trip for a follow-on survey, copying team, instrument, copyright and licence
      * but with a fresh date and empty comments.
      */
     public Trip toNextTrip() {
@@ -228,7 +228,7 @@ public class Trip {
             return false;
         }
 
-        if (objectsNotEqual(trip.license, license)) {
+        if (objectsNotEqual(trip.licence, licence)) {
             return false;
         }
 
@@ -256,7 +256,7 @@ public class Trip {
         result = 31 * result + (comments != null ? comments.hashCode() : 0);
         result = 31 * result + (instrument != null ? instrument.hashCode() : 0);
         result = 31 * result + (copyright != null ? copyright.hashCode() : 0);
-        result = 31 * result + (license != null ? license.hashCode() : 0);
+        result = 31 * result + (licence != null ? licence.hashCode() : 0);
         result = 31 * result + team.hashCode();
         return result;
     }

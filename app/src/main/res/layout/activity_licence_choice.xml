@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="org.hwyl.sexytopo.control.activity.LicenseChoiceActivity">
+    tools:context="org.hwyl.sexytopo.control.activity.LicenceChoiceActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/panelBackground"
-            app:title="@string/license_choice_title"
+            app:title="@string/licence_choice_title"
             app:titleTextColor="@color/white" />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -36,27 +36,27 @@
             android:padding="16dp">
 
             <TextView
-                android:id="@+id/license_choice_message"
+                android:id="@+id/licence_choice_message"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/license_choice_message"
+                android:text="@string/licence_choice_message"
                 android:textSize="16sp"
                 android:lineSpacingExtra="4dp" />
 
             <Spinner
-                android:id="@+id/license_choice_spinner"
+                android:id="@+id/licence_choice_spinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp" />
 
             <Button
-                android:id="@+id/license_choice_confirm_button"
+                android:id="@+id/licence_choice_confirm_button"
                 style="@style/Widget.Material3.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:layout_gravity="end"
-                android:text="@string/license_choice_confirm_button" />
+                android:text="@string/licence_choice_confirm_button" />
 
         </LinearLayout>
 

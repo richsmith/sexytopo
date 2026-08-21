@@ -14,39 +14,39 @@ import org.robolectric.RuntimeEnvironment;
 import org.robolectric.android.controller.ActivityController;
 
 @RunWith(RobolectricTestRunner.class)
-public class LicenseChoiceActivityTest {
+public class LicenceChoiceActivityTest {
 
     @Before
     public void setUp() {
         GeneralPreferences.initialise(RuntimeEnvironment.getApplication());
     }
 
-    private static LicenseChoiceActivity buildActivity() {
-        ActivityController<LicenseChoiceActivity> controller =
-                Robolectric.buildActivity(LicenseChoiceActivity.class).setup();
+    private static LicenceChoiceActivity buildActivity() {
+        ActivityController<LicenceChoiceActivity> controller =
+                Robolectric.buildActivity(LicenceChoiceActivity.class).setup();
         return controller.get();
     }
 
     @Test
-    public void testSpinnerIsPopulatedFromLicenseOptions() {
-        LicenseChoiceActivity activity = buildActivity();
-        Spinner spinner = activity.findViewById(R.id.license_choice_spinner);
+    public void testSpinnerIsPopulatedFromLicenceOptions() {
+        LicenceChoiceActivity activity = buildActivity();
+        Spinner spinner = activity.findViewById(R.id.licence_choice_spinner);
 
-        Assert.assertEquals(GeneralPreferences.getLicenseOptions().size(), spinner.getCount());
+        Assert.assertEquals(GeneralPreferences.getLicenceOptions().size(), spinner.getCount());
     }
 
     @Test
     public void testSpinnerIsPreselectedToGplv3() {
-        LicenseChoiceActivity activity = buildActivity();
-        Spinner spinner = activity.findViewById(R.id.license_choice_spinner);
+        LicenceChoiceActivity activity = buildActivity();
+        Spinner spinner = activity.findViewById(R.id.licence_choice_spinner);
 
         Assert.assertEquals("GPLv3.0+", spinner.getSelectedItem());
     }
 
     @Test
     public void testConfirmPersistsSelectedChoiceAndSetsConfirmedFlag() {
-        LicenseChoiceActivity activity = buildActivity();
-        Spinner spinner = activity.findViewById(R.id.license_choice_spinner);
+        LicenceChoiceActivity activity = buildActivity();
+        Spinner spinner = activity.findViewById(R.id.licence_choice_spinner);
 
         int ccZeroIndex = -1;
         for (int i = 0; i < spinner.getCount(); i++) {
@@ -55,25 +55,25 @@ public class LicenseChoiceActivityTest {
                 break;
             }
         }
-        Assert.assertTrue("CC0 should be one of the seed license options", ccZeroIndex >= 0);
+        Assert.assertTrue("CC0 should be one of the seed licence options", ccZeroIndex >= 0);
         spinner.setSelection(ccZeroIndex);
 
-        Button confirmButton = activity.findViewById(R.id.license_choice_confirm_button);
+        Button confirmButton = activity.findViewById(R.id.licence_choice_confirm_button);
         confirmButton.performClick();
 
-        Assert.assertTrue(GeneralPreferences.isLicenseDefaultConfirmed());
-        Assert.assertEquals("CC0", GeneralPreferences.getDefaultLicenseName());
+        Assert.assertTrue(GeneralPreferences.isLicenceDefaultConfirmed());
+        Assert.assertEquals("CC0", GeneralPreferences.getDefaultLicenceName());
         Assert.assertTrue(activity.isFinishing());
     }
 
     @Test
     public void testBackPressAlsoConfirmsWhateverIsCurrentlySelected() {
-        LicenseChoiceActivity activity = buildActivity();
+        LicenceChoiceActivity activity = buildActivity();
 
         activity.onBackPressed();
 
-        Assert.assertTrue(GeneralPreferences.isLicenseDefaultConfirmed());
-        Assert.assertEquals("GPLv3.0+", GeneralPreferences.getDefaultLicenseName());
+        Assert.assertTrue(GeneralPreferences.isLicenceDefaultConfirmed());
+        Assert.assertEquals("GPLv3.0+", GeneralPreferences.getDefaultLicenceName());
         Assert.assertTrue(activity.isFinishing());
     }
 }

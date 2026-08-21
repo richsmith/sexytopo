@@ -3,16 +3,16 @@ package org.hwyl.sexytopo.model.survey;
 import androidx.annotation.NonNull;
 
 /**
- * One entry in the user-configurable list of license choices offered on the Trip screen. Exactly
+ * One entry in the user-configurable list of licence choices offered on the Trip screen. Exactly
  * one entry in any given list is flagged as the default; this is enforced by the code that manages
  * the stored list (see GeneralPreferences.)
  */
-public class LicenseOption {
+public class LicenceOption {
 
     private final String name;
     private final boolean isDefault;
 
-    public LicenseOption(String name, boolean isDefault) {
+    public LicenceOption(String name, boolean isDefault) {
         this.name = name;
         this.isDefault = isDefault;
     }
@@ -26,13 +26,13 @@ public class LicenseOption {
     }
 
     /** Returns a copy of this option with the same name but the given default flag. */
-    public LicenseOption withDefault(boolean newIsDefault) {
-        return new LicenseOption(name, newIsDefault);
+    public LicenceOption withDefault(boolean newIsDefault) {
+        return new LicenceOption(name, newIsDefault);
     }
 
     /** Returns a copy of this option with a new name but the same default flag. */
-    public LicenseOption withName(String newName) {
-        return new LicenseOption(newName, isDefault);
+    public LicenceOption withName(String newName) {
+        return new LicenceOption(newName, isDefault);
     }
 
     @Override
@@ -40,10 +40,10 @@ public class LicenseOption {
         if (this == other) {
             return true;
         }
-        if (!(other instanceof LicenseOption)) {
+        if (!(other instanceof LicenceOption)) {
             return false;
         }
-        LicenseOption that = (LicenseOption) other;
+        LicenceOption that = (LicenceOption) other;
         if (isDefault != that.isDefault) {
             return false;
         }

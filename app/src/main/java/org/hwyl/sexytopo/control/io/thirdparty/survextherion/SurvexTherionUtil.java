@@ -102,18 +102,18 @@ public class SurvexTherionUtil {
     }
 
     /**
-     * Returns the {@code *copyright <year> "<copyright>" ;"<license>"} line (Survex) or the
-     * equivalent {@code copyright <year> "<copyright>" #"<license>"} line (Therion) for the
-     * survey's trip, or "" if there's no trip, or the trip has neither a copyright nor a license
+     * Returns the {@code *copyright <year> "<copyright>" ;"<licence>"} line (Survex) or the
+     * equivalent {@code copyright <year> "<copyright>" #"<licence>"} line (Therion) for the
+     * survey's trip, or "" if there's no trip, or the trip has neither a copyright nor a licence
      * set.
      *
      * <p>The copyright text is always quoted, and is rendered as an empty pair of quotes if blank.
-     * The license (also quoted) is only appended, as a trailing comment, if it is set; if there's
-     * no license, the line ends after the copyright text.
+     * The licence (also quoted) is only appended, as a trailing comment, if it is set; if there's
+     * no licence, the line ends after the copyright text.
      */
     public static String getCopyrightLine(Survey survey, SurveyFormat format) {
         Trip trip = survey.getTrip();
-        if (trip == null || (!trip.hasCopyright() && !trip.hasLicense())) {
+        if (trip == null || (!trip.hasCopyright() && !trip.hasLicence())) {
             return "";
         }
 
@@ -129,11 +129,11 @@ public class SurvexTherionUtil {
                 .append(copyrightText)
                 .append("\"");
 
-        if (trip.hasLicense()) {
+        if (trip.hasLicence()) {
             builder.append(" ")
                     .append(commentChar)
                     .append("\"")
-                    .append(trip.getLicense())
+                    .append(trip.getLicence())
                     .append("\"");
         }
 

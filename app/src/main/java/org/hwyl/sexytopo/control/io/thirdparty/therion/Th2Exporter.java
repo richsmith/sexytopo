@@ -344,7 +344,7 @@ public class Th2Exporter {
     /**
      * Returns the "scrap ... -projection ..." line, followed - on the very next physical line, not
      * separated by a blank line like the rest of this scrap's sections are - by the
-     * copyright/license line, if the trip has either set.
+     * copyright/licence line, if the trip has either set.
      */
     private static String getStartScrapLines(
             Survey survey, String name, Projection2D projection, Shape frame) {

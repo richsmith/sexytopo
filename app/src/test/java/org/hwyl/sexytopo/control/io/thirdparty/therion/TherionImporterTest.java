@@ -551,44 +551,44 @@ public class TherionImporterTest {
     }
 
     @Test
-    public void testSurvexCopyrightAndLicenseImport() throws Exception {
+    public void testSurvexCopyrightAndLicenceImport() throws Exception {
         String survexText =
                 "*date 2026.01.05\n" + "*copyright 2026 \"Caver Jane\" ;\"CC BY 4.0\"\n";
 
         Trip trip = SurvexTherionImporter.parseMetadata(survexText, SurveyFormat.SURVEX);
         Assert.assertNotNull(trip);
         Assert.assertEquals("Caver Jane", trip.getCopyright());
-        Assert.assertEquals("CC BY 4.0", trip.getLicense());
+        Assert.assertEquals("CC BY 4.0", trip.getLicence());
     }
 
     @Test
-    public void testTherionCopyrightAndLicenseImport() throws Exception {
+    public void testTherionCopyrightAndLicenceImport() throws Exception {
         String therionText = "date 2026.01.05\n" + "copyright 2026 \"Caver Jane\" #\"CC BY 4.0\"\n";
 
         Trip trip = SurvexTherionImporter.parseMetadata(therionText, SurveyFormat.THERION);
         Assert.assertNotNull(trip);
         Assert.assertEquals("Caver Jane", trip.getCopyright());
-        Assert.assertEquals("CC BY 4.0", trip.getLicense());
+        Assert.assertEquals("CC BY 4.0", trip.getLicence());
     }
 
     @Test
-    public void testCopyrightWithoutLicenseImport() throws Exception {
+    public void testCopyrightWithoutLicenceImport() throws Exception {
         String survexText = "*date 2026.01.05\n" + "*copyright 2026 \"Caver Jane\"\n";
 
         Trip trip = SurvexTherionImporter.parseMetadata(survexText, SurveyFormat.SURVEX);
         Assert.assertNotNull(trip);
         Assert.assertEquals("Caver Jane", trip.getCopyright());
-        Assert.assertFalse(trip.hasLicense());
+        Assert.assertFalse(trip.hasLicence());
     }
 
     @Test
-    public void testLicenseWithoutCopyrightImport() throws Exception {
+    public void testLicenceWithoutCopyrightImport() throws Exception {
         String survexText = "*date 2026.01.05\n" + "*copyright 2026 \"\" ;\"CC BY 4.0\"\n";
 
         Trip trip = SurvexTherionImporter.parseMetadata(survexText, SurveyFormat.SURVEX);
         Assert.assertNotNull(trip);
         Assert.assertFalse(trip.hasCopyright());
-        Assert.assertEquals("CC BY 4.0", trip.getLicense());
+        Assert.assertEquals("CC BY 4.0", trip.getLicence());
     }
 
     @Test
@@ -598,15 +598,15 @@ public class TherionImporterTest {
         Trip trip = SurvexTherionImporter.parseMetadata(survexText, SurveyFormat.SURVEX);
         Assert.assertNotNull(trip);
         Assert.assertFalse(trip.hasCopyright());
-        Assert.assertFalse(trip.hasLicense());
+        Assert.assertFalse(trip.hasLicence());
     }
 
     @Test
-    public void testCopyrightLicenseRoundTripSurvex() throws Exception {
+    public void testCopyrightLicenceRoundTripSurvex() throws Exception {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         Trip trip = new Trip();
         trip.setCopyright("Caver Jane");
-        trip.setLicense("CC BY 4.0");
+        trip.setLicence("CC BY 4.0");
         survey.setTrip(trip);
 
         String content = new SurvexExporter().getContent(survey);
@@ -614,15 +614,15 @@ public class TherionImporterTest {
 
         Assert.assertNotNull(imported);
         Assert.assertEquals("Caver Jane", imported.getCopyright());
-        Assert.assertEquals("CC BY 4.0", imported.getLicense());
+        Assert.assertEquals("CC BY 4.0", imported.getLicence());
     }
 
     @Test
-    public void testCopyrightLicenseRoundTripTherion() throws Exception {
+    public void testCopyrightLicenceRoundTripTherion() throws Exception {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         Trip trip = new Trip();
         trip.setCopyright("Caver Jane");
-        trip.setLicense("CC BY 4.0");
+        trip.setLicence("CC BY 4.0");
         survey.setTrip(trip);
 
         String centrelineText =
@@ -634,7 +634,7 @@ public class TherionImporterTest {
 
         Assert.assertNotNull(imported);
         Assert.assertEquals("Caver Jane", imported.getCopyright());
-        Assert.assertEquals("CC BY 4.0", imported.getLicense());
+        Assert.assertEquals("CC BY 4.0", imported.getLicence());
     }
 
     // Splays from later stations can appear before the first real leg in
