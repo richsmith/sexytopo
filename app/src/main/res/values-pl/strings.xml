@@ -380,19 +380,31 @@
     <string name="trip_clear_date">Clear date</string>
     <string name="trip_same_as_survey_date">Taka sama jak data pomiaru</string>
     <string name="trip_comments">Komentarze</string>
+    <string name="trip_save_trip">Zapisz wyjazd</string>
+    <string name="trip_role_book">Dokumentacja (rysowanie)</string>
+    <string name="trip_role_instruments">Instrumenty</string>
+    <string name="trip_role_dog">Asystent</string>
+    <string name="trip_role_exploration">Zespół eksploracyjny</string>
+
+    <!-- Copyright and licensing -->
     <string name="trip_copyright_label">Właściciel praw autorskich</string>
     <string name="trip_licence_label">Licencja</string>
     <string name="trip_licence_none">Brak licencji</string>
     <string name="trip_licence_hint_title">Rozważ otwartą licencję dla swoich danych pomiarowych</string>
     <string name="trip_licence_hint_body">Wolna licencja pozwala innym grotołazom korzystać z twojej pracy i ją rozwijać, tak jak ty możesz korzystać z ich pracy - dane, które można zweryfikować i wykorzystać ponownie, są cenniejsze i z czasem stają się lepsze, z korzyścią dla wszystkich. SexyTopo jest wolny i otwartoźródłowy z tego samego powodu.</string>
     <string name="trip_licence_hint_dismiss">Zamknij</string>
+    <string name="licence_summary_gpl_3_plus">Każdy może korzystać z twojego pomiaru i go zmieniać, pod warunkiem że wszystko, co na jego podstawie opublikuje, udostępni równie swobodnie.</string>
+    <string name="licence_summary_cc0">Całkowicie zrzekasz się swoich praw: każdy może wykorzystać twój pomiar do czegokolwiek, bez pytania i bez podawania autorstwa.</string>
+    <string name="licence_summary_cc_by">Każdy może korzystać z twojego pomiaru i go zmieniać w dowolnym celu, o ile poda twoje autorstwo.</string>
+    <string name="licence_summary_cc_by_sa">Każdy może korzystać z twojego pomiaru i go zmieniać, jeśli poda twoje autorstwo i udostępni swoją wersję na tych samych warunkach.</string>
+    <string name="licence_summary_cc_by_nc">Każdy może korzystać z twojego pomiaru i go zmieniać do celów niekomercyjnych, o ile poda twoje autorstwo.</string>
+    <string name="licence_summary_cc_by_nc_sa">Każdy może korzystać z twojego pomiaru i go zmieniać do celów niekomercyjnych, jeśli poda twoje autorstwo i udostępni swoją wersję na tych samych warunkach.</string>
+    <string name="licence_summary_none">Pozostawienie pomiaru bez licencji nie czyni go wolnym: prawo autorskie obowiązuje automatycznie, więc inni muszą zakładać, że nie wolno im go ani udostępniać, ani wykorzystywać. To to samo co \"Wszelkie prawa zastrzeżone\", tylko bez powiedzenia tego wprost.</string>
+    <string name="licence_summary_all_rights_reserved">Nikt nie może udostępniać ani wykorzystywać twojego pomiaru bez uprzedniej zgody. Jeśli przestaniesz być osiągalny, twoje dane umrą razem z tobą - to częsty sposób, w jaki dane pomiarowe jaskiń przepadają na zawsze.</string>
+    <string name="licence_read_more">Przeczytaj licencję</string>
+    <string name="licence_link_failed">Nie udało się otworzyć strony licencji (jesteś pod ziemią?)</string>
     <string name="trip_licence_required_helper">Wybierz licencję przed zapisaniem lub \"Brak licencji\", jeśli wyraźnie nie chcesz żadnej</string>
     <string name="trip_licence_recommended_suffix">%1$s [Zalecana]</string>
-    <string name="trip_save_trip">Zapisz wyjazd</string>
-    <string name="trip_role_book">Dokumentacja (rysowanie)</string>
-    <string name="trip_role_instruments">Instrumenty</string>
-    <string name="trip_role_dog">Asystent</string>
-    <string name="trip_role_exploration">Zespół eksploracyjny</string>
 
     <!-- Stats -->
     <string name="stats_title_this_survey">Bieżący pomiar</string>

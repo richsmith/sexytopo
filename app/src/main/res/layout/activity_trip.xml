@@ -309,6 +309,36 @@
 
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <!-- What the selected licence actually permits, with a link to the licence
+                         itself. Only shown for the licences we know about. -->
+                    <LinearLayout
+                        android:id="@+id/licence_summary_group"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginBottom="8dp"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:id="@+id/licence_summary"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?attr/textAppearanceBodySmall"/>
+
+                        <TextView
+                            android:id="@+id/licence_link"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="@string/licence_read_more"
+                            android:textAppearance="?attr/textAppearanceBodySmall"
+                            android:textColor="?attr/colorPrimary"
+                            android:background="?attr/selectableItemBackground"
+                            android:paddingTop="4dp"
+                            android:paddingBottom="4dp"/>
+
+                    </LinearLayout>
+
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

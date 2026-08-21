@@ -380,19 +380,31 @@
     <string name="trip_clear_date">Clear date</string>
     <string name="trip_same_as_survey_date">Uguale alla data del rilievo</string>
     <string name="trip_comments">Commenti</string>
+    <string name="trip_save_trip">Salva Uscita</string>
+    <string name="trip_role_book">Rilievo (disegno)</string>
+    <string name="trip_role_instruments">Strumenti</string>
+    <string name="trip_role_dog">Cane (assistente)</string>
+    <string name="trip_role_exploration">Squadra di Esplorazione</string>
+
+    <!-- Copyright and licensing -->
     <string name="trip_copyright_label">Titolare del copyright</string>
     <string name="trip_licence_label">Licenza</string>
     <string name="trip_licence_none">Nessuna licenza</string>
     <string name="trip_licence_hint_title">Valuta una licenza aperta per i tuoi dati di rilievo</string>
     <string name="trip_licence_hint_body">Una licenza libera permette ad altri speleologi di usare il tuo lavoro e di ampliarlo, come tu puoi fare con il loro: i dati che possono essere verificati e riutilizzati valgono di più e migliorano nel tempo, a vantaggio di tutti. SexyTopo è libero e open source per la stessa ragione.</string>
     <string name="trip_licence_hint_dismiss">Chiudi</string>
+    <string name="licence_summary_gpl_3_plus">Chiunque può usare e adattare il tuo rilievo, purché tutto ciò che viene pubblicato sulla sua base sia condiviso con la stessa libertà.</string>
+    <string name="licence_summary_cc0">Rinunci del tutto ai tuoi diritti: chiunque può usare il tuo rilievo per qualsiasi scopo, senza chiedere né citarti.</string>
+    <string name="licence_summary_cc_by">Chiunque può usare e adattare il tuo rilievo per qualsiasi scopo, purché ti citi.</string>
+    <string name="licence_summary_cc_by_sa">Chiunque può usare e adattare il tuo rilievo se ti cita e condivide la propria versione alle stesse condizioni.</string>
+    <string name="licence_summary_cc_by_nc">Chiunque può usare e adattare il tuo rilievo per scopi non commerciali, purché ti citi.</string>
+    <string name="licence_summary_cc_by_nc_sa">Chiunque può usare e adattare il tuo rilievo per scopi non commerciali, se ti cita e condivide la propria versione alle stesse condizioni.</string>
+    <string name="licence_summary_none">Lasciare il rilievo senza licenza non lo rende libero: il diritto d\'autore si applica automaticamente, quindi gli altri devono presumere di non poterlo né condividere né riutilizzare. È lo stesso che \"Tutti i diritti riservati\", senza dirlo.</string>
+    <string name="licence_summary_all_rights_reserved">Nessuno può condividere o riutilizzare il tuo rilievo senza chiedertelo prima. Se diventi irreperibile, i tuoi dati muoiono con te: un modo comune in cui i dati di rilievo delle grotte vanno perduti per sempre.</string>
+    <string name="licence_read_more">Leggi la licenza</string>
+    <string name="licence_link_failed">Impossibile aprire la pagina della licenza (sei sottoterra?)</string>
     <string name="trip_licence_required_helper">Scegli una licenza prima di salvare, o \"Nessuna licenza\" se espressamente non ne vuoi una</string>
     <string name="trip_licence_recommended_suffix">%1$s [Consigliata]</string>
-    <string name="trip_save_trip">Salva Uscita</string>
-    <string name="trip_role_book">Rilievo (disegno)</string>
-    <string name="trip_role_instruments">Strumenti</string>
-    <string name="trip_role_dog">Cane (assistente)</string>
-    <string name="trip_role_exploration">Squadra di Esplorazione</string>
 
     <!-- Stats -->
     <string name="stats_title_this_survey">Rilievo Corrente</string>

@@ -412,14 +412,6 @@
     <string name="trip_dialog_name_required">Name is required</string>
     <string name="trip_dialog_confirm_clear_trip">Clear Trip Data?</string>
     <string name="trip_comments">Comments</string>
-    <string name="trip_copyright_label">Copyright holder</string>
-    <string name="trip_licence_label">Licence</string>
-    <string name="trip_licence_none">No licence</string>
-    <string name="trip_licence_hint_title">Please consider an open licence for your survey data</string>
-    <string name="trip_licence_hint_body">A free licence lets other cavers use and build on your work, as you can with theirs - data that can be verified and reused is more valuable and gets better over time, for mutual benefit. SexyTopo is free and open source for the same reason.</string>
-    <string name="trip_licence_hint_dismiss">Dismiss</string>
-    <string name="trip_licence_required_helper">Pick a licence before saving, or \"No licence\" if you explicitly don\'t want one</string>
-    <string name="trip_licence_recommended_suffix">%1$s [Recommended]</string>
     <string name="trip_save_trip">Save Trip</string>
     <string name="trip_role_book">Book (drawing)</string>
     <string name="trip_role_instruments">Instruments</string>
@@ -432,6 +424,26 @@
     <string name="trip_exploration_date_label">Exploration Date</string>
     <string name="trip_clear_date">Clear date</string>
     <string name="trip_same_as_survey_date">Same as survey date</string>
+
+    <!-- Copyright and licensing -->
+    <string name="trip_copyright_label">Copyright holder</string>
+    <string name="trip_licence_label">Licence</string>
+    <string name="trip_licence_none">No licence</string>
+    <string name="trip_licence_hint_title">Please consider an open licence for your survey data</string>
+    <string name="trip_licence_hint_body">A free licence lets other cavers use and build on your work, as you can with theirs - data that can be verified and reused is more valuable and gets better over time, for mutual benefit. SexyTopo is free and open source for the same reason.</string>
+    <string name="trip_licence_hint_dismiss">Dismiss</string>
+    <string name="licence_summary_gpl_3_plus">Anyone may use and adapt your survey, provided anything they publish based on it is shared just as freely.</string>
+    <string name="licence_summary_cc0">You give up your rights entirely: anyone may use your survey for anything, without asking or crediting you.</string>
+    <string name="licence_summary_cc_by">Anyone may use and adapt your survey for any purpose, as long as they credit you.</string>
+    <string name="licence_summary_cc_by_sa">Anyone may use and adapt your survey if they credit you and share their version on the same terms.</string>
+    <string name="licence_summary_cc_by_nc">Anyone may use and adapt your survey for non-commercial purposes, as long as they credit you.</string>
+    <string name="licence_summary_cc_by_nc_sa">Anyone may use and adapt your survey for non-commercial purposes, if they credit you and share their version on the same terms.</string>
+    <string name="licence_summary_none">Leaving your survey unlicensed does not make it free to use: copyright applies automatically, so others must assume they may not share or reuse it at all. This is the same as All rights reserved, but without saying so.</string>
+    <string name="licence_summary_all_rights_reserved">Nobody may share or reuse your survey without asking you first. If you become uncontactable, your data effectively dies with you - a common way for cave survey data to be lost for good.</string>
+    <string name="licence_read_more">Read the licence</string>
+    <string name="licence_link_failed">Could not open the licence page (are you underground?)</string>
+    <string name="trip_licence_required_helper">Pick a licence before saving, or \"No licence\" if you explicitly don\'t want one</string>
+    <string name="trip_licence_recommended_suffix">%1$s [Recommended]</string>
 
     <!-- Stats -->
     <string name="stats_title_this_survey">Current Survey</string>

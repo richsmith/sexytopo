@@ -11,13 +11,14 @@ public class GeneralPreferencesLicenceTest {
     public void testDefaultNamesAreOfferedInOrder() {
         List<String> names = Licence.getDefaultNames();
 
-        Assert.assertEquals(6, names.size());
+        Assert.assertEquals(7, names.size());
         Assert.assertEquals("GPLv3.0+", names.get(0));
         Assert.assertEquals("CC0", names.get(1));
         Assert.assertEquals("CC BY 4.0", names.get(2));
-        Assert.assertEquals("CC BY SA 4.0", names.get(3));
-        Assert.assertEquals("CC BY SA NC 4.0", names.get(4));
-        Assert.assertEquals("All rights reserved", names.get(5));
+        Assert.assertEquals("CC BY-SA 4.0", names.get(3));
+        Assert.assertEquals("CC BY-NC 4.0", names.get(4));
+        Assert.assertEquals("CC BY-NC-SA 4.0", names.get(5));
+        Assert.assertEquals("All rights reserved", names.get(6));
     }
 
     @Test
@@ -31,6 +32,50 @@ public class GeneralPreferencesLicenceTest {
         Assert.assertTrue(Licence.isDefault("CC0"));
         Assert.assertFalse(Licence.isDefault("CC BY-NC-ND 3.0 AT"));
         Assert.assertFalse(Licence.isDefault(Licence.NONE));
+    }
+
+    @Test
+    public void testEveryDefaultLicenceHasASummary() {
+        for (Licence licence : Licence.values()) {
+            Assert.assertNotEquals(0, licence.getSummaryId());
+        }
+    }
+
+    @Test
+    public void testOnlyAllRightsReservedHasNoUrl() {
+        for (Licence licence : Licence.values()) {
+            Assert.assertEquals(licence != Licence.ALL_RIGHTS_RESERVED, licence.hasUrl());
+        }
+    }
+
+    @Test
+    public void testOnlyAllRightsReservedIsNotFree() {
+        // Every licence that lets other cavers build on the survey counts as free here,
+        // including the non-commercial ones.
+        for (Licence licence : Licence.values()) {
+            Assert.assertEquals(licence != Licence.ALL_RIGHTS_RESERVED, licence.isFree());
+        }
+    }
+
+    @Test
+    public void testSummaryPrefixFollowsFreedom() {
+        for (Licence licence : Licence.values()) {
+            Assert.assertEquals(
+                    licence.isFree() ? Licence.FREE_PREFIX : Licence.WARNING_PREFIX,
+                    licence.getSummaryPrefix());
+        }
+    }
+
+    @Test
+    public void testRecommendedLicenceIsFree() {
+        Assert.assertTrue(Licence.RECOMMENDED.isFree());
+    }
+
+    @Test
+    public void testForNameFindsDefaultsAndNothingElse() {
+        Assert.assertEquals(Licence.CC0, Licence.forName("CC0"));
+        Assert.assertNull(Licence.forName("CC BY-NC-ND 3.0 AT"));
+        Assert.assertNull(Licence.forName(Licence.NONE));
     }
 
     @Test

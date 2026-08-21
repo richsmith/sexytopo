@@ -380,19 +380,31 @@
     <string name="trip_clear_date">Clear date</string>
     <string name="trip_same_as_survey_date">Gleich wie Vermessungsdatum</string>
     <string name="trip_comments">Bemerkungen</string>
+    <string name="trip_save_trip">Tour speichern</string>
+    <string name="trip_role_book">Zeichnung</string>
+    <string name="trip_role_instruments">Vermessung</string>
+    <string name="trip_role_dog">Assistenz/Mithilfe</string>
+    <string name="trip_role_exploration">Erforschung</string>
+
+    <!--  Copyright and licensing  -->
     <string name="trip_copyright_label">Rechteinhaber</string>
     <string name="trip_licence_label">Lizenz</string>
     <string name="trip_licence_none">Keine Lizenz</string>
     <string name="trip_licence_hint_title">Bitte erwäge eine offene Lizenz für deine Vermessungsdaten</string>
     <string name="trip_licence_hint_body">Eine freie Lizenz erlaubt es anderen Höhlenforschern, deine Arbeit zu nutzen und darauf aufzubauen, so wie du es mit ihrer kannst - Daten, die überprüft und weiterverwendet werden können, sind wertvoller und werden mit der Zeit besser, zum gegenseitigen Nutzen. SexyTopo ist aus demselben Grund frei und quelloffen.</string>
     <string name="trip_licence_hint_dismiss">Ausblenden</string>
+    <string name="licence_summary_gpl_3_plus">Jeder darf deine Vermessung nutzen und bearbeiten, sofern alles, was darauf aufbaut und veröffentlicht wird, ebenso frei weitergegeben wird.</string>
+    <string name="licence_summary_cc0">Du gibst deine Rechte vollständig auf: Jeder darf deine Vermessung für alles nutzen, ohne zu fragen und ohne dich zu nennen.</string>
+    <string name="licence_summary_cc_by">Jeder darf deine Vermessung für jeden Zweck nutzen und bearbeiten, solange er dich als Urheber nennt.</string>
+    <string name="licence_summary_cc_by_sa">Jeder darf deine Vermessung nutzen und bearbeiten, wenn er dich nennt und seine Fassung zu denselben Bedingungen weitergibt.</string>
+    <string name="licence_summary_cc_by_nc">Jeder darf deine Vermessung für nicht-kommerzielle Zwecke nutzen und bearbeiten, solange er dich als Urheber nennt.</string>
+    <string name="licence_summary_cc_by_nc_sa">Jeder darf deine Vermessung für nicht-kommerzielle Zwecke nutzen und bearbeiten, wenn er dich nennt und seine Fassung zu denselben Bedingungen weitergibt.</string>
+    <string name="licence_summary_none">Eine Vermessung ohne Lizenz ist nicht frei nutzbar: Das Urheberrecht gilt automatisch, also müssen andere davon ausgehen, dass sie sie überhaupt nicht weitergeben oder nutzen dürfen. Das entspricht \"Alle Rechte vorbehalten\", nur ohne es zu sagen.</string>
+    <string name="licence_summary_all_rights_reserved">Niemand darf deine Vermessung ohne vorherige Nachfrage weitergeben oder nutzen. Wenn du nicht mehr erreichbar bist, stirbt deine Vermessung mit dir - ein häufiger Grund, warum Höhlenvermessungsdaten endgültig verloren gehen.</string>
+    <string name="licence_read_more">Lizenz lesen</string>
+    <string name="licence_link_failed">Lizenzseite konnte nicht geöffnet werden (bist du unter Tage?)</string>
     <string name="trip_licence_required_helper">Vor dem Speichern eine Lizenz wählen, oder \"Keine Lizenz\", wenn ausdrücklich keine gewünscht ist</string>
     <string name="trip_licence_recommended_suffix">%1$s [Empfohlen]</string>
-    <string name="trip_save_trip">Tour speichern</string>
-    <string name="trip_role_book">Zeichnung</string>
-    <string name="trip_role_instruments">Vermessung</string>
-    <string name="trip_role_dog">Assistenz/Mithilfe</string>
-    <string name="trip_role_exploration">Erforschung</string>
 
     <!--  Stats  -->
     <string name="stats_title_this_survey">Aktuelle Vermessung</string>

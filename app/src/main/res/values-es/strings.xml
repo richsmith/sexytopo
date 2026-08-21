@@ -380,19 +380,31 @@
     <string name="trip_clear_date">Clear date</string>
     <string name="trip_same_as_survey_date">Igual que la fecha de topografía</string>
     <string name="trip_comments">Comentarios</string>
+    <string name="trip_save_trip">Guardar Salida</string>
+    <string name="trip_role_book">Topógrafo (dibujo)</string>
+    <string name="trip_role_instruments">Instrumentos</string>
+    <string name="trip_role_dog">Perro (asistente)</string>
+    <string name="trip_role_exploration">Equipo de Exploración</string>
+
+    <!-- Copyright and licensing -->
     <string name="trip_copyright_label">Titular del copyright</string>
     <string name="trip_licence_label">Licencia</string>
     <string name="trip_licence_none">Sin licencia</string>
     <string name="trip_licence_hint_title">Considera una licencia abierta para tus datos topográficos</string>
     <string name="trip_licence_hint_body">Una licencia libre permite a otros espeleólogos usar tu trabajo y desarrollarlo, igual que tú puedes hacer con el suyo: los datos que se pueden verificar y reutilizar son más valiosos y mejoran con el tiempo, en beneficio mutuo. SexyTopo es libre y de código abierto por la misma razón.</string>
     <string name="trip_licence_hint_dismiss">Descartar</string>
+    <string name="licence_summary_gpl_3_plus">Cualquiera puede usar y adaptar tu topografía, siempre que lo que publique a partir de ella se comparta con la misma libertad.</string>
+    <string name="licence_summary_cc0">Renuncias por completo a tus derechos: cualquiera puede usar tu topografía para lo que sea, sin pedir permiso ni atribuirtela.</string>
+    <string name="licence_summary_cc_by">Cualquiera puede usar y adaptar tu topografía para cualquier fin, siempre que te atribuya la autoría.</string>
+    <string name="licence_summary_cc_by_sa">Cualquiera puede usar y adaptar tu topografía si te atribuye la autoría y comparte su versión en los mismos términos.</string>
+    <string name="licence_summary_cc_by_nc">Cualquiera puede usar y adaptar tu topografía con fines no comerciales, siempre que te atribuya la autoría.</string>
+    <string name="licence_summary_cc_by_nc_sa">Cualquiera puede usar y adaptar tu topografía con fines no comerciales, si te atribuye la autoría y comparte su versión en los mismos términos.</string>
+    <string name="licence_summary_none">Dejar tu topografía sin licencia no la hace libre: el copyright se aplica automáticamente, así que los demás deben suponer que no pueden compartirla ni reutilizarla en absoluto. Es lo mismo que \"Todos los derechos reservados\", pero sin decirlo.</string>
+    <string name="licence_summary_all_rights_reserved">Nadie puede compartir ni reutilizar tu topografía sin pedírtelo antes. Si dejas de estar localizable, tus datos mueren contigo: una forma habitual de perder para siempre los datos topográficos de una cueva.</string>
+    <string name="licence_read_more">Leer la licencia</string>
+    <string name="licence_link_failed">No se pudo abrir la página de la licencia (¿estás bajo tierra?)</string>
     <string name="trip_licence_required_helper">Elige una licencia antes de guardar, o \"Sin licencia\" si expresamente no quieres ninguna</string>
     <string name="trip_licence_recommended_suffix">%1$s [Recomendada]</string>
-    <string name="trip_save_trip">Guardar Salida</string>
-    <string name="trip_role_book">Topógrafo (dibujo)</string>
-    <string name="trip_role_instruments">Instrumentos</string>
-    <string name="trip_role_dog">Perro (asistente)</string>
-    <string name="trip_role_exploration">Equipo de Exploración</string>
 
     <!-- Stats -->
     <string name="stats_title_this_survey">Topografía Actual</string>

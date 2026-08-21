@@ -380,19 +380,31 @@
     <string name="trip_clear_date">Clear date</string>
     <string name="trip_same_as_survey_date">Igual à data da topografia</string>
     <string name="trip_comments">Comentários</string>
+    <string name="trip_save_trip">Guardar Saída</string>
+    <string name="trip_role_book">Topógrafo (desenho)</string>
+    <string name="trip_role_instruments">Instrumentos</string>
+    <string name="trip_role_dog">Cão (assistente)</string>
+    <string name="trip_role_exploration">Equipa de Exploração</string>
+
+    <!-- Copyright and licensing -->
     <string name="trip_copyright_label">Titular do copyright</string>
     <string name="trip_licence_label">Licença</string>
     <string name="trip_licence_none">Sem licença</string>
     <string name="trip_licence_hint_title">Considere uma licença aberta para os seus dados de levantamento</string>
     <string name="trip_licence_hint_body">Uma licença livre permite que outros espeleólogos usem o seu trabalho e o desenvolvam, tal como você pode fazer com o deles - dados que podem ser verificados e reutilizados são mais valiosos e melhoram com o tempo, em benefício mútuo. SexyTopo é livre e de código aberto pela mesma razão.</string>
     <string name="trip_licence_hint_dismiss">Dispensar</string>
+    <string name="licence_summary_gpl_3_plus">Qualquer pessoa pode usar e adaptar o seu levantamento, desde que tudo o que publique com base nele seja partilhado com a mesma liberdade.</string>
+    <string name="licence_summary_cc0">Abdica inteiramente dos seus direitos: qualquer pessoa pode usar o seu levantamento para o que quiser, sem pedir nem o creditar.</string>
+    <string name="licence_summary_cc_by">Qualquer pessoa pode usar e adaptar o seu levantamento para qualquer fim, desde que o credite.</string>
+    <string name="licence_summary_cc_by_sa">Qualquer pessoa pode usar e adaptar o seu levantamento se o creditar e partilhar a sua versão nos mesmos termos.</string>
+    <string name="licence_summary_cc_by_nc">Qualquer pessoa pode usar e adaptar o seu levantamento para fins não comerciais, desde que o credite.</string>
+    <string name="licence_summary_cc_by_nc_sa">Qualquer pessoa pode usar e adaptar o seu levantamento para fins não comerciais, se o creditar e partilhar a sua versão nos mesmos termos.</string>
+    <string name="licence_summary_none">Deixar o levantamento sem licença não o torna livre: os direitos de autor aplicam-se automaticamente, pelo que os outros têm de assumir que não o podem partilhar nem reutilizar. É o mesmo que \"Todos os direitos reservados\", mas sem o dizer.</string>
+    <string name="licence_summary_all_rights_reserved">Ninguém pode partilhar ou reutilizar o seu levantamento sem lhe pedir primeiro. Se deixar de estar contactável, os seus dados morrem consigo - uma forma comum de os dados de levantamento de grutas se perderem para sempre.</string>
+    <string name="licence_read_more">Ler a licença</string>
+    <string name="licence_link_failed">Não foi possível abrir a página da licença (está debaixo de terra?)</string>
     <string name="trip_licence_required_helper">Escolha uma licença antes de guardar, ou \"Sem licença\" se explicitamente não quiser nenhuma</string>
     <string name="trip_licence_recommended_suffix">%1$s [Recomendada]</string>
-    <string name="trip_save_trip">Guardar Saída</string>
-    <string name="trip_role_book">Topógrafo (desenho)</string>
-    <string name="trip_role_instruments">Instrumentos</string>
-    <string name="trip_role_dog">Cão (assistente)</string>
-    <string name="trip_role_exploration">Equipa de Exploração</string>
 
     <!-- Stats -->
     <string name="stats_title_this_survey">Topografia Atual</string>

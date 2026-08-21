@@ -1,7 +1,10 @@
 package org.hwyl.sexytopo.control.activity;
 
 import android.annotation.SuppressLint;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -134,6 +137,7 @@ public class TripActivity extends SexyTopoActivity {
                         v -> {
                             GeneralPreferences.setLicenceHintDismissed(true);
                             updateLicenceHintCard();
+                            updateLicenceSummary();
                         });
 
         AutoCompleteTextView licenceField = findViewById(R.id.trip_licence);
@@ -369,6 +373,53 @@ public class TripActivity extends SexyTopoActivity {
         List<String> knownCavers = GeneralPreferences.getKnownCavers();
         holderField.setAdapter(
                 new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, knownCavers));
+    }
+
+    /**
+     * Shows what the currently selected licence permits, with a link to the licence itself. Only
+     * the licences we know about have a summary; free text typed by the user, an unfamiliar licence
+     * from an imported survey, and "no licence" all show nothing.
+     */
+    private void updateLicenceSummary() {
+        AutoCompleteTextView licenceField = findViewById(R.id.trip_licence);
+        String name = licenceField.getText().toString().trim();
+        Licence licence = Licence.forName(name);
+
+        View group = findViewById(R.id.licence_summary_group);
+        TextView summary = findViewById(R.id.licence_summary);
+        TextView link = findViewById(R.id.licence_link);
+
+        // Deliberately choosing "no licence" gets a summary of its own, since leaving a survey
+        // unlicensed doesn't mean what most people assume. An untouched field doesn't: there's
+        // no choice to explain yet, and the hint card is already making that case.
+        if (licence == null && name.isEmpty() && isLicenceChosen) {
+            group.setVisibility(View.VISIBLE);
+            summary.setText(Licence.WARNING_PREFIX + getString(R.string.licence_summary_none));
+            link.setVisibility(View.GONE);
+            return;
+        }
+
+        if (licence == null) {
+            group.setVisibility(View.GONE);
+            return;
+        }
+
+        group.setVisibility(View.VISIBLE);
+        summary.setText(licence.getSummaryPrefix() + getString(licence.getSummaryId()));
+
+        link.setVisibility(licence.hasUrl() ? View.VISIBLE : View.GONE);
+        if (licence.hasUrl()) {
+            link.setOnClickListener(v -> openUrl(licence.getUrl()));
+        }
+    }
+
+    private void openUrl(String url) {
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+        } catch (ActivityNotFoundException exception) {
+            // No browser installed; nothing useful to do but leave the summary on screen.
+            showSimpleToast(R.string.licence_link_failed);
+        }
     }
 
     /**
@@ -646,6 +697,7 @@ public class TripActivity extends SexyTopoActivity {
 
         findViewById(R.id.set_trip).setEnabled(hasAnyData && hasChanges && isLicenceChosen);
         updateLicenceHintCard();
+        updateLicenceSummary();
 
         // Say why Save is disabled, but only when the licence is the one thing blocking it -
         // otherwise the button is disabled for a reason the user can already see (nothing
