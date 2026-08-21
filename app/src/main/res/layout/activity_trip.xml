@@ -226,12 +226,14 @@
                         android:hint="@string/trip_copyright_label"
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
-                        <com.google.android.material.textfield.TextInputEditText
+                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
                             android:id="@+id/trip_copyright_holder"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            style="@style/Widget.Material3.AutoCompleteTextView.OutlinedBox"
                             android:maxLines="1"
-                            android:inputType="text"/>
+                            android:inputType="text"
+                            android:completionThreshold="1"/>
 
                     </com.google.android.material.textfield.TextInputLayout>
 

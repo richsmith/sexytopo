@@ -399,6 +399,24 @@ public class GeneralPreferences {
         prefs.edit().putStringSet(PREF_KNOWN_CAVERS, set).apply();
     }
 
+    // ********** Copyright ***********
+
+    // The copyright holder given for the most recent trip, seeded onto the next new trip: a caver
+    // usually surveys under the same name, or their club's, every time.
+    private static final String PREF_LAST_COPYRIGHT_HOLDER = "pref_last_copyright_holder";
+
+    /** The copyright holder used for the most recent trip, or "" if none has been given yet. */
+    public static String getLastCopyrightHolder() {
+        if (prefs == null) return "";
+        return prefs.getString(PREF_LAST_COPYRIGHT_HOLDER, "");
+    }
+
+    /** Remembers a copyright holder, to seed the next new trip with. */
+    public static void setLastCopyrightHolder(String holder) {
+        if (prefs == null || holder == null) return;
+        prefs.edit().putString(PREF_LAST_COPYRIGHT_HOLDER, holder.trim()).apply();
+    }
+
     // ********** Licences ***********
 
     // The licence chosen for the most recent trip, seeded onto the next new trip so a caver

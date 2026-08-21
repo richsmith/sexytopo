@@ -159,10 +159,19 @@ public class TripActivity extends SexyTopoActivity {
     protected void onResume() {
         super.onResume();
         Trip trip = getSurvey().getTrip();
-        if (trip == null) {
+        boolean isNewTrip = trip == null;
+        if (isNewTrip) {
             trip = new Trip();
             getSurvey().setTrip(trip);
+        }
 
+        // What the trip looked like before anything was seeded onto it. Taking this snapshot
+        // first is what makes seeded values register as unsaved changes, so the Save button is
+        // enabled on arrival and the user can commit them - rather than the screen showing a
+        // licence and copyright holder that were never actually written to the survey.
+        savedTrip = new Trip(trip);
+
+        if (isNewTrip) {
             // Seed a brand new trip with the licence the user chose last time, so it carries
             // over between trips. Until they have chosen one this is blank, so no licence is
             // ever applied to a survey without having been picked. This only ever runs once,
@@ -170,9 +179,11 @@ public class TripActivity extends SexyTopoActivity {
             // trip, since a blank licence there could mean "the user deliberately wants no
             // licence" (or the trip was imported with none), not "never decided".
             trip.setLicence(GeneralPreferences.getLastLicence());
-        }
 
-        savedTrip = new Trip(trip);
+            // Likewise the copyright holder: a caver generally surveys under the same name, or
+            // their club's, each time.
+            trip.setCopyrightHolder(GeneralPreferences.getLastCopyrightHolder());
+        }
         team = new ArrayList<>(trip.getTeam());
 
         isPopulatingFields = true;
@@ -192,8 +203,11 @@ public class TripActivity extends SexyTopoActivity {
                 }
             }
 
-            EditText copyrightHolderField = findViewById(R.id.trip_copyright_holder);
-            copyrightHolderField.setText(trip.getCopyrightHolder());
+            setupCopyrightHolderAutocomplete();
+            AutoCompleteTextView copyrightHolderField = findViewById(R.id.trip_copyright_holder);
+            // false: don't filter on this text, which would pop the suggestion list open over
+            // the screen as it loads.
+            copyrightHolderField.setText(trip.getCopyrightHolder(), false);
 
             setupLicenceAutocomplete();
             AutoCompleteTextView licenceField = findViewById(R.id.trip_licence);
@@ -316,8 +330,9 @@ public class TripActivity extends SexyTopoActivity {
                         (dialog, whichButton) -> {
                             EditText comments = findViewById(R.id.trip_comments);
                             comments.setText("");
-                            EditText copyrightHolder = findViewById(R.id.trip_copyright_holder);
-                            copyrightHolder.setText("");
+                            AutoCompleteTextView copyrightHolder =
+                                    findViewById(R.id.trip_copyright_holder);
+                            copyrightHolder.setText("", false);
                             AutoCompleteTextView licence = findViewById(R.id.trip_licence);
                             licence.setText("");
                             isLicenceChosen = false;
@@ -333,6 +348,19 @@ public class TripActivity extends SexyTopoActivity {
                         })
                 .setNegativeButton(R.string.cancel, null)
                 .show();
+    }
+
+    /**
+     * Offers the known cavers as suggestions for the copyright holder, since it's often one of the
+     * surveyors. Only a suggestion: the field stays free text, as the holder is just as likely to
+     * be a club or an expedition. Suggestions appear once the user starts typing rather than on
+     * focus, because free text is the common case here.
+     */
+    private void setupCopyrightHolderAutocomplete() {
+        AutoCompleteTextView holderField = findViewById(R.id.trip_copyright_holder);
+        List<String> knownCavers = GeneralPreferences.getKnownCavers();
+        holderField.setAdapter(
+                new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, knownCavers));
     }
 
     private void setupLicenceAutocomplete() {
@@ -512,6 +540,9 @@ public class TripActivity extends SexyTopoActivity {
         AutoCompleteTextView licenceField = findViewById(R.id.trip_licence);
         GeneralPreferences.setLastLicence(licenceField.getText().toString());
 
+        AutoCompleteTextView copyrightHolderField = findViewById(R.id.trip_copyright_holder);
+        GeneralPreferences.setLastCopyrightHolder(copyrightHolderField.getText().toString());
+
         startActivity(PlanActivity.class);
     }
 
@@ -572,22 +603,26 @@ public class TripActivity extends SexyTopoActivity {
         EditText instrumentField = findViewById(R.id.instrument_field);
         boolean hasInstrument = !instrumentField.getText().toString().trim().isEmpty();
 
-        EditText copyrightHolderField = findViewById(R.id.trip_copyright_holder);
-        boolean hasCopyrightHolder = !copyrightHolderField.getText().toString().trim().isEmpty();
-
         Trip currentTrip = getSurvey().getTrip();
         boolean hasUnlinkedExploDate =
                 currentTrip != null && !currentTrip.isExplorationDateLinked();
 
-        // Licence is deliberately not part of hasAnyData, like surveyDate - it can be seeded
-        // from the previous choice (see onResume), so including it would make the buttons
-        // permanently enabled even on an otherwise blank new trip. It gates saving separately,
-        // via isLicenceChosen.
+        AutoCompleteTextView copyrightHolderField = findViewById(R.id.trip_copyright_holder);
+        boolean hasCopyrightHolder = !copyrightHolderField.getText().toString().trim().isEmpty();
+
+        AutoCompleteTextView licenceField = findViewById(R.id.trip_licence);
+        boolean hasLicence = !licenceField.getText().toString().trim().isEmpty();
+
+        // Values seeded from the last trip count as data like anything else: they're shown on
+        // screen, so they have to be saveable, or the survey would end up without the licence
+        // and copyright holder the user was looking at. hasChanges is what keeps the buttons
+        // from staying lit once everything on screen has actually been written.
         boolean hasAnyData =
                 hasTeam
                         || hasComments
                         || hasInstrument
                         || hasCopyrightHolder
+                        || hasLicence
                         || hasUnlinkedExploDate;
         boolean hasChanges = savedTrip == null || !savedTrip.equals(currentTrip);
 
