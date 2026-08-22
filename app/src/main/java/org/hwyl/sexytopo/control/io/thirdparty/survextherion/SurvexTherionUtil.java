@@ -313,28 +313,26 @@ public class SurvexTherionUtil {
             String marker) {
 
         Direction currentDirection = station.getExtendedElevationDirection();
+        String directionName = currentDirection.name().toLowerCase();
 
-        if (currentDirection == Direction.VERTICAL) {
-            // VERTICAL is leg-scoped: emit a two-station "extend vertical <from> <to>" command.
-            // The direction seen by child stations is not changed — pass lastDirection forward
-            // unchanged so the survey continues in the same left/right direction after the
-            // vertical leg.
-            builder.append(getExtendCommand(fromStation, station, "vertical", marker));
-            for (Leg leg : station.getConnectedOnwardLegs()) {
-                generateExtendCommandsFromStation(
-                        builder, leg.getDestination(), station, lastDirection, marker);
-            }
+        // A direction that doesn't propagate applies to this leg alone, so it's written with both
+        // of the leg's stations and doesn't change the direction the rest of the survey inherits.
+        Direction inheritedDirection;
+        if (!currentDirection.propagates()) {
+            builder.append(getExtendCommand(fromStation, station, directionName, marker));
+            inheritedDirection = lastDirection;
         } else {
             if (lastDirection == null) {
                 builder.append(getExtendCommand(station, "start", marker));
             } else if (currentDirection != lastDirection) {
-                builder.append(
-                        getExtendCommand(station, currentDirection.name().toLowerCase(), marker));
+                builder.append(getExtendCommand(station, directionName, marker));
             }
-            for (Leg leg : station.getConnectedOnwardLegs()) {
-                generateExtendCommandsFromStation(
-                        builder, leg.getDestination(), station, currentDirection, marker);
-            }
+            inheritedDirection = currentDirection;
+        }
+
+        for (Leg leg : station.getConnectedOnwardLegs()) {
+            generateExtendCommandsFromStation(
+                    builder, leg.getDestination(), station, inheritedDirection, marker);
         }
     }
 

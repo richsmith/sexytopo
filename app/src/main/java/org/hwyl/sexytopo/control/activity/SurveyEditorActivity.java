@@ -69,25 +69,20 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
     }
 
     public void onSetDirectionLeft(Station station) {
-        if (station.getExtendedElevationDirection() != Direction.LEFT) {
-            SurveyUpdater.setDirectionOfSubtree(station, Direction.LEFT);
-            getSurveyManager().broadcastSurveyUpdated();
-            invalidateView();
-        }
+        setDirection(station, Direction.LEFT);
     }
 
     public void onSetDirectionRight(Station station) {
-        if (station.getExtendedElevationDirection() != Direction.RIGHT) {
-            SurveyUpdater.setDirectionOfSubtree(station, Direction.RIGHT);
-            getSurveyManager().broadcastSurveyUpdated();
-            invalidateView();
-        }
+        setDirection(station, Direction.RIGHT);
     }
 
     public void onSetDirectionVertical(Station station) {
-        if (station.getExtendedElevationDirection() != Direction.VERTICAL) {
-            // Only affect this one station's incoming leg — do NOT propagate to the subtree
-            station.setExtendedElevationDirection(Direction.VERTICAL);
+        setDirection(station, Direction.VERTICAL);
+    }
+
+    private void setDirection(Station station, Direction direction) {
+        if (station.getExtendedElevationDirection() != direction) {
+            SurveyUpdater.setExtendedElevationDirection(getSurvey(), station, direction);
             getSurveyManager().broadcastSurveyUpdated();
             invalidateView();
         }

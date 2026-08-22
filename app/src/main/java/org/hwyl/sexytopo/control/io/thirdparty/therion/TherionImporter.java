@@ -144,7 +144,6 @@ public class TherionImporter extends Importer {
                 assert line.startsWith(EXTEND_PREFIX);
                 String rest = line.substring(EXTEND_PREFIX.length());
                 String[] tokens = rest.split(" ");
-                assert tokens.length == 2;
 
                 String directionName = tokens[0];
                 if (directionName.equals("start")) {
@@ -152,14 +151,22 @@ public class TherionImporter extends Importer {
                 }
                 Direction direction = Direction.valueOf(directionName.toUpperCase());
 
-                String stationName = tokens[1];
+                // Propagating directions name one station and apply from there down. Directions
+                // scoped to a single leg name both its stations, and apply to the destination.
+                int expectedTokens = direction.propagates() ? 2 : 3;
+                if (tokens.length != expectedTokens) {
+                    Log.e("extend: could not understand '" + line + "'");
+                    continue;
+                }
+
+                String stationName = tokens[tokens.length - 1];
                 Station station = survey.getStationByName(stationName);
                 if (station == null) {
                     Log.e("extend: station " + stationName + " not found");
                     continue;
                 }
 
-                SurveyUpdater.setDirectionOfSubtree(station, direction);
+                SurveyUpdater.setExtendedElevationDirection(survey, station, direction);
             }
 
         } catch (Exception exception) {

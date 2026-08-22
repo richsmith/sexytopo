@@ -846,4 +846,67 @@ public class TherionImporterTest {
                 mainLeg.getPromotedFrom()[0].getComment() == null
                         || mainLeg.getPromotedFrom()[0].getComment().isEmpty());
     }
+
+    // A vertical extend is scoped to one leg: it names both stations and must apply only to
+    // the destination. Reading the wrong station, or propagating it down the subtree, silently
+    // corrupts every station below the vertical leg on re-import.
+    @Test
+    public void testVerticalExtendAppliesToDestinationOnly() throws Exception {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        survey.getStationByName("3").setExtendedElevationDirection(Direction.VERTICAL);
+
+        String extendCommands =
+                SurvexTherionUtil.getExtendedElevationExtensions(survey, SurveyFormat.THERION);
+        Assert.assertTrue(
+                "vertical extend should name both of the leg's stations",
+                extendCommands.contains("extend vertical 2 3"));
+
+        Survey reimported = new Survey();
+        String th =
+                "survey roundtrip\n"
+                        + "centreline\n"
+                        + "data normal from to tape compass clino\n"
+                        + "1\t2\t5.0\t0.00\t0.00\n"
+                        + "2\t3\t5.0\t0.00\t0.00\n"
+                        + "3\t4\t5.0\t0.00\t0.00\n"
+                        + extendCommands
+                        + "endcentreline\n"
+                        + "endsurvey\n";
+        TherionImporter.updateCentreline(Arrays.asList(th.split("\n")), reimported);
+
+        Assert.assertEquals(
+                "the leg's destination should be vertical",
+                Direction.VERTICAL,
+                reimported.getStationByName("3").getExtendedElevationDirection());
+        Assert.assertEquals(
+                "the leg's origin should be unaffected",
+                Direction.RIGHT,
+                reimported.getStationByName("2").getExtendedElevationDirection());
+        Assert.assertEquals(
+                "stations below a vertical leg should keep their own direction",
+                Direction.RIGHT,
+                reimported.getStationByName("4").getExtendedElevationDirection());
+    }
+
+    @Test
+    public void testMalformedExtendLineIsSkippedNotFatal() throws Exception {
+        // A line we can't parse should be logged and skipped, leaving later lines to apply.
+        Survey survey = new Survey();
+        String th =
+                "survey malformed\n"
+                        + "centreline\n"
+                        + "data normal from to tape compass clino\n"
+                        + "1\t2\t5.0\t0.00\t0.00\n"
+                        + "2\t3\t5.0\t0.00\t0.00\n"
+                        + "extend vertical 2\n"
+                        + "extend left 3\n"
+                        + "endcentreline\n"
+                        + "endsurvey\n";
+        TherionImporter.updateCentreline(Arrays.asList(th.split("\n")), survey);
+
+        Assert.assertEquals(
+                "a later valid extend should still be applied",
+                Direction.LEFT,
+                survey.getStationByName("3").getExtendedElevationDirection());
+    }
 }

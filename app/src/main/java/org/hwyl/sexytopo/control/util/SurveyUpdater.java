@@ -416,6 +416,21 @@ public class SurveyUpdater {
         survey.setSaved(false);
     }
 
+    /**
+     * Sets the extended elevation direction on a station, applying it to the stations below too if
+     * the direction propagates. Directions that don't propagate affect only the leg into this
+     * station, leaving the rest of the survey to carry on as it was.
+     */
+    public static void setExtendedElevationDirection(
+            Survey survey, Station station, Direction direction) {
+        if (direction.propagates()) {
+            setDirectionOfSubtree(station, direction);
+        } else {
+            station.setExtendedElevationDirection(direction);
+        }
+        survey.setSaved(false);
+    }
+
     public static void setDirectionOfSubtree(Station station, Direction direction) {
         station.setExtendedElevationDirection(direction);
         for (Leg leg : station.getConnectedOnwardLegs()) {
@@ -427,20 +442,24 @@ public class SurveyUpdater {
     /**
      * Resolves the direction that a newly-created station should inherit from its parent.
      *
-     * <p>If the active (parent) station has direction VERTICAL, that means the leg into it was a
-     * one-off vertical rendering. The new station should instead continue in the direction of the
-     * nearest non-vertical ancestor, so that the survey resumes its prior horizontal direction
-     * after any number of consecutive vertical legs. If no non-vertical ancestor exists, fall back
-     * to RIGHT.
+     * <p>A direction that doesn't propagate applies to the leg into the parent alone, so it says
+     * nothing about where the survey goes next. In that case we walk up to the nearest ancestor
+     * whose direction does propagate, so the survey resumes the direction it was heading in before.
+     *
+     * <p>NOTE: this is a potentially expensive O(n^2) operation (to keep doing survey traversals to
+     * find the parent with a "standard" EE direction), but we don't anticipate this method being
+     * used outside creating new stations, and anyway long series of VERTICAL legs ought to be very
+     * rare!
      */
     private static Direction resolveInheritedDirection(Survey survey, Station activeStation) {
         Direction activeDirection = activeStation.getExtendedElevationDirection();
-        if (activeDirection != Direction.VERTICAL) {
+        if (activeDirection.propagates()) {
             return activeDirection;
         }
         Leg referringLeg = survey.getReferringLeg(activeStation);
         if (referringLeg == null) {
-            return Direction.RIGHT; // origin station — nothing above it
+            // origin station — nothing above it to inherit from
+            return Direction.DEFAULT;
         }
         Station parent = survey.getOriginatingStation(referringLeg);
         return resolveInheritedDirection(survey, parent);

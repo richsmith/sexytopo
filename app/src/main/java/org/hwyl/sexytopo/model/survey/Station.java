@@ -10,7 +10,7 @@ public class Station extends SurveyComponent {
     private String name;
     private List<Leg> onwardLegs = new ArrayList<>();
     private String comment = "";
-    private Direction extendedElevationDirection = Direction.RIGHT;
+    private Direction extendedElevationDirection = Direction.DEFAULT;
 
     public static final char[] FORBIDDEN_CHARS = new char[] {'\n', '\r'};
 
