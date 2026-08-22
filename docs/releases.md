@@ -1,4 +1,5 @@
 # Unreleased
+- A copyright notice and licence can now be assigned to a survey, along with some light nudging towards free licences (thanks Andrew Atkinson)
 - Legs can be drawn using only their vertical change in the extended elevation (thanks Andrew Atkinson)
 
 # 2026-07-08 1.12.3
