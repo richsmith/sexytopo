@@ -671,6 +671,7 @@
     <string name="menu_elevation">Élévation</string>
     <string name="menu_draw_left">Dessiner à gauche</string>
     <string name="menu_draw_right">Dessiner à droite</string>
+    <string name="menu_draw_vertical">Dessiner à la verticale seulement</string>
     <string name="menu_move_row">Changer de station</string>
     <string name="menu_jump_to">Aller à</string>
     <string name="menu_jump_to_station_in_plan">&#10132; Plan</string>
