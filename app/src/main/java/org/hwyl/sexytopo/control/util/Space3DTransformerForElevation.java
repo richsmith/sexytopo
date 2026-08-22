@@ -25,49 +25,33 @@ public class Space3DTransformerForElevation extends Space3DTransformer {
     }
 
     protected void updateLeg(Space<Coord3D> space, Leg leg, Coord3D start) {
-        ExtendedElevationDirection direction = leg.getDestination().getExtendedElevationDirection();
+        Station destination = leg.getDestination();
+        Leg projected = projectLeg(leg, destination.getExtendedElevationDirection());
 
-        Coord3D end = computeEnd(start, leg, direction);
+        Coord3D end = Space3DUtils.toCartesian(start, projected);
         space.addLeg(leg, new Line<>(start, end));
 
-        if (leg.hasDestination()) {
-            float delta = computeDelta(leg, direction);
-            update(space, leg.getDestination(), end, delta);
-        }
+        float rotation = projected.getAzimuth() - leg.getAzimuth();
+        update(space, destination, end, rotation);
     }
 
     /**
-     * Computes the end coordinate of a leg in the extended elevation projection. Vertical legs
-     * preserve x/y and shift only z by the true height change. Left/right legs are projected via
-     * toCartesian using their adjusted azimuth.
+     * A leg as it is drawn in the extended elevation, which unrolls the cave onto a single plane so
+     * that one dimension can be dropped. The section is laid out along the y axis and x is
+     * discarded, so a leg's real bearing is replaced by whichever one puts its horizontal run where
+     * this direction wants it: north to run rightwards, south to run leftwards, and east to run
+     * into the page, which leaves only the height change visible.
      */
-    private static Coord3D computeEnd(
-            Coord3D start, Leg leg, ExtendedElevationDirection direction) {
-        if (direction == ExtendedElevationDirection.VERTICAL) {
-            return Space3DUtils.toCartesianVertical(start, leg);
-        }
-        Leg adjustedLeg = adjustLegForDirection(leg, direction);
-        return Space3DUtils.toCartesian(start, adjustedLeg);
-    }
-
-    /**
-     * Computes the azimuth delta to pass to child stations. Vertical legs pass delta=0 so
-     * subsequent legs are not rotated by this leg's azimuth. Left/right legs pass the difference
-     * introduced by the direction adjustment.
-     */
-    private static float computeDelta(Leg leg, ExtendedElevationDirection direction) {
-        if (direction == ExtendedElevationDirection.VERTICAL) {
-            return 0;
-        }
-        Leg adjustedLeg = adjustLegForDirection(leg, direction);
-        return adjustedLeg.getAzimuth() - leg.getAzimuth();
-    }
-
-    private static Leg adjustLegForDirection(Leg leg, ExtendedElevationDirection direction) {
-        if (direction == ExtendedElevationDirection.LEFT) {
-            return leg.adjustAzimuth(180);
-        } else {
-            return leg.adjustAzimuth(0);
+    private static Leg projectLeg(Leg leg, ExtendedElevationDirection direction) {
+        switch (direction) {
+            case RIGHT:
+                return leg.adjustAzimuth(0);
+            case LEFT:
+                return leg.adjustAzimuth(180);
+            case VERTICAL:
+                return leg.adjustAzimuth(90);
+            default:
+                throw new IllegalStateException("Unhandled direction: " + direction);
         }
     }
 

@@ -1,7 +1,9 @@
 package org.hwyl.sexytopo.control.util;
 
+import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Coord3D;
 import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
+import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -68,8 +70,11 @@ public class Space3DTransformerForElevationTest {
 
     // --- VERTICAL direction ---
 
+    // The section is laid out along y, so a vertical leg must not travel along it. Its horizontal
+    // run goes into x instead, which this projection discards -- see testVerticalLegDrawnVertically
+    // for what actually reaches the screen.
     @Test
-    public void testVerticalLegPreservesXY() {
+    public void testVerticalLegDoesNotExtendAlongSection() {
         Survey survey = new Survey();
         SurveyUpdater.updateWithNewStation(survey, new Leg(5, 45, 60));
         setDirectionOnStation(survey, "2", ExtendedElevationDirection.VERTICAL);
@@ -77,8 +82,21 @@ public class Space3DTransformerForElevationTest {
         Space<Coord3D> space = TRANSFORMER.transformTo3D(survey);
         Coord3D station2 = space.getStationMap().get(survey.getStationByName("2"));
 
-        Assert.assertEquals(0, station2.x, DELTA);
         Assert.assertEquals(0, station2.y, DELTA);
+    }
+
+    @Test
+    public void testVerticalLegDrawnVertically() {
+        Survey survey = new Survey();
+        SurveyUpdater.updateWithNewStation(survey, new Leg(5, 45, 60));
+        setDirectionOnStation(survey, "2", ExtendedElevationDirection.VERTICAL);
+
+        Space<Coord2D> space = Projection2D.EXTENDED_ELEVATION.project(survey);
+        Coord2D station2 = space.getStationMap().get(survey.getStationByName("2"));
+
+        // Straight down the page: no sideways movement, dropping by 5 * sin(60) = 4.330
+        Assert.assertEquals(0, station2.x, DELTA);
+        Assert.assertEquals(-4.330, station2.y, 0.001);
     }
 
     @Test
