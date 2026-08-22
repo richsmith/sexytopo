@@ -4,7 +4,7 @@ import static org.hwyl.sexytopo.SexyTopoConstants.ALLOWED_DOUBLE_DELTA;
 
 import java.util.Arrays;
 import java.util.List;
-import org.hwyl.sexytopo.model.graph.Direction;
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -476,17 +476,19 @@ public class SurveyUpdaterTest {
         Assert.assertTrue(averaged.getInclination() >= 9.5 && averaged.getInclination() <= 10.5);
     }
 
-    // setDirectionOfSubtree tests
+    // setExtendedElevationDirectionOfSubtree tests
 
     @Test
     public void testSetDirectionOfSubtreeOnSingleStation() {
         Survey survey = new Survey();
         Station origin = survey.getOrigin();
-        origin.setExtendedElevationDirection(Direction.LEFT);
+        origin.setExtendedElevationDirection(ExtendedElevationDirection.LEFT);
 
-        SurveyUpdater.setDirectionOfSubtree(origin, Direction.RIGHT);
+        SurveyUpdater.setExtendedElevationDirectionOfSubtree(
+                origin, ExtendedElevationDirection.RIGHT);
 
-        Assert.assertEquals(Direction.RIGHT, origin.getExtendedElevationDirection());
+        Assert.assertEquals(
+                ExtendedElevationDirection.RIGHT, origin.getExtendedElevationDirection());
     }
 
     @Test
@@ -496,11 +498,15 @@ public class SurveyUpdaterTest {
         Station station1 = survey.getStationByName("1");
         Station station2 = survey.getStationByName("2");
 
-        SurveyUpdater.setDirectionOfSubtree(origin, Direction.RIGHT);
+        SurveyUpdater.setExtendedElevationDirectionOfSubtree(
+                origin, ExtendedElevationDirection.RIGHT);
 
-        Assert.assertEquals(Direction.RIGHT, origin.getExtendedElevationDirection());
-        Assert.assertEquals(Direction.RIGHT, station1.getExtendedElevationDirection());
-        Assert.assertEquals(Direction.RIGHT, station2.getExtendedElevationDirection());
+        Assert.assertEquals(
+                ExtendedElevationDirection.RIGHT, origin.getExtendedElevationDirection());
+        Assert.assertEquals(
+                ExtendedElevationDirection.RIGHT, station1.getExtendedElevationDirection());
+        Assert.assertEquals(
+                ExtendedElevationDirection.RIGHT, station2.getExtendedElevationDirection());
     }
 
     // Bulk update tests

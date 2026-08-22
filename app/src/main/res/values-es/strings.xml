@@ -669,6 +669,7 @@
     <string name="menu_elevation">Alzado</string>
     <string name="menu_draw_left">Dibujar Izquierda</string>
     <string name="menu_draw_right">Dibujar Derecha</string>
+    <string name="menu_draw_vertical">Dibujar Solo Vertical</string>
     <string name="menu_move_row">Mover a Estación Diferente</string>
     <string name="menu_jump_to">Saltar</string>
     <string name="menu_jump_to_station_in_plan">&#10132; Planta</string>

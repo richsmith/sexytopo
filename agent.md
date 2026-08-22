@@ -12,11 +12,18 @@ Start with `overview.md`.
 ## Committing
 
 **Never commit without being asked to.** Make changes in the working tree and
-leave them there; the user decides when something gets committed.
+leave them there, so they can be reviewed before they enter history.
 
-Permission to commit is granted once, for one commit. An instruction like
-"commit that" applies only to the work in front of you at that moment — it is
-not standing permission to commit later changes. Ask again each time.
+Approval to make a change is not approval to commit it. "Do X", "yes", "fix
+it", "go ahead" authorise the work, not the commit — the point is that changes
+get reviewed first, and committing before that review defeats it. When work is
+ready, say so and stop; wait to be told to commit.
+
+Permission to commit covers the commit in front of you at that moment, not
+later ones. Ask again each time.
+
+Only ever stage files you changed yourself. If a file also carries the user's
+own edits, leave it alone and say so.
 
 The same goes for anything else that publishes work outward: pushing, creating
 or updating pull requests, and pushing tags all need an explicit request.

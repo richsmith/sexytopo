@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Locale;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
 import org.hwyl.sexytopo.control.util.TextTools;
-import org.hwyl.sexytopo.model.graph.Direction;
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -301,28 +301,47 @@ public class SurvexTherionUtil {
     public static String getExtendedElevationExtensions(Survey survey, SurveyFormat format) {
         StringBuilder builder = new StringBuilder();
         String marker = format.getCommandChar();
-        generateExtendCommandsFromStation(builder, survey.getOrigin(), null, marker);
+        generateExtendCommandsFromStation(builder, survey.getOrigin(), null, null, marker);
         return builder.toString();
     }
 
     private static void generateExtendCommandsFromStation(
-            StringBuilder builder, Station station, Direction lastDirection, String marker) {
+            StringBuilder builder,
+            Station station,
+            Station fromStation,
+            ExtendedElevationDirection lastDirection,
+            String marker) {
 
-        Direction currentDirection = station.getExtendedElevationDirection();
-        if (lastDirection == null) {
-            builder.append(getExtendCommand(station, "start", marker));
-        } else if (currentDirection != lastDirection) {
-            builder.append(
-                    getExtendCommand(station, currentDirection.name().toLowerCase(), marker));
+        ExtendedElevationDirection currentDirection = station.getExtendedElevationDirection();
+        String directionName = currentDirection.name().toLowerCase();
+
+        // A direction that doesn't propagate applies to this leg alone, so it's written with both
+        // of the leg's stations and doesn't change the direction the rest of the survey inherits.
+        ExtendedElevationDirection inheritedDirection;
+        if (!currentDirection.propagates()) {
+            builder.append(getExtendCommand(fromStation, station, directionName, marker));
+            inheritedDirection = lastDirection;
+        } else {
+            if (lastDirection == null) {
+                builder.append(getExtendCommand(station, "start", marker));
+            } else if (currentDirection != lastDirection) {
+                builder.append(getExtendCommand(station, directionName, marker));
+            }
+            inheritedDirection = currentDirection;
         }
 
         for (Leg leg : station.getConnectedOnwardLegs()) {
             generateExtendCommandsFromStation(
-                    builder, leg.getDestination(), station.getExtendedElevationDirection(), marker);
+                    builder, leg.getDestination(), station, inheritedDirection, marker);
         }
     }
 
     private static String getExtendCommand(Station station, String direction, String marker) {
         return marker + "extend " + direction + " " + station.getName() + "\n";
+    }
+
+    private static String getExtendCommand(
+            Station from, Station to, String direction, String marker) {
+        return marker + "extend " + direction + " " + from.getName() + " " + to.getName() + "\n";
     }
 }

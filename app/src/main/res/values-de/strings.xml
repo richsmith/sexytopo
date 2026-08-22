@@ -669,6 +669,7 @@
     <string name="menu_elevation">Aufriss</string>
     <string name="menu_draw_left">Links zeichnen</string>
     <string name="menu_draw_right">Rechts zeichnen</string>
+    <string name="menu_draw_vertical">Nur vertikal zeichnen</string>
     <string name="menu_move_row">Zu anderem Messpunkt wechseln</string>
     <string name="menu_jump_to">Springen</string>
     <string name="menu_jump_to_station_in_plan">&#10132; Grundriss</string>

@@ -669,6 +669,7 @@
     <string name="menu_elevation">Przekrój</string>
     <string name="menu_draw_left">Rysuj lewo</string>
     <string name="menu_draw_right">Rysuj prawo</string>
+    <string name="menu_draw_vertical">Rysuj tylko pionowo</string>
     <string name="menu_move_row">Przenieś do innego stanowiska</string>
     <string name="menu_jump_to">Przeskocz</string>
     <string name="menu_jump_to_station_in_plan">&#10132; Plan</string>

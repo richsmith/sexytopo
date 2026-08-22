@@ -15,7 +15,7 @@ import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SexyTopo;
 import org.hwyl.sexytopo.control.io.IoUtils;
-import org.hwyl.sexytopo.model.graph.Direction;
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -321,7 +321,8 @@ public class SurveyJsonTranslater {
             // not ideal but not the end of the world; we'd probably prefer to have our data
         }
         try {
-            Direction direction = Direction.valueOf(json.getString(DIRECTION_TAG).toUpperCase());
+            ExtendedElevationDirection direction =
+                    ExtendedElevationDirection.valueOf(json.getString(DIRECTION_TAG).toUpperCase());
             station.setExtendedElevationDirection(direction);
         } catch (Exception ignore) {
             // not ideal but not the end of the world; we'd probably prefer to have our data
