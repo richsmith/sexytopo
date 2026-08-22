@@ -3,8 +3,14 @@ package org.hwyl.sexytopo.testutils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.hwyl.sexytopo.control.util.CrossSectioner;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
+import org.hwyl.sexytopo.model.graph.Coord2D;
+import org.hwyl.sexytopo.model.graph.Projection2D;
+import org.hwyl.sexytopo.model.sketch.CrossSection;
+import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
 
@@ -166,6 +172,25 @@ public class BasicTestSurveyCreator {
 
         Leg leg1 = new Leg(5, 10, 0);
         SurveyUpdater.updateWithNewStation(survey, leg1);
+
+        return survey;
+    }
+
+    /**
+     * Branching survey with a couple of cross-sections attached to the plan sketch. Useful for
+     * exercising cross-section export.
+     */
+    public static Survey createWithCrossSections() {
+        Survey survey = createStraightNorthWith1EBranch();
+        Sketch plan = survey.getSketch(Projection2D.PLAN);
+
+        Station station1 = survey.getStationByName("1");
+        CrossSection xs1 = CrossSectioner.section(survey, station1);
+        plan.addCrossSection(xs1, new Coord2D(2, 0));
+
+        Station station3 = survey.getStationByName("3");
+        CrossSection xs3 = CrossSectioner.section(survey, station3);
+        plan.addCrossSection(xs3, new Coord2D(2, 10));
 
         return survey;
     }

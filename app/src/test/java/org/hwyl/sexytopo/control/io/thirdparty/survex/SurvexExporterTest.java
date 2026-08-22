@@ -2,6 +2,10 @@ package org.hwyl.sexytopo.control.io.thirdparty.survex;
 
 import java.util.Arrays;
 import java.util.Collections;
+import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
+import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
+import org.hwyl.sexytopo.control.util.SurveyUpdater;
+import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
@@ -19,6 +23,22 @@ public class SurvexExporterTest {
         Assert.assertTrue(content.contains("1\t2\t5.000\t0.00\t0.00"));
         Assert.assertTrue(content.contains("2\t3\t5.000\t0.00\t0.00"));
         Assert.assertTrue(content.contains("3\t4\t5.000\t0.00\t0.00"));
+    }
+
+    @Test
+    public void testBackwardsLegExportedAsTaken() {
+        // Regression test: a leg shot backwards must be exported with the stations and
+        // reading as they were physically taken, not as they are stored internally.
+        // Internally stored: 1 -> 2, azimuth 225, inclination -10.
+        // As taken: from 2 to 1, azimuth 45, inclination 10.
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createEmptySurvey();
+        SurveyUpdater.updateWithNewStation(survey, new Leg(5, 225, -10, true));
+
+        String content = survexExporter.getContent(survey);
+
+        Assert.assertTrue(content.contains("2\t1\t5.000\t45.00\t10.00"));
+        Assert.assertFalse(content.contains("1\t2\t5.000\t225.00\t-10.00"));
     }
 
     @Test
@@ -76,6 +96,140 @@ public class SurvexExporterTest {
         Trip trip = createTripWithTeam(entry("Fido", Trip.Role.DOG));
         String result = SurvexExporter.formatTeamLines(trip);
         Assert.assertTrue(result.contains("assistant"));
+    }
+
+    @Test
+    public void testExportIncludesInstrumentWhenPresent() {
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Trip trip = new Trip();
+        trip.setInstrument("DistoX2");
+        survey.setTrip(trip);
+
+        String content = survexExporter.getContent(survey);
+
+        Assert.assertTrue(content.contains("*instrument insts \"DistoX2\""));
+    }
+
+    @Test
+    public void testExportUsesCommentedEmptyInstrumentWhenBlank() {
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Trip trip = new Trip();
+        trip.setInstrument("   ");
+        survey.setTrip(trip);
+
+        String content = survexExporter.getContent(survey);
+
+        Assert.assertTrue(content.contains(";*instrument insts \"\""));
+    }
+
+    @Test
+    public void testSurvexMetadataExploDateLinkedUsesSurveyDate() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Trip trip = new Trip();
+        trip.setExplorationDateLinked(true); // default, but explicit for clarity
+        survey.setTrip(trip);
+
+        String metadata = SurvexTherionUtil.getMetadata(survey, SurveyFormat.SURVEX, "", "");
+
+        Assert.assertTrue(metadata.contains("*date explored "));
+        Assert.assertFalse(metadata.contains(";*date explored "));
+    }
+
+    @Test
+    public void testSurvexMetadataExploDateUnlinkedWithDateSet() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Trip trip = new Trip();
+        trip.setExplorationDateLinked(false);
+        trip.setExplorationDate(new java.util.Date(0)); // 1970.01.01
+        survey.setTrip(trip);
+
+        String metadata = SurvexTherionUtil.getMetadata(survey, SurveyFormat.SURVEX, "", "");
+
+        Assert.assertTrue(metadata.contains("*date explored 1970.01.01"));
+        Assert.assertFalse(metadata.contains(";*date explored "));
+    }
+
+    @Test
+    public void testSurvexMetadataExploDateUnlinkedEmptyUsesCommentedPlaceholder() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Trip trip = new Trip();
+        trip.setExplorationDateLinked(false);
+        trip.setExplorationDate(null);
+        survey.setTrip(trip);
+
+        String metadata = SurvexTherionUtil.getMetadata(survey, SurveyFormat.SURVEX, "", "");
+
+        Assert.assertTrue(metadata.contains(";*date explored "));
+    }
+
+    @Test
+    public void testCreationCommentThenCopyrightOrder() {
+        // Regression test: the created-with comment must be the first line inside the
+        // survey block, with the copyright/licence line immediately after it.
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Trip trip = new Trip();
+        trip.setCopyrightHolder("Caver Jane");
+        trip.setLicence("CC BY 4.0");
+        survey.setTrip(trip);
+
+        String content = survexExporter.getContent(survey);
+        String[] lines = content.split("\n");
+
+        Assert.assertTrue(lines[0].startsWith("*begin "));
+        Assert.assertTrue(lines[1].startsWith("; Created with SexyTopo"));
+
+        String expectedCopyrightLine =
+                SurvexTherionUtil.getCopyrightLine(survey, SurveyFormat.SURVEX).trim();
+        Assert.assertEquals(expectedCopyrightLine, lines[2]);
+    }
+
+    @Test
+    public void testCreationCommentImmediatelyAfterBeginWhenNoCopyright() {
+        // The creation comment's position must not depend on whether a copyright/licence
+        // is set.
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Trip trip = new Trip();
+        survey.setTrip(trip);
+
+        String content = survexExporter.getContent(survey);
+        String[] lines = content.split("\n");
+
+        Assert.assertTrue(lines[0].startsWith("*begin "));
+        Assert.assertTrue(lines[1].startsWith("; Created with SexyTopo"));
+    }
+
+    @Test
+    public void testBlankLineSeparatesHeaderFromMetadata() {
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Trip trip = new Trip();
+        trip.setCopyrightHolder("Caver Jane");
+        trip.setLicence("CC BY 4.0");
+        survey.setTrip(trip);
+
+        String content = survexExporter.getContent(survey);
+        String[] lines = content.split("\n");
+
+        // lines[0] = *begin, lines[1] = creation comment, lines[2] = copyright,
+        // lines[3] must be blank, separating the header from the metadata block.
+        Assert.assertEquals("", lines[3]);
+        Assert.assertTrue(lines[4].startsWith("*date "));
+    }
+
+    @Test
+    public void testNoCopyrightLineWhenTripHasNeitherCopyrightNorLicence() {
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Trip trip = new Trip();
+        survey.setTrip(trip);
+
+        String content = survexExporter.getContent(survey);
+
+        Assert.assertFalse(content.contains("*copyright"));
     }
 
     private static Trip.TeamEntry entry(String name, Trip.Role... roles) {

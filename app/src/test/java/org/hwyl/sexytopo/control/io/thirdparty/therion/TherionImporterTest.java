@@ -2,13 +2,16 @@ package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
 import java.util.Arrays;
 import java.util.List;
+import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexExporter;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionImporter;
+import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
 import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
+import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -282,8 +285,9 @@ public class TherionImporterTest {
                     + "survey BentStalAven\n"
                     + "# Created with SexyTopo 1.10.1 on 2026-02-04\n"
                     + "\n"
+                    + "centreline\n"
                     + "date 2026.01.05\n"
-                    + "#instrument inst \"\"\n"
+                    + "#instrument insts \"\"\n"
                     + "team \"Will Stuart\" instruments\n"
                     + "team \"Andrew Atkinson\" notes\n"
                     + "\n"
@@ -291,10 +295,9 @@ public class TherionImporterTest {
                     + "explo-team \"Will Stuart\"\n"
                     + "explo-team \"Andrew Atkinson\"\n"
                     + "\n"
-                    + "centreline\n"
-                    + "data passage station ignoreall\n"
-                    + "2\tstn 1 is drilled hole\n"
-                    + "3\tdrilled hole\n"
+                    + "data dimensions station left right up down ignoreall\n"
+                    + "2\t-\t-\t-\t-\tstn 1 is drilled hole\n"
+                    + "3\t-\t-\t-\t-\tdrilled hole\n"
                     + "\n"
                     + "data normal from to tape compass clino ignoreall\n"
                     + "1\t-\t1.677\t271.10\t6.59\n"
@@ -513,7 +516,7 @@ public class TherionImporterTest {
         String survexText =
                 "*begin TestSurvey\n"
                         + "*date 2026.01.05\n"
-                        + "*instrument inst \"DistoX2\"\n"
+                        + "*instrument insts \"DistoX2\"\n"
                         + "*team \"Alice\" instruments\n"
                         + "*team \"Bob\" notes explorer\n"
                         + "\n"
@@ -539,12 +542,99 @@ public class TherionImporterTest {
 
     @Test
     public void testSurvexCommentedInstrument() throws Exception {
-        String survexText = "*date 2026.01.05\n" + ";*instrument inst \"\"\n";
+        String survexText = "*date 2026.01.05\n" + ";*instrument insts \"\"\n";
 
         Trip trip = SurvexTherionImporter.parseMetadata(survexText, SurveyFormat.SURVEX);
         Assert.assertNotNull(trip);
         Assert.assertNull(trip.getInstrument());
         Assert.assertFalse(trip.hasInstrument());
+    }
+
+    @Test
+    public void testSurvexCopyrightAndLicenceImport() throws Exception {
+        String survexText =
+                "*date 2026.01.05\n" + "*copyright 2026 \"Caver Jane\" ;\"CC BY 4.0\"\n";
+
+        Trip trip = SurvexTherionImporter.parseMetadata(survexText, SurveyFormat.SURVEX);
+        Assert.assertNotNull(trip);
+        Assert.assertEquals("Caver Jane", trip.getCopyrightHolder());
+        Assert.assertEquals("CC BY 4.0", trip.getLicence());
+    }
+
+    @Test
+    public void testTherionCopyrightAndLicenceImport() throws Exception {
+        String therionText = "date 2026.01.05\n" + "copyright 2026 \"Caver Jane\" #\"CC BY 4.0\"\n";
+
+        Trip trip = SurvexTherionImporter.parseMetadata(therionText, SurveyFormat.THERION);
+        Assert.assertNotNull(trip);
+        Assert.assertEquals("Caver Jane", trip.getCopyrightHolder());
+        Assert.assertEquals("CC BY 4.0", trip.getLicence());
+    }
+
+    @Test
+    public void testCopyrightWithoutLicenceImport() throws Exception {
+        String survexText = "*date 2026.01.05\n" + "*copyright 2026 \"Caver Jane\"\n";
+
+        Trip trip = SurvexTherionImporter.parseMetadata(survexText, SurveyFormat.SURVEX);
+        Assert.assertNotNull(trip);
+        Assert.assertEquals("Caver Jane", trip.getCopyrightHolder());
+        Assert.assertFalse(trip.hasLicence());
+    }
+
+    @Test
+    public void testLicenceWithoutCopyrightImport() throws Exception {
+        String survexText = "*date 2026.01.05\n" + "*copyright 2026 \"\" ;\"CC BY 4.0\"\n";
+
+        Trip trip = SurvexTherionImporter.parseMetadata(survexText, SurveyFormat.SURVEX);
+        Assert.assertNotNull(trip);
+        Assert.assertFalse(trip.hasCopyrightHolder());
+        Assert.assertEquals("CC BY 4.0", trip.getLicence());
+    }
+
+    @Test
+    public void testNoCopyrightLineLeavesDefaultsImport() throws Exception {
+        String survexText = "*date 2026.01.05\n" + "*instrument insts \"DistoX2\"\n";
+
+        Trip trip = SurvexTherionImporter.parseMetadata(survexText, SurveyFormat.SURVEX);
+        Assert.assertNotNull(trip);
+        Assert.assertFalse(trip.hasCopyrightHolder());
+        Assert.assertFalse(trip.hasLicence());
+    }
+
+    @Test
+    public void testCopyrightLicenceRoundTripSurvex() throws Exception {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Trip trip = new Trip();
+        trip.setCopyrightHolder("Caver Jane");
+        trip.setLicence("CC BY 4.0");
+        survey.setTrip(trip);
+
+        String content = new SurvexExporter().getContent(survey);
+        Trip imported = SurvexTherionImporter.parseMetadata(content, SurveyFormat.SURVEX);
+
+        Assert.assertNotNull(imported);
+        Assert.assertEquals("Caver Jane", imported.getCopyrightHolder());
+        Assert.assertEquals("CC BY 4.0", imported.getLicence());
+    }
+
+    @Test
+    public void testCopyrightLicenceRoundTripTherion() throws Exception {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Trip trip = new Trip();
+        trip.setCopyrightHolder("Caver Jane");
+        trip.setLicence("CC BY 4.0");
+        survey.setTrip(trip);
+
+        String centrelineText =
+                "centreline\n"
+                        + SurvexTherionUtil.getCopyrightLine(survey, SurveyFormat.THERION)
+                        + SurvexTherionUtil.getMetadata(survey, SurveyFormat.THERION, "", "")
+                        + "\nendcentreline\n";
+        Trip imported = SurvexTherionImporter.parseMetadata(centrelineText, SurveyFormat.THERION);
+
+        Assert.assertNotNull(imported);
+        Assert.assertEquals("Caver Jane", imported.getCopyrightHolder());
+        Assert.assertEquals("CC BY 4.0", imported.getLicence());
     }
 
     // Splays from later stations can appear before the first real leg in
@@ -648,5 +738,112 @@ public class TherionImporterTest {
         Station stationFive = survey.getStationByName("5");
         Direction stationFiveDirection = stationFive.getExtendedElevationDirection();
         Assert.assertEquals(Direction.RIGHT, stationFiveDirection);
+    }
+
+    // --- Leg comment tests (Therion format) ---
+
+    @Test
+    public void testTherionLegCommentWithHashAppliedToToStation() throws Exception {
+        // Therion data normal: hash comment character
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline("1\t2\t5.0\t45.0\t-5.0\t# Grand Gallery", survey);
+        Assert.assertEquals("Grand Gallery", survey.getStationByName("2").getComment());
+    }
+
+    @Test
+    public void testTherionLegCommentWithoutCommentCharAppliedToToStation() throws Exception {
+        // Bare comment with no comment character — the bug case
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline("1\t2\t3.34\t34.0\t-4.0\tsome comment here", survey);
+        Assert.assertEquals("some comment here", survey.getStationByName("2").getComment());
+    }
+
+    @Test
+    public void testTherionLegCommentWithSemicolonAppliedToToStation() throws Exception {
+        // Survex-style semicolon also valid in shared parser
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline("1\t2\t5.0\t45.0\t-5.0\t; Boulder Choke", survey);
+        Assert.assertEquals("Boulder Choke", survey.getStationByName("2").getComment());
+    }
+
+    @Test
+    public void testTherionLegWithNoCommentLeavesStationCommentEmpty() throws Exception {
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline("1\t2\t5.0\t45.0\t-5.0", survey);
+        Station s = survey.getStationByName("2");
+        Assert.assertTrue(s.getComment() == null || s.getComment().isEmpty());
+    }
+
+    @Test
+    public void testTherionPassageAndLegCommentsAreConcatenated() throws Exception {
+        // Leg comment is set first via parseCentreline, then passage comment is merged
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline("1\t2\t5.0\t45.0\t-5.0\tChamber", survey);
+
+        java.util.Map<String, String> passageComments = new java.util.HashMap<>();
+        passageComments.put("2", "Large Hall");
+        SurvexTherionImporter.mergePassageComments(survey, passageComments);
+
+        // passage comment first, then leg comment
+        Assert.assertEquals("Large Hall :: Chamber", survey.getStationByName("2").getComment());
+    }
+
+    // --- Version-gated leg comment routing (Therion path) ---
+
+    @Test
+    public void testTherionLegCommentGoesToLegWhenVersionAfterCutoff() throws Exception {
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(
+                "1\t2\t5.0\t45.0\t-5.0\tGrand Gallery", survey, /* useLegComments= */ true);
+        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Assert.assertEquals("Grand Gallery", leg.getComment());
+        Assert.assertTrue(
+                survey.getStationByName("2").getComment() == null
+                        || survey.getStationByName("2").getComment().isEmpty());
+    }
+
+    @Test
+    public void testTherionLegCommentGoesToStationWhenVersionAtCutoff() throws Exception {
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(
+                "1\t2\t5.0\t45.0\t-5.0\tGrand Gallery", survey, /* useLegComments= */ false);
+        Assert.assertEquals("Grand Gallery", survey.getStationByName("2").getComment());
+        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Assert.assertTrue(leg.getComment() == null || leg.getComment().isEmpty());
+    }
+
+    @Test
+    public void testTherionLegCommentGoesToLegWhenNoVersionHeader() throws Exception {
+        // No SexyTopo header → useLegComments = true
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(
+                "1\t2\t5.0\t45.0\t-5.0\tGrand Gallery", survey, /* useLegComments= */ true);
+        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Assert.assertEquals("Grand Gallery", leg.getComment());
+    }
+
+    @Test
+    public void testTherionPromotedLegPrecursorCommentImportedOnLeg() throws Exception {
+        // Therion uses # as comment character on precursor lines
+        final String text =
+                "1\t2\t5.541\t253.93\t4.67\n" + "# 1\t2\t5.542\t73.95\t-4.64\tBack sight\n";
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(text, survey, /* useLegComments= */ true);
+        Leg mainLeg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Assert.assertEquals(1, mainLeg.getPromotedFrom().length);
+        Assert.assertEquals("Back sight", mainLeg.getPromotedFrom()[0].getComment());
+    }
+
+    @Test
+    public void testTherionPromotedLegPrecursorCommentIgnoredInLegacyMode() throws Exception {
+        final String text =
+                "1\t2\t5.541\t253.93\t4.67\n" + "# 1\t2\t5.542\t73.95\t-4.64\tBack sight\n";
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(text, survey, /* useLegComments= */ false);
+        Leg mainLeg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Assert.assertEquals(1, mainLeg.getPromotedFrom().length);
+        Assert.assertTrue(
+                mainLeg.getPromotedFrom()[0].getComment() == null
+                        || mainLeg.getPromotedFrom()[0].getComment().isEmpty());
     }
 }

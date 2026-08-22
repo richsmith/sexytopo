@@ -182,6 +182,7 @@ public class Survey {
 
     public List<Station> getAllStationsInChronoOrder() {
         List<Station> stations = new ArrayList<>();
+        stations.add(getOrigin());
         for (Leg leg : getAllLegsInChronoOrder()) {
             if (leg.hasDestination()) {
                 stations.add(leg.getDestination());

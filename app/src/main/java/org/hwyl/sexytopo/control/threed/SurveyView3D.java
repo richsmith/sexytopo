@@ -4,6 +4,7 @@ import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import org.hwyl.sexytopo.control.util.SketchPreferences;
 
 public class SurveyView3D extends GLSurfaceView {
 
@@ -82,7 +83,8 @@ public class SurveyView3D extends GLSurfaceView {
                                                 (midX - previousX) * (midX - previousX)
                                                         + (midY - previousY) * (midY - previousY));
 
-                        if (spacingDelta > midDelta) {
+                        if (spacingDelta > midDelta
+                                && SketchPreferences.Toggle.PINCH_TO_ZOOM.isOn()) {
                             // Predominantly a pinch — zoom
                             float scaleFactor = previousSpacing / spacing;
                             renderer.zoomBy(scaleFactor);

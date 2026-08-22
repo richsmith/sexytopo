@@ -100,6 +100,25 @@ public class LegTest {
     }
 
     @Test
+    public void testReversePreservesCommentWithDestination() {
+        Station destination = new Station("A1");
+        Leg leg = new Leg(5.0f, 45.0f, 30.0f, destination, new Leg[] {}, false);
+        leg.setComment("A test comment");
+        Leg reversed = leg.reverse();
+        Assert.assertTrue(reversed.hasDestination());
+        Assert.assertEquals("A test comment", reversed.getComment());
+    }
+
+    @Test
+    public void testReversePreservesCommentWhenNoDestination() {
+        Leg splay = new Leg(5.0f, 45.0f, 30.0f);
+        splay.setComment("Splay comment");
+        Leg reversed = splay.reverse();
+        Assert.assertFalse(reversed.hasDestination());
+        Assert.assertEquals("Splay comment", reversed.getComment());
+    }
+
+    @Test
     public void testRotateAddsAngle() {
         Leg leg = new Leg(5.0f, 45.0f, 30.0f);
         Leg rotated = leg.rotate(90.0f);
@@ -129,6 +148,14 @@ public class LegTest {
         Assert.assertEquals(225.0f, backsight.getAzimuth(), DELTA);
         Assert.assertEquals(-30.0f, backsight.getInclination(), DELTA);
         Assert.assertEquals(5.0f, backsight.getDistance(), DELTA);
+    }
+
+    @Test
+    public void testAsBacksightPreservesComment() {
+        Leg leg = new Leg(5.0f, 45.0f, 30.0f);
+        leg.setComment("A test comment");
+        Leg backsight = leg.asBacksight();
+        Assert.assertEquals("A test comment", backsight.getComment());
     }
 
     @Test

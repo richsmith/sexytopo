@@ -32,6 +32,14 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         if (findStationItem != null) {
             findStationItem.setEnabled(true);
         }
+        MenuItem addLegItem = menu.findItem(R.id.action_add_leg);
+        if (addLegItem != null) {
+            addLegItem.setEnabled(true);
+        }
+        MenuItem addSplayItem = menu.findItem(R.id.action_add_splay);
+        if (addSplayItem != null) {
+            addSplayItem.setEnabled(true);
+        }
         return true;
     }
 
@@ -42,6 +50,10 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
 
     public void onComment(Station station) {
         openCommentDialog(station);
+    }
+
+    public void onCommentLeg(Leg leg) {
+        openLegCommentDialog(leg);
     }
 
     public void onJumpToTable(Station station) {
@@ -95,6 +107,18 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
     public void onNewCrossSection(Station station) {
         // Default: not applicable in some views
         // Override in activities that support adding cross-sections
+    }
+
+    public void onDeleteCrossSection(Station station) {
+        // Default: not applicable in some views
+    }
+
+    public void onEditCrossSection(Station station) {
+        // Default: not applicable in some views
+    }
+
+    public void onRotateCrossSection(Station station) {
+        // Default: not applicable in some views
     }
 
     public void onStartNewSurvey(Station station) {
@@ -249,6 +273,39 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
                         (dialog, which) -> {
                             CharSequence inputText = input.getText();
                             station.setComment(inputText != null ? inputText.toString() : "");
+                            invalidateView();
+                        })
+                .setNegativeButton(R.string.cancel, null);
+
+        Dialog dialog = builder.create();
+        DialogUtils.showKeyboardOnDisplay(dialog);
+        dialog.show();
+        input.requestFocus();
+    }
+
+    /** Open the comment dialog for the given leg or splay. */
+    protected void openLegCommentDialog(Leg leg) {
+        boolean isSplay = !leg.hasDestination();
+        int hintRes = isSplay ? R.string.menu_comment_splay : R.string.menu_comment_leg;
+        int titleRes = isSplay ? R.string.menu_comment_splay : R.string.menu_comment_leg;
+
+        TextInputLayout inputLayout = DialogUtils.createStandardTextInputLayout(this, hintRes);
+
+        TextInputEditText input = DialogUtils.getEditText(inputLayout);
+        input.setLines(8);
+        input.setGravity(Gravity.START | Gravity.TOP);
+        input.setText(leg.getComment());
+        input.setFocusableInTouchMode(true);
+
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+        builder.setView(inputLayout)
+                .setTitle(titleRes)
+                .setPositiveButton(
+                        R.string.save,
+                        (dialog, which) -> {
+                            CharSequence inputText = input.getText();
+                            leg.setComment(inputText != null ? inputText.toString() : "");
+                            getSurveyManager().broadcastSurveyUpdated();
                             invalidateView();
                         })
                 .setNegativeButton(R.string.cancel, null);

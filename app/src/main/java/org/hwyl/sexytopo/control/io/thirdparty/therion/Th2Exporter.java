@@ -2,9 +2,14 @@ package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
+import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.common.Shape;
@@ -57,6 +62,12 @@ public class Th2Exporter {
         String baseName = getBaseScrapName(survey);
         String scrapSuffix = getScrapSuffix(projection);
 
+        boolean xsEnabled = GeneralPreferences.isTherionCrossSectionsEnabled();
+        Map<String, String> stationNameToXsScrapName =
+                xsEnabled
+                        ? buildStationNameToXsScrapName(sketch, projection, baseName)
+                        : Collections.emptyMap();
+
         for (int i = 1; i <= scrapCount; i++) {
             String scrapName = formatScrapName(baseName, scrapSuffix, i, scrapCount);
             boolean includeStations = (i == 1) && stationsInFirstScrap;
@@ -71,22 +82,38 @@ public class Th2Exporter {
                             innerFrame,
                             scale,
                             includeStations,
-                            includeSketchContent));
+                            includeSketchContent,
+                            includeStations ? stationNameToXsScrapName : Collections.emptyMap()));
         }
 
-        // Add cross-section scraps if enabled
-        if (GeneralPreferences.isTherionCrossSectionsEnabled()) {
-            sections.addAll(getCrossSectionScraps(survey, sketch, projection, baseName, scale));
+        if (xsEnabled) {
+            sections.addAll(
+                    getCrossSectionScraps(
+                            survey, sketch, projection, stationNameToXsScrapName, scale));
         }
 
         return TextTools.join("\n\n", sections);
     }
 
+    private static Map<String, String> buildStationNameToXsScrapName(
+            Sketch sketch, Projection2D projection, String baseName) {
+        Map<String, String> map = new LinkedHashMap<>();
+        String xsSuffix = getXsSuffix(projection);
+        for (CrossSectionDetail xsDetail : sketch.getCrossSectionDetails()) {
+            Station station = xsDetail.getCrossSection().getStation();
+            map.put(station.getName(), formatXsScrapName(baseName, xsSuffix, station.getName()));
+        }
+        return map;
+    }
+
     private static List<String> getCrossSectionScraps(
-            Survey survey, Sketch sketch, Projection2D projection, String baseName, float scale) {
+            Survey survey,
+            Sketch sketch,
+            Projection2D projection,
+            Map<String, String> stationNameToXsScrapName,
+            float scale) {
         List<String> scraps = new ArrayList<>();
 
-        String xsSuffix = getXsSuffix(projection);
         List<CrossSectionDetail> crossSections = new ArrayList<>(sketch.getCrossSectionDetails());
 
         // Sort by station order in survey
@@ -95,10 +122,13 @@ public class Th2Exporter {
                 Comparator.comparingInt(
                         xs -> orderedStations.indexOf(xs.getCrossSection().getStation())));
 
+        float xsScale = sketch.getCrossSectionScale();
         for (CrossSectionDetail xsDetail : crossSections) {
             Station station = xsDetail.getCrossSection().getStation();
-            String scrapName = formatXsScrapName(baseName, xsSuffix, station.getName());
-            scraps.add(getCrossSectionScrap(scrapName, xsDetail, scale));
+            String scrapName = stationNameToXsScrapName.get(station.getName());
+            if (scrapName != null) {
+                scraps.add(getCrossSectionScrap(survey, scrapName, xsDetail, scale, xsScale));
+            }
         }
 
         return scraps;
@@ -143,29 +173,29 @@ public class Th2Exporter {
     }
 
     private static String getCrossSectionScrap(
-            String name, CrossSectionDetail xsDetail, float scale) {
+            Survey survey, String name, CrossSectionDetail xsDetail, float scale, float xsScale) {
         List<String> lines = new ArrayList<>();
 
-        // Calculate scale parameter: [px1 py1 px2 py2 rx1 ry1 rx2 ry2 m]
-        // Picture points are in export units, real world points are in metres
-        float realWorldRef = 10.0f; // Reference distance in metres
-        float pictureRef = realWorldRef * scale; // Corresponding distance in picture units
+        // Scale parameter: [px1 py1 px2 py2 rx1 ry1 rx2 ry2 m]
+        float realWorldRef = 10.0f;
+        float pictureRef = realWorldRef * scale * xsScale;
         String scaleParam =
                 String.format(
-                        java.util.Locale.US,
+                        Locale.US,
                         "[0 0 %s %s 0 0 %s %s m]",
                         TextTools.formatTo2dp(pictureRef),
                         TextTools.formatTo2dp(pictureRef),
                         TextTools.formatTo2dp(realWorldRef),
                         TextTools.formatTo2dp(realWorldRef));
 
-        lines.add("scrap " + name + " -projection none -scale " + scaleParam);
-
-        // Add the station point at the cross-section center
-        Station station = xsDetail.getCrossSection().getStation();
-        Coord2D position = xsDetail.getPosition().scale(scale).flipVertically();
-        lines.add(getPoint(position.x, position.y, "station", "-name", station.getName()));
-
+        String startLine = "scrap " + name + " -projection none -scale " + scaleParam;
+        String copyrightLine = SurvexTherionUtil.getCopyrightLine(survey, SurveyFormat.THERION);
+        if (!copyrightLine.isEmpty()) {
+            // As in getStartScrapLines(): drop the trailing newline, since it's joined onto
+            // the previous line with a single "\n" rather than the "\n\n" used elsewhere here.
+            startLine = startLine + "\n" + copyrightLine.substring(0, copyrightLine.length() - 1);
+        }
+        lines.add(startLine);
         lines.add("endscrap");
 
         return TextTools.join("\n\n", lines);
@@ -224,8 +254,9 @@ public class Th2Exporter {
         if (originPos == null) {
             return TextTools.join("\n", lines);
         }
+        // Survey-frame y is north-positive; XVI/Therion canvas y is down — flip on emit.
         float xPos = originPos.x;
-        float yPos = originPos.y;
+        float yPos = -originPos.y;
         //  xth_me_image_insert {<Xpos> <visibility> <gamma>} {<Ypos> <root>} {<filename>} 0 {}
         //  <Xpos> <Ypos> is the position of the 0,0 point of XVI coordinate system
         //  <visibility> - 0 image is hidden / 1 image is shown
@@ -272,12 +303,19 @@ public class Th2Exporter {
             Shape frame,
             float scale,
             boolean includeStations,
-            boolean includeSketchContent) {
+            boolean includeSketchContent,
+            Map<String, String> stationNameToXsScrapName) {
         List<String> lines = new ArrayList<>();
-        lines.add(getStartScrapCommands(name, projection, frame));
+        lines.add(getStartScrapLines(survey, name, projection, frame));
         lines.addAll(
                 getScrapCommands(
-                        survey, sketch, space, scale, includeStations, includeSketchContent));
+                        survey,
+                        sketch,
+                        space,
+                        scale,
+                        includeStations,
+                        includeSketchContent,
+                        stationNameToXsScrapName));
         lines.add("endscrap");
         return TextTools.join("\n\n", lines);
     }
@@ -290,7 +328,35 @@ public class Th2Exporter {
             Space<Coord2D> space,
             Shape frame,
             float scale) {
-        return getScrap(survey, name, projection, sketch, space, frame, scale, true, true);
+        return getScrap(
+                survey,
+                name,
+                projection,
+                sketch,
+                space,
+                frame,
+                scale,
+                true,
+                true,
+                Collections.emptyMap());
+    }
+
+    /**
+     * Returns the "scrap ... -projection ..." line, followed - on the very next physical line, not
+     * separated by a blank line like the rest of this scrap's sections are - by the
+     * copyright/licence line, if the trip has either set.
+     */
+    private static String getStartScrapLines(
+            Survey survey, String name, Projection2D projection, Shape frame) {
+        String startLine = getStartScrapCommands(name, projection, frame);
+        String copyrightLine = SurvexTherionUtil.getCopyrightLine(survey, SurveyFormat.THERION);
+        if (copyrightLine.isEmpty()) {
+            return startLine;
+        }
+        // getCopyrightLine() always ends with a single trailing newline; drop it here, since
+        // this is joined onto the previous line with a single "\n", not the "\n\n" used to
+        // separate the other sections of this scrap.
+        return startLine + "\n" + copyrightLine.substring(0, copyrightLine.length() - 1);
     }
 
     private static String getStartScrapCommands(String name, Projection2D projection, Shape frame) {
@@ -315,7 +381,8 @@ public class Th2Exporter {
             Space<Coord2D> space,
             float scale,
             boolean includeStations,
-            boolean includeSketchContent) {
+            boolean includeSketchContent,
+            Map<String, String> stationNameToXsScrapName) {
         List<String> commands = new ArrayList<>();
 
         if (includeStations) {
@@ -326,8 +393,17 @@ public class Th2Exporter {
                 if (coord == null) {
                     continue;
                 }
-                coord = coord.scale(scale);
+                // Inputs are survey-frame (y north-positive); Therion canvas is y-down so flip
+                // when emitting. Same convention used for sketch content and section anchors.
+                coord = coord.flipVertically().scale(scale);
                 commands.add(getPoint(coord.x, coord.y, "station", "-name", station.getName()));
+
+                String xsScrapName = stationNameToXsScrapName.get(station.getName());
+                if (xsScrapName != null) {
+                    CrossSectionDetail xsDetail = sketch.getCrossSectionDetail(station);
+                    Coord2D xsCoord = xsDetail.getPosition().flipVertically().scale(scale);
+                    commands.add(getPoint(xsCoord.x, xsCoord.y, "section", "-scrap", xsScrapName));
+                }
             }
         }
 

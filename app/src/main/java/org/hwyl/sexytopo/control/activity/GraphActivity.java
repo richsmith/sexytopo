@@ -15,6 +15,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.HapticFeedbackConstants;
 import android.view.Menu;
@@ -40,6 +41,7 @@ import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.BrushColour;
 import org.hwyl.sexytopo.model.sketch.Colour;
+import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchTool;
 import org.hwyl.sexytopo.model.sketch.Symbol;
@@ -311,6 +313,10 @@ public abstract class GraphActivity extends SurveyEditorActivity
             SketchPreferences.Toggle.SHOW_SPLAYS.set(!item.isChecked());
             graphView.invalidate();
             return true;
+        } else if (itemId == R.id.buttonShowXSections) {
+            SketchPreferences.Toggle.SHOW_X_SECTIONS.set(!item.isChecked());
+            graphView.invalidate();
+            return true;
         } else if (itemId == R.id.buttonShowSketch) {
             SketchPreferences.Toggle.SHOW_SKETCH.set(!item.isChecked());
             setSketchButtonsStatus();
@@ -327,6 +333,12 @@ public abstract class GraphActivity extends SurveyEditorActivity
         } else if (itemId == R.id.buttonAutoRecentre) {
             SketchPreferences.Toggle.AUTO_RECENTRE.set(!item.isChecked());
             graphView.invalidate();
+            return true;
+        } else if (itemId == R.id.buttonBlueWater) {
+            SketchPreferences.Toggle.BLUE_WATER.set(!item.isChecked());
+            return true;
+        } else if (itemId == R.id.buttonPinchToZoom) {
+            SketchPreferences.Toggle.PINCH_TO_ZOOM.set(!item.isChecked());
             return true;
         } else {
             return handleAction(itemId);
@@ -402,13 +414,13 @@ public abstract class GraphActivity extends SurveyEditorActivity
         // ********** Handle special symbol logic **********
 
         if (itemId == R.id.buttonSymbol) {
-            // Open the symbol toolbar if the symbol tool is selected twice
-            // (also open it the first time ever selected to teach the user that it's there)
-            if (!symbolToolbarOpenedOnce || alreadySelectedTool == SketchTool.SYMBOL) {
+            boolean wasAlreadyInSymbolMode = alreadySelectedTool == SketchTool.SYMBOL;
+            selectSketchTool(SketchTool.SYMBOL);
+            // Open the symbol toolbar the first time ever (to teach the user it's there)
+            // and toggle it whenever the symbol tool is tapped while already active.
+            if (!symbolToolbarOpenedOnce || wasAlreadyInSymbolMode) {
                 symbolToolbarOpenedOnce = true;
                 toggleSymbolToolbar();
-            } else { // else standard sketch tool selection
-                selectSketchTool(SketchTool.SYMBOL);
             }
             return true;
         }
@@ -440,6 +452,10 @@ public abstract class GraphActivity extends SurveyEditorActivity
         Menu menu = popup.getMenu();
         popup.getMenuInflater().inflate(R.menu.drawing, menu);
         popup.setOnMenuItemClickListener(this);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            menu.setGroupDividerEnabled(true);
+        }
 
         for (SketchPreferences.Toggle toggle : SketchPreferences.Toggle.values()) {
             int controlId = toggle.getControlId();
@@ -575,6 +591,32 @@ public abstract class GraphActivity extends SurveyEditorActivity
     @Override
     public void onNewCrossSection(Station station) {
         graphView.handleNewCrossSection(station);
+    }
+
+    @Override
+    public void onDeleteCrossSection(Station station) {
+        Sketch planSketch = getSurvey().getPlanSketch();
+        CrossSectionDetail detail = planSketch.getCrossSectionDetail(station);
+        if (detail == null) {
+            return;
+        }
+        planSketch.deleteDetail(detail);
+        getSurveyManager().broadcastSurveyUpdated();
+        invalidateView();
+    }
+
+    @Override
+    public void onRotateCrossSection(Station station) {
+        graphView.handleRotateCrossSection(station);
+    }
+
+    @Override
+    public void onEditCrossSection(Station station) {
+        CrossSectionDetail detail = getSurvey().getPlanSketch().getCrossSectionDetail(station);
+        if (detail == null) {
+            return;
+        }
+        graphView.launchCrossSectionEditor(detail);
     }
 
     @Override

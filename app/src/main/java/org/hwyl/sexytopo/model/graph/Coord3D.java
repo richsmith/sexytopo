@@ -2,7 +2,7 @@ package org.hwyl.sexytopo.model.graph;
 
 import android.annotation.SuppressLint;
 
-public final class Coord3D extends Coord {
+public final class Coord3D extends Coord<Coord3D> {
 
     public static final Coord3D ORIGIN = new Coord3D(0, 0, 0);
 
@@ -40,7 +40,7 @@ public final class Coord3D extends Coord {
     }
 
     @Override
-    public Coord scale(float scale) {
+    public Coord3D scale(float scale) {
         return new Coord3D(x * scale, y * scale, z * scale);
     }
 }

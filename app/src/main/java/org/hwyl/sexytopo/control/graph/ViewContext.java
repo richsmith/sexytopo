@@ -40,15 +40,36 @@ public enum ViewContext {
             setDirectionSubmenuVisible(menu, true);
         }
     },
+    CROSS_SECTION {
+        @Override
+        public void configureViewSpecificItems(Menu menu) {
+            // No station context menu is shown in the cross-section editor.
+        }
+
+        @Override
+        public boolean hasStationContextMenu() {
+            return false;
+        }
+    },
     THREE_D {
         @Override
         public void configureViewSpecificItems(Menu menu) {
             setDirectionSubmenuVisible(menu, false);
             setCrossSectionVisible(menu, false);
         }
+
+        @Override
+        public boolean hasStationContextMenu() {
+            return false;
+        }
     };
 
     public abstract void configureViewSpecificItems(Menu menu);
+
+    /** Whether a station long-press in this view context should open a context menu. */
+    public boolean hasStationContextMenu() {
+        return true;
+    }
 
     protected void setItemVisible(Menu menu, int itemId, boolean visible) {
         MenuItem item = menu.findItem(itemId);
@@ -65,9 +86,9 @@ public enum ViewContext {
     }
 
     protected void setCrossSectionVisible(Menu menu, boolean visible) {
-        MenuItem crossSectionItem = menu.findItem(R.id.action_new_cross_section);
-        if (crossSectionItem != null) {
-            crossSectionItem.setVisible(visible);
+        MenuItem crossSectionMenu = menu.findItem(R.id.menu_xsection);
+        if (crossSectionMenu != null) {
+            crossSectionMenu.setVisible(visible);
         }
     }
 }

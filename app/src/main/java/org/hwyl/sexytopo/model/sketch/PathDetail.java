@@ -44,10 +44,10 @@ public final class PathDetail extends SketchDetail {
     }
 
     @Override
-    public PathDetail translate(Coord2D point) {
+    public PathDetail translate(Coord2D translation) {
         List<Coord2D> newPath = new ArrayList<>();
         for (Coord2D step : path) {
-            newPath.add(step.plus(point));
+            newPath.add(step.plus(translation));
         }
         return new PathDetail(newPath, getColour());
     }

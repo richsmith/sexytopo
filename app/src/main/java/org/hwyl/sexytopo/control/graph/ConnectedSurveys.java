@@ -55,14 +55,13 @@ public class ConnectedSurveys {
                 Coord2D transformation =
                         connectingStationLocation.minus(otherConnectingStationLocation);
 
-                Sketch translatedPlan =
-                        otherSurvey.getPlanSketch().getTranslatedCopy(transformation);
+                Sketch translatedPlan = otherSurvey.getPlanSketch().translate(transformation);
                 lightweightSurveyCopy.setPlanSketch(translatedPlan);
                 Sketch translatedElevation =
-                        otherSurvey.getElevationSketch().getTranslatedCopy(transformation);
+                        otherSurvey.getElevationSketch().translate(transformation);
                 lightweightSurveyCopy.setElevationSketch(translatedElevation);
 
-                otherProjection = Space2DUtils.transform(otherProjection, transformation);
+                otherProjection = Space2DUtils.translate(otherProjection, transformation);
 
                 translated.put(lightweightSurveyCopy, otherProjection);
 

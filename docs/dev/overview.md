@@ -34,6 +34,7 @@ SexyTopo uses git for version control, and the repo is in GitHub. The main branc
 ### Linting & Code Quality
 ```bash
 ./gradlew lint           # Run Android lint checks
+make check-translations  # Report strings missing from locale strings.xml files
 ```
 
 ### Clean
@@ -105,11 +106,26 @@ Each format is handled by dedicated import/export classes. When adding format su
 - **Min API**: 23 (Android 6.0); Compile SDK: 36 (Android 15)
 - Always use braces for `if`, `for`, `while` and similar block statements, even for single-line bodies
 - Never use fully qualified class names in the middle of functions - import them properly instead
+- Avoid using @tags inside method javadoc (e.g. @code or @link -- javadoc is used for humans or agents reading the code, not for generating documentation)
 - Do not insert comments to show what has just been added - only add comments where it is helpful to inform why something is implemented that way, or to explain something that is complex. A comment to aid understanding can be helpful, but consider if a transitive variable might be a simpler way of explaining.
 - Use British English in IDs, comments, variable names etc.
 - **Never hardcode user-facing strings in Java/Kotlin code.** All strings must be defined in `app/src/main/res/values/strings.xml` and referenced via `R.string.*` (in code) or `@string/*` (in XML layouts).
 - String names must use the appropriate section prefix to match the relevant section in `strings.xml` (e.g. `action_`, `file_`, etc.). Place new strings in the correct comment-delimited section.
-- When adding strings, add translations to all language files
+- `sketch_menu_*` strings are labels for the sketch quick menu (the toggle overflow in graph view), so keep them **brief** — a word or two that fits a compact menu row. This applies to translations too: don't expand a short English label into a long phrase. Prefer the most concise natural rendering in each language (e.g. drop articles, abbreviate where idiomatic).
+- When adding strings, add translations to all language files. Supported locales: `values-de` (German), `values-fr` (French), `values-es` (Spanish), `values-it` (Italian), `values-pl` (Polish), `values-pt` (Portuguese). A missing key falls back to the default English, so audit coverage with `make check-translations` (a good release-process gate). To fill gaps in bulk, write a JSON file mapping each key to its translations by locale and apply it:
+
+  ```json
+  {
+    "menu_xsection": {"de": "Querschnitt", "fr": "Coupe", "es": "Sección transversal", "it": "Sezione", "pl": "Przekrój", "pt": "Secção transversal"}
+  }
+  ```
+
+  ```
+  python3 scripts/apply_translations.py translations.json
+  ./gradlew spotlessApply
+  ```
+
+  Locale keys are `de fr es it pl pt`. Values are plain text — the script handles Android escaping (apostrophe, `&`, `<`, `>`) and inserts each string in the right place, mirroring the default's section ordering. Any key/locale may be omitted; already-present keys are skipped, so re-running is safe. Keys marked `translatable="false"` are excluded from the audit. Preserve placeholders (`%s`, `%1$s`, `\n`, `<xliff:g>`) exactly in translations.
 - When updating either sketch view (graph view), remember to consider landscape mode
 
 ## Testing
@@ -123,6 +139,22 @@ Example patterns:
 - Mock Bluetooth/instrument responses for device driver tests
 - Use Mockito for dependency injection in model tests
 - Return default values in unit tests (`unitTests.returnDefaultValues = true`)
+
+## Release & Deployment
+
+Releasing is driven by git tags. The flow is:
+
+1. Run `make bump` (`scripts/bump.py`) to bump `versionName` and `versionCode` in `app/build.gradle`. This only edits the file — no git operations. Use `make bump-minor` for a minor bump, or `make bump VERSION=N.N.N` for an explicit version. The `versionCode` increment is what keeps each Play upload unique, so nothing in CI needs to manage it.
+2. Add release notes under a new `# <date> <version>` heading in `docs/releases.md` (matching the bumped version).
+3. Run `make publish` (`scripts/publish.py`): it checks `docs/releases.md` has an entry for the current version, commits `build.gradle` + `releases.md`, and creates the tag. It does not push.
+4. `git push && git push --tags`.
+
+Pushing a tag matching `N.N.N` triggers `.github/workflows/release.yml`, which:
+
+- builds and signs the release APK,
+- extracts the notes for that version (`scripts/extract_release_notes.py`),
+- creates a GitHub Release with the APK attached,
+- **publishes the signed APK to the Play Store production track** (live to all users).
 
 ## Dependencies & External Tools
 

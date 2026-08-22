@@ -10,6 +10,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.io.IoUtils;
+import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SexyTopoVersion;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionImporter;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
 import org.hwyl.sexytopo.control.io.thirdparty.xvi.XviImporter;
@@ -58,8 +59,17 @@ public class TherionImporter extends Importer {
     private static Survey parseTh(Context context, DocumentFile file) throws Exception {
         Survey survey = new Survey();
         String contents = IoUtils.slurpFile(context, file);
+
+        // Determine import mode based on the SexyTopo version that wrote the file.
+        // Files with no version header (third-party) or written by 1.11.3+ use the new
+        // leg-comment path. Only files positively identified as 1.11.2 or earlier use the
+        // legacy station-comment path.
+        SexyTopoVersion version = SexyTopoVersion.extractFromText(contents);
+        boolean useLegComments =
+                version == null || version.isAfter(SexyTopoVersion.LEG_COMMENTS_VERSION_CUTOFF);
+
         List<String> lines = Arrays.asList(contents.split("\n"));
-        updateCentreline(lines, survey);
+        updateCentreline(lines, survey, useLegComments);
 
         Trip trip = SurvexTherionImporter.parseMetadata(contents, SurveyFormat.THERION);
         if (trip != null) {
@@ -82,6 +92,11 @@ public class TherionImporter extends Importer {
     }
 
     public static void updateCentreline(List<String> lines, Survey survey) throws Exception {
+        updateCentreline(lines, survey, false);
+    }
+
+    public static void updateCentreline(List<String> lines, Survey survey, boolean useLegComments)
+            throws Exception {
         List<String> block = getContentsOfBeginEndBlock(lines, "centreline");
 
         String blockText = TextTools.join("\n", block);
@@ -116,7 +131,7 @@ public class TherionImporter extends Importer {
         }
 
         String centrelineText = TextTools.join("\n", sanitisedCentrelineData);
-        SurvexTherionImporter.parseCentreline(centrelineText, survey);
+        SurvexTherionImporter.parseCentreline(centrelineText, survey, useLegComments);
         handleElevationDirectionData(sanitisedElevationDirectionData, survey);
 
         SurvexTherionImporter.mergePassageComments(survey, passageComments);

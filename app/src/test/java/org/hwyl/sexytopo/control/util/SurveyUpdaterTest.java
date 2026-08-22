@@ -632,4 +632,112 @@ public class SurveyUpdaterTest {
         Assert.assertTrue(stationCreated);
         Assert.assertEquals(2, survey.getAllStations().size());
     }
+
+    @Test
+    public void testDowngradeNonPromotedLegProducesOneSplay() {
+        Survey survey = new Survey();
+        Leg leg = new Leg(5, 90, 10);
+        SurveyUpdater.updateWithNewStation(survey, leg);
+
+        Station origin = survey.getOrigin();
+        Leg connectedLeg = origin.getConnectedOnwardLegs().get(0);
+        Assert.assertFalse(connectedLeg.wasPromoted());
+
+        SurveyUpdater.downgradeLeg(survey, connectedLeg);
+
+        List<Leg> onwardLegs = origin.getOnwardLegs();
+        Assert.assertEquals(1, onwardLegs.size());
+        Assert.assertFalse(onwardLegs.get(0).hasDestination());
+    }
+
+    @Test
+    public void testDowngradePromotedLegRestoresAllSplays() {
+        Survey survey = new Survey();
+        SurveyUpdater.updateWithNewStation(survey, new Leg(5, 90, 10));
+
+        Station origin = survey.getOrigin();
+        Leg splay2 = new Leg(6, 91, 11);
+        origin.addOnwardLeg(splay2);
+        survey.addLegRecord(splay2);
+        SurveyUpdater.promoteToAboveLeg(survey, splay2);
+
+        Leg splay3 = new Leg(7, 92, 12);
+        origin.addOnwardLeg(splay3);
+        survey.addLegRecord(splay3);
+        SurveyUpdater.promoteToAboveLeg(survey, splay3);
+
+        Leg promotedLeg = origin.getConnectedOnwardLegs().get(0);
+        Assert.assertTrue(promotedLeg.wasPromoted());
+        Assert.assertEquals(3, promotedLeg.getPromotedFrom().length);
+
+        SurveyUpdater.downgradeLeg(survey, promotedLeg);
+
+        List<Leg> onwardLegs = origin.getOnwardLegs();
+        Assert.assertEquals(3, onwardLegs.size());
+        for (Leg splay : onwardLegs) {
+            Assert.assertFalse(splay.hasDestination());
+        }
+    }
+
+    @Test
+    public void testDowngradePromotedLegPreservesOriginalReadings() {
+        Survey survey = new Survey();
+        SurveyUpdater.updateWithNewStation(survey, new Leg(5, 90, 10));
+
+        Station origin = survey.getOrigin();
+        Leg splay2 = new Leg(6, 91, 11);
+        origin.addOnwardLeg(splay2);
+        survey.addLegRecord(splay2);
+        SurveyUpdater.promoteToAboveLeg(survey, splay2);
+
+        Leg splay3 = new Leg(7, 92, 12);
+        origin.addOnwardLeg(splay3);
+        survey.addLegRecord(splay3);
+        SurveyUpdater.promoteToAboveLeg(survey, splay3);
+
+        Leg promotedLeg = origin.getConnectedOnwardLegs().get(0);
+        Leg[] promotedFrom = promotedLeg.getPromotedFrom();
+
+        SurveyUpdater.downgradeLeg(survey, promotedLeg);
+
+        List<Leg> onwardLegs = origin.getOnwardLegs();
+        Assert.assertEquals(promotedFrom.length, onwardLegs.size());
+        for (int i = 0; i < promotedFrom.length; i++) {
+            Assert.assertEquals(
+                    promotedFrom[i].getDistance(),
+                    onwardLegs.get(i).getDistance(),
+                    ALLOWED_DOUBLE_DELTA);
+            Assert.assertEquals(
+                    promotedFrom[i].getAzimuth(),
+                    onwardLegs.get(i).getAzimuth(),
+                    ALLOWED_DOUBLE_DELTA);
+            Assert.assertEquals(
+                    promotedFrom[i].getInclination(),
+                    onwardLegs.get(i).getInclination(),
+                    ALLOWED_DOUBLE_DELTA);
+        }
+    }
+
+    @Test
+    public void testDowngradePromotedLegSurveyIntegrity() {
+        Survey survey = new Survey();
+        SurveyUpdater.updateWithNewStation(survey, new Leg(5, 90, 10));
+
+        Station origin = survey.getOrigin();
+        Leg splay2 = new Leg(6, 91, 11);
+        origin.addOnwardLeg(splay2);
+        survey.addLegRecord(splay2);
+        SurveyUpdater.promoteToAboveLeg(survey, splay2);
+
+        Leg splay3 = new Leg(7, 92, 12);
+        origin.addOnwardLeg(splay3);
+        survey.addLegRecord(splay3);
+        SurveyUpdater.promoteToAboveLeg(survey, splay3);
+
+        Leg promotedLeg = origin.getConnectedOnwardLegs().get(0);
+
+        SurveyUpdater.downgradeLeg(survey, promotedLeg);
+
+        survey.checkSurveyIntegrity();
+    }
 }

@@ -8,7 +8,7 @@ public enum TableCol {
     TO(R.id.tableRowTo, "To", "%s"),
     DISTANCE(R.id.tableRowDistance, "Distance", "%.3f"),
     AZIMUTH(R.id.tableRowAzimuth, "Azimuth", "%.2f"),
-    INCLINATION(R.id.tableRowInclination, "Inclination", "%.2f");
+    INCLINATION(R.id.tableRowInclination, "Inclination", "%+.2f");
 
     final int id;
     final String name;

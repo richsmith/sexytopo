@@ -31,12 +31,15 @@ public class SketchJsonTranslater {
     public static final String SYMBOLS_TAG = "symbols";
     public static final String LABELS_TAG = "labels";
     public static final String CROSS_SECTIONS_TAG = "x-sections";
+    public static final String SKETCH_TAG = "sketch";
     public static final String SYMBOL_ID_TAG = "symbol-id";
     public static final String TEXT_TAG = "text";
     public static final String SIZE_TAG = "size";
     public static final String STATION_ID_TAG = "station-id";
     public static final String POSITION_TAG = "location";
     public static final String ANGLE_TAG = "angle";
+    public static final String SETTINGS_TAG = "settings";
+    public static final String CROSS_SECTION_SCALE_TAG = "cross-section-scale";
     public static final String X_TAG = "x";
     public static final String Y_TAG = "y";
 
@@ -84,6 +87,10 @@ public class SketchJsonTranslater {
             crossSectionDetailArray.put(toJson(crossSectionDetail));
         }
         json.put(CROSS_SECTIONS_TAG, crossSectionDetailArray);
+
+        JSONObject settings = new JSONObject();
+        settings.put(CROSS_SECTION_SCALE_TAG, sketch.getCrossSectionScale());
+        json.put(SETTINGS_TAG, settings);
 
         return json;
     }
@@ -138,6 +145,13 @@ public class SketchJsonTranslater {
             sketch.setCrossSectionDetails(crossSectionDetails);
         } catch (Exception e) {
             Log.e(R.string.file_load_cross_sections_error, e);
+        }
+
+        if (json.has(SETTINGS_TAG)) {
+            JSONObject settings = json.optJSONObject(SETTINGS_TAG);
+            if (settings != null && settings.has(CROSS_SECTION_SCALE_TAG)) {
+                sketch.setCrossSectionScale((float) settings.optDouble(CROSS_SECTION_SCALE_TAG));
+            }
         }
 
         return sketch;
@@ -232,6 +246,11 @@ public class SketchJsonTranslater {
         json.put(POSITION_TAG, toJson(crossSectionDetail.getPosition()));
         json.put(ANGLE_TAG, crossSectionDetail.getCrossSection().getAngle());
 
+        Sketch subSketch = crossSectionDetail.getSketch();
+        if (!isSketchEmpty(subSketch)) {
+            json.put(SKETCH_TAG, toSubSketchJson(subSketch));
+        }
+
         return json;
     }
 
@@ -244,10 +263,95 @@ public class SketchJsonTranslater {
         String stationdId = json.getString(STATION_ID_TAG);
         Station station = survey.getStationByName(stationdId);
 
+        Sketch subSketch = new Sketch();
+        if (json.has(SKETCH_TAG)) {
+            subSketch = toSubSketch(json.getJSONObject(SKETCH_TAG));
+        }
+
         CrossSectionDetail crossSectionDetail =
-                new CrossSectionDetail(new CrossSection(station, angle), position);
+                new CrossSectionDetail(new CrossSection(station, angle), position, subSketch);
 
         return crossSectionDetail;
+    }
+
+    private static boolean isSketchEmpty(Sketch sketch) {
+        return sketch.getPathDetails().isEmpty()
+                && sketch.getSymbolDetails().isEmpty()
+                && sketch.getTextDetails().isEmpty();
+    }
+
+    private static JSONObject toSubSketchJson(Sketch sketch) throws JSONException {
+        JSONObject json = new JSONObject();
+
+        JSONArray pathDetailArray = new JSONArray();
+        for (PathDetail pathDetail : sketch.getPathDetails()) {
+            pathDetailArray.put(toJson(pathDetail));
+        }
+        json.put(PATHS_TAG, pathDetailArray);
+
+        JSONArray textDetailArray = new JSONArray();
+        for (TextDetail textDetail : sketch.getTextDetails()) {
+            textDetailArray.put(toJson(textDetail));
+        }
+        json.put(LABELS_TAG, textDetailArray);
+
+        JSONArray symbolDetailArray = new JSONArray();
+        for (SymbolDetail symbolDetail : sketch.getSymbolDetails()) {
+            symbolDetailArray.put(toJson(symbolDetail));
+        }
+        json.put(SYMBOLS_TAG, symbolDetailArray);
+
+        return json;
+    }
+
+    private static Sketch toSubSketch(JSONObject json) {
+
+        Sketch sketch = new Sketch();
+
+        try {
+            if (json.has(PATHS_TAG)) {
+                JSONArray pathsArray = json.getJSONArray(PATHS_TAG);
+                List<PathDetail> pathDetails = new ArrayList<>();
+                for (JSONObject object : IoUtils.toList(pathsArray)) {
+                    pathDetails.add(toPathDetail(object));
+                }
+                sketch.setPathDetails(pathDetails);
+            }
+        } catch (Exception e) {
+            Log.e(R.string.file_load_sketch_paths_error, e);
+        }
+
+        try {
+            if (json.has(SYMBOLS_TAG)) {
+                JSONArray symbolsArray = json.getJSONArray(SYMBOLS_TAG);
+                List<SymbolDetail> symbolDetails = new ArrayList<>();
+                for (JSONObject object : IoUtils.toList(symbolsArray)) {
+                    try {
+                        symbolDetails.add(toSymbolDetail(object));
+                    } catch (Exception e) {
+                        Log.i(R.string.file_load_symbols_error, e);
+                    }
+                }
+                sketch.setSymbolDetails(symbolDetails);
+            }
+        } catch (Exception e) {
+            Log.e(R.string.file_load_symbols_error, e);
+        }
+
+        try {
+            if (json.has(LABELS_TAG)) {
+                JSONArray labelsArray = json.getJSONArray(LABELS_TAG);
+                List<TextDetail> textDetails = new ArrayList<>();
+                for (JSONObject object : IoUtils.toList(labelsArray)) {
+                    textDetails.add(toTextDetail(object));
+                }
+                sketch.setTextDetails(textDetails);
+            }
+        } catch (Exception e) {
+            Log.e(R.string.file_load_sketch_labels_error, e);
+        }
+
+        return sketch;
     }
 
     public static JSONObject toJson(Coord2D coord) throws JSONException {

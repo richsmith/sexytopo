@@ -1,4 +1,5 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -125,7 +126,7 @@
 
 <h2 id="sketch-views">Sketch Views</h2>
 <p>The sketch views (plan and extended elevation) can be accessed through buttons on the Action Bar at the top of the screen. These show a projection of the calculated survey on a canvas so that a sketch of the cave can be drawn on top. The plan view is an intuitive map of the cave whilst the extended elevation is an "unrolled" view of the vertical layout of the cave.</p>
-<p>A selection of sketching tools are provided via a toolbar at the bottom of the screen:
+<p>A selection of sketching tools are provided via a toolbar at the bottom of the screen:</p>
 <ul>
 	<li><strong>Colours</strong> set the current sketching colour</li>
 	<li><strong>Move</strong> enters view mode</li>
@@ -138,7 +139,6 @@
 	<li><strong>Redo</strong> cancels the last undo</li>
 	<li><strong>Zoom In/Out</strong> scales the survey (alternative to pinch-to-zoom)</li>
 </ul>
-</p>
 
 <p>A legend at the bottom right of the view provides a scale bar, basic stats, and a reminder of the survey name.</p>
 
@@ -215,6 +215,8 @@
 <ul>
 	<li><strong>Undo Last Leg</strong> removes the most recent measurement</li>
 	<li><strong>Link to Existing Survey</strong> connects the current survey to another survey at a common station</li>
+	<li><strong>Add Leg</strong> opens a dialog for entering a measurement to a new station from the active station</li>
+	<li><strong>Add Splay</strong> opens a dialog for entering a splay measurement from the active station</li>
 	<li><strong>Generate Test Survey</strong> creates sample data for practice and testing</li>
 	<li><strong>System Log</strong> displays system messages and debug information</li>
 </ul>
@@ -223,6 +225,9 @@
 <p>Opens the settings screen for configuring app preferences, display options, and behaviour. Notable settings include:</p>
 <ul>
 	<li><strong>LRUD Direction</strong> (under Table settings) controls how Left/Right splays are oriented when entering LRUD data. In <em>Survey</em> mode (default), splays are perpendicular to the bisected angle between the incoming and outgoing legs. In <em>Shot</em> mode, splays are perpendicular to the most recent leg direction. The shot mode is a common alternative convention for measuring LRUDs</li>
+	<li><strong>Manual Data Entry</strong> Show or hide various tools for manual data entry. Included entry using Degrees, Minutes,Seconds</li>
+	<li><strong>Leg agreement method</strong> (under Instruments settings) controls how SexyTopo decides whether three repeated readings are close enough to form a new leg. <em>Angular deltas</em> (default) compares distance, azimuth and inclination separately; this is the original behaviour but can wrongly reject genuinely-repeated steep legs, where a small change in position causes a large change in compass bearing. <em>Endpoint distance</em> instead checks that the readings' endpoints all fall within a set distance of each other (the default of 0.1&nbsp;m keeps all readings within BCRA grade&nbsp;5), and <em>Pairwise vectors</em> (the method used by TopoDroid) measures the gap between the readings' endpoints relative to their length, so the permitted difference scales with leg length. The endpoint and pairwise methods cope correctly with steep legs. Each method has its own tolerance setting.</li>
+	<li><strong>Legacy cross-sections</strong> (under Sketching settings) draws cross-sections as a simple projection of the passage walls at the station, without the editable frame introduced in newer versions. With this on, tapping a cross-section no longer opens it for editing; you can still create, delete and set the direction of cross-sections from the station context menu.</li>
 </ul>
 
 <h3>Help Menu</h3>

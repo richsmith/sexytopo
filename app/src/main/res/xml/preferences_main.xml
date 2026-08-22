@@ -33,6 +33,12 @@
         app:fragment="org.hwyl.sexytopo.control.activity.SettingsActivity$TeamFragment" />
 
     <Preference
+        android:key="pref_section_copyright"
+        android:title="@string/settings_copyright_title"
+        android:summary="@string/settings_copyright_summary"
+        app:fragment="org.hwyl.sexytopo.control.activity.SettingsActivity$CopyrightFragment" />
+
+    <Preference
         android:key="pref_section_instruments"
         android:title="@string/settings_instruments_title"
         android:summary="@string/settings_instruments_summary"

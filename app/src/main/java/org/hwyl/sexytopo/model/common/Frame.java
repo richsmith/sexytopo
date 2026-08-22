@@ -1,5 +1,7 @@
 package org.hwyl.sexytopo.model.common;
 
+import org.hwyl.sexytopo.model.graph.Coord2D;
+
 public class Frame extends Shape {
 
     public Frame() {
@@ -38,8 +40,14 @@ public class Frame extends Shape {
                 Math.max(bottom, other.bottom));
     }
 
+    @Override
     public Frame scale(float factor) {
         return new Frame(left * factor, right * factor, top * factor, bottom * factor);
+    }
+
+    @Override
+    public Frame translate(Coord2D translation) {
+        throw new UnsupportedOperationException("No need to support this currently");
     }
 
     private static int roundUpTo(double value, int n) {

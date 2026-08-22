@@ -2,6 +2,7 @@ package org.hwyl.sexytopo.control.io.thirdparty.survextherion;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +22,15 @@ public class SurvexTherionImporter {
     public static final Pattern COMMENT_INSTRUCTION_REGEX = Pattern.compile("([{].*?[}])");
 
     /**
+     * Matches a copyright/licence line as produced by SurvexTherionUtil.getCopyrightLine: copyright
+     * {year} "{holder}" [;#]"{licence}", where the trailing comment-char/licence portion is
+     * optional. Group 1 is the copyright holder, group 2 is the licence (null if no licence was
+     * present).
+     */
+    private static final Pattern COPYRIGHT_LINE_REGEX =
+            Pattern.compile("copyright\\s+\\S+\\s+\"([^\"]*)\"(?:\\s*[;#]\"([^\"]*)\")?");
+
+    /**
      * Parse centreline data from Survex/Therion format.
      *
      * <p>Handles: - Forward and backward legs (detects based on station order) - Promoted legs in
@@ -32,6 +42,29 @@ public class SurvexTherionImporter {
      * @throws Exception if parsing fails
      */
     public static void parseCentreline(String text, Survey survey) throws Exception {
+        parseCentreline(text, survey, false);
+    }
+
+    /**
+     * Parse centreline data, with control over where trailing leg-line comments are applied.
+     *
+     * <p>When {@code useLegComments} is {@code true} (files written by SexyTopo 1.11.3+, or files
+     * with no SexyTopo version header), a trailing comment on a data line is stored on the {@link
+     * Leg} itself. Promoted-leg precursor comments are similarly stored on each precursor {@link
+     * Leg}.
+     *
+     * <p>When {@code useLegComments} is {@code false} (files written by SexyTopo 1.11.2 or
+     * earlier), the legacy behaviour applies: the comment is stored on the newer station of the
+     * leg.
+     *
+     * @param text The centreline data text
+     * @param survey The survey to populate
+     * @param useLegComments {@code true} to attach comments to legs/splays; {@code false} for the
+     *     legacy station-comment path
+     * @throws Exception if parsing fails
+     */
+    public static void parseCentreline(String text, Survey survey, boolean useLegComments)
+            throws Exception {
 
         Map<String, Station> nameToStation = new HashMap<>();
 
@@ -56,16 +89,42 @@ public class SurvexTherionImporter {
             }
 
             try {
-                // Extract comment - support both ; (Survex) and # (Therion)
-                String comment = extractCommentFromLine(line);
+                String[] allTokens = trimmed.split("\\s+");
 
-                String[] fields = line.trim().split("\\s+");
+                // A valid leg line must have at least 5 tokens:
+                // from to distance azimuth inclination
+                if (allTokens.length < 5) {
+                    continue;
+                }
+
+                String[] legFields = Arrays.copyOfRange(allTokens, 0, 5);
+
+                // Any tokens after the 5 leg fields form the comment tail.
+                // The tail may optionally start with a comment character (# or ;) which is
+                // stripped — both "1 2 3.0 45.0 0.0 # My Chamber" and
+                // "1 2 3.0 45.0 0.0 My Chamber" are valid and produce the same comment.
+                String comment = "";
+                if (allTokens.length > 5) {
+                    String tail =
+                            String.join(" ", Arrays.copyOfRange(allTokens, 5, allTokens.length));
+                    if (tail.startsWith(";") || tail.startsWith("#")) {
+                        tail = tail.substring(1).trim();
+                    }
+                    comment = tail;
+                }
 
                 // Check for commented new lines promoted legs in subsequent lines
                 List<Leg> commentedNewLineLegs =
-                        parseCommentedNewLinePromotedLegs(lines, lineIndex, fields[0], fields[1]);
+                        parseCommentedNewLinePromotedLegs(
+                                lines, lineIndex, legFields[0], legFields[1], useLegComments);
 
-                addLegToSurvey(survey, nameToStation, fields, comment, commentedNewLineLegs);
+                addLegToSurvey(
+                        survey,
+                        nameToStation,
+                        legFields,
+                        comment,
+                        commentedNewLineLegs,
+                        useLegComments);
 
             } catch (Exception exception) {
                 throw new Exception("Error importing this line: " + line);
@@ -76,8 +135,12 @@ public class SurvexTherionImporter {
     /**
      * Parse passage data section to extract station comments.
      *
-     * <p>Supports: - Therion: "data passage station ignoreall" - Survex: "*data passage station
-     * ignoreall"
+     * <p>Supports:
+     *
+     * <ul>
+     *   <li>Therion: "data dimensions station left right up down ignoreall"
+     *   <li>Survex: "*data passage station left right up down ignoreall"
+     * </ul>
      *
      * @param text The full file text (may contain multiple sections)
      * @param format the file format being parsed (SURVEX or THERION)
@@ -140,7 +203,7 @@ public class SurvexTherionImporter {
      *
      * <p>If a station has both a passage comment and a leg-line comment,
      *
-     * <p>Format: <passage comment> :: <leg-line comment>
+     * <p>Format: {passage comment} :: {leg-line comment}
      *
      * @param survey The survey with stations
      * @param passageComments Map of station name to passage comment
@@ -177,6 +240,8 @@ public class SurvexTherionImporter {
         Date surveyDate = null;
         Date explorationDate = null; // explo-date / date explored line
         String instrument = null;
+        String copyrightHolder = null;
+        String licence = null;
         Map<String, List<Trip.Role>> teamMap = new java.util.LinkedHashMap<>();
         StringBuilder tripComments = new StringBuilder();
         boolean foundAnyMetadata = false;
@@ -201,16 +266,33 @@ public class SurvexTherionImporter {
                 continue;
             }
 
-            // Instrument: "instrument inst \"name\""
+            // Instrument: "instrument insts \"name\""
             // Commented out instrument are ignored
-            if (effective.startsWith("instrument inst ")) {
-                instrument = extractQuotedValue(effective, "instrument inst ");
+            if (effective.startsWith("instrument insts ")) {
+                instrument = extractQuotedValue(effective, "instrument insts ");
                 foundAnyMetadata = true;
                 continue;
             }
             // Commented-out instrument line — explicitly clear
             if (trimmed.startsWith(format.getCommentedInstrumentPrefix())) {
                 instrument = null;
+                foundAnyMetadata = true;
+                continue;
+            }
+
+            // Copyright / licence: "copyright <year> \"<holder>\" [;#]\"<licence>\""
+            if (effective.startsWith("copyright ")) {
+                Matcher copyrightMatcher = COPYRIGHT_LINE_REGEX.matcher(effective);
+                if (copyrightMatcher.find()) {
+                    String holderText = copyrightMatcher.group(1);
+                    if (holderText != null && !holderText.isEmpty()) {
+                        copyrightHolder = holderText;
+                    }
+                    String licenceText = copyrightMatcher.group(2);
+                    if (licenceText != null && !licenceText.isEmpty()) {
+                        licence = licenceText;
+                    }
+                }
                 foundAnyMetadata = true;
                 continue;
             }
@@ -275,6 +357,13 @@ public class SurvexTherionImporter {
         }
 
         trip.setInstrument(instrument);
+
+        if (copyrightHolder != null) {
+            trip.setCopyrightHolder(copyrightHolder);
+        }
+        if (licence != null) {
+            trip.setLicence(licence);
+        }
 
         // Build team list
         List<Trip.TeamEntry> teamEntries = new ArrayList<>();
@@ -361,7 +450,8 @@ public class SurvexTherionImporter {
             Map<String, Station> nameToStation,
             String[] fields,
             String comment,
-            List<Leg> commentedNewLineLegs) {
+            List<Leg> commentedNewLineLegs,
+            boolean useLegComments) {
 
         String fromName = fields[0];
         String toName = fields[1];
@@ -399,7 +489,7 @@ public class SurvexTherionImporter {
         String commentInstructions = extractCommentInstructions(comment);
         Leg[] promotedFrom = parseInlinePromotedLegs(commentInstructions);
 
-        // Strip the instruction from the comment so it doesn't end up on the station
+        // Strip the instruction from the comment so it doesn't end up on the leg or station
         if (!commentInstructions.isEmpty()) {
             comment = comment.replace(commentInstructions, "").trim();
         }
@@ -413,20 +503,24 @@ public class SurvexTherionImporter {
         Station legFrom;
 
         if (isBackward) {
-            // This leg was shot backwards (from new station to existing station)
-            // Store with swapped stations and wasShotBackwards = true
             legFrom = to;
 
-            // Create leg with original measurements and wasShotBackwards = true
             if (from == Survey.NULL_STATION) {
                 leg = new Leg(distance, azimuth, inclination, true);
             } else {
                 leg = new Leg(distance, azimuth, inclination, from, promotedFrom, true);
             }
 
-            // Station comment goes on the TO station (the new one in the file)
-            if (!comment.isEmpty() && from != Survey.NULL_STATION) {
-                from.setComment(comment);
+            if (!comment.isEmpty()) {
+                if (useLegComments) {
+                    // New path: comment belongs to the leg/splay itself
+                    leg.setComment(comment);
+                } else {
+                    // Legacy path: comment goes on the newer station (from, in a backward leg)
+                    if (from != Survey.NULL_STATION) {
+                        from.setComment(comment);
+                    }
+                }
             }
         } else {
             // Forward leg
@@ -438,9 +532,16 @@ public class SurvexTherionImporter {
                 leg = new Leg(distance, azimuth, inclination, to, promotedFrom);
             }
 
-            // Station comment goes on the TO station
-            if (!comment.isEmpty() && to != Survey.NULL_STATION) {
-                to.setComment(comment);
+            if (!comment.isEmpty()) {
+                if (useLegComments) {
+                    // New path: comment belongs to the leg/splay itself
+                    leg.setComment(comment);
+                } else {
+                    // Legacy path: comment goes on the to station
+                    if (to != Survey.NULL_STATION) {
+                        to.setComment(comment);
+                    }
+                }
             }
         }
 
@@ -453,7 +554,8 @@ public class SurvexTherionImporter {
      * Detect if a leg was shot backwards.
      *
      * <p>A leg is backward if the FROM station is new (not seen before). Detection is based on
-     * POSITION (from/to), not station names/numbers.
+     * POSITION (from/to), not station names/numbers. Loop closures (both stations already known)
+     * are not supported by SexyTopo.
      */
     private static boolean isBackwardLeg(
             String fromName, String toName, Map<String, Station> seenStations) {
@@ -466,7 +568,7 @@ public class SurvexTherionImporter {
         }
 
         if (!fromIsNew && !toIsNew) {
-            // Both exist - this is a loop/connection, assume forward
+            // Both exist - not valid in SexyTopo (no loop closures), assume forward
             return false;
         }
 
@@ -480,9 +582,16 @@ public class SurvexTherionImporter {
      * <p>These are shots on commented lines that come AFTER the main leg line.
      *
      * <p>Example: 1 2 5.541 253.93 4.67 #1 2 5.542 73.95 -4.64 #1 2 5.541 73.93 -4.69
+     *
+     * <p>When {@code useLegComments} is {@code true}, any trailing comment on a precursor line
+     * (tokens after the 5 data fields) is stored on the returned {@link Leg}.
      */
     private static List<Leg> parseCommentedNewLinePromotedLegs(
-            String[] lines, int startIndex, String expectedFrom, String expectedTo) {
+            String[] lines,
+            int startIndex,
+            String expectedFrom,
+            String expectedTo,
+            boolean useLegComments) {
 
         List<Leg> shots = new ArrayList<>();
 
@@ -508,7 +617,21 @@ public class SurvexTherionImporter {
                     float distance = Float.parseFloat(fields[2]);
                     float azimuth = Float.parseFloat(fields[3]);
                     float inclination = Float.parseFloat(fields[4]);
-                    shots.add(new Leg(distance, azimuth, inclination));
+                    Leg precursor = new Leg(distance, azimuth, inclination);
+
+                    // If using leg comments, capture any trailing comment on this precursor line
+                    if (useLegComments && fields.length > 5) {
+                        String tail =
+                                String.join(" ", Arrays.copyOfRange(fields, 5, fields.length));
+                        if (tail.startsWith(";") || tail.startsWith("#")) {
+                            tail = tail.substring(1).trim();
+                        }
+                        if (!tail.isEmpty()) {
+                            precursor.setComment(tail);
+                        }
+                    }
+
+                    shots.add(precursor);
                 } catch (NumberFormatException e) {
                     Log.e("Failed to parse commented new line promoted leg: " + line);
                 }
@@ -528,21 +651,6 @@ public class SurvexTherionImporter {
         } else {
             return "";
         }
-    }
-
-    private static String extractCommentFromLine(String line) {
-        String comment = "";
-
-        // Try semicolon first (Survex style)
-        if (line.contains(";")) {
-            comment = line.substring(line.indexOf(";") + 1).trim();
-        }
-        // Try hash (Therion style)
-        else if (line.contains("#")) {
-            comment = line.substring(line.indexOf("#") + 1).trim();
-        }
-
-        return comment;
     }
 
     /**

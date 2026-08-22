@@ -12,7 +12,6 @@ import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
 import org.hwyl.sexytopo.control.activity.SurveyEditorActivity;
-import org.hwyl.sexytopo.control.activity.TableActivity;
 import org.hwyl.sexytopo.control.components.DialogUtils;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.StationNamer;
@@ -27,9 +26,9 @@ public class LegDialogs {
 
     private LegDialogs() {}
 
-    public static void addStation(final TableActivity tableActivity, final Survey survey) {
+    public static void addStation(final SexyTopoActivity activity, final Survey survey) {
         showAddLegDialog(
-                tableActivity,
+                activity,
                 survey,
                 R.layout.leg_edit_dialog_unified,
                 R.string.manual_add_station_title,
@@ -38,9 +37,9 @@ public class LegDialogs {
                 );
     }
 
-    public static void addSplay(final TableActivity tableActivity, final Survey survey) {
+    public static void addSplay(final SexyTopoActivity activity, final Survey survey) {
         showAddLegDialog(
-                tableActivity,
+                activity,
                 survey,
                 R.layout.leg_edit_dialog_unified,
                 R.string.manual_add_splay_title,
@@ -51,7 +50,7 @@ public class LegDialogs {
 
     /** Unified helper method for showing add leg/station/splay dialogs */
     private static void showAddLegDialog(
-            final TableActivity tableActivity,
+            final SexyTopoActivity activity,
             final Survey survey,
             int layoutResId,
             int titleResId,
@@ -62,14 +61,19 @@ public class LegDialogs {
         String defaultToName =
                 isSplay ? null : StationNamer.generateNextStationName(survey, activeStation);
 
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(tableActivity);
-        LayoutInflater inflater = tableActivity.getLayoutInflater();
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(activity);
+        LayoutInflater inflater = activity.getLayoutInflater();
         final View dialogView = inflater.inflate(layoutResId, null);
 
         boolean usingDegMinsSecs = GeneralPreferences.isDegMinsSecsModeOn();
         if (usingDegMinsSecs) {
             dialogView.findViewById(R.id.azimuth_standard).setVisibility(View.GONE);
-            dialogView.findViewById(R.id.azimuth_deg_mins_secs).setVisibility(View.VISIBLE);
+            dialogView.findViewById(R.id.azimuth_dms_container).setVisibility(View.VISIBLE);
+        }
+
+        if (GeneralPreferences.isIncDegMinsSecsModeOn()) {
+            dialogView.findViewById(R.id.inclinationLayout).setVisibility(View.GONE);
+            dialogView.findViewById(R.id.inclination_dms_container).setVisibility(View.VISIBLE);
         }
 
         // Hide TO field for splays
@@ -81,7 +85,7 @@ public class LegDialogs {
         // Create validation form
         final EditLegForm form =
                 new EditLegForm(
-                        tableActivity, survey, activeStation, defaultToName, isSplay, dialogView);
+                        activity, survey, activeStation, defaultToName, isSplay, dialogView);
 
         builder.setView(dialogView)
                 .setTitle(titleResId)
@@ -98,6 +102,7 @@ public class LegDialogs {
                 () -> {
                     // Get the leg with measurements and shot direction from form
                     Leg leg = form.getUpdatedLeg();
+                    leg.setComment(form.getUpdatedLegComment());
                     Station fromStation = form.getUpdatedFromStation();
 
                     // Get the new station names from the form
@@ -126,6 +131,7 @@ public class LegDialogs {
 
                         // Reconstruct leg with destination station (preserving backwards flag from
                         // form)
+                        String legComment = leg.getComment();
                         leg =
                                 new Leg(
                                         leg.getDistance(),
@@ -134,6 +140,7 @@ public class LegDialogs {
                                         newToStation,
                                         new Leg[] {},
                                         leg.wasShotBackwards());
+                        leg.setComment(legComment);
 
                         // Add leg to from station using SurveyUpdater
                         // This also sets the active station to the new destination
@@ -179,12 +186,14 @@ public class LegDialogs {
                         }
                     }
 
-                    SurveyManager manager = tableActivity.getSurveyManager();
+                    SurveyManager manager = activity.getSurveyManager();
                     manager.broadcastSurveyUpdated();
                     if (!isSplay) {
                         manager.broadcastNewStationCreated();
                     }
-                    tableActivity.syncWithSurvey();
+                    if (activity instanceof SurveyEditorActivity) {
+                        ((SurveyEditorActivity) activity).syncWithSurvey();
+                    }
                 });
     }
 
@@ -202,7 +211,12 @@ public class LegDialogs {
 
         if (usingDegMinsSecs) {
             dialogView.findViewById(R.id.azimuth_standard).setVisibility(View.GONE);
-            dialogView.findViewById(R.id.azimuth_deg_mins_secs).setVisibility(View.VISIBLE);
+            dialogView.findViewById(R.id.azimuth_dms_container).setVisibility(View.VISIBLE);
+        }
+
+        if (GeneralPreferences.isIncDegMinsSecsModeOn()) {
+            dialogView.findViewById(R.id.inclinationLayout).setVisibility(View.GONE);
+            dialogView.findViewById(R.id.inclination_dms_container).setVisibility(View.VISIBLE);
         }
 
         // Hide to station field for splays
@@ -232,25 +246,30 @@ public class LegDialogs {
                 .setText(Float.toString(editData.getDistance()));
 
         if (usingDegMinsSecs) {
-            float azimuth = editData.getAzimuth();
-            int degrees = (int) azimuth;
-            float remainder = azimuth - degrees;
-            int minutes = (int) (remainder * 60);
-            float seconds = ((remainder * 60) - minutes) * 60;
-
+            float[] azimuthDms = Leg.decomposeToDms(editData.getAzimuth());
             ((TextView) (dialog.findViewById(R.id.editAzimuthDegrees)))
-                    .setText(Integer.toString(degrees));
+                    .setText(Integer.toString((int) azimuthDms[0]));
             ((TextView) (dialog.findViewById(R.id.editAzimuthMinutes)))
-                    .setText(Integer.toString(minutes));
+                    .setText(Integer.toString((int) azimuthDms[1]));
             ((TextView) (dialog.findViewById(R.id.editAzimuthSeconds)))
-                    .setText(Float.toString(seconds));
+                    .setText(Float.toString(azimuthDms[2]));
         } else {
             ((TextView) (dialog.findViewById(R.id.editAzimuth)))
                     .setText(Float.toString(editData.getAzimuth()));
         }
 
-        ((TextView) (dialog.findViewById(R.id.editInclination)))
-                .setText(Float.toString(editData.getInclination()));
+        if (GeneralPreferences.isIncDegMinsSecsModeOn()) {
+            float[] inclinationDms = Leg.decomposeToDms(editData.getInclination());
+            ((TextView) (dialog.findViewById(R.id.editInclinationDegrees)))
+                    .setText(Integer.toString((int) inclinationDms[0]));
+            ((TextView) (dialog.findViewById(R.id.editInclinationMinutes)))
+                    .setText(Integer.toString((int) inclinationDms[1]));
+            ((TextView) (dialog.findViewById(R.id.editInclinationSeconds)))
+                    .setText(Float.toString(inclinationDms[2]));
+        } else {
+            ((TextView) (dialog.findViewById(R.id.editInclination)))
+                    .setText(Float.toString(editData.getInclination()));
+        }
 
         DialogUtils.enableValidationOnButton(
                 dialog,
@@ -259,6 +278,7 @@ public class LegDialogs {
 
                     // Get the updated leg with measurements and shot direction from form
                     Leg edited = form.getUpdatedLeg();
+                    edited.setComment(form.getUpdatedLegComment());
 
                     // Get the new station names from the form
                     Station newFromStation = form.getUpdatedFromStation();
@@ -306,9 +326,9 @@ public class LegDialogs {
                 });
     }
 
-    public static void addStationWithLruds(final TableActivity tableActivity, final Survey survey) {
+    public static void addStationWithLruds(final SexyTopoActivity activity, final Survey survey) {
         showAddLegDialog(
-                tableActivity,
+                activity,
                 survey,
                 R.layout.leg_edit_dialog_unified_with_lruds,
                 R.string.manual_add_station_title,

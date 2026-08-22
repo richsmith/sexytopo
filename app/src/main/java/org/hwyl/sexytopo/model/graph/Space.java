@@ -5,7 +5,7 @@ import java.util.Map;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 
-public class Space<T extends Coord> {
+public class Space<T extends Coord<T>> {
     private final Map<Station, T> stations = new HashMap<>();
     private final Map<Leg, Line<T>> legs = new HashMap<>();
 
@@ -30,7 +30,7 @@ public class Space<T extends Coord> {
         Space<T> scaled = new Space<>();
 
         for (Map.Entry<Station, T> entry : stations.entrySet()) {
-            scaled.addStation(entry.getKey(), (T) entry.getValue().scale(scale));
+            scaled.addStation(entry.getKey(), entry.getValue().scale(scale));
         }
 
         for (Map.Entry<Leg, Line<T>> entry : legs.entrySet()) {

@@ -9,6 +9,18 @@ Agent / developer documentation for this project lives in `docs/dev/`:
 
 Start with `overview.md`.
 
+## Committing
+
+**Never commit without being asked to.** Make changes in the working tree and
+leave them there; the user decides when something gets committed.
+
+Permission to commit is granted once, for one commit. An instruction like
+"commit that" applies only to the work in front of you at that moment — it is
+not standing permission to commit later changes. Ask again each time.
+
+The same goes for anything else that publishes work outward: pushing, creating
+or updating pull requests, and pushing tags all need an explicit request.
+
 ## Code formatting
 
 This project uses [Spotless](https://github.com/diffplug/spotless) with
@@ -18,6 +30,12 @@ google-java-format (AOSP style) for Java and ktlint for Kotlin.
 - `./gradlew spotlessCheck` (or `make check`) — verify formatting (used in CI)
 
 CI runs `make check` on every PR, so misformatted code can't merge.
+
+## Javadoc style
+
+Keep javadoc plain prose. Avoid javadoc tags (`{@code ...}`, `{@link ...}`, `@param`, `@return`, etc.) unless they're genuinely needed — most of the time they aren't. In particular, **do not wrap identifiers in `{@code ...}`**: write `onReady` rather than `{@code onReady}`. The same goes for inline references to methods, classes, and constants.
+
+Reach for tags only when something would otherwise be ambiguous or unrenderable (e.g. `<` in a generic, an HTML-sensitive character, or a cross-reference that genuinely benefits from being a clickable link).
 
 ## Documentation maintenance
 

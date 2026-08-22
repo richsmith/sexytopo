@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
+import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -51,11 +52,11 @@ public class SurvexTherionUtil {
             // Instrument line - commented ONLY if field is empty
             if (trip.hasInstrument()) {
                 builder.append(marker)
-                        .append("instrument inst \"")
+                        .append("instrument insts \"")
                         .append(trip.getInstrument())
                         .append("\"\n");
             } else {
-                builder.append(commentChar).append(marker).append("instrument inst \"\"\n");
+                builder.append(commentChar).append(marker).append("instrument insts \"\"\n");
             }
 
             // Team members
@@ -64,14 +65,26 @@ public class SurvexTherionUtil {
             // Blank line before explo block
             builder.append("\n");
 
-            // Explo-date: only emit when unlinked and exploration date is set
-            if (!trip.isExplorationDateLinked() && trip.getExplorationDate() != null) {
+            // Explo-date: three cases:
+            //   1. Linked to survey date -> use survey date
+            //   2. Unlinked and date set -> use the explicit exploration date
+            //   3. Unlinked and date empty -> commented-out placeholder (like blank instrument)
+            if (trip.isExplorationDateLinked()) {
+                String formattedExploDate =
+                        formatDate(trip.getSurveyDate()).substring(5); // Remove "date " prefix
+                builder.append(marker)
+                        .append(exploDateKeyword)
+                        .append(formattedExploDate)
+                        .append("\n");
+            } else if (trip.getExplorationDate() != null) {
                 String formattedExploDate =
                         formatDate(trip.getExplorationDate()).substring(5); // Remove "date " prefix
                 builder.append(marker)
                         .append(exploDateKeyword)
                         .append(formattedExploDate)
                         .append("\n");
+            } else {
+                builder.append(commentChar).append(marker).append(exploDateKeyword).append("\n");
             }
 
             // Explo-team lines
@@ -88,6 +101,49 @@ public class SurvexTherionUtil {
         return builder.toString();
     }
 
+    /**
+     * Returns the copyright line for the survey's trip - *copyright {year} "{holder}" ;"{licence}"
+     * for Survex, or the same without the leading * and with # as the comment character for
+     * Therion. Returns "" if there's no trip, or the trip has neither a copyright holder nor a
+     * licence set.
+     *
+     * <p>The holder is always quoted, and is rendered as an empty pair of quotes if blank. The
+     * licence (also quoted) is only appended, as a trailing comment, if it is set; if there's no
+     * licence, the line ends after the holder.
+     */
+    public static String getCopyrightLine(Survey survey, SurveyFormat format) {
+        Trip trip = survey.getTrip();
+        if (trip == null || (!trip.hasCopyrightHolder() && !trip.hasLicence())) {
+            return "";
+        }
+
+        String marker = format.getCommandChar();
+        char commentChar = format.getCommentChar();
+        String holder = trip.hasCopyrightHolder() ? trip.getCopyrightHolder() : "";
+
+        // The year is normally always present, since a trip is created with today's date, but
+        // an imported survey can leave it unset; omit it rather than writing an empty slot.
+        String year = TextTools.formatYear(trip.getSurveyDate());
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(marker).append("copyright ");
+        if (!year.isEmpty()) {
+            builder.append(year).append(" ");
+        }
+        builder.append("\"").append(holder).append("\"");
+
+        if (trip.hasLicence()) {
+            builder.append(" ")
+                    .append(commentChar)
+                    .append("\"")
+                    .append(trip.getLicence())
+                    .append("\"");
+        }
+
+        builder.append("\n");
+        return builder.toString();
+    }
+
     public static String getStationCommentsData(Survey survey, SurveyFormat format) {
 
         StringBuilder builder = new StringBuilder();
@@ -101,11 +157,17 @@ public class SurvexTherionUtil {
             return "";
         }
 
-        // Output the data passage block
-        builder.append(marker).append("data passage station ignoreall\n");
+        // Output the data passage/dimensions block.
+        // Header varies slightly by format:
+        //   Survex:  *data passage station left right up down ignoreall
+        //   Therion: data dimensions station left right up down ignoreall
+        builder.append(format.getDataPassagePrefix())
+                .append(" station left right up down ignoreall\n");
 
         for (Station station : stationsWithComments) {
             builder.append(station.getName()).append("\t");
+            // LRUD placeholders are unused for now, required by the format
+            builder.append("-\t-\t-\t-\t");
             formatComment(builder, station.getComment());
             builder.append("\n");
         }
@@ -170,11 +232,13 @@ public class SurvexTherionUtil {
             GraphToListTranslator.SurveyListEntry entry,
             SurveyFormat format) {
 
-        Station from = entry.getFrom();
+        GraphToListTranslator.AsTakenReading reading =
+                GraphToListTranslator.toAsTakenReading(entry);
+        Station from = reading.getFrom();
         String fromName = from.getName();
 
-        Leg leg = entry.getLeg();
-        Station to = leg.getDestination();
+        Leg leg = reading.getLeg();
+        Station to = reading.getTo();
         String toName = to.getName();
 
         // Replace splay station name with format-specific syntax
@@ -186,7 +250,12 @@ public class SurvexTherionUtil {
         formatField(builder, toName);
         formatField(builder, TableCol.DISTANCE.format(leg.getDistance(), Locale.UK));
         formatField(builder, TableCol.AZIMUTH.format(leg.getAzimuth(), Locale.UK));
-        formatField(builder, TableCol.INCLINATION.format(leg.getInclination(), Locale.UK));
+        formatField(builder, formatInclination(leg.getInclination()));
+
+        // Append comment on the active data line if present (Cases 1 & 2)
+        if (leg.hasComment()) {
+            builder.append(flattenComment(leg.getComment()));
+        }
 
         // Handle promoted legs - put readings on subsequent lines
         if (leg.wasPromoted()) {
@@ -201,9 +270,22 @@ public class SurvexTherionUtil {
                         .append("\t");
                 builder.append(TableCol.AZIMUTH.format(precursor.getAzimuth(), Locale.UK))
                         .append("\t");
-                builder.append(TableCol.INCLINATION.format(precursor.getInclination(), Locale.UK));
+                builder.append(formatInclination(precursor.getInclination()));
+
+                // Append precursor splay comment if present (Case 3)
+                if (precursor.hasComment()) {
+                    builder.append("\t").append(flattenComment(precursor.getComment()));
+                }
             }
         }
+    }
+
+    private static String flattenComment(String comment) {
+        return comment.replaceAll("(\\r|\\n|\\r\\n)+", "\\\\n");
+    }
+
+    private static String formatInclination(double inclination) {
+        return String.format(Locale.UK, "%.2f", inclination);
     }
 
     private static void formatField(StringBuilder builder, Object value) {
