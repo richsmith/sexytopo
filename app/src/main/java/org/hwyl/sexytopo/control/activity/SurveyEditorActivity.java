@@ -15,7 +15,7 @@ import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.control.util.TextTools;
-import org.hwyl.sexytopo.model.graph.Direction;
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 
@@ -69,18 +69,18 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
     }
 
     public void onSetDirectionLeft(Station station) {
-        setDirection(station, Direction.LEFT);
+        setDirection(station, ExtendedElevationDirection.LEFT);
     }
 
     public void onSetDirectionRight(Station station) {
-        setDirection(station, Direction.RIGHT);
+        setDirection(station, ExtendedElevationDirection.RIGHT);
     }
 
     public void onSetDirectionVertical(Station station) {
-        setDirection(station, Direction.VERTICAL);
+        setDirection(station, ExtendedElevationDirection.VERTICAL);
     }
 
-    private void setDirection(Station station, Direction direction) {
+    private void setDirection(Station station, ExtendedElevationDirection direction) {
         if (station.getExtendedElevationDirection() != direction) {
             SurveyUpdater.setExtendedElevationDirection(getSurvey(), station, direction);
             getSurveyManager().broadcastSurveyUpdated();

@@ -9,7 +9,7 @@ import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SexyTopo;
 import org.hwyl.sexytopo.control.util.amalgamation.LegAmalgamationAlgorithm;
-import org.hwyl.sexytopo.model.graph.Direction;
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -185,7 +185,7 @@ public class SurveyUpdater {
 
             Station newStation = new Station(getNextStationName(survey));
             newStation.setExtendedElevationDirection(
-                    resolveInheritedDirection(survey, activeStation));
+                    resolveInheritedExtendedElevationDirection(survey, activeStation));
 
             Leg newLeg = averageLegs(lastNLegs);
             newLeg =
@@ -242,7 +242,7 @@ public class SurveyUpdater {
         if (areLegsBacksights(fore, back)) {
             Station newStation = new Station(getNextStationName(survey));
             newStation.setExtendedElevationDirection(
-                    resolveInheritedDirection(survey, activeStation));
+                    resolveInheritedExtendedElevationDirection(survey, activeStation));
 
             Leg newLeg = averageBacksights(fore, back);
             newLeg = Leg.toFullLeg(newLeg, newStation);
@@ -422,20 +422,21 @@ public class SurveyUpdater {
      * station, leaving the rest of the survey to carry on as it was.
      */
     public static void setExtendedElevationDirection(
-            Survey survey, Station station, Direction direction) {
+            Survey survey, Station station, ExtendedElevationDirection direction) {
         if (direction.propagates()) {
-            setDirectionOfSubtree(station, direction);
+            setExtendedElevationDirectionOfSubtree(station, direction);
         } else {
             station.setExtendedElevationDirection(direction);
         }
         survey.setSaved(false);
     }
 
-    public static void setDirectionOfSubtree(Station station, Direction direction) {
+    public static void setExtendedElevationDirectionOfSubtree(
+            Station station, ExtendedElevationDirection direction) {
         station.setExtendedElevationDirection(direction);
         for (Leg leg : station.getConnectedOnwardLegs()) {
             Station destination = leg.getDestination();
-            setDirectionOfSubtree(destination, direction);
+            setExtendedElevationDirectionOfSubtree(destination, direction);
         }
     }
 
@@ -451,17 +452,18 @@ public class SurveyUpdater {
      * used outside creating new stations, and anyway long series of VERTICAL legs ought to be very
      * rare!
      */
-    private static Direction resolveInheritedDirection(Survey survey, Station activeStation) {
-        Direction activeDirection = activeStation.getExtendedElevationDirection();
+    private static ExtendedElevationDirection resolveInheritedExtendedElevationDirection(
+            Survey survey, Station activeStation) {
+        ExtendedElevationDirection activeDirection = activeStation.getExtendedElevationDirection();
         if (activeDirection.propagates()) {
             return activeDirection;
         }
         Leg referringLeg = survey.getReferringLeg(activeStation);
         if (referringLeg == null) {
             // origin station — nothing above it to inherit from
-            return Direction.DEFAULT;
+            return ExtendedElevationDirection.DEFAULT;
         }
         Station parent = survey.getOriginatingStation(referringLeg);
-        return resolveInheritedDirection(survey, parent);
+        return resolveInheritedExtendedElevationDirection(survey, parent);
     }
 }

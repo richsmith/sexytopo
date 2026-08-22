@@ -1,7 +1,7 @@
 package org.hwyl.sexytopo.control.util;
 
 import org.hwyl.sexytopo.model.graph.Coord3D;
-import org.hwyl.sexytopo.model.graph.Direction;
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.survey.Leg;
@@ -25,7 +25,7 @@ public class Space3DTransformerForElevation extends Space3DTransformer {
     }
 
     protected void updateLeg(Space<Coord3D> space, Leg leg, Coord3D start) {
-        Direction direction = leg.getDestination().getExtendedElevationDirection();
+        ExtendedElevationDirection direction = leg.getDestination().getExtendedElevationDirection();
 
         Coord3D end = computeEnd(start, leg, direction);
         space.addLeg(leg, new Line<>(start, end));
@@ -41,8 +41,9 @@ public class Space3DTransformerForElevation extends Space3DTransformer {
      * preserve x/y and shift only z by the true height change. Left/right legs are projected via
      * toCartesian using their adjusted azimuth.
      */
-    private static Coord3D computeEnd(Coord3D start, Leg leg, Direction direction) {
-        if (direction == Direction.VERTICAL) {
+    private static Coord3D computeEnd(
+            Coord3D start, Leg leg, ExtendedElevationDirection direction) {
+        if (direction == ExtendedElevationDirection.VERTICAL) {
             return Space3DUtils.toCartesianVertical(start, leg);
         }
         Leg adjustedLeg = adjustLegForDirection(leg, direction);
@@ -54,16 +55,16 @@ public class Space3DTransformerForElevation extends Space3DTransformer {
      * subsequent legs are not rotated by this leg's azimuth. Left/right legs pass the difference
      * introduced by the direction adjustment.
      */
-    private static float computeDelta(Leg leg, Direction direction) {
-        if (direction == Direction.VERTICAL) {
+    private static float computeDelta(Leg leg, ExtendedElevationDirection direction) {
+        if (direction == ExtendedElevationDirection.VERTICAL) {
             return 0;
         }
         Leg adjustedLeg = adjustLegForDirection(leg, direction);
         return adjustedLeg.getAzimuth() - leg.getAzimuth();
     }
 
-    private static Leg adjustLegForDirection(Leg leg, Direction direction) {
-        if (direction == Direction.LEFT) {
+    private static Leg adjustLegForDirection(Leg leg, ExtendedElevationDirection direction) {
+        if (direction == ExtendedElevationDirection.LEFT) {
             return leg.adjustAzimuth(180);
         } else {
             return leg.adjustAzimuth(0);

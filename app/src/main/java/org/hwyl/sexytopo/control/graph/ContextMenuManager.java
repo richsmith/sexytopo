@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
-import org.hwyl.sexytopo.model.graph.Direction;
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -244,11 +244,11 @@ public class ContextMenuManager {
         MenuItem rightItem = menu.findItem(R.id.action_direction_right);
         MenuItem verticalItem = menu.findItem(R.id.action_direction_vertical);
         if (leftItem != null && rightItem != null) {
-            Direction currentDirection = station.getExtendedElevationDirection();
-            leftItem.setChecked(currentDirection == Direction.LEFT);
-            rightItem.setChecked(currentDirection == Direction.RIGHT);
+            ExtendedElevationDirection currentDirection = station.getExtendedElevationDirection();
+            leftItem.setChecked(currentDirection == ExtendedElevationDirection.LEFT);
+            rightItem.setChecked(currentDirection == ExtendedElevationDirection.RIGHT);
             if (verticalItem != null) {
-                verticalItem.setChecked(currentDirection == Direction.VERTICAL);
+                verticalItem.setChecked(currentDirection == ExtendedElevationDirection.VERTICAL);
             }
         }
 

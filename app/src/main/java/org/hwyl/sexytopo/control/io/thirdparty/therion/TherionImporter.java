@@ -17,7 +17,7 @@ import org.hwyl.sexytopo.control.io.thirdparty.xvi.XviImporter;
 import org.hwyl.sexytopo.control.io.translation.Importer;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.control.util.TextTools;
-import org.hwyl.sexytopo.model.graph.Direction;
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -149,7 +149,8 @@ public class TherionImporter extends Importer {
                 if (directionName.equals("start")) {
                     continue;
                 }
-                Direction direction = Direction.valueOf(directionName.toUpperCase());
+                ExtendedElevationDirection direction =
+                        ExtendedElevationDirection.valueOf(directionName.toUpperCase());
 
                 // Propagating directions name one station and apply from there down. Directions
                 // scoped to a single leg name both its stations, and apply to the destination.

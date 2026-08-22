@@ -1,16 +1,16 @@
 package org.hwyl.sexytopo.model.graph;
 
-public enum Direction {
+public enum ExtendedElevationDirection {
     LEFT(true),
     RIGHT(true),
     VERTICAL(false);
 
     /** The direction a station extends in until something says otherwise. */
-    public static final Direction DEFAULT = RIGHT;
+    public static final ExtendedElevationDirection DEFAULT = RIGHT;
 
     private final boolean propagates;
 
-    Direction(boolean propagates) {
+    ExtendedElevationDirection(boolean propagates) {
         this.propagates = propagates;
     }
 

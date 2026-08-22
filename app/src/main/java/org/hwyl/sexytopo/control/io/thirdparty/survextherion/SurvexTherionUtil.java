@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Locale;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
 import org.hwyl.sexytopo.control.util.TextTools;
-import org.hwyl.sexytopo.model.graph.Direction;
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -309,15 +309,15 @@ public class SurvexTherionUtil {
             StringBuilder builder,
             Station station,
             Station fromStation,
-            Direction lastDirection,
+            ExtendedElevationDirection lastDirection,
             String marker) {
 
-        Direction currentDirection = station.getExtendedElevationDirection();
+        ExtendedElevationDirection currentDirection = station.getExtendedElevationDirection();
         String directionName = currentDirection.name().toLowerCase();
 
         // A direction that doesn't propagate applies to this leg alone, so it's written with both
         // of the leg's stations and doesn't change the direction the rest of the survey inherits.
-        Direction inheritedDirection;
+        ExtendedElevationDirection inheritedDirection;
         if (!currentDirection.propagates()) {
             builder.append(getExtendCommand(fromStation, station, directionName, marker));
             inheritedDirection = lastDirection;

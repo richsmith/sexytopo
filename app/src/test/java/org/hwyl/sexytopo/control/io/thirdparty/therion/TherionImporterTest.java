@@ -6,7 +6,7 @@ import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexExporter;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionImporter;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
-import org.hwyl.sexytopo.model.graph.Direction;
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -729,15 +729,17 @@ public class TherionImporterTest {
         TherionImporter.updateCentreline(LINES, survey);
 
         Station stationTwo = survey.getStationByName("2");
-        Direction stationTwoDirection = stationTwo.getExtendedElevationDirection();
-        Assert.assertEquals(Direction.LEFT, stationTwoDirection);
+        ExtendedElevationDirection stationTwoDirection = stationTwo.getExtendedElevationDirection();
+        Assert.assertEquals(ExtendedElevationDirection.LEFT, stationTwoDirection);
         Station stationThree = survey.getStationByName("3");
-        Direction stationThreeDirection = stationThree.getExtendedElevationDirection();
-        Assert.assertEquals(Direction.LEFT, stationThreeDirection);
+        ExtendedElevationDirection stationThreeDirection =
+                stationThree.getExtendedElevationDirection();
+        Assert.assertEquals(ExtendedElevationDirection.LEFT, stationThreeDirection);
 
         Station stationFive = survey.getStationByName("5");
-        Direction stationFiveDirection = stationFive.getExtendedElevationDirection();
-        Assert.assertEquals(Direction.RIGHT, stationFiveDirection);
+        ExtendedElevationDirection stationFiveDirection =
+                stationFive.getExtendedElevationDirection();
+        Assert.assertEquals(ExtendedElevationDirection.RIGHT, stationFiveDirection);
     }
 
     // --- Leg comment tests (Therion format) ---
@@ -853,7 +855,8 @@ public class TherionImporterTest {
     @Test
     public void testVerticalExtendAppliesToDestinationOnly() throws Exception {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
-        survey.getStationByName("3").setExtendedElevationDirection(Direction.VERTICAL);
+        survey.getStationByName("3")
+                .setExtendedElevationDirection(ExtendedElevationDirection.VERTICAL);
 
         String extendCommands =
                 SurvexTherionUtil.getExtendedElevationExtensions(survey, SurveyFormat.THERION);
@@ -876,15 +879,15 @@ public class TherionImporterTest {
 
         Assert.assertEquals(
                 "the leg's destination should be vertical",
-                Direction.VERTICAL,
+                ExtendedElevationDirection.VERTICAL,
                 reimported.getStationByName("3").getExtendedElevationDirection());
         Assert.assertEquals(
                 "the leg's origin should be unaffected",
-                Direction.RIGHT,
+                ExtendedElevationDirection.RIGHT,
                 reimported.getStationByName("2").getExtendedElevationDirection());
         Assert.assertEquals(
                 "stations below a vertical leg should keep their own direction",
-                Direction.RIGHT,
+                ExtendedElevationDirection.RIGHT,
                 reimported.getStationByName("4").getExtendedElevationDirection());
     }
 
@@ -906,7 +909,7 @@ public class TherionImporterTest {
 
         Assert.assertEquals(
                 "a later valid extend should still be applied",
-                Direction.LEFT,
+                ExtendedElevationDirection.LEFT,
                 survey.getStationByName("3").getExtendedElevationDirection());
     }
 }

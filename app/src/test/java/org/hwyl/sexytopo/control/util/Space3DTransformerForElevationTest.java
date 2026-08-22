@@ -1,7 +1,7 @@
 package org.hwyl.sexytopo.control.util;
 
 import org.hwyl.sexytopo.model.graph.Coord3D;
-import org.hwyl.sexytopo.model.graph.Direction;
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -20,7 +20,7 @@ public class Space3DTransformerForElevationTest {
     public void testRightLegProjectsToPositiveY() {
         Survey survey = new Survey();
         SurveyUpdater.updateWithNewStation(survey, new Leg(5, 90, 0));
-        setDirectionOnStation(survey, "2", Direction.RIGHT);
+        setDirectionOnStation(survey, "2", ExtendedElevationDirection.RIGHT);
 
         Space<Coord3D> space = TRANSFORMER.transformTo3D(survey);
         Coord3D station2 = space.getStationMap().get(survey.getStationByName("2"));
@@ -32,7 +32,7 @@ public class Space3DTransformerForElevationTest {
     public void testRightLegZeroesXComponent() {
         Survey survey = new Survey();
         SurveyUpdater.updateWithNewStation(survey, new Leg(5, 90, 0));
-        setDirectionOnStation(survey, "2", Direction.RIGHT);
+        setDirectionOnStation(survey, "2", ExtendedElevationDirection.RIGHT);
 
         Space<Coord3D> space = TRANSFORMER.transformTo3D(survey);
         Coord3D station2 = space.getStationMap().get(survey.getStationByName("2"));
@@ -46,7 +46,7 @@ public class Space3DTransformerForElevationTest {
     public void testLeftLegProjectsToNegativeY() {
         Survey survey = new Survey();
         SurveyUpdater.updateWithNewStation(survey, new Leg(5, 90, 0));
-        setDirectionOnStation(survey, "2", Direction.LEFT);
+        setDirectionOnStation(survey, "2", ExtendedElevationDirection.LEFT);
 
         Space<Coord3D> space = TRANSFORMER.transformTo3D(survey);
         Coord3D station2 = space.getStationMap().get(survey.getStationByName("2"));
@@ -58,7 +58,7 @@ public class Space3DTransformerForElevationTest {
     public void testLeftLegZeroesXComponent() {
         Survey survey = new Survey();
         SurveyUpdater.updateWithNewStation(survey, new Leg(5, 90, 0));
-        setDirectionOnStation(survey, "2", Direction.LEFT);
+        setDirectionOnStation(survey, "2", ExtendedElevationDirection.LEFT);
 
         Space<Coord3D> space = TRANSFORMER.transformTo3D(survey);
         Coord3D station2 = space.getStationMap().get(survey.getStationByName("2"));
@@ -72,7 +72,7 @@ public class Space3DTransformerForElevationTest {
     public void testVerticalLegPreservesXY() {
         Survey survey = new Survey();
         SurveyUpdater.updateWithNewStation(survey, new Leg(5, 45, 60));
-        setDirectionOnStation(survey, "2", Direction.VERTICAL);
+        setDirectionOnStation(survey, "2", ExtendedElevationDirection.VERTICAL);
 
         Space<Coord3D> space = TRANSFORMER.transformTo3D(survey);
         Coord3D station2 = space.getStationMap().get(survey.getStationByName("2"));
@@ -86,7 +86,7 @@ public class Space3DTransformerForElevationTest {
         // 10m leg at 30° inclination: z = 10 * sin(30°) = 5
         Survey survey = new Survey();
         SurveyUpdater.updateWithNewStation(survey, new Leg(10, 45, 30));
-        setDirectionOnStation(survey, "2", Direction.VERTICAL);
+        setDirectionOnStation(survey, "2", ExtendedElevationDirection.VERTICAL);
 
         Space<Coord3D> space = TRANSFORMER.transformTo3D(survey);
         Coord3D station2 = space.getStationMap().get(survey.getStationByName("2"));
@@ -105,8 +105,8 @@ public class Space3DTransformerForElevationTest {
         SurveyUpdater.updateWithNewStation(survey, new Leg(5, 90, 90));
         SurveyUpdater.updateWithNewStation(survey, new Leg(5, 90, 0));
 
-        setDirectionOnStation(survey, "2", Direction.VERTICAL);
-        setDirectionOnStation(survey, "3", Direction.RIGHT);
+        setDirectionOnStation(survey, "2", ExtendedElevationDirection.VERTICAL);
+        setDirectionOnStation(survey, "3", ExtendedElevationDirection.RIGHT);
 
         Space<Coord3D> space = TRANSFORMER.transformTo3D(survey);
         Coord3D station2 = space.getStationMap().get(survey.getStationByName("2"));
@@ -121,7 +121,8 @@ public class Space3DTransformerForElevationTest {
 
     // --- Helpers ---
 
-    private void setDirectionOnStation(Survey survey, String name, Direction direction) {
+    private void setDirectionOnStation(
+            Survey survey, String name, ExtendedElevationDirection direction) {
         survey.getStationByName(name).setExtendedElevationDirection(direction);
     }
 }
