@@ -96,14 +96,6 @@ public class Station extends SurveyComponent {
         this.extendedElevationDirection = extendedElevationDirection;
     }
 
-    public void switchDirection() {
-        if (extendedElevationDirection == ExtendedElevationDirection.LEFT) {
-            setExtendedElevationDirection(ExtendedElevationDirection.RIGHT);
-        } else {
-            setExtendedElevationDirection(ExtendedElevationDirection.LEFT);
-        }
-    }
-
     @NonNull
     public String toString() {
         return name;
