@@ -287,6 +287,12 @@ public class DeviceActivity extends SexyTopoActivity {
     }
 
     public void updateConnectionStatus() {
+        // In theory this method could be called by the static
+        // communicator after this activity finishes
+        if (isFinishing() || isDestroyed()) {
+            return;
+        }
+
         SwitchCompat connectionSwitch = findViewById(R.id.connectionSwitch);
         connectionSwitch.setChecked(requestComms().isConnected());
     }
