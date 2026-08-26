@@ -37,6 +37,20 @@
         android:summary="@string/settings_max_pairwise_error_summary"
         android:defaultValue="0.05"/>
 
+    <SwitchPreferenceCompat
+        android:key="pref_auto_reconnect"
+        android:title="@string/settings_auto_reconnect_title"
+        android:summary="@string/settings_auto_reconnect_summary"
+        android:defaultValue="false" />
+
+    <EditTextPreference
+        android:key="pref_auto_reconnect_window"
+        android:inputType="number"
+        android:title="@string/settings_auto_reconnect_window_title"
+        android:summary="@string/settings_auto_reconnect_window_summary"
+        android:dependency="pref_auto_reconnect"
+        android:defaultValue="15" />
+
     <ListPreference
         android:key="pref_calibration_algorithm"
         android:title="@string/settings_calibration_algorithm_title"

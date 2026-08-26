@@ -1,18 +1,17 @@
 package org.hwyl.sexytopo.comms.sap6;
 
 import android.bluetooth.BluetoothDevice;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.View;
 import java.util.HashMap;
 import java.util.Map;
 import kotlin.Unit;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.comms.Communicator;
+import org.hwyl.sexytopo.comms.Instrument;
+import org.hwyl.sexytopo.comms.ReconnectionPolicy;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.DeviceActivity;
-import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.model.survey.Leg;
 
 public class SAP6Communicator implements Communicator {
@@ -24,9 +23,7 @@ public class SAP6Communicator implements Communicator {
     private final SurveyManager datamanager;
     private boolean _isConnected = false;
 
-    private boolean userRequestedDisconnect = false;
-    private final Handler reconnectHandler = new Handler(Looper.getMainLooper());
-    private static final long RECONNECT_DELAY_MS = 3000;
+    private final ReconnectionPolicy reconnectionPolicy;
 
     private static final int START_CALIBRATION_ID = View.generateViewId();
     private static final int STOP_CALIBRATION_ID = View.generateViewId();
@@ -51,6 +48,8 @@ public class SAP6Communicator implements Communicator {
         this.caveBLE =
                 new CaveBLE(bluetoothDevice, activity, this::legCallback, this::statusCallback);
         this.datamanager = activity.getSurveyManager();
+        this.reconnectionPolicy =
+                new ReconnectionPolicy(Instrument.describe(bluetoothDevice), this::requestConnect);
     }
 
     @Override
@@ -60,20 +59,19 @@ public class SAP6Communicator implements Communicator {
 
     @Override
     public void requestConnect() {
-        userRequestedDisconnect = false;
+        reconnectionPolicy.noteUserRequestedConnect();
         caveBLE.connect();
     }
 
     @Override
     public void requestDisconnect() {
-        userRequestedDisconnect = true;
-        reconnectHandler.removeCallbacksAndMessages(null);
+        reconnectionPolicy.noteUserRequestedDisconnect();
         caveBLE.disconnect();
     }
 
     @Override
     public void forceStop() {
-        reconnectHandler.removeCallbacksAndMessages(null);
+        reconnectionPolicy.cancel();
     }
 
     @Override
@@ -117,20 +115,25 @@ public class SAP6Communicator implements Communicator {
             case CaveBLE.CONNECTED:
                 _isConnected = true;
                 Log.device("Connected");
+                activity.runOnUiThread(reconnectionPolicy::noteConnected);
                 break;
             case CaveBLE.DISCONNECTED:
                 _isConnected = false;
                 Log.device("Disconnected");
-                activity.runOnUiThread(activity::updateConnectionStatus);
-                if (!userRequestedDisconnect && GeneralPreferences.isAutoReconnectOn()) {
-                    Log.device(R.string.device_ble_auto_reconnecting, "SAP6");
-                    reconnectHandler.postDelayed(this::requestConnect, RECONNECT_DELAY_MS);
-                }
+                activity.runOnUiThread(
+                        () -> {
+                            activity.updateConnectionStatus();
+                            reconnectionPolicy.onUnexpectedDisconnection();
+                        });
                 break;
             case CaveBLE.CONNECTION_FAILED:
                 _isConnected = false;
                 Log.device("Communication error: " + msg);
-                activity.updateConnectionStatus();
+                activity.runOnUiThread(
+                        () -> {
+                            activity.updateConnectionStatus();
+                            reconnectionPolicy.onUnexpectedDisconnection();
+                        });
         }
         return Unit.INSTANCE;
     }

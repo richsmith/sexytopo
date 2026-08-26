@@ -242,6 +242,7 @@
     <string name="device_log_title">Dziennik urządzenia</string>
     <string name="device_enable_bluetooth">Włącz Bluetooth</string>
     <string name="device_connect_to_device">Połącz z urządzeniem</string>
+    <string name="device_auto_reconnect">Połącz ponownie automatycznie</string>
     <string name="device_no_permitted_access">[niedostępne urządzenie]</string>
     <string name="device_bluetooth_no_adapter">Brak dostępu do adaptera bluetooth</string>
     <string name="device_connection_requested">Żądanie połączenia</string>
@@ -293,6 +294,8 @@
     <string name="device_ble_device_disconnecting">%1$s rozłączanie</string>
     <string name="device_ble_device_disconnected">%1$s gotowy :)</string>
     <string name="device_ble_failed_to_connect_to">Nie udało się połączyć z %1$s</string>
+    <string name="device_ble_auto_reconnecting">Automatyczne ponowne łączenie z %1$s…</string>
+    <string name="device_ble_auto_reconnect_gave_up">Zaprzestano automatycznego łączenia z %1$s</string>
     <string name="device_ble_invalid_data">Odebrano nieprawidłowe dane: %1$s</string>
     <string name="device_cavway_x1_calibration_on">Włącz tryb kalibracji</string>
     <string name="device_cavway_x1_calibration_off">Wyłącz tryb kalibracji</string>
@@ -465,6 +468,10 @@
     <string name="settings_max_distance_delta_summary">Metoda kątowa: o ile mogą różnić się pomiary odległości przy decydowaniu, czy utworzyć nowe stanowisko</string>
     <string name="settings_max_angle_delta_title">Maks. delta kąta (stopnie)</string>
     <string name="settings_max_angle_delta_summary">Metoda kątowa: o ile mogą różnić się pomiary azymutu lub nachylenia przy decydowaniu, czy utworzyć nowe stanowisko</string>
+    <string name="settings_auto_reconnect_title">Automatyczne ponowne łączenie</string>
+    <string name="settings_auto_reconnect_summary">Połącz ponownie automatycznie, jeśli urządzenie się rozłączy</string>
+    <string name="settings_auto_reconnect_window_title">Limit czasu automatycznego łączenia (minuty)</string>
+    <string name="settings_auto_reconnect_window_summary">Jak długo próbować połączyć się ponownie przed zaprzestaniem</string>
     <string name="settings_leg_amalgamation_algorithm_title">Metoda zgodności ciągu</string>
     <string name="settings_leg_amalgamation_algorithm_summary">Jak oceniane jest, czy powtórzone pomiary są wystarczająco zbliżone, aby utworzyć ciąg</string>
     <string name="settings_max_endpoint_delta_title">Maks. odległość punktów końcowych (m)</string>

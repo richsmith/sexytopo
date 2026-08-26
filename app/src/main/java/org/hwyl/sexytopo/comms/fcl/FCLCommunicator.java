@@ -7,6 +7,8 @@ import java.util.Map;
 import kotlin.Unit;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.comms.Communicator;
+import org.hwyl.sexytopo.comms.Instrument;
+import org.hwyl.sexytopo.comms.ReconnectionPolicy;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.DeviceActivity;
@@ -29,6 +31,7 @@ public class FCLCommunicator implements Communicator {
     private final DeviceActivity activity;
     private final FCLBLE fclBLE;
     private final SurveyManager datamanager;
+    private final ReconnectionPolicy reconnectionPolicy;
 
     private static final int LASER_ON_ID = View.generateViewId();
     private static final int SHOT_ID = View.generateViewId();
@@ -56,6 +59,8 @@ public class FCLCommunicator implements Communicator {
                         this::legCallback,
                         this::enhancedLegCallback,
                         this::statusCallback);
+        this.reconnectionPolicy =
+                new ReconnectionPolicy(Instrument.describe(bluetoothDevice), this::requestConnect);
     }
 
     @Override
@@ -65,12 +70,19 @@ public class FCLCommunicator implements Communicator {
 
     @Override
     public void requestConnect() {
+        reconnectionPolicy.noteUserRequestedConnect();
         fclBLE.connect();
     }
 
     @Override
     public void requestDisconnect() {
+        reconnectionPolicy.noteUserRequestedDisconnect();
         fclBLE.disconnect();
+    }
+
+    @Override
+    public void forceStop() {
+        reconnectionPolicy.cancel();
     }
 
     @Override
@@ -192,16 +204,25 @@ public class FCLCommunicator implements Communicator {
         switch (status) {
             case FCLBLE.CONNECTED:
                 Log.device("FCL Connected - Protocol v2.0");
+                activity.runOnUiThread(reconnectionPolicy::noteConnected);
                 break;
 
             case FCLBLE.DISCONNECTED:
                 Log.device("FCL Disconnected");
-                activity.updateConnectionStatus();
+                activity.runOnUiThread(
+                        () -> {
+                            activity.updateConnectionStatus();
+                            reconnectionPolicy.onUnexpectedDisconnection();
+                        });
                 break;
 
             case FCLBLE.CONNECTION_FAILED:
                 Log.device("FCL Connection Failed: " + msg);
-                activity.updateConnectionStatus();
+                activity.runOnUiThread(
+                        () -> {
+                            activity.updateConnectionStatus();
+                            reconnectionPolicy.onUnexpectedDisconnection();
+                        });
                 break;
         }
         return Unit.INSTANCE;

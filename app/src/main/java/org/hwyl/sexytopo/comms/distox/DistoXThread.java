@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.comms.Instrument;
+import org.hwyl.sexytopo.comms.ReconnectionPolicy;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
 
@@ -130,7 +132,9 @@ public class DistoXThread extends Thread {
                 requestedProtocol = null;
             }
 
-            tryToConnectUntilConnected();
+            if (!tryToConnectUntilConnected()) {
+                break; // streams are still null, so there's nothing to run a protocol against
+            }
 
             if (oneOffProtocol == null) {
                 communicate(currentProtocol);
@@ -143,12 +147,16 @@ public class DistoXThread extends Thread {
         }
 
         try {
-            inStream.close();
+            if (inStream != null) {
+                inStream.close();
+            }
         } catch (Exception exception) {
             // ignore any errors; they are expected if the socket has been closed
         }
         try {
-            outStream.close();
+            if (outStream != null) {
+                outStream.close();
+            }
         } catch (Exception exception) {
             // ignore any errors; they are expected if the socket has been closed
         }
@@ -189,13 +197,28 @@ public class DistoXThread extends Thread {
         requestInterrupt(); // need to interrupt any reads in progress or we'll be waiting forever
     }
 
+    /**
+     * Tries to connect, retrying for as long as the auto-reconnect setting allows. Returns whether
+     * we connected; if not, the streams are still null and callers must not use them.
+     */
     @SuppressWarnings("BusyWait")
-    public void tryToConnectUntilConnected() {
+    public boolean tryToConnectUntilConnected() {
+
+        long retryWindowMs = ReconnectionPolicy.getRetryWindowMs();
+        long giveUpAt = System.currentTimeMillis() + retryWindowMs;
 
         while (keepAlive && !isConnected()) {
             tryToConnectIfNotConnected();
 
             if (!isConnected()) {
+                if (System.currentTimeMillis() >= giveUpAt) {
+                    if (retryWindowMs > 0) { // i.e. we were retrying, not just failing once
+                        Log.device(
+                                R.string.device_ble_auto_reconnect_gave_up,
+                                Instrument.describe(bluetoothDevice));
+                    }
+                    break;
+                }
                 try {
                     sleep(WAIT_BETWEEN_CONNECTION_ATTEMPTS_MS);
                 } catch (InterruptedException exception) {
@@ -203,6 +226,8 @@ public class DistoXThread extends Thread {
                 }
             }
         }
+
+        return isConnected();
     }
 
     public void tryToConnectIfNotConnected() {

@@ -247,7 +247,17 @@ public class GeneralPreferences {
     // ********** Connection ***********
 
     public static boolean isAutoReconnectOn() {
-        return getBoolean("pref_auto_reconnect", true);
+        return getBoolean("pref_auto_reconnect", false);
+    }
+
+    public static void setAutoReconnect(boolean enabled) {
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean("pref_auto_reconnect", enabled);
+        editor.apply();
+    }
+
+    public static int getAutoReconnectWindowMinutes() {
+        return getInt("pref_auto_reconnect_window", 15);
     }
 
     // ********** Calibration ***********
