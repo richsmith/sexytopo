@@ -387,6 +387,26 @@
     <string name="trip_role_dog">Cão (assistente)</string>
     <string name="trip_role_exploration">Equipa de Exploração</string>
 
+    <!-- Copyright and licensing -->
+    <string name="trip_copyright_label">Titular do copyright</string>
+    <string name="trip_licence_label">Licença</string>
+    <string name="trip_licence_none">Sem licença</string>
+    <string name="trip_licence_hint_title">Considere uma licença aberta para os seus dados de levantamento</string>
+    <string name="trip_licence_hint_body">Uma licença livre permite que outros espeleólogos usem o seu trabalho e o desenvolvam, tal como você pode fazer com o deles - dados que podem ser verificados e reutilizados são mais valiosos e melhoram com o tempo, em benefício mútuo. SexyTopo é livre e de código aberto pela mesma razão.</string>
+    <string name="trip_licence_hint_dismiss">Dispensar</string>
+    <string name="licence_summary_gpl_3_plus">Qualquer pessoa pode usar e adaptar o seu levantamento, desde que tudo o que publique com base nele seja partilhado com a mesma liberdade.</string>
+    <string name="licence_summary_cc0">Abdica inteiramente dos seus direitos: qualquer pessoa pode usar o seu levantamento para o que quiser, sem pedir nem o creditar.</string>
+    <string name="licence_summary_cc_by">Qualquer pessoa pode usar e adaptar o seu levantamento para qualquer fim, desde que o credite.</string>
+    <string name="licence_summary_cc_by_sa">Qualquer pessoa pode usar e adaptar o seu levantamento se o creditar e partilhar a sua versão nos mesmos termos.</string>
+    <string name="licence_summary_cc_by_nc">Qualquer pessoa pode usar e adaptar o seu levantamento para fins não comerciais, desde que o credite.</string>
+    <string name="licence_summary_cc_by_nc_sa">Qualquer pessoa pode usar e adaptar o seu levantamento para fins não comerciais, se o creditar e partilhar a sua versão nos mesmos termos.</string>
+    <string name="licence_summary_none">Deixar o levantamento sem licença não o torna livre: os direitos de autor aplicam-se automaticamente, pelo que os outros têm de assumir que não o podem partilhar nem reutilizar. É o mesmo que \"Todos os direitos reservados\", mas sem o dizer.</string>
+    <string name="licence_summary_all_rights_reserved">Ninguém pode partilhar ou reutilizar o seu levantamento sem lhe pedir primeiro. Se deixar de estar contactável, os seus dados morrem consigo - uma forma comum de os dados de levantamento de grutas se perderem para sempre.</string>
+    <string name="licence_read_more">Ler a licença</string>
+    <string name="licence_link_failed">Não foi possível abrir a página da licença (está debaixo de terra?)</string>
+    <string name="trip_licence_required_helper">Escolha uma licença antes de guardar, ou \"Sem licença\" se explicitamente não quiser nenhuma</string>
+    <string name="trip_licence_recommended_suffix">%1$s [Recomendada]</string>
+
     <!-- Stats -->
     <string name="stats_title_this_survey">Topografia Atual</string>
     <string name="stats_title_linked_surveys">Todas as Topografias Ligadas</string>
@@ -436,6 +456,10 @@
     <string name="settings_hot_corners_summary">Arrastar dos cantos do esboço para mover a vista nos modos de desenho</string>
         <string name="settings_team_title">Equipa</string>
     <string name="settings_team_summary">Gerir nomes de espeleólogos conhecidos</string>
+    <string name="settings_copyright_title">Copyright</string>
+    <string name="settings_copyright_summary">Gerir as opções de licença</string>
+    <string name="settings_licence_new_hint">Nome da licença</string>
+    <string name="settings_licence_name_required">O nome da licença é obrigatório</string>
 <string name="settings_instruments_title">Instrumentos</string>
     <string name="settings_instruments_summary">Tolerâncias dos instrumentos, calibração</string>
     <string name="settings_max_distance_delta_title">Delta de distância máxima (m)</string>
@@ -532,6 +556,8 @@
     <string name="settings_export_svg_grid_summary">Desenhar uma grelha de fundo atrás do levantamento</string>
     <string name="settings_export_svg_tagline_title">Mostrar slogan</string>
     <string name="settings_export_svg_tagline_summary">Dar o devido crédito ao SexyTopo</string>
+    <string name="settings_export_svg_copyright_title">Mostrar copyright/licença na legenda</string>
+    <string name="settings_export_svg_copyright_summary">O copyright e a licença são sempre guardados no arquivo; isto também mostra uma linha de crédito na legenda</string>
     <string name="settings_export_therion_symbols_title">Símbolos de exportação Therion</string>
     <string name="settings_export_therion_symbols_summary">Incluir símbolos ao exportar para formato Therion</string>
     <string name="settings_export_therion_text_title">Texto de exportação Therion</string>
@@ -644,6 +670,7 @@
     <string name="menu_elevation">Elevação</string>
     <string name="menu_draw_left">Desenhar Esquerda</string>
     <string name="menu_draw_right">Desenhar Direita</string>
+    <string name="menu_draw_vertical">Desenhar Apenas Vertical</string>
     <string name="menu_move_row">Mover para Estação Diferente</string>
     <string name="menu_jump_to">Saltar</string>
     <string name="menu_jump_to_station_in_plan">→ Planta</string>

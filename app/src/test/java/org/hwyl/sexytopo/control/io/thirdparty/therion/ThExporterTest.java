@@ -42,6 +42,43 @@ public class ThExporterTest {
     }
 
     @Test
+    public void testReplaceCentrelineDoesNotMergeWithPrecedingLine() {
+        // Regression test: the blank line separating the preceding content from the
+        // centreline block must be preserved, not swallowed into a single merged line.
+        String updated = ThExporter.replaceCentreline(TEST_CONTENT, "centreline\nreplacement\n");
+        String[] lines = updated.split("\n");
+
+        Assert.assertTrue(indexOfLine(lines, "input dafung-down-westEe.th2") >= 0);
+        Assert.assertTrue(indexOfLine(lines, "centreline") >= 0);
+    }
+
+    @Test
+    public void testReplaceCentrelinePreservesTextBeforeBlock() {
+        String updated = ThExporter.replaceCentreline(TEST_CONTENT, "centreline\nreplacement\n");
+        Assert.assertTrue(updated.contains("input dafung-down-west.th2"));
+        Assert.assertTrue(updated.contains("input dafung-down-westEe.th2"));
+    }
+
+    @Test
+    public void testReplaceCentrelineHandlesDollarAndBackslash() {
+        // Regression test: the replacement is literal text, not a template. A copyright holder
+        // or licence containing $ used to be read as a group reference and threw
+        // IllegalArgumentException, aborting the export.
+        String replacement =
+                "centreline\ncopyright 2026 \"Jane $1 & Co\\Ltd\" #\"CC BY 4.0\"\nendcentreline\n";
+        String updated = ThExporter.replaceCentreline(TEST_CONTENT, replacement);
+
+        Assert.assertTrue(updated.contains("Jane $1 & Co\\Ltd"));
+    }
+
+    @Test
+    public void testReplaceInputsHandlesDollarAndBackslash() {
+        String updated = ThExporter.replaceInputsText(TEST_CONTENT, "input \"a$1\\b.th2\"\n");
+
+        Assert.assertTrue(updated.contains("a$1\\b.th2"));
+    }
+
+    @Test
     public void testReplaceInputs() {
         String updated = ThExporter.replaceInputsText(TEST_CONTENT, "input replacement");
         Assert.assertTrue(updated.contains("input replacement"));
@@ -181,6 +218,47 @@ public class ThExporterTest {
         String metadata = SurvexTherionUtil.getMetadata(survey, SurveyFormat.THERION, "", "");
 
         Assert.assertTrue(metadata.contains("#explo-date "));
+    }
+
+    @Test
+    public void testCopyrightLineIsImmediatelyAfterCentreline() {
+        Survey survey = new Survey();
+        Trip trip = new Trip();
+        trip.setCopyrightHolder("Caver Jane");
+        trip.setLicence("CC BY 4.0");
+        survey.setTrip(trip);
+
+        String updated =
+                ThExporter.updateOriginalContent(survey, TEST_CONTENT, Collections.emptyList());
+        String[] lines = updated.split("\n");
+
+        int centrelineIndex = indexOfLine(lines, "centreline");
+        Assert.assertTrue("centreline line not found", centrelineIndex >= 0);
+
+        String expectedCopyrightLine =
+                SurvexTherionUtil.getCopyrightLine(survey, SurveyFormat.THERION).trim();
+        Assert.assertEquals(expectedCopyrightLine, lines[centrelineIndex + 1]);
+    }
+
+    @Test
+    public void testNoCopyrightLineWhenTripHasNeitherCopyrightNorLicence() {
+        Survey survey = new Survey();
+        Trip trip = new Trip();
+        survey.setTrip(trip);
+
+        String updated =
+                ThExporter.updateOriginalContent(survey, TEST_CONTENT, Collections.emptyList());
+
+        Assert.assertFalse(updated.contains("copyright"));
+    }
+
+    private static int indexOfLine(String[] lines, String target) {
+        for (int i = 0; i < lines.length; i++) {
+            if (lines[i].equals(target)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     private static Trip.TeamEntry entry(String name, Trip.Role... roles) {

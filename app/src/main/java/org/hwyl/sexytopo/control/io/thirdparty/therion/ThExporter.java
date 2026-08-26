@@ -2,6 +2,7 @@ package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
 import android.content.Context;
 import java.util.List;
+import java.util.regex.Matcher;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
@@ -33,6 +34,9 @@ public class ThExporter {
 
         // Centreline block
         builder.append("centreline\n");
+
+        // Copyright / licence (if the trip has either set)
+        builder.append(SurvexTherionUtil.getCopyrightLine(survey, SurveyFormat.THERION));
 
         // Metadata (inside centreline)
         String teamLines = "";
@@ -76,6 +80,7 @@ public class ThExporter {
 
         String centrelineText =
                 "centreline\n"
+                        + SurvexTherionUtil.getCopyrightLine(survey, SurveyFormat.THERION)
                         + metadataText
                         + "\n"
                         + SurvexTherionUtil.getStationCommentsData(survey, SurveyFormat.THERION)
@@ -147,13 +152,18 @@ public class ThExporter {
         return entry.roles.size() == 1 && entry.roles.contains(Trip.Role.EXPLORATION);
     }
 
+    // The replacement text is literal, not a template: it carries free text the user typed
+    // (copyright holder, licence, comments) and file names, in which a $ would otherwise be read
+    // as a group reference and a backslash as an escape - throwing IllegalArgumentException and
+    // aborting the export.
     static String replaceCentreline(String original, String replacementText) {
         return original.replaceFirst(
-                "(?s)(\\s*?(centreline|centerline)(.*)(endcentreline|endcenterline)\\s*)",
-                replacementText);
+                "(?s)((centreline|centerline)(.*)(endcentreline|endcenterline)\\s*)",
+                Matcher.quoteReplacement(replacementText));
     }
 
     static String replaceInputsText(String original, String replacementText) {
-        return original.replaceFirst("(?m)(^input .*\\n)+", replacementText);
+        return original.replaceFirst(
+                "(?m)(^input .*\\n)+", Matcher.quoteReplacement(replacementText));
     }
 }

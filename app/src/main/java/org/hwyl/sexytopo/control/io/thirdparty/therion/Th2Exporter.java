@@ -8,6 +8,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
+import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.common.Shape;
@@ -127,7 +129,7 @@ public class Th2Exporter {
             Station station = xsDetail.getCrossSection().getStation();
             String scrapName = stationNameToXsScrapName.get(station.getName());
             if (scrapName != null) {
-                scraps.add(getCrossSectionScrap(scrapName, xsDetail, scale, xsScale));
+                scraps.add(getCrossSectionScrap(survey, scrapName, xsDetail, scale, xsScale));
             }
         }
 
@@ -173,7 +175,7 @@ public class Th2Exporter {
     }
 
     private static String getCrossSectionScrap(
-            String name, CrossSectionDetail xsDetail, float scale, float xsScale) {
+            Survey survey, String name, CrossSectionDetail xsDetail, float scale, float xsScale) {
         List<String> lines = new ArrayList<>();
 
         // Scale parameter: [px1 py1 px2 py2 rx1 ry1 rx2 ry2 m]
@@ -188,7 +190,14 @@ public class Th2Exporter {
                         TextTools.formatTo2dp(realWorldRef),
                         TextTools.formatTo2dp(realWorldRef));
 
-        lines.add("scrap " + name + " -projection none -scale " + scaleParam);
+        String startLine = "scrap " + name + " -projection none -scale " + scaleParam;
+        String copyrightLine = SurvexTherionUtil.getCopyrightLine(survey, SurveyFormat.THERION);
+        if (!copyrightLine.isEmpty()) {
+            // As in getStartScrapLines(): drop the trailing newline, since it's joined onto
+            // the previous line with a single "\n" rather than the "\n\n" used elsewhere here.
+            startLine = startLine + "\n" + copyrightLine.substring(0, copyrightLine.length() - 1);
+        }
+        lines.add(startLine);
         lines.add("endscrap");
 
         return TextTools.join("\n\n", lines);
@@ -299,7 +308,7 @@ public class Th2Exporter {
             boolean includeSketchContent,
             Map<String, String> stationNameToXsScrapName) {
         List<String> lines = new ArrayList<>();
-        lines.add(getStartScrapCommands(name, projection, frame));
+        lines.add(getStartScrapLines(survey, name, projection, frame));
         lines.addAll(
                 getScrapCommands(
                         survey,
@@ -332,6 +341,24 @@ public class Th2Exporter {
                 true,
                 true,
                 Collections.emptyMap());
+    }
+
+    /**
+     * Returns the "scrap ... -projection ..." line, followed - on the very next physical line, not
+     * separated by a blank line like the rest of this scrap's sections are - by the
+     * copyright/licence line, if the trip has either set.
+     */
+    private static String getStartScrapLines(
+            Survey survey, String name, Projection2D projection, Shape frame) {
+        String startLine = getStartScrapCommands(name, projection, frame);
+        String copyrightLine = SurvexTherionUtil.getCopyrightLine(survey, SurveyFormat.THERION);
+        if (copyrightLine.isEmpty()) {
+            return startLine;
+        }
+        // getCopyrightLine() always ends with a single trailing newline; drop it here, since
+        // this is joined onto the previous line with a single "\n", not the "\n\n" used to
+        // separate the other sections of this scrap.
+        return startLine + "\n" + copyrightLine.substring(0, copyrightLine.length() - 1);
     }
 
     private static String getStartScrapCommands(String name, Projection2D projection, Shape frame) {

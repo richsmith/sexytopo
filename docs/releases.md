@@ -5,6 +5,8 @@
 - Therion export includes water areas as invisible border lines with an area command, one border per hole
 - Sketch lines can now be given a semantic type (wall, presumed wall, pit edge, chimney): tap the draw tool while it is selected to open the line type toolbar; typed lines render with their conventional ornamentation and export to Therion as first-class lines (e.g. line wall), which can be turned off in the Therion export settings
 - Walls work out which side of the line the passage is on automatically, with a red marker on the last-drawn wall showing the result; Tools → Flip Last Line reverses a line whose ticks or interior came out on the wrong side
+- A copyright notice and licence can now be assigned to a survey, along with some light nudging towards free licences (thanks Andrew Atkinson)
+- Legs can be drawn using only their vertical change in the extended elevation (thanks Andrew Atkinson)
 
 # 2026-07-08 1.12.3
 - Fix Survex and Therion backwards leg bug (thanks Andrew Atkinson)

@@ -387,6 +387,26 @@
     <string name="trip_role_dog">Asystent</string>
     <string name="trip_role_exploration">Zespół eksploracyjny</string>
 
+    <!-- Copyright and licensing -->
+    <string name="trip_copyright_label">Właściciel praw autorskich</string>
+    <string name="trip_licence_label">Licencja</string>
+    <string name="trip_licence_none">Brak licencji</string>
+    <string name="trip_licence_hint_title">Rozważ otwartą licencję dla swoich danych pomiarowych</string>
+    <string name="trip_licence_hint_body">Wolna licencja pozwala innym grotołazom korzystać z twojej pracy i ją rozwijać, tak jak ty możesz korzystać z ich pracy - dane, które można zweryfikować i wykorzystać ponownie, są cenniejsze i z czasem stają się lepsze, z korzyścią dla wszystkich. SexyTopo jest wolny i otwartoźródłowy z tego samego powodu.</string>
+    <string name="trip_licence_hint_dismiss">Zamknij</string>
+    <string name="licence_summary_gpl_3_plus">Każdy może korzystać z twojego pomiaru i go zmieniać, pod warunkiem że wszystko, co na jego podstawie opublikuje, udostępni równie swobodnie.</string>
+    <string name="licence_summary_cc0">Całkowicie zrzekasz się swoich praw: każdy może wykorzystać twój pomiar do czegokolwiek, bez pytania i bez podawania autorstwa.</string>
+    <string name="licence_summary_cc_by">Każdy może korzystać z twojego pomiaru i go zmieniać w dowolnym celu, o ile poda twoje autorstwo.</string>
+    <string name="licence_summary_cc_by_sa">Każdy może korzystać z twojego pomiaru i go zmieniać, jeśli poda twoje autorstwo i udostępni swoją wersję na tych samych warunkach.</string>
+    <string name="licence_summary_cc_by_nc">Każdy może korzystać z twojego pomiaru i go zmieniać do celów niekomercyjnych, o ile poda twoje autorstwo.</string>
+    <string name="licence_summary_cc_by_nc_sa">Każdy może korzystać z twojego pomiaru i go zmieniać do celów niekomercyjnych, jeśli poda twoje autorstwo i udostępni swoją wersję na tych samych warunkach.</string>
+    <string name="licence_summary_none">Pozostawienie pomiaru bez licencji nie czyni go wolnym: prawo autorskie obowiązuje automatycznie, więc inni muszą zakładać, że nie wolno im go ani udostępniać, ani wykorzystywać. To to samo co \"Wszelkie prawa zastrzeżone\", tylko bez powiedzenia tego wprost.</string>
+    <string name="licence_summary_all_rights_reserved">Nikt nie może udostępniać ani wykorzystywać twojego pomiaru bez uprzedniej zgody. Jeśli przestaniesz być osiągalny, twoje dane umrą razem z tobą - to częsty sposób, w jaki dane pomiarowe jaskiń przepadają na zawsze.</string>
+    <string name="licence_read_more">Przeczytaj licencję</string>
+    <string name="licence_link_failed">Nie udało się otworzyć strony licencji (jesteś pod ziemią?)</string>
+    <string name="trip_licence_required_helper">Wybierz licencję przed zapisaniem lub \"Brak licencji\", jeśli wyraźnie nie chcesz żadnej</string>
+    <string name="trip_licence_recommended_suffix">%1$s [Zalecana]</string>
+
     <!-- Stats -->
     <string name="stats_title_this_survey">Bieżący pomiar</string>
     <string name="stats_title_linked_surveys">Wszystkie połączone pomiary</string>
@@ -436,6 +456,10 @@
     <string name="settings_hot_corners_summary">Przeciągaj z rogów szkicu, aby przesunąć widok w trybach rysowania</string>
         <string name="settings_team_title">Zespół</string>
     <string name="settings_team_summary">Zarządzaj nazwami znanych grotołazów</string>
+    <string name="settings_copyright_title">Copyright</string>
+    <string name="settings_copyright_summary">Zarządzaj opcjami licencji</string>
+    <string name="settings_licence_new_hint">Nazwa licencji</string>
+    <string name="settings_licence_name_required">Nazwa licencji jest wymagana</string>
 <string name="settings_instruments_title">Instrumenty</string>
     <string name="settings_instruments_summary">Tolerancje instrumentów, kalibracja</string>
     <string name="settings_max_distance_delta_title">Maks. delta odległości (m)</string>
@@ -532,6 +556,8 @@
     <string name="settings_export_svg_grid_summary">Rysuj siatkę w tle pomiaru</string>
     <string name="settings_export_svg_tagline_title">Pokaż podpis</string>
     <string name="settings_export_svg_tagline_summary">Odpowiednio podziękuj SexyTopo</string>
+    <string name="settings_export_svg_copyright_title">Pokaż copyright/licencję w legendzie</string>
+    <string name="settings_export_svg_copyright_summary">Copyright i licencja są zawsze zapisywane w pliku; to dodatkowo pokazuje informację w legendzie</string>
     <string name="settings_export_therion_symbols_title">Symbole eksportu Therion</string>
     <string name="settings_export_therion_symbols_summary">Uwzględnij symbole podczas eksportu do formatu Therion</string>
     <string name="settings_export_therion_text_title">Tekst eksportu Therion</string>
@@ -644,6 +670,7 @@
     <string name="menu_elevation">Przekrój</string>
     <string name="menu_draw_left">Rysuj lewo</string>
     <string name="menu_draw_right">Rysuj prawo</string>
+    <string name="menu_draw_vertical">Rysuj tylko pionowo</string>
     <string name="menu_move_row">Przenieś do innego stanowiska</string>
     <string name="menu_jump_to">Przeskocz</string>
     <string name="menu_jump_to_station_in_plan">&#10132; Plan</string>

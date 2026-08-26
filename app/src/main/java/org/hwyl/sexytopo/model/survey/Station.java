@@ -3,14 +3,15 @@ package org.hwyl.sexytopo.model.survey;
 import androidx.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.List;
-import org.hwyl.sexytopo.model.graph.Direction;
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
 
 public class Station extends SurveyComponent {
 
     private String name;
     private List<Leg> onwardLegs = new ArrayList<>();
     private String comment = "";
-    private Direction extendedElevationDirection = Direction.RIGHT;
+    private ExtendedElevationDirection extendedElevationDirection =
+            ExtendedElevationDirection.DEFAULT;
 
     public static final char[] FORBIDDEN_CHARS = new char[] {'\n', '\r'};
 
@@ -86,20 +87,13 @@ public class Station extends SurveyComponent {
         return !comment.isEmpty();
     }
 
-    public Direction getExtendedElevationDirection() {
+    public ExtendedElevationDirection getExtendedElevationDirection() {
         return extendedElevationDirection;
     }
 
-    public void setExtendedElevationDirection(Direction extendedElevationDirection) {
+    public void setExtendedElevationDirection(
+            ExtendedElevationDirection extendedElevationDirection) {
         this.extendedElevationDirection = extendedElevationDirection;
-    }
-
-    public void switchDirection() {
-        if (extendedElevationDirection == Direction.LEFT) {
-            setExtendedElevationDirection(Direction.RIGHT);
-        } else {
-            setExtendedElevationDirection(Direction.LEFT);
-        }
     }
 
     @NonNull

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.model.sketch.Colour;
+import org.hwyl.sexytopo.model.survey.Licence;
 import org.hwyl.sexytopo.model.table.LRUD;
 
 public class GeneralPreferences {
@@ -320,6 +321,10 @@ public class GeneralPreferences {
         return getBoolean("pref_export_svg_tagline", true);
     }
 
+    public static boolean isExportSvgCopyrightEnabled() {
+        return getBoolean("pref_export_svg_copyright", true);
+    }
+
     public static SharedPreferences getRawPreferences() {
         return prefs;
     }
@@ -400,5 +405,114 @@ public class GeneralPreferences {
         Set<String> set = new HashSet<>(prefs.getStringSet(PREF_KNOWN_CAVERS, new HashSet<>()));
         set.remove(name);
         prefs.edit().putStringSet(PREF_KNOWN_CAVERS, set).apply();
+    }
+
+    // ********** Copyright ***********
+
+    // The copyright holder given for the most recent trip, seeded onto the next new trip: a caver
+    // usually surveys under the same name, or their club's, every time.
+    private static final String PREF_LAST_COPYRIGHT_HOLDER = "pref_last_copyright_holder";
+
+    /** The copyright holder used for the most recent trip, or "" if none has been given yet. */
+    public static String getLastCopyrightHolder() {
+        if (prefs == null) return "";
+        return prefs.getString(PREF_LAST_COPYRIGHT_HOLDER, "");
+    }
+
+    /** Remembers a copyright holder, to seed the next new trip with. */
+    public static void setLastCopyrightHolder(String holder) {
+        if (prefs == null || holder == null) return;
+        prefs.edit().putString(PREF_LAST_COPYRIGHT_HOLDER, holder.trim()).apply();
+    }
+
+    // ********** Licences ***********
+
+    // The licence chosen for the most recent trip, seeded onto the next new trip so a caver
+    // surveying under one licence doesn't have to re-pick it every time. Absent until the user
+    // has actually chosen one, so no licence is ever applied without having been picked; the
+    // empty string is a real value here, meaning "no licence" was deliberately chosen.
+    private static final String PREF_LAST_LICENCE = "pref_last_licence";
+
+    // Licences the user has actually used that aren't among the defaults - free text typed into
+    // the Trip screen, or names carried in on imported surveys. Kept so they're offered again,
+    // exactly like known cavers.
+    private static final String PREF_USED_LICENCES = "pref_used_licences";
+
+    // Whether the user has dismissed the card pitching open licences on the Trip screen. Once
+    // dismissed it stays dismissed - it's a one-off nudge, not a recurring nag.
+    private static final String PREF_LICENCE_HINT_DISMISSED = "pref_licence_hint_dismissed";
+
+    public static boolean isLicenceHintDismissed() {
+        return getBoolean(PREF_LICENCE_HINT_DISMISSED, false);
+    }
+
+    public static void setLicenceHintDismissed(boolean dismissed) {
+        if (prefs == null) return;
+        prefs.edit().putBoolean(PREF_LICENCE_HINT_DISMISSED, dismissed).apply();
+    }
+
+    /**
+     * The licences to offer, in order: the defaults, followed by any others the user has used,
+     * sorted. "No licence" is offered last, since it's the fallback rather than a suggestion.
+     */
+    public static List<String> getLicenceNames() {
+        List<String> names = new ArrayList<>(Licence.getDefaultNames());
+        names.addAll(getUsedLicences());
+        names.add(Licence.NONE);
+        return names;
+    }
+
+    /** The non-default licences the user has previously used, sorted for a stable ordering. */
+    public static List<String> getUsedLicences() {
+        if (prefs == null) return new ArrayList<>();
+        Set<String> set = prefs.getStringSet(PREF_USED_LICENCES, new HashSet<>());
+        List<String> list = new ArrayList<>(set);
+        Collections.sort(list);
+        return list;
+    }
+
+    /**
+     * Records a licence as used, so it's offered again in future. Defaults are already offered and
+     * so aren't stored; neither is "no licence", which is always offered last.
+     */
+    public static void addUsedLicence(String name) {
+        if (prefs == null || name == null) return;
+        String trimmed = name.trim();
+        if (trimmed.isEmpty() || Licence.isDefault(trimmed)) return;
+        Set<String> set = new HashSet<>(prefs.getStringSet(PREF_USED_LICENCES, new HashSet<>()));
+        set.add(trimmed);
+        prefs.edit().putStringSet(PREF_USED_LICENCES, set).apply();
+    }
+
+    public static void removeUsedLicence(String name) {
+        if (prefs == null) return;
+        Set<String> set = new HashSet<>(prefs.getStringSet(PREF_USED_LICENCES, new HashSet<>()));
+        set.remove(name);
+        prefs.edit().putStringSet(PREF_USED_LICENCES, set).apply();
+    }
+
+    /**
+     * Whether the user has ever chosen a licence. Until they have, new trips start with a blank
+     * licence field and the Trip screen asks them to pick one.
+     */
+    public static boolean hasLastLicence() {
+        return prefs != null && prefs.contains(PREF_LAST_LICENCE);
+    }
+
+    /**
+     * The licence chosen for the most recent trip, or "" if none has been chosen yet - which is
+     * also what's returned when the last choice was "no licence".
+     */
+    public static String getLastLicence() {
+        if (prefs == null) return Licence.NONE;
+        return prefs.getString(PREF_LAST_LICENCE, Licence.NONE);
+    }
+
+    /** Remembers a licence as the latest choice, and adds it to the offered list if it's new. */
+    public static void setLastLicence(String name) {
+        if (prefs == null || name == null) return;
+        String trimmed = name.trim();
+        prefs.edit().putString(PREF_LAST_LICENCE, trimmed).apply();
+        addUsedLicence(trimmed);
     }
 }
