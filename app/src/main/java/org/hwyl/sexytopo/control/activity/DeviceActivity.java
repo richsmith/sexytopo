@@ -12,6 +12,7 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import androidx.appcompat.widget.SwitchCompat;
@@ -26,6 +27,7 @@ import org.hwyl.sexytopo.comms.Communicator;
 import org.hwyl.sexytopo.comms.Instrument;
 import org.hwyl.sexytopo.comms.InstrumentType;
 import org.hwyl.sexytopo.control.Log;
+import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.LogUpdateReceiver;
 
 public class DeviceActivity extends SexyTopoActivity {
@@ -114,17 +116,22 @@ public class DeviceActivity extends SexyTopoActivity {
         updateBluetooth();
         updatePairedStatus();
         updateConnectionStatus();
+        updateAutoReconnectStatus();
         updateComms();
     }
 
-    private void setupSwitchListeners() {
-        SwitchCompat bluetoothSwitch = findViewById(R.id.bluetoothSwitch);
-        bluetoothSwitch.setOnCheckedChangeListener(
-                (buttonView, isChecked) -> toggleBluetooth(buttonView));
+    /** Shows the setting, which can also be changed from the settings screen. */
+    private void updateAutoReconnectStatus() {
+        CheckBox autoReconnectCheckbox = findViewById(R.id.autoReconnectCheckbox);
+        autoReconnectCheckbox.setChecked(GeneralPreferences.isAutoReconnectOn());
+    }
 
-        SwitchCompat connectionSwitch = findViewById(R.id.connectionSwitch);
-        connectionSwitch.setOnCheckedChangeListener(
-                (buttonView, isChecked) -> toggleConnection(buttonView));
+    private void setupSwitchListeners() {
+        findViewById(R.id.bluetoothSwitch).setOnClickListener(this::toggleBluetooth);
+        findViewById(R.id.connectionSwitch).setOnClickListener(this::toggleConnection);
+        findViewById(R.id.autoReconnectCheckbox)
+                .setOnClickListener(
+                        view -> GeneralPreferences.setAutoReconnect(((CheckBox) view).isChecked()));
     }
 
     public void startConnection() {
@@ -281,14 +288,7 @@ public class DeviceActivity extends SexyTopoActivity {
 
     public void updateConnectionStatus() {
         SwitchCompat connectionSwitch = findViewById(R.id.connectionSwitch);
-        boolean isActuallyConnected = requestComms().isConnected();
-        // Temporarily remove listener to avoid triggering toggleConnection()
-        // when the switch state is updated programmatically (e.g. after an
-        // unexpected disconnection), which would cancel auto-reconnect.
-        connectionSwitch.setOnCheckedChangeListener(null);
-        connectionSwitch.setChecked(isActuallyConnected);
-        connectionSwitch.setOnCheckedChangeListener(
-                (buttonView, isChecked) -> toggleConnection(buttonView));
+        connectionSwitch.setChecked(requestComms().isConnected());
     }
 
     private void unpair(BluetoothDevice device) throws SecurityException {
