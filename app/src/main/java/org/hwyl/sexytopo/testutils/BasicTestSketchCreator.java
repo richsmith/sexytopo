@@ -4,7 +4,6 @@ import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.Symbol;
 
-
 public class BasicTestSketchCreator {
 
     public static void drawOneHorizontalLine(Sketch sketch) {
@@ -18,5 +17,4 @@ public class BasicTestSketchCreator {
         Coord2D coord = new Coord2D(0, 0);
         sketch.addSymbolDetail(coord, symbol, 50, 0);
     }
-
 }

@@ -6,10 +6,12 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Unit tests for EditLegForm.
- * Note: These tests focus on the core leg creation logic without UI dependencies.
+ * Unit tests for EditLegForm. Note: These tests focus on the core leg creation logic without UI
+ * dependencies.
  */
 public class EditLegFormTest {
+
+    private static final float DELTA = 0.001f;
 
     @Test
     public void testNewLegCreationDoesNotRequireDestination() {
@@ -26,14 +28,12 @@ public class EditLegFormTest {
 
         // 2. Then caller creates the destination and reconstructs the leg
         Station newStation = new Station("2");
-        Leg legWithDest = new Leg(distance, azimuth, inclination, newStation, new Leg[]{});
+        Leg legWithDest = new Leg(distance, azimuth, inclination, newStation, new Leg[] {});
         Assert.assertTrue(legWithDest.hasDestination());
         Assert.assertEquals(newStation, legWithDest.getDestination());
     }
 
-    /**
-     * Test that splays can be created without destinations.
-     */
+    /** Test that splays can be created without destinations. */
     @Test
     public void testSplayCreationWithoutDestination() {
         Leg splay = new Leg(3.5f, 90.0f, 0.0f);
@@ -45,7 +45,7 @@ public class EditLegFormTest {
     public void testCannotCreateLegWithNullDestinationDirectly() {
         try {
             // Trying to create a full leg (non-splay) with null destination should fail
-            new Leg(5.0f, 0.0f, 0.0f, null, new Leg[]{});
+            new Leg(5.0f, 0.0f, 0.0f, null, new Leg[] {});
             Assert.fail("Should have thrown IllegalArgumentException");
         } catch (IllegalArgumentException e) {
             // Expected - destination should not be null for full legs
@@ -53,4 +53,143 @@ public class EditLegFormTest {
         }
     }
 
+    // ---- decomposeToDms tests ----
+
+    @Test
+    public void testDmsDecompositionPositive() {
+        // 45.5° = 45° 30' 0"
+        float[] dms = Leg.decomposeToDms(45.5f);
+        Assert.assertEquals(45, (int) dms[0]);
+        Assert.assertEquals(30, (int) dms[1]);
+        Assert.assertEquals(0.0f, dms[2], DELTA);
+    }
+
+    @Test
+    public void testDmsDecompositionNegative() {
+        // -30.75° = -30° 45' 0"  (sign on degrees only, minutes/seconds non-negative)
+        float[] dms = Leg.decomposeToDms(-30.75f);
+        Assert.assertEquals(-30, (int) dms[0]);
+        Assert.assertEquals(45, (int) dms[1]);
+        Assert.assertEquals(0.0f, dms[2], DELTA);
+    }
+
+    @Test
+    public void testDmsDecompositionZero() {
+        float[] dms = Leg.decomposeToDms(0.0f);
+        Assert.assertEquals(0, (int) dms[0]);
+        Assert.assertEquals(0, (int) dms[1]);
+        Assert.assertEquals(0.0f, dms[2], DELTA);
+    }
+
+    @Test
+    public void testDmsDecompositionRoundTripPositive() {
+        float original = 47.3f;
+        float[] dms = Leg.decomposeToDms(original);
+        float sign = dms[0] < 0 ? -1.0f : 1.0f;
+        float recomposed = dms[0] + sign * (dms[1] / 60.0f + dms[2] / 3600.0f);
+        Assert.assertEquals(original, recomposed, DELTA);
+    }
+
+    @Test
+    public void testDmsDecompositionRoundTripNegative() {
+        float original = -23.6f;
+        float[] dms = Leg.decomposeToDms(original);
+        float sign = dms[0] < 0 ? -1.0f : 1.0f;
+        float recomposed = dms[0] + sign * (dms[1] / 60.0f + dms[2] / 3600.0f);
+        Assert.assertEquals(original, recomposed, DELTA);
+    }
+
+    @Test
+    public void testDmsDecompositionAtPlusNinety() {
+        // +90° = 90° 0' 0"
+        float[] dms = Leg.decomposeToDms(90.0f);
+        Assert.assertEquals(90, (int) dms[0]);
+        Assert.assertEquals(0, (int) dms[1]);
+        Assert.assertEquals(0.0f, dms[2], DELTA);
+    }
+
+    @Test
+    public void testDmsDecompositionAtMinusNinety() {
+        // -90° = -90° 0' 0"
+        float[] dms = Leg.decomposeToDms(-90.0f);
+        Assert.assertEquals(-90, (int) dms[0]);
+        Assert.assertEquals(0, (int) dms[1]);
+        Assert.assertEquals(0.0f, dms[2], DELTA);
+    }
+
+    // ---- decimal seconds tests ----
+
+    @Test
+    public void testDmsDecompositionProducesDecimalSeconds() {
+        // 45° 30' 30.5" = 45 + 30/60 + 30.5/3600 = 45.508472...°
+        float input = 45.0f + 30.0f / 60.0f + 30.5f / 3600.0f;
+        float[] dms = Leg.decomposeToDms(input);
+        Assert.assertEquals(45, (int) dms[0]);
+        Assert.assertEquals(30, (int) dms[1]);
+        // seconds should be non-integer (≈ 30.5)
+        Assert.assertTrue("Expected fractional seconds", dms[2] > 30.0f && dms[2] < 31.0f);
+    }
+
+    @Test
+    public void testDmsRoundTripWithDecimalSeconds() {
+        // Build a value whose seconds component is fractional
+        float original = 45.0f + 30.0f / 60.0f + 30.5f / 3600.0f;
+        float[] dms = Leg.decomposeToDms(original);
+        float sign = dms[0] < 0 ? -1.0f : 1.0f;
+        float recomposed = dms[0] + sign * (dms[1] / 60.0f + dms[2] / 3600.0f);
+        Assert.assertEquals(original, recomposed, DELTA);
+    }
+
+    @Test
+    public void testNegativeDmsRoundTripWithDecimalSeconds() {
+        // Negative inclination with fractional seconds: -12° 15' 45.75"
+        float original = -(12.0f + 15.0f / 60.0f + 45.75f / 3600.0f);
+        float[] dms = Leg.decomposeToDms(original);
+        float sign = dms[0] < 0 ? -1.0f : 1.0f;
+        float recomposed = dms[0] + sign * (dms[1] / 60.0f + dms[2] / 3600.0f);
+        Assert.assertEquals(original, recomposed, DELTA);
+    }
+
+    // ---- legal range boundary tests ----
+
+    @Test
+    public void testInclinationAtPlusNinetyIsLegal() {
+        Assert.assertTrue(Leg.isInclinationLegal(90.0f));
+    }
+
+    @Test
+    public void testInclinationAtMinusNinetyIsLegal() {
+        Assert.assertTrue(Leg.isInclinationLegal(-90.0f));
+    }
+
+    @Test
+    public void testInclinationAboveNinetyIsIllegal() {
+        Assert.assertFalse(Leg.isInclinationLegal(90.001f));
+    }
+
+    @Test
+    public void testAzimuthAt360IsIllegal() {
+        Assert.assertFalse(Leg.isAzimuthLegal(360.0f));
+    }
+
+    @Test
+    public void testAzimuthAt359Point9IsLegal() {
+        Assert.assertTrue(Leg.isAzimuthLegal(359.9f));
+    }
+
+    @Test
+    public void testDmsRecompositionOfNinetyIsExact() {
+        float[] dms = Leg.decomposeToDms(90.0f);
+        Assert.assertEquals(90, (int) dms[0]);
+        Assert.assertEquals(0, (int) dms[1]);
+        Assert.assertEquals(0.0f, dms[2], DELTA);
+    }
+
+    @Test
+    public void testDmsRecompositionOfMinusNinetyIsExact() {
+        float[] dms = Leg.decomposeToDms(-90.0f);
+        Assert.assertEquals(-90, (int) dms[0]);
+        Assert.assertEquals(0, (int) dms[1]);
+        Assert.assertEquals(0.0f, dms[2], DELTA);
+    }
 }

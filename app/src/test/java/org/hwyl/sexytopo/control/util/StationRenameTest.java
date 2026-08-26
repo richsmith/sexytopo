@@ -1,18 +1,14 @@
 package org.hwyl.sexytopo.control.util;
 
-
+import java.util.ArrayList;
+import java.util.List;
 import org.hwyl.sexytopo.SexyTopoConstants;
-import org.junit.Assert;
-
-import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
+import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
+import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class StationRenameTest {
 
@@ -50,7 +46,7 @@ public class StationRenameTest {
         Assert.assertEquals("ShinyNewName", shinyNewStation.getName());
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testRenamingToExistingNameFails() {
         Survey testSurvey = BasicTestSurveyCreator.createStraightNorth();
         Station s2 = testSurvey.getStationByName("2");
@@ -60,8 +56,10 @@ public class StationRenameTest {
     @Test
     public void testAverageLegs() {
         Leg leg1 = new Leg(10, 359, -1);
-        Leg leg2 = new Leg(20,   1, +1);
-        List<Leg> legs = new ArrayList<>(2); legs.add(leg1); legs.add(leg2);
+        Leg leg2 = new Leg(20, 1, +1);
+        List<Leg> legs = new ArrayList<>(2);
+        legs.add(leg1);
+        legs.add(leg2);
         Leg avgLeg = SurveyUpdater.averageLegs(legs);
         Assert.assertEquals(
                 "Dist", 15.0, avgLeg.getDistance(), SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
@@ -74,7 +72,7 @@ public class StationRenameTest {
     @Test
     public void testBacksights() {
         Leg fore1 = new Leg(10, 180, +42);
-        Leg back1 = new Leg(10,   0, -42);
+        Leg back1 = new Leg(10, 0, -42);
         Assert.assertTrue(
                 "Legs should be perfectly-equal backsights",
                 SurveyUpdater.areLegsBacksights(fore1, back1));
@@ -84,5 +82,4 @@ public class StationRenameTest {
                 "Legs should not be considered backsights for each other",
                 SurveyUpdater.areLegsBacksights(fore1, back2));
     }
-
 }

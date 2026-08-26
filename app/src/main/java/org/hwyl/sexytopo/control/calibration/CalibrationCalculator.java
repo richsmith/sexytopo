@@ -1,9 +1,7 @@
 package org.hwyl.sexytopo.control.calibration;
 
-import org.hwyl.sexytopo.model.calibration.CalibrationReading;
-
 import java.util.List;
-
+import org.hwyl.sexytopo.model.calibration.CalibrationReading;
 
 public class CalibrationCalculator {
 
@@ -13,7 +11,6 @@ public class CalibrationCalculator {
     public CalibrationCalculator(boolean useNonLinearity) {
         this.useNonLinearity = useNonLinearity;
     }
-
 
     @SuppressWarnings("UnnecessaryLocalVariable")
     public int calculate(List<CalibrationReading> calibrationReadings) {
@@ -30,7 +27,9 @@ public class CalibrationCalculator {
                     calibrationReading.getMx(),
                     calibrationReading.getMy(),
                     calibrationReading.getMz(),
-                    g, m, i);
+                    g,
+                    m,
+                    i);
         }
 
         int iterations = CalibAlgorithm.Optimize(g, m, delta, useNonLinearity);
@@ -44,5 +43,4 @@ public class CalibrationCalculator {
     public double getDelta() {
         return delta.value;
     }
-
 }

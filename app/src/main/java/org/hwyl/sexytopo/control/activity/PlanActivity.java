@@ -15,5 +15,4 @@ public class PlanActivity extends GraphActivity {
     public Projection2D getProjectionType() {
         return Projection2D.PLAN;
     }
-
 }

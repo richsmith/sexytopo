@@ -15,5 +15,4 @@ public class ExtendedElevationActivity extends GraphActivity {
     public Projection2D getProjectionType() {
         return Projection2D.EXTENDED_ELEVATION;
     }
-
 }

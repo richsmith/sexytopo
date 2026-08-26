@@ -1,15 +1,16 @@
 package org.hwyl.sexytopo.model.sketch;
 
+import java.util.ArrayList;
+import java.util.List;
+import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.common.Shape;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.survey.Station;
 
-import java.util.ArrayList;
-import java.util.List;
-
-
 public class Sketch extends Shape {
+
+    public static final float DEFAULT_XSECTION_SCALE = 1.0f;
 
     private List<PathDetail> pathDetails = new ArrayList<>();
     private List<SymbolDetail> symbolDetails = new ArrayList<>();
@@ -22,7 +23,20 @@ public class Sketch extends Shape {
     private PathDetail activePath;
     private Colour activeColour = Colour.BLACK;
 
+    private float crossSectionScale = DEFAULT_XSECTION_SCALE;
+
     private boolean isSaved = true;
+
+    public Sketch() {}
+
+    public Sketch(Sketch sketch) {
+        // shallow copies are OK here because paths are immutable
+        setPathDetails(new ArrayList<>(sketch.getPathDetails()));
+        setSymbolDetails(new ArrayList<>(sketch.getSymbolDetails()));
+        setTextDetails(new ArrayList<>(sketch.getTextDetails()));
+        setCrossSectionDetails(new ArrayList<>(sketch.getCrossSectionDetails()));
+        this.crossSectionScale = sketch.crossSectionScale;
+    }
 
     public boolean isSaved() {
         return isSaved;
@@ -47,21 +61,19 @@ public class Sketch extends Shape {
         recalculateBoundingBox();
     }
 
-
     public List<PathDetail> getPathDetails() {
         return pathDetails;
     }
-
 
     public PathDetail getActivePath() {
         return activePath;
     }
 
-
     public PathDetail startNewPath(Coord2D start) {
         activePath = new PathDetail(start, activeColour);
+        // Registered in the undo history only on finishPath, so an unfinished path can be
+        // abandoned without leaving a trace.
         pathDetails.add(activePath);
-        addSketchDetail(activePath);
         return activePath;
     }
 
@@ -72,10 +84,23 @@ public class Sketch extends Shape {
         updateBoundingBox(sketchDetail);
     }
 
+    // Drops the in-progress path without committing it to the sketch or undo history.
+    public void abandonActivePath() {
+        if (activePath == null) {
+            return;
+        }
+        pathDetails.remove(activePath);
+        activePath = null;
+        recalculateBoundingBox();
+    }
+
     public void finishPath() {
+        if (activePath == null) {
+            return;
+        }
         float epsilon = Space2DUtils.simplificationEpsilon(activePath);
         activePath.setPath(Space2DUtils.simplify(activePath.getPath(), epsilon));
-        updateBoundingBox(activePath);
+        addSketchDetail(activePath);
         activePath = null;
     }
 
@@ -90,7 +115,11 @@ public class Sketch extends Shape {
     }
 
     public void addSymbolDetail(Coord2D location, Symbol symbol, float size, float angle) {
-        SymbolDetail symbolDetail = new SymbolDetail(location, symbol, activeColour, size, angle);
+        Colour colour = activeColour;
+        if (symbol.isWater() && SketchPreferences.Toggle.BLUE_WATER.isOn()) {
+            colour = Colour.BLUE;
+        }
+        SymbolDetail symbolDetail = new SymbolDetail(location, symbol, colour, size, angle);
         symbolDetails.add(symbolDetail);
         addSketchDetail(symbolDetail);
     }
@@ -103,13 +132,20 @@ public class Sketch extends Shape {
         this.activeColour = colour;
     }
 
+    public float getCrossSectionScale() {
+        return crossSectionScale;
+    }
+
+    public void setCrossSectionScale(float crossSectionScale) {
+        this.crossSectionScale = crossSectionScale;
+    }
 
     public void undo() {
         if (!sketchHistory.isEmpty()) {
             SketchDetail toUndo = sketchHistory.remove(sketchHistory.size() - 1);
 
             if (toUndo instanceof DeletedDetail) {
-                DeletedDetail deletedDetail = (DeletedDetail)toUndo;
+                DeletedDetail deletedDetail = (DeletedDetail) toUndo;
                 restoreDetailToSketch(deletedDetail.getDeletedDetail());
                 for (SketchDetail sketchDetail : deletedDetail.getReplacementDetails()) {
                     removeDetailFromSketch(sketchDetail);
@@ -122,13 +158,12 @@ public class Sketch extends Shape {
         }
     }
 
-
     public void redo() {
         if (!undoneHistory.isEmpty()) {
             SketchDetail toRedo = undoneHistory.remove(undoneHistory.size() - 1);
 
             if (toRedo instanceof DeletedDetail) {
-                DeletedDetail deletedDetail = (DeletedDetail)toRedo;
+                DeletedDetail deletedDetail = (DeletedDetail) toRedo;
                 removeDetailFromSketch(deletedDetail.getDeletedDetail());
                 for (SketchDetail sketchDetail : deletedDetail.getReplacementDetails()) {
                     restoreDetailToSketch(sketchDetail);
@@ -141,14 +176,11 @@ public class Sketch extends Shape {
         }
     }
 
-
     public void deleteDetail(SketchDetail sketchDetail) {
         deleteDetail(sketchDetail, new ArrayList<>());
     }
 
-
-    public void deleteDetail(
-            SketchDetail sketchDetail, List<SketchDetail> replacementDetails) {
+    public void deleteDetail(SketchDetail sketchDetail, List<SketchDetail> replacementDetails) {
         DeletedDetail deletedDetail = new DeletedDetail(sketchDetail, replacementDetails);
         addSketchDetail(deletedDetail);
         removeDetailFromSketch(sketchDetail);
@@ -156,7 +188,6 @@ public class Sketch extends Shape {
             restoreDetailToSketch(replacementDetail);
         }
     }
-
 
     private void removeDetailFromSketch(SketchDetail sketchDetail) {
         // this is a separate function to deleteDetail because former is user-called and handles
@@ -174,21 +205,19 @@ public class Sketch extends Shape {
         recalculateBoundingBox();
     }
 
-
     public void restoreDetailToSketch(SketchDetail sketchDetail) {
         if (sketchDetail instanceof PathDetail) {
-            pathDetails.add((PathDetail)sketchDetail);
+            pathDetails.add((PathDetail) sketchDetail);
         } else if (sketchDetail instanceof SymbolDetail) {
             symbolDetails.add((SymbolDetail) sketchDetail);
         } else if (sketchDetail instanceof TextDetail) {
             textDetails.add((TextDetail) sketchDetail);
         } else if (sketchDetail instanceof CrossSectionDetail) {
-            crossSectionDetails.add((CrossSectionDetail)sketchDetail);
+            crossSectionDetails.add((CrossSectionDetail) sketchDetail);
         }
 
         updateBoundingBox(sketchDetail);
     }
-
 
     public Coord2D findEligibleSnapPointWithin(Coord2D point, float delta) {
 
@@ -203,7 +232,7 @@ public class Sketch extends Shape {
 
             Coord2D start = path.getPath().get(0);
             Coord2D end = path.getPath().get(path.getPath().size() - 1);
-            for (Coord2D coord2D : new Coord2D[]{start, end}) {
+            for (Coord2D coord2D : new Coord2D[] {start, end}) {
                 float distance = Space2DUtils.getDistance(point, coord2D);
                 if (distance < delta && distance < minDistance) {
                     closest = coord2D;
@@ -213,7 +242,6 @@ public class Sketch extends Shape {
         }
         return closest;
     }
-
 
     private List<SketchDetail> allSketchDetails() {
         List<SketchDetail> all = new ArrayList<>();
@@ -225,11 +253,19 @@ public class Sketch extends Shape {
     }
 
     public SketchDetail findNearestDetailWithin(Coord2D point, float delta) {
+        return findNearestVisibleDetailWithin(point, delta, Float.MAX_VALUE);
+    }
+
+    public SketchDetail findNearestVisibleDetailWithin(
+            Coord2D point, float delta, float viewScale) {
 
         SketchDetail closest = null;
         float minDistance = Float.MAX_VALUE;
 
         for (SketchDetail detail : allSketchDetails()) {
+            if (!detail.couldBeVisibleAtScale(viewScale)) {
+                continue;
+            }
             float distance = detail.getDistanceFrom(point);
             if (distance < delta && distance < minDistance) {
                 closest = detail;
@@ -240,11 +276,25 @@ public class Sketch extends Shape {
         return closest;
     }
 
-
     public void addCrossSection(CrossSection crossSection, Coord2D touchPointOnSurvey) {
         CrossSectionDetail sectionDetail = new CrossSectionDetail(crossSection, touchPointOnSurvey);
+        addCrossSection(sectionDetail);
+    }
+
+    public void addCrossSection(CrossSectionDetail sectionDetail) {
         crossSectionDetails.add(sectionDetail);
         addSketchDetail(sectionDetail);
+    }
+
+    /**
+     * Replace a cross-section detail as an undoable operation on this sketch's undo stack. Use this
+     * for plan-level edits like move and rotate.
+     */
+    public void replaceCrossSectionDetail(
+            CrossSectionDetail oldDetail, CrossSectionDetail newDetail) {
+        List<SketchDetail> replacements = new ArrayList<>();
+        replacements.add(newDetail);
+        deleteDetail(oldDetail, replacements);
     }
 
     public List<CrossSectionDetail> getCrossSectionDetails() {
@@ -267,36 +317,68 @@ public class Sketch extends Shape {
         return null;
     }
 
-    public Sketch getTranslatedCopy(Coord2D point) {
+    @Override
+    public Sketch translate(Coord2D translation) {
         Sketch sketch = new Sketch();
 
         List<PathDetail> newPathDetails = new ArrayList<>();
         for (PathDetail pathDetail : pathDetails) {
-            newPathDetails.add(pathDetail.translate(point));
+            newPathDetails.add(pathDetail.translate(translation));
         }
         sketch.setPathDetails(newPathDetails);
 
         List<SymbolDetail> newSymbolDetails = new ArrayList<>();
         for (SymbolDetail symbolDetail : symbolDetails) {
-            newSymbolDetails.add(symbolDetail.translate(point));
+            newSymbolDetails.add(symbolDetail.translate(translation));
         }
         sketch.setSymbolDetails(newSymbolDetails);
 
         List<TextDetail> newTextDetails = new ArrayList<>();
         for (TextDetail textDetail : textDetails) {
-            newTextDetails.add(textDetail.translate(point));
+            newTextDetails.add(textDetail.translate(translation));
         }
         sketch.setTextDetails(newTextDetails);
 
         List<CrossSectionDetail> newCrossSectionDetails = new ArrayList<>();
         for (CrossSectionDetail crossSectionDetail : crossSectionDetails) {
-            newCrossSectionDetails.add(crossSectionDetail.translate(point));
+            newCrossSectionDetails.add(crossSectionDetail.translate(translation));
         }
         sketch.setCrossSectionDetails(newCrossSectionDetails);
 
         return sketch;
     }
 
+    @Override
+    public Sketch scale(float scale) {
+        Sketch sketch = new Sketch();
+
+        List<PathDetail> newPathDetails = new ArrayList<>();
+        for (PathDetail pathDetail : pathDetails) {
+            newPathDetails.add(pathDetail.scale(scale));
+        }
+        sketch.setPathDetails(newPathDetails);
+
+        List<SymbolDetail> newSymbolDetails = new ArrayList<>();
+        for (SymbolDetail symbolDetail : symbolDetails) {
+            newSymbolDetails.add(symbolDetail.scale(scale));
+        }
+        sketch.setSymbolDetails(newSymbolDetails);
+
+        List<TextDetail> newTextDetails = new ArrayList<>();
+        for (TextDetail textDetail : textDetails) {
+            newTextDetails.add(textDetail.scale(scale));
+        }
+        sketch.setTextDetails(newTextDetails);
+
+        List<CrossSectionDetail> newCrossSectionDetails = new ArrayList<>();
+        for (CrossSectionDetail crossSectionDetail : crossSectionDetails) {
+            SketchDetail scaled = crossSectionDetail.scale(scale);
+            newCrossSectionDetails.add((CrossSectionDetail) scaled);
+        }
+        sketch.setCrossSectionDetails(newCrossSectionDetails);
+
+        return sketch;
+    }
 
     public void recalculateBoundingBox() {
         resetBoundingBox();
@@ -304,5 +386,4 @@ public class Sketch extends Shape {
             updateBoundingBox(sketchDetail);
         }
     }
-
 }

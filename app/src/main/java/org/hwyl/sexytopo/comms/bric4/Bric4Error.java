@@ -1,13 +1,10 @@
 package org.hwyl.sexytopo.comms.bric4;
 
+import androidx.annotation.NonNull;
 import java.util.HashMap;
 import java.util.Map;
 
-import androidx.annotation.NonNull;
-
-
 public enum Bric4Error {
-
     NO_ERROR(0, "no error"),
     ACCELEROMETER_1_HIGH_MAGNITUDE(1, "accelerometer 1 high magnitude"),
     ACCELEROMETER_2_HIGH_MAGNITUDE(2, "accelerometer 2 high magnitude"),

@@ -2,9 +2,7 @@ package org.hwyl.sexytopo.control.io.svg;
 
 import android.content.res.Resources;
 import android.util.Log;
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.io.thirdparty.svg.SvgExporter;
 import org.hwyl.sexytopo.model.graph.Projection2D;
@@ -54,5 +52,4 @@ public class SvgExporterTest {
         Log.i(SexyTopoConstants.TAG, content);
         Assert.assertTrue(content.contains("<svg"));
     }
-
 }

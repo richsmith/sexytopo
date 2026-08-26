@@ -1,23 +1,12 @@
 package org.hwyl.sexytopo.control.activity;
 
 import android.app.Dialog;
-import android.content.DialogInterface;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.WindowManager;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.Button;
-
-import androidx.appcompat.app.AlertDialog;
-
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.components.DialogUtils;
 import org.hwyl.sexytopo.control.components.StationSelectorDialog;
@@ -26,13 +15,13 @@ import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.control.util.TextTools;
-import org.hwyl.sexytopo.model.graph.Direction;
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 
 /**
- * Abstract base class for activities that allow editing surveys with context menus.
- * Provides standard context menu action implementations.
+ * Abstract base class for activities that allow editing surveys with context menus. Provides
+ * standard context menu action implementations.
  */
 public abstract class SurveyEditorActivity extends SexyTopoActivity {
 
@@ -42,6 +31,14 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         MenuItem findStationItem = menu.findItem(R.id.action_find_station);
         if (findStationItem != null) {
             findStationItem.setEnabled(true);
+        }
+        MenuItem addLegItem = menu.findItem(R.id.action_add_leg);
+        if (addLegItem != null) {
+            addLegItem.setEnabled(true);
+        }
+        MenuItem addSplayItem = menu.findItem(R.id.action_add_splay);
+        if (addSplayItem != null) {
+            addSplayItem.setEnabled(true);
         }
         return true;
     }
@@ -53,6 +50,10 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
 
     public void onComment(Station station) {
         openCommentDialog(station);
+    }
+
+    public void onCommentLeg(Leg leg) {
+        openLegCommentDialog(leg);
     }
 
     public void onJumpToTable(Station station) {
@@ -68,22 +69,31 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
     }
 
     public void onSetDirectionLeft(Station station) {
-        if (station.getExtendedElevationDirection() != Direction.LEFT) {
-            SurveyUpdater.setDirectionOfSubtree(station, Direction.LEFT);
-            getSurveyManager().broadcastSurveyUpdated();
-            invalidateView();
-        }
+        setDirection(station, ExtendedElevationDirection.LEFT);
     }
 
     public void onSetDirectionRight(Station station) {
-        if (station.getExtendedElevationDirection() != Direction.RIGHT) {
-            SurveyUpdater.setDirectionOfSubtree(station, Direction.RIGHT);
+        setDirection(station, ExtendedElevationDirection.RIGHT);
+    }
+
+    public void onSetDirectionVertical(Station station) {
+        setDirection(station, ExtendedElevationDirection.VERTICAL);
+    }
+
+    private void setDirection(Station station, ExtendedElevationDirection direction) {
+        if (station.getExtendedElevationDirection() != direction) {
+            SurveyUpdater.setExtendedElevationDirection(getSurvey(), station, direction);
             getSurveyManager().broadcastSurveyUpdated();
             invalidateView();
         }
     }
 
-    public void onReverse(Station station) {
+    public void onReverse(Leg leg) {
+        Station station = leg.getDestination();
+        if (station == null) {
+            return;
+        }
+
         SurveyUpdater.reverseLeg(getSurvey(), station);
         getSurveyManager().broadcastSurveyUpdated();
         invalidateView();
@@ -92,6 +102,18 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
     public void onNewCrossSection(Station station) {
         // Default: not applicable in some views
         // Override in activities that support adding cross-sections
+    }
+
+    public void onDeleteCrossSection(Station station) {
+        // Default: not applicable in some views
+    }
+
+    public void onEditCrossSection(Station station) {
+        // Default: not applicable in some views
+    }
+
+    public void onRotateCrossSection(Station station) {
+        // Default: not applicable in some views
     }
 
     public void onStartNewSurvey(Station station) {
@@ -103,24 +125,26 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
     }
 
     private void showNewSurveyStartStationDialog(Station station) {
-        TextInputLayout inputLayout = DialogUtils.createStandardTextInputLayout(this,
-                R.string.menu_survey_start_new_dialog_station_name);
+        TextInputLayout inputLayout =
+                DialogUtils.createStandardTextInputLayout(
+                        this, R.string.menu_survey_start_new_dialog_station_name);
 
-        TextInputEditText input = new TextInputEditText(this);
+        TextInputEditText input = DialogUtils.getEditText(inputLayout);
         input.setText(station.getName());
         input.selectAll();
-        inputLayout.addView(input);
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setView(inputLayout)
-            .setTitle(R.string.menu_survey_start_new_dialog_title)
-            .setPositiveButton(R.string.ok, (dialog, which) -> {
-                String stationName = input.getText().toString().trim();
-                if (!stationName.isEmpty()) {
-                    continueSurvey(station, stationName);
-                }
-            })
-            .setNegativeButton(R.string.cancel, null);
+                .setTitle(R.string.menu_survey_start_new_dialog_title)
+                .setPositiveButton(
+                        R.string.ok,
+                        (dialog, which) -> {
+                            String stationName = input.getText().toString().trim();
+                            if (!stationName.isEmpty()) {
+                                continueSurvey(station, stationName);
+                            }
+                        })
+                .setNegativeButton(R.string.cancel, null);
 
         Dialog dialog = builder.create();
         dialog.show();
@@ -147,9 +171,7 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         // Override in activities that support renaming
     }
 
-    public void onEditLeg(Station station) {
-        // Get the leg that leads to this station
-        Leg leg = getSurvey().getReferringLeg(station);
+    public void onEditLeg(Leg leg) {
         if (leg == null) {
             // This is the origin station, cannot edit
             return;
@@ -200,50 +222,88 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         getSurveyManager().broadcastSurveyUpdated();
     }
 
-    /**
-     * Set the active station in the current view.
-     */
+    public void onPromoteToAboveLeg(Leg splay) {
+        if (splay == null || splay.hasDestination()) {
+            return;
+        }
+
+        boolean success = SurveyUpdater.promoteToAboveLeg(getSurvey(), splay);
+        if (success) {
+            getSurveyManager().broadcastSurveyUpdated();
+            showSimpleToast(R.string.toast_splay_promoted);
+        } else {
+            showSimpleToast(R.string.toast_no_leg_above);
+        }
+    }
+
+    /** Set the active station in the current view. */
     protected void setActiveStation(Station station) {
         getSurvey().setActiveStation(station);
         getSurveyManager().broadcastSurveyUpdated();
     }
 
-    /**
-     * Invalidate/refresh the current view.
-     * Must be implemented by subclasses.
-     */
+    /** Invalidate/refresh the current view. Must be implemented by subclasses. */
     protected abstract void invalidateView();
 
-    /**
-     * Synchronise the view with the survey data.
-     * Must be implemented by subclasses.
-     */
+    /** Synchronise the view with the survey data. Must be implemented by subclasses. */
     public abstract void syncWithSurvey();
 
-
-    /**
-     * Open the comment dialog for the given station.
-     */
+    /** Open the comment dialog for the given station. */
     protected void openCommentDialog(Station station) {
-        TextInputLayout inputLayout = DialogUtils.createStandardTextInputLayout(this,
-                R.string.context_station_comment_hint);
+        TextInputLayout inputLayout =
+                DialogUtils.createStandardTextInputLayout(
+                        this, R.string.context_station_comment_hint);
 
-        TextInputEditText input = new TextInputEditText(this);
+        TextInputEditText input = DialogUtils.getEditText(inputLayout);
         input.setLines(8);
         input.setGravity(Gravity.START | Gravity.TOP);
         input.setText(station.getComment());
         input.setFocusableInTouchMode(true);
-        inputLayout.addView(input);
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setView(inputLayout)
-            .setTitle(station.getName())
-            .setPositiveButton(R.string.save, (dialog, which) -> {
-                    CharSequence inputText = input.getText();
-                    station.setComment(inputText != null ? inputText.toString() : "");
-                    invalidateView();
-                })
-            .setNegativeButton(R.string.cancel, null);
+                .setTitle(station.getName())
+                .setPositiveButton(
+                        R.string.save,
+                        (dialog, which) -> {
+                            CharSequence inputText = input.getText();
+                            station.setComment(inputText != null ? inputText.toString() : "");
+                            invalidateView();
+                        })
+                .setNegativeButton(R.string.cancel, null);
+
+        Dialog dialog = builder.create();
+        DialogUtils.showKeyboardOnDisplay(dialog);
+        dialog.show();
+        input.requestFocus();
+    }
+
+    /** Open the comment dialog for the given leg or splay. */
+    protected void openLegCommentDialog(Leg leg) {
+        boolean isSplay = !leg.hasDestination();
+        int hintRes = isSplay ? R.string.menu_comment_splay : R.string.menu_comment_leg;
+        int titleRes = isSplay ? R.string.menu_comment_splay : R.string.menu_comment_leg;
+
+        TextInputLayout inputLayout = DialogUtils.createStandardTextInputLayout(this, hintRes);
+
+        TextInputEditText input = DialogUtils.getEditText(inputLayout);
+        input.setLines(8);
+        input.setGravity(Gravity.START | Gravity.TOP);
+        input.setText(leg.getComment());
+        input.setFocusableInTouchMode(true);
+
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+        builder.setView(inputLayout)
+                .setTitle(titleRes)
+                .setPositiveButton(
+                        R.string.save,
+                        (dialog, which) -> {
+                            CharSequence inputText = input.getText();
+                            leg.setComment(inputText != null ? inputText.toString() : "");
+                            getSurveyManager().broadcastSurveyUpdated();
+                            invalidateView();
+                        })
+                .setNegativeButton(R.string.cancel, null);
 
         Dialog dialog = builder.create();
         DialogUtils.showKeyboardOnDisplay(dialog);
@@ -252,8 +312,9 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
     }
 
     /**
-     * Ask the user about deleting the given leg (and any onwards legs
-     * / stations if it's a full leg).
+     * Ask the user about deleting the given leg (and any onwards legs / stations if it's a full
+     * leg).
+     *
      * @noinspection UnusedAssignment
      */
     protected void askAboutDeletingLeg(Leg leg) {
@@ -287,27 +348,28 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         }
 
         new MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.delete_question)
-            .setMessage(message)
-            .setIcon(android.R.drawable.ic_dialog_alert)
-            .setPositiveButton(R.string.delete, (dialog, which) -> {
-                SurveyUpdater.deleteLeg(getSurvey(), fromStation, leg);
-                getSurveyManager().broadcastSurveyUpdated();
-                invalidateView();
-            })
-            .setNegativeButton(R.string.cancel, null)
-            .show();
+                .setTitle(R.string.delete_question)
+                .setMessage(message)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(
+                        R.string.delete,
+                        (dialog, which) -> {
+                            SurveyUpdater.deleteLeg(getSurvey(), fromStation, leg);
+                            getSurveyManager().broadcastSurveyUpdated();
+                            invalidateView();
+                        })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
     }
 
     @Override
     protected void onFindStation() {
         StationSelectorDialog.show(
-            this,
-            getSurvey(),
-            R.string.tool_find_station_dialog_title,
-            R.string.tool_find_station_dialog_hint,
-            R.string.tool_find_station_dialog_navigate,
-            station -> jumpToStation(station, this.getClass())
-        );
+                this,
+                getSurvey(),
+                R.string.tool_find_station_dialog_title,
+                R.string.tool_find_station_dialog_hint,
+                R.string.tool_find_station_dialog_navigate,
+                station -> jumpToStation(station, this.getClass()));
     }
 }

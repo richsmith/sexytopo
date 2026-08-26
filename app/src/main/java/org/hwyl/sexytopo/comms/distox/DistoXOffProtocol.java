@@ -2,9 +2,7 @@ package org.hwyl.sexytopo.comms.distox;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
-
 import org.hwyl.sexytopo.control.SurveyManager;
-
 
 public class DistoXOffProtocol extends CommandProtocol {
 
@@ -14,5 +12,4 @@ public class DistoXOffProtocol extends CommandProtocol {
             Context context, BluetoothDevice bluetoothDevice, SurveyManager dataManager) {
         super(context, bluetoothDevice, dataManager, DISTO_OFF);
     }
-
 }

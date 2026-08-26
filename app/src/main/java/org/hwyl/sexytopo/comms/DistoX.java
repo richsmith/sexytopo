@@ -2,9 +2,7 @@ package org.hwyl.sexytopo.comms;
 
 import android.bluetooth.BluetoothDevice;
 
-/**
- * DistoX subtype.
- */
+/** DistoX subtype. */
 public enum DistoX {
     A3("A3", false),
     X310("X310", true),
@@ -20,7 +18,7 @@ public enum DistoX {
     }
 
     public static DistoX fromDevice(BluetoothDevice bluetoothDevice) {
-        return fromName(InstrumentType.describe(bluetoothDevice));
+        return fromName(Instrument.describe(bluetoothDevice));
     }
 
     public static DistoX fromName(String name) {

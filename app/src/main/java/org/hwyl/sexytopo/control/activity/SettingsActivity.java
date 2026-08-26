@@ -2,13 +2,29 @@ package org.hwyl.sexytopo.control.activity;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
+import android.text.Editable;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
+import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
-
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.control.util.GeneralPreferences;
+import org.hwyl.sexytopo.model.survey.Licence;
 
-public class SettingsActivity extends SexyTopoActivity {
+public class SettingsActivity extends SexyTopoActivity
+        implements PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
 
     private SharedPreferences.OnSharedPreferenceChangeListener prefListener;
 
@@ -19,15 +35,46 @@ public class SettingsActivity extends SexyTopoActivity {
         setupMaterialToolbar();
         applyEdgeToEdgeInsets(R.id.rootLayout, true, true);
 
-        getSupportFragmentManager().beginTransaction()
-            .replace(R.id.settingsFragment, new SettingsFragment())
-            .commit();
+        // Always start fresh at the main settings page when activity is created
+        // Clear any saved fragment state and back stack
+        getSupportFragmentManager()
+                .popBackStackImmediate(
+                        null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.settingsFragment, new MainSettingsFragment())
+                .commitNow();
 
-        prefListener = (prefs, key) -> {
-            if (key.equals("pref_theme")) {
-                setTheme();
+        getSupportFragmentManager()
+                .addOnBackStackChangedListener(
+                        () -> {
+                            boolean isAtRoot =
+                                    getSupportFragmentManager().getBackStackEntryCount() == 0;
+                            if (isAtRoot) {
+                                setTitle(R.string.title_activity_settings);
+                            }
+                            if (getSupportActionBar() != null) {
+                                getSupportActionBar().setDisplayHomeAsUpEnabled(!isAtRoot);
+                            }
+                        });
+
+        prefListener =
+                (prefs, key) -> {
+                    if ("pref_theme".equals(key)) {
+                        setTheme();
+                    }
+                };
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                getSupportFragmentManager().popBackStack();
+                return true;
             }
-        };
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -44,11 +91,287 @@ public class SettingsActivity extends SexyTopoActivity {
         prefs.unregisterOnSharedPreferenceChangeListener(prefListener);
     }
 
+    @Override
+    public boolean onPreferenceStartFragment(
+            @NonNull PreferenceFragmentCompat caller, @NonNull Preference pref) {
+        String fragmentClassName = pref.getFragment();
+        if (fragmentClassName == null) {
+            return false;
+        }
 
-    public static class SettingsFragment extends PreferenceFragmentCompat {
+        Fragment fragment =
+                getSupportFragmentManager()
+                        .getFragmentFactory()
+                        .instantiate(getClassLoader(), fragmentClassName);
+        fragment.setArguments(pref.getExtras());
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.settingsFragment, fragment)
+                .addToBackStack(null)
+                .commit();
+
+        setTitle(pref.getTitle());
+        return true;
+    }
+
+    public static class MainSettingsFragment extends PreferenceFragmentCompat {
         @Override
         public void onCreatePreferences(final Bundle savedInstanceState, final String rootKey) {
-            addPreferencesFromResource(R.xml.general_preferences);
+            setPreferencesFromResource(R.xml.preferences_main, rootKey);
+        }
+    }
+
+    public static class GeneralFragment extends PreferenceFragmentCompat {
+        @Override
+        public void onCreatePreferences(final Bundle savedInstanceState, final String rootKey) {
+            setPreferencesFromResource(R.xml.preferences_general, rootKey);
+        }
+    }
+
+    public static class SketchingFragment extends PreferenceFragmentCompat {
+        @Override
+        public void onCreatePreferences(final Bundle savedInstanceState, final String rootKey) {
+            setPreferencesFromResource(R.xml.preferences_sketching, rootKey);
+        }
+    }
+
+    public static class ExportFragment extends PreferenceFragmentCompat {
+        @Override
+        public void onCreatePreferences(final Bundle savedInstanceState, final String rootKey) {
+            setPreferencesFromResource(R.xml.preferences_export, rootKey);
+        }
+    }
+
+    public static class ExportSvgFragment extends PreferenceFragmentCompat {
+        @Override
+        public void onCreatePreferences(final Bundle savedInstanceState, final String rootKey) {
+            setPreferencesFromResource(R.xml.preferences_export_svg, rootKey);
+        }
+    }
+
+    public static class ExportTherionFragment extends PreferenceFragmentCompat {
+        @Override
+        public void onCreatePreferences(final Bundle savedInstanceState, final String rootKey) {
+            setPreferencesFromResource(R.xml.preferences_export_therion, rootKey);
+        }
+    }
+
+    public static class ManualDataEntryFragment extends PreferenceFragmentCompat {
+        @Override
+        public void onCreatePreferences(final Bundle savedInstanceState, final String rootKey) {
+            setPreferencesFromResource(R.xml.preferences_manual_data_entry, rootKey);
+        }
+    }
+
+    public static class TeamFragment extends Fragment {
+        @Nullable
+        @Override
+        public View onCreateView(
+                @NonNull LayoutInflater inflater,
+                @Nullable ViewGroup container,
+                @Nullable Bundle savedInstanceState) {
+            return inflater.inflate(R.layout.fragment_settings_team, container, false);
+        }
+
+        @Override
+        public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+            super.onViewCreated(view, savedInstanceState);
+            refreshList(view);
+
+            view.findViewById(R.id.add_caver_button)
+                    .setOnClickListener(
+                            v -> {
+                                TextInputEditText field = view.findViewById(R.id.new_caver_field);
+                                TextInputLayout layout = view.findViewById(R.id.new_caver_layout);
+                                String name = field.getText().toString().trim();
+                                if (name.isEmpty()) {
+                                    layout.setError(getString(R.string.trip_dialog_name_required));
+                                    return;
+                                }
+                                layout.setError(null);
+                                GeneralPreferences.addKnownCaver(name);
+                                field.setText("");
+                                refreshList(view);
+                            });
+        }
+
+        private void refreshList(View root) {
+            LinearLayout list = root.findViewById(R.id.cavers_list);
+            list.removeAllViews();
+            LayoutInflater inflater = LayoutInflater.from(requireContext());
+            for (String name : GeneralPreferences.getKnownCavers()) {
+                View row = inflater.inflate(R.layout.trip_team_member_item, list, false);
+                ((TextView) row.findViewById(R.id.name_field)).setText(name);
+                row.findViewById(R.id.role_field).setVisibility(View.GONE);
+                row.findViewById(R.id.icon).setVisibility(View.GONE);
+                row.setOnClickListener(v -> showEditDialog(root, name));
+                row.findViewById(R.id.delete_button)
+                        .setOnClickListener(
+                                v -> {
+                                    GeneralPreferences.removeKnownCaver(name);
+                                    refreshList(root);
+                                });
+                list.addView(row);
+            }
+        }
+
+        private void showEditDialog(View root, String currentName) {
+            View dialogView =
+                    LayoutInflater.from(requireContext())
+                            .inflate(R.layout.dialog_edit_caver_name, null);
+            TextInputLayout layout = dialogView.findViewById(R.id.name_input_layout);
+            TextInputEditText field = dialogView.findViewById(R.id.name_field);
+            field.setText(currentName);
+            field.selectAll();
+
+            AlertDialog dialog =
+                    new MaterialAlertDialogBuilder(requireContext())
+                            .setTitle(R.string.edit)
+                            .setView(dialogView)
+                            .setPositiveButton(R.string.save, null)
+                            .setNegativeButton(R.string.cancel, null)
+                            .show();
+
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                    .setOnClickListener(
+                            v -> {
+                                String newName = field.getText().toString().trim();
+                                if (newName.isEmpty()) {
+                                    layout.setError(getString(R.string.trip_dialog_name_required));
+                                    return;
+                                }
+                                GeneralPreferences.removeKnownCaver(currentName);
+                                GeneralPreferences.addKnownCaver(newName);
+                                dialog.dismiss();
+                                refreshList(root);
+                            });
+        }
+    }
+
+    public static class CopyrightFragment extends Fragment {
+        @Nullable
+        @Override
+        public View onCreateView(
+                @NonNull LayoutInflater inflater,
+                @Nullable ViewGroup container,
+                @Nullable Bundle savedInstanceState) {
+            return inflater.inflate(R.layout.fragment_settings_copyright, container, false);
+        }
+
+        @Override
+        public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+            super.onViewCreated(view, savedInstanceState);
+            refreshList(view);
+
+            view.findViewById(R.id.add_licence_button)
+                    .setOnClickListener(
+                            v -> {
+                                TextInputEditText field = view.findViewById(R.id.new_licence_field);
+                                TextInputLayout layout = view.findViewById(R.id.new_licence_layout);
+                                String name = getTrimmedText(field);
+                                if (name.isEmpty()) {
+                                    layout.setError(
+                                            getString(R.string.settings_licence_name_required));
+                                    return;
+                                }
+                                layout.setError(null);
+                                GeneralPreferences.addUsedLicence(name);
+                                field.setText("");
+                                refreshList(view);
+                            });
+        }
+
+        /**
+         * Lists the licences on offer: the built-in defaults first, shown greyed out since they
+         * can't be edited or removed, then the user's own, which can.
+         */
+        private void refreshList(View root) {
+            LinearLayout list = root.findViewById(R.id.licences_list);
+            list.removeAllViews();
+            LayoutInflater inflater = LayoutInflater.from(requireContext());
+
+            for (String name : Licence.getDefaultNames()) {
+                View row = inflater.inflate(R.layout.licence_option_item, list, false);
+                TextView nameField = row.findViewById(R.id.licence_name_field);
+                nameField.setText(
+                        name.equals(Licence.RECOMMENDED.getName())
+                                ? getString(R.string.trip_licence_recommended_suffix, name)
+                                : name);
+                nameField.setEnabled(false);
+                row.findViewById(R.id.delete_licence_button).setVisibility(View.GONE);
+                list.addView(row);
+            }
+
+            for (String name : GeneralPreferences.getUsedLicences()) {
+                View row = inflater.inflate(R.layout.licence_option_item, list, false);
+                ((TextView) row.findViewById(R.id.licence_name_field)).setText(name);
+                row.setOnClickListener(v -> showEditDialog(root, name));
+                row.findViewById(R.id.delete_licence_button)
+                        .setOnClickListener(
+                                v -> {
+                                    GeneralPreferences.removeUsedLicence(name);
+                                    refreshList(root);
+                                });
+                list.addView(row);
+            }
+        }
+
+        private void showEditDialog(View root, String currentName) {
+            View dialogView =
+                    LayoutInflater.from(requireContext())
+                            .inflate(R.layout.dialog_edit_licence_name, null);
+            TextInputLayout layout = dialogView.findViewById(R.id.licence_name_input_layout);
+            TextInputEditText field = dialogView.findViewById(R.id.licence_name_field);
+            field.setText(currentName);
+            field.selectAll();
+
+            AlertDialog dialog =
+                    new MaterialAlertDialogBuilder(requireContext())
+                            .setTitle(R.string.edit)
+                            .setView(dialogView)
+                            .setPositiveButton(R.string.save, null)
+                            .setNegativeButton(R.string.cancel, null)
+                            .show();
+
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                    .setOnClickListener(
+                            v -> {
+                                String newName = getTrimmedText(field);
+                                if (newName.isEmpty()) {
+                                    layout.setError(
+                                            getString(R.string.settings_licence_name_required));
+                                    return;
+                                }
+                                GeneralPreferences.removeUsedLicence(currentName);
+                                GeneralPreferences.addUsedLicence(newName);
+                                dialog.dismiss();
+                                refreshList(root);
+                            });
+        }
+
+        /**
+         * Returns the field's text, trimmed, or "" if the field has no text at all. {@link
+         * TextInputEditText#getText()} is nullable, even though in practice it won't be null for an
+         * already-inflated field; this keeps the null-check in one place.
+         */
+        private static String getTrimmedText(TextInputEditText field) {
+            Editable text = field.getText();
+            return text == null ? "" : text.toString().trim();
+        }
+    }
+
+    public static class InstrumentsFragment extends PreferenceFragmentCompat {
+        @Override
+        public void onCreatePreferences(final Bundle savedInstanceState, final String rootKey) {
+            setPreferencesFromResource(R.xml.preferences_instruments, rootKey);
+        }
+    }
+
+    public static class DeveloperFragment extends PreferenceFragmentCompat {
+        @Override
+        public void onCreatePreferences(final Bundle savedInstanceState, final String rootKey) {
+            setPreferencesFromResource(R.xml.preferences_developer, rootKey);
         }
     }
 }

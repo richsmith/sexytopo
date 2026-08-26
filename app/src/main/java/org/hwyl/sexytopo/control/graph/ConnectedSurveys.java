@@ -1,5 +1,8 @@
 package org.hwyl.sexytopo.control.graph;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Projection2D;
@@ -8,11 +11,6 @@ import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.SurveyConnection;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 
 public class ConnectedSurveys {
 
@@ -23,10 +21,12 @@ public class ConnectedSurveys {
         return translated;
     }
 
-
     private static void updateTranslatedConnectedSurveys(
-            Projection2D projectionType, Survey original,
-            Map<Survey, Space<Coord2D>> translated, Survey survey, Space<Coord2D> projection) {
+            Projection2D projectionType,
+            Survey original,
+            Map<Survey, Space<Coord2D>> translated,
+            Survey survey,
+            Space<Coord2D> projection) {
 
         Map<Station, Set<SurveyConnection>> connections = survey.getConnectedSurveys();
         for (Station connectingStation : connections.keySet()) {
@@ -55,21 +55,19 @@ public class ConnectedSurveys {
                 Coord2D transformation =
                         connectingStationLocation.minus(otherConnectingStationLocation);
 
-                Sketch translatedPlan =
-                        otherSurvey.getPlanSketch().getTranslatedCopy(transformation);
+                Sketch translatedPlan = otherSurvey.getPlanSketch().translate(transformation);
                 lightweightSurveyCopy.setPlanSketch(translatedPlan);
                 Sketch translatedElevation =
-                        otherSurvey.getElevationSketch().getTranslatedCopy(transformation);
+                        otherSurvey.getElevationSketch().translate(transformation);
                 lightweightSurveyCopy.setElevationSketch(translatedElevation);
 
-                otherProjection = Space2DUtils.transform(otherProjection, transformation);
+                otherProjection = Space2DUtils.translate(otherProjection, transformation);
 
                 translated.put(lightweightSurveyCopy, otherProjection);
 
                 updateTranslatedConnectedSurveys(
                         projectionType, original, translated, otherSurvey, otherProjection);
             }
-
         }
     }
 
@@ -87,5 +85,4 @@ public class ConnectedSurveys {
         }
         return false;
     }
-
 }

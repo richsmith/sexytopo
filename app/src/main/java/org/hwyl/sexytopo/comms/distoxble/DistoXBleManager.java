@@ -8,10 +8,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.view.View;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import no.nordicsemi.android.ble.data.Data;
 import org.apache.commons.lang3.ArrayUtils;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.comms.ble.SexyTopoBleManager;
@@ -25,18 +28,9 @@ import org.hwyl.sexytopo.control.activity.DistoXCalibrationActivity;
 import org.hwyl.sexytopo.model.calibration.CalibrationReading;
 import org.hwyl.sexytopo.model.survey.Leg;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
-import no.nordicsemi.android.ble.data.Data;
-
-
 public class DistoXBleManager extends SexyTopoBleManager {
 
     private enum MemoryRange {
-
         DATA_STORE(0x0000, 0x7FFFF),
         CALIBRATION_COEFFICIENTS(0x8010, 0x8043),
         FIRMWARE_VERSION(0xE000, 0xE003),
@@ -72,7 +66,6 @@ public class DistoXBleManager extends SexyTopoBleManager {
     private BluetoothGattCharacteristic writeCharacteristic;
     private BluetoothGattCharacteristic readCharacteristic;
 
-
     private static final int COMMAND_OPEN_CALIBRATION_VIEW = View.generateViewId();
     private static final int COMMAND_CALIBRATION_MODE_STOP = View.generateViewId();
     private static final int COMMAND_CALIBRATION_MODE_START = View.generateViewId();
@@ -83,40 +76,41 @@ public class DistoXBleManager extends SexyTopoBleManager {
     private static final int COMMAND_LASER_OFF = View.generateViewId();
     private static final int COMMAND_LASER_TRIGGER = View.generateViewId();
 
-
-
     private static final Map<Integer, Integer> CUSTOM_COMMANDS = new HashMap<>();
+
     static {
-        CUSTOM_COMMANDS.put(COMMAND_OPEN_CALIBRATION_VIEW, R.string.device_distox_command_calibration);
+        CUSTOM_COMMANDS.put(
+                COMMAND_OPEN_CALIBRATION_VIEW, R.string.device_distox_command_calibration);
         CUSTOM_COMMANDS.put(COMMAND_LASER_ON, R.string.device_command_laser_on);
         CUSTOM_COMMANDS.put(COMMAND_LASER_TRIGGER, R.string.device_command_take_shot);
         CUSTOM_COMMANDS.put(COMMAND_LASER_OFF, R.string.device_command_laser_off);
-        CUSTOM_COMMANDS.put(COMMAND_SILENT_MODE_START, R.string.device_distox_command_silent_mode_on);
-        CUSTOM_COMMANDS.put(COMMAND_SILENT_MODE_STOP, R.string.device_distox_command_silent_mode_off);
+        CUSTOM_COMMANDS.put(
+                COMMAND_SILENT_MODE_START, R.string.device_distox_command_silent_mode_on);
+        CUSTOM_COMMANDS.put(
+                COMMAND_SILENT_MODE_STOP, R.string.device_distox_command_silent_mode_off);
         CUSTOM_COMMANDS.put(COMMAND_DEVICE_POWER_OFF, R.string.device_command_device_off);
     }
 
     private static final Map<Integer, Integer> CUSTOM_COMMAND_TO_COMMAND_BYTE = new HashMap<>();
+
     static {
         CUSTOM_COMMAND_TO_COMMAND_BYTE.put(COMMAND_CALIBRATION_MODE_STOP, 0x30);
         CUSTOM_COMMAND_TO_COMMAND_BYTE.put(COMMAND_CALIBRATION_MODE_START, 0x31);
         CUSTOM_COMMAND_TO_COMMAND_BYTE.put(COMMAND_SILENT_MODE_STOP, 0x32);
         CUSTOM_COMMAND_TO_COMMAND_BYTE.put(COMMAND_SILENT_MODE_START, 0x33);
-        CUSTOM_COMMAND_TO_COMMAND_BYTE.put(COMMAND_DEVICE_POWER_OFF , 0x34);
+        CUSTOM_COMMAND_TO_COMMAND_BYTE.put(COMMAND_DEVICE_POWER_OFF, 0x34);
         CUSTOM_COMMAND_TO_COMMAND_BYTE.put(COMMAND_LASER_ON, 0x36);
         CUSTOM_COMMAND_TO_COMMAND_BYTE.put(COMMAND_LASER_OFF, 0x37);
         CUSTOM_COMMAND_TO_COMMAND_BYTE.put(COMMAND_LASER_TRIGGER, 0x38);
     }
 
-    private static final Byte[] WRITE_HEADER = new Byte[]{0x64, 0x61, 0x74, 0x61, 0x3a};
-    private static final Byte[] WRITE_FOOTER = new Byte[]{0x0d, 0x0a};
-    private static final Byte[] WRITE_MEMORY_PAYLOAD_HEADER = new Byte[]{0x3e};
+    private static final Byte[] WRITE_HEADER = new Byte[] {0x64, 0x61, 0x74, 0x61, 0x3a};
+    private static final Byte[] WRITE_FOOTER = new Byte[] {0x0d, 0x0a};
+    private static final Byte[] WRITE_MEMORY_PAYLOAD_HEADER = new Byte[] {0x3e};
 
     private final SurveyManager dataManager;
 
-
-    public DistoXBleManager(@NonNull final Context context,
-                            SurveyManager dataManager) {
+    public DistoXBleManager(@NonNull final Context context, SurveyManager dataManager) {
         super(context);
         this.dataManager = dataManager;
     }
@@ -127,7 +121,6 @@ public class DistoXBleManager extends SexyTopoBleManager {
         setNotificationCallback(readCharacteristic).with(handler);
         enableNotifications(readCharacteristic).enqueue();
     }
-
 
     @Override
     public boolean isRequiredServiceSupported(@NonNull final BluetoothGatt gatt) {
@@ -144,13 +137,15 @@ public class DistoXBleManager extends SexyTopoBleManager {
         return CUSTOM_COMMANDS;
     }
 
-    /** @noinspection DataFlowIssue*/
+    /**
+     * @noinspection DataFlowIssue
+     */
     @Override
     public boolean handleCustomCommand(Integer id) {
 
         if (CUSTOM_COMMAND_TO_COMMAND_BYTE.containsKey(id)) {
             int commandInt = CUSTOM_COMMAND_TO_COMMAND_BYTE.get(id);
-            Byte commandByte = (byte)commandInt;
+            Byte commandByte = (byte) commandInt;
             Byte[] packet = createWriteCommandPacket(commandByte);
 
             Integer stringId;
@@ -171,9 +166,7 @@ public class DistoXBleManager extends SexyTopoBleManager {
         } else {
             return false;
         }
-
     }
-
 
     public void startCalibration() {
         handleCustomCommand(COMMAND_CALIBRATION_MODE_START);
@@ -184,8 +177,8 @@ public class DistoXBleManager extends SexyTopoBleManager {
     }
 
     public WriteCalibrationProtocol writeCalibration(Byte... bytes) {
-        Byte[] calibrationWritePacket = createWriteMemoryPacket(
-                MemoryRange.CALIBRATION_COEFFICIENTS, bytes);
+        Byte[] calibrationWritePacket =
+                createWriteMemoryPacket(MemoryRange.CALIBRATION_COEFFICIENTS, bytes);
         writePacket(calibrationWritePacket, R.string.device_distox_calibration_writing);
 
         // A bit hacky, but return null to be consistent with the interface
@@ -201,24 +194,18 @@ public class DistoXBleManager extends SexyTopoBleManager {
         context.startActivity(intent);
     }
 
-
     public static Byte[] createWriteCommandPacket(Byte commandByte) {
-        return createWritePacket(new Byte[]{commandByte});
+        return createWritePacket(new Byte[] {commandByte});
     }
-
 
     private static Byte[] createWriteMemoryPacket(MemoryRange memoryRange, Byte[] payload) {
         Byte[] writePayload = createWriteMemoryPayload(memoryRange, payload);
         return createWritePacket(writePayload);
     }
 
-
-
     private static Byte[] createWritePacket(Byte[] payload) {
 
-
-
-        Byte[] payloadLength = new Byte[]{(byte)(payload.length)};
+        Byte[] payloadLength = new Byte[] {(byte) (payload.length)};
 
         // This is a nice way of doing it, but it makes the app hang
         // for some reason - to be investigated some time
@@ -235,34 +222,31 @@ public class DistoXBleManager extends SexyTopoBleManager {
         return packet;
     }
 
-
-    private static Byte[] createWriteMemoryPayload(
-            MemoryRange memoryRange, Byte[] payload) {
-        Byte[] payloadLength = new Byte[]{(byte)payload.length};
+    private static Byte[] createWriteMemoryPayload(MemoryRange memoryRange, Byte[] payload) {
+        Byte[] payloadLength = new Byte[] {(byte) payload.length};
         Byte[] payloadAddress = memoryRange.asArray();
         Byte[] packet = new Byte[payload.length + 4];
-        System.arraycopy(WRITE_MEMORY_PAYLOAD_HEADER,0 ,packet,0,1);
-        System.arraycopy(payloadAddress,0,packet,1,2);
-        System.arraycopy(payloadLength,0,packet,3,1);
-        System.arraycopy(payload,0,packet,4, payload.length);
+        System.arraycopy(WRITE_MEMORY_PAYLOAD_HEADER, 0, packet, 0, 1);
+        System.arraycopy(payloadAddress, 0, packet, 1, 2);
+        System.arraycopy(payloadLength, 0, packet, 3, 1);
+        System.arraycopy(payload, 0, packet, 4, payload.length);
         return packet;
     }
-
 
     private void writePacket(Byte[] packet, int stringId) {
         byte[] packetBytes = ArrayUtils.toPrimitive(packet);
         writeCharacteristic(
-                writeCharacteristic, packetBytes, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
-            .done(device -> Log.device(stringId))
-            .enqueue();
+                        writeCharacteristic,
+                        packetBytes,
+                        BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
+                .done(device -> Log.device(stringId))
+                .enqueue();
     }
-
 
     private class DataHandler extends SexyTopoDataHandler {
 
         final byte MEASUREMENT_IDENTIFIER = 0x01;
         final byte CALIBRATION_IDENTIFIER = 0x02;
-
 
         @RequiresApi(api = Build.VERSION_CODES.O)
         @Override
@@ -294,7 +278,7 @@ public class DistoXBleManager extends SexyTopoBleManager {
         }
 
         private void handleMeasurementPacket(byte[] packet) {
-            byte[] data = Arrays.copyOfRange(packet,1,16);
+            byte[] data = Arrays.copyOfRange(packet, 1, 16);
             Leg leg = MeasurementProtocol.parseDataPacket(data);
             dataManager.updateSurvey(leg);
         }
@@ -317,6 +301,5 @@ public class DistoXBleManager extends SexyTopoBleManager {
             Byte replyByte = (byte) (packet[1] & 0x80 | 0x55);
             return createWriteCommandPacket(replyByte);
         }
-
     }
 }

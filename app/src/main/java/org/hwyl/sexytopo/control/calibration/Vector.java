@@ -73,24 +73,24 @@ public class Vector {
     }
 
     public static float Abs(Vector a) {
-        return (float)Math.sqrt(a.x * a.x + a.y * a.y + a.z * a.z);
+        return (float) Math.sqrt(a.x * a.x + a.y * a.y + a.z * a.z);
     }
 
     public Vector TurnX(float a) { // turn around X axis
-        float s = (float)Math.sin(a);
-        float c = (float)Math.cos(a);
+        float s = (float) Math.sin(a);
+        float c = (float) Math.cos(a);
         return new Vector(x, c * y - s * z, c * z + s * y);
     }
 
     public Vector TurnY(float a) { // turn around Y axis
-        float s = (float)Math.sin(a);
-        float c = (float)Math.cos(a);
+        float s = (float) Math.sin(a);
+        float c = (float) Math.cos(a);
         return new Vector(c * x + s * z, y, c * z - s * x);
     }
 
     public Vector TurnZ(float a) { // turn around Z axis
-        float s = (float)Math.sin(a);
-        float c = (float)Math.cos(a);
+        float s = (float) Math.sin(a);
+        float c = (float) Math.cos(a);
         return new Vector(c * x - s * y, c * y + s * x, z);
     }
 

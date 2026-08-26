@@ -6,9 +6,10 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
-
+import com.google.android.material.textfield.TextInputLayout;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
+import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.control.util.SurveyTools;
 import org.hwyl.sexytopo.model.survey.Leg;
@@ -18,6 +19,29 @@ import org.hwyl.sexytopo.model.survey.Survey;
 public class EditLegForm extends Form {
     private static final int SPINNER_FORWARD = 0;
     private static final int SPINNER_BACKWARD = 1;
+
+    /**
+     * A TextWatcher that, in addition to triggering validation, enables live-error display as soon
+     * as the watched field contains any non-empty text. This lets out-of-range errors appear
+     * immediately while the user is typing, without showing a "cannot be blank" error on an
+     * untouched field.
+     */
+    private static class LiveErrorTrigger extends TextViewValidationTrigger {
+        private final android.widget.EditText field;
+
+        LiveErrorTrigger(Form form, android.widget.EditText field) {
+            super(form);
+            this.field = field;
+        }
+
+        @Override
+        public void afterTextChanged(android.text.Editable editable) {
+            if (field.getText().length() > 0) {
+                form.enableLiveErrors();
+            }
+            super.afterTextChanged(editable);
+        }
+    }
 
     private final Context context;
     private final Survey survey;
@@ -33,11 +57,25 @@ public class EditLegForm extends Form {
     private EditText graphFromStationField;
     private EditText graphToStationField;
 
-
     private EditText fromCommentField;
     private EditText toCommentField;
+    private EditText legCommentField;
 
     private Station lastFromStation;
+
+    private TextInputLayout fromStationLayout;
+    private TextInputLayout toStationLayout;
+    private TextInputLayout distanceLayout;
+    private TextInputLayout azimuthLayout;
+    private TextInputLayout inclinationLayout;
+
+    // TextInputLayout wrappers for DMS minutes/seconds fields, used to show live errors
+    private TextInputLayout azimuthMinutesLayout;
+    private TextInputLayout azimuthSecondsLayout;
+    private TextInputLayout inclinationMinutesLayout;
+    private TextInputLayout inclinationSecondsLayout;
+    private TextInputLayout azimuthDegreesLayout;
+    private TextInputLayout inclinationDegreesLayout;
 
     private EditText distanceField;
     private EditText azimuthField;
@@ -47,16 +85,18 @@ public class EditLegForm extends Form {
     private EditText azimuthDegreesField;
     private EditText azimuthMinutesField;
     private EditText azimuthSecondsField;
+    private EditText inclinationDegreesField;
+    private EditText inclinationMinutesField;
+    private EditText inclinationSecondsField;
 
     private Spinner inputModeSpinner;
     private InputMode inputMode = InputMode.FORWARD;
 
     private boolean isInitialising;
 
-    /**
-     * Constructor for editing an existing leg
-     */
-    public EditLegForm(Context context, Survey survey, Station fromStation, Leg legToEdit, View dialogView) {
+    /** Constructor for editing an existing leg */
+    public EditLegForm(
+            Context context, Survey survey, Station fromStation, Leg legToEdit, View dialogView) {
         super(context);
         this.context = context;
         this.survey = survey;
@@ -68,17 +108,20 @@ public class EditLegForm extends Form {
         this.initialise(dialogView);
     }
 
-    /**
-     * Constructor for adding a new leg (no existing leg to edit)
-     */
-    public EditLegForm(Context context, Survey survey, Station fromStation, String defaultToName,
-                       boolean isSplay, View dialogView) {
+    /** Constructor for adding a new leg (no existing leg to edit) */
+    public EditLegForm(
+            Context context,
+            Survey survey,
+            Station fromStation,
+            String defaultToName,
+            boolean isSplay,
+            View dialogView) {
         super(context);
         this.context = context;
         this.survey = survey;
         this.originalFromStation = fromStation;
         this.lastFromStation = fromStation;
-        this.originalLeg = null;  // No original leg when adding
+        this.originalLeg = null; // No original leg when adding
         this.defaultToName = defaultToName;
         this.isSplay = isSplay;
 
@@ -95,16 +138,32 @@ public class EditLegForm extends Form {
 
     private void initialiseFields(View dialogView) {
         // Find all view references from the dialog
+        this.fromStationLayout = dialogView.findViewById(R.id.fromStationLayout);
+        this.toStationLayout = dialogView.findViewById(R.id.toStationLayout);
+        this.distanceLayout = dialogView.findViewById(R.id.distanceLayout);
+        this.azimuthLayout = dialogView.findViewById(R.id.azimuth_standard);
+        this.inclinationLayout = dialogView.findViewById(R.id.inclinationLayout);
+        this.azimuthMinutesLayout = dialogView.findViewById(R.id.editAzimuthMinutesLayout);
+        this.azimuthSecondsLayout = dialogView.findViewById(R.id.editAzimuthSecondsLayout);
+        this.inclinationMinutesLayout = dialogView.findViewById(R.id.editInclinationMinutesLayout);
+        this.inclinationSecondsLayout = dialogView.findViewById(R.id.editInclinationSecondsLayout);
+        this.azimuthDegreesLayout = dialogView.findViewById(R.id.editAzimuthDegreesLayout);
+        this.inclinationDegreesLayout = dialogView.findViewById(R.id.editInclinationDegreesLayout);
+
         this.fromStationField = dialogView.findViewById(R.id.editFromStation);
         this.fromCommentField = dialogView.findViewById(R.id.editFromComment);
         this.toStationField = dialogView.findViewById(R.id.editToStation);
         this.toCommentField = dialogView.findViewById(R.id.editToComment);
+        this.legCommentField = dialogView.findViewById(R.id.editLegComment);
         this.distanceField = dialogView.findViewById(R.id.editDistance);
         this.azimuthField = dialogView.findViewById(R.id.editAzimuth);
         this.inclinationField = dialogView.findViewById(R.id.editInclination);
         this.azimuthDegreesField = dialogView.findViewById(R.id.editAzimuthDegrees);
         this.azimuthMinutesField = dialogView.findViewById(R.id.editAzimuthMinutes);
         this.azimuthSecondsField = dialogView.findViewById(R.id.editAzimuthSeconds);
+        this.inclinationDegreesField = dialogView.findViewById(R.id.editInclinationDegrees);
+        this.inclinationMinutesField = dialogView.findViewById(R.id.editInclinationMinutes);
+        this.inclinationSecondsField = dialogView.findViewById(R.id.editInclinationSeconds);
         this.inputModeSpinner = dialogView.findViewById(R.id.inputModeSpinner);
 
         // Set up validation listeners
@@ -113,9 +172,48 @@ public class EditLegForm extends Form {
             this.toStationField.addTextChangedListener(new TextViewValidationTrigger(this));
         }
         this.distanceField.addTextChangedListener(new TextViewValidationTrigger(this));
-        this.azimuthField.addTextChangedListener(new TextViewValidationTrigger(this));
-        this.inclinationField.addTextChangedListener(new TextViewValidationTrigger(this));
+        this.azimuthField.addTextChangedListener(new LiveErrorTrigger(this, this.azimuthField));
+        this.inclinationField.addTextChangedListener(
+                new LiveErrorTrigger(this, this.inclinationField));
 
+        if (GeneralPreferences.isDegMinsSecsModeOn()) {
+            this.azimuthDegreesField.addTextChangedListener(new TextViewValidationTrigger(this));
+            this.azimuthMinutesField.addTextChangedListener(new TextViewValidationTrigger(this));
+            this.azimuthSecondsField.addTextChangedListener(new TextViewValidationTrigger(this));
+        }
+        if (GeneralPreferences.isIncDegMinsSecsModeOn()) {
+            this.inclinationDegreesField.addTextChangedListener(
+                    new TextViewValidationTrigger(this));
+            this.inclinationMinutesField.addTextChangedListener(
+                    new TextViewValidationTrigger(this));
+            this.inclinationSecondsField.addTextChangedListener(
+                    new TextViewValidationTrigger(this));
+        }
+
+        // Enable error display once the user leaves a field for the first time.
+        android.view.View.OnFocusChangeListener enableErrorsOnTouch =
+                (v, hasFocus) -> {
+                    if (!hasFocus) {
+                        enableErrors();
+                        validate();
+                    }
+                };
+        this.fromStationField.setOnFocusChangeListener(enableErrorsOnTouch);
+        if (!isSplay) {
+            this.toStationField.setOnFocusChangeListener(enableErrorsOnTouch);
+        }
+        this.distanceField.setOnFocusChangeListener(enableErrorsOnTouch);
+        this.azimuthField.setOnFocusChangeListener(enableErrorsOnTouch);
+        this.inclinationField.setOnFocusChangeListener(enableErrorsOnTouch);
+
+        if (GeneralPreferences.isDegMinsSecsModeOn()) {
+            this.azimuthMinutesField.setOnFocusChangeListener(enableErrorsOnTouch);
+            this.azimuthSecondsField.setOnFocusChangeListener(enableErrorsOnTouch);
+        }
+        if (GeneralPreferences.isIncDegMinsSecsModeOn()) {
+            this.inclinationMinutesField.setOnFocusChangeListener(enableErrorsOnTouch);
+            this.inclinationSecondsField.setOnFocusChangeListener(enableErrorsOnTouch);
+        }
     }
 
     private void initialiseInputMode(View dialogView) {
@@ -123,52 +221,60 @@ public class EditLegForm extends Form {
             View inputModeContainer = dialogView.findViewById(R.id.inputModeContainer);
             inputModeContainer.setVisibility(View.VISIBLE);
 
-            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-                context, R.array.leg_edit_input_mode_options, android.R.layout.simple_spinner_item);
+            ArrayAdapter<CharSequence> adapter =
+                    ArrayAdapter.createFromResource(
+                            context,
+                            R.array.leg_edit_input_mode_options,
+                            android.R.layout.simple_spinner_item);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             this.inputModeSpinner.setAdapter(adapter);
 
             // Set initial selection
             this.inputModeSpinner.setSelection(
-                inputMode == InputMode.FORWARD ? SPINNER_FORWARD : SPINNER_BACKWARD);
+                    inputMode == InputMode.FORWARD ? SPINNER_FORWARD : SPINNER_BACKWARD);
 
             // Set up spinner listener to update display when selection changes
-            this.inputModeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    InputMode newMode = position == SPINNER_FORWARD ?
-                        InputMode.FORWARD : InputMode.BACKWARD;
-                    boolean isChange = inputMode != newMode;
+            this.inputModeSpinner.setOnItemSelectedListener(
+                    new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(
+                                AdapterView<?> parent, View view, int position, long id) {
+                            InputMode newMode =
+                                    position == SPINNER_FORWARD
+                                            ? InputMode.FORWARD
+                                            : InputMode.BACKWARD;
+                            boolean isChange = inputMode != newMode;
 
-                    if (isChange) {
-                        inputMode = newMode;
+                            if (isChange) {
+                                inputMode = newMode;
 
-                        if (!isInitialising) {
-                            swapStationDisplay();
+                                if (!isInitialising) {
+                                    swapStationDisplay();
+                                }
+                                validate();
+                            }
                         }
-                        validate();
-                    }
-                }
 
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-                    // Do nothing
-                }
-            });
+                        @Override
+                        public void onNothingSelected(AdapterView<?> parent) {
+                            // Do nothing
+                        }
+                    });
         }
     }
 
     @Override
     protected void performValidation() {
         // Validate stations
-        EditText graphFromField = inputMode == InputMode.BACKWARD ? toStationField : fromStationField;
+        EditText graphFromField =
+                inputMode == InputMode.BACKWARD ? toStationField : fromStationField;
         EditText graphToField = inputMode == InputMode.BACKWARD ? fromStationField : toStationField;
 
         Station fromStation = validateGraphFromField(graphFromField);
         if (!isSplay) {
             validateGraphToField(fromStation, graphToField);
         }
-        
+
         // Validate measurements
         validateDistance();
         validateAzimuth();
@@ -193,7 +299,9 @@ public class EditLegForm extends Form {
             if (isRenamingStation) {
                 Station existing = survey.getStationByName(fromName);
                 if (existing == null) {
-                    fromStation=survey.getOrigin(); // Send back the origin station so that it can be renamed
+                    fromStation =
+                            survey.getOrigin(); // Send back the origin station so that it can be
+                    // renamed
                 } else {
                     error = R.string.validation_error_station_name_not_unique;
                 }
@@ -212,7 +320,7 @@ public class EditLegForm extends Form {
         }
 
         // Has the from station changed
-        if (fromStation!=null && fromStation != lastFromStation) {
+        if (fromStation != null && fromStation != lastFromStation) {
             // Update the comment to the new station
             String fromComment = "";
             if (fromStation.hasComment()) {
@@ -223,12 +331,18 @@ public class EditLegForm extends Form {
             lastFromStation = fromStation;
         }
 
-        setError(fromField, error);
+        TextInputLayout layout =
+                (fromField == fromStationField) ? fromStationLayout : toStationLayout;
+        if (layout != null) {
+            setError(layout, error);
+        } else {
+            setError(fromField, error);
+        }
         return fromStation;
     }
 
     private void validateGraphToField(Station fromStation, EditText toField) {
-        String fromName = fromStation == null? null : fromStation.getName();
+        String fromName = fromStation == null ? null : fromStation.getName();
         String toName = toField.getText().toString();
 
         Integer error = null;
@@ -259,70 +373,276 @@ public class EditLegForm extends Form {
             }
         }
 
-        setError(toField, error);
+        TextInputLayout layout = (toField == toStationField) ? toStationLayout : fromStationLayout;
+        if (layout != null) {
+            setError(layout, error);
+        } else {
+            setError(toField, error);
+        }
     }
 
     private void validateDistance() {
         String distanceText = this.distanceField.getText().toString();
         try {
             if (distanceText.isEmpty()) {
-                setError(this.distanceField, R.string.validation_error_cannot_be_blank);
+                setError(this.distanceLayout, R.string.validation_error_cannot_be_blank);
             } else {
                 float distance = Float.parseFloat(distanceText);
                 if (!Leg.isDistanceLegal(distance)) {
-                    setError(this.distanceField,
-                        context.getString(R.string.validation_error_distance_minimum,
-                            Leg.MIN_DISTANCE));
+                    setError(
+                            this.distanceLayout,
+                            context.getString(
+                                    R.string.validation_error_distance_minimum, Leg.MIN_DISTANCE));
                 } else {
-                    setError(this.distanceField, (Integer) null);
+                    setError(this.distanceLayout, (Integer) null);
                 }
             }
         } catch (NumberFormatException e) {
-            setError(this.distanceField, context.getString(R.string.validation_error_must_be_number));
+            setError(
+                    this.distanceLayout,
+                    context.getString(R.string.validation_error_must_be_number));
         }
     }
 
     private void validateAzimuth() {
-        String azimuthText = this.azimuthField.getText().toString();
-        try {
-            if (azimuthText.isEmpty()) {
-                setError(this.azimuthField, context.getString(R.string.validation_error_cannot_be_blank));
-            } else {
-                float azimuth = Float.parseFloat(azimuthText);
-                if (!Leg.isAzimuthLegal(azimuth)) {
-                    setError(this.azimuthField,
-                        context.getString(R.string.validation_error_azimuth_range, Leg.MIN_AZIMUTH, Leg.MAX_AZIMUTH));
-                } else {
-                    setError(this.azimuthField, (Integer) null);
-                }
-            }
-        } catch (NumberFormatException e) {
-            setError(this.azimuthField, context.getString(R.string.validation_error_must_be_number));
+        if (GeneralPreferences.isDegMinsSecsModeOn()) {
+            validateAzimuthDms();
+        } else {
+            validateAzimuthDecimal();
         }
     }
 
-    private void validateInclination() {
-        String inclinationText = this.inclinationField.getText().toString();
+    private void validateAzimuthDecimal() {
+        String azimuthText = this.azimuthField.getText().toString();
         try {
-            if (inclinationText.isEmpty()) {
-                setError(this.inclinationField, context.getString(R.string.validation_error_cannot_be_blank));
+            if (azimuthText.isEmpty()) {
+                setError(
+                        this.azimuthLayout,
+                        context.getString(R.string.validation_error_cannot_be_blank));
             } else {
-                float inclination = Float.parseFloat(inclinationText);
-                if (!Leg.isInclinationLegal(inclination)) {
-                    setError(this.inclinationField,
-                        context.getString(R.string.validation_error_inclination_range, Leg.MIN_INCLINATION, Leg.MAX_INCLINATION));
+                float azimuth = Float.parseFloat(azimuthText);
+                if (!Leg.isAzimuthLegal(azimuth)) {
+                    setLiveError(
+                            this.azimuthLayout,
+                            context.getString(
+                                    R.string.validation_error_azimuth_range,
+                                    Leg.MIN_AZIMUTH,
+                                    Leg.MAX_AZIMUTH));
                 } else {
-                    setError(this.inclinationField, (Integer) null);
+                    setLiveError(this.azimuthLayout, (Integer) null);
                 }
             }
         } catch (NumberFormatException e) {
-            setError(this.inclinationField, context.getString(R.string.validation_error_must_be_number));
+            setError(
+                    this.azimuthLayout,
+                    context.getString(R.string.validation_error_must_be_number));
+        }
+    }
+
+    private void validateAzimuthDms() {
+        // Degrees is required; missing minutes/seconds are treated as zero.
+        if (azimuthDegreesField.getText().toString().isEmpty()) {
+            this.valid = false;
+            return;
+        }
+        // Degrees has content - enable live error display, mirroring what
+        // LiveErrorTrigger does for the decimal azimuth field.
+        enableLiveErrors();
+        validateAzimuthDegreesField();
+        validateMinutesField(azimuthMinutesLayout, azimuthMinutesField);
+        validateSecondsField(azimuthSecondsLayout, azimuthSecondsField);
+    }
+
+    /**
+     * Validates the azimuth degrees field independently. The value must be in [0, 359]. The field's
+     * inputType="number" guarantees a parseable integer.
+     */
+    private boolean validateAzimuthDegreesField() {
+        int degrees = Integer.parseInt(azimuthDegreesField.getText().toString());
+        if (Leg.MIN_AZIMUTH <= degrees && degrees < Leg.MAX_AZIMUTH) {
+            setLiveError(azimuthDegreesLayout, (Integer) null);
+            return true;
+        }
+        setLiveError(
+                azimuthDegreesLayout,
+                context.getString(
+                        R.string.validation_error_azimuth_range, Leg.MIN_AZIMUTH, Leg.MAX_AZIMUTH));
+        return false;
+    }
+
+    private void validateInclination() {
+        if (GeneralPreferences.isIncDegMinsSecsModeOn()) {
+            validateInclinationDms();
+        } else {
+            validateInclinationDecimal();
+        }
+    }
+
+    private void validateInclinationDecimal() {
+        String inclinationText = this.inclinationField.getText().toString();
+        try {
+            if (inclinationText.isEmpty()) {
+                setError(
+                        this.inclinationLayout,
+                        context.getString(R.string.validation_error_cannot_be_blank));
+            } else {
+                float inclination = Float.parseFloat(inclinationText);
+                if (!Leg.isInclinationLegal(inclination)) {
+                    setLiveError(
+                            this.inclinationLayout,
+                            context.getString(R.string.validation_error_inclination_range));
+                } else {
+                    setLiveError(this.inclinationLayout, (Integer) null);
+                }
+            }
+        } catch (NumberFormatException e) {
+            setError(
+                    this.inclinationLayout,
+                    context.getString(R.string.validation_error_must_be_number));
+        }
+    }
+
+    private void validateInclinationDms() {
+        // Degrees is required; missing minutes/seconds are treated as zero.
+        if (inclinationDegreesField.getText().toString().isEmpty()) {
+            this.valid = false;
+            return;
+        }
+        // Degrees has content - enable live error display, mirroring what
+        // LiveErrorTrigger does for the decimal inclination field.
+        enableLiveErrors();
+        validateInclinationDegreesField();
+        validateInclinationMinutesField();
+        validateInclinationSecondsField();
+    }
+
+    /**
+     * Validates the inclination degrees field independently. The value must be in [-90, 90] or
+     * [270, 360] (theodolite range).
+     */
+    private boolean validateInclinationDegreesField() {
+        try {
+            int degrees = Integer.parseInt(inclinationDegreesField.getText().toString());
+            boolean inNormalRange =
+                    degrees >= Leg.MIN_INCLINATION && degrees <= Leg.MAX_INCLINATION;
+            boolean inTheodoliteRange =
+                    degrees >= Leg.MIN_THEODOLITE_INC && degrees <= Leg.MAX_THEODOLITE_INC;
+            if (!inNormalRange && !inTheodoliteRange) {
+                setLiveError(
+                        inclinationDegreesLayout,
+                        context.getString(R.string.validation_error_inclination_range));
+                return false;
+            }
+            setLiveError(inclinationDegreesLayout, (Integer) null);
+            return true;
+        } catch (NumberFormatException e) {
+            // Partial input such as a lone "-"; not yet parseable, suppress error display
+            this.valid = false;
+            return false;
         }
     }
 
     /**
-     * Update the station display based on current shot direction
+     * Validates the inclination minutes field. Applies the standard 0–59 whole-number check, plus
+     * an additional constraint: if the degrees field contains ±90, minutes must be 0 or blank since
+     * as a minute or second value would take it out of range.
      */
+    private boolean validateInclinationMinutesField() {
+        if (isAtInclinationBoundary() && !isZeroOrBlank(inclinationMinutesField)) {
+            setError(
+                    inclinationMinutesLayout,
+                    context.getString(R.string.validation_error_must_be_zero_for_90));
+            return false;
+        }
+        return validateMinutesField(inclinationMinutesLayout, inclinationMinutesField);
+    }
+
+    /**
+     * Validates the inclination seconds field. Applies the standard 0–59.99 check, plus an
+     * additional constraint: if the degrees field contains ±90, seconds must be 0 or blank.
+     */
+    private boolean validateInclinationSecondsField() {
+        if (isAtInclinationBoundary() && !isZeroOrBlank(inclinationSecondsField)) {
+            setError(
+                    inclinationSecondsLayout,
+                    context.getString(R.string.validation_error_must_be_zero_for_90));
+            return false;
+        }
+        return validateSecondsField(inclinationSecondsLayout, inclinationSecondsField);
+    }
+
+    /**
+     * Returns true if the inclination degrees field contains exactly 90 or −90, indicating that the
+     * reading is at the vertical boundary and minutes/seconds must be zero.
+     */
+    private boolean isAtInclinationBoundary() {
+        String text = inclinationDegreesField.getText().toString();
+        return text.equals("90") || text.equals("-90");
+    }
+
+    /**
+     * Returns true if the given field is blank or contains a value that is numerically zero (e.g.
+     * "0", "0.0", "00"). Used to enforce the ±90° boundary constraint.
+     */
+    private boolean isZeroOrBlank(EditText field) {
+        String text = field.getText().toString();
+        if (text.isEmpty()) {
+            return true;
+        }
+        try {
+            return Float.parseFloat(text) == 0.0f;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Validates a minutes field. Blank is accepted (treated as zero). If non-blank, the value must
+     * be in the range 0-59. The field's inputType="number" guarantees a parseable non-negative
+     * integer.
+     */
+    private boolean validateMinutesField(TextInputLayout layout, EditText field) {
+        String text = field.getText().toString();
+        if (text.isEmpty()) {
+            setError(layout, (Integer) null);
+            return true;
+        }
+        int value = Integer.parseInt(text);
+        if (value > 59) {
+            setError(layout, context.getString(R.string.validation_error_mins_secs_range));
+            return false;
+        }
+        setError(layout, (Integer) null);
+        return true;
+    }
+
+    /**
+     * Validates a seconds field. Blank is accepted (treated as zero). If non-blank, the value must
+     * be a non-negative number less than 60; decimal values (e.g. {@code 30.5}) are permitted. Sets
+     * an error on the layout and marks the form invalid if not. Returns true if the field is valid
+     * (or blank), false otherwise.
+     */
+    private boolean validateSecondsField(TextInputLayout layout, EditText field) {
+        String text = field.getText().toString();
+        if (text.isEmpty()) {
+            setError(layout, (Integer) null);
+            return true;
+        }
+        try {
+            float value = Float.parseFloat(text);
+            if (value < 0 || value >= 60) {
+                setError(layout, context.getString(R.string.validation_error_secs_range));
+                return false;
+            }
+            setError(layout, (Integer) null);
+            return true;
+        } catch (NumberFormatException e) {
+            setError(layout, context.getString(R.string.validation_error_must_be_number));
+            return false;
+        }
+    }
+
+    /** Update the station display based on current shot direction */
     private void swapStationDisplay() {
         String fromText = graphFromStationField.getText().toString();
         String toText = graphToStationField.getText().toString();
@@ -335,15 +655,14 @@ public class EditLegForm extends Form {
             graphFromStationField = fromStationField;
             graphToStationField = toStationField; // not used for splay but probably safer to set
         } else {
-            graphFromStationField = inputMode == InputMode.BACKWARD ? toStationField : fromStationField;
-            graphToStationField = inputMode == InputMode.BACKWARD ? fromStationField : toStationField;
+            graphFromStationField =
+                    inputMode == InputMode.BACKWARD ? toStationField : fromStationField;
+            graphToStationField =
+                    inputMode == InputMode.BACKWARD ? fromStationField : toStationField;
         }
-
     }
 
-    /**
-     * Initialise the station display based on current data
-     */
+    /** Initialise the station display based on current data */
     private void initialiseStationDisplay() {
         mapGraphFields();
         String fromComment = "";
@@ -369,6 +688,10 @@ public class EditLegForm extends Form {
             graphToStationField.setText(toName);
             toCommentField.setText(toComment);
         }
+
+        if (legCommentField != null && originalLeg != null) {
+            legCommentField.setText(originalLeg.getComment());
+        }
     }
 
     private String getFromStationName() {
@@ -383,16 +706,35 @@ public class EditLegForm extends Form {
     }
 
     private float getInclination() {
-        return Float.parseFloat(this.inclinationField.getText().toString());
+        // Check if we're using deg/min/sec mode by checking if those fields have values
+        if (inclinationDegreesField != null && inclinationDegreesField.getText().length() > 0) {
+            float degrees = Float.parseFloat(inclinationDegreesField.getText().toString());
+            String minsText = inclinationMinutesField.getText().toString();
+            String secsText = inclinationSecondsField.getText().toString();
+            float minutes = minsText.isEmpty() ? 0.0f : Float.parseFloat(minsText);
+            float seconds = secsText.isEmpty() ? 0.0f : Float.parseFloat(secsText);
+            // The sign of the degrees component determines the direction of the inclination.
+            // Minutes and seconds are always positive and added in the same direction.
+            float sign = degrees < 0 ? -1.0f : 1.0f;
+            return degrees
+                    + sign * (minutes * (1.0f / 60.0f) + seconds * (1.0f / 60.0f) * (1.0f / 60.0f));
+        } else {
+            // Standard decimal mode
+            return Float.parseFloat(this.inclinationField.getText().toString());
+        }
     }
 
     private float getAzimuth() {
         // Check if we're using deg/min/sec mode by checking if those fields have values
         if (azimuthDegreesField != null && azimuthDegreesField.getText().length() > 0) {
             float degrees = Float.parseFloat(azimuthDegreesField.getText().toString());
-            float minutes = Float.parseFloat(azimuthMinutesField.getText().toString());
-            float seconds = Float.parseFloat(azimuthSecondsField.getText().toString());
-            return degrees + (minutes * (1.0f / 60.0f)) + (seconds * (1.0f / 60.0f) * (1.0f / 60.0f));
+            String minsText = azimuthMinutesField.getText().toString();
+            String secsText = azimuthSecondsField.getText().toString();
+            float minutes = minsText.isEmpty() ? 0.0f : Float.parseFloat(minsText);
+            float seconds = secsText.isEmpty() ? 0.0f : Float.parseFloat(secsText);
+            return degrees
+                    + (minutes * (1.0f / 60.0f))
+                    + (seconds * (1.0f / 60.0f) * (1.0f / 60.0f));
         } else {
             // Standard decimal mode
             return Float.parseFloat(this.azimuthField.getText().toString());
@@ -404,7 +746,7 @@ public class EditLegForm extends Form {
         if (fromStation == null && survey.isOrigin(originalFromStation)) {
             // As a special case if we can't find the from station and we are
             // at the origin, we must be wanting to rename it - so return the origin
-            return(originalFromStation);
+            return (originalFromStation);
         }
         return fromStation;
     }
@@ -415,6 +757,7 @@ public class EditLegForm extends Form {
         }
         return toStationField.getText().toString();
     }
+
     private String getToComment() {
         if (toCommentField != null) {
             return toCommentField.getText().toString();
@@ -429,12 +772,11 @@ public class EditLegForm extends Form {
         return null;
     }
 
-
     /**
-     * Create a Leg object from the form data with measurements and shot direction.
-     * For editing: preserves the existing destination station object.
-     * For adding: creates a splay-like leg (caller must create destination and reconstruct).
-     * Should only be called after validation passes.
+     * Create a Leg object from the form data with measurements and shot direction. For editing:
+     * preserves the existing destination station object. For adding: creates a splay-like leg
+     * (caller must create destination and reconstruct). Should only be called after validation
+     * passes.
      */
     public Leg getUpdatedLeg() {
         float distance = getDistance();
@@ -447,7 +789,7 @@ public class EditLegForm extends Form {
         } else if (originalLeg != null && originalLeg.hasDestination()) {
             // For editing: reuse existing destination station object
             Station destination = originalLeg.getDestination();
-            leg = new Leg(distance, azimuth, inclination, destination, new Leg[]{});
+            leg = new Leg(distance, azimuth, inclination, destination, new Leg[] {});
         } else {
             // For adding a new station: create a temporary splay-like leg
             // Caller will reconstruct with proper destination station
@@ -462,10 +804,7 @@ public class EditLegForm extends Form {
         return leg;
     }
 
-    /**
-     * Get the from station for the leg.
-     * Should only be called after validation passes.
-     */
+    /** Get the from station for the leg. Should only be called after validation passes. */
     public Station getUpdatedFromStation() {
         return getFromStation();
     }
@@ -473,19 +812,27 @@ public class EditLegForm extends Form {
     public String getUpdatedFromStationName() {
         return getFromStationName();
     }
+
     public String getUpdatedFromComment() {
         return getFromComment();
     }
 
     /**
-     * Get the to station name for the leg.
-     * Returns null for splays.
-     * Should only be called after validation passes.
+     * Get the to station name for the leg. Returns null for splays. Should only be called after
+     * validation passes.
      */
     public String getUpdatedToStationName() {
         return isSplay ? null : getToStationName();
     }
+
     public String getUpdatedToComment() {
         return isSplay ? null : getToComment();
+    }
+
+    public String getUpdatedLegComment() {
+        if (legCommentField != null) {
+            return legCommentField.getText().toString();
+        }
+        return "";
     }
 }

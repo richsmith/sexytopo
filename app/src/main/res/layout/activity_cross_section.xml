@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:id="@+id/rootLayout"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/panelBackground">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/panelBackground"
+            app:titleTextColor="@color/white" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/lightBackground">
+
+        <org.hwyl.sexytopo.control.graph.CrossSectionView
+            android:id="@+id/graphView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <HorizontalScrollView
+            android:id="@+id/symbolToolbar"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone">
+            <LinearLayout
+                android:orientation="horizontal"
+                android:id="@+id/symbolToolbarButtonPanel"
+                android:weightSum="1"
+                android:background="@color/sexyTopoDarkGreen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+            </LinearLayout>
+
+        </HorizontalScrollView>
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="0dp"
+            android:padding="0dp"
+            android:background="@color/panelBackground"
+            android:columnCount="9"
+            android:rowCount="2"
+            android:useDefaultMargins="false">
+
+            <ImageButton
+                style="@style/ToolbarImageButton"
+                android:id="@+id/buttonBlack"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/toolbar_button_height"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:contentDescription="@string/sketch_toolbar_colour_main"
+                android:hapticFeedbackEnabled="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/black"
+                android:tooltipText="@string/sketch_toolbar_colour_main" />
+
+            <ImageButton
+                style="@style/ToolbarImageButton"
+                android:id="@+id/buttonBrown"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/toolbar_button_height"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:contentDescription="@string/sketch_toolbar_colour_brown"
+                android:cropToPadding="false"
+                android:hapticFeedbackEnabled="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/brown"
+                android:tooltipText="@string/sketch_toolbar_colour_brown" />
+
+            <ImageButton
+                style="@style/ToolbarImageButton"
+                android:id="@+id/buttonGrey"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/toolbar_button_height"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:contentDescription="@string/sketch_toolbar_colour_grey"
+                android:cropToPadding="false"
+                android:hapticFeedbackEnabled="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/grey"
+                android:tooltipText="@string/sketch_toolbar_colour_grey" />
+
+            <ImageButton
+                style="@style/ToolbarImageButton"
+                android:id="@+id/buttonRed"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/toolbar_button_height"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:contentDescription="@string/sketch_toolbar_colour_red"
+                android:cropToPadding="false"
+                android:hapticFeedbackEnabled="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/red"
+                android:tooltipText="@string/sketch_toolbar_colour_red" />
+
+            <ImageButton
+                style="@style/ToolbarImageButton"
+                android:id="@+id/buttonOrange"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/toolbar_button_height"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:contentDescription="@string/sketch_toolbar_colour_orange"
+                android:cropToPadding="false"
+                android:hapticFeedbackEnabled="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/orange"
+                android:tooltipText="@string/sketch_toolbar_colour_orange" />
+
+            <ImageButton
+                style="@style/ToolbarImageButton"
+                android:id="@+id/buttonGreen"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/toolbar_button_height"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:contentDescription="@string/sketch_toolbar_colour_green"
+                android:cropToPadding="false"
+                android:hapticFeedbackEnabled="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/green"
+                android:tooltipText="@string/sketch_toolbar_colour_green" />
+
+            <ImageButton
+                style="@style/ToolbarImageButton"
+                android:id="@+id/buttonBlue"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/toolbar_button_height"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:contentDescription="@string/sketch_toolbar_colour_blue"
+                android:cropToPadding="false"
+                android:hapticFeedbackEnabled="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/blue"
+                android:tooltipText="@string/sketch_toolbar_colour_blue" />
+
+            <ImageButton
+                style="@style/ToolbarImageButton"
+                android:id="@+id/buttonPurple"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/toolbar_button_height"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:contentDescription="@string/sketch_toolbar_colour_purple"
+                android:cropToPadding="false"
+                android:hapticFeedbackEnabled="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/purple"
+                android:tooltipText="@string/sketch_toolbar_colour_purple" />
+
+            <ImageButton
+                style="@style/ToolbarImageButton"
+                android:id="@+id/buttonZoomIn"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/toolbar_button_height"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:contentDescription="@string/sketch_toolbar_zoom_in"
+                android:cropToPadding="false"
+                android:hapticFeedbackEnabled="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/zoom_in"
+                android:tooltipText="@string/sketch_toolbar_zoom_in" />
+
+
+            <ImageButton
+                style="@style/ToolbarImageButton"
+                android:id="@+id/buttonMove"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/toolbar_button_height"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:layout_marginTop="-4dp"
+                android:contentDescription="@string/sketch_toolbar_move"
+                android:cropToPadding="false"
+                android:hapticFeedbackEnabled="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/move"
+                android:tooltipText="@string/sketch_toolbar_move" />
+
+            <ImageButton
+                style="@style/ToolbarImageButton"
+                android:id="@+id/buttonDraw"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/toolbar_button_height"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:layout_marginTop="-4dp"
+                android:contentDescription="@string/sketch_toolbar_draw"
+                android:cropToPadding="false"
+                android:hapticFeedbackEnabled="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/pencil"
+                android:tooltipText="@string/sketch_toolbar_draw" />
+
+
+            <ImageButton
+                style="@style/ToolbarImageButton"
+                android:id="@+id/buttonSymbol"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/toolbar_button_height"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:layout_marginTop="-4dp"
+                android:contentDescription="@string/sketch_toolbar_symbol"
+                android:padding="10dp"
+                android:cropToPadding="false"
+                android:hapticFeedbackEnabled="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/text"
+                android:tooltipText="@string/sketch_toolbar_symbol" />
+
+            <ImageButton
+                style="@style/ToolbarImageButton"
+                android:id="@+id/buttonErase"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/toolbar_button_height"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:layout_marginTop="-4dp"
+                android:contentDescription="@string/sketch_toolbar_eraser"
+                android:cropToPadding="false"
+                android:hapticFeedbackEnabled="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/eraser"
+                android:tooltipText="@string/sketch_toolbar_eraser" />
+
+
+
+
+            <ImageButton
+                style="@style/ToolbarImageButton"
+                android:id="@+id/buttonSelect"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/toolbar_button_height"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:layout_marginTop="-4dp"
+                android:contentDescription="@string/sketch_toolbar_selector"
+                android:cropToPadding="false"
+                android:hapticFeedbackEnabled="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/select"
+                android:tooltipText="@string/sketch_toolbar_selector" />
+
+            <ImageButton
+                style="@style/ToolbarImageButton"
+                android:id="@+id/buttonMenu"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/toolbar_button_height"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:layout_marginTop="-4dp"
+                android:contentDescription="@string/sketch_toolbar_settings"
+                android:cropToPadding="false"
+                android:hapticFeedbackEnabled="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/settings"
+                android:tooltipText="@string/sketch_toolbar_settings" />
+
+            <ImageButton
+                style="@style/ToolbarImageButton"
+                android:id="@+id/buttonUndo"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/toolbar_button_height"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:layout_marginTop="-4dp"
+                android:contentDescription="@string/sketch_toolbar_undo"
+                android:cropToPadding="false"
+                android:hapticFeedbackEnabled="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/undo"
+                android:tooltipText="@string/sketch_toolbar_undo" />
+
+            <ImageButton
+                style="@style/ToolbarImageButton"
+                android:id="@+id/buttonRedo"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/toolbar_button_height"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:layout_marginTop="-4dp"
+                android:contentDescription="@string/sketch_toolbar_symbol"
+                android:cropToPadding="false"
+                android:hapticFeedbackEnabled="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/redo"
+                android:tooltipText="@string/sketch_toolbar_symbol" />
+
+            <ImageButton
+                style="@style/ToolbarImageButton"
+                android:id="@+id/buttonZoomOut"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/toolbar_button_height"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:layout_marginTop="-4dp"
+                android:contentDescription="@string/sketch_toolbar_zoom_out"
+                android:cropToPadding="false"
+                android:hapticFeedbackEnabled="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/zoom_out"
+                android:tooltipText="@string/sketch_toolbar_zoom_out" />
+        </GridLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

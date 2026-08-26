@@ -6,26 +6,28 @@ import static org.mockito.ArgumentMatchers.anySet;
 
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
-import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
 import org.hwyl.sexytopo.testhelpers.SurveyMocker;
+import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
-
 public class MetadataTranslaterTest {
-
 
     @Test
     public void testActiveStationIsTranslatedToJson() throws Exception {
         Survey survey = new Survey();
-        String translated = MetadataTranslater.translate(survey);
-        String expected = "{\"active-station\":\"1\",\"connections\":{}}";
-        Assert.assertEquals(expected, translated.replaceAll("\\s", ""));
+        String translated = MetadataTranslater.translate(survey, "1.0", 1);
+        JSONObject json = new JSONObject(translated);
+        Assert.assertEquals("1.0", json.getString("sexyTopoVersionName"));
+        Assert.assertEquals(1, json.getInt("sexyTopoVersionCode"));
+        Assert.assertEquals(survey.getName(), json.getString("name"));
+        Assert.assertEquals("1", json.getString("active-station"));
+        Assert.assertEquals(0, json.getJSONObject("connections").length());
     }
-
 
     @Test
     public void testActiveStationIsTParsed() throws Exception {
@@ -35,7 +37,6 @@ public class MetadataTranslaterTest {
         Assert.assertEquals("1", survey.getActiveStation().getName());
     }
 
-
     @Test
     public void testConnectedSurveyIsTranslatedToJson() throws Exception {
         Survey survey = new Survey();
@@ -43,10 +44,15 @@ public class MetadataTranslaterTest {
         Survey connectedSurvey = new Survey();
         SurveyMocker.mockSurveyUri(connectedSurvey, "connected");
         connectTwoSurveys(survey, survey.getOrigin(), connectedSurvey, connectedSurvey.getOrigin());
-        String translated = MetadataTranslater.translate(survey);
+        String translated = MetadataTranslater.translate(survey, "1.0", 1);
+        JSONObject json = new JSONObject(translated);
+        Assert.assertEquals("1.0", json.getString("sexyTopoVersionName"));
+        Assert.assertEquals(1, json.getInt("sexyTopoVersionCode"));
+        Assert.assertEquals(survey.getName(), json.getString("name"));
+        Assert.assertEquals("1", json.getString("active-station"));
         Assert.assertEquals(
-            "{\"active-station\":\"1\",\"connections\":{\"1\":[[\"connected\",\"1\"]]}}",
-            translated.replaceAll("\\s", ""));
+                "[[\"connected\",\"1\"]]",
+                json.getJSONObject("connections").getJSONArray("1").toString());
     }
 
     @Test
@@ -59,7 +65,6 @@ public class MetadataTranslaterTest {
         MetadataTranslater.translateAndUpdate(null, testSurvey, json);
         Assert.assertEquals("1", testSurvey.getActiveStation().getName());
         Assert.assertEquals(0, testSurvey.getConnectedSurveys().size());
-
     }
 
     @Ignore("To mock static methods, need to use inline mocks, which breaks other tests")
@@ -71,22 +76,20 @@ public class MetadataTranslaterTest {
         Survey connected = new Survey();
 
         try (MockedStatic<Loader> mockLoader = Mockito.mockStatic(Loader.class)) {
-            mockLoader.when(() -> Loader.loadSurvey(
-                any(), any(), anySet(), anyBoolean())
-            ).thenReturn(connected);
+            mockLoader
+                    .when(() -> Loader.loadSurvey(any(), any(), anySet(), anyBoolean()))
+                    .thenReturn(connected);
         }
 
         MetadataTranslater.translateAndUpdate(null, survey, json);
         Assert.assertEquals(1, survey.getConnectedSurveys().size());
     }
 
-
-    private static void connectTwoSurveys(Survey survey0, Station join0,
-                                          Survey survey1, Station join1) {
+    private static void connectTwoSurveys(
+            Survey survey0, Station join0, Survey survey1, Station join1) {
         survey0.connect(join0, survey1, join1);
         survey1.connect(join1, survey0, join0);
     }
-
 
     @Test
     public void testBidirectionalConnectionWithDifferentStationNames() throws Exception {
@@ -105,18 +108,16 @@ public class MetadataTranslaterTest {
         Assert.assertTrue(surveyB.isConnectedTo(surveyA));
 
         // Verify JSON serialization stores correct station names for survey A
-        String jsonA = MetadataTranslater.translate(surveyA);
-        Assert.assertTrue("Survey A should reference station '1' in survey B",
-            jsonA.contains("\"1\""));
-        Assert.assertTrue("Survey A should connect from station '2'",
-            jsonA.contains("\"2\""));
+        String jsonA = MetadataTranslater.translate(surveyA, "1.0", 1);
+        Assert.assertTrue(
+                "Survey A should reference station '1' in survey B", jsonA.contains("\"1\""));
+        Assert.assertTrue("Survey A should connect from station '2'", jsonA.contains("\"2\""));
 
         // Verify JSON serialization stores correct station names for survey B
-        String jsonB = MetadataTranslater.translate(surveyB);
-        Assert.assertTrue("Survey B should reference station '2' in survey A",
-            jsonB.contains("\"2\""));
+        String jsonB = MetadataTranslater.translate(surveyB, "1.0", 1);
+        Assert.assertTrue(
+                "Survey B should reference station '2' in survey A", jsonB.contains("\"2\""));
     }
-
 
     @Test
     public void testBidirectionalConnectionWithAlphanumericStationName() throws Exception {
@@ -135,22 +136,21 @@ public class MetadataTranslaterTest {
         Assert.assertTrue(surveyB.isConnectedTo(surveyA));
 
         // Verify station lookup works with alphanumeric name
-        Assert.assertNotNull("Should find station A23",
-            surveyB.getStationByName("A23"));
+        Assert.assertNotNull("Should find station A23", surveyB.getStationByName("A23"));
 
         // Verify JSON serialization for survey A contains alphanumeric station name
-        String jsonA = MetadataTranslater.translate(surveyA);
-        Assert.assertTrue("Survey A should reference alphanumeric station 'A23' in survey B",
-            jsonA.contains("\"A23\""));
+        String jsonA = MetadataTranslater.translate(surveyA, "1.0", 1);
+        Assert.assertTrue(
+                "Survey A should reference alphanumeric station 'A23' in survey B",
+                jsonA.contains("\"A23\""));
 
         // Verify JSON serialization for survey B contains the join point from survey A
-        String jsonB = MetadataTranslater.translate(surveyB);
-        Assert.assertTrue("Survey B should reference station '2' in survey A",
-            jsonB.contains("\"2\""));
-        Assert.assertTrue("Survey B connection should be from station 'A23'",
-            jsonB.contains("\"A23\""));
+        String jsonB = MetadataTranslater.translate(surveyB, "1.0", 1);
+        Assert.assertTrue(
+                "Survey B should reference station '2' in survey A", jsonB.contains("\"2\""));
+        Assert.assertTrue(
+                "Survey B connection should be from station 'A23'", jsonB.contains("\"A23\""));
     }
-
 
     @Test
     public void testBidirectionalConnectionWithTextStationName() throws Exception {
@@ -169,13 +169,12 @@ public class MetadataTranslaterTest {
         Assert.assertTrue(surveyB.isConnectedTo(surveyA));
 
         // Verify station lookup works with text name
-        Assert.assertNotNull("Should find station 'Entrance'",
-            surveyB.getStationByName("Entrance"));
+        Assert.assertNotNull(
+                "Should find station 'Entrance'", surveyB.getStationByName("Entrance"));
 
         // Verify JSON contains the text station name
-        String jsonA = MetadataTranslater.translate(surveyA);
-        Assert.assertTrue("Survey A should reference station 'Entrance'",
-            jsonA.contains("\"Entrance\""));
+        String jsonA = MetadataTranslater.translate(surveyA, "1.0", 1);
+        Assert.assertTrue(
+                "Survey A should reference station 'Entrance'", jsonA.contains("\"Entrance\""));
     }
-
 }

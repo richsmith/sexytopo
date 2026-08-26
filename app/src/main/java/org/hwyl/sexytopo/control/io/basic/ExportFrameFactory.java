@@ -10,9 +10,7 @@ import org.hwyl.sexytopo.model.survey.Survey;
 
 public class ExportFrameFactory {
 
-
-    public static Frame getExportFrame(
-            Survey survey, Projection2D projectionType) {
+    public static Frame getExportFrame(Survey survey, Projection2D projectionType) {
 
         // Basic bounds are the union of the sketch and the survey data
         Sketch sketch = survey.getSketch(projectionType);
@@ -22,10 +20,7 @@ public class ExportFrameFactory {
         Frame export = sketchBox.union(surveyDataBox);
 
         return export;
-
-
     }
-
 
     public static Frame addBorder(Frame export) {
         float largestDimension = Math.max(export.getWidth(), export.getHeight());
@@ -50,6 +45,4 @@ public class ExportFrameFactory {
             return 10;
         }
     }
-
-
 }

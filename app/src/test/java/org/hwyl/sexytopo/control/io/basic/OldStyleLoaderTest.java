@@ -3,7 +3,6 @@ package org.hwyl.sexytopo.control.io.basic;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.junit.Test;
 
-
 public class OldStyleLoaderTest {
 
     @Test
@@ -20,16 +19,17 @@ public class OldStyleLoaderTest {
         Survey survey = new Survey();
         OldStyleLoader.parse(text, survey);
         assert survey.getAllStations().size() == 2;
-        assert survey.getOrigin().getConnectedOnwardLegs().get(0)
-                .getDestination().getName().equals("2");
-
+        assert survey.getOrigin()
+                .getConnectedOnwardLegs()
+                .get(0)
+                .getDestination()
+                .getName()
+                .equals("2");
     }
 
     @Test
     public void testStarredLinesAreIgnored() throws Exception {
-        String text =
-                "*data normal from to length compass clino\n" +
-                "1\t2\t9.11\t121\t-23\n";
+        String text = "*data normal from to length compass clino\n" + "1\t2\t9.11\t121\t-23\n";
         Survey survey = new Survey();
         OldStyleLoader.parse(text, survey);
         assert survey.getAllStations().size() == 2;
@@ -41,9 +41,12 @@ public class OldStyleLoaderTest {
         Survey survey = new Survey();
         OldStyleLoader.parse(text, survey);
         assert survey.getAllStations().size() == 2;
-        assert survey.getOrigin().getConnectedOnwardLegs().get(0)
-                .getDestination().getName().equals("2");
-        assert survey.getOrigin().getConnectedOnwardLegs().get(0)
-                .wasShotBackwards();
+        assert survey.getOrigin()
+                .getConnectedOnwardLegs()
+                .get(0)
+                .getDestination()
+                .getName()
+                .equals("2");
+        assert survey.getOrigin().getConnectedOnwardLegs().get(0).wasShotBackwards();
     }
 }

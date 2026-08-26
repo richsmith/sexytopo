@@ -2,12 +2,10 @@ package org.hwyl.sexytopo.control.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.model.sketch.BrushColour;
 import org.hwyl.sexytopo.model.sketch.SketchTool;
 import org.hwyl.sexytopo.model.sketch.Symbol;
-
 
 public class SketchPreferences {
 
@@ -17,10 +15,9 @@ public class SketchPreferences {
     private static final String BRUSH_COLOUR_PREFERENCE_KEY = "pref_sketch_brush_colour";
     private static final String SYMBOL_PREFERENCE_KEY = "pref_sketch_symbol";
 
-
     /**
-     * Toggle-able display options set throught the sketch pop-up menu.
-     * We have a lot of these, so easier to use an enum than squillions of get/sets.
+     * Toggle-able display options set throught the sketch pop-up menu. We have a lot of these, so
+     * easier to use an enum than squillions of get/sets.
      */
     public enum Toggle {
         AUTO_RECENTRE(R.id.buttonAutoRecentre, false),
@@ -30,7 +27,11 @@ public class SketchPreferences {
         SHOW_SPLAYS(R.id.buttonShowSplays, true),
         SHOW_SKETCH(R.id.buttonShowSketch, true),
         SHOW_STATION_LABELS(R.id.buttonShowStationLabels, true),
-        SHOW_CONNECTIONS(R.id.buttonShowConnections, true);
+        SHOW_X_SECTIONS(R.id.buttonShowXSections, true),
+        SHOW_CONNECTIONS(R.id.buttonShowConnections, true),
+        SHOW_COMPASS(R.id.buttonShowCompass, true),
+        BLUE_WATER(R.id.buttonBlueWater, true),
+        PINCH_TO_ZOOM(R.id.buttonPinchToZoom, true);
 
         private final int controlId;
         private final boolean defaultValue;
@@ -52,7 +53,6 @@ public class SketchPreferences {
             return controlId;
         }
     }
-
 
     private static SharedPreferences prefs;
 
@@ -103,5 +103,4 @@ public class SketchPreferences {
         Symbol symbol = Symbol.fromString(selected);
         return symbol;
     }
-
 }

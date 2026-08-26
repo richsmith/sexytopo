@@ -3,11 +3,9 @@ package org.hwyl.sexytopo.model.sketch;
 import org.hwyl.sexytopo.model.common.Shape;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 
-
 public abstract class SketchDetail extends Shape {
 
     private final Colour colour;
-
 
     protected SketchDetail(Colour colour) {
         super();
@@ -32,9 +30,9 @@ public abstract class SketchDetail extends Shape {
 
     public abstract float getDistanceFrom(Coord2D point);
 
-    public abstract SketchDetail translate(Coord2D point);
+    @Override
+    public abstract SketchDetail translate(Coord2D translation);
 
+    @Override
     public abstract SketchDetail scale(float scale);
-
-
 }

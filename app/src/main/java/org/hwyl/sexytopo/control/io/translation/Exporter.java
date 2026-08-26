@@ -1,13 +1,12 @@
 package org.hwyl.sexytopo.control.io.translation;
 
 import android.content.Context;
-
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.io.SurveyDirectory;
 import org.hwyl.sexytopo.control.io.SurveyFile;
+import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.survey.Survey;
-
 
 @SuppressWarnings("UnnecessaryLocalVariable")
 public abstract class Exporter {
@@ -20,6 +19,15 @@ public abstract class Exporter {
     }
 
     public abstract void run(Context context, Survey survey) throws Exception;
+
+    /**
+     * Show an options dialog before exporting; default is a no-op that proceeds immediately.
+     * Override to collect export-specific configuration. Implementations must invoke onReady on the
+     * positive path (and may skip it on cancel).
+     */
+    public void showOptionsDialog(Context context, Runnable onReady) {
+        onReady.run();
+    }
 
     public abstract String getExportTypeName(Context context);
 
@@ -34,11 +42,20 @@ public abstract class Exporter {
     }
 
     public SurveyDirectory getParentExportDirectory() {
-        SurveyDirectory exportDirectory = SurveyDirectory.EXPORT.get(survey);
+        String folderName = GeneralPreferences.getExportFolderName();
+        if (folderName == null || folderName.trim().isEmpty()) {
+            return SurveyDirectory.TOP.get(survey);
+        }
+        SurveyDirectory.SurveyDirectoryType exportDirectoryType =
+                new SurveyDirectory.SurveyDirectoryType(folderName);
+        SurveyDirectory exportDirectory = exportDirectoryType.get(survey);
         return exportDirectory;
     }
 
     public SurveyDirectory getExportDirectory(SurveyDirectory parentDirectory) {
+        if (!GeneralPreferences.isExportTypeSubfoldersEnabled()) {
+            return parentDirectory;
+        }
         String directoryName = getExportDirectoryName();
         SurveyDirectory.SurveyDirectoryType directoryType =
                 new SurveyDirectory.SurveyDirectoryType(directoryName);
@@ -54,9 +71,7 @@ public abstract class Exporter {
         return surveyFile;
     }
 
-
     public String getMimeType() {
         return "text/plain";
     }
-
 }

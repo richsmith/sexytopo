@@ -2,15 +2,12 @@ package org.hwyl.sexytopo.comms.distox;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
-
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SexyTopo;
 import org.hwyl.sexytopo.control.SurveyManager;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-
 
 public class WriteCalibrationProtocol extends DistoXProtocol {
 
@@ -19,17 +16,14 @@ public class WriteCalibrationProtocol extends DistoXProtocol {
     private boolean isFinished = false;
     private boolean wasSuccessful = false;
 
-
     public WriteCalibrationProtocol(
             Context context, BluetoothDevice bluetoothDevice, SurveyManager dataManager) {
         super(context, bluetoothDevice, dataManager);
     }
 
-
     public void setCoeffToWrite(Byte[] coeff) {
         this.coeff = coeff;
     }
-
 
     public void go(DataInputStream inStream, DataOutputStream outStream) {
         try {
@@ -65,19 +59,16 @@ public class WriteCalibrationProtocol extends DistoXProtocol {
         } finally {
             isFinished = true;
         }
-
     }
 
-
     private void checkCalibrationReply(int address, byte[] reply) throws Exception {
-        if (reply[0] != 0x38 ||
-                (reply[1] != (byte)(address & 0xff)) ||
-                (reply[2] != (byte)((address>>8) & 0xff))) {
+        if (reply[0] != 0x38
+                || (reply[1] != (byte) (address & 0xff))
+                || (reply[2] != (byte) ((address >> 8) & 0xff))) {
             throw new Exception(
                     SexyTopo.staticGetString(R.string.device_distox_calibration_write_rejected));
         }
     }
-
 
     public boolean wasSuccessful() {
         return wasSuccessful;
@@ -86,5 +77,4 @@ public class WriteCalibrationProtocol extends DistoXProtocol {
     public boolean isFinished() {
         return isFinished;
     }
-
 }

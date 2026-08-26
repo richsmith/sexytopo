@@ -1,14 +1,13 @@
 package org.hwyl.sexytopo.control.io.thirdparty.xvi;
 
-import org.hwyl.sexytopo.model.graph.Coord2D;
-import org.hwyl.sexytopo.model.sketch.Colour;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
-import org.hwyl.sexytopo.model.sketch.TextDetail;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.hwyl.sexytopo.model.graph.Coord2D;
+import org.hwyl.sexytopo.model.sketch.Colour;
+import org.hwyl.sexytopo.model.sketch.PathDetail;
+import org.hwyl.sexytopo.model.sketch.TextDetail;
 
 public class TextDetailTranslater extends SketchDetailTranslater<TextDetail> {
     private static final float CHAR_HEIGHT = 4.0f;
@@ -26,7 +25,7 @@ public class TextDetailTranslater extends SketchDetailTranslater<TextDetail> {
 
     static {
         // Special characters
-        GLYPH_DATA.put(' ', new int[] {});  // Space (empty)
+        GLYPH_DATA.put(' ', new int[] {}); // Space (empty)
         GLYPH_DATA.put('_', new int[] {0, 0, 2, 0});
         GLYPH_DATA.put('+', new int[] {1, 1, 1, 3, 0, 2, 2, 2});
         GLYPH_DATA.put('-', new int[] {0, 2, 2, 2});
@@ -52,7 +51,9 @@ public class TextDetailTranslater extends SketchDetailTranslater<TextDetail> {
         GLYPH_DATA.put('N', new int[] {0, 0, 0, 4, 0, 4, 2, 0, 2, 4, 2, 0});
         GLYPH_DATA.put('O', new int[] {0, 0, 0, 4, 0, 4, 2, 4, 0, 0, 2, 0, 2, 4, 2, 0});
         GLYPH_DATA.put('P', new int[] {0, 0, 0, 4, 0, 4, 2, 4, 0, 2, 2, 2, 2, 4, 2, 2});
-        GLYPH_DATA.put('Q', new int[] {0, 0, 0, 4, 0, 4, 2, 4, 0, 0, 1, 0, 1, 0, 2, 1, 2, 1, 2, 4, 1, 1, 2, 0});
+        GLYPH_DATA.put(
+                'Q',
+                new int[] {0, 0, 0, 4, 0, 4, 2, 4, 0, 0, 1, 0, 1, 0, 2, 1, 2, 1, 2, 4, 1, 1, 2, 0});
         GLYPH_DATA.put('R', new int[] {0, 0, 0, 4, 0, 4, 2, 4, 2, 4, 2, 2, 0, 2, 2, 2, 0, 2, 2, 0});
         GLYPH_DATA.put('S', new int[] {0, 2, 0, 4, 0, 4, 2, 4, 0, 2, 2, 2, 0, 0, 2, 0, 2, 0, 2, 2});
         GLYPH_DATA.put('T', new int[] {1, 0, 1, 4, 0, 4, 2, 4});
@@ -76,7 +77,9 @@ public class TextDetailTranslater extends SketchDetailTranslater<TextDetail> {
         GLYPH_DATA.put('9', new int[] {0, 2, 2, 2, 0, 4, 2, 4, 0, 2, 0, 4, 2, 4, 2, 0});
 
         // Default for unsupported characters
-        GLYPH_DATA.put('\0', new int[] {2, 2, 1, 4, 1, 4, 0, 2, 0, 2, 1, 0, 1, 0, 2, 2});  // Question mark box
+        GLYPH_DATA.put(
+                '\0',
+                new int[] {2, 2, 1, 4, 1, 4, 0, 2, 0, 2, 1, 0, 1, 0, 2, 2}); // Question mark box
     }
 
     private static List<PathDetail> getPathsForChar(char ch, Colour colour) {
@@ -149,6 +152,4 @@ public class TextDetailTranslater extends SketchDetailTranslater<TextDetail> {
 
         return pathDetails;
     }
-
-
 }

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <EditTextPreference
+        android:key="pref_export_folder_name"
+        android:title="@string/settings_export_folder_name_title"
+        android:summary="@string/settings_export_folder_name_summary"
+        android:defaultValue="Exported"/>
+
+    <CheckBoxPreference
+        android:key="pref_export_type_subfolders"
+        android:title="@string/settings_export_type_subfolders_title"
+        android:summary="@string/settings_export_type_subfolders_summary"
+        android:defaultValue="true"/>
+
+    <Preference
+        android:key="pref_export_svg_section"
+        android:title="@string/settings_export_svg_title"
+        android:summary="@string/settings_export_svg_section_summary"
+        app:fragment="org.hwyl.sexytopo.control.activity.SettingsActivity$ExportSvgFragment" />
+
+    <Preference
+        android:key="pref_export_therion_section"
+        android:title="@string/settings_export_therion_title"
+        android:summary="@string/settings_export_therion_section_summary"
+        app:fragment="org.hwyl.sexytopo.control.activity.SettingsActivity$ExportTherionFragment" />
+
+</PreferenceScreen>

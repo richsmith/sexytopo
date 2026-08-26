@@ -1,12 +1,9 @@
 package org.hwyl.sexytopo.control.io.translation;
 
 import android.content.Context;
-
+import java.io.IOException;
 import org.hwyl.sexytopo.control.io.SurveyFile;
 import org.hwyl.sexytopo.model.survey.Survey;
-
-import java.io.IOException;
-
 
 public abstract class SingleFileExporter extends Exporter {
 
@@ -21,6 +18,4 @@ public abstract class SingleFileExporter extends Exporter {
     public abstract String getContent(Survey survey);
 
     public abstract String getFileExtension();
-
-
 }

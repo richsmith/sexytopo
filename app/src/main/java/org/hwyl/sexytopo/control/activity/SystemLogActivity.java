@@ -6,14 +6,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.widget.TextView;
-
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.util.LogUpdateReceiver;
-
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 
 public class SystemLogActivity extends SexyTopoActivity {
 
@@ -32,7 +29,6 @@ public class SystemLogActivity extends SexyTopoActivity {
         logUpdateReceiver = new SystemLogUpdateReceiver();
     }
 
-
     @Override
     protected void onResume() {
 
@@ -45,14 +41,12 @@ public class SystemLogActivity extends SexyTopoActivity {
         logUpdateReceiver.update();
     }
 
-
     @Override
     protected void onPause() {
         super.onPause();
         LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
         broadcastManager.unregisterReceiver(logUpdateReceiver);
     }
-
 
     private class SystemLogUpdateReceiver extends BroadcastReceiver {
         @Override
@@ -65,5 +59,4 @@ public class SystemLogActivity extends SexyTopoActivity {
             LogUpdateReceiver.update(Log.LogType.SYSTEM, null, logView);
         }
     }
-
 }

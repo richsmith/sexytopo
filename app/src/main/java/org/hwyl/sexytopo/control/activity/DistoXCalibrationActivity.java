@@ -16,12 +16,12 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
-
 import androidx.documentfile.provider.DocumentFile;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.lang3.ArrayUtils;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
@@ -40,11 +40,6 @@ import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.calibration.CalibrationReading;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.json.JSONException;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class DistoXCalibrationActivity extends SexyTopoActivity {
 
@@ -65,7 +60,6 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
         BACK_LEFT_DOWN(R.string.direction_back_left_down),
         BACK_RIGHT_UP(R.string.direction_back_right_up),
         BACK_RIGHT_DOWN(R.string.direction_back_right_down);
-
 
         final int stringId;
 
@@ -108,12 +102,12 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
     private static void setUpPositions() {
         for (CalibrationDirection direction : CalibrationDirection.values()) {
             for (Orientation orientation : Orientation.values()) {
-                Pair<CalibrationDirection, Orientation> position = new Pair<>(direction, orientation);
+                Pair<CalibrationDirection, Orientation> position =
+                        new Pair<>(direction, orientation);
                 positions.add(position);
             }
         }
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,15 +118,17 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         applyEdgeToEdgeInsets(R.id.rootLayout, true, true);
 
-        BroadcastReceiver updatedCalibrationReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                syncWithReadings();
-            }
-        };
+        BroadcastReceiver updatedCalibrationReceiver =
+                new BroadcastReceiver() {
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        syncWithReadings();
+                    }
+                };
 
         LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
-        broadcastManager.registerReceiver(updatedCalibrationReceiver,
+        broadcastManager.registerReceiver(
+                updatedCalibrationReceiver,
                 new IntentFilter(SexyTopoConstants.CALIBRATION_UPDATED_EVENT));
     }
 
@@ -173,11 +169,10 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
 
         if (calibrationReadings.size() < positions.size()) {
             Pair<CalibrationDirection, Orientation> suggestedNext =
-                positions.get(calibrationReadings.size());
-            setInfoField(R.id.calibration_next_direction,
-                getString(suggestedNext.first.stringId));
-            setInfoField(R.id.calibration_next_orientation,
-                getString(suggestedNext.second.stringId));
+                    positions.get(calibrationReadings.size());
+            setInfoField(R.id.calibration_next_direction, getString(suggestedNext.first.stringId));
+            setInfoField(
+                    R.id.calibration_next_orientation, getString(suggestedNext.second.stringId));
             TextView assessmentField = findViewById(R.id.calibrationFieldAssessment);
             assessmentField.setTextColor(Color.BLACK);
             setInfoField(R.id.calibrationFieldAssessment, getString(R.string.not_applicable));
@@ -187,7 +182,7 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
 
             boolean useNonLinearity = useNonLinearAlgorithm();
             final CalibrationCalculator calibrationCalculator =
-                new CalibrationCalculator(useNonLinearity);
+                    new CalibrationCalculator(useNonLinearity);
             calibrationCalculator.calculate(calibrationReadings);
             double calibrationAssessment = calibrationCalculator.getDelta();
 
@@ -198,10 +193,9 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
                 assessmentField.setTextColor(Colour.RED.intValue);
             }
             setInfoField(
-                R.id.calibrationFieldAssessment,TextTools.formatTo2dp(calibrationAssessment));
+                    R.id.calibrationFieldAssessment, TextTools.formatTo2dp(calibrationAssessment));
         }
     }
-
 
     private void updateState() {
 
@@ -216,33 +210,30 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
         } else {
             setButtonEnabled(R.id.calibration_save, true);
             setButtonEnabled(R.id.calibration_clear, true);
-
         }
 
-        switch(state) {
+        switch (state) {
             case READY:
                 setButtonEnabled(R.id.calibration_start, true);
-                //setButtonEnabled(R.id.calibration_stop, false);
+                // setButtonEnabled(R.id.calibration_stop, false);
                 setButtonEnabled(R.id.calibration_complete, false);
                 break;
             case CALIBRATING:
                 setButtonEnabled(R.id.calibration_start, false);
-                //setButtonEnabled(R.id.calibration_stop, true);
+                // setButtonEnabled(R.id.calibration_stop, true);
                 setButtonEnabled(R.id.calibration_complete, false);
                 break;
             case CALIBRATED:
-                //setButtonEnabled(R.id.calibration_start, false);
+                // setButtonEnabled(R.id.calibration_start, false);
                 setButtonEnabled(R.id.calibration_complete, true);
                 break;
         }
     }
 
-
     private void setButtonEnabled(int id, boolean enabled) {
         Button button = findViewById(id);
         button.setEnabled(enabled);
     }
-
 
     private void setInfoField(int id, Number value) {
         setInfoField(id, "" + value);
@@ -252,7 +243,6 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
         TextView textView = findViewById(id);
         textView.setText(text);
     }
-
 
     public void requestStartCalibration(View view) {
         Log.device("Start calibration requested");
@@ -269,7 +259,6 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
         }
     }
 
-
     public void requestStopCalibration(View view) {
         Log.device("Stop calibration requested");
         try {
@@ -280,7 +269,6 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
         state = State.READY;
         updateState();
     }
-
 
     public void requestCompleteCalibration(final View view) {
         if (calibrationReadings.size() < positions.size()) {
@@ -294,55 +282,55 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
         calibrationCalculator.calculate(calibrationReadings);
         double calibrationAssessment = calibrationCalculator.getDelta();
         String result = TextTools.formatTo2dp(calibrationAssessment);
-        String algorithm = useNonLinearity? "Non-Linear" : "Linear";
-        String message = getString(
-                R.string.device_distox_calibration_result, MAX_ERROR, result, algorithm);
+        String algorithm = useNonLinearity ? "Non-Linear" : "Linear";
+        String message =
+                getString(R.string.device_distox_calibration_result, MAX_ERROR, result, algorithm);
 
         new MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.calibration_assessment)
-            .setMessage(message)
-            .setPositiveButton(R.string.calibration_update, (dialog, whichButton) -> {
-                try {
-                    byte[] coeffs = calibrationCalculator.getCoefficients();
-                    Byte[] coefficients = ArrayUtils.toObject(coeffs);
-                    requestWriteCalibration(view, coefficients);
-                } catch (Exception exception) {
-                    showExceptionAndLog(exception);
-                } finally {
-                    updateState();
-                }
-            }).setNegativeButton(R.string.cancel, null)
-            .show();
-
-
+                .setTitle(R.string.calibration_assessment)
+                .setMessage(message)
+                .setPositiveButton(
+                        R.string.calibration_update,
+                        (dialog, whichButton) -> {
+                            try {
+                                byte[] coeffs = calibrationCalculator.getCoefficients();
+                                Byte[] coefficients = ArrayUtils.toObject(coeffs);
+                                requestWriteCalibration(view, coefficients);
+                            } catch (Exception exception) {
+                                showExceptionAndLog(exception);
+                            } finally {
+                                updateState();
+                            }
+                        })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
     }
-
 
     public void requestDeleteLast(View view) {
         getSurveyManager().deleteLastCalibrationReading();
         syncWithReadings();
     }
 
-
     public void requestClearCalibration(View view) {
         new MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.dialog_confirm_clear_title)
-            .setPositiveButton(getString(R.string.clear), (dialog, whichButton) -> {
-                getSurveyManager().clearCalibrationReadings();
-                syncWithReadings();
-            }).setNegativeButton(R.string.cancel, null)
-            .show();
+                .setTitle(R.string.dialog_confirm_clear_title)
+                .setPositiveButton(
+                        getString(R.string.clear),
+                        (dialog, whichButton) -> {
+                            getSurveyManager().clearCalibrationReadings();
+                            syncWithReadings();
+                        })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
     }
-
 
     public void requestSaveCalibration(View view) {
         createFile(
-            SexyTopoConstants.REQUEST_CODE_SAVE_CALIBRATION,
-            StartLocation.TOP_LEVEL,
-            SexyTopoConstants.MIME_TYPE_DEFAULT,
-            null);
+                SexyTopoConstants.REQUEST_CODE_SAVE_CALIBRATION,
+                StartLocation.TOP_LEVEL,
+                SexyTopoConstants.MIME_TYPE_DEFAULT,
+                null);
     }
-
 
     public void requestLoadCalibration(View view) {
         selectFile(SexyTopoConstants.REQUEST_CODE_OPEN_CALIBRATION, StartLocation.TOP_LEVEL, null);
@@ -362,7 +350,6 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
         } catch (Exception exception) {
             showExceptionAndLog(exception);
         }
-
     }
 
     private void saveCalibration(Uri uri) throws JSONException, IOException {
@@ -376,7 +363,7 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
         DocumentFile file = DocumentFile.fromSingleUri(this, uri);
         String content = IoUtils.slurpFile(this, file);
         List<CalibrationReading> calibrationReadings =
-            CalibrationJsonTranslater.toCalibrationReadings(content);
+                CalibrationJsonTranslater.toCalibrationReadings(content);
         getSurveyManager().setCalibrationReadings(calibrationReadings);
         syncWithReadings();
         Log.i(R.string.calibration_loaded_file);
@@ -423,18 +410,16 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
         return distoX;
     }
 
-
     @Override
-    public void onActivityResult(int requestCode, int resultCode,
-                                 Intent resultData) {
+    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
 
         if (resultData == null) {
             return;
         }
 
         if (resultCode != Activity.RESULT_OK) {
-            Exception exception = new Exception(
-                getString(R.string.request_code_error, resultCode, requestCode));
+            Exception exception =
+                    new Exception(getString(R.string.request_code_error, resultCode, requestCode));
             showExceptionAndLog(exception);
             return;
         }
@@ -456,25 +441,25 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
             }
         }
 
-
         super.onActivityResult(requestCode, resultCode, resultData);
     }
-
 
     private class WriteCalibrationTask extends AsyncTask<Byte, Void, Boolean> {
 
         private final Dialog progressDialog;
 
         private WriteCalibrationTask(View view) {
-            android.widget.ProgressBar progressBar = new android.widget.ProgressBar(view.getContext());
+            android.widget.ProgressBar progressBar =
+                    new android.widget.ProgressBar(view.getContext());
             progressBar.setIndeterminate(true);
             progressBar.setPadding(0, 50, 0, 50);
 
-            progressDialog = new MaterialAlertDialogBuilder(view.getContext())
-                .setMessage(getString(R.string.calibration_writing))
-                .setView(progressBar)
-                .setCancelable(false)
-                .create();
+            progressDialog =
+                    new MaterialAlertDialogBuilder(view.getContext())
+                            .setMessage(getString(R.string.calibration_writing))
+                            .setView(progressBar)
+                            .setCancelable(false)
+                            .create();
         }
 
         protected void onPreExecute() {
@@ -485,7 +470,7 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
         protected Boolean doInBackground(Byte... coefficients) {
 
             try {
-                DistoXCommunicator comms = (DistoXCommunicator)getComms();
+                DistoXCommunicator comms = (DistoXCommunicator) getComms();
                 WriteCalibrationProtocol writeCalibrationProtocol =
                         comms.writeCalibration(coefficients);
                 waitForEnd(writeCalibrationProtocol, 60);
@@ -502,7 +487,6 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
             }
         }
 
-
         private void waitForEnd(WriteCalibrationProtocol writeCalibrationProtocol, int attempts) {
             for (int i = 0; i < attempts; i++) {
                 try {
@@ -515,7 +499,6 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
                 }
             }
         }
-
 
         @Override
         protected void onPostExecute(Boolean wasSuccessful) {
@@ -534,6 +517,5 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
         }
     }
 
-    public static class NotConnectedToDistoException extends Exception {
-    }
+    public static class NotConnectedToDistoException extends Exception {}
 }

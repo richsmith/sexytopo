@@ -1,7 +1,6 @@
 package org.hwyl.sexytopo.model.graph;
 
 import junit.framework.TestCase;
-
 import org.hwyl.sexytopo.model.common.Frame;
 
 public class FrameTest extends TestCase {

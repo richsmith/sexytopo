@@ -86,7 +86,7 @@ private enum class PacketState {
     IDLE,
     PRIMARY_RECEIVED,
     COMPLETE,
-    ERROR
+    ERROR,
 }
 
 // Data classes for packet fragments
@@ -99,7 +99,7 @@ private data class PrimaryPacketData(
     val distance: Float,
     val shotQuality: Float,
     val protocolVersion: Int,
-    val isValid: Boolean
+    val isValid: Boolean,
 )
 
 private data class ExtendedPacketData(
@@ -109,26 +109,26 @@ private data class ExtendedPacketData(
     val expectedMagneticDip: Float,
     val temperature: Float,
     val rollAngle: Float,
-    val measurementId: Int
+    val measurementId: Int,
 )
 
 data class EnhancedLegData(
     val azimuth: Float,
     val inclination: Float,
     val distance: Float,
-    val shotQuality: Float,           // 0.0 - 1.0
-    val currentMagneticField: Float,  // µT (measured)
+    val shotQuality: Float, // 0.0 - 1.0
+    val currentMagneticField: Float, // µT (measured)
     val expectedMagneticField: Float, // µT (from config)
-    val currentMagneticDip: Float,    // degrees (measured)
-    val expectedMagneticDip: Float,   // degrees (from config)
-    val temperature: Float,           // °C
-    val rollAngle: Float,             // degrees (rotation around measurement axis)
-    val batteryLevel: Int,            // 0-100%
-    val measurementId: Int,           // Sequential counter
-    val statusFlags: Int,             // Status flags
-    val sequenceNumber: Int,          // Packet sequence
-    val protocolVersion: Int,         // Protocol version
-    val isValid: Boolean              // Packet validation result
+    val currentMagneticDip: Float, // degrees (measured)
+    val expectedMagneticDip: Float, // degrees (from config)
+    val temperature: Float, // °C
+    val rollAngle: Float, // degrees (rotation around measurement axis)
+    val batteryLevel: Int, // 0-100%
+    val measurementId: Int, // Sequential counter
+    val statusFlags: Int, // Status flags
+    val sequenceNumber: Int, // Packet sequence
+    val protocolVersion: Int, // Protocol version
+    val isValid: Boolean, // Packet validation result
 ) {
     // Convenience methods for checking flags
     fun hasVerticalWarning(): Boolean = (statusFlags and FLAG_VERTICAL_SHOT) != 0
@@ -181,11 +181,13 @@ data class EnhancedLegData(
 }
 
 @SuppressLint("MissingPermission")
-class FCLBLE(val device: BluetoothDevice,
-             val context: Context,
-             val leg_callback: LegCallback,
-             val enhanced_leg_callback: EnhancedLegCallback? = null,
-             val statusCallback: StatusCallback?) {
+class FCLBLE(
+    val device: BluetoothDevice,
+    val context: Context,
+    val leg_callback: LegCallback,
+    val enhanced_leg_callback: EnhancedLegCallback? = null,
+    val statusCallback: StatusCallback?,
+) {
 
     companion object {
         const val CONNECTED = 1
@@ -211,7 +213,7 @@ class FCLBLE(val device: BluetoothDevice,
     // Add state tracking for descriptor setup
     private var setupState = 0 // 0=not started, 1=primary done, 2=both done
 
-    private val callback = object: BluetoothGattCallback() {
+    private val callback = object : BluetoothGattCallback() {
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             val deviceAddress = gatt.device.address
 
@@ -326,7 +328,7 @@ class FCLBLE(val device: BluetoothDevice,
 
         override fun onCharacteristicChanged(
             gatt: BluetoothGatt,
-            characteristic: BluetoothGattCharacteristic
+            characteristic: BluetoothGattCharacteristic,
         ) {
             when (characteristic.uuid) {
                 PRIMARY_LEG_CHARACTERISTIC -> {
@@ -384,7 +386,6 @@ class FCLBLE(val device: BluetoothDevice,
         try {
             val primaryData = parsePrimaryPacket(data)
             if (primaryData != null && primaryData.isValid) {
-
                 // Cancel any existing timeout
                 timeoutRunnable?.let { handler.removeCallbacks(it) }
 
@@ -398,7 +399,6 @@ class FCLBLE(val device: BluetoothDevice,
                     handlePacketError("Packet timeout")
                 }
                 handler.postDelayed(timeoutRunnable!!, PACKET_TIMEOUT_MS)
-
             } else {
                 handlePacketError("Primary packet parsing failed")
             }
@@ -417,7 +417,6 @@ class FCLBLE(val device: BluetoothDevice,
 
             val extendedData = parseExtendedPacket(data)
             if (extendedData != null) {
-
                 // Cancel timeout
                 timeoutRunnable?.let { handler.removeCallbacks(it) }
 
@@ -434,7 +433,6 @@ class FCLBLE(val device: BluetoothDevice,
 
                 // Reset state machine
                 resetStateMachine()
-
             } else {
                 handlePacketError("Extended packet parsing failed")
             }
@@ -493,7 +491,7 @@ class FCLBLE(val device: BluetoothDevice,
             val calculatedCrc = calculateCRC16(data, PRIMARY_PACKET_SIZE - 2)
 
             val isValid = (receivedCrc == calculatedCrc) &&
-                    validateMeasurementRanges(azimuth, inclination, distance, shotQuality)
+                validateMeasurementRanges(azimuth, inclination, distance, shotQuality)
 
             return PrimaryPacketData(
                 sequenceNumber = sequence,
@@ -504,9 +502,8 @@ class FCLBLE(val device: BluetoothDevice,
                 distance = distance,
                 shotQuality = shotQuality,
                 protocolVersion = version,
-                isValid = isValid
+                isValid = isValid,
             )
-
         } catch (e: Exception) {
             return null
         }
@@ -535,34 +532,31 @@ class FCLBLE(val device: BluetoothDevice,
                 expectedMagneticDip = expectedMagneticDip,
                 temperature = temperature,
                 rollAngle = rollAngle,
-                measurementId = measurementId
+                measurementId = measurementId,
             )
-
         } catch (e: Exception) {
             return null
         }
     }
 
-    private fun combinePackets(primary: PrimaryPacketData, extended: ExtendedPacketData): EnhancedLegData {
-        return EnhancedLegData(
-            azimuth = primary.azimuth,
-            inclination = primary.inclination,
-            distance = primary.distance,
-            shotQuality = primary.shotQuality,
-            currentMagneticField = extended.currentMagneticField,
-            expectedMagneticField = extended.expectedMagneticField,
-            currentMagneticDip = extended.currentMagneticDip,
-            expectedMagneticDip = extended.expectedMagneticDip,
-            temperature = extended.temperature,
-            rollAngle = extended.rollAngle,
-            batteryLevel = primary.batteryLevel,
-            measurementId = extended.measurementId,
-            statusFlags = primary.statusFlags,
-            sequenceNumber = primary.sequenceNumber,
-            protocolVersion = primary.protocolVersion,
-            isValid = primary.isValid
-        )
-    }
+    private fun combinePackets(primary: PrimaryPacketData, extended: ExtendedPacketData): EnhancedLegData = EnhancedLegData(
+        azimuth = primary.azimuth,
+        inclination = primary.inclination,
+        distance = primary.distance,
+        shotQuality = primary.shotQuality,
+        currentMagneticField = extended.currentMagneticField,
+        expectedMagneticField = extended.expectedMagneticField,
+        currentMagneticDip = extended.currentMagneticDip,
+        expectedMagneticDip = extended.expectedMagneticDip,
+        temperature = extended.temperature,
+        rollAngle = extended.rollAngle,
+        batteryLevel = primary.batteryLevel,
+        measurementId = extended.measurementId,
+        statusFlags = primary.statusFlags,
+        sequenceNumber = primary.sequenceNumber,
+        protocolVersion = primary.protocolVersion,
+        isValid = primary.isValid,
+    )
 
     private fun processCompleteMeasurement(enhancedData: EnhancedLegData) {
         // Send ACK for completed measurement
@@ -573,13 +567,15 @@ class FCLBLE(val device: BluetoothDevice,
         enhanced_leg_callback?.invoke(enhancedData)
     }
 
-    private fun validateMeasurementRanges(azimuth: Float, inclination: Float,
-                                          distance: Float, quality: Float): Boolean {
-        return azimuth in 0.0f..360.0f &&
-                inclination in -90.0f..90.0f &&
-                distance in 0.0f..999.9f &&
-                quality in 0.0f..1.0f
-    }
+    private fun validateMeasurementRanges(
+        azimuth: Float,
+        inclination: Float,
+        distance: Float,
+        quality: Float,
+    ): Boolean = azimuth in 0.0f..360.0f &&
+        inclination in -90.0f..90.0f &&
+        distance in 0.0f..999.9f &&
+        quality in 0.0f..1.0f
 
     private fun calculateCRC16(data: ByteArray, length: Int): Int {
         var crc = 0xFFFF

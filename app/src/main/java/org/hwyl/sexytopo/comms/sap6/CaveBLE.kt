@@ -33,10 +33,12 @@ private const val DEVICE_OFF = 0x34
 private const val TAKE_SHOT = 0x38
 
 @SuppressLint("MissingPermission")
-class CaveBLE(val device: BluetoothDevice,
-              val context: Context,
-              val leg_callback: LegCallback,
-              val statusCallback: StatusCallback?) {
+class CaveBLE(
+    val device: BluetoothDevice,
+    val context: Context,
+    val leg_callback: LegCallback,
+    val statusCallback: StatusCallback?,
+) {
     companion object {
         const val CONNECTED = 1
         const val DISCONNECTED = 2
@@ -46,7 +48,7 @@ class CaveBLE(val device: BluetoothDevice,
     private var command: BluetoothGattCharacteristic? = null
     private var dataIn: BluetoothGattCharacteristic? = null
     private var bluetoothGatt: BluetoothGatt? = null
-    private val callback = object: BluetoothGattCallback() {
+    private val callback = object : BluetoothGattCallback() {
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             val deviceAddress = gatt.device.address
 
@@ -95,7 +97,7 @@ class CaveBLE(val device: BluetoothDevice,
 
         override fun onCharacteristicChanged(
             gatt: BluetoothGatt,
-            characteristic: BluetoothGattCharacteristic
+            characteristic: BluetoothGattCharacteristic,
         ) {
             Log.w("BluetoothGattCallback", "onChanged: $characteristic")
             if (characteristic == dataIn) {
@@ -112,7 +114,7 @@ class CaveBLE(val device: BluetoothDevice,
     }
 
     fun connect() {
-        device.connectGatt(context,false,callback)
+        device.connectGatt(context, false, callback)
     }
 
     fun disconnect() {
@@ -156,4 +158,3 @@ class CaveBLE(val device: BluetoothDevice,
         sendCommand(STOP_CAL)
     }
 }
-

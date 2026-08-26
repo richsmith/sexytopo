@@ -13,7 +13,8 @@
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/panelBackground">
+            android:background="@color/panelBackground"
+            android:elevation="0dp">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar"
@@ -58,6 +59,7 @@
     <!-- Primary FAB for Add Station (positioned at bottom-right) -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddStation"
+        android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
@@ -69,12 +71,12 @@
     <!-- Mini FAB for Add Splay (positioned above primary FAB) -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddSplay"
+        android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_marginEnd="@dimen/fab_margin"
         android:contentDescription="@string/manual_add_splay_title"
-        app:fabSize="mini"
         app:srcCompat="@drawable/add_splay" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

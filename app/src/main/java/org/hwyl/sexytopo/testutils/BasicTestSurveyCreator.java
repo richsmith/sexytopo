@@ -1,21 +1,24 @@
 package org.hwyl.sexytopo.testutils;
 
-import org.hwyl.sexytopo.control.util.SurveyUpdater;
-import org.hwyl.sexytopo.model.survey.Leg;
-import org.hwyl.sexytopo.model.survey.Survey;
-import org.hwyl.sexytopo.model.survey.Trip;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
+import org.hwyl.sexytopo.control.util.CrossSectioner;
+import org.hwyl.sexytopo.control.util.SurveyUpdater;
+import org.hwyl.sexytopo.model.graph.Coord2D;
+import org.hwyl.sexytopo.model.graph.Projection2D;
+import org.hwyl.sexytopo.model.sketch.CrossSection;
+import org.hwyl.sexytopo.model.sketch.Sketch;
+import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.Station;
+import org.hwyl.sexytopo.model.survey.Survey;
+import org.hwyl.sexytopo.model.survey.Trip;
 
 public class BasicTestSurveyCreator {
 
     public static Survey createEmptySurvey() {
         return new Survey();
     }
-
 
     public static Survey createStraightNorthThroughRepeats() {
         Survey survey = new Survey();
@@ -27,7 +30,6 @@ public class BasicTestSurveyCreator {
         }
         return survey;
     }
-
 
     public static Survey createStraightNorth() {
         Survey survey = new Survey();
@@ -44,7 +46,6 @@ public class BasicTestSurveyCreator {
         return survey;
     }
 
-
     public static Survey createStraightSouth() {
         Survey survey = new Survey();
 
@@ -58,9 +59,7 @@ public class BasicTestSurveyCreator {
         SurveyUpdater.updateWithNewStation(survey, leg2);
 
         return survey;
-
     }
-
 
     public static Survey createRightRight() {
         Survey survey = new Survey();
@@ -75,9 +74,7 @@ public class BasicTestSurveyCreator {
         SurveyUpdater.updateWithNewStation(survey, leg2);
 
         return survey;
-
     }
-
 
     public static Survey create5MDown() {
         Survey survey = new Survey();
@@ -87,7 +84,6 @@ public class BasicTestSurveyCreator {
 
         return survey;
     }
-
 
     public static Survey create5MEast() {
         Survey survey = new Survey();
@@ -102,7 +98,6 @@ public class BasicTestSurveyCreator {
 
         return survey;
     }
-
 
     public static Survey createStraightNorthWith1EBranch() {
         Survey survey = new Survey();
@@ -122,7 +117,6 @@ public class BasicTestSurveyCreator {
 
         return survey;
     }
-
 
     public static Survey createStraightNorthWith2EBranch() {
         Survey survey = new Survey();
@@ -146,7 +140,6 @@ public class BasicTestSurveyCreator {
         return survey;
     }
 
-
     public static Survey createStraightNorthWith2EBranchFromS2() {
         Survey survey = new Survey();
 
@@ -169,7 +162,6 @@ public class BasicTestSurveyCreator {
         return survey;
     }
 
-
     public static Survey createSpanningZeroBoundary() {
         // Creates a survey where station 2 has incoming leg at 350° and outgoing at 10°
         // This tests the 0/360 boundary handling for cross-section angle calculation
@@ -184,16 +176,32 @@ public class BasicTestSurveyCreator {
         return survey;
     }
 
+    /**
+     * Branching survey with a couple of cross-sections attached to the plan sketch. Useful for
+     * exercising cross-section export.
+     */
+    public static Survey createWithCrossSections() {
+        Survey survey = createStraightNorthWith1EBranch();
+        Sketch plan = survey.getSketch(Projection2D.PLAN);
+
+        Station station1 = survey.getStationByName("1");
+        CrossSection xs1 = CrossSectioner.section(survey, station1);
+        plan.addCrossSection(xs1, new Coord2D(2, 0));
+
+        Station station3 = survey.getStationByName("3");
+        CrossSection xs3 = CrossSectioner.section(survey, station3);
+        plan.addCrossSection(xs3, new Coord2D(2, 10));
+
+        return survey;
+    }
 
     @SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
     public static Survey createStraightNorthWithTrip() {
         Survey survey = new Survey();
 
         List<Trip.TeamEntry> team = new ArrayList<>();
-        team.add(new Trip.TeamEntry(
-                "Alice", Arrays.asList(Trip.Role.BOOK)));
-        team.add(new Trip.TeamEntry("Bob",
-                Arrays.asList(Trip.Role.INSTRUMENTS, Trip.Role.DOG)));
+        team.add(new Trip.TeamEntry("Alice", Arrays.asList(Trip.Role.BOOK)));
+        team.add(new Trip.TeamEntry("Bob", Arrays.asList(Trip.Role.INSTRUMENTS, Trip.Role.DOG)));
         Trip trip = new Trip();
         trip.setTeam(team);
         survey.setTrip(trip);
@@ -209,5 +217,4 @@ public class BasicTestSurveyCreator {
 
         return survey;
     }
-
 }

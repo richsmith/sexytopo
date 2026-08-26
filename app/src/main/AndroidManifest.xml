@@ -55,6 +55,11 @@
             android:windowSoftInputMode="adjustNothing" >
         </activity>
         <activity
+            android:name=".control.activity.CrossSectionActivity"
+            android:label="@string/title_activity_cross_section"
+            android:windowSoftInputMode="adjustNothing" >
+        </activity>
+        <activity
             android:name=".control.activity.DeviceActivity"
             android:label="@string/title_activity_device" >
         </activity>
@@ -80,6 +85,15 @@
             android:enabled="true"
             android:exported="false" >
         </service>
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="org.hwyl.sexytopo.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
         <activity
             android:name=".control.activity.DistoXCalibrationActivity"
             android:label="@string/title_activity_calibration">
@@ -87,6 +101,10 @@
         <activity
             android:name=".control.activity.TripActivity"
             android:label="@string/action_trip">
+        </activity>
+        <activity
+            android:name=".control.activity.ThreeDViewActivity"
+            android:label="@string/title_activity_3d" >
         </activity>
         <meta-data
             android:name="io.fabric.ApiKey"

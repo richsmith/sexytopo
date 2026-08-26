@@ -4,13 +4,12 @@ import org.hwyl.sexytopo.control.util.Space3DUtils;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Coord3D;
 import org.hwyl.sexytopo.model.graph.Line;
+import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 
-/**
- * Represents a cross-section of a passage at a specified angle on a top-down plan sketch.
- */
+/** Represents a cross-section of a passage at a specified angle on a top-down plan sketch. */
 public class CrossSection {
 
     private final Station station;
@@ -30,7 +29,7 @@ public class CrossSection {
             // first of all normalise to match the angle of the cross section
             Leg rotated = leg.rotate(-angle);
             Coord3D coord3D = Space3DUtils.toCartesian(Coord3D.ORIGIN, rotated);
-            Coord2D coord2D = new Coord2D(coord3D.x, -coord3D.z);
+            Coord2D coord2D = Projection2D.CROSS_SECTION.project(coord3D);
             Line<Coord2D> line = new Line<>(Coord2D.ORIGIN, coord2D);
             projection.addLeg(rotated, line);
         }

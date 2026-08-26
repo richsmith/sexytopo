@@ -2,16 +2,13 @@ package org.hwyl.sexytopo.control.activity;
 
 import android.os.Bundle;
 import android.view.View;
-import android.widget.TableLayout;
 import android.widget.TextView;
-
+import com.google.android.material.card.MaterialCardView;
+import java.util.Set;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.survey.Survey;
-
-import java.util.Set;
-
 
 public class StatsActivity extends SexyTopoActivity {
 
@@ -29,7 +26,6 @@ public class StatsActivity extends SexyTopoActivity {
         updateStats();
         updateLinkedStats();
     }
-
 
     private void updateStats() {
 
@@ -51,7 +47,6 @@ public class StatsActivity extends SexyTopoActivity {
         setStatsField(R.id.statsFieldLongestLeg, TextTools.formatTo2dpWithComma(longestLeg));
     }
 
-
     private void updateLinkedStats() {
 
         Set<Survey> surveys = getSurvey().getRecursiveConnectedSurveys();
@@ -59,11 +54,11 @@ public class StatsActivity extends SexyTopoActivity {
 
         int numberSurveys = surveys.size();
 
-        TableLayout tableLayout = findViewById(R.id.statsAllLinkedSurveys);
+        MaterialCardView cardView = findViewById(R.id.statsAllLinkedSurveys);
         if (numberSurveys <= 1) {
-            tableLayout.setVisibility(View.GONE);
+            cardView.setVisibility(View.GONE);
         } else {
-            tableLayout.setVisibility(View.VISIBLE);
+            cardView.setVisibility(View.VISIBLE);
         }
 
         float length = 0;
@@ -99,18 +94,17 @@ public class StatsActivity extends SexyTopoActivity {
         setStatsField(R.id.statsFieldNumberLinkedSurveys, TextTools.formatWithComma(numberSurveys));
         setStatsField(R.id.statsFieldLinkedLength, TextTools.formatTo2dpWithComma(length));
         setStatsField(R.id.statsFieldLinkedDepth, TextTools.formatTo2dpWithComma(heightRange));
-        setStatsField(R.id.statsFieldLinkedNumberStations, TextTools.formatWithComma(numberOfStations));
+        setStatsField(
+                R.id.statsFieldLinkedNumberStations, TextTools.formatWithComma(numberOfStations));
         setStatsField(R.id.statsFieldLinkedNumberLegs, TextTools.formatWithComma(numberOfLegs));
         setStatsField(R.id.statsFieldLinkedNumberSplays, TextTools.formatWithComma(numberOfSplays));
-        setStatsField(R.id.statsFieldLinkedShortestLeg, TextTools.formatTo2dpWithComma(shortestLeg));
+        setStatsField(
+                R.id.statsFieldLinkedShortestLeg, TextTools.formatTo2dpWithComma(shortestLeg));
         setStatsField(R.id.statsFieldLinkedLongestLeg, TextTools.formatTo2dpWithComma(longestLeg));
-
     }
-
 
     private void setStatsField(int id, String text) {
         TextView textView = findViewById(id);
         textView.setText(text);
     }
-
 }

@@ -14,7 +14,8 @@
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/panelBackground">
+            android:background="@color/panelBackground"
+            android:elevation="0dp">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar"
@@ -66,7 +67,6 @@
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="16dp"
         android:contentDescription="@string/manual_add_splay_title"
-        app:fabSize="mini"
         app:srcCompat="@drawable/add_splay" />
 
     <!-- Primary FAB for Add Station -->

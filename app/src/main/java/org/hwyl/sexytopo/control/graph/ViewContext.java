@@ -2,18 +2,17 @@ package org.hwyl.sexytopo.control.graph;
 
 import android.view.Menu;
 import android.view.MenuItem;
-
 import org.hwyl.sexytopo.R;
 
 /**
- * Represents the different view contexts where station context menus can be displayed.
- * Each context configures menu visibility differently.
+ * Represents the different view contexts where station context menus can be displayed. Each context
+ * configures menu visibility differently.
  */
 public enum ViewContext {
     TABLE {
         @Override
         public void configureViewSpecificItems(Menu menu) {
-            menu.findItem(R.id.action_jump_to_table).setVisible(false);
+            setItemVisible(menu, R.id.action_jump_to_table, false);
             setDirectionSubmenuVisible(menu, false);
             setCrossSectionVisible(menu, false);
         }
@@ -21,7 +20,7 @@ public enum ViewContext {
     PLAN {
         @Override
         public void configureViewSpecificItems(Menu menu) {
-            menu.findItem(R.id.action_jump_to_plan).setVisible(false);
+            setItemVisible(menu, R.id.action_jump_to_plan, false);
             setDirectionSubmenuVisible(menu, false);
             setCrossSectionVisible(menu, true);
         }
@@ -29,7 +28,7 @@ public enum ViewContext {
     ELEVATION {
         @Override
         public void configureViewSpecificItems(Menu menu) {
-            menu.findItem(R.id.action_jump_to_elevation).setVisible(false);
+            setItemVisible(menu, R.id.action_jump_to_elevation, false);
             setDirectionSubmenuVisible(menu, false);
             setCrossSectionVisible(menu, false);
         }
@@ -37,12 +36,47 @@ public enum ViewContext {
     EXTENDED_ELEVATION {
         @Override
         public void configureViewSpecificItems(Menu menu) {
-            menu.findItem(R.id.action_jump_to_elevation).setVisible(false);
+            setItemVisible(menu, R.id.action_jump_to_elevation, false);
             setDirectionSubmenuVisible(menu, true);
+        }
+    },
+    CROSS_SECTION {
+        @Override
+        public void configureViewSpecificItems(Menu menu) {
+            // No station context menu is shown in the cross-section editor.
+        }
+
+        @Override
+        public boolean hasStationContextMenu() {
+            return false;
+        }
+    },
+    THREE_D {
+        @Override
+        public void configureViewSpecificItems(Menu menu) {
+            setDirectionSubmenuVisible(menu, false);
+            setCrossSectionVisible(menu, false);
+        }
+
+        @Override
+        public boolean hasStationContextMenu() {
+            return false;
         }
     };
 
     public abstract void configureViewSpecificItems(Menu menu);
+
+    /** Whether a station long-press in this view context should open a context menu. */
+    public boolean hasStationContextMenu() {
+        return true;
+    }
+
+    protected void setItemVisible(Menu menu, int itemId, boolean visible) {
+        MenuItem item = menu.findItem(itemId);
+        if (item != null) {
+            item.setVisible(visible);
+        }
+    }
 
     protected void setDirectionSubmenuVisible(Menu menu, boolean visible) {
         MenuItem elevationMenu = menu.findItem(R.id.menu_elevation);
@@ -52,9 +86,9 @@ public enum ViewContext {
     }
 
     protected void setCrossSectionVisible(Menu menu, boolean visible) {
-        MenuItem crossSectionItem = menu.findItem(R.id.action_new_cross_section);
-        if (crossSectionItem != null) {
-            crossSectionItem.setVisible(visible);
+        MenuItem crossSectionMenu = menu.findItem(R.id.menu_xsection);
+        if (crossSectionMenu != null) {
+            crossSectionMenu.setVisible(visible);
         }
     }
 }

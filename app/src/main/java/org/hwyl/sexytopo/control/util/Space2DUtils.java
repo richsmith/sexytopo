@@ -1,5 +1,8 @@
 package org.hwyl.sexytopo.control.util;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import org.hwyl.sexytopo.model.common.Frame;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
@@ -7,11 +10,6 @@ import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 
 public class Space2DUtils {
 
@@ -58,52 +56,68 @@ public class Space2DUtils {
         return (float) Math.sqrt(dx * dx + dy * dy);
     }
 
-
     public static float getDistance(Coord2D a, Coord2D b) {
         return (float) Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2));
     }
 
     public static float adjustAngle(float angle, float delta) {
-        float newAngle = angle + delta;
-        while (newAngle < 0) {
+        float newAngle = (angle + delta) % 360;
+        if (newAngle < 0) {
             newAngle += 360;
         }
-         return newAngle % 360;
+        return newAngle;
+    }
+
+    /** Average azimuth values together, handling the 360/0 boundary correctly */
+    public static float averageAzimuths(float... azimuths) {
+        // Azimuth values jump at the 360/0 boundary, so we must be careful to ensure that
+        // values {359, 1} average to 0 rather than the incorrect value 180
+        float min = Float.POSITIVE_INFINITY, max = Float.NEGATIVE_INFINITY;
+        for (float azimuth : azimuths) {
+            min = Math.min(azimuth, min);
+            max = Math.max(azimuth, max);
+        }
+        boolean splitOverZero = max - min > 180;
+        float sum = 0.0f;
+        for (float azimuth : azimuths) {
+            sum += (splitOverZero && azimuth < 180) ? azimuth + 360 : azimuth;
+        }
+        return (sum / azimuths.length) % 360;
     }
 
     @SuppressWarnings("ConstantConditions")
-    public static Space<Coord2D> transform(Space<Coord2D> space, Coord2D point) {
+    public static Space<Coord2D> translate(Space<Coord2D> space, Coord2D translation) {
 
         Space<Coord2D> newSpace = new Space<>();
 
         Map<Station, Coord2D> stations = space.getStationMap();
         for (Station station : stations.keySet()) {
             Coord2D coord = stations.get(station);
-            Coord2D newCoord = coord.plus(point);
+            Coord2D newCoord = coord.plus(translation);
             newSpace.addStation(station, newCoord);
         }
 
         Map<Leg, Line<Coord2D>> legs = space.getLegMap();
         for (Leg leg : legs.keySet()) {
             Line<Coord2D> line = legs.get(leg);
-            Line<Coord2D> newLine = transformLine(line, point);
+            Line<Coord2D> newLine = translateLine(line, translation);
             newSpace.addLeg(leg, newLine);
         }
 
         return newSpace;
     }
 
-    public static Line<Coord2D> transformLine(Line<Coord2D> line, Coord2D point) {
+    public static Line<Coord2D> translateLine(Line<Coord2D> line, Coord2D translation) {
         Coord2D start = line.getStart();
         Coord2D end = line.getEnd();
-        return new Line<>(start.plus(point), end.plus(point));
+        return new Line<>(start.plus(translation), end.plus(translation));
     }
 
     public static float getAngleBetween(Coord2D p0, Coord2D p1) {
         float deltaY = p0.y - p1.y;
         float deltaX = p0.x - p1.x;
-        float radians = (float)Math.atan2(deltaY, deltaX);
-        float angle = (float)Math.toDegrees(radians);
+        float radians = (float) Math.atan2(deltaY, deltaX);
+        float angle = (float) Math.toDegrees(radians);
         return angle;
     }
 
@@ -136,7 +150,8 @@ public class Space2DUtils {
         // If max distance is greater than epsilon, recursively simplify
         if (distMax > epsilon) {
             List<Coord2D> results1 = douglasPeukerIteration(path.subList(0, indexMax + 1), epsilon);
-            List<Coord2D> results2 = douglasPeukerIteration(path.subList(indexMax, pathSize), epsilon);
+            List<Coord2D> results2 =
+                    douglasPeukerIteration(path.subList(indexMax, pathSize), epsilon);
 
             simplifiedPath = new ArrayList<>(results1);
             simplifiedPath.addAll(results2.subList(1, results2.size()));
@@ -162,10 +177,8 @@ public class Space2DUtils {
 
     public static List<Coord2D> simplify(List<Coord2D> path, float epsilon) {
 
-        if (path.isEmpty() || epsilon <= 0)
-            return path;
+        if (path.isEmpty() || epsilon <= 0) return path;
 
         return douglasPeukerIteration(path, epsilon);
     }
-
 }

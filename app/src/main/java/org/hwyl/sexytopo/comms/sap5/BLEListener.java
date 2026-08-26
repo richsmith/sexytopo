@@ -1,10 +1,9 @@
 package org.hwyl.sexytopo.comms.sap5;
 
-import org.hwyl.sexytopo.control.Log;
-
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import org.hwyl.sexytopo.control.Log;
 
 public class BLEListener {
     private final PipedInputStream readStream;
@@ -15,15 +14,15 @@ public class BLEListener {
         readStreamSource = new PipedOutputStream(readStream);
     }
 
-    void onSerialConnect      () {
+    void onSerialConnect() {
         Log.device("BLE Connected");
     }
 
-    void onSerialConnectError (Exception e) {
+    void onSerialConnectError(Exception e) {
         Log.e(e);
     }
 
-    void onSerialRead         (byte[] data) {
+    void onSerialRead(byte[] data) {
         try {
             readStreamSource.write(data);
         } catch (IOException e) {
@@ -31,13 +30,11 @@ public class BLEListener {
         }
     }
 
-    void onSerialIoError      (Exception e) {
+    void onSerialIoError(Exception e) {
         Log.e(e);
     }
 
     public PipedInputStream getInputStream() {
         return readStream;
     }
-
-
 }

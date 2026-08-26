@@ -3,7 +3,6 @@ package org.hwyl.sexytopo.comms;
 import java.util.HashMap;
 import java.util.Map;
 
-
 public interface Communicator {
 
     Map<Integer, Integer> NO_COMMANDS = new HashMap<>();
@@ -25,7 +24,4 @@ public interface Communicator {
     default void forceStop() {
         // Do nothing unless implemented
     }
-
 }
-
-

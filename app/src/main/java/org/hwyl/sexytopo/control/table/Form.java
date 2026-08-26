@@ -4,21 +4,22 @@ import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.TextView;
-
 import androidx.annotation.Nullable;
+import com.google.android.material.textfield.TextInputLayout;
 
-abstract public class Form {
+public abstract class Form {
     private final Context context;
 
     static class TextViewValidationTrigger implements TextWatcher {
-        private final Form form;
+        final Form form;
 
         TextViewValidationTrigger(Form form) {
             this.form = form;
         }
 
         @Override
-        public void beforeTextChanged(CharSequence charSequence, int start, int before, int count) {}
+        public void beforeTextChanged(
+                CharSequence charSequence, int start, int before, int count) {}
 
         @Override
         public void onTextChanged(CharSequence charSequence, int start, int count, int after) {}
@@ -33,13 +34,25 @@ abstract public class Form {
         void onDidValidate(Boolean valid);
     }
 
-    private boolean valid;
+    protected boolean valid;
+    private boolean showErrors;
+    private boolean showLiveErrors;
     @Nullable private OnDidValidateCallback onDidValidateCallback;
 
     Form(Context context) {
         this.context = context;
         this.valid = true;
+        this.showErrors = false;
+        this.showLiveErrors = false;
         this.onDidValidateCallback = null;
+    }
+
+    public void enableErrors() {
+        this.showErrors = true;
+    }
+
+    public void enableLiveErrors() {
+        this.showLiveErrors = true;
     }
 
     public void setOnDidValidateCallback(@Nullable OnDidValidateCallback callback) {
@@ -54,22 +67,42 @@ abstract public class Form {
         this.valid = true;
         performValidation();
 
-        if(this.onDidValidateCallback != null) {
+        if (this.onDidValidateCallback != null) {
             this.onDidValidateCallback.onDidValidate(this.valid);
         }
     }
 
-    abstract protected void performValidation();
+    protected abstract void performValidation();
 
     protected void setError(TextView field, CharSequence error) {
         boolean fieldValid = (error == null);
 
-        this.valid = this.valid  & fieldValid;
-        field.setError(error);
+        this.valid = this.valid & fieldValid;
+        field.setError(showErrors ? error : null);
     }
 
     protected void setError(TextView field, Integer error) {
-        CharSequence message = error == null? null : context.getString(error);
+        CharSequence message = error == null ? null : context.getString(error);
         this.setError(field, message);
+    }
+
+    protected void setError(TextInputLayout layout, CharSequence error) {
+        this.valid = this.valid & (error == null);
+        layout.setError(showErrors ? error : null);
+    }
+
+    protected void setError(TextInputLayout layout, Integer error) {
+        CharSequence message = error == null ? null : context.getString(error);
+        this.setError(layout, message);
+    }
+
+    protected void setLiveError(TextInputLayout layout, CharSequence error) {
+        this.valid = this.valid & (error == null);
+        layout.setError(showLiveErrors ? error : null);
+    }
+
+    protected void setLiveError(TextInputLayout layout, Integer error) {
+        CharSequence message = error == null ? null : context.getString(error);
+        this.setLiveError(layout, message);
     }
 }

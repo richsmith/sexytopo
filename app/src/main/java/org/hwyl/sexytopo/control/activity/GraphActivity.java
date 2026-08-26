@@ -11,20 +11,24 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.HapticFeedbackConstants;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
-
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 import org.apache.commons.lang3.ArrayUtils;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
@@ -37,49 +41,52 @@ import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.BrushColour;
 import org.hwyl.sexytopo.model.sketch.Colour;
+import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchTool;
 import org.hwyl.sexytopo.model.sketch.Symbol;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
-
 public abstract class GraphActivity extends SurveyEditorActivity
-        implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
+        implements View.OnClickListener, PopupMenu.OnMenuItemClickListener, SensorEventListener {
 
     private static final float ZOOM_INCREMENT = 1.1f;
     private static final float ZOOM_DECREMENT = 0.9f;
 
+    private static final int[] SKETCH_BUTTON_IDS =
+            new int[] {
+                R.id.buttonDraw,
+                R.id.buttonErase,
+                R.id.buttonSymbol,
+                R.id.buttonUndo,
+                R.id.buttonRedo,
+                R.id.buttonBlack,
+                R.id.buttonBrown,
+                R.id.buttonGrey,
+                R.id.buttonRed,
+                R.id.buttonOrange,
+                R.id.buttonBlue,
+                R.id.buttonGreen,
+                R.id.buttonPurple
+            };
 
-    private static final int[] SKETCH_BUTTON_IDS = new int[] {
-            R.id.buttonDraw,
-            R.id.buttonErase,
-            R.id.buttonSymbol,
-            R.id.buttonUndo,
-            R.id.buttonRedo,
-            R.id.buttonBlack,
-            R.id.buttonBrown,
-            R.id.buttonGrey,
-            R.id.buttonRed,
-            R.id.buttonOrange,
-            R.id.buttonBlue,
-            R.id.buttonGreen,
-            R.id.buttonPurple
-    };
-
-    private static final int[] CONTROL_BUTTON_IDS = new int[] {
-            R.id.buttonMove,
-            R.id.buttonSelect,
-            R.id.buttonZoomIn,
-            R.id.buttonZoomOut,
-            R.id.buttonMenu
-    };
+    private static final int[] CONTROL_BUTTON_IDS =
+            new int[] {
+                R.id.buttonMove,
+                R.id.buttonSelect,
+                R.id.buttonZoomIn,
+                R.id.buttonZoomOut,
+                R.id.buttonMenu
+            };
 
     private static final int[] BUTTON_IDS =
             ArrayUtils.addAll(SKETCH_BUTTON_IDS, CONTROL_BUTTON_IDS);
 
-
     private GraphView graphView;
+
+    private SensorManager sensorManager;
+    private Sensor rotationSensor;
 
     private BroadcastReceiver updatedReceiver;
     private BroadcastReceiver createdReceiver;
@@ -92,19 +99,26 @@ public abstract class GraphActivity extends SurveyEditorActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        updatedReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                syncWithSurvey();
-            }
-        };
+        updatedReceiver =
+                new BroadcastReceiver() {
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        syncWithSurvey();
+                    }
+                };
 
-        createdReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                handleAutoRecentre();
-            }
-        };
+        createdReceiver =
+                new BroadcastReceiver() {
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        handleAutoRecentre();
+                    }
+                };
+
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        if (sensorManager != null) {
+            rotationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+        }
 
         setContentView(R.layout.activity_graph);
         setupMaterialToolbar();
@@ -124,17 +138,19 @@ public abstract class GraphActivity extends SurveyEditorActivity
         graphView.post(this::setViewLocation);
     }
 
-
     private void handleAutoRecentre() {
         if (SketchPreferences.Toggle.AUTO_RECENTRE.isOn()) {
             graphView.centreViewOnActiveStation();
         }
     }
 
-
     @Override
     protected void onResume() {
         super.onResume();
+
+        if (SketchPreferences.Toggle.SHOW_COMPASS.isOn()) {
+            registerCompassSensor();
+        }
 
         registerReceivers();
         syncWithSurvey();
@@ -149,16 +165,66 @@ public abstract class GraphActivity extends SurveyEditorActivity
 
     public void onPause() {
         super.onPause();
+        unregisterCompassSensor();
         unregisterReceivers();
     }
 
+    private void registerCompassSensor() {
+        if (sensorManager != null && rotationSensor != null) {
+            sensorManager.registerListener(this, rotationSensor, SensorManager.SENSOR_DELAY_UI);
+        }
+    }
+
+    private void unregisterCompassSensor() {
+        if (sensorManager != null) {
+            sensorManager.unregisterListener(this);
+        }
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+            float[] rotMatrix = new float[9];
+            SensorManager.getRotationMatrixFromVector(rotMatrix, event.values);
+
+            int axisX = SensorManager.AXIS_X;
+            int axisY = SensorManager.AXIS_Y;
+            int rotation = getWindowManager().getDefaultDisplay().getRotation();
+            switch (rotation) {
+                case Surface.ROTATION_90:
+                    axisX = SensorManager.AXIS_Y;
+                    axisY = SensorManager.AXIS_MINUS_X;
+                    break;
+                case Surface.ROTATION_180:
+                    axisX = SensorManager.AXIS_MINUS_X;
+                    axisY = SensorManager.AXIS_MINUS_Y;
+                    break;
+                case Surface.ROTATION_270:
+                    axisX = SensorManager.AXIS_MINUS_Y;
+                    axisY = SensorManager.AXIS_X;
+                    break;
+                default:
+                    break;
+            }
+
+            float[] remapped = new float[9];
+            SensorManager.remapCoordinateSystem(rotMatrix, axisX, axisY, remapped);
+            float[] orientation = new float[3];
+            SensorManager.getOrientation(remapped, orientation);
+            float azimuthDeg = (float) Math.toDegrees(orientation[0]);
+            graphView.setCompassAzimuth(azimuthDeg);
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
     private void registerReceivers() {
         LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
-        broadcastManager.registerReceiver(updatedReceiver,
-            new IntentFilter(SexyTopoConstants.SURVEY_UPDATED_EVENT));
-        broadcastManager.registerReceiver(createdReceiver,
-            new IntentFilter(SexyTopoConstants.NEW_STATION_CREATED_EVENT));
+        broadcastManager.registerReceiver(
+                updatedReceiver, new IntentFilter(SexyTopoConstants.SURVEY_UPDATED_EVENT));
+        broadcastManager.registerReceiver(
+                createdReceiver, new IntentFilter(SexyTopoConstants.NEW_STATION_CREATED_EVENT));
     }
 
     private void unregisterReceivers() {
@@ -190,7 +256,6 @@ public abstract class GraphActivity extends SurveyEditorActivity
         graphView.setIsDarkModeActive(isDarkModeActive);
     }
 
-
     @Override
     public void syncWithSurvey() {
         Survey survey = getSurvey();
@@ -204,7 +269,6 @@ public abstract class GraphActivity extends SurveyEditorActivity
         graphView.invalidate();
     }
 
-
     public abstract Sketch getSketch(Survey survey);
 
     public Space<Coord2D> getProjection(Survey survey) {
@@ -213,13 +277,11 @@ public abstract class GraphActivity extends SurveyEditorActivity
 
     public abstract Projection2D getProjectionType();
 
-
     @Override
     public void onClick(View view) {
         int id = view.getId();
         handleAction(id);
     }
-
 
     public boolean onMenuItemClick(MenuItem item) {
         int itemId = item.getItemId();
@@ -233,12 +295,26 @@ public abstract class GraphActivity extends SurveyEditorActivity
             SketchPreferences.Toggle.SHOW_GRID.set(!item.isChecked());
             graphView.invalidate();
             return true;
+        } else if (itemId == R.id.buttonShowCompass) {
+            boolean turningOn = !item.isChecked();
+            SketchPreferences.Toggle.SHOW_COMPASS.set(turningOn);
+            if (turningOn) {
+                registerCompassSensor();
+            } else {
+                unregisterCompassSensor();
+            }
+            graphView.invalidate();
+            return true;
         } else if (itemId == R.id.buttonFadeNonActive) {
             SketchPreferences.Toggle.FADE_NON_ACTIVE.set(!item.isChecked());
             graphView.invalidate();
             return true;
         } else if (itemId == R.id.buttonShowSplays) {
             SketchPreferences.Toggle.SHOW_SPLAYS.set(!item.isChecked());
+            graphView.invalidate();
+            return true;
+        } else if (itemId == R.id.buttonShowXSections) {
+            SketchPreferences.Toggle.SHOW_X_SECTIONS.set(!item.isChecked());
             graphView.invalidate();
             return true;
         } else if (itemId == R.id.buttonShowSketch) {
@@ -258,12 +334,16 @@ public abstract class GraphActivity extends SurveyEditorActivity
             SketchPreferences.Toggle.AUTO_RECENTRE.set(!item.isChecked());
             graphView.invalidate();
             return true;
+        } else if (itemId == R.id.buttonBlueWater) {
+            SketchPreferences.Toggle.BLUE_WATER.set(!item.isChecked());
+            return true;
+        } else if (itemId == R.id.buttonPinchToZoom) {
+            SketchPreferences.Toggle.PINCH_TO_ZOOM.set(!item.isChecked());
+            return true;
         } else {
             return handleAction(itemId);
         }
-
     }
-
 
     private void setSketchButtonsStatus() {
 
@@ -272,7 +352,7 @@ public abstract class GraphActivity extends SurveyEditorActivity
             blackButton.setImageResource(R.drawable.white);
         }
 
-       boolean isEnabled = SketchPreferences.Toggle.SHOW_SKETCH.isOn();
+        boolean isEnabled = SketchPreferences.Toggle.SHOW_SKETCH.isOn();
         for (int id : SKETCH_BUTTON_IDS) {
             ImageButton button = findViewById(id);
             button.setEnabled(isEnabled);
@@ -282,7 +362,6 @@ public abstract class GraphActivity extends SurveyEditorActivity
             graphView.setSketchTool(SketchTool.MOVE);
         }
     }
-
 
     public boolean handleAction(int itemId) {
 
@@ -322,7 +401,7 @@ public abstract class GraphActivity extends SurveyEditorActivity
 
         // ********** General colour selection **********
 
-        for (BrushColour brushColour: BrushColour.values()) {
+        for (BrushColour brushColour : BrushColour.values()) {
             if (brushColour.getId() == itemId) {
                 selectBrushColour(brushColour);
                 if (!graphView.getSketchTool().usesColour()) {
@@ -334,15 +413,14 @@ public abstract class GraphActivity extends SurveyEditorActivity
 
         // ********** Handle special symbol logic **********
 
-
         if (itemId == R.id.buttonSymbol) {
-            // Open the symbol toolbar if the symbol tool is selected twice
-            // (also open it the first time ever selected to teach the user that it's there)
-            if (!symbolToolbarOpenedOnce || alreadySelectedTool == SketchTool.SYMBOL) {
+            boolean wasAlreadyInSymbolMode = alreadySelectedTool == SketchTool.SYMBOL;
+            selectSketchTool(SketchTool.SYMBOL);
+            // Open the symbol toolbar the first time ever (to teach the user it's there)
+            // and toggle it whenever the symbol tool is tapped while already active.
+            if (!symbolToolbarOpenedOnce || wasAlreadyInSymbolMode) {
                 symbolToolbarOpenedOnce = true;
                 toggleSymbolToolbar();
-            } else { // else standard sketch tool selection
-                selectSketchTool(SketchTool.SYMBOL);
             }
             return true;
         }
@@ -367,7 +445,6 @@ public abstract class GraphActivity extends SurveyEditorActivity
         return false;
     }
 
-
     private void openDisplayMenu() {
 
         View view = findViewById(R.id.buttonMenu);
@@ -375,6 +452,10 @@ public abstract class GraphActivity extends SurveyEditorActivity
         Menu menu = popup.getMenu();
         popup.getMenuInflater().inflate(R.menu.drawing, menu);
         popup.setOnMenuItemClickListener(this);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            menu.setGroupDividerEnabled(true);
+        }
 
         for (SketchPreferences.Toggle toggle : SketchPreferences.Toggle.values()) {
             int controlId = toggle.getControlId();
@@ -384,7 +465,6 @@ public abstract class GraphActivity extends SurveyEditorActivity
 
         popup.show();
     }
-
 
     private void initialiseSymbolToolbar() {
         LinearLayout buttonPanel = findViewById(R.id.symbolToolbarButtonPanel);
@@ -406,7 +486,6 @@ public abstract class GraphActivity extends SurveyEditorActivity
         buttonPanel.invalidate();
     }
 
-
     private void toggleSymbolToolbar() {
         View toolbar = getSymbolToolbar();
         boolean isVisible = toolbar.getVisibility() == View.VISIBLE;
@@ -415,13 +494,12 @@ public abstract class GraphActivity extends SurveyEditorActivity
 
     private void setSymbolToolbarOpen(boolean setOpen) {
         View toolbar = getSymbolToolbar();
-        toolbar.setVisibility(setOpen? View.VISIBLE : View.GONE);
+        toolbar.setVisibility(setOpen ? View.VISIBLE : View.GONE);
     }
 
     private View getSymbolToolbar() {
         return findViewById(R.id.symbolToolbar);
     }
-
 
     private void selectSymbol(Symbol symbol) {
         SketchPreferences.setSelectedSymbol(symbol);
@@ -432,13 +510,16 @@ public abstract class GraphActivity extends SurveyEditorActivity
         }
 
         ImageButton selectedSymbolButton = findViewById(symbol.getButtonViewId());
-        selectedSymbolButton.getBackground().setColorFilter(buttonHighlightColour, PorterDuff.Mode.SRC_ATOP);
+        selectedSymbolButton
+                .getBackground()
+                .setColorFilter(buttonHighlightColour, PorterDuff.Mode.SRC_ATOP);
 
         ImageButton symbolButton = findViewById(R.id.buttonSymbol);
         symbolButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
-        ShapeDrawable border = new ShapeDrawable(new RoundRectShape(
-                new float[] { 5, 5, 5, 5, 5, 5, 5, 5 }, null, null));
+        ShapeDrawable border =
+                new ShapeDrawable(
+                        new RoundRectShape(new float[] {5, 5, 5, 5, 5, 5, 5, 5}, null, null));
         border.getPaint().setColor(Color.BLACK); // Set border color
         border.getPaint().setStyle(Paint.Style.STROKE); // Set to be a border (not filled)
         border.getPaint().setStrokeWidth(10); // Set border width
@@ -448,11 +529,8 @@ public abstract class GraphActivity extends SurveyEditorActivity
         LayerDrawable layerDrawable = new LayerDrawable(layers);
         symbolButton.setImageDrawable(layerDrawable);
 
-
         graphView.setCurrentSymbol(symbol);
-
     }
-
 
     private void initialiseTools() {
         SketchTool selected = SketchPreferences.getSelectedSketchTool();
@@ -465,7 +543,6 @@ public abstract class GraphActivity extends SurveyEditorActivity
         Symbol selectedSymbol = SketchPreferences.getSelectedSymbol();
         selectSymbol(selectedSymbol);
     }
-
 
     private void selectSketchTool(SketchTool toSelect) {
 
@@ -480,7 +557,8 @@ public abstract class GraphActivity extends SurveyEditorActivity
             }
 
             if (sketchTool == toSelect) {
-                button.getBackground().setColorFilter(buttonHighlightColour, PorterDuff.Mode.SRC_ATOP);
+                button.getBackground()
+                        .setColorFilter(buttonHighlightColour, PorterDuff.Mode.SRC_ATOP);
             } else {
                 button.getBackground().clearColorFilter();
             }
@@ -496,7 +574,8 @@ public abstract class GraphActivity extends SurveyEditorActivity
 
             View button = findViewById(brushColour.getId());
             if (brushColour == toSelect) {
-                button.getBackground().setColorFilter(buttonHighlightColour, PorterDuff.Mode.SRC_ATOP);
+                button.getBackground()
+                        .setColorFilter(buttonHighlightColour, PorterDuff.Mode.SRC_ATOP);
                 button.invalidate();
             } else {
                 button.getBackground().clearColorFilter();
@@ -515,8 +594,33 @@ public abstract class GraphActivity extends SurveyEditorActivity
     }
 
     @Override
+    public void onDeleteCrossSection(Station station) {
+        Sketch planSketch = getSurvey().getPlanSketch();
+        CrossSectionDetail detail = planSketch.getCrossSectionDetail(station);
+        if (detail == null) {
+            return;
+        }
+        planSketch.deleteDetail(detail);
+        getSurveyManager().broadcastSurveyUpdated();
+        invalidateView();
+    }
+
+    @Override
+    public void onRotateCrossSection(Station station) {
+        graphView.handleRotateCrossSection(station);
+    }
+
+    @Override
+    public void onEditCrossSection(Station station) {
+        CrossSectionDetail detail = getSurvey().getPlanSketch().getCrossSectionDetail(station);
+        if (detail == null) {
+            return;
+        }
+        graphView.launchCrossSectionEditor(detail);
+    }
+
+    @Override
     public void onRenameStation(Station station) {
         LegDialogs.renameStation(this, getSurvey(), station);
     }
-
 }

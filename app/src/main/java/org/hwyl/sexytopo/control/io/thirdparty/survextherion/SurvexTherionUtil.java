@@ -1,75 +1,292 @@
 package org.hwyl.sexytopo.control.io.thirdparty.survextherion;
 
+import android.annotation.SuppressLint;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
+import org.hwyl.sexytopo.control.util.TextTools;
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
+import org.hwyl.sexytopo.model.survey.Survey;
+import org.hwyl.sexytopo.model.survey.Trip;
 import org.hwyl.sexytopo.model.table.TableCol;
-
-import java.util.Locale;
-
 
 public class SurvexTherionUtil {
 
+    public static final String TRIP_DATE_PATTERN = "yyyy.MM.dd";
+
+    public static String getCreationComment(char commentChar, String versionInfo) {
+        String dateOnly = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        return commentChar + " Created with " + versionInfo + " on " + dateOnly;
+    }
+
+    public static String getInputText(List<String> th2Files) {
+        if (th2Files == null || th2Files.isEmpty()) {
+            return "";
+        }
+        StringBuilder builder = new StringBuilder();
+        for (String filename : th2Files) {
+            builder.append("input \"").append(filename).append("\"\n");
+        }
+        return builder.toString();
+    }
+
+    public static String getMetadata(
+            Survey survey, SurveyFormat format, String teamLines, String exploTeamLines) {
+        StringBuilder builder = new StringBuilder();
+
+        Trip trip = survey.getTrip();
+        if (trip != null) {
+            String marker = format.getCommandChar();
+            char commentChar = format.getCommentChar();
+            String exploDateKeyword = format.getExplorationDateKeyword();
+
+            // Date
+            builder.append(marker).append(formatDate(trip.getSurveyDate())).append("\n");
+
+            // Instrument line - commented ONLY if field is empty
+            if (trip.hasInstrument()) {
+                builder.append(marker)
+                        .append("instrument insts \"")
+                        .append(trip.getInstrument())
+                        .append("\"\n");
+            } else {
+                builder.append(commentChar).append(marker).append("instrument insts \"\"\n");
+            }
+
+            // Team members
+            builder.append(teamLines);
+
+            // Blank line before explo block
+            builder.append("\n");
+
+            // Explo-date: three cases:
+            //   1. Linked to survey date -> use survey date
+            //   2. Unlinked and date set -> use the explicit exploration date
+            //   3. Unlinked and date empty -> commented-out placeholder (like blank instrument)
+            if (trip.isExplorationDateLinked()) {
+                String formattedExploDate =
+                        formatDate(trip.getSurveyDate()).substring(5); // Remove "date " prefix
+                builder.append(marker)
+                        .append(exploDateKeyword)
+                        .append(formattedExploDate)
+                        .append("\n");
+            } else if (trip.getExplorationDate() != null) {
+                String formattedExploDate =
+                        formatDate(trip.getExplorationDate()).substring(5); // Remove "date " prefix
+                builder.append(marker)
+                        .append(exploDateKeyword)
+                        .append(formattedExploDate)
+                        .append("\n");
+            } else {
+                builder.append(commentChar).append(marker).append(exploDateKeyword).append("\n");
+            }
+
+            // Explo-team lines
+            builder.append(exploTeamLines);
+
+            // Trip comments block if any
+            if (trip.getComments() != null && !trip.getComments().isEmpty()) {
+                builder.append("\n");
+                builder.append(commentChar).append("Comment from SexyTopo trip information\n");
+                builder.append(commentMultiline(trip.getComments(), commentChar));
+            }
+        }
+
+        return builder.toString();
+    }
+
+    /**
+     * Returns the copyright line for the survey's trip - *copyright {year} "{holder}" ;"{licence}"
+     * for Survex, or the same without the leading * and with # as the comment character for
+     * Therion. Returns "" if there's no trip, or the trip has neither a copyright holder nor a
+     * licence set.
+     *
+     * <p>The holder is always quoted, and is rendered as an empty pair of quotes if blank. The
+     * licence (also quoted) is only appended, as a trailing comment, if it is set; if there's no
+     * licence, the line ends after the holder.
+     */
+    public static String getCopyrightLine(Survey survey, SurveyFormat format) {
+        Trip trip = survey.getTrip();
+        if (trip == null || (!trip.hasCopyrightHolder() && !trip.hasLicence())) {
+            return "";
+        }
+
+        String marker = format.getCommandChar();
+        char commentChar = format.getCommentChar();
+        String holder = trip.hasCopyrightHolder() ? trip.getCopyrightHolder() : "";
+
+        // The year is normally always present, since a trip is created with today's date, but
+        // an imported survey can leave it unset; omit it rather than writing an empty slot.
+        String year = TextTools.formatYear(trip.getSurveyDate());
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(marker).append("copyright ");
+        if (!year.isEmpty()) {
+            builder.append(year).append(" ");
+        }
+        builder.append("\"").append(holder).append("\"");
+
+        if (trip.hasLicence()) {
+            builder.append(" ")
+                    .append(commentChar)
+                    .append("\"")
+                    .append(trip.getLicence())
+                    .append("\"");
+        }
+
+        builder.append("\n");
+        return builder.toString();
+    }
+
+    public static String getStationCommentsData(Survey survey, SurveyFormat format) {
+
+        StringBuilder builder = new StringBuilder();
+        String marker = format.getCommandChar();
+
+        // Collect all stations with comments
+        List<Station> stationsWithComments = new ArrayList<>();
+        collectStationsWithComments(survey.getOrigin(), stationsWithComments);
+
+        if (stationsWithComments.isEmpty()) {
+            return "";
+        }
+
+        // Output the data passage/dimensions block.
+        // Header varies slightly by format:
+        //   Survex:  *data passage station left right up down ignoreall
+        //   Therion: data dimensions station left right up down ignoreall
+        builder.append(format.getDataPassagePrefix())
+                .append(" station left right up down ignoreall\n");
+
+        for (Station station : stationsWithComments) {
+            builder.append(station.getName()).append("\t");
+            // LRUD placeholders are unused for now, required by the format
+            builder.append("-\t-\t-\t-\t");
+            formatComment(builder, station.getComment());
+            builder.append("\n");
+        }
+
+        builder.append("\n");
+
+        return builder.toString();
+    }
+
+    private static void collectStationsWithComments(Station station, List<Station> result) {
+        if (station.hasComment()) {
+            result.add(station);
+        }
+        for (Leg leg : station.getConnectedOnwardLegs()) {
+            collectStationsWithComments(leg.getDestination(), result);
+        }
+    }
+
+    public static String getCentrelineData(Survey survey, SurveyFormat format) {
+
+        GraphToListTranslator graphToListTranslator = new GraphToListTranslator();
+        StringBuilder builder = new StringBuilder();
+
+        // Add data declaration line with optional syntax marker
+        String marker = format.getCommandChar();
+        builder.append(marker).append("data normal from to tape compass clino ignoreall\n");
+
+        // Get chronological list of survey entries
+        List<GraphToListTranslator.SurveyListEntry> list =
+                graphToListTranslator.toChronoListOfSurveyListEntries(survey);
+
+        // Format each entry
+        for (GraphToListTranslator.SurveyListEntry entry : list) {
+            formatEntry(builder, entry, format);
+            builder.append("\n");
+        }
+
+        // Blank line after data block
+        builder.append("\n");
+
+        return builder.toString();
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private static String formatDate(Date date) {
+        DateFormat dateFormat = new SimpleDateFormat(TRIP_DATE_PATTERN);
+        String dateString = dateFormat.format(date);
+        return "date " + dateString;
+    }
+
+    private static String commentMultiline(String raw, char commentChar) {
+        StringBuilder builder = new StringBuilder();
+        String[] lines = raw.split("\n");
+        for (String line : lines) {
+            builder.append(commentChar).append(line).append("\n");
+        }
+        return builder.toString();
+    }
 
     public static void formatEntry(
             StringBuilder builder,
             GraphToListTranslator.SurveyListEntry entry,
-            char commentChar) {
+            SurveyFormat format) {
 
-        Station from = entry.getFrom();
+        GraphToListTranslator.AsTakenReading reading =
+                GraphToListTranslator.toAsTakenReading(entry);
+        Station from = reading.getFrom();
         String fromName = from.getName();
 
-        Leg leg = entry.getLeg();
-        Station to = leg.getDestination();
+        Leg leg = reading.getLeg();
+        Station to = reading.getTo();
         String toName = to.getName();
 
-        if (leg.wasShotBackwards()) {
-            leg = leg.reverse();
-            fromName = to.getName();
-            toName = from.getName();
+        // Replace splay station name with format-specific syntax
+        if (toName.equals("-")) {
+            toName = format.getSplayStationName();
         }
 
         formatField(builder, fromName);
         formatField(builder, toName);
         formatField(builder, TableCol.DISTANCE.format(leg.getDistance(), Locale.UK));
         formatField(builder, TableCol.AZIMUTH.format(leg.getAzimuth(), Locale.UK));
-        formatField(builder, TableCol.INCLINATION.format(leg.getInclination(), Locale.UK));
+        formatField(builder, formatInclination(leg.getInclination()));
 
-        if (leg.wasPromoted() || to.hasComment()) {
-            builder.append("\t").append(commentChar).append(" ");
-            if (leg.wasPromoted()) {
-                builder.append(" ");
-                formatPromotedFrom(builder, leg.getPromotedFrom());
-            }
-            if (to.hasComment()) {
-                builder.append(" ");
-                formatComment(builder, to.getComment());
-
-            }
+        // Append comment on the active data line if present (Cases 1 & 2)
+        if (leg.hasComment()) {
+            builder.append(flattenComment(leg.getComment()));
         }
 
+        // Handle promoted legs - put readings on subsequent lines
+        if (leg.wasPromoted()) {
+            char commentChar = format.getCommentChar();
+            Leg[] precursors = leg.getPromotedFrom();
+            for (Leg precursor : precursors) {
+                builder.append("\n");
+                builder.append(commentChar);
+                builder.append(fromName).append("\t");
+                builder.append(toName).append("\t");
+                builder.append(TableCol.DISTANCE.format(precursor.getDistance(), Locale.UK))
+                        .append("\t");
+                builder.append(TableCol.AZIMUTH.format(precursor.getAzimuth(), Locale.UK))
+                        .append("\t");
+                builder.append(formatInclination(precursor.getInclination()));
 
-    }
-
-    private static void formatPromotedFrom(StringBuilder builder, Leg[] precursors) {
-        builder.append("{from: ");
-        boolean first = true;
-        for (Leg precursor : precursors) {
-            if (first) {
-                first = false;
-            } else {
-                builder.append(", ");
+                // Append precursor splay comment if present (Case 3)
+                if (precursor.hasComment()) {
+                    builder.append("\t").append(flattenComment(precursor.getComment()));
+                }
             }
-            builder.append(TableCol.DISTANCE.format(precursor.getDistance(), Locale.UK));
-            builder.append(" ");
-            builder.append(TableCol.AZIMUTH.format(precursor.getAzimuth(), Locale.UK));
-            builder.append(" ");
-            builder.append(TableCol.INCLINATION.format(precursor.getInclination(), Locale.UK));
         }
-        builder.append("}");
     }
 
+    private static String flattenComment(String comment) {
+        return comment.replaceAll("(\\r|\\n|\\r\\n)+", "\\\\n");
+    }
 
+    private static String formatInclination(double inclination) {
+        return String.format(Locale.UK, "%.2f", inclination);
+    }
 
     private static void formatField(StringBuilder builder, Object value) {
         builder.append(value.toString());
@@ -79,5 +296,52 @@ public class SurvexTherionUtil {
     private static void formatComment(StringBuilder builder, String comment) {
         String formatted = comment.replaceAll("(\\r|\\n|\\r\\n)+", "\\\\n");
         builder.append(formatted);
+    }
+
+    public static String getExtendedElevationExtensions(Survey survey, SurveyFormat format) {
+        StringBuilder builder = new StringBuilder();
+        String marker = format.getCommandChar();
+        generateExtendCommandsFromStation(builder, survey.getOrigin(), null, null, marker);
+        return builder.toString();
+    }
+
+    private static void generateExtendCommandsFromStation(
+            StringBuilder builder,
+            Station station,
+            Station fromStation,
+            ExtendedElevationDirection lastDirection,
+            String marker) {
+
+        ExtendedElevationDirection currentDirection = station.getExtendedElevationDirection();
+        String directionName = currentDirection.name().toLowerCase();
+
+        // A direction that doesn't propagate applies to this leg alone, so it's written with both
+        // of the leg's stations and doesn't change the direction the rest of the survey inherits.
+        ExtendedElevationDirection inheritedDirection;
+        if (!currentDirection.propagates()) {
+            builder.append(getExtendCommand(fromStation, station, directionName, marker));
+            inheritedDirection = lastDirection;
+        } else {
+            if (lastDirection == null) {
+                builder.append(getExtendCommand(station, "start", marker));
+            } else if (currentDirection != lastDirection) {
+                builder.append(getExtendCommand(station, directionName, marker));
+            }
+            inheritedDirection = currentDirection;
+        }
+
+        for (Leg leg : station.getConnectedOnwardLegs()) {
+            generateExtendCommandsFromStation(
+                    builder, leg.getDestination(), station, inheritedDirection, marker);
+        }
+    }
+
+    private static String getExtendCommand(Station station, String direction, String marker) {
+        return marker + "extend " + direction + " " + station.getName() + "\n";
+    }
+
+    private static String getExtendCommand(
+            Station from, Station to, String direction, String marker) {
+        return marker + "extend " + direction + " " + from.getName() + " " + to.getName() + "\n";
     }
 }

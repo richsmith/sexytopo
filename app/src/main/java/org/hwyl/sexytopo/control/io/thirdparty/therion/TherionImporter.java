@@ -1,40 +1,47 @@
 package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
 import android.content.Context;
-
 import androidx.documentfile.provider.DocumentFile;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.io.FilenameUtils;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.io.IoUtils;
-import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexImporter;
+import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SexyTopoVersion;
+import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionImporter;
+import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
 import org.hwyl.sexytopo.control.io.thirdparty.xvi.XviImporter;
 import org.hwyl.sexytopo.control.io.translation.Importer;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.control.util.TextTools;
-import org.hwyl.sexytopo.model.graph.Direction;
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import org.hwyl.sexytopo.model.survey.Trip;
 
 public class TherionImporter extends Importer {
 
     public Survey toSurvey(Context context, DocumentFile directory) throws Exception {
 
         Survey survey = null;
+        List<DocumentFile> xviFiles = new ArrayList<>();
 
+        // Parse .th file first to create the survey
         for (DocumentFile file : directory.listFiles()) {
-
             if (file.getName().endsWith("th")) {
                 survey = parseTh(context, file);
-
             } else if (file.getName().endsWith("xvi")) {
+                xviFiles.add(file);
+            }
+        }
+
+        // Then apply sketches
+        if (survey != null) {
+            for (DocumentFile file : xviFiles) {
                 String filenameNoExtension = FilenameUtils.removeExtension(file.getName());
                 if (filenameNoExtension.endsWith(SexyTopoConstants.PLAN_SUFFIX)) {
                     Sketch sketch = XviImporter.getSketch(context, file);
@@ -43,7 +50,6 @@ public class TherionImporter extends Importer {
                     Sketch sketch = XviImporter.getSketch(context, file);
                     survey.setElevationSketch(sketch);
                 }
-
             }
         }
 
@@ -53,11 +59,25 @@ public class TherionImporter extends Importer {
     private static Survey parseTh(Context context, DocumentFile file) throws Exception {
         Survey survey = new Survey();
         String contents = IoUtils.slurpFile(context, file);
+
+        // Determine import mode based on the SexyTopo version that wrote the file.
+        // Files with no version header (third-party) or written by 1.11.3+ use the new
+        // leg-comment path. Only files positively identified as 1.11.2 or earlier use the
+        // legacy station-comment path.
+        SexyTopoVersion version = SexyTopoVersion.extractFromText(contents);
+        boolean useLegComments =
+                version == null || version.isAfter(SexyTopoVersion.LEG_COMMENTS_VERSION_CUTOFF);
+
         List<String> lines = Arrays.asList(contents.split("\n"));
-        updateCentreline(lines, survey);
+        updateCentreline(lines, survey, useLegComments);
+
+        Trip trip = SurvexTherionImporter.parseMetadata(contents, SurveyFormat.THERION);
+        if (trip != null) {
+            survey.setTrip(trip);
+        }
+
         return survey;
     }
-
 
     public boolean canHandleFile(DocumentFile directory) {
         if (!directory.isDirectory()) {
@@ -71,24 +91,35 @@ public class TherionImporter extends Importer {
         return false;
     }
 
-
     public static void updateCentreline(List<String> lines, Survey survey) throws Exception {
+        updateCentreline(lines, survey, false);
+    }
+
+    public static void updateCentreline(List<String> lines, Survey survey, boolean useLegComments)
+            throws Exception {
         List<String> block = getContentsOfBeginEndBlock(lines, "centreline");
+
+        String blockText = TextTools.join("\n", block);
+        Map<String, String> passageComments =
+                SurvexTherionImporter.parsePassageData(blockText, SurveyFormat.THERION);
+
         List<String> sanitisedCentrelineData = new ArrayList<>();
         List<String> sanitisedElevationDirectionData = new ArrayList<>();
 
-
-        boolean inDataBlock = false;
-        for (String line: block) {
+        boolean inNormalDataBlock = false;
+        for (String line : block) {
             String trimmed = line.trim();
             if (trimmed.equals("")) {
                 continue;
             }
 
             if (trimmed.startsWith("data")) {
-                inDataBlock = true;
+                inNormalDataBlock = trimmed.startsWith("data normal");
                 continue;
-            } else if (!inDataBlock) {
+            } else if (!inNormalDataBlock) {
+                if (trimmed.startsWith("extend")) {
+                    sanitisedElevationDirectionData.add(trimmed);
+                }
                 continue;
             }
 
@@ -100,10 +131,11 @@ public class TherionImporter extends Importer {
         }
 
         String centrelineText = TextTools.join("\n", sanitisedCentrelineData);
-        SurvexImporter.parse(centrelineText, survey);
+        SurvexTherionImporter.parseCentreline(centrelineText, survey, useLegComments);
         handleElevationDirectionData(sanitisedElevationDirectionData, survey);
-    }
 
+        SurvexTherionImporter.mergePassageComments(survey, passageComments);
+    }
 
     private static void handleElevationDirectionData(List<String> lines, Survey survey) {
         try {
@@ -112,25 +144,36 @@ public class TherionImporter extends Importer {
                 assert line.startsWith(EXTEND_PREFIX);
                 String rest = line.substring(EXTEND_PREFIX.length());
                 String[] tokens = rest.split(" ");
-                assert tokens.length == 2;
 
                 String directionName = tokens[0];
                 if (directionName.equals("start")) {
                     continue;
                 }
-                Direction direction = Direction.valueOf(directionName.toUpperCase());
+                ExtendedElevationDirection direction =
+                        ExtendedElevationDirection.valueOf(directionName.toUpperCase());
 
-                String stationName = tokens[1];
+                // Propagating directions name one station and apply from there down. Directions
+                // scoped to a single leg name both its stations, and apply to the destination.
+                int expectedTokens = direction.propagates() ? 2 : 3;
+                if (tokens.length != expectedTokens) {
+                    Log.e("extend: could not understand '" + line + "'");
+                    continue;
+                }
+
+                String stationName = tokens[tokens.length - 1];
                 Station station = survey.getStationByName(stationName);
+                if (station == null) {
+                    Log.e("extend: station " + stationName + " not found");
+                    continue;
+                }
 
-                SurveyUpdater.setDirectionOfSubtree(station, direction);
+                SurveyUpdater.setExtendedElevationDirection(survey, station, direction);
             }
 
         } catch (Exception exception) {
             Log.e("corrupted survey extended elevation directions: " + exception);
         }
     }
-
 
     public static List<String> getContentsOfBeginEndBlock(List<String> lines, String tag)
             throws Exception {
@@ -157,7 +200,8 @@ public class TherionImporter extends Importer {
                     foundEndBlock = true;
                     break;
                 } else {
-                    throw new Exception("End block tag " + endTag + " encountered before block start");
+                    throw new Exception(
+                            "End block tag " + endTag + " encountered before block start");
                 }
 
             } else if (!foundStartBlock) {
@@ -175,5 +219,4 @@ public class TherionImporter extends Importer {
 
         return contents;
     }
-
 }

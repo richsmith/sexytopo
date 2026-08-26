@@ -44,6 +44,7 @@
                     </menu>
                 </item>
                 <item android:id="@+id/action_file_export" android:title="@string/action_file_export"/>
+                <item android:id="@+id/action_file_share" android:title="@string/action_file_share"/>
             </group>
             <group android:id="@+id/exit">
                 <item android:id="@+id/action_file_exit" android:title="@string/action_file_exit"/>
@@ -56,6 +57,8 @@
           app:showAsAction="never">
         <menu>
             <group android:id="@+id/view_items">
+                <item android:id="@+id/action_trip"
+                      android:title="@string/action_trip"/>
                 <item android:id="@+id/action_table"
                       android:title="@string/action_table"
                       tools:ignore="DuplicateIds"/>
@@ -65,8 +68,8 @@
                 <item android:id="@+id/action_elevation"
                       android:title="@string/action_elevation"
                       tools:ignore="DuplicateIds"/>
-                <item android:id="@+id/action_trip"
-                      android:title="@string/action_trip"/>
+                <item android:id="@+id/action_3d"
+                      android:title="@string/action_3d"/>
                 <item android:id="@+id/action_stats"
                       android:title="@string/action_stats"/>
             </group>
@@ -105,21 +108,38 @@
         android:title="@string/action_tools"
         app:showAsAction="never">
         <menu>
-            <item android:id="@+id/action_undo_last_leg"
-                android:title="@string/action_undo_last_leg" />
-            <item android:id="@+id/action_find_station"
-                  android:title="@string/action_find_station"/>
-            <item android:id="@+id/action_generate_test_survey"
-                  android:title="@string/action_generate_test_survey" />
-            <item android:id="@+id/action_system_log"
-                  android:title="@string/action_system_log" />
+            <group android:id="@+id/tools_group_edit">
+                <item android:id="@+id/action_undo_last_leg"
+                      android:title="@string/action_undo_last_leg"/>
+                <item android:id="@+id/action_find_station"
+                      android:title="@string/action_find_station"/>
+            </group>
+            <group android:id="@+id/tools_group_manual_entry">
+                <item android:id="@+id/action_add_leg"
+                      android:title="@string/action_add_leg"/>
+                <item android:id="@+id/action_add_splay"
+                      android:title="@string/action_add_splay"/>
+            </group>
+            <group android:id="@+id/tools_group_diagnostics">
+                <item android:id="@+id/action_generate_test_survey"
+                      android:title="@string/action_generate_test_survey"/>
+                <item android:id="@+id/action_system_log"
+                      android:title="@string/action_system_log"/>
+            </group>
         </menu>
     </item>
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
         android:visible="true"
         android:orderInCategory="100"
-        app:showAsAction="never" />
+        app:showAsAction="never">
+        <menu>
+            <item android:id="@+id/action_settings_system"
+                android:title="@string/action_settings_system"/>
+            <item android:id="@+id/action_settings_survey"
+                android:title="@string/action_settings_survey"/>
+        </menu>
+    </item>
     <item android:id="@+id/action_dev_menu"
           android:title="@string/action_dev"
           android:visible="false"
@@ -128,6 +148,8 @@
         <menu>
             <item android:id="@+id/action_debug_mode"
                 android:title="@string/action_debug_mode" />
+            <item android:id="@+id/action_set_test_instrument"
+                  android:title="@string/action_set_test_instrument"/>
             <item android:id="@+id/action_trigger_autosave"
                 android:title="@string/action_trigger_autosave" />
             <item android:id="@+id/action_kill_connection"

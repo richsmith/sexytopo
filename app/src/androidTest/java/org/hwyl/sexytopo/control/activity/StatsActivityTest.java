@@ -13,12 +13,10 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.filters.LargeTest;
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
 import androidx.test.rule.GrantPermissionRule;
-
 import org.hwyl.sexytopo.R;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 
 @LargeTest
 @RunWith(AndroidJUnit4ClassRunner.class)
@@ -28,13 +26,11 @@ public class StatsActivityTest {
     public ActivityScenarioRule<StartUpActivity> activityRule =
             new ActivityScenarioRule<>(StartUpActivity.class);
 
-
     @Rule
     public GrantPermissionRule mGrantPermissionRule =
             GrantPermissionRule.grant(
                     "android.permission.ACCESS_COARSE_LOCATION",
                     "android.permission.WRITE_EXTERNAL_STORAGE");
-
 
     @Test
     public void basicStatsVisible() {

@@ -4,11 +4,8 @@ import android.annotation.SuppressLint;
 import android.text.Html;
 import android.widget.ScrollView;
 import android.widget.TextView;
-
-import org.hwyl.sexytopo.control.Log;
-
 import java.text.SimpleDateFormat;
-
+import org.hwyl.sexytopo.control.Log;
 
 public class LogUpdateReceiver {
 
@@ -37,6 +34,4 @@ public class LogUpdateReceiver {
 
         return logText.toString();
     }
-
-
 }

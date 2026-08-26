@@ -5,6 +5,6 @@ import org.hwyl.sexytopo.model.graph.Coord2D;
 public interface AutoScalableDetail {
 
     Coord2D getPosition();
-    float getSize();
 
+    float getSize();
 }

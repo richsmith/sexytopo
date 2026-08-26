@@ -1,7 +1,9 @@
 package org.hwyl.sexytopo.control.activity;
 
-import android.webkit.WebView;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
+import android.webkit.WebView;
 import org.hwyl.sexytopo.R;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,20 +11,14 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 28)
 public class GuideActivityTest {
 
     @Test
     public void webviewVisible() {
-        GuideActivity activity = Robolectric.buildActivity(GuideActivity.class)
-                .create()
-                .start()
-                .resume()
-                .get();
+        GuideActivity activity =
+                Robolectric.buildActivity(GuideActivity.class).create().start().resume().get();
 
         WebView webView = activity.findViewById(R.id.webview);
         assertNotNull("WebView should be found by ID", webView);

@@ -3,11 +3,9 @@ package org.hwyl.sexytopo.model.common;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 
 /**
- * Cartesisan shapes for use in SexyTopo.
- * SexyTopo uses screen coords: y axis increases downwards.
+ * Cartesisan shapes for use in SexyTopo. SexyTopo uses screen coords: y axis increases downwards.
  */
-public class Shape {
-
+public abstract class Shape {
 
     protected float left;
     protected float right;
@@ -30,14 +28,12 @@ public class Shape {
         updateBoundingBox(shape.getBottomRight());
     }
 
-
     protected void resetBoundingBox() {
         left = Float.POSITIVE_INFINITY;
         right = Float.NEGATIVE_INFINITY;
         top = Float.POSITIVE_INFINITY;
         bottom = Float.NEGATIVE_INFINITY;
     }
-
 
     public float getWidth() {
         if (left == Float.POSITIVE_INFINITY || right == Float.NEGATIVE_INFINITY) {
@@ -46,7 +42,6 @@ public class Shape {
             return Math.abs(right - left);
         }
     }
-
 
     public float getHeight() {
         if (top == Float.POSITIVE_INFINITY || bottom == Float.NEGATIVE_INFINITY) {
@@ -60,11 +55,9 @@ public class Shape {
         return Math.max(getWidth(), getHeight());
     }
 
-
     public Coord2D getTopLeft() {
         return new Coord2D(getLeft(), getTop());
     }
-
 
     public Coord2D getBottomRight() {
         return new Coord2D(getRight(), getBottom());
@@ -86,7 +79,7 @@ public class Shape {
         }
     }
 
-    public float getTop () {
+    public float getTop() {
         if (top == Float.POSITIVE_INFINITY) {
             return 0;
         } else {
@@ -102,6 +95,9 @@ public class Shape {
         }
     }
 
+    public boolean couldBeVisibleAtScale(float scale) {
+        return getMaxDimension() * scale >= 1;
+    }
 
     public boolean intersectsRectangle(Coord2D rectangleTopLeft, Coord2D rectangleBottomRight) {
 
@@ -113,6 +109,12 @@ public class Shape {
         return (right >= left1 && left <= right1) && (top <= bottom1 && bottom >= top1);
     }
 
+    /** Return a copy of this shape with the given translation applied. */
+    public abstract Shape translate(Coord2D translation);
+
+    /** Return a copy of this shape scaled around the origin by the given factor. */
+    public abstract Shape scale(float scale);
+
     public void flipVertically() {
         // This is a bit hacky! Provided for flipping the Y axis for e.g. Therion export.
         // Do this after all other processing has been done, because it will break things.
@@ -120,5 +122,4 @@ public class Shape {
         top = -top;
         bottom = -bottom;
     }
-
 }

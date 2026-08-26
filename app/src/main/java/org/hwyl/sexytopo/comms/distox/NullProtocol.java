@@ -1,10 +1,8 @@
 package org.hwyl.sexytopo.comms.distox;
 
 import android.annotation.SuppressLint;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-
 
 public class NullProtocol extends DistoXProtocol {
 

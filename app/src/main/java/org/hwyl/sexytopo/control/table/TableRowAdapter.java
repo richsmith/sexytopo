@@ -6,46 +6,48 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
-
-import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.control.util.GraphToListTranslator;
-import org.hwyl.sexytopo.model.survey.Station;
-import org.hwyl.sexytopo.model.survey.Survey;
-import org.hwyl.sexytopo.model.table.TableCol;
-
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.SexyTopoConstants;
+import org.hwyl.sexytopo.control.util.GraphToListTranslator;
+import org.hwyl.sexytopo.model.survey.Station;
+import org.hwyl.sexytopo.model.survey.Survey;
+import org.hwyl.sexytopo.model.table.TableCol;
 
 public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableRowViewHolder> {
 
     private final List<GraphToListTranslator.SurveyListEntry> entries = new ArrayList<>();
-    private final Map<TextView, GraphToListTranslator.SurveyListEntry> fieldToSurveyEntry = new HashMap<>();
+    private final Map<TextView, GraphToListTranslator.SurveyListEntry> fieldToSurveyEntry =
+            new HashMap<>();
     private final Map<TextView, TableCol> fieldToTableCol = new HashMap<>();
     private final Map<View, Integer> viewToPosition = new HashMap<>();
     private final List<Integer> columnWidths = new ArrayList<>();
-    
+
     private final Context context;
     private Survey survey;
     private final OnRowClickListener onRowClickListener;
 
     private static final EnumMap<TableCol, Integer> TABLE_COL_TO_ANDROID_ID =
-        new EnumMap<TableCol, Integer>(TableCol.class) {{
-            put(TableCol.FROM, R.id.tableRowFrom);
-            put(TableCol.TO, R.id.tableRowTo);
-            put(TableCol.DISTANCE, R.id.tableRowDistance);
-            put(TableCol.AZIMUTH, R.id.tableRowAzimuth);
-            put(TableCol.INCLINATION, R.id.tableRowInclination);
-        }};
+            new EnumMap<TableCol, Integer>(TableCol.class) {
+                {
+                    put(TableCol.FROM, R.id.tableRowFrom);
+                    put(TableCol.TO, R.id.tableRowTo);
+                    put(TableCol.DISTANCE, R.id.tableRowDistance);
+                    put(TableCol.AZIMUTH, R.id.tableRowAzimuth);
+                    put(TableCol.INCLINATION, R.id.tableRowInclination);
+                }
+            };
 
     public interface OnRowClickListener {
         void onRowClick(View view, GraphToListTranslator.SurveyListEntry entry, TableCol col);
+
         void onRowLongClick(View view, GraphToListTranslator.SurveyListEntry entry, TableCol col);
     }
 
@@ -93,13 +95,16 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
             int id = TABLE_COL_TO_ANDROID_ID.get(col);
             TextView textView = holder.itemView.findViewById(id);
 
-            if (col == TableCol.FROM || col == TableCol.TO) {
+            boolean isFullLeg = entry.getLeg().hasDestination();
+            if (isFullLeg && (col == TableCol.FROM || col == TableCol.TO)) {
                 Station station = (Station) map.get(col);
                 if (station != null && station.hasComment()) {
-                    textView.setText(display + " 💬");
+                    textView.setText(display + " " + SexyTopoConstants.COMMENT_MARKER);
                 } else {
                     textView.setText(display);
                 }
+            } else if (col == TableCol.DISTANCE && entry.getLeg().hasComment()) {
+                textView.setText(SexyTopoConstants.COMMENT_MARKER + " " + display);
             } else {
                 textView.setText(display);
             }
@@ -151,14 +156,18 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
             }
 
             // Set alignment based on column type
-            if (col == TableCol.DISTANCE || col == TableCol.AZIMUTH || col == TableCol.INCLINATION) {
+            if (col == TableCol.DISTANCE
+                    || col == TableCol.AZIMUTH
+                    || col == TableCol.INCLINATION) {
                 // Right-align numeric columns
-                textView.setGravity(android.view.Gravity.END | android.view.Gravity.CENTER_VERTICAL);
+                textView.setGravity(
+                        android.view.Gravity.END | android.view.Gravity.CENTER_VERTICAL);
             } else if (col == TableCol.FROM || col == TableCol.TO) {
                 // Center-align station names
                 textView.setGravity(android.view.Gravity.CENTER);
             } else {
-                textView.setGravity(android.view.Gravity.START | android.view.Gravity.CENTER_VERTICAL);
+                textView.setGravity(
+                        android.view.Gravity.START | android.view.Gravity.CENTER_VERTICAL);
             }
 
             // Store mappings and position
@@ -167,19 +176,21 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
             viewToPosition.put(textView, position);
 
             // Set click listener
-            textView.setOnClickListener(v -> {
-                if (onRowClickListener != null) {
-                    onRowClickListener.onRowClick(v, entry, col);
-                }
-            });
+            textView.setOnClickListener(
+                    v -> {
+                        if (onRowClickListener != null) {
+                            onRowClickListener.onRowClick(v, entry, col);
+                        }
+                    });
 
             // Set long click listener
-            textView.setOnLongClickListener(v -> {
-                if (onRowClickListener != null) {
-                    onRowClickListener.onRowLongClick(v, entry, col);
-                }
-                return true;
-            });
+            textView.setOnLongClickListener(
+                    v -> {
+                        if (onRowClickListener != null) {
+                            onRowClickListener.onRowLongClick(v, entry, col);
+                        }
+                        return true;
+                    });
         }
     }
 
@@ -198,10 +209,10 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
         if (station == null) {
             return -1;
         }
-        
+
         for (int i = 0; i < entries.size(); i++) {
             GraphToListTranslator.SurveyListEntry entry = entries.get(i);
-            
+
             // Check if this is the destination station of a leg ("To" column)
             // We want to jump to the row where this station is the destination
             if (entry.getLeg().hasDestination()) {

@@ -1,10 +1,8 @@
 package org.hwyl.sexytopo.control.util;
 
-import org.hwyl.sexytopo.SexyTopoConstants;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-
+import org.hwyl.sexytopo.SexyTopoConstants;
 
 public class NumberTools {
 

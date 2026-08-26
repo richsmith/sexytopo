@@ -1,10 +1,8 @@
 package org.hwyl.sexytopo.model.sketch;
 
-import org.hwyl.sexytopo.model.graph.Coord2D;
-
 import java.security.InvalidParameterException;
 import java.util.List;
-
+import org.hwyl.sexytopo.model.graph.Coord2D;
 
 public class DeletedDetail extends SketchDetail {
 
@@ -15,12 +13,10 @@ public class DeletedDetail extends SketchDetail {
         super(Colour.BLACK);
 
         if (sketchDetail instanceof DeletedDetail) {
-            throw new InvalidParameterException(
-                    "Can't wrap a DeletedDetail in a DeletedDetail");
+            throw new InvalidParameterException("Can't wrap a DeletedDetail in a DeletedDetail");
         }
 
         this.deletedDetail = sketchDetail;
-
     }
 
     public DeletedDetail(SketchDetail sketchDetail, List<SketchDetail> replacementDetails) {
@@ -33,18 +29,15 @@ public class DeletedDetail extends SketchDetail {
         return deletedDetail.getDistanceFrom(point);
     }
 
-
     @Override
-    public SketchDetail translate(Coord2D point) {
-        return new DeletedDetail(deletedDetail.translate(point));
+    public SketchDetail translate(Coord2D translation) {
+        return new DeletedDetail(deletedDetail.translate(translation));
     }
 
     @Override
     public SketchDetail scale(float scale) {
         return new DeletedDetail(deletedDetail.scale(scale));
     }
-
-
 
     public SketchDetail getDeletedDetail() {
         return deletedDetail;

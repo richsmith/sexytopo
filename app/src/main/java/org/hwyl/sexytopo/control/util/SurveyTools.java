@@ -1,11 +1,9 @@
 package org.hwyl.sexytopo.control.util;
 
+import java.util.Iterator;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
-
-import java.util.Iterator;
-
 
 public class SurveyTools {
 
@@ -59,7 +57,8 @@ public class SurveyTools {
         traverseStations(survey.getOrigin(), callback);
     }
 
-    public static boolean traverseStations(Station station, SurveyStationTraversalCallback callback) {
+    public static boolean traverseStations(
+            Station station, SurveyStationTraversalCallback callback) {
 
         boolean isFinished = callback.call(station);
 
@@ -85,9 +84,6 @@ public class SurveyTools {
         if (root == null || station == null) {
             return false;
         }
-        return traverseStations(
-            root,
-            s -> s.equals(station));
+        return traverseStations(root, s -> s.equals(station));
     }
-
 }

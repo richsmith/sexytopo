@@ -12,12 +12,11 @@ import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
 import org.junit.Assert;
 import org.junit.Test;
 
-
 public class XviExporterTest {
 
     @Test
     public void testLineIsPassedThroughToXvi() {
-        Survey testSurvey = BasicTestSurveyCreator.createStraightNorth();
+        Survey testSurvey = BasicTestSurveyCreator.createWithCrossSections();
         Projection2D projection = Projection2D.PLAN;
         Sketch sketch = testSurvey.getSketch(projection);
         BasicTestSketchCreator.drawOneHorizontalLine(sketch);

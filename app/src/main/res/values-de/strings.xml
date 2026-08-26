@@ -33,12 +33,14 @@
     <string name="title_activity_table">Tabelle</string>
     <string name="title_activity_plan">Grundriss</string>
     <string name="title_activity_elevation">Seitenriss</string>
+    <string name="title_activity_cross_section">Querschnitt</string>
     <string name="title_activity_calibration">Kalibrierung</string>
     <string name="title_activity_survey">Statistik</string>
     <string name="title_activity_settings">Einstellungen</string>
     <string name="title_activity_system_log">Protokoll-Datei (Log)</string>
     <string name="title_activity_help">Hilfe</string>
     <string name="title_activity_guide">Anleitung</string>
+    <string name="title_activity_3d">3D</string>
 
     <!--  Action bar menu  -->
     <string name="action_table">Tabelle</string>
@@ -47,11 +49,14 @@
     <string name="action_file">Datei</string>
     <string name="action_stats">Statistik</string>
     <string name="action_settings">Einstellungen</string>
+    <string name="action_settings_system">System</string>
+    <string name="action_settings_survey">Vermessung</string>
     <string name="action_dev">Dev</string>
     <string name="action_device">Messgerät</string>
     <string name="action_device_connect">Verbinden…</string>
     <string name="action_connection">Verbindung</string>
-    <string name="action_trip">Aktuelle Tour</string>
+    <string name="action_trip">Tour</string>
+    <string name="action_3d">3D</string>
     <string name="action_help">Hilfe</string>
     <string name="action_guide">Handbuch</string>
     <string name="action_about">Über</string>
@@ -62,6 +67,7 @@
     <string name="action_file_save_as">Speichern unter</string>
     <string name="action_file_import">Importieren…</string>
     <string name="action_file_export">Exportieren…</string>
+    <string name="action_file_share">Teilen…</string>
     <string name="action_file_restore_autosave">Automatische Sicherung wiederherstellen</string>
     <string name="action_file_exit">SexyTopo Verlassen</string>
     <string name="action_file_import_file">Datei Importieren…</string>
@@ -74,6 +80,8 @@
     <string name="action_view">Ansicht</string>
     <string name="action_fullscreen">Vollbild</string>
     <string name="action_tools">Werkzeuge</string>
+    <string name="action_add_leg">Messstrecke hinzufügen…</string>
+    <string name="action_add_splay">Splay hinzufügen…</string>
     <string name="action_undo_last_leg">Letzte Messung rückgängig machen</string>
     <string name="action_find_station">Station finden…</string>
     <string name="action_link_to_existing_survey">Mit einer bestehenden Vermessungsdatei verknüpfen</string>
@@ -83,6 +91,8 @@
     <string name="action_trigger_autosave">Automatische Speicherung auslösen</string>
     <string name="action_kill_connection">Lösch-Kommandoabfolge (Achtung!)</string>
     <string name="action_force_crash">Absturz herbeiführen (Achtung!)</string>
+    <string name="action_xsection_done">Fertig</string>
+    <string name="action_xsection_cancel">Abbrechen</string>
 
     <!--  File handling  -->
     <string name="file_started_new_survey">Neue Vermessung angelegt</string>
@@ -140,6 +150,10 @@
     <string name="export_successful">Export abgeschlossen</string>
     <string name="export_failed">Export fehlgeschlagen</string>
     <string name="created_with">Erzeugt mit %1$s auf %2$s</string>
+    <string name="share_type_survey_zip">Vermessungsdateien teilen (ZIP)</string>
+    <string name="share_chooser_title">Vermessung teilen über</string>
+    <string name="share_failed">Teilen fehlgeschlagen</string>
+    <string name="share_preparing">Vermessung wird zum Teilen vorbereitet…</string>
 
     <!--  Sketch view  -->
     <string name="sketch_toolbar_draw">Zeichnungs-Modus</string>
@@ -162,19 +176,24 @@
     <string name="sketch_toolbar_colour_blue">Blau</string>
     <string name="sketch_toolbar_colour_purple">Violett</string>
     <string name="sketch_toolbar_symbol_close">Werkzeugleiste Symbole schliessen</string>
-    <string name="sketch_menu_delete_last_leg">Letzten Dateneintrag rückgängig machen</string>
-    <string name="sketch_menu_centre_view">Aktives Objekt in Bildschirmmitte anzeigen</string>
+    <string name="sketch_menu_delete_last_leg">Letzte Messung rückgängig</string>
+    <string name="sketch_menu_centre_view">Auf Aktives zentrieren</string>
     <string name="sketch_menu_auto_recentre">Automatisches Zentrieren</string>
     <string name="sketch_menu_redo">Zeichnen-Befehl wiederholen</string>
     <string name="sketch_menu_show_grid">Raster anzeigen</string>
+    <string name="sketch_menu_show_compass">Kompass</string>
+    <string name="sketch_menu_blue_water">Auto-Blauwasser</string>
     <string name="sketch_menu_snap_to_lines">Linien fangen</string>
-    <string name="sketch_menu_fade_non_active">Nicht-Aktiv-Funktion ausblenden</string>
+    <string name="sketch_menu_pinch_to_zoom">Zoom durch Kneifen</string>
+    <string name="sketch_menu_fade_non_active">Inaktive ausblenden</string>
     <string name="sketch_menu_show_station_labels">Messpunkt-Beschriftungen</string>
-    <string name="sketch_menu_show_splays">Dimensionen und Hilfslinien anzeigen</string>
+    <string name="sketch_menu_show_xsections">Querschnitte</string>
+    <string name="sketch_menu_show_splays">Hilfslinien anzeigen</string>
     <string name="sketch_menu_show_sketch">Skizze anzeigen</string>
     <string name="sketch_menu_show_connect">Verknüpfte Vermessungsdateien</string>
-    <string name="sketch_menu_back_measurements">Rückwärtsgerichtete Messstrecken</string>
+    <string name="sketch_menu_back_measurements">Messstrecken umkehren</string>
     <string name="sketch_position_cross_section_instruction">Ort zum Zeichnen eines Querschnitts auswählen</string>
+    <string name="sketch_rotate_cross_section_instruction">Von der Station ziehen, um die Querschnittsrichtung festzulegen</string>
     <string name="sketch_symbol_orientation_education"> Ziehen, um die Richtung des Symbols festzulegen</string>
     <string name="sketch_text_hint">Text eingeben</string>
 
@@ -208,7 +227,8 @@
     <string name="manual_edit_to_station">Zur Station</string>
     <string name="manual_edit_to_station_error">Ungültige Zielstation</string>
     <string name="manual_edit_shot_backwards">⬅ Rückwärts gemessen</string>
-    <string name="manual_edit_comment">Kommentar</string>
+    <string name="manual_edit_station_comment">Messpunkt-Kommentar</string>
+    <string name="manual_edit_leg_comment">Messstrecken-Kommentar</string>
     <string name="manual_rename_station_title">Messpunkt umbenennen</string>
     <string name="manual_rename_station_hint">Stationsname</string>
     <string name="manual_rename_error">Umbenennen fehlgeschlagen</string>
@@ -244,6 +264,7 @@
     <string name="device_connection_connected">Verbunden :)</string>
     <string name="device_connection_ready">Bereit zum Daten-Empfang</string>
     <string name="device_connection_not_connected">Nicht verbunden :(</string>
+    <string name="device_no_instrument_connected">Kein Instrument verbunden</string>
     <string name="device_connection_connecting">Verbindung wird hergestellt…</string>
     <string name="device_connection_stop_requested">Antrag auf Verbindungsabbruch</string>
     <string name="device_connection_closing">Verbindung wird beendet…</string>
@@ -256,6 +277,7 @@
     <string name="device_data_unknown_identifier">Unbekannte Datenpaket-Kennung</string>
     <string name="device_data_acknowledged_packet">Anerkanntes datenpaket</string>
     <string name="device_no_device">Kein Gerät</string>
+    <string name="action_set_test_instrument">Testinstrument festlegen</string>
     <string name="device_missing_name">[Fehlendes Gerät]</string>
     <string name="device_missing_short_name">Fehlend</string>
     <string name="device_unknown_name">[Unbekanntes Gerät]</string>
@@ -349,12 +371,40 @@
     <string name="trip_dialog_title_add_to_team">Zum Team hinzufügen</string>
     <string name="trip_dialog_add_to_team_name_hint">Name</string>
     <string name="trip_dialog_confirm_clear_trip">Tourdaten löschen?</string>
+    <string name="trip_dialog_name_required">Name ist erforderlich</string>
+    <string name="trip_instrument_label">Instrument</string>
+    <string name="trip_instrument_hint">Instrumentenname</string>
+    <string name="trip_instrument_get_button">Holen</string>
+    <string name="trip_survey_date_label">Survey Date</string>
+    <string name="trip_exploration_date_label">Erkundungsdatum</string>
+    <string name="trip_clear_date">Clear date</string>
+    <string name="trip_same_as_survey_date">Gleich wie Vermessungsdatum</string>
     <string name="trip_comments">Bemerkungen</string>
     <string name="trip_save_trip">Tour speichern</string>
     <string name="trip_role_book">Zeichnung</string>
     <string name="trip_role_instruments">Vermessung</string>
     <string name="trip_role_dog">Assistenz/Mithilfe</string>
     <string name="trip_role_exploration">Erforschung</string>
+
+    <!--  Copyright and licensing  -->
+    <string name="trip_copyright_label">Rechteinhaber</string>
+    <string name="trip_licence_label">Lizenz</string>
+    <string name="trip_licence_none">Keine Lizenz</string>
+    <string name="trip_licence_hint_title">Bitte erwäge eine offene Lizenz für deine Vermessungsdaten</string>
+    <string name="trip_licence_hint_body">Eine freie Lizenz erlaubt es anderen Höhlenforschern, deine Arbeit zu nutzen und darauf aufzubauen, so wie du es mit ihrer kannst - Daten, die überprüft und weiterverwendet werden können, sind wertvoller und werden mit der Zeit besser, zum gegenseitigen Nutzen. SexyTopo ist aus demselben Grund frei und quelloffen.</string>
+    <string name="trip_licence_hint_dismiss">Ausblenden</string>
+    <string name="licence_summary_gpl_3_plus">Jeder darf deine Vermessung nutzen und bearbeiten, sofern alles, was darauf aufbaut und veröffentlicht wird, ebenso frei weitergegeben wird.</string>
+    <string name="licence_summary_cc0">Du gibst deine Rechte vollständig auf: Jeder darf deine Vermessung für alles nutzen, ohne zu fragen und ohne dich zu nennen.</string>
+    <string name="licence_summary_cc_by">Jeder darf deine Vermessung für jeden Zweck nutzen und bearbeiten, solange er dich als Urheber nennt.</string>
+    <string name="licence_summary_cc_by_sa">Jeder darf deine Vermessung nutzen und bearbeiten, wenn er dich nennt und seine Fassung zu denselben Bedingungen weitergibt.</string>
+    <string name="licence_summary_cc_by_nc">Jeder darf deine Vermessung für nicht-kommerzielle Zwecke nutzen und bearbeiten, solange er dich als Urheber nennt.</string>
+    <string name="licence_summary_cc_by_nc_sa">Jeder darf deine Vermessung für nicht-kommerzielle Zwecke nutzen und bearbeiten, wenn er dich nennt und seine Fassung zu denselben Bedingungen weitergibt.</string>
+    <string name="licence_summary_none">Eine Vermessung ohne Lizenz ist nicht frei nutzbar: Das Urheberrecht gilt automatisch, also müssen andere davon ausgehen, dass sie sie überhaupt nicht weitergeben oder nutzen dürfen. Das entspricht \"Alle Rechte vorbehalten\", nur ohne es zu sagen.</string>
+    <string name="licence_summary_all_rights_reserved">Niemand darf deine Vermessung ohne vorherige Nachfrage weitergeben oder nutzen. Wenn du nicht mehr erreichbar bist, stirbt deine Vermessung mit dir - ein häufiger Grund, warum Höhlenvermessungsdaten endgültig verloren gehen.</string>
+    <string name="licence_read_more">Lizenz lesen</string>
+    <string name="licence_link_failed">Lizenzseite konnte nicht geöffnet werden (bist du unter Tage?)</string>
+    <string name="trip_licence_required_helper">Vor dem Speichern eine Lizenz wählen, oder \"Keine Lizenz\", wenn ausdrücklich keine gewünscht ist</string>
+    <string name="trip_licence_recommended_suffix">%1$s [Empfohlen]</string>
 
     <!--  Stats  -->
     <string name="stats_title_this_survey">Aktuelle Vermessung</string>
@@ -367,9 +417,12 @@
     <string name="stats_number_splays">Anzahl Dimensionen und Hilfslinien</string>
     <string name="stats_longest_leg">Längste Messstrecke (m)</string>
     <string name="stats_shortest_leg">Kürzeste Messstrecke (m)</string>
+    <string name="settings_survey_title">Vermessungseinstellungen</string>
+    <string name="settings_survey_cross_section_scale">Querschnittsmaßstab</string>
 
     <!--  Settings  -->
     <string name="settings_general_title">Allgemeines</string>
+    <string name="settings_general_summary">Farbschema, Ausrichtung, Vibration</string>
     <string name="settings_theme_title">Farbschema</string>
     <string name="settings_theme_summary">Nachtmodus verwenden? (Startet die App neu, Datei vor dem Wechseln speichern!)</string>
     <string-array name="settings_theme_entries">
@@ -389,35 +442,60 @@
         <item>Linear</item>
         <item>Nicht-Linear</item>
     </string-array>
+    <string-array name="settings_leg_amalgamation_algorithm_entries">
+        <item>Winkeldifferenzen: Distanz, Azimut &amp; Neigung getrennt vergleichen; getrennt mitteln</item>
+        <item>Endpunktabstand: vergleichen, wie weit die Endpunkte voneinander entfernt sind; als Vektoren mitteln</item>
+        <item>Paarweise Vektoren: Endpunktabstand im Verhältnis zur Streckenlänge vergleichen; als Vektoren mitteln</item>
+    </string-array>
+    <string name="settings_immersive_mode_enabled">Vollbildmodus aktiviert</string>
+    <string name="settings_immersive_mode_disabled">Vollbildmodus deaktiviert</string>
     <string name="settings_new_station_vibration_title">Bei neuem Messpunkt vibrieren</string>
     <string name="settings_new_station_vibration_summary">Vibrieren wenn neuer Messpunkt erstellt wird</string>
     <string name="settings_hot_corners_title">Intelligente Ecken</string>
     <string name="settings_hot_corners_summary">Im Zeichenmodus: an den Ecken der Skizze ziehen, um die Ansicht zu verschieben</string>
-    <string name="settings_instruments_title">Werkzeuge</string>
+        <string name="settings_team_title">Team</string>
+    <string name="settings_team_summary">Bekannte Höhlenforscher-Namen verwalten</string>
+    <string name="settings_copyright_title">Copyright</string>
+    <string name="settings_copyright_summary">Lizenzoptionen verwalten</string>
+    <string name="settings_licence_new_hint">Lizenzname</string>
+    <string name="settings_licence_name_required">Lizenzname ist erforderlich</string>
+<string name="settings_instruments_title">Werkzeuge</string>
+    <string name="settings_instruments_summary">Instrumententoleranz, Kalibrierung</string>
     <string name="settings_max_distance_delta_title">Maximal zulässige Abweichung bei der Distanz (m)</string>
-    <string name="settings_max_distance_delta_summary">Maximal zulässiger Fehler bei der Erfassung einer neuen Messstrecke</string>
+    <string name="settings_max_distance_delta_summary">Winkelmethode: wie stark die Distanzmessungen abweichen dürfen, wenn entschieden wird, ob eine neue Station erstellt wird</string>
     <string name="settings_max_angle_delta_title">Maximal zulässige Abweichung beim Neigungswinkel (Grad)</string>
-    <string name="settings_max_angle_delta_summary">Maximal zulässiger Fehler bei der Erfassung einer neuen Messstrecke</string>
+    <string name="settings_max_angle_delta_summary">Winkelmethode: wie stark die Azimut- oder Neigungsmessungen abweichen dürfen, wenn entschieden wird, ob eine neue Station erstellt wird</string>
+    <string name="settings_leg_amalgamation_algorithm_title">Methode zur Streckenübereinstimmung</string>
+    <string name="settings_leg_amalgamation_algorithm_summary">Wie beurteilt wird, ob wiederholte Messungen nah genug sind, um eine Messstrecke zu bilden</string>
+    <string name="settings_max_endpoint_delta_title">Maximaler Endpunktabstand (m)</string>
+    <string name="settings_max_endpoint_delta_summary">Endpunktmethode: wie weit die Endpunkte der Messungen voneinander entfernt sein dürfen, wenn entschieden wird, ob eine neue Station erstellt wird. Der Standardwert von 0.1 hält alle Messungen innerhalb einer BCRA Grade 5-Zelle.</string>
+    <string name="settings_max_pairwise_error_title">Maximaler paarweiser Fehler</string>
+    <string name="settings_max_pairwise_error_summary">Methode der paarweisen Vektoren: die zwischen Messungen tolerierte relative Abweichung (0.05 = etwa 2.5%), wenn entschieden wird, ob eine neue Station erstellt wird</string>
     <string name="settings_calibration_title">Kalibrierung</string>
     <string name="settings_calibration_algorithm_title">DistoX Kalibrierungs-Algorithmus</string>
     <string name="settings_calibration_algorithm_summary">Auswahl des DistoX-Kalibrierungsalgorithmus ausser Kraft setzen</string>
     <string name="settings_sketching_title">Skizzieren</string>
+    <string name="settings_sketching_summary">Zeichenwerkzeuge, Anzeigeoptionen</string>
     <string name="settings_delete_path_fragments_title">Linienteile löschen</string>
     <string name="settings_delete_path_fragments_summary">Im Löschmodus: nur die nächstgelegenen Teile einer Linie löschen (sofern ausgeschaltet, wird die gesamte Linie gelöscht)</string>
     <string name="settings_highlight_latest_leg_title">Aktuelle Messstrecke hervorheben</string>
     <string name="settings_highlight_latest_leg_summary">Letzte Messung in violett anzeigen</string>
     <string name="settings_two_finger_movement_title">Touch-Gesten (experimentell)</string>
     <string name="settings_two_finger_movement_summary">Touch-Gesten auch beim Zeichnen zulassen</string>
+    <string name="settings_legacy_cross_sections_title">Klassische Querschnitte verwenden</string>
+    <string name="settings_legacy_cross_sections_summary">Querschnitte als einfache Projektion ohne bearbeitbaren Rahmen anzeigen; deaktiviert das Antippen zum Bearbeiten.</string>
     <string name="settings_survey_text_tool_font_size_title">Beschriftungsgrösse Textfeld</string>
     <string name="settings_survey_text_tool_font_size_summary">Ausgangsgrösse von manuell platziertem Text (sp)</string>
     <string name="settings_survey_symbol_size_title">Grösse Vermessungs-Symbol</string>
     <string name="settings_survey_symbol_size_summary">Ausgangsgrösse Symbole (dp)</string>
     <string name="settings_leg_width_title">Liniendicke Messstrecke</string>
-    <string name="settings_leg_width_summary">Wie breit Messstrecken dargestellt werden sollen</string>
+    <string name="settings_leg_width_summary">Wie breit Messstrecken dargestellt werden sollen (dp)</string>
+    <string name="settings_sketch_line_width_title">Liniendicke Zeichnung</string>
+    <string name="settings_sketch_line_width_summary">Wie breit Zeichenlinien dargestellt werden sollen (dp)</string>
     <string name="settings_splay_width_title">Liniendicke Dimensionen und Hilfslinien</string>
-    <string name="settings_splay_width_summary">Wie breit Dimensionen und Hilfslinien dargestellt werden sollen</string>
+    <string name="settings_splay_width_summary">Wie breit Dimensionen und Hilfslinien dargestellt werden sollen (dp)</string>
     <string name="settings_station_diameter_title">Durchmesser Messpunkt</string>
-    <string name="settings_station_diameter_summary">Wie gross Messpunkt-Symbole dargestellt werden sollen</string>
+    <string name="settings_station_diameter_summary">Wie gross Messpunkt-Symbole dargestellt werden sollen (dp)</string>
     <string name="settings_station_label_font_size_sp_title">Grösse der Messpunkt-Beschriftung</string>
     <string name="settings_station_label_font_size_sp_summary">Grösse der Messpunkt-Beschriftung</string>
     <string name="settings_legend_font_size_sp_title">Grösse der Legenden-Beschriftung</string>
@@ -425,11 +503,24 @@
     <string name="settings_anti_alias_title">Anti-Alias-Skizzenlinien</string>
     <string name="settings_anti_alias_summary">Anti-Aliasing auf Skizzenlinien usw. anwenden (verbessert die visuelle Darstellung auf Kosten der Rechenleistung)</string>
     <string name="settings_manual_data_entry_title">Manuelle Daten-Eingabe</string>
+    <string name="settings_manual_data_controls_title">Manuelle Dateneingabe</string>
+    <string name="settings_manual_data_controls_summary">Schaltflächen zum manuellen Eingeben von Strecken oder Splays in der Tabellenansicht anzeigen</string>
+    <string name="settings_manual_data_entry_summary">LROU-Felder, Winkelformat</string>
     <string name="settings_key_lrud_fields_title">LROU-Eingaben (Dimensionen)</string>
     <string name="settings_key_lrud_fields_summary">Felder zur Eingabe von LROU-Werten (Links-Rechts-Oben-Unten) für jeden neuen Messpunkt anzeigen</string>
+    <string name="settings_lrud_direction_title">LROU-Richtung</string>
+    <string name="settings_lrud_direction_summary">Ausrichtung der Links- und Rechtsmessungen: Winkelhalbierende zwischen den Messabschnitten (Vermessungsrichtung) oder senkrecht zum nächsten Abschnitt (Schussrichtung)</string>
+    <string-array name="settings_lrud_direction_entries">
+        <item>Vermessungsrichtung (Winkelhalbierende)</item>
+        <item>Schussrichtung (nächster Abschnitt)</item>
+    </string-array>
     <string name="settings_key_deg_mins_secs_title">Azimut in Grad/Minuten/Sekunden</string>
     <string name="settings_key_deg_mins_secs_summary">Azimutwerte in Grad/Minuten/Sekunden eingeben (im Gegensatz zur Standardeinstellung in Dezimalwerten)</string>
+    <string name="manual_edit_inclination_deg_mins_secs">Neigung (° \' \")</string>
+    <string name="settings_key_inc_deg_mins_secs_title">Neigung in Grad/Minuten/Sekunden</string>
+    <string name="settings_key_inc_deg_mins_secs_summary">Neigungswerte in Grad/Minuten/Sekunden eingeben (im Gegensatz zur Standardeinstellung in Dezimalwerten)</string>
     <string name="settings_export_title">Exportieren</string>
+    <string name="settings_export_summary">Exportformate und Ordneroptionen</string>
     <string name="settings_export_svg_background_title">SVG-Hintergrund</string>
     <string name="settings_export_svg_background_summary">Optionaler Export mit undurchsichtigem Hintergrund</string>
     <string-array name="settings_export_svg_background_entries">
@@ -442,11 +533,66 @@
     <string name="settings_export_svg_leg_width_summary">Wie breit Messstrecken im SVG-Export dargestellt werden sollen</string>
     <string name="settings_export_svg_splay_width_title">SVG-Dimensions-Strichstärke</string>
     <string name="settings_export_svg_splay_width_summary">Wie breit Dimensionen im SVG-Export dargestellt werden sollen</string>
+    <string name="settings_export_svg_legend_title">Legende anzeigen</string>
+    <string name="settings_export_svg_legend_summary">Legendenstreifen mit Titel, Datum, Statistik usw. einbeziehen</string>
+    <string name="settings_export_svg_north_arrow_title">Nordpfeil anzeigen</string>
+    <string name="settings_export_svg_north_arrow_summary">Nordpfeil in der Legende bei Grundrissexporten hinzufügen</string>
+    <string name="settings_export_svg_scale_bar_title">Maßstabsleiste anzeigen</string>
+    <string name="settings_export_svg_scale_bar_summary">Maßstabsleiste zur Legende hinzufügen</string>
+    <string name="settings_export_svg_team_title">Vermessungsteam anzeigen</string>
+    <string name="settings_export_svg_team_summary">Liste der Vermesser anzeigen</string>
+    <string name="settings_export_svg_cross_sections_title">Querschnitte exportieren</string>
+    <string name="settings_export_svg_cross_sections_summary">Querschnittsskizzen in den SVG-Export einbeziehen</string>
+    <string name="settings_export_svg_symbols_title">Symbole exportieren</string>
+    <string name="settings_export_svg_symbols_summary">Symbole in den SVG-Export einbeziehen</string>
+    <string name="settings_export_svg_centreline_title">Polygon anzeigen</string>
+    <string name="settings_export_svg_centreline_summary">Vermessungspolygon (Strecken) im SVG-Export zeichnen</string>
+    <string name="settings_export_svg_stations_title">Stationsbeschriftungen anzeigen</string>
+    <string name="settings_export_svg_stations_summary">Stationsnamen-Beschriftungen im SVG-Export zeichnen</string>
+    <string name="settings_export_svg_splays_title">Splays anzeigen</string>
+    <string name="settings_export_svg_splays_summary">Splayschüsse (LRUD-Linien) im SVG-Export zeichnen</string>
+    <string name="settings_export_svg_grid_title">Raster anzeigen</string>
+    <string name="settings_export_svg_grid_summary">Hintergrundraster hinter der Vermessung zeichnen</string>
+    <string name="settings_export_svg_tagline_title">Slogan anzeigen</string>
+    <string name="settings_export_svg_tagline_summary">SexyTopo angemessen würdigen</string>
+    <string name="settings_export_svg_copyright_title">Copyright/Lizenz in der Legende anzeigen</string>
+    <string name="settings_export_svg_copyright_summary">Copyright und Lizenz werden immer in der Datei gespeichert; dies zeigt zusätzlich einen Hinweis in der Legende an</string>
     <string name="settings_export_therion_symbols_title">Therion-Export Symbole</string>
     <string name="settings_export_therion_symbols_summary">Symbole beim Exportieren im Therion-Format einschließen</string>
     <string name="settings_export_therion_text_title">Therion-Export Text</string>
     <string name="settings_export_therion_text_summary">Text beim Exportieren im Therion-Format einschließen</string>
+    <string name="settings_export_folder_name_title">Exportordner-Name</string>
+    <string name="settings_export_folder_name_summary">Name des Ordners im Vermessungsordner, in den exportiert wird</string>
+    <string name="settings_export_type_subfolders_title">Exporttyp-Unterordner</string>
+    <string name="settings_export_type_subfolders_summary">Unterordner mit Exporttyp-Namen erstellen (z. B. therion, survex)</string>
+    <string name="settings_export_svg_title">SVG</string>
+    <string name="settings_export_svg_section_summary">SVG-Exportoptionen</string>
+    <string name="settings_export_therion_title">Therion</string>
+    <string name="settings_export_therion_section_summary">Therion-Exportoptionen</string>
+    <string name="settings_export_therion_plan_suffix_title">Planansicht-Dateisuffix</string>
+    <string name="settings_export_therion_plan_suffix_summary">Suffix für Planansicht th2/xvi-Dateien</string>
+    <string name="settings_export_therion_ee_suffix_title">Erweiterter Aufrissdateisuffix</string>
+    <string name="settings_export_therion_ee_suffix_summary">Suffix für erweiterte Aufriss th2/xvi-Dateien</string>
+    <string name="settings_export_therion_xvi_folder_title">XVI-Ordner</string>
+    <string name="settings_export_therion_xvi_folder_summary">Unterordner für XVI-Dateien (leer für gleichen Ordner)</string>
+    <string name="settings_export_therion_plan_scrap_suffix_title">Planansicht-Scrapsuffix</string>
+    <string name="settings_export_therion_plan_scrap_suffix_summary">Suffix für Planansicht-Scraps (# = Zahl, ## = 01, 02…)</string>
+    <string name="settings_export_therion_ee_scrap_suffix_title">Erweiterter Aufrissscrapsuffix</string>
+    <string name="settings_export_therion_ee_scrap_suffix_summary">Suffix für Aufriss-Scraps (# = Zahl, ## = 01, 02…)</string>
+    <string name="settings_export_therion_cross_sections_title">Querschnitt-Scraps hinzufügen</string>
+    <string name="settings_export_therion_cross_sections_summary">Querschnitt-Scraps beim Export einschließen</string>
+    <string name="settings_export_therion_plan_xs_suffix_title">Planansicht-Querschnittsuffix</string>
+    <string name="settings_export_therion_plan_xs_suffix_summary">Suffix für Planansicht-Querschnitte (# = Messpunktnummer)</string>
+    <string name="settings_export_therion_ee_xs_suffix_title">Erweiterter Aufriss-Querschnittsuffix</string>
+    <string name="settings_export_therion_ee_xs_suffix_summary">Suffix für erweiterte Aufriss-Querschnitte (# = Messpunktnummer)</string>
+    <string name="therion_export_dialog_title">Therion-Exportoptionen</string>
+    <string name="therion_export_plan_scraps">Planansicht-Scraps</string>
+    <string name="therion_export_ee_scraps">Aufriss-Scraps</string>
+    <string name="therion_export_stations_in_plan">Messpunkte zum ersten Planansicht-Scrap hinzufügen</string>
+    <string name="therion_export_stations_in_ee">Messpunkte zum ersten Aufriss-Scrap hinzufügen</string>
+    <string name="svg_export_dialog_title">SVG-Exportoptionen</string>
     <string name="settings_developer_title">Entwickler</string>
+    <string name="settings_developer_summary">Debugging-Optionen</string>
     <string name="settings_key_developer_mode_title"> Entwickler-Modus</string>
     <string name="settings_key_developer_mode_summary">Einträge im Debugging-Menü anzeigen</string>
 
@@ -467,9 +613,18 @@
     <string name="validation_error_same_as_from_station">Kann nicht derselbe wie der Ursprungsmesspunkt sein</string>
     <string name="validation_error_station_name_not_unique">Messpunktname muss eindeutig sein</string>
     <string name="validation_error_must_be_number">Muss eine Zahl sein</string>
-    <string name="validation_error_distance_minimum">Muss >= %1$f sein</string>
-    <string name="validation_error_azimuth_range">Muss zwischen %1$f und %2$f liegen</string>
-    <string name="validation_error_inclination_range">Muss zwischen %1$f und %2$f liegen</string>
+    <string name="validation_error_distance_minimum">Muss >= %1$d sein</string>
+    <string name="validation_error_azimuth_range">Muss zwischen %1$d und %2$d liegen</string>
+    <string name="validation_error_inclination_range">Muss zwischen -90 und 90 oder zwischen 270 und 360 liegen</string>
+    <string name="validation_error_mins_secs_range">Muss zwischen 0 und 59 liegen</string>
+    <string name="validation_error_secs_range">Muss zwischen 0 und weniger als 60 liegen</string>
+    <string name="validation_error_must_be_zero_for_90">Muss 0 sein für ±90°</string>
+
+    <!-- Input mode for leg editing -->
+    <string-array name="leg_edit_input_mode_options">
+        <item>@string/action_input_mode_forward</item>
+        <item>@string/action_input_mode_backward</item>
+    </string-array>
 
     <!--  Survey symbols  -->
     <string name="symbol_text">Text</string>
@@ -497,11 +652,16 @@
     <string name="menu_context_title">Messpunkt</string>
     <string name="menu_leg">Messung</string>
     <string name="menu_splay">Splay</string>
+    <string name="menu_incoming_leg">Eingehende Messung</string>
+    <string name="menu_leg_title_dynamic">Messung %1$s &#10132; %2$s</string>
     <string name="menu_station">Messpunkt</string>
     <string name="menu_set_active_station">Als aktiv setzen</string>
     <string name="menu_rename_station">Umbenennen</string>
     <string name="menu_edit_leg">Bearbeiten</string>
     <string name="menu_upgrade_row">Neuen Messpunkt erzwingen</string>
+    <string name="menu_promote_to_above_leg">Zur obigen Messung hinzufügen</string>
+    <string name="toast_splay_promoted">Splay mit Messung kombiniert</string>
+    <string name="toast_no_leg_above">Keine gültige Messung zum Kombinieren</string>
     <string name="menu_upgrade_splay">Zu Messstrecke aufwerten</string>
     <string name="menu_downgrade_leg">Zu Splay abwerten</string>
     <string name="menu_delete_leg">Löschen</string>
@@ -509,24 +669,34 @@
     <string name="menu_elevation">Aufriss</string>
     <string name="menu_draw_left">Links zeichnen</string>
     <string name="menu_draw_right">Rechts zeichnen</string>
+    <string name="menu_draw_vertical">Nur vertikal zeichnen</string>
     <string name="menu_move_row">Zu anderem Messpunkt wechseln</string>
     <string name="menu_jump_to">Springen</string>
-    <string name="menu_jump_to_station_in_plan">→ Grundriss</string>
-    <string name="menu_jump_to_station_in_elevation">→ Seitenriss</string>
+    <string name="menu_jump_to_station_in_plan">&#10132; Grundriss</string>
+    <string name="menu_jump_to_station_in_elevation">&#10132; Seitenriss</string>
+    <string name="menu_xsection">Querschnitt</string>
+    <string name="menu_xsection_create">Neuer Querschnitt</string>
+    <string name="menu_xsection_delete">Querschnitt löschen</string>
+    <string name="menu_xsection_edit">Skizze bearbeiten</string>
+    <string name="menu_xsection_set_direction">Richtung festlegen</string>
     <string name="menu_new_cross_section">Neuer Querschnitt</string>
-    <string name="menu_jump_to_station_in_table">→ Daten-Tabelle</string>
+    <string name="menu_jump_to_station_in_table">&#10132; Daten-Tabelle</string>
     <string name="menu_delete_station">Löschen</string>
     <string name="menu_reverse">Rückblick</string>
     <string name="menu_switch_direction">Richtung wechseln</string>
     <string name="menu_navigate">Navigieren</string>
     <string name="menu_survey">Vermessung</string>
+    <string name="menu_links">Verknüpfungen</string>
+    <string name="menu_survey_start_new_dialog_title">Neue Vermessung starten</string>
+    <string name="menu_survey_start_new_dialog_station_name">Name des Startmesspunkts</string>
     <string name="menu_start_new_survey">Hier neue Vermessung beginnen</string>
     <string name="menu_unlink_survey">Verknüpfung zu anderer Vermessungsdatei lösen</string>
     <string name="menu_comment">Kommentar</string>
+    <string name="menu_comment_leg">Messstrecken-Kommentar</string>
+    <string name="menu_comment_splay">Peilung-Kommentar</string>
     <string name="menu_toggle_left_right">Links/Rechts umschalten</string>
-    <string name="menu_context_title_leg_to">Messung zu %s</string>
-    <string name="menu_context_title_leg_from">Messung von %s</string>
-    <string name="menu_context_title_splay">%s zu Splay</string>
+    <string name="menu_context_title_leg">Messung %1$s &#10132; %2$s</string>
+    <string name="menu_context_title_splay">Splay %s &#10132;</string>
     <string name="context_this_will_delete">Dadurch wird Folgendes gelöscht:</string>
     <string name="context_jump_to_splay_error">Kann nicht zum Ende einer Dimension/Hilfslinie springen</string>
     <string name="context_jump_to_station_error">Fehler beim Springen zum Messpunkt %1$s</string>

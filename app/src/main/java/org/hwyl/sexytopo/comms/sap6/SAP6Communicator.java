@@ -4,7 +4,9 @@ import android.bluetooth.BluetoothDevice;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
-
+import java.util.HashMap;
+import java.util.Map;
+import kotlin.Unit;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.comms.Communicator;
 import org.hwyl.sexytopo.control.Log;
@@ -13,11 +15,6 @@ import org.hwyl.sexytopo.control.activity.DeviceActivity;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.model.survey.Leg;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import kotlin.Unit;
-
 public class SAP6Communicator implements Communicator {
 
     private final DeviceActivity activity;
@@ -25,6 +22,7 @@ public class SAP6Communicator implements Communicator {
     private final CaveBLE caveBLE;
 
     private final SurveyManager datamanager;
+    private boolean _isConnected = false;
 
     private boolean userRequestedDisconnect = false;
     private final Handler reconnectHandler = new Handler(Looper.getMainLooper());
@@ -36,7 +34,6 @@ public class SAP6Communicator implements Communicator {
     private static final int SHOT_ID = View.generateViewId();
     private static final int LASER_OFF_ID = View.generateViewId();
     private static final int DEVICE_OFF_ID = View.generateViewId();
-
 
     private static final Map<Integer, Integer> CUSTOM_COMMANDS = new HashMap<>();
 
@@ -51,13 +48,14 @@ public class SAP6Communicator implements Communicator {
 
     public SAP6Communicator(DeviceActivity activity, BluetoothDevice bluetoothDevice) {
         this.activity = activity;
-        this.caveBLE = new CaveBLE(bluetoothDevice, activity, this::legCallback, this::statusCallback);
+        this.caveBLE =
+                new CaveBLE(bluetoothDevice, activity, this::legCallback, this::statusCallback);
         this.datamanager = activity.getSurveyManager();
     }
 
     @Override
     public boolean isConnected() {
-        return caveBLE.isConnected();
+        return _isConnected;
     }
 
     @Override
@@ -106,7 +104,9 @@ public class SAP6Communicator implements Communicator {
     }
 
     public Unit legCallback(float azimuth, float inclination, float roll, float distance) {
-        Log.device(String.format("Leg received: %05.1f %+04.1f %.3fm", azimuth, inclination, distance));
+        Log.device(
+                String.format(
+                        "Leg received: %05.1f %+04.1f %.3fm", azimuth, inclination, distance));
         Leg leg = new Leg(distance, azimuth, inclination);
         datamanager.updateSurvey(leg);
         return Unit.INSTANCE;
@@ -115,9 +115,11 @@ public class SAP6Communicator implements Communicator {
     public Unit statusCallback(int status, String msg) {
         switch (status) {
             case CaveBLE.CONNECTED:
+                _isConnected = true;
                 Log.device("Connected");
                 break;
             case CaveBLE.DISCONNECTED:
+                _isConnected = false;
                 Log.device("Disconnected");
                 activity.runOnUiThread(activity::updateConnectionStatus);
                 if (!userRequestedDisconnect && GeneralPreferences.isAutoReconnectOn()) {
@@ -126,13 +128,9 @@ public class SAP6Communicator implements Communicator {
                 }
                 break;
             case CaveBLE.CONNECTION_FAILED:
-                Log.device("Communication error: "+msg);
-                activity.runOnUiThread(activity::updateConnectionStatus);
-                if (!userRequestedDisconnect && GeneralPreferences.isAutoReconnectOn()) {
-                    Log.device(R.string.device_ble_auto_reconnecting, "SAP6");
-                    reconnectHandler.postDelayed(this::requestConnect, RECONNECT_DELAY_MS);
-                }
-                break;
+                _isConnected = false;
+                Log.device("Communication error: " + msg);
+                activity.updateConnectionStatus();
         }
         return Unit.INSTANCE;
     }

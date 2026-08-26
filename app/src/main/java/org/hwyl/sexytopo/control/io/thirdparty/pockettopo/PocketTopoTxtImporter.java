@@ -1,9 +1,12 @@
 package org.hwyl.sexytopo.control.io.thirdparty.pockettopo;
 
 import android.content.Context;
-
 import androidx.documentfile.provider.DocumentFile;
-
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.io.translation.Importer;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
@@ -19,19 +22,9 @@ import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-
-/**
- * Basic import for the .txt file that is exported by PocketTopo.
- */
+/** Basic import for the .txt file that is exported by PocketTopo. */
 @SuppressWarnings("UnnecessaryLocalVariable")
 public class PocketTopoTxtImporter extends Importer {
-
 
     public Survey toSurvey(Context context, DocumentFile file) throws IOException {
         Survey survey = new Survey();
@@ -51,11 +44,9 @@ public class PocketTopoTxtImporter extends Importer {
         return survey;
     }
 
-
     public boolean canHandleFile(DocumentFile file) {
         return file.isFile() && !file.isDirectory() && file.getName().endsWith("txt");
     }
-
 
     private static void parseDataAndUpdateSurvey(Survey survey, String fullText) {
 
@@ -90,7 +81,7 @@ public class PocketTopoTxtImporter extends Importer {
                 SurveyUpdater.update(survey, leg);
             } else {
                 Station toStation = new Station(toStationName);
-                Leg leg = new Leg(distance, azimuth, inclination, toStation, new Leg[]{});
+                Leg leg = new Leg(distance, azimuth, inclination, toStation, new Leg[] {});
                 SurveyUpdater.updateWithNewStation(survey, leg);
             }
         }
@@ -124,19 +115,14 @@ public class PocketTopoTxtImporter extends Importer {
 
         text = text + "\n\n"; // hack (ensure last section is terminated by newline)
 
-        Pattern pattern = Pattern.compile(
-            "(?sm)" +
-            "^" + header.toUpperCase() + "\\n" +
-            "(.*?)\\n" +
-            "^\\n");
+        Pattern pattern =
+                Pattern.compile("(?sm)" + "^" + header.toUpperCase() + "\\n" + "(.*?)\\n" + "^\\n");
         Matcher matcher = pattern.matcher(text);
         matcher.find();
         return matcher.group(1);
     }
 
-
-    public static Coord2D extractOffset(
-            Survey survey, String text, Space<Coord2D> projection) {
+    public static Coord2D extractOffset(Survey survey, String text, Space<Coord2D> projection) {
 
         String stationsSection = getNamedSubSection(text, "STATIONS");
         String[] lines = TextTools.toArrayOfLines(stationsSection);
@@ -175,12 +161,10 @@ public class PocketTopoTxtImporter extends Importer {
         return null;
     }
 
-
     public static String getNamedSubSection(String text, String header, String sectionHeader) {
         String section = getSection(text, sectionHeader);
         return getNamedSubSection(section, header);
     }
-
 
     public static String getNamedSubSection(String text, String header) {
         // a section in the file format appears to be made up of a header, followed by the content,
@@ -241,7 +225,6 @@ public class PocketTopoTxtImporter extends Importer {
         }
 
         return paths;
-
     }
 
     public static Colour interpretColour(String colourText) {
@@ -252,9 +235,8 @@ public class PocketTopoTxtImporter extends Importer {
             BrushColour brushColour = BrushColour.valueOf(colourText);
             return brushColour.getColour();
 
-        } catch(IllegalArgumentException exception) {
+        } catch (IllegalArgumentException exception) {
             return Colour.BLACK;
         }
     }
-
 }

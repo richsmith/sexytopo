@@ -2,9 +2,12 @@ package org.hwyl.sexytopo.control.io.basic;
 
 import android.content.Context;
 import android.net.Uri;
-
 import androidx.documentfile.provider.DocumentFile;
-
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.io.IoUtils;
@@ -15,23 +18,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-
 public class MetadataTranslater {
 
     public static final String CONNECTIONS_TAG = "connections";
     public static final String ACTIVE_STATION_TAG = "active-station";
 
-
-    public static String translate(Survey survey) throws Exception {
-        return toJson(survey).toString(SexyTopoConstants.JSON_INDENT);
+    public static String translate(Survey survey, String versionName, int versionCode)
+            throws Exception {
+        return toJson(survey, versionName, versionCode).toString(SexyTopoConstants.JSON_INDENT);
     }
-
 
     public static void translateAndUpdate(Context context, Survey survey, String string)
             throws Exception {
@@ -39,25 +34,23 @@ public class MetadataTranslater {
         translateAndUpdate(context, survey, string, surveyUrisNotToLoad);
     }
 
-
     public static void translateAndUpdate(
-            Context context,
-            Survey survey,
-            String string,
-            Set<Uri> surveyUrisNotToLoad)
+            Context context, Survey survey, String string, Set<Uri> surveyUrisNotToLoad)
             throws Exception {
         JSONObject json = new JSONObject(string);
         translateAndUpdate(context, survey, json, surveyUrisNotToLoad);
     }
 
-
-    public static JSONObject toJson(Survey survey) throws JSONException {
+    public static JSONObject toJson(Survey survey, String versionName, int versionCode)
+            throws JSONException {
 
         JSONObject json = new JSONObject();
+        json.put(JsonTranslaterConstants.VERSION_NAME_TAG, versionName);
+        json.put(JsonTranslaterConstants.VERSION_CODE_TAG, versionCode);
+        json.put(JsonTranslaterConstants.SURVEY_NAME_TAG, survey.getName());
 
         String activeStationName = survey.getActiveStation().getName();
         json.put(ACTIVE_STATION_TAG, activeStationName);
-
 
         Map<Station, Set<SurveyConnection>> connectedSurveys = survey.getConnectedSurveys();
         JSONObject jsonMap = toJson(connectedSurveys);
@@ -65,7 +58,6 @@ public class MetadataTranslater {
 
         return json;
     }
-
 
     private static JSONObject toJson(Map<Station, Set<SurveyConnection>> connectedSurveys)
             throws JSONException {
@@ -88,7 +80,6 @@ public class MetadataTranslater {
         return connectionMap;
     }
 
-
     private static JSONArray toJson(SurveyConnection connection) {
         JSONArray pair = new JSONArray();
         pair.put(connection.otherSurvey.getUri().toString());
@@ -96,14 +87,12 @@ public class MetadataTranslater {
         return pair;
     }
 
-
     private static void translateAndUpdate(
             Context context, Survey survey, JSONObject json, Set<Uri> surveyUrisNotToLoad)
             throws Exception {
         translateAndUpdateActiveStation(survey, json);
         translateAndUpdateConnections(context, survey, json, surveyUrisNotToLoad);
     }
-
 
     private static void translateAndUpdateActiveStation(Survey survey, JSONObject json)
             throws Exception {
@@ -117,13 +106,9 @@ public class MetadataTranslater {
         }
     }
 
-
     @SuppressWarnings("UnnecessaryContinue")
     private static void translateAndUpdateConnections(
-            Context context,
-            Survey survey,
-            JSONObject json,
-            Set<Uri> surveyUrisNotToLoad)
+            Context context, Survey survey, JSONObject json, Set<Uri> surveyUrisNotToLoad)
             throws Exception {
         try {
             JSONObject connectionsObject = json.getJSONObject(CONNECTIONS_TAG);
@@ -154,13 +139,15 @@ public class MetadataTranslater {
                         try {
                             DocumentFile directory =
                                     DocumentFile.fromTreeUri(context, connectedSurveyUri);
-                            Survey connectedSurvey = Loader.loadSurvey(
-                                    context, directory, surveyUrisNotToLoad, false);
+                            Survey connectedSurvey =
+                                    Loader.loadSurvey(
+                                            context, directory, surveyUrisNotToLoad, false);
                             Station connectionPoint =
                                     connectedSurvey.getStationByName(connectionPointName);
                             if (connectionPoint == null) {
-                                Log.e("Connection point not found for survey "
-                                        + connectedSurvey.getName());
+                                Log.e(
+                                        "Connection point not found for survey "
+                                                + connectedSurvey.getName());
                                 throw new Exception("Connection point not found");
                             }
                             survey.connect(station, connectedSurvey, connectionPoint);
@@ -187,6 +174,4 @@ public class MetadataTranslater {
         }
         return list;
     }
-
 }
-

@@ -1,14 +1,11 @@
 package org.hwyl.sexytopo.control.io.thirdparty.xvi;
 
-import org.junit.Assert;
-
+import java.util.List;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
+import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.List;
-
 
 public class XviImporterTest {
 
@@ -40,19 +37,18 @@ public class XviImporterTest {
         Assert.assertEquals("{foo}", contents);
     }
 
-    @Test(expected=Exception.class)
+    @Test(expected = Exception.class)
     public void testBadlyNestedBlockContentsRaiseError() throws Exception {
         String simpleText = "set Command {{foo}";
         String contents = XviImporter.getBlockContents(simpleText, "set Command");
         Assert.assertEquals("{foo}", contents);
     }
 
-    @Test(expected=Exception.class)
+    @Test(expected = Exception.class)
     public void testNoCommandMatchRaiseError() throws Exception {
         String simpleText = "set Commandx {foo}";
         String contents = XviImporter.getBlockContents(simpleText, "set Command");
     }
-
 
     @Test
     public void testParseBlockEntriesSingle() throws Exception {
@@ -108,13 +104,13 @@ public class XviImporterTest {
         Assert.assertEquals(2, pathDetail.getPath().size());
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testParseSketchEntryFailsForUnevenData() throws Exception {
         String simpleText = "red 0 0 1";
         PathDetail pathDetail = XviImporter.parseSketchEntry(1, simpleText);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testParseSketchEntryFailsForUnknownFirstCommand() throws Exception {
         String simpleText = "connect 0 0";
         PathDetail pathDetail = XviImporter.parseSketchEntry(1, simpleText);
