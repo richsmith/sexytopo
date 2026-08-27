@@ -1,4 +1,5 @@
 # Unreleased
+- Auto-(re)connect to instrument option (thanks Brendan Hall)
 - A copyright notice and licence can now be assigned to a survey, along with some light nudging towards free licences (thanks Andrew Atkinson)
 - Legs can be drawn using only their vertical change in the extended elevation (thanks Andrew Atkinson)
 
