@@ -103,7 +103,15 @@ public abstract class BleCommunicator implements Communicator, ConnectionObserve
     @Override
     public void onDeviceDisconnected(@NonNull BluetoothDevice device, int reason) {
         String name = Instrument.describe(device);
-        Log.device(R.string.device_ble_device_disconnected, name);
+
+        // a timeout here means we never got as far as connecting, so saying we've been
+        // disconnected would overstate what happened
+        boolean neverConnected = reason == ConnectionObserver.REASON_TIMEOUT;
+        Log.device(
+                neverConnected
+                        ? R.string.device_ble_device_not_connected
+                        : R.string.device_ble_device_disconnected,
+                name);
         activity.updateConnectionStatus();
 
         // anything other than REASON_SUCCESS means we didn't ask for this

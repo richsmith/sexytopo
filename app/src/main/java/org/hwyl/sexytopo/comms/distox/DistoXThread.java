@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.comms.Instrument;
 import org.hwyl.sexytopo.comms.ReconnectionPolicy;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
@@ -213,9 +212,7 @@ public class DistoXThread extends Thread {
             if (!isConnected()) {
                 if (System.currentTimeMillis() >= giveUpAt) {
                     if (retryWindowMs > 0) { // i.e. we were retrying, not just failing once
-                        Log.device(
-                                R.string.device_ble_auto_reconnect_gave_up,
-                                Instrument.describe(bluetoothDevice));
+                        Log.device(R.string.device_ble_auto_reconnect_gave_up);
                     }
                     break;
                 }

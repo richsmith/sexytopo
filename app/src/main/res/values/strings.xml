@@ -308,9 +308,10 @@
     <string name="device_ble_device_ready">%1$s ready :)</string>
     <string name="device_ble_device_disconnecting">%1$s disconnecting</string>
     <string name="device_ble_device_disconnected">%1$s disconnected</string>
+    <string name="device_ble_device_not_connected">Not connected to %1$s</string>
     <string name="device_ble_failed_to_connect_to">Failed to connect to %1$s</string>
     <string name="device_ble_auto_reconnecting">Auto-reconnecting to %1$s…</string>
-    <string name="device_ble_auto_reconnect_gave_up">Giving up auto-reconnecting to %1$s</string>
+    <string name="device_ble_auto_reconnect_gave_up">Persistent connection failure; pausing auto-connection</string>
     <string name="device_ble_invalid_data">Invalid data received: %1$s</string>
     <string name="device_distox_name" translatable="false">DistoX</string>
     <string name="device_distox_short_name" translatable="false">DistoX</string>
@@ -516,7 +517,7 @@
     <string name="settings_auto_reconnect_title">Auto-reconnect</string>
     <string name="settings_auto_reconnect_summary">Reconnect automatically if the instrument disconnects</string>
     <string name="settings_auto_reconnect_window_title">Auto-reconnect time limit (minutes)</string>
-    <string name="settings_auto_reconnect_window_summary">How long to keep trying to reconnect before giving up</string>
+    <string name="settings_auto_reconnect_window_summary">How long to keep trying to reconnect before pausing</string>
     <string name="settings_max_endpoint_delta_title">Max endpoint distance (m)</string>
     <string name="settings_max_endpoint_delta_summary">Endpoint method: how far apart the reading endpoints may be when deciding whether to create a new station. The default of 0.1 keeps all readings within one BCRA Grade 5 cell.</string>
     <string name="settings_max_pairwise_error_title">Max pairwise error</string>

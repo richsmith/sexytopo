@@ -72,7 +72,7 @@ public class ReconnectionPolicy {
         if (giveUpAt == null) {
             giveUpAt = now + GeneralPreferences.getAutoReconnectWindowMinutes() * 60_000L;
         } else if (now >= giveUpAt) {
-            Log.device(R.string.device_ble_auto_reconnect_gave_up, deviceName);
+            Log.device(R.string.device_ble_auto_reconnect_gave_up);
             giveUpAt = null;
             return;
         }

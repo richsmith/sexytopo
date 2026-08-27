@@ -289,9 +289,10 @@
     <string name="device_ble_device_ready">%1$s bereit :)</string>
     <string name="device_ble_device_disconnecting">Trennen der verbindung mit %1$s</string>
     <string name="device_ble_device_disconnected">%1$s getrennt</string>
+    <string name="device_ble_device_not_connected">%1$s nicht verbunden</string>
     <string name="device_ble_failed_to_connect_to">Verbinden mit %1$s fehlgeschlagen</string>
     <string name="device_ble_auto_reconnecting">Automatisches Wiederverbinden mit %1$s…</string>
-    <string name="device_ble_auto_reconnect_gave_up">Automatisches Wiederverbinden mit %1$s aufgegeben</string>
+    <string name="device_ble_auto_reconnect_gave_up">Anhaltender Verbindungsfehler; automatisches Verbinden wird pausiert</string>
     <string name="device_ble_invalid_data">Ungültige Daten empfangen: %1$s</string>
     <string name="device_cavway_x1_calibration_on">Kalibrier-Modus starten</string>
     <string name="device_cavway_x1_calibration_off">Kalibrier-Modus beenden</string>
@@ -471,7 +472,7 @@
     <string name="settings_auto_reconnect_title">Automatisch wieder verbinden</string>
     <string name="settings_auto_reconnect_summary">Automatisch wieder verbinden, wenn das Gerät die Verbindung verliert</string>
     <string name="settings_auto_reconnect_window_title">Zeitlimit für automatisches Wiederverbinden (Minuten)</string>
-    <string name="settings_auto_reconnect_window_summary">Wie lange versucht wird, die Verbindung wiederherzustellen, bevor aufgegeben wird</string>
+    <string name="settings_auto_reconnect_window_summary">Wie lange versucht wird, die Verbindung wiederherzustellen, bevor pausiert wird</string>
     <string name="settings_leg_amalgamation_algorithm_title">Methode zur Streckenübereinstimmung</string>
     <string name="settings_leg_amalgamation_algorithm_summary">Wie beurteilt wird, ob wiederholte Messungen nah genug sind, um eine Messstrecke zu bilden</string>
     <string name="settings_max_endpoint_delta_title">Maximaler Endpunktabstand (m)</string>

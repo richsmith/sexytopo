@@ -222,9 +222,7 @@ public class OldDistoXCommunicator extends Thread {
             if (!isConnected()) {
                 if (System.currentTimeMillis() >= giveUpAt) {
                     if (retryWindowMs > 0) { // i.e. we were retrying, not just failing once
-                        Log.device(
-                                R.string.device_ble_auto_reconnect_gave_up,
-                                Instrument.describe(bluetoothDevice));
+                        Log.device(R.string.device_ble_auto_reconnect_gave_up);
                     }
                     break;
                 }

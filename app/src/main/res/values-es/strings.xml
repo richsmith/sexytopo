@@ -293,9 +293,10 @@
     <string name="device_ble_device_ready">%1$s listo :)</string>
     <string name="device_ble_device_disconnecting">%1$s desconectando</string>
     <string name="device_ble_device_disconnected">%1$s desconectado</string>
+    <string name="device_ble_device_not_connected">No conectado a %1$s</string>
     <string name="device_ble_failed_to_connect_to">Error al conectar a %1$s</string>
     <string name="device_ble_auto_reconnecting">Reconectando automáticamente a %1$s…</string>
-    <string name="device_ble_auto_reconnect_gave_up">Se abandona la reconexión automática a %1$s</string>
+    <string name="device_ble_auto_reconnect_gave_up">Fallo de conexión persistente; se pausa la conexión automática</string>
     <string name="device_ble_invalid_data">Datos no válidos recibidos: %1$s</string>
     <string name="device_cavway_x1_calibration_on">Entrar en Modo Calibración</string>
     <string name="device_cavway_x1_calibration_off">Salir del Modo Calibración</string>
@@ -471,7 +472,7 @@
     <string name="settings_auto_reconnect_title">Reconexión automática</string>
     <string name="settings_auto_reconnect_summary">Reconectar automáticamente si el instrumento se desconecta</string>
     <string name="settings_auto_reconnect_window_title">Límite de tiempo de reconexión automática (minutos)</string>
-    <string name="settings_auto_reconnect_window_summary">Cuánto tiempo seguir intentando reconectar antes de abandonar</string>
+    <string name="settings_auto_reconnect_window_summary">Cuánto tiempo seguir intentando reconectar antes de pausar</string>
     <string name="settings_leg_amalgamation_algorithm_title">Método de concordancia de tramos</string>
     <string name="settings_leg_amalgamation_algorithm_summary">Cómo se determina que las mediciones repetidas son lo bastante próximas para formar un tramo</string>
     <string name="settings_max_endpoint_delta_title">Distancia máxima entre extremos (m)</string>

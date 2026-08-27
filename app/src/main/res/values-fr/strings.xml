@@ -289,9 +289,10 @@
     <string name="device_ble_device_ready">%1$s prêt :)</string>
     <string name="device_ble_device_disconnecting">%1$s en déconnexion</string>
     <string name="device_ble_device_disconnected">%1$s déconnecté</string>
+    <string name="device_ble_device_not_connected">Non connecté à %1$s</string>
     <string name="device_ble_failed_to_connect_to">Échec de la connexion à %1$s</string>
     <string name="device_ble_auto_reconnecting">Reconnexion automatique à %1$s…</string>
-    <string name="device_ble_auto_reconnect_gave_up">Abandon de la reconnexion automatique à %1$s</string>
+    <string name="device_ble_auto_reconnect_gave_up">Échec de connexion persistant ; mise en pause de la connexion automatique</string>
     <string name="device_ble_invalid_data">Données invalides reçues : %1$s</string>
     <string name="device_cavway_x1_calibration_on">Démarrer le mode calibration</string>
     <string name="device_cavway_x1_calibration_off">Quitter le mode calibration</string>
@@ -471,7 +472,7 @@
     <string name="settings_auto_reconnect_title">Reconnexion automatique</string>
     <string name="settings_auto_reconnect_summary">Se reconnecter automatiquement si l\'appareil se déconnecte</string>
     <string name="settings_auto_reconnect_window_title">Délai de reconnexion automatique (minutes)</string>
-    <string name="settings_auto_reconnect_window_summary">Combien de temps continuer à essayer de se reconnecter avant d\'abandonner</string>
+    <string name="settings_auto_reconnect_window_summary">Combien de temps continuer à essayer de se reconnecter avant de mettre en pause</string>
     <string name="settings_leg_amalgamation_algorithm_title">Méthode d\'accord des segments</string>
     <string name="settings_leg_amalgamation_algorithm_summary">Comment les mesures répétées sont jugées suffisamment proches pour former un segment</string>
     <string name="settings_max_endpoint_delta_title">Distance d\'extrémité max (m)</string>
