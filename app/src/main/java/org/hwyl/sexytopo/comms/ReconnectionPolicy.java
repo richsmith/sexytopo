@@ -29,6 +29,9 @@ public class ReconnectionPolicy {
     /** When the current run of attempts must give up; null if no run is in progress. */
     private Long giveUpAt = null;
 
+    /** Whether a reconnection attempt we scheduled is currently in flight. */
+    private boolean retrying = false;
+
     public ReconnectionPolicy(String deviceName, Runnable reconnect) {
         this.deviceName = deviceName;
         this.reconnect = reconnect;
@@ -37,6 +40,9 @@ public class ReconnectionPolicy {
     /** Call when the user asks to connect, so a later drop counts as unexpected. */
     public void noteUserRequestedConnect() {
         userRequestedDisconnect = false;
+        if (!retrying) { // a fresh start by hand, rather than one of our own retries
+            giveUpAt = null;
+        }
     }
 
     /** Call when the user asks to disconnect, so we leave the device alone. */
@@ -45,8 +51,12 @@ public class ReconnectionPolicy {
         cancel();
     }
 
-    /** Call on connecting, so the next failure starts a fresh window. */
-    public void noteConnected() {
+    /**
+     * Call once the device is properly usable, so the next failure starts a fresh window. Don't
+     * call this merely on connecting: a link that comes up and immediately drops again would keep
+     * resetting the window, and we'd never give up.
+     */
+    public void noteReady() {
         giveUpAt = null;
     }
 
@@ -68,13 +78,23 @@ public class ReconnectionPolicy {
         }
 
         Log.device(R.string.device_ble_auto_reconnecting, deviceName);
-        handler.postDelayed(reconnect, RETRY_INTERVAL_MS);
+        handler.postDelayed(
+                () -> {
+                    retrying = true;
+                    try {
+                        reconnect.run();
+                    } finally {
+                        retrying = false;
+                    }
+                },
+                RETRY_INTERVAL_MS);
     }
 
     /** Call when the communicator is being torn down, to drop any pending attempt. */
     public void cancel() {
         handler.removeCallbacksAndMessages(null);
         giveUpAt = null;
+        retrying = false;
     }
 
     /**

@@ -115,7 +115,7 @@ public class SAP6Communicator implements Communicator {
             case CaveBLE.CONNECTED:
                 _isConnected = true;
                 Log.device("Connected");
-                activity.runOnUiThread(reconnectionPolicy::noteConnected);
+                activity.runOnUiThread(reconnectionPolicy::noteReady);
                 break;
             case CaveBLE.DISCONNECTED:
                 _isConnected = false;

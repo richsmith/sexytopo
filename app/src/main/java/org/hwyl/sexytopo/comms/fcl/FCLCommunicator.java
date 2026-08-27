@@ -204,7 +204,7 @@ public class FCLCommunicator implements Communicator {
         switch (status) {
             case FCLBLE.CONNECTED:
                 Log.device("FCL Connected - Protocol v2.0");
-                activity.runOnUiThread(reconnectionPolicy::noteConnected);
+                activity.runOnUiThread(reconnectionPolicy::noteReady);
                 break;
 
             case FCLBLE.DISCONNECTED:

@@ -77,7 +77,6 @@ public abstract class BleCommunicator implements Communicator, ConnectionObserve
     public void onDeviceConnected(@NonNull BluetoothDevice device) {
         String name = Instrument.describe(device);
         Log.device(R.string.device_ble_connected_to, name);
-        reconnectionPolicy.noteConnected();
     }
 
     @Override
@@ -92,6 +91,7 @@ public abstract class BleCommunicator implements Communicator, ConnectionObserve
     public void onDeviceReady(@NonNull BluetoothDevice device) {
         String name = Instrument.describe(device);
         Log.device(R.string.device_ble_device_ready, name);
+        reconnectionPolicy.noteReady();
     }
 
     @Override
