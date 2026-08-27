@@ -292,7 +292,7 @@
     <string name="device_ble_connected_to">Conectado a %1$s</string>
     <string name="device_ble_device_ready">%1$s pronto :)</string>
     <string name="device_ble_device_disconnecting">%1$s desconectando</string>
-    <string name="device_ble_device_disconnected">%1$s pronto :)</string>
+    <string name="device_ble_device_disconnected">%1$s desconectado</string>
     <string name="device_ble_failed_to_connect_to">Falha ao conectar a %1$s</string>
     <string name="device_ble_auto_reconnecting">Reconectando automaticamente a %1$s…</string>
     <string name="device_ble_auto_reconnect_gave_up">Desistindo de reconectar automaticamente a %1$s</string>

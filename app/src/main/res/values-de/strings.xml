@@ -288,7 +288,7 @@
     <string name="device_ble_connected_to">Verbunden mit %1$s</string>
     <string name="device_ble_device_ready">%1$s bereit :)</string>
     <string name="device_ble_device_disconnecting">Trennen der verbindung mit %1$s</string>
-    <string name="device_ble_device_disconnected">%1$s bereit :)</string>
+    <string name="device_ble_device_disconnected">%1$s getrennt</string>
     <string name="device_ble_failed_to_connect_to">Verbinden mit %1$s fehlgeschlagen</string>
     <string name="device_ble_auto_reconnecting">Automatisches Wiederverbinden mit %1$s…</string>
     <string name="device_ble_auto_reconnect_gave_up">Automatisches Wiederverbinden mit %1$s aufgegeben</string>
