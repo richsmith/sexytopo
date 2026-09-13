@@ -20,6 +20,13 @@ public class SurvexTherionUtil {
 
     public static final String TRIP_DATE_PATTERN = "yyyy.MM.dd";
 
+    /**
+     * Accepted as a fallback when importing trip dates, so files using ISO-style hyphens (e.g.
+     * "2026-01-05") parse as readily as the native dot-separated Survex/Therion format. Export
+     * always uses {@link #TRIP_DATE_PATTERN}.
+     */
+    public static final String TRIP_DATE_PATTERN_ISO = "yyyy-MM-dd";
+
     public static String getCreationComment(char commentChar, String versionInfo) {
         String dateOnly = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         return commentChar + " Created with " + versionInfo + " on " + dateOnly;

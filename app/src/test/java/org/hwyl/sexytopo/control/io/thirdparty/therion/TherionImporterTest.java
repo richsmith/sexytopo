@@ -562,6 +562,14 @@ public class TherionImporterTest {
     }
 
     @Test
+    public void testTherionMetadataImportAcceptsHyphenSeparatedSurveyDate() throws Exception {
+        String therionText = "date 2026-01-05\n";
+        Trip trip = SurvexTherionImporter.parseMetadata(therionText, SurveyFormat.THERION);
+        Assert.assertNotNull(trip);
+        Assert.assertNotNull(trip.getSurveyDate());
+    }
+
+    @Test
     public void testTherionCopyrightAndLicenceImport() throws Exception {
         String therionText = "date 2026.01.05\n" + "copyright 2026 \"Caver Jane\" #\"CC BY 4.0\"\n";
 

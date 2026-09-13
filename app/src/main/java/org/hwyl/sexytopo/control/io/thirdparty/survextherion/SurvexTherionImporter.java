@@ -258,7 +258,7 @@ public class SurvexTherionImporter {
             // Strip command prefix for uniform data handling
             String effective = format.stripCommandPrefix(trimmed);
 
-            // Survey date: "date yyyy.MM.dd" (but not "date explored")
+            // Survey date: "date yyyy.MM.dd" or "date yyyy-MM-dd" (but not "date explored")
             if (effective.startsWith("date ") && !effective.startsWith("date explored")) {
                 String dateStr = effective.substring(5).trim();
                 surveyDate = parseDate(dateStr);
@@ -435,14 +435,26 @@ public class SurvexTherionImporter {
         return rest;
     }
 
+    /**
+     * Date formats accepted on import, tried in order. Export always uses {@link
+     * SurvexTherionUtil#TRIP_DATE_PATTERN} (dot-separated); the ISO hyphen-separated pattern is
+     * accepted here purely as a convenience for files written or edited by other tools.
+     */
+    private static final String[] ACCEPTED_DATE_PATTERNS = {
+        SurvexTherionUtil.TRIP_DATE_PATTERN, SurvexTherionUtil.TRIP_DATE_PATTERN_ISO
+    };
+
     private static Date parseDate(String dateStr) {
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat(SurvexTherionUtil.TRIP_DATE_PATTERN);
-            return sdf.parse(dateStr);
-        } catch (Exception e) {
-            Log.e("Failed to parse date: " + dateStr);
-            return null;
+        for (String pattern : ACCEPTED_DATE_PATTERNS) {
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+                return sdf.parse(dateStr);
+            } catch (Exception ignored) {
+                // Try the next accepted pattern.
+            }
         }
+        Log.e("Failed to parse date: " + dateStr);
+        return null;
     }
 
     private static void addLegToSurvey(
