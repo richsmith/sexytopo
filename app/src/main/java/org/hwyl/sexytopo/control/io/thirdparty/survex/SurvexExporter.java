@@ -73,30 +73,52 @@ public class SurvexExporter extends SingleFileExporter {
 
     public String getEspecContent(Survey survey) {
         StringBuilder builder = new StringBuilder();
-        generateEspecExtendCommandsFromStation(builder, survey.getOrigin(), null);
+        // NOTE: the traversal logic here mirrors
+        // SurvexTherionUtil.generateExtendCommandsFromStation
+        // — if that method changes (e.g. new non-propagating directions) this must be kept in sync.
+        generateEspecExtendCommandsFromStation(builder, survey.getOrigin(), null, null);
         return builder.toString();
     }
 
     private static void generateEspecExtendCommandsFromStation(
-            StringBuilder builder, Station station, ExtendedElevationDirection lastDirection) {
+            StringBuilder builder,
+            Station station,
+            Station fromStation,
+            ExtendedElevationDirection lastDirection) {
 
         ExtendedElevationDirection currentDirection = station.getExtendedElevationDirection();
-        if (lastDirection == null) {
-            builder.append(getEspecExtendCommand(station, "start"));
-        } else if (currentDirection != lastDirection) {
-            String keyword =
-                    currentDirection == ExtendedElevationDirection.LEFT ? "eleft" : "eright";
-            builder.append(getEspecExtendCommand(station, keyword));
+
+        // A direction that doesn't propagate (e.g. VERTICAL) applies to this leg alone and does
+        // not change what the rest of the survey inherits. The two-station form is not supported
+        // by the Survex extend tool in .espec files, so it is emitted as a comment to preserve
+        // the information without breaking the file.
+        ExtendedElevationDirection inheritedDirection;
+        if (!currentDirection.propagates()) {
+            builder.append(getEspecExtendCommentedCommand(fromStation, station, "evertical"));
+            inheritedDirection = lastDirection;
+        } else {
+            if (lastDirection == null) {
+                builder.append(getEspecExtendCommand(station, "start"));
+            } else if (currentDirection != lastDirection) {
+                String keyword =
+                        currentDirection == ExtendedElevationDirection.LEFT ? "eleft" : "eright";
+                builder.append(getEspecExtendCommand(station, keyword));
+            }
+            inheritedDirection = currentDirection;
         }
 
         for (Leg leg : station.getConnectedOnwardLegs()) {
             generateEspecExtendCommandsFromStation(
-                    builder, leg.getDestination(), station.getExtendedElevationDirection());
+                    builder, leg.getDestination(), station, inheritedDirection);
         }
     }
 
     private static String getEspecExtendCommand(Station station, String keyword) {
         return "*" + keyword + " " + station.getName() + "\n";
+    }
+
+    private static String getEspecExtendCommentedCommand(Station from, Station to, String keyword) {
+        return "; *" + keyword + " " + from.getName() + " " + to.getName() + "\n";
     }
 
     @Override

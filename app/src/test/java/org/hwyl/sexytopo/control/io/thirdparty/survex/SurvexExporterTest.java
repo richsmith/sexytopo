@@ -334,6 +334,63 @@ public class SurvexExporterTest {
     }
 
     @Test
+    public void testGetEspecContentCommentsOutVerticalStation() {
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Station verticalStation = survey.getActiveStation();
+        verticalStation.setExtendedElevationDirection(ExtendedElevationDirection.VERTICAL);
+
+        String espec = survexExporter.getEspecContent(survey);
+
+        Assert.assertTrue(
+                "espec must comment out the vertical line rather than emitting it as a command",
+                espec.contains("; *evertical"));
+        Assert.assertFalse(
+                "espec must not emit an uncommented *evertical command",
+                espec.contains("*evertical") && !espec.contains("; *evertical"));
+    }
+
+    @Test
+    public void testGetEspecContentVerticalLineContainsBothStationNames() {
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Station fromStation = survey.getOrigin().getConnectedOnwardLegs().get(0).getDestination();
+        Station toStation = survey.getActiveStation();
+        toStation.setExtendedElevationDirection(ExtendedElevationDirection.VERTICAL);
+
+        String espec = survexExporter.getEspecContent(survey);
+
+        Assert.assertTrue(
+                "commented vertical line must contain the from station name",
+                espec.contains(fromStation.getName()));
+        Assert.assertTrue(
+                "commented vertical line must contain the to station name",
+                espec.contains(toStation.getName()));
+    }
+
+    @Test
+    public void testGetEspecContentVerticalDoesNotChangeInheritedDirection() {
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        // Set station 2 to LEFT, station 3 to VERTICAL, station 4 stays RIGHT (default).
+        // After VERTICAL the inherited direction reverts to LEFT (station 2's direction),
+        // so the change back to RIGHT at station 4 should still produce *eright.
+        Station station2 = survey.getOrigin().getConnectedOnwardLegs().get(0).getDestination();
+        station2.setExtendedElevationDirection(ExtendedElevationDirection.LEFT);
+        Station station3 = station2.getConnectedOnwardLegs().get(0).getDestination();
+        station3.setExtendedElevationDirection(ExtendedElevationDirection.VERTICAL);
+        Station station4 = survey.getActiveStation();
+        // station4 remains RIGHT (default)
+
+        String espec = survexExporter.getEspecContent(survey);
+
+        Assert.assertTrue(
+                "direction after VERTICAL must revert to pre-vertical direction,"
+                        + " so RIGHT at station 4 must produce *eright",
+                espec.contains("*eright " + station4.getName()));
+    }
+
+    @Test
     public void testEspecFileExtensionConstant() {
         Assert.assertEquals("espec", SurvexExporter.ESPEC_EXTENSION);
     }
