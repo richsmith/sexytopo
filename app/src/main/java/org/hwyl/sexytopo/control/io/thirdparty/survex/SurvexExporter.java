@@ -7,7 +7,7 @@ import org.hwyl.sexytopo.control.io.SurveyFile;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
 import org.hwyl.sexytopo.control.io.translation.SingleFileExporter;
-import org.hwyl.sexytopo.model.graph.Direction;
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -78,13 +78,14 @@ public class SurvexExporter extends SingleFileExporter {
     }
 
     private static void generateEspecExtendCommandsFromStation(
-            StringBuilder builder, Station station, Direction lastDirection) {
+            StringBuilder builder, Station station, ExtendedElevationDirection lastDirection) {
 
-        Direction currentDirection = station.getExtendedElevationDirection();
+        ExtendedElevationDirection currentDirection = station.getExtendedElevationDirection();
         if (lastDirection == null) {
             builder.append(getEspecExtendCommand(station, "start"));
         } else if (currentDirection != lastDirection) {
-            String keyword = currentDirection == Direction.LEFT ? "eleft" : "eright";
+            String keyword =
+                    currentDirection == ExtendedElevationDirection.LEFT ? "eleft" : "eright";
             builder.append(getEspecExtendCommand(station, keyword));
         }
 

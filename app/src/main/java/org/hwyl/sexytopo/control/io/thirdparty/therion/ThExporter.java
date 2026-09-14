@@ -7,9 +7,6 @@ import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
-import org.hwyl.sexytopo.model.graph.Direction;
-import org.hwyl.sexytopo.model.survey.Leg;
-import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
 
@@ -56,7 +53,8 @@ public class ThExporter {
 
         builder.append(SurvexTherionUtil.getStationCommentsData(survey, SurveyFormat.THERION));
         builder.append(SurvexTherionUtil.getCentrelineData(survey, SurveyFormat.THERION));
-        builder.append(getExtendedElevationExtensions(survey));
+        builder.append(
+                SurvexTherionUtil.getExtendedElevationExtensions(survey, SurveyFormat.THERION));
         builder.append("endcentreline\n");
 
         // End survey
@@ -87,7 +85,8 @@ public class ThExporter {
                         + "\n"
                         + SurvexTherionUtil.getStationCommentsData(survey, SurveyFormat.THERION)
                         + SurvexTherionUtil.getCentrelineData(survey, SurveyFormat.THERION)
-                        + getExtendedElevationExtensions(survey)
+                        + SurvexTherionUtil.getExtendedElevationExtensions(
+                                survey, SurveyFormat.THERION)
                         + "endcentreline\n";
         String newContent = replaceCentreline(originalFileContent, centrelineText);
 
@@ -166,31 +165,5 @@ public class ThExporter {
     static String replaceInputsText(String original, String replacementText) {
         return original.replaceFirst(
                 "(?m)(^input .*\\n)+", Matcher.quoteReplacement(replacementText));
-    }
-
-    static String getExtendedElevationExtensions(Survey survey) {
-        StringBuilder builder = new StringBuilder();
-        generateExtendCommandsFromStation(builder, survey.getOrigin(), null);
-        return builder.toString();
-    }
-
-    private static void generateExtendCommandsFromStation(
-            StringBuilder builder, Station station, Direction lastDirection) {
-
-        Direction currentDirection = station.getExtendedElevationDirection();
-        if (lastDirection == null) {
-            builder.append(getExtendCommand(station, "start"));
-        } else if (currentDirection != lastDirection) {
-            builder.append(getExtendCommand(station, currentDirection.name().toLowerCase()));
-        }
-
-        for (Leg leg : station.getConnectedOnwardLegs()) {
-            generateExtendCommandsFromStation(
-                    builder, leg.getDestination(), station.getExtendedElevationDirection());
-        }
-    }
-
-    private static String getExtendCommand(Station station, String direction) {
-        return "extend " + direction + " " + station.getName() + "\n";
     }
 }

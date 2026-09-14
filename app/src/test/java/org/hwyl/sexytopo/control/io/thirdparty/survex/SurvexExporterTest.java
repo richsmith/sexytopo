@@ -5,8 +5,8 @@ import java.util.Collections;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.survey.Leg;
-import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
@@ -261,7 +261,7 @@ public class SurvexExporterTest {
         SurvexExporter survexExporter = new SurvexExporter();
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         // Flip the active station to LEFT so there is a real direction change to emit
-        survey.getActiveStation().setExtendedElevationDirection(Direction.LEFT);
+        survey.getActiveStation().setExtendedElevationDirection(ExtendedElevationDirection.LEFT);
 
         String content = survexExporter.getContent(survey);
 
@@ -289,7 +289,7 @@ public class SurvexExporterTest {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         // Origin defaults to RIGHT; set the active (last) station to LEFT to trigger a change
         Station changedStation = survey.getActiveStation();
-        changedStation.setExtendedElevationDirection(Direction.LEFT);
+        changedStation.setExtendedElevationDirection(ExtendedElevationDirection.LEFT);
 
         String espec = survexExporter.getEspecContent(survey);
 
@@ -304,12 +304,12 @@ public class SurvexExporterTest {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         // Set stations 2 and 3 to LEFT so the direction change back to RIGHT occurs at station 4
         Station intermediate = survey.getOrigin().getConnectedOnwardLegs().get(0).getDestination();
-        intermediate.setExtendedElevationDirection(Direction.LEFT);
+        intermediate.setExtendedElevationDirection(ExtendedElevationDirection.LEFT);
         Station intermediate2 = intermediate.getConnectedOnwardLegs().get(0).getDestination();
-        intermediate2.setExtendedElevationDirection(Direction.LEFT);
+        intermediate2.setExtendedElevationDirection(ExtendedElevationDirection.LEFT);
         // The active (last) station should remain RIGHT (the default), producing an eright command
         Station lastStation = survey.getActiveStation();
-        lastStation.setExtendedElevationDirection(Direction.RIGHT);
+        lastStation.setExtendedElevationDirection(ExtendedElevationDirection.RIGHT);
 
         String espec = survexExporter.getEspecContent(survey);
 
