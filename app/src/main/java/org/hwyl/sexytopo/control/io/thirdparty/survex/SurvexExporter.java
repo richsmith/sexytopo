@@ -38,14 +38,16 @@ public class SurvexExporter extends SingleFileExporter {
 
     /**
      * Returns true if the espec content contains anything beyond the {@code *start} line. Blank
-     * lines and comment lines (starting with {@code ;}) are ignored. If the only substantive line
-     * is the start line, the content is not meaningful and the file should not be written.
+     * lines are ignored. Comment lines (starting with {@code ;}) are treated as substantive — a
+     * commented-out {@code ; *evertical} line carries meaningful information and should be
+     * preserved. If the only non-blank line is the start line, the content is not meaningful and
+     * the file should not be written.
      */
     static boolean isEspecContentMeaningful(String content) {
         int substantiveLineCount = 0;
         for (String line : content.split("\n")) {
             String trimmed = line.trim();
-            if (trimmed.isEmpty() || trimmed.startsWith(";")) {
+            if (trimmed.isEmpty()) {
                 continue;
             }
             substantiveLineCount++;

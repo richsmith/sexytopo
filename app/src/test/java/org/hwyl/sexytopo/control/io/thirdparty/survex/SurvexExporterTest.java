@@ -354,7 +354,9 @@ public class SurvexExporterTest {
     public void testGetEspecContentVerticalLineContainsBothStationNames() {
         SurvexExporter survexExporter = new SurvexExporter();
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
-        Station fromStation = survey.getOrigin().getConnectedOnwardLegs().get(0).getDestination();
+        // station 3 is the immediate predecessor of station 4 (active/last) in the traversal
+        Station intermediate = survey.getOrigin().getConnectedOnwardLegs().get(0).getDestination();
+        Station fromStation = intermediate.getConnectedOnwardLegs().get(0).getDestination();
         Station toStation = survey.getActiveStation();
         toStation.setExtendedElevationDirection(ExtendedElevationDirection.VERTICAL);
 
