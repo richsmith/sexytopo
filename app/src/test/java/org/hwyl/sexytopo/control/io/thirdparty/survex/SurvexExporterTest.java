@@ -401,6 +401,98 @@ public class SurvexExporterTest {
         Assert.assertEquals("application/octet-stream", SurvexExporter.ESPEC_MIME_TYPE);
     }
 
+    // -------------------------------------------------------------------------
+    // isEspecContentMeaningful — direct unit tests
+    // -------------------------------------------------------------------------
+
+    @Test
+    public void testIsEspecContentMeaningfulReturnsFalseForStartOnly() {
+        Assert.assertFalse(SurvexExporter.isEspecContentMeaningful("*start 1\n"));
+    }
+
+    @Test
+    public void testIsEspecContentMeaningfulReturnsFalseForStartOnlyWithBlankLines() {
+        Assert.assertFalse(SurvexExporter.isEspecContentMeaningful("\n*start 1\n\n"));
+    }
+
+    @Test
+    public void testIsEspecContentMeaningfulReturnsTrueWhenEleftPresent() {
+        Assert.assertTrue(SurvexExporter.isEspecContentMeaningful("*start 1\n*eleft 2\n"));
+    }
+
+    @Test
+    public void testIsEspecContentMeaningfulReturnsTrueWhenErightPresent() {
+        Assert.assertTrue(SurvexExporter.isEspecContentMeaningful("*start 1\n*eright 2\n"));
+    }
+
+    @Test
+    public void testIsEspecContentMeaningfulReturnsTrueWhenCommentedVerticalPresent() {
+        // Commented vertical lines count as meaningful — they carry information even though
+        // the Survex extend tool cannot process them directly.
+        Assert.assertTrue(SurvexExporter.isEspecContentMeaningful("*start 1\n; *evertical 2 3\n"));
+    }
+
+    // -------------------------------------------------------------------------
+    // isEspecContentMeaningful — via getEspecContent on real surveys
+    // -------------------------------------------------------------------------
+
+    @Test
+    public void testEspecNotMeaningfulWhenAllStationsRight() {
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        // All stations at default RIGHT — espec should not be written
+
+        String espec = survexExporter.getEspecContent(survey);
+
+        Assert.assertFalse(
+                "all-right survey must produce non-meaningful espec content",
+                SurvexExporter.isEspecContentMeaningful(espec));
+    }
+
+    @Test
+    public void testEspecMeaningfulWhenStationIsLeft() {
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        survey.getActiveStation().setExtendedElevationDirection(ExtendedElevationDirection.LEFT);
+
+        String espec = survexExporter.getEspecContent(survey);
+
+        Assert.assertTrue(
+                "survey with a LEFT station must produce meaningful espec content",
+                SurvexExporter.isEspecContentMeaningful(espec));
+    }
+
+    @Test
+    public void testEspecMeaningfulWhenStationChangesBackToRight() {
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Station intermediate = survey.getOrigin().getConnectedOnwardLegs().get(0).getDestination();
+        intermediate.setExtendedElevationDirection(ExtendedElevationDirection.LEFT);
+        Station intermediate2 = intermediate.getConnectedOnwardLegs().get(0).getDestination();
+        intermediate2.setExtendedElevationDirection(ExtendedElevationDirection.LEFT);
+        survey.getActiveStation().setExtendedElevationDirection(ExtendedElevationDirection.RIGHT);
+
+        String espec = survexExporter.getEspecContent(survey);
+
+        Assert.assertTrue(
+                "survey with direction change back to RIGHT must produce meaningful espec content",
+                SurvexExporter.isEspecContentMeaningful(espec));
+    }
+
+    @Test
+    public void testEspecMeaningfulWhenStationIsVertical() {
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        survey.getActiveStation()
+                .setExtendedElevationDirection(ExtendedElevationDirection.VERTICAL);
+
+        String espec = survexExporter.getEspecContent(survey);
+
+        Assert.assertTrue(
+                "survey with a VERTICAL station must produce meaningful espec content",
+                SurvexExporter.isEspecContentMeaningful(espec));
+    }
+
     private static Trip.TeamEntry entry(String name, Trip.Role... roles) {
         return new Trip.TeamEntry(name, Arrays.asList(roles));
     }

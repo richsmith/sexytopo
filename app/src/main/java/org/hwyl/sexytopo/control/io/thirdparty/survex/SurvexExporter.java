@@ -26,11 +26,34 @@ public class SurvexExporter extends SingleFileExporter {
                 new SurveyFile.SurveyFileType(getFileExtension(), getMimeType());
         getOutputFile(svxType).save(context, svxContent);
 
-        // Save the extended elevation specification to a separate .espec file
+        // Only write the .espec file when it contains more than just the *start line —
+        // an all-right survey carries no information beyond the default, so omit the file.
         String especContent = getEspecContent(survey);
-        SurveyFile.SurveyFileType especType =
-                new SurveyFile.SurveyFileType(ESPEC_EXTENSION, ESPEC_MIME_TYPE);
-        getOutputFile(especType).save(context, especContent);
+        if (isEspecContentMeaningful(especContent)) {
+            SurveyFile.SurveyFileType especType =
+                    new SurveyFile.SurveyFileType(ESPEC_EXTENSION, ESPEC_MIME_TYPE);
+            getOutputFile(especType).save(context, especContent);
+        }
+    }
+
+    /**
+     * Returns true if the espec content contains anything beyond the {@code *start} line. Blank
+     * lines and comment lines (starting with {@code ;}) are ignored. If the only substantive line
+     * is the start line, the content is not meaningful and the file should not be written.
+     */
+    static boolean isEspecContentMeaningful(String content) {
+        int substantiveLineCount = 0;
+        for (String line : content.split("\n")) {
+            String trimmed = line.trim();
+            if (trimmed.isEmpty() || trimmed.startsWith(";")) {
+                continue;
+            }
+            substantiveLineCount++;
+            if (substantiveLineCount > 1) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public String getContent(Survey survey) {
