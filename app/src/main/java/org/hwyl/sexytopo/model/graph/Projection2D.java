@@ -53,7 +53,16 @@ public enum Projection2D {
         }
 
         public boolean isLegInPlane(Leg leg) {
-            return true;
+            // Unrolling the cave puts every leg in the plane by construction, except one drawn
+            // vertical only: that keeps its height and drops its horizontal run, which leaves it
+            // pointing into or out of the page.
+
+            boolean isLegDrawnAsVertical =
+                    leg.hasDestination()
+                            && leg.getDestination().getExtendedElevationDirection()
+                                    == ExtendedElevationDirection.VERTICAL;
+
+            return !isLegDrawnAsVertical;
         }
     },
     CROSS_SECTION("Cross Section", "xs") {

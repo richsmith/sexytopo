@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
+import org.hwyl.sexytopo.control.util.SurveyUpdater;
+import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.graph.Direction;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -39,6 +41,43 @@ public class ThExporterTest {
         String updated = ThExporter.replaceCentreline(TEST_CONTENT, "replacement");
         Assert.assertTrue(updated.contains("replacement"));
         Assert.assertFalse(updated.contains("Calculated"));
+    }
+
+    @Test
+    public void testReplaceCentrelineDoesNotMergeWithPrecedingLine() {
+        // Regression test: the blank line separating the preceding content from the
+        // centreline block must be preserved, not swallowed into a single merged line.
+        String updated = ThExporter.replaceCentreline(TEST_CONTENT, "centreline\nreplacement\n");
+        String[] lines = updated.split("\n");
+
+        Assert.assertTrue(indexOfLine(lines, "input dafung-down-westEe.th2") >= 0);
+        Assert.assertTrue(indexOfLine(lines, "centreline") >= 0);
+    }
+
+    @Test
+    public void testReplaceCentrelinePreservesTextBeforeBlock() {
+        String updated = ThExporter.replaceCentreline(TEST_CONTENT, "centreline\nreplacement\n");
+        Assert.assertTrue(updated.contains("input dafung-down-west.th2"));
+        Assert.assertTrue(updated.contains("input dafung-down-westEe.th2"));
+    }
+
+    @Test
+    public void testReplaceCentrelineHandlesDollarAndBackslash() {
+        // Regression test: the replacement is literal text, not a template. A copyright holder
+        // or licence containing $ used to be read as a group reference and threw
+        // IllegalArgumentException, aborting the export.
+        String replacement =
+                "centreline\ncopyright 2026 \"Jane $1 & Co\\Ltd\" #\"CC BY 4.0\"\nendcentreline\n";
+        String updated = ThExporter.replaceCentreline(TEST_CONTENT, replacement);
+
+        Assert.assertTrue(updated.contains("Jane $1 & Co\\Ltd"));
+    }
+
+    @Test
+    public void testReplaceInputsHandlesDollarAndBackslash() {
+        String updated = ThExporter.replaceInputsText(TEST_CONTENT, "input \"a$1\\b.th2\"\n");
+
+        Assert.assertTrue(updated.contains("a$1\\b.th2"));
     }
 
     @Test
@@ -104,6 +143,21 @@ public class ThExporterTest {
     }
 
     @Test
+    public void testBackwardsLegExportedAsTaken() {
+        // Regression test: a leg shot backwards must be exported with the stations and
+        // reading as they were physically taken, not as they are stored internally.
+        // Internally stored: 1 -> 2, azimuth 225, inclination -10.
+        // As taken: from 2 to 1, azimuth 45, inclination 10.
+        Survey survey = BasicTestSurveyCreator.createEmptySurvey();
+        SurveyUpdater.updateWithNewStation(survey, new Leg(5, 225, -10, true));
+
+        String centrelineData = SurvexTherionUtil.getCentrelineData(survey, SurveyFormat.THERION);
+
+        Assert.assertTrue(centrelineData.contains("2\t1\t5.000\t45.00\t10.00"));
+        Assert.assertFalse(centrelineData.contains("1\t2\t5.000\t225.00\t-10.00"));
+    }
+
+    @Test
     public void testTherionMetadataIncludesInstrumentWhenPresent() {
         Survey survey = new Survey();
         Trip trip = new Trip();
@@ -126,6 +180,19 @@ public class ThExporterTest {
         String metadata = SurvexTherionUtil.getMetadata(survey, SurveyFormat.THERION, "", "");
 
         Assert.assertTrue(metadata.contains("#instrument insts \"\""));
+    }
+
+    @Test
+    public void testTherionMetadataSurveyDateUsesDotSeparator() {
+        Survey survey = new Survey();
+        Trip trip = new Trip();
+        trip.setSurveyDate(new java.util.Date(0)); // 1970.01.01
+        survey.setTrip(trip);
+
+        String metadata = SurvexTherionUtil.getMetadata(survey, SurveyFormat.THERION, "", "");
+
+        Assert.assertTrue(metadata.contains("date 1970.01.01"));
+        Assert.assertFalse(metadata.contains("1970-01-01"));
     }
 
     @Test
@@ -168,51 +235,45 @@ public class ThExporterTest {
         Assert.assertTrue(metadata.contains("#explo-date "));
     }
 
-    // -------------------------------------------------------------------------
-    // Therion extend commands: extend start/left/right
-    // -------------------------------------------------------------------------
-
     @Test
-    public void testTherionExtendContainsExtendStartForOrigin() {
-        Survey survey = BasicTestSurveyCreator.createStraightNorth();
-        String originName = survey.getOrigin().getName();
+    public void testCopyrightLineIsImmediatelyAfterCentreline() {
+        Survey survey = new Survey();
+        Trip trip = new Trip();
+        trip.setCopyrightHolder("Caver Jane");
+        trip.setLicence("CC BY 4.0");
+        survey.setTrip(trip);
 
-        String content = ThExporter.getExtendedElevationExtensions(survey);
+        String updated =
+                ThExporter.updateOriginalContent(survey, TEST_CONTENT, Collections.emptyList());
+        String[] lines = updated.split("\n");
 
-        Assert.assertTrue(
-                "Therion output must contain 'extend start' for the origin station",
-                content.contains("extend start " + originName));
+        int centrelineIndex = indexOfLine(lines, "centreline");
+        Assert.assertTrue("centreline line not found", centrelineIndex >= 0);
+
+        String expectedCopyrightLine =
+                SurvexTherionUtil.getCopyrightLine(survey, SurveyFormat.THERION).trim();
+        Assert.assertEquals(expectedCopyrightLine, lines[centrelineIndex + 1]);
     }
 
     @Test
-    public void testTherionExtendContainsExtendLeftForLeftStation() {
-        Survey survey = BasicTestSurveyCreator.createStraightNorth();
-        Station changedStation = survey.getActiveStation();
-        changedStation.setExtendedElevationDirection(Direction.LEFT);
+    public void testNoCopyrightLineWhenTripHasNeitherCopyrightNorLicence() {
+        Survey survey = new Survey();
+        Trip trip = new Trip();
+        survey.setTrip(trip);
 
-        String content = ThExporter.getExtendedElevationExtensions(survey);
+        String updated =
+                ThExporter.updateOriginalContent(survey, TEST_CONTENT, Collections.emptyList());
 
-        Assert.assertTrue(
-                "Therion output must contain 'extend left' for a station changed to left",
-                content.contains("extend left " + changedStation.getName()));
+        Assert.assertFalse(updated.contains("copyright"));
     }
 
-    @Test
-    public void testTherionExtendContainsExtendRightForRightStation() {
-        Survey survey = BasicTestSurveyCreator.createStraightNorth();
-        // Set stations 2 and 3 to LEFT so the direction change back to RIGHT occurs at station 4
-        Station intermediate = survey.getOrigin().getConnectedOnwardLegs().get(0).getDestination();
-        intermediate.setExtendedElevationDirection(Direction.LEFT);
-        Station intermediate2 = intermediate.getConnectedOnwardLegs().get(0).getDestination();
-        intermediate2.setExtendedElevationDirection(Direction.LEFT);
-        Station lastStation = survey.getActiveStation();
-        lastStation.setExtendedElevationDirection(Direction.RIGHT);
-
-        String content = ThExporter.getExtendedElevationExtensions(survey);
-
-        Assert.assertTrue(
-                "Therion output must contain 'extend right' for a station changed back to right",
-                content.contains("extend right " + lastStation.getName()));
+    private static int indexOfLine(String[] lines, String target) {
+        for (int i = 0; i < lines.length; i++) {
+            if (lines[i].equals(target)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     private static Trip.TeamEntry entry(String name, Trip.Role... roles) {

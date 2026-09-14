@@ -15,6 +15,7 @@ public class SvgExportOptions {
     private boolean showSplays = true;
     private boolean showGrid = false;
     private boolean showTagline = true;
+    private boolean showCopyright = true;
 
     public SvgExportOptions() {}
 
@@ -30,7 +31,8 @@ public class SvgExportOptions {
             boolean showStations,
             boolean showSplays,
             boolean showGrid,
-            boolean showTagline) {
+            boolean showTagline,
+            boolean showCopyright) {
         this.whiteBackground = whiteBackground;
         this.showLegend = showLegend;
         this.showNorthArrow = showNorthArrow;
@@ -43,6 +45,7 @@ public class SvgExportOptions {
         this.showSplays = showSplays;
         this.showGrid = showGrid;
         this.showTagline = showTagline;
+        this.showCopyright = showCopyright;
     }
 
     public boolean isWhiteBackground() {
@@ -91,5 +94,9 @@ public class SvgExportOptions {
 
     public boolean isShowTagline() {
         return showTagline;
+    }
+
+    public boolean isShowCopyright() {
+        return showCopyright;
     }
 }

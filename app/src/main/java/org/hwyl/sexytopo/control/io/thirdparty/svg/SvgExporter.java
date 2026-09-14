@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
@@ -81,7 +83,8 @@ public class SvgExporter extends DoubleSketchFileExporter {
                             GeneralPreferences.isExportSvgStationsEnabled(),
                             GeneralPreferences.isExportSvgSplaysEnabled(),
                             GeneralPreferences.isExportSvgGridEnabled(),
-                            GeneralPreferences.isExportSvgTaglineEnabled());
+                            GeneralPreferences.isExportSvgTaglineEnabled(),
+                            GeneralPreferences.isExportSvgCopyrightEnabled());
         }
         return exportOptions;
     }
@@ -139,6 +142,16 @@ public class SvgExporter extends DoubleSketchFileExporter {
                 "viewBox",
                 TextTools.join(" ", svgTopLeftX, svgTopLeftY, svgWidth, svgHeight));
         xmlSerializer.attribute(null, "xmlns", "http://www.w3.org/2000/svg");
+
+        Trip trip = survey.getTrip();
+        if (trip != null && (trip.hasCopyrightHolder() || trip.hasLicence())) {
+            xmlSerializer.startTag(null, "title");
+            xmlSerializer.text(survey.getName());
+            xmlSerializer.endTag(null, "title");
+            xmlSerializer.startTag(null, "desc");
+            xmlSerializer.text(formatCopyrightLine(trip));
+            xmlSerializer.endTag(null, "desc");
+        }
 
         Colour background = options.isWhiteBackground() ? Colour.WHITE : Colour.TRANSPARENT;
         if (background != Colour.TRANSPARENT) {
@@ -207,18 +220,37 @@ public class SvgExporter extends DoubleSketchFileExporter {
         xmlSerializer.endDocument();
 
         String text = writer.toString();
-        text = unescapeTagsHack(text);
+        text = unescapeSymbolMarkup(text);
         text = prettyPrintXML(text);
 
         return text;
     }
 
-    /** Need this because idiot library developers don't provide an option to override escaping */
-    public String unescapeTagsHack(String text) {
+    // Sentinels fencing off pre-rendered symbol markup that must not stay escaped. They are
+    // written as text, so the serializer escapes them along with everything else and they can't
+    // collide with anything the user typed.
+    private static final String RAW_MARKUP_START = "@@SEXYTOPO_RAW_START@@";
+    private static final String RAW_MARKUP_END = "@@SEXYTOPO_RAW_END@@";
 
-        text = text.replaceAll("&lt;", "<");
-        text = text.replaceAll("&gt;", ">");
-        return text;
+    private static final Pattern RAW_MARKUP_REGION =
+            Pattern.compile(
+                    Pattern.quote(RAW_MARKUP_START) + "(.*?)" + Pattern.quote(RAW_MARKUP_END),
+                    Pattern.DOTALL);
+
+    /**
+     * Un-escapes the pre-rendered symbol markup, which the serializer has no way to write raw. Only
+     * the fenced regions are touched, so a &lt; or &gt; in a station name, comment or copyright
+     * holder stays escaped and the document stays well-formed.
+     */
+    public String unescapeSymbolMarkup(String text) {
+        Matcher matcher = RAW_MARKUP_REGION.matcher(text);
+        StringBuilder result = new StringBuilder();
+        while (matcher.find()) {
+            String markup = matcher.group(1).replace("&lt;", "<").replace("&gt;", ">");
+            matcher.appendReplacement(result, Matcher.quoteReplacement(markup));
+        }
+        matcher.appendTail(result);
+        return result.toString();
     }
 
     /** Pre-computed legend layout: knows its total height so the frame can be expanded for it. */
@@ -348,6 +380,12 @@ public class SvgExporter extends DoubleSketchFileExporter {
             }
         }
         bodyLines.add(formatStatsLine(survey));
+        if (options.isShowCopyright()) {
+            String copyrightLine = formatCopyrightLine(trip);
+            if (!copyrightLine.isEmpty()) {
+                bodyLines.add(copyrightLine);
+            }
+        }
 
         double barLengthMetres = pickScaleBarLength(surveyWidthMetres);
         return new LegendModel(
@@ -534,6 +572,33 @@ public class SvgExporter extends DoubleSketchFileExporter {
             }
         }
         return TextTools.join(", ", names);
+    }
+
+    /**
+     * Formats a trip's copyright holder and licence as a single line, e.g. "© 2026 Caver Jane — CC
+     * BY 4.0". The © and year are added here, so the holder is just the name. Either part may be
+     * omitted if not set; returns an empty string if neither is set.
+     */
+    private static String formatCopyrightLine(Trip trip) {
+        if (trip == null) {
+            return "";
+        }
+        StringBuilder builder = new StringBuilder();
+        if (trip.hasCopyrightHolder()) {
+            builder.append("\u00A9 ");
+            String year = TextTools.formatYear(trip.getSurveyDate());
+            if (!year.isEmpty()) {
+                builder.append(year).append(" ");
+            }
+            builder.append(trip.getCopyrightHolder());
+        }
+        if (trip.hasLicence()) {
+            if (builder.length() > 0) {
+                builder.append(" — ");
+            }
+            builder.append(trip.getLicence());
+        }
+        return builder.toString();
     }
 
     private static String formatStatsLine(Survey survey) {
@@ -779,7 +844,10 @@ public class SvgExporter extends DoubleSketchFileExporter {
         xmlSerializer.attribute("", "viewBox", "0 0 40 40");
 
         xmlSerializer.flush();
-        xmlSerializer.text(innerSvgContent);
+        // The serializer escapes everything written as text, but this is real markup that has to
+        // survive as markup. Fence it so it - and only it - can be unescaped afterwards; see
+        // unescapeSymbolMarkup.
+        xmlSerializer.text(RAW_MARKUP_START + innerSvgContent + RAW_MARKUP_END);
 
         xmlSerializer.endTag("", "symbol");
     }
@@ -902,6 +970,7 @@ public class SvgExporter extends DoubleSketchFileExporter {
         CheckBox splaysCheckbox = dialogView.findViewById(R.id.svgSplaysCheckbox);
         CheckBox gridCheckbox = dialogView.findViewById(R.id.svgGridCheckbox);
         CheckBox taglineCheckbox = dialogView.findViewById(R.id.svgTaglineCheckbox);
+        CheckBox copyrightCheckbox = dialogView.findViewById(R.id.svgCopyrightCheckbox);
 
         String[] backgroundValues =
                 context.getResources()
@@ -920,6 +989,7 @@ public class SvgExporter extends DoubleSketchFileExporter {
         splaysCheckbox.setChecked(GeneralPreferences.isExportSvgSplaysEnabled());
         gridCheckbox.setChecked(GeneralPreferences.isExportSvgGridEnabled());
         taglineCheckbox.setChecked(GeneralPreferences.isExportSvgTaglineEnabled());
+        copyrightCheckbox.setChecked(GeneralPreferences.isExportSvgCopyrightEnabled());
 
         new MaterialAlertDialogBuilder(context)
                 .setTitle(R.string.svg_export_dialog_title)
@@ -941,6 +1011,7 @@ public class SvgExporter extends DoubleSketchFileExporter {
                             boolean splays = splaysCheckbox.isChecked();
                             boolean grid = gridCheckbox.isChecked();
                             boolean tagline = taglineCheckbox.isChecked();
+                            boolean copyright = copyrightCheckbox.isChecked();
                             exportOptions =
                                     new SvgExportOptions(
                                             white,
@@ -954,7 +1025,8 @@ public class SvgExporter extends DoubleSketchFileExporter {
                                             stations,
                                             splays,
                                             grid,
-                                            tagline);
+                                            tagline,
+                                            copyright);
                             saveOptions(
                                     selectedBackground,
                                     legend,
@@ -967,7 +1039,8 @@ public class SvgExporter extends DoubleSketchFileExporter {
                                     stations,
                                     splays,
                                     grid,
-                                    tagline);
+                                    tagline,
+                                    copyright);
                             onReady.run();
                         })
                 .setNegativeButton(R.string.cancel, null)
@@ -995,7 +1068,8 @@ public class SvgExporter extends DoubleSketchFileExporter {
             boolean stations,
             boolean splays,
             boolean grid,
-            boolean tagline) {
+            boolean tagline,
+            boolean copyright) {
         SharedPreferences prefs = GeneralPreferences.getRawPreferences();
         if (prefs == null) {
             return;
@@ -1013,6 +1087,7 @@ public class SvgExporter extends DoubleSketchFileExporter {
                 .putBoolean("pref_export_svg_splays", splays)
                 .putBoolean("pref_export_svg_grid", grid)
                 .putBoolean("pref_export_svg_tagline", tagline)
+                .putBoolean("pref_export_svg_copyright", copyright)
                 .apply();
     }
 

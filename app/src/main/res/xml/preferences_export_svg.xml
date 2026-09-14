@@ -75,6 +75,12 @@
         android:summary="@string/settings_export_svg_tagline_summary"
         android:defaultValue="true" />
 
+    <CheckBoxPreference
+        android:key="pref_export_svg_copyright"
+        android:title="@string/settings_export_svg_copyright_title"
+        android:summary="@string/settings_export_svg_copyright_summary"
+        android:defaultValue="true" />
+
     <EditTextPreference
         android:key="pref_export_svg_stroke_width"
         android:title="@string/settings_export_svg_stroke_width_title"

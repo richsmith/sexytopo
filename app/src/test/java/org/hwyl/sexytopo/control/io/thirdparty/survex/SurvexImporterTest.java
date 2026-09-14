@@ -1,9 +1,11 @@
 package org.hwyl.sexytopo.control.io.thirdparty.survex;
 
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionImporter;
+import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
+import org.hwyl.sexytopo.model.survey.Trip;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -153,5 +155,15 @@ public class SurvexImporterTest {
         Assert.assertTrue(
                 mainLeg.getPromotedFrom()[0].getComment() == null
                         || mainLeg.getPromotedFrom()[0].getComment().isEmpty());
+    }
+
+    // --- Metadata date parsing ---
+
+    @Test
+    public void testMetadataImportAcceptsHyphenSeparatedSurveyDate() throws Exception {
+        String survexText = "*date 2026-01-05\n";
+        Trip trip = SurvexTherionImporter.parseMetadata(survexText, SurveyFormat.SURVEX);
+        Assert.assertNotNull(trip);
+        Assert.assertNotNull(trip.getSurveyDate());
     }
 }

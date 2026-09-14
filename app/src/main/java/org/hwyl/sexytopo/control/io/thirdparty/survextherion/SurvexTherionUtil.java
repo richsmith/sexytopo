@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
+import org.hwyl.sexytopo.control.util.TextTools;
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -17,6 +19,13 @@ import org.hwyl.sexytopo.model.table.TableCol;
 public class SurvexTherionUtil {
 
     public static final String TRIP_DATE_PATTERN = "yyyy.MM.dd";
+
+    /**
+     * Accepted as a fallback when importing trip dates, so files using ISO-style hyphens (e.g.
+     * "2026-01-05") parse as readily as the native dot-separated Survex/Therion format. Export
+     * always uses {@link #TRIP_DATE_PATTERN}.
+     */
+    public static final String TRIP_DATE_PATTERN_ISO = "yyyy-MM-dd";
 
     public static String getCreationComment(char commentChar, String versionInfo) {
         String dateOnly = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
@@ -96,6 +105,49 @@ public class SurvexTherionUtil {
             }
         }
 
+        return builder.toString();
+    }
+
+    /**
+     * Returns the copyright line for the survey's trip - *copyright {year} "{holder}" ;"{licence}"
+     * for Survex, or the same without the leading * and with # as the comment character for
+     * Therion. Returns "" if there's no trip, or the trip has neither a copyright holder nor a
+     * licence set.
+     *
+     * <p>The holder is always quoted, and is rendered as an empty pair of quotes if blank. The
+     * licence (also quoted) is only appended, as a trailing comment, if it is set; if there's no
+     * licence, the line ends after the holder.
+     */
+    public static String getCopyrightLine(Survey survey, SurveyFormat format) {
+        Trip trip = survey.getTrip();
+        if (trip == null || (!trip.hasCopyrightHolder() && !trip.hasLicence())) {
+            return "";
+        }
+
+        String marker = format.getCommandChar();
+        char commentChar = format.getCommentChar();
+        String holder = trip.hasCopyrightHolder() ? trip.getCopyrightHolder() : "";
+
+        // The year is normally always present, since a trip is created with today's date, but
+        // an imported survey can leave it unset; omit it rather than writing an empty slot.
+        String year = TextTools.formatYear(trip.getSurveyDate());
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(marker).append("copyright ");
+        if (!year.isEmpty()) {
+            builder.append(year).append(" ");
+        }
+        builder.append("\"").append(holder).append("\"");
+
+        if (trip.hasLicence()) {
+            builder.append(" ")
+                    .append(commentChar)
+                    .append("\"")
+                    .append(trip.getLicence())
+                    .append("\"");
+        }
+
+        builder.append("\n");
         return builder.toString();
     }
 
@@ -187,11 +239,13 @@ public class SurvexTherionUtil {
             GraphToListTranslator.SurveyListEntry entry,
             SurveyFormat format) {
 
-        Station from = entry.getFrom();
+        GraphToListTranslator.AsTakenReading reading =
+                GraphToListTranslator.toAsTakenReading(entry);
+        Station from = reading.getFrom();
         String fromName = from.getName();
 
-        Leg leg = entry.getLeg();
-        Station to = leg.getDestination();
+        Leg leg = reading.getLeg();
+        Station to = reading.getTo();
         String toName = to.getName();
 
         // Replace splay station name with format-specific syntax
@@ -249,5 +303,52 @@ public class SurvexTherionUtil {
     private static void formatComment(StringBuilder builder, String comment) {
         String formatted = comment.replaceAll("(\\r|\\n|\\r\\n)+", "\\\\n");
         builder.append(formatted);
+    }
+
+    public static String getExtendedElevationExtensions(Survey survey, SurveyFormat format) {
+        StringBuilder builder = new StringBuilder();
+        String marker = format.getCommandChar();
+        generateExtendCommandsFromStation(builder, survey.getOrigin(), null, null, marker);
+        return builder.toString();
+    }
+
+    private static void generateExtendCommandsFromStation(
+            StringBuilder builder,
+            Station station,
+            Station fromStation,
+            ExtendedElevationDirection lastDirection,
+            String marker) {
+
+        ExtendedElevationDirection currentDirection = station.getExtendedElevationDirection();
+        String directionName = currentDirection.name().toLowerCase();
+
+        // A direction that doesn't propagate applies to this leg alone, so it's written with both
+        // of the leg's stations and doesn't change the direction the rest of the survey inherits.
+        ExtendedElevationDirection inheritedDirection;
+        if (!currentDirection.propagates()) {
+            builder.append(getExtendCommand(fromStation, station, directionName, marker));
+            inheritedDirection = lastDirection;
+        } else {
+            if (lastDirection == null) {
+                builder.append(getExtendCommand(station, "start", marker));
+            } else if (currentDirection != lastDirection) {
+                builder.append(getExtendCommand(station, directionName, marker));
+            }
+            inheritedDirection = currentDirection;
+        }
+
+        for (Leg leg : station.getConnectedOnwardLegs()) {
+            generateExtendCommandsFromStation(
+                    builder, leg.getDestination(), station, inheritedDirection, marker);
+        }
+    }
+
+    private static String getExtendCommand(Station station, String direction, String marker) {
+        return marker + "extend " + direction + " " + station.getName() + "\n";
+    }
+
+    private static String getExtendCommand(
+            Station from, Station to, String direction, String marker) {
+        return marker + "extend " + direction + " " + from.getName() + " " + to.getName() + "\n";
     }
 }

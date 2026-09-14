@@ -9,7 +9,7 @@ import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SexyTopo;
 import org.hwyl.sexytopo.control.util.amalgamation.LegAmalgamationAlgorithm;
-import org.hwyl.sexytopo.model.graph.Direction;
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -184,7 +184,8 @@ public class SurveyUpdater {
         if (areLegsAboutTheSame(lastNLegs)) {
 
             Station newStation = new Station(getNextStationName(survey));
-            newStation.setExtendedElevationDirection(activeStation.getExtendedElevationDirection());
+            newStation.setExtendedElevationDirection(
+                    resolveInheritedExtendedElevationDirection(survey, activeStation));
 
             Leg newLeg = averageLegs(lastNLegs);
             newLeg =
@@ -240,7 +241,8 @@ public class SurveyUpdater {
 
         if (areLegsBacksights(fore, back)) {
             Station newStation = new Station(getNextStationName(survey));
-            newStation.setExtendedElevationDirection(activeStation.getExtendedElevationDirection());
+            newStation.setExtendedElevationDirection(
+                    resolveInheritedExtendedElevationDirection(survey, activeStation));
 
             Leg newLeg = averageBacksights(fore, back);
             newLeg = Leg.toFullLeg(newLeg, newStation);
@@ -414,11 +416,54 @@ public class SurveyUpdater {
         survey.setSaved(false);
     }
 
-    public static void setDirectionOfSubtree(Station station, Direction direction) {
+    /**
+     * Sets the extended elevation direction on a station, applying it to the stations below too if
+     * the direction propagates. Directions that don't propagate affect only the leg into this
+     * station, leaving the rest of the survey to carry on as it was.
+     */
+    public static void setExtendedElevationDirection(
+            Survey survey, Station station, ExtendedElevationDirection direction) {
+        if (direction.propagates()) {
+            setExtendedElevationDirectionOfSubtree(station, direction);
+        } else {
+            station.setExtendedElevationDirection(direction);
+        }
+        survey.setSaved(false);
+    }
+
+    public static void setExtendedElevationDirectionOfSubtree(
+            Station station, ExtendedElevationDirection direction) {
         station.setExtendedElevationDirection(direction);
         for (Leg leg : station.getConnectedOnwardLegs()) {
             Station destination = leg.getDestination();
-            setDirectionOfSubtree(destination, direction);
+            setExtendedElevationDirectionOfSubtree(destination, direction);
         }
+    }
+
+    /**
+     * Resolves the direction that a newly-created station should inherit from its parent.
+     *
+     * <p>A direction that doesn't propagate applies to the leg into the parent alone, so it says
+     * nothing about where the survey goes next. In that case we walk up to the nearest ancestor
+     * whose direction does propagate, so the survey resumes the direction it was heading in before.
+     *
+     * <p>NOTE: this is a potentially expensive O(n^2) operation (to keep doing survey traversals to
+     * find the parent with a "standard" EE direction), but we don't anticipate this method being
+     * used outside creating new stations, and anyway long series of VERTICAL legs ought to be very
+     * rare!
+     */
+    private static ExtendedElevationDirection resolveInheritedExtendedElevationDirection(
+            Survey survey, Station activeStation) {
+        ExtendedElevationDirection activeDirection = activeStation.getExtendedElevationDirection();
+        if (activeDirection.propagates()) {
+            return activeDirection;
+        }
+        Leg referringLeg = survey.getReferringLeg(activeStation);
+        if (referringLeg == null) {
+            // origin station — nothing above it to inherit from
+            return ExtendedElevationDirection.DEFAULT;
+        }
+        Station parent = survey.getOriginatingStation(referringLeg);
+        return resolveInheritedExtendedElevationDirection(survey, parent);
     }
 }

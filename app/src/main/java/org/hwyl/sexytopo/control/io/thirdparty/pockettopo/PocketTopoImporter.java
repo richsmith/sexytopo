@@ -12,7 +12,7 @@ import org.hwyl.sexytopo.control.io.translation.Importer;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.graph.Coord2D;
-import org.hwyl.sexytopo.model.graph.Direction;
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
@@ -295,7 +295,9 @@ public class PocketTopoImporter extends Importer {
                         newStation.setComment(shot.comment);
                     }
                     newStation.setExtendedElevationDirection(
-                            shot.flipped ? Direction.LEFT : Direction.RIGHT);
+                            shot.flipped
+                                    ? ExtendedElevationDirection.LEFT
+                                    : ExtendedElevationDirection.RIGHT);
 
                     Leg averaged =
                             (originalLegs.size() > 1)
@@ -329,7 +331,9 @@ public class PocketTopoImporter extends Importer {
                         newStation.setComment(shot.comment);
                     }
                     newStation.setExtendedElevationDirection(
-                            shot.flipped ? Direction.LEFT : Direction.RIGHT);
+                            shot.flipped
+                                    ? ExtendedElevationDirection.LEFT
+                                    : ExtendedElevationDirection.RIGHT);
 
                     Leg averaged =
                             (originalLegs.size() > 1)

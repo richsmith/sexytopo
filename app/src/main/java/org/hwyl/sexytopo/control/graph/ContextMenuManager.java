@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
-import org.hwyl.sexytopo.model.graph.Direction;
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -61,6 +61,7 @@ public class ContextMenuManager {
         menuActions.put(R.id.action_jump_to_elevation, activity::onJumpToElevation);
         menuActions.put(R.id.action_direction_left, activity::onSetDirectionLeft);
         menuActions.put(R.id.action_direction_right, activity::onSetDirectionRight);
+        menuActions.put(R.id.action_direction_vertical, activity::onSetDirectionVertical);
         menuActions.put(R.id.action_xsection_create, activity::onNewCrossSection);
         menuActions.put(R.id.action_xsection_edit, activity::onEditCrossSection);
         menuActions.put(R.id.action_xsection_set_direction, activity::onRotateCrossSection);
@@ -241,10 +242,14 @@ public class ContextMenuManager {
         // Configure direction radio buttons
         MenuItem leftItem = menu.findItem(R.id.action_direction_left);
         MenuItem rightItem = menu.findItem(R.id.action_direction_right);
+        MenuItem verticalItem = menu.findItem(R.id.action_direction_vertical);
         if (leftItem != null && rightItem != null) {
-            Direction currentDirection = station.getExtendedElevationDirection();
-            leftItem.setChecked(currentDirection == Direction.LEFT);
-            rightItem.setChecked(currentDirection == Direction.RIGHT);
+            ExtendedElevationDirection currentDirection = station.getExtendedElevationDirection();
+            leftItem.setChecked(currentDirection == ExtendedElevationDirection.LEFT);
+            rightItem.setChecked(currentDirection == ExtendedElevationDirection.RIGHT);
+            if (verticalItem != null) {
+                verticalItem.setChecked(currentDirection == ExtendedElevationDirection.VERTICAL);
+            }
         }
 
         // Cross-section submenu: enable/disable based on whether one exists at this station.

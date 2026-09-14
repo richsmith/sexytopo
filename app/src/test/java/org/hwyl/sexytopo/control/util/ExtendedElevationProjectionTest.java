@@ -2,6 +2,7 @@ package org.hwyl.sexytopo.control.util;
 
 import java.util.Map;
 import org.hwyl.sexytopo.model.graph.Coord2D;
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
@@ -33,7 +34,7 @@ public class ExtendedElevationProjectionTest {
     public void testProject5MNorthReversed() {
 
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
-        survey.getStationByName("2").switchDirection();
+        survey.getStationByName("2").setExtendedElevationDirection(ExtendedElevationDirection.LEFT);
 
         Space<Coord2D> space = Projection2D.EXTENDED_ELEVATION.project(survey);
         Map<Station, Coord2D> stationMap = space.getStationMap();

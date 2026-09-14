@@ -16,6 +16,8 @@ public class TripTest {
                         new Trip.TeamEntry("Rufus", Arrays.asList(Trip.Role.INSTRUMENTS))));
         trip.setComments("Test comment");
         trip.setInstrument("DistoX");
+        trip.setCopyrightHolder("Test Caver");
+        trip.setLicence("GPLv3.0+");
         return trip;
     }
 
@@ -49,6 +51,51 @@ public class TripTest {
         a.setSurveyDate(b.getSurveyDate());
         b.setInstrument("SAP5");
         Assert.assertNotEquals(a, b);
+    }
+
+    @Test
+    public void testNotEqualDifferentCopyright() {
+        Trip a = basicTrip();
+        Trip b = basicTrip();
+        a.setSurveyDate(b.getSurveyDate());
+        b.setCopyrightHolder("Someone Else");
+        Assert.assertNotEquals(a, b);
+    }
+
+    @Test
+    public void testNotEqualDifferentLicence() {
+        Trip a = basicTrip();
+        Trip b = basicTrip();
+        a.setSurveyDate(b.getSurveyDate());
+        b.setLicence("CC0");
+        Assert.assertNotEquals(a, b);
+    }
+
+    @Test
+    public void testDefaultCopyrightAndLicenceAreEmpty() {
+        Trip trip = new Trip();
+        Assert.assertEquals("", trip.getCopyrightHolder());
+        Assert.assertEquals("", trip.getLicence());
+        Assert.assertFalse(trip.hasCopyrightHolder());
+        Assert.assertFalse(trip.hasLicence());
+    }
+
+    @Test
+    public void testHasCopyrightAndHasLicenceWhenSet() {
+        Trip trip = new Trip();
+        trip.setCopyrightHolder("Jane Caver");
+        trip.setLicence("CC0");
+        Assert.assertTrue(trip.hasCopyrightHolder());
+        Assert.assertTrue(trip.hasLicence());
+    }
+
+    @Test
+    public void testHasCopyrightAndHasLicenceFalseForWhitespaceOnly() {
+        Trip trip = new Trip();
+        trip.setCopyrightHolder("   ");
+        trip.setLicence("   ");
+        Assert.assertFalse(trip.hasCopyrightHolder());
+        Assert.assertFalse(trip.hasLicence());
     }
 
     @Test
@@ -139,6 +186,22 @@ public class TripTest {
         Trip next = original.toNextTrip();
         Assert.assertEquals(original.getTeam(), next.getTeam());
         Assert.assertEquals(original.getInstrument(), next.getInstrument());
+    }
+
+    @Test
+    public void testToNextTripCopiesCopyrightAndLicence() {
+        Trip original = basicTrip();
+        Trip next = original.toNextTrip();
+        Assert.assertEquals(original.getCopyrightHolder(), next.getCopyrightHolder());
+        Assert.assertEquals(original.getLicence(), next.getLicence());
+    }
+
+    @Test
+    public void testCopyIncludesCopyrightAndLicence() {
+        Trip original = basicTrip();
+        Trip copy = new Trip(original);
+        Assert.assertEquals(original.getCopyrightHolder(), copy.getCopyrightHolder());
+        Assert.assertEquals(original.getLicence(), copy.getLicence());
     }
 
     @Test

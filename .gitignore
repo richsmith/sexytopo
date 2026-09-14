@@ -16,7 +16,7 @@
 /local.properties
 /sessions
 bin/
-docs/manual/
+docs/local/
 
 # Python
 __pycache__/

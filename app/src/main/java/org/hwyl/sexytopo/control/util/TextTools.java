@@ -28,6 +28,9 @@ public class TextTools {
     @SuppressLint("SimpleDateFormat")
     public static final DateFormat ISO_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
+    @SuppressLint("SimpleDateFormat")
+    public static final DateFormat YEAR_FORMAT = new SimpleDateFormat("yyyy");
+
     public static String pluralise(int n, String noun) {
         return n + " " + ((n == 1) ? noun : noun + "s");
     }
@@ -151,6 +154,11 @@ public class TextTools {
 
     public static String toIsoDate(Date date) {
         return ISO_DATE_FORMAT.format(date);
+    }
+
+    /** The year of the given date, or "" if there isn't one. */
+    public static String formatYear(Date date) {
+        return date == null ? "" : YEAR_FORMAT.format(date);
     }
 
     public static String getFileAttribution(Context context) {

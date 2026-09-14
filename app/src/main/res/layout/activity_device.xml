@@ -142,6 +142,14 @@
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:checked="false" />
 
+                    <CheckBox
+                        android:id="@+id/autoReconnectCheckbox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/device_auto_reconnect"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:checked="false" />
+
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>

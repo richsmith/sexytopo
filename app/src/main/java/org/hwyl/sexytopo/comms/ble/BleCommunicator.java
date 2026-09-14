@@ -7,6 +7,7 @@ import no.nordicsemi.android.ble.observer.ConnectionObserver;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.comms.Communicator;
 import org.hwyl.sexytopo.comms.Instrument;
+import org.hwyl.sexytopo.comms.ReconnectionPolicy;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.activity.DeviceActivity;
 
@@ -20,12 +21,15 @@ public abstract class BleCommunicator implements Communicator, ConnectionObserve
     protected final SexyTopoBleManager manager;
     protected final BluetoothDevice bluetoothDevice;
     protected final DeviceActivity activity;
+    protected final ReconnectionPolicy reconnectionPolicy;
 
     public BleCommunicator(
             DeviceActivity activity, BluetoothDevice bluetoothDevice, SexyTopoBleManager manager) {
         this.activity = activity;
         this.bluetoothDevice = bluetoothDevice;
         this.manager = manager;
+        this.reconnectionPolicy =
+                new ReconnectionPolicy(Instrument.describe(bluetoothDevice), this::requestConnect);
         manager.setConnectionObserver(this);
     }
 
@@ -36,6 +40,7 @@ public abstract class BleCommunicator implements Communicator, ConnectionObserve
 
     @Override
     public void requestConnect() {
+        reconnectionPolicy.noteUserRequestedConnect();
         manager.connect(bluetoothDevice)
                 .timeout(10000) // milliseconds
                 .retry(3, 100)
@@ -44,7 +49,13 @@ public abstract class BleCommunicator implements Communicator, ConnectionObserve
 
     @Override
     public void requestDisconnect() {
+        reconnectionPolicy.noteUserRequestedDisconnect();
         manager.disconnect().enqueue();
+    }
+
+    @Override
+    public void forceStop() {
+        reconnectionPolicy.cancel();
     }
 
     @Override
@@ -73,12 +84,14 @@ public abstract class BleCommunicator implements Communicator, ConnectionObserve
         String name = Instrument.describe(device);
         Log.device(R.string.device_ble_failed_to_connect_to, name);
         activity.updateConnectionStatus();
+        reconnectionPolicy.onUnexpectedDisconnection();
     }
 
     @Override
     public void onDeviceReady(@NonNull BluetoothDevice device) {
         String name = Instrument.describe(device);
         Log.device(R.string.device_ble_device_ready, name);
+        reconnectionPolicy.noteReady();
     }
 
     @Override
@@ -90,7 +103,20 @@ public abstract class BleCommunicator implements Communicator, ConnectionObserve
     @Override
     public void onDeviceDisconnected(@NonNull BluetoothDevice device, int reason) {
         String name = Instrument.describe(device);
-        Log.device(R.string.device_ble_device_disconnected, name);
+
+        // a timeout here means we never got as far as connecting, so saying we've been
+        // disconnected would overstate what happened
+        boolean neverConnected = reason == ConnectionObserver.REASON_TIMEOUT;
+        Log.device(
+                neverConnected
+                        ? R.string.device_ble_device_not_connected
+                        : R.string.device_ble_device_disconnected,
+                name);
         activity.updateConnectionStatus();
+
+        // anything other than REASON_SUCCESS means we didn't ask for this
+        if (reason != ConnectionObserver.REASON_SUCCESS) {
+            reconnectionPolicy.onUnexpectedDisconnection();
+        }
     }
 }

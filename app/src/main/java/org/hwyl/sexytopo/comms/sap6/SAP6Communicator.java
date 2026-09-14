@@ -7,6 +7,8 @@ import java.util.Map;
 import kotlin.Unit;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.comms.Communicator;
+import org.hwyl.sexytopo.comms.Instrument;
+import org.hwyl.sexytopo.comms.ReconnectionPolicy;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.DeviceActivity;
@@ -20,6 +22,8 @@ public class SAP6Communicator implements Communicator {
 
     private final SurveyManager datamanager;
     private boolean _isConnected = false;
+
+    private final ReconnectionPolicy reconnectionPolicy;
 
     private static final int START_CALIBRATION_ID = View.generateViewId();
     private static final int STOP_CALIBRATION_ID = View.generateViewId();
@@ -44,6 +48,8 @@ public class SAP6Communicator implements Communicator {
         this.caveBLE =
                 new CaveBLE(bluetoothDevice, activity, this::legCallback, this::statusCallback);
         this.datamanager = activity.getSurveyManager();
+        this.reconnectionPolicy =
+                new ReconnectionPolicy(Instrument.describe(bluetoothDevice), this::requestConnect);
     }
 
     @Override
@@ -53,12 +59,19 @@ public class SAP6Communicator implements Communicator {
 
     @Override
     public void requestConnect() {
+        reconnectionPolicy.noteUserRequestedConnect();
         caveBLE.connect();
     }
 
     @Override
     public void requestDisconnect() {
+        reconnectionPolicy.noteUserRequestedDisconnect();
         caveBLE.disconnect();
+    }
+
+    @Override
+    public void forceStop() {
+        reconnectionPolicy.cancel();
     }
 
     @Override
@@ -102,16 +115,25 @@ public class SAP6Communicator implements Communicator {
             case CaveBLE.CONNECTED:
                 _isConnected = true;
                 Log.device("Connected");
+                activity.runOnUiThread(reconnectionPolicy::noteReady);
                 break;
             case CaveBLE.DISCONNECTED:
                 _isConnected = false;
                 Log.device("Disconnected");
-                activity.updateConnectionStatus();
+                activity.runOnUiThread(
+                        () -> {
+                            activity.updateConnectionStatus();
+                            reconnectionPolicy.onUnexpectedDisconnection();
+                        });
                 break;
             case CaveBLE.CONNECTION_FAILED:
                 _isConnected = false;
                 Log.device("Communication error: " + msg);
-                activity.updateConnectionStatus();
+                activity.runOnUiThread(
+                        () -> {
+                            activity.updateConnectionStatus();
+                            reconnectionPolicy.onUnexpectedDisconnection();
+                        });
         }
         return Unit.INSTANCE;
     }

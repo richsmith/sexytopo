@@ -1,7 +1,7 @@
 package org.hwyl.sexytopo.control.util;
 
 import org.hwyl.sexytopo.model.graph.Coord3D;
-import org.hwyl.sexytopo.model.graph.Direction;
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.survey.Leg;
@@ -25,21 +25,33 @@ public class Space3DTransformerForElevation extends Space3DTransformer {
     }
 
     protected void updateLeg(Space<Coord3D> space, Leg leg, Coord3D start) {
+        Station destination = leg.getDestination();
+        Leg projected = projectLeg(leg, destination.getExtendedElevationDirection());
 
-        Leg adjustedLeg;
-        if (leg.getDestination().getExtendedElevationDirection() == Direction.LEFT) {
-            adjustedLeg = leg.adjustAzimuth(180);
-        } else {
-            adjustedLeg = leg.adjustAzimuth(0);
-        }
+        Coord3D end = Space3DUtils.toCartesian(start, projected);
+        space.addLeg(leg, new Line<>(start, end));
 
-        float delta = adjustedLeg.getAzimuth() - leg.getAzimuth();
+        float rotation = projected.getAzimuth() - leg.getAzimuth();
+        update(space, destination, end, rotation);
+    }
 
-        Coord3D end = Space3DUtils.toCartesian(start, adjustedLeg);
-        Line<Coord3D> line = new Line<>(start, end);
-        space.addLeg(leg, line);
-        if (leg.hasDestination()) {
-            update(space, leg.getDestination(), end, delta);
+    /**
+     * A leg as it is drawn in the extended elevation, which unrolls the cave onto a single plane so
+     * that one dimension can be dropped. The section is laid out along the y axis and x is
+     * discarded, so a leg's real bearing is replaced by whichever one puts its horizontal run where
+     * this direction wants it: north to run rightwards, south to run leftwards, and east to run
+     * into the page, which leaves only the height change visible.
+     */
+    private static Leg projectLeg(Leg leg, ExtendedElevationDirection direction) {
+        switch (direction) {
+            case RIGHT:
+                return leg.adjustAzimuth(0);
+            case LEFT:
+                return leg.adjustAzimuth(180);
+            case VERTICAL:
+                return leg.adjustAzimuth(90);
+            default:
+                throw new IllegalStateException("Unhandled direction: " + direction);
         }
     }
 
