@@ -146,6 +146,13 @@
     <!-- Import / Export -->
     <string name="import_successful">"Import zakończony (jeszcze nie zapisano)"</string>
     <string name="import_failed">Import nie powiódł się</string>
+    <string name="import_espec_name_mismatch">Nie znaleziono pasującego pliku .espec dla tego .svx — używam %1$s mimo to</string>
+    <string name="import_no_files_found">Nie znaleziono plików Survex ani Therion w tym folderze</string>
+    <string name="import_choose_format">Znaleziono wiele formatów — wybierz format do importu</string>
+    <string name="import_choose_svx_file">Znaleziono wiele plików .svx — wybierz plik do importu</string>
+    <string name="import_choose_th_file">Znaleziono wiele plików .th — wybierz plik do importu</string>
+    <string name="import_choose_espec">Nie znaleziono pasującego pliku .espec — wybierz jeden lub pomiń</string>
+    <string name="import_espec_none">Żaden — rozciągnij wszystko w prawo</string>
     <string name="export_select_type">Wybierz format eksportu</string>
     <string name="export_successful">Eksport zakończony</string>
     <string name="export_failed">Eksport nie powiódł się</string>
