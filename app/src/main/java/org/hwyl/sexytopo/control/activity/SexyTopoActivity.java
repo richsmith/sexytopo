@@ -60,7 +60,11 @@ import org.hwyl.sexytopo.control.io.SurveyDirectory;
 import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.control.io.basic.Saver;
 import org.hwyl.sexytopo.control.io.share.SurveyZipSharer;
+import org.hwyl.sexytopo.control.io.thirdparty.survex.EspecParser;
+import org.hwyl.sexytopo.control.io.thirdparty.survex.EspecResolution;
+import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexImporter;
 import org.hwyl.sexytopo.control.io.translation.Exporter;
+import org.hwyl.sexytopo.control.io.translation.FolderImporter;
 import org.hwyl.sexytopo.control.io.translation.ImportManager;
 import org.hwyl.sexytopo.control.io.translation.SelectableExporters;
 import org.hwyl.sexytopo.control.table.LegDialogs;
@@ -313,10 +317,10 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             confirmToProceedIfNotSaved("requestRestoreAutosave");
             return true;
         } else if (itemId == R.id.action_file_import_file) {
-            confirmToProceedIfNotSaved("requestImportSurveyFile");
+            confirmToProceedIfNotSaved("requestImportSurvex");
             return true;
         } else if (itemId == R.id.action_file_import_directory) {
-            confirmToProceedIfNotSaved("requestImportSurveyDirectory");
+            confirmToProceedIfNotSaved("requestImportTherion");
             return true;
         } else if (itemId == R.id.action_file_export) {
             confirmToProceedIfNotSaved("requestExportSurvey");
@@ -453,17 +457,17 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
     @SuppressLint("UnusedDeclaration") // called through Reflection
-    public void requestImportSurveyFile() {
-        selectFile(
-                SexyTopoConstants.REQUEST_CODE_IMPORT_SURVEY_FILE,
+    public void requestImportSurvex() {
+        selectDirectory(
+                SexyTopoConstants.REQUEST_CODE_IMPORT_SURVEX,
                 StartLocation.TOP_LEVEL,
                 R.string.file_intent_import_select_source);
     }
 
     @SuppressLint("UnusedDeclaration") // called through Reflection
-    public void requestImportSurveyDirectory() {
+    public void requestImportTherion() {
         selectDirectory(
-                SexyTopoConstants.REQUEST_CODE_IMPORT_SURVEY_DIRECTORY,
+                SexyTopoConstants.REQUEST_CODE_IMPORT_THERION,
                 StartLocation.TOP_LEVEL,
                 R.string.file_intent_import_select_source);
     }
@@ -851,14 +855,14 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 deleteSurvey(toDelete);
                 break;
 
-            case SexyTopoConstants.REQUEST_CODE_IMPORT_SURVEY_FILE:
-                DocumentFile importFile = DocumentFile.fromSingleUri(this, uri);
-                importSurvey(importFile);
+            case SexyTopoConstants.REQUEST_CODE_IMPORT_SURVEX:
+                DocumentFile importFile = DocumentFile.fromTreeUri(this, uri);
+                importFromDirectory(importFile);
                 break;
 
-            case SexyTopoConstants.REQUEST_CODE_IMPORT_SURVEY_DIRECTORY:
+            case SexyTopoConstants.REQUEST_CODE_IMPORT_THERION:
                 DocumentFile importDir = DocumentFile.fromTreeUri(this, uri);
-                importSurvey(importDir);
+                importFromDirectory(importDir);
                 break;
 
             case SexyTopoConstants.REQUEST_CODE_SELECT_SURVEY_TO_LINK:
@@ -1029,13 +1033,145 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         showSimpleToast(R.string.file_autosave_restored);
     }
 
-    protected void importSurvey(DocumentFile file) {
+    protected void importFromDirectory(DocumentFile directory) {
+        List<FolderImporter> folderImporters = ImportManager.getFolderImporters(directory);
+
+        if (folderImporters.isEmpty()) {
+            showExceptionAndLog(
+                    R.string.import_failed,
+                    new IllegalArgumentException(getString(R.string.import_no_files_found)));
+            return;
+        }
+
+        if (folderImporters.size() > 1) {
+            showFormatChoiceDialog(folderImporters, directory);
+        } else {
+            proceedWithFolderImporter(folderImporters.get(0), directory);
+        }
+    }
+
+    private void showFormatChoiceDialog(List<FolderImporter> importers, DocumentFile directory) {
+        String[] labels = new String[importers.size()];
+        for (int i = 0; i < importers.size(); i++) {
+            labels[i] = importers.get(i).getClass().getSimpleName().replace("Importer", "");
+        }
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.import_choose_format)
+                .setItems(
+                        labels,
+                        (dialog, which) ->
+                                proceedWithFolderImporter(importers.get(which), directory))
+                .show();
+    }
+
+    private void proceedWithFolderImporter(FolderImporter importer, DocumentFile directory) {
+        List<DocumentFile> candidates = importer.getCandidateFiles(directory);
+
+        if (candidates.size() == 1) {
+            proceedWithChosenFile(importer, candidates.get(0), directory);
+        } else {
+            showFileChoiceDialog(importer, candidates, directory);
+        }
+    }
+
+    private void showFileChoiceDialog(
+            FolderImporter importer, List<DocumentFile> candidates, DocumentFile directory) {
+        String[] names = new String[candidates.size()];
+        for (int i = 0; i < candidates.size(); i++) {
+            names[i] = candidates.get(i).getName();
+        }
+        int titleRes =
+                importer instanceof SurvexImporter
+                        ? R.string.import_choose_svx_file
+                        : R.string.import_choose_th_file;
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(titleRes)
+                .setItems(
+                        names,
+                        (dialog, which) ->
+                                proceedWithChosenFile(importer, candidates.get(which), directory))
+                .show();
+    }
+
+    private void proceedWithChosenFile(
+            FolderImporter importer, DocumentFile chosenFile, DocumentFile directory) {
+        if (importer instanceof SurvexImporter) {
+            proceedWithSvxFile((SurvexImporter) importer, chosenFile, directory);
+        } else {
+            finishTherionImport(importer, chosenFile, directory);
+        }
+    }
+
+    private void proceedWithSvxFile(
+            SurvexImporter importer, DocumentFile svxFile, DocumentFile directory) {
+        EspecResolution resolution = SurvexImporter.resolveEspec(svxFile, directory);
+
+        if (resolution.isMatched()) {
+            // Name-matched .espec — use silently
+            finishSvxImport(importer, svxFile, directory, resolution.getMatchedFile());
+        } else if (resolution.getOtherEspecFiles().isEmpty()) {
+            // No .espec files at all — import all RIGHT silently
+            finishSvxImport(importer, svxFile, directory, null);
+        } else if (resolution.getOtherEspecFiles().size() == 1
+                && importer.getCandidateFiles(directory).size() == 1) {
+            // One .svx and one .espec but names don't match — warn and use it
+            String especName = resolution.getOtherEspecFiles().get(0).getName();
+            showSimpleToast(getString(R.string.import_espec_name_mismatch, especName));
+            finishSvxImport(importer, svxFile, directory, resolution.getOtherEspecFiles().get(0));
+        } else {
+            // Multiple .espec files or ambiguous — let user choose
+            showEspecChoiceDialog(importer, svxFile, directory, resolution.getOtherEspecFiles());
+        }
+    }
+
+    private void showEspecChoiceDialog(
+            SurvexImporter importer,
+            DocumentFile svxFile,
+            DocumentFile directory,
+            List<DocumentFile> especFiles) {
+        String[] items = new String[especFiles.size() + 1];
+        for (int i = 0; i < especFiles.size(); i++) {
+            items[i] = especFiles.get(i).getName();
+        }
+        items[especFiles.size()] = getString(R.string.import_espec_none);
+
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.import_choose_espec)
+                .setItems(
+                        items,
+                        (dialog, which) -> {
+                            DocumentFile chosen =
+                                    which < especFiles.size() ? especFiles.get(which) : null;
+                            finishSvxImport(importer, svxFile, directory, chosen);
+                        })
+                .show();
+    }
+
+    private void finishSvxImport(
+            SurvexImporter importer,
+            DocumentFile svxFile,
+            DocumentFile directory,
+            DocumentFile especFile) {
         try {
-            Survey survey = ImportManager.toSurvey(this, file);
+            Survey survey = importer.toSurvey(this, svxFile, directory);
+            if (especFile != null) {
+                EspecParser.applyEspec(this, especFile, survey);
+            }
             survey.checkSurveyIntegrity();
             getSurveyManager().setCurrentSurvey(survey);
             showSimpleToast(R.string.import_successful);
+        } catch (Exception exception) {
+            showExceptionAndLog(R.string.import_failed, exception);
+        }
+    }
 
+    private void finishTherionImport(
+            FolderImporter importer, DocumentFile chosenFile, DocumentFile directory) {
+        try {
+            Survey survey = importer.toSurvey(this, chosenFile, directory);
+            survey.checkSurveyIntegrity();
+            getSurveyManager().setCurrentSurvey(survey);
+            showSimpleToast(R.string.import_successful);
         } catch (Exception exception) {
             showExceptionAndLog(R.string.import_failed, exception);
         }

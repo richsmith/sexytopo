@@ -70,8 +70,8 @@
     <string name="action_file_share">Partager…</string>
     <string name="action_file_restore_autosave">Restaurer la sauvegarde automatique</string>
     <string name="action_file_exit">Quitter SexyTopo</string>
-    <string name="action_file_import_file">Importer un fichier…</string>
-    <string name="action_file_import_directory">Importer un dossier…</string>
+    <string name="action_file_import_survex">Import Survex…</string>
+    <string name="action_file_import_therion">Import Therion…</string>
     <string name="action_input">Mode d\'entrée des données</string>
     <string name="action_input_mode_forward">Avant</string>
     <string name="action_input_mode_backward">Rétroviseur</string>
@@ -146,6 +146,13 @@
     <!-- Import / Export -->
     <string name="import_successful">"Importation terminée (pas encore sauvegardée)"</string>
     <string name="import_failed">Échec de l\'importation</string>
+    <string name="import_espec_name_mismatch">Aucun .espec correspondant trouvé pour ce .svx — utilisation de %1$s quand même</string>
+    <string name="import_no_files_found">Aucun fichier Survex ou Therion trouvé dans ce dossier</string>
+    <string name="import_choose_format">Plusieurs formats trouvés — choisir le format à importer</string>
+    <string name="import_choose_svx_file">Plusieurs fichiers .svx trouvés — choisir le fichier à importer</string>
+    <string name="import_choose_th_file">Plusieurs fichiers .th trouvés — choisir le fichier à importer</string>
+    <string name="import_choose_espec">Aucun .espec correspondant trouvé — en choisir un ou ignorer</string>
+    <string name="import_espec_none">Aucun — tout étendre vers la droite</string>
     <string name="export_select_type">Sélectionner le format d\'exportation</string>
     <string name="export_successful">Exportation réussie</string>
     <string name="export_failed">Échec de l\'exportation</string>

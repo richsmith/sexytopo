@@ -5,6 +5,7 @@ import java.util.Collections;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -243,6 +244,255 @@ public class SurvexExporterTest {
         String content = survexExporter.getContent(survey);
 
         Assert.assertFalse(content.contains("*copyright"));
+    }
+
+    @Test
+    public void testGetContentDoesNotContainExtendCommands() {
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+
+        String content = survexExporter.getContent(survey);
+
+        Assert.assertFalse("*extend must not appear in .svx content", content.contains("*extend"));
+    }
+
+    @Test
+    public void testGetContentDoesNotContainExtendCommandsWhenDirectionChanges() {
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        // Flip the active station to LEFT so there is a real direction change to emit
+        survey.getActiveStation().setExtendedElevationDirection(ExtendedElevationDirection.LEFT);
+
+        String content = survexExporter.getContent(survey);
+
+        Assert.assertFalse(
+                "*extend must not appear in .svx content even when directions change",
+                content.contains("*extend"));
+    }
+
+    @Test
+    public void testGetEspecContentContainsExtendStart() {
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        String originName = survey.getOrigin().getName();
+
+        String espec = survexExporter.getEspecContent(survey);
+
+        Assert.assertTrue(
+                "espec must contain '*start' for the origin station",
+                espec.contains("*start " + originName));
+    }
+
+    @Test
+    public void testGetEspecContentContainsExtendLeftWhenStationSetToLeft() {
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        // Origin defaults to RIGHT; set the active (last) station to LEFT to trigger a change
+        Station changedStation = survey.getActiveStation();
+        changedStation.setExtendedElevationDirection(ExtendedElevationDirection.LEFT);
+
+        String espec = survexExporter.getEspecContent(survey);
+
+        Assert.assertTrue(
+                "espec must contain '*eleft' for a station whose direction changed to left",
+                espec.contains("*eleft " + changedStation.getName()));
+    }
+
+    @Test
+    public void testGetEspecContentContainsExtendRightWhenStationSetToRight() {
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        // Set stations 2 and 3 to LEFT so the direction change back to RIGHT occurs at station 4
+        Station intermediate = survey.getOrigin().getConnectedOnwardLegs().get(0).getDestination();
+        intermediate.setExtendedElevationDirection(ExtendedElevationDirection.LEFT);
+        Station intermediate2 = intermediate.getConnectedOnwardLegs().get(0).getDestination();
+        intermediate2.setExtendedElevationDirection(ExtendedElevationDirection.LEFT);
+        // The active (last) station should remain RIGHT (the default), producing an eright command
+        Station lastStation = survey.getActiveStation();
+        lastStation.setExtendedElevationDirection(ExtendedElevationDirection.RIGHT);
+
+        String espec = survexExporter.getEspecContent(survey);
+
+        Assert.assertTrue(
+                "espec must contain '*eright' for a station whose direction changed back to right",
+                espec.contains("*eright " + lastStation.getName()));
+    }
+
+    @Test
+    public void testGetEspecContentOmitsStationsWithUnchangedDirection() {
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        // Leave all stations at the default RIGHT — only the origin start command should appear
+        String originName = survey.getOrigin().getName();
+
+        String espec = survexExporter.getEspecContent(survey);
+
+        Assert.assertTrue(espec.contains("*start " + originName));
+        Assert.assertFalse(
+                "espec must not emit stations whose direction has not changed",
+                espec.contains("*eleft") || espec.contains("*eright"));
+    }
+
+    @Test
+    public void testGetEspecContentCommentsOutVerticalStation() {
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Station verticalStation = survey.getActiveStation();
+        verticalStation.setExtendedElevationDirection(ExtendedElevationDirection.VERTICAL);
+
+        String espec = survexExporter.getEspecContent(survey);
+
+        Assert.assertTrue(
+                "espec must comment out the vertical line rather than emitting it as a command",
+                espec.contains("; *evertical"));
+        Assert.assertFalse(
+                "espec must not emit an uncommented *evertical command",
+                espec.contains("*evertical") && !espec.contains("; *evertical"));
+    }
+
+    @Test
+    public void testGetEspecContentVerticalLineContainsBothStationNames() {
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        // station 3 is the immediate predecessor of station 4 (active/last) in the traversal
+        Station intermediate = survey.getOrigin().getConnectedOnwardLegs().get(0).getDestination();
+        Station fromStation = intermediate.getConnectedOnwardLegs().get(0).getDestination();
+        Station toStation = survey.getActiveStation();
+        toStation.setExtendedElevationDirection(ExtendedElevationDirection.VERTICAL);
+
+        String espec = survexExporter.getEspecContent(survey);
+
+        Assert.assertTrue(
+                "commented vertical line must contain the from station name",
+                espec.contains(fromStation.getName()));
+        Assert.assertTrue(
+                "commented vertical line must contain the to station name",
+                espec.contains(toStation.getName()));
+    }
+
+    @Test
+    public void testGetEspecContentVerticalDoesNotChangeInheritedDirection() {
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        // Set station 2 to LEFT, station 3 to VERTICAL, station 4 stays RIGHT (default).
+        // After VERTICAL the inherited direction reverts to LEFT (station 2's direction),
+        // so the change back to RIGHT at station 4 should still produce *eright.
+        Station station2 = survey.getOrigin().getConnectedOnwardLegs().get(0).getDestination();
+        station2.setExtendedElevationDirection(ExtendedElevationDirection.LEFT);
+        Station station3 = station2.getConnectedOnwardLegs().get(0).getDestination();
+        station3.setExtendedElevationDirection(ExtendedElevationDirection.VERTICAL);
+        Station station4 = survey.getActiveStation();
+        // station4 remains RIGHT (default)
+
+        String espec = survexExporter.getEspecContent(survey);
+
+        Assert.assertTrue(
+                "direction after VERTICAL must revert to pre-vertical direction,"
+                        + " so RIGHT at station 4 must produce *eright",
+                espec.contains("*eright " + station4.getName()));
+    }
+
+    @Test
+    public void testEspecFileExtensionConstant() {
+        Assert.assertEquals("espec", SurvexExporter.ESPEC_EXTENSION);
+    }
+
+    @Test
+    public void testEspecMimeTypeIsOctetStream() {
+        // application/octet-stream prevents Android from appending a .txt suffix
+        Assert.assertEquals("application/octet-stream", SurvexExporter.ESPEC_MIME_TYPE);
+    }
+
+    // -------------------------------------------------------------------------
+    // isEspecContentMeaningful — direct unit tests
+    // -------------------------------------------------------------------------
+
+    @Test
+    public void testIsEspecContentMeaningfulReturnsFalseForStartOnly() {
+        Assert.assertFalse(SurvexExporter.isEspecContentMeaningful("*start 1\n"));
+    }
+
+    @Test
+    public void testIsEspecContentMeaningfulReturnsFalseForStartOnlyWithBlankLines() {
+        Assert.assertFalse(SurvexExporter.isEspecContentMeaningful("\n*start 1\n\n"));
+    }
+
+    @Test
+    public void testIsEspecContentMeaningfulReturnsTrueWhenEleftPresent() {
+        Assert.assertTrue(SurvexExporter.isEspecContentMeaningful("*start 1\n*eleft 2\n"));
+    }
+
+    @Test
+    public void testIsEspecContentMeaningfulReturnsTrueWhenErightPresent() {
+        Assert.assertTrue(SurvexExporter.isEspecContentMeaningful("*start 1\n*eright 2\n"));
+    }
+
+    @Test
+    public void testIsEspecContentMeaningfulReturnsTrueWhenCommentedVerticalPresent() {
+        // Commented vertical lines count as meaningful — they carry information even though
+        // the Survex extend tool cannot process them directly.
+        Assert.assertTrue(SurvexExporter.isEspecContentMeaningful("*start 1\n; *evertical 2 3\n"));
+    }
+
+    // -------------------------------------------------------------------------
+    // isEspecContentMeaningful — via getEspecContent on real surveys
+    // -------------------------------------------------------------------------
+
+    @Test
+    public void testEspecNotMeaningfulWhenAllStationsRight() {
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        // All stations at default RIGHT — espec should not be written
+
+        String espec = survexExporter.getEspecContent(survey);
+
+        Assert.assertFalse(
+                "all-right survey must produce non-meaningful espec content",
+                SurvexExporter.isEspecContentMeaningful(espec));
+    }
+
+    @Test
+    public void testEspecMeaningfulWhenStationIsLeft() {
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        survey.getActiveStation().setExtendedElevationDirection(ExtendedElevationDirection.LEFT);
+
+        String espec = survexExporter.getEspecContent(survey);
+
+        Assert.assertTrue(
+                "survey with a LEFT station must produce meaningful espec content",
+                SurvexExporter.isEspecContentMeaningful(espec));
+    }
+
+    @Test
+    public void testEspecMeaningfulWhenStationChangesBackToRight() {
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Station intermediate = survey.getOrigin().getConnectedOnwardLegs().get(0).getDestination();
+        intermediate.setExtendedElevationDirection(ExtendedElevationDirection.LEFT);
+        Station intermediate2 = intermediate.getConnectedOnwardLegs().get(0).getDestination();
+        intermediate2.setExtendedElevationDirection(ExtendedElevationDirection.LEFT);
+        survey.getActiveStation().setExtendedElevationDirection(ExtendedElevationDirection.RIGHT);
+
+        String espec = survexExporter.getEspecContent(survey);
+
+        Assert.assertTrue(
+                "survey with direction change back to RIGHT must produce meaningful espec content",
+                SurvexExporter.isEspecContentMeaningful(espec));
+    }
+
+    @Test
+    public void testEspecMeaningfulWhenStationIsVertical() {
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        survey.getActiveStation()
+                .setExtendedElevationDirection(ExtendedElevationDirection.VERTICAL);
+
+        String espec = survexExporter.getEspecContent(survey);
+
+        Assert.assertTrue(
+                "survey with a VERTICAL station must produce meaningful espec content",
+                SurvexExporter.isEspecContentMeaningful(espec));
     }
 
     private static Trip.TeamEntry entry(String name, Trip.Role... roles) {

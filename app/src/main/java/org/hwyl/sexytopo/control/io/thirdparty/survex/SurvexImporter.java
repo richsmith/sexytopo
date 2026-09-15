@@ -5,20 +5,34 @@ import androidx.documentfile.provider.DocumentFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.io.FilenameUtils;
 import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SexyTopoVersion;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionImporter;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
-import org.hwyl.sexytopo.control.io.translation.Importer;
+import org.hwyl.sexytopo.control.io.translation.FolderImporter;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
 
-public class SurvexImporter extends Importer {
+public class SurvexImporter extends FolderImporter {
 
-    public Survey toSurvey(Context context, DocumentFile file) throws Exception {
+    @Override
+    public List<DocumentFile> getCandidateFiles(DocumentFile directory) {
+        List<DocumentFile> candidates = new ArrayList<>();
+        for (DocumentFile file : directory.listFiles()) {
+            if (file.isFile() && file.getName() != null && file.getName().endsWith(".svx")) {
+                candidates.add(file);
+            }
+        }
+        return candidates;
+    }
+
+    @Override
+    public Survey toSurvey(Context context, DocumentFile svxFile, DocumentFile directory)
+            throws Exception {
         Survey survey = new Survey();
-        String text = IoUtils.slurpFile(context, file);
+        String text = IoUtils.slurpFile(context, svxFile);
 
         // Determine import mode based on the SexyTopo version that wrote the file.
         // Files with no version header (third-party) or written by 1.11.3+ use the new
@@ -49,9 +63,28 @@ public class SurvexImporter extends Importer {
         return survey;
     }
 
-    @Override
-    public boolean canHandleFile(DocumentFile file) {
-        return file.getName().endsWith(".svx");
+    /**
+     * Finds the matching .espec file for the given .svx file within the directory. Returns the
+     * name-matched .espec if one exists, otherwise returns all .espec files found (may be empty).
+     */
+    public static EspecResolution resolveEspec(DocumentFile svxFile, DocumentFile directory) {
+        String svxBaseName = FilenameUtils.removeExtension(svxFile.getName());
+        List<DocumentFile> allEspecFiles = new ArrayList<>();
+
+        for (DocumentFile file : directory.listFiles()) {
+            if (file.isFile() && file.getName() != null && file.getName().endsWith(".espec")) {
+                allEspecFiles.add(file);
+            }
+        }
+
+        for (DocumentFile especFile : allEspecFiles) {
+            String especBaseName = FilenameUtils.removeExtension(especFile.getName());
+            if (especBaseName.equals(svxBaseName)) {
+                return EspecResolution.matched(especFile);
+            }
+        }
+
+        return EspecResolution.unmatched(allEspecFiles);
     }
 
     private static String extractNormalDataBlock(String text, SurveyFormat format) {
