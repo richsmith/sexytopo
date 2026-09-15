@@ -70,8 +70,8 @@
     <string name="action_file_share">Condividi…</string>
     <string name="action_file_restore_autosave">Ripristina Salvataggio Automatico</string>
     <string name="action_file_exit">Esci da SexyTopo</string>
-    <string name="action_file_import_file">Importa File…</string>
-    <string name="action_file_import_directory">Importa Cartella…</string>
+    <string name="action_file_import_survex">Import Survex…</string>
+    <string name="action_file_import_therion">Import Therion…</string>
     <string name="action_input">Modalità di Inserimento</string>
     <string name="action_input_mode_forward">Avanti</string>
     <string name="action_input_mode_backward">Controvisuale</string>

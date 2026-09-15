@@ -70,8 +70,8 @@
     <string name="action_file_share">Teilen…</string>
     <string name="action_file_restore_autosave">Automatische Sicherung wiederherstellen</string>
     <string name="action_file_exit">SexyTopo Verlassen</string>
-    <string name="action_file_import_file">Datei Importieren…</string>
-    <string name="action_file_import_directory">Ordner Importieren…</string>
+    <string name="action_file_import_survex">Import Survex…</string>
+    <string name="action_file_import_therion">Import Therion…</string>
     <string name="action_input">Eingabe-Modus</string>
     <string name="action_input_mode_forward">Vorwärts</string>
     <string name="action_input_mode_backward">Rückblick</string>

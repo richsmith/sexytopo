@@ -1,0 +1,112 @@
+package org.hwyl.sexytopo.control.io.thirdparty.survex;
+
+import android.content.Context;
+import androidx.documentfile.provider.DocumentFile;
+import org.hwyl.sexytopo.control.Log;
+import org.hwyl.sexytopo.control.io.IoUtils;
+import org.hwyl.sexytopo.control.util.SurveyUpdater;
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
+import org.hwyl.sexytopo.model.survey.Station;
+import org.hwyl.sexytopo.model.survey.Survey;
+
+/** Parses a Survex extended elevation specification (.espec) file and applies it to a survey. */
+public class EspecParser {
+
+    static final String START_COMMAND = "*start";
+    static final String ELEFT_COMMAND = "*eleft";
+    static final String ERIGHT_COMMAND = "*eright";
+    // *evertical is commented out in the .espec because Survex's extend tool does not yet support
+    // it — but we parse it on import so the information is preserved in the survey model.
+    static final String EVERTICAL_COMMENT_PREFIX = "; *evertical";
+    static final String EVERTICAL_COMMAND = "*evertical";
+
+    private EspecParser() {}
+
+    /**
+     * Reads the given .espec file and applies the extend directions to the survey. Stations not
+     * mentioned in the file remain at their default direction (RIGHT).
+     */
+    public static void applyEspec(Context context, DocumentFile especFile, Survey survey)
+            throws Exception {
+        String text = IoUtils.slurpFile(context, especFile);
+        applyEspecText(text, survey);
+    }
+
+    /**
+     * Parses the given .espec text and applies the extend directions to the survey. Exposed as a
+     * separate method to allow testing without Android file I/O.
+     */
+    static void applyEspecText(String text, Survey survey) {
+        try {
+            for (String line : text.split("\n")) {
+                String trimmed = line.trim();
+                if (trimmed.isEmpty()) {
+                    continue;
+                }
+
+                // Only un-comment *evertical lines — these were deliberately commented out
+                // because Survex's extend tool doesn't support them yet, but we preserve the
+                // information on import. All other commented lines remain skipped.
+                if (trimmed.startsWith(";")) {
+                    if (trimmed.startsWith(EVERTICAL_COMMENT_PREFIX)) {
+                        trimmed = trimmed.substring(2).trim();
+                    } else {
+                        continue;
+                    }
+                }
+
+                String[] tokens = trimmed.split("\\s+");
+                String command = tokens[0].toLowerCase();
+
+                if (command.equals(START_COMMAND)) {
+                    continue;
+                }
+
+                if (command.equals(EVERTICAL_COMMAND)) {
+                    // Two-station form: *evertical <from> <to>
+                    // VERTICAL applies only to the destination station — does not propagate.
+                    if (tokens.length != 3) {
+                        Log.e("espec: skipping malformed evertical line: " + trimmed);
+                        continue;
+                    }
+                    String toStationName = tokens[2];
+                    Station toStation = survey.getStationByName(toStationName);
+                    if (toStation == null) {
+                        Log.e("espec: station not found: " + toStationName);
+                        continue;
+                    }
+                    SurveyUpdater.setExtendedElevationDirection(
+                            survey, toStation, ExtendedElevationDirection.VERTICAL);
+                    continue;
+                }
+
+                // Single-station form: *eleft/*eright <station> — propagates down subtree.
+                if (tokens.length != 2) {
+                    Log.e("espec: skipping malformed line: " + trimmed);
+                    continue;
+                }
+                String stationName = tokens[1];
+
+                ExtendedElevationDirection direction;
+                if (command.equals(ELEFT_COMMAND)) {
+                    direction = ExtendedElevationDirection.LEFT;
+                } else if (command.equals(ERIGHT_COMMAND)) {
+                    direction = ExtendedElevationDirection.RIGHT;
+                } else {
+                    Log.e("espec: unknown command: " + command);
+                    continue;
+                }
+
+                Station station = survey.getStationByName(stationName);
+                if (station == null) {
+                    Log.e("espec: station not found: " + stationName);
+                    continue;
+                }
+
+                SurveyUpdater.setExtendedElevationDirectionOfSubtree(station, direction);
+            }
+        } catch (Exception exception) {
+            Log.e("corrupted espec file: " + exception);
+        }
+    }
+}

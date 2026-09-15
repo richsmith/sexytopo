@@ -2,6 +2,7 @@ package org.hwyl.sexytopo.control.io.translation;
 
 import android.content.Context;
 import androidx.documentfile.provider.DocumentFile;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.hwyl.sexytopo.control.io.thirdparty.pockettopo.PocketTopoImporter;
@@ -21,6 +22,20 @@ public class ImportManager {
                     new SurvexImporter(),
                     new PocketTopoImporter(),
                     new PocketTopoTxtImporter());
+
+    /**
+     * Returns all folder importers that can handle the given directory. Used by the UI to determine
+     * whether to show a format-selection dialog before a file-selection dialog.
+     */
+    public static List<FolderImporter> getFolderImporters(DocumentFile directory) {
+        List<FolderImporter> matching = new ArrayList<>();
+        for (Importer importer : IMPORTERS) {
+            if (importer instanceof FolderImporter && importer.canHandleFile(directory)) {
+                matching.add((FolderImporter) importer);
+            }
+        }
+        return matching;
+    }
 
     public static Survey toSurvey(Context context, DocumentFile file) throws Exception {
         Importer importer = chooseImporter(file);

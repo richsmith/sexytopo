@@ -70,8 +70,8 @@
     <string name="action_file_share">Udostępnij…</string>
     <string name="action_file_restore_autosave">Przywróć autozapis</string>
     <string name="action_file_exit">Wyjdź z SexyTopo</string>
-    <string name="action_file_import_file">Importuj plik…</string>
-    <string name="action_file_import_directory">Importuj folder…</string>
+    <string name="action_file_import_survex">Import Survex…</string>
+    <string name="action_file_import_therion">Import Therion…</string>
     <string name="action_input">Tryb wprowadzania</string>
     <string name="action_input_mode_forward">Do przodu</string>
     <string name="action_input_mode_backward">Do tyłu</string>
