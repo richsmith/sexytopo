@@ -398,6 +398,7 @@
     <string name="trip_licence_hint_body">Wolna licencja pozwala innym grotołazom korzystać z twojej pracy i ją rozwijać, tak jak ty możesz korzystać z ich pracy - dane, które można zweryfikować i wykorzystać ponownie, są cenniejsze i z czasem stają się lepsze, z korzyścią dla wszystkich. SexyTopo jest wolny i otwartoźródłowy z tego samego powodu.</string>
     <string name="trip_licence_hint_dismiss">Zamknij</string>
     <string name="licence_summary_gpl_3_plus">Każdy może korzystać z twojego pomiaru i go zmieniać, pod warunkiem że wszystko, co na jego podstawie opublikuje, udostępni równie swobodnie.</string>
+    <string name="licence_summary_polyform_noncommercial">Każdy może korzystać z twojego pomiaru i go zmieniać do celów niekomercyjnych, o ile zachowa dołączoną do niego twoją informację o prawach autorskich.</string>
     <string name="licence_summary_cc0">Całkowicie zrzekasz się swoich praw: każdy może wykorzystać twój pomiar do czegokolwiek, bez pytania i bez podawania autorstwa.</string>
     <string name="licence_summary_cc_by">Każdy może korzystać z twojego pomiaru i go zmieniać w dowolnym celu, o ile poda twoje autorstwo.</string>
     <string name="licence_summary_cc_by_sa">Każdy może korzystać z twojego pomiaru i go zmieniać, jeśli poda twoje autorstwo i udostępni swoją wersję na tych samych warunkach.</string>

@@ -437,6 +437,7 @@
     <string name="trip_licence_hint_body">A free licence lets other cavers use and build on your work, as you can with theirs - data that can be verified and reused is more valuable and gets better over time, for mutual benefit. SexyTopo is free and open source for the same reason.</string>
     <string name="trip_licence_hint_dismiss">Dismiss</string>
     <string name="licence_summary_gpl_3_plus">Anyone may use and adapt your survey, provided anything they publish based on it is shared just as freely.</string>
+    <string name="licence_summary_polyform_noncommercial">Anyone may use and adapt your survey for non-commercial purposes, as long as your copyright notice stays attached to it.</string>
     <string name="licence_summary_cc0">You give up your rights entirely: anyone may use your survey for anything, without asking or crediting you.</string>
     <string name="licence_summary_cc_by">Anyone may use and adapt your survey for any purpose, as long as they credit you.</string>
     <string name="licence_summary_cc_by_sa">Anyone may use and adapt your survey if they credit you and share their version on the same terms.</string>

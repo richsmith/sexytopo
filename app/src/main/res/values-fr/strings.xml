@@ -398,6 +398,7 @@
     <string name="trip_licence_hint_body">Une licence libre permet aux autres spéléologues d\'utiliser votre travail et de le prolonger, comme vous pouvez le faire avec le leur - des données vérifiables et réutilisables ont plus de valeur et s\'améliorent avec le temps, pour le bénéfice de tous. SexyTopo est libre et open source pour la même raison.</string>
     <string name="trip_licence_hint_dismiss">Masquer</string>
     <string name="licence_summary_gpl_3_plus">Chacun peut utiliser et adapter votre topographie, à condition que tout ce qui est publié à partir d\'elle soit partagé tout aussi librement.</string>
+    <string name="licence_summary_polyform_noncommercial">Chacun peut utiliser et adapter votre topographie à des fins non commerciales, à condition de conserver votre mention de copyright.</string>
     <string name="licence_summary_cc0">Vous renoncez entièrement à vos droits : chacun peut utiliser votre topographie pour tout usage, sans demander ni vous créditer.</string>
     <string name="licence_summary_cc_by">Chacun peut utiliser et adapter votre topographie à toute fin, à condition de vous créditer.</string>
     <string name="licence_summary_cc_by_sa">Chacun peut utiliser et adapter votre topographie s\'il vous crédite et partage sa version aux mêmes conditions.</string>

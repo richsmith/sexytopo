@@ -11,14 +11,15 @@ public class GeneralPreferencesLicenceTest {
     public void testDefaultNamesAreOfferedInOrder() {
         List<String> names = Licence.getDefaultNames();
 
-        Assert.assertEquals(7, names.size());
+        Assert.assertEquals(8, names.size());
         Assert.assertEquals("GPLv3.0+", names.get(0));
-        Assert.assertEquals("CC0", names.get(1));
-        Assert.assertEquals("CC BY 4.0", names.get(2));
-        Assert.assertEquals("CC BY-SA 4.0", names.get(3));
-        Assert.assertEquals("CC BY-NC 4.0", names.get(4));
-        Assert.assertEquals("CC BY-NC-SA 4.0", names.get(5));
-        Assert.assertEquals("All rights reserved", names.get(6));
+        Assert.assertEquals("PolyForm Noncommercial License 1.0.0", names.get(1));
+        Assert.assertEquals("CC0", names.get(2));
+        Assert.assertEquals("CC BY 4.0", names.get(3));
+        Assert.assertEquals("CC BY-SA 4.0", names.get(4));
+        Assert.assertEquals("CC BY-NC 4.0", names.get(5));
+        Assert.assertEquals("CC BY-NC-SA 4.0", names.get(6));
+        Assert.assertEquals("All rights reserved", names.get(7));
     }
 
     @Test

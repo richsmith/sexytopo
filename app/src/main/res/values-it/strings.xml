@@ -398,6 +398,7 @@
     <string name="trip_licence_hint_body">Una licenza libera permette ad altri speleologi di usare il tuo lavoro e di ampliarlo, come tu puoi fare con il loro: i dati che possono essere verificati e riutilizzati valgono di più e migliorano nel tempo, a vantaggio di tutti. SexyTopo è libero e open source per la stessa ragione.</string>
     <string name="trip_licence_hint_dismiss">Chiudi</string>
     <string name="licence_summary_gpl_3_plus">Chiunque può usare e adattare il tuo rilievo, purché tutto ciò che viene pubblicato sulla sua base sia condiviso con la stessa libertà.</string>
+    <string name="licence_summary_polyform_noncommercial">Chiunque può usare e adattare il tuo rilievo per scopi non commerciali, purché mantenga la tua nota di copyright.</string>
     <string name="licence_summary_cc0">Rinunci del tutto ai tuoi diritti: chiunque può usare il tuo rilievo per qualsiasi scopo, senza chiedere né citarti.</string>
     <string name="licence_summary_cc_by">Chiunque può usare e adattare il tuo rilievo per qualsiasi scopo, purché ti citi.</string>
     <string name="licence_summary_cc_by_sa">Chiunque può usare e adattare il tuo rilievo se ti cita e condivide la propria versione alle stesse condizioni.</string>
