@@ -20,6 +20,11 @@ public enum Licence {
             R.string.licence_summary_gpl_3_plus,
             "https://www.gnu.org/licenses/gpl-3.0.html",
             true),
+    POLYFORM_NONCOMMERCIAL_1_0_0(
+            "PolyForm Noncommercial License 1.0.0",
+            R.string.licence_summary_polyform_noncommercial,
+            "https://polyformproject.org/licenses/noncommercial/1.0.0",
+            true),
     CC0(
             "CC0",
             R.string.licence_summary_cc0,

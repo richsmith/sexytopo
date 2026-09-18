@@ -398,6 +398,7 @@
     <string name="trip_licence_hint_body">Eine freie Lizenz erlaubt es anderen Höhlenforschern, deine Arbeit zu nutzen und darauf aufzubauen, so wie du es mit ihrer kannst - Daten, die überprüft und weiterverwendet werden können, sind wertvoller und werden mit der Zeit besser, zum gegenseitigen Nutzen. SexyTopo ist aus demselben Grund frei und quelloffen.</string>
     <string name="trip_licence_hint_dismiss">Ausblenden</string>
     <string name="licence_summary_gpl_3_plus">Jeder darf deine Vermessung nutzen und bearbeiten, sofern alles, was darauf aufbaut und veröffentlicht wird, ebenso frei weitergegeben wird.</string>
+    <string name="licence_summary_polyform_noncommercial">Jeder darf deine Vermessung für nicht-kommerzielle Zwecke nutzen und bearbeiten, solange dein Urheberrechtsvermerk daran erhalten bleibt.</string>
     <string name="licence_summary_cc0">Du gibst deine Rechte vollständig auf: Jeder darf deine Vermessung für alles nutzen, ohne zu fragen und ohne dich zu nennen.</string>
     <string name="licence_summary_cc_by">Jeder darf deine Vermessung für jeden Zweck nutzen und bearbeiten, solange er dich als Urheber nennt.</string>
     <string name="licence_summary_cc_by_sa">Jeder darf deine Vermessung nutzen und bearbeiten, wenn er dich nennt und seine Fassung zu denselben Bedingungen weitergibt.</string>

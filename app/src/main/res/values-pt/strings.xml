@@ -398,6 +398,7 @@
     <string name="trip_licence_hint_body">Uma licença livre permite que outros espeleólogos usem o seu trabalho e o desenvolvam, tal como você pode fazer com o deles - dados que podem ser verificados e reutilizados são mais valiosos e melhoram com o tempo, em benefício mútuo. SexyTopo é livre e de código aberto pela mesma razão.</string>
     <string name="trip_licence_hint_dismiss">Dispensar</string>
     <string name="licence_summary_gpl_3_plus">Qualquer pessoa pode usar e adaptar o seu levantamento, desde que tudo o que publique com base nele seja partilhado com a mesma liberdade.</string>
+    <string name="licence_summary_polyform_noncommercial">Qualquer pessoa pode usar e adaptar o seu levantamento para fins não comerciais, desde que mantenha o seu aviso de copyright associado a ele.</string>
     <string name="licence_summary_cc0">Abdica inteiramente dos seus direitos: qualquer pessoa pode usar o seu levantamento para o que quiser, sem pedir nem o creditar.</string>
     <string name="licence_summary_cc_by">Qualquer pessoa pode usar e adaptar o seu levantamento para qualquer fim, desde que o credite.</string>
     <string name="licence_summary_cc_by_sa">Qualquer pessoa pode usar e adaptar o seu levantamento se o creditar e partilhar a sua versão nos mesmos termos.</string>
