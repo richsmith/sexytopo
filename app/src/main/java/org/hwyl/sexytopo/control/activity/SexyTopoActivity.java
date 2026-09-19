@@ -66,7 +66,6 @@ import org.hwyl.sexytopo.control.io.translation.SelectableExporters;
 import org.hwyl.sexytopo.control.table.LegDialogs;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.InputMode;
-import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.SurveyConnection;
@@ -547,7 +546,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
     private void openSurveySettingsDialog() {
-        Sketch planSketch = getSurvey().getPlanSketch();
+        Survey survey = getSurvey();
 
         TextInputLayout inputLayout =
                 DialogUtils.createStandardTextInputLayout(
@@ -556,7 +555,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         editText.setInputType(
                 android.text.InputType.TYPE_CLASS_NUMBER
                         | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        editText.setText(String.valueOf(planSketch.getCrossSectionScale()));
+        editText.setText(String.valueOf(survey.getCrossSectionScale()));
 
         new MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.settings_survey_title)
@@ -566,8 +565,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                         (dialog, which) -> {
                             try {
                                 float scale = Float.parseFloat(editText.getText().toString());
-                                planSketch.setCrossSectionScale(scale);
-                                planSketch.setSaved(false);
+                                survey.setCrossSectionScale(scale);
                             } catch (NumberFormatException e) {
                                 // ignore invalid input
                             }

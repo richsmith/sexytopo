@@ -595,12 +595,12 @@ public abstract class GraphActivity extends SurveyEditorActivity
 
     @Override
     public void onDeleteCrossSection(Station station) {
-        Sketch planSketch = getSurvey().getPlanSketch();
-        CrossSectionDetail detail = planSketch.getCrossSectionDetail(station);
+        Sketch sketch = getSketch(getSurvey());
+        CrossSectionDetail detail = sketch.getCrossSectionDetail(station);
         if (detail == null) {
             return;
         }
-        planSketch.deleteDetail(detail);
+        sketch.deleteDetail(detail);
         getSurveyManager().broadcastSurveyUpdated();
         invalidateView();
     }
@@ -612,7 +612,7 @@ public abstract class GraphActivity extends SurveyEditorActivity
 
     @Override
     public void onEditCrossSection(Station station) {
-        CrossSectionDetail detail = getSurvey().getPlanSketch().getCrossSectionDetail(station);
+        CrossSectionDetail detail = getSketch(getSurvey()).getCrossSectionDetail(station);
         if (detail == null) {
             return;
         }

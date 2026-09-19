@@ -8,6 +8,7 @@ import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
+import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -57,5 +58,47 @@ public class SketchJsonTranslaterTest {
         JSONObject json = SketchJsonTranslater.toJson(detail);
         CrossSectionDetail restored = SketchJsonTranslater.toCrossSectionDetail(survey, json);
         Assert.assertTrue(restored.getSketch().getPathDetails().isEmpty());
+    }
+
+    @Test
+    public void testElevationSketchCrossSectionsAndScaleRoundTrip() throws Exception {
+        Survey survey = new Survey();
+        Station station = survey.getOrigin();
+        Sketch elevation = survey.getElevationSketch();
+        elevation.setCrossSectionScale(2.5f);
+        elevation.addCrossSection(new CrossSection(station, 90f), new Coord2D(3, 4));
+
+        Sketch restored = roundTrip(survey, elevation);
+
+        Assert.assertEquals(2.5f, restored.getCrossSectionScale(), 0f);
+        Assert.assertEquals(1, restored.getCrossSectionDetails().size());
+        CrossSectionDetail detail = restored.getCrossSectionDetail(station);
+        Assert.assertNotNull(detail);
+        Assert.assertEquals(90f, detail.getCrossSection().getAngle(), 0f);
+        Assert.assertEquals(new Coord2D(3, 4), detail.getPosition());
+    }
+
+    @Test
+    public void testSameStationInPlanAndElevationRoundTripsIndependently() throws Exception {
+        Survey survey = new Survey();
+        Station station = survey.getOrigin();
+        survey.getPlanSketch().addCrossSection(new CrossSection(station, 10f), new Coord2D(1, 1));
+        survey.getElevationSketch()
+                .addCrossSection(new CrossSection(station, 20f), new Coord2D(9, 9));
+
+        Sketch restoredPlan = roundTrip(survey, survey.getPlanSketch());
+        Sketch restoredElevation = roundTrip(survey, survey.getElevationSketch());
+
+        CrossSectionDetail planDetail = restoredPlan.getCrossSectionDetail(station);
+        CrossSectionDetail elevationDetail = restoredElevation.getCrossSectionDetail(station);
+        Assert.assertEquals(new Coord2D(1, 1), planDetail.getPosition());
+        Assert.assertEquals(10f, planDetail.getCrossSection().getAngle(), 0f);
+        Assert.assertEquals(new Coord2D(9, 9), elevationDetail.getPosition());
+        Assert.assertEquals(20f, elevationDetail.getCrossSection().getAngle(), 0f);
+    }
+
+    private static Sketch roundTrip(Survey survey, Sketch sketch) throws Exception {
+        String text = SketchJsonTranslater.translate(sketch, survey, "test", 1);
+        return SketchJsonTranslater.translate(survey, text);
     }
 }

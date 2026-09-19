@@ -81,7 +81,8 @@ public class Loader {
 
         SurveyFile planFile = SurveyFile.SKETCH_PLAN.get(survey);
         planFile = considerSwappingForAutosave(context, planFile, restoreAutosave);
-        if (planFile.exists(context)) {
+        boolean planLoaded = planFile.exists(context);
+        if (planLoaded) {
             Log.i(R.string.file_loading_file, planFile.getFilename());
             String planText = planFile.slurp(context);
             Sketch plan = SketchJsonTranslater.translate(survey, planText);
@@ -94,6 +95,12 @@ public class Loader {
             String elevationText = elevationFile.slurp(context);
             Sketch elevation = SketchJsonTranslater.translate(survey, elevationText);
             survey.setElevationSketch(elevation);
+        }
+
+        if (planLoaded) {
+            // The cross-section scale is survey-wide and the plan sketch holds the canonical
+            // value, so make sure the elevation sketch (which may predate that) agrees with it.
+            survey.syncCrossSectionScale();
         }
     }
 

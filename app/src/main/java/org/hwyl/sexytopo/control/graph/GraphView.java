@@ -1097,6 +1097,8 @@ public class GraphView extends View {
         android.content.Intent intent =
                 new android.content.Intent(getContext(), CrossSectionActivity.class);
         intent.putExtra(CrossSectionActivity.EXTRA_STATION_NAME, station.getName());
+        Projection2D parentProjection = projectionType == null ? Projection2D.PLAN : projectionType;
+        intent.putExtra(CrossSectionActivity.EXTRA_PROJECTION, parentProjection.getAbbreviation());
         getContext().startActivity(intent);
     }
 
@@ -1318,7 +1320,7 @@ public class GraphView extends View {
         }
 
         Space<Coord2D> rawProjection = crossSection.getProjection();
-        float xsScale = survey.getPlanSketch().getCrossSectionScale();
+        float xsScale = sketch.getCrossSectionScale();
         Space<Coord2D> scaledProjection = rawProjection.scale(xsScale);
         Space<Coord2D> sectionProjection = Space2DUtils.translate(scaledProjection, centreOnSurvey);
         drawLegs(canvas, sectionProjection, alpha);
@@ -1384,7 +1386,7 @@ public class GraphView extends View {
     private void drawCrossSectionSubSketch(
             Canvas canvas, CrossSectionDetail sectionDetail, Coord2D centreOnSurvey, int alpha) {
 
-        float xsScale = survey.getPlanSketch().getCrossSectionScale();
+        float xsScale = sketch.getCrossSectionScale();
         Sketch subSketch = sectionDetail.getSketch().scale(xsScale).translate(centreOnSurvey);
         drawSketch(canvas, subSketch, alpha);
     }
@@ -1422,7 +1424,7 @@ public class GraphView extends View {
     /** Draw a rectangular border around the cross-section's full extent (legs + sub-sketch). */
     private RectF drawCrossSectionBorder(
             Canvas canvas, CrossSectionDetail sectionDetail, Coord2D dragDelta) {
-        float xsScale = survey.getPlanSketch().getCrossSectionScale();
+        float xsScale = sketch.getCrossSectionScale();
         Coord2D centre = sectionDetail.getPosition().plus(dragDelta);
         Coord2D origin = sectionDetail.getPosition();
         Coord2D scaledTopLeft =

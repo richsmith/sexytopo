@@ -2,6 +2,7 @@ package org.hwyl.sexytopo.model.sketch;
 
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.survey.Station;
+import org.hwyl.sexytopo.model.survey.Survey;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -72,5 +73,32 @@ public class SketchTest {
         sketch.redo(); // redo the create: must not leave two copies
 
         Assert.assertEquals(1, sketch.getCrossSectionDetails().size());
+    }
+
+    @Test
+    public void testSameStationCanHaveIndependentCrossSectionsInPlanAndElevation() {
+        Survey survey = new Survey();
+        Station station = survey.getOrigin();
+        Sketch plan = survey.getPlanSketch();
+        Sketch elevation = survey.getElevationSketch();
+
+        CrossSectionDetail planDetail =
+                new CrossSectionDetail(new CrossSection(station, 0f), new Coord2D(1, 2));
+        plan.addCrossSection(planDetail);
+
+        Assert.assertSame(planDetail, plan.getCrossSectionDetail(station));
+        Assert.assertNull(elevation.getCrossSectionDetail(station));
+
+        CrossSectionDetail elevationDetail =
+                new CrossSectionDetail(new CrossSection(station, 0f), new Coord2D(5, 6));
+        elevation.addCrossSection(elevationDetail);
+
+        Assert.assertSame(planDetail, plan.getCrossSectionDetail(station));
+        Assert.assertSame(elevationDetail, elevation.getCrossSectionDetail(station));
+
+        elevation.deleteDetail(elevationDetail);
+
+        Assert.assertSame(planDetail, plan.getCrossSectionDetail(station));
+        Assert.assertNull(elevation.getCrossSectionDetail(station));
     }
 }

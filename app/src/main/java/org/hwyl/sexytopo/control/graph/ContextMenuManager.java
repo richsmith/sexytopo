@@ -19,6 +19,7 @@ import java.util.Map;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
+import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -254,7 +255,9 @@ public class ContextMenuManager {
 
         // Cross-section submenu: enable/disable based on whether one exists at this station.
         if (survey != null) {
-            boolean hasCrossSection = survey.getPlanSketch().getCrossSectionDetail(station) != null;
+            Sketch sketch = viewContext.getSketch(survey);
+            boolean hasCrossSection =
+                    sketch != null && sketch.getCrossSectionDetail(station) != null;
             MenuItem createItem = menu.findItem(R.id.action_xsection_create);
             MenuItem editItem = menu.findItem(R.id.action_xsection_edit);
             MenuItem setDirectionItem = menu.findItem(R.id.action_xsection_set_direction);
