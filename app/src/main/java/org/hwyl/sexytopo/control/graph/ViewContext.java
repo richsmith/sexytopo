@@ -31,6 +31,11 @@ public enum ViewContext {
         public Sketch getSketch(Survey survey) {
             return survey.getPlanSketch();
         }
+
+        @Override
+        public boolean canRotateCrossSections() {
+            return true;
+        }
     },
     ELEVATION {
         @Override
@@ -45,6 +50,7 @@ public enum ViewContext {
         public void configureViewSpecificItems(Menu menu) {
             setItemVisible(menu, R.id.action_jump_to_elevation, false);
             setDirectionSubmenuVisible(menu, true);
+            setCrossSectionVisible(menu, true);
         }
 
         @Override
@@ -86,6 +92,15 @@ public enum ViewContext {
         return null;
     }
 
+    /**
+     * Whether the user can choose the direction a cross-section faces in this view context. In the
+     * plan a section is a vertical plane that can face any way around its station, so the user sets
+     * it. Elsewhere the direction is worked out when the section is created and stays fixed.
+     */
+    public boolean canRotateCrossSections() {
+        return false;
+    }
+
     /** Whether a station long-press in this view context should open a context menu. */
     public boolean hasStationContextMenu() {
         return true;
@@ -110,5 +125,6 @@ public enum ViewContext {
         if (crossSectionMenu != null) {
             crossSectionMenu.setVisible(visible);
         }
+        setItemVisible(menu, R.id.action_xsection_set_direction, canRotateCrossSections());
     }
 }

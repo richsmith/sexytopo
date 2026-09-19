@@ -1007,6 +1007,10 @@ public class GraphView extends View {
     }
 
     public void handleRotateCrossSection(Station station) {
+        if (!getViewContext().canRotateCrossSections()) {
+            // The direction only makes sense to set on the plan; elsewhere it is fixed.
+            return;
+        }
         CrossSectionDetail detail = sketch.getCrossSectionDetail(station);
         if (detail == null) {
             return;
@@ -1676,37 +1680,34 @@ public class GraphView extends View {
         crossSectionIndicatorPaint.setAlpha(alpha / 2);
         CrossSection crossSection = crossSectionDetail.getCrossSection();
 
-        float activeAngle =
-                crossSectionPreviewAngle == null
-                        ? crossSection.getAngle()
-                        : crossSectionPreviewAngle;
-        float angle = (float) Math.toRadians(activeAngle);
         float indicatorWidth = (1 * surveyToViewScale);
-        float startX = x - ((indicatorWidth / 2) * (float) Math.cos(angle));
-        float startY = y - ((indicatorWidth / 2) * (float) Math.sin(angle));
-        float endX = x + ((indicatorWidth / 2) * (float) Math.cos(angle));
-        float endY = y + ((indicatorWidth / 2) * (float) Math.sin(angle));
+        CrossSectionIndicator indicator;
+        if (projectionType == Projection2D.EXTENDED_ELEVATION) {
+            indicator = CrossSectionIndicator.vertical(x, y, indicatorWidth);
+        } else {
+            float activeAngle =
+                    crossSectionPreviewAngle == null
+                            ? crossSection.getAngle()
+                            : crossSectionPreviewAngle;
+            indicator = CrossSectionIndicator.atAngle(x, y, indicatorWidth, activeAngle);
+        }
 
-        canvas.drawLine(startX, startY, endX, endY, crossSectionIndicatorPaint);
+        canvas.drawLine(
+                indicator.getStartX(),
+                indicator.getStartY(),
+                indicator.getEndX(),
+                indicator.getEndY(),
+                crossSectionIndicatorPaint);
 
-        float lineLength =
-                Space2DUtils.getDistance(new Coord2D(startX, startY), new Coord2D(endX, endY));
-        float arrowLength = lineLength * 0.4f;
-        float arrowOuterCornerX = startX;
-        float arrowOuterCornerY = startY;
-        float arrowInnerCornerX = startX + ((lineLength * 0.05f) * (float) Math.cos(angle));
-        float arrowInnerCornerY = startY + ((lineLength * 0.05f) * (float) Math.sin(angle));
-        float arrowAngle = (float) Math.toRadians(Space2DUtils.adjustAngle(activeAngle, -90));
-        float arrowTipX = startX + (arrowLength * (float) Math.cos(arrowAngle));
-        float arrowTipY = startY + (arrowLength * (float) Math.sin(arrowAngle));
+        if (indicator.hasArrowhead()) {
+            Path path = new Path();
+            path.moveTo(indicator.getArrowInnerX(), indicator.getArrowInnerY());
+            path.lineTo(indicator.getArrowOuterX(), indicator.getArrowOuterY());
+            path.lineTo(indicator.getArrowTipX(), indicator.getArrowTipY());
+            path.lineTo(indicator.getArrowInnerX(), indicator.getArrowInnerY());
 
-        Path path = new Path();
-        path.moveTo(arrowInnerCornerX, arrowInnerCornerY);
-        path.lineTo(arrowOuterCornerX, arrowOuterCornerY);
-        path.lineTo(arrowTipX, arrowTipY);
-        path.lineTo(arrowInnerCornerX, arrowInnerCornerY);
-
-        canvas.drawPath(path, crossSectionIndicatorPaint);
+            canvas.drawPath(path, crossSectionIndicatorPaint);
+        }
     }
 
     private void highlightActiveStation(Canvas canvas, float x, float y) {

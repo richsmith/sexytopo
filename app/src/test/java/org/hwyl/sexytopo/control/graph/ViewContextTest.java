@@ -47,4 +47,15 @@ public class ViewContextTest {
         Assert.assertSame(detail, planSketch.getCrossSectionDetail(station));
         Assert.assertNull(elevationSketch.getCrossSectionDetail(station));
     }
+
+    @Test
+    public void testOnlyThePlanCanRotateCrossSections() {
+        Assert.assertTrue(ViewContext.PLAN.canRotateCrossSections());
+
+        Assert.assertFalse(ViewContext.EXTENDED_ELEVATION.canRotateCrossSections());
+        Assert.assertFalse(ViewContext.ELEVATION.canRotateCrossSections());
+        Assert.assertFalse(ViewContext.TABLE.canRotateCrossSections());
+        Assert.assertFalse(ViewContext.CROSS_SECTION.canRotateCrossSections());
+        Assert.assertFalse(ViewContext.THREE_D.canRotateCrossSections());
+    }
 }

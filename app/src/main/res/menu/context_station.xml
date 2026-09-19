@@ -21,7 +21,7 @@
             android:id="@+id/action_rename_station"
             android:title="@string/menu_rename_station"/>
 
-        <!-- Cross-Section sub-menu (shown only in PLAN view) -->
+        <!-- Cross-Section sub-menu (shown in PLAN and EXTENDED_ELEVATION views) -->
         <item
             android:id="@+id/menu_xsection"
             android:title="@string/menu_xsection"
