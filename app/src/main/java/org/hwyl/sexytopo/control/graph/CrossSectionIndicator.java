@@ -2,24 +2,30 @@ package org.hwyl.sexytopo.control.graph;
 
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.graph.Coord2D;
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
+import org.hwyl.sexytopo.model.sketch.CrossSection;
 
 /**
  * The little mark drawn over a station to show that it has a cross-section: a line representing the
- * plane of the section seen edge-on, optionally with a flag showing which way the section faces.
- * This holds only the geometry, in view coordinates, so that it can be worked out and tested
- * without a canvas.
+ * plane of the section seen edge-on, with a flag showing which way the section faces. This holds
+ * only the geometry, in view coordinates, so that it can be worked out and tested without a canvas.
  */
 public final class CrossSectionIndicator {
 
     private static final float ARROW_LENGTH_FRACTION = 0.4f;
     private static final float ARROW_INNER_OFFSET_FRACTION = 0.05f;
 
+    // Angles on the elevation, where the page is read like a compass rose: 0 is up the page
+    private static final float FACING_RIGHT = 90f;
+    private static final float FACING_DOWN = 180f;
+    private static final float FACING_LEFT = 270f;
+
     private final float startX;
     private final float startY;
     private final float endX;
     private final float endY;
 
-    // innerX, innerY, outerX, outerY, tipX, tipY - or null if the indicator has no arrowhead
+    // innerX, innerY, outerX, outerY, tipX, tipY
     private final float[] arrowhead;
 
     private CrossSectionIndicator(
@@ -32,9 +38,12 @@ public final class CrossSectionIndicator {
     }
 
     /**
-     * An indicator for a section facing a compass direction on a plan: a line of the given length
-     * through (x, y) running in the direction of the angle, with an arrowhead showing the side the
-     * section is viewed from.
+     * An indicator for a section facing the given angle: a line of the given length through (x, y)
+     * running across the direction the section faces, with an arrowhead at the end on the left as
+     * you look that way, pointing the way the section faces.
+     *
+     * <p>On the plan the angle is a compass bearing, with 0 up the page. On the elevation there are
+     * no bearings, but the page can be read the same way; see getElevationFacingAngle.
      */
     public static CrossSectionIndicator atAngle(
             float x, float y, float length, float angleDegrees) {
@@ -65,12 +74,21 @@ public final class CrossSectionIndicator {
     }
 
     /**
-     * An indicator for a vertical section on an elevation: a vertical line of the given length
-     * through (x, y). The plane of the section is at right angles to the page, so there is no side
-     * to point an arrowhead at.
+     * The angle to give atAngle for a cross-section on the elevation, where the page is read like a
+     * compass rose: up is 0, right is 90, down is 180 and left is 270.
+     *
+     * <p>A vertical section faces along the survey, which on the elevation is to the right or to
+     * the left. A horizontal section is looked at from above, so it faces down the page.
+     *
+     * @param surveyDirection the way the survey is heading at the section's station; VERTICAL,
+     *     which isn't a way the survey can head, is treated as the default, to the right
      */
-    public static CrossSectionIndicator vertical(float x, float y, float length) {
-        return new CrossSectionIndicator(x, y - (length / 2), x, y + (length / 2), null);
+    public static float getElevationFacingAngle(
+            CrossSection.Orientation orientation, ExtendedElevationDirection surveyDirection) {
+        if (orientation == CrossSection.Orientation.HORIZONTAL) {
+            return FACING_DOWN;
+        }
+        return surveyDirection == ExtendedElevationDirection.LEFT ? FACING_LEFT : FACING_RIGHT;
     }
 
     public float getStartX() {
@@ -87,10 +105,6 @@ public final class CrossSectionIndicator {
 
     public float getEndY() {
         return endY;
-    }
-
-    public boolean hasArrowhead() {
-        return arrowhead != null;
     }
 
     public float getArrowInnerX() {

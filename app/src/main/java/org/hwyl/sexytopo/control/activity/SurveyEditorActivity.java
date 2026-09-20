@@ -104,6 +104,11 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         // Override in activities that support adding cross-sections
     }
 
+    public void onNewHorizontalCrossSection(Station station) {
+        // Default: not applicable in some views
+        // Override in activities that support adding horizontal cross-sections
+    }
+
     public void onDeleteCrossSection(Station station) {
         // Default: not applicable in some views
     }

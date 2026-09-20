@@ -116,6 +116,7 @@
     <color name="hotCorner">@color/md_grey</color>
     <color name="hotCornerActive">@color/md_yellow</color>
     <color name="crossSectionIndicator">@color/md_dark_red</color>
+    <color name="crossSectionHorizontalBox">@color/sexyTopoPurple</color>
 
     <!-- Text Colors -->
     <color name="bodyTextColor">@color/md_grey_400</color>

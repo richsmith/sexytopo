@@ -80,9 +80,13 @@ public class CrossSectionDetail extends SinglePositionDetail {
 
     /**
      * Return a new detail at the same position and with the same sub-sketch, but a new
-     * cross-section angle (compass azimuth in degrees).
+     * cross-section angle (compass azimuth in degrees). A cross-section that can't be rotated (a
+     * horizontal one) is left as it is.
      */
     public CrossSectionDetail withAngle(float newAngle) {
+        if (!crossSection.isRotatable()) {
+            return this;
+        }
         CrossSection rotated = new CrossSection(crossSection.getStation(), newAngle);
         return new CrossSectionDetail(rotated, getPosition(), sketch);
     }

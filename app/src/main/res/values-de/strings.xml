@@ -34,6 +34,8 @@
     <string name="title_activity_plan">Grundriss</string>
     <string name="title_activity_elevation">Seitenriss</string>
     <string name="title_activity_cross_section">Querschnitt</string>
+    <string name="title_activity_cross_section_horizontal">Horizontaler Querschnitt</string>
+    <string name="title_activity_cross_section_vertical">Vertikaler Querschnitt</string>
     <string name="title_activity_calibration">Kalibrierung</string>
     <string name="title_activity_survey">Statistik</string>
     <string name="title_activity_settings">Einstellungen</string>
@@ -93,6 +95,8 @@
     <string name="action_force_crash">Absturz herbeiführen (Achtung!)</string>
     <string name="action_xsection_done">Fertig</string>
     <string name="action_xsection_cancel">Abbrechen</string>
+    <string name="xsection_orientation_north">N</string>
+    <string name="xsection_orientation_up">Oben</string>
 
     <!--  File handling  -->
     <string name="file_started_new_survey">Neue Vermessung angelegt</string>
@@ -685,6 +689,8 @@
     <string name="menu_jump_to_station_in_elevation">&#10132; Seitenriss</string>
     <string name="menu_xsection">Querschnitt</string>
     <string name="menu_xsection_create">Neuer Querschnitt</string>
+    <string name="menu_xsection_create_horizontal">Neuer horizontaler Querschnitt</string>
+    <string name="menu_xsection_create_vertical">Neuer vertikaler Querschnitt</string>
     <string name="menu_xsection_delete">Querschnitt löschen</string>
     <string name="menu_xsection_edit">Skizze bearbeiten</string>
     <string name="menu_xsection_set_direction">Richtung festlegen</string>

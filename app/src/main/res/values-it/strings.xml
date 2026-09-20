@@ -34,6 +34,8 @@
     <string name="title_activity_plan">Pianta</string>
     <string name="title_activity_elevation">Elevazione</string>
     <string name="title_activity_cross_section">Sezione</string>
+    <string name="title_activity_cross_section_horizontal">Sezione orizzontale</string>
+    <string name="title_activity_cross_section_vertical">Sezione verticale</string>
     <string name="title_activity_calibration">Calibrazione</string>
     <string name="title_activity_survey">Statistiche</string>
     <string name="title_activity_settings">Impostazioni</string>
@@ -93,6 +95,8 @@
     <string name="action_force_crash">Forza Crash (Pericolo!)</string>
     <string name="action_xsection_done">Fatto</string>
     <string name="action_xsection_cancel">Annulla</string>
+    <string name="xsection_orientation_north">N</string>
+    <string name="xsection_orientation_up">Su</string>
 
     <!-- File handling -->
     <string name="file_started_new_survey">Nuovo rilievo iniziato</string>
@@ -685,6 +689,8 @@
     <string name="menu_jump_to_station_in_elevation">&#10132; Elevazione</string>
     <string name="menu_xsection">Sezione</string>
     <string name="menu_xsection_create">Nuova sezione</string>
+    <string name="menu_xsection_create_horizontal">Nuova sezione orizzontale</string>
+    <string name="menu_xsection_create_vertical">Nuova sezione verticale</string>
     <string name="menu_xsection_delete">Elimina sezione</string>
     <string name="menu_xsection_edit">Modifica schizzo</string>
     <string name="menu_xsection_set_direction">Imposta direzione</string>

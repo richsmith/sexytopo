@@ -7,6 +7,9 @@ import android.util.AttributeSet;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Line;
+import org.hwyl.sexytopo.model.graph.Projection2D;
+import org.hwyl.sexytopo.model.sketch.CrossSection;
+import org.hwyl.sexytopo.model.survey.Leg;
 
 /**
  * Overrides parent provide a slightly more minimal editing experience for the cross-section sketch
@@ -22,8 +25,27 @@ public class CrossSectionView extends GraphView {
 
     private boolean autoFitted = false;
 
+    private CrossSection.Orientation orientation = CrossSection.Orientation.VERTICAL;
+
+    // Decides which legs count as being in the plane of the section (and so are drawn solid). A
+    // vertical section is judged by the direction of its splays across the passage; a horizontal
+    // one by how level they are.
+    private Projection2D legPlaneProjection = Projection2D.CROSS_SECTION;
+
     public CrossSectionView(Context context, AttributeSet attrs) {
         super(context, attrs);
+    }
+
+    /** Tells the view which cross-section is being edited, so it can show it appropriately. */
+    public void setCrossSection(CrossSection crossSection) {
+        this.orientation = crossSection.getOrientation();
+        this.legPlaneProjection = crossSection.getProjectionType();
+        invalidate();
+    }
+
+    @Override
+    protected boolean isLegInPlane(Leg leg) {
+        return legPlaneProjection.isLegInPlane(leg);
     }
 
     @Override
@@ -69,6 +91,8 @@ public class CrossSectionView extends GraphView {
         drawGrid(canvas);
         drawSurvey(canvas, survey, projection, SOLID_ALPHA);
         drawLegend(canvas);
+        drawArrowMarker(
+                canvas, getContext().getString(OrientationMarker.getLabelResource(orientation)), 0);
     }
 
     protected ViewContext getViewContext() {

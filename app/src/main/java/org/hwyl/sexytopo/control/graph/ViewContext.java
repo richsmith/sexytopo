@@ -57,6 +57,11 @@ public enum ViewContext {
         public Sketch getSketch(Survey survey) {
             return survey.getElevationSketch();
         }
+
+        @Override
+        public boolean canCreateHorizontalCrossSection() {
+            return true;
+        }
     },
     CROSS_SECTION {
         @Override
@@ -101,6 +106,14 @@ public enum ViewContext {
         return false;
     }
 
+    /**
+     * Whether a horizontal cross-section can be created in this view context. On the plan a
+     * horizontal slice would only repeat what the plan already shows, so it is for the elevation.
+     */
+    public boolean canCreateHorizontalCrossSection() {
+        return false;
+    }
+
     /** Whether a station long-press in this view context should open a context menu. */
     public boolean hasStationContextMenu() {
         return true;
@@ -126,5 +139,14 @@ public enum ViewContext {
             crossSectionMenu.setVisible(visible);
         }
         setItemVisible(menu, R.id.action_xsection_set_direction, canRotateCrossSections());
+        setItemVisible(
+                menu, R.id.action_xsection_create_horizontal, canCreateHorizontalCrossSection());
+        if (canCreateHorizontalCrossSection()) {
+            // With two kinds to choose from, plain "New Cross-Section" needs to say which it is
+            MenuItem createItem = menu.findItem(R.id.action_xsection_create);
+            if (createItem != null) {
+                createItem.setTitle(R.string.menu_xsection_create_vertical);
+            }
+        }
     }
 }

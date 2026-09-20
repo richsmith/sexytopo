@@ -41,6 +41,7 @@ import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.BrushColour;
 import org.hwyl.sexytopo.model.sketch.Colour;
+import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchTool;
@@ -591,6 +592,11 @@ public abstract class GraphActivity extends SurveyEditorActivity
     @Override
     public void onNewCrossSection(Station station) {
         graphView.handleNewCrossSection(station);
+    }
+
+    @Override
+    public void onNewHorizontalCrossSection(Station station) {
+        graphView.handleNewCrossSection(station, CrossSection.Orientation.HORIZONTAL);
     }
 
     @Override

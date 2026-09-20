@@ -1,5 +1,7 @@
 package org.hwyl.sexytopo.control.graph;
 
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
+import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -21,7 +23,6 @@ public class CrossSectionIndicatorTest {
     public void testAtAngleZeroPutsTheArrowheadOnTheStartEndPointingUp() {
         CrossSectionIndicator indicator = CrossSectionIndicator.atAngle(100, 50, 20, 0);
 
-        Assert.assertTrue(indicator.hasArrowhead());
         Assert.assertEquals(91, indicator.getArrowInnerX(), DELTA);
         Assert.assertEquals(50, indicator.getArrowInnerY(), DELTA);
         Assert.assertEquals(90, indicator.getArrowOuterX(), DELTA);
@@ -55,6 +56,18 @@ public class CrossSectionIndicatorTest {
     }
 
     @Test
+    public void testAtAngleTwoSeventyRunsBottomToTopWithArrowheadToTheLeft() {
+        CrossSectionIndicator indicator = CrossSectionIndicator.atAngle(100, 50, 20, 270);
+
+        Assert.assertEquals(100, indicator.getStartX(), DELTA);
+        Assert.assertEquals(60, indicator.getStartY(), DELTA);
+        Assert.assertEquals(100, indicator.getEndX(), DELTA);
+        Assert.assertEquals(40, indicator.getEndY(), DELTA);
+        Assert.assertEquals(92, indicator.getArrowTipX(), DELTA);
+        Assert.assertEquals(60, indicator.getArrowTipY(), DELTA);
+    }
+
+    @Test
     public void testAtAngleIsCentredOnThePointWhateverTheAngle() {
         CrossSectionIndicator indicator = CrossSectionIndicator.atAngle(100, 50, 20, 37.5f);
 
@@ -66,18 +79,88 @@ public class CrossSectionIndicatorTest {
         Assert.assertEquals(20, Math.sqrt(dx * dx + dy * dy), DELTA);
     }
 
-    @Test
-    public void testVerticalIsAVerticalLineCentredOnThePoint() {
-        CrossSectionIndicator indicator = CrossSectionIndicator.vertical(100, 50, 20);
+    // getElevationFacingAngle tests
 
-        Assert.assertEquals(100, indicator.getStartX(), DELTA);
-        Assert.assertEquals(40, indicator.getStartY(), DELTA);
-        Assert.assertEquals(100, indicator.getEndX(), DELTA);
-        Assert.assertEquals(60, indicator.getEndY(), DELTA);
+    @Test
+    public void testHorizontalFacesDownWhicheverWayTheSurveyIsHeading() {
+        for (ExtendedElevationDirection direction : ExtendedElevationDirection.values()) {
+            Assert.assertEquals(
+                    direction.name(),
+                    180f,
+                    CrossSectionIndicator.getElevationFacingAngle(
+                            CrossSection.Orientation.HORIZONTAL, direction),
+                    DELTA);
+        }
     }
 
     @Test
-    public void testVerticalHasNoArrowhead() {
-        Assert.assertFalse(CrossSectionIndicator.vertical(100, 50, 20).hasArrowhead());
+    public void testVerticalFacesRightWhenTheSurveyHeadsRight() {
+        Assert.assertEquals(
+                90f,
+                CrossSectionIndicator.getElevationFacingAngle(
+                        CrossSection.Orientation.VERTICAL, ExtendedElevationDirection.RIGHT),
+                DELTA);
+    }
+
+    @Test
+    public void testVerticalFacesLeftWhenTheSurveyHeadsLeft() {
+        Assert.assertEquals(
+                270f,
+                CrossSectionIndicator.getElevationFacingAngle(
+                        CrossSection.Orientation.VERTICAL, ExtendedElevationDirection.LEFT),
+                DELTA);
+    }
+
+    @Test
+    public void testVerticalFallsBackToTheDefaultIfGivenAVerticalDirection() {
+        Assert.assertEquals(
+                CrossSectionIndicator.getElevationFacingAngle(
+                        CrossSection.Orientation.VERTICAL, ExtendedElevationDirection.DEFAULT),
+                CrossSectionIndicator.getElevationFacingAngle(
+                        CrossSection.Orientation.VERTICAL, ExtendedElevationDirection.VERTICAL),
+                DELTA);
+    }
+
+    // The elevation's indicators as drawn, using the facing angle
+
+    private static CrossSectionIndicator elevationIndicator(
+            CrossSection.Orientation orientation, ExtendedElevationDirection direction) {
+        float angle = CrossSectionIndicator.getElevationFacingAngle(orientation, direction);
+        return CrossSectionIndicator.atAngle(100, 50, 20, angle);
+    }
+
+    @Test
+    public void testVerticalHeadingRightIsAVerticalLineWithTheArrowheadAtTheTopPointingRight() {
+        CrossSectionIndicator indicator =
+                elevationIndicator(
+                        CrossSection.Orientation.VERTICAL, ExtendedElevationDirection.RIGHT);
+
+        Assert.assertEquals(indicator.getStartX(), indicator.getEndX(), DELTA);
+        Assert.assertEquals(40, indicator.getStartY(), DELTA);
+        Assert.assertEquals(108, indicator.getArrowTipX(), DELTA);
+        Assert.assertEquals(40, indicator.getArrowTipY(), DELTA);
+    }
+
+    @Test
+    public void testVerticalHeadingLeftIsAVerticalLineWithTheArrowheadAtTheBottomPointingLeft() {
+        CrossSectionIndicator indicator =
+                elevationIndicator(
+                        CrossSection.Orientation.VERTICAL, ExtendedElevationDirection.LEFT);
+
+        Assert.assertEquals(indicator.getStartX(), indicator.getEndX(), DELTA);
+        Assert.assertEquals(60, indicator.getStartY(), DELTA);
+        Assert.assertEquals(92, indicator.getArrowTipX(), DELTA);
+        Assert.assertEquals(60, indicator.getArrowTipY(), DELTA);
+    }
+
+    @Test
+    public void testHorizontalIsAHorizontalLineWithTheArrowheadPointingDown() {
+        CrossSectionIndicator indicator =
+                elevationIndicator(
+                        CrossSection.Orientation.HORIZONTAL, ExtendedElevationDirection.RIGHT);
+
+        Assert.assertEquals(indicator.getStartY(), indicator.getEndY(), DELTA);
+        Assert.assertEquals(58, indicator.getArrowTipY(), DELTA);
+        Assert.assertEquals(indicator.getStartX(), indicator.getArrowTipX(), DELTA);
     }
 }

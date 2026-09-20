@@ -746,4 +746,86 @@ public class SurveyUpdaterTest {
 
         survey.checkSurveyIntegrity();
     }
+
+    // resolveOnwardExtendedElevationDirection tests
+
+    @Test
+    public void testOnwardDirectionOfAStationLeftAsDefaultIsTheDefault() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Station station2 = survey.getStationByName("2");
+
+        Assert.assertEquals(
+                ExtendedElevationDirection.DEFAULT,
+                SurveyUpdater.resolveOnwardExtendedElevationDirection(survey, station2));
+    }
+
+    @Test
+    public void testOnwardDirectionOfAStationHeadingLeftIsLeft() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Station station2 = survey.getStationByName("2");
+        Station station4 = survey.getStationByName("4");
+
+        SurveyUpdater.setExtendedElevationDirection(
+                survey, station2, ExtendedElevationDirection.LEFT);
+
+        Assert.assertEquals(
+                ExtendedElevationDirection.LEFT,
+                SurveyUpdater.resolveOnwardExtendedElevationDirection(survey, station2));
+        Assert.assertEquals(
+                ExtendedElevationDirection.LEFT,
+                SurveyUpdater.resolveOnwardExtendedElevationDirection(survey, station4));
+    }
+
+    @Test
+    public void testOnwardDirectionOfAVerticalStationIsTheDirectionTheSurveyResumes() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Station station2 = survey.getStationByName("2");
+        Station station3 = survey.getStationByName("3");
+        Station station4 = survey.getStationByName("4");
+        SurveyUpdater.setExtendedElevationDirection(
+                survey, station2, ExtendedElevationDirection.LEFT);
+
+        SurveyUpdater.setExtendedElevationDirection(
+                survey, station3, ExtendedElevationDirection.VERTICAL);
+
+        Assert.assertEquals(
+                ExtendedElevationDirection.VERTICAL, station3.getExtendedElevationDirection());
+        Assert.assertEquals(
+                ExtendedElevationDirection.LEFT,
+                SurveyUpdater.resolveOnwardExtendedElevationDirection(survey, station3));
+        // and the vertical leg didn't change the stations below it
+        Assert.assertEquals(
+                ExtendedElevationDirection.LEFT,
+                SurveyUpdater.resolveOnwardExtendedElevationDirection(survey, station4));
+    }
+
+    @Test
+    public void testOnwardDirectionLooksPastSeveralVerticalStationsInARow() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Station station2 = survey.getStationByName("2");
+        Station station3 = survey.getStationByName("3");
+        Station station4 = survey.getStationByName("4");
+        SurveyUpdater.setExtendedElevationDirection(
+                survey, station2, ExtendedElevationDirection.LEFT);
+        SurveyUpdater.setExtendedElevationDirection(
+                survey, station3, ExtendedElevationDirection.VERTICAL);
+        SurveyUpdater.setExtendedElevationDirection(
+                survey, station4, ExtendedElevationDirection.VERTICAL);
+
+        Assert.assertEquals(
+                ExtendedElevationDirection.LEFT,
+                SurveyUpdater.resolveOnwardExtendedElevationDirection(survey, station4));
+    }
+
+    @Test
+    public void testOnwardDirectionOfAVerticalOriginIsTheDefault() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Station origin = survey.getOrigin();
+        SurveyUpdater.setExtendedElevationDirection(
+                survey, origin, ExtendedElevationDirection.VERTICAL);
+
+        Assert.assertEquals(
+                ExtendedElevationDirection.DEFAULT,
+                SurveyUpdater.resolveOnwardExtendedElevationDirection(survey, origin));
+    }
 }

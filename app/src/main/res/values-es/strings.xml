@@ -34,6 +34,8 @@
     <string name="title_activity_plan">Planta</string>
     <string name="title_activity_elevation">Alzado</string>
     <string name="title_activity_cross_section">Sección transversal</string>
+    <string name="title_activity_cross_section_horizontal">Sección transversal horizontal</string>
+    <string name="title_activity_cross_section_vertical">Sección transversal vertical</string>
     <string name="title_activity_calibration">Calibración</string>
     <string name="title_activity_survey">Estadísticas</string>
     <string name="title_activity_settings">Ajustes</string>
@@ -93,6 +95,8 @@
     <string name="action_force_crash">Forzar Fallo (¡Peligro!)</string>
     <string name="action_xsection_done">Hecho</string>
     <string name="action_xsection_cancel">Cancelar</string>
+    <string name="xsection_orientation_north">N</string>
+    <string name="xsection_orientation_up">Arriba</string>
 
     <!-- File handling -->
     <string name="file_started_new_survey">Nueva topografía iniciada</string>
@@ -685,6 +689,8 @@
     <string name="menu_jump_to_station_in_elevation">&#10132; Alzado</string>
     <string name="menu_xsection">Sección transversal</string>
     <string name="menu_xsection_create">Nueva sección</string>
+    <string name="menu_xsection_create_horizontal">Nueva sección horizontal</string>
+    <string name="menu_xsection_create_vertical">Nueva sección vertical</string>
     <string name="menu_xsection_delete">Eliminar sección</string>
     <string name="menu_xsection_edit">Editar boceto</string>
     <string name="menu_xsection_set_direction">Fijar dirección</string>

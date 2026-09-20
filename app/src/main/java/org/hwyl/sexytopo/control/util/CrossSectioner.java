@@ -17,6 +17,18 @@ public class CrossSectioner {
         return crossSection;
     }
 
+    /**
+     * A vertical section faces the angle worked out from the survey. A horizontal one has no angle
+     * to work out as it always lies flat.
+     */
+    public static CrossSection section(
+            Survey survey, final Station station, CrossSection.Orientation orientation) {
+        if (orientation == CrossSection.Orientation.HORIZONTAL) {
+            return CrossSection.horizontal(station);
+        }
+        return section(survey, station);
+    }
+
     public static float getAngleOfSection(Survey survey, Station station) {
 
         int numIncomingLegs = station == survey.getOrigin() ? 0 : 1;

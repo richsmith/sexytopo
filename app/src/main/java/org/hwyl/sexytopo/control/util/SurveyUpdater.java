@@ -185,7 +185,7 @@ public class SurveyUpdater {
 
             Station newStation = new Station(getNextStationName(survey));
             newStation.setExtendedElevationDirection(
-                    resolveInheritedExtendedElevationDirection(survey, activeStation));
+                    resolveOnwardExtendedElevationDirection(survey, activeStation));
 
             Leg newLeg = averageLegs(lastNLegs);
             newLeg =
@@ -242,7 +242,7 @@ public class SurveyUpdater {
         if (areLegsBacksights(fore, back)) {
             Station newStation = new Station(getNextStationName(survey));
             newStation.setExtendedElevationDirection(
-                    resolveInheritedExtendedElevationDirection(survey, activeStation));
+                    resolveOnwardExtendedElevationDirection(survey, activeStation));
 
             Leg newLeg = averageBacksights(fore, back);
             newLeg = Leg.toFullLeg(newLeg, newStation);
@@ -441,29 +441,31 @@ public class SurveyUpdater {
     }
 
     /**
-     * Resolves the direction that a newly-created station should inherit from its parent.
+     * Resolves the direction the survey is heading in on the extended elevation once it leaves the
+     * given station. This is the direction a newly-created station should inherit from it, and the
+     * direction a cross-section at the station faces.
      *
-     * <p>A direction that doesn't propagate applies to the leg into the parent alone, so it says
+     * <p>A direction that doesn't propagate applies to the leg into the station alone, so it says
      * nothing about where the survey goes next. In that case we walk up to the nearest ancestor
      * whose direction does propagate, so the survey resumes the direction it was heading in before.
      *
-     * <p>NOTE: this is a potentially expensive O(n^2) operation (to keep doing survey traversals to
-     * find the parent with a "standard" EE direction), but we don't anticipate this method being
-     * used outside creating new stations, and anyway long series of VERTICAL legs ought to be very
-     * rare!
+     * <p>NOTE: the walk up only happens for a station whose own direction doesn't propagate (a
+     * VERTICAL leg), so the usual case is immediate. When it does happen it is a potentially
+     * expensive O(n^2) operation (to keep doing survey traversals to find the parent with a
+     * "standard" EE direction), but long series of VERTICAL legs ought to be very rare!
      */
-    private static ExtendedElevationDirection resolveInheritedExtendedElevationDirection(
-            Survey survey, Station activeStation) {
-        ExtendedElevationDirection activeDirection = activeStation.getExtendedElevationDirection();
-        if (activeDirection.propagates()) {
-            return activeDirection;
+    public static ExtendedElevationDirection resolveOnwardExtendedElevationDirection(
+            Survey survey, Station station) {
+        ExtendedElevationDirection direction = station.getExtendedElevationDirection();
+        if (direction.propagates()) {
+            return direction;
         }
-        Leg referringLeg = survey.getReferringLeg(activeStation);
+        Leg referringLeg = survey.getReferringLeg(station);
         if (referringLeg == null) {
             // origin station — nothing above it to inherit from
             return ExtendedElevationDirection.DEFAULT;
         }
         Station parent = survey.getOriginatingStation(referringLeg);
-        return resolveInheritedExtendedElevationDirection(survey, parent);
+        return resolveOnwardExtendedElevationDirection(survey, parent);
     }
 }

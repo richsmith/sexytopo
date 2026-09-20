@@ -44,8 +44,10 @@ import org.hwyl.sexytopo.control.util.CrossSectioner;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
+import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Coord2D;
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
@@ -107,6 +109,10 @@ public class GraphView extends View {
     private static final int CROSS_SECTION_HANDLE_GRIP_WIDTH_DP = 2;
     private static final float CROSS_SECTION_HANDLE_GRIP_SPACING_DP = 5f;
     private static final float CROSS_SECTION_HANDLE_GRIP_LENGTH_FRACTION = 0.45f;
+    // The grip marks have round caps, so each looks a stroke width longer than these lengths and
+    // the gap between dashes looks a stroke width shorter.
+    private static final float CROSS_SECTION_HANDLE_DASH_LENGTH_DP = 4f;
+    private static final float CROSS_SECTION_HANDLE_DASH_GAP_DP = 5f;
 
     public static final int LEGEND_SIZE = 18;
     private static final int LEGEND_TICK_SIZE_DP = 5;
@@ -168,6 +174,8 @@ public class GraphView extends View {
 
     // a bit hacky but I can't think of a better way to do this
     private String stationNameBeingCrossSectioned = null;
+    private CrossSection.Orientation crossSectionOrientationBeingCreated =
+            CrossSection.Orientation.VERTICAL;
 
     // State for dragging a cross-section component's handle on the plan.
     private CrossSectionDetail crossSectionBeingMoved = null;
@@ -205,6 +213,8 @@ public class GraphView extends View {
     private final Paint crossSectionHandlePaint = new Paint();
     private final Paint crossSectionHandleGripPaint = new Paint();
     private final Paint crossSectionBorderPaint = new Paint();
+    private final Paint crossSectionHorizontalHandlePaint = new Paint();
+    private final Paint crossSectionHorizontalBorderPaint = new Paint();
     private final Paint hotCornersPaint = new Paint();
 
     private final Paint[] ANTI_ALIAS_PAINTS =
@@ -224,7 +234,9 @@ public class GraphView extends View {
                 crossSectionIndicatorPaint,
                 crossSectionHandlePaint,
                 crossSectionHandleGripPaint,
-                crossSectionBorderPaint
+                crossSectionBorderPaint,
+                crossSectionHorizontalHandlePaint,
+                crossSectionHorizontalBorderPaint
             };
 
     protected float stationCrossDiameterPx;
@@ -338,6 +350,19 @@ public class GraphView extends View {
         crossSectionBorderPaint.setColor(primaryColor);
         crossSectionBorderPaint.setStrokeWidth(dpToPixels(CROSS_SECTION_BORDER_WIDTH_DP));
         crossSectionBorderPaint.setStyle(Paint.Style.STROKE);
+
+        // Horizontal cross-sections get a differently coloured box so they can be told apart from
+        // vertical ones at a glance
+        int horizontalBoxColour =
+                ContextCompat.getColor(activity, R.color.crossSectionHorizontalBox);
+
+        crossSectionHorizontalHandlePaint.setColor(horizontalBoxColour);
+        crossSectionHorizontalHandlePaint.setStyle(Paint.Style.FILL);
+        crossSectionHorizontalHandlePaint.setAntiAlias(true);
+
+        crossSectionHorizontalBorderPaint.setColor(horizontalBoxColour);
+        crossSectionHorizontalBorderPaint.setStrokeWidth(dpToPixels(CROSS_SECTION_BORDER_WIDTH_DP));
+        crossSectionHorizontalBorderPaint.setStyle(Paint.Style.STROKE);
 
         isTwoFingerModeActive = GeneralPreferences.isTwoFingerModeActive();
 
@@ -821,11 +846,13 @@ public class GraphView extends View {
 
         final Station station = survey.getStationByName(stationNameBeingCrossSectioned);
         stationNameBeingCrossSectioned = null;
+        CrossSection.Orientation orientation = crossSectionOrientationBeingCreated;
+        crossSectionOrientationBeingCreated = CrossSection.Orientation.VERTICAL;
         if (station == null) {
             return true;
         }
 
-        CrossSection crossSection = CrossSectioner.section(survey, station);
+        CrossSection crossSection = CrossSectioner.section(survey, station, orientation);
 
         CrossSectionDetail detail = new CrossSectionDetail(crossSection, touchPointOnSurvey);
         sketch.addCrossSection(detail);
@@ -1001,7 +1028,12 @@ public class GraphView extends View {
     }
 
     public void handleNewCrossSection(Station station) {
+        handleNewCrossSection(station, CrossSection.Orientation.VERTICAL);
+    }
+
+    public void handleNewCrossSection(Station station, CrossSection.Orientation orientation) {
         stationNameBeingCrossSectioned = station.getName();
+        crossSectionOrientationBeingCreated = orientation;
         setSketchTool(SketchTool.POSITION_CROSS_SECTION);
         activity.showSimpleToast(R.string.sketch_position_cross_section_instruction);
     }
@@ -1012,7 +1044,7 @@ public class GraphView extends View {
             return;
         }
         CrossSectionDetail detail = sketch.getCrossSectionDetail(station);
-        if (detail == null) {
+        if (detail == null || !detail.getCrossSection().isRotatable()) {
             return;
         }
         crossSectionBeingRotated = detail;
@@ -1247,6 +1279,8 @@ public class GraphView extends View {
         crossSectionHandlePaint.setAlpha(alpha);
         crossSectionHandleGripPaint.setAlpha(alpha);
         crossSectionBorderPaint.setAlpha(alpha);
+        crossSectionHorizontalHandlePaint.setAlpha(alpha);
+        crossSectionHorizontalBorderPaint.setAlpha(alpha);
 
         crossSectionHandleRects.clear();
 
@@ -1345,7 +1379,15 @@ public class GraphView extends View {
 
         drawCrossSectionSubSketch(canvas, sectionDetail, centreOnSurvey, alpha);
 
-        RectF borderRect = drawCrossSectionBorder(canvas, sectionDetail, dragDelta);
+        boolean isHorizontal =
+                sectionDetail.getCrossSection().getOrientation()
+                        == CrossSection.Orientation.HORIZONTAL;
+        Paint borderPaint =
+                isHorizontal ? crossSectionHorizontalBorderPaint : crossSectionBorderPaint;
+        Paint handlePaint =
+                isHorizontal ? crossSectionHorizontalHandlePaint : crossSectionHandlePaint;
+
+        RectF borderRect = drawCrossSectionBorder(canvas, sectionDetail, dragDelta, borderPaint);
 
         Coord2D connectorEnd =
                 clipSegmentToRectBoundary(viewStationLocation, centreOnView, borderRect);
@@ -1358,7 +1400,7 @@ public class GraphView extends View {
                     crossSectionConnectorPaint);
         }
 
-        RectF handleRect = drawCrossSectionHandle(canvas, borderRect);
+        RectF handleRect = drawCrossSectionHandle(canvas, borderRect, handlePaint, isHorizontal);
         crossSectionHandleRects.put(originalDetail, handleRect);
         return true;
     }
@@ -1427,7 +1469,7 @@ public class GraphView extends View {
 
     /** Draw a rectangular border around the cross-section's full extent (legs + sub-sketch). */
     private RectF drawCrossSectionBorder(
-            Canvas canvas, CrossSectionDetail sectionDetail, Coord2D dragDelta) {
+            Canvas canvas, CrossSectionDetail sectionDetail, Coord2D dragDelta, Paint borderPaint) {
         float xsScale = sketch.getCrossSectionScale();
         Coord2D centre = sectionDetail.getPosition().plus(dragDelta);
         Coord2D origin = sectionDetail.getPosition();
@@ -1453,12 +1495,13 @@ public class GraphView extends View {
                         bottomRight.x + padding,
                         bottomRight.y + padding);
         float cornerRadius = dpToPixels(CROSS_SECTION_BORDER_CORNER_RADIUS_DP);
-        canvas.drawRoundRect(rect, cornerRadius, cornerRadius, crossSectionBorderPaint);
+        canvas.drawRoundRect(rect, cornerRadius, cornerRadius, borderPaint);
         return rect;
     }
 
     /** Draw a full-width handle bar along the top edge of the cross-section border. */
-    private RectF drawCrossSectionHandle(Canvas canvas, RectF borderRect) {
+    private RectF drawCrossSectionHandle(
+            Canvas canvas, RectF borderRect, Paint handlePaint, boolean isHorizontal) {
         float handleHeight = dpToPixels(CROSS_SECTION_HANDLE_WIDTH_DP);
         float cornerRadius = dpToPixels(CROSS_SECTION_BORDER_CORNER_RADIUS_DP);
 
@@ -1484,20 +1527,41 @@ public class GraphView extends View {
                     0f // bottom-left
                 },
                 Path.Direction.CW);
-        canvas.drawPath(handlePath, crossSectionHandlePaint);
+        canvas.drawPath(handlePath, handlePaint);
 
-        // Grip ticks: three short vertical marks centred on the bar.
+        // Grip marks centred on the bar: three short vertical ticks for a vertical cross-section
+        // and three short horizontal dashes for a horizontal one, so that the two can be told apart
+        // without relying on the colour of the box.
         float centreX = (handleRect.left + handleRect.right) / 2f;
         float centreY = (handleRect.top + handleRect.bottom) / 2f;
-        float gripHalfLength = handleHeight * CROSS_SECTION_HANDLE_GRIP_LENGTH_FRACTION / 2f;
-        float gripSpacing = dpToPixels(CROSS_SECTION_HANDLE_GRIP_SPACING_DP);
-        float[] gripXs = {centreX - gripSpacing, centreX, centreX + gripSpacing};
-        for (float gripX : gripXs) {
+        CrossSectionGrip grip;
+        if (isHorizontal) {
+            float usableWidth =
+                    CrossSectionGrip.getUsableWidth(
+                            handleRect.width(),
+                            cornerRadius,
+                            dpToPixels(CROSS_SECTION_HANDLE_GRIP_WIDTH_DP));
+            grip =
+                    CrossSectionGrip.horizontal(
+                            centreX,
+                            centreY,
+                            dpToPixels(CROSS_SECTION_HANDLE_DASH_LENGTH_DP),
+                            dpToPixels(CROSS_SECTION_HANDLE_DASH_GAP_DP),
+                            usableWidth);
+        } else {
+            grip =
+                    CrossSectionGrip.vertical(
+                            centreX,
+                            centreY,
+                            handleHeight * CROSS_SECTION_HANDLE_GRIP_LENGTH_FRACTION,
+                            dpToPixels(CROSS_SECTION_HANDLE_GRIP_SPACING_DP));
+        }
+        for (int i = 0; i < grip.getMarkCount(); i++) {
             canvas.drawLine(
-                    gripX,
-                    centreY - gripHalfLength,
-                    gripX,
-                    centreY + gripHalfLength,
+                    grip.getStartX(i),
+                    grip.getStartY(i),
+                    grip.getEndX(i),
+                    grip.getEndY(i),
                     crossSectionHandleGripPaint);
         }
 
@@ -1579,12 +1643,20 @@ public class GraphView extends View {
                 paint = fade ? fadedLegPaint : legPaint;
             }
 
-            if (projectionType.isLegInPlane(leg)) {
+            if (isLegInPlane(leg)) {
                 canvas.drawLine(start.x, start.y, end.x, end.y, paint);
             } else {
                 drawDashedLine(canvas, start, end, dashedLineIntervalPx, paint);
             }
         }
+    }
+
+    /**
+     * Whether a leg lies in the plane being drawn. Legs that don't are drawn dashed, to show that
+     * they point into or out of the page.
+     */
+    protected boolean isLegInPlane(Leg leg) {
+        return projectionType.isLegInPlane(leg);
     }
 
     private boolean isAttachedToActive(Leg leg) {
@@ -1681,16 +1753,9 @@ public class GraphView extends View {
         CrossSection crossSection = crossSectionDetail.getCrossSection();
 
         float indicatorWidth = (1 * surveyToViewScale);
-        CrossSectionIndicator indicator;
-        if (projectionType == Projection2D.EXTENDED_ELEVATION) {
-            indicator = CrossSectionIndicator.vertical(x, y, indicatorWidth);
-        } else {
-            float activeAngle =
-                    crossSectionPreviewAngle == null
-                            ? crossSection.getAngle()
-                            : crossSectionPreviewAngle;
-            indicator = CrossSectionIndicator.atAngle(x, y, indicatorWidth, activeAngle);
-        }
+        CrossSectionIndicator indicator =
+                CrossSectionIndicator.atAngle(
+                        x, y, indicatorWidth, getIndicatorAngle(crossSection));
 
         canvas.drawLine(
                 indicator.getStartX(),
@@ -1699,15 +1764,33 @@ public class GraphView extends View {
                 indicator.getEndY(),
                 crossSectionIndicatorPaint);
 
-        if (indicator.hasArrowhead()) {
-            Path path = new Path();
-            path.moveTo(indicator.getArrowInnerX(), indicator.getArrowInnerY());
-            path.lineTo(indicator.getArrowOuterX(), indicator.getArrowOuterY());
-            path.lineTo(indicator.getArrowTipX(), indicator.getArrowTipY());
-            path.lineTo(indicator.getArrowInnerX(), indicator.getArrowInnerY());
+        Path path = new Path();
+        path.moveTo(indicator.getArrowInnerX(), indicator.getArrowInnerY());
+        path.lineTo(indicator.getArrowOuterX(), indicator.getArrowOuterY());
+        path.lineTo(indicator.getArrowTipX(), indicator.getArrowTipY());
+        path.lineTo(indicator.getArrowInnerX(), indicator.getArrowInnerY());
 
-            canvas.drawPath(path, crossSectionIndicatorPaint);
+        canvas.drawPath(path, crossSectionIndicatorPaint);
+    }
+
+    /**
+     * The angle to draw a cross-section's indicator at. On the plan this is the compass bearing the
+     * section faces, or the one it is being turned to. On the elevation the section can't be
+     * turned, so it is the way it faces on the page: along the survey for a vertical section, and
+     * down for a horizontal one.
+     */
+    private float getIndicatorAngle(CrossSection crossSection) {
+        boolean isHorizontal = crossSection.getOrientation() == CrossSection.Orientation.HORIZONTAL;
+        if (isHorizontal || projectionType == Projection2D.EXTENDED_ELEVATION) {
+            ExtendedElevationDirection surveyDirection =
+                    SurveyUpdater.resolveOnwardExtendedElevationDirection(
+                            survey, crossSection.getStation());
+            return CrossSectionIndicator.getElevationFacingAngle(
+                    crossSection.getOrientation(), surveyDirection);
         }
+        return crossSectionPreviewAngle == null
+                ? crossSection.getAngle()
+                : crossSectionPreviewAngle;
     }
 
     private void highlightActiveStation(Canvas canvas, float x, float y) {
@@ -1922,32 +2005,41 @@ public class GraphView extends View {
             return;
         }
 
+        drawArrowMarker(canvas, "N", -compassAzimuthDegrees);
+    }
+
+    /**
+     * Draws an arrow with a label above it, above the scale bar at the left of the view. The plan's
+     * compass uses it, turned to follow the plan, and so does the cross-section editor to show how
+     * its sketch is oriented.
+     *
+     * @param label text to put above the tip of the arrow
+     * @param clockwiseDegrees how far to turn the arrow and label about the arrow's centre
+     */
+    protected void drawArrowMarker(Canvas canvas, String label, float clockwiseDegrees) {
         float textSize = legendPaint.getTextSize();
         Paint.FontMetrics metrics = legendPaint.getFontMetrics();
         float textHeight = metrics.descent - metrics.ascent;
-        float offsetX = textSize * 1.25f; // matches legend x
-        float arrowLength = textSize * 2.5f;
-        float arrowHeadSize = textSize * 0.6f;
-        float cx = offsetX + arrowLength / 2f + textSize;
-        float scaleBarY = getHeight() - textSize * 4f;
-        float cy = scaleBarY - arrowLength / 2f - textHeight;
+        OrientationMarker marker = OrientationMarker.layout(textSize, textHeight, getHeight());
+
+        float centreX = marker.getCentreX();
+        float head = marker.getHeadSize();
 
         canvas.save();
-        canvas.rotate(-compassAzimuthDegrees, cx, cy);
-
-        float tipY = cy - arrowLength / 2f;
-        float tailY = cy + arrowLength / 2f;
+        canvas.rotate(clockwiseDegrees, centreX, marker.getCentreY());
 
         legendPaint.setStyle(Paint.Style.STROKE);
         Path arrowPath = new Path();
-        arrowPath.moveTo(cx - arrowHeadSize, tipY + arrowHeadSize);
-        arrowPath.lineTo(cx, tipY);
-        arrowPath.lineTo(cx + arrowHeadSize, tipY + arrowHeadSize);
-        arrowPath.moveTo(cx, tipY);
-        arrowPath.lineTo(cx, tailY);
+        arrowPath.moveTo(centreX - head, marker.getTipY() + head);
+        arrowPath.lineTo(centreX, marker.getTipY());
+        arrowPath.lineTo(centreX + head, marker.getTipY() + head);
+        arrowPath.moveTo(centreX, marker.getTipY());
+        arrowPath.lineTo(centreX, marker.getTailY());
         canvas.drawPath(arrowPath, legendPaint);
         legendPaint.setStyle(Paint.Style.FILL);
-        canvas.drawText("N", cx - textSize * 0.35f, tipY - textSize * 0.2f, legendPaint);
+
+        float labelX = centreX - legendPaint.measureText(label) / 2f;
+        canvas.drawText(label, labelX, marker.getLabelBaselineY(), legendPaint);
 
         canvas.restore();
     }

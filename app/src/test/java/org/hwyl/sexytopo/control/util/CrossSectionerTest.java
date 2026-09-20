@@ -126,4 +126,29 @@ public class CrossSectionerTest {
         Assert.assertSame(s2, crossSection.getStation());
         Assert.assertEquals(45.0, crossSection.getAngle(), SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
     }
+
+    @Test
+    public void testHorizontalSectionIgnoresTheLegsAndLiesFlat() {
+        Survey testSurvey = BasicTestSurveyCreator.createRightRight();
+        Station s2 = testSurvey.getStationByName("2");
+
+        CrossSection crossSection =
+                CrossSectioner.section(testSurvey, s2, CrossSection.Orientation.HORIZONTAL);
+
+        Assert.assertEquals(CrossSection.Orientation.HORIZONTAL, crossSection.getOrientation());
+        Assert.assertSame(s2, crossSection.getStation());
+        Assert.assertEquals(0f, crossSection.getAngle(), SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
+    }
+
+    @Test
+    public void testVerticalSectionByOrientationUsesTheAngleOfTheSection() {
+        Survey testSurvey = BasicTestSurveyCreator.createRightRight();
+        Station s2 = testSurvey.getStationByName("2");
+
+        CrossSection crossSection =
+                CrossSectioner.section(testSurvey, s2, CrossSection.Orientation.VERTICAL);
+
+        Assert.assertEquals(CrossSection.Orientation.VERTICAL, crossSection.getOrientation());
+        Assert.assertEquals(45.0, crossSection.getAngle(), SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
+    }
 }

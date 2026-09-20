@@ -19,6 +19,7 @@ import org.junit.Test;
 public class ViewContextMenuTest {
 
     private Map<Integer, Boolean> visibility;
+    private Map<Integer, Integer> titles;
     private Menu menu;
 
     @Before
@@ -28,10 +29,13 @@ public class ViewContextMenuTest {
         visibility = new HashMap<>();
         visibility.put(R.id.menu_xsection, false);
         visibility.put(R.id.action_xsection_set_direction, true);
+        visibility.put(R.id.action_xsection_create, true);
+        visibility.put(R.id.action_xsection_create_horizontal, false);
         visibility.put(R.id.action_jump_to_plan, true);
         visibility.put(R.id.action_jump_to_elevation, true);
         visibility.put(R.id.menu_elevation, true);
-        menu = createMenu(visibility);
+        titles = new HashMap<>();
+        menu = createMenu(visibility, titles);
     }
 
     @Test
@@ -59,6 +63,39 @@ public class ViewContextMenuTest {
     }
 
     @Test
+    public void testPlanOffersOnlyPlainNewCrossSection() {
+        ViewContext.PLAN.configureViewSpecificItems(menu);
+
+        Assert.assertTrue(visibility.get(R.id.action_xsection_create));
+        Assert.assertFalse(visibility.get(R.id.action_xsection_create_horizontal));
+        Assert.assertFalse(titles.containsKey(R.id.action_xsection_create));
+    }
+
+    @Test
+    public void testExtendedElevationOffersVerticalAndHorizontal() {
+        ViewContext.EXTENDED_ELEVATION.configureViewSpecificItems(menu);
+
+        Assert.assertTrue(visibility.get(R.id.action_xsection_create));
+        Assert.assertTrue(visibility.get(R.id.action_xsection_create_horizontal));
+        Assert.assertEquals(
+                Integer.valueOf(R.string.menu_xsection_create_vertical),
+                titles.get(R.id.action_xsection_create));
+    }
+
+    @Test
+    public void testViewsWithoutCrossSectionsHideTheHorizontalOption() {
+        for (ViewContext viewContext :
+                new ViewContext[] {ViewContext.TABLE, ViewContext.ELEVATION, ViewContext.THREE_D}) {
+            visibility.put(R.id.action_xsection_create_horizontal, true);
+
+            viewContext.configureViewSpecificItems(menu);
+
+            Assert.assertFalse(
+                    viewContext.name(), visibility.get(R.id.action_xsection_create_horizontal));
+        }
+    }
+
+    @Test
     public void testViewsWithoutCrossSectionsHideTheSubmenu() {
         for (ViewContext viewContext :
                 new ViewContext[] {ViewContext.TABLE, ViewContext.ELEVATION, ViewContext.THREE_D}) {
@@ -70,10 +107,10 @@ public class ViewContextMenuTest {
         }
     }
 
-    private static Menu createMenu(Map<Integer, Boolean> visibility) {
+    private static Menu createMenu(Map<Integer, Boolean> visibility, Map<Integer, Integer> titles) {
         Map<Integer, MenuItem> items = new HashMap<>();
         for (Integer id : visibility.keySet()) {
-            items.put(id, createItem(id, visibility));
+            items.put(id, createItem(id, visibility, titles));
         }
         InvocationHandler handler =
                 (proxy, method, args) -> {
@@ -89,9 +126,14 @@ public class ViewContextMenuTest {
                         handler);
     }
 
-    private static MenuItem createItem(int id, Map<Integer, Boolean> visibility) {
+    private static MenuItem createItem(
+            int id, Map<Integer, Boolean> visibility, Map<Integer, Integer> titles) {
         InvocationHandler handler =
                 (proxy, method, args) -> {
+                    if (method.getName().equals("setTitle") && args[0] instanceof Integer) {
+                        titles.put(id, (Integer) args[0]);
+                        return proxy;
+                    }
                     if (method.getName().equals("setVisible")) {
                         visibility.put(id, (Boolean) args[0]);
                         return proxy;

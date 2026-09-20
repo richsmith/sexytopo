@@ -64,6 +64,8 @@ public class ContextMenuManager {
         menuActions.put(R.id.action_direction_right, activity::onSetDirectionRight);
         menuActions.put(R.id.action_direction_vertical, activity::onSetDirectionVertical);
         menuActions.put(R.id.action_xsection_create, activity::onNewCrossSection);
+        menuActions.put(
+                R.id.action_xsection_create_horizontal, activity::onNewHorizontalCrossSection);
         menuActions.put(R.id.action_xsection_edit, activity::onEditCrossSection);
         menuActions.put(R.id.action_xsection_set_direction, activity::onRotateCrossSection);
         menuActions.put(R.id.action_xsection_delete, activity::onDeleteCrossSection);
@@ -259,11 +261,15 @@ public class ContextMenuManager {
             boolean hasCrossSection =
                     sketch != null && sketch.getCrossSectionDetail(station) != null;
             MenuItem createItem = menu.findItem(R.id.action_xsection_create);
+            MenuItem createHorizontalItem = menu.findItem(R.id.action_xsection_create_horizontal);
             MenuItem editItem = menu.findItem(R.id.action_xsection_edit);
             MenuItem setDirectionItem = menu.findItem(R.id.action_xsection_set_direction);
             MenuItem deleteItem = menu.findItem(R.id.action_xsection_delete);
             if (createItem != null) {
                 createItem.setEnabled(!hasCrossSection);
+            }
+            if (createHorizontalItem != null) {
+                createHorizontalItem.setEnabled(!hasCrossSection);
             }
             if (editItem != null) {
                 // The editor activity only exists in the new mode; hide Edit for legacy

@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import java.util.ArrayList;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.graph.CrossSectionView;
+import org.hwyl.sexytopo.control.graph.OrientationMarker;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
@@ -78,6 +79,11 @@ public class CrossSectionActivity extends GraphActivity {
         CrossSectionView graphView = findViewById(R.id.graphView);
         Space<Coord2D> projection = originalDetail.getCrossSection().getProjection();
         graphView.setProjection(projection);
+        graphView.setCrossSection(originalDetail.getCrossSection());
+
+        setTitle(
+                OrientationMarker.getTitleResource(
+                        originalDetail.getCrossSection().getOrientation()));
     }
 
     /** The sketch the cross-section lives in: elevation if asked for, otherwise the plan. */
@@ -168,6 +174,11 @@ public class CrossSectionActivity extends GraphActivity {
 
     @Override
     public void onNewCrossSection(Station station) {
+        // No-op: cross-section editor does not allow nesting cross-sections.
+    }
+
+    @Override
+    public void onNewHorizontalCrossSection(Station station) {
         // No-op: cross-section editor does not allow nesting cross-sections.
     }
 }
