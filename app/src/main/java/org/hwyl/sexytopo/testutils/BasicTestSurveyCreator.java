@@ -195,6 +195,49 @@ public class BasicTestSurveyCreator {
         return survey;
     }
 
+    /**
+     * Like createWithCrossSections(), but with cross-sections on the elevation as well as the plan,
+     * and with splays at the stations so that the cross-sections have something to show.
+     *
+     * <p>The plan has vertical cross-sections at stations 1 and 3. The elevation has a vertical one
+     * at station 1 and a horizontal one at station 3, so each of those stations has a cross-section
+     * in both sketches, and at station 3 they are of different kinds.
+     *
+     * <p>The splays at each of those stations are 2m east, 1.5m west, 1m north, 1m up and 1m down.
+     * Facing north, a vertical section shows the east and west splays to the right and left, and
+     * the up and down ones above and below, while the north one points straight at the viewer. A
+     * horizontal section shows the east, west and north splays, and the up and down ones collapse
+     * to nothing.
+     */
+    public static Survey createWithCrossSectionsInPlanAndElevation() {
+        Survey survey = createStraightNorthWith1EBranch();
+        Station station1 = survey.getStationByName("1");
+        Station station3 = survey.getStationByName("3");
+
+        // Splays first, as a cross-section's bounding box is worked out when it is created
+        for (Station station : new Station[] {station1, station3}) {
+            station.addOnwardLeg(new Leg(2, 90, 0));
+            station.addOnwardLeg(new Leg(1.5f, 270, 0));
+            station.addOnwardLeg(new Leg(1, 0, 0));
+            station.addOnwardLeg(new Leg(1, 0, 90));
+            station.addOnwardLeg(new Leg(1, 0, -90));
+        }
+
+        Sketch plan = survey.getSketch(Projection2D.PLAN);
+        plan.addCrossSection(CrossSectioner.section(survey, station1), new Coord2D(2, 0));
+        plan.addCrossSection(CrossSectioner.section(survey, station3), new Coord2D(2, 10));
+
+        Sketch elevation = survey.getSketch(Projection2D.EXTENDED_ELEVATION);
+        elevation.addCrossSection(
+                CrossSectioner.section(survey, station1, CrossSection.Orientation.VERTICAL),
+                new Coord2D(2, 4));
+        elevation.addCrossSection(
+                CrossSectioner.section(survey, station3, CrossSection.Orientation.HORIZONTAL),
+                new Coord2D(12, 4));
+
+        return survey;
+    }
+
     @SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
     public static Survey createStraightNorthWithTrip() {
         Survey survey = new Survey();
