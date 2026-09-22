@@ -157,6 +157,68 @@ public class SurvexImporterTest {
                         || mainLeg.getPromotedFrom()[0].getComment().isEmpty());
     }
 
+    // --- Splay token recognition (Survex anonymous-station conventions) ---
+
+    @Test
+    public void testDoubleDotSplayImportsAsSplayNotStation() throws Exception {
+        // ".." is Survex's own anonymous-wall-point convention, and the one SexyTopo itself
+        // writes for Survex export - this is the case the old "-"-only check silently broke.
+        // A trailing real leg is needed so station 1 becomes reachable from the origin -
+        // origin is only ever set from a non-splay leg.
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline("1\t..\t1.0\t0.0\t0.0\n1\t2\t5.0\t0.0\t0.0", survey);
+
+        Assert.assertNull(survey.getStationByName(".."));
+        Assert.assertEquals(1, survey.getOrigin().getUnconnectedOnwardLegs().size());
+    }
+
+    @Test
+    public void testSingleDotSplayImportsAsSplayNotStation() throws Exception {
+        // "." is Survex's anonymous non-wall-point convention (and also a valid Therion token)
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline("1\t.\t1.0\t0.0\t0.0\n1\t2\t5.0\t0.0\t0.0", survey);
+
+        Assert.assertNull(survey.getStationByName("."));
+        Assert.assertEquals(1, survey.getOrigin().getUnconnectedOnwardLegs().size());
+    }
+
+    @Test
+    public void testTripleDotSplayImportsAsSplayNotStation() throws Exception {
+        // "..." is Survex's anonymous point with no implicit flags
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline("1\t...\t1.0\t0.0\t0.0\n1\t2\t5.0\t0.0\t0.0", survey);
+
+        Assert.assertNull(survey.getStationByName("..."));
+        Assert.assertEquals(1, survey.getOrigin().getUnconnectedOnwardLegs().size());
+    }
+
+    @Test
+    public void testConsecutiveAnonymousSplaysStayAsSeparateSplays() throws Exception {
+        // Several splays sharing the same anonymous token must not be confused with each
+        // other or merged into a single named station
+        final String text =
+                "1\t..\t1.0\t0.0\t0.0\n"
+                        + "1\t..\t1.2\t90.0\t0.0\n"
+                        + "1\t..\t0.8\t180.0\t0.0\n"
+                        + "1\t2\t5.0\t0.0\t0.0\n";
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(text, survey);
+
+        Assert.assertEquals(2, survey.getAllStations().size()); // origin "1" and "2"
+        Assert.assertEquals(3, survey.getOrigin().getUnconnectedOnwardLegs().size());
+    }
+
+    @Test
+    public void testHyphenSplayStillImportsAsSplay() throws Exception {
+        // Regression: the original "-" convention (Therion's, and the internal blank-station
+        // sentinel) must keep working
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline("1\t-\t1.0\t0.0\t0.0\n1\t2\t5.0\t0.0\t0.0", survey);
+
+        Assert.assertNull(survey.getStationByName("-"));
+        Assert.assertEquals(1, survey.getOrigin().getUnconnectedOnwardLegs().size());
+    }
+
     // --- Metadata date parsing ---
 
     @Test

@@ -457,6 +457,20 @@ public class SurvexTherionImporter {
         return null;
     }
 
+    /**
+     * Splay-station tokens accepted on import from third-party Survex/Therion files.
+     *
+     * <p>Therion's own anonymous-station convention uses "-" or ".". Survex's uses ".", ".." (an
+     * anonymous wall point) or "..." (an anonymous point with no implicit flags) - see the
+     * "Anonymous stations" section of the Survex manual.
+     *
+     * <p>SexyTopo's own exporters still only ever write the single token each format's {@link
+     * SurveyFormat#getSplayStationName()} returns, but a hand-written or third-party file may use
+     * any of the others, so all are accepted here regardless of which format is being imported.
+     */
+    private static final List<String> SPLAY_STATION_TOKENS =
+            Arrays.asList(SexyTopoConstants.BLANK_STATION_NAME, ".", "..", "...");
+
     private static void addLegToSurvey(
             Survey survey,
             Map<String, Station> nameToStation,
@@ -471,7 +485,7 @@ public class SurvexTherionImporter {
         float azimuth = Float.parseFloat(fields[3]);
         float inclination = Float.parseFloat(fields[4]);
 
-        boolean isSplay = toName.equals(SexyTopoConstants.BLANK_STATION_NAME);
+        boolean isSplay = SPLAY_STATION_TOKENS.contains(toName);
 
         // Detect if this is a backward leg BEFORE creating new stations
         boolean isBackward = isBackwardLeg(fromName, toName, nameToStation);
