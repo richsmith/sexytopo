@@ -706,6 +706,31 @@ public class TherionImporterTest {
         Assert.assertEquals(1, splays1.size());
     }
 
+    // --- Splay token recognition (Therion and Survex anonymous-station conventions) ---
+
+    @Test
+    public void testDotSplayImportsAsSplayNotStation() throws Exception {
+        // "." is a valid Therion anonymous-station token (as well as Survex's own convention).
+        // A trailing real leg is needed so station 1 becomes reachable from the origin -
+        // origin is only ever set from a non-splay leg.
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline("1\t.\t1.0\t0.0\t0.0\n1\t2\t5.0\t0.0\t0.0", survey);
+
+        Assert.assertNull(survey.getStationByName("."));
+        Assert.assertEquals(1, survey.getOrigin().getUnconnectedOnwardLegs().size());
+    }
+
+    @Test
+    public void testSurvexDoubleDotSplayIsAlsoRecognisedViaSharedImporter() throws Exception {
+        // The splay-token check is shared between the Survex and Therion importers, so a
+        // Survex-style ".." splay must be recognised even when parsed via this path.
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline("1\t..\t1.0\t0.0\t0.0\n1\t2\t5.0\t0.0\t0.0", survey);
+
+        Assert.assertNull(survey.getStationByName(".."));
+        Assert.assertEquals(1, survey.getOrigin().getUnconnectedOnwardLegs().size());
+    }
+
     @Test
     public void testChronologicalOrderPreserved() throws Exception {
         Survey survey = new Survey();
