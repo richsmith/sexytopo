@@ -123,4 +123,20 @@ public enum SurveyFormat {
         }
         return line;
     }
+
+    /**
+     * Whether this format's own network reduction can treat several legs measured between the same
+     * pair of stations as repeats of one measurement and average them itself, so a
+     * separately-written averaged summary leg is unnecessary.
+     *
+     * <p>Survex can already do this - parallel legs between the same two stations close a trivial
+     * loop, which its least-squares adjustment resolves by weighted averaging. Therion cannot do
+     * this yet, so a promoted (averaged) leg is still exported as one averaged reading followed by
+     * its raw readings as comments, for reference only. Flip this to true for Therion once it gains
+     * the same capability - the shared export and import code branches on this flag, so no other
+     * change should be needed.
+     */
+    public boolean canAverageRepeatedLegs() {
+        return this == SURVEX;
+    }
 }

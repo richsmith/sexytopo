@@ -43,12 +43,61 @@ public class SurvexExporterTest {
 
     @Test
     public void testBasicExportWithPromotedLegs() {
+        // Survex can average repeat legs between the same station pair itself, so a promoted
+        // leg is now exported as its raw readings, as real data lines - no averaged summary
+        // line, and no comments.
         SurvexExporter survexExporter = new SurvexExporter();
         Survey oneNorth = BasicTestSurveyCreator.createStraightNorthThroughRepeats();
         String content = survexExporter.getContent(oneNorth);
-        Assert.assertTrue(content.contains("1\t2\t5.000\t0.00\t0.00"));
-        // Promoted leg original readings are output as commented lines
-        Assert.assertTrue(content.contains(";1\t2\t5.000\t0.00\t0.00"));
+
+        Assert.assertFalse(content.contains(";1\t2"));
+        long matchingLines =
+                Arrays.stream(content.split("\n"))
+                        .filter(line -> line.startsWith("1\t2\t5.000\t0.00\t0.00"))
+                        .count();
+        Assert.assertEquals(3, matchingLines);
+    }
+
+    @Test
+    public void testPromotedLegCommentGoesOnFirstRawLine() {
+        // The leg's own comment has no single "main" line to sit on any more, now that each
+        // raw reading is written as its own real line - it goes on the first one.
+        SurvexExporter survexExporter = new SurvexExporter();
+        Survey survey = BasicTestSurveyCreator.createStraightNorthThroughRepeats();
+        Leg promoted = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        promoted.setComment("Big Sandy Chamber");
+
+        String content = survexExporter.getContent(survey);
+        String[] matchingLines =
+                Arrays.stream(content.split("\n"))
+                        .filter(line -> line.startsWith("1\t2"))
+                        .toArray(String[]::new);
+
+        Assert.assertEquals(3, matchingLines.length);
+        Assert.assertTrue(matchingLines[0].endsWith("Big Sandy Chamber"));
+        Assert.assertFalse(matchingLines[1].contains("Big Sandy Chamber"));
+        Assert.assertFalse(matchingLines[2].contains("Big Sandy Chamber"));
+    }
+
+    @Test
+    public void testPromotedLegCommentAndFirstRawReadingCommentAreCombined() {
+        // Rare edge case: the leg's own comment and its first raw reading's own comment both
+        // want the one trailing-comment slot the first line has - they're joined with " :: ",
+        // matching the convention already used for merging passage and leg comments on import.
+        Survey survey = new Survey();
+        Station destination = new Station("2");
+        Leg rawReading1 = new Leg(5, 0, 0);
+        rawReading1.setComment("cold draught");
+        Leg rawReading2 = new Leg(5, 0, 0);
+        Leg promoted =
+                Leg.upgradeSplayToConnectedLeg(
+                        rawReading1, destination, new Leg[] {rawReading1, rawReading2});
+        promoted.setComment("Big Sandy Chamber");
+        survey.getOrigin().addOnwardLeg(promoted);
+
+        String content = new SurvexExporter().getContent(survey);
+
+        Assert.assertTrue(content.contains("Big Sandy Chamber :: cold draught"));
     }
 
     @Test

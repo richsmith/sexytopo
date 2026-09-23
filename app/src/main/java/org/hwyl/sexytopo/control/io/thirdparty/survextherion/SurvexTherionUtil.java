@@ -253,38 +253,98 @@ public class SurvexTherionUtil {
             toName = format.getSplayStationName();
         }
 
+        if (leg.wasPromoted() && format.canAverageRepeatedLegs()) {
+            formatRepeatedReadingsForAveraging(builder, fromName, toName, leg);
+            return;
+        }
+
+        formatDataLine(builder, fromName, toName, leg, leg.getComment());
+
+        // Formats that can't average repeated legs themselves (currently Therion) still get
+        // the averaged reading above, followed by its raw readings on commented-out lines,
+        // for reference only - neither Survex nor Therion parses these as data.
+        if (leg.wasPromoted()) {
+            formatCommentedPrecursorLines(builder, format, fromName, toName, leg.getPromotedFrom());
+        }
+    }
+
+    /**
+     * Writes a promoted leg's raw readings as separate, real data lines, with no averaged summary
+     * line - for formats whose own network reduction can average repeat legs between the same
+     * station pair itself; see {@link SurveyFormat#canAverageRepeatedLegs()}.
+     *
+     * <p>The leg's own comment, if any, is attached to the first reading's line, since there's no
+     * single "main" line left to hold it; if that first raw reading also carries its own comment,
+     * the two are joined (see combineComments).
+     */
+    private static void formatRepeatedReadingsForAveraging(
+            StringBuilder builder, String fromName, String toName, Leg leg) {
+
+        Leg[] precursors = leg.getPromotedFrom();
+        for (int i = 0; i < precursors.length; i++) {
+            if (i > 0) {
+                builder.append("\n");
+            }
+            Leg precursor = precursors[i];
+            String trailingComment =
+                    (i == 0)
+                            ? combineComments(leg.getComment(), precursor.getComment())
+                            : precursor.getComment();
+            formatDataLine(builder, fromName, toName, precursor, trailingComment);
+        }
+    }
+
+    /**
+     * Writes a promoted leg's raw readings on commented-out lines below the averaged main line, for
+     * reference only - used by formats that can't average repeat legs themselves.
+     */
+    private static void formatCommentedPrecursorLines(
+            StringBuilder builder,
+            SurveyFormat format,
+            String fromName,
+            String toName,
+            Leg[] precursors) {
+
+        char commentChar = format.getCommentChar();
+        for (Leg precursor : precursors) {
+            builder.append("\n");
+            builder.append(commentChar);
+            formatDataLine(builder, fromName, toName, precursor, precursor.getComment());
+        }
+    }
+
+    /** Writes one from/to/tape/compass/clino data line, with an optional trailing comment. */
+    private static void formatDataLine(
+            StringBuilder builder,
+            String fromName,
+            String toName,
+            Leg leg,
+            String trailingComment) {
+
         formatField(builder, fromName);
         formatField(builder, toName);
         formatField(builder, TableCol.DISTANCE.format(leg.getDistance(), Locale.UK));
         formatField(builder, TableCol.AZIMUTH.format(leg.getAzimuth(), Locale.UK));
         formatField(builder, formatInclination(leg.getInclination()));
 
-        // Append comment on the active data line if present (Cases 1 & 2)
-        if (leg.hasComment()) {
-            builder.append(flattenComment(leg.getComment()));
+        if (trailingComment != null && !trailingComment.isEmpty()) {
+            builder.append(flattenComment(trailingComment));
         }
+    }
 
-        // Handle promoted legs - put readings on subsequent lines
-        if (leg.wasPromoted()) {
-            char commentChar = format.getCommentChar();
-            Leg[] precursors = leg.getPromotedFrom();
-            for (Leg precursor : precursors) {
-                builder.append("\n");
-                builder.append(commentChar);
-                builder.append(fromName).append("\t");
-                builder.append(toName).append("\t");
-                builder.append(TableCol.DISTANCE.format(precursor.getDistance(), Locale.UK))
-                        .append("\t");
-                builder.append(TableCol.AZIMUTH.format(precursor.getAzimuth(), Locale.UK))
-                        .append("\t");
-                builder.append(formatInclination(precursor.getInclination()));
-
-                // Append precursor splay comment if present (Case 3)
-                if (precursor.hasComment()) {
-                    builder.append("\t").append(flattenComment(precursor.getComment()));
-                }
-            }
+    /**
+     * Combines two optional comments into the one trailing-comment slot a data line has room for,
+     * joining them with " :: " (matching the convention already used for merging passage and leg
+     * comments on import) when both are set, and returning whichever one is set (or "" if neither
+     * is) otherwise.
+     */
+    private static String combineComments(String primary, String secondary) {
+        boolean hasPrimary = primary != null && !primary.isEmpty();
+        boolean hasSecondary = secondary != null && !secondary.isEmpty();
+        if (hasPrimary && hasSecondary) {
+            return primary + " :: " + secondary;
         }
+        return hasPrimary ? primary : (hasSecondary ? secondary : "");
     }
 
     private static String flattenComment(String comment) {

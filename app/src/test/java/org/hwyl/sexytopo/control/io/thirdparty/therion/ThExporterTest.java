@@ -156,6 +156,23 @@ public class ThExporterTest {
     }
 
     @Test
+    public void testPromotedLegsStillExportAsAveragedLinePlusCommentedRawReadings() {
+        // Regression: unlike Survex, Therion can't average repeat legs between the same
+        // station pair itself yet, so a promoted leg must still export as a single averaged
+        // line followed by its raw readings on commented-out lines, for reference only.
+        Survey oneNorth = BasicTestSurveyCreator.createStraightNorthThroughRepeats();
+
+        String centrelineData = SurvexTherionUtil.getCentrelineData(oneNorth, SurveyFormat.THERION);
+
+        Assert.assertTrue(centrelineData.contains("1\t2\t5.000\t0.00\t0.00"));
+        long commentedRawReadingLines =
+                Arrays.stream(centrelineData.split("\n"))
+                        .filter(line -> line.startsWith("#1\t2\t5.000\t0.00\t0.00"))
+                        .count();
+        Assert.assertEquals(3, commentedRawReadingLines);
+    }
+
+    @Test
     public void testTherionMetadataIncludesInstrumentWhenPresent() {
         Survey survey = new Survey();
         Trip trip = new Trip();
