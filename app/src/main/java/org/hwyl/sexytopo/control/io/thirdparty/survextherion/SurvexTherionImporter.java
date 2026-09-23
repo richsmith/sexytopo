@@ -11,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
+import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -35,7 +36,9 @@ public class SurvexTherionImporter {
      *
      * <p>Handles: - Forward and backward legs (detects based on station order) - Promoted legs in
      * inline{} format: {from: d1 a1 i1, d2 a2 i2, ...} - Promoted legs in commented new lines
-     * format (below main leg) - Both Survex (;) and Therion (#) comment styles
+     * format (below main leg) - Promoted legs written as several repeated real lines between the
+     * same station pair, averaged on import - see {@link SurveyFormat#canAverageRepeatedLegs()} -
+     * Both Survex (;) and Therion (#) comment styles
      *
      * @param text The centreline data text
      * @param survey The survey to populate
@@ -89,40 +92,40 @@ public class SurvexTherionImporter {
             }
 
             try {
-                String[] allTokens = trimmed.split("\\s+");
-
-                // A valid leg line must have at least 5 tokens:
-                // from to distance azimuth inclination
-                if (allTokens.length < 5) {
-                    continue;
+                ParsedLegLine current = parseLegLine(trimmed);
+                if (current == null) {
+                    continue; // fewer than 5 tokens - not a valid leg line
                 }
 
-                String[] legFields = Arrays.copyOfRange(allTokens, 0, 5);
+                boolean isSplay = SPLAY_STATION_TOKENS.contains(current.toName);
 
-                // Any tokens after the 5 leg fields form the comment tail.
-                // The tail may optionally start with a comment character (# or ;) which is
-                // stripped — both "1 2 3.0 45.0 0.0 # My Chamber" and
-                // "1 2 3.0 45.0 0.0 My Chamber" are valid and produce the same comment.
-                String comment = "";
-                if (allTokens.length > 5) {
-                    String tail =
-                            String.join(" ", Arrays.copyOfRange(allTokens, 5, allTokens.length));
-                    if (tail.startsWith(";") || tail.startsWith("#")) {
-                        tail = tail.substring(1).trim();
+                // Splays are never grouped - each is its own independent reading, even when
+                // several share the same anonymous-station token as their "to".
+                if (!isSplay) {
+                    List<ParsedLegLine> repeatGroup =
+                            collectRepeatedRealLines(lines, lineIndex, current);
+                    if (repeatGroup.size() > 1) {
+                        addAveragedLegGroupToSurvey(
+                                survey, nameToStation, repeatGroup, useLegComments);
+                        lineIndex += repeatGroup.size() - 1;
+                        continue;
                     }
-                    comment = tail;
                 }
 
                 // Check for commented new lines promoted legs in subsequent lines
                 List<Leg> commentedNewLineLegs =
                         parseCommentedNewLinePromotedLegs(
-                                lines, lineIndex, legFields[0], legFields[1], useLegComments);
+                                lines, lineIndex, current.fromName, current.toName, useLegComments);
 
                 addLegToSurvey(
                         survey,
                         nameToStation,
-                        legFields,
-                        comment,
+                        current.fromName,
+                        current.toName,
+                        current.distance,
+                        current.azimuth,
+                        current.inclination,
+                        current.comment,
                         commentedNewLineLegs,
                         useLegComments);
 
@@ -471,19 +474,156 @@ public class SurvexTherionImporter {
     private static final List<String> SPLAY_STATION_TOKENS =
             Arrays.asList(SexyTopoConstants.BLANK_STATION_NAME, ".", "..", "...");
 
+    /** A single leg line's fields, parsed but not yet added to the survey. */
+    private static final class ParsedLegLine {
+        final String fromName;
+        final String toName;
+        final float distance;
+        final float azimuth;
+        final float inclination;
+        final String comment;
+
+        ParsedLegLine(
+                String fromName,
+                String toName,
+                float distance,
+                float azimuth,
+                float inclination,
+                String comment) {
+            this.fromName = fromName;
+            this.toName = toName;
+            this.distance = distance;
+            this.azimuth = azimuth;
+            this.inclination = inclination;
+            this.comment = comment;
+        }
+    }
+
+    /**
+     * Parses a trimmed line's leading five fields (from, to, tape, compass, clino) and any trailing
+     * comment. Returns null if the line doesn't have at least five whitespace-separated tokens, so
+     * isn't a valid leg line.
+     *
+     * <p>Any tokens after the five fields form the comment tail, which may optionally start with a
+     * comment character (# or ;) that is stripped - both "1 2 3.0 45.0 0.0 # My Chamber" and "1 2
+     * 3.0 45.0 0.0 My Chamber" are valid and produce the same comment.
+     */
+    private static ParsedLegLine parseLegLine(String trimmedLine) {
+        String[] allTokens = trimmedLine.split("\\s+");
+        if (allTokens.length < 5) {
+            return null;
+        }
+
+        String fromName = allTokens[0];
+        String toName = allTokens[1];
+        float distance = Float.parseFloat(allTokens[2]);
+        float azimuth = Float.parseFloat(allTokens[3]);
+        float inclination = Float.parseFloat(allTokens[4]);
+
+        String comment = "";
+        if (allTokens.length > 5) {
+            String tail = String.join(" ", Arrays.copyOfRange(allTokens, 5, allTokens.length));
+            if (tail.startsWith(";") || tail.startsWith("#")) {
+                tail = tail.substring(1).trim();
+            }
+            comment = tail;
+        }
+
+        return new ParsedLegLine(fromName, toName, distance, azimuth, inclination, comment);
+    }
+
+    /**
+     * Collects the maximal run of consecutive real (non-comment, non-blank, non-command) leg lines,
+     * starting at first, that share the same from/to station pair.
+     *
+     * <p>This is how a promoted (averaged) leg is recognised when it's been written as several
+     * repeated real lines rather than a single averaged line - Survex's own convention, since its
+     * network reduction can average repeat legs between the same station pair itself; see {@link
+     * SurveyFormat#canAverageRepeatedLegs()}. The group is only ever more than one line long for a
+     * real, named station pair: a splay is never grouped this way, even when several splays in a
+     * row share the same anonymous-station token as their "to".
+     */
+    private static List<ParsedLegLine> collectRepeatedRealLines(
+            String[] lines, int startIndex, ParsedLegLine first) {
+
+        List<ParsedLegLine> group = new ArrayList<>();
+        group.add(first);
+
+        for (int i = startIndex + 1; i < lines.length; i++) {
+            String trimmed = lines[i].trim();
+            if (trimmed.isEmpty()
+                    || trimmed.startsWith("*")
+                    || trimmed.startsWith(";")
+                    || trimmed.startsWith("#")) {
+                break;
+            }
+
+            ParsedLegLine candidate = parseLegLine(trimmed);
+            if (candidate == null
+                    || !candidate.fromName.equals(first.fromName)
+                    || !candidate.toName.equals(first.toName)) {
+                break;
+            }
+
+            group.add(candidate);
+        }
+
+        return group;
+    }
+
+    /**
+     * Adds a leg built from several repeated real readings between the same station pair, averaging
+     * them the same way the app does when it promotes repeated readings during a live survey (see
+     * {@link SurveyUpdater#averageLegs}), and keeping the raw readings as the resulting leg's
+     * promotedFrom.
+     *
+     * <p>The first line's own trailing comment (if any) becomes the resulting leg's own comment;
+     * any other line's trailing comment becomes that specific raw reading's own comment - the same
+     * split SurvexTherionUtil's export side uses.
+     */
+    private static void addAveragedLegGroupToSurvey(
+            Survey survey,
+            Map<String, Station> nameToStation,
+            List<ParsedLegLine> group,
+            boolean useLegComments) {
+
+        List<Leg> rawLegs = new ArrayList<>();
+        for (int i = 0; i < group.size(); i++) {
+            ParsedLegLine parsedLine = group.get(i);
+            Leg rawLeg = new Leg(parsedLine.distance, parsedLine.azimuth, parsedLine.inclination);
+            if (useLegComments && i > 0 && !parsedLine.comment.isEmpty()) {
+                rawLeg.setComment(parsedLine.comment);
+            }
+            rawLegs.add(rawLeg);
+        }
+
+        Leg averaged = SurveyUpdater.averageLegs(rawLegs);
+        ParsedLegLine first = group.get(0);
+
+        addLegToSurvey(
+                survey,
+                nameToStation,
+                first.fromName,
+                first.toName,
+                averaged.getDistance(),
+                averaged.getAzimuth(),
+                averaged.getInclination(),
+                first.comment,
+                rawLegs,
+                useLegComments);
+    }
+
     private static void addLegToSurvey(
             Survey survey,
             Map<String, Station> nameToStation,
-            String[] fields,
+            String fromName,
+            String toName,
+            float distance,
+            float azimuth,
+            float inclination,
             String comment,
-            List<Leg> commentedNewLineLegs,
+            List<Leg> rawPromotedLegCandidates,
             boolean useLegComments) {
-
-        String fromName = fields[0];
-        String toName = fields[1];
-        float distance = Float.parseFloat(fields[2]);
-        float azimuth = Float.parseFloat(fields[3]);
-        float inclination = Float.parseFloat(fields[4]);
 
         boolean isSplay = SPLAY_STATION_TOKENS.contains(toName);
 
@@ -520,9 +660,10 @@ public class SurvexTherionImporter {
             comment = comment.replace(commentInstructions, "").trim();
         }
 
-        // If no inline{} promoted legs, use commented new lines if available
-        if (promotedFrom.length == 0 && !commentedNewLineLegs.isEmpty()) {
-            promotedFrom = commentedNewLineLegs.toArray(new Leg[0]);
+        // If no inline{} promoted legs, use whichever raw promoted-leg readings were found -
+        // either commented new lines, or a run of repeated real lines (see parseCentreline)
+        if (promotedFrom.length == 0 && !rawPromotedLegCandidates.isEmpty()) {
+            promotedFrom = rawPromotedLegCandidates.toArray(new Leg[0]);
         }
 
         Leg leg;

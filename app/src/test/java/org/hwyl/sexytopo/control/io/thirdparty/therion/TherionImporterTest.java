@@ -732,6 +732,20 @@ public class TherionImporterTest {
     }
 
     @Test
+    public void testTherionAlsoImportsRepeatedRealLinesForm() throws Exception {
+        // Forward compatibility: Therion doesn't write promoted legs this way yet (its own
+        // network reduction can't average repeat legs between the same station pair itself -
+        // see SurveyFormat.canAverageRepeatedLegs), but the shared importer must still be able
+        // to read the form if it appears in a file, ready for when Therion gains the capability.
+        final String text = "1\t2\t5.001\t0.02\t0.01\n" + "1\t2\t4.999\t359.98\t-0.01\n";
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(text, survey, true);
+
+        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Assert.assertEquals(2, leg.getPromotedFrom().length);
+    }
+
+    @Test
     public void testChronologicalOrderPreserved() throws Exception {
         Survey survey = new Survey();
         TherionImporter.updateCentreline(SPLAYS_BEFORE_LEGS_LINES, survey);

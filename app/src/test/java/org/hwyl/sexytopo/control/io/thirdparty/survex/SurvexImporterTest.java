@@ -1,11 +1,16 @@
 package org.hwyl.sexytopo.control.io.thirdparty.survex;
 
+import java.util.Arrays;
+import java.util.List;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionImporter;
+import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
+import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
+import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -217,6 +222,152 @@ public class SurvexImporterTest {
 
         Assert.assertNull(survey.getStationByName("-"));
         Assert.assertEquals(1, survey.getOrigin().getUnconnectedOnwardLegs().size());
+    }
+
+    // --- Repeated real lines (Survex-style averaging on import) ---
+
+    @Test
+    public void testRepeatedRealLinesAreAveragedIntoOnePromotedLeg() throws Exception {
+        final String text =
+                "1\t2\t5.001\t0.02\t0.01\n"
+                        + "1\t2\t4.999\t359.98\t-0.01\n"
+                        + "1\t2\t5.000\t0.00\t0.02\n";
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(text, survey, true);
+
+        Assert.assertEquals(2, survey.getAllStations().size());
+        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Assert.assertEquals(3, leg.getPromotedFrom().length);
+    }
+
+    @Test
+    public void testRepeatedRealLinesMatchDirectAveraging() throws Exception {
+        // The importer's result must agree with SurveyUpdater.averageLegs on the same readings
+        List<Leg> raw =
+                Arrays.asList(
+                        new Leg(5.001f, 0.02f, 0.01f),
+                        new Leg(4.999f, 359.98f, -0.01f),
+                        new Leg(5.000f, 0.00f, 0.02f));
+        Leg expected = SurveyUpdater.averageLegs(raw);
+
+        final String text =
+                "1\t2\t5.001\t0.02\t0.01\n"
+                        + "1\t2\t4.999\t359.98\t-0.01\n"
+                        + "1\t2\t5.000\t0.00\t0.02\n";
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(text, survey, true);
+        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+
+        Assert.assertEquals(expected.getDistance(), leg.getDistance(), 0.001);
+        Assert.assertEquals(expected.getAzimuth(), leg.getAzimuth(), 0.001);
+        Assert.assertEquals(expected.getInclination(), leg.getInclination(), 0.001);
+    }
+
+    @Test
+    public void testSingleLineIsNotTreatedAsAGroup() throws Exception {
+        // Regression: an ordinary single leg must not be wrapped in a spurious promotion
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline("1\t2\t5.0\t0.0\t0.0", survey);
+        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Assert.assertFalse(leg.wasPromoted());
+    }
+
+    @Test
+    public void testGroupCommentGoesOnLegOwnComment() throws Exception {
+        final String text =
+                "1\t2\t5.001\t0.02\t0.01\tBig Sandy Chamber\n" + "1\t2\t4.999\t359.98\t-0.01\n";
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(text, survey, true);
+        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Assert.assertEquals("Big Sandy Chamber", leg.getComment());
+    }
+
+    @Test
+    public void testSecondLineCommentGoesOnThatRawReadingNotTheLeg() throws Exception {
+        final String text =
+                "1\t2\t5.001\t0.02\t0.01\n" + "1\t2\t4.999\t359.98\t-0.01\tcold draught\n";
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(text, survey, true);
+        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+
+        Assert.assertTrue(leg.getComment() == null || leg.getComment().isEmpty());
+        Assert.assertEquals("cold draught", leg.getPromotedFrom()[1].getComment());
+    }
+
+    @Test
+    public void testGroupCommentGoesToStationInLegacyMode() throws Exception {
+        // useLegComments=false: legacy path - the first line's comment goes on the "to"
+        // station, not the leg, matching the single-line legacy behaviour.
+        final String text =
+                "1\t2\t5.001\t0.02\t0.01\tBig Sandy Chamber\n" + "1\t2\t4.999\t359.98\t-0.01\n";
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(text, survey, false);
+
+        Assert.assertEquals("Big Sandy Chamber", survey.getStationByName("2").getComment());
+        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Assert.assertTrue(leg.getComment() == null || leg.getComment().isEmpty());
+        Assert.assertEquals(2, leg.getPromotedFrom().length);
+    }
+
+    @Test
+    public void testSecondLineCommentIgnoredInLegacyMode() throws Exception {
+        final String text =
+                "1\t2\t5.001\t0.02\t0.01\n" + "1\t2\t4.999\t359.98\t-0.01\tcold draught\n";
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(text, survey, false);
+
+        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Assert.assertEquals(2, leg.getPromotedFrom().length);
+        Assert.assertTrue(
+                leg.getPromotedFrom()[1].getComment() == null
+                        || leg.getPromotedFrom()[1].getComment().isEmpty());
+    }
+
+    @Test
+    public void testRepeatedRealLinesGroupingRespectsBackwardLegDirection() throws Exception {
+        // A backward group (the "from" station in the file is new, "to" already exists) must
+        // still be averaged as a single leg, not split apart by the ordinary per-line
+        // forward/backward detection - which would otherwise mis-read the group's second
+        // line onward, since by then both stations already look "seen".
+        final String text =
+                "1\t2\t5.0\t0.0\t0.0\n" // establishes stations 1 and 2
+                        + "3\t2\t5.001\t180.02\t-0.01\n" // backward: 3 is new, 2 already exists
+                        + "3\t2\t4.999\t179.98\t0.01\n";
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(text, survey, true);
+
+        Station two = survey.getStationByName("2");
+        Assert.assertEquals(1, two.getConnectedOnwardLegs().size());
+        Leg backwardLeg = two.getConnectedOnwardLegs().get(0);
+        Assert.assertEquals(2, backwardLeg.getPromotedFrom().length);
+    }
+
+    @Test
+    public void testLegsAfterARepeatedGroupAreStillParsedCorrectly() throws Exception {
+        // Regression: after consuming a repeat group, the line cursor must resume at the very
+        // next line - not skip past it, and not reprocess any line inside the group.
+        final String text =
+                "1\t2\t5.001\t0.02\t0.01\n"
+                        + "1\t2\t4.999\t359.98\t-0.01\n"
+                        + "2\t3\t5.0\t0.0\t0.0\n";
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(text, survey, true);
+
+        Assert.assertEquals(3, survey.getAllStations().size());
+        Assert.assertNotNull(survey.getStationByName("3"));
+    }
+
+    @Test
+    public void testSurvexPromotedLegRoundTrips() throws Exception {
+        Survey original = BasicTestSurveyCreator.createStraightNorthThroughRepeats();
+        String centreline = SurvexTherionUtil.getCentrelineData(original, SurveyFormat.SURVEX);
+
+        Survey reimported = new Survey();
+        SurvexTherionImporter.parseCentreline(centreline, reimported, true);
+
+        Leg leg = reimported.getOrigin().getConnectedOnwardLegs().get(0);
+        Assert.assertEquals(3, leg.getPromotedFrom().length);
+        Assert.assertEquals(5.0f, leg.getDistance(), 0.001);
     }
 
     // --- Metadata date parsing ---
