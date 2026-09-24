@@ -72,6 +72,11 @@
     <string name="action_file_exit">Exit SexyTopo</string>
     <string name="action_file_import_file">Import File…</string>
     <string name="action_file_import_directory">Import Folder…</string>
+    <string name="import_choose_format">Multiple formats found — choose format to import</string>
+    <string name="import_choose_svx_file">Multiple .svx files found — choose file to import</string>
+    <string name="import_choose_th_file">Multiple .th files found — choose file to import</string>
+    <string name="import_choose_espec">No matching .espec found — choose one or skip</string>
+    <string name="import_espec_none">None — extend everything right</string>
     <string name="action_file_share">Share…</string>
     <string name="action_input">Input Mode</string>
     <string name="action_input_mode_forward">Forward</string>
@@ -154,6 +159,7 @@
     <string name="export_select_type">Select export format</string>
     <string name="export_successful">Export completed</string>
     <string name="export_failed">Export failed</string>
+    <string name="export_survey_needs_saving">This survey needs to be saved before it can be exported</string>
     <string name="third_party_therion" translatable="false">Therion</string>
     <string name="third_party_pocket_topo" translatable="false">PocketTopo (.top)</string>
     <string name="third_party_pocket_topo_txt" translatable="false">PocketTopo .txt</string>
