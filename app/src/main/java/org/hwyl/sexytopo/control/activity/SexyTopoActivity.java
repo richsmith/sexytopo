@@ -52,6 +52,7 @@ import org.hwyl.sexytopo.comms.missing.NullCommunicator;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SexyTopoPermissions;
 import org.hwyl.sexytopo.control.SurveyManager;
+import org.hwyl.sexytopo.control.components.DialogImportChooser;
 import org.hwyl.sexytopo.control.components.DialogUtils;
 import org.hwyl.sexytopo.control.components.StationSelectorDialog;
 import org.hwyl.sexytopo.control.io.IoUtils;
@@ -61,6 +62,7 @@ import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.control.io.basic.Saver;
 import org.hwyl.sexytopo.control.io.share.SurveyZipSharer;
 import org.hwyl.sexytopo.control.io.translation.Exporter;
+import org.hwyl.sexytopo.control.io.translation.ImportCallback;
 import org.hwyl.sexytopo.control.io.translation.ImportManager;
 import org.hwyl.sexytopo.control.io.translation.SelectableExporters;
 import org.hwyl.sexytopo.control.table.LegDialogs;
@@ -319,7 +321,11 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             confirmToProceedIfNotSaved("requestImportSurveyDirectory");
             return true;
         } else if (itemId == R.id.action_file_export) {
-            confirmToProceedIfNotSaved("requestExportSurvey");
+            if (getSurvey().hasHome()) {
+                confirmToProceedIfNotSaved("requestExportSurvey");
+            } else {
+                requestSaveBeforeExport();
+            }
             return true;
         } else if (itemId == R.id.action_file_share) {
             requestShareSurvey();
@@ -589,6 +595,17 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                             Exporter exporter = SelectableExporters.fromName(this, names[which]);
                             exportSurvey(exporter);
                         })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    /**
+     * Exports are written inside the survey's folder, so a survey without one can't be exported.
+     */
+    private void requestSaveBeforeExport() {
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.export_survey_needs_saving)
+                .setPositiveButton(R.string.action_file_save_as, (dialog, which) -> requestSaveAs())
                 .setNegativeButton(R.string.cancel, null)
                 .show();
     }
@@ -1030,15 +1047,27 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
     protected void importSurvey(DocumentFile file) {
-        try {
-            Survey survey = ImportManager.toSurvey(this, file);
-            survey.checkSurveyIntegrity();
-            getSurveyManager().setCurrentSurvey(survey);
-            showSimpleToast(R.string.import_successful);
+        ImportManager.importSurvey(
+                this,
+                file,
+                new DialogImportChooser(this),
+                new ImportCallback() {
+                    @Override
+                    public void onImported(Survey survey) {
+                        try {
+                            survey.checkSurveyIntegrity();
+                            getSurveyManager().setCurrentSurvey(survey);
+                            showSimpleToast(R.string.import_successful);
+                        } catch (Exception exception) {
+                            onImportFailed(exception);
+                        }
+                    }
 
-        } catch (Exception exception) {
-            showExceptionAndLog(R.string.import_failed, exception);
-        }
+                    @Override
+                    public void onImportFailed(Exception exception) {
+                        showExceptionAndLog(R.string.import_failed, exception);
+                    }
+                });
     }
 
     protected void exportSurvey(Exporter exporter) {

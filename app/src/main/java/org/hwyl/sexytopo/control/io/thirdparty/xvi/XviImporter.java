@@ -46,7 +46,9 @@ public class XviImporter extends Importer {
     }
 
     public boolean canHandleFile(DocumentFile file) {
-        return file.isFile() && !file.isDirectory() && file.getName().endsWith("xvi");
+        return file.isFile()
+                && !file.isDirectory()
+                && file.getName().endsWith("." + XviConstants.XVI_EXTENSION);
     }
 
     public Grid parseGrid(String contents) throws Exception {
