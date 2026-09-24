@@ -1,6 +1,7 @@
 package org.hwyl.sexytopo.model.sketch;
 
 import org.hwyl.sexytopo.model.graph.Coord2D;
+import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.junit.Assert;
@@ -100,5 +101,54 @@ public class SketchTest {
 
         Assert.assertSame(planDetail, plan.getCrossSectionDetail(station));
         Assert.assertNull(elevation.getCrossSectionDetail(station));
+    }
+
+    @Test
+    public void testSettingTheCrossSectionScaleUpdatesAnExistingDetailsBoundingBox() {
+        Sketch sketch = new Sketch();
+        Station station = new Station("A1");
+        station.addOnwardLeg(new Leg(2, 90, 0));
+        sketch.addCrossSection(new CrossSection(station, 0f), Coord2D.ORIGIN);
+        CrossSectionDetail detail = sketch.getCrossSectionDetail(station);
+
+        sketch.setCrossSectionScale(3f);
+
+        Assert.assertEquals(3f, detail.getCrossSectionScale(), 0f);
+        Assert.assertEquals(6f, detail.getRight(), 1e-4f);
+        // The sketch's own aggregate box must be rebuilt too, not just the detail's own
+        Assert.assertEquals(6f, sketch.getRight(), 1e-4f);
+    }
+
+    @Test
+    public void testAddingACrossSectionSyncsItToTheSketchsCurrentScale() {
+        Sketch sketch = new Sketch();
+        sketch.setCrossSectionScale(2f);
+        Station station = new Station("A1");
+        station.addOnwardLeg(new Leg(2, 90, 0));
+
+        // Built with the default scale, then added to a sketch already at a different scale
+        CrossSectionDetail detail =
+                new CrossSectionDetail(new CrossSection(station, 0f), Coord2D.ORIGIN);
+        Assert.assertEquals(1f, detail.getCrossSectionScale(), 0f);
+
+        sketch.addCrossSection(detail);
+
+        Assert.assertEquals(2f, detail.getCrossSectionScale(), 0f);
+        Assert.assertEquals(4f, detail.getRight(), 1e-4f);
+    }
+
+    @Test
+    public void testSettingCrossSectionDetailsRecalculatesTheSketchsBoundingBox() {
+        // Reproduces what happens on loading a survey: the list of cross-section details is
+        // replaced wholesale, as one operation, rather than added one at a time
+        Sketch sketch = new Sketch();
+        Station station = new Station("A1");
+        station.addOnwardLeg(new Leg(2, 90, 0));
+        CrossSectionDetail farDetail =
+                new CrossSectionDetail(new CrossSection(station, 0f), new Coord2D(500, 0));
+
+        sketch.setCrossSectionDetails(java.util.Collections.singletonList(farDetail));
+
+        Assert.assertEquals(502f, sketch.getRight(), 1e-4f);
     }
 }

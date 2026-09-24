@@ -14,8 +14,15 @@ public class CrossSectionDetail extends SinglePositionDetail {
 
     private final CrossSection crossSection;
 
-    // The sub-sketch is the one mutable aspect of a cross-section detail:
+    // The sub-sketch is one mutable aspect of a cross-section detail:
     private Sketch sketch;
+
+    // The other is the cross-section scale it is drawn at. This is a survey-wide setting (see
+    // Survey.setCrossSectionScale), copied here so the bounding box can reflect the size the
+    // cross-section is actually drawn at, without every caller having to know the scale too.
+    // Sketch.setCrossSectionScale and Sketch.addCrossSection keep this in sync with the sketch
+    // that holds this detail.
+    private float crossSectionScale = Sketch.DEFAULT_XSECTION_SCALE;
 
     public CrossSectionDetail(CrossSection crossSection, Coord2D position) {
         this(crossSection, position, new Sketch());
@@ -34,21 +41,28 @@ public class CrossSectionDetail extends SinglePositionDetail {
     private static final Coord2D MIN_EXTENT_NW = new Coord2D(-MIN_HALF_EXTENT, -MIN_HALF_EXTENT);
     private static final Coord2D MIN_EXTENT_SE = new Coord2D(MIN_HALF_EXTENT, MIN_HALF_EXTENT);
 
+    /**
+     * Recomputes the bounding box from scratch, at the current cross-section scale. This must reset
+     * first rather than only grow, since it can be called again after something that would shrink
+     * the box: a smaller sub-sketch, or a smaller cross-section scale.
+     */
     private void refreshBoundingBox() {
+        resetBoundingBox();
 
         // Ensure a minimum size so cross-sections with no splays are still usable
-        updateBoundingBox(position.plus(MIN_EXTENT_NW));
-        updateBoundingBox(position.plus(MIN_EXTENT_SE));
+        updateBoundingBox(position.plus(MIN_EXTENT_NW.scale(crossSectionScale)));
+        updateBoundingBox(position.plus(MIN_EXTENT_SE.scale(crossSectionScale)));
 
-        // refresh bbox with outer ends of projection legs
+        // refresh bbox with outer ends of projection legs, at the cross-section scale
         for (Line<Coord2D> line : crossSection.getProjection().getLegMap().values()) {
-            updateBoundingBox(line.getEnd().plus(position));
+            updateBoundingBox(position.plus(line.getEnd().scale(crossSectionScale)));
         }
 
-        // refresh bbox with sketch extremities
-        // updateBoundingBox(sketch.translate(position)); is cleaner but wasteful
-        updateBoundingBox(sketch.getTopLeft().plus(position));
-        updateBoundingBox(sketch.getBottomRight().plus(position));
+        // refresh bbox with sketch extremities, at the cross-section scale
+        // updateBoundingBox(sketch.scale(crossSectionScale).translate(position)); is cleaner but
+        // wasteful
+        updateBoundingBox(position.plus(sketch.getTopLeft().scale(crossSectionScale)));
+        updateBoundingBox(position.plus(sketch.getBottomRight().scale(crossSectionScale)));
     }
 
     public CrossSection getCrossSection() {
@@ -62,6 +76,20 @@ public class CrossSectionDetail extends SinglePositionDetail {
     /** Replace the sub-sketch in place when committing an edit from the cross-section editor. */
     public void setSketch(Sketch sketch) {
         this.sketch = sketch;
+        refreshBoundingBox();
+    }
+
+    /**
+     * The scale this cross-section is drawn at. Kept in sync with the sketch that holds this
+     * detail; see Sketch.setCrossSectionScale.
+     */
+    public float getCrossSectionScale() {
+        return crossSectionScale;
+    }
+
+    /** Sets the cross-section scale and refreshes the bounding box to match. */
+    public void setCrossSectionScale(float crossSectionScale) {
+        this.crossSectionScale = crossSectionScale;
         refreshBoundingBox();
     }
 
@@ -79,16 +107,18 @@ public class CrossSectionDetail extends SinglePositionDetail {
     }
 
     /**
-     * Return a new detail at the same position and with the same sub-sketch, but a new
-     * cross-section angle (compass azimuth in degrees). A cross-section that can't be rotated (a
-     * horizontal one) is left as it is.
+     * Return a new detail at the same position, scale and sub-sketch, but a new cross-section angle
+     * (compass azimuth in degrees). A cross-section that can't be rotated (a horizontal one) is
+     * left as it is.
      */
     public CrossSectionDetail withAngle(float newAngle) {
         if (!crossSection.isRotatable()) {
             return this;
         }
         CrossSection rotated = new CrossSection(crossSection.getStation(), newAngle);
-        return new CrossSectionDetail(rotated, getPosition(), sketch);
+        CrossSectionDetail rotatedDetail = new CrossSectionDetail(rotated, getPosition(), sketch);
+        rotatedDetail.setCrossSectionScale(crossSectionScale);
+        return rotatedDetail;
     }
 
     @Override
@@ -99,6 +129,9 @@ public class CrossSectionDetail extends SinglePositionDetail {
 
     @Override
     public CrossSectionDetail translate(Coord2D translation) {
-        return new CrossSectionDetail(getCrossSection(), getPosition().plus(translation), sketch);
+        CrossSectionDetail translated =
+                new CrossSectionDetail(getCrossSection(), getPosition().plus(translation), sketch);
+        translated.setCrossSectionScale(crossSectionScale);
+        return translated;
     }
 }

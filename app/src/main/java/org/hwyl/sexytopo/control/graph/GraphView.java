@@ -1470,13 +1470,12 @@ public class GraphView extends View {
     /** Draw a rectangular border around the cross-section's full extent (legs + sub-sketch). */
     private RectF drawCrossSectionBorder(
             Canvas canvas, CrossSectionDetail sectionDetail, Coord2D dragDelta, Paint borderPaint) {
-        float xsScale = sketch.getCrossSectionScale();
+        // sectionDetail's bounding box is already at the cross-section scale (see
+        // CrossSectionDetail.refreshBoundingBox), so only the drag offset needs adding here.
         Coord2D centre = sectionDetail.getPosition().plus(dragDelta);
         Coord2D origin = sectionDetail.getPosition();
-        Coord2D scaledTopLeft =
-                centre.plus(sectionDetail.getTopLeft().minus(origin).scale(xsScale));
-        Coord2D scaledBottomRight =
-                centre.plus(sectionDetail.getBottomRight().minus(origin).scale(xsScale));
+        Coord2D scaledTopLeft = centre.plus(sectionDetail.getTopLeft().minus(origin));
+        Coord2D scaledBottomRight = centre.plus(sectionDetail.getBottomRight().minus(origin));
         Coord2D topLeft = surveyCoordsToViewCoords(scaledTopLeft);
         Coord2D bottomRight = surveyCoordsToViewCoords(scaledBottomRight);
         float contentWidth = bottomRight.x - topLeft.x;

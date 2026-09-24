@@ -138,6 +138,13 @@ public class Sketch extends Shape {
 
     public void setCrossSectionScale(float crossSectionScale) {
         this.crossSectionScale = crossSectionScale;
+        for (CrossSectionDetail detail : crossSectionDetails) {
+            detail.setCrossSectionScale(crossSectionScale);
+        }
+        // Each detail's own bounding box is now up to date, but this sketch's bounding box only
+        // grows as details are added (see addSketchDetail), so it must be rebuilt to reflect a
+        // detail that just changed size, larger or smaller.
+        recalculateBoundingBox();
     }
 
     public void undo() {
@@ -282,6 +289,9 @@ public class Sketch extends Shape {
     }
 
     public void addCrossSection(CrossSectionDetail sectionDetail) {
+        // However it was built, a cross-section held by this sketch is drawn at this sketch's
+        // scale, so make sure its bounding box agrees before it is used for anything.
+        sectionDetail.setCrossSectionScale(crossSectionScale);
         crossSectionDetails.add(sectionDetail);
         addSketchDetail(sectionDetail);
     }
@@ -303,6 +313,7 @@ public class Sketch extends Shape {
 
     public void setCrossSectionDetails(List<CrossSectionDetail> crossSectionDetails) {
         this.crossSectionDetails = crossSectionDetails;
+        recalculateBoundingBox();
     }
 
     public CrossSectionDetail getCrossSectionDetail(Station station) {
