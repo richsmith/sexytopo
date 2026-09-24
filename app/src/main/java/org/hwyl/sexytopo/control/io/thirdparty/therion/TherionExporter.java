@@ -13,6 +13,7 @@ import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.io.SurveyDirectory;
 import org.hwyl.sexytopo.control.io.SurveyFile;
 import org.hwyl.sexytopo.control.io.basic.ExportFrameFactory;
+import org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants;
 import org.hwyl.sexytopo.control.io.thirdparty.xvi.XviExporter;
 import org.hwyl.sexytopo.control.io.translation.Exporter;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
@@ -55,15 +56,17 @@ public class TherionExporter extends Exporter {
         readOriginalFilesIfPresent(context, survey);
 
         String thconfigContent = ThconfigExporter.getContent(survey);
-        SurveyFile thconfig = getOutputFile(createFileType("thconfig"));
+        SurveyFile thconfig = getOutputFile(createFileType(TherionConstants.THCONFIG_EXTENSION));
         thconfig.save(context, attribution + thconfigContent);
 
         String planSuffix = GeneralPreferences.getTherionPlanSuffix();
         String eeSuffix = GeneralPreferences.getTherionEeSuffix();
         String xviFolder = GeneralPreferences.getTherionXviFolder();
 
-        SurveyFile.SurveyFileType th2PlanType = createFileType(buildExtension(planSuffix, "th2"));
-        SurveyFile.SurveyFileType xviPlanType = createFileType(buildExtension(planSuffix, "xvi"));
+        SurveyFile.SurveyFileType th2PlanType =
+                createFileType(buildExtension(planSuffix, TherionConstants.TH2_EXTENSION));
+        SurveyFile.SurveyFileType xviPlanType =
+                createFileType(buildExtension(planSuffix, XviConstants.XVI_EXTENSION));
         SurveyFile th2PlanFile = getOutputFile(th2PlanType);
         SurveyFile xviPlanFile = getXviOutputFile(context, xviPlanType, xviFolder);
 
@@ -78,8 +81,10 @@ public class TherionExporter extends Exporter {
                 exportOptions.isStationsInFirstPlanScrap(),
                 xviFolder);
 
-        SurveyFile.SurveyFileType th2EeType = createFileType(buildExtension(eeSuffix, "th2"));
-        SurveyFile.SurveyFileType xviEeType = createFileType(buildExtension(eeSuffix, "xvi"));
+        SurveyFile.SurveyFileType th2EeType =
+                createFileType(buildExtension(eeSuffix, TherionConstants.TH2_EXTENSION));
+        SurveyFile.SurveyFileType xviEeType =
+                createFileType(buildExtension(eeSuffix, XviConstants.XVI_EXTENSION));
         SurveyFile th2EeFile = getOutputFile(th2EeType);
         SurveyFile xviEeFile = getXviOutputFile(context, xviEeType, xviFolder);
 
@@ -100,7 +105,7 @@ public class TherionExporter extends Exporter {
         } else {
             thContent = ThExporter.updateOriginalContent(survey, originalThFileContent, th2Files);
         }
-        SurveyFile th = getOutputFile(createFileType("th"));
+        SurveyFile th = getOutputFile(createFileType(TherionConstants.TH_EXTENSION));
         th.save(context, thContent);
     }
 

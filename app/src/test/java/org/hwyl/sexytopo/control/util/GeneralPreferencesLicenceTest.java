@@ -50,26 +50,26 @@ public class GeneralPreferencesLicenceTest {
     }
 
     @Test
-    public void testOnlyAllRightsReservedIsNotFree() {
-        // Every licence that lets other cavers build on the survey counts as free here,
-        // including the non-commercial ones.
+    public void testOnlyAllRightsReservedDoesNotAllowReuse() {
+        // Every licence that lets other cavers build on the survey counts as allowing reuse
+        // here, including the non-commercial ones.
         for (Licence licence : Licence.values()) {
-            Assert.assertEquals(licence != Licence.ALL_RIGHTS_RESERVED, licence.isFree());
+            Assert.assertEquals(licence != Licence.ALL_RIGHTS_RESERVED, licence.allowsReuse());
         }
     }
 
     @Test
-    public void testSummaryPrefixFollowsFreedom() {
+    public void testSummaryPrefixFollowsReuse() {
         for (Licence licence : Licence.values()) {
             Assert.assertEquals(
-                    licence.isFree() ? Licence.FREE_PREFIX : Licence.WARNING_PREFIX,
+                    licence.allowsReuse() ? Licence.REUSE_PREFIX : Licence.WARNING_PREFIX,
                     licence.getSummaryPrefix());
         }
     }
 
     @Test
-    public void testRecommendedLicenceIsFree() {
-        Assert.assertTrue(Licence.RECOMMENDED.isFree());
+    public void testRecommendedLicenceAllowsReuse() {
+        Assert.assertTrue(Licence.RECOMMENDED.allowsReuse());
     }
 
     @Test

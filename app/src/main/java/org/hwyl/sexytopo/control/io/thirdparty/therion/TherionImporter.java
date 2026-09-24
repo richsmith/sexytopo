@@ -7,49 +7,74 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.io.FilenameUtils;
+import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SexyTopoVersion;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionImporter;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
+import org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants;
 import org.hwyl.sexytopo.control.io.thirdparty.xvi.XviImporter;
+import org.hwyl.sexytopo.control.io.translation.ImportCallback;
+import org.hwyl.sexytopo.control.io.translation.ImportChooser;
 import org.hwyl.sexytopo.control.io.translation.Importer;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
-import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
 
 public class TherionImporter extends Importer {
 
-    public Survey toSurvey(Context context, DocumentFile directory) throws Exception {
+    @Override
+    public boolean canHandleFile(DocumentFile file) {
+        return file.isDirectory() && !findFiles(file, TherionConstants.TH_EXTENSION).isEmpty();
+    }
 
-        Survey survey = null;
-        List<DocumentFile> xviFiles = new ArrayList<>();
-
-        // Parse .th file first to create the survey
-        for (DocumentFile file : directory.listFiles()) {
-            if (file.getName().endsWith("th")) {
-                survey = parseTh(context, file);
-            } else if (file.getName().endsWith("xvi")) {
-                xviFiles.add(file);
-            }
+    @Override
+    public void importSurvey(
+            Context context,
+            DocumentFile directory,
+            ImportChooser chooser,
+            ImportCallback callback) {
+        List<DocumentFile> thFiles = findFiles(directory, TherionConstants.TH_EXTENSION);
+        if (thFiles.size() <= 1) {
+            super.importSurvey(context, directory, chooser, callback);
+        } else {
+            chooser.choose(
+                    R.string.import_choose_th_file,
+                    getNames(thFiles),
+                    index -> {
+                        try {
+                            callback.onImported(toSurvey(context, directory, thFiles.get(index)));
+                        } catch (Exception exception) {
+                            callback.onImportFailed(exception);
+                        }
+                    });
         }
+    }
 
-        // Then apply sketches
-        if (survey != null) {
-            for (DocumentFile file : xviFiles) {
-                String filenameNoExtension = FilenameUtils.removeExtension(file.getName());
-                if (filenameNoExtension.endsWith(SexyTopoConstants.PLAN_SUFFIX)) {
-                    Sketch sketch = XviImporter.getSketch(context, file);
-                    survey.setPlanSketch(sketch);
-                } else if (filenameNoExtension.endsWith(SexyTopoConstants.EE_SUFFIX)) {
-                    Sketch sketch = XviImporter.getSketch(context, file);
-                    survey.setElevationSketch(sketch);
-                }
+    @Override
+    public Survey toSurvey(Context context, DocumentFile directory) throws Exception {
+        List<DocumentFile> thFiles = findFiles(directory, TherionConstants.TH_EXTENSION);
+        if (thFiles.isEmpty()) {
+            throw new IllegalArgumentException("no .th file found");
+        }
+        return toSurvey(context, directory, thFiles.get(0));
+    }
+
+    private static Survey toSurvey(Context context, DocumentFile directory, DocumentFile thFile)
+            throws Exception {
+        Survey survey = parseTh(context, thFile);
+
+        for (DocumentFile file : findFiles(directory, XviConstants.XVI_EXTENSION)) {
+            String filenameNoExtension = FilenameUtils.removeExtension(file.getName());
+            if (filenameNoExtension.endsWith(SexyTopoConstants.PLAN_SUFFIX)) {
+                survey.setPlanSketch(XviImporter.getSketch(context, file));
+            } else if (filenameNoExtension.endsWith(SexyTopoConstants.EE_SUFFIX)) {
+                survey.setElevationSketch(XviImporter.getSketch(context, file));
             }
         }
 
@@ -77,18 +102,6 @@ public class TherionImporter extends Importer {
         }
 
         return survey;
-    }
-
-    public boolean canHandleFile(DocumentFile directory) {
-        if (!directory.isDirectory()) {
-            return false;
-        }
-        for (DocumentFile file : directory.listFiles()) {
-            if (file.getName().endsWith("th")) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public static void updateCentreline(List<String> lines, Survey survey) throws Exception {

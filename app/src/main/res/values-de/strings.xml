@@ -150,9 +150,15 @@
     <!--  Import / Export  -->
     <string name="import_successful">"Import abgeschlossen (noch nicht gespeichert)"</string>
     <string name="import_failed">Import fehlgeschlagen</string>
+    <string name="import_choose_format">Mehrere Formate gefunden — Format zum Importieren wählen</string>
+    <string name="import_choose_svx_file">Mehrere .svx-Dateien gefunden — Datei zum Importieren wählen</string>
+    <string name="import_choose_th_file">Mehrere .th-Dateien gefunden — Datei zum Importieren wählen</string>
+    <string name="import_choose_espec">Keine passende .espec gefunden — eine auswählen oder überspringen</string>
+    <string name="import_espec_none">Keine — alles nach rechts erweitern</string>
     <string name="export_select_type">Exportformat auswählen</string>
     <string name="export_successful">Export abgeschlossen</string>
     <string name="export_failed">Export fehlgeschlagen</string>
+    <string name="export_survey_needs_saving">Die Vermessung muss vor dem Export gespeichert werden</string>
     <string name="created_with">Erzeugt mit %1$s auf %2$s</string>
     <string name="share_type_survey_zip">Vermessungsdateien teilen (ZIP)</string>
     <string name="share_chooser_title">Vermessung teilen über</string>

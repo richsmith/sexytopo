@@ -123,4 +123,13 @@ public enum SurveyFormat {
         }
         return line;
     }
+
+    /**
+     * Whether this format can average repeated readings between the same pair of stations itself,
+     * so promoted legs can be exported as their raw readings. Survex can (its least-squares
+     * adjustment averages parallel legs); Therion can't yet (therion/therion#729).
+     */
+    public boolean canAverageRepeatedLegs() {
+        return this == SURVEX;
+    }
 }

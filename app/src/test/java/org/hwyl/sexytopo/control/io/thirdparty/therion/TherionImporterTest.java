@@ -706,6 +706,42 @@ public class TherionImporterTest {
         Assert.assertEquals(1, splays1.size());
     }
 
+    // --- Splay token recognition (Therion and Survex anonymous-station conventions) ---
+
+    @Test
+    public void testDotSplayImportsAsSplayNotStation() throws Exception {
+        // "." is a valid Therion anonymous-station token (as well as Survex's own convention).
+        // A trailing real leg is needed so station 1 becomes reachable from the origin -
+        // origin is only ever set from a non-splay leg.
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline("1\t.\t1.0\t0.0\t0.0\n1\t2\t5.0\t0.0\t0.0", survey);
+
+        Assert.assertNull(survey.getStationByName("."));
+        Assert.assertEquals(1, survey.getOrigin().getUnconnectedOnwardLegs().size());
+    }
+
+    @Test
+    public void testSurvexDoubleDotSplayIsAlsoRecognisedViaSharedImporter() throws Exception {
+        // The splay-token check is shared between the Survex and Therion importers, so a
+        // Survex-style ".." splay must be recognised even when parsed via this path.
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline("1\t..\t1.0\t0.0\t0.0\n1\t2\t5.0\t0.0\t0.0", survey);
+
+        Assert.assertNull(survey.getStationByName(".."));
+        Assert.assertEquals(1, survey.getOrigin().getUnconnectedOnwardLegs().size());
+    }
+
+    @Test
+    public void testTherionAlsoImportsRepeatedRealLinesForm() throws Exception {
+        // Not exported for Therion yet, but readable for when Therion supports it
+        final String text = "1\t2\t5.001\t0.02\t0.01\n" + "1\t2\t4.999\t359.98\t-0.01\n";
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(text, survey, true);
+
+        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Assert.assertEquals(2, leg.getPromotedFrom().length);
+    }
+
     @Test
     public void testChronologicalOrderPreserved() throws Exception {
         Survey survey = new Survey();

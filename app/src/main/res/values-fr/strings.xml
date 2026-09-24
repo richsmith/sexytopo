@@ -150,9 +150,15 @@
     <!-- Import / Export -->
     <string name="import_successful">"Importation terminée (pas encore sauvegardée)"</string>
     <string name="import_failed">Échec de l\'importation</string>
+    <string name="import_choose_format">Plusieurs formats trouvés — choisir le format à importer</string>
+    <string name="import_choose_svx_file">Plusieurs fichiers .svx trouvés — choisir le fichier à importer</string>
+    <string name="import_choose_th_file">Plusieurs fichiers .th trouvés — choisir le fichier à importer</string>
+    <string name="import_choose_espec">Aucun .espec correspondant trouvé — en choisir un ou ignorer</string>
+    <string name="import_espec_none">Aucun — tout étendre vers la droite</string>
     <string name="export_select_type">Sélectionner le format d\'exportation</string>
     <string name="export_successful">Exportation réussie</string>
     <string name="export_failed">Échec de l\'exportation</string>
+    <string name="export_survey_needs_saving">Le relevé doit être sauvegardé avant de pouvoir être exporté</string>
     <string name="created_with">Créé avec %1$s le %2$s</string>
     <string name="share_type_survey_zip">Partager les fichiers de topographie (ZIP)</string>
     <string name="share_chooser_title">Partager la topographie via</string>
