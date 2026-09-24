@@ -44,9 +44,7 @@ public class SurvexExporterTest {
 
     @Test
     public void testBasicExportWithPromotedLegs() {
-        // Survex can average repeat legs between the same station pair itself, so a promoted
-        // leg is now exported as its raw readings, as real data lines - no averaged summary
-        // line, and no comments.
+        // Survex averages repeated legs itself, so only the raw readings are written
         SurvexExporter survexExporter = new SurvexExporter();
         Survey oneNorth = BasicTestSurveyCreator.createStraightNorthThroughRepeats();
         String content = survexExporter.getContent(oneNorth);
@@ -61,8 +59,6 @@ public class SurvexExporterTest {
 
     @Test
     public void testPromotedLegCommentGoesOnFirstRawLine() {
-        // The leg's own comment has no single "main" line to sit on any more, now that each
-        // raw reading is written as its own real line - it goes on the first one.
         SurvexExporter survexExporter = new SurvexExporter();
         Survey survey = BasicTestSurveyCreator.createStraightNorthThroughRepeats();
         Leg promoted = survey.getOrigin().getConnectedOnwardLegs().get(0);
@@ -82,9 +78,6 @@ public class SurvexExporterTest {
 
     @Test
     public void testPromotedLegCommentAndFirstRawReadingCommentAreCombined() {
-        // Rare edge case: the leg's own comment and its first raw reading's own comment both
-        // want the one trailing-comment slot the first line has - they're joined with " :: ",
-        // matching the convention already used for merging passage and leg comments on import.
         Survey survey = new Survey();
         Station destination = new Station("2");
         Leg rawReading1 = new Leg(5, 0, 0);

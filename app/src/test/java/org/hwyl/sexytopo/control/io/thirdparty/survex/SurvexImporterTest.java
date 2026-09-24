@@ -242,7 +242,6 @@ public class SurvexImporterTest {
 
     @Test
     public void testRepeatedRealLinesMatchDirectAveraging() throws Exception {
-        // The importer's result must agree with SurveyUpdater.averageLegs on the same readings
         List<Leg> raw =
                 Arrays.asList(
                         new Leg(5.001f, 0.02f, 0.01f),
@@ -265,7 +264,6 @@ public class SurvexImporterTest {
 
     @Test
     public void testSingleLineIsNotTreatedAsAGroup() throws Exception {
-        // Regression: an ordinary single leg must not be wrapped in a spurious promotion
         Survey survey = new Survey();
         SurvexTherionImporter.parseCentreline("1\t2\t5.0\t0.0\t0.0", survey);
         Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
@@ -296,8 +294,6 @@ public class SurvexImporterTest {
 
     @Test
     public void testGroupCommentGoesToStationInLegacyMode() throws Exception {
-        // useLegComments=false: legacy path - the first line's comment goes on the "to"
-        // station, not the leg, matching the single-line legacy behaviour.
         final String text =
                 "1\t2\t5.001\t0.02\t0.01\tBig Sandy Chamber\n" + "1\t2\t4.999\t359.98\t-0.01\n";
         Survey survey = new Survey();
@@ -325,10 +321,6 @@ public class SurvexImporterTest {
 
     @Test
     public void testRepeatedRealLinesGroupingRespectsBackwardLegDirection() throws Exception {
-        // A backward group (the "from" station in the file is new, "to" already exists) must
-        // still be averaged as a single leg, not split apart by the ordinary per-line
-        // forward/backward detection - which would otherwise mis-read the group's second
-        // line onward, since by then both stations already look "seen".
         final String text =
                 "1\t2\t5.0\t0.0\t0.0\n" // establishes stations 1 and 2
                         + "3\t2\t5.001\t180.02\t-0.01\n" // backward: 3 is new, 2 already exists
@@ -344,8 +336,6 @@ public class SurvexImporterTest {
 
     @Test
     public void testLegsAfterARepeatedGroupAreStillParsedCorrectly() throws Exception {
-        // Regression: after consuming a repeat group, the line cursor must resume at the very
-        // next line - not skip past it, and not reprocess any line inside the group.
         final String text =
                 "1\t2\t5.001\t0.02\t0.01\n"
                         + "1\t2\t4.999\t359.98\t-0.01\n"
@@ -368,6 +358,49 @@ public class SurvexImporterTest {
         Leg leg = reimported.getOrigin().getConnectedOnwardLegs().get(0);
         Assert.assertEquals(3, leg.getPromotedFrom().length);
         Assert.assertEquals(5.0f, leg.getDistance(), 0.001);
+    }
+
+    @Test
+    public void testSurvexPromotedLegRoundTripIsLossy() throws Exception {
+        // The .svx holds only raw readings, so two things change on a round trip: the leg is
+        // re-averaged with the current algorithm, and the leg's comment and the first reading's
+        // comment share one line, so come back merged onto the leg
+        Leg reading1 = new Leg(5.1f, 1.0f, 2.0f);
+        reading1.setComment("cold draught");
+        Leg reading2 = new Leg(4.9f, 359.0f, -1.0f);
+        Leg reading3 = new Leg(5.0f, 0.5f, 0.0f);
+        Leg[] readings = {reading1, reading2, reading3};
+
+        Survey original = new Survey();
+        Leg promoted =
+                Leg.upgradeSplayToConnectedLeg(
+                        new Leg(5.0f, 0.0f, 0.0f), new Station("2"), readings);
+        promoted.setComment("Big Sandy Chamber");
+        original.getOrigin().addOnwardLeg(promoted);
+
+        String centreline = SurvexTherionUtil.getCentrelineData(original, SurveyFormat.SURVEX);
+        Survey reimported = new Survey();
+        SurvexTherionImporter.parseCentreline(centreline, reimported, true);
+        Leg leg = reimported.getOrigin().getConnectedOnwardLegs().get(0);
+
+        Leg expected = SurveyUpdater.averageLegs(Arrays.asList(readings));
+        Assert.assertEquals(expected.getDistance(), leg.getDistance(), 0.001);
+        Assert.assertEquals(expected.getAzimuth(), leg.getAzimuth(), 0.001);
+        Assert.assertEquals(expected.getInclination(), leg.getInclination(), 0.001);
+
+        Assert.assertEquals("Big Sandy Chamber :: cold draught", leg.getComment());
+        Assert.assertFalse(leg.getPromotedFrom()[0].hasComment());
+    }
+
+    @Test
+    public void testBadLineAfterLegIsReportedAgainstItself() {
+        final String text = "1\t2\t5.0\t0.0\t0.0\n" + "1\t2\t5.0\tnorth\t0.0\n";
+        try {
+            SurvexTherionImporter.parseCentreline(text, new Survey(), true);
+            Assert.fail("Expected an import error");
+        } catch (Exception exception) {
+            Assert.assertTrue(exception.getMessage().endsWith("1\t2\t5.0\tnorth\t0.0"));
+        }
     }
 
     // --- Metadata date parsing ---

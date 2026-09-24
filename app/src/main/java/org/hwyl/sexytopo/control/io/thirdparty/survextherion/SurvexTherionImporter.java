@@ -36,9 +36,8 @@ public class SurvexTherionImporter {
      *
      * <p>Handles: - Forward and backward legs (detects based on station order) - Promoted legs in
      * inline{} format: {from: d1 a1 i1, d2 a2 i2, ...} - Promoted legs in commented new lines
-     * format (below main leg) - Promoted legs written as several repeated real lines between the
-     * same station pair, averaged on import - see {@link SurveyFormat#canAverageRepeatedLegs()} -
-     * Both Survex (;) and Therion (#) comment styles
+     * format (below main leg) - Promoted legs written as consecutive repeated lines between the
+     * same station pair (averaged on import) - Both Survex (;) and Therion (#) comment styles
      *
      * @param text The centreline data text
      * @param survey The survey to populate
@@ -533,15 +532,12 @@ public class SurvexTherionImporter {
     }
 
     /**
-     * Collects the maximal run of consecutive real (non-comment, non-blank, non-command) leg lines,
-     * starting at first, that share the same from/to station pair.
+     * Collects the run of consecutive data lines, starting at first, that share its from/to station
+     * pair. This is how repeated readings of one leg are written for Survex, which averages them
+     * itself. Callers shouldn't pass splays, which are never grouped.
      *
-     * <p>This is how a promoted (averaged) leg is recognised when it's been written as several
-     * repeated real lines rather than a single averaged line - Survex's own convention, since its
-     * network reduction can average repeat legs between the same station pair itself; see {@link
-     * SurveyFormat#canAverageRepeatedLegs()}. The group is only ever more than one line long for a
-     * real, named station pair: a splay is never grouped this way, even when several splays in a
-     * row share the same anonymous-station token as their "to".
+     * <p>The run stops at a blank, comment or command line, or at any line that doesn't parse; an
+     * unparseable line is left for the main loop to report against the right line.
      */
     private static List<ParsedLegLine> collectRepeatedRealLines(
             String[] lines, int startIndex, ParsedLegLine first) {
@@ -558,7 +554,12 @@ public class SurvexTherionImporter {
                 break;
             }
 
-            ParsedLegLine candidate = parseLegLine(trimmed);
+            ParsedLegLine candidate;
+            try {
+                candidate = parseLegLine(trimmed);
+            } catch (NumberFormatException exception) {
+                break;
+            }
             if (candidate == null
                     || !candidate.fromName.equals(first.fromName)
                     || !candidate.toName.equals(first.toName)) {
@@ -572,14 +573,11 @@ public class SurvexTherionImporter {
     }
 
     /**
-     * Adds a leg built from several repeated real readings between the same station pair, averaging
-     * them the same way the app does when it promotes repeated readings during a live survey (see
-     * {@link SurveyUpdater#averageLegs}), and keeping the raw readings as the resulting leg's
-     * promotedFrom.
+     * Adds one leg averaged from repeated readings (using the selected leg amalgamation algorithm,
+     * as for a live survey), keeping the raw readings as its promotedFrom.
      *
-     * <p>The first line's own trailing comment (if any) becomes the resulting leg's own comment;
-     * any other line's trailing comment becomes that specific raw reading's own comment - the same
-     * split SurvexTherionUtil's export side uses.
+     * <p>The first line's trailing comment becomes the leg's comment; any later line's comment
+     * stays on that raw reading.
      */
     private static void addAveragedLegGroupToSurvey(
             Survey survey,

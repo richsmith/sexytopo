@@ -260,22 +260,17 @@ public class SurvexTherionUtil {
 
         formatDataLine(builder, fromName, toName, leg, leg.getComment());
 
-        // Formats that can't average repeated legs themselves (currently Therion) still get
-        // the averaged reading above, followed by its raw readings on commented-out lines,
-        // for reference only - neither Survex nor Therion parses these as data.
+        // Formats that can't average repeated legs get the averaged reading, followed by the raw
+        // readings as comments for reference
         if (leg.wasPromoted()) {
             formatCommentedPrecursorLines(builder, format, fromName, toName, leg.getPromotedFrom());
         }
     }
 
     /**
-     * Writes a promoted leg's raw readings as separate, real data lines, with no averaged summary
-     * line - for formats whose own network reduction can average repeat legs between the same
-     * station pair itself; see {@link SurveyFormat#canAverageRepeatedLegs()}.
-     *
-     * <p>The leg's own comment, if any, is attached to the first reading's line, since there's no
-     * single "main" line left to hold it; if that first raw reading also carries its own comment,
-     * the two are joined (see combineComments).
+     * Writes a promoted leg's raw readings as separate data lines, with no averaged line, for the
+     * format to average itself. The leg's comment goes on the first line, joined with the first
+     * reading's own comment if it has one.
      */
     private static void formatRepeatedReadingsForAveraging(
             StringBuilder builder, String fromName, String toName, Leg leg) {
@@ -294,10 +289,7 @@ public class SurvexTherionUtil {
         }
     }
 
-    /**
-     * Writes a promoted leg's raw readings on commented-out lines below the averaged main line, for
-     * reference only - used by formats that can't average repeat legs themselves.
-     */
+    /** Writes a promoted leg's raw readings as commented-out lines, for reference only. */
     private static void formatCommentedPrecursorLines(
             StringBuilder builder,
             SurveyFormat format,
@@ -332,12 +324,7 @@ public class SurvexTherionUtil {
         }
     }
 
-    /**
-     * Combines two optional comments into the one trailing-comment slot a data line has room for,
-     * joining them with " :: " (matching the convention already used for merging passage and leg
-     * comments on import) when both are set, and returning whichever one is set (or "" if neither
-     * is) otherwise.
-     */
+    /** Joins two optional comments with " :: " if both are set, else returns whichever is. */
     private static String combineComments(String primary, String secondary) {
         boolean hasPrimary = primary != null && !primary.isEmpty();
         boolean hasSecondary = secondary != null && !secondary.isEmpty();
