@@ -1,9 +1,15 @@
 # Unreleased
-- Auto-(re)connect to instrument option (thanks Brendan Hall)
+- Auto-(re)connect to instrument option, now for all supported instruments and with a time limit (thanks Brendan Hall)
+- Fix a disconnected instrument being reported as ready, and a dropped connection being treated as a request to disconnect
 - A copyright notice and licence can now be assigned to a survey, along with some light nudging towards free licences (thanks Andrew Atkinson)
 - Legs can be drawn using only their vertical change in the extended elevation (thanks Andrew Atkinson)
 - Survex export writes repeated leg readings as separate lines for Survex to average, rather than a pre-averaged leg; Survex and Therion import averages repeated readings back into one leg (thanks Andrew Atkinson)
-- Cross-sections can be added to the extended elevation, including horizontal cross-sections for shafts and pitches; the plan and elevation each have their own cross-section scale (thanks Andrew Atkinson). Older versions of SexyTopo will open horizontal cross-sections as vertical ones
+- Survex export writes extended elevation directions to a separate .espec file instead of *extend commands, which made the .svx invalid; importing a folder picks up the .espec along with the .svx (thanks Andrew Atkinson)
+- Survex export writes dates in ISO format (thanks Andrew Atkinson)
+- Survex and Therion import recognise ".", ".." and "..." as splay stations as well as "-" (thanks Andrew Atkinson)
+- Cross-sections can be added to the extended elevation, including horizontal and vertical sections (thanks Andrew Atkinson)
+- Fix Therion export crashing when trip text contains a $ or backslash
+- Fix SVG export writing an invalid file when text such as the copyright holder contains < or >
 
 # 2026-07-08 1.12.3
 - Fix Survex and Therion backwards leg bug (thanks Andrew Atkinson)
