@@ -1,7 +1,7 @@
-# Unreleased
+# 2026-09-25 1.13.0
 - Auto-(re)connect to instrument option, now for all supported instruments and with a time limit (thanks Brendan Hall)
 - Fix a disconnected instrument being reported as ready, and a dropped connection being treated as a request to disconnect
-- A copyright notice and licence can now be assigned to a survey, along with some light nudging towards free licences (thanks Andrew Atkinson)
+- A copyright notice and licence can now be assigned to a survey, along with some light nudging towards free licences (with Andrew Atkinson)
 - Legs can be drawn using only their vertical change in the extended elevation (thanks Andrew Atkinson)
 - Survex export writes repeated leg readings as separate lines for Survex to average, rather than a pre-averaged leg; Survex and Therion import averages repeated readings back into one leg (thanks Andrew Atkinson)
 - Survex export writes extended elevation directions to a separate .espec file instead of *extend commands, which made the .svx invalid; importing a folder picks up the .espec along with the .svx (thanks Andrew Atkinson)
