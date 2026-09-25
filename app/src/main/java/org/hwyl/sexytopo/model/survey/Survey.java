@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import org.hwyl.sexytopo.control.util.StationNamer;
-import org.hwyl.sexytopo.control.util.SurveyTools;
+import org.hwyl.sexytopo.control.util.SurveyTraversal;
 import org.hwyl.sexytopo.control.util.Wrapper;
 import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.sketch.Sketch;
@@ -355,7 +355,7 @@ public class Survey {
         }
 
         final Wrapper wrapper = new Wrapper();
-        SurveyTools.traverseLegs(
+        SurveyTraversal.traverseLegs(
                 this,
                 (origin, leg) -> {
                     if (leg.getDestination() == station) {
@@ -370,7 +370,7 @@ public class Survey {
 
     public Station getOriginatingStation(final Leg leg) {
         final Wrapper wrapper = new Wrapper();
-        SurveyTools.traverseStations(
+        SurveyTraversal.traverseStations(
                 this,
                 station -> {
                     if (station.getOnwardLegs().contains(leg)) {
@@ -391,7 +391,7 @@ public class Survey {
         }
 
         final Leg toDelete = legsInChronoOrder.pop();
-        SurveyTools.traverseLegs(
+        SurveyTraversal.traverseLegs(
                 this,
                 (origin, leg) -> {
                     if (leg == toDelete) {
@@ -411,7 +411,7 @@ public class Survey {
 
     public Station getStationByName(final String name) {
         final Wrapper wrapper = new Wrapper();
-        SurveyTools.traverseStations(
+        SurveyTraversal.traverseStations(
                 this,
                 station -> {
                     if (station.getName().equals(name)) {

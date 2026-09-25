@@ -46,6 +46,8 @@ public class SketchJsonTranslater {
     public static final String STATION_ID_TAG = "station-id";
     public static final String POSITION_TAG = "location";
     public static final String ANGLE_TAG = "angle";
+    public static final String ORIENTATION_TAG = "orientation";
+    public static final String ORIENTATION_HORIZONTAL = "horizontal";
     public static final String SETTINGS_TAG = "settings";
     public static final String CROSS_SECTION_SCALE_TAG = "cross-section-scale";
     public static final String X_TAG = "x";
@@ -336,6 +338,12 @@ public class SketchJsonTranslater {
         json.put(STATION_ID_TAG, crossSectionDetail.getCrossSection().getStation().getName());
         json.put(POSITION_TAG, toJson(crossSectionDetail.getPosition()));
         json.put(ANGLE_TAG, crossSectionDetail.getCrossSection().getAngle());
+        if (crossSectionDetail.getCrossSection().getOrientation()
+                == CrossSection.Orientation.HORIZONTAL) {
+            // Only written when horizontal, so files with just vertical sections are unchanged.
+            // The angle is still written (as 0) as older versions require it.
+            json.put(ORIENTATION_TAG, ORIENTATION_HORIZONTAL);
+        }
 
         Sketch subSketch = crossSectionDetail.getSketch();
         if (!isSketchEmpty(subSketch)) {
@@ -359,8 +367,15 @@ public class SketchJsonTranslater {
             subSketch = toSubSketch(json.getJSONObject(SKETCH_TAG));
         }
 
+        // Anything other than horizontal (including no orientation at all, as in files from before
+        // horizontal cross-sections existed) is a vertical cross-section.
+        CrossSection crossSection =
+                ORIENTATION_HORIZONTAL.equals(json.optString(ORIENTATION_TAG))
+                        ? CrossSection.horizontal(station)
+                        : new CrossSection(station, angle);
+
         CrossSectionDetail crossSectionDetail =
-                new CrossSectionDetail(new CrossSection(station, angle), position, subSketch);
+                new CrossSectionDetail(crossSection, position, subSketch);
 
         return crossSectionDetail;
     }

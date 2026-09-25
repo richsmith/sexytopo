@@ -1,0 +1,126 @@
+package org.hwyl.sexytopo.control.util;
+
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
+import org.hwyl.sexytopo.model.survey.Station;
+import org.hwyl.sexytopo.model.survey.Survey;
+import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
+import org.junit.Assert;
+import org.junit.Test;
+
+public class SurveyTraversalTest {
+
+    @Test
+    public void testIsInSubtreeReturnsFalseForNull() {
+        Survey survey = new Survey();
+        Station station = survey.getOrigin();
+
+        Assert.assertFalse(SurveyTraversal.isInSubtree(station, null));
+        Assert.assertFalse(SurveyTraversal.isInSubtree(null, station));
+        Assert.assertFalse(SurveyTraversal.isInSubtree(null, null));
+    }
+
+    @Test
+    public void testIsInSubtreeReturnsTrueForSameStation() {
+        Survey survey = new Survey();
+        Station station = survey.getOrigin();
+
+        Assert.assertTrue(SurveyTraversal.isInSubtree(station, station));
+    }
+
+    @Test
+    public void testIsInSubtreeReturnsTrueForDirectChild() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Station origin = survey.getOrigin();
+        Station station2 = survey.getStationByName("2");
+
+        Assert.assertTrue(SurveyTraversal.isInSubtree(origin, station2));
+    }
+
+    @Test
+    public void testIsInSubtreeReturnsTrueForGrandchild() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Station origin = survey.getOrigin();
+        Station station3 = survey.getStationByName("3");
+
+        Assert.assertTrue(SurveyTraversal.isInSubtree(origin, station3));
+    }
+
+    @Test
+    public void testIsInSubtreeReturnsFalseForAncestor() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Station origin = survey.getOrigin();
+        Station station2 = survey.getStationByName("2");
+
+        Assert.assertFalse(SurveyTraversal.isInSubtree(station2, origin));
+    }
+
+    @Test
+    public void testIsInSubtreeReturnsFalseForUnrelatedStations() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorthWith1EBranch();
+        Station station2 = survey.getStationByName("2");
+        Station station5 = survey.getStationByName("5");
+
+        Assert.assertFalse(SurveyTraversal.isInSubtree(station5, station2));
+        Assert.assertFalse(SurveyTraversal.isInSubtree(station2, station5));
+    }
+
+    @Test
+    public void testIsInSubtreeWorksWithBranches() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorthWith1EBranch();
+        Station station1 = survey.getStationByName("1");
+        Station station5 = survey.getStationByName("5");
+
+        Assert.assertTrue(SurveyTraversal.isInSubtree(station1, station5));
+    }
+
+    @Test
+    public void testIsInSubtreeReturnsTrueForDeepDescendant() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorthWith2EBranch();
+        Station origin = survey.getOrigin();
+        Station station6 = survey.getStationByName("6");
+
+        Assert.assertTrue(SurveyTraversal.isInSubtree(origin, station6));
+    }
+
+    @Test
+    public void testOnwardDirectionOfAVerticalStationIsTheDirectionTheSurveyResumes() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        SurveyUpdater.setExtendedElevationDirection(
+                survey, survey.getStationByName("2"), ExtendedElevationDirection.LEFT);
+        Station station3 = survey.getStationByName("3");
+        SurveyUpdater.setExtendedElevationDirection(
+                survey, station3, ExtendedElevationDirection.VERTICAL);
+
+        Assert.assertEquals(
+                ExtendedElevationDirection.LEFT,
+                SurveyTraversal.getOnwardExtendedElevationDirection(survey, station3));
+    }
+
+    @Test
+    public void testOnwardDirectionLooksPastSeveralVerticalStationsInARow() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        SurveyUpdater.setExtendedElevationDirection(
+                survey, survey.getStationByName("2"), ExtendedElevationDirection.LEFT);
+        SurveyUpdater.setExtendedElevationDirection(
+                survey, survey.getStationByName("3"), ExtendedElevationDirection.VERTICAL);
+        Station station4 = survey.getStationByName("4");
+        SurveyUpdater.setExtendedElevationDirection(
+                survey, station4, ExtendedElevationDirection.VERTICAL);
+
+        Assert.assertEquals(
+                ExtendedElevationDirection.LEFT,
+                SurveyTraversal.getOnwardExtendedElevationDirection(survey, station4));
+    }
+
+    @Test
+    public void testOnwardDirectionOfAVerticalOriginIsTheDefault() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Station origin = survey.getOrigin();
+        SurveyUpdater.setExtendedElevationDirection(
+                survey, origin, ExtendedElevationDirection.VERTICAL);
+
+        Assert.assertEquals(
+                ExtendedElevationDirection.DEFAULT,
+                SurveyTraversal.getOnwardExtendedElevationDirection(survey, origin));
+    }
+}

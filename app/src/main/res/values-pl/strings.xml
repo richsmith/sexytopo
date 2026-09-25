@@ -34,6 +34,8 @@
     <string name="title_activity_plan">Plan</string>
     <string name="title_activity_elevation">Przekrój</string>
     <string name="title_activity_cross_section">Przekrój</string>
+    <string name="title_activity_cross_section_horizontal">Przekrój poziomy</string>
+    <string name="title_activity_cross_section_vertical">Przekrój pionowy</string>
     <string name="title_activity_calibration">Kalibracja</string>
     <string name="title_activity_survey">Statystyki</string>
     <string name="title_activity_settings">Ustawienia</string>
@@ -146,9 +148,15 @@
     <!-- Import / Export -->
     <string name="import_successful">"Import zakończony (jeszcze nie zapisano)"</string>
     <string name="import_failed">Import nie powiódł się</string>
+    <string name="import_choose_format">Znaleziono wiele formatów — wybierz format do importu</string>
+    <string name="import_choose_svx_file">Znaleziono wiele plików .svx — wybierz plik do importu</string>
+    <string name="import_choose_th_file">Znaleziono wiele plików .th — wybierz plik do importu</string>
+    <string name="import_choose_espec">Nie znaleziono pasującego pliku .espec — wybierz jeden lub pomiń</string>
+    <string name="import_espec_none">Żaden — rozciągnij wszystko w prawo</string>
     <string name="export_select_type">Wybierz format eksportu</string>
     <string name="export_successful">Eksport zakończony</string>
     <string name="export_failed">Eksport nie powiódł się</string>
+    <string name="export_survey_needs_saving">Pomiar musi zostać zapisany przed eksportem</string>
     <string name="created_with">Utworzono za pomocą %1$s w dniu %2$s</string>
     <string name="share_type_survey_zip">Udostępnij pliki inwentaryzacji (ZIP)</string>
     <string name="share_chooser_title">Udostępnij inwentaryzację przez</string>
@@ -399,6 +407,7 @@
     <string name="trip_licence_hint_body">Wolna licencja pozwala innym grotołazom korzystać z twojej pracy i ją rozwijać, tak jak ty możesz korzystać z ich pracy - dane, które można zweryfikować i wykorzystać ponownie, są cenniejsze i z czasem stają się lepsze, z korzyścią dla wszystkich. SexyTopo jest wolny i otwartoźródłowy z tego samego powodu.</string>
     <string name="trip_licence_hint_dismiss">Zamknij</string>
     <string name="licence_summary_gpl_3_plus">Każdy może korzystać z twojego pomiaru i go zmieniać, pod warunkiem że wszystko, co na jego podstawie opublikuje, udostępni równie swobodnie.</string>
+    <string name="licence_summary_polyform_noncommercial">Każdy może korzystać z twojego pomiaru i go zmieniać do celów niekomercyjnych, o ile zachowa dołączoną do niego twoją informację o prawach autorskich.</string>
     <string name="licence_summary_cc0">Całkowicie zrzekasz się swoich praw: każdy może wykorzystać twój pomiar do czegokolwiek, bez pytania i bez podawania autorstwa.</string>
     <string name="licence_summary_cc_by">Każdy może korzystać z twojego pomiaru i go zmieniać w dowolnym celu, o ile poda twoje autorstwo.</string>
     <string name="licence_summary_cc_by_sa">Każdy może korzystać z twojego pomiaru i go zmieniać, jeśli poda twoje autorstwo i udostępni swoją wersję na tych samych warunkach.</string>
@@ -423,7 +432,8 @@
     <string name="stats_longest_leg">Najdłuższy ciąg (m)</string>
     <string name="stats_shortest_leg">Najkrótszy ciąg (m)</string>
     <string name="settings_survey_title">Ustawienia pomiaru</string>
-    <string name="settings_survey_cross_section_scale">Skala przekrojów</string>
+    <string name="settings_survey_plan_cross_section_scale">Skala przekrojów (Plan)</string>
+    <string name="settings_survey_elevation_cross_section_scale">Skala przekrojów (Przekrój)</string>
 
     <!-- Settings -->
     <string name="settings_general_title">Ogólne</string>
@@ -685,6 +695,10 @@
     <string name="menu_jump_to_station_in_elevation">&#10132; Przekrój</string>
     <string name="menu_xsection">Przekrój</string>
     <string name="menu_xsection_create">Nowy przekrój</string>
+    <string name="menu_xsection_create_horizontal">Nowy przekrój poziomy</string>
+    <string name="menu_xsection_create_vertical">Nowy przekrój pionowy</string>
+    <string name="menu_xsection_hint_vertical">korytarz</string>
+    <string name="menu_xsection_hint_horizontal">studnia</string>
     <string name="menu_xsection_delete">Usuń przekrój</string>
     <string name="menu_xsection_edit">Edytuj szkic</string>
     <string name="menu_xsection_set_direction">Ustaw kierunek</string>

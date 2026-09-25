@@ -177,6 +177,36 @@ public class ExampleSurveyCreator {
     }
 
     /**
+     * Adds cross-sections to the elevation, alternately vertical and horizontal, each with a wall
+     * outline drawn through the ends of its splays. This is separate from create() so that the
+     * example survey the app offers is unchanged; it is for the export fixtures, so that exports of
+     * the elevation have cross-sections of both kinds to look at.
+     */
+    public static void addElevationCrossSections(Survey survey) {
+        Sketch elevation = survey.getSketch(Projection2D.EXTENDED_ELEVATION);
+        Map<Station, Coord2D> stationPositions =
+                Projection2D.EXTENDED_ELEVATION.project(survey).getStationMap();
+        List<Station> candidates = survey.getAllStations();
+        candidates.remove(survey.getOrigin());
+        int count = Math.max(2, Math.round(candidates.size() * X_SECTION_FRACTION));
+        for (int i = 0; i < count && !candidates.isEmpty(); i++) {
+            Station station = candidates.remove(random.nextInt(candidates.size()));
+            CrossSection.Orientation orientation =
+                    (i % 2 == 0)
+                            ? CrossSection.Orientation.VERTICAL
+                            : CrossSection.Orientation.HORIZONTAL;
+            CrossSection xs = CrossSectioner.section(survey, station, orientation);
+            float radius = CrossSectioner.getHorizontalRadius(station);
+            float offset = (radius > 0 ? radius : 3) * 2.5f;
+            Coord2D position = stationPositions.get(station).add(0, offset);
+            elevation.addCrossSection(xs, position);
+        }
+        for (CrossSectionDetail xsDetail : elevation.getCrossSectionDetails()) {
+            drawCrossSectionWalls(xsDetail);
+        }
+    }
+
+    /**
      * Draw left- and right-wall polylines that follow the survey's branching tree. Each linear
      * chain becomes one continuous path; at a fork, every child branch starts a fresh path from the
      * shared parent wall point so the walls visibly meet at the junction. Also draws a closed wall

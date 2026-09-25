@@ -7,6 +7,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import java.util.ArrayList;
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.control.graph.CrossSectionLabels;
 import org.hwyl.sexytopo.control.graph.CrossSectionView;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Projection2D;
@@ -17,11 +18,18 @@ import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
-public class CrossSectionActivity extends GraphActivity {
+public class CrossSectionActivity extends SketchActivity {
 
     public static final String EXTRA_STATION_NAME = "crossSectionStationName";
 
+    /**
+     * Abbreviation of the projection whose sketch holds the cross-section being edited. Optional:
+     * if it is missing the plan sketch is assumed.
+     */
+    public static final String EXTRA_PROJECTION = "crossSectionProjection";
+
     private Station station;
+    private Sketch parentSketch;
     private CrossSectionDetail originalDetail;
     private Sketch workingSketch;
 
@@ -42,6 +50,8 @@ public class CrossSectionActivity extends GraphActivity {
 
         Bundle extras = getIntent().getExtras();
         String stationName = (extras == null) ? null : extras.getString(EXTRA_STATION_NAME);
+        String projectionAbbreviation =
+                (extras == null) ? null : extras.getString(EXTRA_PROJECTION);
 
         Survey survey = getSurvey();
         if (stationName == null || survey == null) {
@@ -55,7 +65,8 @@ public class CrossSectionActivity extends GraphActivity {
             return;
         }
 
-        originalDetail = survey.getPlanSketch().getCrossSectionDetail(station);
+        parentSketch = getParentSketch(survey, projectionAbbreviation);
+        originalDetail = parentSketch.getCrossSectionDetail(station);
         if (originalDetail == null) {
             finish();
             return;
@@ -68,6 +79,20 @@ public class CrossSectionActivity extends GraphActivity {
         CrossSectionView graphView = findViewById(R.id.graphView);
         Space<Coord2D> projection = originalDetail.getCrossSection().getProjection();
         graphView.setProjection(projection);
+        graphView.setCrossSection(originalDetail.getCrossSection());
+
+        setTitle(
+                CrossSectionLabels.getTitleResource(
+                        originalDetail.getCrossSection().getOrientation()));
+    }
+
+    /** The sketch the cross-section lives in: elevation if asked for, otherwise the plan. */
+    private static Sketch getParentSketch(Survey survey, String projectionAbbreviation) {
+        Projection2D projection = Projection2D.fromAbbreviation(projectionAbbreviation);
+        if (projection == Projection2D.EXTENDED_ELEVATION) {
+            return survey.getElevationSketch();
+        }
+        return survey.getPlanSketch();
     }
 
     private static Sketch buildWorkingSketch(Sketch source) {
@@ -141,14 +166,19 @@ public class CrossSectionActivity extends GraphActivity {
 
         // Mutate the live detail in place rather than swapping in a new instance: this keeps the
         // detail's identity stable so the plan's undo/redo stacks don't end up referencing a
-        // stale copy. The editor owns its own undo, so committing is not plan-undoable.
+        // stale copy. The editor owns its own undo, so committing is not undoable in the parent.
         originalDetail.setSketch(persistedSubSketch);
-        getSurvey().getPlanSketch().setSaved(false);
+        parentSketch.setSaved(false);
         finish();
     }
 
     @Override
     public void onNewCrossSection(Station station) {
+        // No-op: cross-section editor does not allow nesting cross-sections.
+    }
+
+    @Override
+    public void onNewHorizontalCrossSection(Station station) {
         // No-op: cross-section editor does not allow nesting cross-sections.
     }
 }

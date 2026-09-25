@@ -34,6 +34,8 @@
     <string name="title_activity_plan">Planta</string>
     <string name="title_activity_elevation">Alzado</string>
     <string name="title_activity_cross_section">Sección transversal</string>
+    <string name="title_activity_cross_section_horizontal">Sección horizontal</string>
+    <string name="title_activity_cross_section_vertical">Sección vertical</string>
     <string name="title_activity_calibration">Calibración</string>
     <string name="title_activity_survey">Estadísticas</string>
     <string name="title_activity_settings">Ajustes</string>
@@ -146,9 +148,15 @@
     <!-- Import / Export -->
     <string name="import_successful">"Importación completada (aún no guardada)"</string>
     <string name="import_failed">Importación fallida</string>
+    <string name="import_choose_format">Se encontraron varios formatos — elige el formato a importar</string>
+    <string name="import_choose_svx_file">Se encontraron varios archivos .svx — elige el archivo a importar</string>
+    <string name="import_choose_th_file">Se encontraron varios archivos .th — elige el archivo a importar</string>
+    <string name="import_choose_espec">No se encontró ningún .espec coincidente — elige uno o ignora</string>
+    <string name="import_espec_none">Ninguno — extender todo a la derecha</string>
     <string name="export_select_type">Seleccionar formato de exportación</string>
     <string name="export_successful">Exportación completada</string>
     <string name="export_failed">Exportación fallida</string>
+    <string name="export_survey_needs_saving">La topografía debe guardarse antes de exportarla</string>
     <string name="created_with">Creado con %1$s el %2$s</string>
     <string name="share_type_survey_zip">Compartir archivos de topografía (ZIP)</string>
     <string name="share_chooser_title">Compartir topografía mediante</string>
@@ -399,6 +407,7 @@
     <string name="trip_licence_hint_body">Una licencia libre permite a otros espeleólogos usar tu trabajo y desarrollarlo, igual que tú puedes hacer con el suyo: los datos que se pueden verificar y reutilizar son más valiosos y mejoran con el tiempo, en beneficio mutuo. SexyTopo es libre y de código abierto por la misma razón.</string>
     <string name="trip_licence_hint_dismiss">Descartar</string>
     <string name="licence_summary_gpl_3_plus">Cualquiera puede usar y adaptar tu topografía, siempre que lo que publique a partir de ella se comparta con la misma libertad.</string>
+    <string name="licence_summary_polyform_noncommercial">Cualquiera puede usar y adaptar tu topografía con fines no comerciales, siempre que se mantenga tu aviso de copyright junto a ella.</string>
     <string name="licence_summary_cc0">Renuncias por completo a tus derechos: cualquiera puede usar tu topografía para lo que sea, sin pedir permiso ni atribuirtela.</string>
     <string name="licence_summary_cc_by">Cualquiera puede usar y adaptar tu topografía para cualquier fin, siempre que te atribuya la autoría.</string>
     <string name="licence_summary_cc_by_sa">Cualquiera puede usar y adaptar tu topografía si te atribuye la autoría y comparte su versión en los mismos términos.</string>
@@ -423,7 +432,8 @@
     <string name="stats_longest_leg">Tramo Más Largo (m)</string>
     <string name="stats_shortest_leg">Tramo Más Corto (m)</string>
     <string name="settings_survey_title">Ajustes de topografía</string>
-    <string name="settings_survey_cross_section_scale">Escala de secciones</string>
+    <string name="settings_survey_plan_cross_section_scale">Escala de secciones (Planta)</string>
+    <string name="settings_survey_elevation_cross_section_scale">Escala de secciones (Alzado)</string>
 
     <!-- Settings -->
     <string name="settings_general_title">General</string>
@@ -685,6 +695,10 @@
     <string name="menu_jump_to_station_in_elevation">&#10132; Alzado</string>
     <string name="menu_xsection">Sección transversal</string>
     <string name="menu_xsection_create">Nueva sección</string>
+    <string name="menu_xsection_create_horizontal">Nueva sección horizontal</string>
+    <string name="menu_xsection_create_vertical">Nueva sección vertical</string>
+    <string name="menu_xsection_hint_vertical">galería</string>
+    <string name="menu_xsection_hint_horizontal">pozo</string>
     <string name="menu_xsection_delete">Eliminar sección</string>
     <string name="menu_xsection_edit">Editar boceto</string>
     <string name="menu_xsection_set_direction">Fijar dirección</string>

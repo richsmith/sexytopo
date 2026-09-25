@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.control.util;
 
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -15,6 +16,18 @@ public class CrossSectioner {
         float angle = getAngleOfSection(survey, station);
         CrossSection crossSection = new CrossSection(station, angle);
         return crossSection;
+    }
+
+    /**
+     * A vertical section faces the angle worked out from the survey. A horizontal one has no angle
+     * to work out as it always lies flat.
+     */
+    public static CrossSection section(
+            Survey survey, final Station station, CrossSection.Orientation orientation) {
+        if (orientation == CrossSection.Orientation.HORIZONTAL) {
+            return CrossSection.horizontal(station);
+        }
+        return section(survey, station);
     }
 
     public static float getAngleOfSection(Survey survey, Station station) {
@@ -56,6 +69,40 @@ public class CrossSectioner {
                                                 * Math.cos(Math.toRadians(splay.getInclination())))
                         .max()
                         .orElse(0);
+    }
+
+    /**
+     * Whether a vertical section at the given bearing faces right on the elevation. The elevation
+     * has no bearings, so this compares the bearing with the way the survey heads on from the
+     * station: within 90 degrees of it the section faces along the survey, whichever way the survey
+     * is drawn there, and otherwise back against it.
+     */
+    public static boolean isFacingRightOnElevation(Survey survey, Station station, float angle) {
+        float forward = getAngleOfSection(survey, station);
+        boolean facesForward = getAngleDifference(angle, forward) <= 90;
+        return facesForward == isSurveyDrawnRight(survey, station);
+    }
+
+    /**
+     * The bearing for a vertical section that faces right, or left, on the elevation: the way the
+     * survey heads on from the station, turned round if the survey is drawn the other way there.
+     */
+    public static float getAngleFacingOnElevation(
+            Survey survey, Station station, boolean facingRight) {
+        float forward = getAngleOfSection(survey, station);
+        return facingRight == isSurveyDrawnRight(survey, station)
+                ? forward
+                : Space2DUtils.adjustAngle(forward, 180);
+    }
+
+    private static boolean isSurveyDrawnRight(Survey survey, Station station) {
+        return SurveyTraversal.getOnwardExtendedElevationDirection(survey, station)
+                != ExtendedElevationDirection.LEFT;
+    }
+
+    private static float getAngleDifference(float a, float b) {
+        float difference = Math.abs(a - b) % 360;
+        return difference > 180 ? 360 - difference : difference;
     }
 
     private static float getIncomingAzimuth(Survey survey, Station station) {

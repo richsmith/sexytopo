@@ -20,6 +20,11 @@ public enum Licence {
             R.string.licence_summary_gpl_3_plus,
             "https://www.gnu.org/licenses/gpl-3.0.html",
             true),
+    POLYFORM_NONCOMMERCIAL_1_0_0(
+            "PolyForm Noncommercial License 1.0.0",
+            R.string.licence_summary_polyform_noncommercial,
+            "https://polyformproject.org/licenses/noncommercial/1.0.0",
+            true),
     CC0(
             "CC0",
             R.string.licence_summary_cc0,
@@ -68,7 +73,7 @@ public enum Licence {
      * an information symbol, since choosing one of these is a good outcome and should feel like
      * one. U+2705 is the green-filled variant, so it carries its own colour.
      */
-    public static final String FREE_PREFIX = "\u2705 ";
+    public static final String REUSE_PREFIX = "\u2705 ";
 
     /**
      * Prefixed to the summary of a licence that doesn't, and to leaving the survey unlicensed, so
@@ -82,13 +87,13 @@ public enum Licence {
 
     private final String url;
 
-    private final boolean isFree;
+    private final boolean allowsReuse;
 
-    Licence(String name, @StringRes int summaryId, String url, boolean isFree) {
+    Licence(String name, @StringRes int summaryId, String url, boolean allowsReuse) {
         this.name = name;
         this.summaryId = summaryId;
         this.url = url;
-        this.isFree = isFree;
+        this.allowsReuse = allowsReuse;
     }
 
     /**
@@ -96,13 +101,13 @@ public enum Licence {
      * licences count: they wouldn't meet the Open Definition, but they don't stand in the way of
      * the sharing between cavers that this is about.
      */
-    public boolean isFree() {
-        return isFree;
+    public boolean allowsReuse() {
+        return allowsReuse;
     }
 
     /** The emoji flagging how a licence's summary should read: a good outcome, or a warning. */
     public String getSummaryPrefix() {
-        return isFree ? FREE_PREFIX : WARNING_PREFIX;
+        return allowsReuse ? REUSE_PREFIX : WARNING_PREFIX;
     }
 
     public String getName() {

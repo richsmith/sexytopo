@@ -21,7 +21,7 @@
             android:id="@+id/action_rename_station"
             android:title="@string/menu_rename_station"/>
 
-        <!-- Cross-Section sub-menu (shown only in PLAN view) -->
+        <!-- Cross-Section sub-menu (shown in PLAN and EXTENDED_ELEVATION views) -->
         <item
             android:id="@+id/menu_xsection"
             android:title="@string/menu_xsection"
@@ -30,6 +30,12 @@
                 <item
                     android:id="@+id/action_xsection_create"
                     android:title="@string/menu_xsection_create"/>
+
+                <!-- Only shown in EXTENDED_ELEVATION view -->
+                <item
+                    android:id="@+id/action_xsection_create_horizontal"
+                    android:title="@string/menu_xsection_create_horizontal"
+                    android:visible="false"/>
 
                 <item
                     android:id="@+id/action_xsection_edit"

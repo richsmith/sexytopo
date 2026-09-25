@@ -19,8 +19,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 import androidx.annotation.RequiresApi;
+import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
@@ -52,6 +54,7 @@ import org.hwyl.sexytopo.comms.missing.NullCommunicator;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SexyTopoPermissions;
 import org.hwyl.sexytopo.control.SurveyManager;
+import org.hwyl.sexytopo.control.components.DialogImportChooser;
 import org.hwyl.sexytopo.control.components.DialogUtils;
 import org.hwyl.sexytopo.control.components.StationSelectorDialog;
 import org.hwyl.sexytopo.control.io.IoUtils;
@@ -61,6 +64,7 @@ import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.control.io.basic.Saver;
 import org.hwyl.sexytopo.control.io.share.SurveyZipSharer;
 import org.hwyl.sexytopo.control.io.translation.Exporter;
+import org.hwyl.sexytopo.control.io.translation.ImportCallback;
 import org.hwyl.sexytopo.control.io.translation.ImportManager;
 import org.hwyl.sexytopo.control.io.translation.SelectableExporters;
 import org.hwyl.sexytopo.control.table.LegDialogs;
@@ -325,7 +329,11 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             confirmToProceedIfNotSaved("requestImportSurveyDirectory");
             return true;
         } else if (itemId == R.id.action_file_export) {
-            confirmToProceedIfNotSaved("requestExportSurvey");
+            if (getSurvey().hasHome()) {
+                confirmToProceedIfNotSaved("requestExportSurvey");
+            } else {
+                requestSaveBeforeExport();
+            }
             return true;
         } else if (itemId == R.id.action_file_share) {
             requestShareSurvey();
@@ -553,33 +561,58 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
     private void openSurveySettingsDialog() {
-        Sketch planSketch = getSurvey().getPlanSketch();
+        Survey survey = getSurvey();
+        Sketch planSketch = survey.getPlanSketch();
+        Sketch elevationSketch = survey.getElevationSketch();
 
-        TextInputLayout inputLayout =
-                DialogUtils.createStandardTextInputLayout(
-                        this, R.string.settings_survey_cross_section_scale);
+        // Each sketch has its own cross-section scale, since plan and elevation sections can
+        // need drawing at different sizes
+        TextInputLayout planInput =
+                createCrossSectionScaleInput(
+                        R.string.settings_survey_plan_cross_section_scale, planSketch);
+        TextInputLayout elevationInput =
+                createCrossSectionScaleInput(
+                        R.string.settings_survey_elevation_cross_section_scale, elevationSketch);
+
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.addView(planInput);
+        layout.addView(elevationInput);
+
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.settings_survey_title)
+                .setView(layout)
+                .setPositiveButton(
+                        R.string.ok,
+                        (dialog, which) -> {
+                            applyCrossSectionScale(planInput, planSketch);
+                            applyCrossSectionScale(elevationInput, elevationSketch);
+                        })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    private TextInputLayout createCrossSectionScaleInput(@StringRes int hintRes, Sketch sketch) {
+        TextInputLayout inputLayout = DialogUtils.createStandardTextInputLayout(this, hintRes);
         TextInputEditText editText = DialogUtils.getEditText(inputLayout);
         editText.setInputType(
                 android.text.InputType.TYPE_CLASS_NUMBER
                         | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        editText.setText(String.valueOf(planSketch.getCrossSectionScale()));
+        editText.setText(String.valueOf(sketch.getCrossSectionScale()));
+        return inputLayout;
+    }
 
-        new MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.settings_survey_title)
-                .setView(inputLayout)
-                .setPositiveButton(
-                        R.string.ok,
-                        (dialog, which) -> {
-                            try {
-                                float scale = Float.parseFloat(editText.getText().toString());
-                                planSketch.setCrossSectionScale(scale);
-                                planSketch.setSaved(false);
-                            } catch (NumberFormatException e) {
-                                // ignore invalid input
-                            }
-                        })
-                .setNegativeButton(R.string.cancel, null)
-                .show();
+    private static void applyCrossSectionScale(TextInputLayout inputLayout, Sketch sketch) {
+        try {
+            String text = DialogUtils.getEditText(inputLayout).getText().toString();
+            float scale = Float.parseFloat(text);
+            if (scale != sketch.getCrossSectionScale()) {
+                sketch.setCrossSectionScale(scale);
+                sketch.setSaved(false);
+            }
+        } catch (NumberFormatException e) {
+            // ignore invalid input
+        }
     }
 
     @SuppressLint("UnusedDeclaration")
@@ -595,6 +628,17 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                             Exporter exporter = SelectableExporters.fromName(this, names[which]);
                             exportSurvey(exporter);
                         })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    /**
+     * Exports are written inside the survey's folder, so a survey without one can't be exported.
+     */
+    private void requestSaveBeforeExport() {
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.export_survey_needs_saving)
+                .setPositiveButton(R.string.action_file_save_as, (dialog, which) -> requestSaveAs())
                 .setNegativeButton(R.string.cancel, null)
                 .show();
     }
@@ -1036,15 +1080,27 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
     protected void importSurvey(DocumentFile file) {
-        try {
-            Survey survey = ImportManager.toSurvey(this, file);
-            survey.checkSurveyIntegrity();
-            getSurveyManager().setCurrentSurvey(survey);
-            showSimpleToast(R.string.import_successful);
+        ImportManager.importSurvey(
+                this,
+                file,
+                new DialogImportChooser(this),
+                new ImportCallback() {
+                    @Override
+                    public void onImported(Survey survey) {
+                        try {
+                            survey.checkSurveyIntegrity();
+                            getSurveyManager().setCurrentSurvey(survey);
+                            showSimpleToast(R.string.import_successful);
+                        } catch (Exception exception) {
+                            onImportFailed(exception);
+                        }
+                    }
 
-        } catch (Exception exception) {
-            showExceptionAndLog(R.string.import_failed, exception);
-        }
+                    @Override
+                    public void onImportFailed(Exception exception) {
+                        showExceptionAndLog(R.string.import_failed, exception);
+                    }
+                });
     }
 
     protected void exportSurvey(Exporter exporter) {

@@ -34,6 +34,8 @@
     <string name="title_activity_plan">Pianta</string>
     <string name="title_activity_elevation">Elevazione</string>
     <string name="title_activity_cross_section">Sezione</string>
+    <string name="title_activity_cross_section_horizontal">Sezione orizzontale</string>
+    <string name="title_activity_cross_section_vertical">Sezione verticale</string>
     <string name="title_activity_calibration">Calibrazione</string>
     <string name="title_activity_survey">Statistiche</string>
     <string name="title_activity_settings">Impostazioni</string>
@@ -146,9 +148,15 @@
     <!-- Import / Export -->
     <string name="import_successful">"Importazione completata (non ancora salvata)"</string>
     <string name="import_failed">Importazione fallita</string>
+    <string name="import_choose_format">Trovati più formati — scegliere il formato da importare</string>
+    <string name="import_choose_svx_file">Trovati più file .svx — scegliere il file da importare</string>
+    <string name="import_choose_th_file">Trovati più file .th — scegliere il file da importare</string>
+    <string name="import_choose_espec">Nessun .espec corrispondente trovato — sceglierne uno o ignorare</string>
+    <string name="import_espec_none">Nessuno — estendi tutto a destra</string>
     <string name="export_select_type">Seleziona il formato di esportazione</string>
     <string name="export_successful">Esportazione completata</string>
     <string name="export_failed">Esportazione fallita</string>
+    <string name="export_survey_needs_saving">Il rilievo deve essere salvato prima di poterlo esportare</string>
     <string name="created_with">Creato con %1$s il %2$s</string>
     <string name="share_type_survey_zip">Condividi file del rilievo (ZIP)</string>
     <string name="share_chooser_title">Condividi il rilievo tramite</string>
@@ -399,6 +407,7 @@
     <string name="trip_licence_hint_body">Una licenza libera permette ad altri speleologi di usare il tuo lavoro e di ampliarlo, come tu puoi fare con il loro: i dati che possono essere verificati e riutilizzati valgono di più e migliorano nel tempo, a vantaggio di tutti. SexyTopo è libero e open source per la stessa ragione.</string>
     <string name="trip_licence_hint_dismiss">Chiudi</string>
     <string name="licence_summary_gpl_3_plus">Chiunque può usare e adattare il tuo rilievo, purché tutto ciò che viene pubblicato sulla sua base sia condiviso con la stessa libertà.</string>
+    <string name="licence_summary_polyform_noncommercial">Chiunque può usare e adattare il tuo rilievo per scopi non commerciali, purché mantenga la tua nota di copyright.</string>
     <string name="licence_summary_cc0">Rinunci del tutto ai tuoi diritti: chiunque può usare il tuo rilievo per qualsiasi scopo, senza chiedere né citarti.</string>
     <string name="licence_summary_cc_by">Chiunque può usare e adattare il tuo rilievo per qualsiasi scopo, purché ti citi.</string>
     <string name="licence_summary_cc_by_sa">Chiunque può usare e adattare il tuo rilievo se ti cita e condivide la propria versione alle stesse condizioni.</string>
@@ -423,7 +432,8 @@
     <string name="stats_longest_leg">Tratto Più Lungo (m)</string>
     <string name="stats_shortest_leg">Tratto Più Corto (m)</string>
     <string name="settings_survey_title">Impostazioni rilievo</string>
-    <string name="settings_survey_cross_section_scale">Scala delle sezioni</string>
+    <string name="settings_survey_plan_cross_section_scale">Scala delle sezioni (Pianta)</string>
+    <string name="settings_survey_elevation_cross_section_scale">Scala delle sezioni (Elevazione)</string>
 
     <!-- Settings -->
     <string name="settings_general_title">Generale</string>
@@ -685,6 +695,10 @@
     <string name="menu_jump_to_station_in_elevation">&#10132; Elevazione</string>
     <string name="menu_xsection">Sezione</string>
     <string name="menu_xsection_create">Nuova sezione</string>
+    <string name="menu_xsection_create_horizontal">Nuova sezione orizzontale</string>
+    <string name="menu_xsection_create_vertical">Nuova sezione verticale</string>
+    <string name="menu_xsection_hint_vertical">galleria</string>
+    <string name="menu_xsection_hint_horizontal">pozzo</string>
     <string name="menu_xsection_delete">Elimina sezione</string>
     <string name="menu_xsection_edit">Modifica schizzo</string>
     <string name="menu_xsection_set_direction">Imposta direzione</string>

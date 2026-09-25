@@ -38,6 +38,12 @@ public enum ViewContext {
         public void configureViewSpecificItems(Menu menu) {
             setItemVisible(menu, R.id.action_jump_to_elevation, false);
             setDirectionSubmenuVisible(menu, true);
+            setCrossSectionVisible(menu, true);
+        }
+
+        @Override
+        public boolean canCreateHorizontalCrossSection() {
+            return true;
         }
     },
     CROSS_SECTION {
@@ -66,6 +72,14 @@ public enum ViewContext {
 
     public abstract void configureViewSpecificItems(Menu menu);
 
+    /**
+     * Whether a horizontal cross-section can be created in this view context. On the plan a
+     * horizontal slice would only repeat what the plan already shows, so it is for the elevation.
+     */
+    public boolean canCreateHorizontalCrossSection() {
+        return false;
+    }
+
     /** Whether a station long-press in this view context should open a context menu. */
     public boolean hasStationContextMenu() {
         return true;
@@ -90,5 +104,7 @@ public enum ViewContext {
         if (crossSectionMenu != null) {
             crossSectionMenu.setVisible(visible);
         }
+        setItemVisible(
+                menu, R.id.action_xsection_create_horizontal, canCreateHorizontalCrossSection());
     }
 }

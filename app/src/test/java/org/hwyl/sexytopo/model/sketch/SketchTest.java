@@ -6,11 +6,15 @@ import java.util.Collections;
 import java.util.List;
 import org.hwyl.sexytopo.control.util.PolygonUtils;
 import org.hwyl.sexytopo.model.graph.Coord2D;
+import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
+import org.hwyl.sexytopo.model.survey.Survey;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class SketchTest {
+
+    private static final float DELTA = 1e-4f;
 
     private static List<Coord2D> rectangleContour(
             float left, float top, float width, float height) {
@@ -404,5 +408,62 @@ public class SketchTest {
         sketch.redo(); // redo the create: must not leave two copies
 
         Assert.assertEquals(1, sketch.getCrossSectionDetails().size());
+    }
+
+    @Test
+    public void testSameStationCanHaveIndependentCrossSectionsInPlanAndElevation() {
+        Survey survey = new Survey();
+        Station station = survey.getOrigin();
+        Sketch plan = survey.getPlanSketch();
+        Sketch elevation = survey.getElevationSketch();
+
+        CrossSectionDetail planDetail =
+                new CrossSectionDetail(new CrossSection(station, 0f), new Coord2D(1, 2));
+        plan.addCrossSection(planDetail);
+
+        Assert.assertSame(planDetail, plan.getCrossSectionDetail(station));
+        Assert.assertNull(elevation.getCrossSectionDetail(station));
+
+        CrossSectionDetail elevationDetail =
+                new CrossSectionDetail(new CrossSection(station, 0f), new Coord2D(5, 6));
+        elevation.addCrossSection(elevationDetail);
+
+        Assert.assertSame(planDetail, plan.getCrossSectionDetail(station));
+        Assert.assertSame(elevationDetail, elevation.getCrossSectionDetail(station));
+
+        elevation.deleteDetail(elevationDetail);
+
+        Assert.assertSame(planDetail, plan.getCrossSectionDetail(station));
+        Assert.assertNull(elevation.getCrossSectionDetail(station));
+    }
+
+    /** A section at (10, 0) whose only splay reaches 2m east of it. */
+    private static Sketch sketchWithASectionReachingEast() {
+        Station station = new Station("1");
+        station.addOnwardLeg(new Leg(2, 90, 0));
+        Sketch sketch = new Sketch();
+        sketch.addCrossSection(
+                new CrossSectionDetail(new CrossSection(station, 0f), new Coord2D(10, 0)));
+        return sketch;
+    }
+
+    @Test
+    public void testBoundingBoxHoldsCrossSectionsAtTheCrossSectionScale() {
+        Sketch sketch = sketchWithASectionReachingEast();
+        Assert.assertEquals(12, sketch.getRight(), DELTA);
+
+        sketch.setCrossSectionScale(3f);
+        Assert.assertEquals(16, sketch.getRight(), DELTA);
+
+        sketch.setCrossSectionScale(0.5f);
+        Assert.assertEquals(11, sketch.getRight(), DELTA);
+    }
+
+    @Test
+    public void testCopiedSketchKeepsItsCrossSectionScaleInTheBoundingBox() {
+        Sketch sketch = sketchWithASectionReachingEast();
+        sketch.setCrossSectionScale(3f);
+
+        Assert.assertEquals(16, new Sketch(sketch).getRight(), DELTA);
     }
 }

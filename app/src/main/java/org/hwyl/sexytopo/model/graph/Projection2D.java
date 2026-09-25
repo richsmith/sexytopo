@@ -90,6 +90,20 @@ public enum Projection2D {
         return abbreviation;
     }
 
+    /**
+     * Looks a projection up by its abbreviation (e.g. from an Intent extra). Anything unrecognised,
+     * including null, gives PLAN so that callers written before a projection was passed keep
+     * working.
+     */
+    public static Projection2D fromAbbreviation(String abbreviation) {
+        for (Projection2D projection : values()) {
+            if (projection.abbreviation.equals(abbreviation)) {
+                return projection;
+            }
+        }
+        return PLAN;
+    }
+
     Projection2D(String name, String abbreviation) {
         this.name = name;
         this.abbreviation = abbreviation;

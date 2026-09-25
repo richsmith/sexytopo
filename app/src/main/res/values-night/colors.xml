@@ -41,6 +41,7 @@
 
     <!-- Graph View Colors -->
     <color name="crossSectionIndicator">@color/md_red</color>
+    <color name="crossSectionHorizontalBox">@color/sexyTopoDarkPurple</color>
 
     <!-- Text Colors -->
     <color name="bodyTextColor">@color/md_dark_body_text</color>

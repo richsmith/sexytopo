@@ -35,6 +35,8 @@
     <string name="title_activity_plan">Plan</string>
     <string name="title_activity_elevation">Elevation</string>
     <string name="title_activity_cross_section">Cross-Section</string>
+    <string name="title_activity_cross_section_horizontal">Horizontal Section</string>
+    <string name="title_activity_cross_section_vertical">Vertical Section</string>
     <string name="title_activity_calibration">Calibration</string>
     <string name="title_activity_survey">Stats</string>
     <string name="title_activity_settings">Settings</string>
@@ -72,6 +74,11 @@
     <string name="action_file_exit">Exit SexyTopo</string>
     <string name="action_file_import_file">Import File…</string>
     <string name="action_file_import_directory">Import Folder…</string>
+    <string name="import_choose_format">Multiple formats found — choose format to import</string>
+    <string name="import_choose_svx_file">Multiple .svx files found — choose file to import</string>
+    <string name="import_choose_th_file">Multiple .th files found — choose file to import</string>
+    <string name="import_choose_espec">No matching .espec found — choose one or skip</string>
+    <string name="import_espec_none">None — extend everything right</string>
     <string name="action_file_share">Share…</string>
     <string name="action_input">Input Mode</string>
     <string name="action_input_mode_forward">Forward</string>
@@ -156,6 +163,7 @@
     <string name="export_select_type">Select export format</string>
     <string name="export_successful">Export completed</string>
     <string name="export_failed">Export failed</string>
+    <string name="export_survey_needs_saving">This survey needs to be saved before it can be exported</string>
     <string name="third_party_therion" translatable="false">Therion</string>
     <string name="third_party_pocket_topo" translatable="false">PocketTopo (.top)</string>
     <string name="third_party_pocket_topo_txt" translatable="false">PocketTopo .txt</string>
@@ -446,6 +454,7 @@
     <string name="trip_licence_hint_body">A free licence lets other cavers use and build on your work, as you can with theirs - data that can be verified and reused is more valuable and gets better over time, for mutual benefit. SexyTopo is free and open source for the same reason.</string>
     <string name="trip_licence_hint_dismiss">Dismiss</string>
     <string name="licence_summary_gpl_3_plus">Anyone may use and adapt your survey, provided anything they publish based on it is shared just as freely.</string>
+    <string name="licence_summary_polyform_noncommercial">Anyone may use and adapt your survey for non-commercial purposes, as long as your copyright notice stays attached to it.</string>
     <string name="licence_summary_cc0">You give up your rights entirely: anyone may use your survey for anything, without asking or crediting you.</string>
     <string name="licence_summary_cc_by">Anyone may use and adapt your survey for any purpose, as long as they credit you.</string>
     <string name="licence_summary_cc_by_sa">Anyone may use and adapt your survey if they credit you and share their version on the same terms.</string>
@@ -472,7 +481,8 @@
 
     <!-- Settings -->
     <string name="settings_survey_title">Survey Settings</string>
-    <string name="settings_survey_cross_section_scale">Cross-section scale</string>
+    <string name="settings_survey_plan_cross_section_scale">Cross-section scale (Plan)</string>
+    <string name="settings_survey_elevation_cross_section_scale">Cross-section scale (Elevation)</string>
     <string name="settings_general_title">General</string>
     <string name="settings_general_summary">Theme, orientation, vibration</string>
     <string name="settings_sketching_summary">Drawing tools, display options</string>
@@ -730,6 +740,10 @@
     <string name="menu_jump_to_station_in_elevation">&#10132; Elevation</string>
     <string name="menu_xsection">Cross-Section</string>
     <string name="menu_xsection_create">New Cross-Section</string>
+    <string name="menu_xsection_create_horizontal">New Horizontal Section</string>
+    <string name="menu_xsection_create_vertical">New Vertical Section</string>
+    <string name="menu_xsection_hint_vertical">passage</string>
+    <string name="menu_xsection_hint_horizontal">shaft</string>
     <string name="menu_xsection_delete">Delete Cross-Section</string>
     <string name="menu_xsection_edit">Edit Sketch</string>
     <string name="menu_xsection_set_direction">Set Direction</string>

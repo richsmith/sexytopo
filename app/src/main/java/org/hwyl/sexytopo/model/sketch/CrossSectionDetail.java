@@ -51,6 +51,20 @@ public class CrossSectionDetail extends SinglePositionDetail {
         updateBoundingBox(sketch.getBottomRight().plus(position));
     }
 
+    /** The top-left corner as drawn, with the cross-section scaled about its position. */
+    public Coord2D getTopLeftAtScale(float scale) {
+        return scaleAboutPosition(getTopLeft(), scale);
+    }
+
+    /** The bottom-right corner as drawn, with the cross-section scaled about its position. */
+    public Coord2D getBottomRightAtScale(float scale) {
+        return scaleAboutPosition(getBottomRight(), scale);
+    }
+
+    private Coord2D scaleAboutPosition(Coord2D point, float scale) {
+        return position.plus(point.minus(position).scale(scale));
+    }
+
     public CrossSection getCrossSection() {
         return crossSection;
     }
@@ -80,9 +94,13 @@ public class CrossSectionDetail extends SinglePositionDetail {
 
     /**
      * Return a new detail at the same position and with the same sub-sketch, but a new
-     * cross-section angle (compass azimuth in degrees).
+     * cross-section angle (compass azimuth in degrees). A cross-section that can't be rotated (a
+     * horizontal one) is left as it is.
      */
     public CrossSectionDetail withAngle(float newAngle) {
+        if (!crossSection.isRotatable()) {
+            return this;
+        }
         CrossSection rotated = new CrossSection(crossSection.getStation(), newAngle);
         return new CrossSectionDetail(rotated, getPosition(), sketch);
     }

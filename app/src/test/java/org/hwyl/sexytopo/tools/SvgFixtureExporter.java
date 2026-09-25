@@ -32,6 +32,7 @@ public class SvgFixtureExporter {
         String displayName = "Smith's Folly";
         String fileName = "example";
         Survey survey = ExampleSurveyCreator.create(10, 5, true, true, true);
+        ExampleSurveyCreator.addElevationCrossSections(survey);
         renameSurvey(survey, displayName);
         survey.setTrip(ExampleSurveyCreator.createExampleTrip());
         File dir = new File(outputRoot, fileName);

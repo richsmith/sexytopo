@@ -43,6 +43,7 @@ import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
 import org.hwyl.sexytopo.model.sketch.BrushColour;
 import org.hwyl.sexytopo.model.sketch.Colour;
+import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
 import org.hwyl.sexytopo.model.sketch.LineType;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
@@ -52,7 +53,7 @@ import org.hwyl.sexytopo.model.sketch.Symbol;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
-public abstract class GraphActivity extends SurveyEditorActivity
+public abstract class SketchActivity extends SurveyEditorActivity
         implements View.OnClickListener, PopupMenu.OnMenuItemClickListener, SensorEventListener {
 
     private static final float ZOOM_INCREMENT = 1.1f;
@@ -275,7 +276,18 @@ public abstract class GraphActivity extends SurveyEditorActivity
         graphView.invalidate();
     }
 
-    public abstract Sketch getSketch(Survey survey);
+    /** The sketch this activity shows, from the survey being worked on. */
+    public Sketch getSketch() {
+        return getSketch(getSurvey());
+    }
+
+    /**
+     * The sketch this activity's view shows for the given survey: its plan sketch in the plan, and
+     * so on. This takes a survey because linked surveys are drawn with their own sketches.
+     */
+    public Sketch getSketch(Survey survey) {
+        return survey.getSketch(getProjectionType());
+    }
 
     public Space<Coord2D> getProjection(Survey survey) {
         return getProjectionType().project(survey);
@@ -733,13 +745,29 @@ public abstract class GraphActivity extends SurveyEditorActivity
     }
 
     @Override
+    public boolean hasCrossSection(Station station) {
+        return getSketch().getCrossSectionDetail(station) != null;
+    }
+
+    @Override
+    public boolean hasRotatableCrossSection(Station station) {
+        CrossSectionDetail detail = getSketch().getCrossSectionDetail(station);
+        return detail != null && detail.getCrossSection().isRotatable();
+    }
+
+    @Override
+    public void onNewHorizontalCrossSection(Station station) {
+        graphView.handleNewCrossSection(station, CrossSection.Orientation.HORIZONTAL);
+    }
+
+    @Override
     public void onDeleteCrossSection(Station station) {
-        Sketch planSketch = getSurvey().getPlanSketch();
-        CrossSectionDetail detail = planSketch.getCrossSectionDetail(station);
+        Sketch sketch = getSketch();
+        CrossSectionDetail detail = sketch.getCrossSectionDetail(station);
         if (detail == null) {
             return;
         }
-        planSketch.deleteDetail(detail);
+        sketch.deleteDetail(detail);
         getSurveyManager().broadcastSurveyUpdated();
         invalidateView();
     }
@@ -751,7 +779,7 @@ public abstract class GraphActivity extends SurveyEditorActivity
 
     @Override
     public void onEditCrossSection(Station station) {
-        CrossSectionDetail detail = getSurvey().getPlanSketch().getCrossSectionDetail(station);
+        CrossSectionDetail detail = getSketch().getCrossSectionDetail(station);
         if (detail == null) {
             return;
         }
