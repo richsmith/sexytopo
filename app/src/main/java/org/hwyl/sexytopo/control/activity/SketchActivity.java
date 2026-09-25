@@ -49,7 +49,7 @@ import org.hwyl.sexytopo.model.sketch.Symbol;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
-public abstract class GraphActivity extends SurveyEditorActivity
+public abstract class SketchActivity extends SurveyEditorActivity
         implements View.OnClickListener, PopupMenu.OnMenuItemClickListener, SensorEventListener {
 
     private static final float ZOOM_INCREMENT = 1.1f;

@@ -18,7 +18,7 @@ import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
-public class CrossSectionActivity extends GraphActivity {
+public class CrossSectionActivity extends SketchActivity {
 
     public static final String EXTRA_STATION_NAME = "crossSectionStationName";
 

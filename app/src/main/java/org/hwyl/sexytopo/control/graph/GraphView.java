@@ -38,7 +38,7 @@ import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SexyTopo;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.CrossSectionActivity;
-import org.hwyl.sexytopo.control.activity.GraphActivity;
+import org.hwyl.sexytopo.control.activity.SketchActivity;
 import org.hwyl.sexytopo.control.components.DialogUtils;
 import org.hwyl.sexytopo.control.util.CohenSutherlandAlgorithm;
 import org.hwyl.sexytopo.control.util.CrossSectioner;
@@ -127,7 +127,7 @@ public class GraphView extends View {
     private float snapToLineSensitivityPx;
     private float stationLabelOffsetPx;
 
-    private GraphActivity activity;
+    private SketchActivity activity;
 
     protected Projection2D projectionType = Projection2D.PLAN;
     protected Survey survey;
@@ -385,8 +385,8 @@ public class GraphView extends View {
         linkIcon = BitmapFactory.decodeResource(getResources(), R.drawable.link);
     }
 
-    public void setActivity(GraphActivity graphActivity) {
-        this.activity = graphActivity;
+    public void setActivity(SketchActivity sketchActivity) {
+        this.activity = sketchActivity;
     }
 
     public void setSurvey(Survey survey) {
