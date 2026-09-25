@@ -840,9 +840,21 @@ public class GraphView extends View {
     }
 
     /**
+     * Place the cross-section where the user has selected lifts.
+     *
      * @noinspection SameReturnValue
      */
     private boolean handlePositionCrossSection(MotionEvent event) {
+
+
+        // Acting on UP rather than DOWN means this tool owns the
+        // whole gesture; switching tools on DOWN would hand the rest
+        // of the gesture to the previous tool, which never saw its
+        // DOWN (e.g. MOVE would pan from a stale anchor and jump the
+        // screen).
+        if (event.getAction() != MotionEvent.ACTION_UP) {
+            return true;
+        }
 
         Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
         Coord2D touchPointOnSurvey = viewCoordsToSurveyCoords(touchPointOnView);
