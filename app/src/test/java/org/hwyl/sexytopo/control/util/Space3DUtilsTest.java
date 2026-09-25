@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.control.util;
 
-import org.hwyl.sexytopo.model.graph.Coord3D;
+import org.hwyl.sexytopo.model.geometry.Coord3D;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.junit.Assert;
 import org.junit.Test;

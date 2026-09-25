@@ -17,7 +17,7 @@ package org.hwyl.sexytopo.control.util;
  *   only ones actually used here.
  */
 
-import org.hwyl.sexytopo.model.graph.Coord2D;
+import org.hwyl.sexytopo.model.geometry.Coord2D;
 
 @SuppressWarnings({"RedundantIfStatement", "unused"})
 public class CohenSutherlandAlgorithm {

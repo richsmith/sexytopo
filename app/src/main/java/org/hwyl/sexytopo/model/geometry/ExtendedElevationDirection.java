@@ -1,4 +1,4 @@
-package org.hwyl.sexytopo.model.graph;
+package org.hwyl.sexytopo.model.geometry;
 
 public enum ExtendedElevationDirection {
     LEFT(true),

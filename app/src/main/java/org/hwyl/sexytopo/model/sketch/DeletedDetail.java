@@ -2,7 +2,7 @@ package org.hwyl.sexytopo.model.sketch;
 
 import java.security.InvalidParameterException;
 import java.util.List;
-import org.hwyl.sexytopo.model.graph.Coord2D;
+import org.hwyl.sexytopo.model.geometry.Coord2D;
 
 public class DeletedDetail extends SketchDetail {
 

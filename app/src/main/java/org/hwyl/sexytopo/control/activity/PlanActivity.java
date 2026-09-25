@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.control.activity;
 
-import org.hwyl.sexytopo.model.graph.Projection2D;
+import org.hwyl.sexytopo.model.geometry.Projection2D;
 
 public class PlanActivity extends SketchActivity {
 

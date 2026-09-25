@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
-import org.hwyl.sexytopo.model.graph.Coord2D;
+import org.hwyl.sexytopo.model.geometry.Coord2D;
 
 public final class PathDetail extends SketchDetail {
 

@@ -2,7 +2,7 @@ package org.hwyl.sexytopo.control.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.hwyl.sexytopo.model.graph.Coord2D;
+import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.junit.Assert;
 import org.junit.Test;
 

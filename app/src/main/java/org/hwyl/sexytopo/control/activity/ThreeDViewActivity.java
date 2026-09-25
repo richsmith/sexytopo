@@ -12,8 +12,8 @@ import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.threed.SurveyRenderer;
 import org.hwyl.sexytopo.control.threed.SurveyView3D;
 import org.hwyl.sexytopo.control.util.Space3DTransformer;
-import org.hwyl.sexytopo.model.graph.Coord3D;
-import org.hwyl.sexytopo.model.graph.Space;
+import org.hwyl.sexytopo.model.geometry.Coord3D;
+import org.hwyl.sexytopo.model.geometry.Space;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 public class ThreeDViewActivity extends SexyTopoActivity {

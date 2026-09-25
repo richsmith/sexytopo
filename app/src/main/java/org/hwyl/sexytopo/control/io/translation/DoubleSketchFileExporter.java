@@ -4,7 +4,7 @@ import android.content.Context;
 import java.io.IOException;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.io.SurveyFile;
-import org.hwyl.sexytopo.model.graph.Projection2D;
+import org.hwyl.sexytopo.model.geometry.Projection2D;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 public abstract class DoubleSketchFileExporter extends Exporter {

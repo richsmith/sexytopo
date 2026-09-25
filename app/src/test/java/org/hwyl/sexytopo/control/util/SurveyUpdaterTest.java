@@ -4,7 +4,7 @@ import static org.hwyl.sexytopo.SexyTopoConstants.ALLOWED_DOUBLE_DELTA;
 
 import java.util.Arrays;
 import java.util.List;
-import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
+import org.hwyl.sexytopo.model.geometry.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;

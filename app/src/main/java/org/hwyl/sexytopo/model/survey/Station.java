@@ -3,7 +3,7 @@ package org.hwyl.sexytopo.model.survey;
 import androidx.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.List;
-import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
+import org.hwyl.sexytopo.model.geometry.ExtendedElevationDirection;
 
 public class Station extends SurveyComponent {
 

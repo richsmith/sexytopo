@@ -1,7 +1,7 @@
 package org.hwyl.sexytopo.control.sketch;
 
 import org.hwyl.sexytopo.control.util.Space2DUtils;
-import org.hwyl.sexytopo.model.graph.Coord2D;
+import org.hwyl.sexytopo.model.geometry.Coord2D;
 
 /**
  * The little mark drawn over a station to show that it has a cross-section: a line representing the
