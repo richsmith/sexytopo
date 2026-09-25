@@ -32,7 +32,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import org.apache.commons.lang3.ArrayUtils;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
-import org.hwyl.sexytopo.control.graph.GraphView;
+import org.hwyl.sexytopo.control.sketch.SketchView;
 import org.hwyl.sexytopo.control.table.LegDialogs;
 import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.control.util.SurveyStats;
@@ -84,7 +84,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
     private static final int[] BUTTON_IDS =
             ArrayUtils.addAll(SKETCH_BUTTON_IDS, CONTROL_BUTTON_IDS);
 
-    private GraphView graphView;
+    private SketchView sketchView;
 
     private SensorManager sensorManager;
     private Sensor rotationSensor;
@@ -121,7 +121,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
             rotationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
         }
 
-        setContentView(R.layout.activity_graph);
+        setContentView(R.layout.activity_sketch);
         setupMaterialToolbar();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -132,16 +132,16 @@ public abstract class SketchActivity extends SurveyEditorActivity
             button.setOnClickListener(this);
         }
 
-        graphView = findViewById(R.id.graphView);
-        graphView.setActivity(this);
+        sketchView = findViewById(R.id.sketchView);
+        sketchView.setActivity(this);
 
         // Needs to be threaded so it is only run once we know height and width
-        graphView.post(this::setViewLocation);
+        sketchView.post(this::setViewLocation);
     }
 
     private void handleAutoRecentre() {
         if (SketchPreferences.Toggle.AUTO_RECENTRE.isOn()) {
-            graphView.centreViewOnActiveStation();
+            sketchView.centreViewOnActiveStation();
         }
     }
 
@@ -157,7 +157,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
         syncWithSurvey();
 
         intialiseActivity();
-        initialiseGraphView();
+        initialiseSketchView();
         initialiseSymbolToolbar();
         initialiseTools();
 
@@ -213,7 +213,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
             float[] orientation = new float[3];
             SensorManager.getOrientation(remapped, orientation);
             float azimuthDeg = (float) Math.toDegrees(orientation[0]);
-            graphView.setCompassAzimuth(azimuthDeg);
+            sketchView.setCompassAzimuth(azimuthDeg);
         }
     }
 
@@ -239,9 +239,9 @@ public abstract class SketchActivity extends SurveyEditorActivity
         if (bundle != null && bundle.getString(SexyTopoConstants.JUMP_TO_STATION) != null) {
             String requestedStationName = bundle.getString(SexyTopoConstants.JUMP_TO_STATION);
             Station requestedStation = getSurvey().getStationByName(requestedStationName);
-            graphView.centreViewOnStation(requestedStation);
+            sketchView.centreViewOnStation(requestedStation);
         } else {
-            graphView.centreViewOnActiveStation();
+            sketchView.centreViewOnActiveStation();
         }
     }
 
@@ -249,25 +249,25 @@ public abstract class SketchActivity extends SurveyEditorActivity
         buttonHighlightColour = ContextCompat.getColor(this, R.color.buttonHighlight);
     }
 
-    private void initialiseGraphView() {
-        graphView.initialisePaint();
-        graphView.setProjectionType(getProjectionType());
+    private void initialiseSketchView() {
+        sketchView.initialisePaint();
+        sketchView.setProjectionType(getProjectionType());
 
         boolean isDarkModeActive = isDarkModeActive();
-        graphView.setIsDarkModeActive(isDarkModeActive);
+        sketchView.setIsDarkModeActive(isDarkModeActive);
     }
 
     @Override
     public void syncWithSurvey() {
         Survey survey = getSurvey();
-        graphView.setSurvey(survey);
-        graphView.setSketch(getSketch(survey));
-        graphView.setProjection(getProjection(survey));
-        graphView.checkForChangedSurvey();
+        sketchView.setSurvey(survey);
+        sketchView.setSketch(getSketch(survey));
+        sketchView.setProjection(getProjection(survey));
+        sketchView.checkForChangedSurvey();
         float surveyLength = SurveyStats.calcTotalLength(survey);
         float surveyHeight = SurveyStats.calcHeightRange(survey);
-        graphView.setCachedStats(surveyLength, surveyHeight);
-        graphView.invalidate();
+        sketchView.setCachedStats(surveyLength, surveyHeight);
+        sketchView.invalidate();
     }
 
     /** The sketch this activity shows, from the survey being worked on. */
@@ -305,7 +305,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
             return true;
         } else if (itemId == R.id.buttonShowGrid) {
             SketchPreferences.Toggle.SHOW_GRID.set(!item.isChecked());
-            graphView.invalidate();
+            sketchView.invalidate();
             return true;
         } else if (itemId == R.id.buttonShowCompass) {
             boolean turningOn = !item.isChecked();
@@ -315,36 +315,36 @@ public abstract class SketchActivity extends SurveyEditorActivity
             } else {
                 unregisterCompassSensor();
             }
-            graphView.invalidate();
+            sketchView.invalidate();
             return true;
         } else if (itemId == R.id.buttonFadeNonActive) {
             SketchPreferences.Toggle.FADE_NON_ACTIVE.set(!item.isChecked());
-            graphView.invalidate();
+            sketchView.invalidate();
             return true;
         } else if (itemId == R.id.buttonShowSplays) {
             SketchPreferences.Toggle.SHOW_SPLAYS.set(!item.isChecked());
-            graphView.invalidate();
+            sketchView.invalidate();
             return true;
         } else if (itemId == R.id.buttonShowXSections) {
             SketchPreferences.Toggle.SHOW_X_SECTIONS.set(!item.isChecked());
-            graphView.invalidate();
+            sketchView.invalidate();
             return true;
         } else if (itemId == R.id.buttonShowSketch) {
             SketchPreferences.Toggle.SHOW_SKETCH.set(!item.isChecked());
             setSketchButtonsStatus();
-            graphView.invalidate();
+            sketchView.invalidate();
             return true;
         } else if (itemId == R.id.buttonShowStationLabels) {
             SketchPreferences.Toggle.SHOW_STATION_LABELS.set(!item.isChecked());
-            graphView.invalidate();
+            sketchView.invalidate();
             return true;
         } else if (itemId == R.id.buttonShowConnections) {
             SketchPreferences.Toggle.SHOW_CONNECTIONS.set(!item.isChecked());
-            graphView.invalidate();
+            sketchView.invalidate();
             return true;
         } else if (itemId == R.id.buttonAutoRecentre) {
             SketchPreferences.Toggle.AUTO_RECENTRE.set(!item.isChecked());
-            graphView.invalidate();
+            sketchView.invalidate();
             return true;
         } else if (itemId == R.id.buttonBlueWater) {
             SketchPreferences.Toggle.BLUE_WATER.set(!item.isChecked());
@@ -371,39 +371,39 @@ public abstract class SketchActivity extends SurveyEditorActivity
         }
 
         if (!isEnabled) {
-            graphView.setSketchTool(SketchTool.MOVE);
+            sketchView.setSketchTool(SketchTool.MOVE);
         }
     }
 
     public boolean handleAction(int itemId) {
 
-        GraphView graphView = findViewById(R.id.graphView);
-        graphView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+        SketchView sketchView = findViewById(R.id.sketchView);
+        sketchView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
 
-        SketchTool alreadySelectedTool = graphView.getSketchTool();
+        SketchTool alreadySelectedTool = sketchView.getSketchTool();
 
         // ********** Handle special commands **********
 
         if (itemId == R.id.buttonZoomIn) {
-            graphView.adjustZoomBy(ZOOM_INCREMENT);
-            graphView.invalidate();
+            sketchView.adjustZoomBy(ZOOM_INCREMENT);
+            sketchView.invalidate();
             return true;
         } else if (itemId == R.id.buttonZoomOut) {
-            graphView.adjustZoomBy(ZOOM_DECREMENT);
-            graphView.invalidate();
+            sketchView.adjustZoomBy(ZOOM_DECREMENT);
+            sketchView.invalidate();
             return true;
         } else if (itemId == R.id.buttonUndo) {
-            graphView.undo();
+            sketchView.undo();
             return true;
         } else if (itemId == R.id.buttonRedo) {
-            graphView.redo();
+            sketchView.redo();
             return true;
         } else if (itemId == R.id.buttonMenu) {
             openDisplayMenu();
             return true;
         } else if (itemId == R.id.buttonCentreView) {
-            graphView.centreViewOnActiveStation();
-            graphView.invalidate();
+            sketchView.centreViewOnActiveStation();
+            sketchView.invalidate();
             return true;
         } else if (itemId == R.id.buttonDeleteLastLeg) {
             getSurvey().undoAddLeg();
@@ -416,7 +416,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
         for (BrushColour brushColour : BrushColour.values()) {
             if (brushColour.getId() == itemId) {
                 selectBrushColour(brushColour);
-                if (!graphView.getSketchTool().usesColour()) {
+                if (!sketchView.getSketchTool().usesColour()) {
                     selectSketchTool(SketchTool.DRAW);
                 }
                 return true;
@@ -541,7 +541,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
         LayerDrawable layerDrawable = new LayerDrawable(layers);
         symbolButton.setImageDrawable(layerDrawable);
 
-        graphView.setCurrentSymbol(symbol);
+        sketchView.setCurrentSymbol(symbol);
     }
 
     private void initialiseTools() {
@@ -559,7 +559,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
     private void selectSketchTool(SketchTool toSelect) {
 
         SketchPreferences.setSelectedSketchTool(toSelect);
-        graphView.setSketchTool(toSelect);
+        sketchView.setSketchTool(toSelect);
 
         for (SketchTool sketchTool : SketchTool.values()) {
 
@@ -580,7 +580,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
     private void selectBrushColour(BrushColour toSelect) {
 
         SketchPreferences.setSelectedBrushColour(toSelect);
-        graphView.setBrushColour(toSelect);
+        sketchView.setBrushColour(toSelect);
 
         for (BrushColour brushColour : BrushColour.values()) {
 
@@ -597,12 +597,12 @@ public abstract class SketchActivity extends SurveyEditorActivity
 
     @Override
     protected void invalidateView() {
-        graphView.invalidate();
+        sketchView.invalidate();
     }
 
     @Override
     public void onNewCrossSection(Station station) {
-        graphView.handleNewCrossSection(station);
+        sketchView.handleNewCrossSection(station);
     }
 
     @Override
@@ -618,7 +618,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
 
     @Override
     public void onNewHorizontalCrossSection(Station station) {
-        graphView.handleNewCrossSection(station, CrossSection.Orientation.HORIZONTAL);
+        sketchView.handleNewCrossSection(station, CrossSection.Orientation.HORIZONTAL);
     }
 
     @Override
@@ -635,7 +635,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
 
     @Override
     public void onRotateCrossSection(Station station) {
-        graphView.handleRotateCrossSection(station);
+        sketchView.handleRotateCrossSection(station);
     }
 
     @Override
@@ -644,7 +644,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
         if (detail == null) {
             return;
         }
-        graphView.launchCrossSectionEditor(detail);
+        sketchView.launchCrossSectionEditor(detail);
     }
 
     @Override

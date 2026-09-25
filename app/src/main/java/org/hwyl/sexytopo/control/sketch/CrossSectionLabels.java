@@ -1,4 +1,4 @@
-package org.hwyl.sexytopo.control.graph;
+package org.hwyl.sexytopo.control.sketch;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.model.sketch.CrossSection;

@@ -13,7 +13,7 @@ public enum Projection2D {
     // The projections flip the space vertically (inverts the y-axis) because mathematically
     // we consider the bottom left to be 0,0 but on the screen we consider the top left to be 0,0
     // I think it makes sense to do it here (might reduce calculations a tiny bit compared to doing
-    // it in the GraphView)...
+    // it in the SketchView)...
     // We just have to remember to reverse the flip when exporting the sketch :)
 
     PLAN("Plan", "plan") {

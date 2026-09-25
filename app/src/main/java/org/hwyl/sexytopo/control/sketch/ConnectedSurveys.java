@@ -1,4 +1,4 @@
-package org.hwyl.sexytopo.control.graph;
+package org.hwyl.sexytopo.control.sketch;
 
 import java.util.HashMap;
 import java.util.Map;

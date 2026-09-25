@@ -769,7 +769,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     protected void redraw() {
         // Redraw the graph if we're in a graph view
-        View graph = findViewById(R.id.graphView);
+        View graph = findViewById(R.id.sketchView);
         if (graph != null) {
             graph.invalidate();
         }

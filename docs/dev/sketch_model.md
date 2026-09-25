@@ -33,7 +33,7 @@ The undo/redo stacks are **not persisted** — only the current state is saved t
 
 ## Drawing a Path
 
-Path drawing is a multi-step operation driven by touch events in `GraphView`:
+Path drawing is a multi-step operation driven by touch events in `SketchView`:
 
 1. `sketch.startNewPath(Coord2D)` — creates `activePath`, optionally snapping to a nearby existing path endpoint
 2. `activePath.lineTo(Coord2D)` — called repeatedly on touch move
@@ -86,7 +86,7 @@ The UI exposes only 8 colours via `BrushColour` (BLACK, BROWN, GREY, RED, ORANGE
 
 ## Coordinate System
 
-Sketch coordinates are in **survey space** (metres). `GraphView` converts to screen pixels using `surveyToViewScale` (default 60.0f, range 0.1–500.0f). Avoid storing pixel coordinates in sketch data.
+Sketch coordinates are in **survey space** (metres). `SketchView` converts to screen pixels using `surveyToViewScale` (default 60.0f, range 0.1–500.0f). Avoid storing pixel coordinates in sketch data.
 
 ## Serialization
 
@@ -103,7 +103,7 @@ Path simplification is re-applied on load. History stacks are not serialized.
 
 ## Rendering Overview
 
-`GraphView.drawSketch()` iterates each detail collection:
+`SketchView.drawSketch()` iterates each detail collection:
 - **Paths:** sorted by colour (to minimize paint changes), then batched into `float[]` arrays for `canvas.drawLines()`
 - **Symbols:** rendered as scaled, optionally rotated `Drawable` objects with a colour filter
 - **Text:** font size = `textSize * surveyToViewScale`; supports `\n` for multiline
@@ -124,5 +124,5 @@ Off-screen and sub-pixel details are culled via `couldBeVisible()` before render
 | `model/sketch/Symbol.java` | Symbol enum |
 | `model/sketch/Colour.java` | Colour enum |
 | `model/sketch/BrushColour.java` | UI colour picker enum |
-| `control/graph/GraphView.java` | Rendering and touch handling |
+| `control/sketch/SketchView.java` | Rendering and touch handling |
 | `control/io/basic/SketchJsonTranslater.java` | Serialization |

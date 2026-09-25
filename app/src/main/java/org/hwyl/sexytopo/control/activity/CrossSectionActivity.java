@@ -7,8 +7,8 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import java.util.ArrayList;
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.control.graph.CrossSectionLabels;
-import org.hwyl.sexytopo.control.graph.CrossSectionView;
+import org.hwyl.sexytopo.control.sketch.CrossSectionLabels;
+import org.hwyl.sexytopo.control.sketch.CrossSectionView;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
@@ -36,8 +36,8 @@ public class CrossSectionActivity extends SketchActivity {
     @Override
     public void setContentView(int layoutResID) {
         // Intercept the base-class content view so the cross-section editor uses a layout
-        // wired to a CrossSectionView instead of the full GraphView.
-        if (layoutResID == R.layout.activity_graph) {
+        // wired to a CrossSectionView instead of the full SketchView.
+        if (layoutResID == R.layout.activity_sketch) {
             super.setContentView(R.layout.activity_cross_section);
         } else {
             super.setContentView(layoutResID);
@@ -76,10 +76,10 @@ public class CrossSectionActivity extends SketchActivity {
 
         disableUnsupportedTools();
 
-        CrossSectionView graphView = findViewById(R.id.graphView);
+        CrossSectionView sketchView = findViewById(R.id.sketchView);
         Space<Coord2D> projection = originalDetail.getCrossSection().getProjection();
-        graphView.setProjection(projection);
-        graphView.setCrossSection(originalDetail.getCrossSection());
+        sketchView.setProjection(projection);
+        sketchView.setCrossSection(originalDetail.getCrossSection());
 
         setTitle(
                 CrossSectionLabels.getTitleResource(

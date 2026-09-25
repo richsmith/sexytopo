@@ -1,4 +1,4 @@
-package org.hwyl.sexytopo.control.graph;
+package org.hwyl.sexytopo.control.sketch;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -67,7 +67,7 @@ import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.SurveyConnection;
 
 @SuppressWarnings({"SameParameterValue", "UnnecessaryLocalVariable"})
-public class GraphView extends View {
+public class SketchView extends View {
 
     private final ScaleGestureDetector scaleGestureDetector;
     private final GestureDetector longPressDetector;
@@ -240,7 +240,7 @@ public class GraphView extends View {
 
     protected float stationCrossDiameterPx;
 
-    public GraphView(Context context, AttributeSet attrs) {
+    public SketchView(Context context, AttributeSet attrs) {
         super(context, attrs);
         scaleGestureDetector = new ScaleGestureDetector(context, new ScaleListener());
         longPressDetector = new GestureDetector(context, new LongPressListener());
@@ -845,7 +845,6 @@ public class GraphView extends View {
      * @noinspection SameReturnValue
      */
     private boolean handlePositionCrossSection(MotionEvent event) {
-
 
         // Acting on UP rather than DOWN means this tool owns the
         // whole gesture; switching tools on DOWN would hand the rest

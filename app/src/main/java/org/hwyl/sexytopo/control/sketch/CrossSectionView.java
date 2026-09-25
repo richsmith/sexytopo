@@ -1,4 +1,4 @@
-package org.hwyl.sexytopo.control.graph;
+package org.hwyl.sexytopo.control.sketch;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -15,7 +15,7 @@ import org.hwyl.sexytopo.model.survey.Leg;
  * Overrides parent provide a slightly more minimal editing experience for the cross-section sketch
  * view.
  */
-public class CrossSectionView extends GraphView {
+public class CrossSectionView extends SketchView {
 
     /** Fraction of the smaller screen dimension that the longest splay should occupy. */
     private static final float AUTO_FIT_SCREEN_FRACTION = 0.4f;
