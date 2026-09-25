@@ -45,11 +45,11 @@ public class ViewContextMenuTest {
     }
 
     @Test
-    public void testExtendedElevationShowsCrossSectionsWithoutSetDirection() {
+    public void testExtendedElevationShowsCrossSectionsWithSetDirection() {
         ViewContext.EXTENDED_ELEVATION.configureViewSpecificItems(menu);
 
         Assert.assertTrue(visibility.get(R.id.menu_xsection));
-        Assert.assertFalse(visibility.get(R.id.action_xsection_set_direction));
+        Assert.assertTrue(visibility.get(R.id.action_xsection_set_direction));
     }
 
     @Test

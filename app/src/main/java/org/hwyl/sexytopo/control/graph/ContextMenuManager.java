@@ -281,7 +281,7 @@ public class ContextMenuManager {
                 editItem.setEnabled(hasCrossSection);
             }
             if (setDirectionItem != null) {
-                setDirectionItem.setEnabled(hasCrossSection);
+                setDirectionItem.setEnabled(activity.hasRotatableCrossSection(station));
             }
             if (deleteItem != null) {
                 deleteItem.setEnabled(hasCrossSection);

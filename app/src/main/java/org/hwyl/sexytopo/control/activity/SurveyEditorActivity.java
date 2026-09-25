@@ -104,6 +104,11 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         return false;
     }
 
+    /** Whether the station has a cross-section whose direction can be set (a vertical one). */
+    public boolean hasRotatableCrossSection(Station station) {
+        return false;
+    }
+
     public void onNewCrossSection(Station station) {
         // Default: not applicable in some views
         // Override in activities that support adding cross-sections

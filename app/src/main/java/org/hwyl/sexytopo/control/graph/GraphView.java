@@ -45,10 +45,8 @@ import org.hwyl.sexytopo.control.util.CrossSectioner;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
-import org.hwyl.sexytopo.control.util.SurveyTools;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Coord2D;
-import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.graph.Line;
 import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
@@ -1044,10 +1042,6 @@ public class GraphView extends View {
     }
 
     public void handleRotateCrossSection(Station station) {
-        if (!getViewContext().canRotateCrossSections()) {
-            // The direction only makes sense to set on the plan; elsewhere it is fixed.
-            return;
-        }
         CrossSectionDetail detail = sketch.getCrossSectionDetail(station);
         if (detail == null || !detail.getCrossSection().isRotatable()) {
             return;
@@ -1060,8 +1054,10 @@ public class GraphView extends View {
     }
 
     /**
-     * Handle the rotation drag for a cross-section. The compass azimuth is computed from the
-     * station's position in the main survey to the finger location.
+     * Handle the rotation drag for a cross-section. On the plan the compass azimuth is computed
+     * from the station's position in the main survey to the finger location. On the elevation,
+     * which has no bearings, the section snaps to face left or right, whichever side of the station
+     * the finger is on.
      */
     private boolean handleRotateCrossSection(MotionEvent event) {
         if (crossSectionBeingRotated == null) {
@@ -1083,15 +1079,16 @@ public class GraphView extends View {
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_MOVE:
                 crossSectionRotateFingerOnView = fingerOnView;
-                if (dx != 0 || dy != 0) {
-                    crossSectionPreviewAngle = toAzimuth(dx, dy);
+                Float previewAngle = getRotationAngle(crossSectionBeingRotated, dx, dy);
+                if (previewAngle != null) {
+                    crossSectionPreviewAngle = previewAngle;
                 }
                 invalidate();
                 return true;
 
             case MotionEvent.ACTION_UP:
-                if (dx != 0 || dy != 0) {
-                    float newAngle = toAzimuth(dx, dy);
+                Float newAngle = getRotationAngle(crossSectionBeingRotated, dx, dy);
+                if (newAngle != null) {
                     CrossSectionDetail rotated = crossSectionBeingRotated.withAngle(newAngle);
                     sketch.replaceCrossSectionDetail(crossSectionBeingRotated, rotated);
                 }
@@ -1120,6 +1117,24 @@ public class GraphView extends View {
             return null;
         }
         return projection.getStationMap().get(station);
+    }
+
+    /**
+     * The bearing to turn a cross-section to for a finger at (dx, dy) from its station, or null if
+     * the finger is too close to the station to say.
+     */
+    private Float getRotationAngle(CrossSectionDetail detail, float dx, float dy) {
+        if (projectionType == Projection2D.EXTENDED_ELEVATION) {
+            if (dx == 0) {
+                return null;
+            }
+            return CrossSectioner.getAngleFacingOnElevation(
+                    survey, detail.getCrossSection().getStation(), dx > 0);
+        }
+        if (dx == 0 && dy == 0) {
+            return null;
+        }
+        return toAzimuth(dx, dy);
     }
 
     /** Compass azimuth (0 = North, 90 = East) for a vector in plan-view survey coords. */
@@ -1795,9 +1810,7 @@ public class GraphView extends View {
         CrossSection crossSection = crossSectionDetail.getCrossSection();
 
         float indicatorWidth = (1 * surveyToViewScale);
-        CrossSectionIndicator indicator =
-                CrossSectionIndicator.atAngle(
-                        x, y, indicatorWidth, getIndicatorAngle(crossSection));
+        CrossSectionIndicator indicator = getIndicator(crossSectionDetail, x, y, indicatorWidth);
 
         canvas.drawLine(
                 indicator.getStartX(),
@@ -1816,23 +1829,28 @@ public class GraphView extends View {
     }
 
     /**
-     * The angle to draw a cross-section's indicator at. On the plan this is the compass bearing the
-     * section faces, or the one it is being turned to. On the elevation the section can't be
-     * turned, so it is the way it faces on the page: along the survey for a vertical section, and
-     * down for a horizontal one.
+     * The indicator for a cross-section, facing the way it faces or the way it is being turned to.
+     * On the plan that is its compass bearing. The elevation has no bearings, so a vertical section
+     * faces left or right on the page and a horizontal one is looked at from above.
      */
-    private float getIndicatorAngle(CrossSection crossSection) {
-        boolean isHorizontal = crossSection.getOrientation() == CrossSection.Orientation.HORIZONTAL;
-        if (isHorizontal || projectionType == Projection2D.EXTENDED_ELEVATION) {
-            ExtendedElevationDirection surveyDirection =
-                    SurveyTools.getOnwardExtendedElevationDirection(
-                            survey, crossSection.getStation());
-            return CrossSectionIndicator.getElevationFacingAngle(
-                    crossSection.getOrientation(), surveyDirection);
+    private CrossSectionIndicator getIndicator(
+            CrossSectionDetail detail, float x, float y, float length) {
+        CrossSection crossSection = detail.getCrossSection();
+        if (!crossSection.isRotatable()) {
+            return CrossSectionIndicator.lookingDown(x, y, length);
         }
-        return crossSectionPreviewAngle == null
-                ? crossSection.getAngle()
-                : crossSectionPreviewAngle;
+
+        float angle =
+                detail == crossSectionBeingRotated && crossSectionPreviewAngle != null
+                        ? crossSectionPreviewAngle
+                        : crossSection.getAngle();
+        if (projectionType == Projection2D.EXTENDED_ELEVATION) {
+            boolean facingRight =
+                    CrossSectioner.isFacingRightOnElevation(
+                            survey, crossSection.getStation(), angle);
+            return CrossSectionIndicator.onElevation(x, y, length, facingRight);
+        }
+        return CrossSectionIndicator.atAngle(x, y, length, angle);
     }
 
     private void highlightActiveStation(Canvas canvas, float x, float y) {

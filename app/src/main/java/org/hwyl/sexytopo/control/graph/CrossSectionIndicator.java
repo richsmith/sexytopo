@@ -2,8 +2,6 @@ package org.hwyl.sexytopo.control.graph;
 
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.graph.Coord2D;
-import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
-import org.hwyl.sexytopo.model.sketch.CrossSection;
 
 /**
  * The little mark drawn over a station to show that it has a cross-section: a line representing the
@@ -15,10 +13,9 @@ public final class CrossSectionIndicator {
     private static final float ARROW_LENGTH_FRACTION = 0.4f;
     private static final float ARROW_INNER_OFFSET_FRACTION = 0.05f;
 
-    // Angles on the elevation, where the page is read like a compass rose: 0 is up the page
+    // Angles on the elevation for atAngle, where the page is read like a compass rose: 0 is up
     private static final float FACING_RIGHT = 90f;
     private static final float FACING_DOWN = 180f;
-    private static final float FACING_LEFT = 270f;
 
     private final float startX;
     private final float startY;
@@ -43,7 +40,7 @@ public final class CrossSectionIndicator {
      * you look that way, pointing the way the section faces.
      *
      * <p>On the plan the angle is a compass bearing, with 0 up the page. On the elevation there are
-     * no bearings, but the page can be read the same way; see getElevationFacingAngle.
+     * no bearings; see onElevation and lookingDown.
      */
     public static CrossSectionIndicator atAngle(
             float x, float y, float length, float angleDegrees) {
@@ -74,21 +71,31 @@ public final class CrossSectionIndicator {
     }
 
     /**
-     * The angle to give atAngle for a cross-section on the elevation, where the page is read like a
-     * compass rose: up is 0, right is 90, down is 180 and left is 270.
-     *
-     * <p>A vertical section faces along the survey, which on the elevation is to the right or to
-     * the left. A horizontal section is looked at from above, so it faces down the page.
-     *
-     * @param surveyDirection the way the survey is heading at the section's station; VERTICAL,
-     *     which isn't a way the survey can head, is treated as the default, to the right
+     * An indicator for a vertical section on the elevation: an upright line through (x, y), the
+     * section seen edge-on, with the arrowhead always at the top, pointing the way it faces.
      */
-    public static float getElevationFacingAngle(
-            CrossSection.Orientation orientation, ExtendedElevationDirection surveyDirection) {
-        if (orientation == CrossSection.Orientation.HORIZONTAL) {
-            return FACING_DOWN;
+    public static CrossSectionIndicator onElevation(
+            float x, float y, float length, boolean facingRight) {
+        // Facing right, the arrowhead is on the top end already, so facing left is its mirror image
+        CrossSectionIndicator right = atAngle(x, y, length, FACING_RIGHT);
+        return facingRight ? right : right.mirroredAbout(x);
+    }
+
+    /**
+     * An indicator for a horizontal section on the elevation: a level line through (x, y), with an
+     * arrowhead pointing down, since the section is looked at from above.
+     */
+    public static CrossSectionIndicator lookingDown(float x, float y, float length) {
+        return atAngle(x, y, length, FACING_DOWN);
+    }
+
+    private CrossSectionIndicator mirroredAbout(float x) {
+        float[] mirroredArrowhead = arrowhead.clone();
+        for (int i = 0; i < mirroredArrowhead.length; i += 2) {
+            mirroredArrowhead[i] = 2 * x - mirroredArrowhead[i];
         }
-        return surveyDirection == ExtendedElevationDirection.LEFT ? FACING_LEFT : FACING_RIGHT;
+        return new CrossSectionIndicator(
+                2 * x - startX, startY, 2 * x - endX, endY, mirroredArrowhead);
     }
 
     public float getStartX() {

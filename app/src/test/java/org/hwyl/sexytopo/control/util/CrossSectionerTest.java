@@ -151,4 +151,61 @@ public class CrossSectionerTest {
         Assert.assertEquals(CrossSection.Orientation.VERTICAL, crossSection.getOrientation());
         Assert.assertEquals(45.0, crossSection.getAngle(), SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
     }
+
+    @Test
+    public void testFacingRightOnTheElevationFollowsTheSurveyWhenItIsDrawnRight() {
+        // The survey heads north and is drawn to the right
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Station station = survey.getStationByName("2");
+
+        Assert.assertEquals(
+                0f, CrossSectioner.getAngleFacingOnElevation(survey, station, true), 1e-4f);
+        Assert.assertEquals(
+                180f, CrossSectioner.getAngleFacingOnElevation(survey, station, false), 1e-4f);
+    }
+
+    @Test
+    public void testFacingRightOnTheElevationLooksBackWhenTheSurveyIsDrawnLeft() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Station station = survey.getStationByName("2");
+        SurveyUpdater.setExtendedElevationDirection(
+                survey, survey.getStationByName("1"), ExtendedElevationDirection.LEFT);
+
+        Assert.assertEquals(
+                180f, CrossSectioner.getAngleFacingOnElevation(survey, station, true), 1e-4f);
+        Assert.assertEquals(
+                0f, CrossSectioner.getAngleFacingOnElevation(survey, station, false), 1e-4f);
+    }
+
+    @Test
+    public void testASectionSetOnTheElevationIsSeenFacingThatWay() {
+        for (ExtendedElevationDirection direction :
+                new ExtendedElevationDirection[] {
+                    ExtendedElevationDirection.LEFT, ExtendedElevationDirection.RIGHT
+                }) {
+            Survey survey = BasicTestSurveyCreator.createStraightNorth();
+            Station station = survey.getStationByName("2");
+            SurveyUpdater.setExtendedElevationDirection(
+                    survey, survey.getStationByName("1"), direction);
+
+            for (boolean facingRight : new boolean[] {true, false}) {
+                float angle =
+                        CrossSectioner.getAngleFacingOnElevation(survey, station, facingRight);
+                Assert.assertEquals(
+                        direction + " " + facingRight,
+                        facingRight,
+                        CrossSectioner.isFacingRightOnElevation(survey, station, angle));
+            }
+        }
+    }
+
+    @Test
+    public void testASectionAtAnAngleFacesWhicheverWayIsNearer() {
+        // Heading north, drawn right: a section facing east of north still faces along the survey
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Station station = survey.getStationByName("2");
+
+        Assert.assertTrue(CrossSectioner.isFacingRightOnElevation(survey, station, 60));
+        Assert.assertFalse(CrossSectioner.isFacingRightOnElevation(survey, station, 120));
+    }
 }

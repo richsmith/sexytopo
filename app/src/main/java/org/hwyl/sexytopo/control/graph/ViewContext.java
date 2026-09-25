@@ -24,11 +24,6 @@ public enum ViewContext {
             setDirectionSubmenuVisible(menu, false);
             setCrossSectionVisible(menu, true);
         }
-
-        @Override
-        public boolean canRotateCrossSections() {
-            return true;
-        }
     },
     ELEVATION {
         @Override
@@ -78,15 +73,6 @@ public enum ViewContext {
     public abstract void configureViewSpecificItems(Menu menu);
 
     /**
-     * Whether the user can choose the direction a cross-section faces in this view context. In the
-     * plan a section is a vertical plane that can face any way around its station, so the user sets
-     * it. Elsewhere the direction is worked out when the section is created and stays fixed.
-     */
-    public boolean canRotateCrossSections() {
-        return false;
-    }
-
-    /**
      * Whether a horizontal cross-section can be created in this view context. On the plan a
      * horizontal slice would only repeat what the plan already shows, so it is for the elevation.
      */
@@ -118,7 +104,6 @@ public enum ViewContext {
         if (crossSectionMenu != null) {
             crossSectionMenu.setVisible(visible);
         }
-        setItemVisible(menu, R.id.action_xsection_set_direction, canRotateCrossSections());
         setItemVisible(
                 menu, R.id.action_xsection_create_horizontal, canCreateHorizontalCrossSection());
     }
