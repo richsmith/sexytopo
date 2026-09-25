@@ -6,7 +6,7 @@ import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
-public class SurveyTools {
+public class SurveyTraversal {
 
     public static void traverseLegs(Survey survey, SurveyLegTraversalCallback callback) {
         traverseLegs(survey.getOrigin(), callback);

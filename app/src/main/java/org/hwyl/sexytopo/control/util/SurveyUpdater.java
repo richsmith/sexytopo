@@ -185,7 +185,7 @@ public class SurveyUpdater {
 
             Station newStation = new Station(getNextStationName(survey));
             newStation.setExtendedElevationDirection(
-                    SurveyTools.getOnwardExtendedElevationDirection(survey, activeStation));
+                    SurveyTraversal.getOnwardExtendedElevationDirection(survey, activeStation));
 
             Leg newLeg = averageLegs(lastNLegs);
             newLeg =
@@ -242,7 +242,7 @@ public class SurveyUpdater {
         if (areLegsBacksights(fore, back)) {
             Station newStation = new Station(getNextStationName(survey));
             newStation.setExtendedElevationDirection(
-                    SurveyTools.getOnwardExtendedElevationDirection(survey, activeStation));
+                    SurveyTraversal.getOnwardExtendedElevationDirection(survey, activeStation));
 
             Leg newLeg = averageBacksights(fore, back);
             newLeg = Leg.toFullLeg(newLeg, newStation);
@@ -262,7 +262,7 @@ public class SurveyUpdater {
 
     public static synchronized void editLeg(
             final Survey survey, final Leg toEdit, final Leg edited) {
-        SurveyTools.traverseLegs(
+        SurveyTraversal.traverseLegs(
                 survey,
                 (origin, leg) -> {
                     if (leg == toEdit) {
@@ -319,7 +319,7 @@ public class SurveyUpdater {
 
         // First remove all legs in the subtree from the survey record
         if (leg.hasDestination()) {
-            SurveyTools.traverseLegs(
+            SurveyTraversal.traverseLegs(
                     leg.getDestination(),
                     (origin, subLeg) -> {
                         survey.removeLegRecord(subLeg);
@@ -394,7 +394,7 @@ public class SurveyUpdater {
     }
 
     public static void reverseLeg(final Survey survey, final Station toReverse) {
-        SurveyTools.traverseLegs(
+        SurveyTraversal.traverseLegs(
                 survey,
                 (origin, leg) -> {
                     if (leg.hasDestination() && leg.getDestination() == toReverse) {

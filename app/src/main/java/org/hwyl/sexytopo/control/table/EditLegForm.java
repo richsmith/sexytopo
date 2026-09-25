@@ -11,7 +11,7 @@ import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.InputMode;
-import org.hwyl.sexytopo.control.util.SurveyTools;
+import org.hwyl.sexytopo.control.util.SurveyTraversal;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -313,7 +313,7 @@ public class EditLegForm extends Form {
             boolean isMovingLeg = originalStation != fromStation;
 
             if (isMovingLeg) {
-                if (SurveyTools.isInSubtree(originalLeg.getDestination(), fromStation)) {
+                if (SurveyTraversal.isInSubtree(originalLeg.getDestination(), fromStation)) {
                     error = R.string.survey_update_error_descendant_station;
                 }
             }

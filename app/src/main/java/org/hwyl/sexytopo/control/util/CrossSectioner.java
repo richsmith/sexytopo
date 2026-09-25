@@ -96,7 +96,7 @@ public class CrossSectioner {
     }
 
     private static boolean isSurveyDrawnRight(Survey survey, Station station) {
-        return SurveyTools.getOnwardExtendedElevationDirection(survey, station)
+        return SurveyTraversal.getOnwardExtendedElevationDirection(survey, station)
                 != ExtendedElevationDirection.LEFT;
     }
 
