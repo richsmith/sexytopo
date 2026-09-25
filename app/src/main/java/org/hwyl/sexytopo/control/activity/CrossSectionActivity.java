@@ -7,8 +7,8 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import java.util.ArrayList;
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.control.graph.CrossSectionLabels;
 import org.hwyl.sexytopo.control.graph.CrossSectionView;
-import org.hwyl.sexytopo.control.graph.OrientationMarker;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.Projection2D;
 import org.hwyl.sexytopo.model.graph.Space;
@@ -82,7 +82,7 @@ public class CrossSectionActivity extends GraphActivity {
         graphView.setCrossSection(originalDetail.getCrossSection());
 
         setTitle(
-                OrientationMarker.getTitleResource(
+                CrossSectionLabels.getTitleResource(
                         originalDetail.getCrossSection().getOrientation()));
     }
 

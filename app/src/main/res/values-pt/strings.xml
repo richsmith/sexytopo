@@ -34,8 +34,8 @@
     <string name="title_activity_plan">Planta</string>
     <string name="title_activity_elevation">Elevação</string>
     <string name="title_activity_cross_section">Secção transversal</string>
-    <string name="title_activity_cross_section_horizontal">Secção transversal horizontal</string>
-    <string name="title_activity_cross_section_vertical">Secção transversal vertical</string>
+    <string name="title_activity_cross_section_horizontal">Secção horizontal</string>
+    <string name="title_activity_cross_section_vertical">Secção vertical</string>
     <string name="title_activity_calibration">Calibração</string>
     <string name="title_activity_survey">Estatísticas</string>
     <string name="title_activity_settings">Configurações</string>
@@ -95,8 +95,6 @@
     <string name="action_force_crash">Forçar Falha (Perigo!)</string>
     <string name="action_xsection_done">Concluído</string>
     <string name="action_xsection_cancel">Cancelar</string>
-    <string name="xsection_orientation_north">N</string>
-    <string name="xsection_orientation_up">Cima</string>
 
     <!-- File handling -->
     <string name="file_started_new_survey">Nova topografia iniciada</string>
@@ -698,6 +696,8 @@
     <string name="menu_xsection_create">Nova secção</string>
     <string name="menu_xsection_create_horizontal">Nova secção horizontal</string>
     <string name="menu_xsection_create_vertical">Nova secção vertical</string>
+    <string name="menu_xsection_hint_vertical">galeria</string>
+    <string name="menu_xsection_hint_horizontal">poço</string>
     <string name="menu_xsection_delete">Eliminar secção</string>
     <string name="menu_xsection_edit">Editar esboço</string>
     <string name="menu_xsection_set_direction">Definir direção</string>

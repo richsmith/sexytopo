@@ -95,8 +95,6 @@
     <string name="action_force_crash">Forza Crash (Pericolo!)</string>
     <string name="action_xsection_done">Fatto</string>
     <string name="action_xsection_cancel">Annulla</string>
-    <string name="xsection_orientation_north">N</string>
-    <string name="xsection_orientation_up">Su</string>
 
     <!-- File handling -->
     <string name="file_started_new_survey">Nuovo rilievo iniziato</string>
@@ -698,6 +696,8 @@
     <string name="menu_xsection_create">Nuova sezione</string>
     <string name="menu_xsection_create_horizontal">Nuova sezione orizzontale</string>
     <string name="menu_xsection_create_vertical">Nuova sezione verticale</string>
+    <string name="menu_xsection_hint_vertical">galleria</string>
+    <string name="menu_xsection_hint_horizontal">pozzo</string>
     <string name="menu_xsection_delete">Elimina sezione</string>
     <string name="menu_xsection_edit">Modifica schizzo</string>
     <string name="menu_xsection_set_direction">Imposta direzione</string>

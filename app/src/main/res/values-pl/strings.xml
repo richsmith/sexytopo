@@ -95,8 +95,6 @@
     <string name="action_force_crash">Wymuś awarię (Niebezpieczne!)</string>
     <string name="action_xsection_done">Gotowe</string>
     <string name="action_xsection_cancel">Anuluj</string>
-    <string name="xsection_orientation_north">N</string>
-    <string name="xsection_orientation_up">Góra</string>
 
     <!-- File handling -->
     <string name="file_started_new_survey">Rozpoczęto nowy pomiar</string>
@@ -698,6 +696,8 @@
     <string name="menu_xsection_create">Nowy przekrój</string>
     <string name="menu_xsection_create_horizontal">Nowy przekrój poziomy</string>
     <string name="menu_xsection_create_vertical">Nowy przekrój pionowy</string>
+    <string name="menu_xsection_hint_vertical">korytarz</string>
+    <string name="menu_xsection_hint_horizontal">studnia</string>
     <string name="menu_xsection_delete">Usuń przekrój</string>
     <string name="menu_xsection_edit">Edytuj szkic</string>
     <string name="menu_xsection_set_direction">Ustaw kierunek</string>

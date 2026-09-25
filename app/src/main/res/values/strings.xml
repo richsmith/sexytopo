@@ -35,8 +35,8 @@
     <string name="title_activity_plan">Plan</string>
     <string name="title_activity_elevation">Elevation</string>
     <string name="title_activity_cross_section">Cross-Section</string>
-    <string name="title_activity_cross_section_horizontal">Horizontal Cross-Section</string>
-    <string name="title_activity_cross_section_vertical">Vertical Cross-Section</string>
+    <string name="title_activity_cross_section_horizontal">Horizontal Section</string>
+    <string name="title_activity_cross_section_vertical">Vertical Section</string>
     <string name="title_activity_calibration">Calibration</string>
     <string name="title_activity_survey">Stats</string>
     <string name="title_activity_settings">Settings</string>
@@ -101,8 +101,6 @@
     <string name="action_force_crash">Force Crash (Danger!)</string>
     <string name="action_xsection_done">Done</string>
     <string name="action_xsection_cancel">Cancel</string>
-    <string name="xsection_orientation_north">N</string>
-    <string name="xsection_orientation_up">Up</string>
 
     <!-- File handling -->
     <string name="file_started_new_survey">Started new survey</string>
@@ -729,8 +727,10 @@
     <string name="menu_jump_to_station_in_elevation">&#10132; Elevation</string>
     <string name="menu_xsection">Cross-Section</string>
     <string name="menu_xsection_create">New Cross-Section</string>
-    <string name="menu_xsection_create_horizontal">New Horizontal Cross-Section</string>
-    <string name="menu_xsection_create_vertical">New Vertical Cross-Section</string>
+    <string name="menu_xsection_create_horizontal">New Horizontal Section</string>
+    <string name="menu_xsection_create_vertical">New Vertical Section</string>
+    <string name="menu_xsection_hint_vertical">passage</string>
+    <string name="menu_xsection_hint_horizontal">shaft</string>
     <string name="menu_xsection_delete">Delete Cross-Section</string>
     <string name="menu_xsection_edit">Edit Sketch</string>
     <string name="menu_xsection_set_direction">Set Direction</string>

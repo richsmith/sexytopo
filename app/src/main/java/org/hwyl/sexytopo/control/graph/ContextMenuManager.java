@@ -5,8 +5,12 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.text.SpannableString;
+import android.text.TextPaint;
 import android.text.style.BackgroundColorSpan;
+import android.text.style.CharacterStyle;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.UpdateAppearance;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,7 +23,7 @@ import java.util.Map;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
-import org.hwyl.sexytopo.model.sketch.Sketch;
+import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -257,9 +261,7 @@ public class ContextMenuManager {
 
         // Cross-section submenu: enable/disable based on whether one exists at this station.
         if (survey != null) {
-            Sketch sketch = viewContext.getSketch(survey);
-            boolean hasCrossSection =
-                    sketch != null && sketch.getCrossSectionDetail(station) != null;
+            boolean hasCrossSection = activity.hasCrossSection(station);
             MenuItem createItem = menu.findItem(R.id.action_xsection_create);
             MenuItem createHorizontalItem = menu.findItem(R.id.action_xsection_create_horizontal);
             MenuItem editItem = menu.findItem(R.id.action_xsection_edit);
@@ -287,6 +289,66 @@ public class ContextMenuManager {
         }
 
         viewContext.configureViewSpecificItems(menu);
+
+        if (viewContext.canCreateHorizontalCrossSection()) {
+            // With two kinds to choose from, plain "New Cross-Section" needs to say which it is
+            setCrossSectionCreateTitle(
+                    menu,
+                    R.id.action_xsection_create,
+                    CrossSection.Orientation.VERTICAL,
+                    R.string.menu_xsection_create_vertical,
+                    R.string.menu_xsection_hint_vertical);
+            setCrossSectionCreateTitle(
+                    menu,
+                    R.id.action_xsection_create_horizontal,
+                    CrossSection.Orientation.HORIZONTAL,
+                    R.string.menu_xsection_create_horizontal,
+                    R.string.menu_xsection_hint_horizontal);
+        }
+    }
+
+    /**
+     * Titles a new-cross-section item as name, glyph and then a smaller, fainter hint at where that
+     * kind of section is used, e.g. "New Vertical Section ↕ passage". The glyph goes after the name
+     * so that the names line up.
+     */
+    private static final float HINT_ALPHA = 0.6f;
+
+    /**
+     * Fades text by scaling the alpha of whatever colour it is already drawn in. Unlike a fixed
+     * colour, this still follows the item's state, so the text greys out when the item is disabled.
+     */
+    private static class FadedSpan extends CharacterStyle implements UpdateAppearance {
+        private final float alpha;
+
+        FadedSpan(float alpha) {
+            this.alpha = alpha;
+        }
+
+        @Override
+        public void updateDrawState(TextPaint textPaint) {
+            textPaint.setAlpha(Math.round(textPaint.getAlpha() * alpha));
+        }
+    }
+
+    private void setCrossSectionCreateTitle(
+            Menu menu,
+            int itemId,
+            CrossSection.Orientation orientation,
+            int titleRes,
+            int hintRes) {
+        MenuItem item = menu.findItem(itemId);
+        if (item == null) {
+            return;
+        }
+        String title = context.getString(titleRes) + " " + CrossSectionLabels.getGlyph(orientation);
+        String hint = context.getString(hintRes);
+        SpannableString spannable = new SpannableString(title + "\u2003" + hint);
+        int hintStart = spannable.length() - hint.length();
+
+        spannable.setSpan(new FadedSpan(HINT_ALPHA), hintStart, spannable.length(), 0);
+        spannable.setSpan(new RelativeSizeSpan(0.8f), hintStart, spannable.length(), 0);
+        item.setTitle(spannable);
     }
 
     private void setStationTitle(Menu menu, Station station) {

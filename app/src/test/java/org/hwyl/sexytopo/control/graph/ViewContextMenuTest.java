@@ -19,7 +19,6 @@ import org.junit.Test;
 public class ViewContextMenuTest {
 
     private Map<Integer, Boolean> visibility;
-    private Map<Integer, Integer> titles;
     private Menu menu;
 
     @Before
@@ -34,8 +33,7 @@ public class ViewContextMenuTest {
         visibility.put(R.id.action_jump_to_plan, true);
         visibility.put(R.id.action_jump_to_elevation, true);
         visibility.put(R.id.menu_elevation, true);
-        titles = new HashMap<>();
-        menu = createMenu(visibility, titles);
+        menu = createMenu(visibility);
     }
 
     @Test
@@ -68,7 +66,6 @@ public class ViewContextMenuTest {
 
         Assert.assertTrue(visibility.get(R.id.action_xsection_create));
         Assert.assertFalse(visibility.get(R.id.action_xsection_create_horizontal));
-        Assert.assertFalse(titles.containsKey(R.id.action_xsection_create));
     }
 
     @Test
@@ -77,9 +74,6 @@ public class ViewContextMenuTest {
 
         Assert.assertTrue(visibility.get(R.id.action_xsection_create));
         Assert.assertTrue(visibility.get(R.id.action_xsection_create_horizontal));
-        Assert.assertEquals(
-                Integer.valueOf(R.string.menu_xsection_create_vertical),
-                titles.get(R.id.action_xsection_create));
     }
 
     @Test
@@ -107,10 +101,10 @@ public class ViewContextMenuTest {
         }
     }
 
-    private static Menu createMenu(Map<Integer, Boolean> visibility, Map<Integer, Integer> titles) {
+    private static Menu createMenu(Map<Integer, Boolean> visibility) {
         Map<Integer, MenuItem> items = new HashMap<>();
         for (Integer id : visibility.keySet()) {
-            items.put(id, createItem(id, visibility, titles));
+            items.put(id, createItem(id, visibility));
         }
         InvocationHandler handler =
                 (proxy, method, args) -> {
@@ -126,14 +120,9 @@ public class ViewContextMenuTest {
                         handler);
     }
 
-    private static MenuItem createItem(
-            int id, Map<Integer, Boolean> visibility, Map<Integer, Integer> titles) {
+    private static MenuItem createItem(int id, Map<Integer, Boolean> visibility) {
         InvocationHandler handler =
                 (proxy, method, args) -> {
-                    if (method.getName().equals("setTitle") && args[0] instanceof Integer) {
-                        titles.put(id, (Integer) args[0]);
-                        return proxy;
-                    }
                     if (method.getName().equals("setVisible")) {
                         visibility.put(id, (Boolean) args[0]);
                         return proxy;

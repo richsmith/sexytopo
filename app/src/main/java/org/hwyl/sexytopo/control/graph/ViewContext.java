@@ -3,8 +3,6 @@ package org.hwyl.sexytopo.control.graph;
 import android.view.Menu;
 import android.view.MenuItem;
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.model.sketch.Sketch;
-import org.hwyl.sexytopo.model.survey.Survey;
 
 /**
  * Represents the different view contexts where station context menus can be displayed. Each context
@@ -28,11 +26,6 @@ public enum ViewContext {
         }
 
         @Override
-        public Sketch getSketch(Survey survey) {
-            return survey.getPlanSketch();
-        }
-
-        @Override
         public boolean canRotateCrossSections() {
             return true;
         }
@@ -51,11 +44,6 @@ public enum ViewContext {
             setItemVisible(menu, R.id.action_jump_to_elevation, false);
             setDirectionSubmenuVisible(menu, true);
             setCrossSectionVisible(menu, true);
-        }
-
-        @Override
-        public Sketch getSketch(Survey survey) {
-            return survey.getElevationSketch();
         }
 
         @Override
@@ -88,14 +76,6 @@ public enum ViewContext {
     };
 
     public abstract void configureViewSpecificItems(Menu menu);
-
-    /**
-     * The sketch this view context shows for the given survey, or null if it has no sketch of its
-     * own (e.g. the table).
-     */
-    public Sketch getSketch(Survey survey) {
-        return null;
-    }
 
     /**
      * Whether the user can choose the direction a cross-section faces in this view context. In the
@@ -141,12 +121,5 @@ public enum ViewContext {
         setItemVisible(menu, R.id.action_xsection_set_direction, canRotateCrossSections());
         setItemVisible(
                 menu, R.id.action_xsection_create_horizontal, canCreateHorizontalCrossSection());
-        if (canCreateHorizontalCrossSection()) {
-            // With two kinds to choose from, plain "New Cross-Section" needs to say which it is
-            MenuItem createItem = menu.findItem(R.id.action_xsection_create);
-            if (createItem != null) {
-                createItem.setTitle(R.string.menu_xsection_create_vertical);
-            }
-        }
     }
 }

@@ -99,6 +99,11 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         invalidateView();
     }
 
+    /** Whether the station has a cross-section in the sketch this activity shows. */
+    public boolean hasCrossSection(Station station) {
+        return false;
+    }
+
     public void onNewCrossSection(Station station) {
         // Default: not applicable in some views
         // Override in activities that support adding cross-sections

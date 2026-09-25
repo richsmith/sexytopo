@@ -32,6 +32,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SexyTopo;
@@ -106,13 +107,11 @@ public class GraphView extends View {
     private static final float CROSS_SECTION_BORDER_PADDING_FRACTION = 0.05f;
     private static final float CROSS_SECTION_BORDER_CORNER_RADIUS_DP = 6.0f;
     private static final int CROSS_SECTION_HANDLE_WIDTH_DP = 8;
+    private static final float CROSS_SECTION_GLYPH_SIZE_DP = 13f;
+    private static final float CROSS_SECTION_GLYPH_BOX_SIZE_DP = 18f;
     private static final int CROSS_SECTION_HANDLE_GRIP_WIDTH_DP = 2;
     private static final float CROSS_SECTION_HANDLE_GRIP_SPACING_DP = 5f;
     private static final float CROSS_SECTION_HANDLE_GRIP_LENGTH_FRACTION = 0.45f;
-    // The grip marks have round caps, so each looks a stroke width longer than these lengths and
-    // the gap between dashes looks a stroke width shorter.
-    private static final float CROSS_SECTION_HANDLE_DASH_LENGTH_DP = 4f;
-    private static final float CROSS_SECTION_HANDLE_DASH_GAP_DP = 5f;
 
     public static final int LEGEND_SIZE = 18;
     private static final int LEGEND_TICK_SIZE_DP = 5;
@@ -215,6 +214,7 @@ public class GraphView extends View {
     private final Paint crossSectionBorderPaint = new Paint();
     private final Paint crossSectionHorizontalHandlePaint = new Paint();
     private final Paint crossSectionHorizontalBorderPaint = new Paint();
+    private final Paint crossSectionGlyphPaint = new Paint();
     private final Paint hotCornersPaint = new Paint();
 
     private final Paint[] ANTI_ALIAS_PAINTS =
@@ -236,7 +236,8 @@ public class GraphView extends View {
                 crossSectionHandleGripPaint,
                 crossSectionBorderPaint,
                 crossSectionHorizontalHandlePaint,
-                crossSectionHorizontalBorderPaint
+                crossSectionHorizontalBorderPaint,
+                crossSectionGlyphPaint
             };
 
     protected float stationCrossDiameterPx;
@@ -363,6 +364,10 @@ public class GraphView extends View {
         crossSectionHorizontalBorderPaint.setColor(horizontalBoxColour);
         crossSectionHorizontalBorderPaint.setStrokeWidth(dpToPixels(CROSS_SECTION_BORDER_WIDTH_DP));
         crossSectionHorizontalBorderPaint.setStyle(Paint.Style.STROKE);
+
+        crossSectionGlyphPaint.setTextSize(dpToPixels(CROSS_SECTION_GLYPH_SIZE_DP));
+        crossSectionGlyphPaint.setTextAlign(Paint.Align.CENTER);
+        crossSectionGlyphPaint.setStyle(Paint.Style.FILL);
 
         isTwoFingerModeActive = GeneralPreferences.isTwoFingerModeActive();
 
@@ -1361,7 +1366,8 @@ public class GraphView extends View {
         float xsScale = sketch.getCrossSectionScale();
         Space<Coord2D> scaledProjection = rawProjection.scale(xsScale);
         Space<Coord2D> sectionProjection = Space2DUtils.translate(scaledProjection, centreOnSurvey);
-        drawLegs(canvas, sectionProjection, alpha);
+        // Judge which splays are in the section's plane the same way the section editor does
+        drawLegs(canvas, sectionProjection, alpha, crossSection.getProjectionType()::isLegInPlane);
 
         Coord2D viewStationLocation = surveyCoordsToViewCoords(surveyStationLocation);
 
@@ -1400,9 +1406,65 @@ public class GraphView extends View {
                     crossSectionConnectorPaint);
         }
 
-        RectF handleRect = drawCrossSectionHandle(canvas, borderRect, handlePaint, isHorizontal);
+        RectF handleRect = drawCrossSectionHandle(canvas, borderRect, handlePaint);
         crossSectionHandleRects.put(originalDetail, handleRect);
+
+        if (getViewContext().canCreateHorizontalCrossSection()) {
+            // Where both kinds can be made, mark each with the glyph from its menu item
+            drawCrossSectionGlyph(
+                    canvas,
+                    borderRect,
+                    sectionDetail.getCrossSection().getOrientation(),
+                    handlePaint);
+        }
         return true;
+    }
+
+    /**
+     * Draw the orientation's glyph in a tab filling the bottom-right corner of the border, styled
+     * like the handle bar.
+     */
+    private void drawCrossSectionGlyph(
+            Canvas canvas,
+            RectF borderRect,
+            CrossSection.Orientation orientation,
+            Paint handlePaint) {
+        float size = dpToPixels(CROSS_SECTION_GLYPH_BOX_SIZE_DP);
+        float cornerRadius = dpToPixels(CROSS_SECTION_BORDER_CORNER_RADIUS_DP);
+        RectF box =
+                new RectF(
+                        borderRect.right - size,
+                        borderRect.bottom - size,
+                        borderRect.right,
+                        borderRect.bottom);
+
+        // Only the bottom-right corner is rounded, to follow the border
+        Path boxPath = new Path();
+        boxPath.addRoundRect(
+                box,
+                new float[] {
+                    0f,
+                    0f, // top-left
+                    0f,
+                    0f, // top-right
+                    cornerRadius,
+                    cornerRadius, // bottom-right
+                    0f,
+                    0f // bottom-left
+                },
+                Path.Direction.CW);
+        canvas.drawPath(boxPath, handlePaint);
+
+        crossSectionGlyphPaint.setColor(crossSectionHandleGripPaint.getColor());
+        crossSectionGlyphPaint.setAlpha(crossSectionHandleGripPaint.getAlpha());
+        float baseline =
+                box.centerY()
+                        - (crossSectionGlyphPaint.ascent() + crossSectionGlyphPaint.descent()) / 2f;
+        canvas.drawText(
+                CrossSectionLabels.getGlyph(orientation),
+                box.centerX(),
+                baseline,
+                crossSectionGlyphPaint);
     }
 
     /**
@@ -1496,8 +1558,7 @@ public class GraphView extends View {
     }
 
     /** Draw a full-width handle bar along the top edge of the cross-section border. */
-    private RectF drawCrossSectionHandle(
-            Canvas canvas, RectF borderRect, Paint handlePaint, boolean isHorizontal) {
+    private RectF drawCrossSectionHandle(Canvas canvas, RectF borderRect, Paint handlePaint) {
         float handleHeight = dpToPixels(CROSS_SECTION_HANDLE_WIDTH_DP);
         float cornerRadius = dpToPixels(CROSS_SECTION_BORDER_CORNER_RADIUS_DP);
 
@@ -1525,39 +1586,18 @@ public class GraphView extends View {
                 Path.Direction.CW);
         canvas.drawPath(handlePath, handlePaint);
 
-        // Grip marks centred on the bar: three short vertical ticks for a vertical cross-section
-        // and three short horizontal dashes for a horizontal one, so that the two can be told apart
-        // without relying on the colour of the box.
+        // Grip ticks: three short vertical marks centred on the bar.
         float centreX = (handleRect.left + handleRect.right) / 2f;
         float centreY = (handleRect.top + handleRect.bottom) / 2f;
-        CrossSectionGrip grip;
-        if (isHorizontal) {
-            float usableWidth =
-                    CrossSectionGrip.getUsableWidth(
-                            handleRect.width(),
-                            cornerRadius,
-                            dpToPixels(CROSS_SECTION_HANDLE_GRIP_WIDTH_DP));
-            grip =
-                    CrossSectionGrip.horizontal(
-                            centreX,
-                            centreY,
-                            dpToPixels(CROSS_SECTION_HANDLE_DASH_LENGTH_DP),
-                            dpToPixels(CROSS_SECTION_HANDLE_DASH_GAP_DP),
-                            usableWidth);
-        } else {
-            grip =
-                    CrossSectionGrip.vertical(
-                            centreX,
-                            centreY,
-                            handleHeight * CROSS_SECTION_HANDLE_GRIP_LENGTH_FRACTION,
-                            dpToPixels(CROSS_SECTION_HANDLE_GRIP_SPACING_DP));
-        }
-        for (int i = 0; i < grip.getMarkCount(); i++) {
+        float gripHalfLength = handleHeight * CROSS_SECTION_HANDLE_GRIP_LENGTH_FRACTION / 2f;
+        float gripSpacing = dpToPixels(CROSS_SECTION_HANDLE_GRIP_SPACING_DP);
+        float[] gripXs = {centreX - gripSpacing, centreX, centreX + gripSpacing};
+        for (float gripX : gripXs) {
             canvas.drawLine(
-                    grip.getStartX(i),
-                    grip.getStartY(i),
-                    grip.getEndX(i),
-                    grip.getEndY(i),
+                    gripX,
+                    centreY - gripHalfLength,
+                    gripX,
+                    centreY + gripHalfLength,
                     crossSectionHandleGripPaint);
         }
 
@@ -1603,6 +1643,12 @@ public class GraphView extends View {
     }
 
     protected void drawLegs(Canvas canvas, Space<Coord2D> space, int baseAlpha) {
+        drawLegs(canvas, space, baseAlpha, this::isLegInPlane);
+    }
+
+    /** Draws the legs, dashing those that isInPlane says point into or out of the page. */
+    private void drawLegs(
+            Canvas canvas, Space<Coord2D> space, int baseAlpha, Predicate<Leg> isInPlane) {
 
         boolean highlightLatestLeg = GeneralPreferences.isHighlightLatestLegModeOn();
 
@@ -1639,7 +1685,7 @@ public class GraphView extends View {
                 paint = fade ? fadedLegPaint : legPaint;
             }
 
-            if (isLegInPlane(leg)) {
+            if (isInPlane.test(leg)) {
                 canvas.drawLine(start.x, start.y, end.x, end.y, paint);
             } else {
                 drawDashedLine(canvas, start, end, dashedLineIntervalPx, paint);
@@ -1996,46 +2042,45 @@ public class GraphView extends View {
         canvas.drawText(scaleLabel, x + scaleWidth + 0.3f * legendSize, scaleY, legendPaint);
     }
 
-    private void drawCompass(Canvas canvas) {
-        if (!SketchPreferences.Toggle.SHOW_COMPASS.isOn() || projectionType != Projection2D.PLAN) {
+    /**
+     * Whether to draw the compass, which turns to show which way the device is facing. That only
+     * means something in a view drawn with north at the top.
+     */
+    protected boolean isCompassShown() {
+        return projectionType == Projection2D.PLAN;
+    }
+
+    protected void drawCompass(Canvas canvas) {
+        if (!SketchPreferences.Toggle.SHOW_COMPASS.isOn() || !isCompassShown()) {
             return;
         }
 
-        drawArrowMarker(canvas, "N", -compassAzimuthDegrees);
-    }
-
-    /**
-     * Draws an arrow with a label above it, above the scale bar at the left of the view. The plan's
-     * compass uses it, turned to follow the plan, and so does the cross-section editor to show how
-     * its sketch is oriented.
-     *
-     * @param label text to put above the tip of the arrow
-     * @param clockwiseDegrees how far to turn the arrow and label about the arrow's centre
-     */
-    protected void drawArrowMarker(Canvas canvas, String label, float clockwiseDegrees) {
         float textSize = legendPaint.getTextSize();
         Paint.FontMetrics metrics = legendPaint.getFontMetrics();
         float textHeight = metrics.descent - metrics.ascent;
-        OrientationMarker marker = OrientationMarker.layout(textSize, textHeight, getHeight());
-
-        float centreX = marker.getCentreX();
-        float head = marker.getHeadSize();
+        float offsetX = textSize * 1.25f; // matches legend x
+        float arrowLength = textSize * 2.5f;
+        float arrowHeadSize = textSize * 0.6f;
+        float cx = offsetX + arrowLength / 2f + textSize;
+        float scaleBarY = getHeight() - textSize * 4f;
+        float cy = scaleBarY - arrowLength / 2f - textHeight;
 
         canvas.save();
-        canvas.rotate(clockwiseDegrees, centreX, marker.getCentreY());
+        canvas.rotate(-compassAzimuthDegrees, cx, cy);
+
+        float tipY = cy - arrowLength / 2f;
+        float tailY = cy + arrowLength / 2f;
 
         legendPaint.setStyle(Paint.Style.STROKE);
         Path arrowPath = new Path();
-        arrowPath.moveTo(centreX - head, marker.getTipY() + head);
-        arrowPath.lineTo(centreX, marker.getTipY());
-        arrowPath.lineTo(centreX + head, marker.getTipY() + head);
-        arrowPath.moveTo(centreX, marker.getTipY());
-        arrowPath.lineTo(centreX, marker.getTailY());
+        arrowPath.moveTo(cx - arrowHeadSize, tipY + arrowHeadSize);
+        arrowPath.lineTo(cx, tipY);
+        arrowPath.lineTo(cx + arrowHeadSize, tipY + arrowHeadSize);
+        arrowPath.moveTo(cx, tipY);
+        arrowPath.lineTo(cx, tailY);
         canvas.drawPath(arrowPath, legendPaint);
         legendPaint.setStyle(Paint.Style.FILL);
-
-        float labelX = centreX - legendPaint.measureText(label) / 2f;
-        canvas.drawText(label, labelX, marker.getLabelBaselineY(), legendPaint);
+        canvas.drawText("N", cx - textSize * 0.35f, tipY - textSize * 0.2f, legendPaint);
 
         canvas.restore();
     }

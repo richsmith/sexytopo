@@ -606,6 +606,11 @@ public abstract class GraphActivity extends SurveyEditorActivity
     }
 
     @Override
+    public boolean hasCrossSection(Station station) {
+        return getSketch().getCrossSectionDetail(station) != null;
+    }
+
+    @Override
     public void onNewHorizontalCrossSection(Station station) {
         graphView.handleNewCrossSection(station, CrossSection.Orientation.HORIZONTAL);
     }

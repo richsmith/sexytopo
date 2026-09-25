@@ -43,6 +43,12 @@ public class CrossSectionView extends GraphView {
         invalidate();
     }
 
+    /** A horizontal section is drawn like the plan, with north at the top, so it has a compass. */
+    @Override
+    protected boolean isCompassShown() {
+        return orientation == CrossSection.Orientation.HORIZONTAL;
+    }
+
     @Override
     protected boolean isLegInPlane(Leg leg) {
         return legPlaneProjection.isLegInPlane(leg);
@@ -91,8 +97,7 @@ public class CrossSectionView extends GraphView {
         drawGrid(canvas);
         drawSurvey(canvas, survey, projection, SOLID_ALPHA);
         drawLegend(canvas);
-        drawArrowMarker(
-                canvas, getContext().getString(OrientationMarker.getLabelResource(orientation)), 0);
+        drawCompass(canvas);
     }
 
     protected ViewContext getViewContext() {

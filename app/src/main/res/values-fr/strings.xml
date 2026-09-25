@@ -95,8 +95,6 @@
     <string name="action_force_crash">Forcer la fermeture (danger!)</string>
     <string name="action_xsection_done">Terminé</string>
     <string name="action_xsection_cancel">Annuler</string>
-    <string name="xsection_orientation_north">N</string>
-    <string name="xsection_orientation_up">Haut</string>
 
     <!-- File handling -->
     <string name="file_started_new_survey">Nouvelle topographie démarrée</string>
@@ -700,6 +698,8 @@
     <string name="menu_xsection_create">Nouvelle coupe</string>
     <string name="menu_xsection_create_horizontal">Nouvelle coupe horizontale</string>
     <string name="menu_xsection_create_vertical">Nouvelle coupe verticale</string>
+    <string name="menu_xsection_hint_vertical">galerie</string>
+    <string name="menu_xsection_hint_horizontal">puits</string>
     <string name="menu_xsection_delete">Supprimer la coupe</string>
     <string name="menu_xsection_edit">Modifier le croquis</string>
     <string name="menu_xsection_set_direction">Définir la direction</string>
