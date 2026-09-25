@@ -144,6 +144,25 @@
 
 <p>The plan view can optionally display a <strong>compass</strong> in the corner of the screen, showing the direction of North based on your device's orientation sensor. This can be toggled on or off via the quick settings menu (the display menu icon on the toolbar).</p>
 
+<h2 id="cross-sections">Cross-Sections</h2>
+<p>A cross-section shows the shape of the passage at a station, drawn from that station's splays. It appears on the sketch as a small framed view, joined to its station by a dashed line, and a marker across the station shows which way the section faces. Each station can have one cross-section in the plan and one in the elevation, and the two are independent of each other.</p>
+
+<h3>Adding a Cross-Section</h3>
+<p>Select a station to open the context menu, choose <strong>Cross-Section</strong>, then the kind of section you want, and tap where on the sketch it should go.</p>
+<ul>
+	<li>In the <strong>plan</strong>, <strong>New Cross-Section</strong> adds a vertical section across the passage, facing along it.</li>
+	<li>In the <strong>elevation</strong> there are two kinds. <strong>New Vertical Section</strong> (&#8597;) is a slice across a passage, facing along the survey. <strong>New Horizontal Section</strong> (&#8596;) is a level slice through the station, drawn like the plan with north at the top, which suits shafts and pitches. Each section's frame shows its symbol in the bottom-right corner, and horizontal sections have a purple frame.</li>
+</ul>
+
+<h3>Working with Cross-Sections</h3>
+<ul>
+	<li><strong>Move</strong> a section by dragging the bar along the top of its frame.</li>
+	<li><strong>Sketch</strong> the passage walls by tapping inside the frame (or choosing <strong>Edit Sketch</strong> from the menu) to open the section in its own view. Splays pointing into or out of the section are dashed. A horizontal section shows the compass here, as the plan does. Choose Done to keep your changes or Cancel to discard them.</li>
+	<li><strong>Set Direction</strong> changes which way a vertical section faces: drag from the station towards the direction you want. In the plan it can face any direction; in the elevation it snaps to face onward or back down the passage.</li>
+	<li><strong>Delete Cross-Section</strong> removes it, as does the Erase tool.</li>
+</ul>
+<p>How large cross-sections are drawn relative to the survey can be set separately for the plan and the elevation under Settings &rarr; Survey.</p>
+
 <h2 id="3d-view">3D View</h2>
 <p>The 3D view provides an interactive three-dimensional view of the survey skeleton. It can be accessed from the View menu.</p>
 
@@ -243,7 +262,7 @@
 <ul>
 	<li><strong>Set Active Station</strong> makes this station the current active one for new measurements</li>
 	<li><strong>Rename Station</strong> changes the station's name</li>
-	<li><strong>New Cross-Section</strong> creates a cross-section view at this station; in the elevation this can be vertical or horizontal</li>
+	<li><strong>New Cross-Section</strong> creates a cross-section at this station; in the elevation this can be vertical or horizontal (see <a href="#cross-sections">Cross-Sections</a>)</li>
 	<li><strong>Comment</strong> adds or edits a comment for this station</li>
 	<li><strong>Delete Station</strong> removes the station and all dependent legs and stations</li>
 </ul>
