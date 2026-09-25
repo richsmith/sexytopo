@@ -433,7 +433,8 @@
     <string name="stats_longest_leg">Najdłuższy ciąg (m)</string>
     <string name="stats_shortest_leg">Najkrótszy ciąg (m)</string>
     <string name="settings_survey_title">Ustawienia pomiaru</string>
-    <string name="settings_survey_cross_section_scale">Skala przekrojów</string>
+    <string name="settings_survey_plan_cross_section_scale">Skala przekrojów (Plan)</string>
+    <string name="settings_survey_elevation_cross_section_scale">Skala przekrojów (Przekrój)</string>
 
     <!-- Settings -->
     <string name="settings_general_title">Ogólne</string>

@@ -51,6 +51,20 @@ public class CrossSectionDetail extends SinglePositionDetail {
         updateBoundingBox(sketch.getBottomRight().plus(position));
     }
 
+    /** The top-left corner as drawn, with the cross-section scaled about its position. */
+    public Coord2D getTopLeftAtScale(float scale) {
+        return scaleAboutPosition(getTopLeft(), scale);
+    }
+
+    /** The bottom-right corner as drawn, with the cross-section scaled about its position. */
+    public Coord2D getBottomRightAtScale(float scale) {
+        return scaleAboutPosition(getBottomRight(), scale);
+    }
+
+    private Coord2D scaleAboutPosition(Coord2D point, float scale) {
+        return position.plus(point.minus(position).scale(scale));
+    }
+
     public CrossSection getCrossSection() {
         return crossSection;
     }

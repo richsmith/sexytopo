@@ -31,11 +31,11 @@ public class Sketch extends Shape {
 
     public Sketch(Sketch sketch) {
         // shallow copies are OK here because paths are immutable
+        this.crossSectionScale = sketch.crossSectionScale;
         setPathDetails(new ArrayList<>(sketch.getPathDetails()));
         setSymbolDetails(new ArrayList<>(sketch.getSymbolDetails()));
         setTextDetails(new ArrayList<>(sketch.getTextDetails()));
         setCrossSectionDetails(new ArrayList<>(sketch.getCrossSectionDetails()));
-        this.crossSectionScale = sketch.crossSectionScale;
     }
 
     public boolean isSaved() {
@@ -138,6 +138,7 @@ public class Sketch extends Shape {
 
     public void setCrossSectionScale(float crossSectionScale) {
         this.crossSectionScale = crossSectionScale;
+        recalculateBoundingBox();
     }
 
     public void undo() {
@@ -303,6 +304,7 @@ public class Sketch extends Shape {
 
     public void setCrossSectionDetails(List<CrossSectionDetail> crossSectionDetails) {
         this.crossSectionDetails = crossSectionDetails;
+        recalculateBoundingBox();
     }
 
     public CrossSectionDetail getCrossSectionDetail(Station station) {
@@ -378,6 +380,22 @@ public class Sketch extends Shape {
         sketch.setCrossSectionDetails(newCrossSectionDetails);
 
         return sketch;
+    }
+
+    /**
+     * Cross-sections are drawn enlarged (or shrunk) by the cross-section scale about their
+     * positions, so the sketch's extent has to take that into account rather than using their
+     * natural size.
+     */
+    @Override
+    public void updateBoundingBox(Shape shape) {
+        if (shape instanceof CrossSectionDetail) {
+            CrossSectionDetail crossSectionDetail = (CrossSectionDetail) shape;
+            updateBoundingBox(crossSectionDetail.getTopLeftAtScale(crossSectionScale));
+            updateBoundingBox(crossSectionDetail.getBottomRightAtScale(crossSectionScale));
+        } else {
+            super.updateBoundingBox(shape);
+        }
     }
 
     public void recalculateBoundingBox() {

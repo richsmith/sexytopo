@@ -433,7 +433,8 @@
     <string name="stats_longest_leg">Tratto Più Lungo (m)</string>
     <string name="stats_shortest_leg">Tratto Più Corto (m)</string>
     <string name="settings_survey_title">Impostazioni rilievo</string>
-    <string name="settings_survey_cross_section_scale">Scala delle sezioni</string>
+    <string name="settings_survey_plan_cross_section_scale">Scala delle sezioni (Pianta)</string>
+    <string name="settings_survey_elevation_cross_section_scale">Scala delle sezioni (Elevazione)</string>
 
     <!-- Settings -->
     <string name="settings_general_title">Generale</string>

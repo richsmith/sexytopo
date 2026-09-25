@@ -433,7 +433,8 @@
     <string name="stats_longest_leg">Trecho Mais Longo (m)</string>
     <string name="stats_shortest_leg">Trecho Mais Curto (m)</string>
     <string name="settings_survey_title">Definições de levantamento</string>
-    <string name="settings_survey_cross_section_scale">Escala das secções</string>
+    <string name="settings_survey_plan_cross_section_scale">Escala das secções (Planta)</string>
+    <string name="settings_survey_elevation_cross_section_scale">Escala das secções (Elevação)</string>
 
     <!-- Settings -->
     <string name="settings_general_title">Geral</string>

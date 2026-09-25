@@ -19,8 +19,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 import androidx.annotation.RequiresApi;
+import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
@@ -68,6 +70,7 @@ import org.hwyl.sexytopo.control.io.translation.SelectableExporters;
 import org.hwyl.sexytopo.control.table.LegDialogs;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.InputMode;
+import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.SurveyConnection;
@@ -553,31 +556,57 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     private void openSurveySettingsDialog() {
         Survey survey = getSurvey();
+        Sketch planSketch = survey.getPlanSketch();
+        Sketch elevationSketch = survey.getElevationSketch();
 
-        TextInputLayout inputLayout =
-                DialogUtils.createStandardTextInputLayout(
-                        this, R.string.settings_survey_cross_section_scale);
+        // Each sketch has its own cross-section scale, since plan and elevation sections can
+        // need drawing at different sizes
+        TextInputLayout planInput =
+                createCrossSectionScaleInput(
+                        R.string.settings_survey_plan_cross_section_scale, planSketch);
+        TextInputLayout elevationInput =
+                createCrossSectionScaleInput(
+                        R.string.settings_survey_elevation_cross_section_scale, elevationSketch);
+
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.addView(planInput);
+        layout.addView(elevationInput);
+
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.settings_survey_title)
+                .setView(layout)
+                .setPositiveButton(
+                        R.string.ok,
+                        (dialog, which) -> {
+                            applyCrossSectionScale(planInput, planSketch);
+                            applyCrossSectionScale(elevationInput, elevationSketch);
+                        })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    private TextInputLayout createCrossSectionScaleInput(@StringRes int hintRes, Sketch sketch) {
+        TextInputLayout inputLayout = DialogUtils.createStandardTextInputLayout(this, hintRes);
         TextInputEditText editText = DialogUtils.getEditText(inputLayout);
         editText.setInputType(
                 android.text.InputType.TYPE_CLASS_NUMBER
                         | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        editText.setText(String.valueOf(survey.getCrossSectionScale()));
+        editText.setText(String.valueOf(sketch.getCrossSectionScale()));
+        return inputLayout;
+    }
 
-        new MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.settings_survey_title)
-                .setView(inputLayout)
-                .setPositiveButton(
-                        R.string.ok,
-                        (dialog, which) -> {
-                            try {
-                                float scale = Float.parseFloat(editText.getText().toString());
-                                survey.setCrossSectionScale(scale);
-                            } catch (NumberFormatException e) {
-                                // ignore invalid input
-                            }
-                        })
-                .setNegativeButton(R.string.cancel, null)
-                .show();
+    private static void applyCrossSectionScale(TextInputLayout inputLayout, Sketch sketch) {
+        try {
+            String text = DialogUtils.getEditText(inputLayout).getText().toString();
+            float scale = Float.parseFloat(text);
+            if (scale != sketch.getCrossSectionScale()) {
+                sketch.setCrossSectionScale(scale);
+                sketch.setSaved(false);
+            }
+        } catch (NumberFormatException e) {
+            // ignore invalid input
+        }
     }
 
     @SuppressLint("UnusedDeclaration")

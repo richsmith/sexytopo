@@ -132,30 +132,6 @@ public class Survey {
         return elevationSketch;
     }
 
-    /**
-     * The cross-section scale is a survey-wide setting, but each sketch stores its own copy so the
-     * exporters (which only see one sketch) can read it. The plan sketch holds the canonical value.
-     */
-    public float getCrossSectionScale() {
-        return planSketch.getCrossSectionScale();
-    }
-
-    /** Sets the cross-section scale on both sketches and marks them as needing saving. */
-    public void setCrossSectionScale(float scale) {
-        planSketch.setCrossSectionScale(scale);
-        elevationSketch.setCrossSectionScale(scale);
-        planSketch.setSaved(false);
-        elevationSketch.setSaved(false);
-    }
-
-    /**
-     * Copies the plan sketch's cross-section scale onto the elevation sketch, e.g. after loading.
-     * This does not mark anything as unsaved.
-     */
-    public void syncCrossSectionScale() {
-        elevationSketch.setCrossSectionScale(planSketch.getCrossSectionScale());
-    }
-
     public Sketch getSketch(Projection2D projection) {
         if (projection == Projection2D.PLAN) {
             return getPlanSketch();

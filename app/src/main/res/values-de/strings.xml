@@ -433,7 +433,8 @@
     <string name="stats_longest_leg">Längste Messstrecke (m)</string>
     <string name="stats_shortest_leg">Kürzeste Messstrecke (m)</string>
     <string name="settings_survey_title">Vermessungseinstellungen</string>
-    <string name="settings_survey_cross_section_scale">Querschnittsmaßstab</string>
+    <string name="settings_survey_plan_cross_section_scale">Querschnittsmaßstab (Grundriss)</string>
+    <string name="settings_survey_elevation_cross_section_scale">Querschnittsmaßstab (Seitenriss)</string>
 
     <!--  Settings  -->
     <string name="settings_general_title">Allgemeines</string>

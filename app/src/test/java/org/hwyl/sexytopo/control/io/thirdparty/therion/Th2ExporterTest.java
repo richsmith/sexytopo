@@ -249,7 +249,7 @@ public class Th2ExporterTest {
         float scale = TherionExporter.getScale();
 
         for (float crossSectionScale : new float[] {1f, 2f, 3f}) {
-            survey.setCrossSectionScale(crossSectionScale);
+            survey.getElevationSketch().setCrossSectionScale(crossSectionScale);
 
             String th2 = export(survey, Projection2D.EXTENDED_ELEVATION);
 

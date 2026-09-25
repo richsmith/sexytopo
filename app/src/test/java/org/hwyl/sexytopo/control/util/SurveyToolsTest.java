@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.control.util;
 
+import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
@@ -79,5 +80,47 @@ public class SurveyToolsTest {
         Station station6 = survey.getStationByName("6");
 
         Assert.assertTrue(SurveyTools.isInSubtree(origin, station6));
+    }
+
+    @Test
+    public void testOnwardDirectionOfAVerticalStationIsTheDirectionTheSurveyResumes() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        SurveyUpdater.setExtendedElevationDirection(
+                survey, survey.getStationByName("2"), ExtendedElevationDirection.LEFT);
+        Station station3 = survey.getStationByName("3");
+        SurveyUpdater.setExtendedElevationDirection(
+                survey, station3, ExtendedElevationDirection.VERTICAL);
+
+        Assert.assertEquals(
+                ExtendedElevationDirection.LEFT,
+                SurveyTools.getOnwardExtendedElevationDirection(survey, station3));
+    }
+
+    @Test
+    public void testOnwardDirectionLooksPastSeveralVerticalStationsInARow() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        SurveyUpdater.setExtendedElevationDirection(
+                survey, survey.getStationByName("2"), ExtendedElevationDirection.LEFT);
+        SurveyUpdater.setExtendedElevationDirection(
+                survey, survey.getStationByName("3"), ExtendedElevationDirection.VERTICAL);
+        Station station4 = survey.getStationByName("4");
+        SurveyUpdater.setExtendedElevationDirection(
+                survey, station4, ExtendedElevationDirection.VERTICAL);
+
+        Assert.assertEquals(
+                ExtendedElevationDirection.LEFT,
+                SurveyTools.getOnwardExtendedElevationDirection(survey, station4));
+    }
+
+    @Test
+    public void testOnwardDirectionOfAVerticalOriginIsTheDefault() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Station origin = survey.getOrigin();
+        SurveyUpdater.setExtendedElevationDirection(
+                survey, origin, ExtendedElevationDirection.VERTICAL);
+
+        Assert.assertEquals(
+                ExtendedElevationDirection.DEFAULT,
+                SurveyTools.getOnwardExtendedElevationDirection(survey, origin));
     }
 }

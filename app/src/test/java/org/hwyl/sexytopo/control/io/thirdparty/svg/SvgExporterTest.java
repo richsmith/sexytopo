@@ -333,7 +333,7 @@ public class SvgExporterTest {
     @Test
     public void testElevationCrossSectionsAreDrawnAtTheCrossSectionScale() throws Exception {
         Survey survey = BasicTestSurveyCreator.createWithCrossSectionsInPlanAndElevation();
-        survey.setCrossSectionScale(2f);
+        survey.getElevationSketch().setCrossSectionScale(2f);
 
         Document svg = parse(export(survey, Projection2D.EXTENDED_ELEVATION));
 
@@ -350,7 +350,7 @@ public class SvgExporterTest {
         Survey survey = BasicTestSurveyCreator.createWithCrossSectionsInPlanAndElevation();
         // Large enough for the sections to reach beyond the margin the image leaves around its
         // frame, so that it is the frame that has to make room for them
-        survey.setCrossSectionScale(6f);
+        survey.getElevationSketch().setCrossSectionScale(6f);
 
         Document svg = parse(export(survey, Projection2D.EXTENDED_ELEVATION));
 
@@ -393,7 +393,7 @@ public class SvgExporterTest {
         Assert.assertArrayEquals(
                 new float[] {850, 200, 1100, 200}, getDrawnLine(svg, "xs-3"), 0.01f);
 
-        survey.setCrossSectionScale(2f);
+        survey.getElevationSketch().setCrossSectionScale(2f);
         Document enlarged = parse(export(survey, Projection2D.EXTENDED_ELEVATION));
 
         // At twice the size the drawing stretches away from where the cross-section is

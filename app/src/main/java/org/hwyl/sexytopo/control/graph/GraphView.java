@@ -44,7 +44,7 @@ import org.hwyl.sexytopo.control.util.CrossSectioner;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
-import org.hwyl.sexytopo.control.util.SurveyUpdater;
+import org.hwyl.sexytopo.control.util.SurveyTools;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.graph.Coord2D;
 import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
@@ -1471,12 +1471,8 @@ public class GraphView extends View {
     private RectF drawCrossSectionBorder(
             Canvas canvas, CrossSectionDetail sectionDetail, Coord2D dragDelta, Paint borderPaint) {
         float xsScale = sketch.getCrossSectionScale();
-        Coord2D centre = sectionDetail.getPosition().plus(dragDelta);
-        Coord2D origin = sectionDetail.getPosition();
-        Coord2D scaledTopLeft =
-                centre.plus(sectionDetail.getTopLeft().minus(origin).scale(xsScale));
-        Coord2D scaledBottomRight =
-                centre.plus(sectionDetail.getBottomRight().minus(origin).scale(xsScale));
+        Coord2D scaledTopLeft = sectionDetail.getTopLeftAtScale(xsScale).plus(dragDelta);
+        Coord2D scaledBottomRight = sectionDetail.getBottomRightAtScale(xsScale).plus(dragDelta);
         Coord2D topLeft = surveyCoordsToViewCoords(scaledTopLeft);
         Coord2D bottomRight = surveyCoordsToViewCoords(scaledBottomRight);
         float contentWidth = bottomRight.x - topLeft.x;
@@ -1783,7 +1779,7 @@ public class GraphView extends View {
         boolean isHorizontal = crossSection.getOrientation() == CrossSection.Orientation.HORIZONTAL;
         if (isHorizontal || projectionType == Projection2D.EXTENDED_ELEVATION) {
             ExtendedElevationDirection surveyDirection =
-                    SurveyUpdater.resolveOnwardExtendedElevationDirection(
+                    SurveyTools.getOnwardExtendedElevationDirection(
                             survey, crossSection.getStation());
             return CrossSectionIndicator.getElevationFacingAngle(
                     crossSection.getOrientation(), surveyDirection);

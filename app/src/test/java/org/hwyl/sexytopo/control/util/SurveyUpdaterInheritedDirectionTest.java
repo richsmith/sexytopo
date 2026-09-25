@@ -10,12 +10,13 @@ import org.junit.Test;
 public class SurveyUpdaterInheritedDirectionTest {
 
     // Three identical splays are required to trigger createNewStationIfTripleShot,
-    // which is the path that calls resolveOnwardExtendedElevationDirection for a new station.
+    // which is one of the paths that calls SurveyTools.getOnwardExtendedElevationDirection.
     private static final Leg SPLAY = new Leg(5, 0, 0);
 
     /**
      * Adds a new station via three matching splays, which triggers the triple-shot path and causes
-     * resolveOnwardExtendedElevationDirection to be called. Returns the newly-created station.
+     * SurveyTools.getOnwardExtendedElevationDirection to be called. Returns the newly-created
+     * station.
      */
     private Station addStationViaTripleShot(Survey survey) {
         Station before = survey.getActiveStation();

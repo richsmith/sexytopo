@@ -474,7 +474,8 @@
 
     <!-- Settings -->
     <string name="settings_survey_title">Survey Settings</string>
-    <string name="settings_survey_cross_section_scale">Cross-section scale</string>
+    <string name="settings_survey_plan_cross_section_scale">Cross-section scale (Plan)</string>
+    <string name="settings_survey_elevation_cross_section_scale">Cross-section scale (Elevation)</string>
     <string name="settings_general_title">General</string>
     <string name="settings_general_summary">Theme, orientation, vibration</string>
     <string name="settings_sketching_summary">Drawing tools, display options</string>

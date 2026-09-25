@@ -433,7 +433,8 @@
     <string name="stats_longest_leg">Tramo Más Largo (m)</string>
     <string name="stats_shortest_leg">Tramo Más Corto (m)</string>
     <string name="settings_survey_title">Ajustes de topografía</string>
-    <string name="settings_survey_cross_section_scale">Escala de secciones</string>
+    <string name="settings_survey_plan_cross_section_scale">Escala de secciones (Planta)</string>
+    <string name="settings_survey_elevation_cross_section_scale">Escala de secciones (Alzado)</string>
 
     <!-- Settings -->
     <string name="settings_general_title">General</string>

@@ -1,12 +1,15 @@
 package org.hwyl.sexytopo.model.sketch;
 
 import org.hwyl.sexytopo.model.graph.Coord2D;
+import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class SketchTest {
+
+    private static final float DELTA = 1e-4f;
 
     @Test
     public void testReplaceCrossSectionDetailIsSingleUndoStep() {
@@ -100,5 +103,35 @@ public class SketchTest {
 
         Assert.assertSame(planDetail, plan.getCrossSectionDetail(station));
         Assert.assertNull(elevation.getCrossSectionDetail(station));
+    }
+
+    /** A section at (10, 0) whose only splay reaches 2m east of it. */
+    private static Sketch sketchWithASectionReachingEast() {
+        Station station = new Station("1");
+        station.addOnwardLeg(new Leg(2, 90, 0));
+        Sketch sketch = new Sketch();
+        sketch.addCrossSection(
+                new CrossSectionDetail(new CrossSection(station, 0f), new Coord2D(10, 0)));
+        return sketch;
+    }
+
+    @Test
+    public void testBoundingBoxHoldsCrossSectionsAtTheCrossSectionScale() {
+        Sketch sketch = sketchWithASectionReachingEast();
+        Assert.assertEquals(12, sketch.getRight(), DELTA);
+
+        sketch.setCrossSectionScale(3f);
+        Assert.assertEquals(16, sketch.getRight(), DELTA);
+
+        sketch.setCrossSectionScale(0.5f);
+        Assert.assertEquals(11, sketch.getRight(), DELTA);
+    }
+
+    @Test
+    public void testCopiedSketchKeepsItsCrossSectionScaleInTheBoundingBox() {
+        Sketch sketch = sketchWithASectionReachingEast();
+        sketch.setCrossSectionScale(3f);
+
+        Assert.assertEquals(16, new Sketch(sketch).getRight(), DELTA);
     }
 }

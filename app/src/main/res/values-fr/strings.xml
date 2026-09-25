@@ -433,7 +433,8 @@
     <string name="stats_longest_leg">Segment le plus long (m)</string>
     <string name="stats_shortest_leg">Segment le plus court (m)</string>
     <string name="settings_survey_title">Paramètres du levé</string>
-    <string name="settings_survey_cross_section_scale">Échelle des coupes</string>
+    <string name="settings_survey_plan_cross_section_scale">Échelle des coupes (Plan)</string>
+    <string name="settings_survey_elevation_cross_section_scale">Échelle des coupes (Élévation)</string>
 
     <!-- Settings -->
     <string name="settings_general_title">Général</string>

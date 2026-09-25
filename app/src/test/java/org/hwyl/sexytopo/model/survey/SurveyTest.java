@@ -42,45 +42,4 @@ public class SurveyTest {
         Assert.assertFalse(baseSurvey.isConnectedTo(otherSurvey));
         Assert.assertEquals(0, baseSurvey.getConnectedSurveys().size());
     }
-
-    @Test
-    public void testSettingCrossSectionScaleUpdatesBothSketches() {
-        Survey survey = new Survey();
-        survey.setCrossSectionScale(2.5f);
-        Assert.assertEquals(2.5f, survey.getCrossSectionScale(), 0f);
-        Assert.assertEquals(2.5f, survey.getPlanSketch().getCrossSectionScale(), 0f);
-        Assert.assertEquals(2.5f, survey.getElevationSketch().getCrossSectionScale(), 0f);
-    }
-
-    @Test
-    public void testSettingCrossSectionScaleMarksBothSketchesUnsaved() {
-        Survey survey = new Survey();
-        Assert.assertTrue(survey.isSaved());
-        survey.setCrossSectionScale(2f);
-        Assert.assertFalse(survey.getPlanSketch().isSaved());
-        Assert.assertFalse(survey.getElevationSketch().isSaved());
-        Assert.assertFalse(survey.isSaved());
-    }
-
-    @Test
-    public void testSyncingCrossSectionScaleCopiesPlanScaleToElevation() {
-        Survey survey = new Survey();
-        survey.getPlanSketch().setCrossSectionScale(2f);
-        survey.getElevationSketch().setCrossSectionScale(1f);
-
-        survey.syncCrossSectionScale();
-
-        Assert.assertEquals(2f, survey.getPlanSketch().getCrossSectionScale(), 0f);
-        Assert.assertEquals(2f, survey.getElevationSketch().getCrossSectionScale(), 0f);
-    }
-
-    @Test
-    public void testSyncingCrossSectionScaleDoesNotMarkAnythingUnsaved() {
-        Survey survey = new Survey();
-        survey.getPlanSketch().setCrossSectionScale(2f);
-
-        survey.syncCrossSectionScale();
-
-        Assert.assertTrue(survey.isSaved());
-    }
 }

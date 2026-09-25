@@ -167,7 +167,7 @@ public class XviExporterTest {
     @Test
     public void testElevationCrossSectionsAreDrawnAtTheCrossSectionScale() {
         Survey survey = BasicTestSurveyCreator.createWithCrossSectionsInPlanAndElevation();
-        survey.setCrossSectionScale(2f);
+        survey.getElevationSketch().setCrossSectionScale(2f);
 
         String xvi = export(survey, Projection2D.EXTENDED_ELEVATION);
 
@@ -207,7 +207,7 @@ public class XviExporterTest {
         Assert.assertTrue(xvi.contains("{BLACK 7.00 -4.00 12.00 -4.00}"));
         Assert.assertTrue(xvi.contains("{BLACK 17.00 -4.00 22.00 -4.00}"));
 
-        survey.setCrossSectionScale(2f);
+        survey.getElevationSketch().setCrossSectionScale(2f);
         String enlarged = export(survey, Projection2D.EXTENDED_ELEVATION);
 
         // At twice the size the drawing stretches away from where the cross-section is
