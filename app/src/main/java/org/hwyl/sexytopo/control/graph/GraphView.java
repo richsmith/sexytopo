@@ -1187,7 +1187,10 @@ public class GraphView extends View {
 
     protected void drawSurvey(Canvas canvas, Survey survey, Space<Coord2D> projection, int alpha) {
         drawSketch(canvas, activity.getSketch(survey), alpha);
-        drawCrossSections(canvas, sketch.getCrossSectionDetails(), alpha);
+        if (survey == this.survey) {
+            // Linked surveys are drawn without their cross-sections, to cut down on clutter
+            drawCrossSections(canvas, sketch.getCrossSectionDetails(), alpha);
+        }
         drawSurveyData(survey, canvas, projection, alpha);
     }
 
