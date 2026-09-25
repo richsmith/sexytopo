@@ -3,6 +3,7 @@
 - A copyright notice and licence can now be assigned to a survey, along with some light nudging towards free licences (thanks Andrew Atkinson)
 - Legs can be drawn using only their vertical change in the extended elevation (thanks Andrew Atkinson)
 - Survex export writes repeated leg readings as separate lines for Survex to average, rather than a pre-averaged leg; Survex and Therion import averages repeated readings back into one leg (thanks Andrew Atkinson)
+- Cross-sections can be added to the extended elevation, including horizontal cross-sections for shafts and pitches; the plan and elevation each have their own cross-section scale (thanks Andrew Atkinson). Older versions of SexyTopo will open horizontal cross-sections as vertical ones
 
 # 2026-07-08 1.12.3
 - Fix Survex and Therion backwards leg bug (thanks Andrew Atkinson)
