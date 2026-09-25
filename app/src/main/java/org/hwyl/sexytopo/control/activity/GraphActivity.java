@@ -270,7 +270,18 @@ public abstract class GraphActivity extends SurveyEditorActivity
         graphView.invalidate();
     }
 
-    public abstract Sketch getSketch(Survey survey);
+    /** The sketch this activity shows, from the survey being worked on. */
+    public Sketch getSketch() {
+        return getSketch(getSurvey());
+    }
+
+    /**
+     * The sketch this activity's view shows for the given survey: its plan sketch in the plan, and
+     * so on. This takes a survey because linked surveys are drawn with their own sketches.
+     */
+    public Sketch getSketch(Survey survey) {
+        return survey.getSketch(getProjectionType());
+    }
 
     public Space<Coord2D> getProjection(Survey survey) {
         return getProjectionType().project(survey);
@@ -601,7 +612,7 @@ public abstract class GraphActivity extends SurveyEditorActivity
 
     @Override
     public void onDeleteCrossSection(Station station) {
-        Sketch sketch = getSketch(getSurvey());
+        Sketch sketch = getSketch();
         CrossSectionDetail detail = sketch.getCrossSectionDetail(station);
         if (detail == null) {
             return;
@@ -618,7 +629,7 @@ public abstract class GraphActivity extends SurveyEditorActivity
 
     @Override
     public void onEditCrossSection(Station station) {
-        CrossSectionDetail detail = getSketch(getSurvey()).getCrossSectionDetail(station);
+        CrossSectionDetail detail = getSketch().getCrossSectionDetail(station);
         if (detail == null) {
             return;
         }
