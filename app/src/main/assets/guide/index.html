@@ -113,8 +113,30 @@
 	<li><strong>Enable Bluetooth</strong> - Turn on Bluetooth on your Android device if not already enabled</li>
 	<li><strong>Pair Instrument</strong> - Turn on your instrument and tap "Pair" in SexyTopo. Enter "0000" if prompted. Note: only one instrument can be paired at a time. To switch devices, tap "Unpair" then "Pair" again</li>
 	<li><strong>Connect</strong> - Activate the "Connect" switch to begin communication. Measurements from the instrument should now appear in SexyTopo's data views</li>
-	<li><strong>Calibrate</strong> - Perform any required calibration procedures for your device before surveying. Some instruments self-calibrate; others (such as the DistoX2) can be calibrated with the help of SexyTopo. The Calibration view is accessed from the Instrument menu once a suitable device is connected.</li>
+	<li><strong>Calibrate</strong> - Perform any required calibration procedures for your device before surveying. Some instruments self-calibrate; others (such as the DistoX2) can be calibrated with the help of SexyTopo (see <a href="#calibration">Calibration</a> below).</li>
 </ol>
+
+
+<h2 id="calibration">Calibration</h2>
+<p>The compass and clinometer in a surveying instrument need calibrating to give accurate readings.</p>
+
+<h3>DistoX Calibration</h3>
+<p>SexyTopo can calibrate the DistoX (A3), DistoX2 (X310) and DistoX BLE. Connect to the instrument, then choose <strong>Calibration…</strong> from the Instrument menu to open the Calibration view.</p>
+<p>A calibration is made up of 56 readings: 14 directions (forward, back, left, right, up, down and the eight diagonals in between), each taken with the instrument held in 4 orientations (face up, face right, face down and face left). The readings need not be very precise in direction, but it is important they are spread evenly around the sphere and that the instrument is rotated about its own axis between readings in the same direction.</p>
+<ol>
+	<li><strong>Enter calibration mode</strong> - Tap <strong>Disto Cal Mode On</strong>. The instrument will now send raw sensor readings to SexyTopo instead of survey measurements</li>
+	<li><strong>Take readings</strong> - Take a shot for each position. The <strong>Next (suggested)</strong> panel shows the direction and orientation for the next reading, and the counter shows how many readings have been taken out of 56. The raw sensor values (Gx, Gy, Gz, Mx, My, Mz) of the last reading are shown for reference</li>
+	<li><strong>Fix mistakes</strong> - If a reading goes wrong, tap <strong>Delete Reading</strong> to remove the most recent one. <strong>Clear</strong> removes all readings so you can start again</li>
+	<li><strong>Check the result</strong> - Once all 56 readings have been taken, SexyTopo calculates the calibration and shows the <strong>Calibration Assessment</strong>. This should be under 0.5; it is shown in green if so and red if not. A poor result usually means a bad reading, an uneven spread of directions or magnetic interference - try the calibration again somewhere else</li>
+	<li><strong>Upload</strong> - Tap <strong>Upload Calibration</strong> and then <strong>Write</strong> to send the new calibration coefficients to the instrument</li>
+	<li><strong>Leave calibration mode</strong> - Tap <strong>Disto Cal Mode Off</strong> so the instrument goes back to taking normal survey measurements</li>
+</ol>
+<p>After calibrating, it is worth checking the instrument by taking a few shots between two fixed points in both directions: the forward and back readings should agree closely.</p>
+<p><strong>Save</strong> and <strong>Load</strong> store the set of calibration readings in a file. This lets you keep a record of a calibration, or come back to it later.</p>
+<p>SexyTopo uses a linear calibration algorithm for the original DistoX and a non-linear one for the DistoX2 and DistoX BLE. This can be overridden in Settings → Instruments → Disto-X calibration algorithm.</p>
+
+<h3>Other Instruments</h3>
+<p>Some instruments (such as the SAP6 and CavwayX1) calibrate themselves on the device. For these, SexyTopo provides commands in the Instrument menu to put the device into and out of calibration mode; follow the instrument's own documentation for the calibration procedure.</p>
 
 
 <h2 id="table-view">Table View</h2>
@@ -350,7 +372,7 @@
     <p>If that fails, try turning your instrument off and back on. Try unpairing and re-pairing, or even turning Bluetooth off and on again. It shouldn't make a difference but you could kill SexyTopo and reopen it. Check you haven't paired with the wrong device (the Unpair dialog shows which devices are paired).</p>
     <p>For DistoX devices: if all else fails a factory reset may be necessary. Press CLEAR, FUNC and MEM (the latter has a floppy disk or save icon) for five seconds. Note that this is an option of last resort and requires recalibrating the device.</p>
   <h3>Strange Measurements</h3>
-    <p>Your instrument may need calibrating. Consult your instrument's documentation for calibration procedures. Some devices (such as DistoX) provide calibration tools within SexyTopo accessible from the Instrument menu.</p>
+    <p>Your instrument may need calibrating. Consult your instrument's documentation for calibration procedures. Some devices (such as DistoX) can be calibrated within SexyTopo; see <a href="#calibration">Calibration</a>.</p>
 
 </body>
 </html>
