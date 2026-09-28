@@ -266,6 +266,7 @@
     <string name="device_pairing_attempt">Gekoppelt mit %1$s…</string>
     <string name="device_pairing_error">Fehler beim Koppeln: %1$s</string>
     <string name="device_pairing_incompatible">Nicht kompatibles Gerät "%1$s" entdeckt</string>
+    <string name="device_unnamed">unbenannt</string>
     <string name="device_pairing_unpairing_device">%1$s entkoppeln</string>
     <string name="device_pairing_unpairing_success">Entkoppeln erfolgreich abgeschlossen</string>
     <string name="device_pairing_unpairing_error">Fehler beim Entkoppeln: %1$s</string>

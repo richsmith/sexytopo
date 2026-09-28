@@ -266,6 +266,7 @@
     <string name="device_pairing_attempt">Emparejando con %1$s…</string>
     <string name="device_pairing_error">Error al emparejar: %1$s</string>
     <string name="device_pairing_incompatible">Dispositivo incompatible "%1$s" detectado</string>
+    <string name="device_unnamed">sin nombre</string>
     <string name="device_pairing_unpairing_device">Desemparejando %1$s</string>
     <string name="device_pairing_unpairing_success">Desemparejamiento exitoso</string>
     <string name="device_pairing_unpairing_error">Error al desemparejar: %1$s</string>

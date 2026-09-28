@@ -266,6 +266,7 @@
     <string name="device_pairing_attempt">Association avec %1$s…</string>
     <string name="device_pairing_error">Erreur d\'association : %1$s</string>
     <string name="device_pairing_incompatible">Appareil incompatible "%1$s" détecté</string>
+    <string name="device_unnamed">sans nom</string>
     <string name="device_pairing_unpairing_device">Dissociation de %1$s</string>
     <string name="device_pairing_unpairing_success">Dissociation réussi</string>
     <string name="device_pairing_unpairing_error">Erreur de dissociation : %1$s</string>

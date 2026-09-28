@@ -266,6 +266,7 @@
     <string name="device_pairing_attempt">Parowanie z %1$s…</string>
     <string name="device_pairing_error">Błąd parowania: %1$s</string>
     <string name="device_pairing_incompatible">Wykryto niekompatybilne urządzenie "%1$s"</string>
+    <string name="device_unnamed">bez nazwy</string>
     <string name="device_pairing_unpairing_device">Rozłączanie %1$s</string>
     <string name="device_pairing_unpairing_success">Rozłączanie pomyślne</string>
     <string name="device_pairing_unpairing_error">Błąd rozłączania: %1$s</string>

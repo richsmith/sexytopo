@@ -279,6 +279,7 @@
     <string name="device_pairing_attempt">Pairing with %1$s…</string>
     <string name="device_pairing_error">Error pairing: %1$s</string>
     <string name="device_pairing_incompatible">Incompatible device "%1$s" detected</string>
+    <string name="device_unnamed">unnamed</string>
     <string name="device_pairing_unpairing_device">Unpairing %1$s</string>
     <string name="device_pairing_unpairing_success">Unpairing successful</string>
     <string name="device_pairing_unpairing_error">Unpairing error: %1$s</string>

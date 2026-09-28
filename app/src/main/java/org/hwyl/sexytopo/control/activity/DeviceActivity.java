@@ -457,7 +457,9 @@ public class DeviceActivity extends SexyTopoActivity {
                         }
                         BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
                     } else {
-                        Log.device(R.string.device_pairing_incompatible, name);
+                        Log.device(
+                                R.string.device_pairing_incompatible,
+                                name == null ? getString(R.string.device_unnamed) : name);
                     }
 
                 } catch (SecurityException e) {
