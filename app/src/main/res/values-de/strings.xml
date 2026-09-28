@@ -287,6 +287,7 @@
     <string name="device_data_received_null">Keine Daten erhalten</string>
     <string name="device_data_received_empty">Unvollständige Daten erhalten</string>
     <string name="device_data_unknown_identifier">Unbekannte Datenpaket-Kennung</string>
+    <string name="device_data_unknown_packet">Unbekanntes Paket (%1$d Bytes): %2$s</string>
     <string name="device_data_acknowledged_packet">Anerkanntes datenpaket</string>
     <string name="device_no_device">Kein Gerät</string>
     <string name="action_set_test_instrument">Testinstrument festlegen</string>

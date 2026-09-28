@@ -287,6 +287,7 @@
     <string name="device_data_received_null">Odebrano dane puste</string>
     <string name="device_data_received_empty">Odebrano puste dane</string>
     <string name="device_data_unknown_identifier">Nieznany identyfikator pakietu</string>
+    <string name="device_data_unknown_packet">Nieznany pakiet (%1$d bajtów): %2$s</string>
     <string name="device_data_acknowledged_packet">Potwierdzono pakiet</string>
     <string name="device_no_device">brak urządzenia</string>
     <string name="action_set_test_instrument">Ustaw instrument testowy</string>

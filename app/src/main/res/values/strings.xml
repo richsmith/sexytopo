@@ -300,6 +300,7 @@
     <string name="device_data_received_null">Null data received</string>
     <string name="device_data_received_empty">Empty data received</string>
     <string name="device_data_unknown_identifier">Unknown packet identifier</string>
+    <string name="device_data_unknown_packet">Unknown packet (%1$d bytes): %2$s</string>
     <string name="device_data_acknowledged_packet">Acknowledged packet</string>
     <string name="device_no_device">no device</string>
     <string name="device_test_name" translatable="false">[Test Device]</string>

@@ -287,6 +287,7 @@
     <string name="device_data_received_null">Datos nulos recibidos</string>
     <string name="device_data_received_empty">Datos vacíos recibidos</string>
     <string name="device_data_unknown_identifier">Identificador de paquete desconocido</string>
+    <string name="device_data_unknown_packet">Paquete desconocido (%1$d bytes): %2$s</string>
     <string name="device_data_acknowledged_packet">Paquete confirmado</string>
     <string name="device_no_device">sin dispositivo</string>
     <string name="action_set_test_instrument">Establecer instrumento de prueba</string>

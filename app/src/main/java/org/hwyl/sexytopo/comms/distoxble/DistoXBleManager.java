@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import no.nordicsemi.android.ble.data.Data;
 import org.apache.commons.lang3.ArrayUtils;
 import org.hwyl.sexytopo.R;
@@ -301,8 +303,14 @@ public class DistoXBleManager extends SexyTopoBleManager {
             } else if (packetIdentifier == MEMORY_REPLY_IDENTIFIER) {
                 handleWriteMemoryReply(packet);
             } else {
-                Log.device(R.string.device_data_unknown_identifier);
+                Log.device(R.string.device_data_unknown_packet, packet.length, toHex(packet));
             }
+        }
+
+        private String toHex(byte[] packet) {
+            return IntStream.range(0, packet.length)
+                    .mapToObj(i -> String.format("%02x", packet[i]))
+                    .collect(Collectors.joining(" "));
         }
 
         private void handleMeasurementPacket(byte[] packet) {
