@@ -268,7 +268,7 @@ public class DeviceActivity extends SexyTopoActivity {
             pairButton.setEnabled(false);
             unpairButton.setEnabled(true);
             deviceList.setTextColor(ContextCompat.getColor(this, android.R.color.darker_gray));
-            deviceList.setText(device.getName());
+            deviceList.setText(getDeviceName(device));
         } else {
             pairButton.setEnabled(true);
             unpairButton.setEnabled(false);
@@ -303,6 +303,14 @@ public class DeviceActivity extends SexyTopoActivity {
             return;
         }
 
+        if (isRemembered(device)) {
+            Log.device(R.string.device_pairing_unpairing_device, getDeviceName(device));
+            GeneralPreferences.forgetRememberedDevice();
+            updateComms();
+            Log.device(R.string.device_pairing_unpairing_success);
+            return;
+        }
+
         try {
             Log.device(R.string.device_pairing_unpairing_device, device.getName());
             Method method = device.getClass().getMethod("removeBond", (Class[]) null);
@@ -316,7 +324,8 @@ public class DeviceActivity extends SexyTopoActivity {
 
     private void updateComms() {
         BluetoothDevice device = getPairedDevice();
-        InstrumentType instrumentType = InstrumentType.byDevice(device);
+        String name = getDeviceName(device);
+        InstrumentType instrumentType = InstrumentType.byName(name);
 
         Instrument instrument = getInstrument();
 
@@ -329,7 +338,7 @@ public class DeviceActivity extends SexyTopoActivity {
         }
 
         if (doWeNeedToUpdateInstrument) {
-            instrument = new Instrument(device);
+            instrument = new Instrument(device, name);
             setInstrument(instrument);
 
             try {
@@ -353,11 +362,49 @@ public class DeviceActivity extends SexyTopoActivity {
         }
     }
 
+    private void remember(BluetoothDevice device, String name) {
+        Log.device(R.string.device_pairing_attempt, name);
+        GeneralPreferences.setRememberedDevice(device.getAddress(), name);
+        Log.device(R.string.device_pairing_successful);
+        updateStatuses();
+    }
+
+    private static boolean isRemembered(BluetoothDevice device) {
+        return device.getAddress().equals(GeneralPreferences.getRememberedDeviceAddress());
+    }
+
+    private static String getDeviceName(BluetoothDevice device) {
+        if (device == null) {
+            return null;
+        } else if (isRemembered(device)) {
+            return GeneralPreferences.getRememberedDeviceName();
+        }
+
+        try {
+            return device.getName();
+        } catch (SecurityException e) {
+            return null;
+        }
+    }
+
+    /**
+     * The chosen instrument: either one SexyTopo has remembered because it doesn't bond, or one
+     * from Android's list of paired devices.
+     */
     private BluetoothDevice getPairedDevice() {
 
         BluetoothAdapter bluetoothAdapter = getBluetoothAdapter();
         if (bluetoothAdapter == null) {
             return null;
+        }
+
+        String rememberedAddress = GeneralPreferences.getRememberedDeviceAddress();
+        if (rememberedAddress != null) {
+            try {
+                return bluetoothAdapter.getRemoteDevice(rememberedAddress);
+            } catch (IllegalArgumentException exception) { // not a valid address
+                GeneralPreferences.forgetRememberedDevice();
+            }
         }
 
         Set<BluetoothDevice> allPairedDevices;
@@ -385,7 +432,7 @@ public class DeviceActivity extends SexyTopoActivity {
         }
     }
 
-    private static class ScanReceiver extends BroadcastReceiver {
+    private class ScanReceiver extends BroadcastReceiver {
 
         public void onReceive(Context context, Intent intent) {
 
@@ -403,7 +450,11 @@ public class DeviceActivity extends SexyTopoActivity {
                     InstrumentType instrumentType = InstrumentType.byName(name);
                     if (instrumentType.isUsable()) {
                         Log.device(R.string.device_scan_detected, instrumentType.describe());
-                        pair(device);
+                        if (instrumentType.needsBond()) {
+                            pair(device);
+                        } else {
+                            remember(device, name);
+                        }
                         BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
                     } else {
                         Log.device(R.string.device_pairing_incompatible, name);

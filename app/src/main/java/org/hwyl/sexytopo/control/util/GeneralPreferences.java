@@ -260,6 +260,33 @@ public class GeneralPreferences {
         return getInt("pref_auto_reconnect_window", 15);
     }
 
+    /**
+     * Instruments that don't bond aren't in Android's list of paired devices, so SexyTopo remembers
+     * them itself. The name is kept because Android doesn't reliably know the name of an unbonded
+     * device.
+     */
+    public static String getRememberedDeviceAddress() {
+        return getString("pref_remembered_device_address", null);
+    }
+
+    public static String getRememberedDeviceName() {
+        return getString("pref_remembered_device_name", null);
+    }
+
+    public static void setRememberedDevice(String address, String name) {
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("pref_remembered_device_address", address);
+        editor.putString("pref_remembered_device_name", name);
+        editor.apply();
+    }
+
+    public static void forgetRememberedDevice() {
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.remove("pref_remembered_device_address");
+        editor.remove("pref_remembered_device_name");
+        editor.apply();
+    }
+
     // ********** Calibration ***********
 
     public static String getCalibrationAlgorithm() {

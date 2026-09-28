@@ -148,4 +148,12 @@ public enum InstrumentType {
     public boolean isTest() {
         return this == TEST;
     }
+
+    /**
+     * BLE doesn't need a bond to connect, and the DistoXBLE loses any bond made with it as soon as
+     * it connects, so it's remembered by address instead.
+     */
+    public boolean needsBond() {
+        return this != DISTOX_BLE;
+    }
 }

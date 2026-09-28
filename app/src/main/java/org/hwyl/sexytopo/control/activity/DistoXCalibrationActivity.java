@@ -2,7 +2,6 @@ package org.hwyl.sexytopo.control.activity;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -404,10 +403,8 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
         }
     }
 
-    private DistoX getDistox() throws SecurityException {
-        BluetoothDevice device = getInstrument().getBluetoothDevice();
-        DistoX distoX = DistoX.fromDevice(device);
-        return distoX;
+    private DistoX getDistox() {
+        return DistoX.fromName(getInstrument().getName());
     }
 
     @Override
