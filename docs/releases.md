@@ -1,3 +1,8 @@
+# 2026-09-25 1.13.2
+- Fix DistoXBLE calibration upload never reporting success
+- Fix the DistoXBLE being forgotten after connecting to it
+- Release notes can now be viewed in-app
+
 # 2026-09-25 1.13.1
 - Auto-(re)connect to instrument option, now for all supported instruments and with a time limit (thanks Brendan Hall)
 - Fix a disconnected instrument being reported as ready, and a dropped connection being treated as a request to disconnect
