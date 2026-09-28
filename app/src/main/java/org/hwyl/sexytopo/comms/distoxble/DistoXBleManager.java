@@ -20,8 +20,8 @@ import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.comms.ble.SexyTopoBleManager;
 import org.hwyl.sexytopo.comms.ble.SexyTopoDataHandler;
 import org.hwyl.sexytopo.comms.distox.CalibrationProtocol;
+import org.hwyl.sexytopo.comms.distox.CalibrationWrite;
 import org.hwyl.sexytopo.comms.distox.MeasurementProtocol;
-import org.hwyl.sexytopo.comms.distox.WriteCalibrationProtocol;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.DistoXCalibrationActivity;
@@ -31,7 +31,7 @@ import org.hwyl.sexytopo.model.survey.Leg;
 public class DistoXBleManager extends SexyTopoBleManager {
 
     private enum MemoryRange {
-        DATA_STORE(0x0000, 0x7FFFF),
+        DATA_STORE(0x0000, 0x7FFF),
         CALIBRATION_COEFFICIENTS(0x8010, 0x8043),
         FIRMWARE_VERSION(0xE000, 0xE003),
         HARDWARE_VERSION(0xE004, 0xE007),
@@ -110,6 +110,8 @@ public class DistoXBleManager extends SexyTopoBleManager {
 
     private final SurveyManager dataManager;
 
+    private volatile BleCalibrationWrite pendingCalibrationWrite = null;
+
     public DistoXBleManager(@NonNull final Context context, SurveyManager dataManager) {
         super(context);
         this.dataManager = dataManager;
@@ -176,15 +178,38 @@ public class DistoXBleManager extends SexyTopoBleManager {
         handleCustomCommand(COMMAND_CALIBRATION_MODE_STOP);
     }
 
-    public WriteCalibrationProtocol writeCalibration(Byte... bytes) {
-        Byte[] calibrationWritePacket =
-                createWriteMemoryPacket(MemoryRange.CALIBRATION_COEFFICIENTS, bytes);
-        writePacket(calibrationWritePacket, R.string.device_distox_calibration_writing);
+    /**
+     * Sends the coefficients to the device. The write only counts as successful once the device
+     * replies echoing back the bytes it stored.
+     */
+    public CalibrationWrite writeCalibration(Byte... bytes) {
+        BleCalibrationWrite calibrationWrite =
+                new BleCalibrationWrite(ArrayUtils.toPrimitive(bytes));
+        pendingCalibrationWrite = calibrationWrite;
 
-        // A bit hacky, but return null to be consistent with the interface
-        // There must be a better way to do this, but would involve rewriting how the original Disto
-        // handling code
-        return null;
+        Byte[] packet = createWriteMemoryPacket(MemoryRange.CALIBRATION_COEFFICIENTS, bytes);
+        writeCharacteristic(
+                        writeCharacteristic,
+                        ArrayUtils.toPrimitive(packet),
+                        BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
+                .done(device -> Log.device(R.string.device_distox_calibration_writing))
+                .fail(
+                        (device, status) -> {
+                            Log.device(
+                                    R.string.device_distox_calibration_write_error,
+                                    "(status " + status + ")");
+                            finishCalibrationWrite(calibrationWrite, false);
+                        })
+                .enqueue();
+
+        return calibrationWrite;
+    }
+
+    private void finishCalibrationWrite(BleCalibrationWrite calibrationWrite, boolean success) {
+        if (pendingCalibrationWrite == calibrationWrite) {
+            pendingCalibrationWrite = null;
+        }
+        calibrationWrite.finish(success);
     }
 
     private void startCalibrationActivity() {
@@ -247,6 +272,7 @@ public class DistoXBleManager extends SexyTopoBleManager {
 
         final byte MEASUREMENT_IDENTIFIER = 0x01;
         final byte CALIBRATION_IDENTIFIER = 0x02;
+        final byte MEMORY_REPLY_IDENTIFIER = 0x3d;
 
         @RequiresApi(api = Build.VERSION_CODES.O)
         @Override
@@ -272,6 +298,8 @@ public class DistoXBleManager extends SexyTopoBleManager {
             } else if (packetIdentifier == CALIBRATION_IDENTIFIER) {
                 handleCalibrationPacket(packet);
                 acknowledgePacket(packet);
+            } else if (packetIdentifier == MEMORY_REPLY_IDENTIFIER) {
+                handleWriteMemoryReply(packet);
             } else {
                 Log.device(R.string.device_data_unknown_identifier);
             }
@@ -294,6 +322,32 @@ public class DistoXBleManager extends SexyTopoBleManager {
             dataManager.addCalibrationReading(reading);
         }
 
+        /**
+         * The device answers a memory write with 0x3d (not 0x3e, the write command), the address
+         * (low byte first), the length, then the bytes now stored at that address.
+         */
+        private void handleWriteMemoryReply(byte[] packet) {
+            BleCalibrationWrite calibrationWrite = pendingCalibrationWrite;
+            if (packet.length < 4 || calibrationWrite == null) {
+                return;
+            }
+
+            int address = (packet[1] & 0xFF) | ((packet[2] & 0xFF) << 8);
+            if (address != MemoryRange.CALIBRATION_COEFFICIENTS.start) {
+                return;
+            }
+
+            int length = packet[3] & 0xFF;
+            byte[] stored = Arrays.copyOfRange(packet, 4, Math.min(packet.length, 4 + length));
+            boolean success = Arrays.equals(calibrationWrite.coefficients, stored);
+            if (success) {
+                Log.device(R.string.device_distox_calibration_write_success);
+            } else {
+                Log.device(R.string.device_distox_calibration_write_rejected);
+            }
+            finishCalibrationWrite(calibrationWrite, success);
+        }
+
         private void acknowledgePacket(byte[] packet) {
             Byte[] acknowledgementPacket = createAcknowledgementPacket(packet);
             writePacket(acknowledgementPacket, R.string.device_data_acknowledged_packet);
@@ -302,6 +356,32 @@ public class DistoXBleManager extends SexyTopoBleManager {
         private Byte[] createAcknowledgementPacket(byte[] packet) {
             Byte replyByte = (byte) (packet[1] & 0x80 | 0x55);
             return createWriteCommandPacket(replyByte);
+        }
+    }
+
+    private static class BleCalibrationWrite implements CalibrationWrite {
+
+        private final byte[] coefficients;
+        private volatile boolean isFinished = false;
+        private volatile boolean wasSuccessful = false;
+
+        private BleCalibrationWrite(byte[] coefficients) {
+            this.coefficients = coefficients;
+        }
+
+        private void finish(boolean success) {
+            wasSuccessful = success;
+            isFinished = true;
+        }
+
+        @Override
+        public boolean isFinished() {
+            return isFinished;
+        }
+
+        @Override
+        public boolean wasSuccessful() {
+            return wasSuccessful;
         }
     }
 }

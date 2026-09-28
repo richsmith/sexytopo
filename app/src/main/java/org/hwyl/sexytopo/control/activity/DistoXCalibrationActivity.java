@@ -26,9 +26,9 @@ import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.comms.Communicator;
 import org.hwyl.sexytopo.comms.DistoX;
+import org.hwyl.sexytopo.comms.distox.CalibrationWrite;
 import org.hwyl.sexytopo.comms.distox.DistoXCommunicator;
 import org.hwyl.sexytopo.comms.distox.DistoXStyleCommunicator;
-import org.hwyl.sexytopo.comms.distox.WriteCalibrationProtocol;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.calibration.CalibrationCalculator;
 import org.hwyl.sexytopo.control.io.IoUtils;
@@ -337,15 +337,8 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
 
     public void requestWriteCalibration(View view, Byte[] coefficients) {
         try {
-            DistoXStyleCommunicator comms = getComms();
-
-            if (comms instanceof DistoXCommunicator) {
-                // This is a bit hacky, but the old Disto needs some real-time management
-                new WriteCalibrationTask(view).execute(coefficients);
-            } else {
-                comms.writeCalibration(coefficients);
-            }
-
+            getComms(); // fail fast if not connected
+            new WriteCalibrationTask(view).execute(coefficients);
         } catch (Exception exception) {
             showExceptionAndLog(exception);
         }
@@ -467,16 +460,16 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
         protected Boolean doInBackground(Byte... coefficients) {
 
             try {
-                DistoXCommunicator comms = (DistoXCommunicator) getComms();
-                WriteCalibrationProtocol writeCalibrationProtocol =
-                        comms.writeCalibration(coefficients);
-                waitForEnd(writeCalibrationProtocol, 60);
-                if (!writeCalibrationProtocol.isFinished()) {
+                DistoXStyleCommunicator comms = getComms();
+                CalibrationWrite calibrationWrite = comms.writeCalibration(coefficients);
+                waitForEnd(calibrationWrite, 60);
+                if (!calibrationWrite.isFinished() && comms instanceof DistoXCommunicator) {
+                    // This is a bit hacky, but the old Disto needs some real-time management
                     Log.device(R.string.device_distox_force_disconnect_for_calibration);
                     comms.requestDisconnect(); // force it to stop what it's doing
-                    waitForEnd(writeCalibrationProtocol, 80);
+                    waitForEnd(calibrationWrite, 80);
                 }
-                return writeCalibrationProtocol.wasSuccessful();
+                return calibrationWrite.wasSuccessful();
 
             } catch (NotConnectedToDistoException exception) {
                 showExceptionAndLog(exception);
@@ -484,10 +477,10 @@ public class DistoXCalibrationActivity extends SexyTopoActivity {
             }
         }
 
-        private void waitForEnd(WriteCalibrationProtocol writeCalibrationProtocol, int attempts) {
+        private void waitForEnd(CalibrationWrite calibrationWrite, int attempts) {
             for (int i = 0; i < attempts; i++) {
                 try {
-                    if (writeCalibrationProtocol.isFinished()) {
+                    if (calibrationWrite.isFinished()) {
                         return;
                     }
                     Thread.sleep(100);
