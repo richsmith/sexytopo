@@ -282,6 +282,8 @@
     <string name="device_connection_error">Erro de conexão: %1$s</string>
     <string name="device_connection_closing_error">Erro ao encerrar a conexão: %1$s</string>
     <string name="device_data_received">Medição recebida</string>
+    <string name="device_calibration_reading_received">Leitura de calibração recebida</string>
+    <string name="device_data_duplicated">Pacote duplicado #%1$d</string>
     <string name="device_data_received_null">Dados nulos recebidos</string>
     <string name="device_data_received_empty">Dados vazios recebidos</string>
     <string name="device_data_unknown_identifier">Identificador de pacote desconhecido</string>

@@ -282,6 +282,8 @@
     <string name="device_connection_error">Błąd połączenia: %1$s</string>
     <string name="device_connection_closing_error">Błąd zamykania połączenia: %1$s</string>
     <string name="device_data_received">Odebrano pomiar</string>
+    <string name="device_calibration_reading_received">Odebrano odczyt kalibracyjny</string>
+    <string name="device_data_duplicated">Zduplikowany pakiet #%1$d</string>
     <string name="device_data_received_null">Odebrano dane puste</string>
     <string name="device_data_received_empty">Odebrano puste dane</string>
     <string name="device_data_unknown_identifier">Nieznany identyfikator pakietu</string>

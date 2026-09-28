@@ -64,7 +64,7 @@ public class MeasurementProtocol extends DistoXProtocol {
 
         if (isDataPacket(packet)) {
             if (arePacketsTheSame(packet, previousPacket)) {
-                Log.device("(Duplicated measurement #" + ++duplicateCount + ")");
+                Log.device(R.string.device_data_duplicated, ++duplicateCount);
             } else {
                 duplicateCount = 0;
                 Log.device(context.getString(R.string.device_data_received));

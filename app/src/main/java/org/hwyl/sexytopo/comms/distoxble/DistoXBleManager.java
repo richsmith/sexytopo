@@ -280,6 +280,7 @@ public class DistoXBleManager extends SexyTopoBleManager {
         private void handleMeasurementPacket(byte[] packet) {
             byte[] data = Arrays.copyOfRange(packet, 1, 16);
             Leg leg = MeasurementProtocol.parseDataPacket(data);
+            Log.device(R.string.device_data_received);
             dataManager.updateSurvey(leg);
         }
 
@@ -289,6 +290,7 @@ public class DistoXBleManager extends SexyTopoBleManager {
             CalibrationProtocol.updateAccelerationSensorReading(acceleration, reading);
             byte[] magnetic = Arrays.copyOfRange(packet, 9, 16);
             CalibrationProtocol.updateMagneticSensorReading(magnetic, reading);
+            Log.device(R.string.device_calibration_reading_received);
             dataManager.addCalibrationReading(reading);
         }
 

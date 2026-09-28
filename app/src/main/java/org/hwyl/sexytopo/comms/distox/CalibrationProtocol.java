@@ -5,6 +5,7 @@ import android.content.Context;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.model.calibration.CalibrationReading;
@@ -59,7 +60,7 @@ public class CalibrationProtocol extends DistoXProtocol {
                     updateAccelerationSensorReading(packet, calibrationReading);
                     accelerationDuplicated = 0;
                 } else {
-                    Log.device("(Duplication " + ++accelerationDuplicated + ")");
+                    Log.device(R.string.device_data_duplicated, ++accelerationDuplicated);
                     checkExcessiveDuplication(accelerationDuplicated, inStream, outStream);
                 }
                 break;
@@ -69,18 +70,18 @@ public class CalibrationProtocol extends DistoXProtocol {
                     updateMagneticSensorReading(packet, calibrationReading);
                     magneticDuplicated = 0;
                 } else {
-                    Log.device("(Duplication " + ++magneticDuplicated + ")");
+                    Log.device(R.string.device_data_duplicated, ++magneticDuplicated);
                     checkExcessiveDuplication(magneticDuplicated, inStream, outStream);
                 }
                 break;
 
             default:
-                Log.device("(Not sure what this packet is)");
+                Log.device(R.string.device_data_unknown_identifier);
                 break;
         }
 
         if (calibrationReading.getState() == CalibrationReading.State.COMPLETE) {
-            Log.device("Completed cal reading :)");
+            Log.device(R.string.device_calibration_reading_received);
             dataManager.addCalibrationReading(calibrationReading);
             calibrationReading = null;
         }

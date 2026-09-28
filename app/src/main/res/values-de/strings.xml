@@ -282,6 +282,8 @@
     <string name="device_connection_error">Verbindungsfehler: %1$s</string>
     <string name="device_connection_closing_error">Fehler beim Beenden einer Verbindung: %1$s</string>
     <string name="device_data_received">Messung eingegangen</string>
+    <string name="device_calibration_reading_received">Kalibrierungsmessung empfangen</string>
+    <string name="device_data_duplicated">Doppeltes Paket #%1$d</string>
     <string name="device_data_received_null">Keine Daten erhalten</string>
     <string name="device_data_received_empty">Unvollständige Daten erhalten</string>
     <string name="device_data_unknown_identifier">Unbekannte Datenpaket-Kennung</string>

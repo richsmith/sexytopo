@@ -295,6 +295,8 @@
     <string name="device_connection_error">Connection error: %1$s</string>
     <string name="device_connection_closing_error">Error closing connection: %1$s</string>
     <string name="device_data_received">Received measurement</string>
+    <string name="device_calibration_reading_received">Received calibration reading</string>
+    <string name="device_data_duplicated">Duplicated packet #%1$d</string>
     <string name="device_data_received_null">Null data received</string>
     <string name="device_data_received_empty">Empty data received</string>
     <string name="device_data_unknown_identifier">Unknown packet identifier</string>
