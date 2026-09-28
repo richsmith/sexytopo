@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           java-version: '17'
-          distribution: 'adopt'
+          distribution: 'temurin'
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
@@ -28,25 +28,31 @@ jobs:
         run: ./gradlew assembleRelease
 
       - name: Sign APK
-        id: sign
-        uses: r0adkll/sign-android-release@v1
-        with:
-          releaseDirectory: app/build/outputs/apk/release
-          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
-          alias: ${{ secrets.KEY_ALIAS }}
-          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
         env:
-          BUILD_TOOLS_VERSION: "35.0.0"
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          BUILD_TOOLS="$ANDROID_HOME/build-tools/35.0.0"
+          echo "$SIGNING_KEY" | base64 -d > "$RUNNER_TEMP/signing.jks"
+          "$BUILD_TOOLS/zipalign" -f -p 4 \
+            app/build/outputs/apk/release/app-release-unsigned.apk \
+            "$RUNNER_TEMP/aligned.apk"
+          "$BUILD_TOOLS/apksigner" sign \
+            --ks "$RUNNER_TEMP/signing.jks" \
+            --ks-key-alias "$KEY_ALIAS" \
+            --ks-pass env:KEY_STORE_PASSWORD \
+            --key-pass env:KEY_PASSWORD \
+            --out "sexytopo-${GITHUB_REF_NAME}.apk" \
+            "$RUNNER_TEMP/aligned.apk"
+          "$BUILD_TOOLS/apksigner" verify "sexytopo-${GITHUB_REF_NAME}.apk"
 
       - name: Extract release notes
         run: python3 scripts/extract_release_notes.py "${GITHUB_REF_NAME}" > notes.md
 
-      - name: Rename APK
-        run: mv "${{ steps.sign.outputs.signedReleaseFile }}" "sexytopo-${GITHUB_REF_NAME}.apk"
-
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           name: SexyTopo ${{ github.ref_name }}
           body_path: notes.md
