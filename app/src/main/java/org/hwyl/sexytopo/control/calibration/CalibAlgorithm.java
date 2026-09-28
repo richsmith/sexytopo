@@ -234,10 +234,13 @@ public class CalibAlgorithm {
     }
 
     /*
-     * returns byte sequence to be written to address 0x8010 - 0x803F/0x8043
+     * returns byte sequence to be written to address 0x8010 - 0x8043
+     *
+     * For a linear calibration the non-linear slots are filled with 0xFF, which the DistoX
+     * treats as "no non-linear correction".
      */
     public static byte[] GetCoeff(boolean useNonLinearity) {
-        byte[] data = new byte[useNonLinearity ? 52 : 48];
+        byte[] data = new byte[52];
         PutCoeff(data, 0, bG.x * FV);
         PutCoeff(data, 2, aG.x.x * FM);
         PutCoeff(data, 4, aG.x.y * FM);
@@ -269,8 +272,12 @@ public class CalibAlgorithm {
             data[48] = (byte) (nlx - 1);
             data[49] = (byte) (nly - 1);
             data[50] = (byte) (nlz - 1);
-            data[51] = (byte) 0xFF;
+        } else {
+            data[48] = (byte) 0xFF;
+            data[49] = (byte) 0xFF;
+            data[50] = (byte) 0xFF;
         }
+        data[51] = (byte) 0xFF;
         return data;
     }
 }

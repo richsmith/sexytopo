@@ -112,6 +112,7 @@ public class CalibrationCalculatorTest {
         Assert.assertEquals(43, iterations);
         Assert.assertEquals(
                 0.603272, calibrationCalculator.getDelta(), SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
+        assertCoefficientsFillMemoryRange(calibrationCalculator.getCoefficients(), false);
 
         calibrationCalculator = new CalibrationCalculator(true);
         iterations = calibrationCalculator.calculate(calibrationReadings);
@@ -120,6 +121,7 @@ public class CalibrationCalculatorTest {
                 0.5775869,
                 calibrationCalculator.getDelta(),
                 SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
+        assertCoefficientsFillMemoryRange(calibrationCalculator.getCoefficients(), true);
     }
 
     /**
@@ -222,5 +224,16 @@ public class CalibrationCalculatorTest {
         Assert.assertEquals(expected.x, actual.x, SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
         Assert.assertEquals(expected.y, actual.y, SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
         Assert.assertEquals(expected.z, actual.z, SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
+    }
+
+    /** Coefficients always cover the full 52-byte range, with unused non-linear slots as 0xFF. */
+    private static void assertCoefficientsFillMemoryRange(byte[] coefficients, boolean nonLinear) {
+        Assert.assertEquals(52, coefficients.length);
+        Assert.assertEquals((byte) 0xFF, coefficients[51]);
+        if (!nonLinear) {
+            Assert.assertEquals((byte) 0xFF, coefficients[48]);
+            Assert.assertEquals((byte) 0xFF, coefficients[49]);
+            Assert.assertEquals((byte) 0xFF, coefficients[50]);
+        }
     }
 }
