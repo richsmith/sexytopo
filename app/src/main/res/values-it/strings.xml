@@ -41,7 +41,8 @@
     <string name="title_activity_settings">Impostazioni</string>
     <string name="title_activity_system_log">Registro</string>
     <string name="title_activity_help">Aiuto</string>
-    <string name="title_activity_guide">Guida</string>
+    <string name="title_activity_guide">Manuale</string>
+    <string name="title_activity_release_notes">Note di rilascio</string>
     <string name="title_activity_3d">3D</string>
 
     <!-- Action bar menu -->
@@ -61,6 +62,7 @@
     <string name="action_3d">3D</string>
     <string name="action_help">Aiuto</string>
     <string name="action_guide">Manuale</string>
+    <string name="action_release_notes">Note di rilascio</string>
     <string name="action_about">Informazioni</string>
     <string name="action_file_new">Nuovo Rilievo</string>
     <string name="action_file_open">Apri Rilievo…</string>
@@ -752,5 +754,6 @@
     <string name="request_code_error">Codice errore %1$d dalla richiesta %2$d</string>
     <string name="killing_comms_process">Terminazione del processo di comunicazione</string>
     <string name="setup_error_load_symbol_svg">Errore nel caricamento del simbolo SVG %1$s</string>
+    <string name="release_notes_unavailable">Le note di rilascio non sono disponibili.</string>
 
 </resources>

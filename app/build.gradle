@@ -55,6 +55,34 @@ android {
 
 }
 
+// Bundles docs/releases.md into the app's assets so the release notes can be viewed in-app
+// (Help -> Release Notes).
+abstract class CopyReleaseNotesTask extends DefaultTask {
+    @InputFile
+    abstract RegularFileProperty getReleaseNotes()
+
+    @OutputDirectory
+    abstract DirectoryProperty getOutputDir()
+
+    @TaskAction
+    void copy() {
+        def outputDir = getOutputDir().get().asFile
+        outputDir.mkdirs()
+        new File(outputDir, 'releases.md').bytes = getReleaseNotes().get().asFile.bytes
+    }
+}
+
+def copyReleaseNotes = tasks.register('copyReleaseNotes', CopyReleaseNotesTask) {
+    releaseNotes = rootProject.layout.projectDirectory.file('docs/releases.md')
+}
+
+androidComponents {
+    onVariants(selector().all()) { variant ->
+        variant.sources.assets.addGeneratedSourceDirectory(
+                copyReleaseNotes, CopyReleaseNotesTask::getOutputDir)
+    }
+}
+
 
 repositories {
     mavenCentral()

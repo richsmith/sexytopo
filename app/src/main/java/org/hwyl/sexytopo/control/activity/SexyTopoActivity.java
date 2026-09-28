@@ -289,6 +289,9 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         } else if (itemId == R.id.action_help) {
             startActivity(GuideActivity.class);
             return true;
+        } else if (itemId == R.id.action_release_notes) {
+            startActivity(ReleaseNotesActivity.class);
+            return true;
         } else if (itemId == R.id.action_about) {
             openAboutDialog();
             return true;

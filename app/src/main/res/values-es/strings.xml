@@ -41,7 +41,8 @@
     <string name="title_activity_settings">Ajustes</string>
     <string name="title_activity_system_log">Registro</string>
     <string name="title_activity_help">Ayuda</string>
-    <string name="title_activity_guide">Guía</string>
+    <string name="title_activity_guide">Manual</string>
+    <string name="title_activity_release_notes">Notas de la versión</string>
     <string name="title_activity_3d">3D</string>
 
     <!-- Action bar menu -->
@@ -61,6 +62,7 @@
     <string name="action_3d">3D</string>
     <string name="action_help">Ayuda</string>
     <string name="action_guide">Manual</string>
+    <string name="action_release_notes">Notas de la versión</string>
     <string name="action_about">Acerca de</string>
     <string name="action_file_new">Nueva Topografía</string>
     <string name="action_file_open">Abrir Topografía…</string>
@@ -752,5 +754,6 @@
     <string name="request_code_error">Código de error %1$d del código de solicitud %2$d</string>
     <string name="killing_comms_process">Matando proceso de comunicación</string>
     <string name="setup_error_load_symbol_svg">Error al cargar el símbolo SVG %1$s</string>
+    <string name="release_notes_unavailable">Las notas de la versión no están disponibles.</string>
 
 </resources>

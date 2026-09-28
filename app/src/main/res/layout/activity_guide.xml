@@ -16,7 +16,6 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/panelBackground"
-            app:title="@string/title_activity_guide"
             app:titleTextColor="@color/white" />
 
     </com.google.android.material.appbar.AppBarLayout>

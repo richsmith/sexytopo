@@ -80,6 +80,10 @@
             android:name=".control.activity.GuideActivity"
             android:label="@string/title_activity_guide">
         </activity>
+        <activity
+            android:name=".control.activity.ReleaseNotesActivity"
+            android:label="@string/title_activity_release_notes">
+        </activity>
         <service
             android:name=".control.NewStationNotificationService"
             android:enabled="true"

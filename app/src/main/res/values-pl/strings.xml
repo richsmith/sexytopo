@@ -41,7 +41,8 @@
     <string name="title_activity_settings">Ustawienia</string>
     <string name="title_activity_system_log">Dziennik</string>
     <string name="title_activity_help">Pomoc</string>
-    <string name="title_activity_guide">Instrukcja</string>
+    <string name="title_activity_guide">Podręcznik</string>
+    <string name="title_activity_release_notes">Informacje o wersji</string>
     <string name="title_activity_3d">3D</string>
 
     <!-- Action bar menu -->
@@ -61,6 +62,7 @@
     <string name="action_3d">3D</string>
     <string name="action_help">Pomoc</string>
     <string name="action_guide">Podręcznik</string>
+    <string name="action_release_notes">Informacje o wersji</string>
     <string name="action_about">O programie</string>
     <string name="action_file_new">Nowy pomiar</string>
     <string name="action_file_open">Otwórz pomiar…</string>
@@ -752,5 +754,6 @@
     <string name="request_code_error">Kod błędu %1$d z kodu żądania %2$d</string>
     <string name="killing_comms_process">Zabijanie procesu komunikacji</string>
     <string name="setup_error_load_symbol_svg">Błąd wczytywania symbolu SVG %1$s</string>
+    <string name="release_notes_unavailable">Informacje o wersji są niedostępne.</string>
 
 </resources>

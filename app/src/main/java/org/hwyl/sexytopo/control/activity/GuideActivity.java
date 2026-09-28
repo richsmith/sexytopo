@@ -10,6 +10,7 @@ public class GuideActivity extends SexyTopoActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_guide);
+        setupMaterialToolbar();
 
         applyEdgeToEdgeInsets(R.id.rootLayout, true, true);
 
