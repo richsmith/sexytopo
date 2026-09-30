@@ -303,12 +303,12 @@
                 android:layout_columnWeight="1"
                 android:layout_margin="0dp"
                 android:layout_marginTop="-4dp"
-                android:contentDescription="@string/sketch_toolbar_symbol"
+                android:contentDescription="@string/sketch_toolbar_redo"
                 android:cropToPadding="false"
                 android:hapticFeedbackEnabled="true"
                 android:scaleType="fitCenter"
                 android:src="@drawable/redo"
-                android:tooltipText="@string/sketch_toolbar_symbol" />
+                android:tooltipText="@string/sketch_toolbar_redo" />
 
             <ImageButton
                 style="@style/ToolbarImageButton"
