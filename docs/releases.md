@@ -1,4 +1,4 @@
-# Unreleased
+# 2026-09-30 1.14.0
 - Calibration screen reworked: readings are labelled and grouped by the direction they were actually taken in, so the order of shots no longer matters and every reading is used
 - Calibration readings can be viewed with their direction, roll and consistency with the rest of their set, and any reading can be replaced or deleted
 - Calibration summary of the sets and directions covered, with the least consistent readings analysis shown
