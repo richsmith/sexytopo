@@ -15,8 +15,8 @@ android {
         applicationId "org.hwyl.sexytopo"
         minSdkVersion 23
         targetSdkVersion 36
-        versionCode 100
-        versionName "1.13.2"
+        versionCode 101
+        versionName "1.14.0"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
 
