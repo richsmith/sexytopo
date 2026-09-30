@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,6 +42,8 @@ public class SurveyManager {
 
     private List<CalibrationReading> calibrationReadings = new ArrayList<>();
 
+    private final Handler mainThreadHandler = new Handler(Looper.getMainLooper());
+
     public SurveyManager(Context Context) {
         this.context = Context;
     }
@@ -48,7 +52,22 @@ public class SurveyManager {
         updateSurvey(Collections.singletonList(leg));
     }
 
+    /**
+     * Add readings to the current survey. Instruments deliver readings on their own threads, but
+     * all other survey edits (deleting stations, undo, etc.) happen on the main thread, so the
+     * update is run there too; otherwise a reading arriving mid-edit can be attached to a station
+     * that has just been removed from the survey.
+     */
     public void updateSurvey(List<Leg> legs) {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            applySurveyUpdate(legs);
+        } else {
+            List<Leg> copy = new ArrayList<>(legs);
+            mainThreadHandler.post(() -> applySurveyUpdate(copy));
+        }
+    }
+
+    private void applySurveyUpdate(List<Leg> legs) {
 
         if (!legs.isEmpty()) {
 
