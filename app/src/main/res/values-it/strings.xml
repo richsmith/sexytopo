@@ -320,7 +320,7 @@
     <string name="device_distox_command_calibration_start">Avvia modalità calibrazione</string>
     <string name="device_distox_command_calibration_stop">Ferma modalità calibrazione</string>
     <string name="device_distox_force_disconnect_for_calibration">Disto occupato; forzatura disconnessione per scrivere la calibrazione</string>
-    <string name="device_distox_calibration_result">Valutazione calibrazione (dovrebbe essere inferiore a %1$f): %2$s\n\nAlgoritmo di calibrazione: %3$s</string>
+    <string name="device_distox_calibration_result">Valutazione calibrazione (dovrebbe essere inferiore a %1$s): %2$s\n\nAlgoritmo di calibrazione: %3$s</string>
     <string name="device_distox_calibration_writing">Scrittura coefficienti di calibrazione</string>
     <string name="device_distox_calibration_write_success">Scrittura calibrazione riuscita</string>
     <string name="device_distox_calibration_write_error">Errore nella scrittura della calibrazione %1$s</string>
@@ -343,6 +343,10 @@
     <string name="device_fcl_command_device_off">Dispositivo Spento</string>
 
     <!-- Calibration -->
+    <string name="calibration_title_mode">Modalità calibrazione</string>
+    <string name="calibration_title_readings">Letture</string>
+    <string name="calibration_title_last_reading">Ultima lettura</string>
+    <string name="calibration_title_result">Risultato</string>
     <string name="calibration_index">Numero lettura</string>
     <string name="calibration_start">Modalità Cal Disto Accesa</string>
     <string name="calibration_stop">Modalità Cal Disto Spenta</string>
@@ -363,6 +367,28 @@
     <string name="calibration_loaded_file">Dati di calibrazione caricati</string>
     <string name="calibration_load_error">Errore nella lettura del file di calibrazione</string>
     <string name="calibration_save_error">Errore nel salvataggio del file di calibrazione</string>
+    <string name="calibration_worst_readings">Letture meno coerenti (oltre 1° rispetto al resto della serie)</string>
+    <string name="calibration_algorithm_linear">Lineare</string>
+    <string name="calibration_algorithm_nonlinear">Non lineare</string>
+    <string name="calibration_view_readings">Mostra letture</string>
+    <string name="calibration_pointing_horizontal">Orizzontale</string>
+    <string name="calibration_pointing_corner_up">Angolo in alto</string>
+    <string name="calibration_pointing_corner_down">Angolo in basso</string>
+    <string name="calibration_face_side">Di lato</string>
+    <string name="calibration_set_number">Serie %1$d</string>
+    <string name="calibration_sets">Serie</string>
+    <string name="calibration_sets_value">%1$d (%2$d complete)</string>
+    <string name="calibration_coverage">Direzioni coperte</string>
+    <string name="calibration_coverage_corners_up">Angoli in alto</string>
+    <string name="calibration_coverage_corners_down">Angoli in basso</string>
+    <string name="calibration_reading_title">Lettura #%1$d</string>
+    <string name="calibration_replace">Sostituisci</string>
+    <string name="calibration_reading_options_message">Sostituisci: il suo posto resta per la prossima lettura.\nElimina: viene rimossa e le letture successive salgono di un posto.</string>
+    <string name="calibration_gap_options_message">Rimuovere questo spazio vuoto e far salire di un posto le letture successive?</string>
+    <string name="calibration_roll">Rollio</string>
+    <string name="calibration_uncalibrated_estimate">Stima non calibrata</string>
+    <string name="calibration_reading_deleted">Eliminata: ripeti questa lettura</string>
+    <string name="calibration_no_readings">Ancora nessuna lettura</string>
     <string name="direction_forward">Avanti</string>
     <string name="direction_right">Destra</string>
     <string name="direction_back">Indietro</string>

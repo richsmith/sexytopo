@@ -17,6 +17,7 @@ import org.hwyl.sexytopo.control.io.basic.Saver;
 import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.calibration.CalibrationReading;
+import org.hwyl.sexytopo.model.calibration.CalibrationReadingList;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Survey;
 
@@ -40,7 +41,7 @@ public class SurveyManager {
     // This should be created or loaded on startup
     private static Survey currentSurvey = new Survey();
 
-    private List<CalibrationReading> calibrationReadings = new ArrayList<>();
+    private final CalibrationReadingList calibrationReadings = new CalibrationReadingList();
 
     private final Handler mainThreadHandler = new Handler(Looper.getMainLooper());
 
@@ -131,26 +132,32 @@ public class SurveyManager {
     }
 
     public void addCalibrationReading(CalibrationReading calibrationReading) {
-        this.calibrationReadings.add(calibrationReading);
+        calibrationReadings.add(calibrationReading);
         broadcastCalibrationUpdated();
     }
 
-    public List<CalibrationReading> getCalibrationReadings() {
+    public CalibrationReadingList getCalibrationReadings() {
         return calibrationReadings;
     }
 
-    public void setCalibrationReadings(List<CalibrationReading> calibrationReadings) {
-        this.calibrationReadings = calibrationReadings;
+    public void setCalibrationReadings(List<CalibrationReading> readings) {
+        calibrationReadings.setAll(readings);
     }
 
     public void clearCalibrationReadings() {
-        this.calibrationReadings.clear();
+        calibrationReadings.clear();
+    }
+
+    public void replaceCalibrationReading(int index) {
+        calibrationReadings.replace(index);
+    }
+
+    public void deleteCalibrationReading(int index) {
+        calibrationReadings.delete(index);
     }
 
     public void deleteLastCalibrationReading() {
-        if (!calibrationReadings.isEmpty()) {
-            calibrationReadings.remove(calibrationReadings.size() - 1);
-        }
+        calibrationReadings.deleteLastAdded();
     }
 
     private static class AutosaveTask extends AsyncTask<Context, Void, Void> {

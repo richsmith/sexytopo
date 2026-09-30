@@ -320,7 +320,7 @@
     <string name="device_distox_command_calibration_start">Rozpocznij tryb kalibracji</string>
     <string name="device_distox_command_calibration_stop">Zatrzymaj tryb kalibracji</string>
     <string name="device_distox_force_disconnect_for_calibration">Disto zajęty; wymuszanie rozłączenia w celu zapisu kalibracji</string>
-    <string name="device_distox_calibration_result">Ocena kalibracji (powinno być poniżej %1$f): %2$s\n\nAlgorytm kalibracji: %3$s</string>
+    <string name="device_distox_calibration_result">Ocena kalibracji (powinno być poniżej %1$s): %2$s\n\nAlgorytm kalibracji: %3$s</string>
     <string name="device_distox_calibration_writing">Zapisywanie współczynników kalibracji</string>
     <string name="device_distox_calibration_write_success">Pomyślnie zapisano kalibrację</string>
     <string name="device_distox_calibration_write_error">Błąd zapisu kalibracji %1$s</string>
@@ -343,6 +343,10 @@
     <string name="device_fcl_command_device_off">Urządzenie wyłączone</string>
 
     <!-- Calibration -->
+    <string name="calibration_title_mode">Tryb kalibracji</string>
+    <string name="calibration_title_readings">Odczyty</string>
+    <string name="calibration_title_last_reading">Ostatni odczyt</string>
+    <string name="calibration_title_result">Wynik</string>
     <string name="calibration_index">Numer odczytu</string>
     <string name="calibration_start">Tryb kalibracji Disto włączony</string>
     <string name="calibration_stop">Tryb kalibracji Disto wyłączony</string>
@@ -363,6 +367,28 @@
     <string name="calibration_loaded_file">Wczytano dane kalibracji</string>
     <string name="calibration_load_error">Błąd odczytu pliku kalibracji</string>
     <string name="calibration_save_error">Błąd zapisu pliku kalibracji</string>
+    <string name="calibration_worst_readings">Najmniej spójne odczyty (ponad 1° od reszty serii)</string>
+    <string name="calibration_algorithm_linear">Liniowy</string>
+    <string name="calibration_algorithm_nonlinear">Nieliniowy</string>
+    <string name="calibration_view_readings">Pokaż odczyty</string>
+    <string name="calibration_pointing_horizontal">Poziomo</string>
+    <string name="calibration_pointing_corner_up">Narożnik w górę</string>
+    <string name="calibration_pointing_corner_down">Narożnik w dół</string>
+    <string name="calibration_face_side">Na boku</string>
+    <string name="calibration_set_number">Seria %1$d</string>
+    <string name="calibration_sets">Serie</string>
+    <string name="calibration_sets_value">%1$d (%2$d pełnych)</string>
+    <string name="calibration_coverage">Pokryte kierunki</string>
+    <string name="calibration_coverage_corners_up">Narożniki w górę</string>
+    <string name="calibration_coverage_corners_down">Narożniki w dół</string>
+    <string name="calibration_reading_title">Odczyt #%1$d</string>
+    <string name="calibration_replace">Zastąp</string>
+    <string name="calibration_reading_options_message">Zastąp: jego miejsce zajmie następny wykonany odczyt.\nUsuń: odczyt zostanie usunięty, a późniejsze przesuną się o jedno miejsce w górę.</string>
+    <string name="calibration_gap_options_message">Usunąć tę lukę i przesunąć późniejsze odczyty o jedno miejsce w górę?</string>
+    <string name="calibration_roll">Obrót</string>
+    <string name="calibration_uncalibrated_estimate">Szacunek bez kalibracji</string>
+    <string name="calibration_reading_deleted">Usunięty: wykonaj ten odczyt ponownie</string>
+    <string name="calibration_no_readings">Brak odczytów</string>
     <string name="direction_forward">Do przodu</string>
     <string name="direction_right">W prawo</string>
     <string name="direction_back">Do tyłu</string>

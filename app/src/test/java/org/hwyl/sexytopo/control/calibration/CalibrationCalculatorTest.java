@@ -1,6 +1,7 @@
 package org.hwyl.sexytopo.control.calibration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.model.calibration.CalibrationReading;
@@ -44,67 +45,69 @@ public class CalibrationCalculatorTest {
         assertVectorEquality(expectedMx, actualMx);
     }
 
+    static final int[][] EXAMPLE_CALIBRATION =
+            new int[][] {
+                {12545, 155, 1529, 17916, 5305, 5435},
+                {12563, -490, 660, 18069, -5257, 5596},
+                {12529, 90, -95, 17831, -6762, -4037},
+                {12558, 846, 475, 17559, 4644, -5383},
+                {-15265, -256, 1275, -15908, -7485, 3364},
+                {-15258, 1029, 1000, -15910, 3346, 7294},
+                {-15250, 674, -217, -16244, 6953, -2846},
+                {-15293, -394, 8, -16231, -3702, -7191},
+                {-2256, 14202, 633, 6650, 17342, 419},
+                {-2191, 2272, 14380, 7225, 2625, 17556},
+                {-2288, -13659, 2137, 6899, -17969, 1800},
+                {-2473, -1891, -13041, 6168, -3497, -17212},
+                {-185, 1018, 14485, -4364, -295, 17751},
+                {-320, 14126, -598, -5040, 17503, 331},
+                {-366, 146, -13215, -5376, 677, -17361},
+                {-443, -13747, 261, -5005, -18035, -2011},
+                {-501, 14193, 556, 2643, 16880, 7923},
+                {-350, 838, 14540, 3171, -6868, 17092},
+                {-516, -13762, 681, 2425, -17529, -7635},
+                {-633, 131, -13217, 1960, 6851, -16472},
+                {-2126, 14229, 644, -1194, 17018, -5863},
+                {-2023, 427, 14551, -408, 6673, 17513},
+                {-2090, -13727, 1481, -531, -17288, 7172},
+                {-2189, -94, -13173, -1229, -7523, -17129},
+                {-12118, 836, 9421, -15525, 5225, 7209},
+                {-12240, -8542, 916, -15400, -7474, 5173},
+                {-12330, 1066, -7979, -15801, -4817, -7616},
+                {-12401, 8971, 924, -15940, 6965, -4371},
+                {9382, -81, 9566, 17469, -5886, 6897},
+                {9434, 9073, 1468, 17352, 6354, 6137},
+                {9322, 749, -8137, 16983, 5346, -6285},
+                {9509, -8554, 133, 17201, -7039, -5651},
+                {-8218, -1311, 12591, -11536, -7259, 11530},
+                {-8315, -11840, -715, -12035, -12247, -6960},
+                {-8452, 2007, -11186, -12306, 6859, -11071},
+                {-8352, 12387, 2087, -11803, 11643, 7393},
+                {5750, 112, 12714, 13993, 4513, 12914},
+                {5527, -11988, 329, 13716, -13337, 4205},
+                {5496, 1032, -11263, 13137, -4538, -12932},
+                {5583, 12349, 1139, 13272, 12558, -3814},
+                {-9520, -1257, 11869, -4428, -7482, 15834},
+                {-9544, -11143, 376, -4929, -17271, -5698},
+                {-9617, 1520, -10450, -5349, 6365, -15753},
+                {-9672, 11460, 2362, -4926, 15805, 8037},
+                {6595, -878, 12138, 6748, 2411, 17732},
+                {6529, 11647, -813, 5896, 16263, -5711},
+                {6491, -2406, -10443, 5805, -8548, -15896},
+                {6631, -10996, 3212, 6761, -16322, 7469},
+                {-10512, -165, 11212, -6355, 3673, 16712},
+                {-10644, -10193, -353, -6572, -17075, 2599},
+                {-10686, 797, -9668, -7297, -4341, -16321},
+                {-10709, 10726, 1640, -7118, 16365, -2443},
+                {7782, -10321, -376, 8261, -16015, -7317},
+                {7631, -555, -9738, 7758, 3780, -16056},
+                {7806, 10780, 805, 8383, 15902, 6079},
+                {7683, -270, -9688, 7841, 4231, -15895}
+            };
+
     @Test
     public void testExampleCalibrationIsAssessedCorrectly() {
-        int[][] testCalibrations =
-                new int[][] {
-                    {12545, 155, 1529, 17916, 5305, 5435},
-                    {12563, -490, 660, 18069, -5257, 5596},
-                    {12529, 90, -95, 17831, -6762, -4037},
-                    {12558, 846, 475, 17559, 4644, -5383},
-                    {-15265, -256, 1275, -15908, -7485, 3364},
-                    {-15258, 1029, 1000, -15910, 3346, 7294},
-                    {-15250, 674, -217, -16244, 6953, -2846},
-                    {-15293, -394, 8, -16231, -3702, -7191},
-                    {-2256, 14202, 633, 6650, 17342, 419},
-                    {-2191, 2272, 14380, 7225, 2625, 17556},
-                    {-2288, -13659, 2137, 6899, -17969, 1800},
-                    {-2473, -1891, -13041, 6168, -3497, -17212},
-                    {-185, 1018, 14485, -4364, -295, 17751},
-                    {-320, 14126, -598, -5040, 17503, 331},
-                    {-366, 146, -13215, -5376, 677, -17361},
-                    {-443, -13747, 261, -5005, -18035, -2011},
-                    {-501, 14193, 556, 2643, 16880, 7923},
-                    {-350, 838, 14540, 3171, -6868, 17092},
-                    {-516, -13762, 681, 2425, -17529, -7635},
-                    {-633, 131, -13217, 1960, 6851, -16472},
-                    {-2126, 14229, 644, -1194, 17018, -5863},
-                    {-2023, 427, 14551, -408, 6673, 17513},
-                    {-2090, -13727, 1481, -531, -17288, 7172},
-                    {-2189, -94, -13173, -1229, -7523, -17129},
-                    {-12118, 836, 9421, -15525, 5225, 7209},
-                    {-12240, -8542, 916, -15400, -7474, 5173},
-                    {-12330, 1066, -7979, -15801, -4817, -7616},
-                    {-12401, 8971, 924, -15940, 6965, -4371},
-                    {9382, -81, 9566, 17469, -5886, 6897},
-                    {9434, 9073, 1468, 17352, 6354, 6137},
-                    {9322, 749, -8137, 16983, 5346, -6285},
-                    {9509, -8554, 133, 17201, -7039, -5651},
-                    {-8218, -1311, 12591, -11536, -7259, 11530},
-                    {-8315, -11840, -715, -12035, -12247, -6960},
-                    {-8452, 2007, -11186, -12306, 6859, -11071},
-                    {-8352, 12387, 2087, -11803, 11643, 7393},
-                    {5750, 112, 12714, 13993, 4513, 12914},
-                    {5527, -11988, 329, 13716, -13337, 4205},
-                    {5496, 1032, -11263, 13137, -4538, -12932},
-                    {5583, 12349, 1139, 13272, 12558, -3814},
-                    {-9520, -1257, 11869, -4428, -7482, 15834},
-                    {-9544, -11143, 376, -4929, -17271, -5698},
-                    {-9617, 1520, -10450, -5349, 6365, -15753},
-                    {-9672, 11460, 2362, -4926, 15805, 8037},
-                    {6595, -878, 12138, 6748, 2411, 17732},
-                    {6529, 11647, -813, 5896, 16263, -5711},
-                    {6491, -2406, -10443, 5805, -8548, -15896},
-                    {6631, -10996, 3212, 6761, -16322, 7469},
-                    {-10512, -165, 11212, -6355, 3673, 16712},
-                    {-10644, -10193, -353, -6572, -17075, 2599},
-                    {-10686, 797, -9668, -7297, -4341, -16321},
-                    {-10709, 10726, 1640, -7118, 16365, -2443},
-                    {7782, -10321, -376, 8261, -16015, -7317},
-                    {7631, -555, -9738, 7758, 3780, -16056},
-                    {7806, 10780, 805, 8383, 15902, 6079},
-                    {7683, -270, -9688, 7841, 4231, -15895}
-                };
+        int[][] testCalibrations = EXAMPLE_CALIBRATION;
         List<CalibrationReading> calibrationReadings = toCalibrationReadings(testCalibrations);
 
         CalibrationCalculator calibrationCalculator = new CalibrationCalculator(false);
@@ -113,6 +116,9 @@ public class CalibrationCalculatorTest {
         Assert.assertEquals(
                 0.603272, calibrationCalculator.getDelta(), SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
         assertCoefficientsFillMemoryRange(calibrationCalculator.getCoefficients(), false);
+        double[] readingErrors = calibrationCalculator.getReadingErrors();
+        Assert.assertEquals(56, readingErrors.length);
+        Assert.assertTrue(Arrays.stream(readingErrors).allMatch(error -> error < 1.5));
 
         calibrationCalculator = new CalibrationCalculator(true);
         iterations = calibrationCalculator.calculate(calibrationReadings);
@@ -209,7 +215,7 @@ public class CalibrationCalculatorTest {
                 SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
     }
 
-    private static List<CalibrationReading> toCalibrationReadings(int[][] values) {
+    static List<CalibrationReading> toCalibrationReadings(int[][] values) {
         List<CalibrationReading> calibrationReadings = new ArrayList<>();
         for (int[] line : values) {
             CalibrationReading calibrationReading = new CalibrationReading();
@@ -224,6 +230,44 @@ public class CalibrationCalculatorTest {
         Assert.assertEquals(expected.x, actual.x, SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
         Assert.assertEquals(expected.y, actual.y, SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
         Assert.assertEquals(expected.z, actual.z, SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
+    }
+
+    @Test
+    public void testSetsAreFoundFromWhichWayReadingsPoint() {
+        List<List<Integer>> sets =
+                CalibrationCalculator.findSets(toCalibrationReadings(EXAMPLE_CALIBRATION));
+        Assert.assertEquals(14, sets.size());
+        Assert.assertTrue(sets.stream().allMatch(set -> set.size() == 4));
+    }
+
+    @Test
+    public void testOrderOfTheGroupedSetsDoesNotMatter() {
+        List<CalibrationReading> readings = toCalibrationReadings(EXAMPLE_CALIBRATION);
+        List<CalibrationReading> swapped = new ArrayList<>(readings.subList(0, 4));
+        swapped.addAll(readings.subList(8, 12));
+        swapped.addAll(readings.subList(4, 8));
+        swapped.addAll(readings.subList(12, readings.size()));
+
+        Assert.assertEquals(calculateDelta(readings), calculateDelta(swapped), 0.01);
+    }
+
+    @Test
+    public void testAnExtraReadingJoinsItsSet() {
+        List<CalibrationReading> readings = toCalibrationReadings(EXAMPLE_CALIBRATION);
+        List<CalibrationReading> withExtra = new ArrayList<>(readings);
+        withExtra.add(6, readings.get(6));
+
+        List<List<Integer>> sets = CalibrationCalculator.findSets(withExtra);
+        Assert.assertEquals(14, sets.size());
+        Assert.assertEquals(5, sets.get(1).size());
+        // every reading is used, so a repeated one shifts the result only slightly
+        Assert.assertEquals(calculateDelta(readings), calculateDelta(withExtra), 0.1);
+    }
+
+    private static double calculateDelta(List<CalibrationReading> readings) {
+        CalibrationCalculator calculator = new CalibrationCalculator(false);
+        calculator.calculate(readings);
+        return calculator.getDelta();
     }
 
     /** Coefficients always cover the full 52-byte range, with unused non-linear slots as 0xFF. */

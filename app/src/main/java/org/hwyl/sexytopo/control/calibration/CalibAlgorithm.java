@@ -24,6 +24,20 @@ public class CalibAlgorithm {
         m[idx] = new Vector(mx / FV, my / FV, mz / FV);
     }
 
+    /*
+     * applies the calibration found by Optimize to one raw reading, returning calibrated g and m
+     */
+    public static Vector[] Apply(int gx, int gy, int gz, int mx, int my, int mz) {
+        Vector g = new Vector(gx / FV, gy / FV, gz / FV);
+        Vector m = new Vector(mx / FV, my / FV, mz / FV);
+        Vector gl =
+                new Vector(
+                        g.x + (g.x * g.x - 0.5F) * nl.x,
+                        g.y + (g.y * g.y - 0.5F) * nl.y,
+                        g.z + (g.z * g.z - 0.5F) * nl.z);
+        return new Vector[] {aG.times(gl).plus(bG), aM.times(m).plus(bM)};
+    }
+
     // helpers
     public static Vector[] OptVectors(Vector gr, Vector mr, float alpha) {
         Vector no = Vector.Normalized(gr.crossProduct(mr)); // plane normal

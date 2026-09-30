@@ -341,7 +341,7 @@
     <string name="device_distox_command_calibration_start">Start calibration mode</string>
     <string name="device_distox_command_calibration_stop">Stop calibration mode</string>
     <string name="device_distox_force_disconnect_for_calibration">Disto busy; forcing disconnect to write calibration</string>
-    <string name="device_distox_calibration_result">Calibration assessment (should be under %1$f): %2$s\n\nCalibration algorithm: %3$s</string>
+    <string name="device_distox_calibration_result">Calibration assessment (should be under %1$s): %2$s\n\nCalibration algorithm: %3$s</string>
     <string name="device_distox_calibration_writing">Writing calibration coefficients</string>
     <string name="device_distox_calibration_write_success">Calibration writing successful</string>
     <string name="device_distox_calibration_write_error">Error writing calibration %1$s</string>
@@ -376,6 +376,10 @@
     <string name="device_fcl_command_device_off">Device Off</string>
 
     <!-- Calibration -->
+    <string name="calibration_title_mode">Calibration Mode</string>
+    <string name="calibration_title_readings">Readings</string>
+    <string name="calibration_title_last_reading">Last Reading</string>
+    <string name="calibration_title_result">Result</string>
     <string name="calibration_index">Reading number</string>
     <string name="calibration_start">Disto Cal Mode On</string>
     <string name="calibration_stop">Disto Cal Mode Off</string>
@@ -396,12 +400,36 @@
     <string name="calibration_loaded_file">Calibration data loaded</string>
     <string name="calibration_load_error">Error reading calibration file</string>
     <string name="calibration_save_error">Error saving calibration file</string>
-    <string name="calibration_field_gx" translatable="false">Gx</string>
-    <string name="calibration_field_gy" translatable="false">Gy</string>
-    <string name="calibration_field_gz" translatable="false">Gz</string>
-    <string name="calibration_field_mx" translatable="false">Mx</string>
-    <string name="calibration_field_my" translatable="false">My</string>
-    <string name="calibration_field_mz" translatable="false">Mz</string>
+    <string name="calibration_worst_readings">Least consistent readings (over 1° from the rest of their set)</string>
+    <string name="calibration_algorithm_linear">Linear</string>
+    <string name="calibration_algorithm_nonlinear">Non-linear</string>
+    <string name="calibration_view_readings">View Readings</string>
+    <string name="calibration_pointing_horizontal">Horizontal</string>
+    <string name="calibration_pointing_corner_up">Corner Up</string>
+    <string name="calibration_pointing_corner_down">Corner Down</string>
+    <string name="calibration_face_side">On Its Side</string>
+    <string name="calibration_set_number">Set %1$d</string>
+    <string name="calibration_sets">Sets</string>
+    <string name="calibration_sets_value">%1$d (%2$d complete)</string>
+    <string name="calibration_coverage">Directions covered</string>
+    <string name="calibration_coverage_corners_up">Corners Up</string>
+    <string name="calibration_coverage_corners_down">Corners Down</string>
+    <string name="calibration_coverage_value" translatable="false">%1$d / %2$d</string>
+    <string name="calibration_detail_separator" translatable="false">" · "</string>
+    <string name="calibration_reading_title">Reading #%1$d</string>
+    <string name="calibration_replace">Replace</string>
+    <string name="calibration_reading_options_message">Replace: keep its place for the next reading you take.\nDelete: remove it and move the later readings up one place.</string>
+    <string name="calibration_gap_options_message">Delete this gap and move the later readings up one place?</string>
+    <string name="calibration_roll">Roll</string>
+    <string name="calibration_uncalibrated_estimate">Uncalibrated estimate</string>
+    <string name="calibration_reading_deleted">Deleted: take this reading again</string>
+    <string name="calibration_no_readings">No readings yet</string>
+    <string name="calibration_reading_number" translatable="false">#%1$d</string>
+    <string name="calibration_degrees" translatable="false">%1$s°</string>
+    <string name="calibration_field_g" translatable="false">G</string>
+    <string name="calibration_field_m" translatable="false">M</string>
+    <string name="calibration_position" translatable="false">%1$s, %2$s</string>
+    <string name="calibration_reading_label" translatable="false">#%1$d %2$s</string>
     <string name="direction_forward">Forward</string>
     <string name="direction_right">Right</string>
     <string name="direction_back">Back</string>

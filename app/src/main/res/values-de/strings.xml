@@ -320,7 +320,7 @@
     <string name="device_distox_command_calibration_start">Kalibrier-Modus starten</string>
     <string name="device_distox_command_calibration_stop">Kalibrier-Modus beenden </string>
     <string name="device_distox_force_disconnect_for_calibration">DistoX beschäftigt; Trennen der Verbindung zum Schreiben der Kalibrierung erforderlich</string>
-    <string name="device_distox_calibration_result">Beurteilung der Kalibrierung (Wert sollte unter %1$f liegen): %2$s\n\nKalibrierungs-Algorithmus: %3$s</string>
+    <string name="device_distox_calibration_result">Beurteilung der Kalibrierung (Wert sollte unter %1$s liegen): %2$s\n\nKalibrierungs-Algorithmus: %3$s</string>
     <string name="device_distox_calibration_writing">Schreiben der Kalibrierungskoeffizienten</string>
     <string name="device_distox_calibration_write_success">Schreiben der Kalibrierung erfolgreich</string>
     <string name="device_distox_calibration_write_error">Fehler %1$s beim Übertragen der Kalibrierung</string>
@@ -343,6 +343,10 @@
     <string name="device_fcl_command_device_off">Gerät ausschalten</string>
 
     <!--  Calibration  -->
+    <string name="calibration_title_mode">Kalibriermodus</string>
+    <string name="calibration_title_readings">Messungen</string>
+    <string name="calibration_title_last_reading">Letzte Messung</string>
+    <string name="calibration_title_result">Ergebnis</string>
     <string name="calibration_index">Anzahl bereits erfolgter Messungen</string>
     <string name="calibration_start">Disto Cal Modus Ein</string>
     <string name="calibration_stop">Disto Cal Modus Aus</string>
@@ -363,6 +367,28 @@
     <string name="calibration_loaded_file">Kalibrierungsdaten geladen</string>
     <string name="calibration_load_error">Fehler beim Lesen der Kalibrierungsdatei</string>
     <string name="calibration_save_error">Fehler beim Speichern der Kalibrierungsdatei</string>
+    <string name="calibration_worst_readings">Am wenigsten übereinstimmende Messungen (über 1° Abweichung vom Rest ihres Satzes)</string>
+    <string name="calibration_algorithm_linear">Linear</string>
+    <string name="calibration_algorithm_nonlinear">Nichtlinear</string>
+    <string name="calibration_view_readings">Messungen anzeigen</string>
+    <string name="calibration_pointing_horizontal">Waagerecht</string>
+    <string name="calibration_pointing_corner_up">Ecke oben</string>
+    <string name="calibration_pointing_corner_down">Ecke unten</string>
+    <string name="calibration_face_side">Auf der Seite</string>
+    <string name="calibration_set_number">Satz %1$d</string>
+    <string name="calibration_sets">Sätze</string>
+    <string name="calibration_sets_value">%1$d (%2$d vollständig)</string>
+    <string name="calibration_coverage">Abgedeckte Richtungen</string>
+    <string name="calibration_coverage_corners_up">Ecken oben</string>
+    <string name="calibration_coverage_corners_down">Ecken unten</string>
+    <string name="calibration_reading_title">Messung #%1$d</string>
+    <string name="calibration_replace">Ersetzen</string>
+    <string name="calibration_reading_options_message">Ersetzen: Der Platz bleibt für die nächste Messung frei.\nLöschen: Die Messung entfernen und die späteren Messungen um eine Stelle nach vorne rücken.</string>
+    <string name="calibration_gap_options_message">Diese Lücke entfernen und die späteren Messungen um eine Stelle nach vorne rücken?</string>
+    <string name="calibration_roll">Roll</string>
+    <string name="calibration_uncalibrated_estimate">Unkalibrierte Schätzung</string>
+    <string name="calibration_reading_deleted">Gelöscht: diese Messung wiederholen</string>
+    <string name="calibration_no_readings">Noch keine Messungen</string>
     <string name="direction_forward">Vorwärts</string>
     <string name="direction_right">Rechts</string>
     <string name="direction_back">Rückwärts</string>
