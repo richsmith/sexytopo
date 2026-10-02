@@ -746,4 +746,128 @@ public class SurveyUpdaterTest {
 
         survey.checkSurveyIntegrity();
     }
+
+    // hiding splays
+
+    private static Leg addHiddenSplay(Survey survey, Leg splay) {
+        splay.setComment("Boulder");
+        SurveyUpdater.update(survey, splay);
+        SurveyUpdater.setSplayHidden(survey, splay, true);
+        return splay;
+    }
+
+    @Test
+    public void testSetSplayHiddenHidesAndMarksSurveyUnsaved() {
+        Survey survey = new Survey();
+        Leg splay = new Leg(5, 45, 10);
+        SurveyUpdater.update(survey, splay);
+        survey.setSaved(true);
+
+        SurveyUpdater.setSplayHidden(survey, splay, true);
+
+        Assert.assertTrue(splay.isHidden());
+        Assert.assertFalse(survey.isSaved());
+    }
+
+    @Test
+    public void testSetSplayHiddenCanShowAgain() {
+        Survey survey = new Survey();
+        Leg splay = addHiddenSplay(survey, new Leg(5, 45, 10));
+        survey.setSaved(true);
+
+        SurveyUpdater.setSplayHidden(survey, splay, false);
+
+        Assert.assertFalse(splay.isHidden());
+        Assert.assertFalse(survey.isSaved());
+    }
+
+    @Test
+    public void testHidingSplayKeepsItInSurveyWithItsComment() {
+        Survey survey = new Survey();
+        Leg splay = addHiddenSplay(survey, new Leg(5, 45, 10));
+
+        Assert.assertEquals(1, survey.getAllLegs().size());
+        Assert.assertSame(splay, survey.getOrigin().getOnwardLegs().get(0));
+        Assert.assertEquals("Boulder", splay.getComment());
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testHidingFullLegIsRejected() {
+        Survey survey = new Survey();
+        SurveyUpdater.updateWithNewStation(survey, new Leg(5, 90, 10));
+        Leg fullLeg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+
+        SurveyUpdater.setSplayHidden(survey, fullLeg, true);
+    }
+
+    @Test
+    public void testUpgradingHiddenSplayRemovesHide() {
+        Survey survey = new Survey();
+        Leg splay = addHiddenSplay(survey, new Leg(5, 45, 10));
+
+        SurveyUpdater.upgradeSplay(survey, splay, InputMode.FORWARD);
+
+        Leg upgraded = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Assert.assertTrue(upgraded.hasDestination());
+        Assert.assertFalse(upgraded.isHidden());
+        Assert.assertEquals("Boulder", upgraded.getComment());
+    }
+
+    @Test
+    public void testPromotingHiddenSplayToLegAboveRemovesHide() {
+        Survey survey = new Survey();
+        SurveyUpdater.update(survey, new Leg(5, 45, 10), InputMode.FORWARD);
+        SurveyUpdater.update(survey, new Leg(5.001f, 45.001f, 10), InputMode.FORWARD);
+        SurveyUpdater.update(survey, new Leg(5, 45, 10.001f), InputMode.FORWARD);
+        Station origin = survey.getOrigin();
+        survey.setActiveStation(origin);
+        Leg splay = addHiddenSplay(survey, new Leg(3, 50, 8));
+
+        boolean success = SurveyUpdater.promoteToAboveLeg(survey, splay);
+
+        Assert.assertTrue(success);
+        Leg updatedLeg = origin.getConnectedOnwardLegs().get(0);
+        Assert.assertFalse(updatedLeg.isHidden());
+        for (Leg promoted : updatedLeg.getPromotedFrom()) {
+            Assert.assertFalse(promoted.isHidden());
+        }
+    }
+
+    @Test
+    public void testFailedPromotionLeavesSplayHidden() {
+        Survey survey = new Survey();
+        Leg splay = addHiddenSplay(survey, new Leg(3, 50, 8));
+
+        boolean success = SurveyUpdater.promoteToAboveLeg(survey, splay);
+
+        Assert.assertFalse(success);
+        Assert.assertTrue(splay.isHidden());
+    }
+
+    @Test
+    public void testHiddenSplayInTripleShotIsShownWhenLegIsCreated() {
+        Survey survey = new Survey();
+        Leg first = addHiddenSplay(survey, new Leg(5, 45, 10));
+        SurveyUpdater.update(survey, new Leg(5.001f, 45.001f, 10), InputMode.FORWARD);
+        SurveyUpdater.update(survey, new Leg(5, 45, 10.001f), InputMode.FORWARD);
+
+        Leg created = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Assert.assertFalse(created.isHidden());
+        Assert.assertFalse(first.isHidden());
+        for (Leg promoted : created.getPromotedFrom()) {
+            Assert.assertFalse(promoted.isHidden());
+        }
+    }
+
+    @Test
+    public void testDowngradingLegGivesVisibleSplays() {
+        Survey survey = new Survey();
+        SurveyUpdater.updateWithNewStation(survey, new Leg(5, 90, 10));
+        Station origin = survey.getOrigin();
+        Leg fullLeg = origin.getConnectedOnwardLegs().get(0);
+
+        SurveyUpdater.downgradeLeg(survey, fullLeg);
+
+        Assert.assertFalse(origin.getOnwardLegs().get(0).isHidden());
+    }
 }
