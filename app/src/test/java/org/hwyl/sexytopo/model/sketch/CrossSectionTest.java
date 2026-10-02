@@ -104,4 +104,15 @@ public class CrossSectionTest {
         // Facing east, a splay to the south is to the right
         assertCoord(3, 0, endOfOnlySplay(new CrossSection(stationWithSplay(3, 180, 0), 90f)));
     }
+
+    @Test
+    public void testHiddenSplaysAreNotProjected() {
+        Station station = stationWithSplay(2, 90, 0);
+        Leg hidden = new Leg(3, 0, 0);
+        hidden.setHidden(true);
+        station.addOnwardLeg(hidden);
+
+        Assert.assertEquals(1, new CrossSection(station, 0f).getProjection().getLegMap().size());
+        Assert.assertEquals(1, CrossSection.horizontal(station).getProjection().getLegMap().size());
+    }
 }
