@@ -39,6 +39,7 @@ public class SurveyJsonTranslater {
     public static final String INCLINATION_TAG = "inclination";
     public static final String PROMOTED_FROM_TAG = "promotedFrom";
     public static final String DESTINATION_TAG = "destination";
+    public static final String HIDDEN_TAG = "hidden";
     public static final String WAS_SHOT_BACKWARDS_TAG = "wasShotBackwards";
     public static final String INDEX_TAG = "index";
 
@@ -264,6 +265,9 @@ public class SurveyJsonTranslater {
         if (leg.hasComment()) {
             json.put(COMMENT_TAG, leg.getComment());
         }
+        if (leg.isHidden()) {
+            json.put(HIDDEN_TAG, true);
+        }
         if (index != null) {
             json.put(INDEX_TAG, index);
         }
@@ -388,6 +392,9 @@ public class SurveyJsonTranslater {
         }
 
         leg.setComment(json.optString(COMMENT_TAG, ""));
+        if (!leg.hasDestination() && json.optBoolean(HIDDEN_TAG, false)) {
+            leg.setHidden(true);
+        }
         return leg;
     }
 

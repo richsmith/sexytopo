@@ -24,7 +24,7 @@ public class Space3DTransformer {
 
     protected synchronized void update(Space<Coord3D> space, Station station, Coord3D coord3D) {
         space.addStation(station, coord3D);
-        for (Leg leg : station.getOnwardLegs()) {
+        for (Leg leg : station.getVisibleOnwardLegs()) {
             update(space, leg, coord3D);
         }
     }

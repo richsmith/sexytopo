@@ -15,7 +15,7 @@ public class Space3DTransformerForElevation extends Space3DTransformer {
 
     protected void update(Space<Coord3D> space, Station station, Coord3D coord3D, float rotation) {
         space.addStation(station, coord3D);
-        for (Leg leg : station.getOnwardLegs()) {
+        for (Leg leg : station.getVisibleOnwardLegs()) {
             if (leg.hasDestination()) {
                 updateLeg(space, leg, coord3D);
             } else {

@@ -748,6 +748,8 @@
     <string name="menu_comment">Komentarz</string>
     <string name="menu_comment_leg">Komentarz ciągu</string>
     <string name="menu_comment_splay">Komentarz pomiaru szczegółowego</string>
+    <string name="menu_hide_splay">Ukryj pomiar szczegółowy</string>
+    <string name="menu_show_splay">Pokaż pomiar szczegółowy</string>
     <string name="menu_toggle_left_right">Przełącz lewo/prawo</string>
     <string name="menu_context_title_leg">Ciąg %1$s &#10132; %2$s</string>
     <string name="menu_context_title_splay">%s do pomiaru szczegółowego</string>

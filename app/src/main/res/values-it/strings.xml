@@ -748,6 +748,8 @@
     <string name="menu_comment">Commento</string>
     <string name="menu_comment_leg">Commento del tratto</string>
     <string name="menu_comment_splay">Commento dello splay</string>
+    <string name="menu_hide_splay">Nascondi splay</string>
+    <string name="menu_show_splay">Mostra splay</string>
     <string name="menu_toggle_left_right">Commuta Sinistra/Destra</string>
     <string name="menu_context_title_leg">Tratto %1$s &#10132; %2$s</string>
     <string name="menu_context_title_splay">Splay %s &#10132;</string>

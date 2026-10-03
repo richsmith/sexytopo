@@ -48,7 +48,7 @@ public class CrossSection {
 
         Projection2D projectionType = getProjectionType();
 
-        for (Leg leg : station.getUnconnectedOnwardLegs()) {
+        for (Leg leg : station.getVisibleUnconnectedOnwardLegs()) {
             // A vertical cross-section is first normalised to match its angle; a horizontal one
             // already lies in the real-world horizontal plane so is used as it is.
             Leg drawn = isRotatable() ? leg.rotate(-angle) : leg;
