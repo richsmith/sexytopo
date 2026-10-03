@@ -412,4 +412,121 @@ public class SurvexImporterTest {
         Assert.assertNotNull(trip);
         Assert.assertNotNull(trip.getSurveyDate());
     }
+
+    // --- Hidden splays (commented-out splay lines) ---
+
+    private static void assertIsTheHiddenBoulderSplay(Leg splay) {
+        Assert.assertTrue(splay.isHidden());
+        Assert.assertEquals(2.5f, splay.getDistance(), 0.001);
+        Assert.assertEquals(90.0f, splay.getAzimuth(), 0.001);
+        Assert.assertEquals(10.0f, splay.getInclination(), 0.001);
+        Assert.assertEquals("Boulder", splay.getComment());
+    }
+
+    @Test
+    public void testCommentedOutSplayAfterAVisibleSplayImportsAsHiddenSplay() throws Exception {
+        // The hidden splay has the same stations as the splay before it, so make sure it isn't
+        // mistaken for one of that splay's promoted readings
+        final String text =
+                "1\t..\t1.0\t0.0\t0.0\n"
+                        + ";1\t..\t2.5\t90.0\t10.0\tBoulder\n"
+                        + "1\t2\t5.0\t0.0\t0.0\n";
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(text, survey, /* useLegComments= */ true);
+
+        List<Leg> splays = survey.getOrigin().getUnconnectedOnwardLegs();
+        Assert.assertEquals(2, splays.size());
+        Assert.assertFalse(splays.get(0).isHidden());
+        assertIsTheHiddenBoulderSplay(splays.get(1));
+    }
+
+    @Test
+    public void testConsecutiveCommentedOutSplaysAllImportAsHiddenSplays() throws Exception {
+        final String text =
+                "1\t2\t5.0\t0.0\t0.0\n"
+                        + ";1\t..\t1.0\t0.0\t0.0\n"
+                        + ";1\t..\t1.2\t90.0\t0.0\n"
+                        + ";1\t..\t0.8\t180.0\t0.0\n";
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(text, survey);
+
+        List<Leg> splays = survey.getOrigin().getUnconnectedOnwardLegs();
+        Assert.assertEquals(3, splays.size());
+        for (Leg splay : splays) {
+            Assert.assertTrue(splay.isHidden());
+        }
+        Assert.assertEquals(1.2f, splays.get(1).getDistance(), 0.001);
+    }
+
+    @Test
+    public void testHiddenSplayAttachedToCorrectStation() throws Exception {
+        final String text = "1\t2\t5.0\t0.0\t0.0\n;2\t..\t1.0\t0.0\t0.0\n";
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(text, survey);
+
+        Assert.assertTrue(survey.getOrigin().getUnconnectedOnwardLegs().isEmpty());
+        List<Leg> splays = survey.getStationByName("2").getUnconnectedOnwardLegs();
+        Assert.assertEquals(1, splays.size());
+        Assert.assertTrue(splays.get(0).isHidden());
+    }
+
+    @Test
+    public void testOrdinaryCommentsDoNotBecomeHiddenSplays() throws Exception {
+        final String text =
+                "; Exported by SexyTopo\n"
+                        + "# a comment with more than five words in it\n"
+                        + "; 1 .. is how a splay is written\n"
+                        + ";1\t..\t-1.0\t0.0\t0.0\n"
+                        + ";1\t..\t1.0\t400.0\t0.0\n"
+                        + ";1\t..\t1.0\t0.0\t95.0\n"
+                        + "; 1 2 5.0 0.0 0.0 a commented-out leg\n"
+                        + "1\t2\t5.0\t0.0\t0.0\n";
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(text, survey);
+
+        Assert.assertEquals(2, survey.getAllStations().size());
+        Assert.assertTrue(survey.getOrigin().getUnconnectedOnwardLegs().isEmpty());
+        Assert.assertEquals(1, survey.getAllLegs().size());
+    }
+
+    @Test
+    public void testPromotedLegReadingsStillImportWithHiddenSplaysAround() throws Exception {
+        final String text =
+                ";1\t..\t1.0\t0.0\t0.0\n"
+                        + "1\t2\t5.541\t253.93\t4.67\n"
+                        + ";1\t2\t5.542\t73.95\t-4.64\n"
+                        + ";1\t2\t5.541\t73.93\t-4.69\n"
+                        + ";1\t..\t2.0\t90.0\t0.0\n";
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(text, survey);
+
+        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Assert.assertEquals(2, leg.getPromotedFrom().length);
+        Assert.assertFalse(leg.isHidden());
+        List<Leg> splays = survey.getOrigin().getUnconnectedOnwardLegs();
+        Assert.assertEquals(2, splays.size());
+        Assert.assertTrue(splays.get(0).isHidden());
+        Assert.assertTrue(splays.get(1).isHidden());
+    }
+
+    @Test
+    public void testHiddenSplayRoundTrips() throws Exception {
+        Survey original = new Survey();
+        Leg visibleSplay = new Leg(1.0f, 0.0f, 0.0f);
+        Leg hiddenSplay = new Leg(2.5f, 90.0f, 10.0f);
+        hiddenSplay.setComment("Boulder");
+        SurveyUpdater.update(original, visibleSplay);
+        SurveyUpdater.update(original, hiddenSplay);
+        SurveyUpdater.updateWithNewStation(original, new Leg(5.0f, 0.0f, 0.0f));
+        SurveyUpdater.setSplayHidden(original, hiddenSplay, true);
+
+        String centreline = SurvexTherionUtil.getCentrelineData(original, SurveyFormat.SURVEX);
+        Survey reimported = new Survey();
+        SurvexTherionImporter.parseCentreline(centreline, reimported, /* useLegComments= */ true);
+
+        List<Leg> splays = reimported.getOrigin().getUnconnectedOnwardLegs();
+        Assert.assertEquals(2, splays.size());
+        Assert.assertFalse(splays.get(0).isHidden());
+        assertIsTheHiddenBoulderSplay(splays.get(1));
+    }
 }
