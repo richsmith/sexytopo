@@ -228,7 +228,26 @@ public class LegTest {
         Assert.assertEquals(5.0f, splay.getDistance(), DELTA);
         Assert.assertEquals(45.0f, splay.getAzimuth(), DELTA);
         Assert.assertEquals(30.0f, splay.getInclination(), DELTA);
-        Assert.assertTrue(splay.wasShotBackwards());
+    }
+
+    @Test
+    public void testToSplayClearsWasShotBackwards() {
+        Station destination = new Station("A1");
+        Leg backwardsLeg = new Leg(5.0f, 45.0f, 30.0f, destination, new Leg[] {}, true);
+
+        Leg splay = backwardsLeg.toSplay();
+
+        Assert.assertFalse(splay.wasShotBackwards());
+    }
+
+    @Test
+    public void testToSplayOfForwardLegIsNotShotBackwards() {
+        Station destination = new Station("A1");
+        Leg forwardLeg = new Leg(5.0f, 45.0f, 30.0f, destination, new Leg[] {}, false);
+
+        Leg splay = forwardLeg.toSplay();
+
+        Assert.assertFalse(splay.wasShotBackwards());
     }
 
     @Test

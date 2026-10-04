@@ -138,21 +138,45 @@ public class SurveyUpdater {
                 .orElse(null);
     }
 
+    /**
+     * Averages a splay into a leg.
+     *
+     * <p>The promoted-from readings are the readings exactly as they were taken: never shot
+     * backwards. The leg itself holds their average in the direction the sketch plots, so a leg
+     * that was shot backwards holds the reverse of the average. The splay is therefore added to
+     * the readings untouched, and only the average is reversed, so the leg stays backwards.
+     */
     private static Leg combineSplayWithLeg(Leg splay, Leg leg) {
-        if (leg.wasShotBackwards()) {
-            splay = splay.reverse();
-        }
+        List<Leg> readings = new ArrayList<>(Arrays.asList(getRecordedReadings(leg)));
+        readings.add(splay);
 
-        List<Leg> allShots =
-                new ArrayList<>(
-                        Arrays.asList(leg.wasPromoted() ? leg.getPromotedFrom() : new Leg[] {leg}));
-        allShots.add(splay);
+        Leg average = averageLegs(readings);
+        boolean wasShotBackwards = leg.wasShotBackwards();
+        Leg plotted = wasShotBackwards ? average.reverse() : average;
 
         Leg newLeg =
-                Leg.upgradeSplayToConnectedLeg(
-                        averageLegs(allShots), leg.getDestination(), allShots.toArray(new Leg[0]));
+                new Leg(
+                        plotted.getDistance(),
+                        plotted.getAzimuth(),
+                        plotted.getInclination(),
+                        leg.getDestination(),
+                        readings.toArray(new Leg[0]),
+                        wasShotBackwards);
         newLeg.setComment(leg.getComment());
         return newLeg;
+    }
+
+    /**
+     * The readings a leg was made from, as they were recorded. For a promoted leg these are its
+     * promoted-from readings. A leg made from a single reading has none, so the leg itself is the
+     * reading, reversed back if it was shot backwards.
+     */
+    private static Leg[] getRecordedReadings(Leg leg) {
+        if (leg.wasPromoted()) {
+            return leg.getPromotedFrom();
+        }
+        Leg recorded = leg.wasShotBackwards() ? leg.reverse() : leg;
+        return new Leg[] {recorded.toSplay()};
     }
 
     private static synchronized String getNextStationName(Survey survey) {
@@ -349,17 +373,14 @@ public class SurveyUpdater {
                     "Cannot downgrade leg to splay: destination station has onward legs");
         }
 
-        if (leg.wasPromoted()) {
-            Station originatingStation = survey.getOriginatingStation(leg);
-            Leg[] promotedFrom = leg.getPromotedFrom();
-            editLeg(survey, leg, promotedFrom[0].toSplay());
-            for (int i = 1; i < promotedFrom.length; i++) {
-                Leg splay = promotedFrom[i].toSplay();
-                originatingStation.getOnwardLegs().add(splay);
-                survey.addLegRecord(splay);
-            }
-        } else {
-            editLeg(survey, leg, leg.toSplay());
+        // The originating station has to be found before the leg is replaced
+        Station originatingStation = survey.getOriginatingStation(leg);
+        Leg[] readings = getRecordedReadings(leg);
+        editLeg(survey, leg, readings[0].toSplay());
+        for (int i = 1; i < readings.length; i++) {
+            Leg splay = readings[i].toSplay();
+            originatingStation.getOnwardLegs().add(splay);
+            survey.addLegRecord(splay);
         }
 
         survey.checkSurveyIntegrity();

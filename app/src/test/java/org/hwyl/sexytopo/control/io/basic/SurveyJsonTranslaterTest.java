@@ -1,5 +1,9 @@
 package org.hwyl.sexytopo.control.io.basic;
 
+import java.util.HashMap;
+import java.util.Map;
+import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
 import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
@@ -107,5 +111,51 @@ public class SurveyJsonTranslaterTest {
         Assert.assertEquals("", loaded.getLicence());
         Assert.assertFalse(loaded.hasCopyrightHolder());
         Assert.assertFalse(loaded.hasLicence());
+    }
+
+    @Test
+    public void testSplayStoredAsShotBackwardsIsLoadedAsForwardSplayWithSameNumbers()
+            throws Exception {
+        // Older files can hold a splay with the flag set, but a splay can never be shot backwards
+        Leg flaggedSplay = new Leg(5.5f, 123.0f, -12.0f, true);
+        JSONObject json = SurveyJsonTranslater.toJson(flaggedSplay, 0);
+        Assert.assertTrue(json.getBoolean(SurveyJsonTranslater.WAS_SHOT_BACKWARDS_TAG));
+
+        Leg loaded = SurveyJsonTranslater.toLeg(new HashMap<>(), json);
+
+        Assert.assertFalse(loaded.hasDestination());
+        Assert.assertFalse(loaded.wasShotBackwards());
+        Assert.assertEquals(5.5f, loaded.getDistance(), 0.0001f);
+        Assert.assertEquals(123.0f, loaded.getAzimuth(), 0.0001f);
+        Assert.assertEquals(-12.0f, loaded.getInclination(), 0.0001f);
+    }
+
+    @Test
+    public void testBackwardPromotedLegRoundTripsWithReadingsAndFlag() throws Exception {
+        Station destination = new Station("2");
+        Leg[] readings =
+                new Leg[] {
+                    new Leg(5.0f, 270.0f, 10.0f),
+                    new Leg(5.0f, 270.0f, 10.0f),
+                    new Leg(6.0f, 272.0f, 12.0f)
+                };
+        Leg backwardLeg = new Leg(5.3333f, 90.6667f, -10.6667f, destination, readings, true);
+        Map<String, Station> namesToStations = new HashMap<>();
+        namesToStations.put("2", destination);
+
+        JSONObject json = SurveyJsonTranslater.toJson(backwardLeg, 0);
+        Leg loaded = SurveyJsonTranslater.toLeg(namesToStations, json);
+
+        Assert.assertTrue(loaded.wasShotBackwards());
+        Assert.assertEquals(5.3333f, loaded.getDistance(), 0.0001f);
+        Assert.assertEquals(90.6667f, loaded.getAzimuth(), 0.0001f);
+        Assert.assertEquals(-10.6667f, loaded.getInclination(), 0.0001f);
+        Leg[] loadedReadings = loaded.getPromotedFrom();
+        Assert.assertEquals(3, loadedReadings.length);
+        for (int i = 0; i < readings.length; i++) {
+            Assert.assertFalse(loadedReadings[i].hasDestination());
+            Assert.assertFalse(loadedReadings[i].wasShotBackwards());
+            Assert.assertEquals(readings[i].getAzimuth(), loadedReadings[i].getAzimuth(), 0.0001f);
+        }
     }
 }

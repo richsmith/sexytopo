@@ -103,7 +103,7 @@ public class EditLegForm extends Form {
         this.originalFromStation = fromStation;
         this.originalLeg = legToEdit;
         this.isSplay = !legToEdit.hasDestination();
-        this.inputMode = legToEdit.wasShotBackwards() ? InputMode.BACKWARD : InputMode.FORWARD;
+        this.inputMode = getInitialInputMode(legToEdit);
 
         this.initialise(dialogView);
     }
@@ -796,11 +796,26 @@ public class EditLegForm extends Form {
             leg = new Leg(distance, azimuth, inclination);
         }
 
-        // Apply backwards flag if needed
-        if (inputMode == InputMode.BACKWARD) {
-            leg = leg.reverse();
-        }
+        return applyInputMode(leg, isSplay, inputMode);
+    }
 
+    /**
+     * The input mode a leg is edited in. Only a leg with a destination can be shot backwards; a
+     * splay always runs from its station, so it is always edited as a forward shot.
+     */
+    static InputMode getInitialInputMode(Leg leg) {
+        boolean backwards = leg.hasDestination() && leg.wasShotBackwards();
+        return backwards ? InputMode.BACKWARD : InputMode.FORWARD;
+    }
+
+    /**
+     * Applies the input mode to a freshly built leg. A backward shot is stored reversed and
+     * flagged, but a splay is never reversed or flagged.
+     */
+    static Leg applyInputMode(Leg leg, boolean isSplay, InputMode inputMode) {
+        if (inputMode == InputMode.BACKWARD && !isSplay) {
+            return leg.reverse();
+        }
         return leg;
     }
 

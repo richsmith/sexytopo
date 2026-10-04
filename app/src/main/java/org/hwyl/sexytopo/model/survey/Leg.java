@@ -161,8 +161,13 @@ public class Leg extends SurveyComponent {
         return asBacksight(Survey.NULL_STATION);
     }
 
+    /**
+     * Returns this reading as a splay: no destination, and never shot backwards. A splay always
+     * runs from its station out to nothing, so the backwards flag has no meaning for it and is
+     * cleared. The distance, azimuth and inclination are kept exactly as they are.
+     */
     public Leg toSplay() {
-        return new Leg(distance, azimuth, inclination, wasShotBackwards);
+        return new Leg(distance, azimuth, inclination, false);
     }
 
     public float getDistance() {
