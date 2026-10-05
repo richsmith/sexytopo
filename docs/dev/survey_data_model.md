@@ -29,7 +29,7 @@ A `Leg` represents a measurement between two points (a directed edge in the grap
 - `inclination`: Vertical angle (-90° to +90°)
 - `destination`: The station this leg points TO (may be `Survey.NULL_STATION`)
 - `wasShotBackwards`: Whether this was measured as a backsight
-- `promotedFrom`: Array of legs if this was upgraded from splay(s)
+- `promotedFrom`: Array of legs if this was upgraded from splay(s), wasShotBackwards is false
 
 **Types of Legs:**
 
@@ -38,12 +38,14 @@ A `Leg` represents a measurement between two points (a directed edge in the grap
    - Creates/connects to a named station
    - Forms the skeleton/centreline of the survey
    - Check with: `leg.hasDestination()` returns `true`
+   - Stored azimuth, inclination, for direct use on graph, needs to be reversed for data use 
 
 2. **Splay (Unconnected Leg)**
    - Has `destination == Survey.NULL_STATION`
    - Used to capture cave passage detail (walls, floor, ceiling)
    - Does NOT create a new station
    - Check with: `leg.hasDestination()` returns `false`
+   - wasShotBackwards must be false
 
 ## Graph Structure
 
