@@ -107,14 +107,12 @@ public class Leg extends SurveyComponent {
     }
 
     /**
-     * Builds a connected leg from a reading exactly as it was recorded.
+     * Builds a connected leg from a reading as it was recorded.
      *
      * <p>A leg is stored in the direction the sketch plots it. A reading that was shot backwards,
-     * therefore has to be reversed. The leg i flagged so that tables and exports can show it as it
-     * was taken. The recorded reading's own flag is ignored, as a recorded reading is never shot backwards.
-     *
-     * @param recorded the reading as recorded, or the average of the readings as recorded
-     * @param promotedFrom the readings that were averaged into the reading, if there were several
+     * therefore has to be reversed and is flagged so that tables and exports show it as it was
+     * taken. The recorded reading's own flag is ignored, as a recorded reading is never shot
+     * backwards.
      */
     public static Leg fromRecordedReading(
             Leg recorded, Station destination, Leg[] promotedFrom, boolean shotBackwards) {
@@ -130,7 +128,7 @@ public class Leg extends SurveyComponent {
         return shotBackwards ? leg.reverse() : leg;
     }
 
-    /** As {@link #fromRecordedReading(Leg, Station, Leg[], boolean)}, for a single reading. */
+    /** As the version that takes promoted-from readings, for a single reading. */
     public static Leg fromRecordedReading(
             Leg recorded, Station destination, boolean shotBackwards) {
         return fromRecordedReading(recorded, destination, NO_LEGS, shotBackwards);
@@ -138,8 +136,8 @@ public class Leg extends SurveyComponent {
 
     /**
      * The reading this leg was made from, as it was recorded: reversed back if the leg was shot
-     * backwards, and with no destination. This is the inverse of {@link #fromRecordedReading}, for
-     * a leg made from a single reading.
+     * backwards, and with no destination. This is the inverse of fromRecordedReading, for a leg made
+     * from a single reading.
      */
     public Leg toRecordedReading() {
         Leg recorded = wasShotBackwards ? reverse() : this;
