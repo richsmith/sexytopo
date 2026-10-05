@@ -136,8 +136,8 @@ public class Leg extends SurveyComponent {
 
     /**
      * The reading this leg was made from, as it was recorded: reversed back if the leg was shot
-     * backwards, and with no destination. This is the inverse of fromRecordedReading, for a leg made
-     * from a single reading.
+     * backwards, and with no destination. This is the inverse of fromRecordedReading, for a leg
+     * made from a single reading.
      */
     public Leg toRecordedReading() {
         Leg recorded = wasShotBackwards ? reverse() : this;
