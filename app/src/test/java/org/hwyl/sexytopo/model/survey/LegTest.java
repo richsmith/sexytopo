@@ -284,4 +284,106 @@ public class LegTest {
         Assert.assertFalse(Leg.isInclinationLegal(-90.1f));
         Assert.assertFalse(Leg.isInclinationLegal(90.1f));
     }
+
+    // ---- fromRecordedReading / toRecordedReading ----
+
+    @Test
+    public void testFromRecordedReadingForwardKeepsTheReading() {
+        Station destination = new Station("A1");
+
+        Leg leg = Leg.fromRecordedReading(new Leg(5.0f, 45.0f, 10.0f), destination, false);
+
+        Assert.assertSame(destination, leg.getDestination());
+        Assert.assertFalse(leg.wasShotBackwards());
+        Assert.assertEquals(5.0f, leg.getDistance(), DELTA);
+        Assert.assertEquals(45.0f, leg.getAzimuth(), DELTA);
+        Assert.assertEquals(10.0f, leg.getInclination(), DELTA);
+    }
+
+    @Test
+    public void testFromRecordedReadingBackwardReversesAndFlagsTheLeg() {
+        Leg leg = Leg.fromRecordedReading(new Leg(5.0f, 45.0f, 10.0f), new Station("A1"), true);
+
+        Assert.assertTrue(leg.wasShotBackwards());
+        Assert.assertEquals(5.0f, leg.getDistance(), DELTA);
+        Assert.assertEquals(225.0f, leg.getAzimuth(), DELTA);
+        Assert.assertEquals(-10.0f, leg.getInclination(), DELTA);
+    }
+
+    @Test
+    public void testFromRecordedReadingKeepsPromotedFromAsRecorded() {
+        Leg[] readings = {new Leg(5.0f, 44.0f, 9.0f), new Leg(5.0f, 46.0f, 11.0f)};
+
+        Leg leg =
+                Leg.fromRecordedReading(
+                        new Leg(5.0f, 45.0f, 10.0f), new Station("A1"), readings, true);
+
+        Assert.assertArrayEquals(readings, leg.getPromotedFrom());
+        Assert.assertEquals(44.0f, leg.getPromotedFrom()[0].getAzimuth(), DELTA);
+        Assert.assertFalse(leg.getPromotedFrom()[0].wasShotBackwards());
+    }
+
+    @Test
+    public void testFromRecordedReadingKeepsTheComment() {
+        Leg recorded = new Leg(5.0f, 45.0f, 10.0f);
+        recorded.setComment("a comment");
+
+        Assert.assertEquals(
+                "a comment",
+                Leg.fromRecordedReading(recorded, new Station("A1"), false).getComment());
+        Assert.assertEquals(
+                "a comment",
+                Leg.fromRecordedReading(recorded, new Station("A1"), true).getComment());
+    }
+
+    @Test
+    public void testFromRecordedReadingIgnoresTheFlagOnTheRecordedReading() {
+        // A recorded reading is never shot backwards, so a stray flag must not flip the result
+        Leg flagged = new Leg(5.0f, 45.0f, 10.0f, true);
+
+        Leg leg = Leg.fromRecordedReading(flagged, new Station("A1"), false);
+
+        Assert.assertFalse(leg.wasShotBackwards());
+        Assert.assertEquals(45.0f, leg.getAzimuth(), DELTA);
+    }
+
+    @Test
+    public void testToRecordedReadingOfBackwardLegReversesItBack() {
+        Leg backwardsLeg = new Leg(5.0f, 225.0f, -10.0f, new Station("A1"), new Leg[] {}, true);
+
+        Leg recorded = backwardsLeg.toRecordedReading();
+
+        Assert.assertFalse(recorded.hasDestination());
+        Assert.assertFalse(recorded.wasShotBackwards());
+        Assert.assertEquals(5.0f, recorded.getDistance(), DELTA);
+        Assert.assertEquals(45.0f, recorded.getAzimuth(), DELTA);
+        Assert.assertEquals(10.0f, recorded.getInclination(), DELTA);
+    }
+
+    @Test
+    public void testToRecordedReadingOfForwardLegKeepsTheNumbers() {
+        Leg forwardLeg = new Leg(5.0f, 45.0f, 10.0f, new Station("A1"), new Leg[] {}, false);
+
+        Leg recorded = forwardLeg.toRecordedReading();
+
+        Assert.assertFalse(recorded.hasDestination());
+        Assert.assertFalse(recorded.wasShotBackwards());
+        Assert.assertEquals(45.0f, recorded.getAzimuth(), DELTA);
+        Assert.assertEquals(10.0f, recorded.getInclination(), DELTA);
+    }
+
+    @Test
+    public void testToRecordedReadingIsTheInverseOfFromRecordedReading() {
+        for (boolean shotBackwards : new boolean[] {false, true}) {
+            Leg original = new Leg(7.5f, 123.0f, -33.0f);
+
+            Leg recovered =
+                    Leg.fromRecordedReading(original, new Station("A1"), shotBackwards)
+                            .toRecordedReading();
+
+            Assert.assertEquals(original.getDistance(), recovered.getDistance(), DELTA);
+            Assert.assertEquals(original.getAzimuth(), recovered.getAzimuth(), DELTA);
+            Assert.assertEquals(original.getInclination(), recovered.getInclination(), DELTA);
+        }
+    }
 }

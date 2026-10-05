@@ -664,49 +664,27 @@ public class SurvexTherionImporter {
             promotedFrom = rawPromotedLegCandidates.toArray(new Leg[0]);
         }
 
+        // The leg runs from the station that was already known to the newer one. For a backward
+        // line the readings were taken from the newer station back to the known one, so they are
+        // reversed into the direction the leg is plotted. A splay has an anonymous station.
+        Station legFrom = isBackward ? to : from;
+        Station newStation = isBackward ? from : to;
+
         Leg leg;
-        Station legFrom;
-
-        if (isBackward) {
-            legFrom = to;
-
-            if (from == Survey.NULL_STATION) {
-                leg = new Leg(distance, azimuth, inclination, true);
-            } else {
-                leg = new Leg(distance, azimuth, inclination, from, promotedFrom, true);
-            }
-
-            if (!comment.isEmpty()) {
-                if (useLegComments) {
-                    // New path: comment belongs to the leg/splay itself
-                    leg.setComment(comment);
-                } else {
-                    // Legacy path: comment goes on the newer station (from, in a backward leg)
-                    if (from != Survey.NULL_STATION) {
-                        from.setComment(comment);
-                    }
-                }
-            }
+        if (newStation == Survey.NULL_STATION) {
+            leg = new Leg(distance, azimuth, inclination);
         } else {
-            // Forward leg
-            legFrom = from;
+            Leg recorded = new Leg(distance, azimuth, inclination);
+            leg = Leg.fromRecordedReading(recorded, newStation, promotedFrom, isBackward);
+        }
 
-            if (to == Survey.NULL_STATION) {
-                leg = new Leg(distance, azimuth, inclination);
-            } else {
-                leg = new Leg(distance, azimuth, inclination, to, promotedFrom);
-            }
-
-            if (!comment.isEmpty()) {
-                if (useLegComments) {
-                    // New path: comment belongs to the leg/splay itself
-                    leg.setComment(comment);
-                } else {
-                    // Legacy path: comment goes on the to station
-                    if (to != Survey.NULL_STATION) {
-                        to.setComment(comment);
-                    }
-                }
+        if (!comment.isEmpty()) {
+            if (useLegComments) {
+                // New path: comment belongs to the leg/splay itself
+                leg.setComment(comment);
+            } else if (newStation != Survey.NULL_STATION) {
+                // Legacy path: comment goes on the newer station
+                newStation.setComment(comment);
             }
         }
 

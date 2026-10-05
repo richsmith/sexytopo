@@ -6,12 +6,16 @@ import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexExporter;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionImporter;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
+import org.hwyl.sexytopo.control.util.GraphToListTranslator;
+import org.hwyl.sexytopo.control.util.InputMode;
+import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.geometry.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
 import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
+import org.hwyl.sexytopo.testutils.SurveyAssertions;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -955,5 +959,103 @@ public class TherionImporterTest {
                 "a later valid extend should still be applied",
                 ExtendedElevationDirection.LEFT,
                 survey.getStationByName("3").getExtendedElevationDirection());
+    }
+
+    // ---- backward lines: the new station is in the FROM column ----
+
+    @Test
+    public void testInlineStyleBackwardLegsAreStoredInThePlottedDirection() throws Exception {
+        Survey survey = new Survey();
+        TherionImporter.updateCentreline(INLINE_LINES, survey);
+
+        // "2  1  5.541 73.93 -4.67" was shot from the new station 2 back to station 1
+        Leg legTo2 = survey.getStationByName("1").getConnectedOnwardLegs().get(0);
+        Assert.assertEquals("2", legTo2.getDestination().getName());
+        Assert.assertTrue(legTo2.wasShotBackwards());
+        Assert.assertEquals(5.541f, legTo2.getDistance(), 0.001);
+        Assert.assertEquals(253.93f, legTo2.getAzimuth(), 0.001);
+        Assert.assertEquals(4.67f, legTo2.getInclination(), 0.001);
+
+        Leg legTo3 = survey.getStationByName("2").getConnectedOnwardLegs().get(0);
+        Assert.assertTrue(legTo3.wasShotBackwards());
+        Assert.assertEquals(242.39f, legTo3.getAzimuth(), 0.001);
+        Assert.assertEquals(-27.97f, legTo3.getInclination(), 0.001);
+    }
+
+    @Test
+    public void testInlineStyleBackwardLegsKeepTheirReadingsAsRecorded() throws Exception {
+        Survey survey = new Survey();
+        TherionImporter.updateCentreline(INLINE_LINES, survey);
+
+        Leg legTo2 = survey.getStationByName("1").getConnectedOnwardLegs().get(0);
+        Leg[] readings = legTo2.getPromotedFrom();
+        Assert.assertEquals(3, readings.length);
+        Assert.assertEquals(73.95f, readings[0].getAzimuth(), 0.001);
+        Assert.assertEquals(-4.64f, readings[0].getInclination(), 0.001);
+        for (Leg reading : readings) {
+            Assert.assertFalse(reading.hasDestination());
+            Assert.assertFalse(reading.wasShotBackwards());
+        }
+        SurveyAssertions.assertNoBackwardSplays(survey);
+    }
+
+    private static Survey createSurveyWithBackwardLeg(boolean repeated) {
+        Survey survey = new Survey();
+        SurveyUpdater.updateWithNewStation(survey, new Leg(4, 0, 0));
+        if (repeated) {
+            for (int i = 0; i < 3; i++) {
+                SurveyUpdater.update(survey, new Leg(5, 270, 10), InputMode.BACKWARD);
+            }
+        } else {
+            SurveyUpdater.updateWithNewStation(survey, new Leg(5, 225, -10, true));
+        }
+        return survey;
+    }
+
+    private static Survey exportAndReimport(Survey original) throws Exception {
+        String data = SurvexTherionUtil.getCentrelineData(original, SurveyFormat.THERION);
+        List<String> lines = Arrays.asList(("centreline\n" + data + "\nendcentreline").split("\n"));
+        Survey reimported = new Survey();
+        TherionImporter.updateCentreline(lines, reimported);
+        return reimported;
+    }
+
+    private static void assertBackwardLegRoundTrips(Survey original, Survey reimported) {
+        Station originalTwo = original.getStationByName("2");
+        Station reimportedTwo = reimported.getStationByName("2");
+        Leg expected = originalTwo.getConnectedOnwardLegs().get(0);
+        Leg actual = reimportedTwo.getConnectedOnwardLegs().get(0);
+
+        Assert.assertTrue(actual.wasShotBackwards());
+        Assert.assertEquals(expected.getDistance(), actual.getDistance(), 0.001);
+        Assert.assertEquals(expected.getAzimuth(), actual.getAzimuth(), 0.001);
+        Assert.assertEquals(expected.getInclination(), actual.getInclination(), 0.001);
+        Assert.assertEquals(expected.getPromotedFrom().length, actual.getPromotedFrom().length);
+
+        GraphToListTranslator.AsTakenReading expectedRow =
+                GraphToListTranslator.toAsTakenReading(
+                        new GraphToListTranslator.SurveyListEntry(originalTwo, expected));
+        GraphToListTranslator.AsTakenReading actualRow =
+                GraphToListTranslator.toAsTakenReading(
+                        new GraphToListTranslator.SurveyListEntry(reimportedTwo, actual));
+        Assert.assertEquals(expectedRow.getFrom().getName(), actualRow.getFrom().getName());
+        Assert.assertEquals(expectedRow.getTo().getName(), actualRow.getTo().getName());
+        Assert.assertEquals(
+                expectedRow.getLeg().getAzimuth(), actualRow.getLeg().getAzimuth(), 0.001);
+        Assert.assertEquals(
+                expectedRow.getLeg().getInclination(), actualRow.getLeg().getInclination(), 0.001);
+        SurveyAssertions.assertNoBackwardSplays(reimported);
+    }
+
+    @Test
+    public void testSingleBackwardLegRoundTripsThroughTherion() throws Exception {
+        Survey original = createSurveyWithBackwardLeg(false);
+        assertBackwardLegRoundTrips(original, exportAndReimport(original));
+    }
+
+    @Test
+    public void testRepeatedBackwardLegRoundTripsThroughTherion() throws Exception {
+        Survey original = createSurveyWithBackwardLeg(true);
+        assertBackwardLegRoundTrips(original, exportAndReimport(original));
     }
 }

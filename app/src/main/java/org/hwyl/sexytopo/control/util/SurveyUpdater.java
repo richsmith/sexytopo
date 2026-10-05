@@ -88,11 +88,7 @@ public class SurveyUpdater {
     public static void upgradeSplay(Survey survey, Leg leg, InputMode inputMode) {
         Station newStation = new Station(getNextStationName(survey));
 
-        Leg newLeg = Leg.toFullLeg(leg, newStation);
-
-        if (inputMode == InputMode.BACKWARD) {
-            newLeg = newLeg.reverse();
-        }
+        Leg newLeg = Leg.fromRecordedReading(leg, newStation, inputMode == InputMode.BACKWARD);
 
         editLeg(survey, leg, newLeg);
         survey.setActiveStation(newStation);
@@ -141,27 +137,14 @@ public class SurveyUpdater {
     /**
      * Averages a splay into a leg.
      *
-     * <p>The promoted-from readings are the readings exactly as they were taken: never shot
-     * backwards. The leg itself holds their average in the direction the sketch plots, so a leg
-     * that was shot backwards holds the reverse of the average. The splay is therefore added to
-     * the readings untouched, and only the average is reversed, so the leg stays backwards.
+     * <p>The promoted-from readings are the readings exactly as they were recorded, so the splay is
+     * added to them untouched. The leg keeps its direction, and so stays backwards if it was.
      */
     private static Leg combineSplayWithLeg(Leg splay, Leg leg) {
         List<Leg> readings = new ArrayList<>(Arrays.asList(getRecordedReadings(leg)));
         readings.add(splay);
 
-        Leg average = averageLegs(readings);
-        boolean wasShotBackwards = leg.wasShotBackwards();
-        Leg plotted = wasShotBackwards ? average.reverse() : average;
-
-        Leg newLeg =
-                new Leg(
-                        plotted.getDistance(),
-                        plotted.getAzimuth(),
-                        plotted.getInclination(),
-                        leg.getDestination(),
-                        readings.toArray(new Leg[0]),
-                        wasShotBackwards);
+        Leg newLeg = createLegFromReadings(readings, leg.getDestination(), leg.wasShotBackwards());
         newLeg.setComment(leg.getComment());
         return newLeg;
     }
@@ -175,8 +158,23 @@ public class SurveyUpdater {
         if (leg.wasPromoted()) {
             return leg.getPromotedFrom();
         }
-        Leg recorded = leg.wasShotBackwards() ? leg.reverse() : leg;
-        return new Leg[] {recorded.toSplay()};
+        return new Leg[] {leg.toRecordedReading()};
+    }
+
+    /**
+     * Builds a connected leg from readings as they were recorded: multiple readings are averaged
+     * and kept as the leg's promoted-from readings, while a single reading is used as it is. A leg
+     * shot backwards is reversed into the direction it is plotted and flagged.
+     */
+    public static Leg createLegFromReadings(
+            List<Leg> readings, Station destination, boolean shotBackwards) {
+        if (readings.isEmpty()) {
+            throw new IllegalArgumentException("A leg needs at least one reading");
+        }
+        boolean repeated = readings.size() > 1;
+        Leg recorded = repeated ? averageLegs(readings) : readings.get(0);
+        Leg[] promotedFrom = repeated ? readings.toArray(new Leg[0]) : new Leg[] {};
+        return Leg.fromRecordedReading(recorded, destination, promotedFrom, shotBackwards);
     }
 
     private static synchronized String getNextStationName(Survey survey) {
@@ -211,14 +209,7 @@ public class SurveyUpdater {
             newStation.setExtendedElevationDirection(
                     SurveyTraversal.getOnwardExtendedElevationDirection(survey, activeStation));
 
-            Leg newLeg = averageLegs(lastNLegs);
-            newLeg =
-                    Leg.upgradeSplayToConnectedLeg(
-                            newLeg, newStation, lastNLegs.toArray(new Leg[] {}));
-
-            if (backsightMode) {
-                newLeg = newLeg.reverse();
-            }
+            Leg newLeg = createLegFromReadings(lastNLegs, newStation, backsightMode);
 
             for (int i = 0; i < requiredNumber; i++) {
                 survey.undoAddLeg();

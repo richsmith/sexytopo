@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import org.hwyl.sexytopo.control.util.GraphToListTranslator;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.survey.Leg;
@@ -491,5 +492,153 @@ public class PocketTopoImporterTest {
             Assert.assertNotNull(survey.getTrip().getSurveyDate());
             Assert.assertTrue(survey.getTrip().getComments().contains("DistoX"));
         }
+    }
+
+    // --- Backsight tests ---
+
+    private static final int NORTH = 0x0000;
+    private static final int EAST = 0x4000;
+    private static final int DEGREES_45 = 0x2000;
+
+    /** A shot to write into a test .top file. */
+    private static final class TestShot {
+        final int from;
+        final int to;
+        final int distanceMm;
+        final int azimuth;
+        final int inclination;
+
+        TestShot(int from, int to, int distanceMm, int azimuth, int inclination) {
+            this.from = from;
+            this.to = to;
+            this.distanceMm = distanceMm;
+            this.azimuth = azimuth;
+            this.inclination = inclination;
+        }
+    }
+
+    /** Build a minimal .top file containing just the given shots, with no trips or drawings. */
+    private static byte[] buildTopFileWithShots(TestShot... shots) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        out.write('T');
+        out.write('o');
+        out.write('p');
+        out.write(3);
+        writeInt32(out, 0); // 0 trips
+        writeInt32(out, shots.length);
+        for (TestShot shot : shots) {
+            writeInt32(out, shot.from);
+            writeInt32(out, shot.to);
+            writeInt32(out, shot.distanceMm);
+            writeInt16(out, (short) shot.azimuth);
+            writeInt16(out, (short) shot.inclination);
+            out.write(0); // flags
+            out.write(0); // roll
+            writeInt16(out, (short) -1); // tripIndex = -1 (no trip)
+        }
+        writeInt32(out, 0); // 0 references
+        writeInt32(out, 0); // overview mapping
+        writeInt32(out, 0);
+        writeInt32(out, 1000);
+        writeInt32(out, 0); // empty plan drawing
+        writeInt32(out, 0);
+        writeInt32(out, 1000);
+        out.write(0);
+        writeInt32(out, 0); // empty elevation drawing
+        writeInt32(out, 0);
+        writeInt32(out, 1000);
+        out.write(0);
+        return out.toByteArray();
+    }
+
+    /** 0.0 to 0.1 forward, then 0.2 shot back to 0.1: station 0.2 has not been visited yet. */
+    private static Survey importBacksight(int numberOfBacksightReadings) throws IOException {
+        TestShot[] shots = new TestShot[1 + numberOfBacksightReadings];
+        shots[0] = new TestShot(0x00000000, 0x00000001, 4000, NORTH, 0);
+        for (int i = 1; i < shots.length; i++) {
+            shots[i] = new TestShot(0x00000002, 0x00000001, 5000, DEGREES_45, DEGREES_45);
+        }
+        byte[] data = buildTopFileWithShots(shots);
+        return PocketTopoImporter.parseSurvey(new ByteArrayInputStream(data));
+    }
+
+    @Test
+    public void testBacksightCreatesBackwardLegFromKnownStation() throws IOException {
+        Survey survey = importBacksight(1);
+
+        Station known = survey.getStationByName("0.1");
+        Assert.assertEquals(1, known.getConnectedOnwardLegs().size());
+        Leg leg = known.getConnectedOnwardLegs().get(0);
+        Assert.assertEquals("0.2", leg.getDestination().getName());
+        Assert.assertTrue(leg.wasShotBackwards());
+    }
+
+    @Test
+    public void testBacksightLegIsStoredInTheDirectionItIsPlotted() throws IOException {
+        Survey survey = importBacksight(1);
+
+        // Shot from 0.2 to 0.1 at 45/45, so the leg from 0.1 to 0.2 runs the opposite way
+        Leg leg = survey.getStationByName("0.1").getConnectedOnwardLegs().get(0);
+        Assert.assertEquals(5.0f, leg.getDistance(), 0.01f);
+        Assert.assertEquals(225.0f, leg.getAzimuth(), 0.01f);
+        Assert.assertEquals(-45.0f, leg.getInclination(), 0.01f);
+    }
+
+    @Test
+    public void testSingleBacksightHasNoPromotedFrom() throws IOException {
+        Survey survey = importBacksight(1);
+
+        Leg leg = survey.getStationByName("0.1").getConnectedOnwardLegs().get(0);
+        Assert.assertFalse(leg.wasPromoted());
+    }
+
+    @Test
+    public void testRepeatedBacksightsAreAveragedIntoOneBackwardLeg() throws IOException {
+        Survey survey = importBacksight(3);
+
+        Station known = survey.getStationByName("0.1");
+        Assert.assertEquals(1, known.getConnectedOnwardLegs().size());
+        Leg leg = known.getConnectedOnwardLegs().get(0);
+        Assert.assertTrue(leg.wasShotBackwards());
+        Assert.assertEquals(225.0f, leg.getAzimuth(), 0.01f);
+        Assert.assertEquals(-45.0f, leg.getInclination(), 0.01f);
+    }
+
+    @Test
+    public void testRepeatedBacksightsKeepTheReadingsAsRecorded() throws IOException {
+        Survey survey = importBacksight(3);
+
+        Leg leg = survey.getStationByName("0.1").getConnectedOnwardLegs().get(0);
+        Assert.assertEquals(3, leg.getPromotedFrom().length);
+        for (Leg reading : leg.getPromotedFrom()) {
+            Assert.assertFalse(reading.hasDestination());
+            Assert.assertFalse(reading.wasShotBackwards());
+            Assert.assertEquals(45.0f, reading.getAzimuth(), 0.01f);
+            Assert.assertEquals(45.0f, reading.getInclination(), 0.01f);
+        }
+    }
+
+    @Test
+    public void testBacksightIsListedAsItWasTaken() throws IOException {
+        Survey survey = importBacksight(1);
+        Station known = survey.getStationByName("0.1");
+        Leg leg = known.getConnectedOnwardLegs().get(0);
+
+        GraphToListTranslator.AsTakenReading reading =
+                GraphToListTranslator.toAsTakenReading(
+                        new GraphToListTranslator.SurveyListEntry(known, leg));
+
+        Assert.assertEquals("0.2", reading.getFrom().getName());
+        Assert.assertEquals("0.1", reading.getTo().getName());
+        Assert.assertEquals(45.0f, reading.getLeg().getAzimuth(), 0.01f);
+        Assert.assertEquals(45.0f, reading.getLeg().getInclination(), 0.01f);
+    }
+
+    @Test
+    public void testForwardShotIsNotMarkedBackwards() throws IOException {
+        Survey survey = importBacksight(1);
+
+        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Assert.assertFalse(leg.wasShotBackwards());
     }
 }
