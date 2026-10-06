@@ -784,7 +784,7 @@ public class EditLegForm extends Form {
 
         Leg leg;
         if (isSplay) {
-            leg = new Leg(distance, azimuth, inclination);
+            leg = createSplay(distance, azimuth, inclination, originalLeg);
         } else if (originalLeg != null && originalLeg.hasDestination()) {
             // For editing: reuse existing destination station object
             Station destination = originalLeg.getDestination();
@@ -796,6 +796,16 @@ public class EditLegForm extends Form {
         }
 
         return applyInputMode(leg, isSplay, inputMode);
+    }
+
+    /**
+     * Builds the splay for the readings entered. Editing the readings of a splay must not change
+     * whether it goes to a wall or to another feature, so the new splay goes to the same place as
+     * the one being edited. A new splay goes to a wall.
+     */
+    static Leg createSplay(float distance, float azimuth, float inclination, Leg originalSplay) {
+        Leg splay = new Leg(distance, azimuth, inclination);
+        return originalSplay == null ? splay : splay.withToWall(originalSplay.isToWall());
     }
 
     /**

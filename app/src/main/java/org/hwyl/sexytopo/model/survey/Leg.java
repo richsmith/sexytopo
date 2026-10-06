@@ -206,7 +206,7 @@ public class Leg extends SurveyComponent {
 
     /**
      * Returns a copy of a splay that goes to a wall or to another feature, with everything else
-     * kept. A leg with a destination is returned as going to a wall.
+     * kept. A leg with a destination is returned unchanged.
      */
     public Leg withToWall(boolean toWall) {
         if (hasDestination()) {
