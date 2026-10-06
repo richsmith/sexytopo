@@ -6,6 +6,8 @@ import android.text.TextWatcher;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
 import com.google.android.material.textfield.TextInputLayout;
+import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.SexyTopoConstants;
 
 public abstract class Form {
     private final Context context;
@@ -45,6 +47,13 @@ public abstract class Form {
         this.showErrors = false;
         this.showLiveErrors = false;
         this.onDidValidateCallback = null;
+    }
+
+    /** The error for a station name that is reserved for the stand-ins that splays point at. */
+    protected static int getReservedStationNameError(String name) {
+        return name.equals(SexyTopoConstants.OTHER_FEATURE_STATION_NAME)
+                ? R.string.validation_error_station_named_dot
+                : R.string.validation_error_station_named_dash;
     }
 
     public void enableErrors() {

@@ -237,6 +237,15 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         getSurveyManager().broadcastSurveyUpdated();
     }
 
+    public void onToggleToWall(Leg leg) {
+        if (leg == null || leg.hasDestination()) {
+            return;
+        }
+
+        SurveyUpdater.setSplayToWall(getSurvey(), leg, !leg.isToWall());
+        getSurveyManager().broadcastSurveyUpdated();
+    }
+
     public void onPromoteToAboveLeg(Leg splay) {
         if (splay == null || splay.hasDestination()) {
             return;

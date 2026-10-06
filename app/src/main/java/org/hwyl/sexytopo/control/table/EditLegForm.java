@@ -8,7 +8,6 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import com.google.android.material.textfield.TextInputLayout;
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.control.util.SurveyTraversal;
@@ -289,8 +288,8 @@ public class EditLegForm extends Form {
 
         if (fromName.isEmpty()) {
             error = R.string.validation_error_cannot_be_blank;
-        } else if (fromName.equals(SexyTopoConstants.BLANK_STATION_NAME)) {
-            error = R.string.validation_error_station_named_dash;
+        } else if (Survey.isReservedStationName(fromName)) {
+            error = getReservedStationNameError(fromName);
         } else if (survey.isOrigin(originalFromStation) && fromStation == null) {
             // Are we just renaming the origin station
             boolean isRenamingStation = !originalFromStation.getName().equals(fromName);
@@ -349,8 +348,8 @@ public class EditLegForm extends Form {
 
         if (toName.isEmpty()) {
             error = R.string.validation_error_cannot_be_blank;
-        } else if (toName.equals(SexyTopoConstants.BLANK_STATION_NAME)) {
-            error = R.string.validation_error_station_named_dash;
+        } else if (Survey.isReservedStationName(toName)) {
+            error = getReservedStationNameError(toName);
         } else if (toName.equals(fromName)) {
             error = R.string.validation_error_same_as_from_station;
         } else if (originalLeg != null && originalLeg.hasDestination()) {

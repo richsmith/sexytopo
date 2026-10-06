@@ -694,6 +694,7 @@
     <!-- Form validation errors -->
     <string name="validation_error_cannot_be_blank">Cannot be blank</string>
     <string name="validation_error_station_named_dash">Station cannot be named \"-\"</string>
+    <string name="validation_error_station_named_dot">Station cannot be named \".\"</string>
     <string name="validation_error_station_does_not_exist">Station does not exist</string>
     <string name="validation_error_same_as_from_station">Cannot be the same as from station</string>
     <string name="validation_error_station_name_not_unique">Station name must be unique</string>
@@ -743,6 +744,7 @@
     <string name="menu_set_active_station">Set Active</string>
     <string name="menu_rename_station">Rename</string>
     <string name="menu_edit_leg">Edit</string>
+    <string name="menu_to_wall">To wall</string>
     <string name="menu_upgrade_row">Force New Station</string>
     <string name="menu_promote_to_above_leg">Add to Leg Above</string>
     <string name="toast_splay_promoted">Splay combined with leg</string>

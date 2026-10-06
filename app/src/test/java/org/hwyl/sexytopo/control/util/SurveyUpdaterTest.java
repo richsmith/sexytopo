@@ -1070,6 +1070,107 @@ public class SurveyUpdaterTest {
         SurveyUpdater.createLegFromReadings(Arrays.<Leg>asList(), new Station("2"), false);
     }
 
+    // ---- splays that go to another feature rather than a wall ----
+
+    @Test
+    public void testSetSplayToWallChangesWhatTheSplayGoesToAndKeepsItsPlace() {
+        Survey survey = new Survey();
+        Leg first = new Leg(1, 10, 0);
+        Leg second = new Leg(2, 100, 5);
+        Leg third = new Leg(3, 200, 10);
+        SurveyUpdater.update(survey, first);
+        SurveyUpdater.update(survey, second);
+        SurveyUpdater.update(survey, third);
+
+        SurveyUpdater.setSplayToWall(survey, second, false);
+
+        List<Leg> legs = survey.getAllLegsInChronoOrder();
+        Assert.assertEquals(3, legs.size());
+        Assert.assertSame(first, legs.get(0));
+        Assert.assertSame(third, legs.get(2));
+        Leg edited = legs.get(1);
+        Assert.assertFalse(edited.isToWall());
+        Assert.assertEquals(2f, edited.getDistance(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(100f, edited.getAzimuth(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(5f, edited.getInclination(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(3, survey.getOrigin().getOnwardLegs().size());
+        Assert.assertTrue(survey.getOrigin().getOnwardLegs().contains(edited));
+    }
+
+    @Test
+    public void testSetSplayToWallDoesNothingWhenTheSplayAlreadyGoesThere() {
+        Survey survey = new Survey();
+        Leg splay = new Leg(2, 100, 5);
+        SurveyUpdater.update(survey, splay);
+
+        SurveyUpdater.setSplayToWall(survey, splay, true);
+
+        Assert.assertSame(splay, survey.getAllLegsInChronoOrder().get(0));
+    }
+
+    @Test
+    public void testSetSplayToWallIgnoresALegWithADestination() {
+        Survey survey = new Survey();
+        SurveyUpdater.updateWithNewStation(survey, new Leg(5, 90, 10));
+        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+
+        SurveyUpdater.setSplayToWall(survey, leg, false);
+
+        Assert.assertSame(leg, survey.getOrigin().getConnectedOnwardLegs().get(0));
+    }
+
+    @Test
+    public void testRepeatedSplaysOfAnyTypeMakeALegAndComeBackAsTheyWere() {
+        Survey survey = new Survey();
+        Leg first = new Leg(5, 90, 10);
+        Leg second = new Leg(5, 90, 10);
+        SurveyUpdater.update(survey, first, InputMode.FORWARD);
+        SurveyUpdater.update(survey, second, InputMode.FORWARD);
+        SurveyUpdater.setSplayToWall(survey, second, false);
+        SurveyUpdater.update(survey, new Leg(5, 90, 10), InputMode.FORWARD);
+
+        Station origin = survey.getOrigin();
+        Assert.assertEquals(1, origin.getConnectedOnwardLegs().size());
+        Leg leg = origin.getConnectedOnwardLegs().get(0);
+        Leg[] readings = leg.getPromotedFrom();
+        Assert.assertEquals(3, readings.length);
+        Assert.assertTrue(readings[0].isToWall());
+        Assert.assertFalse(readings[1].isToWall());
+        Assert.assertTrue(readings[2].isToWall());
+
+        SurveyUpdater.downgradeLeg(survey, leg);
+
+        List<Leg> splays = origin.getOnwardLegs();
+        Assert.assertEquals(3, splays.size());
+        Assert.assertTrue(splays.get(0).isToWall());
+        Assert.assertFalse(splays.get(1).isToWall());
+        Assert.assertTrue(splays.get(2).isToWall());
+        SurveyAssertions.assertNoBackwardSplays(survey);
+    }
+
+    @Test
+    public void testSplayPromotedToALegKeepsWhatItGoesToAsAReading() {
+        Survey survey = new Survey();
+        SurveyUpdater.updateWithNewStation(survey, new Leg(5, 90, 10));
+        Station origin = survey.getOrigin();
+        Leg splay = addSplayToOrigin(survey, new Leg(7, 92, 12));
+        SurveyUpdater.setSplayToWall(survey, splay, false);
+        Leg toFeature = origin.getUnconnectedOnwardLegs().get(0);
+
+        SurveyUpdater.promoteToAboveLeg(survey, toFeature);
+
+        Leg leg = origin.getConnectedOnwardLegs().get(0);
+        Assert.assertEquals(2, leg.getPromotedFrom().length);
+        Assert.assertTrue(leg.getPromotedFrom()[0].isToWall());
+        Assert.assertFalse(leg.getPromotedFrom()[1].isToWall());
+
+        SurveyUpdater.downgradeLeg(survey, leg);
+
+        List<Leg> splays = origin.getOnwardLegs();
+        Assert.assertTrue(splays.get(0).isToWall());
+        Assert.assertFalse(splays.get(1).isToWall());
+    }
+
     private static Survey createSurveyWithBackwardTripleShot() {
         Survey survey = new Survey();
         SurveyUpdater.update(survey, new Leg(5, 270, 10), InputMode.BACKWARD);

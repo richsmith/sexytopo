@@ -6,6 +6,7 @@ import android.content.Context;
 import android.widget.EditText;
 import androidx.annotation.Nullable;
 import junit.framework.TestCase;
+import org.hwyl.sexytopo.R;
 import org.mockito.Mockito;
 
 public class FormTest extends TestCase {
@@ -100,5 +101,13 @@ public class FormTest extends TestCase {
         form.validate();
 
         assert (Boolean.FALSE.equals(callback.value));
+    }
+
+    public void testReservedStationNameErrorNamesTheCharacterUsed() {
+        assertEquals(
+                R.string.validation_error_station_named_dash,
+                Form.getReservedStationNameError("-"));
+        assertEquals(
+                R.string.validation_error_station_named_dot, Form.getReservedStationNameError("."));
     }
 }

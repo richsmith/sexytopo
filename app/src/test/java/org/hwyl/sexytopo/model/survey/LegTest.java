@@ -386,4 +386,59 @@ public class LegTest {
             Assert.assertEquals(original.getInclination(), recovered.getInclination(), DELTA);
         }
     }
+
+    // ---- what a splay goes to: a wall or another feature ----
+
+    @Test
+    public void testNewSplayGoesToAWall() {
+        Leg splay = new Leg(5.0f, 45.0f, 10.0f);
+
+        Assert.assertFalse(splay.hasDestination());
+        Assert.assertTrue(splay.isToWall());
+    }
+
+    @Test
+    public void testWithToWallChangesWhatASplayGoesToAndKeepsTheRest() {
+        Leg splay = new Leg(5.0f, 45.0f, 10.0f);
+        splay.setComment("a boulder");
+
+        Leg toFeature = splay.withToWall(false);
+
+        Assert.assertFalse(toFeature.hasDestination());
+        Assert.assertFalse(toFeature.isToWall());
+        Assert.assertEquals(5.0f, toFeature.getDistance(), DELTA);
+        Assert.assertEquals(45.0f, toFeature.getAzimuth(), DELTA);
+        Assert.assertEquals(10.0f, toFeature.getInclination(), DELTA);
+        Assert.assertEquals("a boulder", toFeature.getComment());
+        Assert.assertTrue(toFeature.withToWall(true).isToWall());
+    }
+
+    @Test
+    public void testSplayToAnotherFeatureStaysThatWayWhenCopied() {
+        Leg splay = new Leg(5.0f, 45.0f, 10.0f).withToWall(false);
+
+        Leg[] copies = {
+            splay.reverse(), splay.rotate(30), splay.adjustAzimuth(100), splay.toSplay()
+        };
+
+        for (Leg copy : copies) {
+            Assert.assertFalse(copy.hasDestination());
+            Assert.assertFalse(copy.isToWall());
+        }
+    }
+
+    @Test
+    public void testLegWithADestinationIsNotChangedByWithToWall() {
+        Leg leg = new Leg(5.0f, 45.0f, 10.0f, new Station("A1"), new Leg[] {}, false);
+
+        Assert.assertSame(leg, leg.withToWall(false));
+        Assert.assertTrue(leg.isToWall());
+    }
+
+    @Test
+    public void testLegTurnedIntoASplayGoesToAWall() {
+        Leg leg = new Leg(5.0f, 45.0f, 10.0f, new Station("A1"), new Leg[] {}, false);
+
+        Assert.assertTrue(leg.toSplay().isToWall());
+    }
 }

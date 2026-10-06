@@ -158,4 +158,42 @@ public class SurveyJsonTranslaterTest {
             Assert.assertEquals(readings[i].getAzimuth(), loadedReadings[i].getAzimuth(), 0.0001f);
         }
     }
+
+    @Test
+    public void testSplayDestinationIsADashForAWallAndADotForAnotherFeature() throws Exception {
+        Leg toWall = new Leg(5.0f, 45.0f, 10.0f);
+        Leg toFeature = toWall.withToWall(false);
+
+        JSONObject wallJson = SurveyJsonTranslater.toJson(toWall, 0);
+        JSONObject featureJson = SurveyJsonTranslater.toJson(toFeature, 0);
+
+        Assert.assertEquals("-", wallJson.getString(SurveyJsonTranslater.DESTINATION_TAG));
+        Assert.assertEquals(".", featureJson.getString(SurveyJsonTranslater.DESTINATION_TAG));
+        Assert.assertTrue(SurveyJsonTranslater.toLeg(new HashMap<>(), wallJson).isToWall());
+        Leg loaded = SurveyJsonTranslater.toLeg(new HashMap<>(), featureJson);
+        Assert.assertFalse(loaded.hasDestination());
+        Assert.assertFalse(loaded.isToWall());
+        Assert.assertEquals(5.0f, loaded.getDistance(), 0.0001f);
+    }
+
+    @Test
+    public void testPromotedReadingsKeepWhatTheyGoTo() throws Exception {
+        Station destination = new Station("2");
+        Leg[] readings = {
+            new Leg(5.0f, 270.0f, 10.0f),
+            new Leg(5.0f, 270.0f, 10.0f).withToWall(false),
+            new Leg(5.0f, 270.0f, 10.0f)
+        };
+        Leg leg = new Leg(5.0f, 270.0f, 10.0f, destination, readings);
+        Map<String, Station> namesToStations = new HashMap<>();
+        namesToStations.put("2", destination);
+
+        Leg loaded =
+                SurveyJsonTranslater.toLeg(namesToStations, SurveyJsonTranslater.toJson(leg, 0));
+
+        Assert.assertEquals(3, loaded.getPromotedFrom().length);
+        Assert.assertTrue(loaded.getPromotedFrom()[0].isToWall());
+        Assert.assertFalse(loaded.getPromotedFrom()[1].isToWall());
+        Assert.assertTrue(loaded.getPromotedFrom()[2].isToWall());
+    }
 }

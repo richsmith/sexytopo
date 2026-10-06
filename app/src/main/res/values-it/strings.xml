@@ -659,6 +659,7 @@
     <!-- Form validation errors -->
     <string name="validation_error_cannot_be_blank">Non può essere vuoto</string>
     <string name="validation_error_station_named_dash">La stazione non può essere chiamata \"-\"</string>
+    <string name="validation_error_station_named_dot">La stazione non può essere chiamata \".\"</string>
     <string name="validation_error_station_does_not_exist">La stazione non esiste</string>
     <string name="validation_error_same_as_from_station">Non può essere uguale alla stazione di partenza</string>
     <string name="validation_error_station_name_not_unique">Il nome della stazione deve essere univoco</string>
@@ -708,6 +709,7 @@
     <string name="menu_set_active_station">Imposta come Attiva</string>
     <string name="menu_rename_station">Rinomina</string>
     <string name="menu_edit_leg">Modifica</string>
+    <string name="menu_to_wall">Verso la parete</string>
     <string name="menu_upgrade_row">Forza Nuova Stazione</string>
     <string name="menu_promote_to_above_leg">Aggiungi al tratto sopra</string>
     <string name="toast_splay_promoted">Splay combinato con il tratto</string>

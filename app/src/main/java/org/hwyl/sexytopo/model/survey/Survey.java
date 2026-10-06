@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.util.StationNamer;
 import org.hwyl.sexytopo.control.util.SurveyTraversal;
 import org.hwyl.sexytopo.control.util.Wrapper;
@@ -18,10 +19,29 @@ import org.hwyl.sexytopo.model.sketch.Sketch;
 
 public class Survey {
 
-    public static final Station NULL_STATION = new Station("-");
+    /**
+     * A splay has an anonymous destination, which are shown as dash for wall and dot for feature.
+     */
+    public static final Station NULL_STATION = new Station(SexyTopoConstants.BLANK_STATION_NAME);
+
+    /** The destination of a splay that goes to something other than a wall, such as a boulder. */
+    public static final Station OTHER_FEATURE_STATION =
+            new Station(SexyTopoConstants.OTHER_FEATURE_STATION_NAME);
+
     public static final String DEFAULT_NAME = "Unsaved Survey";
 
     public static final char[] FORBIDDEN_CHARS = new char[] {':', '.', '\n', '\r', '/', '\\'};
+
+    /** Whether the station is one of the anonymous tokens that a splay has as destination. */
+    public static boolean isSplayDestination(Station station) {
+        return station == NULL_STATION || station == OTHER_FEATURE_STATION;
+    }
+
+    /** Whether the name is used for the stand-in stations, so a real station cannot have it. */
+    public static boolean isReservedStationName(String name) {
+        return name.equals(SexyTopoConstants.BLANK_STATION_NAME)
+                || name.equals(SexyTopoConstants.OTHER_FEATURE_STATION_NAME);
+    }
 
     private String name;
 

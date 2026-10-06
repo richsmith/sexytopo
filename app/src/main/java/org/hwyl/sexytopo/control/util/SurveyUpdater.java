@@ -293,6 +293,17 @@ public class SurveyUpdater {
         survey.setSaved(false);
     }
 
+    /**
+     * Sets whether a splay goes to a wall or to another feature. The splay stays where it is in the
+     * survey and keeps its readings; a leg, which has a destination, is left alone.
+     */
+    public static void setSplayToWall(Survey survey, Leg splay, boolean toWall) {
+        if (splay.hasDestination() || splay.isToWall() == toWall) {
+            return;
+        }
+        editLeg(survey, splay, splay.withToWall(toWall));
+    }
+
     public static void renameStation(Survey survey, Station station, String name) {
         String previousName = station.getName();
 

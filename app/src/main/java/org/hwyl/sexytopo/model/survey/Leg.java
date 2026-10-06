@@ -146,22 +146,16 @@ public class Leg extends SurveyComponent {
 
     public Leg reverse() {
         float adjustedAzimuth = Space2DUtils.adjustAngle(getAzimuth(), 180);
-        if (hasDestination()) {
-            Leg leg =
-                    new Leg(
-                            distance,
-                            adjustedAzimuth,
-                            -1 * inclination,
-                            destination,
-                            promotedFrom,
-                            !wasShotBackwards);
-            leg.setComment(comment);
-            return leg;
-        } else {
-            Leg leg = new Leg(distance, adjustedAzimuth, -1 * inclination, !wasShotBackwards);
-            leg.setComment(comment);
-            return leg;
-        }
+        Leg leg =
+                new Leg(
+                        distance,
+                        adjustedAzimuth,
+                        -1 * inclination,
+                        destination,
+                        promotedFrom,
+                        !wasShotBackwards);
+        leg.setComment(comment);
+        return leg;
     }
 
     public Leg rotate(float delta) {
@@ -170,16 +164,8 @@ public class Leg extends SurveyComponent {
     }
 
     public Leg adjustAzimuth(float newAzimuth) {
-        if (hasDestination()) {
-            return new Leg(
-                    getDistance(),
-                    newAzimuth,
-                    getInclination(),
-                    getDestination(),
-                    getPromotedFrom());
-        } else {
-            return new Leg(getDistance(), newAzimuth, getInclination());
-        }
+        return new Leg(
+                getDistance(), newAzimuth, getInclination(), getDestination(), getPromotedFrom());
     }
 
     public Leg asBacksight(Station destination) {
@@ -202,10 +188,41 @@ public class Leg extends SurveyComponent {
     /**
      * Returns this reading as a splay: no destination, and never shot backwards. A splay always
      * runs from its station out to nothing, so the backwards flag has no meaning for it and is
-     * cleared. The distance, azimuth and inclination are kept exactly as they are.
+     * cleared. The distance, azimuth and inclination are kept exactly as they are. A splay keeps
+     * what it goes to, while a leg that is turned into a splay goes to a wall.
      */
     public Leg toSplay() {
-        return new Leg(distance, azimuth, inclination, false);
+        Station splayDestination = hasDestination() ? Survey.NULL_STATION : destination;
+        return new Leg(distance, azimuth, inclination, splayDestination, NO_LEGS, false);
+    }
+
+    /**
+     * Whether a splay goes to a wall, which is the default, rather than to another feature such as
+     * a boulder. A leg with a destination goes to neither, and is reported as going to a wall.
+     */
+    public boolean isToWall() {
+        return destination != Survey.OTHER_FEATURE_STATION;
+    }
+
+    /**
+     * Returns a copy of a splay that goes to a wall or to another feature, with everything else
+     * kept. A leg with a destination is returned as going to a wall.
+     */
+    public Leg withToWall(boolean toWall) {
+        if (hasDestination()) {
+            return this;
+        }
+        Station splayDestination = toWall ? Survey.NULL_STATION : Survey.OTHER_FEATURE_STATION;
+        Leg leg =
+                new Leg(
+                        distance,
+                        azimuth,
+                        inclination,
+                        splayDestination,
+                        promotedFrom,
+                        wasShotBackwards);
+        leg.setComment(comment);
+        return leg;
     }
 
     public float getDistance() {
@@ -225,7 +242,7 @@ public class Leg extends SurveyComponent {
     }
 
     public boolean hasDestination() {
-        return destination != Survey.NULL_STATION;
+        return !Survey.isSplayDestination(destination);
     }
 
     public Leg[] getPromotedFrom() {

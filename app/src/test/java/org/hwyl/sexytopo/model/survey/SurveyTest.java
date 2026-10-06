@@ -42,4 +42,20 @@ public class SurveyTest {
         Assert.assertFalse(baseSurvey.isConnectedTo(otherSurvey));
         Assert.assertEquals(0, baseSurvey.getConnectedSurveys().size());
     }
+
+    @Test
+    public void testReservedStationNamesAreTheSplayStandIns() {
+        Assert.assertTrue(Survey.isReservedStationName("-"));
+        Assert.assertTrue(Survey.isReservedStationName("."));
+        Assert.assertFalse(Survey.isReservedStationName("1"));
+        Assert.assertFalse(Survey.isReservedStationName("0.1"));
+        Assert.assertFalse(Survey.isReservedStationName(""));
+    }
+
+    @Test
+    public void testSplayDestinationsAreTheTwoStandInStations() {
+        Assert.assertTrue(Survey.isSplayDestination(Survey.NULL_STATION));
+        Assert.assertTrue(Survey.isSplayDestination(Survey.OTHER_FEATURE_STATION));
+        Assert.assertFalse(Survey.isSplayDestination(new Station("1")));
+    }
 }

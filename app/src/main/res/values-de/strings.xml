@@ -659,6 +659,7 @@
     <!--  Form validation errors  -->
     <string name="validation_error_cannot_be_blank">Darf nicht leer sein</string>
     <string name="validation_error_station_named_dash">Messpunkt kann nicht \"-\" heißen</string>
+    <string name="validation_error_station_named_dot">Messpunkt kann nicht \".\" heißen</string>
     <string name="validation_error_station_does_not_exist">Messpunkt existiert nicht</string>
     <string name="validation_error_same_as_from_station">Kann nicht derselbe wie der Ursprungsmesspunkt sein</string>
     <string name="validation_error_station_name_not_unique">Messpunktname muss eindeutig sein</string>
@@ -708,6 +709,7 @@
     <string name="menu_set_active_station">Als aktiv setzen</string>
     <string name="menu_rename_station">Umbenennen</string>
     <string name="menu_edit_leg">Bearbeiten</string>
+    <string name="menu_to_wall">Zur Wand</string>
     <string name="menu_upgrade_row">Neuen Messpunkt erzwingen</string>
     <string name="menu_promote_to_above_leg">Zur obigen Messung hinzufügen</string>
     <string name="toast_splay_promoted">Splay mit Messung kombiniert</string>

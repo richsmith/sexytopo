@@ -42,8 +42,8 @@ public class RenameStationForm extends Form {
         // only check for non-null or max length
         if (currentTextString.isEmpty()) {
             setError(this.stationNameLayout, "Cannot be blank");
-        } else if (currentTextString.equals("-")) {
-            setError(this.stationNameLayout, "Station cannot be named \"-\"");
+        } else if (Survey.isReservedStationName(currentTextString)) {
+            setError(this.stationNameLayout, getReservedStationNameError(currentTextString));
         } else if (!currentTextString.equals(currentName)
                 && (survey.getStationByName(currentTextString) != null)) {
             setError(this.stationNameLayout, "Station name must be unique");
