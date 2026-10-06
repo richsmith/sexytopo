@@ -41,9 +41,9 @@ A `Leg` represents a measurement between two points (a directed edge in the grap
    - Stored azimuth, inclination, for direct use on graph, needs to be reversed for data use 
 
 2. **Splay (Unconnected Leg)**
-   - Has `destination == Survey.NULL_STATION`
+   - Destination is an anonymous station `destination == Survey.NULL_STATION`
    - Used to capture cave passage detail (walls, floor, ceiling)
-   - Does NOT create a new station
+   - Does NOT create a new named station
    - Check with: `leg.hasDestination()` returns `false`
    - wasShotBackwards must be false
 
