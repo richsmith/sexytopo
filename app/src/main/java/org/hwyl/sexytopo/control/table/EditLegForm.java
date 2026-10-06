@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import com.google.android.material.textfield.TextInputLayout;
@@ -91,6 +92,9 @@ public class EditLegForm extends Form {
     private Spinner inputModeSpinner;
     private InputMode inputMode = InputMode.FORWARD;
 
+    // Shown for splays only
+    private CheckBox toWallCheckBox;
+
     private boolean isInitialising;
 
     /** Constructor for editing an existing leg */
@@ -131,8 +135,17 @@ public class EditLegForm extends Form {
         this.isInitialising = true;
         this.initialiseFields(dialogView);
         this.initialiseInputMode(dialogView);
+        this.initialiseToWall(dialogView);
         this.initialiseStationDisplay();
         this.isInitialising = false;
+    }
+
+    private void initialiseToWall(View dialogView) {
+        if (isSplay) {
+            this.toWallCheckBox = dialogView.findViewById(R.id.toWallCheckBox);
+            toWallCheckBox.setVisibility(View.VISIBLE);
+            toWallCheckBox.setChecked(initialToWall(originalLeg));
+        }
     }
 
     private void initialiseFields(View dialogView) {
@@ -784,7 +797,7 @@ public class EditLegForm extends Form {
 
         Leg leg;
         if (isSplay) {
-            leg = createSplay(distance, azimuth, inclination, originalLeg);
+            leg = createSplay(distance, azimuth, inclination, toWallCheckBox.isChecked());
         } else if (originalLeg != null && originalLeg.hasDestination()) {
             // For editing: reuse existing destination station object
             Station destination = originalLeg.getDestination();
@@ -798,14 +811,17 @@ public class EditLegForm extends Form {
         return applyInputMode(leg, isSplay, inputMode);
     }
 
+    /** Builds the splay for the readings entered, going to a wall or to another feature. */
+    static Leg createSplay(float distance, float azimuth, float inclination, boolean toWall) {
+        return new Leg(distance, azimuth, inclination).withToWall(toWall);
+    }
+
     /**
-     * Builds the splay for the readings entered. Editing the readings of a splay must not change
-     * whether it goes to a wall or to another feature, so the new splay goes to the same place as
-     * the one being edited. A new splay goes to a wall.
+     * Whether the To Wall tick box starts ticked. A new splay goes to a wall, and an edited splay
+     * keeps what it goes to unless the box is changed.
      */
-    static Leg createSplay(float distance, float azimuth, float inclination, Leg originalSplay) {
-        Leg splay = new Leg(distance, azimuth, inclination);
-        return originalSplay == null ? splay : splay.withToWall(originalSplay.isToWall());
+    static boolean initialToWall(Leg originalSplay) {
+        return originalSplay == null || originalSplay.isToWall();
     }
 
     /**

@@ -247,23 +247,27 @@ public class EditLegFormTest {
         Assert.assertEquals(45.0f, applied.getAzimuth(), DELTA);
     }
 
-    // ---- editing a splay keeps what it goes to ----
+    // ---- the To Wall tick box ----
 
     @Test
-    public void testEditedSplayGoesToTheSamePlaceAsTheOriginal() {
-        Leg toWall = new Leg(5.0f, 45.0f, 10.0f);
-        Leg toFeature = new Leg(5.0f, 45.0f, 10.0f).withToWall(false);
-
-        Assert.assertTrue(EditLegForm.createSplay(6.0f, 50.0f, 12.0f, toWall).isToWall());
-        Leg edited = EditLegForm.createSplay(6.0f, 50.0f, 12.0f, toFeature);
-        Assert.assertFalse(edited.isToWall());
-        Assert.assertEquals(6.0f, edited.getDistance(), DELTA);
-        Assert.assertEquals(50.0f, edited.getAzimuth(), DELTA);
-        Assert.assertEquals(12.0f, edited.getInclination(), DELTA);
+    public void testCreatedSplayGoesWhereTheTickBoxSays() {
+        for (boolean toWall : new boolean[] {true, false}) {
+            Leg splay = EditLegForm.createSplay(6.0f, 50.0f, 12.0f, toWall);
+            Assert.assertFalse(splay.hasDestination());
+            Assert.assertEquals(toWall, splay.isToWall());
+            Assert.assertEquals(6.0f, splay.getDistance(), DELTA);
+            Assert.assertEquals(50.0f, splay.getAzimuth(), DELTA);
+            Assert.assertEquals(12.0f, splay.getInclination(), DELTA);
+        }
     }
 
     @Test
-    public void testNewSplayGoesToAWall() {
-        Assert.assertTrue(EditLegForm.createSplay(6.0f, 50.0f, 12.0f, null).isToWall());
+    public void testTickBoxStartsWithWhatTheSplayGoesTo() {
+        Leg toWall = new Leg(5.0f, 45.0f, 10.0f);
+        Leg toFeature = new Leg(5.0f, 45.0f, 10.0f).withToWall(false);
+
+        Assert.assertTrue(EditLegForm.initialToWall(null));
+        Assert.assertTrue(EditLegForm.initialToWall(toWall));
+        Assert.assertFalse(EditLegForm.initialToWall(toFeature));
     }
 }
