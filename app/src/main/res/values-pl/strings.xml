@@ -733,7 +733,6 @@
     <string name="menu_xsection_delete">Usuń przekrój</string>
     <string name="menu_xsection_edit">Edytuj szkic</string>
     <string name="menu_xsection_set_direction">Ustaw kierunek</string>
-    <string name="menu_new_cross_section">Nowy przekrój poprzeczny</string>
     <string name="menu_jump_to_station_in_table">&#10132; Tabela danych</string>
     <string name="menu_delete_station">Usuń</string>
     <string name="menu_reverse">Odwróć</string>
