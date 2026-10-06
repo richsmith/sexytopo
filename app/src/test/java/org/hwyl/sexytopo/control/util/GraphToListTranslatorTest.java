@@ -96,7 +96,7 @@ public class GraphToListTranslatorTest {
                         new GraphToListTranslator.SurveyListEntry(origin, splay));
 
         Assert.assertEquals(origin, map.get(TableCol.FROM));
-        Assert.assertEquals(Survey.NULL_STATION, map.get(TableCol.TO));
+        Assert.assertEquals(Survey.ANONYMOUS_WALL_STATION, map.get(TableCol.TO));
         Assert.assertEquals(50.0f, (float) map.get(TableCol.AZIMUTH), DELTA);
         Assert.assertEquals(8.0f, (float) map.get(TableCol.INCLINATION), DELTA);
     }
@@ -140,7 +140,7 @@ public class GraphToListTranslatorTest {
         for (GraphToListTranslator.SurveyListEntry entry : entries) {
             Map<TableCol, Object> map = GraphToListTranslator.createMap(entry);
             Assert.assertEquals(origin, map.get(TableCol.FROM));
-            Assert.assertEquals(Survey.NULL_STATION, map.get(TableCol.TO));
+            Assert.assertEquals(Survey.ANONYMOUS_WALL_STATION, map.get(TableCol.TO));
             Assert.assertEquals(270.0f, (float) map.get(TableCol.AZIMUTH), DELTA);
             Assert.assertEquals(10.0f, (float) map.get(TableCol.INCLINATION), DELTA);
         }

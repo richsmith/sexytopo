@@ -658,8 +658,7 @@
 
     <!--  Form validation errors  -->
     <string name="validation_error_cannot_be_blank">Darf nicht leer sein</string>
-    <string name="validation_error_station_named_dash">Messpunkt kann nicht \"-\" heißen</string>
-    <string name="validation_error_station_named_dot">Messpunkt kann nicht \".\" heißen</string>
+    <string name="validation_error_station_name_reserved">Messpunkt kann nicht \"-\" oder \".\" heißen</string>
     <string name="validation_error_station_does_not_exist">Messpunkt existiert nicht</string>
     <string name="validation_error_same_as_from_station">Kann nicht derselbe wie der Ursprungsmesspunkt sein</string>
     <string name="validation_error_station_name_not_unique">Messpunktname muss eindeutig sein</string>

@@ -44,18 +44,23 @@ public class SurveyTest {
     }
 
     @Test
-    public void testReservedStationNamesAreTheSplayStandIns() {
-        Assert.assertTrue(Survey.isReservedStationName("-"));
-        Assert.assertTrue(Survey.isReservedStationName("."));
-        Assert.assertFalse(Survey.isReservedStationName("1"));
-        Assert.assertFalse(Survey.isReservedStationName("0.1"));
-        Assert.assertFalse(Survey.isReservedStationName(""));
-    }
-
-    @Test
-    public void testSplayDestinationsAreTheTwoStandInStations() {
-        Assert.assertTrue(Survey.isSplayDestination(Survey.NULL_STATION));
-        Assert.assertTrue(Survey.isSplayDestination(Survey.OTHER_FEATURE_STATION));
-        Assert.assertFalse(Survey.isSplayDestination(new Station("1")));
+    public void testAnonymousStationsAreFoundByNameOnly() {
+        Object[][] cases = {
+            {"-", Survey.ANONYMOUS_WALL_STATION},
+            {".", Survey.ANONYMOUS_FEATURE_STATION},
+            {"1", null},
+            {"0.1", null},
+            {"..", null},
+            {"", null},
+        };
+        for (Object[] c : cases) {
+            String name = (String) c[0];
+            Station expected = (Station) c[1];
+            Assert.assertSame(name, expected, Survey.getAnonymousStation(name));
+            Assert.assertEquals(name, expected != null, Survey.isReservedStationName(name));
+        }
+        Assert.assertTrue(Survey.isAnonymousStation(Survey.ANONYMOUS_WALL_STATION));
+        Assert.assertTrue(Survey.isAnonymousStation(Survey.ANONYMOUS_FEATURE_STATION));
+        Assert.assertFalse(Survey.isAnonymousStation(new Station("-")));
     }
 }

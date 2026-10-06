@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Leg;
@@ -470,8 +469,7 @@ public class SurvexTherionImporter {
      * SurveyFormat#getSplayStationName()} returns, but a hand-written or third-party file may use
      * any of the others, so all are accepted here regardless of which format is being imported.
      */
-    private static final List<String> SPLAY_STATION_TOKENS =
-            Arrays.asList(SexyTopoConstants.BLANK_STATION_NAME, ".", "..", "...");
+    private static final List<String> SPLAY_STATION_TOKENS = Arrays.asList("-", ".", "..", "...");
 
     /** A single leg line's fields, parsed but not yet added to the survey. */
     private static final class ParsedLegLine {
@@ -634,7 +632,7 @@ public class SurvexTherionImporter {
             nameToStation.put(fromName, from);
         }
 
-        Station to = Survey.NULL_STATION;
+        Station to = Survey.ANONYMOUS_WALL_STATION;
         if (!isSplay) {
             to = nameToStation.get(toName);
             if (to == null) {
@@ -671,7 +669,7 @@ public class SurvexTherionImporter {
         Station newStation = isBackward ? from : to;
 
         Leg leg;
-        if (newStation == Survey.NULL_STATION) {
+        if (newStation == Survey.ANONYMOUS_WALL_STATION) {
             leg = new Leg(distance, azimuth, inclination);
         } else {
             Leg recorded = new Leg(distance, azimuth, inclination);
@@ -682,7 +680,7 @@ public class SurvexTherionImporter {
             if (useLegComments) {
                 // New path: comment belongs to the leg/splay itself
                 leg.setComment(comment);
-            } else if (newStation != Survey.NULL_STATION) {
+            } else if (newStation != Survey.ANONYMOUS_WALL_STATION) {
                 // Legacy path: comment goes on the newer station
                 newStation.setComment(comment);
             }

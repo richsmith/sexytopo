@@ -658,8 +658,7 @@
 
     <!-- Form validation errors -->
     <string name="validation_error_cannot_be_blank">Nie może być puste</string>
-    <string name="validation_error_station_named_dash">Stanowisko nie może nazywać się \"-\"</string>
-    <string name="validation_error_station_named_dot">Stanowisko nie może nazywać się \".\"</string>
+    <string name="validation_error_station_name_reserved">Stanowisko nie może nazywać się \"-\" ani \".\"</string>
     <string name="validation_error_station_does_not_exist">Stanowisko nie istnieje</string>
     <string name="validation_error_same_as_from_station">Nie może być takie samo jak stanowisko początkowe</string>
     <string name="validation_error_station_name_not_unique">Nazwa stanowiska musi być unikalna</string>

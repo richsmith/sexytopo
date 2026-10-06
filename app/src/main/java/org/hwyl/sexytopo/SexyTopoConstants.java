@@ -73,8 +73,6 @@ public class SexyTopoConstants {
     // ********** Misc **********
 
     public static final int NUM_OF_REPEATS_FOR_NEW_STATION = 3;
-    public static final String BLANK_STATION_NAME = "-";
-    public static final String OTHER_FEATURE_STATION_NAME = ".";
     public static final String COMMENT_MARKER = "†";
     public static final String JUMP_TO_STATION = "jumpToStation";
     public static final String LINK_STATION = "linkStation";

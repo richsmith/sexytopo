@@ -289,7 +289,7 @@ public class EditLegForm extends Form {
         if (fromName.isEmpty()) {
             error = R.string.validation_error_cannot_be_blank;
         } else if (Survey.isReservedStationName(fromName)) {
-            error = getReservedStationNameError(fromName);
+            error = R.string.validation_error_station_name_reserved;
         } else if (survey.isOrigin(originalFromStation) && fromStation == null) {
             // Are we just renaming the origin station
             boolean isRenamingStation = !originalFromStation.getName().equals(fromName);
@@ -349,7 +349,7 @@ public class EditLegForm extends Form {
         if (toName.isEmpty()) {
             error = R.string.validation_error_cannot_be_blank;
         } else if (Survey.isReservedStationName(toName)) {
-            error = getReservedStationNameError(toName);
+            error = R.string.validation_error_station_name_reserved;
         } else if (toName.equals(fromName)) {
             error = R.string.validation_error_same_as_from_station;
         } else if (originalLeg != null && originalLeg.hasDestination()) {

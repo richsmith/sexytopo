@@ -936,7 +936,7 @@ public class SurveyUpdaterTest {
                     GraphToListTranslator.toAsTakenReading(
                             new GraphToListTranslator.SurveyListEntry(origin, splay));
             Assert.assertEquals(origin, reading.getFrom());
-            Assert.assertEquals(Survey.NULL_STATION, reading.getTo());
+            Assert.assertEquals(Survey.ANONYMOUS_WALL_STATION, reading.getTo());
             Assert.assertEquals(splay.getAzimuth(), reading.getLeg().getAzimuth(), 0.0001f);
         }
     }

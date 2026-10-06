@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.util.StationNamer;
 import org.hwyl.sexytopo.control.util.SurveyTraversal;
 import org.hwyl.sexytopo.control.util.Wrapper;
@@ -19,28 +18,35 @@ import org.hwyl.sexytopo.model.sketch.Sketch;
 
 public class Survey {
 
-    /**
-     * A splay has an anonymous destination, which are shown as dash for wall and dot for feature.
-     */
-    public static final Station NULL_STATION = new Station(SexyTopoConstants.BLANK_STATION_NAME);
+    /** The anonymous destination of a splay to a wall, shown as a dash. */
+    public static final Station ANONYMOUS_WALL_STATION = new Station("-");
 
-    /** The destination of a splay that goes to something other than a wall, such as a boulder. */
-    public static final Station OTHER_FEATURE_STATION =
-            new Station(SexyTopoConstants.OTHER_FEATURE_STATION_NAME);
+    /** The anonymous destination of a splay to another feature, such as a stal, shown as a dot. */
+    public static final Station ANONYMOUS_FEATURE_STATION = new Station(".");
 
     public static final String DEFAULT_NAME = "Unsaved Survey";
 
     public static final char[] FORBIDDEN_CHARS = new char[] {':', '.', '\n', '\r', '/', '\\'};
 
-    /** Whether the station is one of the anonymous tokens that a splay has as destination. */
-    public static boolean isSplayDestination(Station station) {
-        return station == NULL_STATION || station == OTHER_FEATURE_STATION;
+    /** Whether the station is one of the anonymous destinations of a splay. */
+    public static boolean isAnonymousStation(Station station) {
+        return station == ANONYMOUS_WALL_STATION || station == ANONYMOUS_FEATURE_STATION;
     }
 
-    /** Whether the name is used for the stand-in stations, so a real station cannot have it. */
+    /** The anonymous station with this name, or null if there is none. */
+    public static Station getAnonymousStation(String name) {
+        if (name.equals(ANONYMOUS_WALL_STATION.getName())) {
+            return ANONYMOUS_WALL_STATION;
+        } else if (name.equals(ANONYMOUS_FEATURE_STATION.getName())) {
+            return ANONYMOUS_FEATURE_STATION;
+        } else {
+            return null;
+        }
+    }
+
+    /** Whether the name is used by an anonymous station, so a real station cannot have it. */
     public static boolean isReservedStationName(String name) {
-        return name.equals(SexyTopoConstants.BLANK_STATION_NAME)
-                || name.equals(SexyTopoConstants.OTHER_FEATURE_STATION_NAME);
+        return getAnonymousStation(name) != null;
     }
 
     private String name;

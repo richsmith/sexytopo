@@ -3,7 +3,6 @@ package org.hwyl.sexytopo.control.io.basic;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -55,13 +54,13 @@ public class OldStyleLoader {
             throw new Exception("Duplicate leg encountered");
         } else if (stationsSoFar.contains(from)) { // forward leg
             Leg leg =
-                    (to == Survey.NULL_STATION)
+                    (to == Survey.ANONYMOUS_WALL_STATION)
                             ? new Leg(distance, azimuth, inclination)
                             : new Leg(distance, azimuth, inclination, to, new Leg[] {});
             from.addOnwardLeg(leg);
         } else if (stationsSoFar.contains(to)) { // backwards leg
             Leg leg =
-                    (from == Survey.NULL_STATION)
+                    (from == Survey.ANONYMOUS_WALL_STATION)
                             ? new Leg(distance, azimuth, inclination)
                             : new Leg(distance, azimuth, inclination, from, new Leg[] {});
             to.addOnwardLeg(leg.reverse());
@@ -74,8 +73,8 @@ public class OldStyleLoader {
 
     private static Station retrieveOrCreateStation(
             Map<String, Station> nameToStation, String name, String comment) {
-        if (name.equals(SexyTopoConstants.BLANK_STATION_NAME)) {
-            return Survey.NULL_STATION;
+        if (name.equals(Survey.ANONYMOUS_WALL_STATION.getName())) {
+            return Survey.ANONYMOUS_WALL_STATION;
         } else if (nameToStation.containsKey(name)) {
             return nameToStation.get(name);
         } else {

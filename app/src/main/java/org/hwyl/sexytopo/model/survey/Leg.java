@@ -32,7 +32,13 @@ public class Leg extends SurveyComponent {
     }
 
     public Leg(float distance, float azimuth, float inclination, boolean wasShotBackwards) {
-        this(distance, azimuth, inclination, Survey.NULL_STATION, NO_LEGS, wasShotBackwards);
+        this(
+                distance,
+                azimuth,
+                inclination,
+                Survey.ANONYMOUS_WALL_STATION,
+                NO_LEGS,
+                wasShotBackwards);
     }
 
     public Leg(
@@ -182,7 +188,7 @@ public class Leg extends SurveyComponent {
     }
 
     public Leg asBacksight() {
-        return asBacksight(Survey.NULL_STATION);
+        return asBacksight(Survey.ANONYMOUS_WALL_STATION);
     }
 
     /**
@@ -192,16 +198,16 @@ public class Leg extends SurveyComponent {
      * what it goes to, while a leg that is turned into a splay goes to a wall.
      */
     public Leg toSplay() {
-        Station splayDestination = hasDestination() ? Survey.NULL_STATION : destination;
+        Station splayDestination = hasDestination() ? Survey.ANONYMOUS_WALL_STATION : destination;
         return new Leg(distance, azimuth, inclination, splayDestination, NO_LEGS, false);
     }
 
     /**
      * Whether a splay goes to a wall, which is the default, rather than to another feature such as
-     * a boulder. A leg with a destination goes to neither, and is reported as going to a wall.
+     * a stal. A leg with a destination goes to neither, and is reported as going to a wall.
      */
     public boolean isToWall() {
-        return destination != Survey.OTHER_FEATURE_STATION;
+        return destination != Survey.ANONYMOUS_FEATURE_STATION;
     }
 
     /**
@@ -212,15 +218,9 @@ public class Leg extends SurveyComponent {
         if (hasDestination()) {
             return this;
         }
-        Station splayDestination = toWall ? Survey.NULL_STATION : Survey.OTHER_FEATURE_STATION;
-        Leg leg =
-                new Leg(
-                        distance,
-                        azimuth,
-                        inclination,
-                        splayDestination,
-                        promotedFrom,
-                        wasShotBackwards);
+        Station splayDestination =
+                toWall ? Survey.ANONYMOUS_WALL_STATION : Survey.ANONYMOUS_FEATURE_STATION;
+        Leg leg = new Leg(distance, azimuth, inclination, splayDestination, promotedFrom, false);
         leg.setComment(comment);
         return leg;
     }
@@ -242,7 +242,7 @@ public class Leg extends SurveyComponent {
     }
 
     public boolean hasDestination() {
-        return !Survey.isSplayDestination(destination);
+        return !Survey.isAnonymousStation(destination);
     }
 
     public Leg[] getPromotedFrom() {

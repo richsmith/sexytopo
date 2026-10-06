@@ -43,7 +43,7 @@ public class RenameStationForm extends Form {
         if (currentTextString.isEmpty()) {
             setError(this.stationNameLayout, "Cannot be blank");
         } else if (Survey.isReservedStationName(currentTextString)) {
-            setError(this.stationNameLayout, getReservedStationNameError(currentTextString));
+            setError(this.stationNameLayout, R.string.validation_error_station_name_reserved);
         } else if (!currentTextString.equals(currentName)
                 && (survey.getStationByName(currentTextString) != null)) {
             setError(this.stationNameLayout, "Station name must be unique");

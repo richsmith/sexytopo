@@ -171,7 +171,7 @@ public class LegTest {
     public void testSplayHasNoDestination() {
         Leg splay = new Leg(5.0f, 45.0f, 30.0f);
         Assert.assertFalse(splay.hasDestination());
-        Assert.assertEquals(Survey.NULL_STATION, splay.getDestination());
+        Assert.assertEquals(Survey.ANONYMOUS_WALL_STATION, splay.getDestination());
     }
 
     @Test

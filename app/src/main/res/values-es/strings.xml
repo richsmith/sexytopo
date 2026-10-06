@@ -658,8 +658,7 @@
 
     <!-- Form validation errors -->
     <string name="validation_error_cannot_be_blank">No puede estar vacío</string>
-    <string name="validation_error_station_named_dash">La estación no puede llamarse \"-\"</string>
-    <string name="validation_error_station_named_dot">La estación no puede llamarse \".\"</string>
+    <string name="validation_error_station_name_reserved">La estación no puede llamarse \"-\" ni \".\"</string>
     <string name="validation_error_station_does_not_exist">La estación no existe</string>
     <string name="validation_error_same_as_from_station">No puede ser la misma que la estación de origen</string>
     <string name="validation_error_station_name_not_unique">El nombre de estación debe ser único</string>
