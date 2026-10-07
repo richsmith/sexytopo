@@ -95,7 +95,7 @@ public class SurvexTherionImporter {
                     continue; // fewer than 5 tokens - not a valid leg line
                 }
 
-                boolean isSplay = SPLAY_STATION_TOKENS.contains(current.toName);
+                boolean isSplay = getAnonymousStationForToken(current.toName) != null;
 
                 // Splays are never grouped - each is its own independent reading, even when
                 // several share the same anonymous-station token as their "to".
@@ -459,17 +459,28 @@ public class SurvexTherionImporter {
     }
 
     /**
-     * Splay-station tokens accepted on import from third-party Survex/Therion files.
+     * The anonymous station a splay token stands for, or null if the name is a real station.
      *
-     * <p>Therion's own anonymous-station convention uses "-" or ".". Survex's uses ".", ".." (an
-     * anonymous wall point) or "..." (an anonymous point with no implicit flags) - see the
-     * "Anonymous stations" section of the Survex manual.
+     * <p>Therion uses "-" for a wall and "." for another feature. Survex uses ".." for a wall and
+     * "." for another feature; its "..." is a point with no implied type, which is read as another
+     * feature, so it comes back as "." on export. See the "Anonymous stations" section of the
+     * Survex manual.
      *
-     * <p>SexyTopo's own exporters write the names SurveyFormat.getAnonymousStationName returns, but
-     * a hand-written or third-party file may use any of the others, so all are accepted here
-     * regardless of which format is being imported.
+     * <p>A hand-written or third-party file may use any of these, so all are accepted whichever
+     * format is being imported.
      */
-    private static final List<String> SPLAY_STATION_TOKENS = Arrays.asList("-", ".", "..", "...");
+    private static Station getAnonymousStationForToken(String token) {
+        switch (token) {
+            case "-":
+            case "..":
+                return Survey.ANONYMOUS_WALL_STATION;
+            case ".":
+            case "...":
+                return Survey.ANONYMOUS_FEATURE_STATION;
+            default:
+                return null;
+        }
+    }
 
     /** A single leg line's fields, parsed but not yet added to the survey. */
     private static final class ParsedLegLine {
@@ -621,7 +632,8 @@ public class SurvexTherionImporter {
             List<Leg> rawPromotedLegCandidates,
             boolean useLegComments) {
 
-        boolean isSplay = SPLAY_STATION_TOKENS.contains(toName);
+        Station anonymousStation = getAnonymousStationForToken(toName);
+        boolean isSplay = anonymousStation != null;
 
         // Detect if this is a backward leg BEFORE creating new stations
         boolean isBackward = isBackwardLeg(fromName, toName, nameToStation);
@@ -632,7 +644,7 @@ public class SurvexTherionImporter {
             nameToStation.put(fromName, from);
         }
 
-        Station to = Survey.ANONYMOUS_WALL_STATION;
+        Station to = anonymousStation;
         if (!isSplay) {
             to = nameToStation.get(toName);
             if (to == null) {
@@ -669,8 +681,8 @@ public class SurvexTherionImporter {
         Station newStation = isBackward ? from : to;
 
         Leg leg;
-        if (newStation == Survey.ANONYMOUS_WALL_STATION) {
-            leg = new Leg(distance, azimuth, inclination);
+        if (Survey.isAnonymousStation(newStation)) {
+            leg = new Leg(distance, azimuth, inclination, newStation, new Leg[] {});
         } else {
             Leg recorded = new Leg(distance, azimuth, inclination);
             leg = Leg.fromRecordedReading(recorded, newStation, promotedFrom, isBackward);
@@ -680,7 +692,7 @@ public class SurvexTherionImporter {
             if (useLegComments) {
                 // New path: comment belongs to the leg/splay itself
                 leg.setComment(comment);
-            } else if (newStation != Survey.ANONYMOUS_WALL_STATION) {
+            } else if (leg.hasDestination()) {
                 // Legacy path: comment goes on the newer station
                 newStation.setComment(comment);
             }

@@ -168,36 +168,58 @@ public class SurvexImporterTest {
     // --- Splay token recognition (Survex anonymous-station conventions) ---
 
     @Test
-    public void testDoubleDotSplayImportsAsSplayNotStation() throws Exception {
-        // ".." is Survex's own anonymous-wall-point convention, and the one SexyTopo itself
-        // writes for Survex export - this is the case the old "-"-only check silently broke.
-        // A trailing real leg is needed so station 1 becomes reachable from the origin -
-        // origin is only ever set from a non-splay leg.
-        Survey survey = new Survey();
-        SurvexTherionImporter.parseCentreline("1\t..\t1.0\t0.0\t0.0\n1\t2\t5.0\t0.0\t0.0", survey);
+    public void testEachAnonymousTokenImportsAsASplayOfItsType() throws Exception {
+        // "-" Therion wall, ".." Survex wall, "." feature in both. Survex "..." has no implied
+        // type and is read as another feature. A trailing real leg is needed so station 1 is
+        // reachable from the origin, which is only ever set from a non-splay leg.
+        Object[][] cases = {
+            {"-", true}, {"..", true}, {".", false}, {"...", false},
+        };
+        for (Object[] c : cases) {
+            String token = (String) c[0];
+            Survey survey = new Survey();
+            SurvexTherionImporter.parseCentreline(
+                    "1\t" + token + "\t1.0\t0.0\t0.0\n1\t2\t5.0\t0.0\t0.0", survey);
 
-        Assert.assertNull(survey.getStationByName(".."));
-        Assert.assertEquals(1, survey.getOrigin().getUnconnectedOnwardLegs().size());
+            Assert.assertNull(token, survey.getStationByName(token));
+            List<Leg> splays = survey.getOrigin().getUnconnectedOnwardLegs();
+            Assert.assertEquals(token, 1, splays.size());
+            Assert.assertEquals(token, c[1], splays.get(0).isToWall());
+        }
     }
 
     @Test
-    public void testSingleDotSplayImportsAsSplayNotStation() throws Exception {
-        // "." is Survex's anonymous non-wall-point convention (and also a valid Therion token)
-        Survey survey = new Survey();
-        SurvexTherionImporter.parseCentreline("1\t.\t1.0\t0.0\t0.0\n1\t2\t5.0\t0.0\t0.0", survey);
-
-        Assert.assertNull(survey.getStationByName("."));
-        Assert.assertEquals(1, survey.getOrigin().getUnconnectedOnwardLegs().size());
+    public void testLegacySplayCommentIsNotPutOnTheSharedAnonymousStation() throws Exception {
+        // The legacy path puts a comment on the new station, which a splay does not have
+        for (String token : new String[] {"..", "."}) {
+            Survey survey = new Survey();
+            SurvexTherionImporter.parseCentreline(
+                    "1\t" + token + "\t1.0\t0.0\t0.0\tstal\n1\t2\t5.0\t0.0\t0.0", survey, false);
+        }
+        Assert.assertFalse(Survey.ANONYMOUS_WALL_STATION.hasComment());
+        Assert.assertFalse(Survey.ANONYMOUS_FEATURE_STATION.hasComment());
     }
 
     @Test
-    public void testTripleDotSplayImportsAsSplayNotStation() throws Exception {
-        // "..." is Survex's anonymous point with no implicit flags
-        Survey survey = new Survey();
-        SurvexTherionImporter.parseCentreline("1\t...\t1.0\t0.0\t0.0\n1\t2\t5.0\t0.0\t0.0", survey);
+    public void testExportThenImportKeepsEachSplayType() throws Exception {
+        Survey original = new Survey();
+        SurveyUpdater.updateWithNewStation(original, new Leg(5, 0, -10));
+        SurveyUpdater.update(original, new Leg(2, 90, 5));
+        SurveyUpdater.update(original, new Leg(3, 270, 5).withToWall(false));
+        SurveyUpdater.updateWithNewStation(original, new Leg(4, 180, -10, true));
 
-        Assert.assertNull(survey.getStationByName("..."));
-        Assert.assertEquals(1, survey.getOrigin().getUnconnectedOnwardLegs().size());
+        for (SurveyFormat format : SurveyFormat.values()) {
+            String exported = SurvexTherionUtil.getCentrelineData(original, format);
+            // The importers strip the data header before parsing the lines
+            String dataLines = exported.substring(exported.indexOf('\n') + 1);
+            Survey imported = new Survey();
+            SurvexTherionImporter.parseCentreline(dataLines, imported);
+
+            Assert.assertEquals(
+                    format.toString(),
+                    exported,
+                    SurvexTherionUtil.getCentrelineData(imported, format));
+        }
     }
 
     @Test
@@ -214,17 +236,6 @@ public class SurvexImporterTest {
 
         Assert.assertEquals(2, survey.getAllStations().size()); // origin "1" and "2"
         Assert.assertEquals(3, survey.getOrigin().getUnconnectedOnwardLegs().size());
-    }
-
-    @Test
-    public void testHyphenSplayStillImportsAsSplay() throws Exception {
-        // Regression: the original "-" convention (Therion's, and the internal blank-station
-        // sentinel) must keep working
-        Survey survey = new Survey();
-        SurvexTherionImporter.parseCentreline("1\t-\t1.0\t0.0\t0.0\n1\t2\t5.0\t0.0\t0.0", survey);
-
-        Assert.assertNull(survey.getStationByName("-"));
-        Assert.assertEquals(1, survey.getOrigin().getUnconnectedOnwardLegs().size());
     }
 
     // --- Repeated real lines (Survex-style averaging on import) ---
