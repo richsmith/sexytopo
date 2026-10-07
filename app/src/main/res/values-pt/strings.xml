@@ -733,7 +733,6 @@
     <string name="menu_xsection_delete">Eliminar secção</string>
     <string name="menu_xsection_edit">Editar esboço</string>
     <string name="menu_xsection_set_direction">Definir direção</string>
-    <string name="menu_new_cross_section">Nova Secção Transversal</string>
     <string name="menu_jump_to_station_in_table">→ Tabela de Dados</string>
     <string name="menu_delete_station">Eliminar</string>
     <string name="menu_reverse">Inverter</string>
