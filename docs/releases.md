@@ -1,5 +1,5 @@
 # Unreleased
-- Splays can now be marked as going to another feature, such as a stal, instead of a wall, using the new To Wall tick box in the splay menu or when adding or editing a splay. They are shown as . in the table. Surveys saved with such splays cannot be opened by older versions of SexyTopo
+- Splays can now be marked as going to another feature, such as a stal, instead of a wall, using the new To Wall tick box in the splay menu or when adding or editing a splay. They are shown as . in the table and exported as . to Survex and Therion. Surveys saved with such splays cannot be opened by older versions of SexyTopo
 - Fix Survex and Therion import of legs that were shot backwards, which were placed in the opposite direction
 - Fix promoting a splay onto a leg that was shot backwards, which turned the leg round and added the splay in the wrong direction
 - Fix splays restored from a promoted leg being listed the wrong way round in the table

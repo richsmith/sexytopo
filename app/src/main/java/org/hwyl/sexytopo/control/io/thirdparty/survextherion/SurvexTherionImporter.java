@@ -465,9 +465,9 @@ public class SurvexTherionImporter {
      * anonymous wall point) or "..." (an anonymous point with no implicit flags) - see the
      * "Anonymous stations" section of the Survex manual.
      *
-     * <p>SexyTopo's own exporters still only ever write the single token each format's {@link
-     * SurveyFormat#getSplayStationName()} returns, but a hand-written or third-party file may use
-     * any of the others, so all are accepted here regardless of which format is being imported.
+     * <p>SexyTopo's own exporters write the names SurveyFormat.getAnonymousStationName returns, but
+     * a hand-written or third-party file may use any of the others, so all are accepted here
+     * regardless of which format is being imported.
      */
     private static final List<String> SPLAY_STATION_TOKENS = Arrays.asList("-", ".", "..", "...");
 

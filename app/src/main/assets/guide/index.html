@@ -292,7 +292,7 @@
 <h3>Leg Actions</h3>
 <ul>
 	<li><strong>Edit Leg</strong> modifies the distance, azimuth, and inclination. For a splay the dialog also has the To Wall tick box (see below)</li>
-	<li><strong>To Wall</strong> (splays only) is ticked when the splay goes to a wall, which is the default. Untick it for a splay that goes to something else, such as a boulder or a stalagmite. In the table the To column shows <code>-</code> for a wall and <code>.</code> for another feature, the same notation that Therion uses, and the choice is kept when the survey is saved</li>
+	<li><strong>To Wall</strong> (splays only) is ticked when the splay goes to a wall, which is the default. Untick it for a splay that goes to something else, such as a boulder or a stalagmite. In the table the To column shows <code>-</code> for a wall and <code>.</code> for another feature, the same notation that Therion uses, and the choice is kept when the survey is saved. Survex and Therion exports keep it too: a splay to a wall is written as <code>..</code> in Survex and <code>-</code> in Therion, and a splay to another feature as <code>.</code> in both</li>
 	<li><strong>Reverse</strong> inverts the measurement as if taken from target back to origin</li>
 	<li><strong>Upgrade Splay</strong> (splays only) converts a splay to a full leg, creating a new station</li>
 	<li><strong>Add to Leg Above</strong> (splays only) merges the splay's measurements into the most recent full leg, averaging them together. This is useful when you have taken an additional shot along an existing leg and want to incorporate it for better accuracy</li>
