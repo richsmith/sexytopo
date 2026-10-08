@@ -748,6 +748,8 @@
     <string name="menu_comment">Kommentar</string>
     <string name="menu_comment_leg">Messstrecken-Kommentar</string>
     <string name="menu_comment_splay">Peilung-Kommentar</string>
+    <string name="menu_hide_splay">Peilung ausblenden</string>
+    <string name="menu_show_splay">Peilung einblenden</string>
     <string name="menu_toggle_left_right">Links/Rechts umschalten</string>
     <string name="menu_context_title_leg">Messung %1$s &#10132; %2$s</string>
     <string name="menu_context_title_splay">Splay %s &#10132;</string>

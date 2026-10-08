@@ -888,7 +888,7 @@ public class SvgExporter extends DoubleSketchFileExporter {
         for (Station station : stationMap.keySet()) {
             int splayCount = 0;
             for (Leg leg : station.getOnwardLegs()) {
-                if (!leg.hasDestination()) {
+                if (!leg.hasDestination() && !leg.isHidden()) {
                     Line<Coord2D> line = legMap.get(leg);
                     String splayId = String.format("%s-Splay%d", station.getName(), splayCount);
                     writeLeg(xmlSerializer, line, splayId, scale, splayStrokeWidth);
