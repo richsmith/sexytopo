@@ -18,10 +18,36 @@ import org.hwyl.sexytopo.model.sketch.Sketch;
 
 public class Survey {
 
-    public static final Station NULL_STATION = new Station("-");
+    /** The anonymous destination of a splay to a wall, shown as a dash. */
+    public static final Station ANONYMOUS_WALL_STATION = new Station("-");
+
+    /** The anonymous destination of a splay to another feature, such as a stal, shown as a dot. */
+    public static final Station ANONYMOUS_FEATURE_STATION = new Station(".");
+
     public static final String DEFAULT_NAME = "Unsaved Survey";
 
     public static final char[] FORBIDDEN_CHARS = new char[] {':', '.', '\n', '\r', '/', '\\'};
+
+    /** Whether the station is one of the anonymous destinations of a splay. */
+    public static boolean isAnonymousStation(Station station) {
+        return station == ANONYMOUS_WALL_STATION || station == ANONYMOUS_FEATURE_STATION;
+    }
+
+    /** The anonymous station with this name, or null if there is none. */
+    public static Station getAnonymousStation(String name) {
+        if (name.equals(ANONYMOUS_WALL_STATION.getName())) {
+            return ANONYMOUS_WALL_STATION;
+        } else if (name.equals(ANONYMOUS_FEATURE_STATION.getName())) {
+            return ANONYMOUS_FEATURE_STATION;
+        } else {
+            return null;
+        }
+    }
+
+    /** Whether the name is used by an anonymous station, so a real station cannot have it. */
+    public static boolean isReservedStationName(String name) {
+        return getAnonymousStation(name) != null;
+    }
 
     private String name;
 

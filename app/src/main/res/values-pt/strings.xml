@@ -658,7 +658,7 @@
 
     <!-- Form validation errors -->
     <string name="validation_error_cannot_be_blank">Não pode estar vazio</string>
-    <string name="validation_error_station_named_dash">A estação não pode ser chamada \"-\"</string>
+    <string name="validation_error_station_name_reserved">A estação não pode ser chamada \"-\" ou \".\"</string>
     <string name="validation_error_station_does_not_exist">A estação não existe</string>
     <string name="validation_error_same_as_from_station">Não pode ser a mesma que a estação de origem</string>
     <string name="validation_error_station_name_not_unique">O nome da estação deve ser único</string>
@@ -708,6 +708,7 @@
     <string name="menu_set_active_station">Definir como Ativa</string>
     <string name="menu_rename_station">Renomear</string>
     <string name="menu_edit_leg">Editar</string>
+    <string name="menu_to_wall">À parede</string>
     <string name="menu_upgrade_row">Forçar Nova Estação</string>
     <string name="menu_promote_to_above_leg">Adicionar ao trecho acima</string>
     <string name="toast_splay_promoted">Raio combinado com trecho</string>

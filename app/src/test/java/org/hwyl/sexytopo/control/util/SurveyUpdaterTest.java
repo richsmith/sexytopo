@@ -9,6 +9,7 @@ import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
+import org.hwyl.sexytopo.testutils.SurveyAssertions;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -565,32 +566,181 @@ public class SurveyUpdaterTest {
     }
 
     @Test
-    public void testPromoteToAboveLegInheritsBackwardsFlag() {
-        Survey survey = new Survey();
-
-        Leg back1 = new Leg(5, 45, 10);
-        Leg back2 = new Leg(5.001f, 45.001f, 10);
-        Leg back3 = new Leg(5, 45, 10.001f);
-        SurveyUpdater.update(survey, back1, InputMode.BACKWARD);
-        SurveyUpdater.update(survey, back2, InputMode.BACKWARD);
-        SurveyUpdater.update(survey, back3, InputMode.BACKWARD);
-
+    public void testPromoteToAboveBackwardLegKeepsLegBackwardsAndAddsUnflaggedReading() {
+        Survey survey = createSurveyWithBackwardTripleShot();
         Station origin = survey.getOrigin();
         Leg backwardsLeg = origin.getConnectedOnwardLegs().get(0);
         Assert.assertTrue(backwardsLeg.wasShotBackwards());
 
-        Leg splay = new Leg(3, 50, 8);
-        origin.addOnwardLeg(splay);
-        survey.addLegRecord(splay);
+        Leg splay = addSplayToOrigin(survey, new Leg(3, 50, 8));
 
         boolean success = SurveyUpdater.promoteToAboveLeg(survey, splay);
         Assert.assertTrue(success);
 
         Leg updatedLeg = origin.getConnectedOnwardLegs().get(0);
+        Assert.assertTrue(updatedLeg.wasShotBackwards());
         Assert.assertTrue(updatedLeg.wasPromoted());
         Leg[] promotedFrom = updatedLeg.getPromotedFrom();
         Leg addedShot = promotedFrom[promotedFrom.length - 1];
-        Assert.assertTrue(addedShot.wasShotBackwards());
+        Assert.assertFalse(addedShot.wasShotBackwards());
+        SurveyAssertions.assertNoBackwardSplays(survey);
+    }
+
+    @Test
+    public void testPromoteToAboveBackwardLegRecalculatesPlottedNumbers() {
+        Survey survey = createSurveyWithBackwardTripleShot();
+        Station origin = survey.getOrigin();
+        Leg splay = addSplayToOrigin(survey, new Leg(6, 272, 12));
+
+        SurveyUpdater.promoteToAboveLeg(survey, splay);
+
+        // readings 5/270/10 x3 and 6/272/12 average to 5.25/270.5/10.5; the leg is plotted the
+        // other way round because it was shot backwards
+        Leg updatedLeg = origin.getConnectedOnwardLegs().get(0);
+        Assert.assertTrue(updatedLeg.wasShotBackwards());
+        Assert.assertEquals(5.25f, updatedLeg.getDistance(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(90.5f, updatedLeg.getAzimuth(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(-10.5f, updatedLeg.getInclination(), ALLOWED_DOUBLE_DELTA);
+    }
+
+    @Test
+    public void testPromoteToAboveBackwardLegAddsSplayToReadingsUnchanged() {
+        Survey survey = createSurveyWithBackwardTripleShot();
+        Station origin = survey.getOrigin();
+        Leg splay = addSplayToOrigin(survey, new Leg(6, 272, 12));
+
+        SurveyUpdater.promoteToAboveLeg(survey, splay);
+
+        Leg[] promotedFrom = origin.getConnectedOnwardLegs().get(0).getPromotedFrom();
+        Assert.assertEquals(4, promotedFrom.length);
+        for (Leg reading : promotedFrom) {
+            Assert.assertFalse(reading.hasDestination());
+            Assert.assertFalse(reading.wasShotBackwards());
+        }
+        Leg added = promotedFrom[3];
+        Assert.assertEquals(6f, added.getDistance(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(272f, added.getAzimuth(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(12f, added.getInclination(), ALLOWED_DOUBLE_DELTA);
+    }
+
+    @Test
+    public void testPromoteToAboveBackwardLegIsStillShownBackwardsInTable() {
+        Survey survey = createSurveyWithBackwardTripleShot();
+        Station origin = survey.getOrigin();
+        Leg splay = addSplayToOrigin(survey, new Leg(6, 272, 12));
+
+        SurveyUpdater.promoteToAboveLeg(survey, splay);
+
+        Leg updatedLeg = origin.getConnectedOnwardLegs().get(0);
+        GraphToListTranslator.AsTakenReading reading =
+                GraphToListTranslator.toAsTakenReading(
+                        new GraphToListTranslator.SurveyListEntry(origin, updatedLeg));
+        Assert.assertEquals(updatedLeg.getDestination(), reading.getFrom());
+        Assert.assertEquals(origin, reading.getTo());
+        Assert.assertEquals(270.5f, reading.getLeg().getAzimuth(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(10.5f, reading.getLeg().getInclination(), ALLOWED_DOUBLE_DELTA);
+    }
+
+    @Test
+    public void testPromoteSeveralSplaysToAboveBackwardLeg() {
+        Survey survey = createSurveyWithBackwardTripleShot();
+        Station origin = survey.getOrigin();
+
+        SurveyUpdater.promoteToAboveLeg(survey, addSplayToOrigin(survey, new Leg(6, 272, 12)));
+        SurveyUpdater.promoteToAboveLeg(survey, addSplayToOrigin(survey, new Leg(5, 268, 8)));
+
+        // 5/270/10 x3, 6/272/12 and 5/268/8 average to 5.2/270/10, plotted reversed
+        Leg updatedLeg = origin.getConnectedOnwardLegs().get(0);
+        Assert.assertTrue(updatedLeg.wasShotBackwards());
+        Assert.assertEquals(5, updatedLeg.getPromotedFrom().length);
+        Assert.assertEquals(5.2f, updatedLeg.getDistance(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(90f, updatedLeg.getAzimuth(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(-10f, updatedLeg.getInclination(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(1, origin.getOnwardLegs().size());
+        SurveyAssertions.assertNoBackwardSplays(survey);
+    }
+
+    @Test
+    public void testPromoteToAboveBackwardSingleReadingLegUsesReversedLegAsFirstReading() {
+        Survey survey = new Survey();
+        Leg firstSplay = new Leg(5, 45, 10);
+        SurveyUpdater.update(survey, firstSplay);
+        SurveyUpdater.upgradeSplay(survey, firstSplay, InputMode.BACKWARD);
+        Station origin = survey.getOrigin();
+        Leg backwardsLeg = origin.getConnectedOnwardLegs().get(0);
+        Assert.assertTrue(backwardsLeg.wasShotBackwards());
+        Assert.assertFalse(backwardsLeg.wasPromoted());
+        Leg splay = addSplayToOrigin(survey, new Leg(7, 47, 12));
+
+        SurveyUpdater.promoteToAboveLeg(survey, splay);
+
+        Leg updatedLeg = origin.getConnectedOnwardLegs().get(0);
+        Assert.assertTrue(updatedLeg.wasShotBackwards());
+        Leg[] promotedFrom = updatedLeg.getPromotedFrom();
+        Assert.assertEquals(2, promotedFrom.length);
+        // the leg was stored reversed, so the reading it came from is the original splay
+        Assert.assertFalse(promotedFrom[0].hasDestination());
+        Assert.assertEquals(5f, promotedFrom[0].getDistance(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(45f, promotedFrom[0].getAzimuth(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(10f, promotedFrom[0].getInclination(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertSame(splay, promotedFrom[1]);
+        // 5/45/10 and 7/47/12 average to 6/46/11, plotted reversed
+        Assert.assertEquals(6f, updatedLeg.getDistance(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(226f, updatedLeg.getAzimuth(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(-11f, updatedLeg.getInclination(), ALLOWED_DOUBLE_DELTA);
+        SurveyAssertions.assertNoBackwardSplays(survey);
+    }
+
+    @Test
+    public void testPromoteToAboveBackwardLegKeepsLegComment() {
+        Survey survey = createSurveyWithBackwardTripleShot();
+        Station origin = survey.getOrigin();
+        origin.getConnectedOnwardLegs().get(0).setComment("a comment");
+        Leg splay = addSplayToOrigin(survey, new Leg(6, 272, 12));
+
+        SurveyUpdater.promoteToAboveLeg(survey, splay);
+
+        Assert.assertEquals("a comment", origin.getConnectedOnwardLegs().get(0).getComment());
+    }
+
+    @Test
+    public void testPromoteToAboveForwardLegRecalculatesNumbersWithoutReversing() {
+        Survey survey = new Survey();
+        SurveyUpdater.update(survey, new Leg(5, 270, 10), InputMode.FORWARD);
+        SurveyUpdater.update(survey, new Leg(5, 270, 10), InputMode.FORWARD);
+        SurveyUpdater.update(survey, new Leg(5, 270, 10), InputMode.FORWARD);
+        Station origin = survey.getOrigin();
+        Leg splay = addSplayToOrigin(survey, new Leg(6, 272, 12));
+
+        SurveyUpdater.promoteToAboveLeg(survey, splay);
+
+        Leg updatedLeg = origin.getConnectedOnwardLegs().get(0);
+        Assert.assertFalse(updatedLeg.wasShotBackwards());
+        Assert.assertEquals(5.25f, updatedLeg.getDistance(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(270.5f, updatedLeg.getAzimuth(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(10.5f, updatedLeg.getInclination(), ALLOWED_DOUBLE_DELTA);
+        SurveyAssertions.assertNoBackwardSplays(survey);
+    }
+
+    @Test
+    public void testPromoteToAboveForwardSingleReadingLegUsesLegAsFirstReading() {
+        Survey survey = new Survey();
+        SurveyUpdater.updateWithNewStation(survey, new Leg(5, 90, 10));
+        Station origin = survey.getOrigin();
+        Leg splay = addSplayToOrigin(survey, new Leg(7, 92, 12));
+
+        SurveyUpdater.promoteToAboveLeg(survey, splay);
+
+        Leg updatedLeg = origin.getConnectedOnwardLegs().get(0);
+        Leg[] promotedFrom = updatedLeg.getPromotedFrom();
+        Assert.assertEquals(2, promotedFrom.length);
+        Assert.assertFalse(promotedFrom[0].hasDestination());
+        Assert.assertEquals(5f, promotedFrom[0].getDistance(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(90f, promotedFrom[0].getAzimuth(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(6f, updatedLeg.getDistance(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(91f, updatedLeg.getAzimuth(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(11f, updatedLeg.getInclination(), ALLOWED_DOUBLE_DELTA);
+        SurveyAssertions.assertNoBackwardSplays(survey);
     }
 
     @Test
@@ -745,5 +895,293 @@ public class SurveyUpdaterTest {
         SurveyUpdater.downgradeLeg(survey, promotedLeg);
 
         survey.checkSurveyIntegrity();
+    }
+
+    @Test
+    public void testDowngradePromotedBackwardLegRestoresRecordedReadingsAsSplays() {
+        Survey survey = createSurveyWithBackwardTripleShot();
+        Station origin = survey.getOrigin();
+        SurveyUpdater.promoteToAboveLeg(survey, addSplayToOrigin(survey, new Leg(6, 272, 12)));
+        Leg promotedLeg = origin.getConnectedOnwardLegs().get(0);
+        Leg[] promotedFrom = promotedLeg.getPromotedFrom();
+
+        SurveyUpdater.downgradeLeg(survey, promotedLeg);
+
+        List<Leg> onwardLegs = origin.getOnwardLegs();
+        Assert.assertEquals(4, onwardLegs.size());
+        for (int i = 0; i < promotedFrom.length; i++) {
+            Leg splay = onwardLegs.get(i);
+            Assert.assertFalse(splay.hasDestination());
+            Assert.assertFalse(splay.wasShotBackwards());
+            Assert.assertEquals(
+                    promotedFrom[i].getDistance(), splay.getDistance(), ALLOWED_DOUBLE_DELTA);
+            Assert.assertEquals(
+                    promotedFrom[i].getAzimuth(), splay.getAzimuth(), ALLOWED_DOUBLE_DELTA);
+            Assert.assertEquals(
+                    promotedFrom[i].getInclination(), splay.getInclination(), ALLOWED_DOUBLE_DELTA);
+        }
+        SurveyAssertions.assertNoBackwardSplays(survey);
+    }
+
+    @Test
+    public void testDowngradedBackwardLegSplaysAreShownFromStationToNothingInTable() {
+        Survey survey = createSurveyWithBackwardTripleShot();
+        Station origin = survey.getOrigin();
+        SurveyUpdater.promoteToAboveLeg(survey, addSplayToOrigin(survey, new Leg(6, 272, 12)));
+
+        SurveyUpdater.downgradeLeg(survey, origin.getConnectedOnwardLegs().get(0));
+
+        for (Leg splay : origin.getOnwardLegs()) {
+            GraphToListTranslator.AsTakenReading reading =
+                    GraphToListTranslator.toAsTakenReading(
+                            new GraphToListTranslator.SurveyListEntry(origin, splay));
+            Assert.assertEquals(origin, reading.getFrom());
+            Assert.assertEquals(Survey.ANONYMOUS_WALL_STATION, reading.getTo());
+            Assert.assertEquals(splay.getAzimuth(), reading.getLeg().getAzimuth(), 0.0001f);
+        }
+    }
+
+    @Test
+    public void testDowngradeBackwardSingleReadingLegReversesItBackToTheReading() {
+        Survey survey = new Survey();
+        Leg firstSplay = new Leg(5, 45, 10);
+        SurveyUpdater.update(survey, firstSplay);
+        SurveyUpdater.upgradeSplay(survey, firstSplay, InputMode.BACKWARD);
+        Station origin = survey.getOrigin();
+        Leg backwardsLeg = origin.getConnectedOnwardLegs().get(0);
+        Assert.assertEquals(225f, backwardsLeg.getAzimuth(), ALLOWED_DOUBLE_DELTA);
+
+        SurveyUpdater.downgradeLeg(survey, backwardsLeg);
+
+        Assert.assertEquals(1, origin.getOnwardLegs().size());
+        Leg splay = origin.getOnwardLegs().get(0);
+        Assert.assertFalse(splay.hasDestination());
+        Assert.assertFalse(splay.wasShotBackwards());
+        Assert.assertEquals(5f, splay.getDistance(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(45f, splay.getAzimuth(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(10f, splay.getInclination(), ALLOWED_DOUBLE_DELTA);
+        SurveyAssertions.assertNoBackwardSplays(survey);
+    }
+
+    @Test
+    public void testDowngradeForwardSingleReadingLegKeepsNumbers() {
+        Survey survey = new Survey();
+        SurveyUpdater.updateWithNewStation(survey, new Leg(5, 90, 10));
+        Station origin = survey.getOrigin();
+
+        SurveyUpdater.downgradeLeg(survey, origin.getConnectedOnwardLegs().get(0));
+
+        Leg splay = origin.getOnwardLegs().get(0);
+        Assert.assertFalse(splay.wasShotBackwards());
+        Assert.assertEquals(90f, splay.getAzimuth(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(10f, splay.getInclination(), ALLOWED_DOUBLE_DELTA);
+    }
+
+    @Test
+    public void testPromoteThenDowngradeBackwardSingleReadingLegRestoresOriginalSplays() {
+        Survey survey = new Survey();
+        Leg firstSplay = new Leg(5, 45, 10);
+        SurveyUpdater.update(survey, firstSplay);
+        SurveyUpdater.upgradeSplay(survey, firstSplay, InputMode.BACKWARD);
+        Station origin = survey.getOrigin();
+        Leg secondSplay = addSplayToOrigin(survey, new Leg(7, 47, 12));
+        SurveyUpdater.promoteToAboveLeg(survey, secondSplay);
+
+        SurveyUpdater.downgradeLeg(survey, origin.getConnectedOnwardLegs().get(0));
+
+        List<Leg> onwardLegs = origin.getOnwardLegs();
+        Assert.assertEquals(2, onwardLegs.size());
+        Assert.assertEquals(5f, onwardLegs.get(0).getDistance(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(45f, onwardLegs.get(0).getAzimuth(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(10f, onwardLegs.get(0).getInclination(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(7f, onwardLegs.get(1).getDistance(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(47f, onwardLegs.get(1).getAzimuth(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(12f, onwardLegs.get(1).getInclination(), ALLOWED_DOUBLE_DELTA);
+        SurveyAssertions.assertNoBackwardSplays(survey);
+    }
+
+    @Test
+    public void testCreateLegFromSingleReadingUsesItAsItIs() {
+        Station destination = new Station("2");
+
+        Leg leg =
+                SurveyUpdater.createLegFromReadings(
+                        Arrays.asList(new Leg(5, 45, 10)), destination, false);
+
+        Assert.assertSame(destination, leg.getDestination());
+        Assert.assertFalse(leg.wasShotBackwards());
+        Assert.assertFalse(leg.wasPromoted());
+        Assert.assertEquals(5f, leg.getDistance(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(45f, leg.getAzimuth(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(10f, leg.getInclination(), ALLOWED_DOUBLE_DELTA);
+    }
+
+    @Test
+    public void testCreateLegFromSingleBackwardReadingReversesIt() {
+        Leg leg =
+                SurveyUpdater.createLegFromReadings(
+                        Arrays.asList(new Leg(5, 45, 10)), new Station("2"), true);
+
+        Assert.assertTrue(leg.wasShotBackwards());
+        Assert.assertFalse(leg.wasPromoted());
+        Assert.assertEquals(225f, leg.getAzimuth(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(-10f, leg.getInclination(), ALLOWED_DOUBLE_DELTA);
+    }
+
+    @Test
+    public void testCreateLegFromRepeatedReadingsAveragesAndKeepsTheReadings() {
+        Leg first = new Leg(5, 268, 8);
+        Leg second = new Leg(5, 272, 12);
+
+        Leg leg =
+                SurveyUpdater.createLegFromReadings(
+                        Arrays.asList(first, second), new Station("2"), false);
+
+        Assert.assertFalse(leg.wasShotBackwards());
+        Assert.assertEquals(270f, leg.getAzimuth(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(10f, leg.getInclination(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(2, leg.getPromotedFrom().length);
+        Assert.assertSame(first, leg.getPromotedFrom()[0]);
+        Assert.assertSame(second, leg.getPromotedFrom()[1]);
+    }
+
+    @Test
+    public void testCreateLegFromRepeatedBackwardReadingsReversesOnlyTheAverage() {
+        Leg first = new Leg(5, 268, 8);
+        Leg second = new Leg(5, 272, 12);
+
+        Leg leg =
+                SurveyUpdater.createLegFromReadings(
+                        Arrays.asList(first, second), new Station("2"), true);
+
+        Assert.assertTrue(leg.wasShotBackwards());
+        Assert.assertEquals(90f, leg.getAzimuth(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(-10f, leg.getInclination(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(2, leg.getPromotedFrom().length);
+        for (Leg reading : leg.getPromotedFrom()) {
+            Assert.assertFalse(reading.wasShotBackwards());
+        }
+        Assert.assertEquals(268f, leg.getPromotedFrom()[0].getAzimuth(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(272f, leg.getPromotedFrom()[1].getAzimuth(), ALLOWED_DOUBLE_DELTA);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateLegFromNoReadingsIsRejected() {
+        SurveyUpdater.createLegFromReadings(Arrays.<Leg>asList(), new Station("2"), false);
+    }
+
+    // ---- splays that go to another feature rather than a wall ----
+
+    @Test
+    public void testSetSplayToWallChangesWhatTheSplayGoesToAndKeepsItsPlace() {
+        Survey survey = new Survey();
+        Leg first = new Leg(1, 10, 0);
+        Leg second = new Leg(2, 100, 5);
+        Leg third = new Leg(3, 200, 10);
+        SurveyUpdater.update(survey, first);
+        SurveyUpdater.update(survey, second);
+        SurveyUpdater.update(survey, third);
+
+        SurveyUpdater.setSplayToWall(survey, second, false);
+
+        List<Leg> legs = survey.getAllLegsInChronoOrder();
+        Assert.assertEquals(3, legs.size());
+        Assert.assertSame(first, legs.get(0));
+        Assert.assertSame(third, legs.get(2));
+        Leg edited = legs.get(1);
+        Assert.assertFalse(edited.isToWall());
+        Assert.assertEquals(2f, edited.getDistance(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(100f, edited.getAzimuth(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(5f, edited.getInclination(), ALLOWED_DOUBLE_DELTA);
+        Assert.assertEquals(3, survey.getOrigin().getOnwardLegs().size());
+        Assert.assertTrue(survey.getOrigin().getOnwardLegs().contains(edited));
+    }
+
+    @Test
+    public void testSetSplayToWallDoesNothingWhenTheSplayAlreadyGoesThere() {
+        Survey survey = new Survey();
+        Leg splay = new Leg(2, 100, 5);
+        SurveyUpdater.update(survey, splay);
+
+        SurveyUpdater.setSplayToWall(survey, splay, true);
+
+        Assert.assertSame(splay, survey.getAllLegsInChronoOrder().get(0));
+    }
+
+    @Test
+    public void testSetSplayToWallIgnoresALegWithADestination() {
+        Survey survey = new Survey();
+        SurveyUpdater.updateWithNewStation(survey, new Leg(5, 90, 10));
+        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+
+        SurveyUpdater.setSplayToWall(survey, leg, false);
+
+        Assert.assertSame(leg, survey.getOrigin().getConnectedOnwardLegs().get(0));
+    }
+
+    @Test
+    public void testRepeatedSplaysOfAnyTypeMakeALegAndComeBackAsTheyWere() {
+        Survey survey = new Survey();
+        Leg first = new Leg(5, 90, 10);
+        Leg second = new Leg(5, 90, 10);
+        SurveyUpdater.update(survey, first, InputMode.FORWARD);
+        SurveyUpdater.update(survey, second, InputMode.FORWARD);
+        SurveyUpdater.setSplayToWall(survey, second, false);
+        SurveyUpdater.update(survey, new Leg(5, 90, 10), InputMode.FORWARD);
+
+        Station origin = survey.getOrigin();
+        Assert.assertEquals(1, origin.getConnectedOnwardLegs().size());
+        Leg leg = origin.getConnectedOnwardLegs().get(0);
+        Leg[] readings = leg.getPromotedFrom();
+        Assert.assertEquals(3, readings.length);
+        Assert.assertTrue(readings[0].isToWall());
+        Assert.assertFalse(readings[1].isToWall());
+        Assert.assertTrue(readings[2].isToWall());
+
+        SurveyUpdater.downgradeLeg(survey, leg);
+
+        List<Leg> splays = origin.getOnwardLegs();
+        Assert.assertEquals(3, splays.size());
+        Assert.assertTrue(splays.get(0).isToWall());
+        Assert.assertFalse(splays.get(1).isToWall());
+        Assert.assertTrue(splays.get(2).isToWall());
+        SurveyAssertions.assertNoBackwardSplays(survey);
+    }
+
+    @Test
+    public void testSplayPromotedToALegKeepsWhatItGoesToAsAReading() {
+        Survey survey = new Survey();
+        SurveyUpdater.updateWithNewStation(survey, new Leg(5, 90, 10));
+        Station origin = survey.getOrigin();
+        Leg splay = addSplayToOrigin(survey, new Leg(7, 92, 12));
+        SurveyUpdater.setSplayToWall(survey, splay, false);
+        Leg toFeature = origin.getUnconnectedOnwardLegs().get(0);
+
+        SurveyUpdater.promoteToAboveLeg(survey, toFeature);
+
+        Leg leg = origin.getConnectedOnwardLegs().get(0);
+        Assert.assertEquals(2, leg.getPromotedFrom().length);
+        Assert.assertTrue(leg.getPromotedFrom()[0].isToWall());
+        Assert.assertFalse(leg.getPromotedFrom()[1].isToWall());
+
+        SurveyUpdater.downgradeLeg(survey, leg);
+
+        List<Leg> splays = origin.getOnwardLegs();
+        Assert.assertTrue(splays.get(0).isToWall());
+        Assert.assertFalse(splays.get(1).isToWall());
+    }
+
+    private static Survey createSurveyWithBackwardTripleShot() {
+        Survey survey = new Survey();
+        SurveyUpdater.update(survey, new Leg(5, 270, 10), InputMode.BACKWARD);
+        SurveyUpdater.update(survey, new Leg(5, 270, 10), InputMode.BACKWARD);
+        SurveyUpdater.update(survey, new Leg(5, 270, 10), InputMode.BACKWARD);
+        return survey;
+    }
+
+    private static Leg addSplayToOrigin(Survey survey, Leg splay) {
+        survey.getOrigin().addOnwardLeg(splay);
+        survey.addLegRecord(splay);
+        return splay;
     }
 }

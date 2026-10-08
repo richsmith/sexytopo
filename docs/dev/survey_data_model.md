@@ -27,23 +27,24 @@ A `Leg` represents a measurement between two points (a directed edge in the grap
 - `distance`: Length in metres
 - `azimuth`: Compass bearing (0-360°)
 - `inclination`: Vertical angle (-90° to +90°)
-- `destination`: The station this leg points TO (may be `Survey.NULL_STATION`)
+- `destination`: The station this leg points TO (an anonymous station for a splay)
 - `wasShotBackwards`: Whether this was measured as a backsight
 - `promotedFrom`: Array of legs if this was upgraded from splay(s)
 
 **Types of Legs:**
 
 1. **Full Leg (Connected Leg)**
-   - Has a `destination` that is NOT `Survey.NULL_STATION`
+   - Has a real `destination`, not an anonymous station
    - Creates/connects to a named station
    - Forms the skeleton/centreline of the survey
    - Check with: `leg.hasDestination()` returns `true`
 
 2. **Splay (Unconnected Leg)**
-   - Has `destination == Survey.NULL_STATION`
+   - Has an anonymous station as `destination`: `Survey.ANONYMOUS_WALL_STATION`  or `Survey.ANONYMOUS_FEATURE_STATION`
    - Used to capture cave passage detail (walls, floor, ceiling)
    - Does NOT create a new station
-   - Check with: `leg.hasDestination()` returns `false`
+   - Check with: `leg.hasDestination()` returns `false`. For a station on its own, such as the to-station of an as-taken reading, use `Survey.isAnonymousStation(station)`
+   - Which kind: `leg.isToWall()`.
 
 ## Graph Structure
 
@@ -72,7 +73,7 @@ The survey forms a **tree structure**:
   - A station can have multiple onward legs (both full legs and splays)
 
 - **Leg → To Station**: A full leg POINTS TO a destination station
-  - Access via: `leg.getDestination()` (or `Survey.NULL_STATION` for splays)
+  - Access via: `leg.getDestination()` (an anonymous station for splays)
 
 - **Station ← Leg**: Finding the leg that leads TO a station (the "referring leg")
   - Access via: `survey.getReferringLeg(station)`
@@ -133,7 +134,7 @@ When the user clicks on a row in the table or a point in the graph view:
 
 **For a SPLAY row/point:**
 - The "from" station is where the splay originates
-- There is NO "to" station (`leg.getDestination() == Survey.NULL_STATION`)
+- There is NO real "to" station (`leg.getDestination()` is an anonymous station)
 - Deleting deletes: just that single splay measurement
 
 ## Chronological Order
@@ -171,12 +172,18 @@ This validates:
    - Has no referring leg (`getReferringLeg(origin)` returns `null`)
    - Check: `station == survey.getOrigin()`
 
-2. **NULL_STATION**
-   - Sentinel value `Survey.NULL_STATION`
-   - Used as destination for splays
-   - NOT a real station in the graph
+2. **Anonymous Stations**
+   - `Survey.ANONYMOUS_WALL_STATION` (named `-`) and `Survey.ANONYMOUS_FEATURE_STATION` (named `.`)
+   - Used as the destination of every splay
+   - NOT real stations in the graph.
+   - Their names are reserved.
 
-3. **Backwards Shots**
+3. **Promoted Legs**
+   - `promotedFrom` holds the readings exactly as recorded, each keeping its own kind (wall or another feature)
+
+4. **Backwards Shots**
    - `leg.wasShotBackwards()` indicates measurement direction
+   - The leg is stored in the direction it is plotted; the flag is used for tables and exports to show it as taken
+   - Splays are never shot backwards
    - Same graph structure, just metadata for display/export
    - Doesn't affect deletion logic

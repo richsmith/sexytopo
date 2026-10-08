@@ -4,11 +4,11 @@ import android.content.Context;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import com.google.android.material.textfield.TextInputLayout;
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.control.util.SurveyTraversal;
@@ -92,6 +92,9 @@ public class EditLegForm extends Form {
     private Spinner inputModeSpinner;
     private InputMode inputMode = InputMode.FORWARD;
 
+    // Shown for splays only
+    private CheckBox toWallCheckBox;
+
     private boolean isInitialising;
 
     /** Constructor for editing an existing leg */
@@ -103,7 +106,7 @@ public class EditLegForm extends Form {
         this.originalFromStation = fromStation;
         this.originalLeg = legToEdit;
         this.isSplay = !legToEdit.hasDestination();
-        this.inputMode = legToEdit.wasShotBackwards() ? InputMode.BACKWARD : InputMode.FORWARD;
+        this.inputMode = getInitialInputMode(legToEdit);
 
         this.initialise(dialogView);
     }
@@ -132,8 +135,17 @@ public class EditLegForm extends Form {
         this.isInitialising = true;
         this.initialiseFields(dialogView);
         this.initialiseInputMode(dialogView);
+        this.initialiseToWall(dialogView);
         this.initialiseStationDisplay();
         this.isInitialising = false;
+    }
+
+    private void initialiseToWall(View dialogView) {
+        if (isSplay) {
+            this.toWallCheckBox = dialogView.findViewById(R.id.toWallCheckBox);
+            toWallCheckBox.setVisibility(View.VISIBLE);
+            toWallCheckBox.setChecked(initialToWall(originalLeg));
+        }
     }
 
     private void initialiseFields(View dialogView) {
@@ -289,8 +301,8 @@ public class EditLegForm extends Form {
 
         if (fromName.isEmpty()) {
             error = R.string.validation_error_cannot_be_blank;
-        } else if (fromName.equals(SexyTopoConstants.BLANK_STATION_NAME)) {
-            error = R.string.validation_error_station_named_dash;
+        } else if (Survey.isReservedStationName(fromName)) {
+            error = R.string.validation_error_station_name_reserved;
         } else if (survey.isOrigin(originalFromStation) && fromStation == null) {
             // Are we just renaming the origin station
             boolean isRenamingStation = !originalFromStation.getName().equals(fromName);
@@ -349,8 +361,8 @@ public class EditLegForm extends Form {
 
         if (toName.isEmpty()) {
             error = R.string.validation_error_cannot_be_blank;
-        } else if (toName.equals(SexyTopoConstants.BLANK_STATION_NAME)) {
-            error = R.string.validation_error_station_named_dash;
+        } else if (Survey.isReservedStationName(toName)) {
+            error = R.string.validation_error_station_name_reserved;
         } else if (toName.equals(fromName)) {
             error = R.string.validation_error_same_as_from_station;
         } else if (originalLeg != null && originalLeg.hasDestination()) {
@@ -785,7 +797,7 @@ public class EditLegForm extends Form {
 
         Leg leg;
         if (isSplay) {
-            leg = new Leg(distance, azimuth, inclination);
+            leg = createSplay(distance, azimuth, inclination, toWallCheckBox.isChecked());
         } else if (originalLeg != null && originalLeg.hasDestination()) {
             // For editing: reuse existing destination station object
             Station destination = originalLeg.getDestination();
@@ -796,11 +808,39 @@ public class EditLegForm extends Form {
             leg = new Leg(distance, azimuth, inclination);
         }
 
-        // Apply backwards flag if needed
-        if (inputMode == InputMode.BACKWARD) {
-            leg = leg.reverse();
-        }
+        return applyInputMode(leg, isSplay, inputMode);
+    }
 
+    /** Builds the splay for the readings entered, going to a wall or to another feature. */
+    static Leg createSplay(float distance, float azimuth, float inclination, boolean toWall) {
+        return new Leg(distance, azimuth, inclination).withToWall(toWall);
+    }
+
+    /**
+     * Whether the To Wall tick box starts ticked. A new splay goes to a wall, and an edited splay
+     * keeps what it goes to unless the box is changed.
+     */
+    static boolean initialToWall(Leg originalSplay) {
+        return originalSplay == null || originalSplay.isToWall();
+    }
+
+    /**
+     * The input mode a leg is edited in. Only a leg with a destination can be shot backwards; a
+     * splay always runs from its station, so it is always edited as a forward shot.
+     */
+    static InputMode getInitialInputMode(Leg leg) {
+        boolean backwards = leg.hasDestination() && leg.wasShotBackwards();
+        return backwards ? InputMode.BACKWARD : InputMode.FORWARD;
+    }
+
+    /**
+     * Applies the input mode to a freshly built leg. A backward shot is stored reversed and
+     * flagged, but a splay is never reversed or flagged.
+     */
+    static Leg applyInputMode(Leg leg, boolean isSplay, InputMode inputMode) {
+        if (inputMode == InputMode.BACKWARD && !isSplay) {
+            return leg.reverse();
+        }
         return leg;
     }
 

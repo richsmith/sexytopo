@@ -353,8 +353,13 @@ public class SurveyJsonTranslater {
         String destinationName = json.getString(DESTINATION_TAG);
 
         Leg leg;
-        if (destinationName.equals(SexyTopoConstants.BLANK_STATION_NAME)) {
-            leg = new Leg(distance, azimuth, inclination, wasShotBackwards);
+        Station anonymousStation = Survey.getAnonymousStation(destinationName);
+        if (anonymousStation != null) {
+            // A dash is a splay to a wall and a dot is a splay to another feature.
+            // A splay always runs from its station, so it can never be shot backwards.
+            // Older files may hold a splay with the flag set; the numbers are what is plotted, so
+            // they are kept and only the flag is cleared.
+            leg = new Leg(distance, azimuth, inclination, anonymousStation, new Leg[] {});
 
         } else {
             if (!namesToStations.containsKey(destinationName)) {

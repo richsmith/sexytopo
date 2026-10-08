@@ -82,4 +82,67 @@ public class GraphToListTranslatorTest {
         Assert.assertEquals(45.0f, reading.getLeg().getAzimuth(), DELTA);
         Assert.assertEquals(10.0f, reading.getLeg().getInclination(), DELTA);
     }
+
+    @Test
+    public void testCreateMapShowsSplayFromItsStationToNothing() {
+        Survey survey = BasicTestSurveyCreator.createEmptySurvey();
+        Station origin = survey.getOrigin();
+        Leg splay = new Leg(3, 50, 8);
+        origin.addOnwardLeg(splay);
+        survey.addLegRecord(splay);
+
+        Map<TableCol, Object> map =
+                GraphToListTranslator.createMap(
+                        new GraphToListTranslator.SurveyListEntry(origin, splay));
+
+        Assert.assertEquals(origin, map.get(TableCol.FROM));
+        Assert.assertEquals(Survey.ANONYMOUS_WALL_STATION, map.get(TableCol.TO));
+        Assert.assertEquals(50.0f, (float) map.get(TableCol.AZIMUTH), DELTA);
+        Assert.assertEquals(8.0f, (float) map.get(TableCol.INCLINATION), DELTA);
+    }
+
+    @Test
+    public void testBackwardLegStaysBackwardsInTableAfterPromotingSplayToIt() {
+        Survey survey = new Survey();
+        SurveyUpdater.update(survey, new Leg(5, 270, 10), InputMode.BACKWARD);
+        SurveyUpdater.update(survey, new Leg(5, 270, 10), InputMode.BACKWARD);
+        SurveyUpdater.update(survey, new Leg(5, 270, 10), InputMode.BACKWARD);
+        Station origin = survey.getOrigin();
+        Leg splay = new Leg(6, 272, 12);
+        origin.addOnwardLeg(splay);
+        survey.addLegRecord(splay);
+
+        SurveyUpdater.promoteToAboveLeg(survey, splay);
+
+        Leg promoted = origin.getConnectedOnwardLegs().get(0);
+        Map<TableCol, Object> map =
+                GraphToListTranslator.createMap(
+                        new GraphToListTranslator.SurveyListEntry(origin, promoted));
+        Assert.assertEquals(promoted.getDestination(), map.get(TableCol.FROM));
+        Assert.assertEquals(origin, map.get(TableCol.TO));
+        Assert.assertEquals(270.5f, (float) map.get(TableCol.AZIMUTH), DELTA);
+        Assert.assertEquals(10.5f, (float) map.get(TableCol.INCLINATION), DELTA);
+    }
+
+    @Test
+    public void testDowngradedBackwardLegIsListedAsSplaysFromItsStation() {
+        Survey survey = new Survey();
+        SurveyUpdater.update(survey, new Leg(5, 270, 10), InputMode.BACKWARD);
+        SurveyUpdater.update(survey, new Leg(5, 270, 10), InputMode.BACKWARD);
+        SurveyUpdater.update(survey, new Leg(5, 270, 10), InputMode.BACKWARD);
+        Station origin = survey.getOrigin();
+
+        SurveyUpdater.downgradeLeg(survey, origin.getConnectedOnwardLegs().get(0));
+
+        List<GraphToListTranslator.SurveyListEntry> entries =
+                new GraphToListTranslator().toChronoListOfSurveyListEntries(survey);
+        Assert.assertEquals(3, entries.size());
+        for (GraphToListTranslator.SurveyListEntry entry : entries) {
+            Map<TableCol, Object> map = GraphToListTranslator.createMap(entry);
+            Assert.assertEquals(origin, map.get(TableCol.FROM));
+            Assert.assertEquals(Survey.ANONYMOUS_WALL_STATION, map.get(TableCol.TO));
+            Assert.assertEquals(270.0f, (float) map.get(TableCol.AZIMUTH), DELTA);
+            Assert.assertEquals(10.0f, (float) map.get(TableCol.INCLINATION), DELTA);
+        }
+    }
 }

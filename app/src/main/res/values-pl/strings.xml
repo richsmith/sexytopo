@@ -658,7 +658,7 @@
 
     <!-- Form validation errors -->
     <string name="validation_error_cannot_be_blank">Nie może być puste</string>
-    <string name="validation_error_station_named_dash">Stanowisko nie może nazywać się \"-\"</string>
+    <string name="validation_error_station_name_reserved">Stanowisko nie może nazywać się \"-\" ani \".\"</string>
     <string name="validation_error_station_does_not_exist">Stanowisko nie istnieje</string>
     <string name="validation_error_same_as_from_station">Nie może być takie samo jak stanowisko początkowe</string>
     <string name="validation_error_station_name_not_unique">Nazwa stanowiska musi być unikalna</string>
@@ -708,6 +708,7 @@
     <string name="menu_set_active_station">Ustaw jako aktywne</string>
     <string name="menu_rename_station">Zmień nazwę</string>
     <string name="menu_edit_leg">Edytuj</string>
+    <string name="menu_to_wall">Do ściany</string>
     <string name="menu_upgrade_row">Wymuś nowe stanowisko</string>
     <string name="menu_promote_to_above_leg">Dodaj do ciągu powyżej</string>
     <string name="toast_splay_promoted">Pomiar szczegółowy połączony z ciągiem</string>

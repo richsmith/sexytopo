@@ -1,3 +1,9 @@
+# Unreleased
+- Splays can now be marked as going to another feature, such as a stal. Survex ... is imported as another feature. Surveys saved with such splays cannot be opened by older versions of SexyTopo
+- Fix Survex and Therion import of legs that were shot backwards, which were placed in the opposite direction
+- Fix promoting a splay onto a leg that was shot backwards, which turned the leg round and added the splay in the wrong direction
+- Fix splays restored from a promoted leg being listed the wrong way round in the table
+
 # 2026-09-30 1.14.0
 - Calibration screen reworked: readings are labelled and grouped by the direction they were actually taken in, so the order of shots no longer matters and every reading is used
 - Calibration readings can be viewed with their direction, roll and consistency with the rest of their set, and any reading can be replaced or deleted
@@ -61,7 +67,7 @@
 - PocketTopo .top file import support (thanks Andrew Atkinson)
 - Trip management overhaul: date picker, team member selection, caver name storage (with Andrew Atkinson)
 - LRUD perpendicular mode option (thanks Damian Ivereigh)
-- Improved context menus: separate leg and station menus, with from/to station awareness (with Damian Ivereigh). This is partly a reversion to previous behaviour, but keeping the unified station menu across different views. 
+- Improved context menus: separate leg and station menus, with from/to station awareness (with Damian Ivereigh). This is partly a reversion to previous behaviour, but keeping the unified station menu across different views.
 - New compass display on plan view (turn-offable in sketch quick settings)
 - Basic survey sharing support through the Android share system
 - Experimental 3D view (a bit of a toy at this point - don't complain about the lack of features!)

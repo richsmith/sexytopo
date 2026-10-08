@@ -42,4 +42,25 @@ public class SurveyTest {
         Assert.assertFalse(baseSurvey.isConnectedTo(otherSurvey));
         Assert.assertEquals(0, baseSurvey.getConnectedSurveys().size());
     }
+
+    @Test
+    public void testAnonymousStationsAreFoundByNameOnly() {
+        Object[][] cases = {
+            {"-", Survey.ANONYMOUS_WALL_STATION},
+            {".", Survey.ANONYMOUS_FEATURE_STATION},
+            {"1", null},
+            {"0.1", null},
+            {"..", null},
+            {"", null},
+        };
+        for (Object[] c : cases) {
+            String name = (String) c[0];
+            Station expected = (Station) c[1];
+            Assert.assertSame(name, expected, Survey.getAnonymousStation(name));
+            Assert.assertEquals(name, expected != null, Survey.isReservedStationName(name));
+        }
+        Assert.assertTrue(Survey.isAnonymousStation(Survey.ANONYMOUS_WALL_STATION));
+        Assert.assertTrue(Survey.isAnonymousStation(Survey.ANONYMOUS_FEATURE_STATION));
+        Assert.assertFalse(Survey.isAnonymousStation(new Station("-")));
+    }
 }

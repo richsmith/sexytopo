@@ -257,7 +257,7 @@
 	<li><strong>Undo Last Leg</strong> removes the most recent measurement</li>
 	<li><strong>Link to Existing Survey</strong> connects the current survey to another survey at a common station</li>
 	<li><strong>Add Leg</strong> opens a dialog for entering a measurement to a new station from the active station</li>
-	<li><strong>Add Splay</strong> opens a dialog for entering a splay measurement from the active station</li>
+	<li><strong>Add Splay</strong> opens a dialog for entering a splay measurement from the active station. Untick To Wall if the splay goes to another feature (see Leg Actions above)</li>
 	<li><strong>Generate Test Survey</strong> creates sample data for practice and testing</li>
 	<li><strong>System Log</strong> displays system messages and debug information</li>
 </ul>
@@ -291,7 +291,8 @@
 
 <h3>Leg Actions</h3>
 <ul>
-	<li><strong>Edit Leg</strong> modifies the distance, azimuth, and inclination</li>
+	<li><strong>Edit Leg</strong> modifies the distance, azimuth, and inclination. For a splay the dialog also has the To Wall tick box (see below)</li>
+	<li><strong>To Wall</strong> (splays only) is ticked when the splay goes to a wall, which is the default. Untick it for a splay that goes to something else, such as a stalagmite. In the table the To column shows <code>-</code> for a wall and <code>.</code> for another feature. Survex <code>...</code> (a point with no implied type) is imported as . another feature</li>
 	<li><strong>Reverse</strong> inverts the measurement as if taken from target back to origin</li>
 	<li><strong>Upgrade Splay</strong> (splays only) converts a splay to a full leg, creating a new station</li>
 	<li><strong>Add to Leg Above</strong> (splays only) merges the splay's measurements into the most recent full leg, averaging them together. This is useful when you have taken an additional shot along an existing leg and want to incorporate it for better accuracy</li>

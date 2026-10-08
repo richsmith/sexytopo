@@ -137,6 +137,7 @@ public class PocketTopoTxtExporter extends SingleFileExporter implements Experim
         Leg leg = entry.getLeg();
         Station to = leg.getDestination();
         String toName = to.getName();
+        boolean isSplay = !leg.hasDestination();
 
         if (leg.wasShotBackwards()) {
             leg = leg.reverse();
@@ -144,7 +145,6 @@ public class PocketTopoTxtExporter extends SingleFileExporter implements Experim
             toName = from.getName();
         }
 
-        boolean isSplay = toName.equals("-");
         if (isSplay) {
             toName = "";
         }

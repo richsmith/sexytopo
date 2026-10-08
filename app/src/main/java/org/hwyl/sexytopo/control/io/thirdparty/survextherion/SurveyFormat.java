@@ -18,8 +18,8 @@ public enum SurveyFormat {
         }
 
         @Override
-        public String getSplayStationName() {
-            return "..";
+        public String getAnonymousStationName(boolean toWall) {
+            return toWall ? ".." : ".";
         }
 
         @Override
@@ -45,8 +45,8 @@ public enum SurveyFormat {
         }
 
         @Override
-        public String getSplayStationName() {
-            return "-";
+        public String getAnonymousStationName(boolean toWall) {
+            return toWall ? "-" : ".";
         }
 
         @Override
@@ -78,8 +78,11 @@ public enum SurveyFormat {
 
     public abstract String getCommandChar();
 
-    /** Splay station name: Survex ".." Therion "-" */
-    public abstract String getSplayStationName();
+    /**
+     * Name of the anonymous station at the end of a splay. To a wall: Survex ".." Therion "-". To
+     * another feature: "." in both.
+     */
+    public abstract String getAnonymousStationName(boolean toWall);
 
     /** Exploration date keyword: "date explored "- Survex, "explo-date "- Therion */
     public abstract String getExplorationDateKeyword();

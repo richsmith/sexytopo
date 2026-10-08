@@ -188,6 +188,7 @@ public class ContextMenuManager {
             MenuItem promoteItem = menu.findItem(R.id.action_promote_to_above_leg);
             MenuItem downgradeItem = menu.findItem(R.id.action_downgrade_leg);
             MenuItem reverseItem = menu.findItem(R.id.action_reverse);
+            MenuItem toWallItem = menu.findItem(R.id.action_to_wall);
             MenuItem legMenuItem = menu.findItem(R.id.menu_leg);
 
             if (currentLeg != null) {
@@ -200,6 +201,10 @@ public class ContextMenuManager {
                 }
                 if (reverseItem != null) {
                     reverseItem.setVisible(!isSplay);
+                }
+                if (toWallItem != null) {
+                    toWallItem.setVisible(isSplay);
+                    toWallItem.setChecked(currentLeg.isToWall());
                 }
                 if (downgradeItem != null) {
                     boolean canDowngrade =
@@ -392,6 +397,10 @@ public class ContextMenuManager {
         }
         if (itemId == R.id.action_reverse && currentLeg != null) {
             activity.onReverse(currentLeg);
+            return true;
+        }
+        if (itemId == R.id.action_to_wall && currentLeg != null) {
+            activity.onToggleToWall(currentLeg);
             return true;
         }
         if (itemId == R.id.action_delete_leg && currentLeg != null) {
