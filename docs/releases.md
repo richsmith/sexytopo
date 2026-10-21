@@ -1,3 +1,6 @@
+# Unreleased
+- Survex export now writes ISO dates (2026-01-05), which needs Survex 1.4.13 or later; Therion keeps 2026.01.05. Importing either accepts year-month-day dates separated by ".", "/" or "-"
+
 # 2026-09-30 1.14.0
 - Calibration screen reworked: readings are labelled and grouped by the direction they were actually taken in, so the order of shots no longer matters and every reading is used
 - Calibration readings can be viewed with their direction, roll and consistency with the rest of their set, and any reading can be replaced or deleted
