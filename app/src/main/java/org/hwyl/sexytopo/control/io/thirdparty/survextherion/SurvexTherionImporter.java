@@ -1,8 +1,8 @@
 package org.hwyl.sexytopo.control.io.thirdparty.survextherion;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -260,7 +260,7 @@ public class SurvexTherionImporter {
             // Strip command prefix for uniform data handling
             String effective = format.stripCommandPrefix(trimmed);
 
-            // Survey date: "date yyyy.MM.dd" or "date yyyy-MM-dd" (but not "date explored")
+            // Survey date (but not "date explored")
             if (effective.startsWith("date ") && !effective.startsWith("date explored")) {
                 String dateStr = effective.substring(5).trim();
                 surveyDate = parseDate(dateStr);
@@ -438,21 +438,28 @@ public class SurvexTherionImporter {
     }
 
     /**
-     * Date formats accepted on import, tried in order. Export always uses {@link
-     * SurvexTherionUtil#TRIP_DATE_PATTERN} (dot-separated); the ISO hyphen-separated pattern is
-     * accepted here purely as a convenience for files written or edited by other tools.
+     * A year-month-day date, separated by ".", "/" or "-" (the same one throughout). What may
+     * follow is a range ("-" or whitespace then the end date) or a Therion "@time", which are
+     * ignored, since a trip holds a single day.
      */
-    private static final String[] ACCEPTED_DATE_PATTERNS = {
-        SurvexTherionUtil.TRIP_DATE_PATTERN, SurvexTherionUtil.TRIP_DATE_PATTERN_ISO
-    };
+    private static final Pattern DATE_REGEX =
+            Pattern.compile("^(\\d{4})([./-])(\\d{1,2})\\2(\\d{1,2})(?=$|[\\s@-])");
 
-    private static Date parseDate(String dateStr) {
-        for (String pattern : ACCEPTED_DATE_PATTERNS) {
+    /** Returns null for partial or impossible dates, rather than guessing a day. */
+    static Date parseDate(String dateStr) {
+        Matcher matcher = DATE_REGEX.matcher(dateStr);
+        if (matcher.find()) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.clear();
+            calendar.setLenient(false);
+            calendar.set(
+                    Integer.parseInt(matcher.group(1)),
+                    Integer.parseInt(matcher.group(3)) - 1,
+                    Integer.parseInt(matcher.group(4)));
             try {
-                SimpleDateFormat sdf = new SimpleDateFormat(pattern);
-                return sdf.parse(dateStr);
-            } catch (Exception ignored) {
-                // Try the next accepted pattern.
+                return calendar.getTime();
+            } catch (IllegalArgumentException ignored) {
+                // Impossible date such as 2026.13.40; fall through and log it.
             }
         }
         Log.e("Failed to parse date: " + dateStr);

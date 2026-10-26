@@ -28,6 +28,11 @@ public enum SurveyFormat {
         }
 
         @Override
+        public String getDatePattern() {
+            return "yyyy-MM-dd";
+        }
+
+        @Override
         public boolean parseExploTeamLine(String effective, Map<String, List<Trip.Role>> teamMap) {
             return false;
         }
@@ -52,6 +57,11 @@ public enum SurveyFormat {
         @Override
         public String getExplorationDateKeyword() {
             return "explo-date ";
+        }
+
+        @Override
+        public String getDatePattern() {
+            return "yyyy.MM.dd";
         }
 
         @Override
@@ -83,6 +93,12 @@ public enum SurveyFormat {
 
     /** Exploration date keyword: "date explored "- Survex, "explo-date "- Therion */
     public abstract String getExplorationDateKeyword();
+
+    /**
+     * Export date pattern: Survex uses ISO 8601 (supported since Survex 1.4.13); Therion only
+     * accepts dots, as it reads "-" as a date range.
+     */
+    public abstract String getDatePattern();
 
     /**
      * Try to parse a team-related line during import. Returns true if the line was consumed (e.g.

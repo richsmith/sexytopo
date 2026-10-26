@@ -1,6 +1,8 @@
 package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexExporter;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionImporter;
@@ -458,6 +460,18 @@ public class TherionImporterTest {
         // explo-date is same as survey date — linked=false, explorationDate set
         Assert.assertNotNull(trip.getExplorationDate());
         Assert.assertFalse(trip.isExplorationDateLinked());
+    }
+
+    @Test
+    public void testMetadataImportReadsSurveyAndExplorationDates() throws Exception {
+        String therionText = "date 2026/01/05@10:30\nexplo-date 2025.12.30 - 2026.01.02\n";
+        Trip trip = SurvexTherionImporter.parseMetadata(therionText, SurveyFormat.THERION);
+        Assert.assertNotNull(trip);
+        Assert.assertEquals(
+                new GregorianCalendar(2026, Calendar.JANUARY, 5).getTime(), trip.getSurveyDate());
+        Assert.assertEquals(
+                new GregorianCalendar(2025, Calendar.DECEMBER, 30).getTime(),
+                trip.getExplorationDate());
     }
 
     @Test
