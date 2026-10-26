@@ -22,6 +22,7 @@ public class Leg extends SurveyComponent {
     private final Leg[] promotedFrom;
     private final boolean wasShotBackwards;
     private String comment = "";
+    private boolean hidden = false;
 
     private static final Leg[] NO_LEGS = new Leg[] {};
 
@@ -86,12 +87,17 @@ public class Leg extends SurveyComponent {
                 destination,
                 leg.promotedFrom,
                 leg.wasShotBackwards);
+        copyAnnotationsFrom(leg);
     }
 
     public static Leg toFullLeg(Leg splay, Station destination) {
         return upgradeSplayToConnectedLeg(splay, destination, NO_LEGS);
     }
 
+    /**
+     * Turns a splay into a connected leg. The comment is kept. A hidden splay becomes a visible
+     * leg, because only splays can be hidden.
+     */
     public static Leg upgradeSplayToConnectedLeg(
             Leg splay, Station destination, Leg[] promotedFrom) {
         Leg leg =
@@ -117,11 +123,11 @@ public class Leg extends SurveyComponent {
                             destination,
                             promotedFrom,
                             !wasShotBackwards);
-            leg.setComment(comment);
+            leg.copyAnnotationsFrom(this);
             return leg;
         } else {
             Leg leg = new Leg(distance, adjustedAzimuth, -1 * inclination, !wasShotBackwards);
-            leg.setComment(comment);
+            leg.copyAnnotationsFrom(this);
             return leg;
         }
     }
@@ -132,16 +138,20 @@ public class Leg extends SurveyComponent {
     }
 
     public Leg adjustAzimuth(float newAzimuth) {
+        Leg leg;
         if (hasDestination()) {
-            return new Leg(
-                    getDistance(),
-                    newAzimuth,
-                    getInclination(),
-                    getDestination(),
-                    getPromotedFrom());
+            leg =
+                    new Leg(
+                            getDistance(),
+                            newAzimuth,
+                            getInclination(),
+                            getDestination(),
+                            getPromotedFrom());
         } else {
-            return new Leg(getDistance(), newAzimuth, getInclination());
+            leg = new Leg(getDistance(), newAzimuth, getInclination());
         }
+        leg.copyAnnotationsFrom(this);
+        return leg;
     }
 
     public Leg asBacksight(Station destination) {
@@ -153,7 +163,7 @@ public class Leg extends SurveyComponent {
                         -1 * getInclination(),
                         destination,
                         getPromotedFrom());
-        leg.setComment(comment);
+        leg.copyAnnotationsFrom(this);
         return leg;
     }
 
@@ -238,6 +248,33 @@ public class Leg extends SurveyComponent {
 
     public void setComment(String comment) {
         this.comment = (comment != null) ? comment : "";
+    }
+
+    public boolean isHidden() {
+        return hidden;
+    }
+
+    /**
+     * Hides or shows a splay. A hidden splay is kept in the survey and the data table but is not
+     * drawn in the sketches. Only splays can be hidden; legs always have to be visible.
+     *
+     * @param hidden true to hide the splay, false to show it
+     * @throws IllegalStateException if asked to hide a leg that has a destination
+     */
+    public void setHidden(boolean hidden) {
+        if (hidden && hasDestination()) {
+            throw new IllegalStateException("Only splays can be hidden");
+        }
+        this.hidden = hidden;
+    }
+
+    /**
+     * Copies the comment and hidden state of another leg onto this one. Used when making a modified
+     * copy of that leg. Hidden is only copied if this leg is a splay.
+     */
+    private void copyAnnotationsFrom(Leg other) {
+        this.comment = other.comment;
+        this.hidden = other.hidden && !hasDestination();
     }
 
     @NonNull

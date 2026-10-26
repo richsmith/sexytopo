@@ -75,6 +75,28 @@ public class Station extends SurveyComponent {
         return connectedOnwardLegs;
     }
 
+    /** The onward legs and splays that are not hidden, i.e. the ones that should be drawn. */
+    public List<Leg> getVisibleOnwardLegs() {
+        List<Leg> visibleOnwardLegs = new ArrayList<>();
+        for (Leg leg : onwardLegs) {
+            if (!leg.isHidden()) {
+                visibleOnwardLegs.add(leg);
+            }
+        }
+        return visibleOnwardLegs;
+    }
+
+    /** The splays that are not hidden, i.e. the ones that should be drawn. */
+    public List<Leg> getVisibleUnconnectedOnwardLegs() {
+        List<Leg> visibleSplays = new ArrayList<>();
+        for (Leg leg : onwardLegs) {
+            if (!leg.hasDestination() && !leg.isHidden()) {
+                visibleSplays.add(leg);
+            }
+        }
+        return visibleSplays;
+    }
+
     public String getComment() {
         return comment;
     }

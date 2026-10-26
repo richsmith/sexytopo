@@ -208,4 +208,18 @@ public class CrossSectionerTest {
         Assert.assertTrue(CrossSectioner.isFacingRightOnElevation(survey, station, 60));
         Assert.assertFalse(CrossSectioner.isFacingRightOnElevation(survey, station, 120));
     }
+
+    @Test
+    public void testHiddenSplaysDoNotCountTowardsTheHorizontalRadius() {
+        Station station = new Station("A1");
+        station.addOnwardLeg(new Leg(2, 90, 0));
+        Leg farSplay = new Leg(10, 270, 0);
+        farSplay.setHidden(true);
+        station.addOnwardLeg(farSplay);
+
+        Assert.assertEquals(
+                2.0,
+                CrossSectioner.getHorizontalRadius(station),
+                SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
+    }
 }

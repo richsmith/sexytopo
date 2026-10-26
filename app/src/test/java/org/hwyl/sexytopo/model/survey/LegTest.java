@@ -265,4 +265,99 @@ public class LegTest {
         Assert.assertFalse(Leg.isInclinationLegal(-90.1f));
         Assert.assertFalse(Leg.isInclinationLegal(90.1f));
     }
+
+    private static Leg hiddenSplayWithComment() {
+        Leg splay = new Leg(2.0f, 90.0f, 10.0f);
+        splay.setComment("Boulder");
+        splay.setHidden(true);
+        return splay;
+    }
+
+    @Test
+    public void testLegIsNotHiddenByDefault() {
+        Assert.assertFalse(new Leg(1.0f, 0.0f, 0.0f).isHidden());
+    }
+
+    @Test
+    public void testSplayCanBeHiddenAndShown() {
+        Leg splay = new Leg(1.0f, 0.0f, 0.0f);
+
+        splay.setHidden(true);
+        Assert.assertTrue(splay.isHidden());
+
+        splay.setHidden(false);
+        Assert.assertFalse(splay.isHidden());
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testFullLegCannotBeHidden() {
+        Leg leg = new Leg(1.0f, 0.0f, 0.0f, new Station("1"), new Leg[] {});
+        leg.setHidden(true);
+    }
+
+    @Test
+    public void testFullLegCanBeShown() {
+        Leg leg = new Leg(1.0f, 0.0f, 0.0f, new Station("1"), new Leg[] {});
+        leg.setHidden(false);
+        Assert.assertFalse(leg.isHidden());
+    }
+
+    @Test
+    public void testReverseKeepsHiddenAndComment() {
+        Leg reversed = hiddenSplayWithComment().reverse();
+        Assert.assertTrue(reversed.isHidden());
+        Assert.assertEquals("Boulder", reversed.getComment());
+    }
+
+    @Test
+    public void testAsBacksightKeepsHiddenAndComment() {
+        Leg backsight = hiddenSplayWithComment().asBacksight();
+        Assert.assertTrue(backsight.isHidden());
+        Assert.assertEquals("Boulder", backsight.getComment());
+    }
+
+    @Test
+    public void testRotateKeepsHiddenAndComment() {
+        Leg rotated = hiddenSplayWithComment().rotate(45.0f);
+        Assert.assertTrue(rotated.isHidden());
+        Assert.assertEquals("Boulder", rotated.getComment());
+    }
+
+    @Test
+    public void testAdjustAzimuthKeepsHiddenAndComment() {
+        Leg adjusted = hiddenSplayWithComment().adjustAzimuth(180.0f);
+        Assert.assertTrue(adjusted.isHidden());
+        Assert.assertEquals("Boulder", adjusted.getComment());
+    }
+
+    @Test
+    public void testRotateKeepsCommentOfFullLeg() {
+        Leg leg = new Leg(1.0f, 0.0f, 0.0f, new Station("1"), new Leg[] {});
+        leg.setComment("Tight");
+        Leg rotated = leg.rotate(10.0f);
+        Assert.assertEquals("Tight", rotated.getComment());
+        Assert.assertFalse(rotated.isHidden());
+    }
+
+    @Test
+    public void testCopyWithDestinationKeepsCommentButIsNeverHidden() {
+        Leg copy = new Leg(hiddenSplayWithComment(), new Station("1"));
+        Assert.assertEquals("Boulder", copy.getComment());
+        Assert.assertFalse(copy.isHidden());
+    }
+
+    @Test
+    public void testUpgradingHiddenSplayGivesVisibleLegWithComment() {
+        Leg leg = Leg.toFullLeg(hiddenSplayWithComment(), new Station("1"));
+        Assert.assertFalse(leg.isHidden());
+        Assert.assertEquals("Boulder", leg.getComment());
+    }
+
+    @Test
+    public void testToSplayIsVisible() {
+        Leg splay = hiddenSplayWithComment();
+        Leg leg = Leg.toFullLeg(splay, new Station("1"));
+        Assert.assertFalse(leg.toSplay().isHidden());
+        Assert.assertTrue(splay.isHidden());
+    }
 }

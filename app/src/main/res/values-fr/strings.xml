@@ -750,6 +750,8 @@
     <string name="menu_comment">Commentaire</string>
     <string name="menu_comment_leg">Commentaire du segment</string>
     <string name="menu_comment_splay">Commentaire de la radiale</string>
+    <string name="menu_hide_splay">Masquer la radiale</string>
+    <string name="menu_show_splay">Afficher la radiale</string>
     <string name="menu_toggle_left_right">Basculer Gauche/Droite</string>
     <string name="context_this_will_delete">Cela supprimera :</string>
     <string name="context_jump_to_splay_error">Impossible de se rendre à l\'extrémité d\'une radiale</string>

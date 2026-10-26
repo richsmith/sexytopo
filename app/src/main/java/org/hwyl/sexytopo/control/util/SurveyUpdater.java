@@ -99,6 +99,20 @@ public class SurveyUpdater {
     }
 
     /**
+     * Hides or shows a splay. A hidden splay stays in the survey and its comment can still be
+     * edited, but it is not drawn in the sketches.
+     *
+     * @param survey The survey containing the splay
+     * @param splay The splay to hide or show
+     * @param hidden true to hide the splay, false to show it
+     * @throws IllegalStateException if asked to hide a leg, since only splays can be hidden
+     */
+    public static void setSplayHidden(Survey survey, Leg splay, boolean hidden) {
+        splay.setHidden(hidden);
+        survey.setSaved(false);
+    }
+
+    /**
      * Promote a splay to the leg above it (add it to the promoted legs array).
      *
      * <p>Searches the parent station's legs list for the nearest full leg above this splay in
@@ -117,6 +131,9 @@ public class SurveyUpdater {
         if (above == null) {
             return false;
         }
+
+        // The splay becomes part of a leg, which can't be hidden
+        splay.setHidden(false);
 
         Station parent = survey.getOriginatingStation(splay);
         Leg newLegAbove = combineSplayWithLeg(splay, above);
@@ -182,6 +199,11 @@ public class SurveyUpdater {
         }
 
         if (areLegsAboutTheSame(lastNLegs)) {
+
+            // The splays become part of a leg, which can't be hidden
+            for (Leg splay : lastNLegs) {
+                splay.setHidden(false);
+            }
 
             Station newStation = new Station(getNextStationName(survey));
             newStation.setExtendedElevationDirection(

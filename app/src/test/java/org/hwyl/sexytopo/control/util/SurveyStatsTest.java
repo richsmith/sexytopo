@@ -36,4 +36,18 @@ public class SurveyStatsTest {
         Assert.assertEquals(5, SurveyStats.calcNumberSubStations(subStation));
         Assert.assertEquals(5, SurveyStats.calcNumberSubLegs(subStation));
     }
+
+    @Test
+    public void testHiddenSplaysAreCounted() {
+        Survey survey = new Survey();
+        Leg visibleSplay = new Leg(1, 90, 0);
+        Leg hiddenSplay = new Leg(1, 270, 0);
+        SurveyUpdater.update(survey, visibleSplay);
+        SurveyUpdater.update(survey, hiddenSplay);
+        SurveyUpdater.setSplayHidden(survey, hiddenSplay, true);
+
+        Station origin = survey.getOrigin();
+        Assert.assertEquals(2, SurveyStats.calcNumberSubSplays(origin));
+        Assert.assertEquals(2, SurveyStats.calcNumberSubLegs(origin));
+    }
 }

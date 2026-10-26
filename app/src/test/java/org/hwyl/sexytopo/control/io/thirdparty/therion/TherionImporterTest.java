@@ -6,6 +6,7 @@ import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexExporter;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionImporter;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
+import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.geometry.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -955,5 +956,55 @@ public class TherionImporterTest {
                 "a later valid extend should still be applied",
                 ExtendedElevationDirection.LEFT,
                 survey.getStationByName("3").getExtendedElevationDirection());
+    }
+
+    private static void assertIsTheHiddenBoulderSplay(Leg splay) {
+        Assert.assertTrue(splay.isHidden());
+        Assert.assertEquals(2.5f, splay.getDistance(), 0.001);
+        Assert.assertEquals(90.0f, splay.getAzimuth(), 0.001);
+        Assert.assertEquals(10.0f, splay.getInclination(), 0.001);
+        Assert.assertEquals("Boulder", splay.getComment());
+    }
+
+    @Test
+    public void testCommentedOutSplayImportsAsHiddenSplay() throws Exception {
+        String th =
+                "centreline\n"
+                        + "data normal from to tape compass clino\n"
+                        + "1\t-\t1.0\t0.0\t0.0\n"
+                        + "#1\t-\t2.5\t90.0\t10.0\tBoulder\n"
+                        + "1\t2\t5.0\t0.0\t0.0\n"
+                        + "endcentreline\n";
+        Survey survey = new Survey();
+        TherionImporter.updateCentreline(Arrays.asList(th.split("\n")), survey, true);
+
+        List<Leg> splays = survey.getOrigin().getUnconnectedOnwardLegs();
+        Assert.assertEquals(2, splays.size());
+        Assert.assertFalse(splays.get(0).isHidden());
+        assertIsTheHiddenBoulderSplay(splays.get(1));
+    }
+
+    @Test
+    public void testHiddenSplayRoundTrips() throws Exception {
+        Survey original = new Survey();
+        Leg visibleSplay = new Leg(1.0f, 0.0f, 0.0f);
+        Leg hiddenSplay = new Leg(2.5f, 90.0f, 10.0f);
+        hiddenSplay.setComment("Boulder");
+        SurveyUpdater.update(original, visibleSplay);
+        SurveyUpdater.update(original, hiddenSplay);
+        SurveyUpdater.updateWithNewStation(original, new Leg(5.0f, 0.0f, 0.0f));
+        SurveyUpdater.setSplayHidden(original, hiddenSplay, true);
+
+        String th =
+                "centreline\n"
+                        + SurvexTherionUtil.getCentrelineData(original, SurveyFormat.THERION)
+                        + "endcentreline\n";
+        Survey reimported = new Survey();
+        TherionImporter.updateCentreline(Arrays.asList(th.split("\n")), reimported, true);
+
+        List<Leg> splays = reimported.getOrigin().getUnconnectedOnwardLegs();
+        Assert.assertEquals(2, splays.size());
+        Assert.assertFalse(splays.get(0).isHidden());
+        assertIsTheHiddenBoulderSplay(splays.get(1));
     }
 }

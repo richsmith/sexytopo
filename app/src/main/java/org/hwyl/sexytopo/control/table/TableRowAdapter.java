@@ -1,6 +1,7 @@
 package org.hwyl.sexytopo.control.table;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -76,6 +77,14 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
 
     public Map<TextView, TableCol> getFieldToTableCol() {
         return fieldToTableCol;
+    }
+
+    /** Adds or removes the strike-through flag, leaving any other paint flags alone. */
+    static int strikeThroughFlags(int paintFlags, boolean strikeThrough) {
+        if (strikeThrough) {
+            return paintFlags | Paint.STRIKE_THRU_TEXT_FLAG;
+        }
+        return paintFlags & ~Paint.STRIKE_THRU_TEXT_FLAG;
     }
 
     @NonNull
@@ -154,6 +163,10 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
             } else {
                 textView.setTypeface(Typeface.DEFAULT);
             }
+
+            // Hidden splays are shown crossed out. Rows are recycled so this has to be reset.
+            textView.setPaintFlags(
+                    strikeThroughFlags(textView.getPaintFlags(), entry.getLeg().isHidden()));
 
             // Set alignment based on column type
             if (col == TableCol.DISTANCE

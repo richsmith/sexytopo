@@ -279,6 +279,7 @@ public class LegDialogs {
                     // Get the updated leg with measurements and shot direction from form
                     Leg edited = form.getUpdatedLeg();
                     edited.setComment(form.getUpdatedLegComment());
+                    edited.setHidden(toEdit.isHidden());
 
                     // Get the new station names from the form
                     Station newFromStation = form.getUpdatedFromStation();

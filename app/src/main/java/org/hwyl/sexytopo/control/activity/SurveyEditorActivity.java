@@ -251,6 +251,16 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         }
     }
 
+    public void onToggleHideSplay(Leg splay) {
+        if (splay == null || splay.hasDestination()) {
+            return;
+        }
+
+        SurveyUpdater.setSplayHidden(getSurvey(), splay, !splay.isHidden());
+        getSurveyManager().broadcastSurveyUpdated();
+        invalidateView();
+    }
+
     /** Set the active station in the current view. */
     protected void setActiveStation(Station station) {
         getSurvey().setActiveStation(station);

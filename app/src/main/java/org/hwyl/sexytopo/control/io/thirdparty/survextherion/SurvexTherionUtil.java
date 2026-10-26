@@ -258,6 +258,10 @@ public class SurvexTherionUtil {
             return;
         }
 
+        // Hidden splays are commented out.
+        if (leg.isHidden()) {
+            builder.append(format.getCommentChar());
+        }
         formatDataLine(builder, fromName, toName, leg, leg.getComment());
 
         // Formats that can't average repeated legs get the averaged reading, followed by the raw

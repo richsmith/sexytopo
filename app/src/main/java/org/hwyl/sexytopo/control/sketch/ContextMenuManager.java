@@ -213,6 +213,16 @@ public class ContextMenuManager {
                     commentLegItem.setTitle(
                             isSplay ? R.string.menu_comment_splay : R.string.menu_comment_leg);
                 }
+                MenuItem hideSplayItem = menu.findItem(R.id.action_hide_splay);
+                if (hideSplayItem != null) {
+                    hideSplayItem.setVisible(isSplay);
+                    if (isSplay) {
+                        hideSplayItem.setTitle(
+                                currentLeg.isHidden()
+                                        ? R.string.menu_show_splay
+                                        : R.string.menu_hide_splay);
+                    }
+                }
                 if (legMenuItem != null) {
                     legMenuItem.setTitle(R.string.menu_incoming_leg);
                     if (!isSplay) {
@@ -400,6 +410,10 @@ public class ContextMenuManager {
         }
         if (itemId == R.id.action_comment_leg && currentLeg != null) {
             activity.onCommentLeg(currentLeg);
+            return true;
+        }
+        if (itemId == R.id.action_hide_splay && currentLeg != null) {
+            activity.onToggleHideSplay(currentLeg);
             return true;
         }
 

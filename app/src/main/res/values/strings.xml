@@ -782,6 +782,8 @@
     <string name="menu_comment">Comment</string>
     <string name="menu_comment_leg">Leg comment</string>
     <string name="menu_comment_splay">Splay comment</string>
+    <string name="menu_hide_splay">Hide Splay</string>
+    <string name="menu_show_splay">Show Splay</string>
     <string name="menu_toggle_left_right">Toggle Left/Right</string>
     <string name="menu_context_title_leg">Leg %1$s &#10132; %2$s</string>
     <string name="menu_context_title_splay">Splay %s &#10132;</string>

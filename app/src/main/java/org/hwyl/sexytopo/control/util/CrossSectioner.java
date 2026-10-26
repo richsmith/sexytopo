@@ -62,7 +62,7 @@ public class CrossSectioner {
      */
     public static float getHorizontalRadius(Station station) {
         return (float)
-                station.getUnconnectedOnwardLegs().stream()
+                station.getVisibleUnconnectedOnwardLegs().stream()
                         .mapToDouble(
                                 splay ->
                                         splay.getDistance()

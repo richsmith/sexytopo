@@ -35,6 +35,11 @@
         <item
             android:id="@+id/action_comment_leg"
             android:title="@string/menu_comment_leg"/>
+
+        <item
+            android:id="@+id/action_hide_splay"
+            android:title="@string/menu_hide_splay"
+            android:visible="false"/>
     </group>
 
     <!-- Delete leg separated by divider -->
