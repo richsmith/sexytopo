@@ -168,28 +168,29 @@ public class SurvexExporterTest {
     }
 
     @Test
-    public void testSurvexMetadataSurveyDateUsesDotSeparator() {
+    public void testSurvexMetadataSurveyDateUsesIsoFormat() {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         Trip trip = new Trip();
-        trip.setSurveyDate(new java.util.Date(0)); // 1970.01.01
+        trip.setSurveyDate(new java.util.Date(0)); // 1970-01-01
         survey.setTrip(trip);
 
         String metadata = SurvexTherionUtil.getMetadata(survey, SurveyFormat.SURVEX, "", "");
 
-        Assert.assertTrue(metadata.contains("*date 1970.01.01"));
-        Assert.assertFalse(metadata.contains("1970-01-01"));
+        Assert.assertTrue(metadata.contains("*date 1970-01-01"));
+        Assert.assertFalse(metadata.contains("1970.01.01"));
     }
 
     @Test
     public void testSurvexMetadataExploDateLinkedUsesSurveyDate() {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         Trip trip = new Trip();
+        trip.setSurveyDate(new java.util.Date(0)); // 1970-01-01
         trip.setExplorationDateLinked(true); // default, but explicit for clarity
         survey.setTrip(trip);
 
         String metadata = SurvexTherionUtil.getMetadata(survey, SurveyFormat.SURVEX, "", "");
 
-        Assert.assertTrue(metadata.contains("*date explored "));
+        Assert.assertTrue(metadata.contains("*date explored 1970-01-01"));
         Assert.assertFalse(metadata.contains(";*date explored "));
     }
 
@@ -198,12 +199,12 @@ public class SurvexExporterTest {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         Trip trip = new Trip();
         trip.setExplorationDateLinked(false);
-        trip.setExplorationDate(new java.util.Date(0)); // 1970.01.01
+        trip.setExplorationDate(new java.util.Date(0)); // 1970-01-01
         survey.setTrip(trip);
 
         String metadata = SurvexTherionUtil.getMetadata(survey, SurveyFormat.SURVEX, "", "");
 
-        Assert.assertTrue(metadata.contains("*date explored 1970.01.01"));
+        Assert.assertTrue(metadata.contains("*date explored 1970-01-01"));
         Assert.assertFalse(metadata.contains(";*date explored "));
     }
 
