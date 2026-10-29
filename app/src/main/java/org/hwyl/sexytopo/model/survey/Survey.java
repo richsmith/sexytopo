@@ -18,7 +18,6 @@ import org.hwyl.sexytopo.model.sketch.Sketch;
 
 public class Survey {
 
-    public static final Station NULL_STATION = new Station("-");
     public static final String DEFAULT_NAME = "Unsaved Survey";
 
     public static final char[] FORBIDDEN_CHARS = new char[] {':', '.', '\n', '\r', '/', '\\'};
