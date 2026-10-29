@@ -27,25 +27,24 @@ A `Leg` represents a measurement between two points (a directed edge in the grap
 - `distance`: Length in metres
 - `azimuth`: Compass bearing (0-360°)
 - `inclination`: Vertical angle (-90° to +90°)
-- `destination`: The station this leg points TO (may be `Survey.NULL_STATION`)
+- `destination`: The station this leg points TO (an anonymous station for a splay)
 - `wasShotBackwards`: Whether this was measured as a backsight
-- `promotedFrom`: Array of legs if this was upgraded from splay(s), wasShotBackwards is false
+- `promotedFrom`: Array of legs if this was upgraded from splay(s)
 
 **Types of Legs:**
 
 1. **Full Leg (Connected Leg)**
-   - Has a `destination` that is NOT `Survey.NULL_STATION`
+   - Has a real `destination`, not an anonymous station
    - Creates/connects to a named station
    - Forms the skeleton/centreline of the survey
    - Check with: `leg.hasDestination()` returns `true`
-   - Stored azimuth, inclination, for direct use on graph, needs to be reversed for data use 
 
 2. **Splay (Unconnected Leg)**
-   - Destination is an anonymous station `destination == Survey.NULL_STATION`
+   - Has an anonymous station as `destination`: `Station.ANONYMOUS_WALL`  or `Station.ANONYMOUS_FEATURE`
    - Used to capture cave passage detail (walls, floor, ceiling)
-   - Does NOT create a new named station
-   - Check with: `leg.hasDestination()` returns `false`
-   - wasShotBackwards must be false
+   - Does NOT create a new station
+   - Check with: `leg.hasDestination()` returns `false`. For a station on its own, such as the to-station of an as-taken reading, use `station.isAnonymous()`
+   - Which kind: `leg.isToWall()`.
 
 ## Graph Structure
 
@@ -74,7 +73,7 @@ The survey forms a **tree structure**:
   - A station can have multiple onward legs (both full legs and splays)
 
 - **Leg → To Station**: A full leg POINTS TO a destination station
-  - Access via: `leg.getDestination()` (or `Survey.NULL_STATION` for splays)
+  - Access via: `leg.getDestination()` (an anonymous station for splays)
 
 - **Station ← Leg**: Finding the leg that leads TO a station (the "referring leg")
   - Access via: `survey.getReferringLeg(station)`
@@ -135,7 +134,7 @@ When the user clicks on a row in the table or a point in the graph view:
 
 **For a SPLAY row/point:**
 - The "from" station is where the splay originates
-- There is NO "to" station (`leg.getDestination() == Survey.NULL_STATION`)
+- There is NO real "to" station (`leg.getDestination()` is an anonymous station)
 - Deleting deletes: just that single splay measurement
 
 ## Chronological Order
@@ -173,12 +172,21 @@ This validates:
    - Has no referring leg (`getReferringLeg(origin)` returns `null`)
    - Check: `station == survey.getOrigin()`
 
-2. **NULL_STATION**
-   - Sentinel value `Survey.NULL_STATION`
-   - Used as destination for splays
-   - NOT a real station in the graph
+2. **Anonymous Stations**
+   - `Station.ANONYMOUS_WALL` (named `-`) and `Station.ANONYMOUS_FEATURE` (named `.`)
+   - Used as the destination of every splay
+   - NOT real stations in the graph.
+   - Their names are reserved.
+   - Saved to JSON with a destination of `-` either way, plus `"toWall": false` for a splay to another feature, so older versions still load it (as a wall splay)
 
-3. **Backwards Shots**
+3. **Promoted Legs**
+   - `promotedFrom` holds the readings exactly as recorded, each keeping its own kind (wall or another feature)
+   - None of them is flagged `wasShotBackwards`
+   - For a leg shot backwards they run the opposite way to the leg itself, which is stored reversed for plotting. Average the readings as they are, then reverse the result, rather than mixing them with the stored leg
+
+4. **Backwards Shots**
    - `leg.wasShotBackwards()` indicates measurement direction
+   - The leg is stored in the direction it is plotted; the flag is used for tables and exports to show it as taken
+   - Splays are never shot backwards
    - Same graph structure, just metadata for display/export
    - Doesn't affect deletion logic

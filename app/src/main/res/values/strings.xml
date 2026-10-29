@@ -614,9 +614,9 @@
     <string name="settings_key_inc_deg_mins_secs_summary">Enter inclination values in deg/mins/secs (as opposed to the default of decimal)</string>
     <string name="settings_export_title">Export</string>
     <string name="settings_export_therion_symbols_title">Export symbols</string>
-    <string name="settings_export_therion_symbols_summary">Include symbols when exporting</string>
+    <string name="settings_export_therion_symbols_summary">Include symbols in th2 file</string>
     <string name="settings_export_therion_text_title">Export text</string>
-    <string name="settings_export_therion_text_summary">Include text when exporting</string>
+    <string name="settings_export_therion_text_summary">Include text in th2 file</string>
     <string name="settings_export_folder_name_title">Export folder name</string>
     <string name="settings_export_folder_name_summary">Name of the folder within the survey folder to export to</string>
     <string name="settings_export_type_subfolders_title">Export type subfolders</string>
@@ -693,7 +693,7 @@
 
     <!-- Form validation errors -->
     <string name="validation_error_cannot_be_blank">Cannot be blank</string>
-    <string name="validation_error_station_named_dash">Station cannot be named \"-\"</string>
+    <string name="validation_error_station_name_reserved">Station cannot be named \"-\" or \".\"</string>
     <string name="validation_error_station_does_not_exist">Station does not exist</string>
     <string name="validation_error_same_as_from_station">Cannot be the same as from station</string>
     <string name="validation_error_station_name_not_unique">Station name must be unique</string>
@@ -743,6 +743,9 @@
     <string name="menu_set_active_station">Set Active</string>
     <string name="menu_rename_station">Rename</string>
     <string name="menu_edit_leg">Edit</string>
+    <string name="menu_to_wall">To wall</string>
+    <string name="to_wall_info_title">About To wall</string>
+    <string name="to_wall_info_message">An optional record. Selected means that the splay is to the passage extremities; unselected means it measures to a feature, such as a speleothem.</string>
     <string name="menu_upgrade_row">Force New Station</string>
     <string name="menu_promote_to_above_leg">Add to Leg Above</string>
     <string name="toast_splay_promoted">Splay combined with leg</string>

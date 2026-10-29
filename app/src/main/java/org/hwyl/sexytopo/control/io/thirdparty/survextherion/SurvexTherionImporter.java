@@ -1,15 +1,14 @@
 package org.hwyl.sexytopo.control.io.thirdparty.survextherion;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Leg;
@@ -96,7 +95,7 @@ public class SurvexTherionImporter {
                     continue; // fewer than 5 tokens - not a valid leg line
                 }
 
-                boolean isSplay = SPLAY_STATION_TOKENS.contains(current.toName);
+                boolean isSplay = getAnonymousStationForToken(current.toName) != null;
 
                 // Splays are never grouped - each is its own independent reading, even when
                 // several share the same anonymous-station token as their "to".
@@ -260,7 +259,7 @@ public class SurvexTherionImporter {
             // Strip command prefix for uniform data handling
             String effective = format.stripCommandPrefix(trimmed);
 
-            // Survey date: "date yyyy.MM.dd" or "date yyyy-MM-dd" (but not "date explored")
+            // Survey date (but not "date explored")
             if (effective.startsWith("date ") && !effective.startsWith("date explored")) {
                 String dateStr = effective.substring(5).trim();
                 surveyDate = parseDate(dateStr);
@@ -438,21 +437,28 @@ public class SurvexTherionImporter {
     }
 
     /**
-     * Date formats accepted on import, tried in order. Export always uses {@link
-     * SurvexTherionUtil#TRIP_DATE_PATTERN} (dot-separated); the ISO hyphen-separated pattern is
-     * accepted here purely as a convenience for files written or edited by other tools.
+     * A year-month-day date, separated by ".", "/" or "-" (the same one throughout). What may
+     * follow is a range ("-" or whitespace then the end date) or a Therion "@time", which are
+     * ignored, since a trip holds a single day.
      */
-    private static final String[] ACCEPTED_DATE_PATTERNS = {
-        SurvexTherionUtil.TRIP_DATE_PATTERN, SurvexTherionUtil.TRIP_DATE_PATTERN_ISO
-    };
+    private static final Pattern DATE_REGEX =
+            Pattern.compile("^(\\d{4})([./-])(\\d{1,2})\\2(\\d{1,2})(?=$|[\\s@-])");
 
-    private static Date parseDate(String dateStr) {
-        for (String pattern : ACCEPTED_DATE_PATTERNS) {
+    /** Returns null for partial or impossible dates, rather than guessing a day. */
+    static Date parseDate(String dateStr) {
+        Matcher matcher = DATE_REGEX.matcher(dateStr);
+        if (matcher.find()) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.clear();
+            calendar.setLenient(false);
+            calendar.set(
+                    Integer.parseInt(matcher.group(1)),
+                    Integer.parseInt(matcher.group(3)) - 1,
+                    Integer.parseInt(matcher.group(4)));
             try {
-                SimpleDateFormat sdf = new SimpleDateFormat(pattern);
-                return sdf.parse(dateStr);
-            } catch (Exception ignored) {
-                // Try the next accepted pattern.
+                return calendar.getTime();
+            } catch (IllegalArgumentException ignored) {
+                // Impossible date such as 2026.13.40; fall through and log it.
             }
         }
         Log.e("Failed to parse date: " + dateStr);
@@ -460,18 +466,28 @@ public class SurvexTherionImporter {
     }
 
     /**
-     * Splay-station tokens accepted on import from third-party Survex/Therion files.
+     * The anonymous station a splay token stands for, or null if the name is a real station.
      *
-     * <p>Therion's own anonymous-station convention uses "-" or ".". Survex's uses ".", ".." (an
-     * anonymous wall point) or "..." (an anonymous point with no implicit flags) - see the
-     * "Anonymous stations" section of the Survex manual.
+     * <p>Therion uses "-" for a wall and "." for another feature. Survex uses ".." for a wall and
+     * "." for another feature; its "..." is a point with no implied type, which is read as another
+     * feature, so it comes back as "." on export. See the "Anonymous stations" section of the
+     * Survex manual.
      *
-     * <p>SexyTopo's own exporters still only ever write the single token each format's {@link
-     * SurveyFormat#getSplayStationName()} returns, but a hand-written or third-party file may use
-     * any of the others, so all are accepted here regardless of which format is being imported.
+     * <p>A hand-written or third-party file may use any of these, so all are accepted whichever
+     * format is being imported.
      */
-    private static final List<String> SPLAY_STATION_TOKENS =
-            Arrays.asList(SexyTopoConstants.BLANK_STATION_NAME, ".", "..", "...");
+    private static Station getAnonymousStationForToken(String token) {
+        switch (token) {
+            case "-":
+            case "..":
+                return Station.ANONYMOUS_WALL;
+            case ".":
+            case "...":
+                return Station.ANONYMOUS_FEATURE;
+            default:
+                return null;
+        }
+    }
 
     /** A single leg line's fields, parsed but not yet added to the survey. */
     private static final class ParsedLegLine {
@@ -623,7 +639,8 @@ public class SurvexTherionImporter {
             List<Leg> rawPromotedLegCandidates,
             boolean useLegComments) {
 
-        boolean isSplay = SPLAY_STATION_TOKENS.contains(toName);
+        Station anonymousStation = getAnonymousStationForToken(toName);
+        boolean isSplay = anonymousStation != null;
 
         // Detect if this is a backward leg BEFORE creating new stations
         boolean isBackward = isBackwardLeg(fromName, toName, nameToStation);
@@ -634,7 +651,7 @@ public class SurvexTherionImporter {
             nameToStation.put(fromName, from);
         }
 
-        Station to = Survey.NULL_STATION;
+        Station to = anonymousStation;
         if (!isSplay) {
             to = nameToStation.get(toName);
             if (to == null) {
@@ -664,49 +681,27 @@ public class SurvexTherionImporter {
             promotedFrom = rawPromotedLegCandidates.toArray(new Leg[0]);
         }
 
+        // The leg runs from the station that was already known to the newer one. For a backward
+        // line the readings were taken from the newer station back to the known one, so they are
+        // reversed into the direction the leg is plotted. A splay has an anonymous station.
+        Station legFrom = isBackward ? to : from;
+        Station newStation = isBackward ? from : to;
+
         Leg leg;
-        Station legFrom;
-
-        if (isBackward) {
-            legFrom = to;
-
-            if (from == Survey.NULL_STATION) {
-                leg = new Leg(distance, azimuth, inclination, true);
-            } else {
-                leg = new Leg(distance, azimuth, inclination, from, promotedFrom, true);
-            }
-
-            if (!comment.isEmpty()) {
-                if (useLegComments) {
-                    // New path: comment belongs to the leg/splay itself
-                    leg.setComment(comment);
-                } else {
-                    // Legacy path: comment goes on the newer station (from, in a backward leg)
-                    if (from != Survey.NULL_STATION) {
-                        from.setComment(comment);
-                    }
-                }
-            }
+        if (newStation.isAnonymous()) {
+            leg = new Leg(distance, azimuth, inclination, newStation, new Leg[] {});
         } else {
-            // Forward leg
-            legFrom = from;
+            Leg recorded = new Leg(distance, azimuth, inclination);
+            leg = Leg.fromRecordedReading(recorded, newStation, promotedFrom, isBackward);
+        }
 
-            if (to == Survey.NULL_STATION) {
-                leg = new Leg(distance, azimuth, inclination);
-            } else {
-                leg = new Leg(distance, azimuth, inclination, to, promotedFrom);
-            }
-
-            if (!comment.isEmpty()) {
-                if (useLegComments) {
-                    // New path: comment belongs to the leg/splay itself
-                    leg.setComment(comment);
-                } else {
-                    // Legacy path: comment goes on the to station
-                    if (to != Survey.NULL_STATION) {
-                        to.setComment(comment);
-                    }
-                }
+        if (!comment.isEmpty()) {
+            if (useLegComments) {
+                // New path: comment belongs to the leg/splay itself
+                leg.setComment(comment);
+            } else if (leg.hasDestination()) {
+                // Legacy path: comment goes on the newer station
+                newStation.setComment(comment);
             }
         }
 

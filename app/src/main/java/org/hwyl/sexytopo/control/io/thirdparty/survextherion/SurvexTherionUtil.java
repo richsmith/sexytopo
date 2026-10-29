@@ -18,15 +18,6 @@ import org.hwyl.sexytopo.model.table.TableCol;
 
 public class SurvexTherionUtil {
 
-    public static final String TRIP_DATE_PATTERN = "yyyy.MM.dd";
-
-    /**
-     * Accepted as a fallback when importing trip dates, so files using ISO-style hyphens (e.g.
-     * "2026-01-05") parse as readily as the native dot-separated Survex/Therion format. Export
-     * always uses {@link #TRIP_DATE_PATTERN}.
-     */
-    public static final String TRIP_DATE_PATTERN_ISO = "yyyy-MM-dd";
-
     public static String getCreationComment(char commentChar, String versionInfo) {
         String dateOnly = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         return commentChar + " Created with " + versionInfo + " on " + dateOnly;
@@ -54,7 +45,10 @@ public class SurvexTherionUtil {
             String exploDateKeyword = format.getExplorationDateKeyword();
 
             // Date
-            builder.append(marker).append(formatDate(trip.getSurveyDate())).append("\n");
+            builder.append(marker)
+                    .append("date ")
+                    .append(formatDate(trip.getSurveyDate(), format))
+                    .append("\n");
 
             // Instrument line - commented ONLY if field is empty
             if (trip.hasInstrument()) {
@@ -76,19 +70,14 @@ public class SurvexTherionUtil {
             //   1. Linked to survey date -> use survey date
             //   2. Unlinked and date set -> use the explicit exploration date
             //   3. Unlinked and date empty -> commented-out placeholder (like blank instrument)
-            if (trip.isExplorationDateLinked()) {
-                String formattedExploDate =
-                        formatDate(trip.getSurveyDate()).substring(5); // Remove "date " prefix
+            Date exploDate =
+                    trip.isExplorationDateLinked()
+                            ? trip.getSurveyDate()
+                            : trip.getExplorationDate();
+            if (exploDate != null) {
                 builder.append(marker)
                         .append(exploDateKeyword)
-                        .append(formattedExploDate)
-                        .append("\n");
-            } else if (trip.getExplorationDate() != null) {
-                String formattedExploDate =
-                        formatDate(trip.getExplorationDate()).substring(5); // Remove "date " prefix
-                builder.append(marker)
-                        .append(exploDateKeyword)
-                        .append(formattedExploDate)
+                        .append(formatDate(exploDate, format))
                         .append("\n");
             } else {
                 builder.append(commentChar).append(marker).append(exploDateKeyword).append("\n");
@@ -219,10 +208,9 @@ public class SurvexTherionUtil {
     }
 
     @SuppressLint("SimpleDateFormat")
-    private static String formatDate(Date date) {
-        DateFormat dateFormat = new SimpleDateFormat(TRIP_DATE_PATTERN);
-        String dateString = dateFormat.format(date);
-        return "date " + dateString;
+    private static String formatDate(Date date, SurveyFormat format) {
+        DateFormat dateFormat = new SimpleDateFormat(format.getDatePattern());
+        return dateFormat.format(date);
     }
 
     private static String commentMultiline(String raw, char commentChar) {
@@ -248,9 +236,10 @@ public class SurvexTherionUtil {
         Station to = reading.getTo();
         String toName = to.getName();
 
-        // Replace splay station name with format-specific syntax
-        if (toName.equals("-")) {
-            toName = format.getSplayStationName();
+        // A splay's anonymous station is written in the format's own notation. Test the station,
+        // not the leg: the as-taken reading of a backward leg has no destination.
+        if (to.isAnonymous()) {
+            toName = format.getAnonymousStationName(to == Station.ANONYMOUS_WALL);
         }
 
         if (leg.wasPromoted() && format.canAverageRepeatedLegs()) {

@@ -608,9 +608,9 @@
     <string name="settings_export_svg_copyright_title">Afficher le copyright/la licence dans la légende</string>
     <string name="settings_export_svg_copyright_summary">Le copyright et la licence sont toujours enregistrés dans le fichier ; ceci affiche aussi une mention dans la légende</string>
     <string name="settings_export_therion_symbols_title">Exportation Therion des symboles</string>
-    <string name="settings_export_therion_symbols_summary">Inclure les symboles lors de l\'exportation au format Therion</string>
+    <string name="settings_export_therion_symbols_summary">Inclure les symboles dans le fichier th2</string>
     <string name="settings_export_therion_text_title">Exportation Therion du texte</string>
-    <string name="settings_export_therion_text_summary">Inclure le texte lors de l\'exportation au format Therion</string>
+    <string name="settings_export_therion_text_summary">Inclure le texte dans le fichier th2</string>
     <string name="settings_export_folder_name_title">Nom du dossier d\'export</string>
     <string name="settings_export_folder_name_summary">Nom du dossier dans le répertoire de topographie où exporter</string>
     <string name="settings_export_type_subfolders_title">Sous-dossiers par type d\'export</string>
@@ -658,7 +658,7 @@
 
     <!-- Form validation errors -->
     <string name="validation_error_cannot_be_blank">Ne peut pas être vide</string>
-    <string name="validation_error_station_named_dash">La station ne peut pas s\'appeler \"-\"</string>
+    <string name="validation_error_station_name_reserved">La station ne peut pas s\'appeler \"-\" ou \".\"</string>
     <string name="validation_error_station_does_not_exist">La station n\'existe pas</string>
     <string name="validation_error_same_as_from_station">Ne peut pas être identique à la station d\'origine</string>
     <string name="validation_error_station_name_not_unique">Le nom de la station doit être unique</string>
@@ -710,6 +710,9 @@
     <string name="menu_set_active_station">Définir active</string>
     <string name="menu_rename_station">Renommer</string>
     <string name="menu_edit_leg">Modifier</string>
+    <string name="menu_to_wall">Vers la paroi</string>
+    <string name="to_wall_info_title">À propos de Vers la paroi</string>
+    <string name="to_wall_info_message">Information facultative. Coché signifie que la radiale va jusqu\'aux limites de la galerie ; décoché signifie qu\'elle mesure jusqu\'à un élément, comme un spéléothème.</string>
     <string name="menu_upgrade_row">Forcer une nouvelle station</string>
     <string name="menu_promote_to_above_leg">Ajouter à la visée ci-dessus</string>
     <string name="toast_splay_promoted">Radiale combinée avec la visée</string>
@@ -735,7 +738,7 @@
     <string name="menu_xsection_delete">Supprimer la coupe</string>
     <string name="menu_xsection_edit">Modifier le croquis</string>
     <string name="menu_xsection_set_direction">Définir la direction</string>
-    <string name="menu_new_cross_section">Nouvelle coupe transversale</string>
+
     <string name="menu_jump_to_station_in_table">&#10132; Tableau de données</string>
     <string name="menu_delete_station">Supprimer</string>
     <string name="menu_reverse">Inverser</string>

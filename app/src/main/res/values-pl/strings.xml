@@ -608,9 +608,9 @@
     <string name="settings_export_svg_copyright_title">Pokaż copyright/licencję w legendzie</string>
     <string name="settings_export_svg_copyright_summary">Copyright i licencja są zawsze zapisywane w pliku; to dodatkowo pokazuje informację w legendzie</string>
     <string name="settings_export_therion_symbols_title">Symbole eksportu Therion</string>
-    <string name="settings_export_therion_symbols_summary">Uwzględnij symbole podczas eksportu do formatu Therion</string>
+    <string name="settings_export_therion_symbols_summary">Uwzględnij symbole w pliku th2</string>
     <string name="settings_export_therion_text_title">Tekst eksportu Therion</string>
-    <string name="settings_export_therion_text_summary">Uwzględnij tekst podczas eksportu do formatu Therion</string>
+    <string name="settings_export_therion_text_summary">Uwzględnij tekst w pliku th2</string>
     <string name="settings_export_folder_name_title">Nazwa folderu eksportu</string>
     <string name="settings_export_folder_name_summary">Nazwa folderu w folderze pomiaru, do którego eksportować</string>
     <string name="settings_export_type_subfolders_title">Podfoldery według typu eksportu</string>
@@ -658,7 +658,7 @@
 
     <!-- Form validation errors -->
     <string name="validation_error_cannot_be_blank">Nie może być puste</string>
-    <string name="validation_error_station_named_dash">Stanowisko nie może nazywać się \"-\"</string>
+    <string name="validation_error_station_name_reserved">Stanowisko nie może nazywać się \"-\" ani \".\"</string>
     <string name="validation_error_station_does_not_exist">Stanowisko nie istnieje</string>
     <string name="validation_error_same_as_from_station">Nie może być takie samo jak stanowisko początkowe</string>
     <string name="validation_error_station_name_not_unique">Nazwa stanowiska musi być unikalna</string>
@@ -708,6 +708,9 @@
     <string name="menu_set_active_station">Ustaw jako aktywne</string>
     <string name="menu_rename_station">Zmień nazwę</string>
     <string name="menu_edit_leg">Edytuj</string>
+    <string name="menu_to_wall">Do ściany</string>
+    <string name="to_wall_info_title">Informacje o Do ściany</string>
+    <string name="to_wall_info_message">Informacja opcjonalna. Zaznaczone oznacza, że pomiar szczegółowy sięga granic korytarza; odznaczone oznacza, że mierzy do obiektu, np. nacieku.</string>
     <string name="menu_upgrade_row">Wymuś nowe stanowisko</string>
     <string name="menu_promote_to_above_leg">Dodaj do ciągu powyżej</string>
     <string name="toast_splay_promoted">Pomiar szczegółowy połączony z ciągiem</string>
@@ -733,7 +736,6 @@
     <string name="menu_xsection_delete">Usuń przekrój</string>
     <string name="menu_xsection_edit">Edytuj szkic</string>
     <string name="menu_xsection_set_direction">Ustaw kierunek</string>
-    <string name="menu_new_cross_section">Nowy przekrój poprzeczny</string>
     <string name="menu_jump_to_station_in_table">&#10132; Tabela danych</string>
     <string name="menu_delete_station">Usuń</string>
     <string name="menu_reverse">Odwróć</string>

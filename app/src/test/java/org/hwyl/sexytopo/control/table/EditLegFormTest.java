@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.control.table;
 
+import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.junit.Assert;
@@ -191,5 +192,82 @@ public class EditLegFormTest {
         Assert.assertEquals(-90, (int) dms[0]);
         Assert.assertEquals(0, (int) dms[1]);
         Assert.assertEquals(0.0f, dms[2], DELTA);
+    }
+
+    // ---- input mode of splays ----
+
+    @Test
+    public void testInitialInputModeOfForwardLegIsForward() {
+        Leg leg = new Leg(5.0f, 45.0f, 10.0f, new Station("2"), new Leg[] {}, false);
+        Assert.assertEquals(InputMode.FORWARD, EditLegForm.getInitialInputMode(leg));
+    }
+
+    @Test
+    public void testInitialInputModeOfBackwardLegIsBackward() {
+        Leg leg = new Leg(5.0f, 45.0f, 10.0f, new Station("2"), new Leg[] {}, true);
+        Assert.assertEquals(InputMode.BACKWARD, EditLegForm.getInitialInputMode(leg));
+    }
+
+    @Test
+    public void testInitialInputModeOfSplayIsAlwaysForward() {
+        // Splays cannot be shot backwards, even if an old file left one flagged as such
+        Leg flaggedSplay = new Leg(5.0f, 45.0f, 10.0f, true);
+        Assert.assertEquals(InputMode.FORWARD, EditLegForm.getInitialInputMode(flaggedSplay));
+    }
+
+    @Test
+    public void testApplyBackwardInputModeReversesAndFlagsLeg() {
+        Leg leg = new Leg(5.0f, 45.0f, 10.0f);
+
+        Leg applied = EditLegForm.applyInputMode(leg, false, InputMode.BACKWARD);
+
+        Assert.assertTrue(applied.wasShotBackwards());
+        Assert.assertEquals(225.0f, applied.getAzimuth(), DELTA);
+        Assert.assertEquals(-10.0f, applied.getInclination(), DELTA);
+    }
+
+    @Test
+    public void testApplyBackwardInputModeNeverReversesOrFlagsSplay() {
+        Leg splay = new Leg(5.0f, 45.0f, 10.0f);
+
+        Leg applied = EditLegForm.applyInputMode(splay, true, InputMode.BACKWARD);
+
+        Assert.assertFalse(applied.wasShotBackwards());
+        Assert.assertEquals(45.0f, applied.getAzimuth(), DELTA);
+        Assert.assertEquals(10.0f, applied.getInclination(), DELTA);
+    }
+
+    @Test
+    public void testApplyForwardInputModeLeavesLegAlone() {
+        Leg leg = new Leg(5.0f, 45.0f, 10.0f);
+
+        Leg applied = EditLegForm.applyInputMode(leg, false, InputMode.FORWARD);
+
+        Assert.assertFalse(applied.wasShotBackwards());
+        Assert.assertEquals(45.0f, applied.getAzimuth(), DELTA);
+    }
+
+    // ---- the To Wall tick box ----
+
+    @Test
+    public void testCreatedSplayGoesWhereTheTickBoxSays() {
+        for (boolean toWall : new boolean[] {true, false}) {
+            Leg splay = EditLegForm.createSplay(6.0f, 50.0f, 12.0f, toWall);
+            Assert.assertFalse(splay.hasDestination());
+            Assert.assertEquals(toWall, splay.isToWall());
+            Assert.assertEquals(6.0f, splay.getDistance(), DELTA);
+            Assert.assertEquals(50.0f, splay.getAzimuth(), DELTA);
+            Assert.assertEquals(12.0f, splay.getInclination(), DELTA);
+        }
+    }
+
+    @Test
+    public void testTickBoxStartsWithWhatTheSplayGoesTo() {
+        Leg toWall = new Leg(5.0f, 45.0f, 10.0f);
+        Leg toFeature = new Leg(5.0f, 45.0f, 10.0f).withToWall(false);
+
+        Assert.assertTrue(EditLegForm.initialToWall(null));
+        Assert.assertTrue(EditLegForm.initialToWall(toWall));
+        Assert.assertFalse(EditLegForm.initialToWall(toFeature));
     }
 }

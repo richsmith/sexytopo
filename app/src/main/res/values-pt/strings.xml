@@ -608,9 +608,9 @@
     <string name="settings_export_svg_copyright_title">Mostrar copyright/licença na legenda</string>
     <string name="settings_export_svg_copyright_summary">O copyright e a licença são sempre guardados no arquivo; isto também mostra uma linha de crédito na legenda</string>
     <string name="settings_export_therion_symbols_title">Símbolos de exportação Therion</string>
-    <string name="settings_export_therion_symbols_summary">Incluir símbolos ao exportar para formato Therion</string>
+    <string name="settings_export_therion_symbols_summary">Incluir símbolos no arquivo th2</string>
     <string name="settings_export_therion_text_title">Texto de exportação Therion</string>
-    <string name="settings_export_therion_text_summary">Incluir texto ao exportar para formato Therion</string>
+    <string name="settings_export_therion_text_summary">Incluir texto no arquivo th2</string>
     <string name="settings_export_folder_name_title">Nome da pasta de exportação</string>
     <string name="settings_export_folder_name_summary">Nome da pasta dentro da pasta da topografia para exportar</string>
     <string name="settings_export_type_subfolders_title">Subpastas por tipo de exportação</string>
@@ -658,7 +658,7 @@
 
     <!-- Form validation errors -->
     <string name="validation_error_cannot_be_blank">Não pode estar vazio</string>
-    <string name="validation_error_station_named_dash">A estação não pode ser chamada \"-\"</string>
+    <string name="validation_error_station_name_reserved">A estação não pode ser chamada \"-\" ou \".\"</string>
     <string name="validation_error_station_does_not_exist">A estação não existe</string>
     <string name="validation_error_same_as_from_station">Não pode ser a mesma que a estação de origem</string>
     <string name="validation_error_station_name_not_unique">O nome da estação deve ser único</string>
@@ -708,6 +708,9 @@
     <string name="menu_set_active_station">Definir como Ativa</string>
     <string name="menu_rename_station">Renomear</string>
     <string name="menu_edit_leg">Editar</string>
+    <string name="menu_to_wall">À parede</string>
+    <string name="to_wall_info_title">Sobre À parede</string>
+    <string name="to_wall_info_message">Informação opcional. Marcado significa que o raio vai até aos limites da galeria; desmarcado significa que mede até um elemento, como um espeleotema.</string>
     <string name="menu_upgrade_row">Forçar Nova Estação</string>
     <string name="menu_promote_to_above_leg">Adicionar ao trecho acima</string>
     <string name="toast_splay_promoted">Raio combinado com trecho</string>
@@ -733,7 +736,6 @@
     <string name="menu_xsection_delete">Eliminar secção</string>
     <string name="menu_xsection_edit">Editar esboço</string>
     <string name="menu_xsection_set_direction">Definir direção</string>
-    <string name="menu_new_cross_section">Nova Secção Transversal</string>
     <string name="menu_jump_to_station_in_table">→ Tabela de Dados</string>
     <string name="menu_delete_station">Eliminar</string>
     <string name="menu_reverse">Inverter</string>
