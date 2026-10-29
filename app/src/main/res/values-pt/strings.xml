@@ -608,9 +608,9 @@
     <string name="settings_export_svg_copyright_title">Mostrar copyright/licença na legenda</string>
     <string name="settings_export_svg_copyright_summary">O copyright e a licença são sempre guardados no arquivo; isto também mostra uma linha de crédito na legenda</string>
     <string name="settings_export_therion_symbols_title">Símbolos de exportação Therion</string>
-    <string name="settings_export_therion_symbols_summary">Incluir símbolos ao exportar para formato Therion</string>
+    <string name="settings_export_therion_symbols_summary">Incluir símbolos no arquivo th2</string>
     <string name="settings_export_therion_text_title">Texto de exportação Therion</string>
-    <string name="settings_export_therion_text_summary">Incluir texto ao exportar para formato Therion</string>
+    <string name="settings_export_therion_text_summary">Incluir texto no arquivo th2</string>
     <string name="settings_export_folder_name_title">Nome da pasta de exportação</string>
     <string name="settings_export_folder_name_summary">Nome da pasta dentro da pasta da topografia para exportar</string>
     <string name="settings_export_type_subfolders_title">Subpastas por tipo de exportação</string>
@@ -736,7 +736,6 @@
     <string name="menu_xsection_delete">Eliminar secção</string>
     <string name="menu_xsection_edit">Editar esboço</string>
     <string name="menu_xsection_set_direction">Definir direção</string>
-    <string name="menu_new_cross_section">Nova Secção Transversal</string>
     <string name="menu_jump_to_station_in_table">→ Tabela de Dados</string>
     <string name="menu_delete_station">Eliminar</string>
     <string name="menu_reverse">Inverter</string>

@@ -614,9 +614,9 @@
     <string name="settings_key_inc_deg_mins_secs_summary">Enter inclination values in deg/mins/secs (as opposed to the default of decimal)</string>
     <string name="settings_export_title">Export</string>
     <string name="settings_export_therion_symbols_title">Export symbols</string>
-    <string name="settings_export_therion_symbols_summary">Include symbols when exporting</string>
+    <string name="settings_export_therion_symbols_summary">Include symbols in th2 file</string>
     <string name="settings_export_therion_text_title">Export text</string>
-    <string name="settings_export_therion_text_summary">Include text when exporting</string>
+    <string name="settings_export_therion_text_summary">Include text in th2 file</string>
     <string name="settings_export_folder_name_title">Export folder name</string>
     <string name="settings_export_folder_name_summary">Name of the folder within the survey folder to export to</string>
     <string name="settings_export_type_subfolders_title">Export type subfolders</string>

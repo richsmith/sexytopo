@@ -608,9 +608,9 @@
     <string name="settings_export_svg_copyright_title">Copyright/Lizenz in der Legende anzeigen</string>
     <string name="settings_export_svg_copyright_summary">Copyright und Lizenz werden immer in der Datei gespeichert; dies zeigt zusätzlich einen Hinweis in der Legende an</string>
     <string name="settings_export_therion_symbols_title">Therion-Export Symbole</string>
-    <string name="settings_export_therion_symbols_summary">Symbole beim Exportieren im Therion-Format einschließen</string>
+    <string name="settings_export_therion_symbols_summary">Symbole in die th2-Datei aufnehmen</string>
     <string name="settings_export_therion_text_title">Therion-Export Text</string>
-    <string name="settings_export_therion_text_summary">Text beim Exportieren im Therion-Format einschließen</string>
+    <string name="settings_export_therion_text_summary">Text in die th2-Datei aufnehmen</string>
     <string name="settings_export_folder_name_title">Exportordner-Name</string>
     <string name="settings_export_folder_name_summary">Name des Ordners im Vermessungsordner, in den exportiert wird</string>
     <string name="settings_export_type_subfolders_title">Exporttyp-Unterordner</string>
@@ -736,7 +736,7 @@
     <string name="menu_xsection_delete">Querschnitt löschen</string>
     <string name="menu_xsection_edit">Skizze bearbeiten</string>
     <string name="menu_xsection_set_direction">Richtung festlegen</string>
-    <string name="menu_new_cross_section">Neuer Querschnitt</string>
+
     <string name="menu_jump_to_station_in_table">&#10132; Daten-Tabelle</string>
     <string name="menu_delete_station">Löschen</string>
     <string name="menu_reverse">Rückblick</string>

@@ -1,6 +1,8 @@
 package org.hwyl.sexytopo.control.io.thirdparty.survex;
 
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionImporter;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
@@ -420,11 +422,15 @@ public class SurvexImporterTest {
     // --- Metadata date parsing ---
 
     @Test
-    public void testMetadataImportAcceptsHyphenSeparatedSurveyDate() throws Exception {
-        String survexText = "*date 2026-01-05\n";
+    public void testMetadataImportReadsSurveyAndExplorationDates() throws Exception {
+        String survexText = "*date 2026-01-05\n*date explored 2025/12/30 2026/01/02\n";
         Trip trip = SurvexTherionImporter.parseMetadata(survexText, SurveyFormat.SURVEX);
         Assert.assertNotNull(trip);
-        Assert.assertNotNull(trip.getSurveyDate());
+        Assert.assertEquals(
+                new GregorianCalendar(2026, Calendar.JANUARY, 5).getTime(), trip.getSurveyDate());
+        Assert.assertEquals(
+                new GregorianCalendar(2025, Calendar.DECEMBER, 30).getTime(),
+                trip.getExplorationDate());
     }
 
     // ---- backward lines: the new station is in the FROM column ----
