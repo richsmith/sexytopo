@@ -54,13 +54,13 @@ public class OldStyleLoader {
             throw new Exception("Duplicate leg encountered");
         } else if (stationsSoFar.contains(from)) { // forward leg
             Leg leg =
-                    (to == Survey.ANONYMOUS_WALL_STATION)
+                    (to == Station.ANONYMOUS_WALL)
                             ? new Leg(distance, azimuth, inclination)
                             : new Leg(distance, azimuth, inclination, to, new Leg[] {});
             from.addOnwardLeg(leg);
         } else if (stationsSoFar.contains(to)) { // backwards leg
             Leg leg =
-                    (from == Survey.ANONYMOUS_WALL_STATION)
+                    (from == Station.ANONYMOUS_WALL)
                             ? new Leg(distance, azimuth, inclination)
                             : new Leg(distance, azimuth, inclination, from, new Leg[] {});
             to.addOnwardLeg(leg.reverse());
@@ -73,8 +73,8 @@ public class OldStyleLoader {
 
     private static Station retrieveOrCreateStation(
             Map<String, Station> nameToStation, String name, String comment) {
-        if (name.equals(Survey.ANONYMOUS_WALL_STATION.getName())) {
-            return Survey.ANONYMOUS_WALL_STATION;
+        if (name.equals(Station.ANONYMOUS_WALL.getName())) {
+            return Station.ANONYMOUS_WALL;
         } else if (nameToStation.containsKey(name)) {
             return nameToStation.get(name);
         } else {

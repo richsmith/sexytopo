@@ -7,6 +7,7 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
@@ -142,9 +143,12 @@ public class EditLegForm extends Form {
 
     private void initialiseToWall(View dialogView) {
         if (isSplay) {
+            dialogView.findViewById(R.id.toWallContainer).setVisibility(View.VISIBLE);
             this.toWallCheckBox = dialogView.findViewById(R.id.toWallCheckBox);
-            toWallCheckBox.setVisibility(View.VISIBLE);
             toWallCheckBox.setChecked(initialToWall(originalLeg));
+            dialogView
+                    .findViewById(R.id.toWallInfoButton)
+                    .setOnClickListener(v -> showToWallInfo());
         }
     }
 
@@ -301,7 +305,7 @@ public class EditLegForm extends Form {
 
         if (fromName.isEmpty()) {
             error = R.string.validation_error_cannot_be_blank;
-        } else if (Survey.isReservedStationName(fromName)) {
+        } else if (Station.isReservedName(fromName)) {
             error = R.string.validation_error_station_name_reserved;
         } else if (survey.isOrigin(originalFromStation) && fromStation == null) {
             // Are we just renaming the origin station
@@ -361,7 +365,7 @@ public class EditLegForm extends Form {
 
         if (toName.isEmpty()) {
             error = R.string.validation_error_cannot_be_blank;
-        } else if (Survey.isReservedStationName(toName)) {
+        } else if (Station.isReservedName(toName)) {
             error = R.string.validation_error_station_name_reserved;
         } else if (toName.equals(fromName)) {
             error = R.string.validation_error_same_as_from_station;
@@ -809,6 +813,14 @@ public class EditLegForm extends Form {
         }
 
         return applyInputMode(leg, isSplay, inputMode);
+    }
+
+    private void showToWallInfo() {
+        new MaterialAlertDialogBuilder(context)
+                .setTitle(R.string.to_wall_info_title)
+                .setMessage(R.string.to_wall_info_message)
+                .setPositiveButton(R.string.ok, null)
+                .show();
     }
 
     /** Builds the splay for the readings entered, going to a wall or to another feature. */

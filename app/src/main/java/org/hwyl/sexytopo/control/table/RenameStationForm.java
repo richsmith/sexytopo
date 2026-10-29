@@ -42,7 +42,7 @@ public class RenameStationForm extends Form {
         // only check for non-null or max length
         if (currentTextString.isEmpty()) {
             setError(this.stationNameLayout, "Cannot be blank");
-        } else if (Survey.isReservedStationName(currentTextString)) {
+        } else if (Station.isReservedName(currentTextString)) {
             setError(this.stationNameLayout, R.string.validation_error_station_name_reserved);
         } else if (!currentTextString.equals(currentName)
                 && (survey.getStationByName(currentTextString) != null)) {

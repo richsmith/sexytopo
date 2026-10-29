@@ -709,6 +709,8 @@
     <string name="menu_rename_station">Zmień nazwę</string>
     <string name="menu_edit_leg">Edytuj</string>
     <string name="menu_to_wall">Do ściany</string>
+    <string name="to_wall_info_title">Informacje o Do ściany</string>
+    <string name="to_wall_info_message">Informacja opcjonalna. Zaznaczone oznacza, że pomiar szczegółowy sięga granic korytarza; odznaczone oznacza, że mierzy do obiektu, np. nacieku.</string>
     <string name="menu_upgrade_row">Wymuś nowe stanowisko</string>
     <string name="menu_promote_to_above_leg">Dodaj do ciągu powyżej</string>
     <string name="toast_splay_promoted">Pomiar szczegółowy połączony z ciągiem</string>

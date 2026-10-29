@@ -196,8 +196,8 @@ public class SurvexImporterTest {
             SurvexTherionImporter.parseCentreline(
                     "1\t" + token + "\t1.0\t0.0\t0.0\tstal\n1\t2\t5.0\t0.0\t0.0", survey, false);
         }
-        Assert.assertFalse(Survey.ANONYMOUS_WALL_STATION.hasComment());
-        Assert.assertFalse(Survey.ANONYMOUS_FEATURE_STATION.hasComment());
+        Assert.assertFalse(Station.ANONYMOUS_WALL.hasComment());
+        Assert.assertFalse(Station.ANONYMOUS_FEATURE.hasComment());
     }
 
     @Test

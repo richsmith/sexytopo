@@ -711,6 +711,8 @@
     <string name="menu_rename_station">Renommer</string>
     <string name="menu_edit_leg">Modifier</string>
     <string name="menu_to_wall">Vers la paroi</string>
+    <string name="to_wall_info_title">À propos de Vers la paroi</string>
+    <string name="to_wall_info_message">Information facultative. Coché signifie que la radiale va jusqu\'aux limites de la galerie ; décoché signifie qu\'elle mesure jusqu\'à un élément, comme un spéléothème.</string>
     <string name="menu_upgrade_row">Forcer une nouvelle station</string>
     <string name="menu_promote_to_above_leg">Ajouter à la visée ci-dessus</string>
     <string name="toast_splay_promoted">Radiale combinée avec la visée</string>

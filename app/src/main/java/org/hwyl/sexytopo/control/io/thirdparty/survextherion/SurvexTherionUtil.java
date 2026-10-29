@@ -250,8 +250,8 @@ public class SurvexTherionUtil {
 
         // A splay's anonymous station is written in the format's own notation. Test the station,
         // not the leg: the as-taken reading of a backward leg has no destination.
-        if (Survey.isAnonymousStation(to)) {
-            toName = format.getAnonymousStationName(to == Survey.ANONYMOUS_WALL_STATION);
+        if (to.isAnonymous()) {
+            toName = format.getAnonymousStationName(to == Station.ANONYMOUS_WALL);
         }
 
         if (leg.wasPromoted() && format.canAverageRepeatedLegs()) {

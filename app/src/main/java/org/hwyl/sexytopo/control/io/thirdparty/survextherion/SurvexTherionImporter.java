@@ -473,10 +473,10 @@ public class SurvexTherionImporter {
         switch (token) {
             case "-":
             case "..":
-                return Survey.ANONYMOUS_WALL_STATION;
+                return Station.ANONYMOUS_WALL;
             case ".":
             case "...":
-                return Survey.ANONYMOUS_FEATURE_STATION;
+                return Station.ANONYMOUS_FEATURE;
             default:
                 return null;
         }
@@ -681,7 +681,7 @@ public class SurvexTherionImporter {
         Station newStation = isBackward ? from : to;
 
         Leg leg;
-        if (Survey.isAnonymousStation(newStation)) {
+        if (newStation.isAnonymous()) {
             leg = new Leg(distance, azimuth, inclination, newStation, new Leg[] {});
         } else {
             Leg recorded = new Leg(distance, azimuth, inclination);

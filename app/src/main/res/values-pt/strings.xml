@@ -709,6 +709,8 @@
     <string name="menu_rename_station">Renomear</string>
     <string name="menu_edit_leg">Editar</string>
     <string name="menu_to_wall">À parede</string>
+    <string name="to_wall_info_title">Sobre À parede</string>
+    <string name="to_wall_info_message">Informação opcional. Marcado significa que o raio vai até aos limites da galeria; desmarcado significa que mede até um elemento, como um espeleotema.</string>
     <string name="menu_upgrade_row">Forçar Nova Estação</string>
     <string name="menu_promote_to_above_leg">Adicionar ao trecho acima</string>
     <string name="toast_splay_promoted">Raio combinado com trecho</string>

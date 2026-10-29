@@ -160,20 +160,34 @@ public class SurveyJsonTranslaterTest {
     }
 
     @Test
-    public void testSplayDestinationIsADashForAWallAndADotForAnotherFeature() throws Exception {
+    public void testSplayToAnotherFeatureIsSavedWithADashAndAToWallFlag() throws Exception {
         Leg toWall = new Leg(5.0f, 45.0f, 10.0f);
         Leg toFeature = toWall.withToWall(false);
 
         JSONObject wallJson = SurveyJsonTranslater.toJson(toWall, 0);
         JSONObject featureJson = SurveyJsonTranslater.toJson(toFeature, 0);
 
+        // Both keep the dash older versions understand; only the feature splay gets the flag
         Assert.assertEquals("-", wallJson.getString(SurveyJsonTranslater.DESTINATION_TAG));
-        Assert.assertEquals(".", featureJson.getString(SurveyJsonTranslater.DESTINATION_TAG));
+        Assert.assertEquals("-", featureJson.getString(SurveyJsonTranslater.DESTINATION_TAG));
+        Assert.assertFalse(wallJson.has(SurveyJsonTranslater.TO_WALL_TAG));
+        Assert.assertFalse(featureJson.getBoolean(SurveyJsonTranslater.TO_WALL_TAG));
         Assert.assertTrue(SurveyJsonTranslater.toLeg(new HashMap<>(), wallJson).isToWall());
         Leg loaded = SurveyJsonTranslater.toLeg(new HashMap<>(), featureJson);
         Assert.assertFalse(loaded.hasDestination());
         Assert.assertFalse(loaded.isToWall());
         Assert.assertEquals(5.0f, loaded.getDistance(), 0.0001f);
+    }
+
+    @Test
+    public void testSplayWithADotDestinationIsLoadedAsGoingToAnotherFeature() throws Exception {
+        JSONObject json = SurveyJsonTranslater.toJson(new Leg(5.0f, 45.0f, 10.0f), 0);
+        json.put(SurveyJsonTranslater.DESTINATION_TAG, ".");
+
+        Leg loaded = SurveyJsonTranslater.toLeg(new HashMap<>(), json);
+
+        Assert.assertFalse(loaded.hasDestination());
+        Assert.assertFalse(loaded.isToWall());
     }
 
     @Test

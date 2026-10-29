@@ -73,13 +73,6 @@
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <CheckBox
-            android:id="@+id/toWallCheckBox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/menu_to_wall"
-            android:visibility="gone"/>
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -301,6 +294,28 @@
                     android:inputType="numberDecimal"/>
             </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/toWallContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:visibility="gone">
+            <CheckBox
+                android:id="@+id/toWallCheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/menu_to_wall"/>
+            <ImageButton
+                android:id="@+id/toWallInfoButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/to_wall_info_title"
+                android:src="@drawable/ic_info"/>
         </LinearLayout>
 
         <com.google.android.material.textfield.TextInputLayout

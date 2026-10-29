@@ -15,6 +15,28 @@ public class Station extends SurveyComponent {
 
     public static final char[] FORBIDDEN_CHARS = new char[] {'\n', '\r'};
 
+    /** The anonymous destination of a splay to a wall, shown as a dash. */
+    public static final Station ANONYMOUS_WALL = new Station("-");
+
+    /** The anonymous destination of a splay to another feature, such as a stal, shown as a dot. */
+    public static final Station ANONYMOUS_FEATURE = new Station(".");
+
+    /** The anonymous station with this name, or null if there is none. */
+    public static Station getAnonymous(String name) {
+        if (name.equals(ANONYMOUS_WALL.getName())) {
+            return ANONYMOUS_WALL;
+        } else if (name.equals(ANONYMOUS_FEATURE.getName())) {
+            return ANONYMOUS_FEATURE;
+        } else {
+            return null;
+        }
+    }
+
+    /** Whether the name is used by an anonymous station, so a real station cannot have it. */
+    public static boolean isReservedName(String name) {
+        return getAnonymous(name) != null;
+    }
+
     public Station(String name) {
         this.name = sanitiseName(name);
     }
@@ -41,6 +63,11 @@ public class Station extends SurveyComponent {
 
     public String getName() {
         return name;
+    }
+
+    /** Whether this is one of the anonymous destinations of a splay rather than a real station. */
+    public boolean isAnonymous() {
+        return this == ANONYMOUS_WALL || this == ANONYMOUS_FEATURE;
     }
 
     public void setName(String name) {

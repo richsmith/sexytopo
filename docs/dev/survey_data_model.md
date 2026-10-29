@@ -40,10 +40,10 @@ A `Leg` represents a measurement between two points (a directed edge in the grap
    - Check with: `leg.hasDestination()` returns `true`
 
 2. **Splay (Unconnected Leg)**
-   - Has an anonymous station as `destination`: `Survey.ANONYMOUS_WALL_STATION`  or `Survey.ANONYMOUS_FEATURE_STATION`
+   - Has an anonymous station as `destination`: `Station.ANONYMOUS_WALL`  or `Station.ANONYMOUS_FEATURE`
    - Used to capture cave passage detail (walls, floor, ceiling)
    - Does NOT create a new station
-   - Check with: `leg.hasDestination()` returns `false`. For a station on its own, such as the to-station of an as-taken reading, use `Survey.isAnonymousStation(station)`
+   - Check with: `leg.hasDestination()` returns `false`. For a station on its own, such as the to-station of an as-taken reading, use `station.isAnonymous()`
    - Which kind: `leg.isToWall()`.
 
 ## Graph Structure
@@ -173,10 +173,11 @@ This validates:
    - Check: `station == survey.getOrigin()`
 
 2. **Anonymous Stations**
-   - `Survey.ANONYMOUS_WALL_STATION` (named `-`) and `Survey.ANONYMOUS_FEATURE_STATION` (named `.`)
+   - `Station.ANONYMOUS_WALL` (named `-`) and `Station.ANONYMOUS_FEATURE` (named `.`)
    - Used as the destination of every splay
    - NOT real stations in the graph.
    - Their names are reserved.
+   - Saved to JSON with a destination of `-` either way, plus `"toWall": false` for a splay to another feature, so older versions still load it (as a wall splay)
 
 3. **Promoted Legs**
    - `promotedFrom` holds the readings exactly as recorded, each keeping its own kind (wall or another feature)

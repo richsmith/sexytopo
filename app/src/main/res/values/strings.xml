@@ -744,6 +744,8 @@
     <string name="menu_rename_station">Rename</string>
     <string name="menu_edit_leg">Edit</string>
     <string name="menu_to_wall">To wall</string>
+    <string name="to_wall_info_title">About To wall</string>
+    <string name="to_wall_info_message">An optional record. Selected means that the splay is to the passage extremities; unselected means it measures to a feature, such as a speleothem.</string>
     <string name="menu_upgrade_row">Force New Station</string>
     <string name="menu_promote_to_above_leg">Add to Leg Above</string>
     <string name="toast_splay_promoted">Splay combined with leg</string>

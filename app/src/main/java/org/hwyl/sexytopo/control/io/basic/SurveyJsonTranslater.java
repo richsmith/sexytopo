@@ -40,6 +40,7 @@ public class SurveyJsonTranslater {
     public static final String PROMOTED_FROM_TAG = "promotedFrom";
     public static final String DESTINATION_TAG = "destination";
     public static final String WAS_SHOT_BACKWARDS_TAG = "wasShotBackwards";
+    public static final String TO_WALL_TAG = "toWall";
     public static final String INDEX_TAG = "index";
 
     public static final String ACTIVE_STATION_TAG = "activeStation";
@@ -259,7 +260,16 @@ public class SurveyJsonTranslater {
         json.put(DISTANCE_TAG, leg.getDistance());
         json.put(AZIMUTH_TAG, leg.getAzimuth());
         json.put(INCLINATION_TAG, leg.getInclination());
-        json.put(DESTINATION_TAG, leg.getDestination().getName());
+        // Every splay is saved with a dash as its destination, so older versions of SexyTopo can
+        // still load it; whether it goes to a wall is a separate flag, only written when it doesn't
+        if (leg.hasDestination()) {
+            json.put(DESTINATION_TAG, leg.getDestination().getName());
+        } else {
+            json.put(DESTINATION_TAG, Station.ANONYMOUS_WALL.getName());
+            if (!leg.isToWall()) {
+                json.put(TO_WALL_TAG, false);
+            }
+        }
         json.put(WAS_SHOT_BACKWARDS_TAG, leg.wasShotBackwards());
         if (leg.hasComment()) {
             json.put(COMMENT_TAG, leg.getComment());
@@ -353,13 +363,15 @@ public class SurveyJsonTranslater {
         String destinationName = json.getString(DESTINATION_TAG);
 
         Leg leg;
-        Station anonymousStation = Survey.getAnonymousStation(destinationName);
+        Station anonymousStation = Station.getAnonymous(destinationName);
         if (anonymousStation != null) {
-            // A dash is a splay to a wall and a dot is a splay to another feature.
+            // A splay goes to a wall unless flagged otherwise.
             // A splay always runs from its station, so it can never be shot backwards.
             // Older files may hold a splay with the flag set; the numbers are what is plotted, so
             // they are kept and only the flag is cleared.
-            leg = new Leg(distance, azimuth, inclination, anonymousStation, new Leg[] {});
+            boolean toWall =
+                    json.optBoolean(TO_WALL_TAG, anonymousStation == Station.ANONYMOUS_WALL);
+            leg = new Leg(distance, azimuth, inclination).withToWall(toWall);
 
         } else {
             if (!namesToStations.containsKey(destinationName)) {

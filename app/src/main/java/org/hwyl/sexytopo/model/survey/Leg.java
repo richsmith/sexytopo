@@ -32,13 +32,7 @@ public class Leg extends SurveyComponent {
     }
 
     public Leg(float distance, float azimuth, float inclination, boolean wasShotBackwards) {
-        this(
-                distance,
-                azimuth,
-                inclination,
-                Survey.ANONYMOUS_WALL_STATION,
-                NO_LEGS,
-                wasShotBackwards);
+        this(distance, azimuth, inclination, Station.ANONYMOUS_WALL, NO_LEGS, wasShotBackwards);
     }
 
     public Leg(
@@ -188,7 +182,7 @@ public class Leg extends SurveyComponent {
     }
 
     public Leg asBacksight() {
-        return asBacksight(Survey.ANONYMOUS_WALL_STATION);
+        return asBacksight(Station.ANONYMOUS_WALL);
     }
 
     /**
@@ -198,7 +192,7 @@ public class Leg extends SurveyComponent {
      * what it goes to, while a leg that is turned into a splay goes to a wall.
      */
     public Leg toSplay() {
-        Station splayDestination = hasDestination() ? Survey.ANONYMOUS_WALL_STATION : destination;
+        Station splayDestination = hasDestination() ? Station.ANONYMOUS_WALL : destination;
         return new Leg(distance, azimuth, inclination, splayDestination, NO_LEGS, false);
     }
 
@@ -207,7 +201,7 @@ public class Leg extends SurveyComponent {
      * a stal. A leg with a destination goes to neither, and is reported as going to a wall.
      */
     public boolean isToWall() {
-        return destination != Survey.ANONYMOUS_FEATURE_STATION;
+        return destination != Station.ANONYMOUS_FEATURE;
     }
 
     /**
@@ -218,8 +212,7 @@ public class Leg extends SurveyComponent {
         if (hasDestination()) {
             return this;
         }
-        Station splayDestination =
-                toWall ? Survey.ANONYMOUS_WALL_STATION : Survey.ANONYMOUS_FEATURE_STATION;
+        Station splayDestination = toWall ? Station.ANONYMOUS_WALL : Station.ANONYMOUS_FEATURE;
         Leg leg = new Leg(distance, azimuth, inclination, splayDestination, promotedFrom, false);
         leg.setComment(comment);
         return leg;
@@ -242,7 +235,7 @@ public class Leg extends SurveyComponent {
     }
 
     public boolean hasDestination() {
-        return !Survey.isAnonymousStation(destination);
+        return !destination.isAnonymous();
     }
 
     public Leg[] getPromotedFrom() {
