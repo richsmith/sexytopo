@@ -181,6 +181,8 @@ This validates:
 
 3. **Promoted Legs**
    - `promotedFrom` holds the readings exactly as recorded, each keeping its own kind (wall or another feature)
+   - None of them is flagged `wasShotBackwards`
+   - For a leg shot backwards they run the opposite way to the leg itself, which is stored reversed for plotting. Average the readings as they are, then reverse the result, rather than mixing them with the stored leg
 
 4. **Backwards Shots**
    - `leg.wasShotBackwards()` indicates measurement direction
