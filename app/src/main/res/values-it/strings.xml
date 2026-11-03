@@ -717,6 +717,7 @@
     <string name="toast_no_leg_above">Nessun tratto valido da combinare</string>
     <string name="menu_upgrade_splay">Promuovi a Tratto</string>
     <string name="menu_downgrade_leg">Declassa a Splay</string>
+    <string name="edit_leg_repeated_shots_note">Fatto da %1$d misure, letture bloccate</string>
     <string name="menu_delete_leg">Elimina</string>
     <string name="menu_delete_splay">Elimina Splay</string>
     <string name="menu_elevation">Elevazione</string>

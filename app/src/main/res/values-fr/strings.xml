@@ -719,6 +719,7 @@
     <string name="toast_no_leg_above">Aucune visée valide à combiner</string>
     <string name="menu_upgrade_splay">Convertir en visée directionnelle</string>
     <string name="menu_downgrade_leg">Convertir en visée rayonnante</string>
+    <string name="edit_leg_repeated_shots_note">Issu de %1$d visées, mesures verrouillées</string>
     <string name="menu_delete_leg">Supprimer</string>
     <string name="menu_delete_splay">Supprimer la radiale</string>
     <string name="menu_elevation">Élévation</string>

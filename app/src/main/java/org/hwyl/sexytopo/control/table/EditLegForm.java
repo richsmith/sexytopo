@@ -7,6 +7,7 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 import org.hwyl.sexytopo.R;
@@ -137,8 +138,39 @@ public class EditLegForm extends Form {
         this.initialiseFields(dialogView);
         this.initialiseInputMode(dialogView);
         this.initialiseToWall(dialogView);
+        this.initialiseReadingsLock(dialogView);
         this.initialiseStationDisplay();
         this.isInitialising = false;
+    }
+
+    /** A leg averaged from several shots shouldn't have its readings edited. */
+    private boolean areReadingsLocked() {
+        return originalLeg != null && originalLeg.wasPromoted();
+    }
+
+    private void initialiseReadingsLock(View dialogView) {
+        if (!areReadingsLocked()) {
+            return;
+        }
+        TextView note = dialogView.findViewById(R.id.repeatedShotsNote);
+        int shots = originalLeg.getPromotedFrom().length;
+        note.setText(context.getString(R.string.edit_leg_repeated_shots_note, shots));
+        note.setVisibility(View.VISIBLE);
+
+        View[] readingLayouts = {
+            distanceLayout,
+            azimuthLayout,
+            inclinationLayout,
+            azimuthDegreesLayout,
+            azimuthMinutesLayout,
+            azimuthSecondsLayout,
+            inclinationDegreesLayout,
+            inclinationMinutesLayout,
+            inclinationSecondsLayout
+        };
+        for (View layout : readingLayouts) {
+            layout.setEnabled(false);
+        }
     }
 
     private void initialiseToWall(View dialogView) {
@@ -795,6 +827,10 @@ public class EditLegForm extends Form {
      * passes.
      */
     public Leg getUpdatedLeg() {
+        if (areReadingsLocked()) {
+            return keepReadings(originalLeg, inputMode);
+        }
+
         float distance = getDistance();
         float azimuth = getAzimuth();
         float inclination = getInclination();
@@ -821,6 +857,16 @@ public class EditLegForm extends Form {
                 .setMessage(R.string.to_wall_info_message)
                 .setPositiveButton(R.string.ok, null)
                 .show();
+    }
+
+    /**
+     * Keeps a leg's readings and shots, only changing the direction it was shot in if the input
+     * mode has changed. The comment is left for the caller to set.
+     */
+    static Leg keepReadings(Leg original, InputMode inputMode) {
+        Leg kept = new Leg(original, original.getDestination());
+        boolean backwards = inputMode == InputMode.BACKWARD;
+        return backwards == original.wasShotBackwards() ? kept : kept.reverse();
     }
 
     /** Builds the splay for the readings entered, going to a wall or to another feature. */

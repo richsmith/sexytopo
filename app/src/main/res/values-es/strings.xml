@@ -717,6 +717,7 @@
     <string name="toast_no_leg_above">No hay tramo válido para combinar</string>
     <string name="menu_upgrade_splay">Promover a Tramo</string>
     <string name="menu_downgrade_leg">Degradar a Radial</string>
+    <string name="edit_leg_repeated_shots_note">Hecho con %1$d disparos, lecturas bloqueadas</string>
     <string name="menu_delete_leg">Eliminar</string>
     <string name="menu_delete_splay">Eliminar Radial</string>
     <string name="menu_elevation">Alzado</string>

@@ -717,6 +717,7 @@
     <string name="toast_no_leg_above">Keine gültige Messung zum Kombinieren</string>
     <string name="menu_upgrade_splay">Zu Messstrecke aufwerten</string>
     <string name="menu_downgrade_leg">Zu Splay abwerten</string>
+    <string name="edit_leg_repeated_shots_note">Aus %1$d Messungen, Werte gesperrt</string>
     <string name="menu_delete_leg">Löschen</string>
     <string name="menu_delete_splay">Dimension oder Hilfslinie löschen</string>
     <string name="menu_elevation">Aufriss</string>

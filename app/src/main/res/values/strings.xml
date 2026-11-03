@@ -752,6 +752,7 @@
     <string name="toast_no_leg_above">No valid leg to combine with</string>
     <string name="menu_upgrade_splay">Upgrade to Leg</string>
     <string name="menu_downgrade_leg">Downgrade to Splay</string>
+    <string name="edit_leg_repeated_shots_note">Made from %1$d shots, readings locked</string>
     <string name="menu_delete_leg">Delete</string>
     <string name="menu_delete_splay">Delete Splay</string>
     <string name="menu_elevation">Elevation</string>
