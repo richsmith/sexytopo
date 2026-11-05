@@ -1,4 +1,5 @@
 # Unreleased
+- New flowstone symbol, exported to Therion as a flowstone point
 - Splays can now be marked as going to another feature, such as a stal. Survex ... is imported as another feature. Older versions of SexyTopo open these as ordinary splays to a wall
 - Splays can be disabled from the leg menu or the edit dialog to hide readings (for calibration checks for example). Disabled splays are crossed out in the table, hidden in sketches, and dropped or commented out in file exports (thanks Andrew Atkinson).
 - Fix Survex and Therion import of legs that were shot backwards, which were placed in the opposite direction

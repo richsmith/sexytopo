@@ -164,6 +164,14 @@ public class SymbolDetailTranslater extends SketchDetailTranslater<SymbolDetail>
                     {5, 26.5f, 12, 20, 20, 17.5f, 28, 20, 35, 26.5f}
                 });
 
+        XVI_PATH_DATA.put(
+                Symbol.FLOWSTONE,
+                new float[][] {
+                    {5, 23.333f, 15, 23.333f}, // Bottom left
+                    {25, 23.333f, 35, 23.333f}, // Bottom right
+                    {15, 16.667f, 25, 16.667f} // Top middle
+                });
+
         // ********** Fluids **********
         XVI_PATH_DATA.put(
                 Symbol.WATER_FLOW,
