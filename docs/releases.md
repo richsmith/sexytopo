@@ -1,14 +1,14 @@
 # Unreleased
+- Splays can now be marked as going to another feature, such as a stal. Survex ... is imported as another feature. Older versions of SexyTopo open these as ordinary splays to a wall (thanks Andrew Atkinson)
+- Splays can be disabled from the leg menu or the edit dialog to hide readings (for calibration checks for example). Disabled splays are crossed out in the table, hidden in sketches, and dropped or commented out in file exports (thanks Andrew Atkinson).
+- Fix Survex and Therion import of legs that were shot backwards, which were placed in the opposite direction (thanks Andrew Atkinson)
+- Fix promoting a splay onto a leg that was shot backwards, which turned the leg round and added the splay in the wrong direction (thanks Andrew Atkinson)
+- Fix splays restored from a promoted leg being listed the wrong way round in the table (thanks Andrew Atkinson)
+- Fix editing a leg averaged from several shots, such as renaming one of its stations, which replaced the shots with their average. The shots are now kept unless the readings themselves are changed (thanks Andrew Atkinson)
+- Fix leg and station comments added from the menu not being treated as an unsaved change (thanks Andrew Atkinson)
+- Survex export now writes ISO dates (2026-01-05), which needs Survex 1.4.13 or later; Therion keeps 2026.01.05. Importing either accepts year-month-day dates separated by ".", "/" or "-" (thanks Andrew Atkinson)
 - New flowstone symbol, exported to Therion as a flowstone point
 - Fix column, air draught and too tight symbols missing from SVG exports
-- Splays can now be marked as going to another feature, such as a stal. Survex ... is imported as another feature. Older versions of SexyTopo open these as ordinary splays to a wall
-- Splays can be disabled from the leg menu or the edit dialog to hide readings (for calibration checks for example). Disabled splays are crossed out in the table, hidden in sketches, and dropped or commented out in file exports (thanks Andrew Atkinson).
-- Fix Survex and Therion import of legs that were shot backwards, which were placed in the opposite direction
-- Fix promoting a splay onto a leg that was shot backwards, which turned the leg round and added the splay in the wrong direction
-- Fix splays restored from a promoted leg being listed the wrong way round in the table
-- Fix editing a leg averaged from several shots, such as renaming one of its stations, which replaced the shots with their average. The shots are now kept unless the readings themselves are changed
-- Fix leg and station comments added from the menu not being treated as an unsaved change
-- Survex export now writes ISO dates (2026-01-05), which needs Survex 1.4.13 or later; Therion keeps 2026.01.05. Importing either accepts year-month-day dates separated by ".", "/" or "-"
 
 # 2026-09-30 1.14.0
 - Calibration screen reworked: readings are labelled and grouped by the direction they were actually taken in, so the order of shots no longer matters and every reading is used
