@@ -280,7 +280,7 @@ public class EditLegFormTest {
     @Test
     public void testCreatedSplayGoesWhereTheTickBoxSays() {
         for (boolean toWall : new boolean[] {true, false}) {
-            Leg splay = EditLegForm.createSplay(6.0f, 50.0f, 12.0f, toWall);
+            Leg splay = EditLegForm.createSplay(6.0f, 50.0f, 12.0f, toWall, true);
             Assert.assertFalse(splay.hasDestination());
             Assert.assertEquals(toWall, splay.isToWall());
             Assert.assertEquals(6.0f, splay.getDistance(), DELTA);
@@ -297,5 +297,29 @@ public class EditLegFormTest {
         Assert.assertTrue(EditLegForm.initialToWall(null));
         Assert.assertTrue(EditLegForm.initialToWall(toWall));
         Assert.assertFalse(EditLegForm.initialToWall(toFeature));
+    }
+
+    // ---- the Enabled tick box ----
+
+    @Test
+    public void testCreatedSplayIsEnabledAsTheTickBoxSays() {
+        for (boolean enabled : new boolean[] {true, false}) {
+            for (boolean toWall : new boolean[] {true, false}) {
+                Leg splay = EditLegForm.createSplay(6.0f, 50.0f, 12.0f, toWall, enabled);
+                Assert.assertEquals(enabled, splay.isEnabled());
+                Assert.assertEquals(toWall, splay.isToWall());
+            }
+        }
+    }
+
+    @Test
+    public void testEnabledTickBoxStartsWithTheSplaysState() {
+        Leg enabled = new Leg(5.0f, 45.0f, 10.0f);
+        Leg disabled = new Leg(5.0f, 45.0f, 10.0f);
+        disabled.setEnabled(false);
+
+        Assert.assertTrue(EditLegForm.initialEnabled(null));
+        Assert.assertTrue(EditLegForm.initialEnabled(enabled));
+        Assert.assertFalse(EditLegForm.initialEnabled(disabled));
     }
 }

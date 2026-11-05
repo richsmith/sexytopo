@@ -711,6 +711,9 @@
     <string name="menu_to_wall">Zur Wand</string>
     <string name="to_wall_info_title">Über Zur Wand</string>
     <string name="to_wall_info_message">Optionale Angabe. Angehakt bedeutet, dass der Splay zur Begrenzung des Ganges geht; nicht angehakt bedeutet, dass er zu einem Objekt misst, etwa einem Speläothem.</string>
+    <string name="menu_enabled">Aktiviert</string>
+    <string name="enabled_info_title">Über Aktiviert</string>
+    <string name="enabled_info_message">Nicht angehakt bedeutet, dass die Peilung erhalten bleibt, aber in der Datentabelle durchgestrichen und in Skizzen, Querschnitten und Exporten weggelassen wird (Survex und Therion behalten sie als auskommentierte Zeile). Nützlich für Messungen wie Kalibrierungskontrollen.</string>
     <string name="menu_upgrade_row">Neuen Messpunkt erzwingen</string>
     <string name="menu_promote_to_above_leg">Zur obigen Messung hinzufügen</string>
     <string name="toast_splay_promoted">Splay mit Messung kombiniert</string>

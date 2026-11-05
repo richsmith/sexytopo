@@ -24,4 +24,16 @@ public class PocketTopoTxtExporterTest {
                 PocketTopoTxtExporter.exportData(createSurveyWithSplay(true)),
                 PocketTopoTxtExporter.exportData(createSurveyWithSplay(false)));
     }
+
+    @Test
+    public void testDisabledSplayIsLeftOut() {
+        Survey withDisabledSplay = createSurveyWithSplay(true);
+        Leg disabledSplay = new Leg(3.5f, 180.0f, -5.0f);
+        SurveyUpdater.update(withDisabledSplay, disabledSplay);
+        SurveyUpdater.setSplayEnabled(withDisabledSplay, disabledSplay, false);
+
+        Assert.assertEquals(
+                PocketTopoTxtExporter.exportData(createSurveyWithSplay(true)),
+                PocketTopoTxtExporter.exportData(withDisabledSplay));
+    }
 }

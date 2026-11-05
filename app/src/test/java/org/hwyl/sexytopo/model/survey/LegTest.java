@@ -285,6 +285,101 @@ public class LegTest {
         Assert.assertFalse(Leg.isInclinationLegal(90.1f));
     }
 
+    private static Leg disabledSplayWithComment() {
+        Leg splay = new Leg(2.0f, 90.0f, 10.0f);
+        splay.setComment("Boulder");
+        splay.setEnabled(false);
+        return splay;
+    }
+
+    @Test
+    public void testLegIsNotDisabledByDefault() {
+        Assert.assertTrue(new Leg(1.0f, 0.0f, 0.0f).isEnabled());
+    }
+
+    @Test
+    public void testSplayCanBeDisabledAndShown() {
+        Leg splay = new Leg(1.0f, 0.0f, 0.0f);
+
+        splay.setEnabled(false);
+        Assert.assertFalse(splay.isEnabled());
+
+        splay.setEnabled(true);
+        Assert.assertTrue(splay.isEnabled());
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testFullLegCannotBeDisabled() {
+        Leg leg = new Leg(1.0f, 0.0f, 0.0f, new Station("1"), new Leg[] {});
+        leg.setEnabled(false);
+    }
+
+    @Test
+    public void testFullLegCanBeShown() {
+        Leg leg = new Leg(1.0f, 0.0f, 0.0f, new Station("1"), new Leg[] {});
+        leg.setEnabled(true);
+        Assert.assertTrue(leg.isEnabled());
+    }
+
+    @Test
+    public void testReverseKeepsDisabledAndComment() {
+        Leg reversed = disabledSplayWithComment().reverse();
+        Assert.assertFalse(reversed.isEnabled());
+        Assert.assertEquals("Boulder", reversed.getComment());
+    }
+
+    @Test
+    public void testAsBacksightKeepsDisabledAndComment() {
+        Leg backsight = disabledSplayWithComment().asBacksight();
+        Assert.assertFalse(backsight.isEnabled());
+        Assert.assertEquals("Boulder", backsight.getComment());
+    }
+
+    @Test
+    public void testRotateKeepsDisabledAndComment() {
+        Leg rotated = disabledSplayWithComment().rotate(45.0f);
+        Assert.assertFalse(rotated.isEnabled());
+        Assert.assertEquals("Boulder", rotated.getComment());
+    }
+
+    @Test
+    public void testAdjustAzimuthKeepsDisabledAndComment() {
+        Leg adjusted = disabledSplayWithComment().adjustAzimuth(180.0f);
+        Assert.assertFalse(adjusted.isEnabled());
+        Assert.assertEquals("Boulder", adjusted.getComment());
+    }
+
+    @Test
+    public void testRotateKeepsCommentOfFullLeg() {
+        Leg leg = new Leg(1.0f, 0.0f, 0.0f, new Station("1"), new Leg[] {});
+        leg.setComment("Tight");
+        Leg rotated = leg.rotate(10.0f);
+        Assert.assertEquals("Tight", rotated.getComment());
+        Assert.assertTrue(rotated.isEnabled());
+    }
+
+    @Test
+    public void testCopyWithDestinationKeepsCommentButIsNeverDisabled() {
+        Leg copy = new Leg(disabledSplayWithComment(), new Station("1"));
+        Assert.assertEquals("Boulder", copy.getComment());
+        Assert.assertTrue(copy.isEnabled());
+    }
+
+    @Test
+    public void testUpgradingDisabledSplayGivesEnabledLegWithComment() {
+        Leg leg = Leg.toFullLeg(disabledSplayWithComment(), new Station("1"));
+        Assert.assertTrue(leg.isEnabled());
+        Assert.assertEquals("Boulder", leg.getComment());
+    }
+
+    @Test
+    public void testToSplayIsEnabled() {
+        Leg splay = disabledSplayWithComment();
+        Leg leg = Leg.toFullLeg(splay, new Station("1"));
+        Assert.assertTrue(leg.toSplay().isEnabled());
+        Assert.assertFalse(splay.isEnabled());
+    }
+
     // ---- fromRecordedReading / toRecordedReading ----
 
     @Test

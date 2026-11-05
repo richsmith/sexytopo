@@ -25,6 +25,7 @@ import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.model.geometry.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.LegFilter;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
@@ -193,11 +194,14 @@ public class ContextMenuManager {
 
             if (currentLeg != null) {
                 boolean isSplay = !currentLeg.hasDestination();
+                // A disabled splay can't be made into, or part of, a leg
                 if (upgradeItem != null) {
                     upgradeItem.setVisible(isSplay);
+                    upgradeItem.setEnabled(currentLeg.isEnabled());
                 }
                 if (promoteItem != null) {
                     promoteItem.setVisible(isSplay);
+                    promoteItem.setEnabled(currentLeg.isEnabled());
                 }
                 if (reverseItem != null) {
                     reverseItem.setVisible(!isSplay);
@@ -208,7 +212,11 @@ public class ContextMenuManager {
                 }
                 if (downgradeItem != null) {
                     boolean canDowngrade =
-                            !isSplay && currentLeg.getDestination().getOnwardLegs().isEmpty();
+                            !isSplay
+                                    && currentLeg
+                                            .getDestination()
+                                            .getOnwardLegs(LegFilter.ALL.includeDisabled(true))
+                                            .isEmpty();
                     downgradeItem.setVisible(!isSplay);
                     downgradeItem.setEnabled(canDowngrade);
                 }
@@ -217,6 +225,11 @@ public class ContextMenuManager {
                 if (commentLegItem != null) {
                     commentLegItem.setTitle(
                             isSplay ? R.string.menu_comment_splay : R.string.menu_comment_leg);
+                }
+                MenuItem enabledItem = menu.findItem(R.id.action_enable_splay);
+                if (enabledItem != null) {
+                    enabledItem.setVisible(isSplay);
+                    enabledItem.setChecked(currentLeg.isEnabled());
                 }
                 if (legMenuItem != null) {
                     legMenuItem.setTitle(R.string.menu_incoming_leg);
@@ -409,6 +422,10 @@ public class ContextMenuManager {
         }
         if (itemId == R.id.action_comment_leg && currentLeg != null) {
             activity.onCommentLeg(currentLeg);
+            return true;
+        }
+        if (itemId == R.id.action_enable_splay && currentLeg != null) {
+            activity.onToggleSplayEnabled(currentLeg);
             return true;
         }
 

@@ -2,6 +2,7 @@ package org.hwyl.sexytopo.control.util;
 
 import org.hwyl.sexytopo.model.geometry.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
+import org.hwyl.sexytopo.model.survey.LegFilter;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
@@ -33,7 +34,7 @@ public class CrossSectioner {
     public static float getAngleOfSection(Survey survey, Station station) {
 
         int numIncomingLegs = station == survey.getOrigin() ? 0 : 1;
-        int numOutgoingLegs = station.getConnectedOnwardLegs().size();
+        int numOutgoingLegs = station.getOnwardLegs(LegFilter.LEGS).size();
 
         float angle;
         if (numIncomingLegs == 1 && numOutgoingLegs == 1) {
@@ -62,7 +63,7 @@ public class CrossSectioner {
      */
     public static float getHorizontalRadius(Station station) {
         return (float)
-                station.getUnconnectedOnwardLegs().stream()
+                station.getOnwardLegs(LegFilter.SPLAYS).stream()
                         .mapToDouble(
                                 splay ->
                                         splay.getDistance()
@@ -114,6 +115,6 @@ public class CrossSectioner {
     }
 
     private static float getOutgoingAzimuth(Station station) {
-        return station.getConnectedOnwardLegs().get(0).getAzimuth();
+        return station.getOnwardLegs(LegFilter.LEGS).get(0).getAzimuth();
     }
 }

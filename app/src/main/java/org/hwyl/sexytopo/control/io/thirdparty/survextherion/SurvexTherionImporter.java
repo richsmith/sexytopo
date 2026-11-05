@@ -36,7 +36,8 @@ public class SurvexTherionImporter {
      * <p>Handles: - Forward and backward legs (detects based on station order) - Promoted legs in
      * inline{} format: {from: d1 a1 i1, d2 a2 i2, ...} - Promoted legs in commented new lines
      * format (below main leg) - Promoted legs written as consecutive repeated lines between the
-     * same station pair (averaged on import) - Both Survex (;) and Therion (#) comment styles
+     * same station pair (averaged on import) - Commented-out splays, which are imported as disabled
+     * splays - Both Survex (;) and Therion (#) comment styles
      *
      * @param text The centreline data text
      * @param survey The survey to populate
@@ -78,14 +79,24 @@ public class SurvexTherionImporter {
                 continue;
             }
 
-            // Skip pure comment lines (but not lines with data and comments)
+            // Pure comment lines are skipped, apart from commented-out splays, which are disabled
+            // splays. (Commented-out promoted leg readings are picked up with their leg below.)
             if (trimmed.startsWith(";") || trimmed.startsWith("#")) {
-                // Don't skip if it looks like commented new lines promoted leg
-                String[] parts = trimmed.substring(1).trim().split("\\s+");
-                if (parts.length < 5) {
-                    continue; // Just a comment, skip it
+                ParsedLegLine disabledSplay = parseDisabledSplayLine(trimmed);
+                if (disabledSplay != null) {
+                    addLegToSurvey(
+                            survey,
+                            nameToStation,
+                            disabledSplay.fromName,
+                            disabledSplay.toName,
+                            disabledSplay.distance,
+                            disabledSplay.azimuth,
+                            disabledSplay.inclination,
+                            disabledSplay.comment,
+                            new ArrayList<>(),
+                            useLegComments,
+                            false);
                 }
-                // Might be commented new lines promoted leg, let it fall through
                 continue;
             }
 
@@ -125,7 +136,8 @@ public class SurvexTherionImporter {
                         current.inclination,
                         current.comment,
                         commentedNewLineLegs,
-                        useLegComments);
+                        useLegComments,
+                        true);
 
             } catch (Exception exception) {
                 throw new Exception("Error importing this line: " + line);
@@ -548,6 +560,28 @@ public class SurvexTherionImporter {
     }
 
     /**
+     * Parses a commented-out line as a disabled splay, which is how disabled splays are exported.
+     * Returns null if the line isn't one. Comments are common, so this is deliberately strict: the
+     * line must be a splay data line, from a real station, with valid readings.
+     */
+    private static ParsedLegLine parseDisabledSplayLine(String commentedLine) {
+        try {
+            ParsedLegLine parsed = parseLegLine(commentedLine.substring(1).trim());
+            if (parsed == null
+                    || getAnonymousStationForToken(parsed.fromName) != null
+                    || getAnonymousStationForToken(parsed.toName) == null) {
+                return null;
+            }
+            // Rejects readings that are out of range
+            new Leg(parsed.distance, parsed.azimuth, parsed.inclination);
+            return parsed;
+        } catch (IllegalArgumentException exception) {
+            // Not a splay line - includes NumberFormatException, which is a kind of this
+            return null;
+        }
+    }
+
+    /**
      * Collects the run of consecutive data lines, starting at first, that share its from/to station
      * pair. This is how repeated readings of one leg are written for Survex, which averages them
      * itself. Callers shouldn't pass splays, which are never grouped.
@@ -624,7 +658,8 @@ public class SurvexTherionImporter {
                 averaged.getInclination(),
                 first.comment,
                 rawLegs,
-                useLegComments);
+                useLegComments,
+                true);
     }
 
     private static void addLegToSurvey(
@@ -637,7 +672,8 @@ public class SurvexTherionImporter {
             float inclination,
             String comment,
             List<Leg> rawPromotedLegCandidates,
-            boolean useLegComments) {
+            boolean useLegComments,
+            boolean enabled) {
 
         Station anonymousStation = getAnonymousStationForToken(toName);
         boolean isSplay = anonymousStation != null;
@@ -703,6 +739,10 @@ public class SurvexTherionImporter {
                 // Legacy path: comment goes on the newer station
                 newStation.setComment(comment);
             }
+        }
+
+        if (!enabled && isSplay) {
+            leg.setEnabled(false);
         }
 
         legFrom.addOnwardLeg(leg);

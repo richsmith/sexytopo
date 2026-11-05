@@ -713,6 +713,9 @@
     <string name="menu_to_wall">Vers la paroi</string>
     <string name="to_wall_info_title">À propos de Vers la paroi</string>
     <string name="to_wall_info_message">Information facultative. Coché signifie que la radiale va jusqu\'aux limites de la galerie ; décoché signifie qu\'elle mesure jusqu\'à un élément, comme un spéléothème.</string>
+    <string name="menu_enabled">Activée</string>
+    <string name="enabled_info_title">À propos de Activée</string>
+    <string name="enabled_info_message">Décoché signifie que la radiale est conservée, mais barrée dans le tableau des données et omise des croquis, des coupes et des exports (Survex et Therion la gardent en ligne commentée). Utile pour des mesures comme les contrôles d\'étalonnage.</string>
     <string name="menu_upgrade_row">Forcer une nouvelle station</string>
     <string name="menu_promote_to_above_leg">Ajouter à la visée ci-dessus</string>
     <string name="toast_splay_promoted">Radiale combinée avec la visée</string>

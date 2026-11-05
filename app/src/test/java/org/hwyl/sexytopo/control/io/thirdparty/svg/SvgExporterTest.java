@@ -10,10 +10,12 @@ import java.util.List;
 import java.util.Locale;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
+import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.geometry.Projection2D;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.hwyl.sexytopo.model.sketch.Sketch;
+import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
 import org.hwyl.sexytopo.testutils.BasicTestSketchCreator;
@@ -401,5 +403,51 @@ public class SvgExporterTest {
                 new float[] {600, 200, 1100, 200}, getDrawnLine(enlarged, "xs-1"), 0.01f);
         Assert.assertArrayEquals(
                 new float[] {1100, 200, 1600, 200}, getDrawnLine(enlarged, "xs-3"), 0.01f);
+    }
+
+    private static List<String> getSplayIds(Document document) {
+        List<String> ids = new ArrayList<>();
+        NodeList lines = document.getElementsByTagName("polyline");
+        for (int i = 0; i < lines.getLength(); i++) {
+            String id = ((Element) lines.item(i)).getAttribute("id");
+            if (id.matches(".*-Splay\\d+")) {
+                ids.add(id);
+            }
+        }
+        return ids;
+    }
+
+    private static Survey surveyWithADisabledAndAEnabledSplay() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        Leg disabled = new Leg(2, 270, 0);
+        Leg enabled = new Leg(2, 90, 0);
+        for (Leg splay : new Leg[] {disabled, enabled}) {
+            survey.getOrigin().addOnwardLeg(splay);
+            survey.addLegRecord(splay);
+        }
+        SurveyUpdater.setSplayEnabled(survey, disabled, false);
+        return survey;
+    }
+
+    @Test
+    public void testDisabledSplayIsNotExportedFromPlan() throws Exception {
+        Survey survey = surveyWithADisabledAndAEnabledSplay();
+
+        Document svg = parse(export(survey, Projection2D.PLAN));
+
+        Assert.assertEquals(
+                Collections.singletonList(survey.getOrigin().getName() + "-Splay0"),
+                getSplayIds(svg));
+    }
+
+    @Test
+    public void testDisabledSplayIsNotExportedFromExtendedElevation() throws Exception {
+        Survey survey = surveyWithADisabledAndAEnabledSplay();
+
+        Document svg = parse(export(survey, Projection2D.EXTENDED_ELEVATION));
+
+        Assert.assertEquals(
+                Collections.singletonList(survey.getOrigin().getName() + "-Splay0"),
+                getSplayIds(svg));
     }
 }

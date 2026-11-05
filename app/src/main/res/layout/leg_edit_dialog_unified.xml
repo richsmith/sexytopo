@@ -304,7 +304,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/toWallContainer"
+            android:id="@+id/splayOptionsContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -322,6 +322,19 @@
                 android:layout_height="48dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/to_wall_info_title"
+                android:src="@drawable/ic_info"/>
+            <CheckBox
+                android:id="@+id/enabledCheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/menu_enabled"/>
+            <ImageButton
+                android:id="@+id/enabledInfoButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/enabled_info_title"
                 android:src="@drawable/ic_info"/>
         </LinearLayout>
 
