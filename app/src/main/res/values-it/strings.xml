@@ -711,6 +711,9 @@
     <string name="menu_to_wall">Verso la parete</string>
     <string name="to_wall_info_title">Informazioni su Verso la parete</string>
     <string name="to_wall_info_message">Dato facoltativo. Selezionato significa che lo splay va ai limiti della galleria; deselezionato significa che misura fino a un elemento, come uno speleotema.</string>
+    <string name="menu_enabled">Attivo</string>
+    <string name="enabled_info_title">Informazioni su Attivo</string>
+    <string name="enabled_info_message">Deselezionato significa che lo splay viene conservato, ma barrato nella tabella dei dati e omesso da schizzi, sezioni ed esportazioni (Survex e Therion lo mantengono come riga commentata). Utile per letture come i controlli di calibrazione.</string>
     <string name="menu_upgrade_row">Forza Nuova Stazione</string>
     <string name="menu_promote_to_above_leg">Aggiungi al tratto sopra</string>
     <string name="toast_splay_promoted">Splay combinato con il tratto</string>

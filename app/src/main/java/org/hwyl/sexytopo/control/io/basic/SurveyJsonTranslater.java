@@ -17,6 +17,7 @@ import org.hwyl.sexytopo.control.SexyTopo;
 import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.model.geometry.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.LegFilter;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
@@ -39,6 +40,7 @@ public class SurveyJsonTranslater {
     public static final String INCLINATION_TAG = "inclination";
     public static final String PROMOTED_FROM_TAG = "promotedFrom";
     public static final String DESTINATION_TAG = "destination";
+    public static final String ENABLED_TAG = "enabled";
     public static final String WAS_SHOT_BACKWARDS_TAG = "wasShotBackwards";
     public static final String TO_WALL_TAG = "toWall";
     public static final String INDEX_TAG = "index";
@@ -142,7 +144,7 @@ public class SurveyJsonTranslater {
         json.put(COMMENT_TAG, station.getComment());
 
         JSONArray onwardLegsArray = new JSONArray();
-        for (Leg leg : station.getOnwardLegs()) {
+        for (Leg leg : station.getOnwardLegs(LegFilter.ALL.includeDisabled(true))) {
             int index = chronoList.indexOf(leg);
             onwardLegsArray.put(toJson(leg, index));
         }
@@ -273,6 +275,9 @@ public class SurveyJsonTranslater {
         json.put(WAS_SHOT_BACKWARDS_TAG, leg.wasShotBackwards());
         if (leg.hasComment()) {
             json.put(COMMENT_TAG, leg.getComment());
+        }
+        if (!leg.isEnabled()) {
+            json.put(ENABLED_TAG, false);
         }
         if (index != null) {
             json.put(INDEX_TAG, index);
@@ -405,6 +410,9 @@ public class SurveyJsonTranslater {
         }
 
         leg.setComment(json.optString(COMMENT_TAG, ""));
+        if (!leg.hasDestination() && !json.optBoolean(ENABLED_TAG, true)) {
+            leg.setEnabled(false);
+        }
         return leg;
     }
 

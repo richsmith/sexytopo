@@ -29,6 +29,7 @@ import org.hwyl.sexytopo.control.table.TableRowAdapter;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
 import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.LegFilter;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.table.TableCol;
@@ -247,7 +248,8 @@ public class TableActivity extends SurveyEditorActivity
         tableRowAdapter.setSurvey(survey);
 
         List<GraphToListTranslator.SurveyListEntry> tableEntries =
-                graphToListTranslator.toChronoListOfSurveyListEntries(survey);
+                graphToListTranslator.toChronoListOfSurveyListEntries(
+                        survey, LegFilter.ALL.includeDisabled(true));
 
         if (tableEntries.isEmpty()) {
             Toast.makeText(getApplicationContext(), R.string.no_data, Toast.LENGTH_SHORT).show();

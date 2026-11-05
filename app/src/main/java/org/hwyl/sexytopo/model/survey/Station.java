@@ -3,6 +3,7 @@ package org.hwyl.sexytopo.model.survey;
 import androidx.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.hwyl.sexytopo.model.geometry.ExtendedElevationDirection;
 
 public class Station extends SurveyComponent {
@@ -74,32 +75,25 @@ public class Station extends SurveyComponent {
         this.name = sanitiseName(name);
     }
 
+    /** The enabled legs and splays going out from this station. */
     public List<Leg> getOnwardLegs() {
-        return onwardLegs;
+        return getOnwardLegs(LegFilter.ALL);
+    }
+
+    /**
+     * The legs going out from this station that match the filter, e.g. LegFilter.SPLAYS. This is a
+     * new list, so use addOnwardLeg and removeOnwardLeg to change the station.
+     */
+    public List<Leg> getOnwardLegs(LegFilter filter) {
+        return onwardLegs.stream().filter(filter).collect(Collectors.toList());
     }
 
     public void addOnwardLeg(Leg leg) {
         onwardLegs.add(leg);
     }
 
-    public List<Leg> getUnconnectedOnwardLegs() {
-        List<Leg> unconnectedOnwardLegs = new ArrayList<>();
-        for (Leg leg : onwardLegs) {
-            if (!leg.hasDestination()) {
-                unconnectedOnwardLegs.add(leg);
-            }
-        }
-        return unconnectedOnwardLegs;
-    }
-
-    public List<Leg> getConnectedOnwardLegs() {
-        List<Leg> connectedOnwardLegs = new ArrayList<>();
-        for (Leg leg : onwardLegs) {
-            if (leg.hasDestination()) {
-                connectedOnwardLegs.add(leg);
-            }
-        }
-        return connectedOnwardLegs;
+    public void removeOnwardLeg(Leg leg) {
+        onwardLegs.remove(leg);
     }
 
     public String getComment() {

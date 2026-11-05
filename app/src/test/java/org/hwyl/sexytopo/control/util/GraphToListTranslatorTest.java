@@ -3,6 +3,7 @@ package org.hwyl.sexytopo.control.util;
 import java.util.List;
 import java.util.Map;
 import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.LegFilter;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.table.TableCol;
@@ -114,7 +115,7 @@ public class GraphToListTranslatorTest {
 
         SurveyUpdater.promoteToAboveLeg(survey, splay);
 
-        Leg promoted = origin.getConnectedOnwardLegs().get(0);
+        Leg promoted = origin.getOnwardLegs(LegFilter.LEGS).get(0);
         Map<TableCol, Object> map =
                 GraphToListTranslator.createMap(
                         new GraphToListTranslator.SurveyListEntry(origin, promoted));
@@ -132,7 +133,7 @@ public class GraphToListTranslatorTest {
         SurveyUpdater.update(survey, new Leg(5, 270, 10), InputMode.BACKWARD);
         Station origin = survey.getOrigin();
 
-        SurveyUpdater.downgradeLeg(survey, origin.getConnectedOnwardLegs().get(0));
+        SurveyUpdater.downgradeLeg(survey, origin.getOnwardLegs(LegFilter.LEGS).get(0));
 
         List<GraphToListTranslator.SurveyListEntry> entries =
                 new GraphToListTranslator().toChronoListOfSurveyListEntries(survey);
@@ -144,5 +145,39 @@ public class GraphToListTranslatorTest {
             Assert.assertEquals(270.0f, (float) map.get(TableCol.AZIMUTH), DELTA);
             Assert.assertEquals(10.0f, (float) map.get(TableCol.INCLINATION), DELTA);
         }
+    }
+
+    private static Survey createSurveyWithDisabledSplay(Leg disabledSplay) {
+        Survey survey = BasicTestSurveyCreator.createEmptySurvey();
+        SurveyUpdater.update(survey, new Leg(1, 90, 0));
+        SurveyUpdater.update(survey, disabledSplay);
+        SurveyUpdater.setSplayEnabled(survey, disabledSplay, false);
+        return survey;
+    }
+
+    @Test
+    public void testChronoListLeavesOutDisabledSplays() {
+        Leg disabledSplay = new Leg(1, 270, 0);
+        Survey survey = createSurveyWithDisabledSplay(disabledSplay);
+
+        List<GraphToListTranslator.SurveyListEntry> entries =
+                new GraphToListTranslator().toChronoListOfSurveyListEntries(survey);
+
+        Assert.assertEquals(1, entries.size());
+        Assert.assertNotSame(disabledSplay, entries.get(0).getLeg());
+    }
+
+    @Test
+    public void testChronoListCanIncludeDisabledSplaysInOrder() {
+        Leg disabledSplay = new Leg(1, 270, 0);
+        Survey survey = createSurveyWithDisabledSplay(disabledSplay);
+
+        List<GraphToListTranslator.SurveyListEntry> entries =
+                new GraphToListTranslator()
+                        .toChronoListOfSurveyListEntries(
+                                survey, LegFilter.ALL.includeDisabled(true));
+
+        Assert.assertEquals(2, entries.size());
+        Assert.assertSame(disabledSplay, entries.get(1).getLeg());
     }
 }

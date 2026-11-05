@@ -11,6 +11,7 @@ import org.hwyl.sexytopo.control.util.GraphToListTranslator;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.geometry.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.LegFilter;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
@@ -177,7 +178,7 @@ public class SurvexTherionUtil {
         if (station.hasComment()) {
             result.add(station);
         }
-        for (Leg leg : station.getConnectedOnwardLegs()) {
+        for (Leg leg : station.getOnwardLegs(LegFilter.LEGS)) {
             collectStationsWithComments(leg.getDestination(), result);
         }
     }
@@ -193,7 +194,8 @@ public class SurvexTherionUtil {
 
         // Get chronological list of survey entries
         List<GraphToListTranslator.SurveyListEntry> list =
-                graphToListTranslator.toChronoListOfSurveyListEntries(survey);
+                graphToListTranslator.toChronoListOfSurveyListEntries(
+                        survey, LegFilter.ALL.includeDisabled(true));
 
         // Format each entry
         for (GraphToListTranslator.SurveyListEntry entry : list) {
@@ -247,6 +249,10 @@ public class SurvexTherionUtil {
             return;
         }
 
+        // Disabled splays are commented out.
+        if (!leg.isEnabled()) {
+            builder.append(format.getCommentChar());
+        }
         formatDataLine(builder, fromName, toName, leg, leg.getComment());
 
         // Formats that can't average repeated legs get the averaged reading, followed by the raw
@@ -373,7 +379,7 @@ public class SurvexTherionUtil {
             inheritedDirection = currentDirection;
         }
 
-        for (Leg leg : station.getConnectedOnwardLegs()) {
+        for (Leg leg : station.getOnwardLegs(LegFilter.LEGS)) {
             generateExtendCommandsFromStation(
                     builder, leg.getDestination(), station, inheritedDirection, marker);
         }

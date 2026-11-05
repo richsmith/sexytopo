@@ -2,7 +2,9 @@ package org.hwyl.sexytopo.control.io.basic;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.LegFilter;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
@@ -111,6 +113,85 @@ public class SurveyJsonTranslaterTest {
         Assert.assertEquals("", loaded.getLicence());
         Assert.assertFalse(loaded.hasCopyrightHolder());
         Assert.assertFalse(loaded.hasLicence());
+    }
+
+    private static Leg disabledSplayWithComment() {
+        Leg splay = new Leg(2.5f, 90.0f, 10.0f);
+        splay.setComment("Boulder");
+        splay.setEnabled(false);
+        return splay;
+    }
+
+    @Test
+    public void testDisabledSplayIsWrittenAsDisabled() throws Exception {
+        JSONObject json = SurveyJsonTranslater.toJson(disabledSplayWithComment(), null);
+        Assert.assertFalse(json.getBoolean(SurveyJsonTranslater.ENABLED_TAG));
+    }
+
+    @Test
+    public void testEnabledSplayHasNoEnabledKey() throws Exception {
+        JSONObject json = SurveyJsonTranslater.toJson(new Leg(2.5f, 90.0f, 10.0f), null);
+        Assert.assertFalse(json.has(SurveyJsonTranslater.ENABLED_TAG));
+    }
+
+    @Test
+    public void testFullLegHasNoEnabledKey() throws Exception {
+        Leg leg = new Leg(2.5f, 90.0f, 10.0f, new Station("1"), new Leg[] {});
+        JSONObject json = SurveyJsonTranslater.toJson(leg, null);
+        Assert.assertFalse(json.has(SurveyJsonTranslater.ENABLED_TAG));
+    }
+
+    @Test
+    public void testDisabledSplayAndCommentRoundTrip() throws Exception {
+        JSONObject json = SurveyJsonTranslater.toJson(disabledSplayWithComment(), null);
+
+        Leg loaded = SurveyJsonTranslater.toLeg(new HashMap<>(), json);
+
+        Assert.assertFalse(loaded.isEnabled());
+        Assert.assertEquals("Boulder", loaded.getComment());
+        Assert.assertEquals(2.5f, loaded.getDistance(), 0.0001f);
+    }
+
+    @Test
+    public void testSplayWithoutEnabledKeyLoadsAsEnabled() throws Exception {
+        JSONObject json = SurveyJsonTranslater.toJson(disabledSplayWithComment(), null);
+        json.remove(SurveyJsonTranslater.ENABLED_TAG);
+
+        Leg loaded = SurveyJsonTranslater.toLeg(new HashMap<>(), json);
+
+        Assert.assertTrue(loaded.isEnabled());
+    }
+
+    @Test
+    public void testEnabledFalseOnFullLegIsIgnored() throws Exception {
+        Station destination = new Station("1");
+        Leg leg = new Leg(2.5f, 90.0f, 10.0f, destination, new Leg[] {});
+        JSONObject json = SurveyJsonTranslater.toJson(leg, null);
+        json.put(SurveyJsonTranslater.ENABLED_TAG, false);
+        Map<String, Station> stations = new HashMap<>();
+        stations.put("1", destination);
+
+        Leg loaded = SurveyJsonTranslater.toLeg(stations, json);
+
+        Assert.assertTrue(loaded.isEnabled());
+    }
+
+    @Test
+    public void testSurveyWithDisabledSplayRoundTrips() throws Exception {
+        Survey survey = new Survey();
+        Leg splay = new Leg(2.5f, 90.0f, 10.0f);
+        splay.setComment("Boulder");
+        SurveyUpdater.update(survey, splay);
+        SurveyUpdater.setSplayEnabled(survey, splay, false);
+        String text = SurveyJsonTranslater.toText(survey, "test", 0);
+
+        Survey loaded = new Survey();
+        SurveyJsonTranslater.populateSurvey(loaded, text);
+
+        Leg loadedSplay =
+                loaded.getOrigin().getOnwardLegs(LegFilter.ALL.includeDisabled(true)).get(0);
+        Assert.assertFalse(loadedSplay.isEnabled());
+        Assert.assertEquals("Boulder", loadedSplay.getComment());
     }
 
     @Test

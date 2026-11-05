@@ -711,6 +711,9 @@
     <string name="menu_to_wall">Do ściany</string>
     <string name="to_wall_info_title">Informacje o Do ściany</string>
     <string name="to_wall_info_message">Informacja opcjonalna. Zaznaczone oznacza, że pomiar szczegółowy sięga granic korytarza; odznaczone oznacza, że mierzy do obiektu, np. nacieku.</string>
+    <string name="menu_enabled">Włączony</string>
+    <string name="enabled_info_title">Informacje o Włączony</string>
+    <string name="enabled_info_message">Odznaczone oznacza, że pomiar szczegółowy zostaje zachowany, ale jest przekreślony w tabeli danych i pomijany w szkicach, przekrojach i eksportach (Survex i Therion zachowują go jako zakomentowaną linię). Przydatne dla odczytów takich jak kontrole kalibracji.</string>
     <string name="menu_upgrade_row">Wymuś nowe stanowisko</string>
     <string name="menu_promote_to_above_leg">Dodaj do ciągu powyżej</string>
     <string name="toast_splay_promoted">Pomiar szczegółowy połączony z ciągiem</string>

@@ -10,6 +10,7 @@ import org.hwyl.sexytopo.control.util.GraphToListTranslator;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.LegFilter;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.junit.Assert;
@@ -191,7 +192,7 @@ public class PocketTopoImporterTest {
         byte[] data = buildMinimalTopFile();
         Survey survey = PocketTopoImporter.parseSurvey(new ByteArrayInputStream(data));
         Station origin = survey.getOrigin();
-        List<Leg> connected = origin.getConnectedOnwardLegs();
+        List<Leg> connected = origin.getOnwardLegs(LegFilter.LEGS);
         Assert.assertEquals(1, connected.size());
         Assert.assertEquals(3.5f, connected.get(0).getDistance(), 0.01f);
     }
@@ -200,7 +201,7 @@ public class PocketTopoImporterTest {
     public void testConnectedLegAzimuth() throws IOException {
         byte[] data = buildMinimalTopFile();
         Survey survey = PocketTopoImporter.parseSurvey(new ByteArrayInputStream(data));
-        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Leg leg = survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertEquals(90.0f, leg.getAzimuth(), 0.01f);
     }
 
@@ -208,7 +209,7 @@ public class PocketTopoImporterTest {
     public void testConnectedLegInclination() throws IOException {
         byte[] data = buildMinimalTopFile();
         Survey survey = PocketTopoImporter.parseSurvey(new ByteArrayInputStream(data));
-        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Leg leg = survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertEquals(0.0f, leg.getInclination(), 0.01f);
     }
 
@@ -218,7 +219,7 @@ public class PocketTopoImporterTest {
         Survey survey = PocketTopoImporter.parseSurvey(new ByteArrayInputStream(data));
         Station station01 = survey.getStationByName("0.1");
         Assert.assertNotNull(station01);
-        List<Leg> splays = station01.getUnconnectedOnwardLegs();
+        List<Leg> splays = station01.getOnwardLegs(LegFilter.SPLAYS);
         Assert.assertEquals(1, splays.size());
         Assert.assertEquals(2.0f, splays.get(0).getDistance(), 0.01f);
         Assert.assertEquals(45.0f, splays.get(0).getInclination(), 0.01f);
@@ -343,14 +344,14 @@ public class PocketTopoImporterTest {
         Survey survey = PocketTopoImporter.parseSurvey(new ByteArrayInputStream(data));
         Assert.assertEquals(2, survey.getAllStations().size());
         Station origin = survey.getOrigin();
-        Assert.assertEquals(1, origin.getConnectedOnwardLegs().size());
+        Assert.assertEquals(1, origin.getOnwardLegs(LegFilter.LEGS).size());
     }
 
     @Test
     public void testTripleShotHasPromotedFrom() throws IOException {
         byte[] data = buildTripleShotTopFile();
         Survey survey = PocketTopoImporter.parseSurvey(new ByteArrayInputStream(data));
-        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Leg leg = survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertTrue(leg.wasPromoted());
         Assert.assertEquals(3, leg.getPromotedFrom().length);
     }
@@ -359,7 +360,7 @@ public class PocketTopoImporterTest {
     public void testTripleShotAveragesDistance() throws IOException {
         byte[] data = buildTripleShotTopFile();
         Survey survey = PocketTopoImporter.parseSurvey(new ByteArrayInputStream(data));
-        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Leg leg = survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0);
         // Average of 5.0, 5.01, 4.99 = 5.0
         Assert.assertEquals(5.0f, leg.getDistance(), 0.01f);
     }
@@ -368,7 +369,7 @@ public class PocketTopoImporterTest {
     public void testTripleShotPromotedFromHasOriginalReadings() throws IOException {
         byte[] data = buildTripleShotTopFile();
         Survey survey = PocketTopoImporter.parseSurvey(new ByteArrayInputStream(data));
-        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Leg leg = survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0);
         Leg[] originals = leg.getPromotedFrom();
         Assert.assertEquals(5.0f, originals[0].getDistance(), 0.01f);
         Assert.assertEquals(5.01f, originals[1].getDistance(), 0.01f);
@@ -379,7 +380,7 @@ public class PocketTopoImporterTest {
     public void testSingleShotHasNoPromotedFrom() throws IOException {
         byte[] data = buildMinimalTopFile();
         Survey survey = PocketTopoImporter.parseSurvey(new ByteArrayInputStream(data));
-        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Leg leg = survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertFalse(leg.wasPromoted());
         Assert.assertEquals(0, leg.getPromotedFrom().length);
     }
@@ -467,12 +468,13 @@ public class PocketTopoImporterTest {
         Survey survey = PocketTopoImporter.parseSurvey(new ByteArrayInputStream(data));
         // 0.0 should have: 1 connected leg to 0.1 + 1 splay
         Station origin = survey.getOrigin();
-        Assert.assertEquals(1, origin.getConnectedOnwardLegs().size());
-        Assert.assertEquals(1, origin.getUnconnectedOnwardLegs().size());
+        Assert.assertEquals(1, origin.getOnwardLegs(LegFilter.LEGS).size());
+        Assert.assertEquals(1, origin.getOnwardLegs(LegFilter.SPLAYS).size());
         // 0.1 should have: 1 connected leg to 0.2
         Station station01 = survey.getStationByName("0.1");
-        Assert.assertEquals(1, station01.getConnectedOnwardLegs().size());
-        Assert.assertEquals(4.0f, station01.getConnectedOnwardLegs().get(0).getDistance(), 0.01f);
+        Assert.assertEquals(1, station01.getOnwardLegs(LegFilter.LEGS).size());
+        Assert.assertEquals(
+                4.0f, station01.getOnwardLegs(LegFilter.LEGS).get(0).getDistance(), 0.01f);
     }
 
     // --- Integration test with real .top file ---
@@ -567,8 +569,8 @@ public class PocketTopoImporterTest {
         Survey survey = importBacksight(1);
 
         Station known = survey.getStationByName("0.1");
-        Assert.assertEquals(1, known.getConnectedOnwardLegs().size());
-        Leg leg = known.getConnectedOnwardLegs().get(0);
+        Assert.assertEquals(1, known.getOnwardLegs(LegFilter.LEGS).size());
+        Leg leg = known.getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertEquals("0.2", leg.getDestination().getName());
         Assert.assertTrue(leg.wasShotBackwards());
     }
@@ -578,7 +580,7 @@ public class PocketTopoImporterTest {
         Survey survey = importBacksight(1);
 
         // Shot from 0.2 to 0.1 at 45/45, so the leg from 0.1 to 0.2 runs the opposite way
-        Leg leg = survey.getStationByName("0.1").getConnectedOnwardLegs().get(0);
+        Leg leg = survey.getStationByName("0.1").getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertEquals(5.0f, leg.getDistance(), 0.01f);
         Assert.assertEquals(225.0f, leg.getAzimuth(), 0.01f);
         Assert.assertEquals(-45.0f, leg.getInclination(), 0.01f);
@@ -588,7 +590,7 @@ public class PocketTopoImporterTest {
     public void testSingleBacksightHasNoPromotedFrom() throws IOException {
         Survey survey = importBacksight(1);
 
-        Leg leg = survey.getStationByName("0.1").getConnectedOnwardLegs().get(0);
+        Leg leg = survey.getStationByName("0.1").getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertFalse(leg.wasPromoted());
     }
 
@@ -597,8 +599,8 @@ public class PocketTopoImporterTest {
         Survey survey = importBacksight(3);
 
         Station known = survey.getStationByName("0.1");
-        Assert.assertEquals(1, known.getConnectedOnwardLegs().size());
-        Leg leg = known.getConnectedOnwardLegs().get(0);
+        Assert.assertEquals(1, known.getOnwardLegs(LegFilter.LEGS).size());
+        Leg leg = known.getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertTrue(leg.wasShotBackwards());
         Assert.assertEquals(225.0f, leg.getAzimuth(), 0.01f);
         Assert.assertEquals(-45.0f, leg.getInclination(), 0.01f);
@@ -608,7 +610,7 @@ public class PocketTopoImporterTest {
     public void testRepeatedBacksightsKeepTheReadingsAsRecorded() throws IOException {
         Survey survey = importBacksight(3);
 
-        Leg leg = survey.getStationByName("0.1").getConnectedOnwardLegs().get(0);
+        Leg leg = survey.getStationByName("0.1").getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertEquals(3, leg.getPromotedFrom().length);
         for (Leg reading : leg.getPromotedFrom()) {
             Assert.assertFalse(reading.hasDestination());
@@ -622,7 +624,7 @@ public class PocketTopoImporterTest {
     public void testBacksightIsListedAsItWasTaken() throws IOException {
         Survey survey = importBacksight(1);
         Station known = survey.getStationByName("0.1");
-        Leg leg = known.getConnectedOnwardLegs().get(0);
+        Leg leg = known.getOnwardLegs(LegFilter.LEGS).get(0);
 
         GraphToListTranslator.AsTakenReading reading =
                 GraphToListTranslator.toAsTakenReading(
@@ -638,7 +640,7 @@ public class PocketTopoImporterTest {
     public void testForwardShotIsNotMarkedBackwards() throws IOException {
         Survey survey = importBacksight(1);
 
-        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Leg leg = survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertFalse(leg.wasShotBackwards());
     }
 }

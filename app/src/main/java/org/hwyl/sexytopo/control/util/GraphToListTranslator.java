@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.LegFilter;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.table.TableCol;
@@ -13,30 +14,43 @@ import org.hwyl.sexytopo.model.table.TableCol;
 public class GraphToListTranslator {
 
     public List<SurveyListEntry> toListOfSurveyListEntries(Survey survey) {
-        return createListOfEntriesFromStation(survey.getOrigin());
+        return createListOfEntriesFromStation(survey.getOrigin(), LegFilter.ALL);
     }
 
+    /** The enabled legs and splays of the survey, in the order they were taken. */
     public List<SurveyListEntry> toChronoListOfSurveyListEntries(Survey survey) {
+        return toChronoListOfSurveyListEntries(survey, LegFilter.ALL);
+    }
+
+    /**
+     * The legs and splays of the survey that match the filter, in the order they were taken. The
+     * data table and some exports use LegFilter.ALL.includeDisabled(true), as they show disabled
+     * splays.
+     */
+    public List<SurveyListEntry> toChronoListOfSurveyListEntries(Survey survey, LegFilter filter) {
         final List<Leg> chronoLegs = survey.getAllLegsInChronoOrder();
-        List<SurveyListEntry> entries = toListOfSurveyListEntries(survey);
+        List<SurveyListEntry> entries = createListOfEntriesFromStation(survey.getOrigin(), filter);
         Collections.sort(
                 entries, (e0, e1) -> chronoLegs.indexOf(e0.leg) - chronoLegs.indexOf(e1.leg));
         return entries;
     }
 
-    private List<SurveyListEntry> createListOfEntriesFromStation(Station from) {
+    private List<SurveyListEntry> createListOfEntriesFromStation(Station from, LegFilter filter) {
 
         List<SurveyListEntry> list = new ArrayList<>();
 
-        for (Leg leg : from.getUnconnectedOnwardLegs()) {
-            SurveyListEntry entry = new SurveyListEntry(from, leg);
-            list.add(entry);
+        for (Leg leg : from.getOnwardLegs(filter)) {
+            if (!leg.hasDestination()) {
+                list.add(new SurveyListEntry(from, leg));
+            }
         }
 
-        for (Leg leg : from.getConnectedOnwardLegs()) {
-            SurveyListEntry entry = new SurveyListEntry(from, leg);
-            list.add(entry);
-            list.addAll(createListOfEntriesFromStation(leg.getDestination()));
+        // The whole survey is walked, whatever the filter, so every station is reached
+        for (Leg leg : from.getOnwardLegs(LegFilter.LEGS)) {
+            if (filter.test(leg)) {
+                list.add(new SurveyListEntry(from, leg));
+            }
+            list.addAll(createListOfEntriesFromStation(leg.getDestination(), filter));
         }
 
         return list;

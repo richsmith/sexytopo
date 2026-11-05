@@ -220,7 +220,7 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
     }
 
     public void onUpgradeSplay(Leg leg) {
-        if (leg == null || leg.hasDestination()) {
+        if (leg == null || leg.hasDestination() || !leg.isEnabled()) {
             return;
         }
 
@@ -247,7 +247,7 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
     }
 
     public void onPromoteToAboveLeg(Leg splay) {
-        if (splay == null || splay.hasDestination()) {
+        if (splay == null || splay.hasDestination() || !splay.isEnabled()) {
             return;
         }
 
@@ -258,6 +258,16 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         } else {
             showSimpleToast(R.string.toast_no_leg_above);
         }
+    }
+
+    public void onToggleSplayEnabled(Leg splay) {
+        if (splay == null || splay.hasDestination()) {
+            return;
+        }
+
+        SurveyUpdater.setSplayEnabled(getSurvey(), splay, !splay.isEnabled());
+        getSurveyManager().broadcastSurveyUpdated();
+        invalidateView();
     }
 
     /** Set the active station in the current view. */

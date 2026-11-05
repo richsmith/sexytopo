@@ -95,6 +95,7 @@ public class EditLegForm extends Form {
 
     // Shown for splays only
     private CheckBox toWallCheckBox;
+    private CheckBox enabledCheckBox;
 
     private boolean isInitialising;
 
@@ -136,19 +137,32 @@ public class EditLegForm extends Form {
         this.isInitialising = true;
         this.initialiseFields(dialogView);
         this.initialiseInputMode(dialogView);
-        this.initialiseToWall(dialogView);
+        this.initialiseSplayOptions(dialogView);
         this.initialiseStationDisplay();
         this.isInitialising = false;
     }
 
-    private void initialiseToWall(View dialogView) {
+    private void initialiseSplayOptions(View dialogView) {
         if (isSplay) {
-            dialogView.findViewById(R.id.toWallContainer).setVisibility(View.VISIBLE);
+            dialogView.findViewById(R.id.splayOptionsContainer).setVisibility(View.VISIBLE);
             this.toWallCheckBox = dialogView.findViewById(R.id.toWallCheckBox);
             toWallCheckBox.setChecked(initialToWall(originalLeg));
             dialogView
                     .findViewById(R.id.toWallInfoButton)
-                    .setOnClickListener(v -> showToWallInfo());
+                    .setOnClickListener(
+                            v ->
+                                    showInfo(
+                                            R.string.to_wall_info_title,
+                                            R.string.to_wall_info_message));
+            this.enabledCheckBox = dialogView.findViewById(R.id.enabledCheckBox);
+            enabledCheckBox.setChecked(initialEnabled(originalLeg));
+            dialogView
+                    .findViewById(R.id.enabledInfoButton)
+                    .setOnClickListener(
+                            v ->
+                                    showInfo(
+                                            R.string.enabled_info_title,
+                                            R.string.enabled_info_message));
         }
     }
 
@@ -801,7 +815,13 @@ public class EditLegForm extends Form {
 
         Leg leg;
         if (isSplay) {
-            leg = createSplay(distance, azimuth, inclination, toWallCheckBox.isChecked());
+            leg =
+                    createSplay(
+                            distance,
+                            azimuth,
+                            inclination,
+                            toWallCheckBox.isChecked(),
+                            enabledCheckBox.isChecked());
         } else if (originalLeg != null && originalLeg.hasDestination()) {
             // For editing: reuse existing destination station object
             Station destination = originalLeg.getDestination();
@@ -815,17 +835,23 @@ public class EditLegForm extends Form {
         return applyInputMode(leg, isSplay, inputMode);
     }
 
-    private void showToWallInfo() {
+    private void showInfo(int titleId, int messageId) {
         new MaterialAlertDialogBuilder(context)
-                .setTitle(R.string.to_wall_info_title)
-                .setMessage(R.string.to_wall_info_message)
+                .setTitle(titleId)
+                .setMessage(messageId)
                 .setPositiveButton(R.string.ok, null)
                 .show();
     }
 
-    /** Builds the splay for the readings entered, going to a wall or to another feature. */
-    static Leg createSplay(float distance, float azimuth, float inclination, boolean toWall) {
-        return new Leg(distance, azimuth, inclination).withToWall(toWall);
+    /**
+     * Builds the splay for the readings entered, going to a wall or to another feature, and enabled
+     * or disabled.
+     */
+    static Leg createSplay(
+            float distance, float azimuth, float inclination, boolean toWall, boolean enabled) {
+        Leg splay = new Leg(distance, azimuth, inclination).withToWall(toWall);
+        splay.setEnabled(enabled);
+        return splay;
     }
 
     /**
@@ -834,6 +860,14 @@ public class EditLegForm extends Form {
      */
     static boolean initialToWall(Leg originalSplay) {
         return originalSplay == null || originalSplay.isToWall();
+    }
+
+    /**
+     * Whether the Enabled tick box starts ticked. A new splay is enabled, and an edited splay keeps
+     * its state unless the box is changed.
+     */
+    static boolean initialEnabled(Leg originalSplay) {
+        return originalSplay == null || originalSplay.isEnabled();
     }
 
     /**

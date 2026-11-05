@@ -22,6 +22,7 @@ public class Leg extends SurveyComponent {
     private final Leg[] promotedFrom;
     private final boolean wasShotBackwards;
     private String comment = "";
+    private boolean enabled = true;
 
     private static final Leg[] NO_LEGS = new Leg[] {};
 
@@ -86,12 +87,17 @@ public class Leg extends SurveyComponent {
                 destination,
                 leg.promotedFrom,
                 leg.wasShotBackwards);
+        copyAnnotationsFrom(leg);
     }
 
     public static Leg toFullLeg(Leg splay, Station destination) {
         return upgradeSplayToConnectedLeg(splay, destination, NO_LEGS);
     }
 
+    /**
+     * Turns a splay into a connected leg. The comment is kept. A disabled splay becomes an enabled
+     * leg, because only splays can be disabled.
+     */
     public static Leg upgradeSplayToConnectedLeg(
             Leg splay, Station destination, Leg[] promotedFrom) {
         Leg leg =
@@ -154,7 +160,7 @@ public class Leg extends SurveyComponent {
                         destination,
                         promotedFrom,
                         !wasShotBackwards);
-        leg.setComment(comment);
+        leg.copyAnnotationsFrom(this);
         return leg;
     }
 
@@ -164,8 +170,15 @@ public class Leg extends SurveyComponent {
     }
 
     public Leg adjustAzimuth(float newAzimuth) {
-        return new Leg(
-                getDistance(), newAzimuth, getInclination(), getDestination(), getPromotedFrom());
+        Leg leg =
+                new Leg(
+                        getDistance(),
+                        newAzimuth,
+                        getInclination(),
+                        getDestination(),
+                        getPromotedFrom());
+        leg.copyAnnotationsFrom(this);
+        return leg;
     }
 
     public Leg asBacksight(Station destination) {
@@ -177,7 +190,7 @@ public class Leg extends SurveyComponent {
                         -1 * getInclination(),
                         destination,
                         getPromotedFrom());
-        leg.setComment(comment);
+        leg.copyAnnotationsFrom(this);
         return leg;
     }
 
@@ -214,7 +227,7 @@ public class Leg extends SurveyComponent {
         }
         Station splayDestination = toWall ? Station.ANONYMOUS_WALL : Station.ANONYMOUS_FEATURE;
         Leg leg = new Leg(distance, azimuth, inclination, splayDestination, promotedFrom, false);
-        leg.setComment(comment);
+        leg.copyAnnotationsFrom(this);
         return leg;
     }
 
@@ -291,6 +304,33 @@ public class Leg extends SurveyComponent {
 
     public void setComment(String comment) {
         this.comment = (comment != null) ? comment : "";
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    /**
+     * Enables or disables a splay. A disabled splay is kept in the survey and shown crossed out in
+     * the data table, but is otherwise left out: it isn't drawn and is commented out on export.
+     * Only splays can be disabled, so this throws an IllegalStateException if asked to disable a
+     * leg.
+     */
+    public void setEnabled(boolean enabled) {
+        if (!enabled && hasDestination()) {
+            throw new IllegalStateException("Only splays can be disabled");
+        }
+        this.enabled = enabled;
+    }
+
+    /**
+     * Copies the comment and enabled state of another leg onto this one. Used when making a
+     * modified copy of that leg. A leg is always enabled, so the state only carries over to a
+     * splay.
+     */
+    private void copyAnnotationsFrom(Leg other) {
+        this.comment = other.comment;
+        this.enabled = other.enabled || hasDestination();
     }
 
     @NonNull

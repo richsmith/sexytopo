@@ -1,7 +1,9 @@
 package org.hwyl.sexytopo.control.io.thirdparty.survextherion;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -161,5 +163,68 @@ public class SurvexTherionUtilTest {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.YEAR, year);
         return calendar.getTime();
+    }
+
+    private static Survey surveyWithADisabledSplay() {
+        Survey survey = new Survey();
+        Leg enabledSplay = new Leg(1.0f, 0.0f, 0.0f);
+        Leg disabledSplay = new Leg(2.5f, 90.0f, 10.0f);
+        disabledSplay.setComment("Boulder");
+        SurveyUpdater.update(survey, enabledSplay);
+        SurveyUpdater.update(survey, disabledSplay);
+        SurveyUpdater.updateWithNewStation(survey, new Leg(5.0f, 0.0f, 0.0f));
+        SurveyUpdater.setSplayEnabled(survey, disabledSplay, false);
+        return survey;
+    }
+
+    private static List<String> getDataLines(Survey survey, SurveyFormat format) {
+        String data = SurvexTherionUtil.getCentrelineData(survey, format);
+        return Arrays.asList(data.split("\n"));
+    }
+
+    @Test
+    public void testDisabledSplayIsCommentedOutInSurvex() {
+        List<String> lines = getDataLines(surveyWithADisabledSplay(), SurveyFormat.SURVEX);
+
+        Assert.assertTrue(lines.contains(";1\t..\t2.500\t90.00\t10.00\tBoulder"));
+    }
+
+    @Test
+    public void testDisabledSplayIsCommentedOutInTherion() {
+        List<String> lines = getDataLines(surveyWithADisabledSplay(), SurveyFormat.THERION);
+
+        Assert.assertTrue(lines.contains("#1\t-\t2.500\t90.00\t10.00\tBoulder"));
+    }
+
+    private static void assertOnlyTheDisabledSplayIsCommentedOut(
+            SurveyFormat format, String splayName) {
+        List<String> lines = getDataLines(surveyWithADisabledSplay(), format);
+
+        Assert.assertTrue(lines.contains("1\t" + splayName + "\t1.000\t0.00\t0.00\t"));
+        Assert.assertTrue(lines.contains("1\t2\t5.000\t0.00\t0.00\t"));
+        long commentedLines =
+                lines.stream()
+                        .filter(line -> line.startsWith(String.valueOf(format.getCommentChar())))
+                        .count();
+        Assert.assertEquals(1, commentedLines);
+    }
+
+    @Test
+    public void testOnlyDisabledSplaysAreCommentedOut() {
+        assertOnlyTheDisabledSplayIsCommentedOut(SurveyFormat.SURVEX, "..");
+        assertOnlyTheDisabledSplayIsCommentedOut(SurveyFormat.THERION, "-");
+    }
+
+    @Test
+    public void testDisabledSplayKeepsItsPlaceInTheData() {
+        List<String> lines = getDataLines(surveyWithADisabledSplay(), SurveyFormat.SURVEX);
+
+        int enabledSplay = lines.indexOf("1\t..\t1.000\t0.00\t0.00\t");
+        int disabledSplay = lines.indexOf(";1\t..\t2.500\t90.00\t10.00\tBoulder");
+        int leg = lines.indexOf("1\t2\t5.000\t0.00\t0.00\t");
+
+        Assert.assertTrue(enabledSplay >= 0);
+        Assert.assertTrue(enabledSplay < disabledSplay);
+        Assert.assertTrue(disabledSplay < leg);
     }
 }

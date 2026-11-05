@@ -11,6 +11,7 @@ import org.hwyl.sexytopo.control.util.GraphToListTranslator;
 import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.LegFilter;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
@@ -35,7 +36,7 @@ public class SurvexImporterTest {
                 "1\t2\t5.0\t0.0\t0.0\t; {from: 5.0 0.0 0.0, 5.0 0.0 0.0, 5.0 0.0 0.0}";
         Survey survey = new Survey();
         SurvexTherionImporter.parseCentreline(testContent, survey);
-        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Leg leg = survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertEquals(3, leg.getPromotedFrom().length);
     }
 
@@ -113,7 +114,7 @@ public class SurvexImporterTest {
         Survey survey = new Survey();
         SurvexTherionImporter.parseCentreline(
                 "1\t2\t5.0\t0.0\t0.0\tMy Chamber", survey, /* useLegComments= */ true);
-        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Leg leg = survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertEquals("My Chamber", leg.getComment());
         Assert.assertTrue(
                 survey.getStationByName("2").getComment() == null
@@ -127,7 +128,7 @@ public class SurvexImporterTest {
         SurvexTherionImporter.parseCentreline(
                 "1\t2\t5.0\t0.0\t0.0\tMy Chamber", survey, /* useLegComments= */ false);
         Assert.assertEquals("My Chamber", survey.getStationByName("2").getComment());
-        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Leg leg = survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertTrue(leg.getComment() == null || leg.getComment().isEmpty());
     }
 
@@ -137,7 +138,7 @@ public class SurvexImporterTest {
         Survey survey = new Survey();
         SurvexTherionImporter.parseCentreline(
                 "1\t2\t5.0\t0.0\t0.0\tMy Chamber", survey, /* useLegComments= */ true);
-        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Leg leg = survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertEquals("My Chamber", leg.getComment());
     }
 
@@ -148,7 +149,7 @@ public class SurvexImporterTest {
                 "1\t2\t5.541\t253.93\t4.67\n" + "; 1\t2\t5.542\t73.95\t-4.64\tBack sight\n";
         Survey survey = new Survey();
         SurvexTherionImporter.parseCentreline(text, survey, /* useLegComments= */ true);
-        Leg mainLeg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Leg mainLeg = survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertEquals(1, mainLeg.getPromotedFrom().length);
         Assert.assertEquals("Back sight", mainLeg.getPromotedFrom()[0].getComment());
     }
@@ -160,7 +161,7 @@ public class SurvexImporterTest {
                 "1\t2\t5.541\t253.93\t4.67\n" + "; 1\t2\t5.542\t73.95\t-4.64\tBack sight\n";
         Survey survey = new Survey();
         SurvexTherionImporter.parseCentreline(text, survey, /* useLegComments= */ false);
-        Leg mainLeg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Leg mainLeg = survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertEquals(1, mainLeg.getPromotedFrom().length);
         Assert.assertTrue(
                 mainLeg.getPromotedFrom()[0].getComment() == null
@@ -184,7 +185,7 @@ public class SurvexImporterTest {
                     "1\t" + token + "\t1.0\t0.0\t0.0\n1\t2\t5.0\t0.0\t0.0", survey);
 
             Assert.assertNull(token, survey.getStationByName(token));
-            List<Leg> splays = survey.getOrigin().getUnconnectedOnwardLegs();
+            List<Leg> splays = survey.getOrigin().getOnwardLegs(LegFilter.SPLAYS);
             Assert.assertEquals(token, 1, splays.size());
             Assert.assertEquals(token, c[1], splays.get(0).isToWall());
         }
@@ -237,7 +238,7 @@ public class SurvexImporterTest {
         SurvexTherionImporter.parseCentreline(text, survey);
 
         Assert.assertEquals(2, survey.getAllStations().size()); // origin "1" and "2"
-        Assert.assertEquals(3, survey.getOrigin().getUnconnectedOnwardLegs().size());
+        Assert.assertEquals(3, survey.getOrigin().getOnwardLegs(LegFilter.SPLAYS).size());
     }
 
     // --- Repeated real lines (Survex-style averaging on import) ---
@@ -252,7 +253,7 @@ public class SurvexImporterTest {
         SurvexTherionImporter.parseCentreline(text, survey, true);
 
         Assert.assertEquals(2, survey.getAllStations().size());
-        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Leg leg = survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertEquals(3, leg.getPromotedFrom().length);
     }
 
@@ -271,7 +272,7 @@ public class SurvexImporterTest {
                         + "1\t2\t5.000\t0.00\t0.02\n";
         Survey survey = new Survey();
         SurvexTherionImporter.parseCentreline(text, survey, true);
-        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Leg leg = survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0);
 
         Assert.assertEquals(expected.getDistance(), leg.getDistance(), 0.001);
         Assert.assertEquals(expected.getAzimuth(), leg.getAzimuth(), 0.001);
@@ -282,7 +283,7 @@ public class SurvexImporterTest {
     public void testSingleLineIsNotTreatedAsAGroup() throws Exception {
         Survey survey = new Survey();
         SurvexTherionImporter.parseCentreline("1\t2\t5.0\t0.0\t0.0", survey);
-        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Leg leg = survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertFalse(leg.wasPromoted());
     }
 
@@ -292,7 +293,7 @@ public class SurvexImporterTest {
                 "1\t2\t5.001\t0.02\t0.01\tBig Sandy Chamber\n" + "1\t2\t4.999\t359.98\t-0.01\n";
         Survey survey = new Survey();
         SurvexTherionImporter.parseCentreline(text, survey, true);
-        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Leg leg = survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertEquals("Big Sandy Chamber", leg.getComment());
     }
 
@@ -302,7 +303,7 @@ public class SurvexImporterTest {
                 "1\t2\t5.001\t0.02\t0.01\n" + "1\t2\t4.999\t359.98\t-0.01\tcold draught\n";
         Survey survey = new Survey();
         SurvexTherionImporter.parseCentreline(text, survey, true);
-        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Leg leg = survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0);
 
         Assert.assertTrue(leg.getComment() == null || leg.getComment().isEmpty());
         Assert.assertEquals("cold draught", leg.getPromotedFrom()[1].getComment());
@@ -316,7 +317,7 @@ public class SurvexImporterTest {
         SurvexTherionImporter.parseCentreline(text, survey, false);
 
         Assert.assertEquals("Big Sandy Chamber", survey.getStationByName("2").getComment());
-        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Leg leg = survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertTrue(leg.getComment() == null || leg.getComment().isEmpty());
         Assert.assertEquals(2, leg.getPromotedFrom().length);
     }
@@ -328,7 +329,7 @@ public class SurvexImporterTest {
         Survey survey = new Survey();
         SurvexTherionImporter.parseCentreline(text, survey, false);
 
-        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Leg leg = survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertEquals(2, leg.getPromotedFrom().length);
         Assert.assertTrue(
                 leg.getPromotedFrom()[1].getComment() == null
@@ -345,8 +346,8 @@ public class SurvexImporterTest {
         SurvexTherionImporter.parseCentreline(text, survey, true);
 
         Station two = survey.getStationByName("2");
-        Assert.assertEquals(1, two.getConnectedOnwardLegs().size());
-        Leg backwardLeg = two.getConnectedOnwardLegs().get(0);
+        Assert.assertEquals(1, two.getOnwardLegs(LegFilter.LEGS).size());
+        Leg backwardLeg = two.getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertEquals(2, backwardLeg.getPromotedFrom().length);
     }
 
@@ -371,7 +372,7 @@ public class SurvexImporterTest {
         Survey reimported = new Survey();
         SurvexTherionImporter.parseCentreline(centreline, reimported, true);
 
-        Leg leg = reimported.getOrigin().getConnectedOnwardLegs().get(0);
+        Leg leg = reimported.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertEquals(3, leg.getPromotedFrom().length);
         Assert.assertEquals(5.0f, leg.getDistance(), 0.001);
     }
@@ -397,7 +398,7 @@ public class SurvexImporterTest {
         String centreline = SurvexTherionUtil.getCentrelineData(original, SurveyFormat.SURVEX);
         Survey reimported = new Survey();
         SurvexTherionImporter.parseCentreline(centreline, reimported, true);
-        Leg leg = reimported.getOrigin().getConnectedOnwardLegs().get(0);
+        Leg leg = reimported.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0);
 
         Leg expected = SurveyUpdater.averageLegs(Arrays.asList(readings));
         Assert.assertEquals(expected.getDistance(), leg.getDistance(), 0.001);
@@ -443,7 +444,7 @@ public class SurvexImporterTest {
         Survey survey = new Survey();
         SurvexTherionImporter.parseCentreline(text, survey, true);
 
-        Leg leg = survey.getStationByName("2").getConnectedOnwardLegs().get(0);
+        Leg leg = survey.getStationByName("2").getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertEquals("3", leg.getDestination().getName());
         Assert.assertTrue(leg.wasShotBackwards());
         Assert.assertFalse(leg.wasPromoted());
@@ -458,7 +459,7 @@ public class SurvexImporterTest {
         Survey survey = new Survey();
         SurvexTherionImporter.parseCentreline(text, survey, true);
         Station two = survey.getStationByName("2");
-        Leg leg = two.getConnectedOnwardLegs().get(0);
+        Leg leg = two.getOnwardLegs(LegFilter.LEGS).get(0);
 
         GraphToListTranslator.AsTakenReading reading =
                 GraphToListTranslator.toAsTakenReading(
@@ -476,7 +477,7 @@ public class SurvexImporterTest {
         Survey survey = new Survey();
         SurvexTherionImporter.parseCentreline(text, survey, true);
 
-        Leg leg = survey.getStationByName("2").getConnectedOnwardLegs().get(0);
+        Leg leg = survey.getStationByName("2").getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertFalse(leg.wasShotBackwards());
         Assert.assertEquals(45.0f, leg.getAzimuth(), 0.001);
         Assert.assertEquals(10.0f, leg.getInclination(), 0.001);
@@ -492,7 +493,7 @@ public class SurvexImporterTest {
         Survey survey = new Survey();
         SurvexTherionImporter.parseCentreline(text, survey, true);
 
-        Leg leg = survey.getStationByName("2").getConnectedOnwardLegs().get(0);
+        Leg leg = survey.getStationByName("2").getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertTrue(leg.wasShotBackwards());
         Assert.assertEquals(5.0f, leg.getDistance(), 0.001);
         Assert.assertEquals(90.0f, leg.getAzimuth(), 0.001);
@@ -510,7 +511,7 @@ public class SurvexImporterTest {
         SurvexTherionImporter.parseCentreline(text, survey, true);
 
         Leg[] readings =
-                survey.getStationByName("2").getConnectedOnwardLegs().get(0).getPromotedFrom();
+                survey.getStationByName("2").getOnwardLegs(LegFilter.LEGS).get(0).getPromotedFrom();
         Assert.assertEquals(3, readings.length);
         Assert.assertEquals(269.9f, readings[0].getAzimuth(), 0.001);
         Assert.assertEquals(270.1f, readings[1].getAzimuth(), 0.001);
@@ -530,7 +531,7 @@ public class SurvexImporterTest {
         Survey survey = new Survey();
         SurvexTherionImporter.parseCentreline(text, survey, true);
 
-        Leg leg = survey.getStationByName("2").getConnectedOnwardLegs().get(0);
+        Leg leg = survey.getStationByName("2").getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertTrue(leg.wasShotBackwards());
         Assert.assertEquals(90.0f, leg.getAzimuth(), 0.001);
         Assert.assertEquals(-10.0f, leg.getInclination(), 0.001);
@@ -549,8 +550,8 @@ public class SurvexImporterTest {
         Survey survey = new Survey();
         SurvexTherionImporter.parseCentreline(text, survey, true);
 
-        Assert.assertEquals(1, survey.getStationByName("2").getUnconnectedOnwardLegs().size());
-        Assert.assertEquals(1, survey.getStationByName("3").getUnconnectedOnwardLegs().size());
+        Assert.assertEquals(1, survey.getStationByName("2").getOnwardLegs(LegFilter.SPLAYS).size());
+        Assert.assertEquals(1, survey.getStationByName("3").getOnwardLegs(LegFilter.SPLAYS).size());
         SurveyAssertions.assertNoBackwardSplays(survey);
     }
 
@@ -571,8 +572,8 @@ public class SurvexImporterTest {
     private static void assertBackwardLegRoundTrips(Survey original, Survey reimported) {
         Station originalTwo = original.getStationByName("2");
         Station reimportedTwo = reimported.getStationByName("2");
-        Leg expected = originalTwo.getConnectedOnwardLegs().get(0);
-        Leg actual = reimportedTwo.getConnectedOnwardLegs().get(0);
+        Leg expected = originalTwo.getOnwardLegs(LegFilter.LEGS).get(0);
+        Leg actual = reimportedTwo.getOnwardLegs(LegFilter.LEGS).get(0);
 
         Assert.assertEquals(expected.getDestination().getName(), actual.getDestination().getName());
         Assert.assertTrue(actual.wasShotBackwards());
@@ -616,5 +617,125 @@ public class SurvexImporterTest {
         SurvexTherionImporter.parseCentreline(centreline, reimported, true);
 
         assertBackwardLegRoundTrips(original, reimported);
+    }
+
+    // --- Disabled splays (commented-out splay lines) ---
+
+    private static void assertIsTheDisabledBoulderSplay(Leg splay) {
+        Assert.assertFalse(splay.isEnabled());
+        Assert.assertEquals(2.5f, splay.getDistance(), 0.001);
+        Assert.assertEquals(90.0f, splay.getAzimuth(), 0.001);
+        Assert.assertEquals(10.0f, splay.getInclination(), 0.001);
+        Assert.assertEquals("Boulder", splay.getComment());
+    }
+
+    @Test
+    public void testCommentedOutSplayAfterAnEnabledSplayImportsAsDisabledSplay() throws Exception {
+        // The disabled splay has the same stations as the splay before it, so make sure it isn't
+        // mistaken for one of that splay's promoted readings
+        final String text =
+                "1\t..\t1.0\t0.0\t0.0\n"
+                        + ";1\t..\t2.5\t90.0\t10.0\tBoulder\n"
+                        + "1\t2\t5.0\t0.0\t0.0\n";
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(text, survey, /* useLegComments= */ true);
+
+        List<Leg> splays = survey.getOrigin().getOnwardLegs(LegFilter.SPLAYS.includeDisabled(true));
+        Assert.assertEquals(2, splays.size());
+        Assert.assertTrue(splays.get(0).isEnabled());
+        assertIsTheDisabledBoulderSplay(splays.get(1));
+    }
+
+    @Test
+    public void testConsecutiveCommentedOutSplaysAllImportAsDisabledSplays() throws Exception {
+        final String text =
+                "1\t2\t5.0\t0.0\t0.0\n"
+                        + ";1\t..\t1.0\t0.0\t0.0\n"
+                        + ";1\t..\t1.2\t90.0\t0.0\n"
+                        + ";1\t..\t0.8\t180.0\t0.0\n";
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(text, survey);
+
+        List<Leg> splays = survey.getOrigin().getOnwardLegs(LegFilter.SPLAYS.includeDisabled(true));
+        Assert.assertEquals(3, splays.size());
+        for (Leg splay : splays) {
+            Assert.assertFalse(splay.isEnabled());
+        }
+        Assert.assertEquals(1.2f, splays.get(1).getDistance(), 0.001);
+    }
+
+    @Test
+    public void testDisabledSplayAttachedToCorrectStation() throws Exception {
+        final String text = "1\t2\t5.0\t0.0\t0.0\n;2\t..\t1.0\t0.0\t0.0\n";
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(text, survey);
+
+        Assert.assertTrue(
+                survey.getOrigin().getOnwardLegs(LegFilter.SPLAYS.includeDisabled(true)).isEmpty());
+        List<Leg> splays =
+                survey.getStationByName("2").getOnwardLegs(LegFilter.SPLAYS.includeDisabled(true));
+        Assert.assertEquals(1, splays.size());
+        Assert.assertFalse(splays.get(0).isEnabled());
+    }
+
+    @Test
+    public void testOrdinaryCommentsDoNotBecomeDisabledSplays() throws Exception {
+        final String text =
+                "; Exported by SexyTopo\n"
+                        + "# a comment with more than five words in it\n"
+                        + "; 1 .. is how a splay is written\n"
+                        + ";1\t..\t-1.0\t0.0\t0.0\n"
+                        + ";1\t..\t1.0\t400.0\t0.0\n"
+                        + ";1\t..\t1.0\t0.0\t95.0\n"
+                        + "; 1 2 5.0 0.0 0.0 a commented-out leg\n"
+                        + "1\t2\t5.0\t0.0\t0.0\n";
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(text, survey);
+
+        Assert.assertEquals(2, survey.getAllStations().size());
+        Assert.assertTrue(survey.getOrigin().getOnwardLegs(LegFilter.SPLAYS).isEmpty());
+        Assert.assertEquals(1, survey.getAllLegs().size());
+    }
+
+    @Test
+    public void testPromotedLegReadingsStillImportWithDisabledSplaysAround() throws Exception {
+        final String text =
+                ";1\t..\t1.0\t0.0\t0.0\n"
+                        + "1\t2\t5.541\t253.93\t4.67\n"
+                        + ";1\t2\t5.542\t73.95\t-4.64\n"
+                        + ";1\t2\t5.541\t73.93\t-4.69\n"
+                        + ";1\t..\t2.0\t90.0\t0.0\n";
+        Survey survey = new Survey();
+        SurvexTherionImporter.parseCentreline(text, survey);
+
+        Leg leg = survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0);
+        Assert.assertEquals(2, leg.getPromotedFrom().length);
+        Assert.assertTrue(leg.isEnabled());
+        List<Leg> splays = survey.getOrigin().getOnwardLegs(LegFilter.SPLAYS.includeDisabled(true));
+        Assert.assertEquals(2, splays.size());
+        Assert.assertFalse(splays.get(0).isEnabled());
+        Assert.assertFalse(splays.get(1).isEnabled());
+    }
+
+    @Test
+    public void testDisabledSplayRoundTrips() throws Exception {
+        Survey original = new Survey();
+        Leg enabledSplay = new Leg(1.0f, 0.0f, 0.0f);
+        Leg disabledSplay = new Leg(2.5f, 90.0f, 10.0f);
+        disabledSplay.setComment("Boulder");
+        SurveyUpdater.update(original, enabledSplay);
+        SurveyUpdater.update(original, disabledSplay);
+        SurveyUpdater.updateWithNewStation(original, new Leg(5.0f, 0.0f, 0.0f));
+        SurveyUpdater.setSplayEnabled(original, disabledSplay, false);
+
+        String centreline = SurvexTherionUtil.getCentrelineData(original, SurveyFormat.SURVEX);
+        Survey reimported = new Survey();
+        SurvexTherionImporter.parseCentreline(centreline, reimported, /* useLegComments= */ true);
+
+        List<Leg> splays =
+                reimported.getOrigin().getOnwardLegs(LegFilter.SPLAYS.includeDisabled(true));
+        Assert.assertEquals(2, splays.size());
+        Assert.assertTrue(splays.get(0).isEnabled());
+        assertIsTheDisabledBoulderSplay(splays.get(1));
     }
 }

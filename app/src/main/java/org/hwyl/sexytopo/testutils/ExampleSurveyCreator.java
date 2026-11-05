@@ -23,6 +23,7 @@ import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.Symbol;
 import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.LegFilter;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
@@ -245,7 +246,7 @@ public class ExampleSurveyCreator {
             Station from,
             LRUD side,
             PathDetail path) {
-        List<Leg> onward = from.getConnectedOnwardLegs();
+        List<Leg> onward = from.getOnwardLegs(LegFilter.LEGS);
         Coord2D fromWall = wallPoints.get(from);
         if (fromWall == null) {
             return;
