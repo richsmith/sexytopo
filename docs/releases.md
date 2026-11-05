@@ -9,6 +9,7 @@
 - Survex export now writes ISO dates (2026-01-05), which needs Survex 1.4.13 or later; Therion keeps 2026.01.05. Importing either accepts year-month-day dates separated by ".", "/" or "-" (thanks Andrew Atkinson)
 - New flowstone symbol, exported to Therion as a flowstone point
 - Fix column, air draught and too tight symbols missing from SVG exports
+- Add more settings to Therion transient export screen
 
 # 2026-09-30 1.14.0
 - Calibration screen reworked: readings are labelled and grouped by the direction they were actually taken in, so the order of shots no longer matters and every reading is used
