@@ -521,7 +521,6 @@
     <string name="settings_auto_reconnect_window_title">Limite di tempo per la riconnessione automatica (minuti)</string>
     <string name="settings_auto_reconnect_window_summary">Per quanto tempo continuare a tentare la riconnessione prima di mettere in pausa</string>
     <string name="settings_leg_amalgamation_algorithm_title">Metodo di concordanza del tratto</string>
-    <string name="settings_leg_amalgamation_algorithm_summary">Come si valuta se letture ripetute sono abbastanza simili da formare un tratto</string>
     <string name="settings_max_endpoint_delta_title">Distanza massima tra estremi (m)</string>
     <string name="settings_max_endpoint_delta_summary">Metodo della distanza tra estremi: quanto possono essere distanti gli estremi delle letture per decidere se creare una nuova stazione. Il valore predefinito di 0.1 mantiene tutte le letture entro una cella di Grado 5 BCRA.</string>
     <string name="settings_max_pairwise_error_title">Errore massimo a coppie</string>

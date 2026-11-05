@@ -521,7 +521,6 @@
     <string name="settings_auto_reconnect_window_title">Délai de reconnexion automatique (minutes)</string>
     <string name="settings_auto_reconnect_window_summary">Combien de temps continuer à essayer de se reconnecter avant de mettre en pause</string>
     <string name="settings_leg_amalgamation_algorithm_title">Méthode d\'accord des segments</string>
-    <string name="settings_leg_amalgamation_algorithm_summary">Comment les mesures répétées sont jugées suffisamment proches pour former un segment</string>
     <string name="settings_max_endpoint_delta_title">Distance d\'extrémité max (m)</string>
     <string name="settings_max_endpoint_delta_summary">Méthode des extrémités : à quelle distance les extrémités des mesures peuvent se trouver pour décider de créer une nouvelle station. La valeur par défaut de 0.1 maintient toutes les mesures dans une même cellule BCRA Grade 5.</string>
     <string name="settings_max_pairwise_error_title">Erreur par paires max</string>

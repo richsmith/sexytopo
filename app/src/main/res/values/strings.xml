@@ -566,7 +566,6 @@
     <string name="settings_licence_name_required">Licence name is required</string>
     <string name="settings_instruments_title">Instruments</string>
     <string name="settings_leg_amalgamation_algorithm_title">Leg agreement method</string>
-    <string name="settings_leg_amalgamation_algorithm_summary">How repeated readings are judged close enough to form a leg</string>
     <string name="settings_max_distance_delta_title">Max distance delta (m)</string>
     <string name="settings_max_distance_delta_summary">Angular method: how much the distance readings may differ when deciding whether to create a new station</string>
     <string name="settings_max_angle_delta_title">Max angle delta (degrees)</string>

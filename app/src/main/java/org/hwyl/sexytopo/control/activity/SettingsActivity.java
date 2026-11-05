@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
@@ -21,6 +22,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
+import org.hwyl.sexytopo.control.util.amalgamation.LegAmalgamationAlgorithm;
 import org.hwyl.sexytopo.model.survey.Licence;
 
 public class SettingsActivity extends SexyTopoActivity
@@ -365,6 +367,34 @@ public class SettingsActivity extends SexyTopoActivity
         @Override
         public void onCreatePreferences(final Bundle savedInstanceState, final String rootKey) {
             setPreferencesFromResource(R.xml.preferences_instruments, rootKey);
+
+            ListPreference algorithm = findPreference("pref_leg_amalgamation_algorithm");
+            if (algorithm == null) {
+                return;
+            }
+            showTolerancesFor(algorithm.getValue());
+            algorithm.setOnPreferenceChangeListener(
+                    (preference, newValue) -> {
+                        showTolerancesFor((String) newValue);
+                        return true;
+                    });
+        }
+
+        /** Shows only the tolerance settings used by the given leg agreement method. */
+        private void showTolerancesFor(String algorithmValue) {
+            LegAmalgamationAlgorithm algorithm =
+                    LegAmalgamationAlgorithm.fromPreferenceValue(algorithmValue);
+            setVisible("pref_max_distance_delta", algorithm == LegAmalgamationAlgorithm.ANGULAR);
+            setVisible("pref_max_angle_delta", algorithm == LegAmalgamationAlgorithm.ANGULAR);
+            setVisible("pref_max_endpoint_delta", algorithm == LegAmalgamationAlgorithm.CARTESIAN);
+            setVisible("pref_max_pairwise_error", algorithm == LegAmalgamationAlgorithm.PAIRWISE);
+        }
+
+        private void setVisible(String key, boolean visible) {
+            Preference preference = findPreference(key);
+            if (preference != null) {
+                preference.setVisible(visible);
+            }
         }
     }
 
