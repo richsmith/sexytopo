@@ -16,6 +16,12 @@ public class Space3DUtilsTest {
     }
 
     @Test
+    public void testToLegJustWestOfNorthGivesValidAzimuth() {
+        Leg leg = Space3DUtils.toLeg(new Coord3D(-1e-9f, 10, 0));
+        Assert.assertTrue(leg.getAzimuth() >= 0 && leg.getAzimuth() < 360);
+    }
+
+    @Test
     public void testTransform1MEast() {
         Leg east1MLeg = new Leg(1, 90, 0);
         Coord3D result = Space3DUtils.toCartesian(Coord3D.ORIGIN, east1MLeg);
