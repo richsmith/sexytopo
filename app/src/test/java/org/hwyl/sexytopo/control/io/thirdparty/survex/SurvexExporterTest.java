@@ -7,6 +7,7 @@ import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.geometry.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.LegFilter;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
@@ -61,7 +62,7 @@ public class SurvexExporterTest {
     public void testPromotedLegCommentGoesOnFirstRawLine() {
         SurvexExporter survexExporter = new SurvexExporter();
         Survey survey = BasicTestSurveyCreator.createStraightNorthThroughRepeats();
-        Leg promoted = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Leg promoted = survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0);
         promoted.setComment("Big Sandy Chamber");
 
         String content = survexExporter.getContent(survey);
@@ -168,28 +169,29 @@ public class SurvexExporterTest {
     }
 
     @Test
-    public void testSurvexMetadataSurveyDateUsesDotSeparator() {
+    public void testSurvexMetadataSurveyDateUsesIsoFormat() {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         Trip trip = new Trip();
-        trip.setSurveyDate(new java.util.Date(0)); // 1970.01.01
+        trip.setSurveyDate(new java.util.Date(0)); // 1970-01-01
         survey.setTrip(trip);
 
         String metadata = SurvexTherionUtil.getMetadata(survey, SurveyFormat.SURVEX, "", "");
 
-        Assert.assertTrue(metadata.contains("*date 1970.01.01"));
-        Assert.assertFalse(metadata.contains("1970-01-01"));
+        Assert.assertTrue(metadata.contains("*date 1970-01-01"));
+        Assert.assertFalse(metadata.contains("1970.01.01"));
     }
 
     @Test
     public void testSurvexMetadataExploDateLinkedUsesSurveyDate() {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         Trip trip = new Trip();
+        trip.setSurveyDate(new java.util.Date(0)); // 1970-01-01
         trip.setExplorationDateLinked(true); // default, but explicit for clarity
         survey.setTrip(trip);
 
         String metadata = SurvexTherionUtil.getMetadata(survey, SurveyFormat.SURVEX, "", "");
 
-        Assert.assertTrue(metadata.contains("*date explored "));
+        Assert.assertTrue(metadata.contains("*date explored 1970-01-01"));
         Assert.assertFalse(metadata.contains(";*date explored "));
     }
 
@@ -198,12 +200,12 @@ public class SurvexExporterTest {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         Trip trip = new Trip();
         trip.setExplorationDateLinked(false);
-        trip.setExplorationDate(new java.util.Date(0)); // 1970.01.01
+        trip.setExplorationDate(new java.util.Date(0)); // 1970-01-01
         survey.setTrip(trip);
 
         String metadata = SurvexTherionUtil.getMetadata(survey, SurveyFormat.SURVEX, "", "");
 
-        Assert.assertTrue(metadata.contains("*date explored 1970.01.01"));
+        Assert.assertTrue(metadata.contains("*date explored 1970-01-01"));
         Assert.assertFalse(metadata.contains(";*date explored "));
     }
 
@@ -345,9 +347,10 @@ public class SurvexExporterTest {
         SurvexExporter survexExporter = new SurvexExporter();
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         // Set stations 2 and 3 to LEFT so the direction change back to RIGHT occurs at station 4
-        Station intermediate = survey.getOrigin().getConnectedOnwardLegs().get(0).getDestination();
+        Station intermediate =
+                survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0).getDestination();
         intermediate.setExtendedElevationDirection(ExtendedElevationDirection.LEFT);
-        Station intermediate2 = intermediate.getConnectedOnwardLegs().get(0).getDestination();
+        Station intermediate2 = intermediate.getOnwardLegs(LegFilter.LEGS).get(0).getDestination();
         intermediate2.setExtendedElevationDirection(ExtendedElevationDirection.LEFT);
         // The active (last) station should remain RIGHT (the default), producing an eright command
         Station lastStation = survey.getActiveStation();
@@ -397,8 +400,9 @@ public class SurvexExporterTest {
         SurvexExporter survexExporter = new SurvexExporter();
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         // station 3 is the immediate predecessor of station 4 (active/last) in the traversal
-        Station intermediate = survey.getOrigin().getConnectedOnwardLegs().get(0).getDestination();
-        Station fromStation = intermediate.getConnectedOnwardLegs().get(0).getDestination();
+        Station intermediate =
+                survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0).getDestination();
+        Station fromStation = intermediate.getOnwardLegs(LegFilter.LEGS).get(0).getDestination();
         Station toStation = survey.getActiveStation();
         toStation.setExtendedElevationDirection(ExtendedElevationDirection.VERTICAL);
 
@@ -419,9 +423,9 @@ public class SurvexExporterTest {
         // Set station 2 to LEFT, station 3 to VERTICAL, station 4 stays RIGHT (default).
         // After VERTICAL the inherited direction reverts to LEFT (station 2's direction),
         // so the change back to RIGHT at station 4 should still produce *eright.
-        Station station2 = survey.getOrigin().getConnectedOnwardLegs().get(0).getDestination();
+        Station station2 = survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0).getDestination();
         station2.setExtendedElevationDirection(ExtendedElevationDirection.LEFT);
-        Station station3 = station2.getConnectedOnwardLegs().get(0).getDestination();
+        Station station3 = station2.getOnwardLegs(LegFilter.LEGS).get(0).getDestination();
         station3.setExtendedElevationDirection(ExtendedElevationDirection.VERTICAL);
         Station station4 = survey.getActiveStation();
         // station4 remains RIGHT (default)

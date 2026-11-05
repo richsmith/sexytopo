@@ -210,11 +210,11 @@ public class CrossSectionerTest {
     }
 
     @Test
-    public void testHiddenSplaysDoNotCountTowardsTheHorizontalRadius() {
+    public void testDisabledSplaysDoNotCountTowardsTheHorizontalRadius() {
         Station station = new Station("A1");
         station.addOnwardLeg(new Leg(2, 90, 0));
         Leg farSplay = new Leg(10, 270, 0);
-        farSplay.setHidden(true);
+        farSplay.setEnabled(false);
         station.addOnwardLeg(farSplay);
 
         Assert.assertEquals(

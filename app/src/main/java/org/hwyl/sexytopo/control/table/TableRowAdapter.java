@@ -164,9 +164,9 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.TableR
                 textView.setTypeface(Typeface.DEFAULT);
             }
 
-            // Hidden splays are shown crossed out. Rows are recycled so this has to be reset.
+            // Disabled splays are shown crossed out. Rows are recycled so this has to be reset.
             textView.setPaintFlags(
-                    strikeThroughFlags(textView.getPaintFlags(), entry.getLeg().isHidden()));
+                    strikeThroughFlags(textView.getPaintFlags(), !entry.getLeg().isEnabled()));
 
             // Set alignment based on column type
             if (col == TableCol.DISTANCE

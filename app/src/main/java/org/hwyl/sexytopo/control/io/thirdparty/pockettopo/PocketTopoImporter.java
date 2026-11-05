@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.hwyl.sexytopo.control.io.translation.Importer;
-import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.geometry.ExtendedElevationDirection;
@@ -284,13 +283,18 @@ public class PocketTopoImporter extends Importer {
                     fromStation.addOnwardLeg(leg);
                     survey.addLegRecord(leg);
 
-                } else if (fromStation != null && toStation == null) {
-                    // Foresight: "from" exists, "to" is new
+                } else if ((fromStation != null) != (toStation != null)) {
+                    // One end of the shot exists and the other is new. A foresight is shot from
+                    // the existing station to the new one; a backsight is shot from the new
+                    // station back to the existing one, and so is stored reversed.
+                    boolean isBackward = fromStation == null;
+                    Station knownStation = isBackward ? toStation : fromStation;
+
                     // Collect all repeat shots for this station pair and average
                     List<Leg> originalLegs = collectRepeatLegs(shots, processed, shot);
                     progress = true;
 
-                    Station newStation = new Station(shot.to);
+                    Station newStation = new Station(isBackward ? shot.from : shot.to);
                     if (shot.comment != null && !shot.comment.isEmpty()) {
                         newStation.setComment(shot.comment);
                     }
@@ -299,62 +303,10 @@ public class PocketTopoImporter extends Importer {
                                     ? ExtendedElevationDirection.LEFT
                                     : ExtendedElevationDirection.RIGHT);
 
-                    Leg averaged =
-                            (originalLegs.size() > 1)
-                                    ? SurveyUpdater.averageLegs(originalLegs)
-                                    : originalLegs.get(0);
-                    Leg[] promotedFrom =
-                            (originalLegs.size() > 1)
-                                    ? originalLegs.toArray(new Leg[0])
-                                    : new Leg[] {};
-
                     Leg leg =
-                            new Leg(
-                                    averaged.getDistance(),
-                                    averaged.getAzimuth(),
-                                    averaged.getInclination(),
-                                    newStation,
-                                    promotedFrom);
-                    fromStation.addOnwardLeg(leg);
-                    survey.addLegRecord(leg);
-                    survey.setActiveStation(newStation);
-
-                } else if (fromStation == null && toStation != null) {
-                    // Backsight: "to" exists, "from" is new.
-                    // Collect repeats, average, then convert to forward direction
-                    // matching SurveyUpdater convention.
-                    List<Leg> originalLegs = collectRepeatLegs(shots, processed, shot);
-                    progress = true;
-
-                    Station newStation = new Station(shot.from);
-                    if (shot.comment != null && !shot.comment.isEmpty()) {
-                        newStation.setComment(shot.comment);
-                    }
-                    newStation.setExtendedElevationDirection(
-                            shot.flipped
-                                    ? ExtendedElevationDirection.LEFT
-                                    : ExtendedElevationDirection.RIGHT);
-
-                    Leg averaged =
-                            (originalLegs.size() > 1)
-                                    ? SurveyUpdater.averageLegs(originalLegs)
-                                    : originalLegs.get(0);
-                    Leg[] promotedFrom =
-                            (originalLegs.size() > 1)
-                                    ? originalLegs.toArray(new Leg[0])
-                                    : new Leg[] {};
-
-                    float forwardAzimuth = Space2DUtils.adjustAngle(averaged.getAzimuth(), 180);
-                    float forwardInclination = -averaged.getInclination();
-                    Leg leg =
-                            new Leg(
-                                    averaged.getDistance(),
-                                    forwardAzimuth,
-                                    forwardInclination,
-                                    newStation,
-                                    promotedFrom,
-                                    true);
-                    toStation.addOnwardLeg(leg);
+                            SurveyUpdater.createLegFromReadings(
+                                    originalLegs, newStation, isBackward);
+                    knownStation.addOnwardLeg(leg);
                     survey.addLegRecord(leg);
                     survey.setActiveStation(newStation);
 

@@ -25,6 +25,7 @@ import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.model.geometry.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.LegFilter;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
@@ -188,22 +189,34 @@ public class ContextMenuManager {
             MenuItem promoteItem = menu.findItem(R.id.action_promote_to_above_leg);
             MenuItem downgradeItem = menu.findItem(R.id.action_downgrade_leg);
             MenuItem reverseItem = menu.findItem(R.id.action_reverse);
+            MenuItem toWallItem = menu.findItem(R.id.action_to_wall);
             MenuItem legMenuItem = menu.findItem(R.id.menu_leg);
 
             if (currentLeg != null) {
                 boolean isSplay = !currentLeg.hasDestination();
+                // A disabled splay can't be made into, or part of, a leg
                 if (upgradeItem != null) {
                     upgradeItem.setVisible(isSplay);
+                    upgradeItem.setEnabled(currentLeg.isEnabled());
                 }
                 if (promoteItem != null) {
                     promoteItem.setVisible(isSplay);
+                    promoteItem.setEnabled(currentLeg.isEnabled());
                 }
                 if (reverseItem != null) {
                     reverseItem.setVisible(!isSplay);
                 }
+                if (toWallItem != null) {
+                    toWallItem.setVisible(isSplay);
+                    toWallItem.setChecked(currentLeg.isToWall());
+                }
                 if (downgradeItem != null) {
                     boolean canDowngrade =
-                            !isSplay && currentLeg.getDestination().getOnwardLegs().isEmpty();
+                            !isSplay
+                                    && currentLeg
+                                            .getDestination()
+                                            .getOnwardLegs(LegFilter.ALL.includeDisabled(true))
+                                            .isEmpty();
                     downgradeItem.setVisible(!isSplay);
                     downgradeItem.setEnabled(canDowngrade);
                 }
@@ -213,15 +226,10 @@ public class ContextMenuManager {
                     commentLegItem.setTitle(
                             isSplay ? R.string.menu_comment_splay : R.string.menu_comment_leg);
                 }
-                MenuItem hideSplayItem = menu.findItem(R.id.action_hide_splay);
-                if (hideSplayItem != null) {
-                    hideSplayItem.setVisible(isSplay);
-                    if (isSplay) {
-                        hideSplayItem.setTitle(
-                                currentLeg.isHidden()
-                                        ? R.string.menu_show_splay
-                                        : R.string.menu_hide_splay);
-                    }
+                MenuItem enabledItem = menu.findItem(R.id.action_enable_splay);
+                if (enabledItem != null) {
+                    enabledItem.setVisible(isSplay);
+                    enabledItem.setChecked(currentLeg.isEnabled());
                 }
                 if (legMenuItem != null) {
                     legMenuItem.setTitle(R.string.menu_incoming_leg);
@@ -404,6 +412,10 @@ public class ContextMenuManager {
             activity.onReverse(currentLeg);
             return true;
         }
+        if (itemId == R.id.action_to_wall && currentLeg != null) {
+            activity.onToggleToWall(currentLeg);
+            return true;
+        }
         if (itemId == R.id.action_delete_leg && currentLeg != null) {
             activity.onDeleteLeg(currentLeg);
             return true;
@@ -412,8 +424,8 @@ public class ContextMenuManager {
             activity.onCommentLeg(currentLeg);
             return true;
         }
-        if (itemId == R.id.action_hide_splay && currentLeg != null) {
-            activity.onToggleHideSplay(currentLeg);
+        if (itemId == R.id.action_enable_splay && currentLeg != null) {
+            activity.onToggleSplayEnabled(currentLeg);
             return true;
         }
 

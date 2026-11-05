@@ -106,11 +106,20 @@ public class CrossSectionTest {
     }
 
     @Test
-    public void testHiddenSplaysAreNotProjected() {
+    public void testDisabledSplaysAreNotProjected() {
         Station station = stationWithSplay(2, 90, 0);
-        Leg hidden = new Leg(3, 0, 0);
-        hidden.setHidden(true);
-        station.addOnwardLeg(hidden);
+        Leg disabled = new Leg(3, 0, 0);
+        disabled.setEnabled(false);
+        station.addOnwardLeg(disabled);
+
+        Assert.assertEquals(1, new CrossSection(station, 0f).getProjection().getLegMap().size());
+        Assert.assertEquals(1, CrossSection.horizontal(station).getProjection().getLegMap().size());
+    }
+
+    @Test
+    public void testOnlySplaysToTheWallAreProjected() {
+        Station station = stationWithSplay(2, 90, 0);
+        station.addOnwardLeg(new Leg(3, 0, 0).withToWall(false));
 
         Assert.assertEquals(1, new CrossSection(station, 0f).getProjection().getLegMap().size());
         Assert.assertEquals(1, CrossSection.horizontal(station).getProjection().getLegMap().size());

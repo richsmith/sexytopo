@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.LegFilter;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
@@ -114,81 +115,180 @@ public class SurveyJsonTranslaterTest {
         Assert.assertFalse(loaded.hasLicence());
     }
 
-    private static Leg hiddenSplayWithComment() {
+    private static Leg disabledSplayWithComment() {
         Leg splay = new Leg(2.5f, 90.0f, 10.0f);
         splay.setComment("Boulder");
-        splay.setHidden(true);
+        splay.setEnabled(false);
         return splay;
     }
 
     @Test
-    public void testHiddenSplayIsWrittenAsHidden() throws Exception {
-        JSONObject json = SurveyJsonTranslater.toJson(hiddenSplayWithComment(), null);
-        Assert.assertTrue(json.getBoolean(SurveyJsonTranslater.HIDDEN_TAG));
+    public void testDisabledSplayIsWrittenAsDisabled() throws Exception {
+        JSONObject json = SurveyJsonTranslater.toJson(disabledSplayWithComment(), null);
+        Assert.assertFalse(json.getBoolean(SurveyJsonTranslater.ENABLED_TAG));
     }
 
     @Test
-    public void testVisibleSplayHasNoHiddenKey() throws Exception {
+    public void testEnabledSplayHasNoEnabledKey() throws Exception {
         JSONObject json = SurveyJsonTranslater.toJson(new Leg(2.5f, 90.0f, 10.0f), null);
-        Assert.assertFalse(json.has(SurveyJsonTranslater.HIDDEN_TAG));
+        Assert.assertFalse(json.has(SurveyJsonTranslater.ENABLED_TAG));
     }
 
     @Test
-    public void testFullLegHasNoHiddenKey() throws Exception {
+    public void testFullLegHasNoEnabledKey() throws Exception {
         Leg leg = new Leg(2.5f, 90.0f, 10.0f, new Station("1"), new Leg[] {});
         JSONObject json = SurveyJsonTranslater.toJson(leg, null);
-        Assert.assertFalse(json.has(SurveyJsonTranslater.HIDDEN_TAG));
+        Assert.assertFalse(json.has(SurveyJsonTranslater.ENABLED_TAG));
     }
 
     @Test
-    public void testHiddenSplayAndCommentRoundTrip() throws Exception {
-        JSONObject json = SurveyJsonTranslater.toJson(hiddenSplayWithComment(), null);
+    public void testDisabledSplayAndCommentRoundTrip() throws Exception {
+        JSONObject json = SurveyJsonTranslater.toJson(disabledSplayWithComment(), null);
 
         Leg loaded = SurveyJsonTranslater.toLeg(new HashMap<>(), json);
 
-        Assert.assertTrue(loaded.isHidden());
+        Assert.assertFalse(loaded.isEnabled());
         Assert.assertEquals("Boulder", loaded.getComment());
         Assert.assertEquals(2.5f, loaded.getDistance(), 0.0001f);
     }
 
     @Test
-    public void testLegWithoutHiddenKeyLoadsAsVisible() throws Exception {
-        JSONObject json = SurveyJsonTranslater.toJson(hiddenSplayWithComment(), null);
-        json.remove(SurveyJsonTranslater.HIDDEN_TAG);
+    public void testSplayWithoutEnabledKeyLoadsAsEnabled() throws Exception {
+        JSONObject json = SurveyJsonTranslater.toJson(disabledSplayWithComment(), null);
+        json.remove(SurveyJsonTranslater.ENABLED_TAG);
 
         Leg loaded = SurveyJsonTranslater.toLeg(new HashMap<>(), json);
 
-        Assert.assertFalse(loaded.isHidden());
+        Assert.assertTrue(loaded.isEnabled());
     }
 
     @Test
-    public void testHiddenKeyOnFullLegIsIgnored() throws Exception {
+    public void testEnabledFalseOnFullLegIsIgnored() throws Exception {
         Station destination = new Station("1");
         Leg leg = new Leg(2.5f, 90.0f, 10.0f, destination, new Leg[] {});
         JSONObject json = SurveyJsonTranslater.toJson(leg, null);
-        json.put(SurveyJsonTranslater.HIDDEN_TAG, true);
+        json.put(SurveyJsonTranslater.ENABLED_TAG, false);
         Map<String, Station> stations = new HashMap<>();
         stations.put("1", destination);
 
         Leg loaded = SurveyJsonTranslater.toLeg(stations, json);
 
-        Assert.assertFalse(loaded.isHidden());
+        Assert.assertTrue(loaded.isEnabled());
     }
 
     @Test
-    public void testSurveyWithHiddenSplayRoundTrips() throws Exception {
+    public void testSurveyWithDisabledSplayRoundTrips() throws Exception {
         Survey survey = new Survey();
         Leg splay = new Leg(2.5f, 90.0f, 10.0f);
         splay.setComment("Boulder");
         SurveyUpdater.update(survey, splay);
-        SurveyUpdater.setSplayHidden(survey, splay, true);
+        SurveyUpdater.setSplayEnabled(survey, splay, false);
         String text = SurveyJsonTranslater.toText(survey, "test", 0);
 
         Survey loaded = new Survey();
         SurveyJsonTranslater.populateSurvey(loaded, text);
 
-        Leg loadedSplay = loaded.getOrigin().getOnwardLegs().get(0);
-        Assert.assertTrue(loadedSplay.isHidden());
+        Leg loadedSplay =
+                loaded.getOrigin().getOnwardLegs(LegFilter.ALL.includeDisabled(true)).get(0);
+        Assert.assertFalse(loadedSplay.isEnabled());
         Assert.assertEquals("Boulder", loadedSplay.getComment());
+    }
+
+    @Test
+    public void testSplayStoredAsShotBackwardsIsLoadedAsForwardSplayWithSameNumbers()
+            throws Exception {
+        // Older files can hold a splay with the flag set, but a splay can never be shot backwards
+        Leg flaggedSplay = new Leg(5.5f, 123.0f, -12.0f, true);
+        JSONObject json = SurveyJsonTranslater.toJson(flaggedSplay, 0);
+        Assert.assertTrue(json.getBoolean(SurveyJsonTranslater.WAS_SHOT_BACKWARDS_TAG));
+
+        Leg loaded = SurveyJsonTranslater.toLeg(new HashMap<>(), json);
+
+        Assert.assertFalse(loaded.hasDestination());
+        Assert.assertFalse(loaded.wasShotBackwards());
+        Assert.assertEquals(5.5f, loaded.getDistance(), 0.0001f);
+        Assert.assertEquals(123.0f, loaded.getAzimuth(), 0.0001f);
+        Assert.assertEquals(-12.0f, loaded.getInclination(), 0.0001f);
+    }
+
+    @Test
+    public void testBackwardPromotedLegRoundTripsWithReadingsAndFlag() throws Exception {
+        Station destination = new Station("2");
+        Leg[] readings =
+                new Leg[] {
+                    new Leg(5.0f, 270.0f, 10.0f),
+                    new Leg(5.0f, 270.0f, 10.0f),
+                    new Leg(6.0f, 272.0f, 12.0f)
+                };
+        Leg backwardLeg = new Leg(5.3333f, 90.6667f, -10.6667f, destination, readings, true);
+        Map<String, Station> namesToStations = new HashMap<>();
+        namesToStations.put("2", destination);
+
+        JSONObject json = SurveyJsonTranslater.toJson(backwardLeg, 0);
+        Leg loaded = SurveyJsonTranslater.toLeg(namesToStations, json);
+
+        Assert.assertTrue(loaded.wasShotBackwards());
+        Assert.assertEquals(5.3333f, loaded.getDistance(), 0.0001f);
+        Assert.assertEquals(90.6667f, loaded.getAzimuth(), 0.0001f);
+        Assert.assertEquals(-10.6667f, loaded.getInclination(), 0.0001f);
+        Leg[] loadedReadings = loaded.getPromotedFrom();
+        Assert.assertEquals(3, loadedReadings.length);
+        for (int i = 0; i < readings.length; i++) {
+            Assert.assertFalse(loadedReadings[i].hasDestination());
+            Assert.assertFalse(loadedReadings[i].wasShotBackwards());
+            Assert.assertEquals(readings[i].getAzimuth(), loadedReadings[i].getAzimuth(), 0.0001f);
+        }
+    }
+
+    @Test
+    public void testSplayToAnotherFeatureIsSavedWithADashAndAToWallFlag() throws Exception {
+        Leg toWall = new Leg(5.0f, 45.0f, 10.0f);
+        Leg toFeature = toWall.withToWall(false);
+
+        JSONObject wallJson = SurveyJsonTranslater.toJson(toWall, 0);
+        JSONObject featureJson = SurveyJsonTranslater.toJson(toFeature, 0);
+
+        // Both keep the dash older versions understand; only the feature splay gets the flag
+        Assert.assertEquals("-", wallJson.getString(SurveyJsonTranslater.DESTINATION_TAG));
+        Assert.assertEquals("-", featureJson.getString(SurveyJsonTranslater.DESTINATION_TAG));
+        Assert.assertFalse(wallJson.has(SurveyJsonTranslater.TO_WALL_TAG));
+        Assert.assertFalse(featureJson.getBoolean(SurveyJsonTranslater.TO_WALL_TAG));
+        Assert.assertTrue(SurveyJsonTranslater.toLeg(new HashMap<>(), wallJson).isToWall());
+        Leg loaded = SurveyJsonTranslater.toLeg(new HashMap<>(), featureJson);
+        Assert.assertFalse(loaded.hasDestination());
+        Assert.assertFalse(loaded.isToWall());
+        Assert.assertEquals(5.0f, loaded.getDistance(), 0.0001f);
+    }
+
+    @Test
+    public void testSplayWithADotDestinationIsLoadedAsGoingToAnotherFeature() throws Exception {
+        JSONObject json = SurveyJsonTranslater.toJson(new Leg(5.0f, 45.0f, 10.0f), 0);
+        json.put(SurveyJsonTranslater.DESTINATION_TAG, ".");
+
+        Leg loaded = SurveyJsonTranslater.toLeg(new HashMap<>(), json);
+
+        Assert.assertFalse(loaded.hasDestination());
+        Assert.assertFalse(loaded.isToWall());
+    }
+
+    @Test
+    public void testPromotedReadingsKeepWhatTheyGoTo() throws Exception {
+        Station destination = new Station("2");
+        Leg[] readings = {
+            new Leg(5.0f, 270.0f, 10.0f),
+            new Leg(5.0f, 270.0f, 10.0f).withToWall(false),
+            new Leg(5.0f, 270.0f, 10.0f)
+        };
+        Leg leg = new Leg(5.0f, 270.0f, 10.0f, destination, readings);
+        Map<String, Station> namesToStations = new HashMap<>();
+        namesToStations.put("2", destination);
+
+        Leg loaded =
+                SurveyJsonTranslater.toLeg(namesToStations, SurveyJsonTranslater.toJson(leg, 0));
+
+        Assert.assertEquals(3, loaded.getPromotedFrom().length);
+        Assert.assertTrue(loaded.getPromotedFrom()[0].isToWall());
+        Assert.assertFalse(loaded.getPromotedFrom()[1].isToWall());
+        Assert.assertTrue(loaded.getPromotedFrom()[2].isToWall());
     }
 }

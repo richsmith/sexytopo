@@ -3,6 +3,7 @@ package org.hwyl.sexytopo.control.util;
 import java.util.Iterator;
 import org.hwyl.sexytopo.model.geometry.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.LegFilter;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
@@ -15,8 +16,8 @@ public class SurveyTraversal {
     @SuppressWarnings("WhileLoopReplaceableByForEach")
     public static boolean traverseIterator(Station station, SurveyLegTraversalCallback callback) {
 
-        // use an iterator because the callback might mutate the list of legs
-        Iterator<Leg> i = station.getOnwardLegs().iterator();
+        // The callback might change the station's legs, which is safe as this is a copy
+        Iterator<Leg> i = station.getOnwardLegs(LegFilter.ALL.includeDisabled(true)).iterator();
         while (i.hasNext()) {
             Leg leg = i.next();
             boolean isFinished = callback.call(station, leg);
@@ -33,7 +34,7 @@ public class SurveyTraversal {
 
     public static boolean traverseLegs(Station station, SurveyLegTraversalCallback callback) {
 
-        for (Leg leg : station.getOnwardLegs()) {
+        for (Leg leg : station.getOnwardLegs(LegFilter.ALL.includeDisabled(true))) {
 
             boolean isFinished = callback.call(station, leg);
 
@@ -67,7 +68,7 @@ public class SurveyTraversal {
             return true;
         }
 
-        for (Leg leg : station.getConnectedOnwardLegs()) {
+        for (Leg leg : station.getOnwardLegs(LegFilter.LEGS)) {
             isFinished = traverseStations(leg.getDestination(), callback);
             if (isFinished) {
                 return true;

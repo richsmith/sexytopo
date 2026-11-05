@@ -44,57 +44,57 @@ public class Projection2DTest {
     }
 
     @Test
-    public void testHiddenSplayIsNotProjectedInPlan() {
+    public void testDisabledSplayIsNotProjectedInPlan() {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
-        Leg visible = addSplay(survey, survey.getOrigin(), 90);
-        Leg hidden = addSplay(survey, survey.getOrigin(), 270);
+        Leg enabled = addSplay(survey, survey.getOrigin(), 90);
+        Leg disabled = addSplay(survey, survey.getOrigin(), 270);
         int stationCount = Projection2D.PLAN.project(survey).getStationMap().size();
-        SurveyUpdater.setSplayHidden(survey, hidden, true);
+        SurveyUpdater.setSplayEnabled(survey, disabled, false);
 
         Space<Coord2D> plan = Projection2D.PLAN.project(survey);
 
-        Assert.assertTrue(plan.getLegMap().containsKey(visible));
-        Assert.assertFalse(plan.getLegMap().containsKey(hidden));
+        Assert.assertTrue(plan.getLegMap().containsKey(enabled));
+        Assert.assertFalse(plan.getLegMap().containsKey(disabled));
         Assert.assertEquals(stationCount, plan.getStationMap().size());
     }
 
     @Test
-    public void testHiddenSplayIsNotProjectedInExtendedElevation() {
+    public void testDisabledSplayIsNotProjectedInExtendedElevation() {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         Station station = survey.getStationByName("2");
-        Leg visible = addSplay(survey, station, 90);
-        Leg hidden = addSplay(survey, station, 270);
+        Leg enabled = addSplay(survey, station, 90);
+        Leg disabled = addSplay(survey, station, 270);
         int stationCount = Projection2D.EXTENDED_ELEVATION.project(survey).getStationMap().size();
-        SurveyUpdater.setSplayHidden(survey, hidden, true);
+        SurveyUpdater.setSplayEnabled(survey, disabled, false);
 
         Space<Coord2D> elevation = Projection2D.EXTENDED_ELEVATION.project(survey);
 
-        Assert.assertTrue(elevation.getLegMap().containsKey(visible));
-        Assert.assertFalse(elevation.getLegMap().containsKey(hidden));
+        Assert.assertTrue(elevation.getLegMap().containsKey(enabled));
+        Assert.assertFalse(elevation.getLegMap().containsKey(disabled));
         Assert.assertEquals(stationCount, elevation.getStationMap().size());
     }
 
     @Test
-    public void testHiddenSplayIsNotIn3DSpace() {
+    public void testDisabledSplayIsNotIn3DSpace() {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
-        Leg visible = addSplay(survey, survey.getOrigin(), 90);
-        Leg hidden = addSplay(survey, survey.getOrigin(), 270);
-        SurveyUpdater.setSplayHidden(survey, hidden, true);
+        Leg enabled = addSplay(survey, survey.getOrigin(), 90);
+        Leg disabled = addSplay(survey, survey.getOrigin(), 270);
+        SurveyUpdater.setSplayEnabled(survey, disabled, false);
 
         Space<Coord3D> space = Projection2D.PLAN.transform(survey);
 
-        Assert.assertTrue(space.getLegMap().containsKey(visible));
-        Assert.assertFalse(space.getLegMap().containsKey(hidden));
+        Assert.assertTrue(space.getLegMap().containsKey(enabled));
+        Assert.assertFalse(space.getLegMap().containsKey(disabled));
     }
 
     @Test
-    public void testShowingAHiddenSplayProjectsItAgain() {
+    public void testShowingADisabledSplayProjectsItAgain() {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         Leg splay = addSplay(survey, survey.getOrigin(), 270);
-        SurveyUpdater.setSplayHidden(survey, splay, true);
+        SurveyUpdater.setSplayEnabled(survey, splay, false);
         Assert.assertFalse(Projection2D.PLAN.project(survey).getLegMap().containsKey(splay));
 
-        SurveyUpdater.setSplayHidden(survey, splay, false);
+        SurveyUpdater.setSplayEnabled(survey, splay, true);
 
         Assert.assertTrue(Projection2D.PLAN.project(survey).getLegMap().containsKey(splay));
     }

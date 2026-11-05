@@ -3,6 +3,7 @@ package org.hwyl.sexytopo.model.survey;
 import androidx.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.hwyl.sexytopo.model.geometry.ExtendedElevationDirection;
 
 public class Station extends SurveyComponent {
@@ -14,6 +15,28 @@ public class Station extends SurveyComponent {
             ExtendedElevationDirection.DEFAULT;
 
     public static final char[] FORBIDDEN_CHARS = new char[] {'\n', '\r'};
+
+    /** The anonymous destination of a splay to a wall, shown as a dash. */
+    public static final Station ANONYMOUS_WALL = new Station("-");
+
+    /** The anonymous destination of a splay to another feature, such as a stal, shown as a dot. */
+    public static final Station ANONYMOUS_FEATURE = new Station(".");
+
+    /** The anonymous station with this name, or null if there is none. */
+    public static Station getAnonymous(String name) {
+        if (name.equals(ANONYMOUS_WALL.getName())) {
+            return ANONYMOUS_WALL;
+        } else if (name.equals(ANONYMOUS_FEATURE.getName())) {
+            return ANONYMOUS_FEATURE;
+        } else {
+            return null;
+        }
+    }
+
+    /** Whether the name is used by an anonymous station, so a real station cannot have it. */
+    public static boolean isReservedName(String name) {
+        return getAnonymous(name) != null;
+    }
 
     public Station(String name) {
         this.name = sanitiseName(name);
@@ -43,58 +66,34 @@ public class Station extends SurveyComponent {
         return name;
     }
 
+    /** Whether this is one of the anonymous destinations of a splay rather than a real station. */
+    public boolean isAnonymous() {
+        return this == ANONYMOUS_WALL || this == ANONYMOUS_FEATURE;
+    }
+
     public void setName(String name) {
         this.name = sanitiseName(name);
     }
 
+    /** The enabled legs and splays going out from this station. */
     public List<Leg> getOnwardLegs() {
-        return onwardLegs;
+        return getOnwardLegs(LegFilter.ALL);
+    }
+
+    /**
+     * The legs going out from this station that match the filter, e.g. LegFilter.SPLAYS. This is a
+     * new list, so use addOnwardLeg and removeOnwardLeg to change the station.
+     */
+    public List<Leg> getOnwardLegs(LegFilter filter) {
+        return onwardLegs.stream().filter(filter).collect(Collectors.toList());
     }
 
     public void addOnwardLeg(Leg leg) {
         onwardLegs.add(leg);
     }
 
-    public List<Leg> getUnconnectedOnwardLegs() {
-        List<Leg> unconnectedOnwardLegs = new ArrayList<>();
-        for (Leg leg : onwardLegs) {
-            if (!leg.hasDestination()) {
-                unconnectedOnwardLegs.add(leg);
-            }
-        }
-        return unconnectedOnwardLegs;
-    }
-
-    public List<Leg> getConnectedOnwardLegs() {
-        List<Leg> connectedOnwardLegs = new ArrayList<>();
-        for (Leg leg : onwardLegs) {
-            if (leg.hasDestination()) {
-                connectedOnwardLegs.add(leg);
-            }
-        }
-        return connectedOnwardLegs;
-    }
-
-    /** The onward legs and splays that are not hidden, i.e. the ones that should be drawn. */
-    public List<Leg> getVisibleOnwardLegs() {
-        List<Leg> visibleOnwardLegs = new ArrayList<>();
-        for (Leg leg : onwardLegs) {
-            if (!leg.isHidden()) {
-                visibleOnwardLegs.add(leg);
-            }
-        }
-        return visibleOnwardLegs;
-    }
-
-    /** The splays that are not hidden, i.e. the ones that should be drawn. */
-    public List<Leg> getVisibleUnconnectedOnwardLegs() {
-        List<Leg> visibleSplays = new ArrayList<>();
-        for (Leg leg : onwardLegs) {
-            if (!leg.hasDestination() && !leg.isHidden()) {
-                visibleSplays.add(leg);
-            }
-        }
-        return visibleSplays;
+    public void removeOnwardLeg(Leg leg) {
+        onwardLegs.remove(leg);
     }
 
     public String getComment() {

@@ -417,21 +417,21 @@ public class SvgExporterTest {
         return ids;
     }
 
-    private static Survey surveyWithAHiddenAndAVisibleSplay() {
+    private static Survey surveyWithADisabledAndAEnabledSplay() {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
-        Leg hidden = new Leg(2, 270, 0);
-        Leg visible = new Leg(2, 90, 0);
-        for (Leg splay : new Leg[] {hidden, visible}) {
+        Leg disabled = new Leg(2, 270, 0);
+        Leg enabled = new Leg(2, 90, 0);
+        for (Leg splay : new Leg[] {disabled, enabled}) {
             survey.getOrigin().addOnwardLeg(splay);
             survey.addLegRecord(splay);
         }
-        SurveyUpdater.setSplayHidden(survey, hidden, true);
+        SurveyUpdater.setSplayEnabled(survey, disabled, false);
         return survey;
     }
 
     @Test
-    public void testHiddenSplayIsNotExportedFromPlan() throws Exception {
-        Survey survey = surveyWithAHiddenAndAVisibleSplay();
+    public void testDisabledSplayIsNotExportedFromPlan() throws Exception {
+        Survey survey = surveyWithADisabledAndAEnabledSplay();
 
         Document svg = parse(export(survey, Projection2D.PLAN));
 
@@ -441,8 +441,8 @@ public class SvgExporterTest {
     }
 
     @Test
-    public void testHiddenSplayIsNotExportedFromExtendedElevation() throws Exception {
-        Survey survey = surveyWithAHiddenAndAVisibleSplay();
+    public void testDisabledSplayIsNotExportedFromExtendedElevation() throws Exception {
+        Survey survey = surveyWithADisabledAndAEnabledSplay();
 
         Document svg = parse(export(survey, Projection2D.EXTENDED_ELEVATION));
 

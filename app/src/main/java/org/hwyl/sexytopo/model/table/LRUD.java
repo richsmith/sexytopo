@@ -4,6 +4,7 @@ import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.util.CrossSectioner;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.LegFilter;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
@@ -44,7 +45,7 @@ public enum LRUD {
         },
         SHOT {
             public float getSideAzimuth(Survey survey, Station station) {
-                return station.getConnectedOnwardLegs().get(0).getAzimuth();
+                return station.getOnwardLegs(LegFilter.LEGS).get(0).getAzimuth();
             }
         };
 

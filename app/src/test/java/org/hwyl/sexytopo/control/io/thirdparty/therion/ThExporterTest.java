@@ -212,12 +212,13 @@ public class ThExporterTest {
     public void testTherionMetadataExploDateLinkedUsesSurveyDate() {
         Survey survey = new Survey();
         Trip trip = new Trip();
+        trip.setSurveyDate(new java.util.Date(0)); // 1970.01.01
         trip.setExplorationDateLinked(true); // default, but explicit for clarity
         survey.setTrip(trip);
 
         String metadata = SurvexTherionUtil.getMetadata(survey, SurveyFormat.THERION, "", "");
 
-        Assert.assertTrue(metadata.contains("explo-date "));
+        Assert.assertTrue(metadata.contains("explo-date 1970.01.01"));
         Assert.assertFalse(metadata.contains("#explo-date "));
     }
 

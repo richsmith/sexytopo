@@ -38,16 +38,16 @@ public class SurveyStatsTest {
     }
 
     @Test
-    public void testHiddenSplaysAreCounted() {
+    public void testDisabledSplaysAreNotCounted() {
         Survey survey = new Survey();
-        Leg visibleSplay = new Leg(1, 90, 0);
-        Leg hiddenSplay = new Leg(1, 270, 0);
-        SurveyUpdater.update(survey, visibleSplay);
-        SurveyUpdater.update(survey, hiddenSplay);
-        SurveyUpdater.setSplayHidden(survey, hiddenSplay, true);
+        Leg enabledSplay = new Leg(1, 90, 0);
+        Leg disabledSplay = new Leg(1, 270, 0);
+        SurveyUpdater.update(survey, enabledSplay);
+        SurveyUpdater.update(survey, disabledSplay);
+        SurveyUpdater.setSplayEnabled(survey, disabledSplay, false);
 
         Station origin = survey.getOrigin();
-        Assert.assertEquals(2, SurveyStats.calcNumberSubSplays(origin));
-        Assert.assertEquals(2, SurveyStats.calcNumberSubLegs(origin));
+        Assert.assertEquals(1, SurveyStats.calcNumberSubSplays(origin));
+        Assert.assertEquals(1, SurveyStats.calcNumberSubLegs(origin));
     }
 }

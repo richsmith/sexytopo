@@ -3,6 +3,7 @@ package org.hwyl.sexytopo.testutils;
 import java.text.DecimalFormat;
 import java.util.List;
 import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.LegFilter;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
@@ -52,8 +53,8 @@ public class SurveyChecker {
             return false;
         }
 
-        List<Leg> oneLegs = one.getOnwardLegs();
-        List<Leg> twoLegs = two.getOnwardLegs();
+        List<Leg> oneLegs = one.getOnwardLegs(LegFilter.ALL.includeDisabled(true));
+        List<Leg> twoLegs = two.getOnwardLegs(LegFilter.ALL.includeDisabled(true));
 
         if (oneLegs.size() != twoLegs.size()) {
             return false;

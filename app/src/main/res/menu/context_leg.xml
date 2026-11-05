@@ -14,6 +14,18 @@
             android:title="@string/menu_edit_leg"/>
 
         <item
+            android:id="@+id/action_to_wall"
+            android:title="@string/menu_to_wall"
+            android:checkable="true"
+            android:visible="false"/>
+
+        <item
+            android:id="@+id/action_enable_splay"
+            android:title="@string/menu_enabled"
+            android:checkable="true"
+            android:visible="false"/>
+
+        <item
             android:id="@+id/action_reverse"
             android:title="@string/menu_reverse"/>
 
@@ -36,10 +48,6 @@
             android:id="@+id/action_comment_leg"
             android:title="@string/menu_comment_leg"/>
 
-        <item
-            android:id="@+id/action_hide_splay"
-            android:title="@string/menu_hide_splay"
-            android:visible="false"/>
     </group>
 
     <!-- Delete leg separated by divider -->
