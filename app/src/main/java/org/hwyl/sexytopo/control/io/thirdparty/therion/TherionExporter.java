@@ -2,6 +2,7 @@ package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -222,6 +223,13 @@ public class TherionExporter extends Exporter {
         EditText eeScrapsInput = dialogView.findViewById(R.id.eeScrapsInput);
         CheckBox stationsInPlanCheckbox = dialogView.findViewById(R.id.stationsInPlanCheckbox);
         CheckBox stationsInEeCheckbox = dialogView.findViewById(R.id.stationsInEeCheckbox);
+        CheckBox crossSectionsCheckbox = dialogView.findViewById(R.id.therionCrossSectionsCheckbox);
+        CheckBox symbolsCheckbox = dialogView.findViewById(R.id.therionSymbolsCheckbox);
+        CheckBox textCheckbox = dialogView.findViewById(R.id.therionTextCheckbox);
+
+        crossSectionsCheckbox.setChecked(GeneralPreferences.isTherionCrossSectionsEnabled());
+        symbolsCheckbox.setChecked(GeneralPreferences.isXviExportSymbolsEnabled());
+        textCheckbox.setChecked(GeneralPreferences.isXviExportTextEnabled());
 
         new MaterialAlertDialogBuilder(context)
                 .setTitle(R.string.therion_export_dialog_title)
@@ -237,10 +245,26 @@ public class TherionExporter extends Exporter {
                             exportOptions =
                                     new TherionExportOptions(
                                             planScraps, eeScraps, stationsInPlan, stationsInEe);
+                            saveOptions(
+                                    crossSectionsCheckbox.isChecked(),
+                                    symbolsCheckbox.isChecked(),
+                                    textCheckbox.isChecked());
                             onReady.run();
                         })
                 .setNegativeButton(R.string.cancel, null)
                 .show();
+    }
+
+    private static void saveOptions(boolean crossSections, boolean symbols, boolean text) {
+        SharedPreferences prefs = GeneralPreferences.getRawPreferences();
+        if (prefs == null) {
+            return;
+        }
+        prefs.edit()
+                .putBoolean("pref_therion_cross_sections", crossSections)
+                .putBoolean("pref_therion_export_symbols", symbols)
+                .putBoolean("pref_therion_export_text", text)
+                .apply();
     }
 
     private static int parseIntSafe(String value, int defaultValue) {
