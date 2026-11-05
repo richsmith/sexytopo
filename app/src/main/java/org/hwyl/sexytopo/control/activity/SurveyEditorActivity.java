@@ -254,9 +254,9 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         boolean success = SurveyUpdater.promoteToAboveLeg(getSurvey(), splay);
         if (success) {
             getSurveyManager().broadcastSurveyUpdated();
-            showSimpleToast(R.string.toast_splay_promoted);
+            showSimpleToast(R.string.context_splay_promoted);
         } else {
-            showSimpleToast(R.string.toast_no_leg_above);
+            showSimpleToast(R.string.context_no_leg_above);
         }
     }
 

@@ -2,6 +2,14 @@
 <!-- resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2" -->
 <resources>
 
+    <!--
+    Strings are grouped into the sections below. Apart from those in Common,
+    each name starts with its section's prefix (e.g. file_, sketch_, menu_ or
+    context_), and sits in that section alongside the others sharing its
+    prefix. The prefix says where a string is used: don't invent new prefixes
+    or add names without one. Translations mirror this ordering.
+    -->
+
     <!-- Common -->
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
@@ -253,6 +261,10 @@
     <string name="manual_edit_station_comment">Station comment</string>
     <string name="manual_edit_leg_comment">Leg comment</string>
     <string name="manual_edit_shots_warning">Manually editing the readings will discard the shots this leg was averaged from</string>
+    <string name="manual_edit_to_wall_info_title">About To wall</string>
+    <string name="manual_edit_to_wall_info_message">An optional record. Selected means that the splay is to the passage extremities; unselected means it measures to a feature, such as a speleothem.</string>
+    <string name="manual_edit_enabled_info_title">About Enabled</string>
+    <string name="manual_edit_enabled_info_message">Unselected means the splay is kept, but crossed out in the data table and left out of sketches, cross-sections and exports (Survex and Therion keep it as a commented-out line). Useful for readings such as calibration checks.</string>
     <string name="manual_rename_station_title">Rename Station</string>
     <string name="manual_rename_station_hint">Station name</string>
     <string name="manual_rename_error">Rename failed</string>
@@ -745,15 +757,9 @@
     <string name="menu_rename_station">Rename</string>
     <string name="menu_edit_leg">Edit</string>
     <string name="menu_to_wall">To wall</string>
-    <string name="to_wall_info_title">About To wall</string>
-    <string name="to_wall_info_message">An optional record. Selected means that the splay is to the passage extremities; unselected means it measures to a feature, such as a speleothem.</string>
     <string name="menu_enabled">Enabled</string>
-    <string name="enabled_info_title">About Enabled</string>
-    <string name="enabled_info_message">Unselected means the splay is kept, but crossed out in the data table and left out of sketches, cross-sections and exports (Survex and Therion keep it as a commented-out line). Useful for readings such as calibration checks.</string>
     <string name="menu_upgrade_row">Force New Station</string>
     <string name="menu_promote_to_above_leg">Add to Leg Above</string>
-    <string name="toast_splay_promoted">Splay combined with leg</string>
-    <string name="toast_no_leg_above">No valid leg to combine with</string>
     <string name="menu_upgrade_splay">Upgrade to Leg</string>
     <string name="menu_downgrade_leg">Downgrade to Splay</string>
     <string name="menu_delete_leg">Delete</string>
@@ -800,6 +806,8 @@
     <string name="context_rename_splay_error">Cannot rename a splay end</string>
     <string name="context_set_active_splay_error">Cannot set splay end as the active station</string>
     <string name="context_station_comment_hint">Station comment</string>
+    <string name="context_splay_promoted">Splay combined with leg</string>
+    <string name="context_no_leg_above">No valid leg to combine with</string>
 
     <!-- Logging -->
     <string name="log_starting_up">Starting up</string>

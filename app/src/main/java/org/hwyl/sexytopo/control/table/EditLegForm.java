@@ -160,8 +160,8 @@ public class EditLegForm extends Form {
                     .setOnClickListener(
                             v ->
                                     showInfo(
-                                            R.string.to_wall_info_title,
-                                            R.string.to_wall_info_message));
+                                            R.string.manual_edit_to_wall_info_title,
+                                            R.string.manual_edit_to_wall_info_message));
             this.enabledCheckBox = dialogView.findViewById(R.id.enabledCheckBox);
             enabledCheckBox.setChecked(initialEnabled(originalLeg));
             dialogView
@@ -169,8 +169,8 @@ public class EditLegForm extends Form {
                     .setOnClickListener(
                             v ->
                                     showInfo(
-                                            R.string.enabled_info_title,
-                                            R.string.enabled_info_message));
+                                            R.string.manual_edit_enabled_info_title,
+                                            R.string.manual_edit_enabled_info_message));
         }
     }
 

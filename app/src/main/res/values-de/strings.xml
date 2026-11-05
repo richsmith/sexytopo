@@ -240,6 +240,10 @@
     <string name="manual_edit_station_comment">Messpunkt-Kommentar</string>
     <string name="manual_edit_leg_comment">Messstrecken-Kommentar</string>
     <string name="manual_edit_shots_warning">Wenn die Werte manuell geändert werden, werden die Messungen verworfen, aus denen diese Messstrecke gemittelt wurde</string>
+    <string name="manual_edit_to_wall_info_title">Über Zur Wand</string>
+    <string name="manual_edit_to_wall_info_message">Optionale Angabe. Angehakt bedeutet, dass der Splay zur Begrenzung des Ganges geht; nicht angehakt bedeutet, dass er zu einem Objekt misst, etwa einem Speläothem.</string>
+    <string name="manual_edit_enabled_info_title">Über Aktiviert</string>
+    <string name="manual_edit_enabled_info_message">Nicht angehakt bedeutet, dass die Peilung erhalten bleibt, aber in der Datentabelle durchgestrichen und in Skizzen, Querschnitten und Exporten weggelassen wird (Survex und Therion behalten sie als auskommentierte Zeile). Nützlich für Messungen wie Kalibrierungskontrollen.</string>
     <string name="manual_rename_station_title">Messpunkt umbenennen</string>
     <string name="manual_rename_station_hint">Stationsname</string>
     <string name="manual_rename_error">Umbenennen fehlgeschlagen</string>
@@ -710,15 +714,9 @@
     <string name="menu_rename_station">Umbenennen</string>
     <string name="menu_edit_leg">Bearbeiten</string>
     <string name="menu_to_wall">Zur Wand</string>
-    <string name="to_wall_info_title">Über Zur Wand</string>
-    <string name="to_wall_info_message">Optionale Angabe. Angehakt bedeutet, dass der Splay zur Begrenzung des Ganges geht; nicht angehakt bedeutet, dass er zu einem Objekt misst, etwa einem Speläothem.</string>
     <string name="menu_enabled">Aktiviert</string>
-    <string name="enabled_info_title">Über Aktiviert</string>
-    <string name="enabled_info_message">Nicht angehakt bedeutet, dass die Peilung erhalten bleibt, aber in der Datentabelle durchgestrichen und in Skizzen, Querschnitten und Exporten weggelassen wird (Survex und Therion behalten sie als auskommentierte Zeile). Nützlich für Messungen wie Kalibrierungskontrollen.</string>
     <string name="menu_upgrade_row">Neuen Messpunkt erzwingen</string>
     <string name="menu_promote_to_above_leg">Zur obigen Messung hinzufügen</string>
-    <string name="toast_splay_promoted">Splay mit Messung kombiniert</string>
-    <string name="toast_no_leg_above">Keine gültige Messung zum Kombinieren</string>
     <string name="menu_upgrade_splay">Zu Messstrecke aufwerten</string>
     <string name="menu_downgrade_leg">Zu Splay abwerten</string>
     <string name="menu_delete_leg">Löschen</string>
@@ -766,6 +764,8 @@
     <string name="context_rename_splay_error">Kann das Ende einer Dimension/Hilfslinie nicht umbenennen</string>
     <string name="context_set_active_splay_error">Ende einer Dimension/Hilfslinie kann nicht als aktiver Messpunkt definiert werden</string>
     <string name="context_station_comment_hint">Stationskommentar</string>
+    <string name="context_splay_promoted">Splay mit Messung kombiniert</string>
+    <string name="context_no_leg_above">Keine gültige Messung zum Kombinieren</string>
 
     <!--  Logging  -->
     <string name="log_starting_up">Startprozess läuft</string>

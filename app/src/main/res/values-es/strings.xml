@@ -240,6 +240,10 @@
     <string name="manual_edit_station_comment">Comentario de la estación</string>
     <string name="manual_edit_leg_comment">Comentario del tramo</string>
     <string name="manual_edit_shots_warning">Al cambiar manualmente las lecturas se descartarán los disparos de los que se promedió este tramo</string>
+    <string name="manual_edit_to_wall_info_title">Acerca de A la pared</string>
+    <string name="manual_edit_to_wall_info_message">Dato opcional. Marcado significa que la radial va a los límites de la galería; desmarcado significa que mide hasta un elemento, como un espeleotema.</string>
+    <string name="manual_edit_enabled_info_title">Acerca de Activada</string>
+    <string name="manual_edit_enabled_info_message">Desmarcado significa que la radial se conserva, pero aparece tachada en la tabla de datos y se omite en los croquis, las secciones y las exportaciones (Survex y Therion la conservan como una línea comentada). Útil para lecturas como las comprobaciones de calibración.</string>
     <string name="manual_rename_station_title">Renombrar Estación</string>
     <string name="manual_rename_station_hint">Nombre de estación</string>
     <string name="manual_rename_error">Renombrado fallido</string>
@@ -710,15 +714,9 @@
     <string name="menu_rename_station">Renombrar</string>
     <string name="menu_edit_leg">Editar</string>
     <string name="menu_to_wall">A la pared</string>
-    <string name="to_wall_info_title">Acerca de A la pared</string>
-    <string name="to_wall_info_message">Dato opcional. Marcado significa que la radial va a los límites de la galería; desmarcado significa que mide hasta un elemento, como un espeleotema.</string>
     <string name="menu_enabled">Activada</string>
-    <string name="enabled_info_title">Acerca de Activada</string>
-    <string name="enabled_info_message">Desmarcado significa que la radial se conserva, pero aparece tachada en la tabla de datos y se omite en los croquis, las secciones y las exportaciones (Survex y Therion la conservan como una línea comentada). Útil para lecturas como las comprobaciones de calibración.</string>
     <string name="menu_upgrade_row">Forzar Nueva Estación</string>
     <string name="menu_promote_to_above_leg">Añadir al tramo superior</string>
-    <string name="toast_splay_promoted">Radial combinada con tramo</string>
-    <string name="toast_no_leg_above">No hay tramo válido para combinar</string>
     <string name="menu_upgrade_splay">Promover a Tramo</string>
     <string name="menu_downgrade_leg">Degradar a Radial</string>
     <string name="menu_delete_leg">Eliminar</string>
@@ -765,6 +763,8 @@
     <string name="context_rename_splay_error">No se puede renombrar un extremo de radial</string>
     <string name="context_set_active_splay_error">No se puede establecer el extremo de radial como estación activa</string>
     <string name="context_station_comment_hint">Comentario de estación</string>
+    <string name="context_splay_promoted">Radial combinada con tramo</string>
+    <string name="context_no_leg_above">No hay tramo válido para combinar</string>
 
     <!-- Logging -->
     <string name="log_starting_up">Iniciando</string>

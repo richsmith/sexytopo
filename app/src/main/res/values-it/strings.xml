@@ -240,6 +240,10 @@
     <string name="manual_edit_station_comment">Commento della stazione</string>
     <string name="manual_edit_leg_comment">Commento del tratto</string>
     <string name="manual_edit_shots_warning">Modificando manualmente le letture verranno scartate le misure di cui questo tratto è la media</string>
+    <string name="manual_edit_to_wall_info_title">Informazioni su Verso la parete</string>
+    <string name="manual_edit_to_wall_info_message">Dato facoltativo. Selezionato significa che lo splay va ai limiti della galleria; deselezionato significa che misura fino a un elemento, come uno speleotema.</string>
+    <string name="manual_edit_enabled_info_title">Informazioni su Attivo</string>
+    <string name="manual_edit_enabled_info_message">Deselezionato significa che lo splay viene conservato, ma barrato nella tabella dei dati e omesso da schizzi, sezioni ed esportazioni (Survex e Therion lo mantengono come riga commentata). Utile per letture come i controlli di calibrazione.</string>
     <string name="manual_rename_station_title">Rinomina Stazione</string>
     <string name="manual_rename_station_hint">Nome stazione</string>
     <string name="manual_rename_error">Rinomina fallita</string>
@@ -710,15 +714,9 @@
     <string name="menu_rename_station">Rinomina</string>
     <string name="menu_edit_leg">Modifica</string>
     <string name="menu_to_wall">Verso la parete</string>
-    <string name="to_wall_info_title">Informazioni su Verso la parete</string>
-    <string name="to_wall_info_message">Dato facoltativo. Selezionato significa che lo splay va ai limiti della galleria; deselezionato significa che misura fino a un elemento, come uno speleotema.</string>
     <string name="menu_enabled">Attivo</string>
-    <string name="enabled_info_title">Informazioni su Attivo</string>
-    <string name="enabled_info_message">Deselezionato significa che lo splay viene conservato, ma barrato nella tabella dei dati e omesso da schizzi, sezioni ed esportazioni (Survex e Therion lo mantengono come riga commentata). Utile per letture come i controlli di calibrazione.</string>
     <string name="menu_upgrade_row">Forza Nuova Stazione</string>
     <string name="menu_promote_to_above_leg">Aggiungi al tratto sopra</string>
-    <string name="toast_splay_promoted">Splay combinato con il tratto</string>
-    <string name="toast_no_leg_above">Nessun tratto valido da combinare</string>
     <string name="menu_upgrade_splay">Promuovi a Tratto</string>
     <string name="menu_downgrade_leg">Declassa a Splay</string>
     <string name="menu_delete_leg">Elimina</string>
@@ -765,6 +763,8 @@
     <string name="context_rename_splay_error">Impossibile rinominare una terminazione di splay</string>
     <string name="context_set_active_splay_error">Impossibile impostare la terminazione di splay come stazione attiva</string>
     <string name="context_station_comment_hint">Commento stazione</string>
+    <string name="context_splay_promoted">Splay combinato con il tratto</string>
+    <string name="context_no_leg_above">Nessun tratto valido da combinare</string>
 
     <!-- Logging -->
     <string name="log_starting_up">Avvio in corso</string>

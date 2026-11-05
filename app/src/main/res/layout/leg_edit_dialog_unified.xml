@@ -314,7 +314,7 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/to_wall_info_title"
+                android:contentDescription="@string/manual_edit_to_wall_info_title"
                 android:src="@drawable/ic_info"/>
             <CheckBox
                 android:id="@+id/enabledCheckBox"
@@ -327,7 +327,7 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/enabled_info_title"
+                android:contentDescription="@string/manual_edit_enabled_info_title"
                 android:src="@drawable/ic_info"/>
         </LinearLayout>
 
