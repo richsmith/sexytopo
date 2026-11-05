@@ -291,8 +291,9 @@
 
 <h3>Leg Actions</h3>
 <ul>
-	<li><strong>Edit Leg</strong> modifies the distance, azimuth, and inclination. For a splay the dialog also has the To Wall tick box (see below). A leg made from several shots keeps them unless its readings are changed, when it takes the new readings in their place; the dialog warns before this happens.</li>
-	<li><strong>To Wall</strong> (splays only) is ticked when the splay goes to a wall, which is the default. Untick it for a splay that goes to something else, such as a stalagmite. In the table the To column shows <code>-</code> for a wall and <code>.</code> for another feature. Survex <code>...</code> (a point with no implied type) is imported as . another feature</li>
+	<li><strong>Edit Leg</strong> opens the edit dialog for manual editing of the leg's paraemters</li>
+	<li><strong>To Wall</strong> (splays only) is ticked when the splay goes to a wall, which is the default. Untick it for a splay that goes to something else, such as a stalagmite.</li>
+	<li><strong>Enabled</strong> (splays only) is ticked by default. Untick it to disable a splay, such as a calibration check, without deleting it. Disabled splays are hidden in the sketch and disabled in file exports.</li>
 	<li><strong>Reverse</strong> inverts the measurement as if taken from target back to origin</li>
 	<li><strong>Upgrade Splay</strong> (splays only) converts a splay to a full leg, creating a new station</li>
 	<li><strong>Add to Leg Above</strong> (splays only) merges the splay's measurements into the most recent full leg, averaging them together. This is useful when you have taken an additional shot along an existing leg and want to incorporate it for better accuracy</li>
