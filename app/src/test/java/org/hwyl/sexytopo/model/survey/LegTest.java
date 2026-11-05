@@ -536,4 +536,25 @@ public class LegTest {
 
         Assert.assertTrue(leg.toSplay().isToWall());
     }
+
+    @Test
+    public void testLegsWithSameReadingsAreEquivalentWhateverElseDiffers() {
+        Leg leg = new Leg(5.0f, 45.0f, 10.0f, new Station("A1"), new Leg[] {}, false);
+        Leg other = new Leg(5.0f, 45.0f, 10.0f, new Station("B2"), new Leg[] {leg}, true);
+        Assert.assertTrue(leg.hasEquivalentReadings(other));
+    }
+
+    @Test
+    public void testLegsWithReadingsWithinRoundingAreEquivalent() {
+        Leg leg = new Leg(5.0f, 45.0f, 10.0f);
+        Assert.assertTrue(leg.hasEquivalentReadings(new Leg(5.0f, 45.0f + 1 / 3600f, 10.0f)));
+    }
+
+    @Test
+    public void testLegsWithAnyReadingDifferentAreNotEquivalent() {
+        Leg leg = new Leg(5.0f, 45.0f, 10.0f);
+        Assert.assertFalse(leg.hasEquivalentReadings(new Leg(5.1f, 45.0f, 10.0f)));
+        Assert.assertFalse(leg.hasEquivalentReadings(new Leg(5.0f, 45.1f, 10.0f)));
+        Assert.assertFalse(leg.hasEquivalentReadings(new Leg(5.0f, 45.0f, 10.1f)));
+    }
 }

@@ -239,6 +239,7 @@
     <string name="manual_edit_shot_backwards">⬅ Tir en arrière</string>
     <string name="manual_edit_station_comment">Commentaire de la station</string>
     <string name="manual_edit_leg_comment">Commentaire du segment</string>
+    <string name="manual_edit_shots_warning">Modifier manuellement les mesures supprimera les visées dont cette visée est la moyenne</string>
     <string name="manual_rename_station_title">Renommer la station</string>
     <string name="manual_rename_station_hint">Nom de la station</string>
     <string name="manual_rename_error">Échec du renommage</string>
@@ -722,7 +723,6 @@
     <string name="toast_no_leg_above">Aucune visée valide à combiner</string>
     <string name="menu_upgrade_splay">Convertir en visée directionnelle</string>
     <string name="menu_downgrade_leg">Convertir en visée rayonnante</string>
-    <string name="edit_leg_repeated_shots_note">Issu de %1$d visées, mesures verrouillées</string>
     <string name="menu_delete_leg">Supprimer</string>
     <string name="menu_delete_splay">Supprimer la radiale</string>
     <string name="menu_elevation">Élévation</string>

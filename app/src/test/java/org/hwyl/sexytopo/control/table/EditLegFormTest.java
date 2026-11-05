@@ -247,32 +247,25 @@ public class EditLegFormTest {
         Assert.assertEquals(45.0f, applied.getAzimuth(), DELTA);
     }
 
-    // ---- keeping the shots of a leg averaged from several shots ----
+    // ---- whether the readings shown have been changed ----
 
     @Test
-    public void testKeepReadingsKeepsShotsAndFollowsInputMode() {
-        Leg[] shots = {new Leg(5.0f, 40.0f, 10.0f), new Leg(5.0f, 50.0f, 10.0f)};
-        Station destination = new Station("2");
-        Leg forward = new Leg(5.0f, 45.0f, 10.0f, destination, shots, false);
-        Leg backward = forward.reverse();
+    public void testReadingsAsShownAreUnchanged() {
+        Leg shown = new Leg(5.0f, 45.12f, 10.0f);
+        Assert.assertTrue(EditLegForm.isUnchanged(shown, new Leg(5.0f, 45.12f, 10.0f)));
+    }
 
-        // original, input mode, expected backwards, expected azimuth, expected inclination
-        Object[][] cases = {
-            {forward, InputMode.FORWARD, false, 45.0f, 10.0f},
-            {forward, InputMode.BACKWARD, true, 225.0f, -10.0f},
-            {backward, InputMode.BACKWARD, true, 225.0f, -10.0f},
-            {backward, InputMode.FORWARD, false, 45.0f, 10.0f},
-        };
+    @Test
+    public void testAnyReadingDifferentFromShownIsChanged() {
+        Leg shown = new Leg(5.0f, 45.12f, 10.0f);
+        Assert.assertFalse(EditLegForm.isUnchanged(shown, new Leg(5.1f, 45.12f, 10.0f)));
+        Assert.assertFalse(EditLegForm.isUnchanged(shown, new Leg(5.0f, 45.13f, 10.0f)));
+        Assert.assertFalse(EditLegForm.isUnchanged(shown, new Leg(5.0f, 45.12f, 10.1f)));
+    }
 
-        for (Object[] c : cases) {
-            Leg kept = EditLegForm.keepReadings((Leg) c[0], (InputMode) c[1]);
-            Assert.assertSame(shots, kept.getPromotedFrom());
-            Assert.assertSame(destination, kept.getDestination());
-            Assert.assertEquals(c[2], kept.wasShotBackwards());
-            Assert.assertEquals(5.0f, kept.getDistance(), DELTA);
-            Assert.assertEquals((float) c[3], kept.getAzimuth(), DELTA);
-            Assert.assertEquals((float) c[4], kept.getInclination(), DELTA);
-        }
+    @Test
+    public void testNothingShownCountsAsChanged() {
+        Assert.assertFalse(EditLegForm.isUnchanged(null, new Leg(5.0f, 45.0f, 10.0f)));
     }
 
     // ---- the To Wall tick box ----

@@ -239,6 +239,7 @@
     <string name="manual_edit_shot_backwards">⬅ Lettura all\'indietro</string>
     <string name="manual_edit_station_comment">Commento della stazione</string>
     <string name="manual_edit_leg_comment">Commento del tratto</string>
+    <string name="manual_edit_shots_warning">Modificando manualmente le letture verranno scartate le misure di cui questo tratto è la media</string>
     <string name="manual_rename_station_title">Rinomina Stazione</string>
     <string name="manual_rename_station_hint">Nome stazione</string>
     <string name="manual_rename_error">Rinomina fallita</string>
@@ -720,7 +721,6 @@
     <string name="toast_no_leg_above">Nessun tratto valido da combinare</string>
     <string name="menu_upgrade_splay">Promuovi a Tratto</string>
     <string name="menu_downgrade_leg">Declassa a Splay</string>
-    <string name="edit_leg_repeated_shots_note">Fatto da %1$d misure, letture bloccate</string>
     <string name="menu_delete_leg">Elimina</string>
     <string name="menu_delete_splay">Elimina Splay</string>
     <string name="menu_elevation">Elevazione</string>

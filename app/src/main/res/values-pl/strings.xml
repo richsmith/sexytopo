@@ -239,6 +239,7 @@
     <string name="manual_edit_shot_backwards">⬅ Pomiar wsteczny</string>
     <string name="manual_edit_station_comment">Komentarz stanowiska</string>
     <string name="manual_edit_leg_comment">Komentarz ciągu</string>
+    <string name="manual_edit_shots_warning">Ręczna zmiana odczytów usunie pomiary, z których uśredniono ten ciąg</string>
     <string name="manual_rename_station_title">Zmień nazwę stanowiska</string>
     <string name="manual_rename_station_hint">Nazwa stanowiska</string>
     <string name="manual_rename_error">Zmiana nazwy nie powiodła się</string>
@@ -720,7 +721,6 @@
     <string name="toast_no_leg_above">Brak prawidłowego ciągu do połączenia</string>
     <string name="menu_upgrade_splay">Podnieś do ciągu</string>
     <string name="menu_downgrade_leg">Obniż do pomiaru szczegółowego</string>
-    <string name="edit_leg_repeated_shots_note">Z %1$d pomiarów, odczyty zablokowane</string>
     <string name="menu_delete_leg">Usuń</string>
     <string name="menu_delete_splay">Usuń pomiar szczegółowy</string>
     <string name="menu_elevation">Przekrój</string>

@@ -239,6 +239,7 @@
     <string name="manual_edit_shot_backwards">⬅ Leitura para trás</string>
     <string name="manual_edit_station_comment">Comentário da estação</string>
     <string name="manual_edit_leg_comment">Comentário do trecho</string>
+    <string name="manual_edit_shots_warning">Alterar manualmente as leituras irá descartar as medições de que este trecho é a média</string>
     <string name="manual_rename_station_title">Renomear Estação</string>
     <string name="manual_rename_station_hint">Nome da estação</string>
     <string name="manual_rename_error">Falha ao renomear</string>
@@ -720,7 +721,6 @@
     <string name="toast_no_leg_above">Nenhum trecho válido para combinar</string>
     <string name="menu_upgrade_splay">Promover a Trecho</string>
     <string name="menu_downgrade_leg">Degradar a Raio</string>
-    <string name="edit_leg_repeated_shots_note">Feito de %1$d medições, leituras bloqueadas</string>
     <string name="menu_delete_leg">Eliminar</string>
     <string name="menu_delete_splay">Eliminar Raio</string>
     <string name="menu_elevation">Elevação</string>

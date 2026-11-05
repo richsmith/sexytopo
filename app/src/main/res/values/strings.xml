@@ -252,6 +252,7 @@
     <string name="manual_edit_shot_backwards">⬅ Shot backwards</string>
     <string name="manual_edit_station_comment">Station comment</string>
     <string name="manual_edit_leg_comment">Leg comment</string>
+    <string name="manual_edit_shots_warning">Manually editing the readings will discard the shots this leg was averaged from</string>
     <string name="manual_rename_station_title">Rename Station</string>
     <string name="manual_rename_station_hint">Station name</string>
     <string name="manual_rename_error">Rename failed</string>
@@ -755,7 +756,6 @@
     <string name="toast_no_leg_above">No valid leg to combine with</string>
     <string name="menu_upgrade_splay">Upgrade to Leg</string>
     <string name="menu_downgrade_leg">Downgrade to Splay</string>
-    <string name="edit_leg_repeated_shots_note">Made from %1$d shots, readings locked</string>
     <string name="menu_delete_leg">Delete</string>
     <string name="menu_delete_splay">Delete Splay</string>
     <string name="menu_elevation">Elevation</string>
