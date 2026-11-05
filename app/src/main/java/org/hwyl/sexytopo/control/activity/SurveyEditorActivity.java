@@ -302,6 +302,7 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
                         (dialog, which) -> {
                             CharSequence inputText = input.getText();
                             station.setComment(inputText != null ? inputText.toString() : "");
+                            getSurvey().setSaved(false);
                             invalidateView();
                         })
                 .setNegativeButton(R.string.cancel, null);
@@ -334,6 +335,7 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
                         (dialog, which) -> {
                             CharSequence inputText = input.getText();
                             leg.setComment(inputText != null ? inputText.toString() : "");
+                            getSurvey().setSaved(false);
                             getSurveyManager().broadcastSurveyUpdated();
                             invalidateView();
                         })

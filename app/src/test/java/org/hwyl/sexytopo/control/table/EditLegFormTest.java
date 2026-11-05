@@ -247,6 +247,27 @@ public class EditLegFormTest {
         Assert.assertEquals(45.0f, applied.getAzimuth(), DELTA);
     }
 
+    // ---- whether the readings shown have been changed ----
+
+    @Test
+    public void testReadingsAsShownAreUnchanged() {
+        Leg shown = new Leg(5.0f, 45.12f, 10.0f);
+        Assert.assertTrue(EditLegForm.isUnchanged(shown, new Leg(5.0f, 45.12f, 10.0f)));
+    }
+
+    @Test
+    public void testAnyReadingDifferentFromShownIsChanged() {
+        Leg shown = new Leg(5.0f, 45.12f, 10.0f);
+        Assert.assertFalse(EditLegForm.isUnchanged(shown, new Leg(5.1f, 45.12f, 10.0f)));
+        Assert.assertFalse(EditLegForm.isUnchanged(shown, new Leg(5.0f, 45.13f, 10.0f)));
+        Assert.assertFalse(EditLegForm.isUnchanged(shown, new Leg(5.0f, 45.12f, 10.1f)));
+    }
+
+    @Test
+    public void testNothingShownCountsAsChanged() {
+        Assert.assertFalse(EditLegForm.isUnchanged(null, new Leg(5.0f, 45.0f, 10.0f)));
+    }
+
     // ---- the To Wall tick box ----
 
     @Test

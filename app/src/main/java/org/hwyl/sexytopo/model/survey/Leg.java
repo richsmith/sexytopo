@@ -26,6 +26,10 @@ public class Leg extends SurveyComponent {
 
     private static final Leg[] NO_LEGS = new Leg[] {};
 
+    // Readings that have been through a text field, such as degrees, minutes and seconds, don't
+    // always come back exactly as they were
+    private static final float READING_TOLERANCE = 0.001f;
+
     public static final Leg EMPTY_LEG = new Leg(0, 0, 0);
 
     public Leg(float distance, float azimuth, float inclination) {
@@ -148,6 +152,17 @@ public class Leg extends SurveyComponent {
     public Leg toRecordedReading() {
         Leg recorded = wasShotBackwards ? reverse() : this;
         return recorded.toSplay();
+    }
+
+    /**
+     * Whether this leg has the same distance, azimuth and inclination as another, to within
+     * rounding. Nothing else is compared: not the stations, the shots or the direction it was shot
+     * in.
+     */
+    public boolean hasEquivalentReadings(Leg other) {
+        return Math.abs(distance - other.distance) < READING_TOLERANCE
+                && Math.abs(azimuth - other.azimuth) < READING_TOLERANCE
+                && Math.abs(inclination - other.inclination) < READING_TOLERANCE;
     }
 
     public Leg reverse() {

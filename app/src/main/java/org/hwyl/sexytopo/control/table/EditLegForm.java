@@ -7,8 +7,11 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
+import androidx.annotation.Nullable;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
+import java.util.Locale;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.InputMode;
@@ -96,6 +99,11 @@ public class EditLegForm extends Form {
     // Shown for splays only
     private CheckBox toWallCheckBox;
     private CheckBox enabledCheckBox;
+
+    private TextView shotsWarning;
+
+    // The readings the fields were filled with, rounded for display, if editing a leg
+    @Nullable private Leg shownReadings;
 
     private boolean isInitialising;
 
@@ -195,6 +203,7 @@ public class EditLegForm extends Form {
         this.inclinationMinutesField = dialogView.findViewById(R.id.editInclinationMinutes);
         this.inclinationSecondsField = dialogView.findViewById(R.id.editInclinationSeconds);
         this.inputModeSpinner = dialogView.findViewById(R.id.inputModeSpinner);
+        this.shotsWarning = dialogView.findViewById(R.id.shotsWarning);
 
         // Set up validation listeners
         this.fromStationField.addTextChangedListener(new TextViewValidationTrigger(this));
@@ -309,6 +318,29 @@ public class EditLegForm extends Form {
         validateDistance();
         validateAzimuth();
         validateInclination();
+
+        updateShotsWarning();
+    }
+
+    /** Warns that a leg averaged from several shots will lose them if its readings are changed. */
+    private void updateShotsWarning() {
+        boolean hasShots = !isSplay && originalLeg != null && originalLeg.wasPromoted();
+        if (!hasShots) {
+            return;
+        }
+        Leg entered = getEnteredReadings();
+        boolean losesShots = entered == null || !isUnchanged(shownReadings, entered);
+        shotsWarning.setVisibility(losesShots ? View.VISIBLE : View.GONE);
+    }
+
+    /** The readings entered, as taken, or null if they can't be read, such as a blank field. */
+    @Nullable
+    private Leg getEnteredReadings() {
+        try {
+            return new Leg(getDistance(), getAzimuth(), getInclination());
+        } catch (IllegalArgumentException exception) {
+            return null;
+        }
     }
 
     private Station validateGraphFromField(EditText fromField) {
@@ -803,15 +835,52 @@ public class EditLegForm extends Form {
     }
 
     /**
+     * Fills the reading fields with a leg's readings, as taken, to the same number of decimal
+     * places as the table.
+     */
+    public void showReadings(Leg asTaken) {
+        distanceField.setText(formatReading("%.3f", asTaken.getDistance()));
+
+        if (GeneralPreferences.isDegMinsSecsModeOn()) {
+            float[] azimuthDms = Leg.decomposeToDms(asTaken.getAzimuth());
+            azimuthDegreesField.setText(Integer.toString((int) azimuthDms[0]));
+            azimuthMinutesField.setText(Integer.toString((int) azimuthDms[1]));
+            azimuthSecondsField.setText(Float.toString(azimuthDms[2]));
+        } else {
+            azimuthField.setText(formatReading("%.2f", asTaken.getAzimuth()));
+        }
+
+        if (GeneralPreferences.isIncDegMinsSecsModeOn()) {
+            float[] inclinationDms = Leg.decomposeToDms(asTaken.getInclination());
+            inclinationDegreesField.setText(Integer.toString((int) inclinationDms[0]));
+            inclinationMinutesField.setText(Integer.toString((int) inclinationDms[1]));
+            inclinationSecondsField.setText(Float.toString(inclinationDms[2]));
+        } else {
+            inclinationField.setText(formatReading("%.2f", asTaken.getInclination()));
+        }
+
+        shownReadings = getEnteredReadings();
+        validate();
+    }
+
+    /** Fields are parsed with a full stop as the decimal point, whatever the locale. */
+    private static String formatReading(String format, float reading) {
+        return String.format(Locale.ROOT, format, reading);
+    }
+
+    /**
      * Create a Leg object from the form data with measurements and shot direction. For editing:
      * preserves the existing destination station object. For adding: creates a splay-like leg
      * (caller must create destination and reconstruct). Should only be called after validation
      * passes.
      */
     public Leg getUpdatedLeg() {
-        float distance = getDistance();
-        float azimuth = getAzimuth();
-        float inclination = getInclination();
+        Leg entered = new Leg(getDistance(), getAzimuth(), getInclination());
+        boolean unchanged = originalLeg != null && isUnchanged(shownReadings, entered);
+        Leg readings = unchanged ? originalLeg.toRecordedReading() : entered;
+        float distance = readings.getDistance();
+        float azimuth = readings.getAzimuth();
+        float inclination = readings.getInclination();
 
         Leg leg;
         if (isSplay) {
@@ -825,7 +894,8 @@ public class EditLegForm extends Form {
         } else if (originalLeg != null && originalLeg.hasDestination()) {
             // For editing: reuse existing destination station object
             Station destination = originalLeg.getDestination();
-            leg = new Leg(distance, azimuth, inclination, destination, new Leg[] {});
+            Leg[] shots = unchanged ? originalLeg.getPromotedFrom() : new Leg[] {};
+            leg = new Leg(distance, azimuth, inclination, destination, shots);
         } else {
             // For adding a new station: create a temporary splay-like leg
             // Caller will reconstruct with proper destination station
@@ -841,6 +911,15 @@ public class EditLegForm extends Form {
                 .setMessage(messageId)
                 .setPositiveButton(R.string.ok, null)
                 .show();
+    }
+
+    /**
+     * Whether the readings entered are still the ones the fields were filled with. If so, the leg
+     * keeps its own readings, which would otherwise be rounded to what was shown, and the shots it
+     * was averaged from, which wouldn't match changed readings.
+     */
+    static boolean isUnchanged(@Nullable Leg shown, Leg entered) {
+        return shown != null && entered.hasEquivalentReadings(shown);
     }
 
     /**

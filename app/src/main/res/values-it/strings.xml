@@ -239,6 +239,7 @@
     <string name="manual_edit_shot_backwards">⬅ Lettura all\'indietro</string>
     <string name="manual_edit_station_comment">Commento della stazione</string>
     <string name="manual_edit_leg_comment">Commento del tratto</string>
+    <string name="manual_edit_shots_warning">Modificando manualmente le letture verranno scartate le misure di cui questo tratto è la media</string>
     <string name="manual_rename_station_title">Rinomina Stazione</string>
     <string name="manual_rename_station_hint">Nome stazione</string>
     <string name="manual_rename_error">Rinomina fallita</string>

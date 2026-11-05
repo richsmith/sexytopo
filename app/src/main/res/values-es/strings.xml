@@ -239,6 +239,7 @@
     <string name="manual_edit_shot_backwards">⬅ Lectura hacia atrás</string>
     <string name="manual_edit_station_comment">Comentario de la estación</string>
     <string name="manual_edit_leg_comment">Comentario del tramo</string>
+    <string name="manual_edit_shots_warning">Al cambiar manualmente las lecturas se descartarán los disparos de los que se promedió este tramo</string>
     <string name="manual_rename_station_title">Renombrar Estación</string>
     <string name="manual_rename_station_hint">Nombre de estación</string>
     <string name="manual_rename_error">Renombrado fallido</string>
