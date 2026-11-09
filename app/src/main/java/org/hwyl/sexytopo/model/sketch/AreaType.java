@@ -176,6 +176,9 @@ public enum AreaType {
         }
     }
 
+    /** The opacity of the outline of an area with no defined edge, from 0 to 1. */
+    public static final float LIGHT_OUTLINE_OPACITY = 0.5f;
+
     private static final AreaType DEFAULT = WATER;
 
     private final int stringId;
@@ -215,6 +218,16 @@ public enum AreaType {
     }
 
     public boolean isWater() {
+        return isWater;
+    }
+
+    /**
+     * Whether the area's edge is a real feature, drawn at full line weight: the shoreline of water.
+     * Other areas are deposits with no sharp edge, so their outline is drawn lightly (thin, and
+     * faded to LIGHT_OUTLINE_OPACITY), to show their extent without competing with walls and other
+     * lines.
+     */
+    public boolean hasDefinedEdge() {
         return isWater;
     }
 

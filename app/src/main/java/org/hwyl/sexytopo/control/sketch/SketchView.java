@@ -2400,8 +2400,13 @@ public class SketchView extends View {
             canvas.drawPath(outline, areaFillPaint);
 
             areaPaint.setColor(colour.intValue);
-            areaPaint.setAlpha(alpha);
-            areaPaint.setStrokeWidth(drawPaint.getStrokeWidth());
+            if (areaDetail.getAreaType().hasDefinedEdge()) {
+                areaPaint.setAlpha(alpha);
+                areaPaint.setStrokeWidth(drawPaint.getStrokeWidth());
+            } else {
+                areaPaint.setAlpha(Math.round(alpha * AreaType.LIGHT_OUTLINE_OPACITY));
+                areaPaint.setStrokeWidth(dpToPixels(AreaType.Fill.STROKE_WIDTH_DP));
+            }
             canvas.drawPath(outline, areaPaint);
         }
     }

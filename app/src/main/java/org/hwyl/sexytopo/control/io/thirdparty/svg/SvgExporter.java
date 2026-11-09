@@ -813,7 +813,7 @@ public class SvgExporter extends DoubleSketchFileExporter {
             throws IOException {
 
         double unit = AreaType.Fill.METRES_PER_DP * scale;
-        int strokeWidth = Math.max(1, GeneralPreferences.getExportSvgStrokeWidth() / 2);
+        int strokeWidth = getAreaLightStrokeWidth();
 
         xmlSerializer.startTag("", "defs");
         for (Map.Entry<String, AreaDetail> entry : patterns.entrySet()) {
@@ -877,6 +877,11 @@ public class SvgExporter extends DoubleSketchFileExporter {
         xmlSerializer.endTag("", tag);
     }
 
+    /** The stroke width of fill marks, and of the outlines of areas with no defined edge. */
+    private static int getAreaLightStrokeWidth() {
+        return Math.max(1, GeneralPreferences.getExportSvgStrokeWidth() / 2);
+    }
+
     private static String getAreaFillPatternId(AreaDetail areaDetail) {
         return "area-"
                 + areaDetail.getAreaType().getTherionName()
@@ -890,7 +895,13 @@ public class SvgExporter extends DoubleSketchFileExporter {
      */
     private static void writeAreaDetail(
             XmlSerializer xmlSerializer, AreaDetail areaDetail, int scale) throws IOException {
-        Integer strokeWidth = GeneralPreferences.getExportSvgStrokeWidth();
+        // as on screen, only a real edge (a shoreline) gets a full-weight outline; others are
+        // thin and faded
+        boolean hasDefinedEdge = areaDetail.getAreaType().hasDefinedEdge();
+        Integer strokeWidth =
+                hasDefinedEdge
+                        ? GeneralPreferences.getExportSvgStrokeWidth()
+                        : getAreaLightStrokeWidth();
         String colour = getSvgColour(areaDetail);
         String patternId = getAreaFillPatternId(areaDetail);
         xmlSerializer.startTag(null, "path");
@@ -898,6 +909,10 @@ public class SvgExporter extends DoubleSketchFileExporter {
         xmlSerializer.attribute(null, "fill-rule", "evenodd");
         xmlSerializer.attribute(null, "stroke", colour);
         xmlSerializer.attribute(null, "stroke-width", strokeWidth.toString());
+        if (!hasDefinedEdge) {
+            xmlSerializer.attribute(
+                    null, "stroke-opacity", Float.toString(AreaType.LIGHT_OUTLINE_OPACITY));
+        }
         xmlSerializer.attribute(null, "fill", "url(#" + patternId + ")");
         xmlSerializer.endTag(null, "path");
     }

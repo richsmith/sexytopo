@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
@@ -132,6 +133,52 @@ public class SvgExporterAreaTest {
         String debris = getPattern(content, "area-debris-black");
         Assert.assertEquals(
                 AreaType.DEBRIS.getFill().getMarks().size(), countOccurrences(debris, "<polygon"));
+    }
+
+    @Test
+    public void testOnlyWaterGetsAFullWeightOutline() throws Exception {
+        GeneralPreferences.getRawPreferences()
+                .edit()
+                .putInt("pref_export_svg_stroke_width", 4)
+                .commit();
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        survey.getPlanSketch()
+                .setAreaDetails(
+                        Arrays.asList(
+                                rectangleArea(1, AreaType.WATER, Colour.BLUE),
+                                rectangleArea(10, AreaType.SAND, Colour.BLACK)));
+
+        String content = new SvgExporter().getContent(survey, Projection2D.PLAN);
+
+        Assert.assertEquals("4", getAreaAttribute(content, "area-water-blue", "stroke-width"));
+        Assert.assertEquals("2", getAreaAttribute(content, "area-sand-black", "stroke-width"));
+    }
+
+    @Test
+    public void testOnlyAreasWithoutADefinedEdgeHaveFadedOutlines() throws Exception {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        survey.getPlanSketch()
+                .setAreaDetails(
+                        Arrays.asList(
+                                rectangleArea(1, AreaType.WATER, Colour.BLUE),
+                                rectangleArea(10, AreaType.SAND, Colour.BLACK)));
+
+        String content = new SvgExporter().getContent(survey, Projection2D.PLAN);
+
+        Assert.assertNull(getAreaAttribute(content, "area-water-blue", "stroke-opacity"));
+        Assert.assertEquals(
+                Float.toString(AreaType.LIGHT_OUTLINE_OPACITY),
+                getAreaAttribute(content, "area-sand-black", "stroke-opacity"));
+    }
+
+    /** An attribute of the area path filled with the given pattern, or null if it has none. */
+    private static String getAreaAttribute(String content, String patternId, String attribute) {
+        int fillIndex = content.indexOf("fill=\"url(#" + patternId + ")\"");
+        Assert.assertTrue("no area filled with " + patternId, fillIndex >= 0);
+        int start = content.lastIndexOf("<path", fillIndex);
+        String path = content.substring(start, content.indexOf(">", fillIndex));
+        Matcher matcher = Pattern.compile(" " + attribute + "=\"([^\"]*)\"").matcher(path);
+        return matcher.find() ? matcher.group(1) : null;
     }
 
     @Test
