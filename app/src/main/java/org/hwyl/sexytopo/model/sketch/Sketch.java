@@ -146,9 +146,10 @@ public class Sketch extends Shape {
      * existing areas of the same type and colour, they are all merged into one (as a single
      * undoable operation).
      *
-     * <p>A stroke that crosses itself is resolved to its outer edge, so an accidental overshoot
-     * where the outline closes doesn't leave a stray hole behind. Such a stroke can also enclose
-     * two separate lobes, in which case each becomes its own area.
+     * <p>If the stroke carries on past where it started, the overshoot is trimmed off so the ends
+     * join cleanly. Any other crossing is resolved to the stroke's outer edge, so it doesn't leave
+     * a stray hole behind. Such a stroke can also enclose two separate lobes, in which case each
+     * becomes its own area.
      *
      * <p>Anything enclosing less than minimumArea (in square metres) is discarded, so a stray tap
      * or a tiny lobe doesn't leave a speck of an area behind.
@@ -161,7 +162,8 @@ public class Sketch extends Shape {
         abandonActivePath();
 
         float epsilon = Space2DUtils.simplificationEpsilon(outlinePath);
-        List<Coord2D> outline = Space2DUtils.simplify(outlinePath.getPath(), epsilon);
+        List<Coord2D> stroke = PolygonUtils.trimOvershoot(outlinePath.getPath());
+        List<Coord2D> outline = Space2DUtils.simplify(stroke, epsilon);
         if (outline.size() < 3) {
             return; // too small to form a polygon; treat as an accidental tap
         }

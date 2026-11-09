@@ -30,6 +30,80 @@ public class PolygonUtilsTest {
                         new Coord2D(left, top + height)));
     }
 
+    private static Coord2D point(float x, float y) {
+        return new Coord2D(x, y);
+    }
+
+    @Test
+    public void testTrimOvershootCutsStrokeAtTheCrossing() {
+        // round a 10x10 square from (2,0), carrying on past the start and out below it
+        List<Coord2D> stroke =
+                Arrays.asList(
+                        point(2, 0),
+                        point(10, 0),
+                        point(10, 10),
+                        point(0, 10),
+                        point(0, 0),
+                        point(3, 1),
+                        point(5, -1));
+
+        List<Coord2D> trimmed = PolygonUtils.trimOvershoot(stroke);
+
+        // the overshoot (3,1)-(5,-1) crosses the opening segment at (4,0); everything outside
+        // that is cut off
+        Assert.assertEquals(6, trimmed.size());
+        Assert.assertEquals(4, trimmed.get(0).x, 1e-4);
+        Assert.assertEquals(0, trimmed.get(0).y, 1e-4);
+        Assert.assertEquals(point(10, 0), trimmed.get(1));
+        Assert.assertEquals(point(3, 1), trimmed.get(5));
+    }
+
+    @Test
+    public void testTrimOvershootDropsLeadIn() {
+        // starts outside the shape, so the start is a lead-in the closing stretch cuts across
+        List<Coord2D> stroke =
+                Arrays.asList(
+                        point(5, -2),
+                        point(5, 1),
+                        point(10, 1),
+                        point(10, 10),
+                        point(0, 10),
+                        point(0, 0),
+                        point(8, 0));
+
+        List<Coord2D> trimmed = PolygonUtils.trimOvershoot(stroke);
+
+        // the closing segment (0,0)-(8,0) crosses the lead-in (5,-2)-(5,1) at (5,0)
+        Assert.assertEquals(point(5, 0), trimmed.get(0));
+        Assert.assertEquals(point(5, 1), trimmed.get(1));
+        Assert.assertEquals(point(0, 0), trimmed.get(trimmed.size() - 1));
+    }
+
+    @Test
+    public void testTrimOvershootLeavesAStrokeThatFallsShortAlone() {
+        List<Coord2D> stroke =
+                Arrays.asList(point(1, 0), point(10, 0), point(10, 10), point(0, 10), point(0, 1));
+
+        Assert.assertSame(stroke, PolygonUtils.trimOvershoot(stroke));
+    }
+
+    @Test
+    public void testTrimOvershootIgnoresCrossingsAwayFromTheEnds() {
+        // a figure of eight (a lemniscate) started at one end, so it crosses itself a quarter
+        // and three quarters of the way along; stops just short of closing
+        List<Coord2D> stroke = new ArrayList<>();
+        for (int i = 0; i < 95; i++) {
+            double t = 2 * Math.PI * i / 100;
+            double scale = 10 / (1 + Math.sin(t) * Math.sin(t));
+            stroke.add(
+                    point(
+                            (float) (scale * Math.cos(t)),
+                            (float) (scale * Math.sin(t) * Math.cos(t))));
+        }
+
+        Assert.assertSame(stroke, PolygonUtils.trimOvershoot(stroke));
+    }
+
     @Test
     public void testAreaOfRectangle() {
         Assert.assertEquals(12, PolygonUtils.area(rectangle(1, 2, 3, 4)), 1e-6);

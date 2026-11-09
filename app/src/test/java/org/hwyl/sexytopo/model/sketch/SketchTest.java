@@ -242,6 +242,23 @@ public class SketchTest {
     }
 
     @Test
+    public void testFinishAreaTrimsOvershootWhereTheEndsMeet() {
+        Sketch sketch = new Sketch();
+        sketch.startNewArea(new Coord2D(2, 0), AreaType.WATER);
+        sketch.getActivePath().lineTo(new Coord2D(10, 0));
+        sketch.getActivePath().lineTo(new Coord2D(10, 10));
+        sketch.getActivePath().lineTo(new Coord2D(0, 10));
+        sketch.getActivePath().lineTo(new Coord2D(0, 0));
+        sketch.getActivePath().lineTo(new Coord2D(3, 1));
+        sketch.getActivePath().lineTo(new Coord2D(5, -1)); // overshoots below the start
+        sketch.finishArea(AreaType.WATER, 0);
+
+        AreaDetail area = sketch.getAreaDetails().get(0);
+        // nothing of the overshoot is left poking out below the square
+        Assert.assertTrue(area.getOutline().stream().allMatch(point -> point.y >= -1e-4));
+    }
+
+    @Test
     public void testFinishAreaDiscardsAreaBelowMinimumSize() {
         Sketch sketch = new Sketch();
         sketch.startNewArea(new Coord2D(0, 0), AreaType.WATER);

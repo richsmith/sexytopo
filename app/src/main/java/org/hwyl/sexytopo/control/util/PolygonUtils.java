@@ -25,6 +25,11 @@ public class PolygonUtils {
     private static final float MAX_SAMPLE_STEP = 0.5f;
     private static final int TARGET_SAMPLES_PER_CONTOUR = 200;
 
+    // how far along the stroke, from either end, to look for the crossing that closes it, as a
+    // fraction of the stroke's length. Kept well short of a quarter: a figure of eight started at
+    // one end crosses itself a quarter of the way along, and must not lose a lobe.
+    private static final double OVERSHOOT_SEARCH_FRACTION = 0.15;
+
     /**
      * A filled region: an outline contour, plus zero or more holes lying within it. This is the
      * geometric counterpart of AreaDetail, without the sketch-level concerns of colour and type.
@@ -100,6 +105,94 @@ public class PolygonUtils {
             return null;
         }
         return extractRegions(result);
+    }
+
+    /**
+     * Trim the overshoot from a stroke sketched as the outline of an area.
+     *
+     * <p>To be sure of closing an outline, people tend to carry on past where they started, so the
+     * end of the stroke crosses its beginning. Closed as drawn, the stretch beyond the crossing
+     * (and any lead-in before it) would enclose a little flap outside the shape, which survives as
+     * a jagged spike or notch where the ends meet. Instead, the stroke is cut at the crossing and
+     * joined there.
+     *
+     * <p>Only crossings between the stroke's opening and closing stretches count, so a deliberate
+     * figure of eight further round is left alone. If there are several (a scribbled join), the one
+     * that keeps the most of the stroke is used. A stroke whose ends don't cross is returned
+     * unchanged, to be closed with a straight line as usual.
+     */
+    public static List<Coord2D> trimOvershoot(List<Coord2D> stroke) {
+        int size = stroke.size();
+        if (size < 4) {
+            return stroke;
+        }
+
+        double[] distanceAlong = new double[size];
+        for (int i = 1; i < size; i++) {
+            Coord2D a = stroke.get(i - 1);
+            Coord2D b = stroke.get(i);
+            distanceAlong[i] = distanceAlong[i - 1] + Math.hypot(b.x - a.x, b.y - a.y);
+        }
+        double length = distanceAlong[size - 1];
+        double window = length * OVERSHOOT_SEARCH_FRACTION;
+
+        // segment i runs from point i to point i + 1
+        int bestHead = -1;
+        int bestTail = -1;
+        Coord2D bestCrossing = null;
+        double bestKept = -1;
+        for (int head = 0; head < size - 1 && distanceAlong[head] <= window; head++) {
+            for (int tail = size - 2; tail > head + 1; tail--) {
+                if (distanceAlong[tail + 1] < length - window) {
+                    break;
+                }
+                Coord2D crossing =
+                        segmentIntersection(
+                                stroke.get(head),
+                                stroke.get(head + 1),
+                                stroke.get(tail),
+                                stroke.get(tail + 1));
+                if (crossing == null) {
+                    continue;
+                }
+                double kept = distanceAlong[tail] - distanceAlong[head + 1];
+                if (kept > bestKept) {
+                    bestKept = kept;
+                    bestHead = head;
+                    bestTail = tail;
+                    bestCrossing = crossing;
+                }
+            }
+        }
+
+        if (bestCrossing == null) {
+            return stroke;
+        }
+
+        List<Coord2D> trimmed = new ArrayList<>();
+        trimmed.add(bestCrossing);
+        trimmed.addAll(stroke.subList(bestHead + 1, bestTail + 1));
+        return trimmed;
+    }
+
+    /** Where segments ab and cd cross, or null if they don't. */
+    private static Coord2D segmentIntersection(Coord2D a, Coord2D b, Coord2D c, Coord2D d) {
+        double abX = b.x - a.x;
+        double abY = b.y - a.y;
+        double cdX = d.x - c.x;
+        double cdY = d.y - c.y;
+        double denominator = abX * cdY - abY * cdX;
+        if (denominator == 0) {
+            return null; // parallel
+        }
+        double acX = c.x - a.x;
+        double acY = c.y - a.y;
+        double t = (acX * cdY - acY * cdX) / denominator;
+        double u = (acX * abY - acY * abX) / denominator;
+        if (t < 0 || t > 1 || u < 0 || u > 1) {
+            return null;
+        }
+        return new Coord2D((float) (a.x + t * abX), (float) (a.y + t * abY));
     }
 
     /**
