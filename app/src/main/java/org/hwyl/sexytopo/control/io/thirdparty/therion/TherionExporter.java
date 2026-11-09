@@ -225,10 +225,12 @@ public class TherionExporter extends Exporter {
         CheckBox stationsInEeCheckbox = dialogView.findViewById(R.id.stationsInEeCheckbox);
         CheckBox crossSectionsCheckbox = dialogView.findViewById(R.id.therionCrossSectionsCheckbox);
         CheckBox symbolsCheckbox = dialogView.findViewById(R.id.therionSymbolsCheckbox);
+        CheckBox linesCheckbox = dialogView.findViewById(R.id.therionLinesCheckbox);
         CheckBox textCheckbox = dialogView.findViewById(R.id.therionTextCheckbox);
 
         crossSectionsCheckbox.setChecked(GeneralPreferences.isTherionCrossSectionsEnabled());
         symbolsCheckbox.setChecked(GeneralPreferences.isXviExportSymbolsEnabled());
+        linesCheckbox.setChecked(GeneralPreferences.isTherionLineExportEnabled());
         textCheckbox.setChecked(GeneralPreferences.isXviExportTextEnabled());
 
         new MaterialAlertDialogBuilder(context)
@@ -248,6 +250,7 @@ public class TherionExporter extends Exporter {
                             saveOptions(
                                     crossSectionsCheckbox.isChecked(),
                                     symbolsCheckbox.isChecked(),
+                                    linesCheckbox.isChecked(),
                                     textCheckbox.isChecked());
                             onReady.run();
                         })
@@ -255,7 +258,8 @@ public class TherionExporter extends Exporter {
                 .show();
     }
 
-    private static void saveOptions(boolean crossSections, boolean symbols, boolean text) {
+    private static void saveOptions(
+            boolean crossSections, boolean symbols, boolean lines, boolean text) {
         SharedPreferences prefs = GeneralPreferences.getRawPreferences();
         if (prefs == null) {
             return;
@@ -263,6 +267,7 @@ public class TherionExporter extends Exporter {
         prefs.edit()
                 .putBoolean("pref_therion_cross_sections", crossSections)
                 .putBoolean("pref_therion_export_symbols", symbols)
+                .putBoolean("pref_therion_export_lines", lines)
                 .putBoolean("pref_therion_export_text", text)
                 .apply();
     }

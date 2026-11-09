@@ -83,6 +83,13 @@
             android:text="@string/settings_export_therion_symbols_title" />
 
         <CheckBox
+            android:id="@+id/therionLinesCheckbox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/settings_export_therion_lines_title" />
+
+        <CheckBox
             android:id="@+id/therionTextCheckbox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
