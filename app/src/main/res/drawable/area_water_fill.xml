@@ -1,0 +1,15 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="40dp"
+    android:viewportWidth="40"
+    android:viewportHeight="40">
+  <!-- Horizontal hatching filling the square: the area's fill pattern (see
+       AreaType) for the toolbar of area types. -->
+  <path
+      android:strokeWidth="2"
+      android:pathData="M0,3 L6,3 M0,9 L6,9 M0,15 L6,15 M0,21 L6,21 M0,27 L6,27 M0,33 L6,33 M0,39 L6,39 M6,3 L12,3 M6,9 L12,9 M6,15 L12,15 M6,21 L12,21 M6,27 L12,27 M6,33 L12,33 M6,39 L12,39 M12,3 L18,3 M12,9 L18,9 M12,15 L18,15 M12,21 L18,21 M12,27 L18,27 M12,33 L18,33 M12,39 L18,39 M18,3 L24,3 M18,9 L24,9 M18,15 L24,15 M18,21 L24,21 M18,27 L24,27 M18,33 L24,33 M18,39 L24,39 M24,3 L30,3 M24,9 L30,9 M24,15 L30,15 M24,21 L30,21 M24,27 L30,27 M24,33 L30,33 M24,39 L30,39 M30,3 L36,3 M30,9 L36,9 M30,15 L36,15 M30,21 L36,21 M30,27 L36,27 M30,33 L36,33 M30,39 L36,39 M36,3 L42,3 M36,9 L42,9 M36,15 L42,15 M36,21 L42,21 M36,27 L42,27 M36,33 L42,33 M36,39 L42,39"
+      android:fillColor="#00000000"
+      android:strokeColor="#000"
+      android:strokeLineCap="round"
+      android:strokeLineJoin="round"/>
+</vector>

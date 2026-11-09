@@ -19,6 +19,7 @@ public enum AreaType {
     WATER(
             R.string.area_type_water,
             R.drawable.area_water,
+            R.drawable.area_water_fill,
             "water",
             true,
             new Fill(8, Mark.line(0, 4, 8, 4))),
@@ -26,12 +27,14 @@ public enum AreaType {
     SUMP(
             R.string.area_type_sump,
             R.drawable.area_sump,
+            R.drawable.area_sump_fill,
             "sump",
             true,
             new Fill(8, Mark.line(0, 4, 8, 4), Mark.line(4, 0, 4, 8))),
     SAND(
             R.string.area_type_sand,
             R.drawable.area_sand,
+            R.drawable.area_sand_fill,
             "sand",
             false,
             new Fill(
@@ -48,6 +51,7 @@ public enum AreaType {
     CLAY(
             R.string.area_type_clay,
             R.drawable.area_clay,
+            R.drawable.area_clay_fill,
             "clay",
             false,
             new Fill(
@@ -60,6 +64,7 @@ public enum AreaType {
     PEBBLES(
             R.string.area_type_pebbles,
             R.drawable.area_pebbles,
+            R.drawable.area_pebbles_fill,
             "pebbles",
             false,
             new Fill(
@@ -74,6 +79,7 @@ public enum AreaType {
     DEBRIS(
             R.string.area_type_debris,
             R.drawable.area_debris,
+            R.drawable.area_debris_fill,
             "debris",
             false,
             new Fill(
@@ -87,6 +93,7 @@ public enum AreaType {
     BLOCKS(
             R.string.area_type_blocks,
             R.drawable.area_blocks,
+            R.drawable.area_blocks_fill,
             "blocks",
             false,
             new Fill(
@@ -183,14 +190,22 @@ public enum AreaType {
 
     private final int stringId;
     private final int drawableId;
+    private final int fillDrawableId;
     private final String therionName;
     private final boolean isWater;
     private final Fill fill;
     private final int viewId;
 
-    AreaType(int stringId, int drawableId, String therionName, boolean isWater, Fill fill) {
+    AreaType(
+            int stringId,
+            int drawableId,
+            int fillDrawableId,
+            String therionName,
+            boolean isWater,
+            Fill fill) {
         this.stringId = stringId;
         this.drawableId = drawableId;
+        this.fillDrawableId = fillDrawableId;
         this.therionName = therionName;
         this.isWater = isWater;
         this.fill = fill;
@@ -205,8 +220,18 @@ public enum AreaType {
         return stringId;
     }
 
+    /**
+     * The type's icon for the area tool button: its fill pattern clipped to a pool shape. The
+     * pool's outline is a separate drawable, area_outline, so that it stays black when the icon is
+     * tinted.
+     */
     public int getDrawableId() {
         return drawableId;
+    }
+
+    /** The type's fill pattern alone, filling a square, for the area type toolbar. */
+    public int getFillDrawableId() {
+        return fillDrawableId;
     }
 
     public int getButtonViewId() {

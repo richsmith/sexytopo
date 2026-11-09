@@ -273,6 +273,7 @@
                 android:layout_margin="0dp"
                 android:layout_marginTop="-4dp"
                 android:contentDescription="@string/sketch_toolbar_area"
+                android:padding="8dp"
                 android:cropToPadding="false"
                 android:hapticFeedbackEnabled="true"
                 android:scaleType="fitCenter"

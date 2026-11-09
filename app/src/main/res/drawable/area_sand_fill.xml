@@ -1,0 +1,14 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="40dp"
+    android:viewportWidth="40"
+    android:viewportHeight="40">
+  <!-- A scatter of dots filling the square: the area's fill pattern (see
+       AreaType) for the toolbar of area types. -->
+  <path
+      android:strokeWidth="2.6"
+      android:pathData="M-1.1,-1.1h0m0,12h0m0,12h0m0,12h0m3,-32.7h0m0,7.9h0m0,4.1h0m0,7.9h0m0,4.1h0m0,7.9h0m0,4.1h0m2.6,-31.8h0m0,12h0m0,12h0m1.1,-31.3h0m0,12h0m0,12h0m0,12h0m1.2,-33.7h0m0,11.9h0m0,12.1h0m0,12h0m1.4,-28.4h0m0,12h0m0,12h0m1.9,-28.1h0m0,12h0m0,12h0m0,12h0m0.8,-42h0m0,12h0m0,12h0m0,12h0m3,-32.7h0m0,7.9h0m0,4.1h0m0,7.9h0m0,4.1h0m0,7.9h0m0,4.1h0m2.6,-31.8h0m0,12h0m0,12h0m1.1,-31.3h0m0,12h0m0,12h0m0,12h0m1.2,-33.7h0m0,11.9h0m0,12.1h0m0,12h0m1.4,-28.4h0m0,12h0m0,12h0m1.9,-28.1h0m0,12h0m0,12h0m0,12h0m0.8,-42h0m0,12h0m0,12h0m0,12h0m3,-32.7h0m0,7.9h0m0,4.1h0m0,7.9h0m0,4.1h0m0,7.9h0m0,4.1h0m2.6,-31.8h0m0,12h0m0,12h0m1.1,-31.3h0m0,12h0m0,12h0m0,12h0m1.2,-33.7h0m0,11.9h0m0,12.1h0m0,12h0m1.4,-28.4h0m0,12h0m0,12h0m1.9,-28.1h0m0,12h0m0,12h0m0,12h0m0.8,-42h0m0,12h0m0,12h0m0,12h0m3,-32.7h0m0,7.9h0m0,4.1h0m0,7.9h0m0,4.1h0m0,7.9h0m0,4.1h0m2.6,-31.8h0m0,12h0m0,12h0"
+      android:fillColor="#00000000"
+      android:strokeColor="#000"
+      android:strokeLineCap="round"/>
+</vector>

@@ -1,0 +1,15 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="40dp"
+    android:viewportWidth="40"
+    android:viewportHeight="40">
+  <!-- Larger angular blocks filling the square: the area's fill pattern (see
+       AreaType) for the toolbar of area types. -->
+  <path
+      android:strokeWidth="1.5"
+      android:pathData="M1.65,2.75 L8.25,1.1 L9.9,6.6 L3.3,8.8 Z M12.65,2.2 L19.25,3.85 L18.15,9.35 L12.1,8.25 Z M4.4,12.1 L11,11 L12.1,18.15 L5.5,19.8 L2.75,15.95 Z M14.85,12.65 L20.35,13.75 L19.25,19.8 L14.3,18.15 Z M1.65,24.75 L8.25,23.1 L9.9,28.6 L3.3,30.8 Z M12.65,24.2 L19.25,25.85 L18.15,31.35 L12.1,30.25 Z M4.4,34.1 L11,33 L12.1,40.15 L5.5,41.8 L2.75,37.95 Z M14.85,34.65 L20.35,35.75 L19.25,41.8 L14.3,40.15 Z M23.65,2.75 L30.25,1.1 L31.9,6.6 L25.3,8.8 Z M34.65,2.2 L41.25,3.85 L40.15,9.35 L34.1,8.25 Z M26.4,12.1 L33,11 L34.1,18.15 L27.5,19.8 L24.75,15.95 Z M36.85,12.65 L42.35,13.75 L41.25,19.8 L36.3,18.15 Z M23.65,24.75 L30.25,23.1 L31.9,28.6 L25.3,30.8 Z M34.65,24.2 L41.25,25.85 L40.15,31.35 L34.1,30.25 Z M26.4,34.1 L33,33 L34.1,40.15 L27.5,41.8 L24.75,37.95 Z M36.85,34.65 L42.35,35.75 L41.25,41.8 L36.3,40.15 Z"
+      android:fillColor="#00000000"
+      android:strokeColor="#000"
+      android:strokeLineCap="round"
+      android:strokeLineJoin="round"/>
+</vector>

@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.ShapeDrawable;
@@ -400,6 +401,9 @@ public abstract class SketchActivity extends SurveyEditorActivity
             return true;
         } else if (itemId == R.id.buttonBlueWater) {
             SketchPreferences.Toggle.BLUE_WATER.set(!item.isChecked());
+            // the water area icons follow the setting
+            initialiseAreaTypeToolbar();
+            selectAreaType(SketchPreferences.getSelectedAreaType());
             return true;
         } else if (itemId == R.id.buttonPinchToZoom) {
             SketchPreferences.Toggle.PINCH_TO_ZOOM.set(!item.isChecked());
@@ -648,7 +652,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
             button.setId(areaType.getButtonViewId());
             button.setLayoutParams(params);
             button.setScaleType(ImageView.ScaleType.FIT_CENTER);
-            button.setImageResource(areaType.getDrawableId());
+            button.setImageDrawable(getAreaTypeIcon(areaType, areaType.getFillDrawableId()));
             button.setContentDescription(getString(areaType.getStringId()));
             TooltipCompat.setTooltipText(button, getString(areaType.getStringId()));
             button.setOnClickListener(this);
@@ -673,9 +677,26 @@ public abstract class SketchActivity extends SurveyEditorActivity
         ImageButton areaButton = findViewById(R.id.buttonArea);
         areaButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
         areaButton.setImageDrawable(
-                addSelectionBorder(AppCompatResources.getDrawable(this, areaType.getDrawableId())));
+                new LayerDrawable(
+                        new Drawable[] {
+                            getAreaTypeIcon(areaType, areaType.getDrawableId()),
+                            AppCompatResources.getDrawable(this, R.drawable.area_outline)
+                        }));
 
         sketchView.setAreaType(areaType);
+    }
+
+    /**
+     * One of an area type's icons, in blue for water types when blue water is on, to match how the
+     * area will be drawn.
+     */
+    private Drawable getAreaTypeIcon(AreaType areaType, int drawableId) {
+        Drawable drawable = AppCompatResources.getDrawable(this, drawableId).mutate();
+        if (areaType.isWater() && SketchPreferences.Toggle.BLUE_WATER.isOn()) {
+            drawable.setColorFilter(
+                    new PorterDuffColorFilter(Colour.BLUE.intValue, PorterDuff.Mode.SRC_IN));
+        }
+        return drawable;
     }
 
     /** Opens or closes one of the pop-up toolbars; opening it closes any other that is open. */

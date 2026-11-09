@@ -141,6 +141,7 @@
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonArea"
+            android:padding="8dp"
             android:hapticFeedbackEnabled="true"
             />
 
