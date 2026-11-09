@@ -68,8 +68,8 @@
             android:icon="@android:drawable/ic_menu_preferences"
             android:checkable="true"/>
         <item
-            android:id="@+id/buttonShowWallInsideTick"
-            android:title="@string/sketch_menu_show_wall_inside_tick"
+            android:id="@+id/buttonShowWallSides"
+            android:title="@string/sketch_menu_show_wall_sides"
             android:icon="@android:drawable/ic_menu_preferences"
             android:checkable="true"/>
         <item

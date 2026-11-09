@@ -387,8 +387,8 @@ public abstract class SketchActivity extends SurveyEditorActivity
             SketchPreferences.Toggle.SHOW_STATION_LABELS.set(!item.isChecked());
             sketchView.invalidate();
             return true;
-        } else if (itemId == R.id.buttonShowWallInsideTick) {
-            SketchPreferences.Toggle.SHOW_WALL_INSIDE_TICK.set(!item.isChecked());
+        } else if (itemId == R.id.buttonShowWallSides) {
+            SketchPreferences.Toggle.SHOW_WALL_SIDES.set(!item.isChecked());
             sketchView.invalidate();
             return true;
         } else if (itemId == R.id.buttonShowConnections) {

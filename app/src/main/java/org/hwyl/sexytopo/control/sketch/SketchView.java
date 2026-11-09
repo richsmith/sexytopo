@@ -2112,7 +2112,8 @@ public class SketchView extends View {
 
         boolean isDebugMode = activity.isDebugMode();
 
-        PathDetail wallPathToMark = findWallPathToMark(sketch);
+        boolean showWallSides = SketchPreferences.Toggle.SHOW_WALL_SIDES.isOn();
+        PathDetail mostRecentWall = findMostRecentWall(sketch);
 
         for (PathDetail pathDetail : sketch.getPathDetails()) {
 
@@ -2122,7 +2123,8 @@ public class SketchView extends View {
 
             if (pathDetail.getLineType() != LineType.SKETCH) {
                 drawTypedPath(canvas, pathDetail, alpha);
-                if (pathDetail == wallPathToMark) {
+                if (pathDetail == mostRecentWall
+                        || (showWallSides && isFinishedWall(sketch, pathDetail))) {
                     drawWallInsideTick(canvas, pathDetail, alpha);
                 }
                 continue;
@@ -2282,19 +2284,14 @@ public class SketchView extends View {
     }
 
     /**
-     * The wall-kind line whose interior-side marker should be shown: the most recently drawn one,
-     * excluding a stroke still in progress (the marker hopping along a growing line is
-     * disconcerting, and orientation isn't decided until the stroke finishes anyway). Ticked types
-     * need no marker — their ornamentation already shows their orientation.
+     * The most recently drawn wall-kind line, whose interior-side marker is always shown so a wrong
+     * auto-orientation guess is visible immediately; the Wall Sides toggle marks the rest too.
      */
-    private PathDetail findWallPathToMark(Sketch sketch) {
-        if (!SketchPreferences.Toggle.SHOW_WALL_INSIDE_TICK.isOn()) {
-            return null;
-        }
+    private static PathDetail findMostRecentWall(Sketch sketch) {
         List<PathDetail> pathDetails = sketch.getPathDetails();
         for (int i = pathDetails.size() - 1; i >= 0; i--) {
             PathDetail candidate = pathDetails.get(i);
-            if (candidate.getLineType().isWall() && candidate != sketch.getActivePath()) {
+            if (isFinishedWall(sketch, candidate)) {
                 return candidate;
             }
         }
@@ -2302,10 +2299,19 @@ public class SketchView extends View {
     }
 
     /**
-     * A slim red arrowhead at the midpoint of the last-drawn wall, pointing to the side SexyTopo
-     * believes is the passage interior. Red and arrow-shaped so it reads as UI feedback rather than
-     * a drawing artefact; it is never exported. If it points the wrong way, Tools -> Flip Last Line
-     * corrects the wall.
+     * Whether a line can carry an interior-side marker: any wall-kind line, excluding a stroke
+     * still in progress (the marker hopping along a growing line is disconcerting, and orientation
+     * isn't decided until the stroke finishes anyway). Ticked types need no marker — their
+     * ornamentation already shows their orientation.
+     */
+    private static boolean isFinishedWall(Sketch sketch, PathDetail pathDetail) {
+        return pathDetail.getLineType().isWall() && pathDetail != sketch.getActivePath();
+    }
+
+    /**
+     * A slim red arrowhead at the midpoint of a wall, pointing to the side SexyTopo believes is the
+     * passage interior. Red and arrow-shaped so it reads as UI feedback rather than a drawing
+     * artefact; it is never exported.
      */
     private void drawWallInsideTick(Canvas canvas, PathDetail pathDetail, int alpha) {
         List<Coord2D> points = pathDetail.getPath();

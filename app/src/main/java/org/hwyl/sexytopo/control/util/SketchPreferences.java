@@ -31,7 +31,7 @@ public class SketchPreferences {
         SHOW_SPLAYS(R.id.buttonShowSplays, true),
         SHOW_SKETCH(R.id.buttonShowSketch, true),
         SHOW_STATION_LABELS(R.id.buttonShowStationLabels, true),
-        SHOW_WALL_INSIDE_TICK(R.id.buttonShowWallInsideTick, true),
+        SHOW_WALL_SIDES(R.id.buttonShowWallSides, false),
         SHOW_X_SECTIONS(R.id.buttonShowXSections, true),
         SHOW_CONNECTIONS(R.id.buttonShowConnections, true),
         SHOW_COMPASS(R.id.buttonShowCompass, true),
