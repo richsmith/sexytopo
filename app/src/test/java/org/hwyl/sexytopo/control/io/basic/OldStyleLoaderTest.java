@@ -1,5 +1,6 @@
 package org.hwyl.sexytopo.control.io.basic;
 
+import org.hwyl.sexytopo.model.survey.LegFilter;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.junit.Test;
 
@@ -20,7 +21,7 @@ public class OldStyleLoaderTest {
         OldStyleLoader.parse(text, survey);
         assert survey.getAllStations().size() == 2;
         assert survey.getOrigin()
-                .getConnectedOnwardLegs()
+                .getOnwardLegs(LegFilter.LEGS)
                 .get(0)
                 .getDestination()
                 .getName()
@@ -42,11 +43,11 @@ public class OldStyleLoaderTest {
         OldStyleLoader.parse(text, survey);
         assert survey.getAllStations().size() == 2;
         assert survey.getOrigin()
-                .getConnectedOnwardLegs()
+                .getOnwardLegs(LegFilter.LEGS)
                 .get(0)
                 .getDestination()
                 .getName()
                 .equals("2");
-        assert survey.getOrigin().getConnectedOnwardLegs().get(0).wasShotBackwards();
+        assert survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0).wasShotBackwards();
     }
 }

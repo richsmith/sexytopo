@@ -1,0 +1,14 @@
+package org.hwyl.sexytopo.model.geometry;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+public class Coord2DTest {
+
+    @Test
+    public void testBasicEquality() {
+        Coord2D origin = Coord2D.ORIGIN;
+        Coord2D zeroes = new Coord2D(0, 0);
+        Assert.assertEquals(origin, zeroes);
+    }
+}

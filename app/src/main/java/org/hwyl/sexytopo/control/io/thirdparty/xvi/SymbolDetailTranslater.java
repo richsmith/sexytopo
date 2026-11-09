@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.hwyl.sexytopo.model.graph.Coord2D;
+import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Symbol;
 import org.hwyl.sexytopo.model.sketch.SymbolDetail;
@@ -162,6 +162,14 @@ public class SymbolDetailTranslater extends SketchDetailTranslater<SymbolDetail>
                 new float[][] {
                     // Simplified arc - 3 lines
                     {5, 26.5f, 12, 20, 20, 17.5f, 28, 20, 35, 26.5f}
+                });
+
+        XVI_PATH_DATA.put(
+                Symbol.FLOWSTONE,
+                new float[][] {
+                    {5, 23.333f, 15, 23.333f}, // Bottom left
+                    {25, 23.333f, 35, 23.333f}, // Bottom right
+                    {15, 16.667f, 25, 16.667f} // Top middle
                 });
 
         // ********** Fluids **********

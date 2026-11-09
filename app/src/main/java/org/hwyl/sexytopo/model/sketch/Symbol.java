@@ -100,6 +100,12 @@ public enum Symbol {
             "symbol_uis_gour.svg",
             true,
             "rimstone-dam"),
+    FLOWSTONE(
+            R.string.symbol_flowstone,
+            R.drawable.symbol_uis_flowstone,
+            "symbol_uis_flowstone.svg",
+            false,
+            "flowstone"),
 
     // ********** Fluids **********
     WATER_FLOW(

@@ -8,5 +8,5 @@ public interface DistoXStyleCommunicator extends Communicator {
 
     void stopCalibration();
 
-    WriteCalibrationProtocol writeCalibration(Byte[] coefficients);
+    CalibrationWrite writeCalibration(Byte[] coefficients);
 }

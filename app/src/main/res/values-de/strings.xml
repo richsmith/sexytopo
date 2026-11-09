@@ -41,7 +41,8 @@
     <string name="title_activity_settings">Einstellungen</string>
     <string name="title_activity_system_log">Protokoll-Datei (Log)</string>
     <string name="title_activity_help">Hilfe</string>
-    <string name="title_activity_guide">Anleitung</string>
+    <string name="title_activity_guide">Handbuch</string>
+    <string name="title_activity_release_notes">Versionshinweise</string>
     <string name="title_activity_3d">3D</string>
 
     <!--  Action bar menu  -->
@@ -61,6 +62,7 @@
     <string name="action_3d">3D</string>
     <string name="action_help">Hilfe</string>
     <string name="action_guide">Handbuch</string>
+    <string name="action_release_notes">Versionshinweise</string>
     <string name="action_about">Über</string>
     <string name="action_file_new">Neue Vermessung</string>
     <string name="action_file_open">Vermessungsdatei öffnen…</string>
@@ -238,6 +240,11 @@
     <string name="manual_edit_shot_backwards">⬅ Rückwärts gemessen</string>
     <string name="manual_edit_station_comment">Messpunkt-Kommentar</string>
     <string name="manual_edit_leg_comment">Messstrecken-Kommentar</string>
+    <string name="manual_edit_shots_warning">Wenn die Werte manuell geändert werden, werden die Messungen verworfen, aus denen diese Messstrecke gemittelt wurde</string>
+    <string name="manual_edit_to_wall_info_title">Über Zur Wand</string>
+    <string name="manual_edit_to_wall_info_message">Optionale Angabe. Angehakt bedeutet, dass der Splay zur Begrenzung des Ganges geht; nicht angehakt bedeutet, dass er zu einem Objekt misst, etwa einem Speläothem.</string>
+    <string name="manual_edit_enabled_info_title">Über Aktiviert</string>
+    <string name="manual_edit_enabled_info_message">Nicht angehakt bedeutet, dass die Peilung erhalten bleibt, aber in der Datentabelle durchgestrichen und in Skizzen, Querschnitten und Exporten weggelassen wird (Survex und Therion behalten sie als auskommentierte Zeile). Nützlich für Messungen wie Kalibrierungskontrollen.</string>
     <string name="manual_rename_station_title">Messpunkt umbenennen</string>
     <string name="manual_rename_station_hint">Stationsname</string>
     <string name="manual_rename_error">Umbenennen fehlgeschlagen</string>
@@ -267,6 +274,7 @@
     <string name="device_pairing_attempt">Gekoppelt mit %1$s…</string>
     <string name="device_pairing_error">Fehler beim Koppeln: %1$s</string>
     <string name="device_pairing_incompatible">Nicht kompatibles Gerät "%1$s" entdeckt</string>
+    <string name="device_unnamed">unbenannt</string>
     <string name="device_pairing_unpairing_device">%1$s entkoppeln</string>
     <string name="device_pairing_unpairing_success">Entkoppeln erfolgreich abgeschlossen</string>
     <string name="device_pairing_unpairing_error">Fehler beim Entkoppeln: %1$s</string>
@@ -282,9 +290,12 @@
     <string name="device_connection_error">Verbindungsfehler: %1$s</string>
     <string name="device_connection_closing_error">Fehler beim Beenden einer Verbindung: %1$s</string>
     <string name="device_data_received">Messung eingegangen</string>
+    <string name="device_calibration_reading_received">Kalibrierungsmessung empfangen</string>
+    <string name="device_data_duplicated">Doppeltes Paket #%1$d</string>
     <string name="device_data_received_null">Keine Daten erhalten</string>
     <string name="device_data_received_empty">Unvollständige Daten erhalten</string>
     <string name="device_data_unknown_identifier">Unbekannte Datenpaket-Kennung</string>
+    <string name="device_data_unknown_packet">Unbekanntes Paket (%1$d Bytes): %2$s</string>
     <string name="device_data_acknowledged_packet">Anerkanntes datenpaket</string>
     <string name="device_no_device">Kein Gerät</string>
     <string name="action_set_test_instrument">Testinstrument festlegen</string>
@@ -315,7 +326,7 @@
     <string name="device_distox_command_calibration_start">Kalibrier-Modus starten</string>
     <string name="device_distox_command_calibration_stop">Kalibrier-Modus beenden </string>
     <string name="device_distox_force_disconnect_for_calibration">DistoX beschäftigt; Trennen der Verbindung zum Schreiben der Kalibrierung erforderlich</string>
-    <string name="device_distox_calibration_result">Beurteilung der Kalibrierung (Wert sollte unter %1$f liegen): %2$s\n\nKalibrierungs-Algorithmus: %3$s</string>
+    <string name="device_distox_calibration_result">Beurteilung der Kalibrierung (Wert sollte unter %1$s liegen): %2$s\n\nKalibrierungs-Algorithmus: %3$s</string>
     <string name="device_distox_calibration_writing">Schreiben der Kalibrierungskoeffizienten</string>
     <string name="device_distox_calibration_write_success">Schreiben der Kalibrierung erfolgreich</string>
     <string name="device_distox_calibration_write_error">Fehler %1$s beim Übertragen der Kalibrierung</string>
@@ -338,6 +349,10 @@
     <string name="device_fcl_command_device_off">Gerät ausschalten</string>
 
     <!--  Calibration  -->
+    <string name="calibration_title_mode">Kalibriermodus</string>
+    <string name="calibration_title_readings">Messungen</string>
+    <string name="calibration_title_last_reading">Letzte Messung</string>
+    <string name="calibration_title_result">Ergebnis</string>
     <string name="calibration_index">Anzahl bereits erfolgter Messungen</string>
     <string name="calibration_start">Disto Cal Modus Ein</string>
     <string name="calibration_stop">Disto Cal Modus Aus</string>
@@ -358,6 +373,28 @@
     <string name="calibration_loaded_file">Kalibrierungsdaten geladen</string>
     <string name="calibration_load_error">Fehler beim Lesen der Kalibrierungsdatei</string>
     <string name="calibration_save_error">Fehler beim Speichern der Kalibrierungsdatei</string>
+    <string name="calibration_worst_readings">Am wenigsten übereinstimmende Messungen (über 1° Abweichung vom Rest ihres Satzes)</string>
+    <string name="calibration_algorithm_linear">Linear</string>
+    <string name="calibration_algorithm_nonlinear">Nichtlinear</string>
+    <string name="calibration_view_readings">Messungen anzeigen</string>
+    <string name="calibration_pointing_horizontal">Waagerecht</string>
+    <string name="calibration_pointing_corner_up">Ecke oben</string>
+    <string name="calibration_pointing_corner_down">Ecke unten</string>
+    <string name="calibration_face_side">Auf der Seite</string>
+    <string name="calibration_set_number">Satz %1$d</string>
+    <string name="calibration_sets">Sätze</string>
+    <string name="calibration_sets_value">%1$d (%2$d vollständig)</string>
+    <string name="calibration_coverage">Abgedeckte Richtungen</string>
+    <string name="calibration_coverage_corners_up">Ecken oben</string>
+    <string name="calibration_coverage_corners_down">Ecken unten</string>
+    <string name="calibration_reading_title">Messung #%1$d</string>
+    <string name="calibration_replace">Ersetzen</string>
+    <string name="calibration_reading_options_message">Ersetzen: Der Platz bleibt für die nächste Messung frei.\nLöschen: Die Messung entfernen und die späteren Messungen um eine Stelle nach vorne rücken.</string>
+    <string name="calibration_gap_options_message">Diese Lücke entfernen und die späteren Messungen um eine Stelle nach vorne rücken?</string>
+    <string name="calibration_roll">Roll</string>
+    <string name="calibration_uncalibrated_estimate">Unkalibrierte Schätzung</string>
+    <string name="calibration_reading_deleted">Gelöscht: diese Messung wiederholen</string>
+    <string name="calibration_no_readings">Noch keine Messungen</string>
     <string name="direction_forward">Vorwärts</string>
     <string name="direction_right">Rechts</string>
     <string name="direction_back">Rückwärts</string>
@@ -457,11 +494,6 @@
         <item>Linear</item>
         <item>Nicht-Linear</item>
     </string-array>
-    <string-array name="settings_leg_amalgamation_algorithm_entries">
-        <item>Winkeldifferenzen: Distanz, Azimut &amp; Neigung getrennt vergleichen; getrennt mitteln</item>
-        <item>Endpunktabstand: vergleichen, wie weit die Endpunkte voneinander entfernt sind; als Vektoren mitteln</item>
-        <item>Paarweise Vektoren: Endpunktabstand im Verhältnis zur Streckenlänge vergleichen; als Vektoren mitteln</item>
-    </string-array>
     <string name="settings_immersive_mode_enabled">Vollbildmodus aktiviert</string>
     <string name="settings_immersive_mode_disabled">Vollbildmodus deaktiviert</string>
     <string name="settings_new_station_vibration_title">Bei neuem Messpunkt vibrieren</string>
@@ -477,19 +509,26 @@
 <string name="settings_instruments_title">Werkzeuge</string>
     <string name="settings_instruments_summary">Instrumententoleranz, Kalibrierung</string>
     <string name="settings_max_distance_delta_title">Maximal zulässige Abweichung bei der Distanz (m)</string>
-    <string name="settings_max_distance_delta_summary">Winkelmethode: wie stark die Distanzmessungen abweichen dürfen, wenn entschieden wird, ob eine neue Station erstellt wird</string>
+    <string name="settings_max_distance_delta_summary">Wie stark die Distanzmessungen abweichen dürfen, wenn entschieden wird, ob eine neue Station erstellt wird</string>
     <string name="settings_max_angle_delta_title">Maximal zulässige Abweichung beim Neigungswinkel (Grad)</string>
-    <string name="settings_max_angle_delta_summary">Winkelmethode: wie stark die Azimut- oder Neigungsmessungen abweichen dürfen, wenn entschieden wird, ob eine neue Station erstellt wird</string>
+    <string name="settings_max_angle_delta_summary">Wie stark die Azimut- oder Neigungsmessungen abweichen dürfen, wenn entschieden wird, ob eine neue Station erstellt wird</string>
     <string name="settings_auto_reconnect_title">Automatisch wieder verbinden</string>
     <string name="settings_auto_reconnect_summary">Automatisch wieder verbinden, wenn das Gerät die Verbindung verliert</string>
     <string name="settings_auto_reconnect_window_title">Zeitlimit für automatisches Wiederverbinden (Minuten)</string>
     <string name="settings_auto_reconnect_window_summary">Wie lange versucht wird, die Verbindung wiederherzustellen, bevor pausiert wird</string>
     <string name="settings_leg_amalgamation_algorithm_title">Methode zur Streckenübereinstimmung</string>
-    <string name="settings_leg_amalgamation_algorithm_summary">Wie beurteilt wird, ob wiederholte Messungen nah genug sind, um eine Messstrecke zu bilden</string>
+    <string name="settings_leg_amalgamation_angular_name">Winkeldifferenzen</string>
+    <string name="settings_leg_amalgamation_angular_description">Distanz, Azimut und Neigung werden getrennt verglichen und gemittelt. Kann wiederholte steile Messungen ablehnen</string>
+    <string name="settings_leg_amalgamation_slope_corrected_name">Neigungskorrigierte Winkeldifferenzen</string>
+    <string name="settings_leg_amalgamation_slope_corrected_description">Distanz, Neigung und seitliche Abweichung (Azimutdifferenz nach Steilheit skaliert) getrennt verglichen; als Vektoren gemittelt</string>
+    <string name="settings_leg_amalgamation_cartesian_name">Endpunktabstand</string>
+    <string name="settings_leg_amalgamation_cartesian_description">Die Endpunkte der Messungen müssen innerhalb eines festen Abstands voneinander liegen; als Vektoren gemittelt</string>
+    <string name="settings_leg_amalgamation_pairwise_name">Paarweise Vektoren</string>
+    <string name="settings_leg_amalgamation_pairwise_description">Abstand der Endpunkte im Verhältnis zur Streckenlänge verglichen; als Vektoren gemittelt</string>
     <string name="settings_max_endpoint_delta_title">Maximaler Endpunktabstand (m)</string>
-    <string name="settings_max_endpoint_delta_summary">Endpunktmethode: wie weit die Endpunkte der Messungen voneinander entfernt sein dürfen, wenn entschieden wird, ob eine neue Station erstellt wird. Der Standardwert von 0.1 hält alle Messungen innerhalb einer BCRA Grade 5-Zelle.</string>
+    <string name="settings_max_endpoint_delta_summary">Wie weit die Endpunkte der Messungen voneinander entfernt sein dürfen, wenn entschieden wird, ob eine neue Station erstellt wird. Der Standardwert von 0.1 hält alle Messungen innerhalb einer BCRA Grade 5-Zelle.</string>
     <string name="settings_max_pairwise_error_title">Maximaler paarweiser Fehler</string>
-    <string name="settings_max_pairwise_error_summary">Methode der paarweisen Vektoren: die zwischen Messungen tolerierte relative Abweichung (0.05 = etwa 2.5%), wenn entschieden wird, ob eine neue Station erstellt wird</string>
+    <string name="settings_max_pairwise_error_summary">Die zwischen Messungen tolerierte relative Abweichung (0.05 = etwa 2.5%), wenn entschieden wird, ob eine neue Station erstellt wird</string>
     <string name="settings_calibration_title">Kalibrierung</string>
     <string name="settings_calibration_algorithm_title">DistoX Kalibrierungs-Algorithmus</string>
     <string name="settings_calibration_algorithm_summary">Auswahl des DistoX-Kalibrierungsalgorithmus ausser Kraft setzen</string>
@@ -577,9 +616,9 @@
     <string name="settings_export_svg_copyright_title">Copyright/Lizenz in der Legende anzeigen</string>
     <string name="settings_export_svg_copyright_summary">Copyright und Lizenz werden immer in der Datei gespeichert; dies zeigt zusätzlich einen Hinweis in der Legende an</string>
     <string name="settings_export_therion_symbols_title">Therion-Export Symbole</string>
-    <string name="settings_export_therion_symbols_summary">Symbole beim Exportieren im Therion-Format einschließen</string>
+    <string name="settings_export_therion_symbols_summary">Symbole in die th2-Datei aufnehmen</string>
     <string name="settings_export_therion_text_title">Therion-Export Text</string>
-    <string name="settings_export_therion_text_summary">Text beim Exportieren im Therion-Format einschließen</string>
+    <string name="settings_export_therion_text_summary">Text in die th2-Datei aufnehmen</string>
     <string name="settings_export_folder_name_title">Exportordner-Name</string>
     <string name="settings_export_folder_name_summary">Name des Ordners im Vermessungsordner, in den exportiert wird</string>
     <string name="settings_export_type_subfolders_title">Exporttyp-Unterordner</string>
@@ -627,7 +666,7 @@
 
     <!--  Form validation errors  -->
     <string name="validation_error_cannot_be_blank">Darf nicht leer sein</string>
-    <string name="validation_error_station_named_dash">Messpunkt kann nicht \"-\" heißen</string>
+    <string name="validation_error_station_name_reserved">Messpunkt kann nicht \"-\" oder \".\" heißen</string>
     <string name="validation_error_station_does_not_exist">Messpunkt existiert nicht</string>
     <string name="validation_error_same_as_from_station">Kann nicht derselbe wie der Ursprungsmesspunkt sein</string>
     <string name="validation_error_station_name_not_unique">Messpunktname muss eindeutig sein</string>
@@ -662,6 +701,7 @@
     <string name="symbol_helictites">Exzentriker</string>
     <string name="symbol_crystals">Kristalle</string>
     <string name="symbol_gour">Wasserbecken</string>
+    <string name="symbol_flowstone">Sinter</string>
     <string name="symbol_water_flow">Fliessendes Wasser</string>
     <string name="symbol_air_draught">Luftzug</string>
     <string name="symbol_guano">Guano</string>
@@ -677,10 +717,10 @@
     <string name="menu_set_active_station">Als aktiv setzen</string>
     <string name="menu_rename_station">Umbenennen</string>
     <string name="menu_edit_leg">Bearbeiten</string>
+    <string name="menu_to_wall">Zur Wand</string>
+    <string name="menu_enabled">Aktiviert</string>
     <string name="menu_upgrade_row">Neuen Messpunkt erzwingen</string>
     <string name="menu_promote_to_above_leg">Zur obigen Messung hinzufügen</string>
-    <string name="toast_splay_promoted">Splay mit Messung kombiniert</string>
-    <string name="toast_no_leg_above">Keine gültige Messung zum Kombinieren</string>
     <string name="menu_upgrade_splay">Zu Messstrecke aufwerten</string>
     <string name="menu_downgrade_leg">Zu Splay abwerten</string>
     <string name="menu_delete_leg">Löschen</string>
@@ -702,7 +742,7 @@
     <string name="menu_xsection_delete">Querschnitt löschen</string>
     <string name="menu_xsection_edit">Skizze bearbeiten</string>
     <string name="menu_xsection_set_direction">Richtung festlegen</string>
-    <string name="menu_new_cross_section">Neuer Querschnitt</string>
+
     <string name="menu_jump_to_station_in_table">&#10132; Daten-Tabelle</string>
     <string name="menu_delete_station">Löschen</string>
     <string name="menu_reverse">Rückblick</string>
@@ -728,6 +768,8 @@
     <string name="context_rename_splay_error">Kann das Ende einer Dimension/Hilfslinie nicht umbenennen</string>
     <string name="context_set_active_splay_error">Ende einer Dimension/Hilfslinie kann nicht als aktiver Messpunkt definiert werden</string>
     <string name="context_station_comment_hint">Stationskommentar</string>
+    <string name="context_splay_promoted">Splay mit Messung kombiniert</string>
+    <string name="context_no_leg_above">Keine gültige Messung zum Kombinieren</string>
 
     <!--  Logging  -->
     <string name="log_starting_up">Startprozess läuft</string>
@@ -749,5 +791,6 @@
     <string name="request_code_error">Fehlermeldung %1$d aus Anfragecode %2$d</string>
     <string name="killing_comms_process">Lösch-Kommandoabfolge</string>
     <string name="setup_error_load_symbol_svg">Fehler beim Laden von SVG-Symbol %1$s</string>
+    <string name="release_notes_unavailable">Versionshinweise sind nicht verfügbar.</string>
 
 </resources>

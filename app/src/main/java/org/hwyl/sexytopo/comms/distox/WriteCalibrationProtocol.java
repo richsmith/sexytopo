@@ -9,7 +9,7 @@ import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SexyTopo;
 import org.hwyl.sexytopo.control.SurveyManager;
 
-public class WriteCalibrationProtocol extends DistoXProtocol {
+public class WriteCalibrationProtocol extends DistoXProtocol implements CalibrationWrite {
 
     private Byte[] coeff;
 
@@ -70,10 +70,12 @@ public class WriteCalibrationProtocol extends DistoXProtocol {
         }
     }
 
+    @Override
     public boolean wasSuccessful() {
         return wasSuccessful;
     }
 
+    @Override
     public boolean isFinished() {
         return isFinished;
     }

@@ -22,8 +22,13 @@ public class Leg extends SurveyComponent {
     private final Leg[] promotedFrom;
     private final boolean wasShotBackwards;
     private String comment = "";
+    private boolean enabled = true;
 
     private static final Leg[] NO_LEGS = new Leg[] {};
+
+    // Readings that have been through a text field, such as degrees, minutes and seconds, don't
+    // always come back exactly as they were
+    private static final float READING_TOLERANCE = 0.001f;
 
     public static final Leg EMPTY_LEG = new Leg(0, 0, 0);
 
@@ -32,7 +37,7 @@ public class Leg extends SurveyComponent {
     }
 
     public Leg(float distance, float azimuth, float inclination, boolean wasShotBackwards) {
-        this(distance, azimuth, inclination, Survey.NULL_STATION, NO_LEGS, wasShotBackwards);
+        this(distance, azimuth, inclination, Station.ANONYMOUS_WALL, NO_LEGS, wasShotBackwards);
     }
 
     public Leg(
@@ -86,12 +91,17 @@ public class Leg extends SurveyComponent {
                 destination,
                 leg.promotedFrom,
                 leg.wasShotBackwards);
+        copyAnnotationsFrom(leg);
     }
 
     public static Leg toFullLeg(Leg splay, Station destination) {
         return upgradeSplayToConnectedLeg(splay, destination, NO_LEGS);
     }
 
+    /**
+     * Turns a splay into a connected leg. The comment is kept. A disabled splay becomes an enabled
+     * leg, because only splays can be disabled.
+     */
     public static Leg upgradeSplayToConnectedLeg(
             Leg splay, Station destination, Leg[] promotedFrom) {
         Leg leg =
@@ -106,24 +116,67 @@ public class Leg extends SurveyComponent {
         return leg;
     }
 
+    /**
+     * Builds a connected leg from a reading as it was recorded.
+     *
+     * <p>A leg is stored in the direction the sketch plots it. A reading that was shot backwards,
+     * therefore has to be reversed and is flagged so that tables and exports show it as it was
+     * taken. The recorded reading's own flag is ignored, as a recorded reading is never shot
+     * backwards.
+     */
+    public static Leg fromRecordedReading(
+            Leg recorded, Station destination, Leg[] promotedFrom, boolean shotBackwards) {
+        Leg leg =
+                new Leg(
+                        recorded.distance,
+                        recorded.azimuth,
+                        recorded.inclination,
+                        destination,
+                        promotedFrom,
+                        false);
+        leg.setComment(recorded.getComment());
+        return shotBackwards ? leg.reverse() : leg;
+    }
+
+    /** As the version that takes promoted-from readings, for a single reading. */
+    public static Leg fromRecordedReading(
+            Leg recorded, Station destination, boolean shotBackwards) {
+        return fromRecordedReading(recorded, destination, NO_LEGS, shotBackwards);
+    }
+
+    /**
+     * The reading this leg was made from, as it was recorded: reversed back if the leg was shot
+     * backwards, and with no destination. This is the inverse of fromRecordedReading, for a leg
+     * made from a single reading.
+     */
+    public Leg toRecordedReading() {
+        Leg recorded = wasShotBackwards ? reverse() : this;
+        return recorded.toSplay();
+    }
+
+    /**
+     * Whether this leg has the same distance, azimuth and inclination as another, to within
+     * rounding. Nothing else is compared: not the stations, the shots or the direction it was shot
+     * in.
+     */
+    public boolean hasEquivalentReadings(Leg other) {
+        return Math.abs(distance - other.distance) < READING_TOLERANCE
+                && Math.abs(azimuth - other.azimuth) < READING_TOLERANCE
+                && Math.abs(inclination - other.inclination) < READING_TOLERANCE;
+    }
+
     public Leg reverse() {
         float adjustedAzimuth = Space2DUtils.adjustAngle(getAzimuth(), 180);
-        if (hasDestination()) {
-            Leg leg =
-                    new Leg(
-                            distance,
-                            adjustedAzimuth,
-                            -1 * inclination,
-                            destination,
-                            promotedFrom,
-                            !wasShotBackwards);
-            leg.setComment(comment);
-            return leg;
-        } else {
-            Leg leg = new Leg(distance, adjustedAzimuth, -1 * inclination, !wasShotBackwards);
-            leg.setComment(comment);
-            return leg;
-        }
+        Leg leg =
+                new Leg(
+                        distance,
+                        adjustedAzimuth,
+                        -1 * inclination,
+                        destination,
+                        promotedFrom,
+                        !wasShotBackwards);
+        leg.copyAnnotationsFrom(this);
+        return leg;
     }
 
     public Leg rotate(float delta) {
@@ -132,16 +185,15 @@ public class Leg extends SurveyComponent {
     }
 
     public Leg adjustAzimuth(float newAzimuth) {
-        if (hasDestination()) {
-            return new Leg(
-                    getDistance(),
-                    newAzimuth,
-                    getInclination(),
-                    getDestination(),
-                    getPromotedFrom());
-        } else {
-            return new Leg(getDistance(), newAzimuth, getInclination());
-        }
+        Leg leg =
+                new Leg(
+                        getDistance(),
+                        newAzimuth,
+                        getInclination(),
+                        getDestination(),
+                        getPromotedFrom());
+        leg.copyAnnotationsFrom(this);
+        return leg;
     }
 
     public Leg asBacksight(Station destination) {
@@ -153,16 +205,45 @@ public class Leg extends SurveyComponent {
                         -1 * getInclination(),
                         destination,
                         getPromotedFrom());
-        leg.setComment(comment);
+        leg.copyAnnotationsFrom(this);
         return leg;
     }
 
     public Leg asBacksight() {
-        return asBacksight(Survey.NULL_STATION);
+        return asBacksight(Station.ANONYMOUS_WALL);
     }
 
+    /**
+     * Returns this reading as a splay: no destination, and never shot backwards. A splay always
+     * runs from its station out to nothing, so the backwards flag has no meaning for it and is
+     * cleared. The distance, azimuth and inclination are kept exactly as they are. A splay keeps
+     * what it goes to, while a leg that is turned into a splay goes to a wall.
+     */
     public Leg toSplay() {
-        return new Leg(distance, azimuth, inclination, wasShotBackwards);
+        Station splayDestination = hasDestination() ? Station.ANONYMOUS_WALL : destination;
+        return new Leg(distance, azimuth, inclination, splayDestination, NO_LEGS, false);
+    }
+
+    /**
+     * Whether a splay goes to a wall, which is the default, rather than to another feature such as
+     * a stal. A leg with a destination goes to neither, and is reported as going to a wall.
+     */
+    public boolean isToWall() {
+        return destination != Station.ANONYMOUS_FEATURE;
+    }
+
+    /**
+     * Returns a copy of a splay that goes to a wall or to another feature, with everything else
+     * kept. A leg with a destination is returned unchanged.
+     */
+    public Leg withToWall(boolean toWall) {
+        if (hasDestination()) {
+            return this;
+        }
+        Station splayDestination = toWall ? Station.ANONYMOUS_WALL : Station.ANONYMOUS_FEATURE;
+        Leg leg = new Leg(distance, azimuth, inclination, splayDestination, promotedFrom, false);
+        leg.copyAnnotationsFrom(this);
+        return leg;
     }
 
     public float getDistance() {
@@ -182,7 +263,7 @@ public class Leg extends SurveyComponent {
     }
 
     public boolean hasDestination() {
-        return destination != Survey.NULL_STATION;
+        return !destination.isAnonymous();
     }
 
     public Leg[] getPromotedFrom() {
@@ -238,6 +319,33 @@ public class Leg extends SurveyComponent {
 
     public void setComment(String comment) {
         this.comment = (comment != null) ? comment : "";
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    /**
+     * Enables or disables a splay. A disabled splay is kept in the survey and shown crossed out in
+     * the data table, but is otherwise left out: it isn't drawn and is commented out on export.
+     * Only splays can be disabled, so this throws an IllegalStateException if asked to disable a
+     * leg.
+     */
+    public void setEnabled(boolean enabled) {
+        if (!enabled && hasDestination()) {
+            throw new IllegalStateException("Only splays can be disabled");
+        }
+        this.enabled = enabled;
+    }
+
+    /**
+     * Copies the comment and enabled state of another leg onto this one. Used when making a
+     * modified copy of that leg. A leg is always enabled, so the state only carries over to a
+     * splay.
+     */
+    private void copyAnnotationsFrom(Leg other) {
+        this.comment = other.comment;
+        this.enabled = other.enabled || hasDestination();
     }
 
     @NonNull

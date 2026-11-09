@@ -92,4 +92,31 @@
         <item name="android:layout_marginBottom">8dp</item>
     </style>
 
+    <!-- Calibration screen styles -->
+    <style name="CalibrationSensorLabel">
+        <item name="android:gravity">center</item>
+        <item name="android:textAppearance">?attr/textAppearanceLabelMedium</item>
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <style name="CalibrationSensorValue">
+        <item name="android:gravity">center</item>
+        <item name="android:textAppearance">?attr/textAppearanceBodyLarge</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="CalibrationRawLabel">
+        <item name="android:paddingEnd">8dp</item>
+        <item name="android:textAppearance">?attr/textAppearanceLabelMedium</item>
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <style name="CalibrationRawValue">
+        <item name="android:gravity">end</item>
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:textAppearance">?attr/textAppearanceBodySmall</item>
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
 </resources>

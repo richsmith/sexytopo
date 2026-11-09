@@ -1,7 +1,5 @@
 package org.hwyl.sexytopo.comms;
 
-import android.bluetooth.BluetoothDevice;
-
 /** DistoX subtype. */
 public enum DistoX {
     A3("A3", false),
@@ -17,13 +15,11 @@ public enum DistoX {
         this.preferNonLinearCalibration = preferNonLinearCalibration;
     }
 
-    public static DistoX fromDevice(BluetoothDevice bluetoothDevice) {
-        return fromName(Instrument.describe(bluetoothDevice));
-    }
-
     public static DistoX fromName(String name) {
         // NB: order is important here
-        if (name.startsWith("DistoXBLE")) {
+        if (name == null) {
+            return UNKNOWN;
+        } else if (name.startsWith("DistoXBLE")) {
             return BLE;
         } else if (name.startsWith("DistoX-")) {
             return X310;

@@ -13,12 +13,11 @@ import java.util.Stack;
 import org.hwyl.sexytopo.control.util.StationNamer;
 import org.hwyl.sexytopo.control.util.SurveyTraversal;
 import org.hwyl.sexytopo.control.util.Wrapper;
-import org.hwyl.sexytopo.model.graph.Projection2D;
+import org.hwyl.sexytopo.model.geometry.Projection2D;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 
 public class Survey {
 
-    public static final Station NULL_STATION = new Station("-");
     public static final String DEFAULT_NAME = "Unsaved Survey";
 
     public static final char[] FORBIDDEN_CHARS = new char[] {':', '.', '\n', '\r', '/', '\\'};
@@ -164,7 +163,7 @@ public class Survey {
 
     public static List<Leg> getAllLegs(Station root) {
         List<Leg> legs = new ArrayList<>(root.getOnwardLegs());
-        for (Leg leg : root.getConnectedOnwardLegs()) {
+        for (Leg leg : root.getOnwardLegs(LegFilter.LEGS)) {
             legs.addAll(getAllLegs(leg.getDestination()));
         }
         return legs;
@@ -196,7 +195,7 @@ public class Survey {
         List<Station> stations = new ArrayList<>();
         stations.add(root);
 
-        for (Leg leg : root.getConnectedOnwardLegs()) {
+        for (Leg leg : root.getOnwardLegs(LegFilter.LEGS)) {
             Station destination = leg.getDestination();
             stations.addAll(getAllStations(destination));
         }
@@ -373,7 +372,7 @@ public class Survey {
         SurveyTraversal.traverseStations(
                 this,
                 station -> {
-                    if (station.getOnwardLegs().contains(leg)) {
+                    if (station.getOnwardLegs(LegFilter.ALL.includeDisabled(true)).contains(leg)) {
                         wrapper.value = station;
                         return true;
                     } else {
@@ -395,7 +394,7 @@ public class Survey {
                 this,
                 (origin, leg) -> {
                     if (leg == toDelete) {
-                        origin.getOnwardLegs().remove(toDelete);
+                        origin.removeOnwardLeg(toDelete);
                         return true;
                     } else {
                         return false;

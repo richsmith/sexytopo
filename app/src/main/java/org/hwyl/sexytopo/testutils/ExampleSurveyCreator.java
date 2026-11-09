@@ -13,16 +13,17 @@ import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.util.CrossSectioner;
 import org.hwyl.sexytopo.control.util.Space3DUtils;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
-import org.hwyl.sexytopo.model.graph.Coord2D;
-import org.hwyl.sexytopo.model.graph.Coord3D;
-import org.hwyl.sexytopo.model.graph.Line;
-import org.hwyl.sexytopo.model.graph.Projection2D;
+import org.hwyl.sexytopo.model.geometry.Coord2D;
+import org.hwyl.sexytopo.model.geometry.Coord3D;
+import org.hwyl.sexytopo.model.geometry.Line;
+import org.hwyl.sexytopo.model.geometry.Projection2D;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.Symbol;
 import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.LegFilter;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
@@ -245,7 +246,7 @@ public class ExampleSurveyCreator {
             Station from,
             LRUD side,
             PathDetail path) {
-        List<Leg> onward = from.getConnectedOnwardLegs();
+        List<Leg> onward = from.getOnwardLegs(LegFilter.LEGS);
         Coord2D fromWall = wallPoints.get(from);
         if (fromWall == null) {
             return;

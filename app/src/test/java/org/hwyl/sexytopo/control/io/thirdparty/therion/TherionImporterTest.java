@@ -1,17 +1,24 @@
 package org.hwyl.sexytopo.control.io.thirdparty.therion;
 
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 import org.hwyl.sexytopo.control.io.thirdparty.survex.SurvexExporter;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionImporter;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
-import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
+import org.hwyl.sexytopo.control.util.GraphToListTranslator;
+import org.hwyl.sexytopo.control.util.InputMode;
+import org.hwyl.sexytopo.control.util.SurveyUpdater;
+import org.hwyl.sexytopo.model.geometry.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.LegFilter;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
 import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
+import org.hwyl.sexytopo.testutils.SurveyAssertions;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -351,7 +358,7 @@ public class TherionImporterTest {
 
         Station station1 = survey.getStationByName("1");
         Assert.assertNotNull(station1);
-        Leg legTo2 = station1.getConnectedOnwardLegs().get(0);
+        Leg legTo2 = station1.getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertTrue(legTo2.wasPromoted());
         Assert.assertEquals(3, legTo2.getPromotedFrom().length);
     }
@@ -364,7 +371,7 @@ public class TherionImporterTest {
 
         Station station1 = survey.getStationByName("1");
         Assert.assertNotNull(station1);
-        Leg legTo2 = station1.getConnectedOnwardLegs().get(0);
+        Leg legTo2 = station1.getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertTrue(legTo2.wasPromoted());
         Assert.assertEquals(3, legTo2.getPromotedFrom().length);
     }
@@ -458,6 +465,18 @@ public class TherionImporterTest {
         // explo-date is same as survey date — linked=false, explorationDate set
         Assert.assertNotNull(trip.getExplorationDate());
         Assert.assertFalse(trip.isExplorationDateLinked());
+    }
+
+    @Test
+    public void testMetadataImportReadsSurveyAndExplorationDates() throws Exception {
+        String therionText = "date 2026/01/05@10:30\nexplo-date 2025.12.30 - 2026.01.02\n";
+        Trip trip = SurvexTherionImporter.parseMetadata(therionText, SurveyFormat.THERION);
+        Assert.assertNotNull(trip);
+        Assert.assertEquals(
+                new GregorianCalendar(2026, Calendar.JANUARY, 5).getTime(), trip.getSurveyDate());
+        Assert.assertEquals(
+                new GregorianCalendar(2025, Calendar.DECEMBER, 30).getTime(),
+                trip.getExplorationDate());
     }
 
     @Test
@@ -697,12 +716,12 @@ public class TherionImporterTest {
 
         // Station 3's splays (added before connecting leg) must be preserved
         Station station3 = survey.getStationByName("3");
-        List<Leg> splays3 = station3.getUnconnectedOnwardLegs();
+        List<Leg> splays3 = station3.getOnwardLegs(LegFilter.SPLAYS);
         Assert.assertEquals(2, splays3.size());
 
         // Station 1's splay must also be preserved
         Station station1 = survey.getStationByName("1");
-        List<Leg> splays1 = station1.getUnconnectedOnwardLegs();
+        List<Leg> splays1 = station1.getOnwardLegs(LegFilter.SPLAYS);
         Assert.assertEquals(1, splays1.size());
     }
 
@@ -717,7 +736,7 @@ public class TherionImporterTest {
         SurvexTherionImporter.parseCentreline("1\t.\t1.0\t0.0\t0.0\n1\t2\t5.0\t0.0\t0.0", survey);
 
         Assert.assertNull(survey.getStationByName("."));
-        Assert.assertEquals(1, survey.getOrigin().getUnconnectedOnwardLegs().size());
+        Assert.assertEquals(1, survey.getOrigin().getOnwardLegs(LegFilter.SPLAYS).size());
     }
 
     @Test
@@ -728,7 +747,7 @@ public class TherionImporterTest {
         SurvexTherionImporter.parseCentreline("1\t..\t1.0\t0.0\t0.0\n1\t2\t5.0\t0.0\t0.0", survey);
 
         Assert.assertNull(survey.getStationByName(".."));
-        Assert.assertEquals(1, survey.getOrigin().getUnconnectedOnwardLegs().size());
+        Assert.assertEquals(1, survey.getOrigin().getOnwardLegs(LegFilter.SPLAYS).size());
     }
 
     @Test
@@ -738,7 +757,7 @@ public class TherionImporterTest {
         Survey survey = new Survey();
         SurvexTherionImporter.parseCentreline(text, survey, true);
 
-        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Leg leg = survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertEquals(2, leg.getPromotedFrom().length);
     }
 
@@ -841,7 +860,7 @@ public class TherionImporterTest {
         Survey survey = new Survey();
         SurvexTherionImporter.parseCentreline(
                 "1\t2\t5.0\t45.0\t-5.0\tGrand Gallery", survey, /* useLegComments= */ true);
-        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Leg leg = survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertEquals("Grand Gallery", leg.getComment());
         Assert.assertTrue(
                 survey.getStationByName("2").getComment() == null
@@ -854,7 +873,7 @@ public class TherionImporterTest {
         SurvexTherionImporter.parseCentreline(
                 "1\t2\t5.0\t45.0\t-5.0\tGrand Gallery", survey, /* useLegComments= */ false);
         Assert.assertEquals("Grand Gallery", survey.getStationByName("2").getComment());
-        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Leg leg = survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertTrue(leg.getComment() == null || leg.getComment().isEmpty());
     }
 
@@ -864,7 +883,7 @@ public class TherionImporterTest {
         Survey survey = new Survey();
         SurvexTherionImporter.parseCentreline(
                 "1\t2\t5.0\t45.0\t-5.0\tGrand Gallery", survey, /* useLegComments= */ true);
-        Leg leg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Leg leg = survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertEquals("Grand Gallery", leg.getComment());
     }
 
@@ -875,7 +894,7 @@ public class TherionImporterTest {
                 "1\t2\t5.541\t253.93\t4.67\n" + "# 1\t2\t5.542\t73.95\t-4.64\tBack sight\n";
         Survey survey = new Survey();
         SurvexTherionImporter.parseCentreline(text, survey, /* useLegComments= */ true);
-        Leg mainLeg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Leg mainLeg = survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertEquals(1, mainLeg.getPromotedFrom().length);
         Assert.assertEquals("Back sight", mainLeg.getPromotedFrom()[0].getComment());
     }
@@ -886,7 +905,7 @@ public class TherionImporterTest {
                 "1\t2\t5.541\t253.93\t4.67\n" + "# 1\t2\t5.542\t73.95\t-4.64\tBack sight\n";
         Survey survey = new Survey();
         SurvexTherionImporter.parseCentreline(text, survey, /* useLegComments= */ false);
-        Leg mainLeg = survey.getOrigin().getConnectedOnwardLegs().get(0);
+        Leg mainLeg = survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0);
         Assert.assertEquals(1, mainLeg.getPromotedFrom().length);
         Assert.assertTrue(
                 mainLeg.getPromotedFrom()[0].getComment() == null
@@ -955,5 +974,154 @@ public class TherionImporterTest {
                 "a later valid extend should still be applied",
                 ExtendedElevationDirection.LEFT,
                 survey.getStationByName("3").getExtendedElevationDirection());
+    }
+
+    private static void assertIsTheDisabledBoulderSplay(Leg splay) {
+        Assert.assertFalse(splay.isEnabled());
+        Assert.assertEquals(2.5f, splay.getDistance(), 0.001);
+        Assert.assertEquals(90.0f, splay.getAzimuth(), 0.001);
+        Assert.assertEquals(10.0f, splay.getInclination(), 0.001);
+        Assert.assertEquals("Boulder", splay.getComment());
+    }
+
+    @Test
+    public void testCommentedOutSplayImportsAsDisabledSplay() throws Exception {
+        String th =
+                "centreline\n"
+                        + "data normal from to tape compass clino\n"
+                        + "1\t-\t1.0\t0.0\t0.0\n"
+                        + "#1\t-\t2.5\t90.0\t10.0\tBoulder\n"
+                        + "1\t2\t5.0\t0.0\t0.0\n"
+                        + "endcentreline\n";
+        Survey survey = new Survey();
+        TherionImporter.updateCentreline(Arrays.asList(th.split("\n")), survey, true);
+
+        List<Leg> splays = survey.getOrigin().getOnwardLegs(LegFilter.SPLAYS.includeDisabled(true));
+        Assert.assertEquals(2, splays.size());
+        Assert.assertTrue(splays.get(0).isEnabled());
+        assertIsTheDisabledBoulderSplay(splays.get(1));
+    }
+
+    @Test
+    public void testDisabledSplayRoundTrips() throws Exception {
+        Survey original = new Survey();
+        Leg enabledSplay = new Leg(1.0f, 0.0f, 0.0f);
+        Leg disabledSplay = new Leg(2.5f, 90.0f, 10.0f);
+        disabledSplay.setComment("Boulder");
+        SurveyUpdater.update(original, enabledSplay);
+        SurveyUpdater.update(original, disabledSplay);
+        SurveyUpdater.updateWithNewStation(original, new Leg(5.0f, 0.0f, 0.0f));
+        SurveyUpdater.setSplayEnabled(original, disabledSplay, false);
+
+        String th =
+                "centreline\n"
+                        + SurvexTherionUtil.getCentrelineData(original, SurveyFormat.THERION)
+                        + "endcentreline\n";
+        Survey reimported = new Survey();
+        TherionImporter.updateCentreline(Arrays.asList(th.split("\n")), reimported, true);
+
+        List<Leg> splays =
+                reimported.getOrigin().getOnwardLegs(LegFilter.SPLAYS.includeDisabled(true));
+        Assert.assertEquals(2, splays.size());
+        Assert.assertTrue(splays.get(0).isEnabled());
+        assertIsTheDisabledBoulderSplay(splays.get(1));
+    }
+
+    // ---- backward lines: the new station is in the FROM column ----
+
+    @Test
+    public void testInlineStyleBackwardLegsAreStoredInThePlottedDirection() throws Exception {
+        Survey survey = new Survey();
+        TherionImporter.updateCentreline(INLINE_LINES, survey);
+
+        // "2  1  5.541 73.93 -4.67" was shot from the new station 2 back to station 1
+        Leg legTo2 = survey.getStationByName("1").getOnwardLegs(LegFilter.LEGS).get(0);
+        Assert.assertEquals("2", legTo2.getDestination().getName());
+        Assert.assertTrue(legTo2.wasShotBackwards());
+        Assert.assertEquals(5.541f, legTo2.getDistance(), 0.001);
+        Assert.assertEquals(253.93f, legTo2.getAzimuth(), 0.001);
+        Assert.assertEquals(4.67f, legTo2.getInclination(), 0.001);
+
+        Leg legTo3 = survey.getStationByName("2").getOnwardLegs(LegFilter.LEGS).get(0);
+        Assert.assertTrue(legTo3.wasShotBackwards());
+        Assert.assertEquals(242.39f, legTo3.getAzimuth(), 0.001);
+        Assert.assertEquals(-27.97f, legTo3.getInclination(), 0.001);
+    }
+
+    @Test
+    public void testInlineStyleBackwardLegsKeepTheirReadingsAsRecorded() throws Exception {
+        Survey survey = new Survey();
+        TherionImporter.updateCentreline(INLINE_LINES, survey);
+
+        Leg legTo2 = survey.getStationByName("1").getOnwardLegs(LegFilter.LEGS).get(0);
+        Leg[] readings = legTo2.getPromotedFrom();
+        Assert.assertEquals(3, readings.length);
+        Assert.assertEquals(73.95f, readings[0].getAzimuth(), 0.001);
+        Assert.assertEquals(-4.64f, readings[0].getInclination(), 0.001);
+        for (Leg reading : readings) {
+            Assert.assertFalse(reading.hasDestination());
+            Assert.assertFalse(reading.wasShotBackwards());
+        }
+        SurveyAssertions.assertNoBackwardSplays(survey);
+    }
+
+    private static Survey createSurveyWithBackwardLeg(boolean repeated) {
+        Survey survey = new Survey();
+        SurveyUpdater.updateWithNewStation(survey, new Leg(4, 0, 0));
+        if (repeated) {
+            for (int i = 0; i < 3; i++) {
+                SurveyUpdater.update(survey, new Leg(5, 270, 10), InputMode.BACKWARD);
+            }
+        } else {
+            SurveyUpdater.updateWithNewStation(survey, new Leg(5, 225, -10, true));
+        }
+        return survey;
+    }
+
+    private static Survey exportAndReimport(Survey original) throws Exception {
+        String data = SurvexTherionUtil.getCentrelineData(original, SurveyFormat.THERION);
+        List<String> lines = Arrays.asList(("centreline\n" + data + "\nendcentreline").split("\n"));
+        Survey reimported = new Survey();
+        TherionImporter.updateCentreline(lines, reimported);
+        return reimported;
+    }
+
+    private static void assertBackwardLegRoundTrips(Survey original, Survey reimported) {
+        Station originalTwo = original.getStationByName("2");
+        Station reimportedTwo = reimported.getStationByName("2");
+        Leg expected = originalTwo.getOnwardLegs(LegFilter.LEGS).get(0);
+        Leg actual = reimportedTwo.getOnwardLegs(LegFilter.LEGS).get(0);
+
+        Assert.assertTrue(actual.wasShotBackwards());
+        Assert.assertEquals(expected.getDistance(), actual.getDistance(), 0.001);
+        Assert.assertEquals(expected.getAzimuth(), actual.getAzimuth(), 0.001);
+        Assert.assertEquals(expected.getInclination(), actual.getInclination(), 0.001);
+        Assert.assertEquals(expected.getPromotedFrom().length, actual.getPromotedFrom().length);
+
+        GraphToListTranslator.AsTakenReading expectedRow =
+                GraphToListTranslator.toAsTakenReading(
+                        new GraphToListTranslator.SurveyListEntry(originalTwo, expected));
+        GraphToListTranslator.AsTakenReading actualRow =
+                GraphToListTranslator.toAsTakenReading(
+                        new GraphToListTranslator.SurveyListEntry(reimportedTwo, actual));
+        Assert.assertEquals(expectedRow.getFrom().getName(), actualRow.getFrom().getName());
+        Assert.assertEquals(expectedRow.getTo().getName(), actualRow.getTo().getName());
+        Assert.assertEquals(
+                expectedRow.getLeg().getAzimuth(), actualRow.getLeg().getAzimuth(), 0.001);
+        Assert.assertEquals(
+                expectedRow.getLeg().getInclination(), actualRow.getLeg().getInclination(), 0.001);
+        SurveyAssertions.assertNoBackwardSplays(reimported);
+    }
+
+    @Test
+    public void testSingleBackwardLegRoundTripsThroughTherion() throws Exception {
+        Survey original = createSurveyWithBackwardLeg(false);
+        assertBackwardLegRoundTrips(original, exportAndReimport(original));
+    }
+
+    @Test
+    public void testRepeatedBackwardLegRoundTripsThroughTherion() throws Exception {
+        Survey original = createSurveyWithBackwardLeg(true);
+        assertBackwardLegRoundTrips(original, exportAndReimport(original));
     }
 }

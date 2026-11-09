@@ -3,7 +3,7 @@ package org.hwyl.sexytopo.control.io.thirdparty.therion;
 import android.content.SharedPreferences;
 import java.util.List;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
-import org.hwyl.sexytopo.model.graph.Projection2D;
+import org.hwyl.sexytopo.model.geometry.Projection2D;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
 import org.junit.Assert;

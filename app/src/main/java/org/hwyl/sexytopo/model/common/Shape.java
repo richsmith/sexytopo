@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.model.common;
 
-import org.hwyl.sexytopo.model.graph.Coord2D;
+import org.hwyl.sexytopo.model.geometry.Coord2D;
 
 /**
  * Cartesisan shapes for use in SexyTopo. SexyTopo uses screen coords: y axis increases downwards.

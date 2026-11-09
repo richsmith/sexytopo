@@ -1,6 +1,7 @@
 package org.hwyl.sexytopo.control.io.thirdparty.survex;
 
-import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
+import org.hwyl.sexytopo.model.geometry.ExtendedElevationDirection;
+import org.hwyl.sexytopo.model.survey.LegFilter;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
 import org.junit.Assert;
@@ -114,13 +115,13 @@ public class EspecParserTest {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         // Station 2 is from, station 3 is to (destination)
         String fromName =
-                survey.getOrigin().getConnectedOnwardLegs().get(0).getDestination().getName();
+                survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0).getDestination().getName();
         String toName =
                 survey.getOrigin()
-                        .getConnectedOnwardLegs()
+                        .getOnwardLegs(LegFilter.LEGS)
                         .get(0)
                         .getDestination()
-                        .getConnectedOnwardLegs()
+                        .getOnwardLegs(LegFilter.LEGS)
                         .get(0)
                         .getDestination()
                         .getName();
@@ -138,13 +139,13 @@ public class EspecParserTest {
     public void testCommentedEverticalSetsOnlyDestinationNotFrom() {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         String fromName =
-                survey.getOrigin().getConnectedOnwardLegs().get(0).getDestination().getName();
+                survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0).getDestination().getName();
         String toName =
                 survey.getOrigin()
-                        .getConnectedOnwardLegs()
+                        .getOnwardLegs(LegFilter.LEGS)
                         .get(0)
                         .getDestination()
-                        .getConnectedOnwardLegs()
+                        .getOnwardLegs(LegFilter.LEGS)
                         .get(0)
                         .getDestination()
                         .getName();
@@ -162,13 +163,13 @@ public class EspecParserTest {
     public void testCommentedEverticalDoesNotPropagateToStationBelow() {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
         String fromName =
-                survey.getOrigin().getConnectedOnwardLegs().get(0).getDestination().getName();
+                survey.getOrigin().getOnwardLegs(LegFilter.LEGS).get(0).getDestination().getName();
         String toName =
                 survey.getOrigin()
-                        .getConnectedOnwardLegs()
+                        .getOnwardLegs(LegFilter.LEGS)
                         .get(0)
                         .getDestination()
-                        .getConnectedOnwardLegs()
+                        .getOnwardLegs(LegFilter.LEGS)
                         .get(0)
                         .getDestination()
                         .getName();

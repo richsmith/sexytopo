@@ -14,9 +14,9 @@ android {
     defaultConfig {
         applicationId "org.hwyl.sexytopo"
         minSdkVersion 23
-        targetSdkVersion 35
-        versionCode 97
-        versionName "1.12.3"
+        targetSdkVersion 36
+        versionCode 102
+        versionName "1.15.0"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
 
@@ -53,6 +53,34 @@ android {
     }
     namespace = 'org.hwyl.sexytopo'
 
+}
+
+// Bundles docs/releases.md into the app's assets so the release notes can be viewed in-app
+// (Help -> Release Notes).
+abstract class CopyReleaseNotesTask extends DefaultTask {
+    @InputFile
+    abstract RegularFileProperty getReleaseNotes()
+
+    @OutputDirectory
+    abstract DirectoryProperty getOutputDir()
+
+    @TaskAction
+    void copy() {
+        def outputDir = getOutputDir().get().asFile
+        outputDir.mkdirs()
+        new File(outputDir, 'releases.md').bytes = getReleaseNotes().get().asFile.bytes
+    }
+}
+
+def copyReleaseNotes = tasks.register('copyReleaseNotes', CopyReleaseNotesTask) {
+    releaseNotes = rootProject.layout.projectDirectory.file('docs/releases.md')
+}
+
+androidComponents {
+    onVariants(selector().all()) { variant ->
+        variant.sources.assets.addGeneratedSourceDirectory(
+                copyReleaseNotes, CopyReleaseNotesTask::getOutputDir)
+    }
 }
 
 

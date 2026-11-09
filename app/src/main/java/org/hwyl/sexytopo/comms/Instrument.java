@@ -8,19 +8,22 @@ public class Instrument {
 
     private final InstrumentType instrumentType;
     private final BluetoothDevice bluetoothDevice;
+    private final String name;
 
     private final boolean isTest;
 
-    public Instrument(BluetoothDevice bluetoothDevice) throws SecurityException {
+    /** The name is passed in because Android may not know it for an unbonded device. */
+    public Instrument(BluetoothDevice bluetoothDevice, String name) {
         this.isTest = false;
         this.bluetoothDevice = bluetoothDevice;
-        String reportedName = bluetoothDevice == null ? null : bluetoothDevice.getName();
-        instrumentType = InstrumentType.byName(reportedName);
+        this.name = name;
+        instrumentType = InstrumentType.byName(name);
     }
 
     private Instrument() {
         isTest = true;
         bluetoothDevice = null;
+        name = null;
         instrumentType = InstrumentType.TEST;
     }
 
@@ -40,19 +43,14 @@ public class Instrument {
         if (isTest) {
             return instrumentType.describe();
         }
-
-        try {
-            return bluetoothDevice == null ? null : bluetoothDevice.getName();
-        } catch (SecurityException e) {
-            return null;
-        }
+        return name;
     }
 
     public String describe() {
-        if (isTest) {
-            return this.getName();
+        if (isTest || name != null) {
+            return getName();
         }
-        return this.describe(bluetoothDevice);
+        return describe(bluetoothDevice);
     }
 
     public static String describe(BluetoothDevice bluetoothDevice) {

@@ -4,11 +4,15 @@ import android.content.Context;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
+import androidx.annotation.Nullable;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
+import java.util.Locale;
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.control.util.SurveyTraversal;
@@ -92,6 +96,15 @@ public class EditLegForm extends Form {
     private Spinner inputModeSpinner;
     private InputMode inputMode = InputMode.FORWARD;
 
+    // Shown for splays only
+    private CheckBox toWallCheckBox;
+    private CheckBox enabledCheckBox;
+
+    private TextView shotsWarning;
+
+    // The readings the fields were filled with, rounded for display, if editing a leg
+    @Nullable private Leg shownReadings;
+
     private boolean isInitialising;
 
     /** Constructor for editing an existing leg */
@@ -103,7 +116,7 @@ public class EditLegForm extends Form {
         this.originalFromStation = fromStation;
         this.originalLeg = legToEdit;
         this.isSplay = !legToEdit.hasDestination();
-        this.inputMode = legToEdit.wasShotBackwards() ? InputMode.BACKWARD : InputMode.FORWARD;
+        this.inputMode = getInitialInputMode(legToEdit);
 
         this.initialise(dialogView);
     }
@@ -132,8 +145,33 @@ public class EditLegForm extends Form {
         this.isInitialising = true;
         this.initialiseFields(dialogView);
         this.initialiseInputMode(dialogView);
+        this.initialiseSplayOptions(dialogView);
         this.initialiseStationDisplay();
         this.isInitialising = false;
+    }
+
+    private void initialiseSplayOptions(View dialogView) {
+        if (isSplay) {
+            dialogView.findViewById(R.id.splayOptionsContainer).setVisibility(View.VISIBLE);
+            this.toWallCheckBox = dialogView.findViewById(R.id.toWallCheckBox);
+            toWallCheckBox.setChecked(initialToWall(originalLeg));
+            dialogView
+                    .findViewById(R.id.toWallInfoButton)
+                    .setOnClickListener(
+                            v ->
+                                    showInfo(
+                                            R.string.manual_edit_to_wall_info_title,
+                                            R.string.manual_edit_to_wall_info_message));
+            this.enabledCheckBox = dialogView.findViewById(R.id.enabledCheckBox);
+            enabledCheckBox.setChecked(initialEnabled(originalLeg));
+            dialogView
+                    .findViewById(R.id.enabledInfoButton)
+                    .setOnClickListener(
+                            v ->
+                                    showInfo(
+                                            R.string.manual_edit_enabled_info_title,
+                                            R.string.manual_edit_enabled_info_message));
+        }
     }
 
     private void initialiseFields(View dialogView) {
@@ -165,6 +203,7 @@ public class EditLegForm extends Form {
         this.inclinationMinutesField = dialogView.findViewById(R.id.editInclinationMinutes);
         this.inclinationSecondsField = dialogView.findViewById(R.id.editInclinationSeconds);
         this.inputModeSpinner = dialogView.findViewById(R.id.inputModeSpinner);
+        this.shotsWarning = dialogView.findViewById(R.id.shotsWarning);
 
         // Set up validation listeners
         this.fromStationField.addTextChangedListener(new TextViewValidationTrigger(this));
@@ -279,6 +318,29 @@ public class EditLegForm extends Form {
         validateDistance();
         validateAzimuth();
         validateInclination();
+
+        updateShotsWarning();
+    }
+
+    /** Warns that a leg averaged from several shots will lose them if its readings are changed. */
+    private void updateShotsWarning() {
+        boolean hasShots = !isSplay && originalLeg != null && originalLeg.wasPromoted();
+        if (!hasShots) {
+            return;
+        }
+        Leg entered = getEnteredReadings();
+        boolean losesShots = entered == null || !isUnchanged(shownReadings, entered);
+        shotsWarning.setVisibility(losesShots ? View.VISIBLE : View.GONE);
+    }
+
+    /** The readings entered, as taken, or null if they can't be read, such as a blank field. */
+    @Nullable
+    private Leg getEnteredReadings() {
+        try {
+            return new Leg(getDistance(), getAzimuth(), getInclination());
+        } catch (IllegalArgumentException exception) {
+            return null;
+        }
     }
 
     private Station validateGraphFromField(EditText fromField) {
@@ -289,8 +351,8 @@ public class EditLegForm extends Form {
 
         if (fromName.isEmpty()) {
             error = R.string.validation_error_cannot_be_blank;
-        } else if (fromName.equals(SexyTopoConstants.BLANK_STATION_NAME)) {
-            error = R.string.validation_error_station_named_dash;
+        } else if (Station.isReservedName(fromName)) {
+            error = R.string.validation_error_station_name_reserved;
         } else if (survey.isOrigin(originalFromStation) && fromStation == null) {
             // Are we just renaming the origin station
             boolean isRenamingStation = !originalFromStation.getName().equals(fromName);
@@ -349,8 +411,8 @@ public class EditLegForm extends Form {
 
         if (toName.isEmpty()) {
             error = R.string.validation_error_cannot_be_blank;
-        } else if (toName.equals(SexyTopoConstants.BLANK_STATION_NAME)) {
-            error = R.string.validation_error_station_named_dash;
+        } else if (Station.isReservedName(toName)) {
+            error = R.string.validation_error_station_name_reserved;
         } else if (toName.equals(fromName)) {
             error = R.string.validation_error_same_as_from_station;
         } else if (originalLeg != null && originalLeg.hasDestination()) {
@@ -773,34 +835,137 @@ public class EditLegForm extends Form {
     }
 
     /**
+     * Fills the reading fields with a leg's readings, as taken, to the same number of decimal
+     * places as the table.
+     */
+    public void showReadings(Leg asTaken) {
+        distanceField.setText(formatReading("%.3f", asTaken.getDistance()));
+
+        if (GeneralPreferences.isDegMinsSecsModeOn()) {
+            float[] azimuthDms = Leg.decomposeToDms(asTaken.getAzimuth());
+            azimuthDegreesField.setText(Integer.toString((int) azimuthDms[0]));
+            azimuthMinutesField.setText(Integer.toString((int) azimuthDms[1]));
+            azimuthSecondsField.setText(Float.toString(azimuthDms[2]));
+        } else {
+            azimuthField.setText(formatReading("%.2f", asTaken.getAzimuth()));
+        }
+
+        if (GeneralPreferences.isIncDegMinsSecsModeOn()) {
+            float[] inclinationDms = Leg.decomposeToDms(asTaken.getInclination());
+            inclinationDegreesField.setText(Integer.toString((int) inclinationDms[0]));
+            inclinationMinutesField.setText(Integer.toString((int) inclinationDms[1]));
+            inclinationSecondsField.setText(Float.toString(inclinationDms[2]));
+        } else {
+            inclinationField.setText(formatReading("%.2f", asTaken.getInclination()));
+        }
+
+        shownReadings = getEnteredReadings();
+        validate();
+    }
+
+    /** Fields are parsed with a full stop as the decimal point, whatever the locale. */
+    private static String formatReading(String format, float reading) {
+        return String.format(Locale.ROOT, format, reading);
+    }
+
+    /**
      * Create a Leg object from the form data with measurements and shot direction. For editing:
      * preserves the existing destination station object. For adding: creates a splay-like leg
      * (caller must create destination and reconstruct). Should only be called after validation
      * passes.
      */
     public Leg getUpdatedLeg() {
-        float distance = getDistance();
-        float azimuth = getAzimuth();
-        float inclination = getInclination();
+        Leg entered = new Leg(getDistance(), getAzimuth(), getInclination());
+        boolean unchanged = originalLeg != null && isUnchanged(shownReadings, entered);
+        Leg readings = unchanged ? originalLeg.toRecordedReading() : entered;
+        float distance = readings.getDistance();
+        float azimuth = readings.getAzimuth();
+        float inclination = readings.getInclination();
 
         Leg leg;
         if (isSplay) {
-            leg = new Leg(distance, azimuth, inclination);
+            leg =
+                    createSplay(
+                            distance,
+                            azimuth,
+                            inclination,
+                            toWallCheckBox.isChecked(),
+                            enabledCheckBox.isChecked());
         } else if (originalLeg != null && originalLeg.hasDestination()) {
             // For editing: reuse existing destination station object
             Station destination = originalLeg.getDestination();
-            leg = new Leg(distance, azimuth, inclination, destination, new Leg[] {});
+            Leg[] shots = unchanged ? originalLeg.getPromotedFrom() : new Leg[] {};
+            leg = new Leg(distance, azimuth, inclination, destination, shots);
         } else {
             // For adding a new station: create a temporary splay-like leg
             // Caller will reconstruct with proper destination station
             leg = new Leg(distance, azimuth, inclination);
         }
 
-        // Apply backwards flag if needed
-        if (inputMode == InputMode.BACKWARD) {
-            leg = leg.reverse();
-        }
+        return applyInputMode(leg, isSplay, inputMode);
+    }
 
+    private void showInfo(int titleId, int messageId) {
+        new MaterialAlertDialogBuilder(context)
+                .setTitle(titleId)
+                .setMessage(messageId)
+                .setPositiveButton(R.string.ok, null)
+                .show();
+    }
+
+    /**
+     * Whether the readings entered are still the ones the fields were filled with. If so, the leg
+     * keeps its own readings, which would otherwise be rounded to what was shown, and the shots it
+     * was averaged from, which wouldn't match changed readings.
+     */
+    static boolean isUnchanged(@Nullable Leg shown, Leg entered) {
+        return shown != null && entered.hasEquivalentReadings(shown);
+    }
+
+    /**
+     * Builds the splay for the readings entered, going to a wall or to another feature, and enabled
+     * or disabled.
+     */
+    static Leg createSplay(
+            float distance, float azimuth, float inclination, boolean toWall, boolean enabled) {
+        Leg splay = new Leg(distance, azimuth, inclination).withToWall(toWall);
+        splay.setEnabled(enabled);
+        return splay;
+    }
+
+    /**
+     * Whether the To Wall tick box starts ticked. A new splay goes to a wall, and an edited splay
+     * keeps what it goes to unless the box is changed.
+     */
+    static boolean initialToWall(Leg originalSplay) {
+        return originalSplay == null || originalSplay.isToWall();
+    }
+
+    /**
+     * Whether the Enabled tick box starts ticked. A new splay is enabled, and an edited splay keeps
+     * its state unless the box is changed.
+     */
+    static boolean initialEnabled(Leg originalSplay) {
+        return originalSplay == null || originalSplay.isEnabled();
+    }
+
+    /**
+     * The input mode a leg is edited in. Only a leg with a destination can be shot backwards; a
+     * splay always runs from its station, so it is always edited as a forward shot.
+     */
+    static InputMode getInitialInputMode(Leg leg) {
+        boolean backwards = leg.hasDestination() && leg.wasShotBackwards();
+        return backwards ? InputMode.BACKWARD : InputMode.FORWARD;
+    }
+
+    /**
+     * Applies the input mode to a freshly built leg. A backward shot is stored reversed and
+     * flagged, but a splay is never reversed or flagged.
+     */
+    static Leg applyInputMode(Leg leg, boolean isSplay, InputMode inputMode) {
+        if (inputMode == InputMode.BACKWARD && !isSplay) {
+            return leg.reverse();
+        }
         return leg;
     }
 

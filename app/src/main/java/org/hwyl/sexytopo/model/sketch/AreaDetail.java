@@ -7,7 +7,7 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import org.hwyl.sexytopo.control.util.PolygonUtils;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
-import org.hwyl.sexytopo.model.graph.Coord2D;
+import org.hwyl.sexytopo.model.geometry.Coord2D;
 
 /**
  * A filled region of the sketch, e.g. a pool of water. The region is bounded by an outline: a list

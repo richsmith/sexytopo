@@ -295,6 +295,9 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         } else if (itemId == R.id.action_help) {
             startActivity(GuideActivity.class);
             return true;
+        } else if (itemId == R.id.action_release_notes) {
+            startActivity(ReleaseNotesActivity.class);
+            return true;
         } else if (itemId == R.id.action_about) {
             openAboutDialog();
             return true;
@@ -775,7 +778,7 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     protected void redraw() {
         // Redraw the graph if we're in a graph view
-        View graph = findViewById(R.id.graphView);
+        View graph = findViewById(R.id.sketchView);
         if (graph != null) {
             graph.invalidate();
         }

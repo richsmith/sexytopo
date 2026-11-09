@@ -19,6 +19,8 @@ public class TextTools {
     static final DecimalFormat dp0WithCommaFormatter = new DecimalFormat("#,##0");
     static final DecimalFormat dp2WithCommaFormatter = new DecimalFormat("#,##0.00");
     static final DecimalFormat dp2WithoutCommaFormatter = new DecimalFormat("##0.00");
+    static final DecimalFormat dp1WithoutCommaFormatter = new DecimalFormat("##0.0");
+    static final DecimalFormat dp0WithoutCommaFormatter = new DecimalFormat("##0");
     static final DecimalFormat dp2WithoutCommaFormatterUk =
             new DecimalFormat("##0.00", new DecimalFormatSymbols(Locale.UK));
 
@@ -95,6 +97,14 @@ public class TextTools {
 
     public static String formatTo2dp(Number number) {
         return dp2WithoutCommaFormatter.format(number);
+    }
+
+    public static String formatTo1dp(Number number) {
+        return dp1WithoutCommaFormatter.format(number);
+    }
+
+    public static String formatTo0dp(Number number) {
+        return dp0WithoutCommaFormatter.format(number);
     }
 
     public static String formatTo2dpWithDot(Number number) {

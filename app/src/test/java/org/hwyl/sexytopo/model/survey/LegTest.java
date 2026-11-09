@@ -171,7 +171,7 @@ public class LegTest {
     public void testSplayHasNoDestination() {
         Leg splay = new Leg(5.0f, 45.0f, 30.0f);
         Assert.assertFalse(splay.hasDestination());
-        Assert.assertEquals(Survey.NULL_STATION, splay.getDestination());
+        Assert.assertEquals(Station.ANONYMOUS_WALL, splay.getDestination());
     }
 
     @Test
@@ -228,7 +228,26 @@ public class LegTest {
         Assert.assertEquals(5.0f, splay.getDistance(), DELTA);
         Assert.assertEquals(45.0f, splay.getAzimuth(), DELTA);
         Assert.assertEquals(30.0f, splay.getInclination(), DELTA);
-        Assert.assertTrue(splay.wasShotBackwards());
+    }
+
+    @Test
+    public void testToSplayClearsWasShotBackwards() {
+        Station destination = new Station("A1");
+        Leg backwardsLeg = new Leg(5.0f, 45.0f, 30.0f, destination, new Leg[] {}, true);
+
+        Leg splay = backwardsLeg.toSplay();
+
+        Assert.assertFalse(splay.wasShotBackwards());
+    }
+
+    @Test
+    public void testToSplayOfForwardLegIsNotShotBackwards() {
+        Station destination = new Station("A1");
+        Leg forwardLeg = new Leg(5.0f, 45.0f, 30.0f, destination, new Leg[] {}, false);
+
+        Leg splay = forwardLeg.toSplay();
+
+        Assert.assertFalse(splay.wasShotBackwards());
     }
 
     @Test
@@ -264,5 +283,278 @@ public class LegTest {
         Assert.assertTrue(Leg.isInclinationLegal(0.0f));
         Assert.assertFalse(Leg.isInclinationLegal(-90.1f));
         Assert.assertFalse(Leg.isInclinationLegal(90.1f));
+    }
+
+    private static Leg disabledSplayWithComment() {
+        Leg splay = new Leg(2.0f, 90.0f, 10.0f);
+        splay.setComment("Boulder");
+        splay.setEnabled(false);
+        return splay;
+    }
+
+    @Test
+    public void testLegIsNotDisabledByDefault() {
+        Assert.assertTrue(new Leg(1.0f, 0.0f, 0.0f).isEnabled());
+    }
+
+    @Test
+    public void testSplayCanBeDisabledAndShown() {
+        Leg splay = new Leg(1.0f, 0.0f, 0.0f);
+
+        splay.setEnabled(false);
+        Assert.assertFalse(splay.isEnabled());
+
+        splay.setEnabled(true);
+        Assert.assertTrue(splay.isEnabled());
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testFullLegCannotBeDisabled() {
+        Leg leg = new Leg(1.0f, 0.0f, 0.0f, new Station("1"), new Leg[] {});
+        leg.setEnabled(false);
+    }
+
+    @Test
+    public void testFullLegCanBeShown() {
+        Leg leg = new Leg(1.0f, 0.0f, 0.0f, new Station("1"), new Leg[] {});
+        leg.setEnabled(true);
+        Assert.assertTrue(leg.isEnabled());
+    }
+
+    @Test
+    public void testReverseKeepsDisabledAndComment() {
+        Leg reversed = disabledSplayWithComment().reverse();
+        Assert.assertFalse(reversed.isEnabled());
+        Assert.assertEquals("Boulder", reversed.getComment());
+    }
+
+    @Test
+    public void testAsBacksightKeepsDisabledAndComment() {
+        Leg backsight = disabledSplayWithComment().asBacksight();
+        Assert.assertFalse(backsight.isEnabled());
+        Assert.assertEquals("Boulder", backsight.getComment());
+    }
+
+    @Test
+    public void testRotateKeepsDisabledAndComment() {
+        Leg rotated = disabledSplayWithComment().rotate(45.0f);
+        Assert.assertFalse(rotated.isEnabled());
+        Assert.assertEquals("Boulder", rotated.getComment());
+    }
+
+    @Test
+    public void testAdjustAzimuthKeepsDisabledAndComment() {
+        Leg adjusted = disabledSplayWithComment().adjustAzimuth(180.0f);
+        Assert.assertFalse(adjusted.isEnabled());
+        Assert.assertEquals("Boulder", adjusted.getComment());
+    }
+
+    @Test
+    public void testRotateKeepsCommentOfFullLeg() {
+        Leg leg = new Leg(1.0f, 0.0f, 0.0f, new Station("1"), new Leg[] {});
+        leg.setComment("Tight");
+        Leg rotated = leg.rotate(10.0f);
+        Assert.assertEquals("Tight", rotated.getComment());
+        Assert.assertTrue(rotated.isEnabled());
+    }
+
+    @Test
+    public void testCopyWithDestinationKeepsCommentButIsNeverDisabled() {
+        Leg copy = new Leg(disabledSplayWithComment(), new Station("1"));
+        Assert.assertEquals("Boulder", copy.getComment());
+        Assert.assertTrue(copy.isEnabled());
+    }
+
+    @Test
+    public void testUpgradingDisabledSplayGivesEnabledLegWithComment() {
+        Leg leg = Leg.toFullLeg(disabledSplayWithComment(), new Station("1"));
+        Assert.assertTrue(leg.isEnabled());
+        Assert.assertEquals("Boulder", leg.getComment());
+    }
+
+    @Test
+    public void testToSplayIsEnabled() {
+        Leg splay = disabledSplayWithComment();
+        Leg leg = Leg.toFullLeg(splay, new Station("1"));
+        Assert.assertTrue(leg.toSplay().isEnabled());
+        Assert.assertFalse(splay.isEnabled());
+    }
+
+    // ---- fromRecordedReading / toRecordedReading ----
+
+    @Test
+    public void testFromRecordedReadingForwardKeepsTheReading() {
+        Station destination = new Station("A1");
+
+        Leg leg = Leg.fromRecordedReading(new Leg(5.0f, 45.0f, 10.0f), destination, false);
+
+        Assert.assertSame(destination, leg.getDestination());
+        Assert.assertFalse(leg.wasShotBackwards());
+        Assert.assertEquals(5.0f, leg.getDistance(), DELTA);
+        Assert.assertEquals(45.0f, leg.getAzimuth(), DELTA);
+        Assert.assertEquals(10.0f, leg.getInclination(), DELTA);
+    }
+
+    @Test
+    public void testFromRecordedReadingBackwardReversesAndFlagsTheLeg() {
+        Leg leg = Leg.fromRecordedReading(new Leg(5.0f, 45.0f, 10.0f), new Station("A1"), true);
+
+        Assert.assertTrue(leg.wasShotBackwards());
+        Assert.assertEquals(5.0f, leg.getDistance(), DELTA);
+        Assert.assertEquals(225.0f, leg.getAzimuth(), DELTA);
+        Assert.assertEquals(-10.0f, leg.getInclination(), DELTA);
+    }
+
+    @Test
+    public void testFromRecordedReadingKeepsPromotedFromAsRecorded() {
+        Leg[] readings = {new Leg(5.0f, 44.0f, 9.0f), new Leg(5.0f, 46.0f, 11.0f)};
+
+        Leg leg =
+                Leg.fromRecordedReading(
+                        new Leg(5.0f, 45.0f, 10.0f), new Station("A1"), readings, true);
+
+        Assert.assertArrayEquals(readings, leg.getPromotedFrom());
+        Assert.assertEquals(44.0f, leg.getPromotedFrom()[0].getAzimuth(), DELTA);
+        Assert.assertFalse(leg.getPromotedFrom()[0].wasShotBackwards());
+    }
+
+    @Test
+    public void testFromRecordedReadingKeepsTheComment() {
+        Leg recorded = new Leg(5.0f, 45.0f, 10.0f);
+        recorded.setComment("a comment");
+
+        Assert.assertEquals(
+                "a comment",
+                Leg.fromRecordedReading(recorded, new Station("A1"), false).getComment());
+        Assert.assertEquals(
+                "a comment",
+                Leg.fromRecordedReading(recorded, new Station("A1"), true).getComment());
+    }
+
+    @Test
+    public void testFromRecordedReadingIgnoresTheFlagOnTheRecordedReading() {
+        // A recorded reading is never shot backwards, so a stray flag must not flip the result
+        Leg flagged = new Leg(5.0f, 45.0f, 10.0f, true);
+
+        Leg leg = Leg.fromRecordedReading(flagged, new Station("A1"), false);
+
+        Assert.assertFalse(leg.wasShotBackwards());
+        Assert.assertEquals(45.0f, leg.getAzimuth(), DELTA);
+    }
+
+    @Test
+    public void testToRecordedReadingOfBackwardLegReversesItBack() {
+        Leg backwardsLeg = new Leg(5.0f, 225.0f, -10.0f, new Station("A1"), new Leg[] {}, true);
+
+        Leg recorded = backwardsLeg.toRecordedReading();
+
+        Assert.assertFalse(recorded.hasDestination());
+        Assert.assertFalse(recorded.wasShotBackwards());
+        Assert.assertEquals(5.0f, recorded.getDistance(), DELTA);
+        Assert.assertEquals(45.0f, recorded.getAzimuth(), DELTA);
+        Assert.assertEquals(10.0f, recorded.getInclination(), DELTA);
+    }
+
+    @Test
+    public void testToRecordedReadingOfForwardLegKeepsTheNumbers() {
+        Leg forwardLeg = new Leg(5.0f, 45.0f, 10.0f, new Station("A1"), new Leg[] {}, false);
+
+        Leg recorded = forwardLeg.toRecordedReading();
+
+        Assert.assertFalse(recorded.hasDestination());
+        Assert.assertFalse(recorded.wasShotBackwards());
+        Assert.assertEquals(45.0f, recorded.getAzimuth(), DELTA);
+        Assert.assertEquals(10.0f, recorded.getInclination(), DELTA);
+    }
+
+    @Test
+    public void testToRecordedReadingIsTheInverseOfFromRecordedReading() {
+        for (boolean shotBackwards : new boolean[] {false, true}) {
+            Leg original = new Leg(7.5f, 123.0f, -33.0f);
+
+            Leg recovered =
+                    Leg.fromRecordedReading(original, new Station("A1"), shotBackwards)
+                            .toRecordedReading();
+
+            Assert.assertEquals(original.getDistance(), recovered.getDistance(), DELTA);
+            Assert.assertEquals(original.getAzimuth(), recovered.getAzimuth(), DELTA);
+            Assert.assertEquals(original.getInclination(), recovered.getInclination(), DELTA);
+        }
+    }
+
+    // ---- what a splay goes to: a wall or another feature ----
+
+    @Test
+    public void testNewSplayGoesToAWall() {
+        Leg splay = new Leg(5.0f, 45.0f, 10.0f);
+
+        Assert.assertFalse(splay.hasDestination());
+        Assert.assertTrue(splay.isToWall());
+    }
+
+    @Test
+    public void testWithToWallChangesWhatASplayGoesToAndKeepsTheRest() {
+        Leg splay = new Leg(5.0f, 45.0f, 10.0f);
+        splay.setComment("a boulder");
+
+        Leg toFeature = splay.withToWall(false);
+
+        Assert.assertFalse(toFeature.hasDestination());
+        Assert.assertFalse(toFeature.isToWall());
+        Assert.assertEquals(5.0f, toFeature.getDistance(), DELTA);
+        Assert.assertEquals(45.0f, toFeature.getAzimuth(), DELTA);
+        Assert.assertEquals(10.0f, toFeature.getInclination(), DELTA);
+        Assert.assertEquals("a boulder", toFeature.getComment());
+        Assert.assertTrue(toFeature.withToWall(true).isToWall());
+    }
+
+    @Test
+    public void testSplayToAnotherFeatureStaysThatWayWhenCopied() {
+        Leg splay = new Leg(5.0f, 45.0f, 10.0f).withToWall(false);
+
+        Leg[] copies = {
+            splay.reverse(), splay.rotate(30), splay.adjustAzimuth(100), splay.toSplay()
+        };
+
+        for (Leg copy : copies) {
+            Assert.assertFalse(copy.hasDestination());
+            Assert.assertFalse(copy.isToWall());
+        }
+    }
+
+    @Test
+    public void testLegWithADestinationIsNotChangedByWithToWall() {
+        Leg leg = new Leg(5.0f, 45.0f, 10.0f, new Station("A1"), new Leg[] {}, false);
+
+        Assert.assertSame(leg, leg.withToWall(false));
+        Assert.assertTrue(leg.isToWall());
+    }
+
+    @Test
+    public void testLegTurnedIntoASplayGoesToAWall() {
+        Leg leg = new Leg(5.0f, 45.0f, 10.0f, new Station("A1"), new Leg[] {}, false);
+
+        Assert.assertTrue(leg.toSplay().isToWall());
+    }
+
+    @Test
+    public void testLegsWithSameReadingsAreEquivalentWhateverElseDiffers() {
+        Leg leg = new Leg(5.0f, 45.0f, 10.0f, new Station("A1"), new Leg[] {}, false);
+        Leg other = new Leg(5.0f, 45.0f, 10.0f, new Station("B2"), new Leg[] {leg}, true);
+        Assert.assertTrue(leg.hasEquivalentReadings(other));
+    }
+
+    @Test
+    public void testLegsWithReadingsWithinRoundingAreEquivalent() {
+        Leg leg = new Leg(5.0f, 45.0f, 10.0f);
+        Assert.assertTrue(leg.hasEquivalentReadings(new Leg(5.0f, 45.0f + 1 / 3600f, 10.0f)));
+    }
+
+    @Test
+    public void testLegsWithAnyReadingDifferentAreNotEquivalent() {
+        Leg leg = new Leg(5.0f, 45.0f, 10.0f);
+        Assert.assertFalse(leg.hasEquivalentReadings(new Leg(5.1f, 45.0f, 10.0f)));
+        Assert.assertFalse(leg.hasEquivalentReadings(new Leg(5.0f, 45.1f, 10.0f)));
+        Assert.assertFalse(leg.hasEquivalentReadings(new Leg(5.0f, 45.0f, 10.1f)));
     }
 }

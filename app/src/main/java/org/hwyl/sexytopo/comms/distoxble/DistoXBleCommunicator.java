@@ -2,8 +2,8 @@ package org.hwyl.sexytopo.comms.distoxble;
 
 import android.bluetooth.BluetoothDevice;
 import org.hwyl.sexytopo.comms.ble.BleCommunicator;
+import org.hwyl.sexytopo.comms.distox.CalibrationWrite;
 import org.hwyl.sexytopo.comms.distox.DistoXStyleCommunicator;
-import org.hwyl.sexytopo.comms.distox.WriteCalibrationProtocol;
 import org.hwyl.sexytopo.control.activity.DeviceActivity;
 
 public class DistoXBleCommunicator extends BleCommunicator implements DistoXStyleCommunicator {
@@ -31,7 +31,7 @@ public class DistoXBleCommunicator extends BleCommunicator implements DistoXStyl
     }
 
     @Override
-    public WriteCalibrationProtocol writeCalibration(Byte... bytes) {
+    public CalibrationWrite writeCalibration(Byte... bytes) {
         return getManager().writeCalibration(bytes);
     }
 }

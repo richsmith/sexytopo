@@ -1,12 +1,13 @@
 package org.hwyl.sexytopo.model.sketch;
 
 import org.hwyl.sexytopo.control.util.Space3DUtils;
-import org.hwyl.sexytopo.model.graph.Coord2D;
-import org.hwyl.sexytopo.model.graph.Coord3D;
-import org.hwyl.sexytopo.model.graph.Line;
-import org.hwyl.sexytopo.model.graph.Projection2D;
-import org.hwyl.sexytopo.model.graph.Space;
+import org.hwyl.sexytopo.model.geometry.Coord2D;
+import org.hwyl.sexytopo.model.geometry.Coord3D;
+import org.hwyl.sexytopo.model.geometry.Line;
+import org.hwyl.sexytopo.model.geometry.Projection2D;
+import org.hwyl.sexytopo.model.geometry.Space;
 import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.LegFilter;
 import org.hwyl.sexytopo.model.survey.Station;
 
 /**
@@ -48,7 +49,8 @@ public class CrossSection {
 
         Projection2D projectionType = getProjectionType();
 
-        for (Leg leg : station.getUnconnectedOnwardLegs()) {
+        // Only splays to the wall show the shape of the passage
+        for (Leg leg : station.getOnwardLegs(LegFilter.SPLAYS.includeFeatures(false))) {
             // A vertical cross-section is first normalised to match its angle; a horizontal one
             // already lies in the real-world horizontal plane so is used as it is.
             Leg drawn = isRotatable() ? leg.rotate(-angle) : leg;

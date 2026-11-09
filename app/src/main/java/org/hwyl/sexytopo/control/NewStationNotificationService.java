@@ -20,8 +20,9 @@ public class NewStationNotificationService extends Service {
     BroadcastReceiver receiver;
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        BroadcastReceiver receiver =
+    public void onCreate() {
+        super.onCreate();
+        receiver =
                 new BroadcastReceiver() {
                     @Override
                     public void onReceive(Context context, Intent intent) {
@@ -38,7 +39,10 @@ public class NewStationNotificationService extends Service {
             crashlytics.recordException(exception);
             Log.e(exception);
         }
+    }
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
         return START_REDELIVER_INTENT;
     }
 

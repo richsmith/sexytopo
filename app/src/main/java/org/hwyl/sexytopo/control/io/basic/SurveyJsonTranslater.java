@@ -15,8 +15,9 @@ import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SexyTopo;
 import org.hwyl.sexytopo.control.io.IoUtils;
-import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
+import org.hwyl.sexytopo.model.geometry.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.LegFilter;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
@@ -39,7 +40,9 @@ public class SurveyJsonTranslater {
     public static final String INCLINATION_TAG = "inclination";
     public static final String PROMOTED_FROM_TAG = "promotedFrom";
     public static final String DESTINATION_TAG = "destination";
+    public static final String ENABLED_TAG = "enabled";
     public static final String WAS_SHOT_BACKWARDS_TAG = "wasShotBackwards";
+    public static final String TO_WALL_TAG = "toWall";
     public static final String INDEX_TAG = "index";
 
     public static final String ACTIVE_STATION_TAG = "activeStation";
@@ -141,7 +144,7 @@ public class SurveyJsonTranslater {
         json.put(COMMENT_TAG, station.getComment());
 
         JSONArray onwardLegsArray = new JSONArray();
-        for (Leg leg : station.getOnwardLegs()) {
+        for (Leg leg : station.getOnwardLegs(LegFilter.ALL.includeDisabled(true))) {
             int index = chronoList.indexOf(leg);
             onwardLegsArray.put(toJson(leg, index));
         }
@@ -259,10 +262,22 @@ public class SurveyJsonTranslater {
         json.put(DISTANCE_TAG, leg.getDistance());
         json.put(AZIMUTH_TAG, leg.getAzimuth());
         json.put(INCLINATION_TAG, leg.getInclination());
-        json.put(DESTINATION_TAG, leg.getDestination().getName());
+        // Every splay is saved with a dash as its destination, so older versions of SexyTopo can
+        // still load it; whether it goes to a wall is a separate flag, only written when it doesn't
+        if (leg.hasDestination()) {
+            json.put(DESTINATION_TAG, leg.getDestination().getName());
+        } else {
+            json.put(DESTINATION_TAG, Station.ANONYMOUS_WALL.getName());
+            if (!leg.isToWall()) {
+                json.put(TO_WALL_TAG, false);
+            }
+        }
         json.put(WAS_SHOT_BACKWARDS_TAG, leg.wasShotBackwards());
         if (leg.hasComment()) {
             json.put(COMMENT_TAG, leg.getComment());
+        }
+        if (!leg.isEnabled()) {
+            json.put(ENABLED_TAG, false);
         }
         if (index != null) {
             json.put(INDEX_TAG, index);
@@ -353,8 +368,15 @@ public class SurveyJsonTranslater {
         String destinationName = json.getString(DESTINATION_TAG);
 
         Leg leg;
-        if (destinationName.equals(SexyTopoConstants.BLANK_STATION_NAME)) {
-            leg = new Leg(distance, azimuth, inclination, wasShotBackwards);
+        Station anonymousStation = Station.getAnonymous(destinationName);
+        if (anonymousStation != null) {
+            // A splay goes to a wall unless flagged otherwise.
+            // A splay always runs from its station, so it can never be shot backwards.
+            // Older files may hold a splay with the flag set; the numbers are what is plotted, so
+            // they are kept and only the flag is cleared.
+            boolean toWall =
+                    json.optBoolean(TO_WALL_TAG, anonymousStation == Station.ANONYMOUS_WALL);
+            leg = new Leg(distance, azimuth, inclination).withToWall(toWall);
 
         } else {
             if (!namesToStations.containsKey(destinationName)) {
@@ -388,6 +410,9 @@ public class SurveyJsonTranslater {
         }
 
         leg.setComment(json.optString(COMMENT_TAG, ""));
+        if (!leg.hasDestination() && !json.optBoolean(ENABLED_TAG, true)) {
+            leg.setEnabled(false);
+        }
         return leg;
     }
 

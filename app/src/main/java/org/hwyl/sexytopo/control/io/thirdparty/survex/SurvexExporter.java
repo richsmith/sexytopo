@@ -7,8 +7,9 @@ import org.hwyl.sexytopo.control.io.SurveyFile;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
 import org.hwyl.sexytopo.control.io.translation.Exporter;
-import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
+import org.hwyl.sexytopo.model.geometry.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.LegFilter;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
@@ -119,7 +120,7 @@ public class SurvexExporter extends Exporter {
             inheritedDirection = currentDirection;
         }
 
-        for (Leg leg : station.getConnectedOnwardLegs()) {
+        for (Leg leg : station.getOnwardLegs(LegFilter.LEGS)) {
             generateEspecExtendCommandsFromStation(
                     builder, leg.getDestination(), station, inheritedDirection);
         }

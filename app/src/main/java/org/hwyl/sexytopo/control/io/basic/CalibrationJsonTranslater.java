@@ -3,7 +3,6 @@ package org.hwyl.sexytopo.control.io.basic;
 import java.util.ArrayList;
 import java.util.List;
 import org.hwyl.sexytopo.SexyTopoConstants;
-import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.model.calibration.CalibrationReading;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,9 +26,10 @@ public class CalibrationJsonTranslater {
             throws JSONException {
         List<CalibrationReading> calibrationReadings = new ArrayList<>();
         JSONArray array = new JSONArray(string);
-        List<JSONObject> calibrationData = IoUtils.toList(array);
-        for (JSONObject json : calibrationData) {
-            calibrationReadings.add(toCalibrationReading(json));
+        for (int i = 0; i < array.length(); i++) {
+            // null marks a deleted reading waiting to be retaken
+            calibrationReadings.add(
+                    array.isNull(i) ? null : toCalibrationReading(array.getJSONObject(i)));
         }
         return calibrationReadings;
     }
@@ -39,7 +39,7 @@ public class CalibrationJsonTranslater {
 
         JSONArray json = new JSONArray();
         for (CalibrationReading calibrationReading : calibrationReadings) {
-            json.put(toJson(calibrationReading));
+            json.put(calibrationReading == null ? JSONObject.NULL : toJson(calibrationReading));
         }
 
         return json;

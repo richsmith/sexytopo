@@ -1,7 +1,7 @@
 package org.hwyl.sexytopo.model.sketch;
 
-import org.hwyl.sexytopo.model.graph.Coord2D;
-import org.hwyl.sexytopo.model.graph.Projection2D;
+import org.hwyl.sexytopo.model.geometry.Coord2D;
+import org.hwyl.sexytopo.model.geometry.Projection2D;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.junit.Assert;
@@ -103,5 +103,25 @@ public class CrossSectionTest {
     public void testVerticalProjectionIsUnchangedFacingEast() {
         // Facing east, a splay to the south is to the right
         assertCoord(3, 0, endOfOnlySplay(new CrossSection(stationWithSplay(3, 180, 0), 90f)));
+    }
+
+    @Test
+    public void testDisabledSplaysAreNotProjected() {
+        Station station = stationWithSplay(2, 90, 0);
+        Leg disabled = new Leg(3, 0, 0);
+        disabled.setEnabled(false);
+        station.addOnwardLeg(disabled);
+
+        Assert.assertEquals(1, new CrossSection(station, 0f).getProjection().getLegMap().size());
+        Assert.assertEquals(1, CrossSection.horizontal(station).getProjection().getLegMap().size());
+    }
+
+    @Test
+    public void testOnlySplaysToTheWallAreProjected() {
+        Station station = stationWithSplay(2, 90, 0);
+        station.addOnwardLeg(new Leg(3, 0, 0).withToWall(false));
+
+        Assert.assertEquals(1, new CrossSection(station, 0f).getProjection().getLegMap().size());
+        Assert.assertEquals(1, CrossSection.horizontal(station).getProjection().getLegMap().size());
     }
 }

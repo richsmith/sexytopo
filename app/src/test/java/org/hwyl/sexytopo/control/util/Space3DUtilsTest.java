@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.control.util;
 
-import org.hwyl.sexytopo.model.graph.Coord3D;
+import org.hwyl.sexytopo.model.geometry.Coord3D;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.junit.Assert;
 import org.junit.Test;
@@ -13,6 +13,12 @@ public class Space3DUtilsTest {
         Coord3D result = Space3DUtils.toCartesian(Coord3D.ORIGIN, north1MLeg);
         Coord3D expected = new Coord3D(0, 1, 0);
         assertEquals(expected, result);
+    }
+
+    @Test
+    public void testToLegJustWestOfNorthGivesValidAzimuth() {
+        Leg leg = Space3DUtils.toLeg(new Coord3D(-1e-9f, 10, 0));
+        Assert.assertTrue(leg.getAzimuth() >= 0 && leg.getAzimuth() < 360);
     }
 
     @Test

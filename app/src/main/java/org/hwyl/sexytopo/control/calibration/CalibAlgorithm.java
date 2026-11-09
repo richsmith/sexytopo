@@ -24,6 +24,20 @@ public class CalibAlgorithm {
         m[idx] = new Vector(mx / FV, my / FV, mz / FV);
     }
 
+    /*
+     * applies the calibration found by Optimize to one raw reading, returning calibrated g and m
+     */
+    public static Vector[] Apply(int gx, int gy, int gz, int mx, int my, int mz) {
+        Vector g = new Vector(gx / FV, gy / FV, gz / FV);
+        Vector m = new Vector(mx / FV, my / FV, mz / FV);
+        Vector gl =
+                new Vector(
+                        g.x + (g.x * g.x - 0.5F) * nl.x,
+                        g.y + (g.y * g.y - 0.5F) * nl.y,
+                        g.z + (g.z * g.z - 0.5F) * nl.z);
+        return new Vector[] {aG.times(gl).plus(bG), aM.times(m).plus(bM)};
+    }
+
     // helpers
     public static Vector[] OptVectors(Vector gr, Vector mr, float alpha) {
         Vector no = Vector.Normalized(gr.crossProduct(mr)); // plane normal
@@ -234,10 +248,13 @@ public class CalibAlgorithm {
     }
 
     /*
-     * returns byte sequence to be written to address 0x8010 - 0x803F/0x8043
+     * returns byte sequence to be written to address 0x8010 - 0x8043
+     *
+     * For a linear calibration the non-linear slots are filled with 0xFF, which the DistoX
+     * treats as "no non-linear correction".
      */
     public static byte[] GetCoeff(boolean useNonLinearity) {
-        byte[] data = new byte[useNonLinearity ? 52 : 48];
+        byte[] data = new byte[52];
         PutCoeff(data, 0, bG.x * FV);
         PutCoeff(data, 2, aG.x.x * FM);
         PutCoeff(data, 4, aG.x.y * FM);
@@ -269,8 +286,12 @@ public class CalibAlgorithm {
             data[48] = (byte) (nlx - 1);
             data[49] = (byte) (nly - 1);
             data[50] = (byte) (nlz - 1);
-            data[51] = (byte) 0xFF;
+        } else {
+            data[48] = (byte) 0xFF;
+            data[49] = (byte) 0xFF;
+            data[50] = (byte) 0xFF;
         }
+        data[51] = (byte) 0xFF;
         return data;
     }
 }

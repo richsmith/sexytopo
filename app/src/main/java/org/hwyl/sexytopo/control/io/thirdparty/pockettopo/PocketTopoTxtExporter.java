@@ -11,10 +11,10 @@ import org.hwyl.sexytopo.control.io.translation.Experimental;
 import org.hwyl.sexytopo.control.io.translation.SingleFileExporter;
 import org.hwyl.sexytopo.control.util.GraphToListTranslator;
 import org.hwyl.sexytopo.control.util.TextTools;
-import org.hwyl.sexytopo.model.graph.Coord2D;
-import org.hwyl.sexytopo.model.graph.Line;
-import org.hwyl.sexytopo.model.graph.Projection2D;
-import org.hwyl.sexytopo.model.graph.Space;
+import org.hwyl.sexytopo.model.geometry.Coord2D;
+import org.hwyl.sexytopo.model.geometry.Line;
+import org.hwyl.sexytopo.model.geometry.Projection2D;
+import org.hwyl.sexytopo.model.geometry.Space;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Leg;
@@ -137,6 +137,7 @@ public class PocketTopoTxtExporter extends SingleFileExporter implements Experim
         Leg leg = entry.getLeg();
         Station to = leg.getDestination();
         String toName = to.getName();
+        boolean isSplay = !leg.hasDestination();
 
         if (leg.wasShotBackwards()) {
             leg = leg.reverse();
@@ -144,7 +145,6 @@ public class PocketTopoTxtExporter extends SingleFileExporter implements Experim
             toName = from.getName();
         }
 
-        boolean isSplay = toName.equals("-");
         if (isSplay) {
             toName = "";
         }

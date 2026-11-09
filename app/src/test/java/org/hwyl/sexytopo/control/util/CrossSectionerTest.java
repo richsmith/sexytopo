@@ -1,7 +1,7 @@
 package org.hwyl.sexytopo.control.util;
 
 import org.hwyl.sexytopo.SexyTopoConstants;
-import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
+import org.hwyl.sexytopo.model.geometry.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -207,5 +207,19 @@ public class CrossSectionerTest {
 
         Assert.assertTrue(CrossSectioner.isFacingRightOnElevation(survey, station, 60));
         Assert.assertFalse(CrossSectioner.isFacingRightOnElevation(survey, station, 120));
+    }
+
+    @Test
+    public void testDisabledSplaysDoNotCountTowardsTheHorizontalRadius() {
+        Station station = new Station("A1");
+        station.addOnwardLeg(new Leg(2, 90, 0));
+        Leg farSplay = new Leg(10, 270, 0);
+        farSplay.setEnabled(false);
+        station.addOnwardLeg(farSplay);
+
+        Assert.assertEquals(
+                2.0,
+                CrossSectioner.getHorizontalRadius(station),
+                SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
     }
 }

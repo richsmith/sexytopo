@@ -1,12 +1,13 @@
 package org.hwyl.sexytopo.control.util;
 
 import java.util.Map;
-import org.hwyl.sexytopo.model.graph.Coord2D;
-import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
-import org.hwyl.sexytopo.model.graph.Line;
-import org.hwyl.sexytopo.model.graph.Projection2D;
-import org.hwyl.sexytopo.model.graph.Space;
+import org.hwyl.sexytopo.model.geometry.Coord2D;
+import org.hwyl.sexytopo.model.geometry.ExtendedElevationDirection;
+import org.hwyl.sexytopo.model.geometry.Line;
+import org.hwyl.sexytopo.model.geometry.Projection2D;
+import org.hwyl.sexytopo.model.geometry.Space;
 import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.LegFilter;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
@@ -75,13 +76,13 @@ public class ExtendedElevationProjectionTest {
         Coord2D expected = new Coord2D(5, 0);
         Assert.assertEquals(expected, twoCoord);
 
-        Leg splayLeft = two.getUnconnectedOnwardLegs().get(0);
+        Leg splayLeft = two.getOnwardLegs(LegFilter.SPLAYS).get(0);
         Line<Coord2D> splayLeftLine = legMap.get(splayLeft);
         expected = new Coord2D(5, 0);
         assert splayLeftLine != null;
         Assert.assertEquals(expected, splayLeftLine.getEnd());
 
-        Leg splayRight = two.getUnconnectedOnwardLegs().get(1);
+        Leg splayRight = two.getOnwardLegs(LegFilter.SPLAYS).get(1);
         Line<Coord2D> splayRightLine = legMap.get(splayRight);
         expected = new Coord2D(5, 0);
         assert splayRightLine != null;

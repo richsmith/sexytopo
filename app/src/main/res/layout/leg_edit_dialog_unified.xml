@@ -296,6 +296,41 @@
             </LinearLayout>
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/splayOptionsContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:visibility="gone">
+            <CheckBox
+                android:id="@+id/toWallCheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/menu_to_wall"/>
+            <ImageButton
+                android:id="@+id/toWallInfoButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/manual_edit_to_wall_info_title"
+                android:src="@drawable/ic_info"/>
+            <CheckBox
+                android:id="@+id/enabledCheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/menu_enabled"/>
+            <ImageButton
+                android:id="@+id/enabledInfoButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/manual_edit_enabled_info_title"
+                android:src="@drawable/ic_info"/>
+        </LinearLayout>
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/legCommentLayout"
             android:layout_width="match_parent"
@@ -309,6 +344,15 @@
                 android:layout_height="wrap_content"
                 android:inputType="text"/>
         </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/shotsWarning"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/manual_edit_shots_warning"
+            android:textColor="?attr/colorError"
+            android:visibility="gone"/>
 
     </LinearLayout>
 </ScrollView>

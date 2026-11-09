@@ -3,7 +3,7 @@ package org.hwyl.sexytopo.control.util.amalgamation;
 import java.util.List;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.control.util.Space3DUtils;
-import org.hwyl.sexytopo.model.graph.Coord3D;
+import org.hwyl.sexytopo.model.geometry.Coord3D;
 import org.hwyl.sexytopo.model.survey.Leg;
 
 /** Geometry helpers shared between the leg amalgamation strategies. */

@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.control.util;
 
-import org.hwyl.sexytopo.model.graph.Coord3D;
+import org.hwyl.sexytopo.model.geometry.Coord3D;
 import org.hwyl.sexytopo.model.survey.Leg;
 
 public class Space3DUtils {
@@ -36,6 +36,10 @@ public class Space3DUtils {
         float azimuth = (float) Math.toDegrees(Math.atan2(x, y));
         if (azimuth < 0) {
             azimuth += 360;
+        }
+        // A tiny negative angle rounds to exactly 360 above, which isn't a valid azimuth
+        if (azimuth >= 360) {
+            azimuth -= 360;
         }
 
         float horizontal = (float) Math.sqrt((x * x) + (y * y));

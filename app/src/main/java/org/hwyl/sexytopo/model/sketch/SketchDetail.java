@@ -1,7 +1,7 @@
 package org.hwyl.sexytopo.model.sketch;
 
 import org.hwyl.sexytopo.model.common.Shape;
-import org.hwyl.sexytopo.model.graph.Coord2D;
+import org.hwyl.sexytopo.model.geometry.Coord2D;
 
 public abstract class SketchDetail extends Shape {
 

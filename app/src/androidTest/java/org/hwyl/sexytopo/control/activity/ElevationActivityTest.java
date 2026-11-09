@@ -31,13 +31,13 @@ public class ElevationActivityTest {
                     "android.permission.WRITE_EXTERNAL_STORAGE");
 
     @Test
-    public void graphViewVisible() {
+    public void sketchViewVisible() {
         onView(withId(R.id.action_elevation)).perform(click());
-        onView(withId(R.id.graphView)).check(matches(isDisplayed()));
+        onView(withId(R.id.sketchView)).check(matches(isDisplayed()));
     }
 
     @Test
-    public void graphViewVisibleInLandscape() {
+    public void sketchViewVisibleInLandscape() {
         onView(withId(R.id.action_elevation)).perform(click());
         activityRule
                 .getScenario()
@@ -45,6 +45,6 @@ public class ElevationActivityTest {
                         activity ->
                                 activity.setRequestedOrientation(
                                         ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE));
-        onView(withId(R.id.graphView)).check(matches(isDisplayed()));
+        onView(withId(R.id.sketchView)).check(matches(isDisplayed()));
     }
 }

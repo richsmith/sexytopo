@@ -3,7 +3,7 @@ package org.hwyl.sexytopo.control.util;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import org.hwyl.sexytopo.model.graph.Coord2D;
+import org.hwyl.sexytopo.model.geometry.Coord2D;
 
 /**
  * Normalises the point order of wall-kind sketch lines so the passage interior is on a consistent

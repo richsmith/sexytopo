@@ -1,8 +1,8 @@
 package org.hwyl.sexytopo.model.sketch;
 
-import org.hwyl.sexytopo.model.graph.Coord2D;
-import org.hwyl.sexytopo.model.graph.Line;
-import org.hwyl.sexytopo.model.graph.Space;
+import org.hwyl.sexytopo.model.geometry.Coord2D;
+import org.hwyl.sexytopo.model.geometry.Line;
+import org.hwyl.sexytopo.model.geometry.Space;
 import org.hwyl.sexytopo.model.survey.Leg;
 
 public class SketchDetailProjection extends SketchDetail {

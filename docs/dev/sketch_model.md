@@ -36,7 +36,7 @@ The undo/redo stacks are **not persisted** — only the current state is saved t
 
 ## Drawing a Path
 
-Path drawing is a multi-step operation driven by touch events in `GraphView`:
+Path drawing is a multi-step operation driven by touch events in `SketchView`:
 
 1. `sketch.startNewPath(Coord2D)` — creates `activePath`, optionally snapping to a nearby existing path endpoint
 2. `activePath.lineTo(Coord2D)` — called repeatedly on touch move
@@ -54,7 +54,7 @@ Stamp and dash measurements are multiples of the path's **ornament size** (`Path
 
 Lines are oriented by point order (Therion's convention: the side matters for walls and ticked types). Wall-kind lines are auto-oriented when the stroke is finished: `LineOrienter` infers the passage-interior side from the survey centreline (per-segment nearest-station votes, weighted by length) and reverses the stored point order if needed, so the data is canonical whichever way the user drew it. Ticked types can't be inferred — only the user knows which side the drop is — so they keep the drawn direction, with live tick rendering as feedback. Tools → Flip Last Line reverses the most recently drawn semantic line (`Sketch.flipPathDetail`, a delete-and-replace so it's one undo step). The most recently drawn wall-kind line gets a slim red arrowhead at its midpoint pointing to the side taken to be the passage interior, so a wrong auto-orientation guess is visible immediately; it is feedback only — never exported, not shown on a stroke in progress, and toggled by the "Wall Inside Marker" quick setting. Ticked types get no marker since their ornamentation already shows their orientation.
 
-Two rendering caveats: path effects only work on a hardware-accelerated canvas from API 28, so older devices fall back to a plain stroke (the width factor still applies); and zoomed far enough out the ornamentation would render as a smear, so below a minimum on-screen advance the effect is dropped and the line drawn as a plain stroke. `GraphView` caches one `Paint` per type alongside the on-screen ornament size its effect was built for, rebuilding only when that changes (i.e. on zoom, or between lines drawn at different zooms) rather than every frame.
+Two rendering caveats: path effects only work on a hardware-accelerated canvas from API 28, so older devices fall back to a plain stroke (the width factor still applies); and zoomed far enough out the ornamentation would render as a smear, so below a minimum on-screen advance the effect is dropped and the line drawn as a plain stroke. `SketchView` caches one `Paint` per type alongside the on-screen ornament size its effect was built for, rebuilding only when that changes (i.e. on zoom, or between lines drawn at different zooms) rather than every frame.
 
 On export, semantic lines become first-class Therion `line wall` / `line pit` etc. commands in the th2 — Therion draws the ornamentation itself. This can be turned off with the "Export typed lines" Therion export setting. Unlike areas, semantic lines also stay in the XVI tracing background (all paths do), so the tracing is always a complete record of the sketch whether or not th2 line export is on; the duplication is harmless since the XVI is only a background reference. SVG gets a class attribute naming the type plus the width factor and (for dashed types) a dash array; tick ornamentation is not reproduced in SVG yet.
 
@@ -129,7 +129,7 @@ The UI exposes only 8 colours via `BrushColour` (BLACK, BROWN, GREY, RED, ORANGE
 
 ## Coordinate System
 
-Sketch coordinates are in **survey space** (metres). `GraphView` converts to screen pixels using `surveyToViewScale` (default 60.0f, range 0.1–500.0f). Avoid storing pixel coordinates in sketch data.
+Sketch coordinates are in **survey space** (metres). `SketchView` converts to screen pixels using `surveyToViewScale` (default 60.0f, range 0.1–500.0f). Avoid storing pixel coordinates in sketch data.
 
 ## Serialization
 
@@ -147,7 +147,7 @@ Path simplification is re-applied on load. History stacks are not serialized.
 
 ## Rendering Overview
 
-`GraphView.drawSketch()` iterates each detail collection:
+`SketchView.drawSketch()` iterates each detail collection:
 - **Areas:** drawn first (underneath lines): each contour is outlined, and horizontal parallel-line hatching is clipped to the region (an even-odd `Path`, so holes are outlined but left unhatched) and anchored to survey space so it doesn't crawl when panning
 - **Paths:** SKETCH paths are sorted by colour (to minimize paint changes), then batched into `float[]` arrays for `canvas.drawLines()`; semantic lines are drawn individually via `canvas.drawPath()` with their type's paint so dashes and tick stamps can apply
 - **Symbols:** rendered as scaled, optionally rotated `Drawable` objects with a colour filter
@@ -173,5 +173,5 @@ Off-screen and sub-pixel details are culled via `couldBeVisible()` before render
 | `model/sketch/Symbol.java` | Symbol enum |
 | `model/sketch/Colour.java` | Colour enum |
 | `model/sketch/BrushColour.java` | UI colour picker enum |
-| `control/graph/GraphView.java` | Rendering and touch handling |
+| `control/sketch/SketchView.java` | Rendering and touch handling |
 | `control/io/basic/SketchJsonTranslater.java` | Serialization |

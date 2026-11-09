@@ -7,12 +7,15 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
@@ -21,6 +24,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
+import org.hwyl.sexytopo.control.util.amalgamation.LegAmalgamationAlgorithm;
 import org.hwyl.sexytopo.model.survey.Licence;
 
 public class SettingsActivity extends SexyTopoActivity
@@ -362,9 +366,107 @@ public class SettingsActivity extends SexyTopoActivity
     }
 
     public static class InstrumentsFragment extends PreferenceFragmentCompat {
+        private static final String LEG_AMALGAMATION_KEY = "pref_leg_amalgamation_algorithm";
+
         @Override
         public void onCreatePreferences(final Bundle savedInstanceState, final String rootKey) {
             setPreferencesFromResource(R.xml.preferences_instruments, rootKey);
+
+            ListPreference algorithm = findPreference(LEG_AMALGAMATION_KEY);
+            if (algorithm == null) {
+                return;
+            }
+            showTolerancesFor(algorithm.getValue());
+            algorithm.setOnPreferenceChangeListener(
+                    (preference, newValue) -> {
+                        showTolerancesFor((String) newValue);
+                        return true;
+                    });
+        }
+
+        @Override
+        public void onDisplayPreferenceDialog(@NonNull Preference preference) {
+            if (preference instanceof ListPreference
+                    && LEG_AMALGAMATION_KEY.equals(preference.getKey())) {
+                showLegAmalgamationDialog((ListPreference) preference);
+            } else {
+                super.onDisplayPreferenceDialog(preference);
+            }
+        }
+
+        /**
+         * Shows the leg agreement methods with a description under each name, which the standard
+         * list preference dialog has no room for.
+         */
+        private void showLegAmalgamationDialog(ListPreference preference) {
+            LegAmalgamationAlgorithm[] algorithms = LegAmalgamationAlgorithm.values();
+            LegAmalgamationAlgorithm selected =
+                    LegAmalgamationAlgorithm.fromPreferenceValue(preference.getValue());
+
+            ArrayAdapter<LegAmalgamationAlgorithm> adapter =
+                    new ArrayAdapter<>(
+                            requireContext(),
+                            R.layout.leg_amalgamation_algorithm_item,
+                            algorithms) {
+                        @NonNull
+                        @Override
+                        public View getView(
+                                int position,
+                                @Nullable View convertView,
+                                @NonNull ViewGroup parent) {
+                            View row =
+                                    convertView != null
+                                            ? convertView
+                                            : getLayoutInflater()
+                                                    .inflate(
+                                                            R.layout
+                                                                    .leg_amalgamation_algorithm_item,
+                                                            parent,
+                                                            false);
+                            LegAmalgamationAlgorithm algorithm = algorithms[position];
+                            RadioButton radio = row.findViewById(R.id.leg_amalgamation_radio);
+                            TextView name = row.findViewById(R.id.leg_amalgamation_name);
+                            TextView description =
+                                    row.findViewById(R.id.leg_amalgamation_description);
+                            radio.setChecked(algorithm == selected);
+                            name.setText(algorithm.getNameId());
+                            description.setText(algorithm.getDescriptionId());
+                            return row;
+                        }
+                    };
+
+            new MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(preference.getTitle())
+                    .setAdapter(
+                            adapter,
+                            (dialog, which) -> {
+                                String value = algorithms[which].toPreferenceValue();
+                                if (preference.callChangeListener(value)) {
+                                    preference.setValue(value);
+                                }
+                            })
+                    .setNegativeButton(R.string.cancel, null)
+                    .show();
+        }
+
+        /** Shows only the tolerance settings used by the given leg agreement method. */
+        private void showTolerancesFor(String algorithmValue) {
+            LegAmalgamationAlgorithm algorithm =
+                    LegAmalgamationAlgorithm.fromPreferenceValue(algorithmValue);
+            boolean usesAngleDeltas =
+                    algorithm == LegAmalgamationAlgorithm.ANGULAR
+                            || algorithm == LegAmalgamationAlgorithm.SLOPE_CORRECTED;
+            setVisible("pref_max_distance_delta", usesAngleDeltas);
+            setVisible("pref_max_angle_delta", usesAngleDeltas);
+            setVisible("pref_max_endpoint_delta", algorithm == LegAmalgamationAlgorithm.CARTESIAN);
+            setVisible("pref_max_pairwise_error", algorithm == LegAmalgamationAlgorithm.PAIRWISE);
+        }
+
+        private void setVisible(String key, boolean visible) {
+            Preference preference = findPreference(key);
+            if (preference != null) {
+                preference.setVisible(visible);
+            }
         }
     }
 

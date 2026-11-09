@@ -41,7 +41,8 @@
     <string name="title_activity_settings">Paramètres</string>
     <string name="title_activity_system_log">Journal</string>
     <string name="title_activity_help">Aide</string>
-    <string name="title_activity_guide">Guide</string>
+    <string name="title_activity_guide">Manuel</string>
+    <string name="title_activity_release_notes">Notes de version</string>
     <string name="title_activity_3d">3D</string>
 
     <!-- Action bar menu -->
@@ -61,6 +62,7 @@
     <string name="action_3d">3D</string>
     <string name="action_help">Aide</string>
     <string name="action_guide">Manuel</string>
+    <string name="action_release_notes">Notes de version</string>
     <string name="action_about">À propos</string>
     <string name="action_file_new">Nouvelle topographie</string>
     <string name="action_file_open">Ouvrir la topographie…</string>
@@ -238,6 +240,11 @@
     <string name="manual_edit_shot_backwards">⬅ Tir en arrière</string>
     <string name="manual_edit_station_comment">Commentaire de la station</string>
     <string name="manual_edit_leg_comment">Commentaire du segment</string>
+    <string name="manual_edit_shots_warning">Modifier manuellement les mesures supprimera les visées dont cette visée est la moyenne</string>
+    <string name="manual_edit_to_wall_info_title">À propos de Vers la paroi</string>
+    <string name="manual_edit_to_wall_info_message">Information facultative. Coché signifie que la radiale va jusqu\'aux limites de la galerie ; décoché signifie qu\'elle mesure jusqu\'à un élément, comme un spéléothème.</string>
+    <string name="manual_edit_enabled_info_title">À propos de Activée</string>
+    <string name="manual_edit_enabled_info_message">Décoché signifie que la radiale est conservée, mais barrée dans le tableau des données et omise des croquis, des coupes et des exports (Survex et Therion la gardent en ligne commentée). Utile pour des mesures comme les contrôles d\'étalonnage.</string>
     <string name="manual_rename_station_title">Renommer la station</string>
     <string name="manual_rename_station_hint">Nom de la station</string>
     <string name="manual_rename_error">Échec du renommage</string>
@@ -267,6 +274,7 @@
     <string name="device_pairing_attempt">Association avec %1$s…</string>
     <string name="device_pairing_error">Erreur d\'association : %1$s</string>
     <string name="device_pairing_incompatible">Appareil incompatible "%1$s" détecté</string>
+    <string name="device_unnamed">sans nom</string>
     <string name="device_pairing_unpairing_device">Dissociation de %1$s</string>
     <string name="device_pairing_unpairing_success">Dissociation réussi</string>
     <string name="device_pairing_unpairing_error">Erreur de dissociation : %1$s</string>
@@ -282,9 +290,12 @@
     <string name="device_connection_error">Erreur de connexion : %1$s</string>
     <string name="device_connection_closing_error">Erreur lors de la fermeture de la connexion : %1$s</string>
     <string name="device_data_received">Données reçues</string>
+    <string name="device_calibration_reading_received">Mesure de calibration reçue</string>
+    <string name="device_data_duplicated">Paquet dupliqué #%1$d</string>
     <string name="device_data_received_null">Données nulles reçues</string>
     <string name="device_data_received_empty">Données vides reçues</string>
     <string name="device_data_unknown_identifier">Identifiant de paquet inconnu</string>
+    <string name="device_data_unknown_packet">Paquet inconnu (%1$d octets) : %2$s</string>
     <string name="device_data_acknowledged_packet">Paquet reconnu</string>
     <string name="device_no_device">aucun appareil</string>
     <string name="action_set_test_instrument">Définir l\'instrument de test</string>
@@ -315,7 +326,7 @@
     <string name="device_distox_command_calibration_start">Démarrer le mode calibration</string>
     <string name="device_distox_command_calibration_stop">Arrêter le mode calibration</string>
     <string name="device_distox_force_disconnect_for_calibration">Disto occupé ; forçage de la déconnexion pour écrire la calibration</string>
-    <string name="device_distox_calibration_result">Évaluation de la calibration (devrait être inférieure à %1$f) : %2$s\n\nAlgorithme de calibration : %3$s</string>
+    <string name="device_distox_calibration_result">Évaluation de la calibration (devrait être inférieure à %1$s) : %2$s\n\nAlgorithme de calibration : %3$s</string>
     <string name="device_distox_calibration_writing">Écriture des coefficients de calibration</string>
     <string name="device_distox_calibration_write_success">Écriture de la calibration réussie</string>
     <string name="device_distox_calibration_write_error">Erreur d\'écriture de la calibration %1$s</string>
@@ -338,6 +349,10 @@
     <string name="device_fcl_command_device_off">Appareil éteint</string>
 
     <!-- Calibration -->
+    <string name="calibration_title_mode">Mode calibration</string>
+    <string name="calibration_title_readings">Mesures</string>
+    <string name="calibration_title_last_reading">Dernière mesure</string>
+    <string name="calibration_title_result">Résultat</string>
     <string name="calibration_index">Numéro de lecture</string>
     <string name="calibration_start">Mode Cal Disto activé</string>
     <string name="calibration_stop">Mode Cal Disto désactivé</string>
@@ -358,6 +373,28 @@
     <string name="calibration_loaded_file">Données de calibration chargées</string>
     <string name="calibration_load_error">Erreur de lecture du fichier de calibration</string>
     <string name="calibration_save_error">Erreur de sauvegarde du fichier de calibration</string>
+    <string name="calibration_worst_readings">Mesures les moins cohérentes (plus de 1° d\'écart avec le reste de leur série)</string>
+    <string name="calibration_algorithm_linear">Linéaire</string>
+    <string name="calibration_algorithm_nonlinear">Non linéaire</string>
+    <string name="calibration_view_readings">Voir les mesures</string>
+    <string name="calibration_pointing_horizontal">Horizontal</string>
+    <string name="calibration_pointing_corner_up">Coin haut</string>
+    <string name="calibration_pointing_corner_down">Coin bas</string>
+    <string name="calibration_face_side">Sur le côté</string>
+    <string name="calibration_set_number">Série %1$d</string>
+    <string name="calibration_sets">Séries</string>
+    <string name="calibration_sets_value">%1$d (%2$d complètes)</string>
+    <string name="calibration_coverage">Directions couvertes</string>
+    <string name="calibration_coverage_corners_up">Coins hauts</string>
+    <string name="calibration_coverage_corners_down">Coins bas</string>
+    <string name="calibration_reading_title">Mesure #%1$d</string>
+    <string name="calibration_replace">Remplacer</string>
+    <string name="calibration_reading_options_message">Remplacer : sa place est gardée pour la prochaine mesure.\nSupprimer : elle est retirée et les mesures suivantes remontent d\'une place.</string>
+    <string name="calibration_gap_options_message">Retirer cet emplacement vide et remonter les mesures suivantes d\'une place ?</string>
+    <string name="calibration_roll">Roulis</string>
+    <string name="calibration_uncalibrated_estimate">Estimation non calibrée</string>
+    <string name="calibration_reading_deleted">Supprimée : refaites cette mesure</string>
+    <string name="calibration_no_readings">Aucune mesure pour l\'instant</string>
     <string name="direction_forward">Avant</string>
     <string name="direction_right">Droite</string>
     <string name="direction_back">Arrière</string>
@@ -457,11 +494,6 @@
         <item>Linéaire</item>
         <item>Non linéaire</item>
     </string-array>
-    <string-array name="settings_leg_amalgamation_algorithm_entries">
-        <item>Deltas angulaires : comparer distance, azimut &amp; inclinaison séparément ; moyenner séparément</item>
-        <item>Distance des extrémités : comparer l\'écart entre les points d\'extrémité ; moyenner comme des vecteurs</item>
-        <item>Vecteurs par paires : comparer l\'écart des extrémités par rapport à la longueur du segment ; moyenner comme des vecteurs</item>
-    </string-array>
     <string name="settings_immersive_mode_enabled">Mode plein écran activé</string>
     <string name="settings_immersive_mode_disabled">Mode plein écran désactivé</string>
     <string name="settings_new_station_vibration_title">Vibrer à la nouvelle station</string>
@@ -477,19 +509,26 @@
 <string name="settings_instruments_title">Outils</string>
     <string name="settings_instruments_summary">Tolérances des instruments, calibration</string>
     <string name="settings_max_distance_delta_title">Delta de distance max (m)</string>
-    <string name="settings_max_distance_delta_summary">Méthode angulaire : de combien les mesures de distance peuvent différer pour décider de créer une nouvelle station</string>
+    <string name="settings_max_distance_delta_summary">De combien les mesures de distance peuvent différer pour décider de créer une nouvelle station</string>
     <string name="settings_max_angle_delta_title">Delta d\'angle max (degrés)</string>
-    <string name="settings_max_angle_delta_summary">Méthode angulaire : de combien les mesures d\'azimut ou d\'inclinaison peuvent différer pour décider de créer une nouvelle station</string>
+    <string name="settings_max_angle_delta_summary">De combien les mesures d\'azimut ou d\'inclinaison peuvent différer pour décider de créer une nouvelle station</string>
     <string name="settings_auto_reconnect_title">Reconnexion automatique</string>
     <string name="settings_auto_reconnect_summary">Se reconnecter automatiquement si l\'appareil se déconnecte</string>
     <string name="settings_auto_reconnect_window_title">Délai de reconnexion automatique (minutes)</string>
     <string name="settings_auto_reconnect_window_summary">Combien de temps continuer à essayer de se reconnecter avant de mettre en pause</string>
     <string name="settings_leg_amalgamation_algorithm_title">Méthode d\'accord des segments</string>
-    <string name="settings_leg_amalgamation_algorithm_summary">Comment les mesures répétées sont jugées suffisamment proches pour former un segment</string>
+    <string name="settings_leg_amalgamation_angular_name">Deltas angulaires</string>
+    <string name="settings_leg_amalgamation_angular_description">Distance, azimut et inclinaison comparés et moyennés séparément. Peut rejeter des mesures raides répétées</string>
+    <string name="settings_leg_amalgamation_slope_corrected_name">Deltas angulaires corrigés de la pente</string>
+    <string name="settings_leg_amalgamation_slope_corrected_description">Distance, inclinaison et écart latéral (différence d\'azimut pondérée par la pente) comparés séparément ; moyennées comme des vecteurs</string>
+    <string name="settings_leg_amalgamation_cartesian_name">Distance des extrémités</string>
+    <string name="settings_leg_amalgamation_cartesian_description">Les extrémités des mesures doivent être à moins d\'une distance fixée les unes des autres ; moyennées comme des vecteurs</string>
+    <string name="settings_leg_amalgamation_pairwise_name">Vecteurs par paires</string>
+    <string name="settings_leg_amalgamation_pairwise_description">Écart des extrémités comparé à la longueur du segment ; moyennées comme des vecteurs</string>
     <string name="settings_max_endpoint_delta_title">Distance d\'extrémité max (m)</string>
-    <string name="settings_max_endpoint_delta_summary">Méthode des extrémités : à quelle distance les extrémités des mesures peuvent se trouver pour décider de créer une nouvelle station. La valeur par défaut de 0.1 maintient toutes les mesures dans une même cellule BCRA Grade 5.</string>
+    <string name="settings_max_endpoint_delta_summary">À quelle distance les extrémités des mesures peuvent se trouver pour décider de créer une nouvelle station. La valeur par défaut de 0.1 maintient toutes les mesures dans une même cellule BCRA Grade 5.</string>
     <string name="settings_max_pairwise_error_title">Erreur par paires max</string>
-    <string name="settings_max_pairwise_error_summary">Méthode des vecteurs par paires : l\'erreur relative tolérée entre les mesures (0.05 = environ 2.5%) pour décider de créer une nouvelle station</string>
+    <string name="settings_max_pairwise_error_summary">L\'erreur relative tolérée entre les mesures (0.05 = environ 2.5%) pour décider de créer une nouvelle station</string>
     <string name="settings_calibration_title">Calibration</string>
     <string name="settings_calibration_algorithm_title">Algorithme de calibration Disto-X</string>
     <string name="settings_calibration_algorithm_summary">Remplacer le choix de l\'algorithme de calibration du Disto-X</string>
@@ -577,9 +616,9 @@
     <string name="settings_export_svg_copyright_title">Afficher le copyright/la licence dans la légende</string>
     <string name="settings_export_svg_copyright_summary">Le copyright et la licence sont toujours enregistrés dans le fichier ; ceci affiche aussi une mention dans la légende</string>
     <string name="settings_export_therion_symbols_title">Exportation Therion des symboles</string>
-    <string name="settings_export_therion_symbols_summary">Inclure les symboles lors de l\'exportation au format Therion</string>
+    <string name="settings_export_therion_symbols_summary">Inclure les symboles dans le fichier th2</string>
     <string name="settings_export_therion_text_title">Exportation Therion du texte</string>
-    <string name="settings_export_therion_text_summary">Inclure le texte lors de l\'exportation au format Therion</string>
+    <string name="settings_export_therion_text_summary">Inclure le texte dans le fichier th2</string>
     <string name="settings_export_folder_name_title">Nom du dossier d\'export</string>
     <string name="settings_export_folder_name_summary">Nom du dossier dans le répertoire de topographie où exporter</string>
     <string name="settings_export_type_subfolders_title">Sous-dossiers par type d\'export</string>
@@ -627,7 +666,7 @@
 
     <!-- Form validation errors -->
     <string name="validation_error_cannot_be_blank">Ne peut pas être vide</string>
-    <string name="validation_error_station_named_dash">La station ne peut pas s\'appeler \"-\"</string>
+    <string name="validation_error_station_name_reserved">La station ne peut pas s\'appeler \"-\" ou \".\"</string>
     <string name="validation_error_station_does_not_exist">La station n\'existe pas</string>
     <string name="validation_error_same_as_from_station">Ne peut pas être identique à la station d\'origine</string>
     <string name="validation_error_station_name_not_unique">Le nom de la station doit être unique</string>
@@ -662,6 +701,7 @@
     <string name="symbol_helictites">Hélictites</string>
     <string name="symbol_crystals">Cristaux</string>
     <string name="symbol_gour">Gour</string>
+    <string name="symbol_flowstone">Coulée de calcite</string>
     <string name="symbol_water_flow">Écoulement</string>
     <string name="symbol_air_draught">Courant d\'air</string>
     <string name="symbol_guano">Guano</string>
@@ -679,10 +719,10 @@
     <string name="menu_set_active_station">Définir active</string>
     <string name="menu_rename_station">Renommer</string>
     <string name="menu_edit_leg">Modifier</string>
+    <string name="menu_to_wall">Vers la paroi</string>
+    <string name="menu_enabled">Activée</string>
     <string name="menu_upgrade_row">Forcer une nouvelle station</string>
     <string name="menu_promote_to_above_leg">Ajouter à la visée ci-dessus</string>
-    <string name="toast_splay_promoted">Radiale combinée avec la visée</string>
-    <string name="toast_no_leg_above">Aucune visée valide à combiner</string>
     <string name="menu_upgrade_splay">Convertir en visée directionnelle</string>
     <string name="menu_downgrade_leg">Convertir en visée rayonnante</string>
     <string name="menu_delete_leg">Supprimer</string>
@@ -704,7 +744,7 @@
     <string name="menu_xsection_delete">Supprimer la coupe</string>
     <string name="menu_xsection_edit">Modifier le croquis</string>
     <string name="menu_xsection_set_direction">Définir la direction</string>
-    <string name="menu_new_cross_section">Nouvelle coupe transversale</string>
+
     <string name="menu_jump_to_station_in_table">&#10132; Tableau de données</string>
     <string name="menu_delete_station">Supprimer</string>
     <string name="menu_reverse">Inverser</string>
@@ -728,6 +768,8 @@
     <string name="context_rename_splay_error">Impossible de renommer une extrémité de radiale</string>
     <string name="context_set_active_splay_error">Impossible de définir une extrémité de radiale comme station active</string>
     <string name="context_station_comment_hint">Commentaire de station</string>
+    <string name="context_splay_promoted">Radiale combinée avec la visée</string>
+    <string name="context_no_leg_above">Aucune visée valide à combiner</string>
 
     <!-- Logging -->
     <string name="log_starting_up">Démarrage</string>
@@ -749,5 +791,6 @@
     <string name="request_code_error">Erreur de code %1$d lors de la demande de code %2$d</string>
     <string name="killing_comms_process">Processus de communication terminé</string>
     <string name="setup_error_load_symbol_svg">Erreur lors du chargement du symbole SVG %1$s</string>
+    <string name="release_notes_unavailable">Les notes de version ne sont pas disponibles.</string>
 
 </resources>

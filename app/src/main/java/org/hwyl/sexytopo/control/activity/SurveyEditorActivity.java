@@ -15,7 +15,7 @@ import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.control.util.TextTools;
-import org.hwyl.sexytopo.model.graph.ExtendedElevationDirection;
+import org.hwyl.sexytopo.model.geometry.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 
@@ -220,7 +220,7 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
     }
 
     public void onUpgradeSplay(Leg leg) {
-        if (leg == null || leg.hasDestination()) {
+        if (leg == null || leg.hasDestination() || !leg.isEnabled()) {
             return;
         }
 
@@ -237,18 +237,37 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         getSurveyManager().broadcastSurveyUpdated();
     }
 
+    public void onToggleToWall(Leg leg) {
+        if (leg == null || leg.hasDestination()) {
+            return;
+        }
+
+        SurveyUpdater.setSplayToWall(getSurvey(), leg, !leg.isToWall());
+        getSurveyManager().broadcastSurveyUpdated();
+    }
+
     public void onPromoteToAboveLeg(Leg splay) {
-        if (splay == null || splay.hasDestination()) {
+        if (splay == null || splay.hasDestination() || !splay.isEnabled()) {
             return;
         }
 
         boolean success = SurveyUpdater.promoteToAboveLeg(getSurvey(), splay);
         if (success) {
             getSurveyManager().broadcastSurveyUpdated();
-            showSimpleToast(R.string.toast_splay_promoted);
+            showSimpleToast(R.string.context_splay_promoted);
         } else {
-            showSimpleToast(R.string.toast_no_leg_above);
+            showSimpleToast(R.string.context_no_leg_above);
         }
+    }
+
+    public void onToggleSplayEnabled(Leg splay) {
+        if (splay == null || splay.hasDestination()) {
+            return;
+        }
+
+        SurveyUpdater.setSplayEnabled(getSurvey(), splay, !splay.isEnabled());
+        getSurveyManager().broadcastSurveyUpdated();
+        invalidateView();
     }
 
     /** Set the active station in the current view. */
@@ -283,6 +302,7 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
                         (dialog, which) -> {
                             CharSequence inputText = input.getText();
                             station.setComment(inputText != null ? inputText.toString() : "");
+                            getSurvey().setSaved(false);
                             invalidateView();
                         })
                 .setNegativeButton(R.string.cancel, null);
@@ -315,6 +335,7 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
                         (dialog, which) -> {
                             CharSequence inputText = input.getText();
                             leg.setComment(inputText != null ? inputText.toString() : "");
+                            getSurvey().setSaved(false);
                             getSurveyManager().broadcastSurveyUpdated();
                             invalidateView();
                         })

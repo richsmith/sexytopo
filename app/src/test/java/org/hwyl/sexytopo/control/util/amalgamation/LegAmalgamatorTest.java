@@ -38,6 +38,58 @@ public class LegAmalgamatorTest {
     }
 
     @Test
+    public void slopeCorrectedAcceptsSteepReadingsThatAreReallyTheSame() {
+        Assert.assertTrue(SlopeCorrectedAmalgamator.areReadingsCompatible(STEEP_BUT_SAME));
+    }
+
+    @Test
+    public void slopeCorrectedAcceptsSteepReadingsFromIssue321() {
+        // 8.6 degrees of azimuth spread, but at about 85 degrees inclination that is only about
+        // 0.7 degrees of sideways swing; the inclinations span 1.5 degrees
+        List<Leg> legs =
+                Arrays.asList(
+                        new Leg(1.269f, 326.86f, 85.70f),
+                        new Leg(1.269f, 319.87f, 84.18f),
+                        new Leg(1.269f, 328.51f, 85.63f));
+        Assert.assertTrue(SlopeCorrectedAmalgamator.areReadingsCompatible(legs));
+    }
+
+    @Test
+    public void slopeCorrectedMatchesAngularOnLevelLegs() {
+        List<Leg> close = Arrays.asList(new Leg(10.0f, 90, 0), new Leg(10.0f, 91.5f, 0));
+        List<Leg> apart = Arrays.asList(new Leg(10.0f, 90, 0), new Leg(10.0f, 92, 0));
+        Assert.assertTrue(SlopeCorrectedAmalgamator.areReadingsCompatible(close));
+        Assert.assertFalse(SlopeCorrectedAmalgamator.areReadingsCompatible(apart));
+    }
+
+    @Test
+    public void slopeCorrectedScalesAzimuthSpreadByInclination() {
+        // At 60 degrees the sideways swing is half the azimuth spread
+        List<Leg> close = Arrays.asList(new Leg(10.0f, 90, 60), new Leg(10.0f, 93, 60));
+        List<Leg> apart = Arrays.asList(new Leg(10.0f, 90, 60), new Leg(10.0f, 94, 60));
+        Assert.assertTrue(SlopeCorrectedAmalgamator.areReadingsCompatible(close));
+        Assert.assertFalse(SlopeCorrectedAmalgamator.areReadingsCompatible(apart));
+    }
+
+    @Test
+    public void slopeCorrectedHandlesReadingsEitherSideOfNorth() {
+        List<Leg> legs = Arrays.asList(new Leg(10.0f, 359.5f, 0), new Leg(10.0f, 0.5f, 0));
+        Assert.assertTrue(SlopeCorrectedAmalgamator.areReadingsCompatible(legs));
+    }
+
+    @Test
+    public void slopeCorrectedRejectsDifferentInclinations() {
+        List<Leg> legs = Arrays.asList(new Leg(10.0f, 90, 10), new Leg(10.0f, 90, 12));
+        Assert.assertFalse(SlopeCorrectedAmalgamator.areReadingsCompatible(legs));
+    }
+
+    @Test
+    public void slopeCorrectedRejectsDifferentDistances() {
+        List<Leg> legs = Arrays.asList(new Leg(10.0f, 90, 0), new Leg(10.1f, 90, 0));
+        Assert.assertFalse(SlopeCorrectedAmalgamator.areReadingsCompatible(legs));
+    }
+
+    @Test
     public void cartesianRejectsGenuinelyDifferentReadings() {
         List<Leg> different = Arrays.asList(new Leg(10.0f, 90, 0), new Leg(10.0f, 100, 0));
         Assert.assertFalse(CartesianAmalgamator.areReadingsCompatible(different));

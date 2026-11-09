@@ -11,14 +11,15 @@ import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.io.translation.Importer;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.control.util.TextTools;
-import org.hwyl.sexytopo.model.graph.Coord2D;
-import org.hwyl.sexytopo.model.graph.Projection2D;
-import org.hwyl.sexytopo.model.graph.Space;
+import org.hwyl.sexytopo.model.geometry.Coord2D;
+import org.hwyl.sexytopo.model.geometry.Projection2D;
+import org.hwyl.sexytopo.model.geometry.Space;
 import org.hwyl.sexytopo.model.sketch.BrushColour;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.LegFilter;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
@@ -131,8 +132,8 @@ public class PocketTopoTxtImporter extends Importer {
         Coord2D offset = getOffsetForNamedStation(lines, guessedAnchorStation);
 
         if (offset == null) {
-            if (!guessedAnchorStation.getConnectedOnwardLegs().isEmpty()) {
-                Leg onward = guessedAnchorStation.getConnectedOnwardLegs().get(0);
+            if (!guessedAnchorStation.getOnwardLegs(LegFilter.LEGS).isEmpty()) {
+                Leg onward = guessedAnchorStation.getOnwardLegs(LegFilter.LEGS).get(0);
                 guessedAnchorStation = onward.getDestination();
                 offset = getOffsetForNamedStation(lines, guessedAnchorStation);
                 Coord2D position = projection.getStationMap().get(guessedAnchorStation);
