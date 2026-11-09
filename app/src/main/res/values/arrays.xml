@@ -15,8 +15,15 @@
         <item>linear</item>
         <item>nonlinear</item>
     </string-array>
+    <string-array name="settings_leg_amalgamation_algorithm_entries">
+        <item>@string/settings_leg_amalgamation_angular_name</item>
+        <item>@string/settings_leg_amalgamation_slope_corrected_name</item>
+        <item>@string/settings_leg_amalgamation_cartesian_name</item>
+        <item>@string/settings_leg_amalgamation_pairwise_name</item>
+    </string-array>
     <string-array name="settings_leg_amalgamation_algorithm_values">
         <item>angular</item>
+        <item>slope_corrected</item>
         <item>cartesian</item>
         <item>pairwise</item>
     </string-array>

@@ -7,7 +7,9 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -364,11 +366,13 @@ public class SettingsActivity extends SexyTopoActivity
     }
 
     public static class InstrumentsFragment extends PreferenceFragmentCompat {
+        private static final String LEG_AMALGAMATION_KEY = "pref_leg_amalgamation_algorithm";
+
         @Override
         public void onCreatePreferences(final Bundle savedInstanceState, final String rootKey) {
             setPreferencesFromResource(R.xml.preferences_instruments, rootKey);
 
-            ListPreference algorithm = findPreference("pref_leg_amalgamation_algorithm");
+            ListPreference algorithm = findPreference(LEG_AMALGAMATION_KEY);
             if (algorithm == null) {
                 return;
             }
@@ -380,12 +384,80 @@ public class SettingsActivity extends SexyTopoActivity
                     });
         }
 
+        @Override
+        public void onDisplayPreferenceDialog(@NonNull Preference preference) {
+            if (preference instanceof ListPreference
+                    && LEG_AMALGAMATION_KEY.equals(preference.getKey())) {
+                showLegAmalgamationDialog((ListPreference) preference);
+            } else {
+                super.onDisplayPreferenceDialog(preference);
+            }
+        }
+
+        /**
+         * Shows the leg agreement methods with a description under each name, which the standard
+         * list preference dialog has no room for.
+         */
+        private void showLegAmalgamationDialog(ListPreference preference) {
+            LegAmalgamationAlgorithm[] algorithms = LegAmalgamationAlgorithm.values();
+            LegAmalgamationAlgorithm selected =
+                    LegAmalgamationAlgorithm.fromPreferenceValue(preference.getValue());
+
+            ArrayAdapter<LegAmalgamationAlgorithm> adapter =
+                    new ArrayAdapter<>(
+                            requireContext(),
+                            R.layout.leg_amalgamation_algorithm_item,
+                            algorithms) {
+                        @NonNull
+                        @Override
+                        public View getView(
+                                int position,
+                                @Nullable View convertView,
+                                @NonNull ViewGroup parent) {
+                            View row =
+                                    convertView != null
+                                            ? convertView
+                                            : getLayoutInflater()
+                                                    .inflate(
+                                                            R.layout
+                                                                    .leg_amalgamation_algorithm_item,
+                                                            parent,
+                                                            false);
+                            LegAmalgamationAlgorithm algorithm = algorithms[position];
+                            RadioButton radio = row.findViewById(R.id.leg_amalgamation_radio);
+                            TextView name = row.findViewById(R.id.leg_amalgamation_name);
+                            TextView description =
+                                    row.findViewById(R.id.leg_amalgamation_description);
+                            radio.setChecked(algorithm == selected);
+                            name.setText(algorithm.getNameId());
+                            description.setText(algorithm.getDescriptionId());
+                            return row;
+                        }
+                    };
+
+            new MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(preference.getTitle())
+                    .setAdapter(
+                            adapter,
+                            (dialog, which) -> {
+                                String value = algorithms[which].toPreferenceValue();
+                                if (preference.callChangeListener(value)) {
+                                    preference.setValue(value);
+                                }
+                            })
+                    .setNegativeButton(R.string.cancel, null)
+                    .show();
+        }
+
         /** Shows only the tolerance settings used by the given leg agreement method. */
         private void showTolerancesFor(String algorithmValue) {
             LegAmalgamationAlgorithm algorithm =
                     LegAmalgamationAlgorithm.fromPreferenceValue(algorithmValue);
-            setVisible("pref_max_distance_delta", algorithm == LegAmalgamationAlgorithm.ANGULAR);
-            setVisible("pref_max_angle_delta", algorithm == LegAmalgamationAlgorithm.ANGULAR);
+            boolean usesAngleDeltas =
+                    algorithm == LegAmalgamationAlgorithm.ANGULAR
+                            || algorithm == LegAmalgamationAlgorithm.SLOPE_CORRECTED;
+            setVisible("pref_max_distance_delta", usesAngleDeltas);
+            setVisible("pref_max_angle_delta", usesAngleDeltas);
             setVisible("pref_max_endpoint_delta", algorithm == LegAmalgamationAlgorithm.CARTESIAN);
             setVisible("pref_max_pairwise_error", algorithm == LegAmalgamationAlgorithm.PAIRWISE);
         }

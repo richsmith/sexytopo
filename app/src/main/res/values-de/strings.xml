@@ -493,11 +493,6 @@
         <item>Linear</item>
         <item>Nicht-Linear</item>
     </string-array>
-    <string-array name="settings_leg_amalgamation_algorithm_entries">
-        <item>Winkeldifferenzen: Distanz, Azimut &amp; Neigung getrennt vergleichen; getrennt mitteln</item>
-        <item>Endpunktabstand: vergleichen, wie weit die Endpunkte voneinander entfernt sind; als Vektoren mitteln</item>
-        <item>Paarweise Vektoren: Endpunktabstand im Verhältnis zur Streckenlänge vergleichen; als Vektoren mitteln</item>
-    </string-array>
     <string name="settings_immersive_mode_enabled">Vollbildmodus aktiviert</string>
     <string name="settings_immersive_mode_disabled">Vollbildmodus deaktiviert</string>
     <string name="settings_new_station_vibration_title">Bei neuem Messpunkt vibrieren</string>
@@ -513,18 +508,26 @@
 <string name="settings_instruments_title">Werkzeuge</string>
     <string name="settings_instruments_summary">Instrumententoleranz, Kalibrierung</string>
     <string name="settings_max_distance_delta_title">Maximal zulässige Abweichung bei der Distanz (m)</string>
-    <string name="settings_max_distance_delta_summary">Winkelmethode: wie stark die Distanzmessungen abweichen dürfen, wenn entschieden wird, ob eine neue Station erstellt wird</string>
+    <string name="settings_max_distance_delta_summary">Wie stark die Distanzmessungen abweichen dürfen, wenn entschieden wird, ob eine neue Station erstellt wird</string>
     <string name="settings_max_angle_delta_title">Maximal zulässige Abweichung beim Neigungswinkel (Grad)</string>
-    <string name="settings_max_angle_delta_summary">Winkelmethode: wie stark die Azimut- oder Neigungsmessungen abweichen dürfen, wenn entschieden wird, ob eine neue Station erstellt wird</string>
+    <string name="settings_max_angle_delta_summary">Wie stark die Azimut- oder Neigungsmessungen abweichen dürfen, wenn entschieden wird, ob eine neue Station erstellt wird</string>
     <string name="settings_auto_reconnect_title">Automatisch wieder verbinden</string>
     <string name="settings_auto_reconnect_summary">Automatisch wieder verbinden, wenn das Gerät die Verbindung verliert</string>
     <string name="settings_auto_reconnect_window_title">Zeitlimit für automatisches Wiederverbinden (Minuten)</string>
     <string name="settings_auto_reconnect_window_summary">Wie lange versucht wird, die Verbindung wiederherzustellen, bevor pausiert wird</string>
     <string name="settings_leg_amalgamation_algorithm_title">Methode zur Streckenübereinstimmung</string>
+    <string name="settings_leg_amalgamation_angular_name">Winkeldifferenzen</string>
+    <string name="settings_leg_amalgamation_angular_description">Distanz, Azimut und Neigung werden getrennt verglichen und gemittelt. Kann wiederholte steile Messungen ablehnen</string>
+    <string name="settings_leg_amalgamation_slope_corrected_name">Neigungskorrigierte Winkeldifferenzen</string>
+    <string name="settings_leg_amalgamation_slope_corrected_description">Distanz, Neigung und seitliche Abweichung (Azimutdifferenz nach Steilheit skaliert) getrennt verglichen; als Vektoren gemittelt</string>
+    <string name="settings_leg_amalgamation_cartesian_name">Endpunktabstand</string>
+    <string name="settings_leg_amalgamation_cartesian_description">Die Endpunkte der Messungen müssen innerhalb eines festen Abstands voneinander liegen; als Vektoren gemittelt</string>
+    <string name="settings_leg_amalgamation_pairwise_name">Paarweise Vektoren</string>
+    <string name="settings_leg_amalgamation_pairwise_description">Abstand der Endpunkte im Verhältnis zur Streckenlänge verglichen; als Vektoren gemittelt</string>
     <string name="settings_max_endpoint_delta_title">Maximaler Endpunktabstand (m)</string>
-    <string name="settings_max_endpoint_delta_summary">Endpunktmethode: wie weit die Endpunkte der Messungen voneinander entfernt sein dürfen, wenn entschieden wird, ob eine neue Station erstellt wird. Der Standardwert von 0.1 hält alle Messungen innerhalb einer BCRA Grade 5-Zelle.</string>
+    <string name="settings_max_endpoint_delta_summary">Wie weit die Endpunkte der Messungen voneinander entfernt sein dürfen, wenn entschieden wird, ob eine neue Station erstellt wird. Der Standardwert von 0.1 hält alle Messungen innerhalb einer BCRA Grade 5-Zelle.</string>
     <string name="settings_max_pairwise_error_title">Maximaler paarweiser Fehler</string>
-    <string name="settings_max_pairwise_error_summary">Methode der paarweisen Vektoren: die zwischen Messungen tolerierte relative Abweichung (0.05 = etwa 2.5%), wenn entschieden wird, ob eine neue Station erstellt wird</string>
+    <string name="settings_max_pairwise_error_summary">Die zwischen Messungen tolerierte relative Abweichung (0.05 = etwa 2.5%), wenn entschieden wird, ob eine neue Station erstellt wird</string>
     <string name="settings_calibration_title">Kalibrierung</string>
     <string name="settings_calibration_algorithm_title">DistoX Kalibrierungs-Algorithmus</string>
     <string name="settings_calibration_algorithm_summary">Auswahl des DistoX-Kalibrierungsalgorithmus ausser Kraft setzen</string>

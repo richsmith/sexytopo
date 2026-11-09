@@ -493,11 +493,6 @@
         <item>Lineal</item>
         <item>No Lineal</item>
     </string-array>
-    <string-array name="settings_leg_amalgamation_algorithm_entries">
-        <item>Deltas angulares: comparar distancia, azimut e inclinación por separado; promediar por separado</item>
-        <item>Distancia entre extremos: comparar cuánto se separan los puntos finales; promediar como vectores</item>
-        <item>Vectores por pares: comparar la separación entre extremos en relación con la longitud del tramo; promediar como vectores</item>
-    </string-array>
     <string name="settings_immersive_mode_enabled">Modo pantalla completa activado</string>
     <string name="settings_immersive_mode_disabled">Modo pantalla completa desactivado</string>
     <string name="settings_new_station_vibration_title">Vibrar en nueva estación</string>
@@ -513,18 +508,26 @@
 <string name="settings_instruments_title">Instrumentos</string>
     <string name="settings_instruments_summary">Tolerancias de instrumentos, calibración</string>
     <string name="settings_max_distance_delta_title">Delta de distancia máxima (m)</string>
-    <string name="settings_max_distance_delta_summary">Método angular: cuánto pueden diferir las mediciones de distancia al decidir si crear una nueva estación</string>
+    <string name="settings_max_distance_delta_summary">Cuánto pueden diferir las mediciones de distancia al decidir si crear una nueva estación</string>
     <string name="settings_max_angle_delta_title">Delta de ángulo máximo (grados)</string>
-    <string name="settings_max_angle_delta_summary">Método angular: cuánto pueden diferir las mediciones de azimut o inclinación al decidir si crear una nueva estación</string>
+    <string name="settings_max_angle_delta_summary">Cuánto pueden diferir las mediciones de azimut o inclinación al decidir si crear una nueva estación</string>
     <string name="settings_auto_reconnect_title">Reconexión automática</string>
     <string name="settings_auto_reconnect_summary">Reconectar automáticamente si el instrumento se desconecta</string>
     <string name="settings_auto_reconnect_window_title">Límite de tiempo de reconexión automática (minutos)</string>
     <string name="settings_auto_reconnect_window_summary">Cuánto tiempo seguir intentando reconectar antes de pausar</string>
     <string name="settings_leg_amalgamation_algorithm_title">Método de concordancia de tramos</string>
+    <string name="settings_leg_amalgamation_angular_name">Deltas angulares</string>
+    <string name="settings_leg_amalgamation_angular_description">Distancia, azimut e inclinación se comparan y promedian por separado. Puede rechazar mediciones empinadas repetidas</string>
+    <string name="settings_leg_amalgamation_slope_corrected_name">Deltas angulares corregidos por pendiente</string>
+    <string name="settings_leg_amalgamation_slope_corrected_description">Distancia, inclinación y desviación lateral (diferencia de azimut escalada según la pendiente) comparadas por separado; promediadas como vectores</string>
+    <string name="settings_leg_amalgamation_cartesian_name">Distancia entre extremos</string>
+    <string name="settings_leg_amalgamation_cartesian_description">Los extremos de las mediciones deben estar a menos de una distancia fija entre sí; promediadas como vectores</string>
+    <string name="settings_leg_amalgamation_pairwise_name">Vectores por pares</string>
+    <string name="settings_leg_amalgamation_pairwise_description">Separación entre extremos comparada en relación con la longitud del tramo; promediadas como vectores</string>
     <string name="settings_max_endpoint_delta_title">Distancia máxima entre extremos (m)</string>
-    <string name="settings_max_endpoint_delta_summary">Método de distancia entre extremos: cuánto pueden separarse los extremos de las mediciones al decidir si crear una nueva estación. El valor predeterminado de 0.1 mantiene todas las mediciones dentro de una celda de BCRA Grade 5.</string>
+    <string name="settings_max_endpoint_delta_summary">Cuánto pueden separarse los extremos de las mediciones al decidir si crear una nueva estación. El valor predeterminado de 0.1 mantiene todas las mediciones dentro de una celda de BCRA Grade 5.</string>
     <string name="settings_max_pairwise_error_title">Error máximo por pares</string>
-    <string name="settings_max_pairwise_error_summary">Método de vectores por pares: el error relativo que se tolera entre mediciones (0.05 = aproximadamente 2.5%) al decidir si crear una nueva estación</string>
+    <string name="settings_max_pairwise_error_summary">El error relativo que se tolera entre mediciones (0.05 = aproximadamente 2.5%) al decidir si crear una nueva estación</string>
     <string name="settings_calibration_title">Calibración</string>
     <string name="settings_calibration_algorithm_title">Algoritmo de calibración Disto-X</string>
     <string name="settings_calibration_algorithm_summary">Anular la elección del algoritmo de calibración Disto-X</string>
