@@ -104,6 +104,62 @@ public class PolygonUtilsTest {
         Assert.assertSame(stroke, PolygonUtils.trimOvershoot(stroke));
     }
 
+    /** A polyline through the given corners, sampled every quarter unit like a real stroke. */
+    private static List<Coord2D> stroke(Coord2D... corners) {
+        List<Coord2D> points = new ArrayList<>();
+        points.add(corners[0]);
+        for (int i = 1; i < corners.length; i++) {
+            Coord2D from = corners[i - 1];
+            Coord2D to = corners[i];
+            double length = Math.hypot(to.x - from.x, to.y - from.y);
+            int steps = Math.max(1, (int) Math.round(length / 0.25));
+            for (int step = 1; step <= steps; step++) {
+                float fraction = (float) step / steps;
+                points.add(
+                        point(
+                                from.x + (to.x - from.x) * fraction,
+                                from.y + (to.y - from.y) * fraction));
+            }
+        }
+        return points;
+    }
+
+    @Test
+    public void testTrimHooksCutsWhereTheEndsCameClosest() {
+        // round a 10x10 square from (2,0) to (0,0), with a hook curling out at each end
+        List<Coord2D> stroke =
+                stroke(
+                        point(3, -2),
+                        point(2, 0),
+                        point(10, 0),
+                        point(10, 10),
+                        point(0, 10),
+                        point(0, 0),
+                        point(-2, -2));
+
+        List<Coord2D> trimmed = PolygonUtils.trimHooks(stroke);
+
+        Assert.assertEquals(point(2, 0), trimmed.get(0));
+        Assert.assertEquals(point(0, 0), trimmed.get(trimmed.size() - 1));
+    }
+
+    @Test
+    public void testTrimHooksLeavesTheTipOfANarrowChannel() {
+        // a channel one unit wide, started at its tip and finished a little way off it: the two
+        // sides are about as close as the ends, so this is not a hook
+        List<Coord2D> stroke = stroke(point(0, 0), point(20, 0), point(20, 1), point(-1, 1));
+
+        Assert.assertSame(stroke, PolygonUtils.trimHooks(stroke));
+    }
+
+    @Test
+    public void testTrimHooksLeavesAStrokeThatFallsShortAlone() {
+        List<Coord2D> stroke =
+                stroke(point(1, 0), point(10, 0), point(10, 10), point(0, 10), point(0, 1));
+
+        Assert.assertSame(stroke, PolygonUtils.trimHooks(stroke));
+    }
+
     @Test
     public void testAreaOfRectangle() {
         Assert.assertEquals(12, PolygonUtils.area(rectangle(1, 2, 3, 4)), 1e-6);

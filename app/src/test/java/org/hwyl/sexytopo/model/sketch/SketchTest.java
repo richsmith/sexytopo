@@ -259,6 +259,28 @@ public class SketchTest {
     }
 
     @Test
+    public void testFinishAreaTrimsHooksWhereTheEndsMeet() {
+        Sketch sketch = new Sketch();
+        sketch.startNewArea(new Coord2D(3, -2), AreaType.WATER);
+        Coord2D[] corners = {
+            new Coord2D(2, 0),
+            new Coord2D(10, 0),
+            new Coord2D(10, 10),
+            new Coord2D(0, 10),
+            new Coord2D(0, 0),
+            new Coord2D(-2, -2) // curls away from the start
+        };
+        for (Coord2D corner : corners) {
+            sketch.getActivePath().lineTo(corner);
+        }
+        sketch.finishArea(AreaType.WATER, 0);
+
+        AreaDetail area = sketch.getAreaDetails().get(0);
+        // neither hook is left poking out below the square
+        Assert.assertTrue(area.getOutline().stream().allMatch(point -> point.y >= -1e-4));
+    }
+
+    @Test
     public void testFinishAreaDiscardsAreaBelowMinimumSize() {
         Sketch sketch = new Sketch();
         sketch.startNewArea(new Coord2D(0, 0), AreaType.WATER);

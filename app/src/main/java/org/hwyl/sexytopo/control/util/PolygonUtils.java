@@ -30,6 +30,11 @@ public class PolygonUtils {
     // one end crosses itself a quarter of the way along, and must not lose a lobe.
     private static final double OVERSHOOT_SEARCH_FRACTION = 0.15;
 
+    // a hook is only looked for this far back from each end, as a multiple of the gap between the
+    // ends, and only trimmed if the ends came closer than this fraction of the gap
+    private static final double HOOK_SEARCH_GAPS = 2;
+    private static final double HOOK_CLOSEST_APPROACH_RATIO = 0.5;
+
     /**
      * A filled region: an outline contour, plus zero or more holes lying within it. This is the
      * geometric counterpart of AreaDetail, without the sketch-level concerns of colour and type.
@@ -173,6 +178,67 @@ public class PolygonUtils {
         trimmed.add(bestCrossing);
         trimmed.addAll(stroke.subList(bestHead + 1, bestTail + 1));
         return trimmed;
+    }
+
+    /**
+     * Trim hooks from the ends of a stroke sketched as the outline of an area.
+     *
+     * <p>A stroke can stop short of its start, but with its ends curling away from each other as
+     * the finger comes off the screen. Closed as drawn, the hooks leave a kink either side of the
+     * closing line. Instead, the stroke is cut where its ends came closest, and closed with a
+     * straight line from there.
+     *
+     * <p>This is guarded to avoid misreading a narrow area: the hooks are only looked for a short
+     * way back from each end (relative to the gap between the ends, and never beyond the stroke's
+     * opening and closing stretches), and only trimmed if the ends came much closer together than
+     * they finished. In a narrow channel, the two sides are about as far apart as the ends, so the
+     * channel's tip is left alone. A stroke whose ends cross should have had its overshoot trimmed
+     * first (see trimOvershoot); its ends then meet, and there is nothing more to do.
+     */
+    public static List<Coord2D> trimHooks(List<Coord2D> stroke) {
+        int size = stroke.size();
+        if (size < 4) {
+            return stroke;
+        }
+
+        Coord2D first = stroke.get(0);
+        Coord2D last = stroke.get(size - 1);
+        double gap = Math.hypot(last.x - first.x, last.y - first.y);
+        if (gap == 0) {
+            return stroke;
+        }
+
+        double[] distanceAlong = new double[size];
+        for (int i = 1; i < size; i++) {
+            Coord2D a = stroke.get(i - 1);
+            Coord2D b = stroke.get(i);
+            distanceAlong[i] = distanceAlong[i - 1] + Math.hypot(b.x - a.x, b.y - a.y);
+        }
+        double length = distanceAlong[size - 1];
+        double window = Math.min(length * OVERSHOOT_SEARCH_FRACTION, gap * HOOK_SEARCH_GAPS);
+
+        int bestHead = 0;
+        int bestTail = size - 1;
+        double bestDistance = gap;
+        for (int head = 0; head < size && distanceAlong[head] <= window; head++) {
+            for (int tail = size - 1;
+                    tail > head && distanceAlong[tail] >= length - window;
+                    tail--) {
+                Coord2D a = stroke.get(head);
+                Coord2D b = stroke.get(tail);
+                double distance = Math.hypot(b.x - a.x, b.y - a.y);
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    bestHead = head;
+                    bestTail = tail;
+                }
+            }
+        }
+
+        if (bestDistance >= gap * HOOK_CLOSEST_APPROACH_RATIO) {
+            return stroke;
+        }
+        return new ArrayList<>(stroke.subList(bestHead, bestTail + 1));
     }
 
     /** Where segments ab and cd cross, or null if they don't. */
