@@ -149,8 +149,11 @@ public class Sketch extends Shape {
      * <p>A stroke that crosses itself is resolved to its outer edge, so an accidental overshoot
      * where the outline closes doesn't leave a stray hole behind. Such a stroke can also enclose
      * two separate lobes, in which case each becomes its own area.
+     *
+     * <p>Anything enclosing less than minimumArea (in square metres) is discarded, so a stray tap
+     * or a tiny lobe doesn't leave a speck of an area behind.
      */
-    public void finishArea(AreaType areaType) {
+    public void finishArea(AreaType areaType, double minimumArea) {
         if (activePath == null) {
             return;
         }
@@ -167,12 +170,14 @@ public class Sketch extends Shape {
         if (regions == null || regions.isEmpty()) {
             // the geometry op failed or gave us nothing back; rather than silently lose the
             // user's stroke, fall back to using it as drawn
-            addAreaDetail(new AreaDetail(outline, areaType, outlinePath.getColour()));
-            return;
+            regions = Collections.singletonList(new PolygonUtils.Region(outline));
         }
 
         for (PolygonUtils.Region region : regions) {
-            addAreaDetail(new AreaDetail(region.getOutline(), areaType, outlinePath.getColour()));
+            if (region.getArea() >= minimumArea) {
+                addAreaDetail(
+                        new AreaDetail(region.getOutline(), areaType, outlinePath.getColour()));
+            }
         }
     }
 

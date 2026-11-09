@@ -41,6 +41,7 @@ import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.geometry.Projection2D;
 import org.hwyl.sexytopo.model.geometry.Space;
+import org.hwyl.sexytopo.model.sketch.AreaType;
 import org.hwyl.sexytopo.model.sketch.BrushColour;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
@@ -100,6 +101,11 @@ public abstract class SketchActivity extends SurveyEditorActivity
 
     private boolean symbolToolbarOpenedOnce = false;
     private boolean lineTypeToolbarOpenedOnce = false;
+    private boolean areaTypeToolbarOpenedOnce = false;
+
+    // the pop-up toolbars above the sketch toolbar; at most one is open at a time
+    private static final int[] POP_UP_TOOLBAR_IDS =
+            new int[] {R.id.symbolToolbar, R.id.lineTypeToolbar, R.id.areaTypeToolbar};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,6 +171,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
         initialiseSketchView();
         initialiseSymbolToolbar();
         initialiseLineTypeToolbar();
+        initialiseAreaTypeToolbar();
         initialiseTools();
 
         setSketchButtonsStatus();
@@ -477,8 +484,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
             // and toggle it whenever the symbol tool is tapped while already active.
             if (!symbolToolbarOpenedOnce || wasAlreadyInSymbolMode) {
                 symbolToolbarOpenedOnce = true;
-                setLineTypeToolbarOpen(false);
-                toggleSymbolToolbar();
+                togglePopUpToolbar(R.id.symbolToolbar);
             }
             return true;
         }
@@ -500,8 +506,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
             // draw tool is tapped while already active.
             if (!lineTypeToolbarOpenedOnce || wasAlreadyInDrawMode) {
                 lineTypeToolbarOpenedOnce = true;
-                setSymbolToolbarOpen(false);
-                toggleLineTypeToolbar();
+                togglePopUpToolbar(R.id.lineTypeToolbar);
             }
             return true;
         }
@@ -510,6 +515,28 @@ public abstract class SketchActivity extends SurveyEditorActivity
             if (itemId == lineType.getButtonViewId()) {
                 selectSketchTool(SketchTool.DRAW);
                 selectLineType(lineType);
+                return true;
+            }
+        }
+
+        // ********** Handle special area type logic **********
+
+        if (itemId == R.id.buttonArea) {
+            boolean wasAlreadyInAreaMode = alreadySelectedTool == SketchTool.AREA;
+            selectSketchTool(SketchTool.AREA);
+            // Mirrors the symbol toolbar: open the first time ever, then toggle whenever the
+            // area tool is tapped while already active.
+            if (!areaTypeToolbarOpenedOnce || wasAlreadyInAreaMode) {
+                areaTypeToolbarOpenedOnce = true;
+                togglePopUpToolbar(R.id.areaTypeToolbar);
+            }
+            return true;
+        }
+
+        for (AreaType areaType : AreaType.values()) {
+            if (itemId == areaType.getButtonViewId()) {
+                selectSketchTool(SketchTool.AREA);
+                selectAreaType(areaType);
                 return true;
             }
         }
@@ -588,17 +615,6 @@ public abstract class SketchActivity extends SurveyEditorActivity
         buttonPanel.invalidate();
     }
 
-    private void toggleLineTypeToolbar() {
-        View toolbar = findViewById(R.id.lineTypeToolbar);
-        boolean isVisible = toolbar.getVisibility() == View.VISIBLE;
-        setLineTypeToolbarOpen(!isVisible);
-    }
-
-    private void setLineTypeToolbarOpen(boolean setOpen) {
-        View toolbar = findViewById(R.id.lineTypeToolbar);
-        toolbar.setVisibility(setOpen ? View.VISIBLE : View.GONE);
-    }
-
     private void selectLineType(LineType lineType) {
         SketchPreferences.setSelectedLineType(lineType);
 
@@ -620,19 +636,55 @@ public abstract class SketchActivity extends SurveyEditorActivity
         sketchView.setLineType(lineType);
     }
 
-    private void toggleSymbolToolbar() {
-        View toolbar = getSymbolToolbar();
-        boolean isVisible = toolbar.getVisibility() == View.VISIBLE;
-        setSymbolToolbarOpen(!isVisible);
+    private void initialiseAreaTypeToolbar() {
+        LinearLayout buttonPanel = findViewById(R.id.areaTypeToolbarButtonPanel);
+        buttonPanel.removeAllViews();
+
+        int heightDp = Math.round(getResources().getDimension(R.dimen.toolbar_button_height));
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(heightDp, heightDp);
+
+        for (AreaType areaType : AreaType.values()) {
+            ImageButton button = new ImageButton(this);
+            button.setId(areaType.getButtonViewId());
+            button.setLayoutParams(params);
+            button.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            button.setImageResource(areaType.getDrawableId());
+            button.setContentDescription(getString(areaType.getStringId()));
+            TooltipCompat.setTooltipText(button, getString(areaType.getStringId()));
+            button.setOnClickListener(this);
+            buttonPanel.addView(button);
+        }
+        buttonPanel.invalidate();
     }
 
-    private void setSymbolToolbarOpen(boolean setOpen) {
-        View toolbar = getSymbolToolbar();
-        toolbar.setVisibility(setOpen ? View.VISIBLE : View.GONE);
+    private void selectAreaType(AreaType areaType) {
+        SketchPreferences.setSelectedAreaType(areaType);
+
+        for (AreaType a : AreaType.values()) {
+            ImageButton button = findViewById(a.getButtonViewId());
+            button.getBackground().clearColorFilter();
+        }
+
+        ImageButton selectedAreaTypeButton = findViewById(areaType.getButtonViewId());
+        selectedAreaTypeButton
+                .getBackground()
+                .setColorFilter(buttonHighlightColour, PorterDuff.Mode.SRC_ATOP);
+
+        ImageButton areaButton = findViewById(R.id.buttonArea);
+        areaButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        areaButton.setImageDrawable(
+                addSelectionBorder(AppCompatResources.getDrawable(this, areaType.getDrawableId())));
+
+        sketchView.setAreaType(areaType);
     }
 
-    private View getSymbolToolbar() {
-        return findViewById(R.id.symbolToolbar);
+    /** Opens or closes one of the pop-up toolbars; opening it closes any other that is open. */
+    private void togglePopUpToolbar(int toolbarId) {
+        boolean open = findViewById(toolbarId).getVisibility() != View.VISIBLE;
+        for (int id : POP_UP_TOOLBAR_IDS) {
+            View toolbar = findViewById(id);
+            toolbar.setVisibility(id == toolbarId && open ? View.VISIBLE : View.GONE);
+        }
     }
 
     private void selectSymbol(Symbol symbol) {
@@ -656,8 +708,8 @@ public abstract class SketchActivity extends SurveyEditorActivity
     }
 
     /**
-     * Wraps a toolbar drawable in the border used to show what is currently selected on the draw
-     * and symbol buttons.
+     * Wraps a toolbar drawable in the border used to show what is currently selected on the draw,
+     * area and symbol buttons.
      *
      * <p>The border is given an explicit size rather than being allowed to take the size of the
      * drawable it wraps, so that the box stays the same whatever is selected.
@@ -693,6 +745,9 @@ public abstract class SketchActivity extends SurveyEditorActivity
 
         LineType selectedLineType = SketchPreferences.getSelectedLineType();
         selectLineType(selectedLineType);
+
+        AreaType selectedAreaType = SketchPreferences.getSelectedAreaType();
+        selectAreaType(selectedAreaType);
     }
 
     private void selectSketchTool(SketchTool toSelect) {

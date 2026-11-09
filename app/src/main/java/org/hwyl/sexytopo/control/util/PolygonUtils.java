@@ -57,6 +57,11 @@ public class PolygonUtils {
             contours.addAll(holes);
             return contours;
         }
+
+        /** The filled area: that enclosed by the outline, less that of the holes. */
+        public double getArea() {
+            return area(outline) - holes.stream().mapToDouble(PolygonUtils::area).sum();
+        }
     }
 
     /** Whether two regions overlap (share any filled area). Holes count as not filled. */
@@ -243,6 +248,18 @@ public class PolygonUtils {
         List<Coord2D> polygon = Space2DUtils.simplify(sampled, epsilon);
 
         return polygon.size() >= 3 ? polygon : null;
+    }
+
+    /** The area enclosed by a closed contour (shoelace formula), whichever way round it runs. */
+    public static double area(List<Coord2D> polygon) {
+        double twiceSignedArea = 0;
+        int size = polygon.size();
+        for (int i = 0, j = size - 1; i < size; j = i++) {
+            Coord2D a = polygon.get(j);
+            Coord2D b = polygon.get(i);
+            twiceSignedArea += (double) a.x * b.y - (double) b.x * a.y;
+        }
+        return Math.abs(twiceSignedArea) / 2;
     }
 
     /** Standard ray-casting point-in-polygon test. */

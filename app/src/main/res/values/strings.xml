@@ -215,6 +215,14 @@
     <string name="line_type_presumed_wall">Presumed wall</string>
     <string name="line_type_pit">Pit edge</string>
     <string name="line_type_chimney">Chimney</string>
+    <string name="area_type_water">Water</string>
+    <string name="area_type_sump">Sump</string>
+    <string name="area_type_sand">Sand</string>
+    <string name="area_type_clay">Clay</string>
+    <string name="area_type_pebbles">Pebbles</string>
+    <string name="area_type_debris">Debris</string>
+    <string name="area_type_blocks">Blocks</string>
+
     <string name="sketch_menu_delete_last_leg">Undo Last Reading</string>
     <string name="sketch_menu_centre_view">Centre on Active</string>
     <string name="sketch_menu_auto_recentre">Auto-Recentre</string>

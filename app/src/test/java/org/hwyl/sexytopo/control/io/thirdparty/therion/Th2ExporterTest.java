@@ -74,6 +74,30 @@ public class Th2ExporterTest {
     }
 
     @Test
+    public void testAreaExportsUnderItsTypesTherionName() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+
+        List<Coord2D> polygon =
+                Arrays.asList(
+                        new Coord2D(1, 1), new Coord2D(4, 1), new Coord2D(4, 3), new Coord2D(1, 3));
+        survey.getPlanSketch()
+                .setAreaDetails(
+                        Collections.singletonList(
+                                new AreaDetail(polygon, AreaType.PEBBLES, Colour.BLACK)));
+
+        float scale = TherionExporter.getScale();
+        Projection2D projection = Projection2D.PLAN;
+        Frame exportFrame = ExportFrameFactory.getExportFrame(survey, projection).scale(scale);
+        Space<Coord2D> space = projection.project(survey);
+        String th2 =
+                Th2Exporter.getContent(
+                        survey, projection, space, "filename.xvi", exportFrame, exportFrame, scale);
+
+        Assert.assertTrue(th2.contains("line border:invisible -id pebbles1 -close on"));
+        Assert.assertTrue(th2.contains("area pebbles\n  pebbles1\nendarea"));
+    }
+
+    @Test
     public void testSemanticLineExportsAsTherionLine() {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
 

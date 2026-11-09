@@ -60,11 +60,17 @@ On export, semantic lines become first-class Therion `line wall` / `line pit` et
 
 ## Drawing an Area
 
-An area (currently only water) is sketched like a path — `sketch.startNewArea(Coord2D, AreaType)` creates the `activePath`, `lineTo` extends it — but `sketch.finishArea(AreaType)` closes the outline into a polygon and adds an `AreaDetail` instead of a path. Degenerate outlines (fewer than 3 points after simplification) are discarded.
+An area is sketched like a path — `sketch.startNewArea(Coord2D, AreaType)` creates the `activePath`, `lineTo` extends it — but `sketch.finishArea(AreaType)` closes the outline into a polygon and adds an `AreaDetail` instead of a path. Degenerate outlines (fewer than 3 points after simplification) are discarded, as is anything enclosing less than a minimum area: a square 10dp across on screen, converted at the current zoom (`SketchView.getMinimumArea`), so a stray tap or a tiny lobe doesn't leave a speck behind. Erasing applies the same minimum to the pieces that survive, dropping slivers.
 
 A single stroke can cross itself, most often when the user overshoots the point where the outline closes. `PolygonUtils.normalise` resolves such a stroke using the *winding* fill rule and keeps only outermost contours, so the crossing is absorbed into the boundary rather than punching a hole: interior loops from one drawing action are always discarded. This is a deliberate choice — a caver is far more likely to cross a stroke by accident than to draw a hole that way, and stray holes would be an annoying artefact. Deliberate holes come from erasing or merging instead (see below). A self-crossing stroke can also enclose two disjoint lobes, in which case each becomes its own area. If the platform op fails or returns nothing, `finishArea` falls back to using the stroke as drawn rather than silently discarding the user's work.
 
-If the new polygon overlaps existing areas of the same type *and* colour, they are all merged into one via `PolygonUtils.union` as a single undoable operation. When the "Blue Water" toggle is on, new water areas record `Colour.BLUE` (mirroring the water symbol behaviour).
+If the new polygon overlaps existing areas of the same type *and* colour, they are all merged into one via `PolygonUtils.union` as a single undoable operation. So a patch of sand drawn across a pool stays a separate area on top of it. When the "Blue Water" toggle is on, new water and sump areas record `Colour.BLUE` (mirroring the water symbol behaviour).
+
+### Area types and fills
+
+`AreaType` lists the kinds of area (water, sump, sand, clay, pebbles, debris, blocks), each named after the Therion area it exports as. The user picks one from the area type toolbar, opened by tapping the area tool while it is already selected (as with line types and symbols); the choice is remembered in `SketchPreferences`.
+
+Each type carries a `Fill`: a square tile of marks (polylines, closed polygons, filled dots, outlined rings) measured in dp. This one definition drives everything: `SketchView` renders each tile into an `ALPHA_8` bitmap once and fills areas through a repeating `BitmapShader` (an alpha mask, so it takes the area's colour from the paint), and `SvgExporter` writes the same marks into an SVG `<pattern>`, converting dp to metres at `Fill.METRES_PER_DP`. Marks stay inside their tile, apart from lines meant to join up with the next tile (water's hatching), so the repeats butt together seamlessly. The toolbar icons (`drawable/area_*.xml`) show the same patterns, drawn larger inside a common pool outline.
 
 ### Holes
 
@@ -80,7 +86,7 @@ Note that under Robolectric, `Path`'s shadow implements neither real boolean geo
 
 ### Export
 
-Areas are exported to SVG as `<path>` elements with `fill-rule="evenodd"` — one closed subpath per contour, so holes come out unfilled — filled with a per-colour horizontal-line `<pattern>` (see SvgExporter). Therion th2 gets one closed `line border:invisible` per contour plus an `area water` command referencing them all; Therion treats the borders after the first as holes, so this maps directly (see Th2Exporter). The XVI tracing background deliberately omits areas — the th2 carries them as first-class editable objects, so baking them into the background would just duplicate them. The PocketTopo exporter does not emit areas.
+Areas are exported to SVG as `<path>` elements with `fill-rule="evenodd"` — one closed subpath per contour, so holes come out unfilled — filled with a `<pattern>` for that combination of area type and colour (see SvgExporter). Therion th2 gets one closed `line border:invisible` per contour plus an `area <type>` command (`area water`, `area sand`, ...) referencing them all; Therion treats the borders after the first as holes, so this maps directly (see Th2Exporter). The XVI tracing background deliberately omits areas — the th2 carries them as first-class editable objects, so baking them into the background would just duplicate them. The PocketTopo exporter does not emit areas.
 
 ## Adding Other Elements
 
@@ -148,7 +154,7 @@ Path simplification is re-applied on load. History stacks are not serialized.
 ## Rendering Overview
 
 `SketchView.drawSketch()` iterates each detail collection:
-- **Areas:** drawn first (underneath lines): each contour is outlined, and horizontal parallel-line hatching is clipped to the region (an even-odd `Path`, so holes are outlined but left unhatched) and anchored to survey space so it doesn't crawl when panning
+- **Areas:** drawn first (underneath lines): each region is filled with its type's pattern through a repeating bitmap shader and its contours outlined (an even-odd `Path`, so holes are outlined but left unfilled); the shader is anchored to survey space so the pattern doesn't crawl when panning
 - **Paths:** SKETCH paths are sorted by colour (to minimize paint changes), then batched into `float[]` arrays for `canvas.drawLines()`; semantic lines are drawn individually via `canvas.drawPath()` with their type's paint so dashes and tick stamps can apply
 - **Symbols:** rendered as scaled, optionally rotated `Drawable` objects with a colour filter
 - **Text:** font size = `textSize * surveyToViewScale`; supports `\n` for multiline
@@ -164,7 +170,7 @@ Off-screen and sub-pixel details are culled via `couldBeVisible()` before render
 | `model/sketch/PathDetail.java` | Path/line element |
 | `model/sketch/LineType.java` | Line type enum (wall, pit etc.) with per-type appearance |
 | `model/sketch/AreaDetail.java` | Filled region element (outline plus holes) |
-| `model/sketch/AreaType.java` | Area type enum (currently just WATER) |
+| `model/sketch/AreaType.java` | Area type enum, with each type's Therion name and fill pattern |
 | `control/util/PolygonUtils.java` | Polygon union/subtraction (Path ops) |
 | `model/sketch/SymbolDetail.java` | Symbol element |
 | `model/sketch/TextDetail.java` | Text label element |

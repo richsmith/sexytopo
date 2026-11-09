@@ -31,6 +31,26 @@ public class PolygonUtilsTest {
     }
 
     @Test
+    public void testAreaOfRectangle() {
+        Assert.assertEquals(12, PolygonUtils.area(rectangle(1, 2, 3, 4)), 1e-6);
+    }
+
+    @Test
+    public void testAreaIgnoresWhichWayTheContourRuns() {
+        List<Coord2D> reversed = rectangle(1, 2, 3, 4);
+        Collections.reverse(reversed);
+        Assert.assertEquals(12, PolygonUtils.area(reversed), 1e-6);
+    }
+
+    @Test
+    public void testRegionAreaExcludesHoles() {
+        PolygonUtils.Region region =
+                new PolygonUtils.Region(
+                        rectangle(0, 0, 10, 10), Collections.singletonList(rectangle(2, 2, 6, 6)));
+        Assert.assertEquals(64, region.getArea(), 1e-6);
+    }
+
+    @Test
     public void testCourtyardContourBecomesAHole() {
         // what a union of four walls of water produces: an outer square plus the courtyard inside
         List<Coord2D> outer = rectangle(0, 0, 10, 10);

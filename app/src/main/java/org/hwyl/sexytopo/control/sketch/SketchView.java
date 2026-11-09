@@ -4,13 +4,16 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BitmapShader;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RotateDrawable;
 import android.text.Editable;
@@ -123,10 +126,9 @@ public class SketchView extends View {
     private float legendTickSizePx;
     private float dashedLineIntervalPx;
 
-    private static final float AREA_HATCHING_SPACING_DP = 8.0f;
-    private static final float AREA_HATCHING_WIDTH_DP = 1.0f;
-
     private static final float DELETE_DETAILS_WITHIN_N_DP = 10.0f;
+    // areas smaller than a square this size on screen are discarded as specks
+    private static final float MINIMUM_AREA_SIZE_DP = 10.0f;
     private static final float SELECTION_SENSITIVITY_DP = 25.0f;
     private static final float SNAP_TO_LINE_SENSITIVITY_DP = 25.0f;
     public static final float HOT_CORNER_DISTANCE_PROPORTION = 0.05f;
@@ -179,8 +181,7 @@ public class SketchView extends View {
 
     private Symbol currentSymbol = Symbol.getDefault();
 
-    // Only water areas exist for now; a field so an area type picker can slot in later.
-    private final AreaType currentAreaType = AreaType.WATER;
+    private AreaType currentAreaType = AreaType.WATER;
 
     // a bit hacky but I can't think of a better way to do this
     private String stationNameBeingCrossSectioned = null;
@@ -226,6 +227,11 @@ public class SketchView extends View {
     // path effects must not apply to it)
     private final Paint wallInsideTickPaint = new Paint();
     private final Paint areaPaint = new Paint();
+    // fills areas with their type's pattern; the shader is swapped per area type
+    private final Paint areaFillPaint = new Paint();
+    private final Map<AreaType, BitmapShader> areaFillShaders = new EnumMap<>(AreaType.class);
+    // scratch object reused to position the fill pattern, to avoid per-frame allocation
+    private final Matrix areaFillMatrix = new Matrix();
     private final Paint labelPaint = new Paint();
     private final Paint highlightPaint = new Paint();
     private final Paint legendPaint = new Paint();
@@ -350,6 +356,12 @@ public class SketchView extends View {
         areaPaint.setStyle(Paint.Style.STROKE);
         areaPaint.setStrokeJoin(Paint.Join.ROUND);
         areaPaint.setStrokeCap(Paint.Cap.ROUND);
+
+        areaFillPaint.setStyle(Paint.Style.FILL);
+        areaFillShaders.clear();
+        for (AreaType areaType : AreaType.values()) {
+            areaFillShaders.put(areaType, createAreaFillShader(areaType.getFill()));
+        }
 
         int legendColour = ContextCompat.getColor(activity, R.color.legend);
         legendPaint.setColor(legendColour);
@@ -679,7 +691,7 @@ public class SketchView extends View {
                 break;
 
             case MotionEvent.ACTION_UP:
-                sketch.finishArea(currentAreaType);
+                sketch.finishArea(currentAreaType, getMinimumArea());
                 invalidate();
                 break;
 
@@ -846,11 +858,24 @@ public class SketchView extends View {
             sketch.deleteDetail(areaDetail);
             return;
         }
+        // a nibble can leave slivers too small to be worth keeping
+        double minimumArea = getMinimumArea();
         List<SketchDetail> replacements =
                 remaining.stream()
+                        .filter(region -> region.getArea() >= minimumArea)
                         .map(region -> (SketchDetail) areaDetail.withRegion(region))
                         .collect(Collectors.toList());
         sketch.deleteDetail(areaDetail, replacements);
+    }
+
+    /**
+     * The smallest area (in square metres) worth keeping: a square of fixed on-screen size,
+     * converted at the current zoom. So the threshold follows what the user can actually see,
+     * rather than being a fixed size in the cave.
+     */
+    private double getMinimumArea() {
+        double sizeInMetres = dpToPixels(MINIMUM_AREA_SIZE_DP) / surveyToViewScale;
+        return sizeInMetres * sizeInMetres;
     }
 
     private boolean handleSymbol(MotionEvent event) {
@@ -2331,12 +2356,15 @@ public class SketchView extends View {
     }
 
     /**
-     * Draw the sketch's areas: each region is outlined and filled with horizontal parallel lines.
-     * Holes are drawn as further contours of the same path under the even-odd fill rule, so they
-     * are outlined too but left unhatched. The hatching is anchored to survey space so it doesn't
-     * crawl when the view is panned.
+     * Draw the sketch's areas: each region is filled with its type's pattern and outlined. Holes
+     * are drawn as further contours of the same path under the even-odd fill rule, so they are
+     * outlined too but left unfilled. The pattern is anchored to survey space so it doesn't crawl
+     * when the view is panned.
      */
     private void drawAreas(Canvas canvas, Sketch sketch, int alpha) {
+
+        areaFillMatrix.setTranslate(
+                -viewpointOffset.x * surveyToViewScale, -viewpointOffset.y * surveyToViewScale);
 
         for (AreaDetail areaDetail : sketch.getAreaDetails()) {
 
@@ -2362,31 +2390,71 @@ public class SketchView extends View {
             }
 
             Colour colour = areaDetail.getDrawColour(isDarkModeActive);
+
+            // the fill tile is an alpha mask, so it takes the paint's colour
+            BitmapShader shader = areaFillShaders.get(areaDetail.getAreaType());
+            shader.setLocalMatrix(areaFillMatrix);
+            areaFillPaint.setShader(shader);
+            areaFillPaint.setColor(colour.intValue);
+            areaFillPaint.setAlpha(alpha);
+            canvas.drawPath(outline, areaFillPaint);
+
             areaPaint.setColor(colour.intValue);
             areaPaint.setAlpha(alpha);
-
             areaPaint.setStrokeWidth(drawPaint.getStrokeWidth());
             canvas.drawPath(outline, areaPaint);
-
-            areaPaint.setStrokeWidth(dpToPixels(AREA_HATCHING_WIDTH_DP));
-            float spacingInMetres = dpToPixels(AREA_HATCHING_SPACING_DP) / surveyToViewScale;
-
-            float top = Math.max(areaDetail.getTop(), viewpointTopLeftOnSurvey.y);
-            float bottom = Math.min(areaDetail.getBottom(), viewpointBottomRightOnSurvey.y);
-            float left = Math.max(areaDetail.getLeft(), viewpointTopLeftOnSurvey.x);
-            float right = Math.min(areaDetail.getRight(), viewpointBottomRightOnSurvey.x);
-            float leftOnView = (left - viewpointOffset.x) * surveyToViewScale;
-            float rightOnView = (right - viewpointOffset.x) * surveyToViewScale;
-
-            canvas.save();
-            canvas.clipPath(outline);
-            float firstY = (float) Math.ceil(top / spacingInMetres) * spacingInMetres;
-            for (float ySurvey = firstY; ySurvey < bottom; ySurvey += spacingInMetres) {
-                float yOnView = (ySurvey - viewpointOffset.y) * surveyToViewScale;
-                canvas.drawLine(leftOnView, yOnView, rightOnView, yOnView, areaPaint);
-            }
-            canvas.restore();
         }
+    }
+
+    /**
+     * Render one tile of an area fill pattern into an alpha mask, to be repeated by a shader. The
+     * tile is rounded to a whole number of pixels so the repeats line up exactly.
+     */
+    private static BitmapShader createAreaFillShader(AreaType.Fill fill) {
+        int sizePixels = Math.max(1, Math.round(dpToPixels(fill.getTileSize())));
+        float scale = sizePixels / fill.getTileSize();
+
+        Bitmap tile = Bitmap.createBitmap(sizePixels, sizePixels, Bitmap.Config.ALPHA_8);
+        Canvas tileCanvas = new Canvas(tile);
+
+        Paint strokePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        strokePaint.setStyle(Paint.Style.STROKE);
+        strokePaint.setStrokeWidth(dpToPixels(AreaType.Fill.STROKE_WIDTH_DP));
+        strokePaint.setStrokeJoin(Paint.Join.ROUND);
+        strokePaint.setStrokeCap(Paint.Cap.ROUND);
+        Paint fillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        fillPaint.setStyle(Paint.Style.FILL);
+
+        for (AreaType.Mark mark : fill.getMarks()) {
+            float[] values = mark.getValues();
+            Path path = new Path();
+            switch (mark.getKind()) {
+                case LINE:
+                case POLYGON:
+                    path.moveTo(values[0] * scale, values[1] * scale);
+                    for (int i = 2; i < values.length; i += 2) {
+                        path.lineTo(values[i] * scale, values[i + 1] * scale);
+                    }
+                    if (mark.getKind() == AreaType.Mark.Kind.POLYGON) {
+                        path.close();
+                    }
+                    tileCanvas.drawPath(path, strokePaint);
+                    break;
+                case DOT:
+                case RING:
+                    path.addCircle(
+                            values[0] * scale,
+                            values[1] * scale,
+                            values[2] * scale,
+                            Path.Direction.CW);
+                    Paint paint =
+                            mark.getKind() == AreaType.Mark.Kind.DOT ? fillPaint : strokePaint;
+                    tileCanvas.drawPath(path, paint);
+                    break;
+            }
+        }
+
+        return new BitmapShader(tile, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
     }
 
     private void setDrawColour(Paint paint, SketchDetail sketchDetail) {
@@ -2654,6 +2722,10 @@ public class SketchView extends View {
 
     public void setLineType(LineType lineType) {
         sketch.setActiveLineType(lineType);
+    }
+
+    public void setAreaType(AreaType areaType) {
+        currentAreaType = areaType;
     }
 
     public void setCurrentSymbol(Symbol symbol) {

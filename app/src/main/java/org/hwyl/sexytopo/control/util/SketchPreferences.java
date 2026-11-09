@@ -3,6 +3,7 @@ package org.hwyl.sexytopo.control.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.model.sketch.AreaType;
 import org.hwyl.sexytopo.model.sketch.BrushColour;
 import org.hwyl.sexytopo.model.sketch.LineType;
 import org.hwyl.sexytopo.model.sketch.SketchTool;
@@ -16,6 +17,7 @@ public class SketchPreferences {
     private static final String BRUSH_COLOUR_PREFERENCE_KEY = "pref_sketch_brush_colour";
     private static final String SYMBOL_PREFERENCE_KEY = "pref_sketch_symbol";
     private static final String LINE_TYPE_PREFERENCE_KEY = "pref_sketch_line_type";
+    private static final String AREA_TYPE_PREFERENCE_KEY = "pref_sketch_area_type";
 
     /**
      * Toggle-able display options set throught the sketch pop-up menu. We have a lot of these, so
@@ -116,5 +118,15 @@ public class SketchPreferences {
         String selected = prefs.getString(LINE_TYPE_PREFERENCE_KEY, null);
         LineType lineType = LineType.fromString(selected);
         return lineType;
+    }
+
+    public static void setSelectedAreaType(AreaType areaType) {
+        setString(AREA_TYPE_PREFERENCE_KEY, areaType.toString());
+    }
+
+    public static AreaType getSelectedAreaType() {
+        String selected = prefs.getString(AREA_TYPE_PREFERENCE_KEY, null);
+        AreaType areaType = AreaType.fromString(selected);
+        return areaType;
     }
 }

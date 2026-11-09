@@ -85,6 +85,18 @@ public class SketchJsonTranslaterTest {
     }
 
     @Test
+    public void testEveryAreaTypeRoundTrips() throws Exception {
+        List<Coord2D> polygon =
+                Arrays.asList(new Coord2D(0, 0), new Coord2D(4, 0), new Coord2D(4, 4));
+        for (AreaType areaType : AreaType.values()) {
+            AreaDetail areaDetail = new AreaDetail(polygon, areaType, Colour.BLACK);
+            JSONObject json = SketchJsonTranslater.toJson(areaDetail);
+            AreaDetail restored = SketchJsonTranslater.toAreaDetail(json);
+            Assert.assertEquals(areaType, restored.getAreaType());
+        }
+    }
+
+    @Test
     public void testAreaDetailWithHolesRoundTrip() throws Exception {
         List<Coord2D> outline =
                 Arrays.asList(

@@ -205,7 +205,7 @@ public class SketchTest {
         sketch.getActivePath().lineTo(new Coord2D(4, 0));
         sketch.getActivePath().lineTo(new Coord2D(4, 4));
         sketch.getActivePath().lineTo(new Coord2D(0, 4));
-        sketch.finishArea(AreaType.WATER);
+        sketch.finishArea(AreaType.WATER, 0);
 
         Assert.assertEquals(1, sketch.getAreaDetails().size());
         Assert.assertEquals(0, sketch.getPathDetails().size());
@@ -222,7 +222,7 @@ public class SketchTest {
         sketch.getActivePath().lineTo(new Coord2D(4, 0));
         sketch.getActivePath().lineTo(new Coord2D(4, 4));
         sketch.getActivePath().lineTo(new Coord2D(0, 4));
-        sketch.finishArea(AreaType.WATER);
+        sketch.finishArea(AreaType.WATER, 0);
 
         Assert.assertEquals(1, sketch.getAreaDetails().size());
         Assert.assertFalse(sketch.getAreaDetails().get(0).hasHoles());
@@ -233,12 +233,38 @@ public class SketchTest {
         Sketch sketch = new Sketch();
         sketch.startNewArea(new Coord2D(0, 0), AreaType.WATER);
         sketch.getActivePath().lineTo(new Coord2D(1, 0));
-        sketch.finishArea(AreaType.WATER);
+        sketch.finishArea(AreaType.WATER, 0);
 
         Assert.assertEquals(0, sketch.getAreaDetails().size());
         Assert.assertEquals(0, sketch.getPathDetails().size());
         sketch.undo(); // must not blow up or resurrect anything
         Assert.assertEquals(0, sketch.getAreaDetails().size());
+    }
+
+    @Test
+    public void testFinishAreaDiscardsAreaBelowMinimumSize() {
+        Sketch sketch = new Sketch();
+        sketch.startNewArea(new Coord2D(0, 0), AreaType.WATER);
+        sketch.getActivePath().lineTo(new Coord2D(2, 0));
+        sketch.getActivePath().lineTo(new Coord2D(2, 2));
+        sketch.getActivePath().lineTo(new Coord2D(0, 2));
+        sketch.finishArea(AreaType.WATER, 5); // encloses 4 square metres
+
+        Assert.assertEquals(0, sketch.getAreaDetails().size());
+        Assert.assertEquals(0, sketch.getPathDetails().size());
+        Assert.assertNull(sketch.getActivePath());
+    }
+
+    @Test
+    public void testFinishAreaKeepsAreaAtMinimumSize() {
+        Sketch sketch = new Sketch();
+        sketch.startNewArea(new Coord2D(0, 0), AreaType.WATER);
+        sketch.getActivePath().lineTo(new Coord2D(2, 0));
+        sketch.getActivePath().lineTo(new Coord2D(2, 2));
+        sketch.getActivePath().lineTo(new Coord2D(0, 2));
+        sketch.finishArea(AreaType.WATER, 4);
+
+        Assert.assertEquals(1, sketch.getAreaDetails().size());
     }
 
     @Test

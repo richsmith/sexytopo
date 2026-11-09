@@ -15,6 +15,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -41,6 +42,7 @@ import org.hwyl.sexytopo.model.geometry.Line;
 import org.hwyl.sexytopo.model.geometry.Projection2D;
 import org.hwyl.sexytopo.model.geometry.Space;
 import org.hwyl.sexytopo.model.sketch.AreaDetail;
+import org.hwyl.sexytopo.model.sketch.AreaType;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
 import org.hwyl.sexytopo.model.sketch.LineType;
@@ -67,10 +69,6 @@ public class SvgExporter extends DoubleSketchFileExporter {
     public static final int SCALE = 50;
     public static final int STATION_FONT = 15;
     public static final int BORDER = 10;
-
-    // Spacing of the parallel hatch lines used to fill areas, roughly matching the app's
-    // on-screen rendering at default zoom.
-    public static final double AREA_HATCH_SPACING_METRES = 0.15;
 
     private SvgExportOptions exportOptions;
 
@@ -180,9 +178,10 @@ public class SvgExporter extends DoubleSketchFileExporter {
             xmlSerializer.endTag("", "g");
         }
 
-        Set<String> hatchColours = collectAreaHatchColours(sketch, options.isShowCrossSections());
-        if (!hatchColours.isEmpty()) {
-            writeAreaHatchPatterns(xmlSerializer, hatchColours, SCALE);
+        Map<String, AreaDetail> fillPatterns =
+                collectAreaFillPatterns(sketch, options.isShowCrossSections());
+        if (!fillPatterns.isEmpty()) {
+            writeAreaFillPatterns(xmlSerializer, fillPatterns, SCALE);
         }
 
         xmlSerializer.startTag("", "g");
@@ -785,56 +784,104 @@ public class SvgExporter extends DoubleSketchFileExporter {
     }
 
     /**
-     * The set of SVG colours needed for area hatch patterns, across the main sketch and (if they
-     * are being exported) the cross-section sub-sketches.
+     * The area fill patterns needed, across the main sketch and (if they are being exported) the
+     * cross-section sub-sketches. One pattern is needed per combination of area type and colour;
+     * each is keyed by its pattern id, with an area that uses it standing for the combination.
      */
-    private static Set<String> collectAreaHatchColours(Sketch sketch, boolean showCrossSections) {
-        Set<String> colours = new HashSet<>();
+    private static Map<String, AreaDetail> collectAreaFillPatterns(
+            Sketch sketch, boolean showCrossSections) {
+        Map<String, AreaDetail> patterns = new LinkedHashMap<>();
         for (AreaDetail areaDetail : sketch.getAreaDetails()) {
-            colours.add(getSvgColour(areaDetail));
+            patterns.putIfAbsent(getAreaFillPatternId(areaDetail), areaDetail);
         }
         if (showCrossSections) {
             for (CrossSectionDetail xsDetail : sketch.getCrossSectionDetails()) {
                 for (AreaDetail areaDetail : xsDetail.getSketch().getAreaDetails()) {
-                    colours.add(getSvgColour(areaDetail));
+                    patterns.putIfAbsent(getAreaFillPatternId(areaDetail), areaDetail);
                 }
             }
         }
-        return colours;
+        return patterns;
     }
 
     /**
-     * One horizontal-line hatch pattern per colour in use; area polygons reference these by id as
-     * their fill.
+     * One pattern per area type and colour in use, drawn from the type's fill tile; area paths
+     * reference these by id as their fill.
      */
-    private static void writeAreaHatchPatterns(
-            XmlSerializer xmlSerializer, Set<String> colours, int scale) throws IOException {
+    private static void writeAreaFillPatterns(
+            XmlSerializer xmlSerializer, Map<String, AreaDetail> patterns, int scale)
+            throws IOException {
 
-        double spacing = AREA_HATCH_SPACING_METRES * scale;
-        int hatchStrokeWidth = Math.max(1, GeneralPreferences.getExportSvgStrokeWidth() / 2);
+        double unit = AreaType.Fill.METRES_PER_DP * scale;
+        int strokeWidth = Math.max(1, GeneralPreferences.getExportSvgStrokeWidth() / 2);
 
         xmlSerializer.startTag("", "defs");
-        for (String colour : colours) {
+        for (Map.Entry<String, AreaDetail> entry : patterns.entrySet()) {
+            AreaType.Fill fill = entry.getValue().getAreaType().getFill();
+            String colour = getSvgColour(entry.getValue());
+            String tileSize = Double.toString(fill.getTileSize() * unit);
             xmlSerializer.startTag("", "pattern");
-            xmlSerializer.attribute("", "id", getAreaHatchPatternId(colour));
+            xmlSerializer.attribute("", "id", entry.getKey());
             xmlSerializer.attribute("", "patternUnits", "userSpaceOnUse");
-            xmlSerializer.attribute("", "width", Double.toString(spacing));
-            xmlSerializer.attribute("", "height", Double.toString(spacing));
-            xmlSerializer.startTag("", "line");
-            xmlSerializer.attribute("", "x1", "0");
-            xmlSerializer.attribute("", "y1", Double.toString(spacing / 2));
-            xmlSerializer.attribute("", "x2", Double.toString(spacing));
-            xmlSerializer.attribute("", "y2", Double.toString(spacing / 2));
-            xmlSerializer.attribute("", "stroke", colour);
-            xmlSerializer.attribute("", "stroke-width", Integer.toString(hatchStrokeWidth));
-            xmlSerializer.endTag("", "line");
+            xmlSerializer.attribute("", "width", tileSize);
+            xmlSerializer.attribute("", "height", tileSize);
+            for (AreaType.Mark mark : fill.getMarks()) {
+                writeAreaFillMark(xmlSerializer, mark, unit, colour, strokeWidth);
+            }
             xmlSerializer.endTag("", "pattern");
         }
         xmlSerializer.endTag("", "defs");
     }
 
-    private static String getAreaHatchPatternId(String colour) {
-        return "area-hatch-" + colour.toLowerCase(Locale.ROOT);
+    private static void writeAreaFillMark(
+            XmlSerializer xmlSerializer,
+            AreaType.Mark mark,
+            double unit,
+            String colour,
+            int strokeWidth)
+            throws IOException {
+        float[] values = mark.getValues();
+        String tag;
+        switch (mark.getKind()) {
+            case LINE:
+                tag = "polyline";
+                break;
+            case POLYGON:
+                tag = "polygon";
+                break;
+            default:
+                tag = "circle";
+                break;
+        }
+        xmlSerializer.startTag("", tag);
+        if (tag.equals("circle")) {
+            xmlSerializer.attribute("", "cx", Double.toString(values[0] * unit));
+            xmlSerializer.attribute("", "cy", Double.toString(values[1] * unit));
+            xmlSerializer.attribute("", "r", Double.toString(values[2] * unit));
+        } else {
+            List<String> points = new ArrayList<>();
+            for (int i = 0; i < values.length; i += 2) {
+                points.add(values[i] * unit + "," + values[i + 1] * unit);
+            }
+            xmlSerializer.attribute("", "points", TextTools.join(" ", points));
+        }
+        if (mark.getKind() == AreaType.Mark.Kind.DOT) {
+            xmlSerializer.attribute("", "fill", colour);
+        } else {
+            xmlSerializer.attribute("", "fill", "none");
+            xmlSerializer.attribute("", "stroke", colour);
+            xmlSerializer.attribute("", "stroke-width", Integer.toString(strokeWidth));
+            xmlSerializer.attribute("", "stroke-linecap", "round");
+            xmlSerializer.attribute("", "stroke-linejoin", "round");
+        }
+        xmlSerializer.endTag("", tag);
+    }
+
+    private static String getAreaFillPatternId(AreaDetail areaDetail) {
+        return "area-"
+                + areaDetail.getAreaType().getTherionName()
+                + "-"
+                + getSvgColour(areaDetail).toLowerCase(Locale.ROOT);
     }
 
     /**
@@ -845,12 +892,13 @@ public class SvgExporter extends DoubleSketchFileExporter {
             XmlSerializer xmlSerializer, AreaDetail areaDetail, int scale) throws IOException {
         Integer strokeWidth = GeneralPreferences.getExportSvgStrokeWidth();
         String colour = getSvgColour(areaDetail);
+        String patternId = getAreaFillPatternId(areaDetail);
         xmlSerializer.startTag(null, "path");
         xmlSerializer.attribute(null, "d", getAreaPathData(areaDetail, scale));
         xmlSerializer.attribute(null, "fill-rule", "evenodd");
         xmlSerializer.attribute(null, "stroke", colour);
         xmlSerializer.attribute(null, "stroke-width", strokeWidth.toString());
-        xmlSerializer.attribute(null, "fill", "url(#" + getAreaHatchPatternId(colour) + ")");
+        xmlSerializer.attribute(null, "fill", "url(#" + patternId + ")");
         xmlSerializer.endTag(null, "path");
     }
 
