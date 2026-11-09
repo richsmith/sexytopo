@@ -12,44 +12,7 @@ import org.hwyl.sexytopo.control.Log;
 
 public enum Symbol {
 
-    // ********** Special **********
-    TEXT(R.string.symbol_text, R.drawable.text, "text.svg", false, "label"),
-
-    // ********** Cave geometry **********
-    ENTRANCE(
-            R.string.symbol_entrance,
-            R.drawable.symbol_uis_entrance,
-            "symbol_uis_entrance.svg",
-            true,
-            "entrance"),
-    GRADIENT(
-            R.string.symbol_gradient,
-            R.drawable.symbol_uis_gradient,
-            "symbol_uis_gradient.svg",
-            true,
-            "gradient"),
-    TOO_TIGHT(
-            R.string.symbol_too_tight,
-            R.drawable.symbol_uis_too_tight,
-            "symbol_uis_too_tight.svg",
-            true,
-            "narrow-end"),
-
-    // ********** Floor stuff **********
-    SAND(R.string.symbol_sand, R.drawable.symbol_uis_sand, "symbol_uis_sand.svg", false, "sand"),
-    CLAY(R.string.symbol_clay, R.drawable.symbol_uis_clay, "symbol_uis_clay.svg", false, "clay"),
-    PEBBLES(
-            R.string.symbol_pebbles,
-            R.drawable.symbol_uis_pebbles,
-            "symbol_uis_pebbles.svg",
-            false,
-            "pebbles"),
-    BLOCKS(
-            R.string.symbol_blocks,
-            R.drawable.symbol_uis_blocks,
-            "symbol_uis_blocks.svg",
-            false,
-            "blocks"),
+    // Declared in the order they appear in the symbol picker, most commonly used first.
 
     // ********** Speleothems **********
     STALACTITE(
@@ -107,6 +70,42 @@ public enum Symbol {
             false,
             "flowstone"),
 
+    // ********** Floor **********
+    SAND(R.string.symbol_sand, R.drawable.symbol_uis_sand, "symbol_uis_sand.svg", false, "sand"),
+    CLAY(R.string.symbol_clay, R.drawable.symbol_uis_clay, "symbol_uis_clay.svg", false, "clay"),
+    PEBBLES(
+            R.string.symbol_pebbles,
+            R.drawable.symbol_uis_pebbles,
+            "symbol_uis_pebbles.svg",
+            false,
+            "pebbles"),
+    BLOCKS(
+            R.string.symbol_blocks,
+            R.drawable.symbol_uis_blocks,
+            "symbol_uis_blocks.svg",
+            false,
+            "blocks"),
+
+    // ********** Cave geometry **********
+    ENTRANCE(
+            R.string.symbol_entrance,
+            R.drawable.symbol_uis_entrance,
+            "symbol_uis_entrance.svg",
+            true,
+            "entrance"),
+    GRADIENT(
+            R.string.symbol_gradient,
+            R.drawable.symbol_uis_gradient,
+            "symbol_uis_gradient.svg",
+            true,
+            "gradient"),
+    TOO_TIGHT(
+            R.string.symbol_too_tight,
+            R.drawable.symbol_uis_too_tight,
+            "symbol_uis_too_tight.svg",
+            true,
+            "narrow-end"),
+
     // ********** Fluids **********
     WATER_FLOW(
             R.string.symbol_water_flow,
@@ -133,7 +132,10 @@ public enum Symbol {
             R.drawable.symbol_uis_debris,
             "symbol_uis_debris.svg",
             false,
-            "debris");
+            "debris"),
+
+    // ********** Special **********
+    TEXT(R.string.symbol_text, R.drawable.text, "text.svg", false, "label");
 
     private static Resources resources;
 

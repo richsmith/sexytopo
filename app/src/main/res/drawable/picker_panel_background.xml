@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Background for the symbol, line and area pickers: with a line along the top
+     in the main toolbar colour, to separate them from the sketch above. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <color android:color="@color/panelBackground" />
+    </item>
+    <item android:top="2dp">
+        <color android:color="@color/pickerBackground" />
+    </item>
+</layer-list>

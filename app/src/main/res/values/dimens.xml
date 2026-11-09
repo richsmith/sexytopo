@@ -3,6 +3,7 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="toolbar_button_height">40dp</dimen>
+    <dimen name="picker_button_size">44dp</dimen>
 
     <!-- FAB spacing -->
     <dimen name="fab_margin">16dp</dimen>

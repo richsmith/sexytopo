@@ -20,6 +20,12 @@
     <color name="innerPanelBackground">@color/md_dark_surface</color>
     <color name="dividerColour">@color/md_grey_400</color>
 
+    <!-- Symbol, line and area pickers -->
+    <color name="pickerBackground">@color/md_dark_surface</color>
+    <color name="pickerAccent">@color/md_sexy_green</color>
+    <color name="pickerSelectedFill">@color/md_sexy_dark_green</color>
+    <color name="pickerIcon">@color/md_white</color>
+
     <!-- Dialogs -->
     <color name="dialogSurface">@color/md_dark_surface_dim</color>
 

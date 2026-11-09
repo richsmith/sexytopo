@@ -33,53 +33,53 @@
             android:layout_height="0dp"
             android:layout_weight="1"/>
 
-        <HorizontalScrollView
+        <FrameLayout
             android:id="@+id/lineTypeToolbar"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/picker_panel_background"
+            android:padding="2dp"
+            android:paddingTop="6dp"
             android:visibility="gone">
-            <LinearLayout
-                android:orientation="horizontal"
+            <GridLayout
                 android:id="@+id/lineTypeToolbarButtonPanel"
-                android:weightSum="1"
-                android:background="@color/sexyTopoDarkGreen"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-            </LinearLayout>
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:useDefaultMargins="false" />
+        </FrameLayout>
 
-        </HorizontalScrollView>
-
-        <HorizontalScrollView
+        <FrameLayout
             android:id="@+id/areaTypeToolbar"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/picker_panel_background"
+            android:padding="2dp"
+            android:paddingTop="6dp"
             android:visibility="gone">
-            <LinearLayout
-                android:orientation="horizontal"
+            <GridLayout
                 android:id="@+id/areaTypeToolbarButtonPanel"
-                android:weightSum="1"
-                android:background="@color/sexyTopoDarkGreen"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-            </LinearLayout>
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:useDefaultMargins="false" />
+        </FrameLayout>
 
-        </HorizontalScrollView>
-
-        <HorizontalScrollView
+        <FrameLayout
             android:id="@+id/symbolToolbar"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/picker_panel_background"
+            android:padding="2dp"
+            android:paddingTop="6dp"
             android:visibility="gone">
-            <LinearLayout
-                android:orientation="horizontal"
+            <GridLayout
                 android:id="@+id/symbolToolbarButtonPanel"
-                android:weightSum="1"
-                android:background="@color/sexyTopoDarkGreen"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-            </LinearLayout>
-
-        </HorizontalScrollView>
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:useDefaultMargins="false" />
+        </FrameLayout>
 
         <GridLayout
             android:layout_width="match_parent"

@@ -23,10 +23,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Surface;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.TooltipCompat;
@@ -579,58 +580,72 @@ public abstract class SketchActivity extends SurveyEditorActivity
     }
 
     private void initialiseSymbolToolbar() {
-        LinearLayout buttonPanel = findViewById(R.id.symbolToolbarButtonPanel);
-        buttonPanel.removeAllViews();
-
-        int heightDp = Math.round(getResources().getDimension(R.dimen.toolbar_button_height));
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(heightDp, heightDp);
-
+        GridLayout buttonPanel =
+                preparePickerPanel(R.id.symbolToolbarButtonPanel, Symbol.values().length);
         for (Symbol symbol : Symbol.values()) {
-            Drawable drawable = symbol.createDrawable();
-            ImageButton button = new ImageButton(this);
-            button.setId(symbol.getButtonViewId());
-            button.setLayoutParams(params);
-            button.setScaleType(ImageView.ScaleType.FIT_CENTER);
-            button.setImageDrawable(drawable);
-            button.setOnClickListener(this);
-            buttonPanel.addView(button);
+            buttonPanel.addView(
+                    createPickerButton(
+                            symbol.getButtonViewId(),
+                            tintPickerIcon(symbol.createDrawable()),
+                            symbol.getName()));
         }
-        buttonPanel.invalidate();
     }
 
     private void initialiseLineTypeToolbar() {
-        LinearLayout buttonPanel = findViewById(R.id.lineTypeToolbarButtonPanel);
+        GridLayout buttonPanel =
+                preparePickerPanel(R.id.lineTypeToolbarButtonPanel, LineType.values().length);
+        for (LineType lineType : LineType.values()) {
+            buttonPanel.addView(
+                    createPickerButton(
+                            lineType.getButtonViewId(),
+                            tintPickerIcon(
+                                    AppCompatResources.getDrawable(this, lineType.getDrawableId())),
+                            getString(lineType.getStringId())));
+        }
+    }
+
+    /**
+     * Empties one of the pop-up pickers and sets it up as a grid with as many columns as fit across
+     * the screen, so that every item can be seen at once without scrolling. The columns are then
+     * evened out so the last row isn't left nearly empty.
+     */
+    private GridLayout preparePickerPanel(int panelId, int itemCount) {
+        GridLayout buttonPanel = findViewById(panelId);
         buttonPanel.removeAllViews();
 
-        int heightDp = Math.round(getResources().getDimension(R.dimen.toolbar_button_height));
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(heightDp, heightDp);
+        int buttonSize = getResources().getDimensionPixelSize(R.dimen.picker_button_size);
+        int screenWidth = getResources().getDisplayMetrics().widthPixels;
+        int maxColumns = Math.max(1, screenWidth / buttonSize);
+        int rows = (itemCount + maxColumns - 1) / maxColumns;
+        int columns = (itemCount + rows - 1) / rows;
+        buttonPanel.setColumnCount(columns);
+        return buttonPanel;
+    }
 
-        for (LineType lineType : LineType.values()) {
-            ImageButton button = new ImageButton(this);
-            button.setId(lineType.getButtonViewId());
-            button.setLayoutParams(params);
-            button.setScaleType(ImageView.ScaleType.FIT_CENTER);
-            button.setImageResource(lineType.getDrawableId());
-            button.setContentDescription(getString(lineType.getStringId()));
-            TooltipCompat.setTooltipText(button, getString(lineType.getStringId()));
-            button.setOnClickListener(this);
-            buttonPanel.addView(button);
-        }
-        buttonPanel.invalidate();
+    private ImageButton createPickerButton(int viewId, Drawable drawable, String name) {
+        int buttonSize = getResources().getDimensionPixelSize(R.dimen.picker_button_size);
+        int padding = Math.round(buttonSize * 0.12f);
+
+        ImageButton button = new ImageButton(this);
+        button.setId(viewId);
+        button.setLayoutParams(
+                new GridLayout.LayoutParams(new ViewGroup.LayoutParams(buttonSize, buttonSize)));
+        button.setBackgroundResource(R.drawable.picker_button_background);
+        button.setPadding(padding, padding, padding, padding);
+        button.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        button.setImageDrawable(drawable);
+        button.setContentDescription(name);
+        TooltipCompat.setTooltipText(button, name);
+        button.setOnClickListener(this);
+        return button;
     }
 
     private void selectLineType(LineType lineType) {
         SketchPreferences.setSelectedLineType(lineType);
 
         for (LineType l : LineType.values()) {
-            ImageButton button = findViewById(l.getButtonViewId());
-            button.getBackground().clearColorFilter();
+            findViewById(l.getButtonViewId()).setSelected(l == lineType);
         }
-
-        ImageButton selectedLineTypeButton = findViewById(lineType.getButtonViewId());
-        selectedLineTypeButton
-                .getBackground()
-                .setColorFilter(buttonHighlightColour, PorterDuff.Mode.SRC_ATOP);
 
         ImageButton drawButton = findViewById(R.id.buttonDraw);
         drawButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
@@ -641,38 +656,25 @@ public abstract class SketchActivity extends SurveyEditorActivity
     }
 
     private void initialiseAreaTypeToolbar() {
-        LinearLayout buttonPanel = findViewById(R.id.areaTypeToolbarButtonPanel);
-        buttonPanel.removeAllViews();
-
-        int heightDp = Math.round(getResources().getDimension(R.dimen.toolbar_button_height));
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(heightDp, heightDp);
-
+        GridLayout buttonPanel =
+                preparePickerPanel(R.id.areaTypeToolbarButtonPanel, AreaType.values().length);
         for (AreaType areaType : AreaType.values()) {
-            ImageButton button = new ImageButton(this);
-            button.setId(areaType.getButtonViewId());
-            button.setLayoutParams(params);
-            button.setScaleType(ImageView.ScaleType.FIT_CENTER);
-            button.setImageDrawable(getAreaTypeIcon(areaType, areaType.getFillDrawableId()));
-            button.setContentDescription(getString(areaType.getStringId()));
-            TooltipCompat.setTooltipText(button, getString(areaType.getStringId()));
-            button.setOnClickListener(this);
-            buttonPanel.addView(button);
+            Drawable icon = getAreaTypeIcon(areaType, areaType.getFillDrawableId());
+            if (!isDrawnBlue(areaType)) {
+                tintPickerIcon(icon);
+            }
+            buttonPanel.addView(
+                    createPickerButton(
+                            areaType.getButtonViewId(), icon, getString(areaType.getStringId())));
         }
-        buttonPanel.invalidate();
     }
 
     private void selectAreaType(AreaType areaType) {
         SketchPreferences.setSelectedAreaType(areaType);
 
         for (AreaType a : AreaType.values()) {
-            ImageButton button = findViewById(a.getButtonViewId());
-            button.getBackground().clearColorFilter();
+            findViewById(a.getButtonViewId()).setSelected(a == areaType);
         }
-
-        ImageButton selectedAreaTypeButton = findViewById(areaType.getButtonViewId());
-        selectedAreaTypeButton
-                .getBackground()
-                .setColorFilter(buttonHighlightColour, PorterDuff.Mode.SRC_ATOP);
 
         ImageButton areaButton = findViewById(R.id.buttonArea);
         areaButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
@@ -692,11 +694,27 @@ public abstract class SketchActivity extends SurveyEditorActivity
      */
     private Drawable getAreaTypeIcon(AreaType areaType, int drawableId) {
         Drawable drawable = AppCompatResources.getDrawable(this, drawableId).mutate();
-        if (areaType.isWater() && SketchPreferences.Toggle.BLUE_WATER.isOn()) {
+        if (isDrawnBlue(areaType)) {
             drawable.setColorFilter(
                     new PorterDuffColorFilter(Colour.BLUE.intValue, PorterDuff.Mode.SRC_IN));
         }
         return drawable;
+    }
+
+    private boolean isDrawnBlue(AreaType areaType) {
+        return areaType.isWater() && SketchPreferences.Toggle.BLUE_WATER.isOn();
+    }
+
+    /**
+     * Colours a picker icon to suit the theme: the icons are drawn in black, which would vanish
+     * against the dark picker background in dark mode.
+     */
+    private Drawable tintPickerIcon(Drawable drawable) {
+        Drawable tinted = drawable.mutate();
+        tinted.setColorFilter(
+                new PorterDuffColorFilter(
+                        ContextCompat.getColor(this, R.color.pickerIcon), PorterDuff.Mode.SRC_IN));
+        return tinted;
     }
 
     /** Opens or closes one of the pop-up toolbars; opening it closes any other that is open. */
@@ -712,14 +730,8 @@ public abstract class SketchActivity extends SurveyEditorActivity
         SketchPreferences.setSelectedSymbol(symbol);
 
         for (Symbol s : Symbol.values()) {
-            ImageButton button = findViewById(s.getButtonViewId());
-            button.getBackground().clearColorFilter();
+            findViewById(s.getButtonViewId()).setSelected(s == symbol);
         }
-
-        ImageButton selectedSymbolButton = findViewById(symbol.getButtonViewId());
-        selectedSymbolButton
-                .getBackground()
-                .setColorFilter(buttonHighlightColour, PorterDuff.Mode.SRC_ATOP);
 
         ImageButton symbolButton = findViewById(R.id.buttonSymbol);
         symbolButton.setScaleType(ImageView.ScaleType.FIT_CENTER);

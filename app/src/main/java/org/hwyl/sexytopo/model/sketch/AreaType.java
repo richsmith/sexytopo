@@ -75,6 +75,19 @@ public enum AreaType {
                     Mark.ring(8, 15.5f, 1.8f),
                     Mark.ring(15, 20.5f, 1.5f),
                     Mark.ring(3.5f, 21, 1.3f))),
+    // larger angular boulders
+    BLOCKS(
+            R.string.area_type_blocks,
+            R.drawable.area_blocks,
+            R.drawable.area_blocks_fill,
+            "blocks",
+            false,
+            new Fill(
+                    40,
+                    Mark.polygon(3, 5, 15, 2, 18, 12, 6, 16),
+                    Mark.polygon(23, 4, 35, 7, 33, 17, 22, 15),
+                    Mark.polygon(8, 22, 20, 20, 22, 33, 10, 36, 5, 29),
+                    Mark.polygon(27, 23, 37, 25, 35, 36, 26, 33))),
     // small angular fragments
     DEBRIS(
             R.string.area_type_debris,
@@ -88,20 +101,7 @@ public enum AreaType {
                     Mark.polygon(13, 4, 18, 5, 17, 8.5f, 12.5f, 7.5f),
                     Mark.polygon(4, 13, 9, 12, 7.5f, 16.5f),
                     Mark.polygon(16.5f, 14, 21.5f, 16, 18, 20),
-                    Mark.polygon(8, 19.5f, 12.5f, 20.5f, 10, 23))),
-    // larger angular boulders
-    BLOCKS(
-            R.string.area_type_blocks,
-            R.drawable.area_blocks,
-            R.drawable.area_blocks_fill,
-            "blocks",
-            false,
-            new Fill(
-                    40,
-                    Mark.polygon(3, 5, 15, 2, 18, 12, 6, 16),
-                    Mark.polygon(23, 4, 35, 7, 33, 17, 22, 15),
-                    Mark.polygon(8, 22, 20, 20, 22, 33, 10, 36, 5, 29),
-                    Mark.polygon(27, 23, 37, 25, 35, 36, 26, 33)));
+                    Mark.polygon(8, 19.5f, 12.5f, 20.5f, 10, 23)));
 
     /**
      * One mark in a fill tile. Lines are open polylines and polygons closed outlines, both given as
