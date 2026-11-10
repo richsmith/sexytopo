@@ -5,6 +5,7 @@
 - Highlight for active view button in action bar
 - Change default for floating manual-entry buttons on table view to off (can be turned back on in settings, and manual entry can already be triggered from the menu)
 - Fix Cavway X1 downward shots being recorded with clinos of 270-360° rather than negative values (#357)
+- Fix bug where automatic autosave restore was not fetching the extended elevation
 
 # 2026-11-09 1.15.0
 - Another new leg agreement algorithm "Slope-corrected angular deltas" that ought to solve issues with taking repeated readings on steep legs while remaining close in spirit to BCRA Grade 5; testing and feedback welcome (#321)

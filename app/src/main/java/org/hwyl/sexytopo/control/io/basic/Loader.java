@@ -89,8 +89,9 @@ public class Loader {
         }
 
         SurveyFile elevationFile = SurveyFile.SKETCH_EXT_ELEVATION.get(survey);
+        elevationFile = considerSwappingForAutosave(context, elevationFile, restoreAutosave);
         if (elevationFile.exists(context)) {
-            Log.i(R.string.file_loading_file, planFile.getFilename());
+            Log.i(R.string.file_loading_file, elevationFile.getFilename());
             String elevationText = elevationFile.slurp(context);
             Sketch elevation = SketchJsonTranslater.translate(survey, elevationText);
             survey.setElevationSketch(elevation);
