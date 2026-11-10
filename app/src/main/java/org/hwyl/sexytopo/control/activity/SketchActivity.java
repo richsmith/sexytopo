@@ -696,7 +696,9 @@ public abstract class SketchActivity extends SurveyEditorActivity
         Drawable drawable = AppCompatResources.getDrawable(this, drawableId).mutate();
         if (isDrawnBlue(areaType)) {
             drawable.setColorFilter(
-                    new PorterDuffColorFilter(Colour.BLUE.intValue, PorterDuff.Mode.SRC_IN));
+                    new PorterDuffColorFilter(
+                            Colour.WATER.getDrawColour(isDarkModeActive()).intValue,
+                            PorterDuff.Mode.SRC_IN));
         }
         return drawable;
     }

@@ -17,11 +17,7 @@ public abstract class SketchDetail extends Shape {
     }
 
     public Colour getDrawColour(boolean isDarkModeActive) {
-        if (isDarkModeActive && colour == Colour.BLACK) {
-            return Colour.WHITE;
-        } else {
-            return colour;
-        }
+        return colour.getDrawColour(isDarkModeActive);
     }
 
     public String getXviString() {

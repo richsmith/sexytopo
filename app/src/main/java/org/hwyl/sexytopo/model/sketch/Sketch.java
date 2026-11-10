@@ -134,7 +134,7 @@ public class Sketch extends Shape {
     public PathDetail startNewArea(Coord2D start, AreaType areaType) {
         Colour colour = activeColour;
         if (areaType.isWater() && SketchPreferences.Toggle.BLUE_WATER.isOn()) {
-            colour = Colour.BLUE;
+            colour = Colour.WATER;
         }
         activePath = new PathDetail(start, colour);
         pathDetails.add(activePath);
@@ -235,7 +235,7 @@ public class Sketch extends Shape {
     public void addSymbolDetail(Coord2D location, Symbol symbol, float size, float angle) {
         Colour colour = activeColour;
         if (symbol.isWater() && SketchPreferences.Toggle.BLUE_WATER.isOn()) {
-            colour = Colour.BLUE;
+            colour = Colour.WATER;
         }
         SymbolDetail symbolDetail = new SymbolDetail(location, symbol, colour, size, angle);
         symbolDetails.add(symbolDetail);
