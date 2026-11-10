@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.hwyl.sexytopo.control.util.PolygonUtils;
 import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
@@ -14,6 +15,13 @@ import org.hwyl.sexytopo.model.survey.Station;
 public class Sketch extends Shape {
 
     public static final float DEFAULT_XSECTION_SCALE = 1.0f;
+
+    // How near a wall must come to an area to clip it: a fraction of the area's size, with a floor
+    private static final float WALL_CLIP_MARGIN_FACTOR = 0.25f;
+    private static final float MINIMUM_WALL_CLIP_MARGIN = 0.5f;
+
+    // How far past its ends a wall cuts, in metres, so one stopping just short still cuts across
+    private static final float WALL_CLIP_EXTENSION = 0.25f;
 
     private List<PathDetail> pathDetails = new ArrayList<>();
     private List<AreaDetail> areaDetails = new ArrayList<>();
@@ -152,6 +160,9 @@ public class Sketch extends Shape {
      * behind. Such a stroke can also enclose two separate lobes, in which case each becomes its own
      * area.
      *
+     * <p>If Clip Areas to Walls is on, the area is cut along any walls it strays across and the
+     * parts on their outer side are dropped (see clipToWalls).
+     *
      * <p>Anything enclosing less than minimumArea (in square metres) is discarded, so a stray tap
      * or a tiny lobe doesn't leave a speck of an area behind.
      */
@@ -177,49 +188,148 @@ public class Sketch extends Shape {
             regions = Collections.singletonList(new PolygonUtils.Region(outline));
         }
 
-        for (PolygonUtils.Region region : regions) {
-            if (region.getArea() >= minimumArea) {
-                addAreaDetail(
-                        new AreaDetail(region.getOutline(), areaType, outlinePath.getColour()));
-            }
+        addAreaDetails(
+                regions.stream()
+                        .map(
+                                region ->
+                                        new AreaDetail(
+                                                region.getOutline(),
+                                                areaType,
+                                                outlinePath.getColour()))
+                        .flatMap(area -> clipToWalls(area).stream())
+                        .filter(area -> area.toRegion().getArea() >= minimumArea)
+                        .collect(Collectors.toList()));
+    }
+
+    /**
+     * The area cut along any walls it strays across, keeping the parts on their inner side; may be
+     * several pieces. Relies on walls having been oriented to the passage interior when drawn.
+     * Falls back to the area as drawn if clipping fails.
+     */
+    private List<AreaDetail> clipToWalls(AreaDetail area) {
+
+        if (!SketchPreferences.Toggle.CLIP_AREAS_TO_WALLS.isOn()) {
+            return Collections.singletonList(area);
         }
+
+        List<List<Coord2D>> walls =
+                findClippingWalls(area).stream()
+                        .map(PathDetail::getPath)
+                        .collect(Collectors.toList());
+        if (walls.isEmpty()) {
+            return Collections.singletonList(area);
+        }
+
+        List<PolygonUtils.Region> clipped =
+                PolygonUtils.clipToInteriorOf(area.toRegion(), walls, WALL_CLIP_EXTENSION);
+        if (clipped == null || clipped.isEmpty()) {
+            return Collections.singletonList(area);
+        }
+
+        return clipped.stream().map(area::withRegion).collect(Collectors.toList());
+    }
+
+    /**
+     * Wall-kind lines near enough the area to cut it or to say which side of them it's on. Pit
+     * edges and chimneys don't count: they aren't passage boundaries and have no inferred interior
+     * side.
+     */
+    private List<PathDetail> findClippingWalls(AreaDetail area) {
+
+        float margin =
+                Math.max(
+                        MINIMUM_WALL_CLIP_MARGIN,
+                        WALL_CLIP_MARGIN_FACTOR * Math.max(area.getWidth(), area.getHeight()));
+        Coord2D grow = new Coord2D(margin, margin);
+        Coord2D topLeft = area.getTopLeft().minus(grow);
+        Coord2D bottomRight = area.getBottomRight().plus(grow);
+
+        return pathDetails.stream()
+                .filter(path -> path.getLineType().isWall())
+                .filter(path -> path.getPath().size() >= 2)
+                .filter(path -> path.intersectsRectangle(topLeft, bottomRight))
+                .filter(path -> comesWithin(path, area, margin))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Whether the line comes within the given distance of the area. Checks both ways round, so
+     * neither a long straight stretch of wall nor a long straight edge of area slips through.
+     */
+    private static boolean comesWithin(PathDetail path, AreaDetail area, float margin) {
+        return path.getPath().stream()
+                        .anyMatch(
+                                point ->
+                                        area.getDistanceFrom(point) <= margin
+                                                || area.contains(point))
+                || area.getOutline().stream()
+                        .anyMatch(point -> path.getDistanceFrom(point) <= margin);
     }
 
     public void addAreaDetail(AreaDetail newArea) {
+        addAreaDetails(Collections.singletonList(newArea));
+    }
 
-        List<SketchDetail> overlapping = new ArrayList<>();
-        for (AreaDetail existing : areaDetails) {
-            if (existing.getAreaType() == newArea.getAreaType()
-                    && existing.getColour() == newArea.getColour()
-                    && existing.intersectsRectangle(newArea.getTopLeft(), newArea.getBottomRight())
-                    && PolygonUtils.overlap(existing.toRegion(), newArea.toRegion())) {
-                overlapping.add(existing);
-            }
+    /**
+     * Add areas from a single action as one undoable step, merging any that overlap existing areas
+     * of the same type and colour, or each other.
+     */
+    public void addAreaDetails(List<AreaDetail> newAreas) {
+
+        if (newAreas.isEmpty()) {
+            return;
         }
 
-        List<SketchDetail> merged = null;
-        if (!overlapping.isEmpty()) {
-            List<PolygonUtils.Region> regions = new ArrayList<>();
-            regions.add(newArea.toRegion());
-            for (SketchDetail detail : overlapping) {
-                regions.add(((AreaDetail) detail).toRegion());
+        List<SketchDetail> mergedAway = new ArrayList<>();
+        List<AreaDetail> added = new ArrayList<>();
+
+        for (AreaDetail newArea : newAreas) {
+            // check against what's been added so far too, so two new areas overlapping the same
+            // existing one all end up merged together
+            List<AreaDetail> mergeWith =
+                    Stream.concat(
+                                    areaDetails.stream()
+                                            .filter(existing -> !mergedAway.contains(existing)),
+                                    added.stream())
+                            .filter(other -> overlaps(other, newArea))
+                            .collect(Collectors.toList());
+
+            List<PolygonUtils.Region> union = null;
+            if (!mergeWith.isEmpty()) {
+                List<PolygonUtils.Region> regions = new ArrayList<>();
+                regions.add(newArea.toRegion());
+                mergeWith.stream().map(AreaDetail::toRegion).forEach(regions::add);
+                union = PolygonUtils.union(regions);
             }
-            List<PolygonUtils.Region> union = PolygonUtils.union(regions);
-            if (union != null && !union.isEmpty()) {
-                merged =
-                        union.stream()
-                                .map(region -> (SketchDetail) newArea.withRegion(region))
-                                .collect(Collectors.toList());
+
+            if (union == null || union.isEmpty()) {
+                // nothing to merge with (or the merge failed): just add the new area as-is
+                added.add(newArea);
+                continue;
             }
+
+            for (AreaDetail other : mergeWith) {
+                if (!added.remove(other)) {
+                    mergedAway.add(other);
+                }
+            }
+            union.stream().map(newArea::withRegion).forEach(added::add);
         }
 
-        if (merged == null) {
-            // nothing to merge with (or the merge failed): just add the new area as-is
-            areaDetails.add(newArea);
-            addSketchDetail(newArea);
+        if (mergedAway.isEmpty() && added.size() == 1) {
+            AreaDetail only = added.get(0);
+            areaDetails.add(only);
+            addSketchDetail(only);
         } else {
-            deleteDetails(overlapping, merged);
+            deleteDetails(mergedAway, new ArrayList<>(added));
         }
+    }
+
+    private static boolean overlaps(AreaDetail existing, AreaDetail newArea) {
+        return existing.getAreaType() == newArea.getAreaType()
+                && existing.getColour() == newArea.getColour()
+                && existing.intersectsRectangle(newArea.getTopLeft(), newArea.getBottomRight())
+                && PolygonUtils.overlap(existing.toRegion(), newArea.toRegion());
     }
 
     public void addTextDetail(Coord2D location, String text, float size) {

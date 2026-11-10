@@ -36,6 +36,7 @@ public class SketchPreferences {
         SHOW_CONNECTIONS(R.id.buttonShowConnections, true),
         SHOW_COMPASS(R.id.buttonShowCompass, true),
         BLUE_WATER(R.id.buttonBlueWater, true),
+        CLIP_AREAS_TO_WALLS(R.id.buttonClipAreasToWalls, true),
         PINCH_TO_ZOOM(R.id.buttonPinchToZoom, true);
 
         private final int controlId;

@@ -406,6 +406,9 @@ public abstract class SketchActivity extends SurveyEditorActivity
             initialiseAreaTypeToolbar();
             selectAreaType(SketchPreferences.getSelectedAreaType());
             return true;
+        } else if (itemId == R.id.buttonClipAreasToWalls) {
+            SketchPreferences.Toggle.CLIP_AREAS_TO_WALLS.set(!item.isChecked());
+            return true;
         } else if (itemId == R.id.buttonPinchToZoom) {
             SketchPreferences.Toggle.PINCH_TO_ZOOM.set(!item.isChecked());
             return true;

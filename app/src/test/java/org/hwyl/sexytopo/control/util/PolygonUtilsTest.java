@@ -306,6 +306,80 @@ public class PolygonUtilsTest {
     }
 
     @Test
+    public void testIslandInAHoleIsARegionOfItsOwn() {
+        // a ring of area cut around a pillar: the piece inside the pillar is separate, not a hole
+        List<Coord2D> outer = rectangle(0, 0, 20, 20);
+        List<Coord2D> ring = rectangle(5, 5, 10, 10);
+        List<Coord2D> island = rectangle(8, 8, 4, 4);
+
+        List<PolygonUtils.Region> regions =
+                PolygonUtils.groupIntoRegions(Arrays.asList(island, outer, ring));
+
+        Assert.assertEquals(2, regions.size());
+        PolygonUtils.Region outerRegion =
+                regions.stream().filter(r -> r.getOutline() == outer).findFirst().get();
+        PolygonUtils.Region islandRegion =
+                regions.stream().filter(r -> r.getOutline() == island).findFirst().get();
+        Assert.assertEquals(Collections.singletonList(ring), outerRegion.getHoles());
+        Assert.assertTrue(islandRegion.getHoles().isEmpty());
+    }
+
+    @Test
+    public void testPieceInsideAWallVotesInterior() {
+        // left to right along y = 0: the interior (-dy, dx) side is +y
+        List<Coord2D> wall = Arrays.asList(point(0, 0), point(10, 0));
+        PolygonUtils.Region inside = new PolygonUtils.Region(rectangle(2, 1, 4, 3));
+
+        double vote = PolygonUtils.getInteriorVote(inside, Collections.singletonList(wall));
+
+        Assert.assertTrue(vote > 0);
+    }
+
+    @Test
+    public void testPieceBeyondAWallVotesExterior() {
+        List<Coord2D> wall = Arrays.asList(point(0, 0), point(10, 0));
+        PolygonUtils.Region outside = new PolygonUtils.Region(rectangle(2, -4, 4, 3));
+
+        double vote = PolygonUtils.getInteriorVote(outside, Collections.singletonList(wall));
+
+        Assert.assertTrue(vote < 0);
+    }
+
+    @Test
+    public void testPieceBetweenTwoWallsVotesInterior() {
+        // a passage along x, walls oriented with the interior between them
+        List<Coord2D> lower = Arrays.asList(point(0, 0), point(10, 0));
+        List<Coord2D> upper = Arrays.asList(point(10, 4), point(0, 4));
+        List<List<Coord2D>> walls = Arrays.asList(lower, upper);
+
+        Assert.assertTrue(
+                PolygonUtils.getInteriorVote(
+                                new PolygonUtils.Region(rectangle(2, 0.5f, 6, 3)), walls)
+                        > 0);
+        Assert.assertTrue(
+                PolygonUtils.getInteriorVote(
+                                new PolygonUtils.Region(rectangle(2, 4.5f, 6, 2)), walls)
+                        < 0);
+        Assert.assertTrue(
+                PolygonUtils.getInteriorVote(
+                                new PolygonUtils.Region(rectangle(2, -2.5f, 6, 2)), walls)
+                        < 0);
+    }
+
+    @Test
+    public void testPieceBeyondTheTipOfASpikeOfWallVotesInterior() {
+        // a thin fin of rock jutting into the passage, its tip at (10, 0): out along y = 0 and
+        // sharply back. A piece just beyond the tip is nearest the tip itself, where the first
+        // segment alone would put it on the wrong side.
+        List<Coord2D> wall = Arrays.asList(point(0, 0), point(10, 0), point(0, -5));
+        PolygonUtils.Region beyondTip = new PolygonUtils.Region(rectangle(10.5f, -0.6f, 1, 0.4f));
+
+        double vote = PolygonUtils.getInteriorVote(beyondTip, Collections.singletonList(wall));
+
+        Assert.assertTrue(vote > 0);
+    }
+
+    @Test
     public void testContainsDistinguishesInsideFromOutside() {
         List<Coord2D> square = rectangle(0, 0, 10, 10);
 
