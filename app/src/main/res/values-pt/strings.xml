@@ -8,6 +8,7 @@
     <string name="carry_on">Continuar</string>
     <string name="delete">Eliminar</string>
     <string name="save">Guardar</string>
+    <string name="update">Atualizar</string>
     <string name="overwrite">Sobrescrever</string>
     <string name="move">Mover</string>
     <string name="replace">Substituir</string>

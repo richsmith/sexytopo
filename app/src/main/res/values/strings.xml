@@ -16,6 +16,7 @@
     <string name="carry_on">Continue</string>
     <string name="delete">Delete</string>
     <string name="save">Save</string>
+    <string name="update">Update</string>
     <string name="overwrite">Overwrite</string>
     <string name="move">Move</string>
     <string name="replace">Replace</string>

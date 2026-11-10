@@ -233,7 +233,7 @@ public class LegDialogs {
                         toEdit.hasDestination()
                                 ? R.string.manual_edit_leg_title
                                 : R.string.manual_edit_splay_title)
-                .setPositiveButton(R.string.save, null)
+                .setPositiveButton(R.string.update, null)
                 .setNegativeButton(R.string.cancel, null);
 
         final AlertDialog dialog = builder.create();
