@@ -148,7 +148,7 @@ public class GeneralPreferences {
     // ********** Table ***********
 
     public static boolean isManualControlsEnabled() {
-        return getBoolean("pref_manual_controls", true);
+        return getBoolean("pref_manual_controls", false);
     }
 
     public static boolean isManualLrudModeOn() {

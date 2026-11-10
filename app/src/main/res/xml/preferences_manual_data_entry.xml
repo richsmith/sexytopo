@@ -5,7 +5,7 @@
         android:key="pref_manual_controls"
         android:title="@string/settings_manual_data_controls_title"
         android:summary="@string/settings_manual_data_controls_summary"
-        android:defaultValue="true"/>
+        android:defaultValue="false"/>
 
     <CheckBoxPreference
         android:key="pref_lrud_fields"
