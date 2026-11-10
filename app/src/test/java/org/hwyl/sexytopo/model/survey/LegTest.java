@@ -67,6 +67,25 @@ public class LegTest {
         new Leg(1.0f, 0.0f, 90.1f);
     }
 
+    @Test
+    public void testTheodoliteInclinationIsKeptAsRecorded() {
+        Leg leg = new Leg(1.0f, 0.0f, 340.0f);
+        Assert.assertEquals(340.0f, leg.getInclination(), DELTA);
+        Assert.assertEquals(-20.0f, leg.getSignedInclination(), DELTA);
+    }
+
+    @Test
+    public void testSignedInclinationLeavesUsualReadingsAlone() {
+        Assert.assertEquals(-20.0f, new Leg(1.0f, 0.0f, -20.0f).getSignedInclination(), DELTA);
+        Assert.assertEquals(90.0f, new Leg(1.0f, 0.0f, 90.0f).getSignedInclination(), DELTA);
+    }
+
+    @Test
+    public void testReverseOfTheodoliteInclinationPointsUpwards() {
+        Leg reversed = new Leg(1.0f, 0.0f, 340.0f).reverse();
+        Assert.assertEquals(20.0f, reversed.getInclination(), DELTA);
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void testNullDestinationThrowsException() {
         new Leg(1.0f, 0.0f, 0.0f, null, new Leg[] {});
