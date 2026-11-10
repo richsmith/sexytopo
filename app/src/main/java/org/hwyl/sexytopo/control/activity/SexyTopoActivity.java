@@ -2,6 +2,7 @@ package org.hwyl.sexytopo.control.activity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -78,6 +79,11 @@ import org.hwyl.sexytopo.testutils.ExampleSurveyCreator;
 
 /** Base class for all activities that use the action bar. */
 public abstract class SexyTopoActivity extends AppCompatActivity {
+
+    // the top bar views that act like tabs
+    private static final int[] VIEW_MENU_ITEM_IDS = {
+        R.id.action_table, R.id.action_plan, R.id.action_elevation
+    };
 
     protected SurveyManager dataManager;
 
@@ -194,6 +200,14 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * The menu item ID of the top bar view (Table, Plan or Elevation) this activity shows, so the
+     * button can be highlighted; 0 if it shows none of them.
+     */
+    protected int getActiveViewMenuItemId() {
+        return 0;
+    }
+
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
 
@@ -252,7 +266,24 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             flipLastLineItem.setEnabled(false);
         }
 
+        // the button views only exist once the menu has been laid out
+        getWindow().getDecorView().post(this::highlightActiveViewButton);
+
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    private void highlightActiveViewButton() {
+        int activeViewId = getActiveViewMenuItemId();
+        for (int viewId : VIEW_MENU_ITEM_IDS) {
+            // action bar buttons take the ID of their menu item
+            View button = findViewById(viewId);
+            if (button != null) {
+                button.setForeground(
+                        viewId == activeViewId
+                                ? ContextCompat.getDrawable(this, R.drawable.active_view_highlight)
+                                : null);
+            }
+        }
     }
 
     @Override
@@ -269,13 +300,13 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             startActivity(DeviceActivity.class);
             return true;
         } else if (itemId == R.id.action_table) {
-            startActivity(TableActivity.class);
+            switchToView(TableActivity.class);
             return true;
         } else if (itemId == R.id.action_plan) {
-            startActivity(PlanActivity.class);
+            switchToView(PlanActivity.class);
             return true;
         } else if (itemId == R.id.action_elevation) {
-            startActivity(ExtendedElevationActivity.class);
+            switchToView(ExtendedElevationActivity.class);
             return true;
         } else if (itemId == R.id.action_3d) {
             startActivity(ThreeDViewActivity.class);
@@ -719,11 +750,28 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Switches between the Table, Plan and Elevation views with a crossfade. A plain startActivity
+     * slides in a view the first time it opens but not when an existing one is reordered to the
+     * front, so switching would otherwise look different depending on what has been opened before.
+     */
+    private void switchToView(Class<? extends SexyTopoActivity> clazz) {
+        Bundle options =
+                ActivityOptions.makeCustomAnimation(
+                                this, android.R.anim.fade_in, android.R.anim.fade_out)
+                        .toBundle();
+        startActivity(clazz, options);
+    }
+
     protected void startActivity(Class<? extends SexyTopoActivity> clazz) {
+        startActivity(clazz, null);
+    }
+
+    private void startActivity(Class<? extends SexyTopoActivity> clazz, Bundle options) {
         if (!clazz.isInstance(this)) {
             Intent intent = new Intent(this, clazz);
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
+            startActivity(intent, options);
         }
     }
 

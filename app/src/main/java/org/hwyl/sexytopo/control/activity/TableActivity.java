@@ -46,6 +46,11 @@ public class TableActivity extends SurveyEditorActivity
     private View highlightedRow;
 
     @Override
+    protected int getActiveViewMenuItemId() {
+        return R.id.action_table;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);

@@ -1,11 +1,8 @@
 # Unreleased
-- New area sketching tool for marking regions of water: sketch around a region to fill it with parallel lines; overlapping areas of the same kind merge, and erasing can split an area in two (the redo button has moved to the quick settings menu to make room)
-- Areas can have holes: erase into the middle of one to leave an unfilled island, or draw a ring of water (e.g. four overlapping "walls") and the enclosed courtyard stays empty
-- SVG export includes water areas as hatch-filled shapes, holes included
-- Therion export includes water areas as invisible border lines with an area command, one border per hole
-- Sketch lines can now be given a semantic type (wall, presumed wall, pit edge, chimney): tap the draw tool while it is selected to open the line type toolbar; typed lines render with their conventional ornamentation and export to Therion as first-class lines (e.g. line wall), which can be turned off in the Therion export settings
-- Walls work out which side of the line the passage is on automatically, with a red marker on the last-drawn wall showing the result (the "Wall Sides" quick setting shows it on every wall); Tools → Flip Last Line reverses a line whose ticks or interior came out on the wrong side
-- Blue in dark mode is now lighter for better visibility
+- New area sketching tool for marking filled regions such as water
+- Sketch lines can now be given a semantic type (e.g. wall)
+- Blue is now lighter in dark mode
+- Highlight for active view button in action bar
 
 # 2026-11-09 1.15.0
 - Another new leg agreement algorithm "Slope-corrected angular deltas" that ought to solve issues with taking repeated readings on steep legs while remaining close in spirit to BCRA Grade 5; testing and feedback welcome (#321)
