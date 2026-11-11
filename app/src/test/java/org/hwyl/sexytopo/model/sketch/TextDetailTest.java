@@ -19,7 +19,7 @@ public class TextDetailTest {
     @Test
     public void testEraseFindsText() {
         Sketch sketch = new Sketch();
-        sketch.addTextDetail(new Coord2D(0, 0), "Hello", 0.3f);
+        sketch.addTextDetail(new Coord2D(0, 0), "Hello", Colour.BLACK, 0.3f);
 
         SketchDetail found = sketch.findNearestVisibleDetailWithin(new Coord2D(0, 0), 1f, 60f);
 

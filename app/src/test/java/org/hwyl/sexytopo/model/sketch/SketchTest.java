@@ -36,14 +36,22 @@ public class SketchTest {
     }
 
     @Test
-    public void testStartNewPathUsesActiveLineType() {
+    public void testStartNewPathUsesGivenLineType() {
         Sketch sketch = new Sketch();
-        sketch.setActiveLineType(LineType.WALL);
-        PathDetail pathDetail = sketch.startNewPath(Coord2D.ORIGIN);
+        PathDetail pathDetail =
+                sketch.startNewPath(
+                        Coord2D.ORIGIN,
+                        Colour.BLACK,
+                        LineType.WALL,
+                        PathDetail.DEFAULT_ORNAMENT_SIZE);
         Assert.assertEquals(LineType.WALL, pathDetail.getLineType());
 
-        sketch.setActiveLineType(LineType.SKETCH);
-        PathDetail plain = sketch.startNewPath(new Coord2D(1, 1));
+        PathDetail plain =
+                sketch.startNewPath(
+                        new Coord2D(1, 1),
+                        Colour.BLACK,
+                        LineType.SKETCH,
+                        PathDetail.DEFAULT_ORNAMENT_SIZE);
         Assert.assertEquals(LineType.SKETCH, plain.getLineType());
     }
 
@@ -71,8 +79,12 @@ public class SketchTest {
     @Test
     public void testFlipPathDetailReversesPointsAsSingleUndoStep() {
         Sketch sketch = new Sketch();
-        sketch.setActiveLineType(LineType.PIT);
-        PathDetail original = sketch.startNewPath(new Coord2D(0, 0));
+        PathDetail original =
+                sketch.startNewPath(
+                        new Coord2D(0, 0),
+                        Colour.BLACK,
+                        LineType.PIT,
+                        PathDetail.DEFAULT_ORNAMENT_SIZE);
         original.lineTo(new Coord2D(5, 0));
         original.lineTo(new Coord2D(10, 0));
         sketch.finishPath();
@@ -130,13 +142,21 @@ public class SketchTest {
         Sketch sketch = new Sketch();
         Assert.assertNull(sketch.getMostRecentSemanticPath());
 
-        sketch.setActiveLineType(LineType.WALL);
-        PathDetail wall = sketch.startNewPath(new Coord2D(0, 0));
+        PathDetail wall =
+                sketch.startNewPath(
+                        new Coord2D(0, 0),
+                        Colour.BLACK,
+                        LineType.WALL,
+                        PathDetail.DEFAULT_ORNAMENT_SIZE);
         wall.lineTo(new Coord2D(1, 0));
         sketch.finishPath();
 
-        sketch.setActiveLineType(LineType.SKETCH);
-        PathDetail scribble = sketch.startNewPath(new Coord2D(5, 5));
+        PathDetail scribble =
+                sketch.startNewPath(
+                        new Coord2D(5, 5),
+                        Colour.BLACK,
+                        LineType.SKETCH,
+                        PathDetail.DEFAULT_ORNAMENT_SIZE);
         scribble.lineTo(new Coord2D(6, 5));
         sketch.finishPath();
 
@@ -201,7 +221,7 @@ public class SketchTest {
     @Test
     public void testFinishAreaCreatesPolygonFromOutline() {
         Sketch sketch = new Sketch();
-        sketch.startNewArea(new Coord2D(0, 0), AreaType.WATER);
+        sketch.startNewArea(new Coord2D(0, 0), Colour.BLACK, AreaType.WATER);
         sketch.getActivePath().lineTo(new Coord2D(4, 0));
         sketch.getActivePath().lineTo(new Coord2D(4, 4));
         sketch.getActivePath().lineTo(new Coord2D(0, 4));
@@ -218,7 +238,7 @@ public class SketchTest {
         // (and could in principle fail on a device). Either way the user's stroke must still
         // become an area rather than vanishing.
         Sketch sketch = new Sketch();
-        sketch.startNewArea(new Coord2D(0, 0), AreaType.WATER);
+        sketch.startNewArea(new Coord2D(0, 0), Colour.BLACK, AreaType.WATER);
         sketch.getActivePath().lineTo(new Coord2D(4, 0));
         sketch.getActivePath().lineTo(new Coord2D(4, 4));
         sketch.getActivePath().lineTo(new Coord2D(0, 4));
@@ -231,7 +251,7 @@ public class SketchTest {
     @Test
     public void testFinishAreaDiscardsDegenerateOutline() {
         Sketch sketch = new Sketch();
-        sketch.startNewArea(new Coord2D(0, 0), AreaType.WATER);
+        sketch.startNewArea(new Coord2D(0, 0), Colour.BLACK, AreaType.WATER);
         sketch.getActivePath().lineTo(new Coord2D(1, 0));
         sketch.finishArea(AreaType.WATER, 0);
 
@@ -244,7 +264,7 @@ public class SketchTest {
     @Test
     public void testFinishAreaTrimsOvershootWhereTheEndsMeet() {
         Sketch sketch = new Sketch();
-        sketch.startNewArea(new Coord2D(2, 0), AreaType.WATER);
+        sketch.startNewArea(new Coord2D(2, 0), Colour.BLACK, AreaType.WATER);
         sketch.getActivePath().lineTo(new Coord2D(10, 0));
         sketch.getActivePath().lineTo(new Coord2D(10, 10));
         sketch.getActivePath().lineTo(new Coord2D(0, 10));
@@ -261,7 +281,7 @@ public class SketchTest {
     @Test
     public void testFinishAreaTrimsHooksWhereTheEndsMeet() {
         Sketch sketch = new Sketch();
-        sketch.startNewArea(new Coord2D(3, -2), AreaType.WATER);
+        sketch.startNewArea(new Coord2D(3, -2), Colour.BLACK, AreaType.WATER);
         Coord2D[] corners = {
             new Coord2D(2, 0),
             new Coord2D(10, 0),
@@ -283,7 +303,7 @@ public class SketchTest {
     @Test
     public void testFinishAreaDiscardsAreaBelowMinimumSize() {
         Sketch sketch = new Sketch();
-        sketch.startNewArea(new Coord2D(0, 0), AreaType.WATER);
+        sketch.startNewArea(new Coord2D(0, 0), Colour.BLACK, AreaType.WATER);
         sketch.getActivePath().lineTo(new Coord2D(2, 0));
         sketch.getActivePath().lineTo(new Coord2D(2, 2));
         sketch.getActivePath().lineTo(new Coord2D(0, 2));
@@ -297,7 +317,7 @@ public class SketchTest {
     @Test
     public void testFinishAreaKeepsAreaAtMinimumSize() {
         Sketch sketch = new Sketch();
-        sketch.startNewArea(new Coord2D(0, 0), AreaType.WATER);
+        sketch.startNewArea(new Coord2D(0, 0), Colour.BLACK, AreaType.WATER);
         sketch.getActivePath().lineTo(new Coord2D(2, 0));
         sketch.getActivePath().lineTo(new Coord2D(2, 2));
         sketch.getActivePath().lineTo(new Coord2D(0, 2));

@@ -17,6 +17,7 @@ import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.geometry.Coord3D;
 import org.hwyl.sexytopo.model.geometry.Line;
 import org.hwyl.sexytopo.model.geometry.Projection2D;
+import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
@@ -157,7 +158,7 @@ public class ExampleSurveyCreator {
             float dy = (random.nextFloat() * 2 - 1) * SYMBOL_OFFSET_RADIUS;
             Symbol symbol = symbols[random.nextInt(symbols.length)];
             float angle = symbol.isDirectional() ? random.nextFloat() * 360 : 0;
-            plan.addSymbolDetail(stationPos.add(dx, dy), symbol, SYMBOL_SIZE, angle);
+            plan.addSymbolDetail(stationPos.add(dx, dy), symbol, Colour.BLACK, SYMBOL_SIZE, angle);
         }
     }
 

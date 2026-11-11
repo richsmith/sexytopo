@@ -1,6 +1,7 @@
 package org.hwyl.sexytopo.testutils;
 
 import org.hwyl.sexytopo.model.geometry.Coord2D;
+import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.Symbol;
 
@@ -15,6 +16,6 @@ public class BasicTestSketchCreator {
 
     public static void drawSymbol(Sketch sketch, Symbol symbol) {
         Coord2D coord = new Coord2D(0, 0);
-        sketch.addSymbolDetail(coord, symbol, 50, 0);
+        sketch.addSymbolDetail(coord, symbol, Colour.BLACK, 50, 0);
     }
 }

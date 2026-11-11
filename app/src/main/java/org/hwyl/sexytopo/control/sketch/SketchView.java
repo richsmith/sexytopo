@@ -183,6 +183,10 @@ public class SketchView extends View {
 
     private AreaType currentAreaType = AreaType.WATER;
 
+    private Colour currentColour = Colour.BLACK;
+
+    private LineType currentLineType = LineType.SKETCH;
+
     // a bit hacky but I can't think of a better way to do this
     private String stationNameBeingCrossSectioned = null;
     private CrossSection.Orientation crossSectionOrientationBeingCreated =
@@ -635,13 +639,18 @@ public class SketchView extends View {
                         start = snappedStart;
                     }
                 }
-                sketch.startNewPath(start, getOrnamentSizeForNewLine());
+                sketch.startNewPath(
+                        start, currentColour, currentLineType, getOrnamentSizeForNewLine());
                 break;
 
             case MotionEvent.ACTION_MOVE:
                 if (sketch.getActivePath() == null) {
                     // shouldn't be null, but just in case...
-                    sketch.startNewPath(surveyCoords, getOrnamentSizeForNewLine());
+                    sketch.startNewPath(
+                            surveyCoords,
+                            currentColour,
+                            currentLineType,
+                            getOrnamentSizeForNewLine());
                 } else {
                     sketch.getActivePath().lineTo(surveyCoords);
                 }
@@ -677,13 +686,13 @@ public class SketchView extends View {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 actionDownPointOnView = touchPointOnView;
-                sketch.startNewArea(surveyCoords, currentAreaType);
+                sketch.startNewArea(surveyCoords, currentColour, currentAreaType);
                 break;
 
             case MotionEvent.ACTION_MOVE:
                 if (sketch.getActivePath() == null) {
                     // shouldn't be null, but just in case...
-                    sketch.startNewArea(surveyCoords, currentAreaType);
+                    sketch.startNewArea(surveyCoords, currentColour, currentAreaType);
                 } else {
                     sketch.getActivePath().lineTo(surveyCoords);
                 }
@@ -903,14 +912,15 @@ public class SketchView extends View {
                             Space2DUtils.getAngleBetween(actionDownPointOnView, touchPointOnView);
                     angle = Space2DUtils.adjustAngle(angle, -90);
                     Coord2D firstTouch = viewCoordsToSurveyCoords(actionDownPointOnView);
-                    sketch.addSymbolDetail(firstTouch, currentSymbol, size, angle);
+                    sketch.addSymbolDetail(firstTouch, currentSymbol, currentColour, size, angle);
                     float distance =
                             Space2DUtils.getDistance(actionDownPointOnView, touchPointOnView);
                     if (distance < 5) {
                         activity.showSimpleToast(R.string.sketch_symbol_orientation_education);
                     }
                 } else {
-                    sketch.addSymbolDetail(touchPointOnSurvey, currentSymbol, size, 0);
+                    sketch.addSymbolDetail(
+                            touchPointOnSurvey, currentSymbol, currentColour, size, 0);
                 }
                 invalidate();
                 return true;
@@ -947,7 +957,8 @@ public class SketchView extends View {
                                     int startingSizeSp = GeneralPreferences.getTextStartingSizeSp();
                                     float startingSizePixels = spToPixels(startingSizeSp);
                                     float size = startingSizePixels / surveyToViewScale;
-                                    sketch.addTextDetail(touchPointOnSurvey, text, size);
+                                    sketch.addTextDetail(
+                                            touchPointOnSurvey, text, currentColour, size);
                                     invalidate();
                                 })
                         .setNegativeButton(R.string.cancel, null);
@@ -2728,11 +2739,11 @@ public class SketchView extends View {
     }
 
     public void setBrushColour(BrushColour brushColour) {
-        sketch.setActiveColour(brushColour.getColour());
+        currentColour = brushColour.getColour();
     }
 
     public void setLineType(LineType lineType) {
-        sketch.setActiveLineType(lineType);
+        currentLineType = lineType;
     }
 
     public void setAreaType(AreaType areaType) {

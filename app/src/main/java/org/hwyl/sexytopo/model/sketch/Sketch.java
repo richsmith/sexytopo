@@ -33,8 +33,6 @@ public class Sketch extends Shape {
     private final List<SketchDetail> undoneHistory = new ArrayList<>();
 
     private PathDetail activePath;
-    private Colour activeColour = Colour.BLACK;
-    private LineType activeLineType = LineType.SKETCH;
 
     private float crossSectionScale = DEFAULT_XSECTION_SCALE;
 
@@ -107,15 +105,16 @@ public class Sketch extends Shape {
     }
 
     public PathDetail startNewPath(Coord2D start) {
-        return startNewPath(start, PathDetail.DEFAULT_ORNAMENT_SIZE);
+        return startNewPath(start, Colour.BLACK, LineType.SKETCH, PathDetail.DEFAULT_ORNAMENT_SIZE);
     }
 
     /**
      * Starts a new path, recording the ornament size (in survey metres) new lines should use —
      * derived by the caller from the current zoom, as symbol sizes are.
      */
-    public PathDetail startNewPath(Coord2D start, float ornamentSize) {
-        activePath = new PathDetail(start, activeColour, activeLineType, ornamentSize);
+    public PathDetail startNewPath(
+            Coord2D start, Colour colour, LineType lineType, float ornamentSize) {
+        activePath = new PathDetail(start, colour, lineType, ornamentSize);
         // Registered in the undo history only on finishPath, so an unfinished path can be
         // abandoned without leaving a trace.
         pathDetails.add(activePath);
@@ -153,8 +152,7 @@ public class Sketch extends Shape {
      * Start sketching the outline of a new area. The outline is drawn like a normal path (so it
      * renders as the user drags) and is turned into a polygon by finishArea.
      */
-    public PathDetail startNewArea(Coord2D start, AreaType areaType) {
-        Colour colour = activeColour;
+    public PathDetail startNewArea(Coord2D start, Colour colour, AreaType areaType) {
         if (areaType.isWater() && SketchPreferences.Toggle.BLUE_WATER.isOn()) {
             colour = Colour.WATER;
         }
@@ -346,8 +344,8 @@ public class Sketch extends Shape {
                 && PolygonUtils.overlap(existing.toRegion(), newArea.toRegion());
     }
 
-    public void addTextDetail(Coord2D location, String text, float size) {
-        TextDetail textDetail = new TextDetail(location, text, activeColour, size);
+    public void addTextDetail(Coord2D location, String text, Colour colour, float size) {
+        TextDetail textDetail = new TextDetail(location, text, colour, size);
         textDetails.add(textDetail);
         addSketchDetail(textDetail);
     }
@@ -356,8 +354,8 @@ public class Sketch extends Shape {
         return symbolDetails;
     }
 
-    public void addSymbolDetail(Coord2D location, Symbol symbol, float size, float angle) {
-        Colour colour = activeColour;
+    public void addSymbolDetail(
+            Coord2D location, Symbol symbol, Colour colour, float size, float angle) {
         if (symbol.isWater() && SketchPreferences.Toggle.BLUE_WATER.isOn()) {
             colour = Colour.WATER;
         }
@@ -368,14 +366,6 @@ public class Sketch extends Shape {
 
     public List<TextDetail> getTextDetails() {
         return textDetails;
-    }
-
-    public void setActiveColour(Colour colour) {
-        this.activeColour = colour;
-    }
-
-    public void setActiveLineType(LineType lineType) {
-        this.activeLineType = lineType;
     }
 
     /**
