@@ -3,6 +3,7 @@
 - Sketch lines can now be given a semantic type (e.g. wall)
 - Lighter blue colour (including display of water) in dark mode for better visibility
 - Highlight for active view button in action bar
+- Tidy up sketch quick-menu (now with submenus)
 - Change default for floating manual-entry buttons on table view to off (can be turned back on in settings, and manual entry can already be triggered from the menu)
 - Fix Cavway X1 downward shots being recorded with clinos of 270-360° rather than negative values (#357)
 - Pressing back out of the app now warns if the survey isn't saved
