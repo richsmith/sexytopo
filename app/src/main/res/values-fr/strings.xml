@@ -135,6 +135,9 @@
     <string name="file_error_deleting_survey">Erreur lors de la suppression de la topographie</string>
     <string name="file_cannot_extend_unsaved_survey">Impossible d\'étendre une topographie non sauvegardé</string>
     <string name="file_autosave_restored">Sauvegarde automatique restaurée</string>
+    <string name="file_restoring_unsaved_survey">Restauration de la topographie non enregistrée</string>
+    <string name="file_unsaved_survey_restored">Topographie non enregistrée restaurée</string>
+    <string name="file_unsaved_survey_restore_error">Erreur lors de la restauration de la topographie non enregistrée : %1$s</string>
     <string name="file_autosave_load_error">Erreur lors de la restauration de la sauvegarde automatique</string>
     <string name="file_warning_survey_not_saved">Attention : le relevé actuel n\'est pas sauvegardé</string>
     <string name="file_active_survey">Le relevé actif est %1$s</string>

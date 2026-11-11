@@ -9,6 +9,7 @@ import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.NewStationNotificationService;
 import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.io.SurveyFile;
+import org.hwyl.sexytopo.control.io.basic.ScratchAutosave;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.model.survey.Survey;
 
@@ -51,6 +52,15 @@ public class StartUpActivity extends SexyTopoActivity {
 
     protected void initialiseSurvey() {
         try {
+
+            // a survey that was never saved anywhere takes priority over the last saved one
+            if (shouldWeRestoreScratchAutosave()) {
+                boolean success = tryToRestoreUnsavedSurvey();
+                if (success) {
+                    return;
+                }
+            }
+
             DocumentFile activeSurveyDirectory = tryToFindActiveSurveyDirectory();
 
             if (activeSurveyDirectory == null) {
@@ -71,6 +81,21 @@ public class StartUpActivity extends SexyTopoActivity {
             if (getSurvey() == null) { // should be impossible
                 startNewSurvey();
             }
+        }
+    }
+
+    private boolean tryToRestoreUnsavedSurvey() {
+        try {
+            Log.i(R.string.file_restoring_unsaved_survey);
+            Survey survey = ScratchAutosave.load(this);
+            setSurvey(survey);
+            // setting the survey clears the scratch copy, so write it back straight away
+            getSurveyManager().autosave();
+            showSimpleToast(R.string.file_unsaved_survey_restored);
+            return true;
+        } catch (Exception exception) {
+            Log.e(R.string.file_unsaved_survey_restore_error, exception.getMessage());
+            return false;
         }
     }
 
@@ -99,6 +124,11 @@ public class StartUpActivity extends SexyTopoActivity {
 
         Log.i(R.string.file_active_survey, surveyDirectory.getName());
         return surveyDirectory;
+    }
+
+    private boolean shouldWeRestoreScratchAutosave() {
+        boolean exists = ScratchAutosave.exists(this);
+        return exists;
     }
 
     private boolean shouldWeRestoreAutosave(DocumentFile surveyDirectory) {

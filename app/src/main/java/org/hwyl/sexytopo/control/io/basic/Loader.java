@@ -12,7 +12,6 @@ import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.io.SurveyFile;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Survey;
-import org.json.JSONException;
 
 public class Loader {
 
@@ -43,58 +42,60 @@ public class Loader {
 
         Survey survey = new Survey();
         survey.setDirectory(directory);
-        loadSurveyData(context, survey, restoreAutosave);
-        loadSketches(context, survey, restoreAutosave);
         surveyUrisNotToLoad.add(survey.getUri());
-        loadMetadata(context, survey, surveyUrisNotToLoad, restoreAutosave);
+
+        SurveyTextSource surveyFiles =
+                type -> {
+                    SurveyFile surveyFile = type.get(survey);
+                    surveyFile = considerSwappingForAutosave(context, surveyFile, restoreAutosave);
+                    if (!surveyFile.exists(context)) {
+                        return null;
+                    }
+                    Log.i(R.string.file_loading_file, surveyFile.getFilename());
+                    String text = surveyFile.slurp(context);
+                    return text;
+                };
+        populate(context, survey, surveyFiles, surveyUrisNotToLoad);
+
         survey.setSaved(true);
         return survey;
     }
 
-    private static void loadMetadata(
-            Context context, Survey survey, Set<Uri> surveyUrisNotToLoad, boolean restoreAutosave)
-            throws Exception {
+    /** Supplies the contents of each of a survey's files, or null if there isn't one. */
+    public interface SurveyTextSource {
+        String read(SurveyFile.SurveyFileType type) throws IOException;
+    }
 
-        SurveyFile surveyFile = SurveyFile.METADATA.get(survey);
-        surveyFile = considerSwappingForAutosave(context, surveyFile, restoreAutosave);
-        if (surveyFile.exists(context)) {
-            Log.i(context.getString(R.string.file_loading_file, surveyFile.getFilename()));
-            String metadataText = surveyFile.slurp(context);
-            MetadataTranslater.translateAndUpdate(
-                    context, survey, metadataText, surveyUrisNotToLoad);
+    public static void populate(
+            Context context, Survey survey, SurveyTextSource source, Set<Uri> surveyUrisNotToLoad)
+            throws Exception {
+        for (SurveyFile.SurveyFileType type : SurveyFile.ALL_DATA_TYPES) {
+            String text = source.read(type);
+            if (text != null) {
+                fromText(context, survey, type, text, surveyUrisNotToLoad);
+            }
         }
     }
 
-    private static void loadSurveyData(Context context, Survey survey, boolean restoreAutosave)
+    private static void fromText(
+            Context context,
+            Survey survey,
+            SurveyFile.SurveyFileType type,
+            String text,
+            Set<Uri> surveyUrisNotToLoad)
             throws Exception {
-        SurveyFile surveyFile = SurveyFile.DATA.get(survey);
-        surveyFile = considerSwappingForAutosave(context, surveyFile, restoreAutosave);
-        if (surveyFile.exists(context)) {
-            Log.i(R.string.file_loading_file, surveyFile.getFilename());
-            String text = surveyFile.slurp(context);
+        if (type == SurveyFile.DATA) {
             SurveyJsonTranslater.populateSurvey(survey, text);
-        }
-    }
-
-    private static void loadSketches(Context context, Survey survey, boolean restoreAutosave)
-            throws IOException, JSONException {
-
-        SurveyFile planFile = SurveyFile.SKETCH_PLAN.get(survey);
-        planFile = considerSwappingForAutosave(context, planFile, restoreAutosave);
-        if (planFile.exists(context)) {
-            Log.i(R.string.file_loading_file, planFile.getFilename());
-            String planText = planFile.slurp(context);
-            Sketch plan = SketchJsonTranslater.translate(survey, planText);
+        } else if (type == SurveyFile.METADATA) {
+            MetadataTranslater.translateAndUpdate(context, survey, text, surveyUrisNotToLoad);
+        } else if (type == SurveyFile.SKETCH_PLAN) {
+            Sketch plan = SketchJsonTranslater.translate(survey, text);
             survey.setPlanSketch(plan);
-        }
-
-        SurveyFile elevationFile = SurveyFile.SKETCH_EXT_ELEVATION.get(survey);
-        elevationFile = considerSwappingForAutosave(context, elevationFile, restoreAutosave);
-        if (elevationFile.exists(context)) {
-            Log.i(R.string.file_loading_file, elevationFile.getFilename());
-            String elevationText = elevationFile.slurp(context);
-            Sketch elevation = SketchJsonTranslater.translate(survey, elevationText);
+        } else if (type == SurveyFile.SKETCH_EXT_ELEVATION) {
+            Sketch elevation = SketchJsonTranslater.translate(survey, text);
             survey.setElevationSketch(elevation);
+        } else {
+            throw new IllegalArgumentException("Not a survey data file: " + type.getExtension());
         }
     }
 

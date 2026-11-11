@@ -135,6 +135,9 @@
     <string name="file_error_deleting_survey">Errore nell\'eliminazione del rilievo</string>
     <string name="file_cannot_extend_unsaved_survey">Impossibile estendere un rilievo non salvato</string>
     <string name="file_autosave_restored">Salvataggio automatico ripristinato</string>
+    <string name="file_restoring_unsaved_survey">Ripristino del rilievo non salvato</string>
+    <string name="file_unsaved_survey_restored">Rilievo non salvato ripristinato</string>
+    <string name="file_unsaved_survey_restore_error">Errore nel ripristino del rilievo non salvato: %1$s</string>
     <string name="file_autosave_load_error">Errore nel ripristino del salvataggio automatico</string>
     <string name="file_warning_survey_not_saved">Attenzione: rilievo corrente non salvato</string>
     <string name="file_active_survey">Il rilievo attivo è %1$s</string>

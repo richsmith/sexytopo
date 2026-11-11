@@ -151,6 +151,9 @@
     <string name="file_error_deleting_survey">Error deleting survey</string>
     <string name="file_cannot_extend_unsaved_survey">Cannot extend unsaved survey</string>
     <string name="file_autosave_restored">Restored autosave</string>
+    <string name="file_restoring_unsaved_survey">Restoring unsaved survey</string>
+    <string name="file_unsaved_survey_restored">Restored unsaved survey</string>
+    <string name="file_unsaved_survey_restore_error">Error restoring unsaved survey: %1$s</string>
     <string name="file_autosave_load_error">Error restoring autosave</string>
     <string name="file_warning_survey_not_saved">Warning: current survey not saved</string>
     <string name="file_active_survey">Active survey is %1$s</string>

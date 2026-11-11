@@ -1,100 +1,47 @@
 package org.hwyl.sexytopo.control.io.basic;
 
 import android.content.Context;
-import java.io.IOException;
 import org.hwyl.sexytopo.control.activity.SexyTopoActivity;
 import org.hwyl.sexytopo.control.io.SurveyFile;
-import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Survey;
-import org.json.JSONException;
 
 public class Saver {
 
     public static synchronized void save(Context context, Survey survey) throws Exception {
-        String versionName = SexyTopoActivity.getVersionName(context);
-        int versionCode = SexyTopoActivity.getVersionCode(context);
-        saveMetadata(context, survey, SurveyFile.METADATA.get(survey), versionName, versionCode);
-        saveSurveyData(context, survey, SurveyFile.DATA.get(survey), versionName, versionCode);
-        savePlanSketch(
-                context, survey, SurveyFile.SKETCH_PLAN.get(survey), versionName, versionCode);
-        saveElevationSketch(
-                context,
-                survey,
-                SurveyFile.SKETCH_EXT_ELEVATION.get(survey),
-                versionName,
-                versionCode);
+        for (SurveyFile.SurveyFileType type : SurveyFile.ALL_DATA_TYPES) {
+            String text = toText(context, survey, type);
+            SurveyFile surveyFile = type.get(survey);
+            surveyFile.save(context, text);
+        }
         survey.setSaved(true);
     }
 
     public static synchronized void autosave(Context context, Survey survey) throws Exception {
-        String versionName = SexyTopoActivity.getVersionName(context);
-        int versionCode = SexyTopoActivity.getVersionCode(context);
-        saveMetadata(
-                context,
-                survey,
-                SurveyFile.METADATA.AUTOSAVE.get(survey),
-                versionName,
-                versionCode);
-        saveSurveyData(
-                context, survey, SurveyFile.DATA.AUTOSAVE.get(survey), versionName, versionCode);
-        savePlanSketch(
-                context,
-                survey,
-                SurveyFile.SKETCH_PLAN.AUTOSAVE.get(survey),
-                versionName,
-                versionCode);
-        saveElevationSketch(
-                context,
-                survey,
-                SurveyFile.SKETCH_EXT_ELEVATION.AUTOSAVE.get(survey),
-                versionName,
-                versionCode);
+        for (SurveyFile.SurveyFileType type : SurveyFile.ALL_DATA_TYPES) {
+            String text = toText(context, survey, type);
+            SurveyFile autosaveFile = type.AUTOSAVE.get(survey);
+            autosaveFile.save(context, text);
+        }
         survey.setAutosaved(true);
     }
 
-    private static void saveSurveyData(
-            Context context,
-            Survey survey,
-            SurveyFile surveyFile,
-            String versionName,
-            int versionCode)
-            throws IOException, JSONException {
-        String surveyText = SurveyJsonTranslater.toText(survey, versionName, versionCode);
-        surveyFile.save(context, surveyText);
-    }
-
-    private static void savePlanSketch(
-            Context context,
-            Survey survey,
-            SurveyFile surveyFile,
-            String versionName,
-            int versionCode)
-            throws IOException, JSONException {
-        Sketch sketch = survey.getPlanSketch();
-        String planText = SketchJsonTranslater.translate(sketch, survey, versionName, versionCode);
-        surveyFile.save(context, planText);
-    }
-
-    private static void saveElevationSketch(
-            Context context,
-            Survey survey,
-            SurveyFile surveyFile,
-            String versionName,
-            int versionCode)
-            throws IOException, JSONException {
-        Sketch sketch = survey.getElevationSketch();
-        String eeText = SketchJsonTranslater.translate(sketch, survey, versionName, versionCode);
-        surveyFile.save(context, eeText);
-    }
-
-    private static void saveMetadata(
-            Context context,
-            Survey survey,
-            SurveyFile surveyFile,
-            String versionName,
-            int versionCode)
+    public static String toText(Context context, Survey survey, SurveyFile.SurveyFileType type)
             throws Exception {
-        String metadataText = MetadataTranslater.translate(survey, versionName, versionCode);
-        surveyFile.save(context, metadataText);
+        String versionName = SexyTopoActivity.getVersionName(context);
+        int versionCode = SexyTopoActivity.getVersionCode(context);
+
+        if (type == SurveyFile.DATA) {
+            return SurveyJsonTranslater.toText(survey, versionName, versionCode);
+        } else if (type == SurveyFile.METADATA) {
+            return MetadataTranslater.translate(survey, versionName, versionCode);
+        } else if (type == SurveyFile.SKETCH_PLAN) {
+            return SketchJsonTranslater.translate(
+                    survey.getPlanSketch(), survey, versionName, versionCode);
+        } else if (type == SurveyFile.SKETCH_EXT_ELEVATION) {
+            return SketchJsonTranslater.translate(
+                    survey.getElevationSketch(), survey, versionName, versionCode);
+        } else {
+            throw new IllegalArgumentException("Not a survey data file: " + type.getExtension());
+        }
     }
 }

@@ -1,6 +1,7 @@
 package org.hwyl.sexytopo.model.survey;
 
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
+import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
 import org.junit.Assert;
 import org.junit.Test;
@@ -41,5 +42,21 @@ public class SurveyTest {
         baseSurvey.disconnect(baseSurvey.getActiveStation(), otherSurvey);
         Assert.assertFalse(baseSurvey.isConnectedTo(otherSurvey));
         Assert.assertEquals(0, baseSurvey.getConnectedSurveys().size());
+    }
+
+    @Test
+    public void testSketchChangeMeansAutosaveRequired() {
+        Survey survey = new Survey();
+        survey.setAutosaved(true);
+        survey.getPlanSketch().addTextDetail(new Coord2D(1, 2), "note", 1);
+        Assert.assertFalse(survey.isAutosaved());
+    }
+
+    @Test
+    public void testAutosavingCoversSketches() {
+        Survey survey = new Survey();
+        survey.getElevationSketch().addTextDetail(new Coord2D(1, 2), "note", 1);
+        survey.setAutosaved(true);
+        Assert.assertTrue(survey.isAutosaved());
     }
 }

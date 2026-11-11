@@ -135,6 +135,9 @@
     <string name="file_error_deleting_survey">Fehler beim Löschen der Vermessungsdatei</string>
     <string name="file_cannot_extend_unsaved_survey">Nicht gespeicherte Vermessung kann nicht erweitert werden</string>
     <string name="file_autosave_restored">Automatische Sicherung wiederhergestellt</string>
+    <string name="file_restoring_unsaved_survey">Wiederherstellung der ungespeicherten Vermessung</string>
+    <string name="file_unsaved_survey_restored">Ungespeicherte Vermessung wiederhergestellt</string>
+    <string name="file_unsaved_survey_restore_error">Fehler beim Wiederherstellen der ungespeicherten Vermessung: %1$s</string>
     <string name="file_autosave_load_error">Fehler bei der Wiederherstellung der automatischen Sicherung</string>
     <string name="file_warning_survey_not_saved">Warnung: aktuelle Vermessungsdatei nicht gespeichert</string>
     <string name="file_active_survey">Aktuelle Vermessung ist %1$s</string>

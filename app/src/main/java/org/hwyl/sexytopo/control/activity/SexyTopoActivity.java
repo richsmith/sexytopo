@@ -22,6 +22,7 @@ import android.view.SubMenu;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
@@ -63,6 +64,7 @@ import org.hwyl.sexytopo.control.io.StartLocation;
 import org.hwyl.sexytopo.control.io.SurveyDirectory;
 import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.control.io.basic.Saver;
+import org.hwyl.sexytopo.control.io.basic.ScratchAutosave;
 import org.hwyl.sexytopo.control.io.share.SurveyZipSharer;
 import org.hwyl.sexytopo.control.io.translation.Exporter;
 import org.hwyl.sexytopo.control.io.translation.ImportCallback;
@@ -96,6 +98,20 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
     private String pendingLinkStation = null;
 
+    // Pressing back on the bottom activity leaves the app, so warn if there's unsaved work
+    private final OnBackPressedCallback exitWarningCallback =
+            new OnBackPressedCallback(true) {
+                @Override
+                public void handleOnBackPressed() {
+                    Survey survey = getSurvey();
+                    if (isTaskRoot() && survey != null && !survey.isSaved()) {
+                        confirmToProceedIfNotSaved(R.string.exit_question, "leaveViaBack");
+                    } else {
+                        leaveViaBack();
+                    }
+                }
+            };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -115,6 +131,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
         dataManager = SurveyManager.getInstance(this.getApplicationContext());
 
+        getOnBackPressedDispatcher().addCallback(this, exitWarningCallback);
+
         // if Android restarts the activity after a crash, force it to go through the startup
         // process :/
         if (!hasStarted && !(this instanceof StartUpActivity)) {
@@ -125,7 +143,21 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        requestPermissionsIfRequired();
+        // StartUpActivity finishes straight away; a permission request from it would hold it at
+        // the bottom of the task (breaking isTaskRoot()), so leave asking to the next activity
+        if (!(this instanceof StartUpActivity)) {
+            requestPermissionsIfRequired();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Not everything that changes the survey triggers an autosave (e.g. sketching), so catch
+        // anything outstanding whenever a screen is left - including when leaving the app
+        if (getSurvey() != null) {
+            getSurveyManager().autosave();
+        }
     }
 
     /**
@@ -527,6 +559,13 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     public void requestExit() {
         finishAffinity();
         System.exit(0);
+    }
+
+    @SuppressLint("UnusedDeclaration") // called through Reflection
+    public void leaveViaBack() {
+        exitWarningCallback.setEnabled(false);
+        getOnBackPressedDispatcher().onBackPressed();
+        exitWarningCallback.setEnabled(true);
     }
 
     private void requestPermissionsIfRequired() {
@@ -1438,6 +1477,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 android.content.Context context = contexts[0];
                 Survey survey = getSurvey();
                 Saver.save(context, survey);
+                // the survey has a directory of its own now, so autosaves will go there instead
+                ScratchAutosave.clear(context);
                 return true;
             } catch (Exception exception) {
                 Log.e(exception);

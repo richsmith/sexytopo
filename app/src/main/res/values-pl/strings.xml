@@ -135,6 +135,9 @@
     <string name="file_error_deleting_survey">Błąd usuwania pomiaru</string>
     <string name="file_cannot_extend_unsaved_survey">Nie można rozszerzyć niezapisanego pomiaru</string>
     <string name="file_autosave_restored">Przywrócono autozapis</string>
+    <string name="file_restoring_unsaved_survey">Przywracanie niezapisanego pomiaru</string>
+    <string name="file_unsaved_survey_restored">Przywrócono niezapisany pomiar</string>
+    <string name="file_unsaved_survey_restore_error">Błąd przywracania niezapisanego pomiaru: %1$s</string>
     <string name="file_autosave_load_error">Błąd przywracania autozapisu</string>
     <string name="file_warning_survey_not_saved">Uwaga: bieżący pomiar nie został zapisany</string>
     <string name="file_active_survey">Aktywny pomiar to %1$s</string>

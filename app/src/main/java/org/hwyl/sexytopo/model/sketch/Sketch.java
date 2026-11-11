@@ -39,6 +39,7 @@ public class Sketch extends Shape {
     private float crossSectionScale = DEFAULT_XSECTION_SCALE;
 
     private boolean isSaved = true;
+    private boolean isAutosaved = true;
 
     public Sketch() {}
 
@@ -58,6 +59,19 @@ public class Sketch extends Shape {
 
     public void setSaved(boolean isSaved) {
         this.isSaved = isSaved;
+
+        if (!isSaved) {
+            // saving doesn't mean it's autosaved, but unsaved data means autosave required
+            setAutosaved(false);
+        }
+    }
+
+    public boolean isAutosaved() {
+        return isAutosaved;
+    }
+
+    public void setAutosaved(boolean isAutosaved) {
+        this.isAutosaved = isAutosaved;
     }
 
     public void setPathDetails(List<PathDetail> pathDetails) {

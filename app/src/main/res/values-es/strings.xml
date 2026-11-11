@@ -135,6 +135,9 @@
     <string name="file_error_deleting_survey">Error al eliminar la topografía</string>
     <string name="file_cannot_extend_unsaved_survey">No se puede extender una topografía sin guardar</string>
     <string name="file_autosave_restored">Autoguardado restaurado</string>
+    <string name="file_restoring_unsaved_survey">Restaurando topografía no guardada</string>
+    <string name="file_unsaved_survey_restored">Topografía no guardada restaurada</string>
+    <string name="file_unsaved_survey_restore_error">Error al restaurar la topografía no guardada: %1$s</string>
     <string name="file_autosave_load_error">Error al restaurar el autoguardado</string>
     <string name="file_warning_survey_not_saved">Advertencia: topografía actual no guardada</string>
     <string name="file_active_survey">La topografía activa es %1$s</string>
