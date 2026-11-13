@@ -31,8 +31,8 @@
                     android:title="@string/sketch_menu_blue_water"
                     android:checkable="true"/>
                 <item
-                    android:id="@+id/buttonClipAreasToWalls"
-                    android:title="@string/sketch_menu_clip_areas_to_walls"
+                    android:id="@+id/buttonClipToWalls"
+                    android:title="@string/sketch_menu_clip_to_walls"
                     android:checkable="true"/>
                 <item
                     android:id="@+id/buttonPinchToZoom"

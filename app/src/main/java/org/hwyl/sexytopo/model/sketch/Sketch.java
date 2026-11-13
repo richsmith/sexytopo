@@ -222,7 +222,7 @@ public class Sketch extends Shape {
      */
     private List<AreaDetail> clipToWalls(AreaDetail area) {
 
-        if (!SketchPreferences.Toggle.CLIP_AREAS_TO_WALLS.isOn()) {
+        if (!SketchPreferences.Toggle.CLIP_TO_WALLS.isOn()) {
             return Collections.singletonList(area);
         }
 
