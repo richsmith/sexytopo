@@ -29,32 +29,6 @@ import org.hwyl.sexytopo.R;
 public enum LineType {
     SKETCH(R.string.line_type_sketch, R.drawable.pencil, null, false, 1.0f, null, null),
     WALL(R.string.line_type_wall, R.drawable.line_wall, "wall", true, 1.5f, null, null),
-    PRESUMED_WALL(
-            R.string.line_type_presumed_wall,
-            R.drawable.line_presumed_wall,
-            "wall:presumed",
-            true,
-            1.0f,
-            new float[] {0.8f, 0.4f},
-            null),
-    // the wall of a passage passing beneath this one: a wall with shorter dashes than presumed
-    UNDERLYING_WALL(
-            R.string.line_type_underlying_wall,
-            R.drawable.line_underlying_wall,
-            "wall:underlying",
-            true,
-            1.5f,
-            new float[] {0.4f, 0.4f},
-            null),
-    // solid baseline with a perpendicular tick, repeating every ornament size
-    PIT(
-            R.string.line_type_pit,
-            R.drawable.line_pit,
-            "pit",
-            false,
-            1.0f,
-            null,
-            Stamp.ticked(1.2f, 1.2f, -0.6f)),
     // a drop too small to be a pit: as PIT, with shorter ticks (Therion draws the two alike, but
     // they need telling apart while sketching)
     FLOOR_STEP(
@@ -65,6 +39,15 @@ public enum LineType {
             1.0f,
             null,
             Stamp.ticked(1.2f, 1.2f, -0.35f)),
+    // solid baseline with a perpendicular tick, repeating every ornament size
+    PIT(
+            R.string.line_type_pit,
+            R.drawable.line_pit,
+            "pit",
+            false,
+            1.0f,
+            null,
+            Stamp.ticked(1.2f, 1.2f, -0.6f)),
     // dashed baseline (the bar covers two thirds of the advance) with a tick on the opposite
     // side to PIT
     CHIMNEY(
@@ -93,8 +76,7 @@ public enum LineType {
             1.0f,
             null,
             Stamp.toothed(1.2f, -0.9f)),
-    // the outline of a boulder, and the edges within one: plain lines, thinner than a wall in
-    // Therion's proportions
+    // the outline of a boulder: a plain line, thinner than a wall in Therion's proportions
     ROCK_BORDER(
             R.string.line_type_rock_border,
             R.drawable.line_rock_border,
@@ -103,6 +85,7 @@ public enum LineType {
             0.75f,
             null,
             null),
+    // the edges within a boulder: thinner still than its border
     ROCK_EDGE(
             R.string.line_type_rock_edge,
             R.drawable.line_rock_edge,
@@ -110,6 +93,23 @@ public enum LineType {
             false,
             0.5f,
             null,
+            null),
+    PRESUMED_WALL(
+            R.string.line_type_presumed_wall,
+            R.drawable.line_presumed_wall,
+            "wall:presumed",
+            true,
+            1.0f,
+            new float[] {0.8f, 0.4f},
+            null),
+    // the wall of a passage passing beneath this one: a wall with shorter dashes than presumed
+    UNDERLYING_WALL(
+            R.string.line_type_underlying_wall,
+            R.drawable.line_underlying_wall,
+            "wall:underlying",
+            true,
+            1.5f,
+            new float[] {0.4f, 0.4f},
             null);
 
     /**
