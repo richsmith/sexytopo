@@ -4,7 +4,7 @@
 - Lighter blue colour (including display of water) in dark mode for better visibility
 - Highlight for active view button in action bar
 - Tidy up sketch quick-menu (now with submenus)
-- New Edit menu with sketch Undo / Redo and Undo Last Reading (moved from the Tools menu); Redo is no longer in the sketch quick menu
+- New Edit menu with sketch Undo / Redo, Undo Last Reading, Add Leg and Add Splay (the last three moved from the Tools menu); Redo is no longer in the sketch quick menu
 - Change default for floating manual-entry buttons on table view to off (can be turned back on in settings, and manual entry can already be triggered from the menu)
 - Fix Cavway X1 downward shots being recorded with clinos of 270-360° rather than negative values (#357)
 - Pressing back out of the app now warns if the survey isn't saved
