@@ -170,7 +170,7 @@
     <string name="share_preparing">Preparando topografía para compartir…</string>
 
     <!-- Sketch view -->
-    <string name="sketch_toolbar_draw">Modo dibujo</string>
+    <string name="sketch_toolbar_line">Herramienta de línea</string>
     <string name="sketch_toolbar_area">Herramienta de área</string>
     <string name="sketch_toolbar_move">Modo mover</string>
     <string name="sketch_toolbar_eraser">Borrador</string>

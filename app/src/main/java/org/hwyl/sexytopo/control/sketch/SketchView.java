@@ -534,8 +534,8 @@ public class SketchView extends View {
                 return handleMove(event);
             case MODAL_MOVE:
                 return handleMove(event);
-            case DRAW:
-                return handleDraw(event);
+            case LINE:
+                return handleLine(event);
             case AREA:
                 return handleDrawArea(event);
             case ERASE:
@@ -627,7 +627,7 @@ public class SketchView extends View {
                 ((coords.y - viewpointOffset.y) * surveyToViewScale));
     }
 
-    private boolean handleDraw(MotionEvent event) {
+    private boolean handleLine(MotionEvent event) {
 
         Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
         Coord2D surveyCoords = viewCoordsToSurveyCoords(touchPointOnView);
@@ -2878,7 +2878,7 @@ public class SketchView extends View {
             Coord2D touchPointOnView = new Coord2D(motionEvent.getX(), motionEvent.getY());
             Station matchedStation = checkForStation(touchPointOnView);
             if (matchedStation != null && !menuShownInThisTouch) {
-                if (currentSketchTool == SketchTool.DRAW || currentSketchTool == SketchTool.AREA) {
+                if (currentSketchTool == SketchTool.LINE || currentSketchTool == SketchTool.AREA) {
                     sketch.abandonActivePath();
                 }
                 showContextMenu(motionEvent, matchedStation);
@@ -2891,7 +2891,7 @@ public class SketchView extends View {
             // or adjusting a cross-section
             if (currentSketchTool != SketchTool.MOVE
                     && currentSketchTool != SketchTool.SELECT
-                    && currentSketchTool != SketchTool.DRAW
+                    && currentSketchTool != SketchTool.LINE
                     && currentSketchTool != SketchTool.AREA) {
                 return;
             }

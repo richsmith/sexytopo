@@ -4,7 +4,7 @@ import org.hwyl.sexytopo.R;
 
 public enum SketchTool {
     MOVE(R.id.buttonMove, false, false),
-    DRAW(R.id.buttonDraw, true, false),
+    LINE(R.id.buttonLine, true, false),
     AREA(R.id.buttonArea, true, false),
     ERASE(R.id.buttonErase, false, false),
     SYMBOL(R.id.buttonSymbol, true, false),
@@ -29,7 +29,14 @@ public enum SketchTool {
     }
 
     public static SketchTool fromString(String name) {
-        return name == null ? DEFAULT : SketchTool.valueOf(name);
+        if (name == null) {
+            return DEFAULT;
+        }
+        // The line tool was saved as DRAW before it was renamed
+        if (name.equals("DRAW")) {
+            return LINE;
+        }
+        return SketchTool.valueOf(name);
     }
 
     public int getId() {

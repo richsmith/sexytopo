@@ -170,7 +170,7 @@
     <string name="share_preparing">Preparazione del rilievo per la condivisione…</string>
 
     <!-- Sketch view -->
-    <string name="sketch_toolbar_draw">Modalità disegno</string>
+    <string name="sketch_toolbar_line">Strumento linea</string>
     <string name="sketch_toolbar_area">Strumento area</string>
     <string name="sketch_toolbar_move">Modalità spostamento</string>
     <string name="sketch_toolbar_eraser">Gomma</string>

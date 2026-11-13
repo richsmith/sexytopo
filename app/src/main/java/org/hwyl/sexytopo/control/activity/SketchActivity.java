@@ -64,7 +64,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
 
     private static final int[] SKETCH_BUTTON_IDS =
             new int[] {
-                R.id.buttonDraw,
+                R.id.buttonLine,
                 R.id.buttonArea,
                 R.id.buttonErase,
                 R.id.buttonSymbol,
@@ -477,7 +477,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
             if (brushColour.getId() == itemId) {
                 selectBrushColour(brushColour);
                 if (!sketchView.getSketchTool().usesColour()) {
-                    selectSketchTool(SketchTool.DRAW);
+                    selectSketchTool(SketchTool.LINE);
                 }
                 return true;
             }
@@ -507,12 +507,12 @@ public abstract class SketchActivity extends SurveyEditorActivity
 
         // ********** Handle special line type logic **********
 
-        if (itemId == R.id.buttonDraw) {
-            boolean wasAlreadyInDrawMode = alreadySelectedTool == SketchTool.DRAW;
-            selectSketchTool(SketchTool.DRAW);
+        if (itemId == R.id.buttonLine) {
+            boolean wasAlreadyInLineMode = alreadySelectedTool == SketchTool.LINE;
+            selectSketchTool(SketchTool.LINE);
             // Mirrors the symbol toolbar: open the first time ever, then toggle whenever the
-            // draw tool is tapped while already active.
-            if (!lineTypeToolbarOpenedOnce || wasAlreadyInDrawMode) {
+            // line tool is tapped while already active.
+            if (!lineTypeToolbarOpenedOnce || wasAlreadyInLineMode) {
                 lineTypeToolbarOpenedOnce = true;
                 togglePopUpToolbar(R.id.lineTypeToolbar);
             }
@@ -521,7 +521,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
 
         for (LineType lineType : LineType.values()) {
             if (itemId == lineType.getButtonViewId()) {
-                selectSketchTool(SketchTool.DRAW);
+                selectSketchTool(SketchTool.LINE);
                 selectLineType(lineType);
                 return true;
             }
@@ -650,9 +650,9 @@ public abstract class SketchActivity extends SurveyEditorActivity
             findViewById(l.getButtonViewId()).setSelected(l == lineType);
         }
 
-        ImageButton drawButton = findViewById(R.id.buttonDraw);
-        drawButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        drawButton.setImageDrawable(
+        ImageButton lineButton = findViewById(R.id.buttonLine);
+        lineButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        lineButton.setImageDrawable(
                 addSelectionBorder(AppCompatResources.getDrawable(this, lineType.getDrawableId())));
 
         sketchView.setLineType(lineType);
@@ -746,7 +746,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
     }
 
     /**
-     * Wraps a toolbar drawable in the border used to show what is currently selected on the draw,
+     * Wraps a toolbar drawable in the border used to show what is currently selected on the line,
      * area and symbol buttons.
      *
      * <p>The border is given an explicit size rather than being allowed to take the size of the

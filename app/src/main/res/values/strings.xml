@@ -193,7 +193,7 @@
     <string name="svg_export_dialog_title">SVG Export Options</string>
 
     <!-- Sketch view -->
-    <string name="sketch_toolbar_draw">Draw mode</string>
+    <string name="sketch_toolbar_line">Line tool</string>
     <string name="sketch_toolbar_area">Area tool</string>
     <string name="sketch_toolbar_move">Move mode</string>
     <string name="sketch_toolbar_eraser">Eraser</string>

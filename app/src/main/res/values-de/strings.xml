@@ -170,7 +170,7 @@
     <string name="share_preparing">Vermessung wird zum Teilen vorbereitet…</string>
 
     <!--  Sketch view  -->
-    <string name="sketch_toolbar_draw">Zeichnungs-Modus</string>
+    <string name="sketch_toolbar_line">Linienwerkzeug</string>
     <string name="sketch_toolbar_area">Flächenwerkzeug</string>
     <string name="sketch_toolbar_move">Verschieben-Modus</string>
     <string name="sketch_toolbar_eraser">Radiergummi</string>

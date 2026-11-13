@@ -170,7 +170,7 @@
     <string name="share_preparing">Przygotowywanie inwentaryzacji do udostępnienia…</string>
 
     <!-- Sketch view -->
-    <string name="sketch_toolbar_draw">Tryb rysowania</string>
+    <string name="sketch_toolbar_line">Narzędzie linii</string>
     <string name="sketch_toolbar_area">Narzędzie obszaru</string>
     <string name="sketch_toolbar_move">Tryb przesuwania</string>
     <string name="sketch_toolbar_eraser">Gumka</string>
