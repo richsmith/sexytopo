@@ -1,10 +1,12 @@
 package org.hwyl.sexytopo.model.sketch;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.hwyl.sexytopo.control.util.LineOrienter;
 import org.hwyl.sexytopo.control.util.PolygonUtils;
 import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
@@ -399,6 +401,26 @@ public class Sketch extends Shape {
         return flipped;
     }
 
+    /**
+     * Changes a path's line type as a single undoable operation (a delete-and-replace, as for
+     * flipPathDetail). A line becoming a wall from something else is auto-oriented against the
+     * station positions, just as a freshly drawn wall is; otherwise the point order is kept, so a
+     * deliberate flip survives a change between wall types or between ticked types.
+     */
+    public PathDetail retypePathDetail(
+            PathDetail pathDetail,
+            LineType lineType,
+            float ornamentSize,
+            Collection<Coord2D> stationPositions) {
+        List<Coord2D> points = new ArrayList<>(pathDetail.getPath());
+        if (lineType.isWall() && !pathDetail.getLineType().isWall()) {
+            LineOrienter.orientToInterior(points, stationPositions);
+        }
+        PathDetail retyped = new PathDetail(points, pathDetail.getColour(), lineType, ornamentSize);
+        deleteDetail(pathDetail, Collections.singletonList((SketchDetail) retyped));
+        return retyped;
+    }
+
     public float getCrossSectionScale() {
         return crossSectionScale;
     }
@@ -551,7 +573,8 @@ public class Sketch extends Shape {
         float minDistance = Float.MAX_VALUE;
 
         for (SketchDetail detail : allSketchDetails()) {
-            if (!detail.couldBeVisibleAtScale(viewScale)) {
+            // a stroke still being drawn isn't part of the sketch yet
+            if (detail == activePath || !detail.couldBeVisibleAtScale(viewScale)) {
                 continue;
             }
             float distance = detail.getDistanceFrom(point);

@@ -752,6 +752,9 @@
     <string name="menu_jump_to_station_in_table">&#10132; Tabella Dati</string>
     <string name="menu_delete_station">Elimina</string>
     <string name="menu_reverse">Inverti</string>
+    <string name="menu_line">Linea</string>
+    <string name="menu_flip_line">Inverti</string>
+    <string name="menu_line_type">Tipo di linea</string>
     <string name="menu_switch_direction">Cambia Direzione</string>
     <string name="menu_navigate">Naviga</string>
     <string name="menu_survey">Rilievo</string>

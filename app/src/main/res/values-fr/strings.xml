@@ -755,6 +755,9 @@
     <string name="menu_jump_to_station_in_table">&#10132; Tableau de données</string>
     <string name="menu_delete_station">Supprimer</string>
     <string name="menu_reverse">Inverser</string>
+    <string name="menu_line">Ligne</string>
+    <string name="menu_flip_line">Inverser</string>
+    <string name="menu_line_type">Type de ligne</string>
     <string name="menu_switch_direction">Changer de direction</string>
     <string name="menu_navigate">Naviguer</string>
     <string name="menu_links">Liens</string>

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import org.hwyl.sexytopo.control.util.LineOrienter;
 import org.hwyl.sexytopo.control.util.PolygonUtils;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.survey.Leg;
@@ -102,6 +103,71 @@ public class SketchTest {
 
         sketch.redo();
         Assert.assertSame(flipped, sketch.getPathDetails().get(0));
+    }
+
+    @Test
+    public void testRetypePathDetailIsOneUndoableStepKeepingPointOrder() {
+        Sketch sketch = new Sketch();
+        PathDetail original =
+                new PathDetail(
+                        new ArrayList<>(Arrays.asList(new Coord2D(0, 0), new Coord2D(10, 0))),
+                        Colour.RED,
+                        LineType.CHIMNEY,
+                        0.3f);
+        sketch.restoreDetailToSketch(original);
+
+        PathDetail retyped =
+                sketch.retypePathDetail(
+                        original, LineType.PIT, 0.5f, Collections.singletonList(new Coord2D(5, 5)));
+
+        Assert.assertEquals(1, sketch.getPathDetails().size());
+        Assert.assertSame(retyped, sketch.getPathDetails().get(0));
+        Assert.assertEquals(LineType.PIT, retyped.getLineType());
+        Assert.assertEquals(Colour.RED, retyped.getColour());
+        Assert.assertEquals(0.5f, retyped.getOrnamentSize(), 0.0001f);
+        Assert.assertEquals(original.getPath(), retyped.getPath());
+
+        sketch.undo();
+        Assert.assertSame(original, sketch.getPathDetails().get(0));
+    }
+
+    @Test
+    public void testRetypePathDetailToWallOrientsItLikeADrawnWall() {
+        List<Coord2D> stations = Arrays.asList(new Coord2D(5, 5));
+        List<Coord2D> points = Arrays.asList(new Coord2D(0, 0), new Coord2D(10, 0));
+        List<Coord2D> expected = new ArrayList<>(points);
+        LineOrienter.orientToInterior(expected, stations);
+
+        for (List<Coord2D> drawn : Arrays.asList(points, reversed(points))) {
+            Sketch sketch = new Sketch();
+            PathDetail original = new PathDetail(new ArrayList<>(drawn), Colour.BLACK);
+            sketch.restoreDetailToSketch(original);
+            PathDetail retyped = sketch.retypePathDetail(original, LineType.WALL, 0.2f, stations);
+            Assert.assertEquals(expected, retyped.getPath());
+        }
+    }
+
+    @Test
+    public void testRetypePathDetailBetweenWallTypesKeepsAFlip() {
+        List<Coord2D> stations = Arrays.asList(new Coord2D(5, 5));
+        List<Coord2D> points =
+                new ArrayList<>(Arrays.asList(new Coord2D(0, 0), new Coord2D(10, 0)));
+        LineOrienter.orientToInterior(points, stations);
+        List<Coord2D> flipped = reversed(points);
+
+        Sketch sketch = new Sketch();
+        PathDetail original =
+                new PathDetail(new ArrayList<>(flipped), Colour.BLACK, LineType.WALL, 0.2f);
+        sketch.restoreDetailToSketch(original);
+        PathDetail retyped =
+                sketch.retypePathDetail(original, LineType.PRESUMED_WALL, 0.2f, stations);
+        Assert.assertEquals(flipped, retyped.getPath());
+    }
+
+    private static List<Coord2D> reversed(List<Coord2D> points) {
+        List<Coord2D> copy = new ArrayList<>(points);
+        Collections.reverse(copy);
+        return copy;
     }
 
     @Test

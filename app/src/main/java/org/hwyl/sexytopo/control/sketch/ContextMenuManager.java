@@ -91,8 +91,24 @@ public class ContextMenuManager {
             return;
         }
 
-        Activity activityContext = (Activity) context;
-        ViewGroup decorView = (ViewGroup) activityContext.getWindow().getDecorView();
+        PopupMenu popup = createPopupMenuAt(context, anchorView, x, y);
+        popup.inflate(R.menu.context_station);
+        enableGroupDividers(popup);
+        configureMenuVisibility(popup.getMenu(), station, survey, null);
+        setStationTitle(popup.getMenu(), station);
+
+        popup.setOnMenuItemClickListener(item -> handleMenuItemClick(item, station));
+        popup.show();
+    }
+
+    /**
+     * Creates a popup menu that appears at specific coordinates within anchorView, rather than
+     * hanging off the view as a whole. PopupMenu can only anchor to a view, so this places a
+     * temporary invisible one at the point, removed again when the menu is dismissed. The caller
+     * must not replace the dismiss listener.
+     */
+    public static PopupMenu createPopupMenuAt(Context context, View anchorView, int x, int y) {
+        ViewGroup decorView = (ViewGroup) ((Activity) context).getWindow().getDecorView();
 
         int[] location = new int[2];
         anchorView.getLocationOnScreen(location);
@@ -105,17 +121,6 @@ public class ContextMenuManager {
         decorView.addView(invisibleAnchor);
 
         PopupMenu popup = new PopupMenu(context, invisibleAnchor);
-        popup.inflate(R.menu.context_station);
-        enableGroupDividers(popup);
-        configureMenuVisibility(popup.getMenu(), station, survey, null);
-        setStationTitle(popup.getMenu(), station);
-
-        popup.setOnMenuItemClickListener(
-                item -> {
-                    boolean handled = handleMenuItemClick(item, station);
-                    decorView.post(() -> decorView.removeView(invisibleAnchor));
-                    return handled;
-                });
         popup.setOnDismissListener(
                 menu ->
                         decorView.post(
@@ -126,7 +131,7 @@ public class ContextMenuManager {
                                         // View might already be removed
                                     }
                                 }));
-        popup.show();
+        return popup;
     }
 
     public void showMenuForStation(

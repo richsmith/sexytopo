@@ -20,15 +20,20 @@ import android.text.Editable;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.GestureDetector;
+import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.PopupMenu;
 import androidx.core.content.ContextCompat;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1167,6 +1172,73 @@ public class SketchView extends View {
                 new ContextMenuManager(getContext(), viewContext, activity);
         menuManager.showMenuForStation(
                 this, station, survey, (int) event.getX(), (int) event.getY());
+    }
+
+    /**
+     * The line the user pressed on, or null. Only the nearest detail counts, so pressing on a
+     * symbol that sits on a line picks out the symbol rather than the line.
+     */
+    private PathDetail checkForPath(Coord2D touchPointOnView) {
+        float selectionTolerance = selectionSensitivityPx / surveyToViewScale;
+        Coord2D touchPointOnSurvey = viewCoordsToSurveyCoords(touchPointOnView);
+        SketchDetail nearest =
+                sketch.findNearestVisibleDetailWithin(
+                        touchPointOnSurvey, selectionTolerance, surveyToViewScale);
+        return nearest instanceof PathDetail ? (PathDetail) nearest : null;
+    }
+
+    /** Offers to flip a line or change its type. Both are single undoable steps. */
+    private void showLineContextMenu(MotionEvent event, final PathDetail pathDetail) {
+        PopupMenu popup =
+                ContextMenuManager.createPopupMenuAt(
+                        getContext(), this, (int) event.getX(), (int) event.getY());
+        popup.inflate(R.menu.context_line);
+        Menu menu = popup.getMenu();
+
+        LineType currentType = pathDetail.getLineType();
+        menu.findItem(R.id.line_title).setTitle(currentType.getStringId());
+        // Orientation means nothing for a plain sketch line
+        menu.findItem(R.id.action_flip_line).setEnabled(currentType.isSemantic());
+
+        Map<Integer, LineType> lineTypesByItemId = new HashMap<>();
+        SubMenu lineTypeMenu = menu.findItem(R.id.menu_line_type).getSubMenu();
+        for (LineType lineType : LineType.values()) {
+            int itemId = lineType.getButtonViewId();
+            lineTypeMenu
+                    .add(R.id.menu_line_type, itemId, Menu.NONE, lineType.getStringId())
+                    .setChecked(lineType == currentType);
+            lineTypesByItemId.put(itemId, lineType);
+        }
+        lineTypeMenu.setGroupCheckable(R.id.menu_line_type, true, true);
+
+        popup.setOnMenuItemClickListener(
+                item -> {
+                    if (item.getItemId() == R.id.action_flip_line) {
+                        sketch.flipPathDetail(pathDetail);
+                        invalidate();
+                        return true;
+                    }
+                    LineType lineType = lineTypesByItemId.get(item.getItemId());
+                    if (lineType != null && lineType != currentType) {
+                        retypeLine(pathDetail, lineType);
+                        return true;
+                    }
+                    return false;
+                });
+        popup.show();
+    }
+
+    private void retypeLine(PathDetail pathDetail, LineType lineType) {
+        // A sketch line's ornament size never shows and isn't saved, so it can't be trusted; size
+        // the new ornamentation as for a line drawn now instead
+        float ornamentSize =
+                pathDetail.getLineType().isSemantic()
+                        ? pathDetail.getOrnamentSize()
+                        : getOrnamentSizeForNewLine();
+        Collection<Coord2D> stationPositions =
+                projection == null ? Collections.emptyList() : projection.getStationMap().values();
+        sketch.retypePathDetail(pathDetail, lineType, ornamentSize, stationPositions);
+        invalidate();
     }
 
     /**
@@ -2810,6 +2882,23 @@ public class SketchView extends View {
                     sketch.abandonActivePath();
                 }
                 showContextMenu(motionEvent, matchedStation);
+                menuShownInThisTouch = true;
+                return;
+            }
+
+            // Not offered by tools that act as soon as the finger lands (erasing, placing a symbol
+            // or text), since by then a long press has already done something, nor while placing
+            // or adjusting a cross-section
+            if (currentSketchTool != SketchTool.MOVE
+                    && currentSketchTool != SketchTool.SELECT
+                    && currentSketchTool != SketchTool.DRAW
+                    && currentSketchTool != SketchTool.AREA) {
+                return;
+            }
+            PathDetail matchedPath = checkForPath(touchPointOnView);
+            if (matchedPath != null && !menuShownInThisTouch) {
+                sketch.abandonActivePath();
+                showLineContextMenu(motionEvent, matchedPath);
                 menuShownInThisTouch = true;
             }
         }

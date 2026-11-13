@@ -752,6 +752,9 @@
     <string name="menu_jump_to_station_in_table">&#10132; Tabela danych</string>
     <string name="menu_delete_station">Usuń</string>
     <string name="menu_reverse">Odwróć</string>
+    <string name="menu_line">Linia</string>
+    <string name="menu_flip_line">Odwróć</string>
+    <string name="menu_line_type">Typ linii</string>
     <string name="menu_switch_direction">Przełącz kierunek</string>
     <string name="menu_navigate">Nawiguj</string>
     <string name="menu_links">Połączenia</string>
