@@ -151,26 +151,52 @@
 <p>A selection of sketching tools are provided via a toolbar at the bottom of the screen:</p>
 <ul>
 	<li><strong>Colours</strong> set the current sketching colour</li>
-	<li><strong>Move</strong> enters view mode</li>
-	<li><strong>Draw</strong> enters sketch mode (tap again to open line type selection, see below)</li>
-	<li><strong>Area</strong> enters area mode for marking regions such as water (see below)</li>
+	<li><strong>Move</strong> enters view mode, which allows for panning and zooming without editing</li>
+	<li><strong>Line</strong> enters line mode (tap again to open line type selection, see below)</li>
 	<li><strong>Symbol</strong> enters symbol mode (tap again to open symbol/text selection option)</li>
+	<li><strong>Area</strong> enters area mode for marking regions such as water (see below)</li>
 	<li><strong>Erase</strong> deletes sketch features</li>
 	<li><strong>Select</strong> (dashed square) marks a station as the active station (select twice to open context menu)</li>
-	<li><strong>Quick Settings</strong> opens settings for adjusting sketch view on the fly</li>
+	<li><strong>Quick Settings</strong> opens settings for adjusting sketch view on the fly (see <a href="#quick-settings">Quick Settings</a> below)</li>
 	<li><strong>Undo</strong> undoes the last sketching command</li>
 	<li><strong>Zoom In/Out</strong> scales the survey (alternative to pinch-to-zoom)</li>
 </ul>
 
-<p><strong>Redo</strong> (cancelling the last undo) is available from the quick settings menu.</p>
+<p>The <strong>Line</strong> tool defaults to a freehand line; this allows for drawing details of any type on the sketch. Tapping on the icon twice allows for the selection of a line type, including walls and other features. Tap the opened line selection icon to select it, and tap again (or long-press) to see the name of the type. Once selected, the line will be drawn with the appropriate pattern. Selecting a line type allows SexyTopo to understand what is being drawn and use that information intelligently. For example, lines can optionally be exported to Therion as proper semantic lines (e.g. <i>line wall</i>), and the "clip to walls" quick setting (on by default) clips areas and other lines so that they don't overlap walls. Note that some line types have an orientation: the most recently drawn wall shows a small marker pointing to the inside of the passage, and the ticks on pit edges, chimneys and steps, and the teeth on overhangs, show which side is which. Lines can be long-pressed to get a context menu which allows you to change the type and orientation of the line.</p>
 
-<p>The <strong>Draw</strong> tool normally sketches a plain freehand line, but a line can instead be given a meaning: wall, presumed wall, pit edge, or chimney. Tapping the draw tool while it is already selected opens a toolbar of line types; the chosen type applies to lines you draw from then on. Typed lines are drawn with their conventional cave-surveying appearance — walls are bold, presumed walls dashed, pit edges ticked, and so on — and are exported to Therion as proper semantic lines (e.g. <i>line wall</i>) rather than just background tracing, which makes the resulting files much more useful for drawing up. Walls work out for themselves which side of the line the passage is on, so you can draw them in either direction. The ticks and dashes are sized when you draw the line, based on how far you are zoomed in at the time (as symbols are), so they stay fixed to the cave as you zoom around afterwards; draw zoomed in for finer ornamentation, or adjust the starting size under Settings. Tick marks on pit edges and chimneys fall on one side of the line depending on which direction you draw it in (SexyTopo can't know which side the drop is), so if the ticks come out on the wrong side, use Tools&nbsp;&rarr;&nbsp;Flip Last Line (or undo and draw the line the other way). The most recently drawn wall shows a slim red arrow pointing to the side SexyTopo has taken to be the inside of the passage — if that's wrong, Flip Last Line corrects it. To see the arrow on every wall, turn on Show&nbsp;&rarr;&nbsp;All Wall Sides in the quick settings menu. The arrows are only ever a visual aid (they are not part of the sketch and are never exported).</p>
+<p>The <strong>Symbol</strong> tool is for drawing point symbols (e.g. to show the location of a stalactite). Tap the icon twice to select the symbol type as per the line tool. The size of the symbol is set automatically according to the current scale of the sketch; zoom in to draw small symbols and zoom out to draw larger ones. Symbols may be optionally exported to Therion.</p>
 
-<p>The <strong>Area</strong> tool marks a region of the sketch as a feature — currently water, such as a pool or sump. Sketch roughly around the region you want to mark and SexyTopo will close the outline into an area, drawn with parallel lines across it. Sketching an area overlapping an existing area of the same kind extends it, so a large region can be built up from several strokes. Erasing part of an area cuts a notch out of it, which may split it into separate areas (with the "Delete line fragments" setting off, erasing deletes the whole area instead). Erasing into the middle of an area leaves a hole — useful for a dry island in a pool — and building a ring of water, for example by sketching four overlapping walls, leaves the enclosed space empty rather than filling it in. If a single stroke crosses over itself, SexyTopo takes its outer edge, so an accidental overlap where you close the outline won't leave a stray hole behind. With the "Auto-Blue Water" quick setting on, new water areas are always drawn in blue regardless of the selected colour.</p>
+<p>The <strong>Area</strong> tool is for drawing regions (e.g. to indicate the extent of a pool of water). Tap the icon twice to select the area type as above. If areas of the same type overlap during sketching they are automatically joined. Areas may be optionally exported to Therion.</p>
+
+<p>The plan view can optionally display a <strong>compass</strong> in the corner of the screen, showing the direction of North based on your device's orientation sensor. This can be toggled on or off via the quick settings menu.</p>
 
 <p>A legend at the bottom right of the view provides a scale bar, basic stats, and a reminder of the survey name.</p>
 
-<p>The plan view can optionally display a <strong>compass</strong> in the corner of the screen, showing the direction of North based on your device's orientation sensor. This can be toggled on or off via the quick settings menu (the display menu icon on the toolbar).</p>
+<h3 id="quick-settings">Quick Settings</h3>
+<p>The quick settings button on the toolbar opens a menu of options that can be quickly adjusted while sketching.</p>
+<ul>
+	<li><strong>Undo Last Reading</strong> removes the most recently added leg or splay.</li>
+	<li><strong>Centre on Active</strong> moves the view to the active station.</li>
+	<li><strong>Redo sketch action</strong> reapplies the last sketching action that was undone.</li>
+</ul>
+<p><strong>Modes</strong> changes how sketching behaves:</p>
+<ul>
+	<li><strong>Auto-Recentre</strong> moves the view to the active station whenever a new leg arrives, so you can follow the survey as it goes (off by default).</li>
+	<li><strong>Snap to Lines</strong> joins the start or end of a new line to the end of a nearby existing line, which helps to draw continuous walls in several strokes (off by default).</li>
+	<li><strong>Auto-Blue Water</strong> always draws water features in blue, whatever the selected colour (on by default).</li>
+	<li><strong>Clip to Walls</strong> trims areas and typed lines that cross a wall to the extent of the wall (on by default).</li>
+	<li><strong>Pinch to Zoom</strong> allows zooming with two fingers; turn it off to rely solely on the zoom buttons (on by default). It may be useful to turn this off if water droplets or mud are undesirably triggering zooming.</li>
+	<li><strong>Fade Non-Active</strong> fades out the stations and the legs not attached to the active station, so it is easier to see where you are in a busy survey (off by default).</li>
+</ul>
+<p><strong>Show</strong> chooses what is drawn on the view; all of these are on by default except All Wall Sides:</p>
+<ul>
+	<li><strong>Splays</strong>, <strong>Sketch</strong>, <strong>Cross-Sections</strong> and <strong>Station Labels</strong> show or hide those parts of the view.</li>
+	<li><strong>Linked Surveys</strong> also draws the surveys connected to this one.</li>
+	<li><strong>Graph Paper</strong> draws a grid behind the survey.</li>
+	<li><strong>All Wall Sides</strong> shows the orientation marker on every wall rather than only the most recent (see above).</li>
+	<li><strong>Compass</strong> shows the compass on the plan view. Turn it off to save a small amount of battery.</li>
+</ul>
+
 
 <h2 id="cross-sections">Cross-Sections</h2>
 <p>A cross-section shows the shape of the passage at a station, drawn from that station's splays. It appears on the sketch as a small framed view, joined to its station by a dashed line, and a marker across the station shows which way the section faces. Each station can have one cross-section in the plan and one in the elevation, and the two are independent of each other.</p>
