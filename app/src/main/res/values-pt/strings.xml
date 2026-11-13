@@ -191,6 +191,17 @@
     <string name="sketch_toolbar_colour_blue">Azul</string>
     <string name="sketch_toolbar_colour_purple">Roxo</string>
     <string name="sketch_toolbar_symbol_close">Fechar barra de símbolos</string>
+    <string name="line_type_sketch">Linha de esboço</string>
+    <string name="line_type_wall">Parede</string>
+    <string name="line_type_presumed_wall">Parede presumida</string>
+    <string name="line_type_underlying_wall">Parede subjacente</string>
+    <string name="line_type_pit">Bordo de poço</string>
+    <string name="line_type_floor_step">Degrau no chão</string>
+    <string name="line_type_chimney">Chaminé</string>
+    <string name="line_type_ceiling_step">Degrau no teto</string>
+    <string name="line_type_overhang">Saliência</string>
+    <string name="line_type_rock_border">Contorno de bloco</string>
+    <string name="line_type_rock_edge">Aresta de bloco</string>
     <string name="sketch_menu_delete_last_leg">Desfazer Última Leitura</string>
     <string name="sketch_menu_centre_view">Centrar na Ativa</string>
     <string name="sketch_menu_auto_recentre">Auto-Centrar</string>

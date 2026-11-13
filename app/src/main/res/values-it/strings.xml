@@ -191,6 +191,17 @@
     <string name="sketch_toolbar_colour_blue">Blu</string>
     <string name="sketch_toolbar_colour_purple">Viola</string>
     <string name="sketch_toolbar_symbol_close">Chiudi barra dei simboli</string>
+    <string name="line_type_sketch">Linea di schizzo</string>
+    <string name="line_type_wall">Parete</string>
+    <string name="line_type_presumed_wall">Parete presunta</string>
+    <string name="line_type_underlying_wall">Parete sottostante</string>
+    <string name="line_type_pit">Bordo di pozzo</string>
+    <string name="line_type_floor_step">Saltino</string>
+    <string name="line_type_chimney">Camino</string>
+    <string name="line_type_ceiling_step">Gradino del soffitto</string>
+    <string name="line_type_overhang">Strapiombo</string>
+    <string name="line_type_rock_border">Contorno di masso</string>
+    <string name="line_type_rock_edge">Spigolo di masso</string>
     <string name="sketch_menu_delete_last_leg">Annulla Ultima Lettura</string>
     <string name="sketch_menu_centre_view">Centra su Attiva</string>
     <string name="sketch_menu_auto_recentre">Auto-Centratura</string>

@@ -387,4 +387,66 @@ public class PolygonUtilsTest {
         Assert.assertFalse(PolygonUtils.contains(square, new Coord2D(15, 5)));
         Assert.assertFalse(PolygonUtils.contains(square, new Coord2D(5, -1)));
     }
+
+    // walls with the interior on their (-dy, dx) side: y > 0 for the first, y < 4 for the second
+    private static final List<Coord2D> LOWER_WALL =
+            Arrays.asList(new Coord2D(0, 0), new Coord2D(10, 0));
+    private static final List<Coord2D> UPPER_WALL =
+            Arrays.asList(new Coord2D(10, 4), new Coord2D(0, 4));
+
+    @Test
+    public void testClipLineDropsTheOvershootPastAWall() {
+        List<Coord2D> line = Arrays.asList(new Coord2D(5, 2), new Coord2D(5, -3));
+        List<List<Coord2D>> clipped =
+                PolygonUtils.clipLineToInteriorOf(
+                        line, Collections.singletonList(LOWER_WALL), 0.25f);
+        Assert.assertEquals(1, clipped.size());
+        Assert.assertEquals(Arrays.asList(new Coord2D(5, 2), new Coord2D(5, 0)), clipped.get(0));
+    }
+
+    @Test
+    public void testClipLineKeepsTheStretchBetweenTwoWalls() {
+        List<Coord2D> line =
+                Arrays.asList(new Coord2D(2, -2), new Coord2D(2, 2), new Coord2D(2, 6));
+        List<List<Coord2D>> clipped =
+                PolygonUtils.clipLineToInteriorOf(
+                        line, Arrays.asList(LOWER_WALL, UPPER_WALL), 0.25f);
+        Assert.assertEquals(1, clipped.size());
+        Assert.assertEquals(
+                Arrays.asList(new Coord2D(2, 0), new Coord2D(2, 2), new Coord2D(2, 4)),
+                clipped.get(0));
+    }
+
+    @Test
+    public void testClipLineCutsAcrossTheExtendedEndOfAWall() {
+        // the wall stops just short of the line, but is extended past its end to cut it anyway
+        List<Coord2D> line = Arrays.asList(new Coord2D(10.1f, 2), new Coord2D(10.1f, -2));
+        List<List<Coord2D>> clipped =
+                PolygonUtils.clipLineToInteriorOf(
+                        line, Collections.singletonList(LOWER_WALL), 0.25f);
+        Assert.assertEquals(1, clipped.size());
+        Assert.assertEquals(2, clipped.get(0).get(0).y, 0.0001f);
+        Assert.assertEquals(0, clipped.get(0).get(1).y, 0.0001f);
+    }
+
+    @Test
+    public void testClipLineLeavesALineThatDoesNotCrossAlone() {
+        List<Coord2D> line = Arrays.asList(new Coord2D(1, 1), new Coord2D(9, 1));
+        List<List<Coord2D>> clipped =
+                PolygonUtils.clipLineToInteriorOf(
+                        line, Collections.singletonList(LOWER_WALL), 0.25f);
+        Assert.assertEquals(1, clipped.size());
+        Assert.assertSame(line, clipped.get(0));
+    }
+
+    @Test
+    public void testClipLineLeavesItAloneIfEverythingWouldGo() {
+        // entirely outside: nothing to cut, so it can't be the walls' orientation that's wrong
+        List<Coord2D> line = Arrays.asList(new Coord2D(1, -1), new Coord2D(9, -1));
+        Assert.assertSame(
+                line,
+                PolygonUtils.clipLineToInteriorOf(
+                                line, Collections.singletonList(LOWER_WALL), 0.25f)
+                        .get(0));
+    }
 }

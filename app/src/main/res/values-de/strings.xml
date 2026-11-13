@@ -191,6 +191,17 @@
     <string name="sketch_toolbar_colour_blue">Blau</string>
     <string name="sketch_toolbar_colour_purple">Violett</string>
     <string name="sketch_toolbar_symbol_close">Werkzeugleiste Symbole schliessen</string>
+    <string name="line_type_sketch">Skizzenlinie</string>
+    <string name="line_type_wall">Wand</string>
+    <string name="line_type_presumed_wall">Vermutete Wand</string>
+    <string name="line_type_underlying_wall">Darunterliegende Wand</string>
+    <string name="line_type_pit">Schachtkante</string>
+    <string name="line_type_floor_step">Bodenstufe</string>
+    <string name="line_type_chimney">Schlot</string>
+    <string name="line_type_ceiling_step">Deckenstufe</string>
+    <string name="line_type_overhang">Überhang</string>
+    <string name="line_type_rock_border">Blockumriss</string>
+    <string name="line_type_rock_edge">Blockkante</string>
     <string name="sketch_menu_delete_last_leg">Letzte Messung rückgängig</string>
     <string name="sketch_menu_centre_view">Auf Aktives zentrieren</string>
     <string name="sketch_menu_auto_recentre">Automatisches Zentrieren</string>

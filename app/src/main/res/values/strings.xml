@@ -217,8 +217,14 @@
     <string name="line_type_sketch">Sketch line</string>
     <string name="line_type_wall">Wall</string>
     <string name="line_type_presumed_wall">Presumed wall</string>
+    <string name="line_type_underlying_wall">Underlying wall</string>
     <string name="line_type_pit">Pit edge</string>
+    <string name="line_type_floor_step">Floor step</string>
     <string name="line_type_chimney">Chimney</string>
+    <string name="line_type_ceiling_step">Ceiling step</string>
+    <string name="line_type_overhang">Overhang</string>
+    <string name="line_type_rock_border">Boulder outline</string>
+    <string name="line_type_rock_edge">Boulder edge</string>
     <string name="area_type_water">Water</string>
     <string name="area_type_sump">Sump</string>
     <string name="area_type_sand">Sand</string>
@@ -236,7 +242,7 @@
     <string name="sketch_menu_show_grid">Graph Paper</string>
     <string name="sketch_menu_show_compass">Compass</string>
     <string name="sketch_menu_blue_water">Auto-Blue Water</string>
-    <string name="sketch_menu_clip_to_walls">Clip Areas to Walls</string>
+    <string name="sketch_menu_clip_to_walls">Clip to Walls</string>
     <string name="sketch_menu_pinch_to_zoom">Pinch to Zoom</string>
     <string name="sketch_menu_snap_to_lines">Snap to Lines</string>
     <string name="sketch_menu_fade_non_active">Fade Non-Active</string>

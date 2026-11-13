@@ -191,6 +191,17 @@
     <string name="sketch_toolbar_colour_blue">Bleu</string>
     <string name="sketch_toolbar_colour_purple">Violet</string>
     <string name="sketch_toolbar_symbol_close">Fermer la barre d\'outils des symboles</string>
+    <string name="line_type_sketch">Ligne de croquis</string>
+    <string name="line_type_wall">Paroi</string>
+    <string name="line_type_presumed_wall">Paroi supposée</string>
+    <string name="line_type_underlying_wall">Paroi sous-jacente</string>
+    <string name="line_type_pit">Bord de puits</string>
+    <string name="line_type_floor_step">Ressaut</string>
+    <string name="line_type_chimney">Cheminée</string>
+    <string name="line_type_ceiling_step">Ressaut de plafond</string>
+    <string name="line_type_overhang">Surplomb</string>
+    <string name="line_type_rock_border">Contour de bloc</string>
+    <string name="line_type_rock_edge">Arête de bloc</string>
     <string name="sketch_menu_delete_last_leg">Annuler le dernier segment</string>
     <string name="sketch_menu_centre_view">Centrer sur l\'actif</string>
     <string name="sketch_menu_auto_recentre">Recentrage automatique</string>

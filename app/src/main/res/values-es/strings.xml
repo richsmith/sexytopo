@@ -191,6 +191,17 @@
     <string name="sketch_toolbar_colour_blue">Azul</string>
     <string name="sketch_toolbar_colour_purple">Morado</string>
     <string name="sketch_toolbar_symbol_close">Cerrar barra de símbolos</string>
+    <string name="line_type_sketch">Línea de croquis</string>
+    <string name="line_type_wall">Pared</string>
+    <string name="line_type_presumed_wall">Pared supuesta</string>
+    <string name="line_type_underlying_wall">Pared subyacente</string>
+    <string name="line_type_pit">Borde de pozo</string>
+    <string name="line_type_floor_step">Escalón en el suelo</string>
+    <string name="line_type_chimney">Chimenea</string>
+    <string name="line_type_ceiling_step">Escalón en el techo</string>
+    <string name="line_type_overhang">Voladizo</string>
+    <string name="line_type_rock_border">Contorno de bloque</string>
+    <string name="line_type_rock_edge">Arista de bloque</string>
     <string name="sketch_menu_delete_last_leg">Deshacer Última Lectura</string>
     <string name="sketch_menu_centre_view">Centrar en Activa</string>
     <string name="sketch_menu_auto_recentre">Auto-Centrado</string>

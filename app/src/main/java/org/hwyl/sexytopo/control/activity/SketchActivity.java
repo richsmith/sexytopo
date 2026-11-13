@@ -336,7 +336,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
      */
     private void flipLastLine() {
         Sketch sketch = getSketch(getSurvey());
-        PathDetail toFlip = sketch.getMostRecentSemanticPath();
+        PathDetail toFlip = sketch.getMostRecentOrientedPath();
         if (toFlip == null) {
             showSimpleToast(R.string.tools_flip_last_line_none);
             return;
@@ -521,6 +521,11 @@ public abstract class SketchActivity extends SurveyEditorActivity
 
         for (LineType lineType : LineType.values()) {
             if (itemId == lineType.getButtonViewId()) {
+                // Several line types have similar icons, so tapping the selected one again shows
+                // its name, as a long press does
+                if (lineType == SketchPreferences.getSelectedLineType()) {
+                    findViewById(itemId).performLongClick();
+                }
                 selectSketchTool(SketchTool.LINE);
                 selectLineType(lineType);
                 return true;

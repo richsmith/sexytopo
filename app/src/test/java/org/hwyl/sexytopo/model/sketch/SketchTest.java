@@ -106,6 +106,54 @@ public class SketchTest {
     }
 
     @Test
+    public void testFinishPathDropsLinesSmallerThanTheMinimum() {
+        Sketch sketch = new Sketch();
+        sketch.startNewPath(new Coord2D(0, 0)).lineTo(new Coord2D(0.05f, 0.05f));
+        sketch.finishPath(0.1f);
+        Assert.assertTrue(sketch.getPathDetails().isEmpty());
+        Assert.assertNull(sketch.getActivePath());
+
+        sketch.startNewPath(new Coord2D(0, 0)).lineTo(new Coord2D(0.05f, 0.2f));
+        sketch.finishPath(0.1f);
+        Assert.assertEquals(1, sketch.getPathDetails().size());
+    }
+
+    @Test
+    public void testFinishPathClipsTypedLinesToWallsAsOneUndoableStep() {
+        Sketch sketch = new Sketch();
+        // interior on the (-dy, dx) side, i.e. y > 0
+        drawLine(sketch, LineType.WALL, new Coord2D(0, 0), new Coord2D(10, 0));
+
+        drawLine(sketch, LineType.PIT, new Coord2D(5, 3), new Coord2D(5, -2));
+
+        Assert.assertEquals(2, sketch.getPathDetails().size());
+        PathDetail pit = sketch.getPathDetails().get(1);
+        Assert.assertEquals(LineType.PIT, pit.getLineType());
+        Assert.assertEquals(0, pit.getPath().get(pit.getPath().size() - 1).y, 0.0001f);
+
+        sketch.undo();
+        Assert.assertEquals(1, sketch.getPathDetails().size());
+    }
+
+    @Test
+    public void testFinishPathDoesNotClipFreehandLinesOrWalls() {
+        Sketch sketch = new Sketch();
+        drawLine(sketch, LineType.WALL, new Coord2D(0, 0), new Coord2D(10, 0));
+
+        drawLine(sketch, LineType.SKETCH, new Coord2D(5, 3), new Coord2D(5, -2));
+        drawLine(sketch, LineType.PRESUMED_WALL, new Coord2D(3, 3), new Coord2D(3, -2));
+
+        Assert.assertEquals(-2, sketch.getPathDetails().get(1).getPath().get(1).y, 0.0001f);
+        Assert.assertEquals(-2, sketch.getPathDetails().get(2).getPath().get(1).y, 0.0001f);
+    }
+
+    private static void drawLine(Sketch sketch, LineType lineType, Coord2D from, Coord2D to) {
+        sketch.startNewPath(from, Colour.BLACK, lineType, PathDetail.DEFAULT_ORNAMENT_SIZE)
+                .lineTo(to);
+        sketch.finishPath();
+    }
+
+    @Test
     public void testRetypePathDetailIsOneUndoableStepKeepingPointOrder() {
         Sketch sketch = new Sketch();
         PathDetail original =
@@ -204,9 +252,9 @@ public class SketchTest {
     }
 
     @Test
-    public void testGetMostRecentSemanticPathSkipsGeneralLines() {
+    public void testGetMostRecentOrientedPathSkipsUnorientedLines() {
         Sketch sketch = new Sketch();
-        Assert.assertNull(sketch.getMostRecentSemanticPath());
+        Assert.assertNull(sketch.getMostRecentOrientedPath());
 
         PathDetail wall =
                 sketch.startNewPath(
@@ -226,7 +274,16 @@ public class SketchTest {
         scribble.lineTo(new Coord2D(6, 5));
         sketch.finishPath();
 
-        Assert.assertSame(wall, sketch.getMostRecentSemanticPath());
+        PathDetail boulder =
+                sketch.startNewPath(
+                        new Coord2D(8, 8),
+                        Colour.BLACK,
+                        LineType.ROCK_BORDER,
+                        PathDetail.DEFAULT_ORNAMENT_SIZE);
+        boulder.lineTo(new Coord2D(9, 8));
+        sketch.finishPath();
+
+        Assert.assertSame(wall, sketch.getMostRecentOrientedPath());
     }
 
     @Test

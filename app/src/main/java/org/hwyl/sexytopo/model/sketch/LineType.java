@@ -37,6 +37,15 @@ public enum LineType {
             1.0f,
             new float[] {0.8f, 0.4f},
             null),
+    // the wall of a passage passing beneath this one: a wall with shorter dashes than presumed
+    UNDERLYING_WALL(
+            R.string.line_type_underlying_wall,
+            R.drawable.line_underlying_wall,
+            "wall:underlying",
+            true,
+            1.5f,
+            new float[] {0.4f, 0.4f},
+            null),
     // solid baseline with a perpendicular tick, repeating every ornament size
     PIT(
             R.string.line_type_pit,
@@ -45,7 +54,17 @@ public enum LineType {
             false,
             1.0f,
             null,
-            new Stamp(1.2f, 1.2f, -0.6f)),
+            Stamp.ticked(1.2f, 1.2f, -0.6f)),
+    // a drop too small to be a pit: as PIT, with shorter ticks (Therion draws the two alike, but
+    // they need telling apart while sketching)
+    FLOOR_STEP(
+            R.string.line_type_floor_step,
+            R.drawable.line_floor_step,
+            "floor-step",
+            false,
+            1.0f,
+            null,
+            Stamp.ticked(1.2f, 1.2f, -0.35f)),
     // dashed baseline (the bar covers two thirds of the advance) with a tick on the opposite
     // side to PIT
     CHIMNEY(
@@ -55,33 +74,93 @@ public enum LineType {
             false,
             1.0f,
             new float[] {0.8f, 0.4f},
-            new Stamp(1.2f, 0.8f, 0.5f));
+            Stamp.ticked(1.2f, 0.8f, 0.5f)),
+    // the ceiling's counterpart to FLOOR_STEP: as CHIMNEY, with shorter ticks
+    CEILING_STEP(
+            R.string.line_type_ceiling_step,
+            R.drawable.line_ceiling_step,
+            "ceiling-step",
+            false,
+            1.0f,
+            new float[] {0.8f, 0.4f},
+            Stamp.ticked(1.2f, 0.8f, 0.3f)),
+    // solid baseline with a row of filled teeth on the same side as PIT's ticks
+    OVERHANG(
+            R.string.line_type_overhang,
+            R.drawable.line_overhang,
+            "overhang",
+            false,
+            1.0f,
+            null,
+            Stamp.toothed(1.2f, -0.9f)),
+    // the outline of a boulder, and the edges within one: plain lines, thinner than a wall in
+    // Therion's proportions
+    ROCK_BORDER(
+            R.string.line_type_rock_border,
+            R.drawable.line_rock_border,
+            "rock-border",
+            false,
+            0.75f,
+            null,
+            null),
+    ROCK_EDGE(
+            R.string.line_type_rock_edge,
+            R.drawable.line_rock_edge,
+            "rock-edge",
+            false,
+            0.5f,
+            null,
+            null);
 
     /**
-     * A repeating tick stamp, measured in multiples of the line's ornament size: a thin baseline
-     * bar of barLength (repeating every advance, so a shorter bar leaves a dashed gap) plus a
-     * perpendicular tick of tickLength halfway along the bar (the sign picks the side).
+     * A repeating stamp, measured in multiples of the line's ornament size: a thin baseline bar of
+     * barLength (repeating every advance, so a shorter bar leaves a dashed gap) plus either a
+     * perpendicular tick of tickLength halfway along the bar, or a triangular tooth spanning the
+     * bar with its point tickLength away from it. The sign of tickLength picks the side.
      */
     private static final class Stamp {
         final float advance;
         final float barLength;
         final float tickLength;
+        final boolean isTooth;
 
-        Stamp(float advance, float barLength, float tickLength) {
+        private Stamp(float advance, float barLength, float tickLength, boolean isTooth) {
             this.advance = advance;
             this.barLength = barLength;
             this.tickLength = tickLength;
+            this.isTooth = isTooth;
+        }
+
+        static Stamp ticked(float advance, float barLength, float tickLength) {
+            return new Stamp(advance, barLength, tickLength, false);
+        }
+
+        // teeth abut, so the bar runs the full advance
+        static Stamp toothed(float advance, float toothHeight) {
+            return new Stamp(advance, advance, toothHeight, true);
         }
 
         /** Builds the effect for an ornament size already converted to pixels. */
         PathEffect createEffect(float ornamentSizePixels, float strokeWidth) {
             float half = strokeWidth / 2;
+            float barEnd = barLength * ornamentSizePixels;
+            float tickX = barEnd / 2;
+            float tickEnd = tickLength * ornamentSizePixels;
             Path stamp = new Path();
-            stamp.addRect(0, -half, barLength * ornamentSizePixels, half, Path.Direction.CW);
-            float tickX = barLength / 2 * ornamentSizePixels;
-            float tickTop = Math.min(0, tickLength * ornamentSizePixels);
-            float tickBottom = Math.max(0, tickLength * ornamentSizePixels);
-            stamp.addRect(tickX - half, tickTop, tickX + half, tickBottom, Path.Direction.CW);
+            stamp.addRect(0, -half, barEnd, half, Path.Direction.CW);
+            if (isTooth) {
+                stamp.moveTo(0, 0);
+                stamp.lineTo(barEnd, 0);
+                stamp.lineTo(tickX, tickEnd);
+                stamp.close();
+            } else {
+                stamp.addRect(
+                        tickX - half,
+                        Math.min(0, tickEnd),
+                        tickX + half,
+                        Math.max(0, tickEnd),
+                        Path.Direction.CW);
+            }
             return new PathDashPathEffect(
                     stamp, advance * ornamentSizePixels, 0, PathDashPathEffect.Style.MORPH);
         }
@@ -157,6 +236,24 @@ public enum LineType {
      */
     public boolean isWall() {
         return isWall;
+    }
+
+    /**
+     * Whether a new line of this type is clipped to the walls around it (when Clip to Walls is on):
+     * true for the features that lie within a passage. Walls themselves aren't, since they're what
+     * does the clipping (and an underlying wall crosses the walls above by definition), and nor are
+     * freehand lines, which can be anything at all, including notes beyond the walls.
+     */
+    public boolean isClippedToWalls() {
+        return isSemantic() && !isWall;
+    }
+
+    /**
+     * Whether it matters which way the line runs: true for walls (passage side) and for types with
+     * ticks or teeth (which side they fall on). For the rest, flipping changes nothing.
+     */
+    public boolean isOriented() {
+        return isWall || stamp != null;
     }
 
     public float getStrokeWidthFactor() {

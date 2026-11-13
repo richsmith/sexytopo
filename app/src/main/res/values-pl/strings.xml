@@ -191,6 +191,17 @@
     <string name="sketch_toolbar_colour_blue">Niebieski</string>
     <string name="sketch_toolbar_colour_purple">Fioletowy</string>
     <string name="sketch_toolbar_symbol_close">Zamknij pasek symboli</string>
+    <string name="line_type_sketch">Linia szkicu</string>
+    <string name="line_type_wall">Ściana</string>
+    <string name="line_type_presumed_wall">Ściana domniemana</string>
+    <string name="line_type_underlying_wall">Ściana poniżej</string>
+    <string name="line_type_pit">Krawędź studni</string>
+    <string name="line_type_floor_step">Próg</string>
+    <string name="line_type_chimney">Komin</string>
+    <string name="line_type_ceiling_step">Próg stropowy</string>
+    <string name="line_type_overhang">Przewieszenie</string>
+    <string name="line_type_rock_border">Obrys bloku</string>
+    <string name="line_type_rock_edge">Krawędź bloku</string>
     <string name="sketch_menu_delete_last_leg">Cofnij ostatni pomiar</string>
     <string name="sketch_menu_centre_view">Wyśrodkuj na aktywnym</string>
     <string name="sketch_menu_auto_recentre">Automatyczne wyśrodkowywanie</string>

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.hwyl.sexytopo.control.util.LineOrienter;
@@ -141,13 +142,75 @@ public class Sketch extends Shape {
     }
 
     public void finishPath() {
+        finishPath(0);
+    }
+
+    /**
+     * Commits the active path, unless it spans less than minimumSize (in metres) in both
+     * directions, in which case it's taken to be an accidental tap and dropped.
+     *
+     * <p>If Clip to Walls is on, a line of a type that belongs inside the passage is cut along any
+     * walls it strays across and the parts on their outer side are dropped, as for areas. The
+     * pieces left are added as one undoable step; any too small to keep are dropped too.
+     */
+    public void finishPath(float minimumSize) {
         if (activePath == null) {
+            return;
+        }
+        if (activePath.getMaxDimension() < minimumSize) {
+            abandonActivePath();
             return;
         }
         float epsilon = Space2DUtils.simplificationEpsilon(activePath);
         activePath.setPath(Space2DUtils.simplify(activePath.getPath(), epsilon));
-        addSketchDetail(activePath);
-        activePath = null;
+
+        List<List<Coord2D>> pieces = clipToWalls(activePath);
+        if (pieces.size() == 1 && pieces.get(0) == activePath.getPath()) {
+            addSketchDetail(activePath);
+            activePath = null;
+            return;
+        }
+
+        PathDetail drawn = activePath;
+        abandonActivePath();
+        List<SketchDetail> kept =
+                pieces.stream()
+                        .map(
+                                piece ->
+                                        new PathDetail(
+                                                piece,
+                                                drawn.getColour(),
+                                                drawn.getLineType(),
+                                                drawn.getOrnamentSize()))
+                        .filter(piece -> piece.getMaxDimension() >= minimumSize)
+                        .collect(Collectors.toList());
+        if (!kept.isEmpty()) {
+            deleteDetails(Collections.emptyList(), kept);
+        }
+    }
+
+    /**
+     * The line cut along any walls it strays across, keeping the parts on their inner side; may be
+     * several pieces. Returns the line's own points, as the only piece, if it isn't to be clipped.
+     */
+    private List<List<Coord2D>> clipToWalls(PathDetail line) {
+
+        if (!SketchPreferences.Toggle.CLIP_TO_WALLS.isOn()
+                || !line.getLineType().isClippedToWalls()) {
+            return Collections.singletonList(line.getPath());
+        }
+
+        // Nearness by bounding box alone is enough here: each piece is judged against whichever
+        // wall is nearest it, so an outlying one has no say
+        List<List<Coord2D>> walls =
+                findWallsNear(line, getWallClipMargin(line), wall -> true).stream()
+                        .map(PathDetail::getPath)
+                        .collect(Collectors.toList());
+        if (walls.isEmpty()) {
+            return Collections.singletonList(line.getPath());
+        }
+
+        return PolygonUtils.clipLineToInteriorOf(line.getPath(), walls, WALL_CLIP_EXTENSION);
     }
 
     /**
@@ -249,20 +312,32 @@ public class Sketch extends Shape {
      * side.
      */
     private List<PathDetail> findClippingWalls(AreaDetail area) {
+        float margin = getWallClipMargin(area);
+        return findWallsNear(area, margin, wall -> comesWithin(wall, area, margin));
+    }
 
-        float margin =
-                Math.max(
-                        MINIMUM_WALL_CLIP_MARGIN,
-                        WALL_CLIP_MARGIN_FACTOR * Math.max(area.getWidth(), area.getHeight()));
+    /** How near a wall must come to a detail to clip it. */
+    private static float getWallClipMargin(Shape shape) {
+        return Math.max(
+                MINIMUM_WALL_CLIP_MARGIN,
+                WALL_CLIP_MARGIN_FACTOR * Math.max(shape.getWidth(), shape.getHeight()));
+    }
+
+    /**
+     * Wall-kind lines within the margin of the shape's bounding box that pass the closer check
+     * given, which says whether a wall really comes near enough the shape itself.
+     */
+    private List<PathDetail> findWallsNear(
+            Shape shape, float margin, Predicate<PathDetail> comesNear) {
         Coord2D grow = new Coord2D(margin, margin);
-        Coord2D topLeft = area.getTopLeft().minus(grow);
-        Coord2D bottomRight = area.getBottomRight().plus(grow);
+        Coord2D topLeft = shape.getTopLeft().minus(grow);
+        Coord2D bottomRight = shape.getBottomRight().plus(grow);
 
         return pathDetails.stream()
                 .filter(path -> path.getLineType().isWall())
                 .filter(path -> path.getPath().size() >= 2)
                 .filter(path -> path.intersectsRectangle(topLeft, bottomRight))
-                .filter(path -> comesWithin(path, area, margin))
+                .filter(comesNear)
                 .collect(Collectors.toList());
     }
 
@@ -371,13 +446,13 @@ public class Sketch extends Shape {
     }
 
     /**
-     * The most recently added path with a semantic line type, or null if there isn't one. Used by
-     * the "Flip Last Line" tool (orientation is meaningless for general lines).
+     * The most recently added path whose direction matters, or null if there isn't one. Used by the
+     * "Flip Last Line" tool, since flipping any other line would do nothing visible.
      */
-    public PathDetail getMostRecentSemanticPath() {
+    public PathDetail getMostRecentOrientedPath() {
         for (int i = pathDetails.size() - 1; i >= 0; i--) {
             PathDetail pathDetail = pathDetails.get(i);
-            if (pathDetail.getLineType().isSemantic()) {
+            if (pathDetail.getLineType().isOriented()) {
                 return pathDetail;
             }
         }

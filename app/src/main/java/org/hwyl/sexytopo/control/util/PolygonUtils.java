@@ -337,6 +337,94 @@ public class PolygonUtils {
         return closeCuts(kept, region);
     }
 
+    /**
+     * Clip a line to the interior side of a set of oriented lines (e.g. walls), as clipToInteriorOf
+     * does for a region. The line is cut wherever it crosses one of them, each extended a little
+     * past its ends as there, and each piece is kept if it lies mostly on the interior side of the
+     * lines nearest it. So a pit edge drawn a little past a wall loses the overshoot.
+     *
+     * <p>Returns the line unchanged, as its only piece, if nothing is cut off, and also if
+     * everything would be.
+     */
+    public static List<List<Coord2D>> clipLineToInteriorOf(
+            List<Coord2D> line, List<List<Coord2D>> orientedLines, float extension) {
+
+        List<List<Coord2D>> lines =
+                orientedLines.stream()
+                        .map(PolygonUtils::withoutRepeatedPoints)
+                        .filter(oriented -> oriented.size() >= 2)
+                        .collect(Collectors.toList());
+        List<List<Coord2D>> cutters =
+                lines.stream()
+                        .map(oriented -> extendEnds(oriented, extension))
+                        .collect(Collectors.toList());
+
+        List<List<Coord2D>> pieces =
+                cutAt(line, cutters).stream()
+                        .map(PolygonUtils::withoutRepeatedPoints)
+                        .filter(piece -> piece.size() >= 2)
+                        .collect(Collectors.toList());
+        List<List<Coord2D>> kept =
+                pieces.stream()
+                        .filter(piece -> getInteriorVote(piece, false, lines) >= 0)
+                        .collect(Collectors.toList());
+        if (kept.isEmpty() || kept.size() == pieces.size()) {
+            return Collections.singletonList(line);
+        }
+        return kept;
+    }
+
+    /** The line split into pieces at every point where it crosses one of the cutters. */
+    private static List<List<Coord2D>> cutAt(List<Coord2D> line, List<List<Coord2D>> cutters) {
+        List<List<Coord2D>> pieces = new ArrayList<>();
+        List<Coord2D> piece = new ArrayList<>();
+        piece.add(line.get(0));
+        for (int i = 0; i < line.size() - 1; i++) {
+            Coord2D from = line.get(i);
+            Coord2D to = line.get(i + 1);
+            for (float t : getCrossings(from, to, cutters)) {
+                Coord2D crossing = from.plus(to.minus(from).scale(t));
+                piece.add(crossing);
+                pieces.add(piece);
+                piece = new ArrayList<>();
+                piece.add(crossing);
+            }
+            piece.add(to);
+        }
+        pieces.add(piece);
+        return pieces;
+    }
+
+    /**
+     * Where the segment from-to crosses the cutters, as fractions of the way along it, in order.
+     */
+    private static List<Float> getCrossings(Coord2D from, Coord2D to, List<List<Coord2D>> cutters) {
+        List<Float> crossings = new ArrayList<>();
+        Coord2D direction = to.minus(from);
+        for (List<Coord2D> cutter : cutters) {
+            for (int i = 0; i < cutter.size() - 1; i++) {
+                Coord2D start = cutter.get(i);
+                Coord2D cutterDirection = cutter.get(i + 1).minus(start);
+                float denominator = cross(direction, cutterDirection);
+                if (denominator == 0) {
+                    continue; // parallel
+                }
+                Coord2D offset = start.minus(from);
+                float t = cross(offset, cutterDirection) / denominator;
+                float u = cross(offset, direction) / denominator;
+                if (t > 0 && t < 1 && u >= 0 && u <= 1) {
+                    crossings.add(t);
+                }
+            }
+        }
+        Collections.sort(crossings);
+        return crossings;
+    }
+
+    private static float cross(Coord2D a, Coord2D b) {
+        return a.x * b.y - a.y * b.x;
+    }
+
     /** The pieces left after cutting a narrow channel along each line. */
     private static List<Region> cutAlong(
             Region region, List<List<Coord2D>> lines, float extension) {
@@ -393,17 +481,24 @@ public class PolygonUtils {
      * <p>Package-private rather than private so it can be unit tested directly.
      */
     static double getInteriorVote(Region region, List<List<Coord2D>> orientedLines) {
+        return region.getContours().stream()
+                .mapToDouble(contour -> getInteriorVote(contour, true, orientedLines))
+                .sum();
+    }
+
+    /** As for a region, but for the edges of a single contour, or of an open line. */
+    private static double getInteriorVote(
+            List<Coord2D> points, boolean isClosed, List<List<Coord2D>> orientedLines) {
+        int size = points.size();
+        int edgeCount = isClosed ? size : size - 1;
         double vote = 0;
-        for (List<Coord2D> contour : region.getContours()) {
-            int size = contour.size();
-            for (int i = 0; i < size; i++) {
-                Coord2D from = contour.get(i);
-                Coord2D to = contour.get((i + 1) % size);
-                Coord2D midpoint = from.plus(to).scale(0.5f);
-                vote +=
-                        Math.signum(getSide(midpoint, orientedLines))
-                                * Space2DUtils.getDistance(from, to);
-            }
+        for (int i = 0; i < edgeCount; i++) {
+            Coord2D from = points.get(i);
+            Coord2D to = points.get((i + 1) % size);
+            Coord2D midpoint = from.plus(to).scale(0.5f);
+            vote +=
+                    Math.signum(getSide(midpoint, orientedLines))
+                            * Space2DUtils.getDistance(from, to);
         }
         return vote;
     }

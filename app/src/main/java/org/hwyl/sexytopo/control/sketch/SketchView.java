@@ -9,6 +9,8 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PathDashPathEffect;
+import android.graphics.PathEffect;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
@@ -132,8 +134,9 @@ public class SketchView extends View {
     private float dashedLineIntervalPx;
 
     private static final float DELETE_DETAILS_WITHIN_N_DP = 10.0f;
-    // areas smaller than a square this size on screen are discarded as specks
-    private static final float MINIMUM_AREA_SIZE_DP = 10.0f;
+    // typed lines spanning less than this on screen, and areas smaller than a square this size,
+    // are discarded as specks
+    private static final float MINIMUM_DETAIL_SIZE_DP = 10.0f;
     private static final float SELECTION_SENSITIVITY_DP = 25.0f;
     private static final float SNAP_TO_LINE_SENSITIVITY_DP = 25.0f;
     public static final float HOT_CORNER_DISTANCE_PROPORTION = 0.05f;
@@ -673,7 +676,10 @@ public class SketchView extends View {
                     }
                 }
                 orientActivePathIfRequired();
-                sketch.finishPath();
+                // A tap with a freehand line leaves a dot, but a typed line that small is a
+                // mistake: it would be meaningless in an export
+                float minimumSize = currentLineType.isSemantic() ? getMinimumLineSize() : 0;
+                sketch.finishPath(minimumSize);
                 break;
 
             default:
@@ -888,8 +894,17 @@ public class SketchView extends View {
      * rather than being a fixed size in the cave.
      */
     private double getMinimumArea() {
-        double sizeInMetres = dpToPixels(MINIMUM_AREA_SIZE_DP) / surveyToViewScale;
+        double sizeInMetres = getMinimumLineSize();
         return sizeInMetres * sizeInMetres;
+    }
+
+    /**
+     * The smallest extent (in metres) a typed line must span to be kept, so a stray tap doesn't
+     * leave a speck. Like getMinimumArea, it's a fixed on-screen size converted at the current
+     * zoom.
+     */
+    private float getMinimumLineSize() {
+        return dpToPixels(MINIMUM_DETAIL_SIZE_DP) / surveyToViewScale;
     }
 
     private boolean handleSymbol(MotionEvent event) {
@@ -1197,8 +1212,8 @@ public class SketchView extends View {
 
         LineType currentType = pathDetail.getLineType();
         menu.findItem(R.id.line_title).setTitle(currentType.getStringId());
-        // Orientation means nothing for a plain sketch line
-        menu.findItem(R.id.action_flip_line).setEnabled(currentType.isSemantic());
+        // Orientation means nothing for a plain sketch line or a rock outline
+        menu.findItem(R.id.action_flip_line).setEnabled(currentType.isOriented());
 
         Map<Integer, LineType> lineTypesByItemId = new HashMap<>();
         SubMenu lineTypeMenu = menu.findItem(R.id.menu_line_type).getSubMenu();
@@ -2362,7 +2377,15 @@ public class SketchView extends View {
         if (builtFor != null && builtFor == ornamentSizePixels) {
             return;
         }
-        paint.setPathEffect(lineType.createPathEffect(ornamentSizePixels, paint.getStrokeWidth()));
+        PathEffect pathEffect =
+                lineType.createPathEffect(ornamentSizePixels, paint.getStrokeWidth());
+        paint.setPathEffect(pathEffect);
+        // Stamped shapes are filled as well as outlined, so overhang teeth come out solid. Only
+        // while the stamp is in use, though: filling a plain path would fill the area it encloses.
+        paint.setStyle(
+                pathEffect instanceof PathDashPathEffect
+                        ? Paint.Style.FILL_AND_STROKE
+                        : Paint.Style.STROKE);
         lineTypePaintOrnamentSizePixels.put(lineType, ornamentSizePixels);
     }
 
