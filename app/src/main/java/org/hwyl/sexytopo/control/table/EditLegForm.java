@@ -1,6 +1,7 @@
 package org.hwyl.sexytopo.control.table;
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -9,13 +10,14 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
+import com.google.android.material.color.MaterialColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 import java.util.Locale;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.InputMode;
-import org.hwyl.sexytopo.control.util.SurveyTraversal;
+import org.hwyl.sexytopo.control.util.StationNameRule;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -57,18 +59,22 @@ public class EditLegForm extends Form {
 
     private EditText fromStationField;
     private EditText toStationField;
-    // These point to one of the above fields, depending on input mode
-    private EditText graphFromStationField;
-    private EditText graphToStationField;
 
     private EditText fromCommentField;
     private EditText toCommentField;
     private EditText legCommentField;
 
+    // The station whose comment is shown
     private Station lastFromStation;
+
+    private StationNameRule.Result existingStationResult;
+    private StationNameRule.Result newStationResult;
 
     private TextInputLayout fromStationLayout;
     private TextInputLayout toStationLayout;
+    // Full-width lines under the station rows for helper text or errors
+    private TextView fromStationHelper;
+    private TextView toStationHelper;
     private TextInputLayout distanceLayout;
     private TextInputLayout azimuthLayout;
     private TextInputLayout inclinationLayout;
@@ -133,7 +139,6 @@ public class EditLegForm extends Form {
         this.context = context;
         this.survey = survey;
         this.originalFromStation = fromStation;
-        this.lastFromStation = fromStation;
         this.originalLeg = null; // No original leg when adding
         this.defaultToName = defaultToName;
         this.isSplay = isSplay;
@@ -143,6 +148,7 @@ public class EditLegForm extends Form {
 
     private void initialise(View dialogView) {
         this.isInitialising = true;
+        this.lastFromStation = originalFromStation;
         this.initialiseFields(dialogView);
         this.initialiseInputMode(dialogView);
         this.initialiseSplayOptions(dialogView);
@@ -178,6 +184,11 @@ public class EditLegForm extends Form {
         // Find all view references from the dialog
         this.fromStationLayout = dialogView.findViewById(R.id.fromStationLayout);
         this.toStationLayout = dialogView.findViewById(R.id.toStationLayout);
+        this.fromStationHelper = dialogView.findViewById(R.id.fromStationHelper);
+        this.toStationHelper = dialogView.findViewById(R.id.toStationHelper);
+        if (isSplay) {
+            this.toStationHelper.setVisibility(View.GONE);
+        }
         this.distanceLayout = dialogView.findViewById(R.id.distanceLayout);
         this.azimuthLayout = dialogView.findViewById(R.id.azimuth_standard);
         this.inclinationLayout = dialogView.findViewById(R.id.inclinationLayout);
@@ -228,6 +239,9 @@ public class EditLegForm extends Form {
             this.inclinationSecondsField.addTextChangedListener(
                     new TextViewValidationTrigger(this));
         }
+
+        // Keep a focused station box's helper text in view, such as when the keyboard opens
+        dialogView.getViewTreeObserver().addOnGlobalLayoutListener(this::showFocusedStationBox);
 
         // Enable error display once the user leaves a field for the first time.
         android.view.View.OnFocusChangeListener enableErrorsOnTouch =
@@ -304,15 +318,7 @@ public class EditLegForm extends Form {
 
     @Override
     protected void performValidation() {
-        // Validate stations
-        EditText graphFromField =
-                inputMode == InputMode.BACKWARD ? toStationField : fromStationField;
-        EditText graphToField = inputMode == InputMode.BACKWARD ? fromStationField : toStationField;
-
-        Station fromStation = validateGraphFromField(graphFromField);
-        if (!isSplay) {
-            validateGraphToField(fromStation, graphToField);
-        }
+        validateStations();
 
         // Validate measurements
         validateDistance();
@@ -343,103 +349,66 @@ public class EditLegForm extends Form {
         }
     }
 
-    private Station validateGraphFromField(EditText fromField) {
-        String fromName = fromField.getText().toString();
-        Station fromStation = survey.getStationByName(fromName);
+    /** Checks both station boxes with the shared rule and says what each will do. */
+    private void validateStations() {
+        String existingName = existingStationField().getText().toString();
+        existingStationResult =
+                isSplay
+                        ? StationNameRule.checkSplayStation(
+                                survey, originalFromStation, existingName)
+                        : StationNameRule.checkExisting(
+                                survey, originalFromStation, originalLeg, existingName);
+        showStationResult(
+                existingStationHelper(),
+                existingStationResult,
+                StationNameText.existingHelper(
+                        context, survey, originalFromStation, existingStationResult, isSplay));
+        updateFromComment();
 
-        Integer error = null;
-
-        if (fromName.isEmpty()) {
-            error = R.string.validation_error_cannot_be_blank;
-        } else if (Station.isReservedName(fromName)) {
-            error = R.string.validation_error_station_name_reserved;
-        } else if (survey.isOrigin(originalFromStation) && fromStation == null) {
-            // Are we just renaming the origin station
-            boolean isRenamingStation = !originalFromStation.getName().equals(fromName);
-
-            // For edit mode: only check uniqueness if the graph from station name is changing
-            if (isRenamingStation) {
-                Station existing = survey.getStationByName(fromName);
-                if (existing == null) {
-                    fromStation =
-                            survey.getOrigin(); // Send back the origin station so that it can be
-                    // renamed
-                } else {
-                    error = R.string.validation_error_station_name_not_unique;
-                }
-            }
-        } else if (fromStation == null) {
-            error = R.string.validation_error_station_does_not_exist;
-        } else if (originalLeg != null && originalLeg.hasDestination()) {
-            Station originalStation = survey.getOriginatingStation(originalLeg);
-            boolean isMovingLeg = originalStation != fromStation;
-
-            if (isMovingLeg) {
-                if (SurveyTraversal.isInSubtree(originalLeg.getDestination(), fromStation)) {
-                    error = R.string.survey_update_error_descendant_station;
-                }
-            }
+        if (!isSplay) {
+            Station newStation = originalLeg == null ? null : originalLeg.getDestination();
+            String newName = newStationField().getText().toString();
+            newStationResult =
+                    StationNameRule.checkNew(survey, newStation, newName, existingStationResult);
+            showStationResult(
+                    newStationHelper(),
+                    newStationResult,
+                    StationNameText.newHelper(context, survey, newStation, newStationResult));
         }
-
-        // Has the from station changed
-        if (fromStation != null && fromStation != lastFromStation) {
-            // Update the comment to the new station
-            String fromComment = "";
-            if (fromStation.hasComment()) {
-                fromComment = fromStation.getComment();
-            }
-
-            fromCommentField.setText(fromComment);
-            lastFromStation = fromStation;
-        }
-
-        TextInputLayout layout =
-                (fromField == fromStationField) ? fromStationLayout : toStationLayout;
-        if (layout != null) {
-            setError(layout, error);
-        } else {
-            setError(fromField, error);
-        }
-        return fromStation;
     }
 
-    private void validateGraphToField(Station fromStation, EditText toField) {
-        String fromName = fromStation == null ? null : fromStation.getName();
-        String toName = toField.getText().toString();
-
-        Integer error = null;
-
-        if (toName.isEmpty()) {
-            error = R.string.validation_error_cannot_be_blank;
-        } else if (Station.isReservedName(toName)) {
-            error = R.string.validation_error_station_name_reserved;
-        } else if (toName.equals(fromName)) {
-            error = R.string.validation_error_same_as_from_station;
-        } else if (originalLeg != null && originalLeg.hasDestination()) {
-            // Only validate uniqueness for existing legs being edited
-            Station originalStation = originalLeg.getDestination();
-            boolean isRenamingStation = !originalStation.getName().equals(toName);
-
-            // For edit mode: only check uniqueness if the graph to station name is changing
-            if (isRenamingStation) {
-                Station existing = survey.getStationByName(toName);
-                if (existing != null) {
-                    error = R.string.validation_error_station_name_not_unique;
-                }
-            }
-        } else {
-            // New leg - check that station name doesn't already exist
-            Station existing = survey.getStationByName(toName);
-            if (existing != null) {
-                error = R.string.validation_error_station_name_not_unique;
-            }
+    /** Scrolls so a focused station box's helper line is in view. */
+    private void showFocusedStationBox() {
+        TextView line = null;
+        if (fromStationLayout.hasFocus()) {
+            line = fromStationHelper;
+        } else if (toStationLayout.hasFocus()) {
+            line = toStationHelper;
         }
+        if (line != null) {
+            line.requestRectangleOnScreen(new Rect(0, 0, line.getWidth(), line.getHeight()));
+        }
+    }
 
-        TextInputLayout layout = (toField == toStationField) ? toStationLayout : fromStationLayout;
-        if (layout != null) {
-            setError(layout, error);
-        } else {
-            setError(toField, error);
+    /** Shows a station box's error, or else its helper text, on the line under its row. */
+    private void showStationResult(
+            TextView line, StationNameRule.Result result, CharSequence helper) {
+        CharSequence error = StationNameText.error(context, result);
+        this.valid = this.valid & (error == null);
+        line.setText(error == null ? helper : error);
+        int colour = error == null ? R.attr.colorOnSurfaceVariant : R.attr.colorError;
+        line.setTextColor(MaterialColors.getColor(line, colour));
+    }
+
+    /** Shows the comment of the station the leg will run from, when that changes. */
+    private void updateFromComment() {
+        Station fromStation =
+                existingStationResult.action == StationNameRule.Action.MOVE
+                        ? existingStationResult.target
+                        : originalFromStation;
+        if (fromStation != lastFromStation) {
+            fromCommentField.setText(fromStation.hasComment() ? fromStation.getComment() : "");
+            lastFromStation = fromStation;
         }
     }
 
@@ -706,32 +675,40 @@ public class EditLegForm extends Form {
 
     /** Update the station display based on current shot direction */
     private void swapStationDisplay() {
-        String fromText = graphFromStationField.getText().toString();
-        String toText = graphToStationField.getText().toString();
-        graphFromStationField.setText(toText);
-        graphToStationField.setText(fromText);
+        String fromText = fromStationField.getText().toString();
+        String toText = toStationField.getText().toString();
+        fromStationField.setText(toText);
+        toStationField.setText(fromText);
     }
 
-    private void mapGraphFields() {
-        if (isSplay) {
-            graphFromStationField = fromStationField;
-            graphToStationField = toStationField; // not used for splay but probably safer to set
-        } else {
-            graphFromStationField =
-                    inputMode == InputMode.BACKWARD ? toStationField : fromStationField;
-            graphToStationField =
-                    inputMode == InputMode.BACKWARD ? fromStationField : toStationField;
-        }
+    /** On a backward leg the From box holds the new station; a splay has only From. */
+    private boolean isNewStationInFromBox() {
+        return inputMode == InputMode.BACKWARD && !isSplay;
+    }
+
+    private EditText existingStationField() {
+        return isNewStationInFromBox() ? toStationField : fromStationField;
+    }
+
+    private EditText newStationField() {
+        return isNewStationInFromBox() ? fromStationField : toStationField;
+    }
+
+    private TextView existingStationHelper() {
+        return isNewStationInFromBox() ? toStationHelper : fromStationHelper;
+    }
+
+    private TextView newStationHelper() {
+        return isNewStationInFromBox() ? fromStationHelper : toStationHelper;
     }
 
     /** Initialise the station display based on current data */
     private void initialiseStationDisplay() {
-        mapGraphFields();
         String fromComment = "";
         if (originalFromStation.hasComment()) {
             fromComment = originalFromStation.getComment();
         }
-        graphFromStationField.setText(originalFromStation.getName());
+        existingStationField().setText(originalFromStation.getName());
         fromCommentField.setText(fromComment);
 
         if (!isSplay) {
@@ -747,20 +724,13 @@ public class EditLegForm extends Form {
             } else if (defaultToName != null) {
                 toName = defaultToName;
             }
-            graphToStationField.setText(toName);
+            newStationField().setText(toName);
             toCommentField.setText(toComment);
         }
 
         if (legCommentField != null && originalLeg != null) {
             legCommentField.setText(originalLeg.getComment());
         }
-    }
-
-    private String getFromStationName() {
-        if (inputMode == InputMode.BACKWARD && !isSplay) {
-            return toStationField.getText().toString();
-        }
-        return fromStationField.getText().toString();
     }
 
     private float getDistance() {
@@ -801,23 +771,6 @@ public class EditLegForm extends Form {
             // Standard decimal mode
             return Float.parseFloat(this.azimuthField.getText().toString());
         }
-    }
-
-    private Station getFromStation() {
-        Station fromStation = survey.getStationByName(getFromStationName());
-        if (fromStation == null && survey.isOrigin(originalFromStation)) {
-            // As a special case if we can't find the from station and we are
-            // at the origin, we must be wanting to rename it - so return the origin
-            return (originalFromStation);
-        }
-        return fromStation;
-    }
-
-    private String getToStationName() {
-        if (inputMode == InputMode.BACKWARD) {
-            return fromStationField.getText().toString();
-        }
-        return toStationField.getText().toString();
     }
 
     private String getToComment() {
@@ -969,25 +922,18 @@ public class EditLegForm extends Form {
         return leg;
     }
 
-    /** Get the from station for the leg. Should only be called after validation passes. */
-    public Station getUpdatedFromStation() {
-        return getFromStation();
+    /** What the existing station box will do. Only call after validation passes. */
+    public StationNameRule.Result getExistingStationResult() {
+        return existingStationResult;
     }
 
-    public String getUpdatedFromStationName() {
-        return getFromStationName();
+    /** What the new station box will do; null for a splay. Only call after validation passes. */
+    public StationNameRule.Result getNewStationResult() {
+        return isSplay ? null : newStationResult;
     }
 
     public String getUpdatedFromComment() {
         return getFromComment();
-    }
-
-    /**
-     * Get the to station name for the leg. Returns null for splays. Should only be called after
-     * validation passes.
-     */
-    public String getUpdatedToStationName() {
-        return isSplay ? null : getToStationName();
     }
 
     public String getUpdatedToComment() {

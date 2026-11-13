@@ -45,7 +45,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="@string/manual_edit_from_station"
-                app:errorEnabled="true"
+                app:errorEnabled="false"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editFromStation"
@@ -61,7 +61,7 @@
                 android:layout_weight="2"
                 android:layout_marginStart="8dp"
                 android:hint="@string/manual_edit_station_comment"
-                app:errorEnabled="true"
+                app:errorEnabled="false"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -72,6 +72,15 @@
 
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/fromStationHelper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:paddingTop="4dp"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="?attr/colorOnSurfaceVariant"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -85,7 +94,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="@string/manual_edit_to_station"
-                app:errorEnabled="true"
+                app:errorEnabled="false"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editToStation"
@@ -101,7 +110,7 @@
                 android:layout_weight="2"
                 android:layout_marginStart="8dp"
                 android:hint="@string/manual_edit_station_comment"
-                app:errorEnabled="true"
+                app:errorEnabled="false"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -112,6 +121,15 @@
 
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/toStationHelper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:paddingTop="4dp"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="?attr/colorOnSurfaceVariant"/>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/distanceLayout"

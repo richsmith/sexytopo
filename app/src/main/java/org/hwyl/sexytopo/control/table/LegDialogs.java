@@ -103,17 +103,9 @@ public class LegDialogs {
                     // Get the leg with measurements and shot direction from form
                     Leg leg = form.getUpdatedLeg();
                     leg.setComment(form.getUpdatedLegComment());
-                    Station fromStation = form.getUpdatedFromStation();
-
-                    // Get the new station names from the form
-                    String newFromStationName = form.getUpdatedFromStationName();
-                    String oldFromStationName = fromStation.getName();
-                    if (!newFromStationName.equals(oldFromStationName)
-                            && survey.isOrigin(fromStation)) {
-                        // Just rename the origin station
-                        SurveyUpdater.renameStation(survey, survey.getOrigin(), newFromStationName);
-                    }
-
+                    Station fromStation =
+                            SurveyUpdater.applyStationName(
+                                    survey, activeStation, null, form.getExistingStationResult());
                     fromStation.setComment(form.getUpdatedFromComment());
 
                     if (isSplay) {
@@ -121,8 +113,9 @@ public class LegDialogs {
                         SurveyUpdater.addLegFromStation(survey, fromStation, leg);
                     } else {
                         // Create new destination station and set it on the leg
-                        String toStationName = form.getUpdatedToStationName();
-                        Station newToStation = new Station(toStationName);
+                        Station newToStation =
+                                SurveyUpdater.applyStationName(
+                                        survey, null, null, form.getNewStationResult());
 
                         String toComment = form.getUpdatedToComment();
                         if (toComment != null) {
@@ -252,42 +245,22 @@ public class LegDialogs {
                     Leg edited = form.getUpdatedLeg();
                     edited.setComment(form.getUpdatedLegComment());
 
-                    // Get the new station names from the form
-                    Station newFromStation = form.getUpdatedFromStation();
-                    String newFromStationName = form.getUpdatedFromStationName();
-                    String oldFromStationName = fromStation.getName();
-
-                    // Apply changes in the correct order:
-                    // 1. First, edit the leg measurements
+                    // Edit the readings first, then the stations of the edited leg
                     SurveyUpdater.editLeg(survey, toEdit, edited);
 
-                    // 2. Move leg (or rename origin station) if from station changed
-                    if (!newFromStationName.equals(oldFromStationName)) {
-                        if (newFromStation == fromStation && survey.isOrigin(newFromStation)) {
-                            // If the station hasn't changed and it is the origin, then just rename
-                            // the origin
-                            SurveyUpdater.renameStation(
-                                    survey, survey.getOrigin(), newFromStationName);
-                        } else {
-                            SurveyUpdater.moveLeg(survey, edited, newFromStation);
-                        }
-                    }
-
+                    Station newFromStation =
+                            SurveyUpdater.applyStationName(
+                                    survey, fromStation, edited, form.getExistingStationResult());
                     newFromStation.setComment(form.getUpdatedFromComment());
 
-                    // 3. Rename destination station if to station name changed (for full legs)
-                    if (toEdit.hasDestination()) {
-                        Station newToStation = toEdit.getDestination();
-                        String newToStationName = form.getUpdatedToStationName();
-                        String newToComment = form.getUpdatedToComment();
-
-                        newToStation.setComment(newToComment);
-
-                        String oldToStationName = toEdit.getDestination().getName();
-                        if (!newToStationName.equals(oldToStationName)) {
-                            SurveyUpdater.renameStation(
-                                    survey, edited.getDestination(), newToStationName);
-                        }
+                    if (edited.hasDestination()) {
+                        Station toStation =
+                                SurveyUpdater.applyStationName(
+                                        survey,
+                                        edited.getDestination(),
+                                        edited,
+                                        form.getNewStationResult());
+                        toStation.setComment(form.getUpdatedToComment());
                     }
 
                     activity.getSurveyManager().broadcastSurveyUpdated();

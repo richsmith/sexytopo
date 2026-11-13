@@ -265,6 +265,13 @@
     <string name="manual_edit_to_wall_info_message">An optional record. Selected means that the splay is to the passage extremities; unselected means it measures to a feature, such as a speleothem.</string>
     <string name="manual_edit_enabled_info_title">About Enabled</string>
     <string name="manual_edit_enabled_info_message">Unselected means the splay is kept, but crossed out in the data table and left out of sketches, cross-sections and exports (Survex and Therion keep it as a commented-out line). Useful for readings such as calibration checks.</string>
+    <string name="manual_station_existing_helper">Changes the name of the station, or moves it to an earlier station</string>
+    <string name="manual_station_new_helper">Name of station that does not exist</string>
+    <string name="manual_station_rename_helper">Renames the station everywhere, to a name that does not exist</string>
+    <string name="manual_station_splay_helper">Moves the splay to another station</string>
+    <string name="manual_station_renames_to">Renames to %1$s</string>
+    <string name="manual_station_moves_to">Moves to %1$s</string>
+    <string name="manual_station_linked_warning">%1$s links to another survey, the link will need updating</string>
     <string name="manual_rename_station_title">Rename Station</string>
     <string name="manual_rename_station_hint">Station name</string>
     <string name="manual_rename_error">Rename failed</string>
@@ -710,6 +717,9 @@
     <string name="validation_error_station_does_not_exist">Station does not exist</string>
     <string name="validation_error_same_as_from_station">Cannot be the same as from station</string>
     <string name="validation_error_station_name_not_unique">Station name must be unique</string>
+    <string name="validation_error_station_already_exists">Station %1$s already exists, must be a new station</string>
+    <string name="validation_error_station_breaks_continuity">Cannot move to %1$s, this breaks the continuity</string>
+    <string name="validation_error_station_not_found">Station %1$s does not exist</string>
     <string name="validation_error_must_be_number">Must be a number</string>
     <string name="validation_error_distance_minimum">Must be >= %1$d</string>
     <string name="validation_error_azimuth_range">Must be %1$d-%2$d</string>
