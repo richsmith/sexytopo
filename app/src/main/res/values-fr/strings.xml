@@ -84,6 +84,9 @@
     <string name="action_input_mode_cal_check">Radiales seulement</string>
     <string name="action_view">Affichage</string>
     <string name="action_fullscreen">Plein écran</string>
+    <string name="action_edit">Édition</string>
+    <string name="action_undo_sketch">Annuler l\'esquisse</string>
+    <string name="action_redo_sketch">Rétablir l\'esquisse</string>
     <string name="action_tools">Outils</string>
     <string name="action_add_leg">Ajouter un segment…</string>
     <string name="action_add_splay">Ajouter une radiale…</string>
@@ -179,7 +182,6 @@
     <string name="sketch_toolbar_selector">Sélectioneur</string>
     <string name="sketch_toolbar_settings">Paramètres rapides</string>
     <string name="sketch_toolbar_undo">Annuler</string>
-    <string name="sketch_toolbar_redo">Refaire</string>
     <string name="sketch_toolbar_zoom_in">Zoom grossissant</string>
     <string name="sketch_toolbar_zoom_out">Zoom dégrossissant</string>
     <string name="sketch_toolbar_colour_main">Couleur principale</string>
@@ -205,7 +207,6 @@
     <string name="sketch_menu_delete_last_leg">Annuler le dernier segment</string>
     <string name="sketch_menu_centre_view">Centrer sur l\'actif</string>
     <string name="sketch_menu_auto_recentre">Recentrage automatique</string>
-    <string name="sketch_menu_redo">Refaire l\'action d\'esquisse</string>
     <string name="sketch_menu_modes">Modes</string>
     <string name="sketch_menu_show">Afficher</string>
     <string name="sketch_menu_show_grid">Papier millimétré</string>

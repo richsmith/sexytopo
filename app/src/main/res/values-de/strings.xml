@@ -84,6 +84,9 @@
     <string name="action_input_mode_cal_check">Nur Dimensionen/Hilfslinien</string>
     <string name="action_view">Ansicht</string>
     <string name="action_fullscreen">Vollbild</string>
+    <string name="action_edit">Bearbeiten</string>
+    <string name="action_undo_sketch">Zeichnung rückgängig</string>
+    <string name="action_redo_sketch">Zeichnung wiederholen</string>
     <string name="action_tools">Werkzeuge</string>
     <string name="action_add_leg">Messstrecke hinzufügen…</string>
     <string name="action_add_splay">Splay hinzufügen…</string>
@@ -179,7 +182,6 @@
     <string name="sketch_toolbar_selector">Auswahl-Werkzeug</string>
     <string name="sketch_toolbar_settings">Schnelleinstellungen</string>
     <string name="sketch_toolbar_undo">Rückgängig</string>
-    <string name="sketch_toolbar_redo">Wiederholen</string>
     <string name="sketch_toolbar_zoom_in">Vergrößern</string>
     <string name="sketch_toolbar_zoom_out">Verkleinern</string>
     <string name="sketch_toolbar_colour_main">Hauptfarbe</string>
@@ -205,7 +207,6 @@
     <string name="sketch_menu_delete_last_leg">Letzte Messung rückgängig</string>
     <string name="sketch_menu_centre_view">Auf Aktives zentrieren</string>
     <string name="sketch_menu_auto_recentre">Automatisches Zentrieren</string>
-    <string name="sketch_menu_redo">Zeichnen-Befehl wiederholen</string>
     <string name="sketch_menu_modes">Modi</string>
     <string name="sketch_menu_show">Anzeigen</string>
     <string name="sketch_menu_show_grid">Raster anzeigen</string>

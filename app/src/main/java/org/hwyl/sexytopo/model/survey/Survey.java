@@ -385,6 +385,10 @@ public class Survey {
         return (Station) (wrapper.value);
     }
 
+    public boolean canUndoAddLeg() {
+        return !legsInChronoOrder.isEmpty();
+    }
+
     public void undoAddLeg() {
 
         if (legsInChronoOrder.isEmpty()) {

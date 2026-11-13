@@ -84,6 +84,9 @@
     <string name="action_input_mode_cal_check">Apenas Raios</string>
     <string name="action_view">Vista</string>
     <string name="action_fullscreen">Ecrã Completo</string>
+    <string name="action_edit">Editar</string>
+    <string name="action_undo_sketch">Desfazer esboço</string>
+    <string name="action_redo_sketch">Refazer esboço</string>
     <string name="action_tools">Ferramentas</string>
     <string name="action_add_leg">Adicionar Trecho…</string>
     <string name="action_add_splay">Adicionar Raio…</string>
@@ -179,7 +182,6 @@
     <string name="sketch_toolbar_selector">Seletor</string>
     <string name="sketch_toolbar_settings">Configurações rápidas</string>
     <string name="sketch_toolbar_undo">Desfazer</string>
-    <string name="sketch_toolbar_redo">Refazer</string>
     <string name="sketch_toolbar_zoom_in">Ampliar</string>
     <string name="sketch_toolbar_zoom_out">Reduzir</string>
     <string name="sketch_toolbar_colour_main">Cor principal</string>
@@ -205,7 +207,6 @@
     <string name="sketch_menu_delete_last_leg">Desfazer Última Leitura</string>
     <string name="sketch_menu_centre_view">Centrar na Ativa</string>
     <string name="sketch_menu_auto_recentre">Auto-Centrar</string>
-    <string name="sketch_menu_redo">Refazer ação de esboço</string>
     <string name="sketch_menu_modes">Modos</string>
     <string name="sketch_menu_show">Mostrar</string>
     <string name="sketch_menu_show_grid">Papel Quadriculado</string>

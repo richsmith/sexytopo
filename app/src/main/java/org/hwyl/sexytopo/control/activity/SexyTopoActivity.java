@@ -23,6 +23,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
@@ -292,6 +293,18 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             addSplayItem.setEnabled(false);
         }
 
+        // disable sketch Undo / Redo by default — only meaningful in a sketch view
+        MenuItem undoSketchItem = menu.findItem(R.id.action_undo_sketch);
+        if (undoSketchItem != null) {
+            undoSketchItem.setEnabled(false);
+        }
+        MenuItem redoSketchItem = menu.findItem(R.id.action_redo_sketch);
+        if (redoSketchItem != null) {
+            redoSketchItem.setEnabled(false);
+        }
+
+        updateUndoLastLegItem(menu);
+
         // disable Flip Last Line by default — only meaningful in a sketch view
         MenuItem flipLastLineItem = menu.findItem(R.id.action_flip_last_line);
         if (flipLastLineItem != null) {
@@ -302,6 +315,33 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         getWindow().getDecorView().post(this::highlightActiveViewButton);
 
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    /**
+     * Readings can arrive while the menu is closed, and the action bar menu is only prepared when
+     * it is invalidated, so the Edit submenu refreshes Undo Last Reading as it is shown.
+     */
+    @Override
+    public boolean onMenuOpened(int featureId, @NonNull Menu menu) {
+        updateUndoLastLegItem(menu);
+        return super.onMenuOpened(featureId, menu);
+    }
+
+    /**
+     * Whether this screen offers Undo Last Reading; only survey-editor views and the device screen
+     * do.
+     */
+    protected boolean offersUndoLastLeg() {
+        return false;
+    }
+
+    private void updateUndoLastLegItem(Menu menu) {
+        MenuItem undoLastLegItem = menu.findItem(R.id.action_undo_last_leg);
+        if (undoLastLegItem != null) {
+            Survey survey = getSurvey();
+            undoLastLegItem.setEnabled(
+                    offersUndoLastLeg() && survey != null && survey.canUndoAddLeg());
+        }
     }
 
     private void highlightActiveViewButton() {

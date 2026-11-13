@@ -505,6 +505,14 @@ public class Sketch extends Shape {
         recalculateBoundingBox();
     }
 
+    public boolean canUndo() {
+        return !sketchHistory.isEmpty();
+    }
+
+    public boolean canRedo() {
+        return !undoneHistory.isEmpty();
+    }
+
     public void undo() {
         if (!sketchHistory.isEmpty()) {
             SketchDetail toUndo = sketchHistory.remove(sketchHistory.size() - 1);

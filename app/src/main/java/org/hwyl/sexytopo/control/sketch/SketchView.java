@@ -2823,6 +2823,14 @@ public class SketchView extends View {
         surveyToViewScale = newZoom;
     }
 
+    public boolean canUndo() {
+        return sketch.canUndo();
+    }
+
+    public boolean canRedo() {
+        return sketch.canRedo();
+    }
+
     public void undo() {
         sketch.undo();
         invalidate();

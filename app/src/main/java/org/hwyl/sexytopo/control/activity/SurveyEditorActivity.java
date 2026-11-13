@@ -43,6 +43,11 @@ public abstract class SurveyEditorActivity extends SexyTopoActivity {
         return true;
     }
 
+    @Override
+    protected boolean offersUndoLastLeg() {
+        return true;
+    }
+
     public void onSetActiveStation(Station station) {
         setActiveStation(station);
         invalidateView();

@@ -112,6 +112,12 @@ public class DeviceActivity extends SexyTopoActivity {
         }
     }
 
+    @Override
+    protected boolean offersUndoLastLeg() {
+        // a bad reading can be thrown away straight from here while surveying
+        return true;
+    }
+
     private void updateStatuses() {
         updateBluetooth();
         updatePairedStatus();

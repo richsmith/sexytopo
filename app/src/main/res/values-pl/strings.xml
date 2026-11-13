@@ -84,6 +84,9 @@
     <string name="action_input_mode_cal_check">Tylko pomiary szczegółowe</string>
     <string name="action_view">Widok</string>
     <string name="action_fullscreen">Pełny ekran</string>
+    <string name="action_edit">Edycja</string>
+    <string name="action_undo_sketch">Cofnij szkic</string>
+    <string name="action_redo_sketch">Ponów szkic</string>
     <string name="action_tools">Narzędzia</string>
     <string name="action_add_leg">Dodaj ciąg…</string>
     <string name="action_add_splay">Dodaj pomiar szczegółowy…</string>
@@ -179,7 +182,6 @@
     <string name="sketch_toolbar_selector">Selektor</string>
     <string name="sketch_toolbar_settings">Szybkie ustawienia</string>
     <string name="sketch_toolbar_undo">Cofnij</string>
-    <string name="sketch_toolbar_redo">Ponów</string>
     <string name="sketch_toolbar_zoom_in">Powiększ</string>
     <string name="sketch_toolbar_zoom_out">Pomniejsz</string>
     <string name="sketch_toolbar_colour_main">Kolor główny</string>
@@ -205,7 +207,6 @@
     <string name="sketch_menu_delete_last_leg">Cofnij ostatni pomiar</string>
     <string name="sketch_menu_centre_view">Wyśrodkuj na aktywnym</string>
     <string name="sketch_menu_auto_recentre">Automatyczne wyśrodkowywanie</string>
-    <string name="sketch_menu_redo">Ponów akcję szkicu</string>
     <string name="sketch_menu_modes">Tryby</string>
     <string name="sketch_menu_show">Pokaż</string>
     <string name="sketch_menu_show_grid">Siatka</string>

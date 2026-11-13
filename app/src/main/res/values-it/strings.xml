@@ -84,6 +84,9 @@
     <string name="action_input_mode_cal_check">Solo Splay</string>
     <string name="action_view">Vista</string>
     <string name="action_fullscreen">Schermo Intero</string>
+    <string name="action_edit">Modifica</string>
+    <string name="action_undo_sketch">Annulla schizzo</string>
+    <string name="action_redo_sketch">Ripeti schizzo</string>
     <string name="action_tools">Strumenti</string>
     <string name="action_add_leg">Aggiungi Tratto…</string>
     <string name="action_add_splay">Aggiungi Splay…</string>
@@ -179,7 +182,6 @@
     <string name="sketch_toolbar_selector">Selettore</string>
     <string name="sketch_toolbar_settings">Impostazioni rapide</string>
     <string name="sketch_toolbar_undo">Annulla</string>
-    <string name="sketch_toolbar_redo">Ripeti</string>
     <string name="sketch_toolbar_zoom_in">Ingrandisci</string>
     <string name="sketch_toolbar_zoom_out">Riduci</string>
     <string name="sketch_toolbar_colour_main">Colore principale</string>
@@ -205,7 +207,6 @@
     <string name="sketch_menu_delete_last_leg">Annulla Ultima Lettura</string>
     <string name="sketch_menu_centre_view">Centra su Attiva</string>
     <string name="sketch_menu_auto_recentre">Auto-Centratura</string>
-    <string name="sketch_menu_redo">Ripeti azione schizzo</string>
     <string name="sketch_menu_modes">Modalità</string>
     <string name="sketch_menu_show">Mostra</string>
     <string name="sketch_menu_show_grid">Carta Millimetrata</string>

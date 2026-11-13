@@ -29,6 +29,7 @@ import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
+import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.TooltipCompat;
 import androidx.core.content.ContextCompat;
@@ -313,6 +314,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
+        updateUndoRedoItems(menu);
         MenuItem flipLastLineItem = menu.findItem(R.id.action_flip_last_line);
         if (flipLastLineItem != null) {
             flipLastLineItem.setEnabled(true);
@@ -320,9 +322,37 @@ public abstract class SketchActivity extends SurveyEditorActivity
         return true;
     }
 
+    /**
+     * The action bar menu is only prepared when it is invalidated, not each time it opens, so the
+     * Edit submenu refreshes Undo and Redo against the sketch history as it is shown.
+     */
+    @Override
+    public boolean onMenuOpened(int featureId, @NonNull Menu menu) {
+        updateUndoRedoItems(menu);
+        return super.onMenuOpened(featureId, menu);
+    }
+
+    private void updateUndoRedoItems(Menu menu) {
+        MenuItem undoSketchItem = menu.findItem(R.id.action_undo_sketch);
+        if (undoSketchItem != null) {
+            undoSketchItem.setEnabled(sketchView.canUndo());
+        }
+        MenuItem redoSketchItem = menu.findItem(R.id.action_redo_sketch);
+        if (redoSketchItem != null) {
+            redoSketchItem.setEnabled(sketchView.canRedo());
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_flip_last_line) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_undo_sketch) {
+            sketchView.undo();
+            return true;
+        } else if (itemId == R.id.action_redo_sketch) {
+            sketchView.redo();
+            return true;
+        } else if (itemId == R.id.action_flip_last_line) {
             flipLastLine();
             return true;
         }
@@ -454,9 +484,6 @@ public abstract class SketchActivity extends SurveyEditorActivity
             return true;
         } else if (itemId == R.id.buttonUndo) {
             sketchView.undo();
-            return true;
-        } else if (itemId == R.id.buttonRedo) {
-            sketchView.redo();
             return true;
         } else if (itemId == R.id.buttonMenu) {
             openDisplayMenu();

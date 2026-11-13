@@ -84,6 +84,9 @@
     <string name="action_input_mode_cal_check">Solo Radiales</string>
     <string name="action_view">Vista</string>
     <string name="action_fullscreen">Pantalla Completa</string>
+    <string name="action_edit">Editar</string>
+    <string name="action_undo_sketch">Deshacer croquis</string>
+    <string name="action_redo_sketch">Rehacer croquis</string>
     <string name="action_tools">Herramientas</string>
     <string name="action_add_leg">Añadir Tramo…</string>
     <string name="action_add_splay">Añadir Radial…</string>
@@ -179,7 +182,6 @@
     <string name="sketch_toolbar_selector">Selector</string>
     <string name="sketch_toolbar_settings">Ajustes rápidos</string>
     <string name="sketch_toolbar_undo">Deshacer</string>
-    <string name="sketch_toolbar_redo">Rehacer</string>
     <string name="sketch_toolbar_zoom_in">Acercar</string>
     <string name="sketch_toolbar_zoom_out">Alejar</string>
     <string name="sketch_toolbar_colour_main">Color principal</string>
@@ -205,7 +207,6 @@
     <string name="sketch_menu_delete_last_leg">Deshacer Última Lectura</string>
     <string name="sketch_menu_centre_view">Centrar en Activa</string>
     <string name="sketch_menu_auto_recentre">Auto-Centrado</string>
-    <string name="sketch_menu_redo">Rehacer acción de croquis</string>
     <string name="sketch_menu_modes">Modos</string>
     <string name="sketch_menu_show">Mostrar</string>
     <string name="sketch_menu_show_grid">Papel Cuadriculado</string>
