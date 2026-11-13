@@ -202,6 +202,7 @@
     <string name="line_type_chimney">Camino</string>
     <string name="line_type_ceiling_step">Gradino del soffitto</string>
     <string name="line_type_overhang">Strapiombo</string>
+    <string name="line_type_slope">Pendio</string>
     <string name="line_type_rock_border">Contorno di masso</string>
     <string name="line_type_rock_edge">Spigolo di masso</string>
     <string name="sketch_menu_delete_last_leg">Annulla Ultima Lettura</string>

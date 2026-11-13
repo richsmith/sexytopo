@@ -202,6 +202,7 @@
     <string name="line_type_chimney">Komin</string>
     <string name="line_type_ceiling_step">Próg stropowy</string>
     <string name="line_type_overhang">Przewieszenie</string>
+    <string name="line_type_slope">Stok</string>
     <string name="line_type_rock_border">Obrys bloku</string>
     <string name="line_type_rock_edge">Krawędź bloku</string>
     <string name="sketch_menu_delete_last_leg">Cofnij ostatni pomiar</string>

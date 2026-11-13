@@ -202,6 +202,7 @@
     <string name="line_type_chimney">Schlot</string>
     <string name="line_type_ceiling_step">Deckenstufe</string>
     <string name="line_type_overhang">Überhang</string>
+    <string name="line_type_slope">Hang</string>
     <string name="line_type_rock_border">Blockumriss</string>
     <string name="line_type_rock_edge">Blockkante</string>
     <string name="sketch_menu_delete_last_leg">Letzte Messung rückgängig</string>

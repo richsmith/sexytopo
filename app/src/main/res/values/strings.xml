@@ -225,6 +225,7 @@
     <string name="line_type_chimney">Chimney</string>
     <string name="line_type_ceiling_step">Ceiling step</string>
     <string name="line_type_overhang">Overhang</string>
+    <string name="line_type_slope">Slope</string>
     <string name="line_type_rock_border">Boulder outline</string>
     <string name="line_type_rock_edge">Boulder edge</string>
     <string name="area_type_water">Water</string>

@@ -1,0 +1,25 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="40dp"
+    android:viewportWidth="40"
+    android:viewportHeight="40">
+  <!-- A slope: a line with hachures hanging down one side, alternating long and short. -->
+  <path
+      android:strokeWidth="2.5"
+      android:pathData="M4,12 L36,12"
+      android:fillColor="#00000000"
+      android:strokeColor="#000"
+      android:strokeLineCap="round"/>
+  <path
+      android:strokeWidth="2.5"
+      android:pathData="M7,12 L7,28 M17,12 L17,28 M27,12 L27,28"
+      android:fillColor="#00000000"
+      android:strokeColor="#000"
+      android:strokeLineCap="round"/>
+  <path
+      android:strokeWidth="2.5"
+      android:pathData="M12,12 L12,20 M22,12 L22,20 M32,12 L32,20"
+      android:fillColor="#00000000"
+      android:strokeColor="#000"
+      android:strokeLineCap="round"/>
+</vector>

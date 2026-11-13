@@ -76,6 +76,15 @@ public enum LineType {
             1.0f,
             null,
             Stamp.toothed(1.2f, -0.9f)),
+    // hachures hanging down the slope on the same side as PIT's ticks, alternating long and short
+    SLOPE(
+            R.string.line_type_slope,
+            R.drawable.line_slope,
+            "slope",
+            false,
+            1.0f,
+            null,
+            Stamp.hachured(1.0f, -1.2f, -0.6f)),
     // the outline of a boulder: a plain line, thinner than a wall in Therion's proportions
     ROCK_BORDER(
             R.string.line_type_rock_border,
@@ -114,52 +123,60 @@ public enum LineType {
 
     /**
      * A repeating stamp, measured in multiples of the line's ornament size: a thin baseline bar of
-     * barLength (repeating every advance, so a shorter bar leaves a dashed gap) plus either a
-     * perpendicular tick of tickLength halfway along the bar, or a triangular tooth spanning the
-     * bar with its point tickLength away from it. The sign of tickLength picks the side.
+     * barLength (repeating every advance, so a shorter bar leaves a dashed gap) plus either
+     * perpendicular ticks of the given lengths spaced evenly along the bar, or a triangular tooth
+     * spanning the bar with its point tickLength away from it. The sign of a length picks the side.
      */
     private static final class Stamp {
         final float advance;
         final float barLength;
-        final float tickLength;
+        final float[] tickLengths;
         final boolean isTooth;
 
-        private Stamp(float advance, float barLength, float tickLength, boolean isTooth) {
+        private Stamp(float advance, float barLength, float[] tickLengths, boolean isTooth) {
             this.advance = advance;
             this.barLength = barLength;
-            this.tickLength = tickLength;
+            this.tickLengths = tickLengths;
             this.isTooth = isTooth;
         }
 
         static Stamp ticked(float advance, float barLength, float tickLength) {
-            return new Stamp(advance, barLength, tickLength, false);
+            return new Stamp(advance, barLength, new float[] {tickLength}, false);
+        }
+
+        // a long and a short tick per advance; the bar runs the full advance
+        static Stamp hachured(float advance, float longTickLength, float shortTickLength) {
+            return new Stamp(
+                    advance, advance, new float[] {longTickLength, shortTickLength}, false);
         }
 
         // teeth abut, so the bar runs the full advance
         static Stamp toothed(float advance, float toothHeight) {
-            return new Stamp(advance, advance, toothHeight, true);
+            return new Stamp(advance, advance, new float[] {toothHeight}, true);
         }
 
         /** Builds the effect for an ornament size already converted to pixels. */
         PathEffect createEffect(float ornamentSizePixels, float strokeWidth) {
             float half = strokeWidth / 2;
             float barEnd = barLength * ornamentSizePixels;
-            float tickX = barEnd / 2;
-            float tickEnd = tickLength * ornamentSizePixels;
             Path stamp = new Path();
             stamp.addRect(0, -half, barEnd, half, Path.Direction.CW);
             if (isTooth) {
                 stamp.moveTo(0, 0);
                 stamp.lineTo(barEnd, 0);
-                stamp.lineTo(tickX, tickEnd);
+                stamp.lineTo(barEnd / 2, tickLengths[0] * ornamentSizePixels);
                 stamp.close();
             } else {
-                stamp.addRect(
-                        tickX - half,
-                        Math.min(0, tickEnd),
-                        tickX + half,
-                        Math.max(0, tickEnd),
-                        Path.Direction.CW);
+                for (int i = 0; i < tickLengths.length; i++) {
+                    float tickX = barEnd * (i + 0.5f) / tickLengths.length;
+                    float tickEnd = tickLengths[i] * ornamentSizePixels;
+                    stamp.addRect(
+                            tickX - half,
+                            Math.min(0, tickEnd),
+                            tickX + half,
+                            Math.max(0, tickEnd),
+                            Path.Direction.CW);
+                }
             }
             return new PathDashPathEffect(
                     stamp, advance * ornamentSizePixels, 0, PathDashPathEffect.Style.MORPH);

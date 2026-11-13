@@ -202,6 +202,7 @@
     <string name="line_type_chimney">Chaminé</string>
     <string name="line_type_ceiling_step">Degrau no teto</string>
     <string name="line_type_overhang">Saliência</string>
+    <string name="line_type_slope">Declive</string>
     <string name="line_type_rock_border">Contorno de bloco</string>
     <string name="line_type_rock_edge">Aresta de bloco</string>
     <string name="sketch_menu_delete_last_leg">Desfazer Última Leitura</string>
