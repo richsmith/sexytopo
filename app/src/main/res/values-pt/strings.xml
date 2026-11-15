@@ -244,6 +244,13 @@
     <string name="manual_edit_to_wall_info_message">Informação opcional. Marcado significa que o raio vai até aos limites da galeria; desmarcado significa que mede até um elemento, como um espeleotema.</string>
     <string name="manual_edit_enabled_info_title">Sobre Ativo</string>
     <string name="manual_edit_enabled_info_message">Desmarcado significa que o raio é mantido, mas aparece riscado na tabela de dados e é omitido dos esboços, secções e exportações (o Survex e o Therion mantêm-no como uma linha comentada). Útil para leituras como verificações de calibração.</string>
+    <string name="manual_station_existing_helper">Altera o nome da estação, ou move-a para uma estação anterior</string>
+    <string name="manual_station_new_helper">Nome de uma estação que não existe</string>
+    <string name="manual_station_rename_helper">Renomeia a estação em todo o lado, com um nome que não existe</string>
+    <string name="manual_station_splay_helper">Move o raio para outra estação</string>
+    <string name="manual_station_renames_to">Renomeia para %1$s</string>
+    <string name="manual_station_moves_to">Move para %1$s</string>
+    <string name="manual_station_linked_warning">%1$s está ligada a outra topografia, a ligação terá de ser atualizada</string>
     <string name="manual_rename_station_title">Renomear Estação</string>
     <string name="manual_rename_station_hint">Nome da estação</string>
     <string name="manual_rename_error">Falha ao renomear</string>
@@ -664,9 +671,9 @@
     <!-- Form validation errors -->
     <string name="validation_error_cannot_be_blank">Não pode estar vazio</string>
     <string name="validation_error_station_name_reserved">A estação não pode ser chamada \"-\" ou \".\"</string>
-    <string name="validation_error_station_does_not_exist">A estação não existe</string>
-    <string name="validation_error_same_as_from_station">Não pode ser a mesma que a estação de origem</string>
-    <string name="validation_error_station_name_not_unique">O nome da estação deve ser único</string>
+    <string name="validation_error_station_already_exists">A estação %1$s já existe, tem de ser uma estação nova</string>
+    <string name="validation_error_station_breaks_continuity">Não é possível mover para %1$s, isso quebra a continuidade</string>
+    <string name="validation_error_station_not_found">A estação %1$s não existe</string>
     <string name="validation_error_must_be_number">Deve ser um número</string>
     <string name="validation_error_distance_minimum">Deve ser >= %1$d</string>
     <string name="validation_error_azimuth_range">Deve ser %1$d-%2$d</string>
@@ -761,7 +768,6 @@
     <string name="context_jump_to_station_error">Não foi possível saltar para a estação %1$s</string>
     <string name="context_move_leg_select_station_title">Selecionar estação para a qual mover</string>
     <string name="context_move_leg_no_valid_move">Não há lugar válido para mover este trecho</string>
-    <string name="context_rename_splay_error">Não é possível renomear uma extremidade de raio</string>
     <string name="context_set_active_splay_error">Não é possível definir a extremidade de raio como estação ativa</string>
     <string name="context_station_comment_hint">Comentário da estação</string>
     <string name="context_splay_promoted">Raio combinado com trecho</string>

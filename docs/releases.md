@@ -9,6 +9,7 @@
 - Fix editing a leg averaged from several shots, such as renaming one of its stations, which replaced the shots with their average. The shots are now kept unless the readings themselves are changed
 - Fix leg and station comments added from the menu not being treated as an unsaved change
 - Survex export now writes ISO dates (2026-01-05), which needs Survex 1.4.13 or later; Therion keeps 2026.01.05. Importing either accepts year-month-day dates separated by ".", "/" or "-"
+- Renaming and moving stations follow the same rules in the add and edit dialogs and the Rename menu. A new name renames the station everywhere, and giving a leg's existing station another station's name moves the leg there, unless that would break the survey's continuity. The line under each station box says what the name will do
 
 # 2026-09-30 1.14.0
 - Calibration screen reworked: readings are labelled and grouped by the direction they were actually taken in, so the order of shots no longer matters and every reading is used

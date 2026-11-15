@@ -244,6 +244,13 @@
     <string name="manual_edit_to_wall_info_message">Informacja opcjonalna. Zaznaczone oznacza, że pomiar szczegółowy sięga granic korytarza; odznaczone oznacza, że mierzy do obiektu, np. nacieku.</string>
     <string name="manual_edit_enabled_info_title">Informacje o Włączony</string>
     <string name="manual_edit_enabled_info_message">Odznaczone oznacza, że pomiar szczegółowy zostaje zachowany, ale jest przekreślony w tabeli danych i pomijany w szkicach, przekrojach i eksportach (Survex i Therion zachowują go jako zakomentowaną linię). Przydatne dla odczytów takich jak kontrole kalibracji.</string>
+    <string name="manual_station_existing_helper">Zmienia nazwę stanowiska lub przenosi je do wcześniejszego stanowiska</string>
+    <string name="manual_station_new_helper">Nazwa stanowiska, które nie istnieje</string>
+    <string name="manual_station_rename_helper">Zmienia nazwę stanowiska wszędzie, na nazwę, która nie istnieje</string>
+    <string name="manual_station_splay_helper">Przenosi pomiar szczegółowy do innego stanowiska</string>
+    <string name="manual_station_renames_to">Zmieni nazwę na %1$s</string>
+    <string name="manual_station_moves_to">Przeniesie do %1$s</string>
+    <string name="manual_station_linked_warning">%1$s jest połączone z innym pomiarem, połączenie trzeba będzie zaktualizować</string>
     <string name="manual_rename_station_title">Zmień nazwę stanowiska</string>
     <string name="manual_rename_station_hint">Nazwa stanowiska</string>
     <string name="manual_rename_error">Zmiana nazwy nie powiodła się</string>
@@ -664,9 +671,9 @@
     <!-- Form validation errors -->
     <string name="validation_error_cannot_be_blank">Nie może być puste</string>
     <string name="validation_error_station_name_reserved">Stanowisko nie może nazywać się \"-\" ani \".\"</string>
-    <string name="validation_error_station_does_not_exist">Stanowisko nie istnieje</string>
-    <string name="validation_error_same_as_from_station">Nie może być takie samo jak stanowisko początkowe</string>
-    <string name="validation_error_station_name_not_unique">Nazwa stanowiska musi być unikalna</string>
+    <string name="validation_error_station_already_exists">Stanowisko %1$s już istnieje, musi to być nowe stanowisko</string>
+    <string name="validation_error_station_breaks_continuity">Nie można przenieść do %1$s, to przerywa ciągłość</string>
+    <string name="validation_error_station_not_found">Stanowisko %1$s nie istnieje</string>
     <string name="validation_error_must_be_number">Musi być liczbą</string>
     <string name="validation_error_distance_minimum">Musi być >= %1$d</string>
     <string name="validation_error_azimuth_range">Musi być %1$d-%2$d</string>
@@ -761,7 +768,6 @@
     <string name="context_jump_to_station_error">Nie można przeskoczyć do stanowiska %1$s</string>
     <string name="context_move_leg_select_station_title">Wybierz stanowisko do przeniesienia</string>
     <string name="context_move_leg_no_valid_move">Brak prawidłowego miejsca do przeniesienia tego ciągu</string>
-    <string name="context_rename_splay_error">Nie można zmienić nazwy końca pomiaru szczegółowego</string>
     <string name="context_set_active_splay_error">Nie można ustawić końca pomiaru szczegółowego jako aktywnego stanowiska</string>
     <string name="context_station_comment_hint">Komentarz do stanowiska</string>
     <string name="context_splay_promoted">Pomiar szczegółowy połączony z ciągiem</string>

@@ -714,9 +714,6 @@
     <!-- Form validation errors -->
     <string name="validation_error_cannot_be_blank">Cannot be blank</string>
     <string name="validation_error_station_name_reserved">Station cannot be named \"-\" or \".\"</string>
-    <string name="validation_error_station_does_not_exist">Station does not exist</string>
-    <string name="validation_error_same_as_from_station">Cannot be the same as from station</string>
-    <string name="validation_error_station_name_not_unique">Station name must be unique</string>
     <string name="validation_error_station_already_exists">Station %1$s already exists, must be a new station</string>
     <string name="validation_error_station_breaks_continuity">Cannot move to %1$s, this breaks the continuity</string>
     <string name="validation_error_station_not_found">Station %1$s does not exist</string>
@@ -814,7 +811,6 @@
     <string name="context_jump_to_station_error">Could not jump to station %1$s</string>
     <string name="context_move_leg_select_station_title">Select station to move to</string>
     <string name="context_move_leg_no_valid_move">Nowhere valid to move this leg</string>
-    <string name="context_rename_splay_error">Cannot rename a splay end</string>
     <string name="context_set_active_splay_error">Cannot set splay end as the active station</string>
     <string name="context_station_comment_hint">Station comment</string>
     <string name="context_splay_promoted">Splay combined with leg</string>

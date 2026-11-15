@@ -4,7 +4,6 @@ import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -312,9 +311,8 @@ public class LegDialogs {
 
         Runnable renameAction =
                 () -> {
-                    String newName = form.stationName.getText().toString();
                     try {
-                        SurveyUpdater.renameStation(survey, toRename, newName);
+                        SurveyUpdater.applyStationName(survey, toRename, null, form.getResult());
                         activity.getSurveyManager().broadcastSurveyUpdated();
                         activity.syncWithSurvey();
                     } catch (Exception e) {
@@ -326,34 +324,20 @@ public class LegDialogs {
                 new MaterialAlertDialogBuilder(activity)
                         .setTitle(R.string.manual_rename_station_title)
                         .setView(form.stationNameLayout)
-                        .setPositiveButton(
-                                R.string.rename, (ignore, buttonId) -> renameAction.run())
+                        .setPositiveButton(R.string.rename, null)
                         .setNegativeButton(R.string.cancel, null)
                         .create();
 
+        // The keyboard's done key acts as the Rename button
         form.stationName.setOnEditorActionListener(
-                (view, actionId, event) -> {
-                    form.validate();
-
-                    if (form.isValid()) {
-                        renameAction.run();
-                        dialog.dismiss();
-                        return true;
-                    } else {
-                        return false;
-                    }
-                });
-
-        form.setOnDidValidateCallback(
-                (valid) -> {
-                    Button positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
-                    positiveButton.setEnabled(valid);
-                });
+                (view, actionId, event) ->
+                        dialog.getButton(DialogInterface.BUTTON_POSITIVE).performClick());
 
         if (dialog.getWindow() != null) {
             dialog.getWindow()
                     .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         }
         dialog.show();
+        DialogUtils.enableValidationOnButton(dialog, form, renameAction);
     }
 }

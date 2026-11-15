@@ -1,6 +1,8 @@
 package org.hwyl.sexytopo.control.table;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.view.View;
 import android.widget.AdapterView;
@@ -75,6 +77,9 @@ public class EditLegForm extends Form {
     // Full-width lines under the station rows for helper text or errors
     private TextView fromStationHelper;
     private TextView toStationHelper;
+    // Station box outlines, normally and when a name is refused
+    private ColorStateList stationStroke;
+    private ColorStateList stationErrorStroke;
     private TextInputLayout distanceLayout;
     private TextInputLayout azimuthLayout;
     private TextInputLayout inclinationLayout;
@@ -189,6 +194,7 @@ public class EditLegForm extends Form {
         if (isSplay) {
             this.toStationHelper.setVisibility(View.GONE);
         }
+        initialiseStationStrokes();
         this.distanceLayout = dialogView.findViewById(R.id.distanceLayout);
         this.azimuthLayout = dialogView.findViewById(R.id.azimuth_standard);
         this.inclinationLayout = dialogView.findViewById(R.id.inclinationLayout);
@@ -398,6 +404,23 @@ public class EditLegForm extends Form {
         line.setText(error == null ? helper : error);
         int colour = error == null ? R.attr.colorOnSurfaceVariant : R.attr.colorError;
         line.setTextColor(MaterialColors.getColor(line, colour));
+        TextInputLayout layout = line == fromStationHelper ? fromStationLayout : toStationLayout;
+        layout.setBoxStrokeColorStateList(error == null ? stationStroke : stationErrorStroke);
+    }
+
+    /** The boxes' own outline colours come from their style, as they show no errors themselves. */
+    private void initialiseStationStrokes() {
+        TypedArray style =
+                context.obtainStyledAttributes(
+                        R.style.Widget_Material3_TextInputLayout_OutlinedBox,
+                        new int[] {R.attr.boxStrokeColor});
+        stationStroke = style.getColorStateList(0);
+        style.recycle();
+        // Stateful, so it colours the outline whether focused or not
+        int error = MaterialColors.getColor(fromStationLayout, R.attr.colorError);
+        stationErrorStroke =
+                new ColorStateList(
+                        new int[][] {{android.R.attr.state_focused}, {}}, new int[] {error, error});
     }
 
     /** Shows the comment of the station the leg will run from, when that changes. */
