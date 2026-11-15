@@ -11,6 +11,7 @@
 - Surveys that haven't been saved yet are now autosaved and restored when the app restarts
 - Sketch and table edits are now autosaved when you leave a screen, not just when a new leg arrives
 - Fix bug where automatic autosave restore was not fetching the extended elevation
+- Renaming and moving stations follow the same rules in the add and edit dialogs and the Rename menu. A new name renames the station everywhere, and giving a leg's existing station another station's name moves the leg there, unless that would break the survey's continuity. The line under each station box says what the name will do
 
 # 2026-11-09 1.15.0
 - Another new leg agreement algorithm "Slope-corrected angular deltas" that ought to solve issues with taking repeated readings on steep legs while remaining close in spirit to BCRA Grade 5; testing and feedback welcome (#321)
