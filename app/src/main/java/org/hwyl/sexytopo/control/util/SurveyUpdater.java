@@ -343,11 +343,38 @@ public class SurveyUpdater {
         Log.i(R.string.survey_update_renamed_station, previousName, name);
     }
 
-    public static void renameOrigin(Survey survey, String name) {
-        renameStation(survey, survey.getOrigin(), name);
+    /**
+     * Carries out a name checked by StationNameRule. Returns the station named: the same station
+     * when renamed, the target when moved, or a new station, not yet in the survey, when created.
+     * With no leg, a move only picks the target.
+     */
+    public static Station applyStationName(
+            Survey survey, Station station, Leg leg, StationNameRule.Result result) {
+        if (!result.isValid()) {
+            throw new IllegalArgumentException("Invalid station name: " + result.error);
+        }
+        switch (result.action) {
+            case RENAME:
+                renameStation(survey, station, result.name);
+                return station;
+            case MOVE:
+                if (leg != null) {
+                    moveLeg(survey, leg, result.target);
+                }
+                return result.target;
+            case CREATE:
+                return new Station(result.name);
+            default:
+                return station;
+        }
     }
 
     public static void moveLeg(Survey survey, Leg leg, Station newSource) {
+        if (SurveyTraversal.isInSubtree(leg.getDestination(), newSource)) {
+            String message =
+                    SexyTopo.staticGetString(R.string.survey_update_error_descendant_station);
+            throw new IllegalArgumentException(message);
+        }
         Station originating = survey.getOriginatingStation(leg);
         originating.removeOnwardLeg(leg);
         newSource.addOnwardLeg(leg);

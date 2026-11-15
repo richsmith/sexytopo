@@ -320,7 +320,7 @@
 <h3>Station Actions</h3>
 <ul>
 	<li><strong>Set Active Station</strong> makes this station the current active one for new measurements</li>
-	<li><strong>Rename Station</strong> changes the station's name</li>
+	<li><strong>Rename Station</strong> changes the station's name everywhere it is used. The new name must not already be in use</li>
 	<li><strong>New Cross-Section</strong> creates a cross-section at this station; in the elevation this can be vertical or horizontal (see <a href="#cross-sections">Cross-Sections</a>)</li>
 	<li><strong>Comment</strong> adds or edits a comment for this station</li>
 	<li><strong>Delete Station</strong> removes the station and all dependent legs and stations</li>
@@ -328,7 +328,7 @@
 
 <h3>Leg Actions</h3>
 <ul>
-	<li><strong>Edit Leg</strong> opens the edit dialog for manual editing of the leg's paraemters</li>
+	<li><strong>Edit Leg</strong> opens the edit dialog for manual editing of the leg's parameters. Each leg joins an existing station to a new one. On a forward leg From is the existing station and To the new one, and on a backward leg it is the other way round. Typing a name that is not in the survey for the existing station renames it everywhere, and typing another station's name moves the leg, and everything beyond it, to that station. A leg cannot be moved to a station further along itself, as that would break the survey's continuity. The new station can only be renamed, to a name that is not already used. For a splay, typing another station's name moves just that splay. The line under each station says what will happen, with a reminder when a renamed station links to another survey, as that link will need updating</li>
 	<li><strong>To Wall</strong> (splays only) is ticked when the splay goes to a wall, which is the default. Untick it for a splay that goes to something else, such as a stalagmite.</li>
 	<li><strong>Enabled</strong> (splays only) is ticked by default. Untick it to disable a splay, such as a calibration check, without deleting it. Disabled splays are hidden in the sketch and disabled in file exports.</li>
 	<li><strong>Reverse</strong> inverts the measurement as if taken from target back to origin</li>

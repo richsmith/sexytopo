@@ -265,6 +265,13 @@
     <string name="manual_edit_to_wall_info_message">Dato facoltativo. Selezionato significa che lo splay va ai limiti della galleria; deselezionato significa che misura fino a un elemento, come uno speleotema.</string>
     <string name="manual_edit_enabled_info_title">Informazioni su Attivo</string>
     <string name="manual_edit_enabled_info_message">Deselezionato significa che lo splay viene conservato, ma barrato nella tabella dei dati e omesso da schizzi, sezioni ed esportazioni (Survex e Therion lo mantengono come riga commentata). Utile per letture come i controlli di calibrazione.</string>
+    <string name="manual_station_existing_helper">Cambia il nome della stazione, o la sposta a una stazione precedente</string>
+    <string name="manual_station_new_helper">Nome di una stazione che non esiste</string>
+    <string name="manual_station_rename_helper">Rinomina la stazione ovunque, con un nome che non esiste</string>
+    <string name="manual_station_splay_helper">Sposta lo splay a un\'altra stazione</string>
+    <string name="manual_station_renames_to">Rinomina in %1$s</string>
+    <string name="manual_station_moves_to">Sposta a %1$s</string>
+    <string name="manual_station_linked_warning">%1$s è collegata a un altro rilievo, il collegamento dovrà essere aggiornato</string>
     <string name="manual_rename_station_title">Rinomina Stazione</string>
     <string name="manual_rename_station_hint">Nome stazione</string>
     <string name="manual_rename_error">Rinomina fallita</string>
@@ -687,9 +694,9 @@
     <!-- Form validation errors -->
     <string name="validation_error_cannot_be_blank">Non può essere vuoto</string>
     <string name="validation_error_station_name_reserved">La stazione non può essere chiamata \"-\" o \".\"</string>
-    <string name="validation_error_station_does_not_exist">La stazione non esiste</string>
-    <string name="validation_error_same_as_from_station">Non può essere uguale alla stazione di partenza</string>
-    <string name="validation_error_station_name_not_unique">Il nome della stazione deve essere univoco</string>
+    <string name="validation_error_station_already_exists">La stazione %1$s esiste già, deve essere una nuova stazione</string>
+    <string name="validation_error_station_breaks_continuity">Impossibile spostare a %1$s, si interrompe la continuità</string>
+    <string name="validation_error_station_not_found">La stazione %1$s non esiste</string>
     <string name="validation_error_must_be_number">Deve essere un numero</string>
     <string name="validation_error_distance_minimum">Deve essere >= %1$d</string>
     <string name="validation_error_azimuth_range">Deve essere %1$d-%2$d</string>
@@ -787,7 +794,6 @@
     <string name="context_jump_to_station_error">Impossibile saltare alla stazione %1$s</string>
     <string name="context_move_leg_select_station_title">Seleziona la stazione a cui spostare</string>
     <string name="context_move_leg_no_valid_move">Nessun posto valido dove spostare questo tratto</string>
-    <string name="context_rename_splay_error">Impossibile rinominare una terminazione di splay</string>
     <string name="context_set_active_splay_error">Impossibile impostare la terminazione di splay come stazione attiva</string>
     <string name="context_station_comment_hint">Commento stazione</string>
     <string name="context_splay_promoted">Splay combinato con il tratto</string>

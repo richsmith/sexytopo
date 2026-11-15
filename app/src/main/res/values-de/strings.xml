@@ -265,6 +265,13 @@
     <string name="manual_edit_to_wall_info_message">Optionale Angabe. Angehakt bedeutet, dass der Splay zur Begrenzung des Ganges geht; nicht angehakt bedeutet, dass er zu einem Objekt misst, etwa einem Speläothem.</string>
     <string name="manual_edit_enabled_info_title">Über Aktiviert</string>
     <string name="manual_edit_enabled_info_message">Nicht angehakt bedeutet, dass die Peilung erhalten bleibt, aber in der Datentabelle durchgestrichen und in Skizzen, Querschnitten und Exporten weggelassen wird (Survex und Therion behalten sie als auskommentierte Zeile). Nützlich für Messungen wie Kalibrierungskontrollen.</string>
+    <string name="manual_station_existing_helper">Ändert den Namen des Messpunkts oder verschiebt ihn zu einem früheren Messpunkt</string>
+    <string name="manual_station_new_helper">Name eines Messpunkts, der noch nicht existiert</string>
+    <string name="manual_station_rename_helper">Benennt den Messpunkt überall um, in einen Namen, der noch nicht existiert</string>
+    <string name="manual_station_splay_helper">Verschiebt die Peilung zu einem anderen Messpunkt</string>
+    <string name="manual_station_renames_to">Wird in %1$s umbenannt</string>
+    <string name="manual_station_moves_to">Wird zu %1$s verschoben</string>
+    <string name="manual_station_linked_warning">%1$s ist mit einer anderen Vermessung verknüpft, die Verknüpfung muss aktualisiert werden</string>
     <string name="manual_rename_station_title">Messpunkt umbenennen</string>
     <string name="manual_rename_station_hint">Stationsname</string>
     <string name="manual_rename_error">Umbenennen fehlgeschlagen</string>
@@ -687,9 +694,9 @@
     <!--  Form validation errors  -->
     <string name="validation_error_cannot_be_blank">Darf nicht leer sein</string>
     <string name="validation_error_station_name_reserved">Messpunkt kann nicht \"-\" oder \".\" heißen</string>
-    <string name="validation_error_station_does_not_exist">Messpunkt existiert nicht</string>
-    <string name="validation_error_same_as_from_station">Kann nicht derselbe wie der Ursprungsmesspunkt sein</string>
-    <string name="validation_error_station_name_not_unique">Messpunktname muss eindeutig sein</string>
+    <string name="validation_error_station_already_exists">Messpunkt %1$s existiert bereits, es muss ein neuer Messpunkt sein</string>
+    <string name="validation_error_station_breaks_continuity">Verschieben zu %1$s nicht möglich, das unterbricht den Zusammenhang</string>
+    <string name="validation_error_station_not_found">Messpunkt %1$s existiert nicht</string>
     <string name="validation_error_must_be_number">Muss eine Zahl sein</string>
     <string name="validation_error_distance_minimum">Muss >= %1$d sein</string>
     <string name="validation_error_azimuth_range">Muss zwischen %1$d und %2$d liegen</string>
@@ -788,7 +795,6 @@
     <string name="context_jump_to_station_error">Fehler beim Springen zum Messpunkt %1$s</string>
     <string name="context_move_leg_select_station_title">Messpunkt auswählen, der aktiviert werden soll</string>
     <string name="context_move_leg_no_valid_move">Keine gültige Möglichkeit, um diese Messstrecke zu bewegen</string>
-    <string name="context_rename_splay_error">Kann das Ende einer Dimension/Hilfslinie nicht umbenennen</string>
     <string name="context_set_active_splay_error">Ende einer Dimension/Hilfslinie kann nicht als aktiver Messpunkt definiert werden</string>
     <string name="context_station_comment_hint">Stationskommentar</string>
     <string name="context_splay_promoted">Splay mit Messung kombiniert</string>

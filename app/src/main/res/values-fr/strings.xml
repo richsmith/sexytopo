@@ -265,6 +265,13 @@
     <string name="manual_edit_to_wall_info_message">Information facultative. Coché signifie que la radiale va jusqu\'aux limites de la galerie ; décoché signifie qu\'elle mesure jusqu\'à un élément, comme un spéléothème.</string>
     <string name="manual_edit_enabled_info_title">À propos de Activée</string>
     <string name="manual_edit_enabled_info_message">Décoché signifie que la radiale est conservée, mais barrée dans le tableau des données et omise des croquis, des coupes et des exports (Survex et Therion la gardent en ligne commentée). Utile pour des mesures comme les contrôles d\'étalonnage.</string>
+    <string name="manual_station_existing_helper">Change le nom de la station, ou la déplace vers une station antérieure</string>
+    <string name="manual_station_new_helper">Nom d\'une station qui n\'existe pas</string>
+    <string name="manual_station_rename_helper">Renomme la station partout, avec un nom qui n\'existe pas</string>
+    <string name="manual_station_splay_helper">Déplace la radiale vers une autre station</string>
+    <string name="manual_station_renames_to">Renomme en %1$s</string>
+    <string name="manual_station_moves_to">Déplace vers %1$s</string>
+    <string name="manual_station_linked_warning">%1$s est liée à une autre topographie, le lien devra être mis à jour</string>
     <string name="manual_rename_station_title">Renommer la station</string>
     <string name="manual_rename_station_hint">Nom de la station</string>
     <string name="manual_rename_error">Échec du renommage</string>
@@ -687,9 +694,9 @@
     <!-- Form validation errors -->
     <string name="validation_error_cannot_be_blank">Ne peut pas être vide</string>
     <string name="validation_error_station_name_reserved">La station ne peut pas s\'appeler \"-\" ou \".\"</string>
-    <string name="validation_error_station_does_not_exist">La station n\'existe pas</string>
-    <string name="validation_error_same_as_from_station">Ne peut pas être identique à la station d\'origine</string>
-    <string name="validation_error_station_name_not_unique">Le nom de la station doit être unique</string>
+    <string name="validation_error_station_already_exists">La station %1$s existe déjà, il faut une nouvelle station</string>
+    <string name="validation_error_station_breaks_continuity">Impossible de déplacer vers %1$s, cela rompt la continuité</string>
+    <string name="validation_error_station_not_found">La station %1$s n\'existe pas</string>
     <string name="validation_error_must_be_number">Doit être un nombre</string>
     <string name="validation_error_distance_minimum">Doit être >= %1$d</string>
     <string name="validation_error_azimuth_range">Doit être entre %1$d et %2$d</string>
@@ -788,7 +795,6 @@
     <string name="context_jump_to_station_error">Impossible de se rendre à la station %1$s</string>
     <string name="context_move_leg_select_station_title">Sélectionner la station à déplacer</string>
     <string name="context_move_leg_no_valid_move">Aucun emplacement valide pour déplacer ce segment</string>
-    <string name="context_rename_splay_error">Impossible de renommer une extrémité de radiale</string>
     <string name="context_set_active_splay_error">Impossible de définir une extrémité de radiale comme station active</string>
     <string name="context_station_comment_hint">Commentaire de station</string>
     <string name="context_splay_promoted">Radiale combinée avec la visée</string>
