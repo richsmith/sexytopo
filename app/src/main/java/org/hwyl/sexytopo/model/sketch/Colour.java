@@ -149,6 +149,9 @@ public enum Colour {
     NAVY(0x000080),
     BLACK(0x000000);
 
+    /** The colour water areas and symbols are drawn in when blue water is on. */
+    public static final Colour WATER = BLUE;
+
     public final int intValue;
     public final int baseValue;
 
@@ -157,5 +160,21 @@ public enum Colour {
     Colour(int baseValue) {
         this.baseValue = baseValue;
         this.intValue = SOLID + baseValue;
+    }
+
+    /**
+     * The colour to draw this one in, which differs in dark mode for colours that would be hard to
+     * see against a dark background: black becomes white, and blue becomes a lighter blue.
+     */
+    public Colour getDrawColour(boolean isDarkModeActive) {
+        if (!isDarkModeActive) {
+            return this;
+        } else if (this == BLACK) {
+            return WHITE;
+        } else if (this == BLUE) {
+            return DODGER_BLUE;
+        } else {
+            return this;
+        }
     }
 }

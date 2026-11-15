@@ -8,6 +8,7 @@
     <string name="carry_on">Continua</string>
     <string name="delete">Elimina</string>
     <string name="save">Salva</string>
+    <string name="update">Aggiorna</string>
     <string name="overwrite">Sovrascrivi</string>
     <string name="move">Sposta</string>
     <string name="replace">Sostituisci</string>
@@ -83,6 +84,9 @@
     <string name="action_input_mode_cal_check">Solo Splay</string>
     <string name="action_view">Vista</string>
     <string name="action_fullscreen">Schermo Intero</string>
+    <string name="action_edit">Modifica</string>
+    <string name="action_undo_sketch">Annulla schizzo</string>
+    <string name="action_redo_sketch">Ripeti schizzo</string>
     <string name="action_tools">Strumenti</string>
     <string name="action_add_leg">Aggiungi Tratto…</string>
     <string name="action_add_splay">Aggiungi Splay…</string>
@@ -134,6 +138,9 @@
     <string name="file_error_deleting_survey">Errore nell\'eliminazione del rilievo</string>
     <string name="file_cannot_extend_unsaved_survey">Impossibile estendere un rilievo non salvato</string>
     <string name="file_autosave_restored">Salvataggio automatico ripristinato</string>
+    <string name="file_restoring_unsaved_survey">Ripristino del rilievo non salvato</string>
+    <string name="file_unsaved_survey_restored">Rilievo non salvato ripristinato</string>
+    <string name="file_unsaved_survey_restore_error">Errore nel ripristino del rilievo non salvato: %1$s</string>
     <string name="file_autosave_load_error">Errore nel ripristino del salvataggio automatico</string>
     <string name="file_warning_survey_not_saved">Attenzione: rilievo corrente non salvato</string>
     <string name="file_active_survey">Il rilievo attivo è %1$s</string>
@@ -166,7 +173,8 @@
     <string name="share_preparing">Preparazione del rilievo per la condivisione…</string>
 
     <!-- Sketch view -->
-    <string name="sketch_toolbar_draw">Modalità disegno</string>
+    <string name="sketch_toolbar_line">Strumento linea</string>
+    <string name="sketch_toolbar_area">Strumento area</string>
     <string name="sketch_toolbar_move">Modalità spostamento</string>
     <string name="sketch_toolbar_eraser">Gomma</string>
     <string name="sketch_toolbar_text">Strumento testo</string>
@@ -174,7 +182,6 @@
     <string name="sketch_toolbar_selector">Selettore</string>
     <string name="sketch_toolbar_settings">Impostazioni rapide</string>
     <string name="sketch_toolbar_undo">Annulla</string>
-    <string name="sketch_toolbar_redo">Ripeti</string>
     <string name="sketch_toolbar_zoom_in">Ingrandisci</string>
     <string name="sketch_toolbar_zoom_out">Riduci</string>
     <string name="sketch_toolbar_colour_main">Colore principale</string>
@@ -186,20 +193,34 @@
     <string name="sketch_toolbar_colour_blue">Blu</string>
     <string name="sketch_toolbar_colour_purple">Viola</string>
     <string name="sketch_toolbar_symbol_close">Chiudi barra dei simboli</string>
+    <string name="line_type_sketch">Linea di schizzo</string>
+    <string name="line_type_wall">Parete</string>
+    <string name="line_type_presumed_wall">Parete presunta</string>
+    <string name="line_type_underlying_wall">Parete sottostante</string>
+    <string name="line_type_pit">Bordo di pozzo</string>
+    <string name="line_type_floor_step">Saltino</string>
+    <string name="line_type_chimney">Camino</string>
+    <string name="line_type_ceiling_step">Gradino del soffitto</string>
+    <string name="line_type_overhang">Strapiombo</string>
+    <string name="line_type_slope">Pendio</string>
+    <string name="line_type_rock_border">Contorno di masso</string>
+    <string name="line_type_rock_edge">Spigolo di masso</string>
     <string name="sketch_menu_delete_last_leg">Annulla Ultima Lettura</string>
     <string name="sketch_menu_centre_view">Centra su Attiva</string>
     <string name="sketch_menu_auto_recentre">Auto-Centratura</string>
-    <string name="sketch_menu_redo">Ripeti azione schizzo</string>
+    <string name="sketch_menu_modes">Modalità</string>
+    <string name="sketch_menu_show">Mostra</string>
     <string name="sketch_menu_show_grid">Carta Millimetrata</string>
     <string name="sketch_menu_show_compass">Bussola</string>
     <string name="sketch_menu_blue_water">Acqua blu auto</string>
     <string name="sketch_menu_snap_to_lines">Aggancia alle Linee</string>
     <string name="sketch_menu_pinch_to_zoom">Zoom con pizzico</string>
     <string name="sketch_menu_fade_non_active">Sfuma Non-Attive</string>
+    <string name="sketch_menu_show_wall_sides">Tutti i lati delle pareti</string>
     <string name="sketch_menu_show_station_labels">Etichette Stazioni</string>
     <string name="sketch_menu_show_xsections">Sezioni</string>
-    <string name="sketch_menu_show_splays">Mostra Splay</string>
-    <string name="sketch_menu_show_sketch">Mostra Schizzo</string>
+    <string name="sketch_menu_show_splays">Splay</string>
+    <string name="sketch_menu_show_sketch">Schizzo</string>
     <string name="sketch_menu_show_connect">Rilievi Collegati</string>
     <string name="sketch_menu_back_measurements">Tratti Inversi</string>
     <string name="sketch_position_cross_section_instruction">Seleziona dove disegnare la sezione trasversale</string>
@@ -500,11 +521,6 @@
         <item>Lineare</item>
         <item>Non-Lineare</item>
     </string-array>
-    <string-array name="settings_leg_amalgamation_algorithm_entries">
-        <item>Delta angolari: confronta distanza, azimut e inclinazione separatamente; media separatamente</item>
-        <item>Distanza tra estremi: confronta quanto sono distanti i punti estremi; media come vettori</item>
-        <item>Vettori a coppie: confronta lo scarto tra gli estremi rispetto alla lunghezza del tratto; media come vettori</item>
-    </string-array>
     <string name="settings_immersive_mode_enabled">Modalità schermo intero attivata</string>
     <string name="settings_immersive_mode_disabled">Modalità schermo intero disattivata</string>
     <string name="settings_new_station_vibration_title">Vibrazione per nuova stazione</string>
@@ -520,19 +536,26 @@
 <string name="settings_instruments_title">Strumenti</string>
     <string name="settings_instruments_summary">Tolleranze degli strumenti, calibrazione</string>
     <string name="settings_max_distance_delta_title">Delta distanza massima (m)</string>
-    <string name="settings_max_distance_delta_summary">Metodo angolare: quanto possono differire le letture di distanza per decidere se creare una nuova stazione</string>
+    <string name="settings_max_distance_delta_summary">Quanto possono differire le letture di distanza per decidere se creare una nuova stazione</string>
     <string name="settings_max_angle_delta_title">Delta angolo massimo (gradi)</string>
-    <string name="settings_max_angle_delta_summary">Metodo angolare: quanto possono differire le letture di azimut o inclinazione per decidere se creare una nuova stazione</string>
+    <string name="settings_max_angle_delta_summary">Quanto possono differire le letture di azimut o inclinazione per decidere se creare una nuova stazione</string>
     <string name="settings_auto_reconnect_title">Riconnessione automatica</string>
     <string name="settings_auto_reconnect_summary">Riconnetti automaticamente se lo strumento si disconnette</string>
     <string name="settings_auto_reconnect_window_title">Limite di tempo per la riconnessione automatica (minuti)</string>
     <string name="settings_auto_reconnect_window_summary">Per quanto tempo continuare a tentare la riconnessione prima di mettere in pausa</string>
     <string name="settings_leg_amalgamation_algorithm_title">Metodo di concordanza del tratto</string>
-    <string name="settings_leg_amalgamation_algorithm_summary">Come si valuta se letture ripetute sono abbastanza simili da formare un tratto</string>
+    <string name="settings_leg_amalgamation_angular_name">Delta angolari</string>
+    <string name="settings_leg_amalgamation_angular_description">Distanza, azimut e inclinazione confrontati e mediati separatamente. Può rifiutare letture ripide ripetute</string>
+    <string name="settings_leg_amalgamation_slope_corrected_name">Delta angolari corretti per la pendenza</string>
+    <string name="settings_leg_amalgamation_slope_corrected_description">Distanza, inclinazione e scostamento laterale (differenza di azimut scalata secondo la pendenza) confrontati separatamente; mediate come vettori</string>
+    <string name="settings_leg_amalgamation_cartesian_name">Distanza tra estremi</string>
+    <string name="settings_leg_amalgamation_cartesian_description">Gli estremi delle letture devono essere entro una distanza fissata l\'uno dall\'altro; mediate come vettori</string>
+    <string name="settings_leg_amalgamation_pairwise_name">Vettori a coppie</string>
+    <string name="settings_leg_amalgamation_pairwise_description">Scarto tra gli estremi confrontato con la lunghezza del tratto; mediate come vettori</string>
     <string name="settings_max_endpoint_delta_title">Distanza massima tra estremi (m)</string>
-    <string name="settings_max_endpoint_delta_summary">Metodo della distanza tra estremi: quanto possono essere distanti gli estremi delle letture per decidere se creare una nuova stazione. Il valore predefinito di 0.1 mantiene tutte le letture entro una cella di Grado 5 BCRA.</string>
+    <string name="settings_max_endpoint_delta_summary">Quanto possono essere distanti gli estremi delle letture per decidere se creare una nuova stazione. Il valore predefinito di 0.1 mantiene tutte le letture entro una cella di Grado 5 BCRA.</string>
     <string name="settings_max_pairwise_error_title">Errore massimo a coppie</string>
-    <string name="settings_max_pairwise_error_summary">Metodo dei vettori a coppie: l\'errore relativo tollerato tra le letture (0.05 = circa il 2.5%) per decidere se creare una nuova stazione</string>
+    <string name="settings_max_pairwise_error_summary">L\'errore relativo tollerato tra le letture (0.05 = circa il 2.5%) per decidere se creare una nuova stazione</string>
     <string name="settings_calibration_title">Calibrazione</string>
     <string name="settings_calibration_algorithm_title">Algoritmo di calibrazione Disto-X</string>
     <string name="settings_calibration_algorithm_summary">Sovrascrivi la scelta dell\'algoritmo di calibrazione Disto-X</string>
@@ -749,6 +772,9 @@
     <string name="menu_jump_to_station_in_table">&#10132; Tabella Dati</string>
     <string name="menu_delete_station">Elimina</string>
     <string name="menu_reverse">Inverti</string>
+    <string name="menu_line">Linea</string>
+    <string name="menu_flip_line">Inverti</string>
+    <string name="menu_line_type">Tipo di linea</string>
     <string name="menu_switch_direction">Cambia Direzione</string>
     <string name="menu_navigate">Naviga</string>
     <string name="menu_survey">Rilievo</string>

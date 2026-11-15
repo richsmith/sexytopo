@@ -171,7 +171,7 @@ public class Leg extends SurveyComponent {
                 new Leg(
                         distance,
                         adjustedAzimuth,
-                        -1 * inclination,
+                        -1 * getSignedInclination(),
                         destination,
                         promotedFrom,
                         !wasShotBackwards);
@@ -256,6 +256,14 @@ public class Leg extends SurveyComponent {
 
     public float getInclination() {
         return inclination;
+    }
+
+    /**
+     * The inclination in the usual range of -90 to 90. A theodolite-style reading, where 270 to 360
+     * is below the horizontal, is stored as it was recorded and only converted here.
+     */
+    public float getSignedInclination() {
+        return inclination >= MIN_THEODOLITE_INC ? inclination - 360 : inclination;
     }
 
     public Station getDestination() {

@@ -1,0 +1,14 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="40dp"
+    android:viewportWidth="40"
+    android:viewportHeight="40">
+  <!-- A boulder outline: a closed, angular loop in a lighter stroke than a wall. -->
+  <path
+      android:strokeWidth="2.2"
+      android:pathData="M8,27 L6,19 L12,11 L23,9 L33,14 L35,24 L27,31 L15,31 Z"
+      android:fillColor="#00000000"
+      android:strokeColor="#000"
+      android:strokeLineCap="round"
+      android:strokeLineJoin="round"/>
+</vector>

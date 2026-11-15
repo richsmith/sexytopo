@@ -8,6 +8,7 @@
     <string name="carry_on">Continuer</string>
     <string name="delete">Supprimer</string>
     <string name="save">Sauvegarder</string>
+    <string name="update">Mettre à jour</string>
     <string name="overwrite">Écraser</string>
     <string name="move">Déplacer</string>
     <string name="replace">Remplacer</string>
@@ -83,6 +84,9 @@
     <string name="action_input_mode_cal_check">Radiales seulement</string>
     <string name="action_view">Affichage</string>
     <string name="action_fullscreen">Plein écran</string>
+    <string name="action_edit">Édition</string>
+    <string name="action_undo_sketch">Annuler l\'esquisse</string>
+    <string name="action_redo_sketch">Rétablir l\'esquisse</string>
     <string name="action_tools">Outils</string>
     <string name="action_add_leg">Ajouter un segment…</string>
     <string name="action_add_splay">Ajouter une radiale…</string>
@@ -134,6 +138,9 @@
     <string name="file_error_deleting_survey">Erreur lors de la suppression de la topographie</string>
     <string name="file_cannot_extend_unsaved_survey">Impossible d\'étendre une topographie non sauvegardé</string>
     <string name="file_autosave_restored">Sauvegarde automatique restaurée</string>
+    <string name="file_restoring_unsaved_survey">Restauration de la topographie non enregistrée</string>
+    <string name="file_unsaved_survey_restored">Topographie non enregistrée restaurée</string>
+    <string name="file_unsaved_survey_restore_error">Erreur lors de la restauration de la topographie non enregistrée : %1$s</string>
     <string name="file_autosave_load_error">Erreur lors de la restauration de la sauvegarde automatique</string>
     <string name="file_warning_survey_not_saved">Attention : le relevé actuel n\'est pas sauvegardé</string>
     <string name="file_active_survey">Le relevé actif est %1$s</string>
@@ -166,7 +173,8 @@
     <string name="share_preparing">Préparation de la topographie pour le partage…</string>
 
     <!-- Sketch view -->
-    <string name="sketch_toolbar_draw">Mode dessin</string>
+    <string name="sketch_toolbar_line">Outil ligne</string>
+    <string name="sketch_toolbar_area">Outil zone</string>
     <string name="sketch_toolbar_move">Mode déplacement</string>
     <string name="sketch_toolbar_eraser">Gomme</string>
     <string name="sketch_toolbar_text">Outil texte</string>
@@ -174,7 +182,6 @@
     <string name="sketch_toolbar_selector">Sélectioneur</string>
     <string name="sketch_toolbar_settings">Paramètres rapides</string>
     <string name="sketch_toolbar_undo">Annuler</string>
-    <string name="sketch_toolbar_redo">Refaire</string>
     <string name="sketch_toolbar_zoom_in">Zoom grossissant</string>
     <string name="sketch_toolbar_zoom_out">Zoom dégrossissant</string>
     <string name="sketch_toolbar_colour_main">Couleur principale</string>
@@ -186,20 +193,34 @@
     <string name="sketch_toolbar_colour_blue">Bleu</string>
     <string name="sketch_toolbar_colour_purple">Violet</string>
     <string name="sketch_toolbar_symbol_close">Fermer la barre d\'outils des symboles</string>
+    <string name="line_type_sketch">Ligne de croquis</string>
+    <string name="line_type_wall">Paroi</string>
+    <string name="line_type_presumed_wall">Paroi supposée</string>
+    <string name="line_type_underlying_wall">Paroi sous-jacente</string>
+    <string name="line_type_pit">Bord de puits</string>
+    <string name="line_type_floor_step">Ressaut</string>
+    <string name="line_type_chimney">Cheminée</string>
+    <string name="line_type_ceiling_step">Ressaut de plafond</string>
+    <string name="line_type_overhang">Surplomb</string>
+    <string name="line_type_slope">Pente</string>
+    <string name="line_type_rock_border">Contour de bloc</string>
+    <string name="line_type_rock_edge">Arête de bloc</string>
     <string name="sketch_menu_delete_last_leg">Annuler le dernier segment</string>
     <string name="sketch_menu_centre_view">Centrer sur l\'actif</string>
     <string name="sketch_menu_auto_recentre">Recentrage automatique</string>
-    <string name="sketch_menu_redo">Refaire l\'action d\'esquisse</string>
+    <string name="sketch_menu_modes">Modes</string>
+    <string name="sketch_menu_show">Afficher</string>
     <string name="sketch_menu_show_grid">Papier millimétré</string>
     <string name="sketch_menu_show_compass">Boussole</string>
     <string name="sketch_menu_blue_water">Eau bleue auto</string>
     <string name="sketch_menu_snap_to_lines">Accrocher aux lignes</string>
     <string name="sketch_menu_pinch_to_zoom">Zoom par pincement</string>
     <string name="sketch_menu_fade_non_active">Atténuer les inactifs</string>
+    <string name="sketch_menu_show_wall_sides">Tous les côtés de paroi</string>
     <string name="sketch_menu_show_station_labels">Noms des stations</string>
     <string name="sketch_menu_show_xsections">Coupes</string>
-    <string name="sketch_menu_show_splays">Afficher les radiales</string>
-    <string name="sketch_menu_show_sketch">Afficher l\'esquisse</string>
+    <string name="sketch_menu_show_splays">Radiales</string>
+    <string name="sketch_menu_show_sketch">Esquisse</string>
     <string name="sketch_menu_show_connect">Topographies liées</string>
     <string name="sketch_menu_back_measurements">Inverser les segments</string>
     <string name="sketch_position_cross_section_instruction">Sélectionnez où dessiner la coupe transversale</string>
@@ -500,11 +521,6 @@
         <item>Linéaire</item>
         <item>Non linéaire</item>
     </string-array>
-    <string-array name="settings_leg_amalgamation_algorithm_entries">
-        <item>Deltas angulaires : comparer distance, azimut &amp; inclinaison séparément ; moyenner séparément</item>
-        <item>Distance des extrémités : comparer l\'écart entre les points d\'extrémité ; moyenner comme des vecteurs</item>
-        <item>Vecteurs par paires : comparer l\'écart des extrémités par rapport à la longueur du segment ; moyenner comme des vecteurs</item>
-    </string-array>
     <string name="settings_immersive_mode_enabled">Mode plein écran activé</string>
     <string name="settings_immersive_mode_disabled">Mode plein écran désactivé</string>
     <string name="settings_new_station_vibration_title">Vibrer à la nouvelle station</string>
@@ -520,19 +536,26 @@
 <string name="settings_instruments_title">Outils</string>
     <string name="settings_instruments_summary">Tolérances des instruments, calibration</string>
     <string name="settings_max_distance_delta_title">Delta de distance max (m)</string>
-    <string name="settings_max_distance_delta_summary">Méthode angulaire : de combien les mesures de distance peuvent différer pour décider de créer une nouvelle station</string>
+    <string name="settings_max_distance_delta_summary">De combien les mesures de distance peuvent différer pour décider de créer une nouvelle station</string>
     <string name="settings_max_angle_delta_title">Delta d\'angle max (degrés)</string>
-    <string name="settings_max_angle_delta_summary">Méthode angulaire : de combien les mesures d\'azimut ou d\'inclinaison peuvent différer pour décider de créer une nouvelle station</string>
+    <string name="settings_max_angle_delta_summary">De combien les mesures d\'azimut ou d\'inclinaison peuvent différer pour décider de créer une nouvelle station</string>
     <string name="settings_auto_reconnect_title">Reconnexion automatique</string>
     <string name="settings_auto_reconnect_summary">Se reconnecter automatiquement si l\'appareil se déconnecte</string>
     <string name="settings_auto_reconnect_window_title">Délai de reconnexion automatique (minutes)</string>
     <string name="settings_auto_reconnect_window_summary">Combien de temps continuer à essayer de se reconnecter avant de mettre en pause</string>
     <string name="settings_leg_amalgamation_algorithm_title">Méthode d\'accord des segments</string>
-    <string name="settings_leg_amalgamation_algorithm_summary">Comment les mesures répétées sont jugées suffisamment proches pour former un segment</string>
+    <string name="settings_leg_amalgamation_angular_name">Deltas angulaires</string>
+    <string name="settings_leg_amalgamation_angular_description">Distance, azimut et inclinaison comparés et moyennés séparément. Peut rejeter des mesures raides répétées</string>
+    <string name="settings_leg_amalgamation_slope_corrected_name">Deltas angulaires corrigés de la pente</string>
+    <string name="settings_leg_amalgamation_slope_corrected_description">Distance, inclinaison et écart latéral (différence d\'azimut pondérée par la pente) comparés séparément ; moyennées comme des vecteurs</string>
+    <string name="settings_leg_amalgamation_cartesian_name">Distance des extrémités</string>
+    <string name="settings_leg_amalgamation_cartesian_description">Les extrémités des mesures doivent être à moins d\'une distance fixée les unes des autres ; moyennées comme des vecteurs</string>
+    <string name="settings_leg_amalgamation_pairwise_name">Vecteurs par paires</string>
+    <string name="settings_leg_amalgamation_pairwise_description">Écart des extrémités comparé à la longueur du segment ; moyennées comme des vecteurs</string>
     <string name="settings_max_endpoint_delta_title">Distance d\'extrémité max (m)</string>
-    <string name="settings_max_endpoint_delta_summary">Méthode des extrémités : à quelle distance les extrémités des mesures peuvent se trouver pour décider de créer une nouvelle station. La valeur par défaut de 0.1 maintient toutes les mesures dans une même cellule BCRA Grade 5.</string>
+    <string name="settings_max_endpoint_delta_summary">À quelle distance les extrémités des mesures peuvent se trouver pour décider de créer une nouvelle station. La valeur par défaut de 0.1 maintient toutes les mesures dans une même cellule BCRA Grade 5.</string>
     <string name="settings_max_pairwise_error_title">Erreur par paires max</string>
-    <string name="settings_max_pairwise_error_summary">Méthode des vecteurs par paires : l\'erreur relative tolérée entre les mesures (0.05 = environ 2.5%) pour décider de créer une nouvelle station</string>
+    <string name="settings_max_pairwise_error_summary">L\'erreur relative tolérée entre les mesures (0.05 = environ 2.5%) pour décider de créer une nouvelle station</string>
     <string name="settings_calibration_title">Calibration</string>
     <string name="settings_calibration_algorithm_title">Algorithme de calibration Disto-X</string>
     <string name="settings_calibration_algorithm_summary">Remplacer le choix de l\'algorithme de calibration du Disto-X</string>
@@ -752,6 +775,9 @@
     <string name="menu_jump_to_station_in_table">&#10132; Tableau de données</string>
     <string name="menu_delete_station">Supprimer</string>
     <string name="menu_reverse">Inverser</string>
+    <string name="menu_line">Ligne</string>
+    <string name="menu_flip_line">Inverser</string>
+    <string name="menu_line_type">Type de ligne</string>
     <string name="menu_switch_direction">Changer de direction</string>
     <string name="menu_navigate">Naviguer</string>
     <string name="menu_links">Liens</string>

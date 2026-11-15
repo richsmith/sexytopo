@@ -2,6 +2,7 @@ package org.hwyl.sexytopo.control.activity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -21,6 +22,8 @@ import android.view.SubMenu;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
@@ -62,6 +65,7 @@ import org.hwyl.sexytopo.control.io.StartLocation;
 import org.hwyl.sexytopo.control.io.SurveyDirectory;
 import org.hwyl.sexytopo.control.io.basic.Loader;
 import org.hwyl.sexytopo.control.io.basic.Saver;
+import org.hwyl.sexytopo.control.io.basic.ScratchAutosave;
 import org.hwyl.sexytopo.control.io.share.SurveyZipSharer;
 import org.hwyl.sexytopo.control.io.translation.Exporter;
 import org.hwyl.sexytopo.control.io.translation.ImportCallback;
@@ -79,6 +83,11 @@ import org.hwyl.sexytopo.testutils.ExampleSurveyCreator;
 /** Base class for all activities that use the action bar. */
 public abstract class SexyTopoActivity extends AppCompatActivity {
 
+    // the top bar views that act like tabs
+    private static final int[] VIEW_MENU_ITEM_IDS = {
+        R.id.action_table, R.id.action_plan, R.id.action_elevation
+    };
+
     protected SurveyManager dataManager;
 
     protected static Instrument instrument;
@@ -89,6 +98,20 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     private static boolean debugMode = false;
 
     private String pendingLinkStation = null;
+
+    // Pressing back on the bottom activity leaves the app, so warn if there's unsaved work
+    private final OnBackPressedCallback exitWarningCallback =
+            new OnBackPressedCallback(true) {
+                @Override
+                public void handleOnBackPressed() {
+                    Survey survey = getSurvey();
+                    if (isTaskRoot() && survey != null && !survey.isSaved()) {
+                        confirmToProceedIfNotSaved(R.string.exit_question, "leaveViaBack");
+                    } else {
+                        leaveViaBack();
+                    }
+                }
+            };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +132,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
 
         dataManager = SurveyManager.getInstance(this.getApplicationContext());
 
+        getOnBackPressedDispatcher().addCallback(this, exitWarningCallback);
+
         // if Android restarts the activity after a crash, force it to go through the startup
         // process :/
         if (!hasStarted && !(this instanceof StartUpActivity)) {
@@ -119,7 +144,21 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        requestPermissionsIfRequired();
+        // StartUpActivity finishes straight away; a permission request from it would hold it at
+        // the bottom of the task (breaking isTaskRoot()), so leave asking to the next activity
+        if (!(this instanceof StartUpActivity)) {
+            requestPermissionsIfRequired();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Not everything that changes the survey triggers an autosave (e.g. sketching), so catch
+        // anything outstanding whenever a screen is left - including when leaving the app
+        if (getSurvey() != null) {
+            getSurveyManager().autosave();
+        }
     }
 
     /**
@@ -194,6 +233,14 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * The menu item ID of the top bar view (Table, Plan or Elevation) this activity shows, so the
+     * button can be highlighted; 0 if it shows none of them.
+     */
+    protected int getActiveViewMenuItemId() {
+        return 0;
+    }
+
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
 
@@ -246,7 +293,69 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             addSplayItem.setEnabled(false);
         }
 
+        // disable sketch Undo / Redo by default — only meaningful in a sketch view
+        MenuItem undoSketchItem = menu.findItem(R.id.action_undo_sketch);
+        if (undoSketchItem != null) {
+            undoSketchItem.setEnabled(false);
+        }
+        MenuItem redoSketchItem = menu.findItem(R.id.action_redo_sketch);
+        if (redoSketchItem != null) {
+            redoSketchItem.setEnabled(false);
+        }
+
+        updateUndoLastLegItem(menu);
+
+        // disable Flip Last Line by default — only meaningful in a sketch view
+        MenuItem flipLastLineItem = menu.findItem(R.id.action_flip_last_line);
+        if (flipLastLineItem != null) {
+            flipLastLineItem.setEnabled(false);
+        }
+
+        // the button views only exist once the menu has been laid out
+        getWindow().getDecorView().post(this::highlightActiveViewButton);
+
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    /**
+     * Readings can arrive while the menu is closed, and the action bar menu is only prepared when
+     * it is invalidated, so the Edit submenu refreshes Undo Last Reading as it is shown.
+     */
+    @Override
+    public boolean onMenuOpened(int featureId, @NonNull Menu menu) {
+        updateUndoLastLegItem(menu);
+        return super.onMenuOpened(featureId, menu);
+    }
+
+    /**
+     * Whether this screen offers Undo Last Reading; only survey-editor views and the device screen
+     * do.
+     */
+    protected boolean offersUndoLastLeg() {
+        return false;
+    }
+
+    private void updateUndoLastLegItem(Menu menu) {
+        MenuItem undoLastLegItem = menu.findItem(R.id.action_undo_last_leg);
+        if (undoLastLegItem != null) {
+            Survey survey = getSurvey();
+            undoLastLegItem.setEnabled(
+                    offersUndoLastLeg() && survey != null && survey.canUndoAddLeg());
+        }
+    }
+
+    private void highlightActiveViewButton() {
+        int activeViewId = getActiveViewMenuItemId();
+        for (int viewId : VIEW_MENU_ITEM_IDS) {
+            // action bar buttons take the ID of their menu item
+            View button = findViewById(viewId);
+            if (button != null) {
+                button.setForeground(
+                        viewId == activeViewId
+                                ? ContextCompat.getDrawable(this, R.drawable.active_view_highlight)
+                                : null);
+            }
+        }
     }
 
     @Override
@@ -263,13 +372,13 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
             startActivity(DeviceActivity.class);
             return true;
         } else if (itemId == R.id.action_table) {
-            startActivity(TableActivity.class);
+            switchToView(TableActivity.class);
             return true;
         } else if (itemId == R.id.action_plan) {
-            startActivity(PlanActivity.class);
+            switchToView(PlanActivity.class);
             return true;
         } else if (itemId == R.id.action_elevation) {
-            startActivity(ExtendedElevationActivity.class);
+            switchToView(ExtendedElevationActivity.class);
             return true;
         } else if (itemId == R.id.action_3d) {
             startActivity(ThreeDViewActivity.class);
@@ -490,6 +599,13 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     public void requestExit() {
         finishAffinity();
         System.exit(0);
+    }
+
+    @SuppressLint("UnusedDeclaration") // called through Reflection
+    public void leaveViaBack() {
+        exitWarningCallback.setEnabled(false);
+        getOnBackPressedDispatcher().onBackPressed();
+        exitWarningCallback.setEnabled(true);
     }
 
     private void requestPermissionsIfRequired() {
@@ -713,11 +829,28 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Switches between the Table, Plan and Elevation views with a crossfade. A plain startActivity
+     * slides in a view the first time it opens but not when an existing one is reordered to the
+     * front, so switching would otherwise look different depending on what has been opened before.
+     */
+    private void switchToView(Class<? extends SexyTopoActivity> clazz) {
+        Bundle options =
+                ActivityOptions.makeCustomAnimation(
+                                this, android.R.anim.fade_in, android.R.anim.fade_out)
+                        .toBundle();
+        startActivity(clazz, options);
+    }
+
     protected void startActivity(Class<? extends SexyTopoActivity> clazz) {
+        startActivity(clazz, null);
+    }
+
+    private void startActivity(Class<? extends SexyTopoActivity> clazz, Bundle options) {
         if (!clazz.isInstance(this)) {
             Intent intent = new Intent(this, clazz);
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
+            startActivity(intent, options);
         }
     }
 
@@ -1384,6 +1517,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
                 android.content.Context context = contexts[0];
                 Survey survey = getSurvey();
                 Saver.save(context, survey);
+                // the survey has a directory of its own now, so autosaves will go there instead
+                ScratchAutosave.clear(context);
                 return true;
             } catch (Exception exception) {
                 Log.e(exception);

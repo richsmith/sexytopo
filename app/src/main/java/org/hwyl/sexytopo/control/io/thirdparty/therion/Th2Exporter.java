@@ -16,8 +16,10 @@ import org.hwyl.sexytopo.model.common.Shape;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.geometry.Projection2D;
 import org.hwyl.sexytopo.model.geometry.Space;
+import org.hwyl.sexytopo.model.sketch.AreaDetail;
 import org.hwyl.sexytopo.model.sketch.AutoScalableDetail;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
+import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.Symbol;
 import org.hwyl.sexytopo.model.sketch.SymbolDetail;
@@ -423,6 +425,21 @@ public class Th2Exporter {
                 }
             }
 
+            // semantic lines (walls etc.) can be exported as first-class Therion lines on top
+            // of their appearance in the XVI tracing background
+            if (GeneralPreferences.isTherionLineExportEnabled()) {
+                for (PathDetail pathDetail : sketch.getPathDetails()) {
+                    if (pathDetail.getLineType().isSemantic()) {
+                        commands.add(getLine(pathDetail, scale));
+                    }
+                }
+            }
+
+            List<AreaDetail> areaDetails = sketch.getAreaDetails();
+            for (int i = 0; i < areaDetails.size(); i++) {
+                commands.add(getArea(areaDetails.get(i), i + 1, scale));
+            }
+
             if (GeneralPreferences.isXviExportSymbolsEnabled()) {
                 for (SymbolDetail symbolDetail : sketch.getSymbolDetails()) {
                     Coord2D coord = symbolDetail.getPosition().scale(scale).flipVertically();
@@ -444,6 +461,54 @@ public class Th2Exporter {
         }
 
         return commands;
+    }
+
+    private static String getLine(PathDetail pathDetail, float scale) {
+        List<String> lines = new ArrayList<>();
+        lines.add("line " + pathDetail.getLineType().getTherionName());
+        for (Coord2D point : pathDetail.getPath()) {
+            Coord2D coord = point.scale(scale).flipVertically();
+            lines.add("  " + coord.x + " " + coord.y);
+        }
+        lines.add("endline");
+        return TextTools.join("\n", lines);
+    }
+
+    /**
+     * An area is expressed in Therion as one closed border line per contour, plus an area command
+     * referencing them all by id. The borders use the invisible subtype since they are just
+     * construction aids, not drawn walls. Therion treats the borders after the first as holes, so
+     * an area with a hole maps directly onto this form.
+     */
+    private static String getArea(AreaDetail areaDetail, int index, float scale) {
+        String therionName = areaDetail.getAreaType().getTherionName();
+
+        List<String> lines = new ArrayList<>();
+        List<String> ids = new ArrayList<>();
+
+        List<List<Coord2D>> contours = areaDetail.getContours();
+        for (int i = 0; i < contours.size(); i++) {
+            // one id per contour: water1, water1b, water1c, ...
+            String id = therionName + index + (i == 0 ? "" : Character.toString((char) ('a' + i)));
+            ids.add(id);
+            lines.add("line border:invisible -id " + id + " -close on");
+            List<Coord2D> contour = contours.get(i);
+            for (Coord2D point : contour) {
+                Coord2D coord = point.scale(scale).flipVertically();
+                lines.add("  " + coord.x + " " + coord.y);
+            }
+            // xtherion expects the start point repeated to close the loop
+            Coord2D first = contour.get(0).scale(scale).flipVertically();
+            lines.add("  " + first.x + " " + first.y);
+            lines.add("endline");
+        }
+
+        lines.add("area " + therionName);
+        for (String id : ids) {
+            lines.add("  " + id);
+        }
+        lines.add("endarea");
+        return TextTools.join("\n", lines);
     }
 
     private static String getPoint(float x, float y, String name, String... args) {

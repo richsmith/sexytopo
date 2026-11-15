@@ -1,0 +1,32 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="40dp"
+    android:viewportWidth="40"
+    android:viewportHeight="40">
+  <!-- A chimney/aven: a dashed line with ticks on the upward side (a ceiling feature, so the
+       opposite side to the pit ticks). -->
+  <path
+      android:strokeWidth="2.5"
+      android:pathData="M4,22 C9,20 13,19.4 17,19.4"
+      android:fillColor="#00000000"
+      android:strokeColor="#000"
+      android:strokeLineCap="round"/>
+  <path
+      android:strokeWidth="2.5"
+      android:pathData="M23,19.4 C28,19.7 32,20.5 36,22"
+      android:fillColor="#00000000"
+      android:strokeColor="#000"
+      android:strokeLineCap="round"/>
+  <path
+      android:strokeWidth="2.5"
+      android:pathData="M11,20 L11,13.5"
+      android:fillColor="#00000000"
+      android:strokeColor="#000"
+      android:strokeLineCap="round"/>
+  <path
+      android:strokeWidth="2.5"
+      android:pathData="M29,20 L29,13.5"
+      android:fillColor="#00000000"
+      android:strokeColor="#000"
+      android:strokeLineCap="round"/>
+</vector>

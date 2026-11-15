@@ -150,7 +150,6 @@ public class CavwayX1Manager extends SexyTopoBleManager {
     private class DataHandler extends SexyTopoDataHandler {
         private static final byte PACKET_TYPE_NORMAL = 0x01;
         private static final byte PACKET_TYPE_CALIBRATION = 0x02;
-        private static final float ANGLE_SCALE = 360.0f / 65535.0f; // 360.0 / 0xFFFF
 
         @RequiresApi(api = Build.VERSION_CODES.O)
         @Override
@@ -177,31 +176,8 @@ public class CavwayX1Manager extends SexyTopoBleManager {
         }
 
         private void handleMeasurementPacket(byte[] packet) {
-            // According to the protocol document
-            // Byte 2: distance (16 - 23 bit)
-            // Byte 3: distance (0 – 7 bit)
-            // Byte 4: distance (8 – 15 bit)
-            int dist_p3 = (packet[3] & 0xFF);
-            int dist_p4 = (packet[4] & 0xFF) << 8;
-            int dist_p2 = (packet[2] & 0xFF) << 16;
-            float distance = (dist_p2 | dist_p4 | dist_p3) / 1000.0f;
-
-            // Byte 5-6: Azimuth
-            // Byte 7-8: Inclination
-            // Byte 9-10: Roll
-            float azimuth = parseAngle(packet, 5);
-            float inclination = parseAngle(packet, 7);
-            float roll = parseAngle(packet, 9);
-
-            Leg leg = new Leg(distance, azimuth, inclination);
+            Leg leg = CavwayX1Protocol.parseMeasurementPacket(packet);
             dataManager.updateSurvey(leg);
-        }
-
-        private float parseAngle(byte[] data, int startIndex) {
-            int lowByte = data[startIndex] & 0xFF;
-            int highByte = data[startIndex + 1] & 0xFF;
-            int combined = (highByte << 8) | lowByte;
-            return combined * ANGLE_SCALE;
         }
 
         private void acknowledgePacket(byte flags) {

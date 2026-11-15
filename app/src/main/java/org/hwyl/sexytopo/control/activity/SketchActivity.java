@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.ShapeDrawable;
@@ -22,11 +23,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Surface;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import androidx.annotation.NonNull;
+import androidx.appcompat.content.res.AppCompatResources;
+import androidx.appcompat.widget.TooltipCompat;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import org.apache.commons.lang3.ArrayUtils;
@@ -39,10 +44,13 @@ import org.hwyl.sexytopo.control.util.SurveyStats;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.geometry.Projection2D;
 import org.hwyl.sexytopo.model.geometry.Space;
+import org.hwyl.sexytopo.model.sketch.AreaType;
 import org.hwyl.sexytopo.model.sketch.BrushColour;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
+import org.hwyl.sexytopo.model.sketch.LineType;
+import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchTool;
 import org.hwyl.sexytopo.model.sketch.Symbol;
@@ -57,11 +65,11 @@ public abstract class SketchActivity extends SurveyEditorActivity
 
     private static final int[] SKETCH_BUTTON_IDS =
             new int[] {
-                R.id.buttonDraw,
+                R.id.buttonLine,
+                R.id.buttonArea,
                 R.id.buttonErase,
                 R.id.buttonSymbol,
                 R.id.buttonUndo,
-                R.id.buttonRedo,
                 R.id.buttonBlack,
                 R.id.buttonBrown,
                 R.id.buttonGrey,
@@ -95,6 +103,12 @@ public abstract class SketchActivity extends SurveyEditorActivity
     private int buttonHighlightColour = Colour.RED.intValue;
 
     private boolean symbolToolbarOpenedOnce = false;
+    private boolean lineTypeToolbarOpenedOnce = false;
+    private boolean areaTypeToolbarOpenedOnce = false;
+
+    // the pop-up toolbars above the sketch toolbar; at most one is open at a time
+    private static final int[] POP_UP_TOOLBAR_IDS =
+            new int[] {R.id.symbolToolbar, R.id.lineTypeToolbar, R.id.areaTypeToolbar};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -159,6 +173,8 @@ public abstract class SketchActivity extends SurveyEditorActivity
         intialiseActivity();
         initialiseSketchView();
         initialiseSymbolToolbar();
+        initialiseLineTypeToolbar();
+        initialiseAreaTypeToolbar();
         initialiseTools();
 
         setSketchButtonsStatus();
@@ -295,6 +311,70 @@ public abstract class SketchActivity extends SurveyEditorActivity
         handleAction(id);
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        updateUndoRedoItems(menu);
+        MenuItem flipLastLineItem = menu.findItem(R.id.action_flip_last_line);
+        if (flipLastLineItem != null) {
+            flipLastLineItem.setEnabled(true);
+        }
+        return true;
+    }
+
+    /**
+     * The action bar menu is only prepared when it is invalidated, not each time it opens, so the
+     * Edit submenu refreshes Undo and Redo against the sketch history as it is shown.
+     */
+    @Override
+    public boolean onMenuOpened(int featureId, @NonNull Menu menu) {
+        updateUndoRedoItems(menu);
+        return super.onMenuOpened(featureId, menu);
+    }
+
+    private void updateUndoRedoItems(Menu menu) {
+        MenuItem undoSketchItem = menu.findItem(R.id.action_undo_sketch);
+        if (undoSketchItem != null) {
+            undoSketchItem.setEnabled(sketchView.canUndo());
+        }
+        MenuItem redoSketchItem = menu.findItem(R.id.action_redo_sketch);
+        if (redoSketchItem != null) {
+            redoSketchItem.setEnabled(sketchView.canRedo());
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_undo_sketch) {
+            sketchView.undo();
+            return true;
+        } else if (itemId == R.id.action_redo_sketch) {
+            sketchView.redo();
+            return true;
+        } else if (itemId == R.id.action_flip_last_line) {
+            flipLastLine();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Reverses the most recently drawn typed line, flipping which side its ticks fall on. Meant for
+     * the case where a pit or chimney came out ticked on the wrong side: one menu tap fixes it
+     * instead of undoing and redrawing the other way.
+     */
+    private void flipLastLine() {
+        Sketch sketch = getSketch(getSurvey());
+        PathDetail toFlip = sketch.getMostRecentOrientedPath();
+        if (toFlip == null) {
+            showSimpleToast(R.string.tools_flip_last_line_none);
+            return;
+        }
+        sketch.flipPathDetail(toFlip);
+        sketchView.invalidate();
+    }
+
     public boolean onMenuItemClick(MenuItem item) {
         int itemId = item.getItemId();
 
@@ -338,6 +418,10 @@ public abstract class SketchActivity extends SurveyEditorActivity
             SketchPreferences.Toggle.SHOW_STATION_LABELS.set(!item.isChecked());
             sketchView.invalidate();
             return true;
+        } else if (itemId == R.id.buttonShowWallSides) {
+            SketchPreferences.Toggle.SHOW_WALL_SIDES.set(!item.isChecked());
+            sketchView.invalidate();
+            return true;
         } else if (itemId == R.id.buttonShowConnections) {
             SketchPreferences.Toggle.SHOW_CONNECTIONS.set(!item.isChecked());
             sketchView.invalidate();
@@ -348,6 +432,12 @@ public abstract class SketchActivity extends SurveyEditorActivity
             return true;
         } else if (itemId == R.id.buttonBlueWater) {
             SketchPreferences.Toggle.BLUE_WATER.set(!item.isChecked());
+            // the water area icons follow the setting
+            initialiseAreaTypeToolbar();
+            selectAreaType(SketchPreferences.getSelectedAreaType());
+            return true;
+        } else if (itemId == R.id.buttonClipToWalls) {
+            SketchPreferences.Toggle.CLIP_TO_WALLS.set(!item.isChecked());
             return true;
         } else if (itemId == R.id.buttonPinchToZoom) {
             SketchPreferences.Toggle.PINCH_TO_ZOOM.set(!item.isChecked());
@@ -395,9 +485,6 @@ public abstract class SketchActivity extends SurveyEditorActivity
         } else if (itemId == R.id.buttonUndo) {
             sketchView.undo();
             return true;
-        } else if (itemId == R.id.buttonRedo) {
-            sketchView.redo();
-            return true;
         } else if (itemId == R.id.buttonMenu) {
             openDisplayMenu();
             return true;
@@ -417,7 +504,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
             if (brushColour.getId() == itemId) {
                 selectBrushColour(brushColour);
                 if (!sketchView.getSketchTool().usesColour()) {
-                    selectSketchTool(SketchTool.DRAW);
+                    selectSketchTool(SketchTool.LINE);
                 }
                 return true;
             }
@@ -432,7 +519,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
             // and toggle it whenever the symbol tool is tapped while already active.
             if (!symbolToolbarOpenedOnce || wasAlreadyInSymbolMode) {
                 symbolToolbarOpenedOnce = true;
-                toggleSymbolToolbar();
+                togglePopUpToolbar(R.id.symbolToolbar);
             }
             return true;
         }
@@ -441,6 +528,55 @@ public abstract class SketchActivity extends SurveyEditorActivity
             if (itemId == symbol.getButtonViewId()) {
                 selectSketchTool(SketchTool.SYMBOL);
                 selectSymbol(symbol);
+                return true;
+            }
+        }
+
+        // ********** Handle special line type logic **********
+
+        if (itemId == R.id.buttonLine) {
+            boolean wasAlreadyInLineMode = alreadySelectedTool == SketchTool.LINE;
+            selectSketchTool(SketchTool.LINE);
+            // Mirrors the symbol toolbar: open the first time ever, then toggle whenever the
+            // line tool is tapped while already active.
+            if (!lineTypeToolbarOpenedOnce || wasAlreadyInLineMode) {
+                lineTypeToolbarOpenedOnce = true;
+                togglePopUpToolbar(R.id.lineTypeToolbar);
+            }
+            return true;
+        }
+
+        for (LineType lineType : LineType.values()) {
+            if (itemId == lineType.getButtonViewId()) {
+                // Several line types have similar icons, so tapping the selected one again shows
+                // its name, as a long press does
+                if (lineType == SketchPreferences.getSelectedLineType()) {
+                    findViewById(itemId).performLongClick();
+                }
+                selectSketchTool(SketchTool.LINE);
+                selectLineType(lineType);
+                return true;
+            }
+        }
+
+        // ********** Handle special area type logic **********
+
+        if (itemId == R.id.buttonArea) {
+            boolean wasAlreadyInAreaMode = alreadySelectedTool == SketchTool.AREA;
+            selectSketchTool(SketchTool.AREA);
+            // Mirrors the symbol toolbar: open the first time ever, then toggle whenever the
+            // area tool is tapped while already active.
+            if (!areaTypeToolbarOpenedOnce || wasAlreadyInAreaMode) {
+                areaTypeToolbarOpenedOnce = true;
+                togglePopUpToolbar(R.id.areaTypeToolbar);
+            }
+            return true;
+        }
+
+        for (AreaType areaType : AreaType.values()) {
+            if (itemId == areaType.getButtonViewId()) {
+                selectSketchTool(SketchTool.AREA);
+                selectAreaType(areaType);
                 return true;
             }
         }
@@ -479,69 +615,191 @@ public abstract class SketchActivity extends SurveyEditorActivity
     }
 
     private void initialiseSymbolToolbar() {
-        LinearLayout buttonPanel = findViewById(R.id.symbolToolbarButtonPanel);
+        GridLayout buttonPanel =
+                preparePickerPanel(R.id.symbolToolbarButtonPanel, Symbol.values().length);
+        for (Symbol symbol : Symbol.values()) {
+            buttonPanel.addView(
+                    createPickerButton(
+                            symbol.getButtonViewId(),
+                            tintPickerIcon(symbol.createDrawable()),
+                            symbol.getName()));
+        }
+    }
+
+    private void initialiseLineTypeToolbar() {
+        GridLayout buttonPanel =
+                preparePickerPanel(R.id.lineTypeToolbarButtonPanel, LineType.values().length);
+        for (LineType lineType : LineType.values()) {
+            buttonPanel.addView(
+                    createPickerButton(
+                            lineType.getButtonViewId(),
+                            tintPickerIcon(
+                                    AppCompatResources.getDrawable(this, lineType.getDrawableId())),
+                            getString(lineType.getStringId())));
+        }
+    }
+
+    /**
+     * Empties one of the pop-up pickers and sets it up as a grid with as many columns as fit across
+     * the screen, so that every item can be seen at once without scrolling. The columns are then
+     * evened out so the last row isn't left nearly empty.
+     */
+    private GridLayout preparePickerPanel(int panelId, int itemCount) {
+        GridLayout buttonPanel = findViewById(panelId);
         buttonPanel.removeAllViews();
 
-        int heightDp = Math.round(getResources().getDimension(R.dimen.toolbar_button_height));
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(heightDp, heightDp);
+        int buttonSize = getResources().getDimensionPixelSize(R.dimen.picker_button_size);
+        int screenWidth = getResources().getDisplayMetrics().widthPixels;
+        int maxColumns = Math.max(1, screenWidth / buttonSize);
+        int rows = (itemCount + maxColumns - 1) / maxColumns;
+        int columns = (itemCount + rows - 1) / rows;
+        buttonPanel.setColumnCount(columns);
+        return buttonPanel;
+    }
 
-        for (Symbol symbol : Symbol.values()) {
-            Drawable drawable = symbol.createDrawable();
-            ImageButton button = new ImageButton(this);
-            button.setId(symbol.getButtonViewId());
-            button.setLayoutParams(params);
-            button.setScaleType(ImageView.ScaleType.FIT_CENTER);
-            button.setImageDrawable(drawable);
-            button.setOnClickListener(this);
-            buttonPanel.addView(button);
+    private ImageButton createPickerButton(int viewId, Drawable drawable, String name) {
+        int buttonSize = getResources().getDimensionPixelSize(R.dimen.picker_button_size);
+        int padding = Math.round(buttonSize * 0.12f);
+
+        ImageButton button = new ImageButton(this);
+        button.setId(viewId);
+        button.setLayoutParams(
+                new GridLayout.LayoutParams(new ViewGroup.LayoutParams(buttonSize, buttonSize)));
+        button.setBackgroundResource(R.drawable.picker_button_background);
+        button.setPadding(padding, padding, padding, padding);
+        button.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        button.setImageDrawable(drawable);
+        button.setContentDescription(name);
+        TooltipCompat.setTooltipText(button, name);
+        button.setOnClickListener(this);
+        return button;
+    }
+
+    private void selectLineType(LineType lineType) {
+        SketchPreferences.setSelectedLineType(lineType);
+
+        for (LineType l : LineType.values()) {
+            findViewById(l.getButtonViewId()).setSelected(l == lineType);
         }
-        buttonPanel.invalidate();
+
+        ImageButton lineButton = findViewById(R.id.buttonLine);
+        lineButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        lineButton.setImageDrawable(
+                addSelectionBorder(AppCompatResources.getDrawable(this, lineType.getDrawableId())));
+
+        sketchView.setLineType(lineType);
     }
 
-    private void toggleSymbolToolbar() {
-        View toolbar = getSymbolToolbar();
-        boolean isVisible = toolbar.getVisibility() == View.VISIBLE;
-        setSymbolToolbarOpen(!isVisible);
+    private void initialiseAreaTypeToolbar() {
+        GridLayout buttonPanel =
+                preparePickerPanel(R.id.areaTypeToolbarButtonPanel, AreaType.values().length);
+        for (AreaType areaType : AreaType.values()) {
+            Drawable icon = getAreaTypeIcon(areaType, areaType.getFillDrawableId());
+            if (!isDrawnBlue(areaType)) {
+                tintPickerIcon(icon);
+            }
+            buttonPanel.addView(
+                    createPickerButton(
+                            areaType.getButtonViewId(), icon, getString(areaType.getStringId())));
+        }
     }
 
-    private void setSymbolToolbarOpen(boolean setOpen) {
-        View toolbar = getSymbolToolbar();
-        toolbar.setVisibility(setOpen ? View.VISIBLE : View.GONE);
+    private void selectAreaType(AreaType areaType) {
+        SketchPreferences.setSelectedAreaType(areaType);
+
+        for (AreaType a : AreaType.values()) {
+            findViewById(a.getButtonViewId()).setSelected(a == areaType);
+        }
+
+        ImageButton areaButton = findViewById(R.id.buttonArea);
+        areaButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        areaButton.setImageDrawable(
+                new LayerDrawable(
+                        new Drawable[] {
+                            getAreaTypeIcon(areaType, areaType.getDrawableId()),
+                            AppCompatResources.getDrawable(this, R.drawable.area_outline)
+                        }));
+
+        sketchView.setAreaType(areaType);
     }
 
-    private View getSymbolToolbar() {
-        return findViewById(R.id.symbolToolbar);
+    /**
+     * One of an area type's icons, in blue for water types when blue water is on, to match how the
+     * area will be drawn.
+     */
+    private Drawable getAreaTypeIcon(AreaType areaType, int drawableId) {
+        Drawable drawable = AppCompatResources.getDrawable(this, drawableId).mutate();
+        if (isDrawnBlue(areaType)) {
+            drawable.setColorFilter(
+                    new PorterDuffColorFilter(
+                            Colour.WATER.getDrawColour(isDarkModeActive()).intValue,
+                            PorterDuff.Mode.SRC_IN));
+        }
+        return drawable;
+    }
+
+    private boolean isDrawnBlue(AreaType areaType) {
+        return areaType.isWater() && SketchPreferences.Toggle.BLUE_WATER.isOn();
+    }
+
+    /**
+     * Colours a picker icon to suit the theme: the icons are drawn in black, which would vanish
+     * against the dark picker background in dark mode.
+     */
+    private Drawable tintPickerIcon(Drawable drawable) {
+        Drawable tinted = drawable.mutate();
+        tinted.setColorFilter(
+                new PorterDuffColorFilter(
+                        ContextCompat.getColor(this, R.color.pickerIcon), PorterDuff.Mode.SRC_IN));
+        return tinted;
+    }
+
+    /** Opens or closes one of the pop-up toolbars; opening it closes any other that is open. */
+    private void togglePopUpToolbar(int toolbarId) {
+        boolean open = findViewById(toolbarId).getVisibility() != View.VISIBLE;
+        for (int id : POP_UP_TOOLBAR_IDS) {
+            View toolbar = findViewById(id);
+            toolbar.setVisibility(id == toolbarId && open ? View.VISIBLE : View.GONE);
+        }
     }
 
     private void selectSymbol(Symbol symbol) {
         SketchPreferences.setSelectedSymbol(symbol);
 
         for (Symbol s : Symbol.values()) {
-            ImageButton button = findViewById(s.getButtonViewId());
-            button.getBackground().clearColorFilter();
+            findViewById(s.getButtonViewId()).setSelected(s == symbol);
         }
-
-        ImageButton selectedSymbolButton = findViewById(symbol.getButtonViewId());
-        selectedSymbolButton
-                .getBackground()
-                .setColorFilter(buttonHighlightColour, PorterDuff.Mode.SRC_ATOP);
 
         ImageButton symbolButton = findViewById(R.id.buttonSymbol);
         symbolButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        symbolButton.setImageDrawable(addSelectionBorder(symbol.createDrawable()));
 
+        sketchView.setCurrentSymbol(symbol);
+    }
+
+    /**
+     * Wraps a toolbar drawable in the border used to show what is currently selected on the line,
+     * area and symbol buttons.
+     *
+     * <p>The border is given an explicit size rather than being allowed to take the size of the
+     * drawable it wraps, so that the box stays the same whatever is selected.
+     */
+    private Drawable addSelectionBorder(Drawable drawable) {
         ShapeDrawable border =
                 new ShapeDrawable(
                         new RoundRectShape(new float[] {5, 5, 5, 5, 5, 5, 5, 5}, null, null));
-        border.getPaint().setColor(Color.BLACK); // Set border color
-        border.getPaint().setStyle(Paint.Style.STROKE); // Set to be a border (not filled)
-        border.getPaint().setStrokeWidth(10); // Set border width
+        border.getPaint().setColor(Color.BLACK);
+        border.getPaint().setStyle(Paint.Style.STROKE);
+        border.getPaint().setStrokeWidth(10);
 
-        Drawable drawable = symbol.createDrawable();
-        Drawable[] layers = {drawable, border};
-        LayerDrawable layerDrawable = new LayerDrawable(layers);
-        symbolButton.setImageDrawable(layerDrawable);
+        int size = Math.round(getResources().getDimension(R.dimen.toolbar_button_height));
+        border.setIntrinsicWidth(size);
+        border.setIntrinsicHeight(size);
 
-        sketchView.setCurrentSymbol(symbol);
+        LayerDrawable layers = new LayerDrawable(new Drawable[] {drawable, border});
+        layers.setLayerSize(0, size, size);
+        layers.setLayerSize(1, size, size);
+        return layers;
     }
 
     private void initialiseTools() {
@@ -554,6 +812,12 @@ public abstract class SketchActivity extends SurveyEditorActivity
         Symbol.setResources(getResources());
         Symbol selectedSymbol = SketchPreferences.getSelectedSymbol();
         selectSymbol(selectedSymbol);
+
+        LineType selectedLineType = SketchPreferences.getSelectedLineType();
+        selectLineType(selectedLineType);
+
+        AreaType selectedAreaType = SketchPreferences.getSelectedAreaType();
+        selectAreaType(selectedAreaType);
     }
 
     private void selectSketchTool(SketchTool toSelect) {

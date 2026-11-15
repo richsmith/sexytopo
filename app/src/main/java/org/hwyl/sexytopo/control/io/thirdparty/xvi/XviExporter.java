@@ -70,6 +70,9 @@ public class XviExporter {
             content.shots.add(getLegText(line, scale));
         }
         for (PathDetail pathDetail : sketch.getPathDetails()) {
+            // Semantic lines can also be exported as first-class th2 lines, but they stay in
+            // the tracing background regardless so it is always a complete record of the
+            // sketch (th2 line export is optional, and th2 lines are freely editable/deletable)
             content.sketchLines.add(getPathDetailText(pathDetail, scale));
         }
         for (TextDetail textDetail : sketch.getTextDetails()) {

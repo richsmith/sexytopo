@@ -46,6 +46,13 @@
         android:defaultValue="35"/>
 
     <EditTextPreference
+        android:key="pref_survey_line_ornament_size"
+        android:title="@string/settings_survey_line_ornament_size_title"
+        android:summary="@string/settings_survey_line_ornament_size_summary"
+        android:inputType="number"
+        android:defaultValue="12"/>
+
+    <EditTextPreference
         android:key="pref_sketch_line_width"
         android:title="@string/settings_sketch_line_width_title"
         android:summary="@string/settings_sketch_line_width_summary"

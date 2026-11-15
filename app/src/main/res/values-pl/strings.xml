@@ -8,6 +8,7 @@
     <string name="carry_on">Kontynuuj</string>
     <string name="delete">Usuń</string>
     <string name="save">Zapisz</string>
+    <string name="update">Aktualizuj</string>
     <string name="overwrite">Nadpisz</string>
     <string name="move">Przenieś</string>
     <string name="replace">Zamień</string>
@@ -83,6 +84,9 @@
     <string name="action_input_mode_cal_check">Tylko pomiary szczegółowe</string>
     <string name="action_view">Widok</string>
     <string name="action_fullscreen">Pełny ekran</string>
+    <string name="action_edit">Edycja</string>
+    <string name="action_undo_sketch">Cofnij szkic</string>
+    <string name="action_redo_sketch">Ponów szkic</string>
     <string name="action_tools">Narzędzia</string>
     <string name="action_add_leg">Dodaj ciąg…</string>
     <string name="action_add_splay">Dodaj pomiar szczegółowy…</string>
@@ -134,6 +138,9 @@
     <string name="file_error_deleting_survey">Błąd usuwania pomiaru</string>
     <string name="file_cannot_extend_unsaved_survey">Nie można rozszerzyć niezapisanego pomiaru</string>
     <string name="file_autosave_restored">Przywrócono autozapis</string>
+    <string name="file_restoring_unsaved_survey">Przywracanie niezapisanego pomiaru</string>
+    <string name="file_unsaved_survey_restored">Przywrócono niezapisany pomiar</string>
+    <string name="file_unsaved_survey_restore_error">Błąd przywracania niezapisanego pomiaru: %1$s</string>
     <string name="file_autosave_load_error">Błąd przywracania autozapisu</string>
     <string name="file_warning_survey_not_saved">Uwaga: bieżący pomiar nie został zapisany</string>
     <string name="file_active_survey">Aktywny pomiar to %1$s</string>
@@ -166,7 +173,8 @@
     <string name="share_preparing">Przygotowywanie inwentaryzacji do udostępnienia…</string>
 
     <!-- Sketch view -->
-    <string name="sketch_toolbar_draw">Tryb rysowania</string>
+    <string name="sketch_toolbar_line">Narzędzie linii</string>
+    <string name="sketch_toolbar_area">Narzędzie obszaru</string>
     <string name="sketch_toolbar_move">Tryb przesuwania</string>
     <string name="sketch_toolbar_eraser">Gumka</string>
     <string name="sketch_toolbar_text">Narzędzie tekstu</string>
@@ -174,7 +182,6 @@
     <string name="sketch_toolbar_selector">Selektor</string>
     <string name="sketch_toolbar_settings">Szybkie ustawienia</string>
     <string name="sketch_toolbar_undo">Cofnij</string>
-    <string name="sketch_toolbar_redo">Ponów</string>
     <string name="sketch_toolbar_zoom_in">Powiększ</string>
     <string name="sketch_toolbar_zoom_out">Pomniejsz</string>
     <string name="sketch_toolbar_colour_main">Kolor główny</string>
@@ -186,20 +193,34 @@
     <string name="sketch_toolbar_colour_blue">Niebieski</string>
     <string name="sketch_toolbar_colour_purple">Fioletowy</string>
     <string name="sketch_toolbar_symbol_close">Zamknij pasek symboli</string>
+    <string name="line_type_sketch">Linia szkicu</string>
+    <string name="line_type_wall">Ściana</string>
+    <string name="line_type_presumed_wall">Ściana domniemana</string>
+    <string name="line_type_underlying_wall">Ściana poniżej</string>
+    <string name="line_type_pit">Krawędź studni</string>
+    <string name="line_type_floor_step">Próg</string>
+    <string name="line_type_chimney">Komin</string>
+    <string name="line_type_ceiling_step">Próg stropowy</string>
+    <string name="line_type_overhang">Przewieszenie</string>
+    <string name="line_type_slope">Stok</string>
+    <string name="line_type_rock_border">Obrys bloku</string>
+    <string name="line_type_rock_edge">Krawędź bloku</string>
     <string name="sketch_menu_delete_last_leg">Cofnij ostatni pomiar</string>
     <string name="sketch_menu_centre_view">Wyśrodkuj na aktywnym</string>
     <string name="sketch_menu_auto_recentre">Automatyczne wyśrodkowywanie</string>
-    <string name="sketch_menu_redo">Ponów akcję szkicu</string>
+    <string name="sketch_menu_modes">Tryby</string>
+    <string name="sketch_menu_show">Pokaż</string>
     <string name="sketch_menu_show_grid">Siatka</string>
     <string name="sketch_menu_show_compass">Kompas</string>
     <string name="sketch_menu_blue_water">Auto niebieska woda</string>
     <string name="sketch_menu_snap_to_lines">Przyciąganie do linii</string>
     <string name="sketch_menu_pinch_to_zoom">Zoom szczypaniem</string>
     <string name="sketch_menu_fade_non_active">Przyciemnij nieaktywne</string>
+    <string name="sketch_menu_show_wall_sides">Wszystkie strony ścian</string>
     <string name="sketch_menu_show_station_labels">Etykiety stanowisk</string>
     <string name="sketch_menu_show_xsections">Przekroje</string>
-    <string name="sketch_menu_show_splays">Pokaż pomiary szczegółowe</string>
-    <string name="sketch_menu_show_sketch">Pokaż szkic</string>
+    <string name="sketch_menu_show_splays">Pomiary szczegółowe</string>
+    <string name="sketch_menu_show_sketch">Szkic</string>
     <string name="sketch_menu_show_connect">Połączone pomiary</string>
     <string name="sketch_menu_back_measurements">Odwrócone ciągi</string>
     <string name="sketch_position_cross_section_instruction">Wybierz miejsce narysowania przekroju</string>
@@ -500,11 +521,6 @@
         <item>Liniowy</item>
         <item>Nieliniowy</item>
     </string-array>
-    <string-array name="settings_leg_amalgamation_algorithm_entries">
-        <item>Delty kątowe: porównuj odległość, azymut i nachylenie osobno; uśredniaj osobno</item>
-        <item>Odległość punktów końcowych: porównuj, jak daleko od siebie są punkty końcowe; uśredniaj jako wektory</item>
-        <item>Wektory parami: porównuj odstęp punktów końcowych względem długości ciągu; uśredniaj jako wektory</item>
-    </string-array>
     <string name="settings_immersive_mode_enabled">Tryb pełnoekranowy włączony</string>
     <string name="settings_immersive_mode_disabled">Tryb pełnoekranowy wyłączony</string>
     <string name="settings_new_station_vibration_title">Wibracja przy nowym stanowisku</string>
@@ -520,19 +536,26 @@
 <string name="settings_instruments_title">Instrumenty</string>
     <string name="settings_instruments_summary">Tolerancje instrumentów, kalibracja</string>
     <string name="settings_max_distance_delta_title">Maks. delta odległości (m)</string>
-    <string name="settings_max_distance_delta_summary">Metoda kątowa: o ile mogą różnić się pomiary odległości przy decydowaniu, czy utworzyć nowe stanowisko</string>
+    <string name="settings_max_distance_delta_summary">O ile mogą różnić się pomiary odległości przy decydowaniu, czy utworzyć nowe stanowisko</string>
     <string name="settings_max_angle_delta_title">Maks. delta kąta (stopnie)</string>
-    <string name="settings_max_angle_delta_summary">Metoda kątowa: o ile mogą różnić się pomiary azymutu lub nachylenia przy decydowaniu, czy utworzyć nowe stanowisko</string>
+    <string name="settings_max_angle_delta_summary">O ile mogą różnić się pomiary azymutu lub nachylenia przy decydowaniu, czy utworzyć nowe stanowisko</string>
     <string name="settings_auto_reconnect_title">Automatyczne ponowne łączenie</string>
     <string name="settings_auto_reconnect_summary">Połącz ponownie automatycznie, jeśli urządzenie się rozłączy</string>
     <string name="settings_auto_reconnect_window_title">Limit czasu automatycznego łączenia (minuty)</string>
     <string name="settings_auto_reconnect_window_summary">Jak długo próbować połączyć się ponownie przed wstrzymaniem</string>
     <string name="settings_leg_amalgamation_algorithm_title">Metoda zgodności ciągu</string>
-    <string name="settings_leg_amalgamation_algorithm_summary">Jak oceniane jest, czy powtórzone pomiary są wystarczająco zbliżone, aby utworzyć ciąg</string>
+    <string name="settings_leg_amalgamation_angular_name">Delty kątowe</string>
+    <string name="settings_leg_amalgamation_angular_description">Odległość, azymut i nachylenie porównywane i uśredniane osobno. Może odrzucać powtórzone strome pomiary</string>
+    <string name="settings_leg_amalgamation_slope_corrected_name">Delty kątowe z korekcją nachylenia</string>
+    <string name="settings_leg_amalgamation_slope_corrected_description">Odległość, nachylenie i odchylenie boczne (różnica azymutu skalowana według stromości) porównywane osobno; uśredniane jako wektory</string>
+    <string name="settings_leg_amalgamation_cartesian_name">Odległość punktów końcowych</string>
+    <string name="settings_leg_amalgamation_cartesian_description">Punkty końcowe pomiarów muszą leżeć w ustalonej odległości od siebie; uśredniane jako wektory</string>
+    <string name="settings_leg_amalgamation_pairwise_name">Wektory parami</string>
+    <string name="settings_leg_amalgamation_pairwise_description">Odstęp punktów końcowych porównywany względem długości ciągu; uśredniane jako wektory</string>
     <string name="settings_max_endpoint_delta_title">Maks. odległość punktów końcowych (m)</string>
-    <string name="settings_max_endpoint_delta_summary">Metoda punktów końcowych: jak daleko od siebie mogą być punkty końcowe pomiarów przy decydowaniu, czy utworzyć nowe stanowisko. Domyślna wartość 0.1 utrzymuje wszystkie pomiary w obrębie jednej komórki BCRA Grade 5.</string>
+    <string name="settings_max_endpoint_delta_summary">Jak daleko od siebie mogą być punkty końcowe pomiarów przy decydowaniu, czy utworzyć nowe stanowisko. Domyślna wartość 0.1 utrzymuje wszystkie pomiary w obrębie jednej komórki BCRA Grade 5.</string>
     <string name="settings_max_pairwise_error_title">Maks. błąd parami</string>
-    <string name="settings_max_pairwise_error_summary">Metoda wektorów parami: dopuszczalny błąd względny między pomiarami (0.05 = około 2.5%) przy decydowaniu, czy utworzyć nowe stanowisko</string>
+    <string name="settings_max_pairwise_error_summary">Dopuszczalny błąd względny między pomiarami (0.05 = około 2.5%) przy decydowaniu, czy utworzyć nowe stanowisko</string>
     <string name="settings_calibration_title">Kalibracja</string>
     <string name="settings_calibration_algorithm_title">Algorytm kalibracji Disto-X</string>
     <string name="settings_calibration_algorithm_summary">Nadpisz wybór algorytmu kalibracji Disto-X</string>
@@ -749,6 +772,9 @@
     <string name="menu_jump_to_station_in_table">&#10132; Tabela danych</string>
     <string name="menu_delete_station">Usuń</string>
     <string name="menu_reverse">Odwróć</string>
+    <string name="menu_line">Linia</string>
+    <string name="menu_flip_line">Odwróć</string>
+    <string name="menu_line_type">Typ linii</string>
     <string name="menu_switch_direction">Przełącz kierunek</string>
     <string name="menu_navigate">Nawiguj</string>
     <string name="menu_links">Połączenia</string>

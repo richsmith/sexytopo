@@ -37,6 +37,10 @@ public class Space3DUtils {
         if (azimuth < 0) {
             azimuth += 360;
         }
+        // A tiny negative angle rounds to exactly 360 above, which isn't a valid azimuth
+        if (azimuth >= 360) {
+            azimuth -= 360;
+        }
 
         float horizontal = (float) Math.sqrt((x * x) + (y * y));
         float inclination = (float) Math.toDegrees(Math.atan2(z, horizontal));

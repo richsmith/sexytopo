@@ -8,6 +8,7 @@
     <string name="carry_on">Fortsetzen</string>
     <string name="delete">Löschen</string>
     <string name="save">Speichern</string>
+    <string name="update">Aktualisieren</string>
     <string name="overwrite">Überschreiben</string>
     <string name="move">Verschieben</string>
     <string name="replace">Ersetzen</string>
@@ -83,6 +84,9 @@
     <string name="action_input_mode_cal_check">Nur Dimensionen/Hilfslinien</string>
     <string name="action_view">Ansicht</string>
     <string name="action_fullscreen">Vollbild</string>
+    <string name="action_edit">Bearbeiten</string>
+    <string name="action_undo_sketch">Zeichnung rückgängig</string>
+    <string name="action_redo_sketch">Zeichnung wiederholen</string>
     <string name="action_tools">Werkzeuge</string>
     <string name="action_add_leg">Messstrecke hinzufügen…</string>
     <string name="action_add_splay">Splay hinzufügen…</string>
@@ -134,6 +138,9 @@
     <string name="file_error_deleting_survey">Fehler beim Löschen der Vermessungsdatei</string>
     <string name="file_cannot_extend_unsaved_survey">Nicht gespeicherte Vermessung kann nicht erweitert werden</string>
     <string name="file_autosave_restored">Automatische Sicherung wiederhergestellt</string>
+    <string name="file_restoring_unsaved_survey">Wiederherstellung der ungespeicherten Vermessung</string>
+    <string name="file_unsaved_survey_restored">Ungespeicherte Vermessung wiederhergestellt</string>
+    <string name="file_unsaved_survey_restore_error">Fehler beim Wiederherstellen der ungespeicherten Vermessung: %1$s</string>
     <string name="file_autosave_load_error">Fehler bei der Wiederherstellung der automatischen Sicherung</string>
     <string name="file_warning_survey_not_saved">Warnung: aktuelle Vermessungsdatei nicht gespeichert</string>
     <string name="file_active_survey">Aktuelle Vermessung ist %1$s</string>
@@ -166,7 +173,8 @@
     <string name="share_preparing">Vermessung wird zum Teilen vorbereitet…</string>
 
     <!--  Sketch view  -->
-    <string name="sketch_toolbar_draw">Zeichnungs-Modus</string>
+    <string name="sketch_toolbar_line">Linienwerkzeug</string>
+    <string name="sketch_toolbar_area">Flächenwerkzeug</string>
     <string name="sketch_toolbar_move">Verschieben-Modus</string>
     <string name="sketch_toolbar_eraser">Radiergummi</string>
     <string name="sketch_toolbar_text">Text-Werkzeug</string>
@@ -174,7 +182,6 @@
     <string name="sketch_toolbar_selector">Auswahl-Werkzeug</string>
     <string name="sketch_toolbar_settings">Schnelleinstellungen</string>
     <string name="sketch_toolbar_undo">Rückgängig</string>
-    <string name="sketch_toolbar_redo">Wiederholen</string>
     <string name="sketch_toolbar_zoom_in">Vergrößern</string>
     <string name="sketch_toolbar_zoom_out">Verkleinern</string>
     <string name="sketch_toolbar_colour_main">Hauptfarbe</string>
@@ -186,20 +193,34 @@
     <string name="sketch_toolbar_colour_blue">Blau</string>
     <string name="sketch_toolbar_colour_purple">Violett</string>
     <string name="sketch_toolbar_symbol_close">Werkzeugleiste Symbole schliessen</string>
+    <string name="line_type_sketch">Skizzenlinie</string>
+    <string name="line_type_wall">Wand</string>
+    <string name="line_type_presumed_wall">Vermutete Wand</string>
+    <string name="line_type_underlying_wall">Darunterliegende Wand</string>
+    <string name="line_type_pit">Schachtkante</string>
+    <string name="line_type_floor_step">Bodenstufe</string>
+    <string name="line_type_chimney">Schlot</string>
+    <string name="line_type_ceiling_step">Deckenstufe</string>
+    <string name="line_type_overhang">Überhang</string>
+    <string name="line_type_slope">Hang</string>
+    <string name="line_type_rock_border">Blockumriss</string>
+    <string name="line_type_rock_edge">Blockkante</string>
     <string name="sketch_menu_delete_last_leg">Letzte Messung rückgängig</string>
     <string name="sketch_menu_centre_view">Auf Aktives zentrieren</string>
     <string name="sketch_menu_auto_recentre">Automatisches Zentrieren</string>
-    <string name="sketch_menu_redo">Zeichnen-Befehl wiederholen</string>
+    <string name="sketch_menu_modes">Modi</string>
+    <string name="sketch_menu_show">Anzeigen</string>
     <string name="sketch_menu_show_grid">Raster anzeigen</string>
     <string name="sketch_menu_show_compass">Kompass</string>
     <string name="sketch_menu_blue_water">Auto-Blauwasser</string>
     <string name="sketch_menu_snap_to_lines">Linien fangen</string>
     <string name="sketch_menu_pinch_to_zoom">Zoom durch Kneifen</string>
     <string name="sketch_menu_fade_non_active">Inaktive ausblenden</string>
+    <string name="sketch_menu_show_wall_sides">Alle Wandseiten</string>
     <string name="sketch_menu_show_station_labels">Messpunkt-Beschriftungen</string>
     <string name="sketch_menu_show_xsections">Querschnitte</string>
-    <string name="sketch_menu_show_splays">Hilfslinien anzeigen</string>
-    <string name="sketch_menu_show_sketch">Skizze anzeigen</string>
+    <string name="sketch_menu_show_splays">Hilfslinien</string>
+    <string name="sketch_menu_show_sketch">Skizze</string>
     <string name="sketch_menu_show_connect">Verknüpfte Vermessungsdateien</string>
     <string name="sketch_menu_back_measurements">Messstrecken umkehren</string>
     <string name="sketch_position_cross_section_instruction">Ort zum Zeichnen eines Querschnitts auswählen</string>
@@ -500,11 +521,6 @@
         <item>Linear</item>
         <item>Nicht-Linear</item>
     </string-array>
-    <string-array name="settings_leg_amalgamation_algorithm_entries">
-        <item>Winkeldifferenzen: Distanz, Azimut &amp; Neigung getrennt vergleichen; getrennt mitteln</item>
-        <item>Endpunktabstand: vergleichen, wie weit die Endpunkte voneinander entfernt sind; als Vektoren mitteln</item>
-        <item>Paarweise Vektoren: Endpunktabstand im Verhältnis zur Streckenlänge vergleichen; als Vektoren mitteln</item>
-    </string-array>
     <string name="settings_immersive_mode_enabled">Vollbildmodus aktiviert</string>
     <string name="settings_immersive_mode_disabled">Vollbildmodus deaktiviert</string>
     <string name="settings_new_station_vibration_title">Bei neuem Messpunkt vibrieren</string>
@@ -520,19 +536,26 @@
 <string name="settings_instruments_title">Werkzeuge</string>
     <string name="settings_instruments_summary">Instrumententoleranz, Kalibrierung</string>
     <string name="settings_max_distance_delta_title">Maximal zulässige Abweichung bei der Distanz (m)</string>
-    <string name="settings_max_distance_delta_summary">Winkelmethode: wie stark die Distanzmessungen abweichen dürfen, wenn entschieden wird, ob eine neue Station erstellt wird</string>
+    <string name="settings_max_distance_delta_summary">Wie stark die Distanzmessungen abweichen dürfen, wenn entschieden wird, ob eine neue Station erstellt wird</string>
     <string name="settings_max_angle_delta_title">Maximal zulässige Abweichung beim Neigungswinkel (Grad)</string>
-    <string name="settings_max_angle_delta_summary">Winkelmethode: wie stark die Azimut- oder Neigungsmessungen abweichen dürfen, wenn entschieden wird, ob eine neue Station erstellt wird</string>
+    <string name="settings_max_angle_delta_summary">Wie stark die Azimut- oder Neigungsmessungen abweichen dürfen, wenn entschieden wird, ob eine neue Station erstellt wird</string>
     <string name="settings_auto_reconnect_title">Automatisch wieder verbinden</string>
     <string name="settings_auto_reconnect_summary">Automatisch wieder verbinden, wenn das Gerät die Verbindung verliert</string>
     <string name="settings_auto_reconnect_window_title">Zeitlimit für automatisches Wiederverbinden (Minuten)</string>
     <string name="settings_auto_reconnect_window_summary">Wie lange versucht wird, die Verbindung wiederherzustellen, bevor pausiert wird</string>
     <string name="settings_leg_amalgamation_algorithm_title">Methode zur Streckenübereinstimmung</string>
-    <string name="settings_leg_amalgamation_algorithm_summary">Wie beurteilt wird, ob wiederholte Messungen nah genug sind, um eine Messstrecke zu bilden</string>
+    <string name="settings_leg_amalgamation_angular_name">Winkeldifferenzen</string>
+    <string name="settings_leg_amalgamation_angular_description">Distanz, Azimut und Neigung werden getrennt verglichen und gemittelt. Kann wiederholte steile Messungen ablehnen</string>
+    <string name="settings_leg_amalgamation_slope_corrected_name">Neigungskorrigierte Winkeldifferenzen</string>
+    <string name="settings_leg_amalgamation_slope_corrected_description">Distanz, Neigung und seitliche Abweichung (Azimutdifferenz nach Steilheit skaliert) getrennt verglichen; als Vektoren gemittelt</string>
+    <string name="settings_leg_amalgamation_cartesian_name">Endpunktabstand</string>
+    <string name="settings_leg_amalgamation_cartesian_description">Die Endpunkte der Messungen müssen innerhalb eines festen Abstands voneinander liegen; als Vektoren gemittelt</string>
+    <string name="settings_leg_amalgamation_pairwise_name">Paarweise Vektoren</string>
+    <string name="settings_leg_amalgamation_pairwise_description">Abstand der Endpunkte im Verhältnis zur Streckenlänge verglichen; als Vektoren gemittelt</string>
     <string name="settings_max_endpoint_delta_title">Maximaler Endpunktabstand (m)</string>
-    <string name="settings_max_endpoint_delta_summary">Endpunktmethode: wie weit die Endpunkte der Messungen voneinander entfernt sein dürfen, wenn entschieden wird, ob eine neue Station erstellt wird. Der Standardwert von 0.1 hält alle Messungen innerhalb einer BCRA Grade 5-Zelle.</string>
+    <string name="settings_max_endpoint_delta_summary">Wie weit die Endpunkte der Messungen voneinander entfernt sein dürfen, wenn entschieden wird, ob eine neue Station erstellt wird. Der Standardwert von 0.1 hält alle Messungen innerhalb einer BCRA Grade 5-Zelle.</string>
     <string name="settings_max_pairwise_error_title">Maximaler paarweiser Fehler</string>
-    <string name="settings_max_pairwise_error_summary">Methode der paarweisen Vektoren: die zwischen Messungen tolerierte relative Abweichung (0.05 = etwa 2.5%), wenn entschieden wird, ob eine neue Station erstellt wird</string>
+    <string name="settings_max_pairwise_error_summary">Die zwischen Messungen tolerierte relative Abweichung (0.05 = etwa 2.5%), wenn entschieden wird, ob eine neue Station erstellt wird</string>
     <string name="settings_calibration_title">Kalibrierung</string>
     <string name="settings_calibration_algorithm_title">DistoX Kalibrierungs-Algorithmus</string>
     <string name="settings_calibration_algorithm_summary">Auswahl des DistoX-Kalibrierungsalgorithmus ausser Kraft setzen</string>
@@ -750,6 +773,9 @@
     <string name="menu_jump_to_station_in_table">&#10132; Daten-Tabelle</string>
     <string name="menu_delete_station">Löschen</string>
     <string name="menu_reverse">Rückblick</string>
+    <string name="menu_line">Linie</string>
+    <string name="menu_flip_line">Umdrehen</string>
+    <string name="menu_line_type">Linientyp</string>
     <string name="menu_switch_direction">Richtung wechseln</string>
     <string name="menu_navigate">Navigieren</string>
     <string name="menu_survey">Vermessung</string>

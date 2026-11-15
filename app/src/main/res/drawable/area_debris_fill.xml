@@ -1,0 +1,15 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="40dp"
+    android:viewportWidth="40"
+    android:viewportHeight="40">
+  <!-- Small angular fragments filling the square: the area's fill pattern (see
+       AreaType) for the toolbar of area types. -->
+  <path
+      android:strokeWidth="1.5"
+      android:pathData="M3,3 L7.5,2 L6,6.5 Z M13,4 L18,5 L17,8.5 L12.5,7.5 Z M4,13 L9,12 L7.5,16.5 Z M16.5,14 L21.5,16 L18,20 Z M8,19.5 L12.5,20.5 L10,23 Z M3,27 L7.5,26 L6,30.5 Z M13,28 L18,29 L17,32.5 L12.5,31.5 Z M4,37 L9,36 L7.5,40.5 Z M16.5,38 L21.5,40 L18,44 Z M27,3 L31.5,2 L30,6.5 Z M37,4 L42,5 L41,8.5 L36.5,7.5 Z M28,13 L33,12 L31.5,16.5 Z M32,19.5 L36.5,20.5 L34,23 Z M27,27 L31.5,26 L30,30.5 Z M37,28 L42,29 L41,32.5 L36.5,31.5 Z M28,37 L33,36 L31.5,40.5 Z"
+      android:fillColor="#00000000"
+      android:strokeColor="#000"
+      android:strokeLineCap="round"
+      android:strokeLineJoin="round"/>
+</vector>

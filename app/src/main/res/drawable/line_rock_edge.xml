@@ -1,0 +1,36 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="40dp"
+    android:viewportWidth="40"
+    android:viewportHeight="40">
+  <!-- Boulder edges: thin lines across a boulder, whose outline is shown faintly. -->
+  <path
+      android:strokeWidth="1.6"
+      android:pathData="M8,27 L6,19 L12,11 L23,9 L33,14 L35,24 L27,31 L15,31 Z"
+      android:fillColor="#00000000"
+      android:strokeColor="#000"
+      android:strokeAlpha="0.35"
+      android:strokeLineCap="round"
+      android:strokeLineJoin="round"/>
+  <path
+      android:strokeWidth="1.6"
+      android:pathData="M12,11 L18,20 L15,31"
+      android:fillColor="#00000000"
+      android:strokeColor="#000"
+      android:strokeLineCap="round"
+      android:strokeLineJoin="round"/>
+  <path
+      android:strokeWidth="1.6"
+      android:pathData="M18,20 L33,14"
+      android:fillColor="#00000000"
+      android:strokeColor="#000"
+      android:strokeLineCap="round"
+      android:strokeLineJoin="round"/>
+  <path
+      android:strokeWidth="1.6"
+      android:pathData="M18,20 L27,31"
+      android:fillColor="#00000000"
+      android:strokeColor="#000"
+      android:strokeLineCap="round"
+      android:strokeLineJoin="round"/>
+</vector>

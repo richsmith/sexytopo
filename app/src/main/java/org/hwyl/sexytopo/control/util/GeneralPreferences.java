@@ -148,7 +148,7 @@ public class GeneralPreferences {
     // ********** Table ***********
 
     public static boolean isManualControlsEnabled() {
-        return getBoolean("pref_manual_controls", true);
+        return getBoolean("pref_manual_controls", false);
     }
 
     public static boolean isManualLrudModeOn() {
@@ -242,6 +242,10 @@ public class GeneralPreferences {
 
     public static int getSymbolStartingSizeDp() {
         return getInt("pref_survey_symbol_size", 25);
+    }
+
+    public static int getLineOrnamentSizeDp() {
+        return getInt("pref_survey_line_ornament_size", 12);
     }
 
     // ********** Connection ***********
@@ -374,6 +378,10 @@ public class GeneralPreferences {
 
     public static boolean isXviExportTextEnabled() {
         return getBoolean("pref_therion_export_text", true);
+    }
+
+    public static boolean isTherionLineExportEnabled() {
+        return getBoolean("pref_therion_export_lines", true);
     }
 
     public static String getTherionPlanSuffix() {

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Line title (disabled, shows the line's type) -->
+    <item
+        android:id="@+id/line_title"
+        android:title="@string/menu_line"
+        android:enabled="false"/>
+
+    <item
+        android:id="@+id/action_flip_line"
+        android:title="@string/menu_flip_line"/>
+
+    <!-- Populated from LineType -->
+    <item
+        android:id="@+id/menu_line_type"
+        android:title="@string/menu_line_type">
+        <menu/>
+    </item>
+
+</menu>

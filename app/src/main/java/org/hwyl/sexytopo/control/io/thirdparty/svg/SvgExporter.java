@@ -15,6 +15,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -40,8 +41,11 @@ import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.geometry.Line;
 import org.hwyl.sexytopo.model.geometry.Projection2D;
 import org.hwyl.sexytopo.model.geometry.Space;
+import org.hwyl.sexytopo.model.sketch.AreaDetail;
+import org.hwyl.sexytopo.model.sketch.AreaType;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
+import org.hwyl.sexytopo.model.sketch.LineType;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchDetail;
@@ -172,6 +176,12 @@ public class SvgExporter extends DoubleSketchFileExporter {
             xmlSerializer.attribute("", "id", "grid");
             writeGrid(xmlSerializer, contentFrame, SCALE);
             xmlSerializer.endTag("", "g");
+        }
+
+        Map<String, AreaDetail> fillPatterns =
+                collectAreaFillPatterns(sketch, options.isShowCrossSections());
+        if (!fillPatterns.isEmpty()) {
+            writeAreaFillPatterns(xmlSerializer, fillPatterns, SCALE);
         }
 
         xmlSerializer.startTag("", "g");
@@ -695,6 +705,11 @@ public class SvgExporter extends DoubleSketchFileExporter {
             }
         }
 
+        // areas go first so their hatching sits underneath drawn lines
+        for (AreaDetail areaDetail : sketch.getAreaDetails()) {
+            writeAreaDetail(xmlSerializer, areaDetail, scale);
+        }
+
         for (PathDetail pathDetail : sketch.getPathDetails()) {
             writePathDetail(xmlSerializer, pathDetail, scale);
         }
@@ -749,6 +764,9 @@ public class SvgExporter extends DoubleSketchFileExporter {
             // Write sub-sketch paths scaled and translated to position
             Sketch subSketch =
                     xsDetail.getSketch().scale(xsScale).translate(xsDetail.getPosition());
+            for (AreaDetail areaDetail : subSketch.getAreaDetails()) {
+                writeAreaDetail(xmlSerializer, areaDetail, scale);
+            }
             for (PathDetail pathDetail : subSketch.getPathDetails()) {
                 writePathDetail(xmlSerializer, pathDetail, scale);
             }
@@ -765,17 +783,177 @@ public class SvgExporter extends DoubleSketchFileExporter {
         }
     }
 
+    /**
+     * The area fill patterns needed, across the main sketch and (if they are being exported) the
+     * cross-section sub-sketches. One pattern is needed per combination of area type and colour;
+     * each is keyed by its pattern id, with an area that uses it standing for the combination.
+     */
+    private static Map<String, AreaDetail> collectAreaFillPatterns(
+            Sketch sketch, boolean showCrossSections) {
+        Map<String, AreaDetail> patterns = new LinkedHashMap<>();
+        for (AreaDetail areaDetail : sketch.getAreaDetails()) {
+            patterns.putIfAbsent(getAreaFillPatternId(areaDetail), areaDetail);
+        }
+        if (showCrossSections) {
+            for (CrossSectionDetail xsDetail : sketch.getCrossSectionDetails()) {
+                for (AreaDetail areaDetail : xsDetail.getSketch().getAreaDetails()) {
+                    patterns.putIfAbsent(getAreaFillPatternId(areaDetail), areaDetail);
+                }
+            }
+        }
+        return patterns;
+    }
+
+    /**
+     * One pattern per area type and colour in use, drawn from the type's fill tile; area paths
+     * reference these by id as their fill.
+     */
+    private static void writeAreaFillPatterns(
+            XmlSerializer xmlSerializer, Map<String, AreaDetail> patterns, int scale)
+            throws IOException {
+
+        double unit = AreaType.Fill.METRES_PER_DP * scale;
+        int strokeWidth = getAreaLightStrokeWidth();
+
+        xmlSerializer.startTag("", "defs");
+        for (Map.Entry<String, AreaDetail> entry : patterns.entrySet()) {
+            AreaType.Fill fill = entry.getValue().getAreaType().getFill();
+            String colour = getSvgColour(entry.getValue());
+            String tileSize = Double.toString(fill.getTileSize() * unit);
+            xmlSerializer.startTag("", "pattern");
+            xmlSerializer.attribute("", "id", entry.getKey());
+            xmlSerializer.attribute("", "patternUnits", "userSpaceOnUse");
+            xmlSerializer.attribute("", "width", tileSize);
+            xmlSerializer.attribute("", "height", tileSize);
+            for (AreaType.Mark mark : fill.getMarks()) {
+                writeAreaFillMark(xmlSerializer, mark, unit, colour, strokeWidth);
+            }
+            xmlSerializer.endTag("", "pattern");
+        }
+        xmlSerializer.endTag("", "defs");
+    }
+
+    private static void writeAreaFillMark(
+            XmlSerializer xmlSerializer,
+            AreaType.Mark mark,
+            double unit,
+            String colour,
+            int strokeWidth)
+            throws IOException {
+        float[] values = mark.getValues();
+        String tag;
+        switch (mark.getKind()) {
+            case LINE:
+                tag = "polyline";
+                break;
+            case POLYGON:
+                tag = "polygon";
+                break;
+            default:
+                tag = "circle";
+                break;
+        }
+        xmlSerializer.startTag("", tag);
+        if (tag.equals("circle")) {
+            xmlSerializer.attribute("", "cx", Double.toString(values[0] * unit));
+            xmlSerializer.attribute("", "cy", Double.toString(values[1] * unit));
+            xmlSerializer.attribute("", "r", Double.toString(values[2] * unit));
+        } else {
+            List<String> points = new ArrayList<>();
+            for (int i = 0; i < values.length; i += 2) {
+                points.add(values[i] * unit + "," + values[i + 1] * unit);
+            }
+            xmlSerializer.attribute("", "points", TextTools.join(" ", points));
+        }
+        if (mark.getKind() == AreaType.Mark.Kind.DOT) {
+            xmlSerializer.attribute("", "fill", colour);
+        } else {
+            xmlSerializer.attribute("", "fill", "none");
+            xmlSerializer.attribute("", "stroke", colour);
+            xmlSerializer.attribute("", "stroke-width", Integer.toString(strokeWidth));
+            xmlSerializer.attribute("", "stroke-linecap", "round");
+            xmlSerializer.attribute("", "stroke-linejoin", "round");
+        }
+        xmlSerializer.endTag("", tag);
+    }
+
+    /** The stroke width of fill marks, and of the outlines of areas with no defined edge. */
+    private static int getAreaLightStrokeWidth() {
+        return Math.max(1, GeneralPreferences.getExportSvgStrokeWidth() / 2);
+    }
+
+    private static String getAreaFillPatternId(AreaDetail areaDetail) {
+        return "area-"
+                + areaDetail.getAreaType().getTherionName()
+                + "-"
+                + getSvgColour(areaDetail).toLowerCase(Locale.ROOT);
+    }
+
+    /**
+     * An area is written as a path rather than a polygon so that holes can be expressed: each
+     * contour becomes a closed subpath, and the even-odd fill rule leaves the holes unfilled.
+     */
+    private static void writeAreaDetail(
+            XmlSerializer xmlSerializer, AreaDetail areaDetail, int scale) throws IOException {
+        // as on screen, only a real edge (a shoreline) gets a full-weight outline; others are
+        // thin and faded
+        boolean hasDefinedEdge = areaDetail.getAreaType().hasDefinedEdge();
+        Integer strokeWidth =
+                hasDefinedEdge
+                        ? GeneralPreferences.getExportSvgStrokeWidth()
+                        : getAreaLightStrokeWidth();
+        String colour = getSvgColour(areaDetail);
+        String patternId = getAreaFillPatternId(areaDetail);
+        xmlSerializer.startTag(null, "path");
+        xmlSerializer.attribute(null, "d", getAreaPathData(areaDetail, scale));
+        xmlSerializer.attribute(null, "fill-rule", "evenodd");
+        xmlSerializer.attribute(null, "stroke", colour);
+        xmlSerializer.attribute(null, "stroke-width", strokeWidth.toString());
+        if (!hasDefinedEdge) {
+            xmlSerializer.attribute(
+                    null, "stroke-opacity", Float.toString(AreaType.LIGHT_OUTLINE_OPACITY));
+        }
+        xmlSerializer.attribute(null, "fill", "url(#" + patternId + ")");
+        xmlSerializer.endTag(null, "path");
+    }
+
+    private static String getAreaPathData(AreaDetail areaDetail, int scale) {
+        List<String> subpaths = new ArrayList<>();
+        for (List<Coord2D> contour : areaDetail.getContours()) {
+            List<String> coordStrings = new ArrayList<>();
+            for (Coord2D coord2D : contour) {
+                coordStrings.add(toXmlText(coord2D, scale));
+            }
+            subpaths.add("M " + TextTools.join(" L ", coordStrings) + " Z");
+        }
+        return TextTools.join(" ", subpaths);
+    }
+
+    /**
+     * Semantic line types get a class attribute naming the type, a scaled stroke width and (for
+     * dashed types) a dash array. Tick ornamentation is not reproduced in SVG yet.
+     */
     private static void writePathDetail(
             XmlSerializer xmlSerializer, PathDetail pathDetail, int scale) throws IOException {
-        Integer strokeWidth = GeneralPreferences.getExportSvgStrokeWidth();
+        int strokeWidth = GeneralPreferences.getExportSvgStrokeWidth();
+        LineType lineType = pathDetail.getLineType();
+        strokeWidth = Math.round(strokeWidth * lineType.getStrokeWidthFactor());
         List<String> coordStrings = new ArrayList<>();
         for (Coord2D coord2D : pathDetail.getPath()) {
             coordStrings.add(toXmlText(coord2D, scale));
         }
         xmlSerializer.startTag(null, "polyline");
+        if (lineType.isSemantic()) {
+            xmlSerializer.attribute(
+                    null, "class", lineType.toString().toLowerCase(Locale.ROOT).replace("_", "-"));
+        }
         xmlSerializer.attribute(null, "points", TextTools.join(" ", coordStrings));
         xmlSerializer.attribute(null, "stroke", getSvgColour(pathDetail));
-        xmlSerializer.attribute(null, "stroke-width", strokeWidth.toString());
+        xmlSerializer.attribute(null, "stroke-width", Integer.toString(strokeWidth));
+        String dashArray = lineType.getSvgDashArray(pathDetail.getOrnamentSize(), scale);
+        if (dashArray != null) {
+            xmlSerializer.attribute(null, "stroke-dasharray", dashArray);
+        }
         xmlSerializer.attribute(null, "fill", "none");
         xmlSerializer.endTag(null, "polyline");
     }

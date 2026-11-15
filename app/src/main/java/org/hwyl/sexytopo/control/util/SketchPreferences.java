@@ -3,7 +3,9 @@ package org.hwyl.sexytopo.control.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.model.sketch.AreaType;
 import org.hwyl.sexytopo.model.sketch.BrushColour;
+import org.hwyl.sexytopo.model.sketch.LineType;
 import org.hwyl.sexytopo.model.sketch.SketchTool;
 import org.hwyl.sexytopo.model.sketch.Symbol;
 
@@ -14,6 +16,8 @@ public class SketchPreferences {
     private static final String SKETCH_TOOL_PREFERENCE_KEY = "pref_sketch_sketch_tool";
     private static final String BRUSH_COLOUR_PREFERENCE_KEY = "pref_sketch_brush_colour";
     private static final String SYMBOL_PREFERENCE_KEY = "pref_sketch_symbol";
+    private static final String LINE_TYPE_PREFERENCE_KEY = "pref_sketch_line_type";
+    private static final String AREA_TYPE_PREFERENCE_KEY = "pref_sketch_area_type";
 
     /**
      * Toggle-able display options set throught the sketch pop-up menu. We have a lot of these, so
@@ -27,10 +31,12 @@ public class SketchPreferences {
         SHOW_SPLAYS(R.id.buttonShowSplays, true),
         SHOW_SKETCH(R.id.buttonShowSketch, true),
         SHOW_STATION_LABELS(R.id.buttonShowStationLabels, true),
+        SHOW_WALL_SIDES(R.id.buttonShowWallSides, false),
         SHOW_X_SECTIONS(R.id.buttonShowXSections, true),
         SHOW_CONNECTIONS(R.id.buttonShowConnections, true),
         SHOW_COMPASS(R.id.buttonShowCompass, true),
         BLUE_WATER(R.id.buttonBlueWater, true),
+        CLIP_TO_WALLS(R.id.buttonClipToWalls, true),
         PINCH_TO_ZOOM(R.id.buttonPinchToZoom, true);
 
         private final int controlId;
@@ -46,7 +52,8 @@ public class SketchPreferences {
         }
 
         public Boolean isOn() {
-            return prefs.getBoolean(this.toString(), defaultValue);
+            // prefs is only null outside a running app (i.e. unit tests)
+            return prefs == null ? defaultValue : prefs.getBoolean(this.toString(), defaultValue);
         }
 
         public int getControlId() {
@@ -102,5 +109,25 @@ public class SketchPreferences {
         String selected = prefs.getString(SYMBOL_PREFERENCE_KEY, null);
         Symbol symbol = Symbol.fromString(selected);
         return symbol;
+    }
+
+    public static void setSelectedLineType(LineType lineType) {
+        setString(LINE_TYPE_PREFERENCE_KEY, lineType.toString());
+    }
+
+    public static LineType getSelectedLineType() {
+        String selected = prefs.getString(LINE_TYPE_PREFERENCE_KEY, null);
+        LineType lineType = LineType.fromString(selected);
+        return lineType;
+    }
+
+    public static void setSelectedAreaType(AreaType areaType) {
+        setString(AREA_TYPE_PREFERENCE_KEY, areaType.toString());
+    }
+
+    public static AreaType getSelectedAreaType() {
+        String selected = prefs.getString(AREA_TYPE_PREFERENCE_KEY, null);
+        AreaType areaType = AreaType.fromString(selected);
+        return areaType;
     }
 }

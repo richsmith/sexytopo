@@ -16,6 +16,7 @@
     <string name="carry_on">Continue</string>
     <string name="delete">Delete</string>
     <string name="save">Save</string>
+    <string name="update">Update</string>
     <string name="overwrite">Overwrite</string>
     <string name="move">Move</string>
     <string name="replace">Replace</string>
@@ -97,10 +98,15 @@
     <string name="action_input_mode_cal_check">Splays Only</string>
     <string name="action_view">View</string>
     <string name="action_fullscreen">Fullscreen</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_undo_sketch">Undo Sketch</string>
+    <string name="action_redo_sketch">Redo Sketch</string>
     <string name="action_tools">Tools</string>
     <string name="action_add_leg">Add Leg…</string>
     <string name="action_add_splay">Add Splay…</string>
     <string name="action_undo_last_leg">Undo last reading</string>
+    <string name="action_flip_last_line">Flip last line</string>
+    <string name="tools_flip_last_line_none">No typed line to flip</string>
     <string name="action_find_station">Find Station…</string>
     <string name="action_link_to_existing_survey">Link to an Existing Survey</string>
     <string name="action_system_log">System Log</string>
@@ -148,6 +154,9 @@
     <string name="file_error_deleting_survey">Error deleting survey</string>
     <string name="file_cannot_extend_unsaved_survey">Cannot extend unsaved survey</string>
     <string name="file_autosave_restored">Restored autosave</string>
+    <string name="file_restoring_unsaved_survey">Restoring unsaved survey</string>
+    <string name="file_unsaved_survey_restored">Restored unsaved survey</string>
+    <string name="file_unsaved_survey_restore_error">Error restoring unsaved survey: %1$s</string>
     <string name="file_autosave_load_error">Error restoring autosave</string>
     <string name="file_warning_survey_not_saved">Warning: current survey not saved</string>
     <string name="file_active_survey">Active survey is %1$s</string>
@@ -187,7 +196,8 @@
     <string name="svg_export_dialog_title">SVG Export Options</string>
 
     <!-- Sketch view -->
-    <string name="sketch_toolbar_draw">Draw mode</string>
+    <string name="sketch_toolbar_line">Line tool</string>
+    <string name="sketch_toolbar_area">Area tool</string>
     <string name="sketch_toolbar_move">Move mode</string>
     <string name="sketch_toolbar_eraser">Eraser</string>
     <string name="sketch_toolbar_text">Text tool</string>
@@ -195,7 +205,6 @@
     <string name="sketch_toolbar_selector">Selector</string>
     <string name="sketch_toolbar_settings">Quick settings</string>
     <string name="sketch_toolbar_undo">Undo</string>
-    <string name="sketch_toolbar_redo">Redo</string>
     <string name="sketch_toolbar_zoom_in">Zoom in</string>
     <string name="sketch_toolbar_zoom_out">Zoom out</string>
     <string name="sketch_toolbar_colour_main">Main colour</string>
@@ -207,20 +216,43 @@
     <string name="sketch_toolbar_colour_blue">Blue</string>
     <string name="sketch_toolbar_colour_purple">Purple</string>
     <string name="sketch_toolbar_symbol_close">Close symbol toolbar</string>
+    <string name="line_type_sketch">Sketch line</string>
+    <string name="line_type_wall">Wall</string>
+    <string name="line_type_presumed_wall">Presumed wall</string>
+    <string name="line_type_underlying_wall">Underlying wall</string>
+    <string name="line_type_pit">Pit edge</string>
+    <string name="line_type_floor_step">Floor step</string>
+    <string name="line_type_chimney">Chimney</string>
+    <string name="line_type_ceiling_step">Ceiling step</string>
+    <string name="line_type_overhang">Overhang</string>
+    <string name="line_type_slope">Slope</string>
+    <string name="line_type_rock_border">Boulder outline</string>
+    <string name="line_type_rock_edge">Boulder edge</string>
+    <string name="area_type_water">Water</string>
+    <string name="area_type_sump">Sump</string>
+    <string name="area_type_sand">Sand</string>
+    <string name="area_type_clay">Clay</string>
+    <string name="area_type_pebbles">Pebbles</string>
+    <string name="area_type_debris">Debris</string>
+    <string name="area_type_blocks">Blocks</string>
+
     <string name="sketch_menu_delete_last_leg">Undo Last Reading</string>
     <string name="sketch_menu_centre_view">Centre on Active</string>
     <string name="sketch_menu_auto_recentre">Auto-Recentre</string>
-    <string name="sketch_menu_redo">Redo sketch action</string>
+    <string name="sketch_menu_modes">Modes</string>
+    <string name="sketch_menu_show">Show</string>
     <string name="sketch_menu_show_grid">Graph Paper</string>
     <string name="sketch_menu_show_compass">Compass</string>
     <string name="sketch_menu_blue_water">Auto-Blue Water</string>
+    <string name="sketch_menu_clip_to_walls">Clip to Walls</string>
     <string name="sketch_menu_pinch_to_zoom">Pinch to Zoom</string>
     <string name="sketch_menu_snap_to_lines">Snap to Lines</string>
     <string name="sketch_menu_fade_non_active">Fade Non-Active</string>
     <string name="sketch_menu_show_station_labels">Station Labels</string>
+    <string name="sketch_menu_show_wall_sides">All Wall Sides</string>
     <string name="sketch_menu_show_xsections">Cross-Sections</string>
-    <string name="sketch_menu_show_splays">Show Splays</string>
-    <string name="sketch_menu_show_sketch">Show Sketch</string>
+    <string name="sketch_menu_show_splays">Splays</string>
+    <string name="sketch_menu_show_sketch">Sketch</string>
     <string name="sketch_menu_show_connect">Linked Surveys</string>
     <string name="sketch_menu_back_measurements">Reverse Legs</string>
     <string name="sketch_position_cross_section_instruction">Select where to draw cross-section</string>
@@ -554,11 +586,6 @@
         <item>Linear</item>
         <item>Non-Linear</item>
     </string-array>
-    <string-array name="settings_leg_amalgamation_algorithm_entries">
-        <item>Angular deltas: compare distance, azimuth &amp; inclination separately; average separately</item>
-        <item>Endpoint distance: compare how far apart end points are; average as vectors</item>
-        <item>Pairwise vectors: compare end-point gap relative to leg length; average as vectors</item>
-    </string-array>
     <string name="settings_immersive_mode_enabled">Fullscreen mode enabled</string>
     <string name="settings_immersive_mode_disabled">Fullscreen mode disabled</string>
     <string name="settings_new_station_vibration_title">Vibrate on new station</string>
@@ -573,19 +600,26 @@
     <string name="settings_licence_name_required">Licence name is required</string>
     <string name="settings_instruments_title">Instruments</string>
     <string name="settings_leg_amalgamation_algorithm_title">Leg agreement method</string>
-    <string name="settings_leg_amalgamation_algorithm_summary">How repeated readings are judged close enough to form a leg</string>
+    <string name="settings_leg_amalgamation_angular_name">Angular deltas</string>
+    <string name="settings_leg_amalgamation_angular_description">Distance, azimuth and inclination compared and averaged separately. Can reject repeated steep readings</string>
+    <string name="settings_leg_amalgamation_slope_corrected_name">Slope-corrected angular deltas</string>
+    <string name="settings_leg_amalgamation_slope_corrected_description">Distance, inclination and sideways swing (azimuth difference scaled for steepness) compared separately; averaged as vectors</string>
+    <string name="settings_leg_amalgamation_cartesian_name">Endpoint distance</string>
+    <string name="settings_leg_amalgamation_cartesian_description">Reading endpoints must be within a set distance of each other; averaged as vectors</string>
+    <string name="settings_leg_amalgamation_pairwise_name">Pairwise vectors</string>
+    <string name="settings_leg_amalgamation_pairwise_description">Gap between endpoints compared relative to leg length; averaged as vectors</string>
     <string name="settings_max_distance_delta_title">Max distance delta (m)</string>
-    <string name="settings_max_distance_delta_summary">Angular method: how much the distance readings may differ when deciding whether to create a new station</string>
+    <string name="settings_max_distance_delta_summary">How much the distance readings may differ when deciding whether to create a new station</string>
     <string name="settings_max_angle_delta_title">Max angle delta (degrees)</string>
-    <string name="settings_max_angle_delta_summary">Angular method: how much the azimuth or inclination readings may differ when deciding whether to create a new station</string>
+    <string name="settings_max_angle_delta_summary">How much the azimuth or inclination readings may differ when deciding whether to create a new station</string>
     <string name="settings_auto_reconnect_title">Auto-reconnect</string>
     <string name="settings_auto_reconnect_summary">Reconnect automatically if the instrument disconnects</string>
     <string name="settings_auto_reconnect_window_title">Auto-reconnect time limit (minutes)</string>
     <string name="settings_auto_reconnect_window_summary">How long to keep trying to reconnect before pausing</string>
     <string name="settings_max_endpoint_delta_title">Max endpoint distance (m)</string>
-    <string name="settings_max_endpoint_delta_summary">Endpoint method: how far apart the reading endpoints may be when deciding whether to create a new station. The default of 0.1 keeps all readings within one BCRA Grade 5 cell.</string>
+    <string name="settings_max_endpoint_delta_summary">How far apart the reading endpoints may be when deciding whether to create a new station. The default of 0.1 keeps all readings within one BCRA Grade 5 cell.</string>
     <string name="settings_max_pairwise_error_title">Max pairwise error</string>
-    <string name="settings_max_pairwise_error_summary">Pairwise vectors method: the relative error tolerated between readings (0.05 = roughly 2.5%) when deciding whether to create a new station</string>
+    <string name="settings_max_pairwise_error_summary">The relative error tolerated between readings (0.05 = roughly 2.5%) when deciding whether to create a new station</string>
     <string name="settings_calibration_title">Calibration</string>
     <string name="settings_calibration_algorithm_title">Disto-X calibration algorithm</string>
     <string name="settings_calibration_algorithm_summary">Override Disto-X calibration algorithm choice</string>
@@ -602,6 +636,8 @@
     <string name="settings_survey_text_tool_font_size_summary">How big to initially draw manually-placed text (sp)</string>
     <string name="settings_survey_symbol_size_title">Survey symbol size</string>
     <string name="settings_survey_symbol_size_summary">How big to initially draw symbols (dp)</string>
+    <string name="settings_survey_line_ornament_size_title">Line ornament size</string>
+    <string name="settings_survey_line_ornament_size_summary">How big to initially draw the ticks and dashes on wall, pit and chimney lines (dp)</string>
     <string name="settings_sketch_line_width_title">Sketch line thickness</string>
     <string name="settings_sketch_line_width_summary">How wide to draw sketch lines (dp)</string>
     <string name="settings_leg_width_title">Leg line thickness</string>
@@ -635,6 +671,8 @@
     <string name="settings_export_title">Export</string>
     <string name="settings_export_therion_symbols_title">Export symbols</string>
     <string name="settings_export_therion_symbols_summary">Include symbols in th2 file</string>
+    <string name="settings_export_therion_lines_title">Export typed lines</string>
+    <string name="settings_export_therion_lines_summary">Include lines with a type (wall, pit etc.) as Therion line commands when exporting</string>
     <string name="settings_export_therion_text_title">Export text</string>
     <string name="settings_export_therion_text_summary">Include text in th2 file</string>
     <string name="settings_export_folder_name_title">Export folder name</string>
@@ -792,6 +830,9 @@
     <string name="menu_jump_to_station_in_table">&#10132; Data Table</string>
     <string name="menu_delete_station">Delete</string>
     <string name="menu_reverse">Reverse</string>
+    <string name="menu_line">Line</string>
+    <string name="menu_flip_line">Flip</string>
+    <string name="menu_line_type">Line Type</string>
     <string name="menu_switch_direction">Switch Direction</string>
     <string name="menu_navigate">Navigate</string>
     <string name="menu_survey">Survey</string>

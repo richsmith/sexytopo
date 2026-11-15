@@ -22,6 +22,7 @@
     <!-- Brand Colors -->
     <color name="md_sexy_green">#7FAF7F</color>
     <color name="md_sexy_dark_green">#3A5738</color>
+    <color name="md_sexy_pale_green">#D5E5D5</color>
     <color name="md_sexy_purple">#AF7FAF</color>
     <color name="md_sexy_dark_purple">#383A57</color>
     <color name="md_navy">#000080</color>
@@ -89,6 +90,11 @@
     <color name="headerBackground">@color/md_sexy_green</color>
     <color name="innerPanelBackground">@color/md_grey_100</color>
     <color name="dividerColour">@color/md_grey_300</color>
+    <!-- Symbol, line and area pickers -->
+    <color name="pickerBackground">@color/md_sexy_pale_green</color>
+    <color name="pickerAccent">@color/md_sexy_dark_green</color>
+    <color name="pickerSelectedFill">@color/md_white</color>
+    <color name="pickerIcon">@color/md_black</color>
 
     <!-- Dialogs -->
     <color name="dialogSurface">@color/md_white</color>

@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ListPreference
         android:key="pref_leg_amalgamation_algorithm"
         android:title="@string/settings_leg_amalgamation_algorithm_title"
-        android:summary="@string/settings_leg_amalgamation_algorithm_summary"
         android:entries="@array/settings_leg_amalgamation_algorithm_entries"
         android:entryValues="@array/settings_leg_amalgamation_algorithm_values"
-        android:defaultValue="angular" />
+        android:defaultValue="angular"
+        app:useSimpleSummaryProvider="true" />
 
     <EditTextPreference
         android:key="pref_max_distance_delta"

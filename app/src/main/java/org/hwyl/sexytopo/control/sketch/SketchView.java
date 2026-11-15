@@ -4,28 +4,39 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BitmapShader;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PathDashPathEffect;
+import android.graphics.PathEffect;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RotateDrawable;
 import android.text.Editable;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.GestureDetector;
+import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.PopupMenu;
 import androidx.core.content.ContextCompat;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -33,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SexyTopo;
@@ -43,6 +55,8 @@ import org.hwyl.sexytopo.control.components.DialogUtils;
 import org.hwyl.sexytopo.control.util.CohenSutherlandAlgorithm;
 import org.hwyl.sexytopo.control.util.CrossSectioner;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
+import org.hwyl.sexytopo.control.util.LineOrienter;
+import org.hwyl.sexytopo.control.util.PolygonUtils;
 import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.control.util.TextTools;
@@ -50,10 +64,13 @@ import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.geometry.Line;
 import org.hwyl.sexytopo.model.geometry.Projection2D;
 import org.hwyl.sexytopo.model.geometry.Space;
+import org.hwyl.sexytopo.model.sketch.AreaDetail;
+import org.hwyl.sexytopo.model.sketch.AreaType;
 import org.hwyl.sexytopo.model.sketch.BrushColour;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
+import org.hwyl.sexytopo.model.sketch.LineType;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchDetail;
@@ -117,6 +134,9 @@ public class SketchView extends View {
     private float dashedLineIntervalPx;
 
     private static final float DELETE_DETAILS_WITHIN_N_DP = 10.0f;
+    // typed lines spanning less than this on screen, and areas smaller than a square this size,
+    // are discarded as specks
+    private static final float MINIMUM_DETAIL_SIZE_DP = 10.0f;
     private static final float SELECTION_SENSITIVITY_DP = 25.0f;
     private static final float SNAP_TO_LINE_SENSITIVITY_DP = 25.0f;
     public static final float HOT_CORNER_DISTANCE_PROPORTION = 0.05f;
@@ -169,6 +189,12 @@ public class SketchView extends View {
 
     private Symbol currentSymbol = Symbol.getDefault();
 
+    private AreaType currentAreaType = AreaType.WATER;
+
+    private Colour currentColour = Colour.BLACK;
+
+    private LineType currentLineType = LineType.SKETCH;
+
     // a bit hacky but I can't think of a better way to do this
     private String stationNameBeingCrossSectioned = null;
     private CrossSection.Orientation crossSectionOrientationBeingCreated =
@@ -201,6 +227,23 @@ public class SketchView extends View {
     private final Paint fadedSplayPaint = new Paint();
 
     private final Paint drawPaint = new Paint();
+    // one paint per semantic line type (stroke width and ornamentation baked in), alongside the
+    // on-screen ornament size each paint's effect was last built for, so the effect is only
+    // rebuilt when that changes (i.e. on zoom, or moving between lines drawn at different zooms)
+    private final Map<LineType, Paint> lineTypePaints = new EnumMap<>(LineType.class);
+    private final Map<LineType, Float> lineTypePaintOrnamentSizePixels =
+            new EnumMap<>(LineType.class);
+    // scratch object reused when drawing typed paths, to avoid per-frame allocation
+    private final Path typedPathScratch = new Path();
+    // the red interior-side marker on the last-drawn wall (a plain stroke — the wall paints'
+    // path effects must not apply to it)
+    private final Paint wallInsideTickPaint = new Paint();
+    private final Paint areaPaint = new Paint();
+    // fills areas with their type's pattern; the shader is swapped per area type
+    private final Paint areaFillPaint = new Paint();
+    private final Map<AreaType, BitmapShader> areaFillShaders = new EnumMap<>(AreaType.class);
+    // scratch object reused to position the fill pattern, to avoid per-frame allocation
+    private final Matrix areaFillMatrix = new Matrix();
     private final Paint labelPaint = new Paint();
     private final Paint highlightPaint = new Paint();
     private final Paint legendPaint = new Paint();
@@ -226,6 +269,7 @@ public class SketchView extends View {
                 fadedLatestLegPaint,
                 fadedSplayPaint,
                 drawPaint,
+                areaPaint,
                 labelPaint,
                 legendPaint,
                 crossSectionConnectorPaint,
@@ -309,6 +353,27 @@ public class SketchView extends View {
         drawPaint.setStyle(Paint.Style.STROKE);
         drawPaint.setStrokeJoin(Paint.Join.ROUND);
         drawPaint.setStrokeCap(Paint.Cap.ROUND);
+
+        wallInsideTickPaint.set(drawPaint);
+        wallInsideTickPaint.setColor(Colour.RED.intValue);
+
+        lineTypePaints.clear();
+        for (LineType lineType : LineType.values()) {
+            Paint paint = new Paint(drawPaint);
+            paint.setStrokeWidth(drawPaint.getStrokeWidth() * lineType.getStrokeWidthFactor());
+            lineTypePaints.put(lineType, paint);
+        }
+        lineTypePaintOrnamentSizePixels.clear();
+
+        areaPaint.setStyle(Paint.Style.STROKE);
+        areaPaint.setStrokeJoin(Paint.Join.ROUND);
+        areaPaint.setStrokeCap(Paint.Cap.ROUND);
+
+        areaFillPaint.setStyle(Paint.Style.FILL);
+        areaFillShaders.clear();
+        for (AreaType areaType : AreaType.values()) {
+            areaFillShaders.put(areaType, createAreaFillShader(areaType.getFill()));
+        }
 
         int legendColour = ContextCompat.getColor(activity, R.color.legend);
         legendPaint.setColor(legendColour);
@@ -472,8 +537,10 @@ public class SketchView extends View {
                 return handleMove(event);
             case MODAL_MOVE:
                 return handleMove(event);
-            case DRAW:
-                return handleDraw(event);
+            case LINE:
+                return handleLine(event);
+            case AREA:
+                return handleDrawArea(event);
             case ERASE:
                 return handleErase(event);
             case SYMBOL:
@@ -563,7 +630,7 @@ public class SketchView extends View {
                 ((coords.y - viewpointOffset.y) * surveyToViewScale));
     }
 
-    private boolean handleDraw(MotionEvent event) {
+    private boolean handleLine(MotionEvent event) {
 
         Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
         Coord2D surveyCoords = viewCoordsToSurveyCoords(touchPointOnView);
@@ -580,13 +647,18 @@ public class SketchView extends View {
                         start = snappedStart;
                     }
                 }
-                sketch.startNewPath(start);
+                sketch.startNewPath(
+                        start, currentColour, currentLineType, getOrnamentSizeForNewLine());
                 break;
 
             case MotionEvent.ACTION_MOVE:
                 if (sketch.getActivePath() == null) {
                     // shouldn't be null, but just in case...
-                    sketch.startNewPath(surveyCoords);
+                    sketch.startNewPath(
+                            surveyCoords,
+                            currentColour,
+                            currentLineType,
+                            getOrnamentSizeForNewLine());
                 } else {
                     sketch.getActivePath().lineTo(surveyCoords);
                 }
@@ -603,7 +675,11 @@ public class SketchView extends View {
                         invalidate();
                     }
                 }
-                sketch.finishPath();
+                orientActivePathIfRequired();
+                // A tap with a freehand line leaves a dot, but a typed line that small is a
+                // mistake: it would be meaningless in an export
+                float minimumSize = currentLineType.isSemantic() ? getMinimumLineSize() : 0;
+                sketch.finishPath(minimumSize);
                 break;
 
             default:
@@ -611,6 +687,62 @@ public class SketchView extends View {
         }
 
         return true;
+    }
+
+    private boolean handleDrawArea(MotionEvent event) {
+
+        Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
+        Coord2D surveyCoords = viewCoordsToSurveyCoords(touchPointOnView);
+
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                actionDownPointOnView = touchPointOnView;
+                sketch.startNewArea(surveyCoords, currentColour, currentAreaType);
+                break;
+
+            case MotionEvent.ACTION_MOVE:
+                if (sketch.getActivePath() == null) {
+                    // shouldn't be null, but just in case...
+                    sketch.startNewArea(surveyCoords, currentColour, currentAreaType);
+                } else {
+                    sketch.getActivePath().lineTo(surveyCoords);
+                }
+                invalidate();
+                break;
+
+            case MotionEvent.ACTION_UP:
+                sketch.finishArea(currentAreaType, getMinimumArea());
+                invalidate();
+                break;
+
+            default:
+                return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * The ornament size (in survey metres) to record on a line drawn now: a fixed on-screen size
+     * converted at the current zoom, exactly as a symbol's size is chosen. Drawing zoomed in
+     * therefore gives finer ticks than drawing zoomed out, and either way the ornamentation is then
+     * fixed relative to the cave.
+     */
+    private float getOrnamentSizeForNewLine() {
+        float sizePixels = SexyTopo.dpToPixels(GeneralPreferences.getLineOrnamentSizeDp());
+        return sizePixels / surveyToViewScale;
+    }
+
+    /**
+     * Wall-kind lines get their point order normalised on completion so the passage interior is on
+     * a consistent side, whichever way the user drew the stroke (see LineOrienter).
+     */
+    private void orientActivePathIfRequired() {
+        PathDetail activePath = sketch.getActivePath();
+        if (activePath == null || !activePath.getLineType().isWall() || projection == null) {
+            return;
+        }
+        LineOrienter.orientToInterior(activePath.getPath(), projection.getStationMap().values());
     }
 
     private Coord2D considerSnapToSketchLine(Coord2D pointTouched) {
@@ -654,40 +786,16 @@ public class SketchView extends View {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                // A press anywhere on a cross-section's body deletes it. This is hit-tested
-                // separately because findNearestVisibleDetailWithin only measures distance to a
-                // cross-section's centre point, not its whole body.
-                if (SketchPreferences.Toggle.SHOW_X_SECTIONS.isOn()) {
-                    CrossSectionDetail crossSection = findCrossSectionBodyAt(touchPointOnSurvey);
-                    if (crossSection != null) {
-                        sketch.deleteDetail(crossSection);
-                        invalidate();
-                        return true;
-                    }
-                }
-
-                SketchDetail closestDetail =
-                        sketch.findNearestVisibleDetailWithin(
-                                touchPointOnSurvey, deleteToleranceInMetres, surveyToViewScale);
-
-                if (closestDetail == null) {
+                SketchDetail tapped = findDetailTapped(touchPointOnSurvey, deleteToleranceInMetres);
+                if (tapped == null) {
                     // you missed, try again :P
                     return true;
-
-                } else if (deleteLineFragments && closestDetail instanceof PathDetail) {
-                    // you got part of the line
-                    List<SketchDetail> fragments =
-                            ((PathDetail) closestDetail)
-                                    .getPathFragmentsOutsideRadius(
-                                            touchPointOnSurvey, deleteToleranceInMetres);
-                    sketch.deleteDetail(closestDetail, fragments);
-                    invalidate();
-
-                } else {
-                    // bullseye!
-                    sketch.deleteDetail(closestDetail);
-                    invalidate();
                 }
+                eraseDetail(
+                        tapped, touchPointOnSurvey, deleteToleranceInMetres, deleteLineFragments);
+                invalidate();
+                break;
+
             case MotionEvent.ACTION_MOVE:
             case MotionEvent.ACTION_UP:
                 break;
@@ -697,6 +805,106 @@ public class SketchView extends View {
         }
 
         return true;
+    }
+
+    /**
+     * Work out which sketch detail the user has just tapped, or null if they missed everything.
+     * This only decides what was hit; what to do about it is up to the caller.
+     *
+     * <p>Details are tried in order of how specifically the tap identifies them. Whatever lies
+     * nearest the tap wins first, so a line drawn across an area is still picked out when the user
+     * aims at the line. Cross-sections come next: a press anywhere on the body counts, which is a
+     * bigger target than a point and so shouldn't pre-empt something the user aimed at precisely.
+     * Last comes an area under the finger, which covers tapping the middle of one — too far from
+     * its boundary for the distance test to reach, and otherwise unhittable.
+     */
+    private SketchDetail findDetailTapped(Coord2D touchPointOnSurvey, float toleranceInMetres) {
+
+        SketchDetail nearest =
+                sketch.findNearestVisibleDetailWithin(
+                        touchPointOnSurvey, toleranceInMetres, surveyToViewScale);
+        if (nearest != null) {
+            return nearest;
+        }
+
+        if (SketchPreferences.Toggle.SHOW_X_SECTIONS.isOn()) {
+            CrossSectionDetail crossSection = findCrossSectionBodyAt(touchPointOnSurvey);
+            if (crossSection != null) {
+                return crossSection;
+            }
+        }
+
+        return sketch.findAreaContaining(touchPointOnSurvey);
+    }
+
+    /**
+     * Delete a tapped detail. With "delete line fragments" on, lines and areas are cut into rather
+     * than removed whole; everything else is deleted outright.
+     */
+    private void eraseDetail(
+            SketchDetail detail,
+            Coord2D touchPointOnSurvey,
+            float toleranceInMetres,
+            boolean deleteLineFragments) {
+
+        if (deleteLineFragments && detail instanceof PathDetail) {
+            // you got part of the line
+            List<SketchDetail> fragments =
+                    ((PathDetail) detail)
+                            .getPathFragmentsOutsideRadius(touchPointOnSurvey, toleranceInMetres);
+            sketch.deleteDetail(detail, fragments);
+
+        } else if (deleteLineFragments && detail instanceof AreaDetail) {
+            // carve a notch out of the area; this can split it into several areas, or punch a
+            // hole if the user is erasing in the middle of one
+            eraseFromArea((AreaDetail) detail, touchPointOnSurvey, toleranceInMetres);
+
+        } else {
+            // bullseye!
+            sketch.deleteDetail(detail);
+        }
+    }
+
+    /**
+     * Erase a disc from an area as an undoable operation. Whatever survives comes back as
+     * replacement areas: possibly one shrunken region, possibly one with a new hole if the user
+     * erased into the middle of it, possibly several if the notch split it, possibly none if the
+     * disc swallowed it. Falls back to deleting the whole area if the geometry op fails.
+     */
+    private void eraseFromArea(AreaDetail areaDetail, Coord2D touchPointOnSurvey, float radius) {
+        List<PolygonUtils.Region> remaining =
+                PolygonUtils.subtract(areaDetail.toRegion(), touchPointOnSurvey, radius);
+        if (remaining == null) {
+            sketch.deleteDetail(areaDetail);
+            return;
+        }
+        // a nibble can leave slivers too small to be worth keeping
+        double minimumArea = getMinimumArea();
+        List<SketchDetail> replacements =
+                remaining.stream()
+                        .filter(region -> region.getArea() >= minimumArea)
+                        .map(region -> (SketchDetail) areaDetail.withRegion(region))
+                        .collect(Collectors.toList());
+        sketch.deleteDetail(areaDetail, replacements);
+    }
+
+    /**
+     * The smallest area (in square metres) worth keeping: a square of fixed on-screen size,
+     * converted at the current zoom. So the threshold follows what the user can actually see,
+     * rather than being a fixed size in the cave.
+     */
+    private double getMinimumArea() {
+        double sizeInMetres = getMinimumLineSize();
+        return sizeInMetres * sizeInMetres;
+    }
+
+    /**
+     * The smallest extent (in metres) a typed line must span to be kept, so a stray tap doesn't
+     * leave a speck. Like getMinimumArea, it's a fixed on-screen size converted at the current
+     * zoom.
+     */
+    private float getMinimumLineSize() {
+        return dpToPixels(MINIMUM_DETAIL_SIZE_DP) / surveyToViewScale;
     }
 
     private boolean handleSymbol(MotionEvent event) {
@@ -724,14 +932,15 @@ public class SketchView extends View {
                             Space2DUtils.getAngleBetween(actionDownPointOnView, touchPointOnView);
                     angle = Space2DUtils.adjustAngle(angle, -90);
                     Coord2D firstTouch = viewCoordsToSurveyCoords(actionDownPointOnView);
-                    sketch.addSymbolDetail(firstTouch, currentSymbol, size, angle);
+                    sketch.addSymbolDetail(firstTouch, currentSymbol, currentColour, size, angle);
                     float distance =
                             Space2DUtils.getDistance(actionDownPointOnView, touchPointOnView);
                     if (distance < 5) {
                         activity.showSimpleToast(R.string.sketch_symbol_orientation_education);
                     }
                 } else {
-                    sketch.addSymbolDetail(touchPointOnSurvey, currentSymbol, size, 0);
+                    sketch.addSymbolDetail(
+                            touchPointOnSurvey, currentSymbol, currentColour, size, 0);
                 }
                 invalidate();
                 return true;
@@ -768,7 +977,8 @@ public class SketchView extends View {
                                     int startingSizeSp = GeneralPreferences.getTextStartingSizeSp();
                                     float startingSizePixels = spToPixels(startingSizeSp);
                                     float size = startingSizePixels / surveyToViewScale;
-                                    sketch.addTextDetail(touchPointOnSurvey, text, size);
+                                    sketch.addTextDetail(
+                                            touchPointOnSurvey, text, currentColour, size);
                                     invalidate();
                                 })
                         .setNegativeButton(R.string.cancel, null);
@@ -977,6 +1187,73 @@ public class SketchView extends View {
                 new ContextMenuManager(getContext(), viewContext, activity);
         menuManager.showMenuForStation(
                 this, station, survey, (int) event.getX(), (int) event.getY());
+    }
+
+    /**
+     * The line the user pressed on, or null. Only the nearest detail counts, so pressing on a
+     * symbol that sits on a line picks out the symbol rather than the line.
+     */
+    private PathDetail checkForPath(Coord2D touchPointOnView) {
+        float selectionTolerance = selectionSensitivityPx / surveyToViewScale;
+        Coord2D touchPointOnSurvey = viewCoordsToSurveyCoords(touchPointOnView);
+        SketchDetail nearest =
+                sketch.findNearestVisibleDetailWithin(
+                        touchPointOnSurvey, selectionTolerance, surveyToViewScale);
+        return nearest instanceof PathDetail ? (PathDetail) nearest : null;
+    }
+
+    /** Offers to flip a line or change its type. Both are single undoable steps. */
+    private void showLineContextMenu(MotionEvent event, final PathDetail pathDetail) {
+        PopupMenu popup =
+                ContextMenuManager.createPopupMenuAt(
+                        getContext(), this, (int) event.getX(), (int) event.getY());
+        popup.inflate(R.menu.context_line);
+        Menu menu = popup.getMenu();
+
+        LineType currentType = pathDetail.getLineType();
+        menu.findItem(R.id.line_title).setTitle(currentType.getStringId());
+        // Orientation means nothing for a plain sketch line or a rock outline
+        menu.findItem(R.id.action_flip_line).setEnabled(currentType.isOriented());
+
+        Map<Integer, LineType> lineTypesByItemId = new HashMap<>();
+        SubMenu lineTypeMenu = menu.findItem(R.id.menu_line_type).getSubMenu();
+        for (LineType lineType : LineType.values()) {
+            int itemId = lineType.getButtonViewId();
+            lineTypeMenu
+                    .add(R.id.menu_line_type, itemId, Menu.NONE, lineType.getStringId())
+                    .setChecked(lineType == currentType);
+            lineTypesByItemId.put(itemId, lineType);
+        }
+        lineTypeMenu.setGroupCheckable(R.id.menu_line_type, true, true);
+
+        popup.setOnMenuItemClickListener(
+                item -> {
+                    if (item.getItemId() == R.id.action_flip_line) {
+                        sketch.flipPathDetail(pathDetail);
+                        invalidate();
+                        return true;
+                    }
+                    LineType lineType = lineTypesByItemId.get(item.getItemId());
+                    if (lineType != null && lineType != currentType) {
+                        retypeLine(pathDetail, lineType);
+                        return true;
+                    }
+                    return false;
+                });
+        popup.show();
+    }
+
+    private void retypeLine(PathDetail pathDetail, LineType lineType) {
+        // A sketch line's ornament size never shows and isn't saved, so it can't be trusted; size
+        // the new ornamentation as for a line drawn now instead
+        float ornamentSize =
+                pathDetail.getLineType().isSemantic()
+                        ? pathDetail.getOrnamentSize()
+                        : getOrnamentSizeForNewLine();
+        Collection<Coord2D> stationPositions =
+                projection == null ? Collections.emptyList() : projection.getStationMap().values();
+        sketch.retypePathDetail(pathDetail, lineType, ornamentSize, stationPositions);
+        invalidate();
     }
 
     /**
@@ -1924,6 +2201,8 @@ public class SketchView extends View {
             return;
         }
 
+        drawAreas(canvas, sketch, alpha);
+
         Colour lastColour = Colour.BLACK;
 
         drawPaint.setColor(lastColour.intValue);
@@ -1931,9 +2210,21 @@ public class SketchView extends View {
 
         boolean isDebugMode = activity.isDebugMode();
 
+        boolean showWallSides = SketchPreferences.Toggle.SHOW_WALL_SIDES.isOn();
+        PathDetail mostRecentWall = findMostRecentWall(sketch);
+
         for (PathDetail pathDetail : sketch.getPathDetails()) {
 
             if (!couldBeVisible(pathDetail)) {
+                continue;
+            }
+
+            if (pathDetail.getLineType() != LineType.SKETCH) {
+                drawTypedPath(canvas, pathDetail, alpha);
+                if (pathDetail == mostRecentWall
+                        || (showWallSides && isFinishedWall(sketch, pathDetail))) {
+                    drawWallInsideTick(canvas, pathDetail, alpha);
+                }
                 continue;
             }
 
@@ -2035,6 +2326,252 @@ public class SketchView extends View {
                 drawable.draw(canvas);
             }
         }
+    }
+
+    /**
+     * Semantic lines are drawn individually via drawPath so their type's ornamentation (dashes,
+     * tick stamps) can apply. The path is built in view space, so the ornamentation keeps a
+     * constant on-screen size across zoom levels rather than scaling with the survey.
+     */
+    private void drawTypedPath(Canvas canvas, PathDetail pathDetail, int alpha) {
+        LineType lineType = pathDetail.getLineType();
+        Paint paint = lineTypePaints.get(lineType);
+        if (paint == null) { // paints not initialised yet
+            paint = drawPaint;
+        } else {
+            updateOrnamentation(paint, pathDetail);
+        }
+        paint.setColor(pathDetail.getDrawColour(isDarkModeActive).intValue);
+        paint.setAlpha(alpha);
+
+        typedPathScratch.rewind();
+        boolean first = true;
+        for (Coord2D point : pathDetail.getPath()) {
+            float x = (point.x - viewpointOffset.x) * surveyToViewScale;
+            float y = (point.y - viewpointOffset.y) * surveyToViewScale;
+            if (first) {
+                typedPathScratch.moveTo(x, y);
+                first = false;
+            } else {
+                typedPathScratch.lineTo(x, y);
+            }
+        }
+        canvas.drawPath(typedPathScratch, paint);
+    }
+
+    /**
+     * Rebuilds a line type's path effect if the line's ornament size on screen differs from the one
+     * the cached effect was built for. Ornament sizes are survey-space, so this happens on zoom and
+     * when moving between lines drawn at different zoom levels — not on every frame.
+     *
+     * <p>Path effects only render on a hardware-accelerated canvas from API 28, so on older devices
+     * semantic lines keep a plain stroke (still distinguished by width).
+     */
+    private void updateOrnamentation(Paint paint, PathDetail pathDetail) {
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.P) {
+            return;
+        }
+        LineType lineType = pathDetail.getLineType();
+        float ornamentSizePixels = pathDetail.getOrnamentSize() * surveyToViewScale;
+        Float builtFor = lineTypePaintOrnamentSizePixels.get(lineType);
+        if (builtFor != null && builtFor == ornamentSizePixels) {
+            return;
+        }
+        PathEffect pathEffect =
+                lineType.createPathEffect(ornamentSizePixels, paint.getStrokeWidth());
+        paint.setPathEffect(pathEffect);
+        // Stamped shapes are filled as well as outlined, so overhang teeth come out solid. Only
+        // while the stamp is in use, though: filling a plain path would fill the area it encloses.
+        paint.setStyle(
+                pathEffect instanceof PathDashPathEffect
+                        ? Paint.Style.FILL_AND_STROKE
+                        : Paint.Style.STROKE);
+        lineTypePaintOrnamentSizePixels.put(lineType, ornamentSizePixels);
+    }
+
+    /**
+     * The most recently drawn wall-kind line, whose interior-side marker is always shown so a wrong
+     * auto-orientation guess is visible immediately; the Wall Sides toggle marks the rest too.
+     */
+    private static PathDetail findMostRecentWall(Sketch sketch) {
+        List<PathDetail> pathDetails = sketch.getPathDetails();
+        for (int i = pathDetails.size() - 1; i >= 0; i--) {
+            PathDetail candidate = pathDetails.get(i);
+            if (isFinishedWall(sketch, candidate)) {
+                return candidate;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Whether a line can carry an interior-side marker: any wall-kind line, excluding a stroke
+     * still in progress (the marker hopping along a growing line is disconcerting, and orientation
+     * isn't decided until the stroke finishes anyway). Ticked types need no marker — their
+     * ornamentation already shows their orientation.
+     */
+    private static boolean isFinishedWall(Sketch sketch, PathDetail pathDetail) {
+        return pathDetail.getLineType().isWall() && pathDetail != sketch.getActivePath();
+    }
+
+    /**
+     * A slim red arrowhead at the midpoint of a wall, pointing to the side SexyTopo believes is the
+     * passage interior. Red and arrow-shaped so it reads as UI feedback rather than a drawing
+     * artefact; it is never exported.
+     */
+    private void drawWallInsideTick(Canvas canvas, PathDetail pathDetail, int alpha) {
+        List<Coord2D> points = pathDetail.getPath();
+        if (points.size() < 2) {
+            return;
+        }
+        int midIndex = points.size() / 2;
+        Coord2D from = points.get(midIndex - 1);
+        Coord2D to = points.get(midIndex);
+
+        float fromX = (from.x - viewpointOffset.x) * surveyToViewScale;
+        float fromY = (from.y - viewpointOffset.y) * surveyToViewScale;
+        float toX = (to.x - viewpointOffset.x) * surveyToViewScale;
+        float toY = (to.y - viewpointOffset.y) * surveyToViewScale;
+
+        float dx = toX - fromX, dy = toY - fromY;
+        float length = (float) Math.sqrt(dx * dx + dy * dy);
+        if (length < 0.001f) {
+            return;
+        }
+
+        // interior normal: the direction rotated +90 degrees, matching LineOrienter's canonical
+        // side (positive cross product of direction with the vector to the interior)
+        float nx = -dy / length, ny = dx / length;
+        // tangent along the wall, for the arrowhead's narrow base
+        float tx = dx / length, ty = dy / length;
+
+        float midX = (fromX + toX) / 2, midY = (fromY + toY) / 2;
+        float arrowLength = dpToPixels(8);
+        float halfBaseWidth = dpToPixels(2.5f);
+
+        // slim arrowhead: tip out in the passage, narrow base astride the wall's midpoint
+        float tipX = midX + nx * arrowLength, tipY = midY + ny * arrowLength;
+
+        wallInsideTickPaint.setAlpha(alpha);
+        canvas.drawLine(
+                tipX,
+                tipY,
+                midX + tx * halfBaseWidth,
+                midY + ty * halfBaseWidth,
+                wallInsideTickPaint);
+        canvas.drawLine(
+                tipX,
+                tipY,
+                midX - tx * halfBaseWidth,
+                midY - ty * halfBaseWidth,
+                wallInsideTickPaint);
+    }
+
+    /**
+     * Draw the sketch's areas: each region is filled with its type's pattern and outlined. Holes
+     * are drawn as further contours of the same path under the even-odd fill rule, so they are
+     * outlined too but left unfilled. The pattern is anchored to survey space so it doesn't crawl
+     * when the view is panned.
+     */
+    private void drawAreas(Canvas canvas, Sketch sketch, int alpha) {
+
+        areaFillMatrix.setTranslate(
+                -viewpointOffset.x * surveyToViewScale, -viewpointOffset.y * surveyToViewScale);
+
+        for (AreaDetail areaDetail : sketch.getAreaDetails()) {
+
+            if (!couldBeVisible(areaDetail)) {
+                continue;
+            }
+
+            Path outline = new Path();
+            outline.setFillType(Path.FillType.EVEN_ODD);
+            for (List<Coord2D> contour : areaDetail.getContours()) {
+                boolean first = true;
+                for (Coord2D point : contour) {
+                    float x = (point.x - viewpointOffset.x) * surveyToViewScale;
+                    float y = (point.y - viewpointOffset.y) * surveyToViewScale;
+                    if (first) {
+                        outline.moveTo(x, y);
+                        first = false;
+                    } else {
+                        outline.lineTo(x, y);
+                    }
+                }
+                outline.close();
+            }
+
+            Colour colour = areaDetail.getDrawColour(isDarkModeActive);
+
+            // the fill tile is an alpha mask, so it takes the paint's colour
+            BitmapShader shader = areaFillShaders.get(areaDetail.getAreaType());
+            shader.setLocalMatrix(areaFillMatrix);
+            areaFillPaint.setShader(shader);
+            areaFillPaint.setColor(colour.intValue);
+            areaFillPaint.setAlpha(alpha);
+            canvas.drawPath(outline, areaFillPaint);
+
+            areaPaint.setColor(colour.intValue);
+            if (areaDetail.getAreaType().hasDefinedEdge()) {
+                areaPaint.setAlpha(alpha);
+                areaPaint.setStrokeWidth(drawPaint.getStrokeWidth());
+            } else {
+                areaPaint.setAlpha(Math.round(alpha * AreaType.LIGHT_OUTLINE_OPACITY));
+                areaPaint.setStrokeWidth(dpToPixels(AreaType.Fill.STROKE_WIDTH_DP));
+            }
+            canvas.drawPath(outline, areaPaint);
+        }
+    }
+
+    /**
+     * Render one tile of an area fill pattern into an alpha mask, to be repeated by a shader. The
+     * tile is rounded to a whole number of pixels so the repeats line up exactly.
+     */
+    private static BitmapShader createAreaFillShader(AreaType.Fill fill) {
+        int sizePixels = Math.max(1, Math.round(dpToPixels(fill.getTileSize())));
+        float scale = sizePixels / fill.getTileSize();
+
+        Bitmap tile = Bitmap.createBitmap(sizePixels, sizePixels, Bitmap.Config.ALPHA_8);
+        Canvas tileCanvas = new Canvas(tile);
+
+        Paint strokePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        strokePaint.setStyle(Paint.Style.STROKE);
+        strokePaint.setStrokeWidth(dpToPixels(AreaType.Fill.STROKE_WIDTH_DP));
+        strokePaint.setStrokeJoin(Paint.Join.ROUND);
+        strokePaint.setStrokeCap(Paint.Cap.ROUND);
+        Paint fillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        fillPaint.setStyle(Paint.Style.FILL);
+
+        for (AreaType.Mark mark : fill.getMarks()) {
+            float[] values = mark.getValues();
+            Path path = new Path();
+            switch (mark.getKind()) {
+                case LINE:
+                case POLYGON:
+                    path.moveTo(values[0] * scale, values[1] * scale);
+                    for (int i = 2; i < values.length; i += 2) {
+                        path.lineTo(values[i] * scale, values[i + 1] * scale);
+                    }
+                    if (mark.getKind() == AreaType.Mark.Kind.POLYGON) {
+                        path.close();
+                    }
+                    tileCanvas.drawPath(path, strokePaint);
+                    break;
+                case DOT:
+                case RING:
+                    path.addCircle(
+                            values[0] * scale,
+                            values[1] * scale,
+                            values[2] * scale,
+                            Path.Direction.CW);
+                    Paint paint =
+                            mark.getKind() == AreaType.Mark.Kind.DOT ? fillPaint : strokePaint;
+                    tileCanvas.drawPath(path, paint);
+                    break;
+            }
+        }
+
+        return new BitmapShader(tile, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
     }
 
     private void setDrawColour(Paint paint, SketchDetail sketchDetail) {
@@ -2286,6 +2823,14 @@ public class SketchView extends View {
         surveyToViewScale = newZoom;
     }
 
+    public boolean canUndo() {
+        return sketch.canUndo();
+    }
+
+    public boolean canRedo() {
+        return sketch.canRedo();
+    }
+
     public void undo() {
         sketch.undo();
         invalidate();
@@ -2297,7 +2842,15 @@ public class SketchView extends View {
     }
 
     public void setBrushColour(BrushColour brushColour) {
-        sketch.setActiveColour(brushColour.getColour());
+        currentColour = brushColour.getColour();
+    }
+
+    public void setLineType(LineType lineType) {
+        currentLineType = lineType;
+    }
+
+    public void setAreaType(AreaType areaType) {
+        currentAreaType = areaType;
     }
 
     public void setCurrentSymbol(Symbol symbol) {
@@ -2356,10 +2909,27 @@ public class SketchView extends View {
             Coord2D touchPointOnView = new Coord2D(motionEvent.getX(), motionEvent.getY());
             Station matchedStation = checkForStation(touchPointOnView);
             if (matchedStation != null && !menuShownInThisTouch) {
-                if (currentSketchTool == SketchTool.DRAW) {
+                if (currentSketchTool == SketchTool.LINE || currentSketchTool == SketchTool.AREA) {
                     sketch.abandonActivePath();
                 }
                 showContextMenu(motionEvent, matchedStation);
+                menuShownInThisTouch = true;
+                return;
+            }
+
+            // Not offered by tools that act as soon as the finger lands (erasing, placing a symbol
+            // or text), since by then a long press has already done something, nor while placing
+            // or adjusting a cross-section
+            if (currentSketchTool != SketchTool.MOVE
+                    && currentSketchTool != SketchTool.SELECT
+                    && currentSketchTool != SketchTool.LINE
+                    && currentSketchTool != SketchTool.AREA) {
+                return;
+            }
+            PathDetail matchedPath = checkForPath(touchPointOnView);
+            if (matchedPath != null && !menuShownInThisTouch) {
+                sketch.abandonActivePath();
+                showLineContextMenu(motionEvent, matchedPath);
                 menuShownInThisTouch = true;
             }
         }

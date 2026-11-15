@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Background for a button in the symbol, line and area pickers: a ring round the selected item. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_selected="true">
+        <shape android:shape="rectangle">
+            <corners android:radius="8dp" />
+            <solid android:color="@color/pickerSelectedFill" />
+            <stroke android:width="3dp" android:color="@color/pickerAccent" />
+        </shape>
+    </item>
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <corners android:radius="8dp" />
+            <solid android:color="#33000000" />
+        </shape>
+    </item>
+    <item android:drawable="@android:color/transparent" />
+</selector>

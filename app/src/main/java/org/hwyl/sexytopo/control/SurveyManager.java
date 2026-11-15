@@ -14,6 +14,7 @@ import java.util.List;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.io.basic.Saver;
+import org.hwyl.sexytopo.control.io.basic.ScratchAutosave;
 import org.hwyl.sexytopo.control.util.InputMode;
 import org.hwyl.sexytopo.control.util.SurveyUpdater;
 import org.hwyl.sexytopo.model.calibration.CalibrationReading;
@@ -127,6 +128,11 @@ public class SurveyManager {
     }
 
     public void setCurrentSurvey(Survey currentSurvey) {
+        if (currentSurvey != SurveyManager.currentSurvey) {
+            // any unsaved survey being kept in scratch is being replaced (the user will have been
+            // warned it's not saved), so it shouldn't come back next time the app starts
+            ScratchAutosave.clear(context);
+        }
         SurveyManager.currentSurvey = currentSurvey;
         broadcastSurveyUpdated();
     }
@@ -167,7 +173,11 @@ public class SurveyManager {
             Context context = contexts[0];
             try {
                 if (!currentSurvey.isAutosaved()) {
-                    Saver.autosave(context, currentSurvey);
+                    if (currentSurvey.hasHome()) {
+                        Saver.autosave(context, currentSurvey);
+                    } else {
+                        ScratchAutosave.save(context, currentSurvey);
+                    }
                     Log.d(R.string.file_save_autosaved);
                 }
                 return null;

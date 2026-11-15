@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Marks the active Table / Plan / Elevation button in the top bar -->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:insetLeft="2dp"
+    android:insetRight="2dp"
+    android:insetTop="6dp"
+    android:insetBottom="6dp">
+    <shape android:shape="rectangle">
+        <solid android:color="#33FFFFFF" />
+        <corners android:radius="8dp" />
+    </shape>
+</inset>

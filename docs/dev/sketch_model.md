@@ -6,7 +6,8 @@ A `Survey` contains two `Sketch` objects: one for the plan view and one for the 
 
 ```
 SketchDetail (abstract)
-├── PathDetail          — a drawn line (list of Coord2D points)
+├── PathDetail          — a drawn line (list of Coord2D points), typed by LineType
+├── AreaDetail          — a filled region (e.g. water) with optional holes, typed by AreaType
 ├── SinglePositionDetail (abstract)
 │   ├── SymbolDetail    — a cave symbol at a fixed location
 │   ├── TextDetail      — a text label
@@ -22,11 +23,13 @@ The one exception is a `CrossSectionDetail`'s sub-sketch: committing an edit fro
 
 `Sketch` holds:
 - `List<PathDetail> pathDetails`
+- `List<AreaDetail> areaDetails`
 - `List<SymbolDetail> symbolDetails`
 - `List<TextDetail> textDetails`
 - `List<CrossSectionDetail> crossSectionDetails`
 - `PathDetail activePath` — the path currently being drawn (null when not drawing)
 - `Colour activeColour` — colour applied to new elements (default: BLACK)
+- `LineType activeLineType` — line type applied to new paths (default: SKETCH)
 - `List<SketchDetail> sketchHistory` / `undoneHistory` — undo/redo stacks
 
 The undo/redo stacks are **not persisted** — only the current state is saved to disk.
@@ -37,7 +40,57 @@ Path drawing is a multi-step operation driven by touch events in `SketchView`:
 
 1. `sketch.startNewPath(Coord2D)` — creates `activePath`, optionally snapping to a nearby existing path endpoint
 2. `activePath.lineTo(Coord2D)` — called repeatedly on touch move
-3. `sketch.finishPath()` — moves `activePath` into `pathDetails` and applies point simplification (`Space2DUtils.simplify()`)
+3. `sketch.finishPath(minimumSize)` — moves `activePath` into `pathDetails` and applies point simplification (`Space2DUtils.simplify()`). A stroke whose bounding box is smaller than `minimumSize` in both directions is dropped as an accidental tap. `SketchView` passes a fixed on-screen size (10dp, shared with the minimum area size) converted at the current zoom for typed lines, and zero for freehand SKETCH lines, where a tap deliberately leaves a dot
+
+### Line Types
+
+`LineType` types a path as SKETCH (a plain freehand line, the historical behaviour) or as a semantic cave feature, each named after the Therion line it exports as: WALL, PRESUMED_WALL and UNDERLYING_WALL (wall-kind); PIT and FLOOR_STEP (ticked, solid); CHIMNEY and CEILING_STEP (ticked, dashed); OVERHANG (toothed); SLOPE (hachured: alternating long and short ticks); ROCK_BORDER and ROCK_EDGE (plain, thinner than a wall). Therion's default symbol set draws pit and floor-step identically, and likewise chimney and ceiling-step; here the steps get shorter ticks so they can be told apart while sketching. `LineType.isOriented` is true for wall-kind and stamped types — the ones where flipping changes anything — and gates the context menu's Flip and Tools → Flip Last Line. The active line type is picked from a toolbar that opens when the line tool is tapped while already selected (mirroring the symbol toolbar), and is persisted in `SketchPreferences`. Eraser fragments keep the type of the path they came from. Long-pressing a line with the move, select, line or area tool opens a line context menu (`SketchView.showLineContextMenu`) to flip it or change its type; with a drawing tool the stroke just begun is abandoned (the in-progress path is ignored when hit-testing, so it can't be the line found). Erase, symbol and text act on touch-down, so don't offer it. Retyping (`Sketch.retypePathDetail`) is a delete-and-replace, so one undo step. A line becoming wall-kind from another type is auto-oriented as if freshly drawn; otherwise point order is kept, so a deliberate flip survives e.g. wall → presumed wall. A sketch line gaining ornamentation takes its ornament size from the current zoom, since a sketch line's stored size is never shown or saved.
+
+Each type is defined entirely by its constructor arguments — stroke width factor, optional dash pattern, optional tick stamp, wall-ness — so adding a type needs no logic changes and there are no switch statements over the enum. Ornamented types (pit/chimney ticks) use a small stamp path repeated along the line via `PathDashPathEffect` — the TopoDroid approach — so drawing them is a plain `drawPath` call with a per-type `Paint`. Where a type needs both dashes and ticks, the gaps are built into the stamp rather than composing effects. A stamp is a baseline bar plus either one or more ticks spaced evenly along it (one for pit and the rest, a long and a short for slope) or a triangular tooth (overhang); while a stamp effect is in use the paint is FILL_AND_STROKE so teeth come out solid, reverting to STROKE when the effect is dropped (too small on screen), since filling a plain path would fill the area it encloses.
+
+When the "Clip to Walls" quick setting is on (`SketchPreferences.Toggle.CLIP_TO_WALLS`), `Sketch.finishPath` clips lines whose type `isClippedToWalls` — every semantic type except the wall kinds — the same way areas are clipped: `PolygonUtils.clipLineToInteriorOf` cuts the line where it crosses a wall (walls extended a little past their ends), and keeps each piece that lies mostly on the interior side of its nearest wall. If nothing would be cut off, or everything would be, the line is kept as drawn. The surviving pieces are added in a single undo step. Walls aren't clipped because they're what does the clipping, and an underlying wall crosses the walls above by definition. Freehand lines aren't clipped because they can be anything, including notes outside the passage.
+
+SLOPE exports as a bare `line slope`: the `-l-size` extent Therion can take per point is not written, so hachure length is left to Therion.
+
+Stamp and dash measurements are multiples of the path's **ornament size** (`PathDetail.getOrnamentSize`), a survey-space quantity in metres fixed when the line is drawn — a fixed dp size (the "Line ornament size" preference) converted at the zoom in force at the time, exactly as `SymbolDetail`'s size is chosen. So ornamentation is anchored to the cave: it stays put over the rock and scales with everything else when zooming, instead of crawling along the line. Drawing zoomed in gives finer ticks than drawing zoomed out, and `PathDetail.scale` scales the ornament size with the geometry (as symbols do), so cross-section sub-sketches stay consistent. The size round-trips through JSON as `ornament-size` (written only for typed lines, defaulted on load) and is used by the SVG exporter's dash array, but **not** by th2 — Therion applies its own styling to line commands.
+
+Lines are oriented by point order (Therion's convention: the side matters for walls and ticked types). Wall-kind lines are auto-oriented when the stroke is finished: `LineOrienter` infers the passage-interior side from the survey centreline (per-segment nearest-station votes, weighted by length) and reverses the stored point order if needed, so the data is canonical whichever way the user drew it. Ticked types can't be inferred — only the user knows which side the drop is — so they keep the drawn direction, with live tick rendering as feedback. Tools → Flip Last Line reverses the most recently drawn oriented line (`Sketch.flipPathDetail`, a delete-and-replace so it's one undo step). The most recently drawn wall-kind line gets a slim red arrowhead at its midpoint pointing to the side taken to be the passage interior, so a wrong auto-orientation guess is visible immediately; the "All Wall Sides" quick setting (off by default) shows it on every wall-kind line, so a wrong guess can be spotted anywhere in the sketch. The marker is feedback only — never exported and not shown on a stroke in progress. Ticked types get no marker since their ornamentation already shows their orientation.
+
+Two rendering caveats: path effects only work on a hardware-accelerated canvas from API 28, so older devices fall back to a plain stroke (the width factor still applies); and zoomed far enough out the ornamentation would render as a smear, so below a minimum on-screen advance the effect is dropped and the line drawn as a plain stroke. `SketchView` caches one `Paint` per type alongside the on-screen ornament size its effect was built for, rebuilding only when that changes (i.e. on zoom, or between lines drawn at different zooms) rather than every frame.
+
+On export, semantic lines become first-class Therion `line wall` / `line pit` etc. commands in the th2 — Therion draws the ornamentation itself. This can be turned off with the "Export typed lines" Therion export setting. Unlike areas, semantic lines also stay in the XVI tracing background (all paths do), so the tracing is always a complete record of the sketch whether or not th2 line export is on; the duplication is harmless since the XVI is only a background reference. SVG gets a class attribute naming the type plus the width factor and (for dashed types) a dash array; tick ornamentation is not reproduced in SVG yet.
+
+## Drawing an Area
+
+An area is sketched like a path — `sketch.startNewArea(Coord2D, AreaType)` creates the `activePath`, `lineTo` extends it — but `sketch.finishArea(AreaType)` closes the outline into a polygon and adds an `AreaDetail` instead of a path. Degenerate outlines (fewer than 3 points after simplification) are discarded, as is anything enclosing less than a minimum area: a square 10dp across on screen, converted at the current zoom (`SketchView.getMinimumArea`), so a stray tap or a tiny lobe doesn't leave a speck behind. Erasing applies the same minimum to the pieces that survive, dropping slivers.
+
+To be sure of closing an outline, people tend to carry on past where they started. Closed as drawn, that overshoot (and any lead-in before the crossing) would enclose a little flap outside the shape, left as a jagged spike or notch where the ends meet. So before anything else, `PolygonUtils.trimOvershoot` looks for a crossing between the stroke's opening and closing stretches (the first and last 15% of its length) and cuts the stroke there, joining the ends at the crossing. The window is kept well short of a quarter because a figure of eight started at one end crosses itself a quarter of the way along, and that must not cost it a lobe. A stroke that falls short is closed with a straight line, after `PolygonUtils.trimHooks` has cut off any hooks: ends that came close together and then curled away from each other as the finger lifted, which would leave a kink either side of the closing line. The stroke is cut where its ends came closest. To avoid misreading a narrow channel (whose two sides are about as close as its ends) and lopping off its tip, hooks are only looked for within twice the final gap of each end, and only trimmed if the ends came within half that gap.
+
+A single stroke can also cross itself elsewhere. `PolygonUtils.normalise` resolves such a stroke using the *winding* fill rule and keeps only outermost contours, so the crossing is absorbed into the boundary rather than punching a hole: interior loops from one drawing action are always discarded. This is a deliberate choice — a caver is far more likely to cross a stroke by accident than to draw a hole that way, and stray holes would be an annoying artefact. Deliberate holes come from erasing or merging instead (see below). A self-crossing stroke can also enclose two disjoint lobes, in which case each becomes its own area. If the platform op fails or returns nothing, `finishArea` falls back to using the stroke as drawn rather than silently discarding the user's work.
+
+If the new polygon overlaps existing areas of the same type *and* colour, they are all merged into one via `PolygonUtils.union` as a single undoable operation. So a patch of sand drawn across a pool stays a separate area on top of it. When the "Blue Water" toggle is on, new water and sump areas record `Colour.BLUE` (mirroring the water symbol behaviour).
+
+### Area types and fills
+
+`AreaType` lists the kinds of area (water, sump, sand, clay, pebbles, debris, blocks), each named after the Therion area it exports as. The user picks one from the area type toolbar, opened by tapping the area tool while it is already selected (as with line types and symbols); the choice is remembered in `SketchPreferences`.
+
+Each type carries a `Fill`: a square tile of marks (polylines, closed polygons, filled dots, outlined rings) measured in dp. This one definition drives everything: `SketchView` renders each tile into an `ALPHA_8` bitmap once and fills areas through a repeating `BitmapShader` (an alpha mask, so it takes the area's colour from the paint), and `SvgExporter` writes the same marks into an SVG `<pattern>`, converting dp to metres at `Fill.METRES_PER_DP`. Marks stay inside their tile, apart from lines meant to join up with the next tile (water's hatching), so the repeats butt together seamlessly. The toolbar icons (`drawable/area_*.xml`) show the same patterns, drawn larger inside a common pool outline.
+
+### Holes
+
+An `AreaDetail` has an outline contour plus zero or more *holes* — unfilled islands within it. Holes arise from two routes: erasing into the middle of a pool punches one, and merging areas that together enclose a gap (four "walls" of water forming a ring, say) turns that gap into one. Both are handled by the same mechanism, so neither needs special-casing. Note that drawing a self-crossing outline in one stroke is deliberately *not* a third route — see above.
+
+Holes are not nested — a hole never contains a further filled region. That can't arise from drawing, merging or erasing without deliberate effort, and if it somehow does, the even-odd fill rule renders the innermost contour filled, which is the sensible picture anyway.
+
+Because the courtyard of a ring isn't part of the area, `PolygonUtils.overlap` tests against the whole contour set rather than just the outline: an area drawn inside a courtyard stays separate instead of merging and filling it in.
+
+`PolygonUtils` (control/util) implements region union/subtraction on top of `android.graphics.Path` boolean ops, recovering contours by sampling the result with `PathMeasure` and then sorting them into regions (a contour inside another is a hole). Inputs and outputs both use the even-odd fill rule.
+
+Note that under Robolectric, `Path`'s shadow implements neither real boolean geometry nor multi-contour `PathMeasure` iteration, so union/subtract/overlap can only be exercised on a device or emulator. The contour-grouping step is pure geometry and is unit tested directly (`PolygonUtilsTest`).
+
+### Export
+
+Areas are exported to SVG as `<path>` elements with `fill-rule="evenodd"` — one closed subpath per contour, so holes come out unfilled — filled with a `<pattern>` for that combination of area type and colour (see SvgExporter). Therion th2 gets one closed `line border:invisible` per contour plus an `area <type>` command (`area water`, `area sand`, ...) referencing them all; Therion treats the borders after the first as holes, so this maps directly (see Th2Exporter). The XVI tracing background deliberately omits areas — the th2 carries them as first-class editable objects, so baking them into the background would just duplicate them. The PocketTopo exporter does not emit areas.
 
 ## Adding Other Elements
 
@@ -55,7 +108,7 @@ Every add clears the redo stack and sets `isSaved = false`.
 sketch.deleteDetail(SketchDetail toDelete, List<SketchDetail> replacements)
 ```
 
-When erasing a path fragment (rather than the whole path), `replacements` contains the surviving path segments. The deleted detail is wrapped in a `DeletedDetail` and pushed onto `sketchHistory`.
+When erasing a path fragment (rather than the whole path), `replacements` contains the surviving path segments. Erasing part of an area similarly subtracts a disc from the region; the survivors become the replacements — possibly one shrunken region, possibly one with a new hole if the user erased into the middle, possibly two or more if the notch split it, possibly none if the disc swallowed it. The deleted detail(s) are wrapped in a `DeletedDetail` and pushed onto `sketchHistory`. `deleteDetails` deletes several details in one undoable step (used when merging areas).
 
 ## Undo / Redo
 
@@ -94,7 +147,8 @@ Sketch coordinates are in **survey space** (metres). `SketchView` converts to sc
 
 | Key | Contents |
 |-----|----------|
-| `"paths"` | array of `{colour, points:[{x,y}...]}` |
+| `"paths"` | array of `{colour, line-type, points:[{x,y}...]}` (`line-type` omitted for SKETCH, as in pre-line-type files) |
+| `"areas"` | array of `{area-type, colour, points:[{x,y}...], holes:[[{x,y}...]...]}` (absent in pre-area files; `holes` omitted when the area has none) |
 | `"symbols"` | array of `{location, symbol-id, colour, size, angle}` |
 | `"labels"` | array of `{location, text, colour, size}` |
 | `"x-sections"` | array of `{station-id, location, angle}` |
@@ -104,7 +158,8 @@ Path simplification is re-applied on load. History stacks are not serialized.
 ## Rendering Overview
 
 `SketchView.drawSketch()` iterates each detail collection:
-- **Paths:** sorted by colour (to minimize paint changes), then batched into `float[]` arrays for `canvas.drawLines()`
+- **Areas:** drawn first (underneath lines): each region is filled with its type's pattern through a repeating bitmap shader and its contours outlined (an even-odd `Path`, so holes are outlined but left unfilled); the shader is anchored to survey space so the pattern doesn't crawl when panning. Only water and sump (`AreaType.hasDefinedEdge`) are outlined at full line weight, since a shoreline is a real edge; other areas get a light outline, at the weight of their fill marks and faded to `AreaType.LIGHT_OUTLINE_OPACITY`, so they don't compete with walls (likewise in SVG export)
+- **Paths:** SKETCH paths are sorted by colour (to minimize paint changes), then batched into `float[]` arrays for `canvas.drawLines()`; semantic lines are drawn individually via `canvas.drawPath()` with their type's paint so dashes and tick stamps can apply
 - **Symbols:** rendered as scaled, optionally rotated `Drawable` objects with a colour filter
 - **Text:** font size = `textSize * surveyToViewScale`; supports `\n` for multiline
 - **Cross-sections:** `CrossSectionDetail.getProjection()` computes the legs; drawn with dashed connector line to the actual station
@@ -117,6 +172,10 @@ Off-screen and sub-pixel details are culled via `couldBeVisible()` before render
 |------|---------|
 | `model/sketch/Sketch.java` | Main container |
 | `model/sketch/PathDetail.java` | Path/line element |
+| `model/sketch/LineType.java` | Line type enum (wall, pit etc.) with per-type appearance |
+| `model/sketch/AreaDetail.java` | Filled region element (outline plus holes) |
+| `model/sketch/AreaType.java` | Area type enum, with each type's Therion name and fill pattern |
+| `control/util/PolygonUtils.java` | Polygon union/subtraction (Path ops) |
 | `model/sketch/SymbolDetail.java` | Symbol element |
 | `model/sketch/TextDetail.java` | Text label element |
 | `model/sketch/CrossSectionDetail.java` | Cross-section element |

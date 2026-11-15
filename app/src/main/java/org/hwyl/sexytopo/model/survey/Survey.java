@@ -105,10 +105,12 @@ public class Survey {
 
     public void setAutosaved(boolean isAutosaved) {
         this.isAutosaved = isAutosaved;
+        planSketch.setAutosaved(isAutosaved);
+        elevationSketch.setAutosaved(isAutosaved);
     }
 
     public boolean isAutosaved() {
-        return isAutosaved;
+        return isAutosaved && planSketch.isAutosaved() && elevationSketch.isAutosaved();
     }
 
     public Leg getMostRecentLeg() {
@@ -381,6 +383,10 @@ public class Survey {
                 });
 
         return (Station) (wrapper.value);
+    }
+
+    public boolean canUndoAddLeg() {
+        return !legsInChronoOrder.isEmpty();
     }
 
     public void undoAddLeg() {

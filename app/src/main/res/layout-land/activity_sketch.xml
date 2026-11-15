@@ -35,6 +35,36 @@
             android:layout_weight="1"/>
 
         <HorizontalScrollView
+            android:id="@+id/lineTypeToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone">
+            <LinearLayout
+                android:orientation="horizontal"
+                android:id="@+id/lineTypeToolbarButtonPanel"
+                android:weightSum="1"
+                android:background="@color/sexyTopoDarkGreen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <HorizontalScrollView
+            android:id="@+id/areaTypeToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone">
+            <LinearLayout
+                android:orientation="horizontal"
+                android:id="@+id/areaTypeToolbarButtonPanel"
+                android:weightSum="1"
+                android:background="@color/sexyTopoDarkGreen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <HorizontalScrollView
             android:id="@+id/symbolToolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -77,11 +107,11 @@
             android:layout_marginTop="-4dp"
             android:layout_weight="0.2"
             android:src="@drawable/pencil"
-            android:tooltipText="@string/sketch_toolbar_draw"
+            android:tooltipText="@string/sketch_toolbar_line"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
-            android:id="@+id/buttonDraw"
+            android:id="@+id/buttonLine"
             android:hapticFeedbackEnabled="true"
             />
 
@@ -101,6 +131,19 @@
             android:scaleType="fitCenter"
             android:src="@drawable/text"
             android:tooltipText="@string/sketch_toolbar_symbol" />
+        <ImageButton
+            style="@style/ToolbarImageButton"
+            android:layout_marginTop="-4dp"
+            android:layout_weight="0.2"
+            android:src="@drawable/area_water"
+            android:tooltipText="@string/sketch_toolbar_area"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/toolbar_button_height"
+            android:scaleType="fitCenter"
+            android:id="@+id/buttonArea"
+            android:padding="8dp"
+            android:hapticFeedbackEnabled="true"
+            />
 
         <ImageButton
             style="@style/ToolbarImageButton"
@@ -149,18 +192,6 @@
             android:layout_height="@dimen/toolbar_button_height"
             android:scaleType="fitCenter"
             android:id="@+id/buttonUndo"
-            android:hapticFeedbackEnabled="true"
-            />
-        <ImageButton
-            style="@style/ToolbarImageButton"
-            android:layout_marginTop="-4dp"
-            android:layout_weight="0.2"
-            android:src="@drawable/redo"
-            android:tooltipText="@string/sketch_toolbar_redo"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/toolbar_button_height"
-            android:scaleType="fitCenter"
-            android:id="@+id/buttonRedo"
             android:hapticFeedbackEnabled="true"
             />
         <ImageButton

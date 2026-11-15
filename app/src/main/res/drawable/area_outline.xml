@@ -1,0 +1,13 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="40dp"
+    android:viewportWidth="40"
+    android:viewportHeight="40">
+  <!-- The irregular pool outline drawn around the area icons (area_water and so on). -->
+  <path
+      android:strokeWidth="2.75"
+      android:pathData="M7,5 C8.75,4.17 11.67,3.5 14,3.5 C16.33,3.5 18.5,5.17 21,5 C23.5,4.83 26.58,2.58 29,2.5 C31.42,2.42 34.08,3.17 35.5,4.5 C36.92,5.83 37.75,8.75 37.5,10.5 C37.25,12.25 34.92,13.5 34,15 C33.08,16.5 31.58,18 32,19.5 C32.42,21 35.58,22.08 36.5,24 C37.42,25.92 38.08,29 37.5,31 C36.92,33 35,34.92 33,36 C31,37.08 27.75,37.75 25.5,37.5 C23.25,37.25 21.67,34.5 19.5,34.5 C17.33,34.5 14.83,37.33 12.5,37.5 C10.17,37.67 7.17,37 5.5,35.5 C3.83,34 2.67,30.83 2.5,28.5 C2.33,26.17 4.5,23.75 4.5,21.5 C4.5,19.25 2.67,17.17 2.5,15 C2.33,12.83 2.75,10.17 3.5,8.5 C4.25,6.83 5.25,5.83 7,5 Z"
+      android:fillColor="#00000000"
+      android:strokeColor="#000"
+      android:strokeLineJoin="round"/>
+</vector>

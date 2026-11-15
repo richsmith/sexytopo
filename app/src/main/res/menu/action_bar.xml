@@ -52,6 +52,28 @@
 
         </menu>
     </item>
+    <item android:id="@+id/action_edit"
+        android:title="@string/action_edit"
+        app:showAsAction="never">
+        <menu>
+            <group android:id="@+id/edit_group_sketch">
+                <item android:id="@+id/action_undo_sketch"
+                      android:title="@string/action_undo_sketch"/>
+                <item android:id="@+id/action_redo_sketch"
+                      android:title="@string/action_redo_sketch"/>
+            </group>
+            <group android:id="@+id/edit_group_survey">
+                <item android:id="@+id/action_undo_last_leg"
+                      android:title="@string/action_undo_last_leg"/>
+            </group>
+            <group android:id="@+id/edit_group_manual_entry">
+                <item android:id="@+id/action_add_leg"
+                      android:title="@string/action_add_leg"/>
+                <item android:id="@+id/action_add_splay"
+                      android:title="@string/action_add_splay"/>
+            </group>
+        </menu>
+    </item>
         <item android:id="@+id/action_view"
           android:title="@string/action_view"
           app:showAsAction="never">
@@ -109,16 +131,10 @@
         app:showAsAction="never">
         <menu>
             <group android:id="@+id/tools_group_edit">
-                <item android:id="@+id/action_undo_last_leg"
-                      android:title="@string/action_undo_last_leg"/>
+                <item android:id="@+id/action_flip_last_line"
+                      android:title="@string/action_flip_last_line"/>
                 <item android:id="@+id/action_find_station"
                       android:title="@string/action_find_station"/>
-            </group>
-            <group android:id="@+id/tools_group_manual_entry">
-                <item android:id="@+id/action_add_leg"
-                      android:title="@string/action_add_leg"/>
-                <item android:id="@+id/action_add_splay"
-                      android:title="@string/action_add_splay"/>
             </group>
             <group android:id="@+id/tools_group_diagnostics">
                 <item android:id="@+id/action_generate_test_survey"
