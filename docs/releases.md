@@ -1,15 +1,30 @@
 # Unreleased
+- New area sketching tool for marking filled regions such as water
+- Sketch lines can now be given a semantic type (e.g. wall)
+- Lighter blue colour (including display of water) in dark mode for better visibility
+- Highlight for active view button in action bar
+- Tidy up sketch quick-menu (now with submenus)
+- New Edit menu with sketch Undo / Redo, Undo Last Reading, Add Leg and Add Splay (the last three moved from the Tools menu); Redo is no longer in the sketch quick menu
+- Change default for floating manual-entry buttons on table view to off (can be turned back on in settings, and manual entry can already be triggered from the menu)
+- Fix Cavway X1 downward shots being recorded with clinos of 270-360° rather than negative values (#357)
+- Pressing back out of the app now warns if the survey isn't saved
+- Surveys that haven't been saved yet are now autosaved and restored when the app restarts
+- Sketch and table edits are now autosaved when you leave a screen, not just when a new leg arrives
+- Fix bug where automatic autosave restore was not fetching the extended elevation
+
+# 2026-11-09 1.15.0
+- Another new leg agreement algorithm "Slope-corrected angular deltas" that ought to solve issues with taking repeated readings on steep legs while remaining close in spirit to BCRA Grade 5; testing and feedback welcome (#321)
+- Splays can now be marked as going to another feature, such as a stal. Survex ... is imported as another feature. Older versions of SexyTopo open these as ordinary splays to a wall (thanks Andrew Atkinson)
+- Splays can be disabled from the leg menu or the edit dialog to hide readings (for calibration checks for example). Disabled splays are crossed out in the table, hidden in sketches, and dropped or commented out in file exports (thanks Andrew Atkinson).
+- Fix Survex and Therion import of legs that were shot backwards, which were placed in the opposite direction (thanks Andrew Atkinson)
+- Fix promoting a splay onto a leg that was shot backwards, which turned the leg round and added the splay in the wrong direction (thanks Andrew Atkinson)
+- Fix splays restored from a promoted leg being listed the wrong way round in the table (thanks Andrew Atkinson)
+- Fix editing a leg averaged from several shots, such as renaming one of its stations, which replaced the shots with their average. The shots are now kept unless the readings themselves are changed (thanks Andrew Atkinson)
+- Fix leg and station comments added from the menu not being treated as an unsaved change (thanks Andrew Atkinson)
+- Survex export now writes ISO dates (2026-01-05), which needs Survex 1.4.13 or later; Therion keeps 2026.01.05. Importing either accepts year-month-day dates separated by ".", "/" or "-" (thanks Andrew Atkinson)
 - New flowstone symbol, exported to Therion as a flowstone point
 - Fix column, air draught and too tight symbols missing from SVG exports
-- Splays can now be marked as going to another feature, such as a stal. Survex ... is imported as another feature. Older versions of SexyTopo open these as ordinary splays to a wall
-- Splays can be disabled from the leg menu or the edit dialog to hide readings (for calibration checks for example). Disabled splays are crossed out in the table, hidden in sketches, and dropped or commented out in file exports (thanks Andrew Atkinson).
-- Fix Survex and Therion import of legs that were shot backwards, which were placed in the opposite direction
-- Fix promoting a splay onto a leg that was shot backwards, which turned the leg round and added the splay in the wrong direction
-- Fix splays restored from a promoted leg being listed the wrong way round in the table
-- Fix editing a leg averaged from several shots, such as renaming one of its stations, which replaced the shots with their average. The shots are now kept unless the readings themselves are changed
-- Fix leg and station comments added from the menu not being treated as an unsaved change
-- Survex export now writes ISO dates (2026-01-05), which needs Survex 1.4.13 or later; Therion keeps 2026.01.05. Importing either accepts year-month-day dates separated by ".", "/" or "-"
-- Renaming and moving stations follow the same rules in the add and edit dialogs and the Rename menu. A new name renames the station everywhere, and giving a leg's existing station another station's name moves the leg there, unless that would break the survey's continuity. The line under each station box says what the name will do
+- Add more settings to Therion transient export screen
 
 # 2026-09-30 1.14.0
 - Calibration screen reworked: readings are labelled and grouped by the direction they were actually taken in, so the order of shots no longer matters and every reading is used
