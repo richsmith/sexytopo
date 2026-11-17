@@ -12,6 +12,7 @@
 - Surveys that haven't been saved yet are now autosaved and restored when the app restarts
 - Sketch and table edits are now autosaved when you leave a screen, not just when a new leg arrives
 - Fix bug where automatic autosave restore was not fetching the extended elevation
+- Snap to Lines quick-menu mode now works more intelligently and is consequently on by default
 
 # 2026-11-09 1.15.0
 - Another new leg agreement algorithm "Slope-corrected angular deltas" that ought to solve issues with taking repeated readings on steep legs while remaining close in spirit to BCRA Grade 5; testing and feedback welcome (#321)
