@@ -1,6 +1,7 @@
 # Unreleased
 - New area sketching tool for marking filled regions such as water
 - Sketch lines can now be given a semantic type (e.g. wall)
+- New Auto-Orientation sketch mode (on by default) attempts to intelligently set a line's direction if appropriate
 - Lighter blue colour (including display of water) in dark mode for better visibility
 - Highlight for active view button in action bar
 - Tidy up sketch quick-menu (now with submenus)

@@ -184,6 +184,7 @@
 	<li><strong>Snap to Lines</strong> joins the start or end of a new line to the end of a nearby existing line, which helps to draw continuous walls in several strokes (off by default).</li>
 	<li><strong>Auto-Blue Water</strong> always draws water features in blue, whatever the selected colour (on by default).</li>
 	<li><strong>Clip to Walls</strong> trims areas and typed lines that cross a wall to the extent of the wall (on by default).</li>
+	<li><strong>Auto-Orientation</strong> attempts to orient directional lines in the right direction according to some heuristics (on by default; see <a href="#auto-orientation">Auto-Orientation</a> below).</li>
 	<li><strong>Pinch to Zoom</strong> allows zooming with two fingers; turn it off to rely solely on the zoom buttons (on by default). It may be useful to turn this off if water droplets or mud are undesirably triggering zooming.</li>
 	<li><strong>Fade Non-Active</strong> fades out the stations and the legs not attached to the active station, so it is easier to see where you are in a busy survey (off by default).</li>
 </ul>
@@ -404,8 +405,18 @@
     <p>Export allows you to save your survey in various formats for use with other software, sharing, or publishing. Select File → Export and choose your desired format.</p>
     <p>The exported file or folder will be produced in an <code>Exported</code> folder inside your survey folder with a name of the export selected (e.g. <code>Exported/therion</code>), unless otherwise specificied in Settings.</p>
 
+
+<h2 id="misc">Miscellaneous</h2>
+  <h3 id="auto-orientation">Auto-Orientation</h3>
+  <p>Some line types have a direction (e.g. a wall has an interior side, and a pit edge has a drop side). With the <strong>Auto-Orientation</strong> quick setting on (the default), SexyTopo uses some (hopefully) intelligent rules to automatically orient some line types in some situations.</p>
+  <ul>
+    <li>The interior of walls are considered to be the side facing the nearest survey leg</li>
+    <li>Pit edges or chimneys have an assumed interior if they form a complete loop with themselves or a wall</li>
+  </ul>
+  <p>Long-press on a line and select flip if the auto rule gets it wrong.</p>
+
 <h2 id="troubleshooting">Troubleshooting</h2>
-  <p>In typical caver fashion, you've probably cajoled someone into lending you their shiny measuring device, completely failed to have a practice with it and assumed you'd just wing it. Now you've found yourself in the sharp end of some crappy hole somewhere realising that you have no idea why your surveying kit doesn't work. Luckily you've found SexyTopo has a help file and you're desperately trying to scan through it looking for some hope. First of all, don't panic...</p>
+  <p>In typical caver fashion, you've probably cajoled someone into lending you their shiny measuring device, completely failed to have a practice with it and assumed you'd just wing it. Now you've found yourself in the sharp end of some miserable hole somewhere realising that you have no idea why your surveying kit doesn't work. Luckily you've found SexyTopo has a help file and you're desperately trying to scan through it looking for some hope. First of all, don't panic...</p>
   <h3>Problems Connecting to Your Instrument</h3>
     <p>Check the following are true: Bluetooth is turned on on the device, the device is paired with your instrument and the Connect switch is on. Check the on-screen console on the Instrument page: it may show an error message or give some clue as to what is wrong.</p>
     <p>If that fails, try turning your instrument off and back on. Try unpairing and re-pairing, or even turning Bluetooth off and on again. It shouldn't make a difference but you could kill SexyTopo and reopen it. Check you haven't paired with the wrong device (the Unpair dialog shows which devices are paired).</p>
