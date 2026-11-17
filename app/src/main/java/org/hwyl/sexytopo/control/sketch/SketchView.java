@@ -2264,9 +2264,10 @@ public class SketchView extends View {
 
             if (pathDetail.getLineType() != LineType.SKETCH) {
                 drawTypedPath(canvas, pathDetail, alpha);
-                if (pathDetail == mostRecentWall
-                        || (showWallSides && isFinishedWall(sketch, pathDetail))) {
-                    drawWallInsideTick(canvas, pathDetail, alpha);
+                if (pathDetail == mostRecentWall) {
+                    drawWallInsideTick(canvas, pathDetail, true, alpha);
+                } else if (showWallSides && isFinishedWall(sketch, pathDetail)) {
+                    drawWallInsideTick(canvas, pathDetail, false, alpha);
                 }
                 continue;
             }
@@ -2458,16 +2459,21 @@ public class SketchView extends View {
     }
 
     /**
-     * A slim red arrowhead at the midpoint of a wall, pointing to the side SexyTopo believes is the
-     * passage interior. Red and arrow-shaped so it reads as UI feedback rather than a drawing
-     * artefact; it is never exported.
+     * A slim red arrowhead on a wall, pointing to the side SexyTopo believes is the passage
+     * interior. Red and arrow-shaped so it reads as UI feedback rather than a drawing artefact; it
+     * is never exported.
+     *
+     * <p>It goes at the middle of the wall, or, if atEnd, of the wall's last segment: on the wall
+     * just drawn, that's the part still on screen even once a stroke has been joined on to the end
+     * of a long wall.
      */
-    private void drawWallInsideTick(Canvas canvas, PathDetail pathDetail, int alpha) {
+    private void drawWallInsideTick(
+            Canvas canvas, PathDetail pathDetail, boolean atEnd, int alpha) {
         List<Coord2D> points = pathDetail.getPath();
         if (points.size() < 2) {
             return;
         }
-        int midIndex = points.size() / 2;
+        int midIndex = atEnd ? points.size() - 1 : points.size() / 2;
         Coord2D from = points.get(midIndex - 1);
         Coord2D to = points.get(midIndex);
 
