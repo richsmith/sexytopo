@@ -25,7 +25,7 @@ public class SketchPreferences {
      */
     public enum Toggle {
         AUTO_RECENTRE(R.id.buttonAutoRecentre, false),
-        SNAP_TO_LINES(R.id.buttonSnapToLines, false),
+        SNAP_TO_LINES(R.id.buttonSnapToLines, true),
         FADE_NON_ACTIVE(R.id.buttonFadeNonActive, false),
         SHOW_GRID(R.id.buttonShowGrid, true),
         SHOW_SPLAYS(R.id.buttonShowSplays, true),

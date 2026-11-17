@@ -2,7 +2,9 @@ package org.hwyl.sexytopo.model.sketch;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -34,6 +36,9 @@ public class Sketch extends Shape {
     private final List<SketchDetail> undoneHistory = new ArrayList<>();
 
     private PathDetail activePath;
+    // the lines the active path's start and end were snapped to, to be joined into it on finishing
+    private PathDetail startJoin;
+    private PathDetail endJoin;
 
     private float crossSectionScale = DEFAULT_XSECTION_SCALE;
 
@@ -116,6 +121,8 @@ public class Sketch extends Shape {
     public PathDetail startNewPath(
             Coord2D start, Colour colour, LineType lineType, float ornamentSize) {
         activePath = new PathDetail(start, colour, lineType, ornamentSize);
+        startJoin = null;
+        endJoin = null;
         // Registered in the undo history only on finishPath, so an unfinished path can be
         // abandoned without leaving a trace.
         pathDetails.add(activePath);
@@ -155,6 +162,11 @@ public class Sketch extends Shape {
         if (activePath == null) {
             return;
         }
+        PathDetail startJoin = this.startJoin;
+        PathDetail endJoin = this.endJoin;
+        this.startJoin = null;
+        this.endJoin = null;
+
         if (activePath.getMaxDimension() < minimumSize) {
             abandonActivePath();
             return;
@@ -163,7 +175,10 @@ public class Sketch extends Shape {
         activePath.setPath(Space2DUtils.simplify(activePath.getPath(), epsilon));
 
         List<List<Coord2D>> pieces = clipToWalls(activePath);
-        if (pieces.size() == 1 && pieces.get(0) == activePath.getPath()) {
+        if (pieces.size() == 1
+                && pieces.get(0) == activePath.getPath()
+                && startJoin == null
+                && endJoin == null) {
             addSketchDetail(activePath);
             activePath = null;
             return;
@@ -171,6 +186,7 @@ public class Sketch extends Shape {
 
         PathDetail drawn = activePath;
         abandonActivePath();
+        List<PathDetail> joined = new ArrayList<>();
         List<SketchDetail> kept =
                 pieces.stream()
                         .map(
@@ -181,9 +197,10 @@ public class Sketch extends Shape {
                                                 drawn.getLineType(),
                                                 drawn.getOrnamentSize()))
                         .filter(piece -> piece.getMaxDimension() >= minimumSize)
+                        .map(piece -> piece.joinedWith(startJoin, endJoin, joined))
                         .collect(Collectors.toList());
         if (!kept.isEmpty()) {
-            deleteDetails(Collections.emptyList(), kept);
+            deleteDetails(new ArrayList<>(joined), kept);
         }
     }
 
@@ -602,28 +619,69 @@ public class Sketch extends Shape {
         updateBoundingBox(sketchDetail);
     }
 
-    public Coord2D findEligibleSnapPointWithin(Coord2D point, float delta) {
-
-        Coord2D closest = null;
-        float minDistance = Float.MAX_VALUE;
-
-        for (PathDetail path : pathDetails) {
-
-            if (activePath == path) {
-                continue;
-            }
-
-            Coord2D start = path.getPath().get(0);
-            Coord2D end = path.getPath().get(path.getPath().size() - 1);
-            for (Coord2D coord2D : new Coord2D[] {start, end}) {
-                float distance = Space2DUtils.getDistance(point, coord2D);
-                if (distance < delta && distance < minDistance) {
-                    closest = coord2D;
-                    minDistance = distance;
-                }
-            }
+    /**
+     * Snaps the ends of the active path to the ends of nearby lines of the same type and colour, to
+     * be joined into one line with them when it's finished, or closes it into a loop if its end
+     * comes back to its own start. Lines only join head to tail: where it matters which way a line
+     * runs (see LineType.isOriented), the path's start only snaps to another line's end and its end
+     * to another line's start, so the joined line doesn't change direction partway.
+     *
+     * <p>The points drawn near a join are dropped, so a stroke that starts or finishes a little
+     * beyond its target, or wobbles about it, runs straight into it rather than doubling back. A
+     * stroke that never strays beyond delta of its start is too small to close on itself.
+     */
+    public void snapActivePath(float delta) {
+        startJoin = null;
+        endJoin = null;
+        if (activePath == null || activePath.getPath().size() < 2 || activePath.isClosed()) {
+            return;
         }
-        return closest;
+        Coord2D start = activePath.getStart();
+        Coord2D end = activePath.getEnd();
+
+        float distanceToStart = Space2DUtils.getDistance(end, start);
+        PathDetail endTarget = findLineToSnapTo(end, delta, false, null);
+        if (activePath.reachesBeyond(delta)
+                && distanceToStart < delta
+                && (endTarget == null
+                        || distanceToStart
+                                < Space2DUtils.getDistance(
+                                        end, endTarget.getEndToJoinBefore(end)))) {
+            activePath.snapEndTo(start, delta);
+            return;
+        }
+
+        PathDetail startTarget = findLineToSnapTo(start, delta, true, null);
+        if (startTarget != null) {
+            activePath.snapStartTo(startTarget.getEndToJoinAfter(start), delta);
+            startJoin = startTarget;
+        }
+
+        // the end mustn't snap to the very point the start just did
+        endTarget = findLineToSnapTo(end, delta, false, activePath.getStart());
+        if (endTarget != null) {
+            activePath.snapEndTo(endTarget.getEndToJoinBefore(end), delta);
+            endJoin = endTarget;
+        }
+    }
+
+    /**
+     * The finished line the active path could join whose joinable end is nearest the point and
+     * within delta of it, or null if there isn't one. atStart says which end of the active path is
+     * joining: its start joins on after another line, its end before one.
+     */
+    private PathDetail findLineToSnapTo(
+            Coord2D point, float delta, boolean atStart, Coord2D excluded) {
+        Function<PathDetail, Coord2D> joinableEnd =
+                line -> atStart ? line.getEndToJoinAfter(point) : line.getEndToJoinBefore(point);
+        Function<PathDetail, Float> distance =
+                line -> Space2DUtils.getDistance(point, joinableEnd.apply(line));
+        return pathDetails.stream()
+                .filter(line -> line != activePath && activePath.canJoin(line))
+                .filter(line -> !joinableEnd.apply(line).equals(excluded))
+                .filter(line -> distance.apply(line) < delta)
+                .min(Comparator.comparing(distance))
+                .orElse(null);
     }
 
     private List<SketchDetail> allSketchDetails() {

@@ -652,4 +652,188 @@ public class SketchTest {
 
         Assert.assertEquals(16, new Sketch(sketch).getRight(), DELTA);
     }
+
+    /**
+     * A sketch holding one finished line of the given type drawn from (0, 0) to (10, 0) by (5, -2).
+     */
+    private static Sketch sketchWithLine(LineType lineType) {
+        Sketch sketch = new Sketch();
+        drawActivePath(sketch, lineType, Coord2D.ORIGIN, new Coord2D(5, -2), new Coord2D(10, 0));
+        sketch.finishPath();
+        return sketch;
+    }
+
+    private static PathDetail drawActivePath(Sketch sketch, LineType lineType, Coord2D... points) {
+        PathDetail path = sketch.startNewPath(points[0], Colour.BLACK, lineType, 0.2f);
+        for (int i = 1; i < points.length; i++) {
+            path.lineTo(points[i]);
+        }
+        return path;
+    }
+
+    private static List<Coord2D> onlyLine(Sketch sketch) {
+        Assert.assertEquals(1, sketch.getPathDetails().size());
+        return sketch.getPathDetails().get(0).getPath();
+    }
+
+    @Test
+    public void testLineSnappedOnToTheEndOfAnotherIsJoinedToIt() {
+        Sketch sketch = sketchWithLine(LineType.WALL);
+        // lands a little beyond the wall's end and wobbles back before heading off
+        drawActivePath(
+                sketch,
+                LineType.WALL,
+                new Coord2D(10.5f, 0),
+                new Coord2D(9.8f, 0.3f),
+                new Coord2D(10, 5),
+                new Coord2D(10, 10));
+
+        sketch.snapActivePath(1);
+        sketch.finishPath();
+
+        Assert.assertEquals(
+                Arrays.asList(
+                        Coord2D.ORIGIN,
+                        new Coord2D(5, -2),
+                        new Coord2D(10, 0),
+                        new Coord2D(10, 10)),
+                onlyLine(sketch));
+    }
+
+    @Test
+    public void testLineSnappedInToTheStartOfAnotherIsJoinedToIt() {
+        Sketch sketch = sketchWithLine(LineType.WALL);
+        // overshoots the wall's start and wobbles back
+        drawActivePath(
+                sketch,
+                LineType.WALL,
+                new Coord2D(0, 10),
+                new Coord2D(0, 5),
+                new Coord2D(0, -0.5f),
+                new Coord2D(0.3f, 0.2f));
+
+        sketch.snapActivePath(1);
+        sketch.finishPath();
+
+        Assert.assertEquals(
+                Arrays.asList(
+                        new Coord2D(0, 10), Coord2D.ORIGIN, new Coord2D(5, -2), new Coord2D(10, 0)),
+                onlyLine(sketch));
+    }
+
+    @Test
+    public void testJoinCanBeUndone() {
+        Sketch sketch = sketchWithLine(LineType.WALL);
+        drawActivePath(sketch, LineType.WALL, new Coord2D(10.5f, 0), new Coord2D(10, 10));
+        sketch.snapActivePath(1);
+        sketch.finishPath();
+
+        sketch.undo();
+
+        Assert.assertEquals(
+                Arrays.asList(Coord2D.ORIGIN, new Coord2D(5, -2), new Coord2D(10, 0)),
+                onlyLine(sketch));
+    }
+
+    @Test
+    public void testOrientedLinesRunningOppositeWaysDoNotSnap() {
+        Sketch sketch = sketchWithLine(LineType.WALL);
+        // starts at the wall's start, so would run against it
+        PathDetail path =
+                drawActivePath(sketch, LineType.WALL, new Coord2D(-0.5f, 0), new Coord2D(-10, 0));
+
+        sketch.snapActivePath(1);
+
+        Assert.assertEquals(new Coord2D(-0.5f, 0), path.getPath().get(0));
+    }
+
+    @Test
+    public void testUnorientedLinesJoinWhicheverWayTheyRun() {
+        Sketch sketch = sketchWithLine(LineType.SKETCH);
+        drawActivePath(sketch, LineType.SKETCH, new Coord2D(-0.5f, 0), new Coord2D(-10, 0));
+
+        sketch.snapActivePath(1);
+        sketch.finishPath();
+
+        Assert.assertEquals(
+                Arrays.asList(
+                        new Coord2D(10, 0),
+                        new Coord2D(5, -2),
+                        Coord2D.ORIGIN,
+                        new Coord2D(-10, 0)),
+                onlyLine(sketch));
+    }
+
+    @Test
+    public void testLinesOfAnotherTypeAreNotSnappedTo() {
+        Sketch sketch = sketchWithLine(LineType.WALL);
+        PathDetail path =
+                drawActivePath(sketch, LineType.PIT, new Coord2D(10, 10), new Coord2D(10, 0.5f));
+
+        sketch.snapActivePath(1);
+
+        Assert.assertEquals(
+                Arrays.asList(new Coord2D(10, 10), new Coord2D(10, 0.5f)), path.getPath());
+    }
+
+    @Test
+    public void testLineSnappedAtBothEndsToOneLineClosesIt() {
+        Sketch sketch = sketchWithLine(LineType.WALL);
+        drawActivePath(
+                sketch,
+                LineType.WALL,
+                new Coord2D(10.5f, 0),
+                new Coord2D(5, 5),
+                new Coord2D(-0.5f, 0));
+
+        sketch.snapActivePath(1);
+        sketch.finishPath();
+
+        Assert.assertEquals(
+                Arrays.asList(
+                        Coord2D.ORIGIN,
+                        new Coord2D(5, -2),
+                        new Coord2D(10, 0),
+                        new Coord2D(5, 5),
+                        Coord2D.ORIGIN),
+                onlyLine(sketch));
+    }
+
+    @Test
+    public void testEndSnapsBackToItsOwnStart() {
+        Sketch sketch = new Sketch();
+        PathDetail path =
+                drawActivePath(
+                        sketch,
+                        LineType.WALL,
+                        new Coord2D(0, 0),
+                        new Coord2D(5, 0),
+                        new Coord2D(5, 5),
+                        new Coord2D(0.5f, 0.3f),
+                        new Coord2D(-0.2f, -0.5f));
+
+        sketch.snapActivePath(1);
+
+        Assert.assertEquals(
+                Arrays.asList(
+                        new Coord2D(0, 0), new Coord2D(5, 0), new Coord2D(5, 5), new Coord2D(0, 0)),
+                path.getPath());
+    }
+
+    @Test
+    public void testSmallStrokeDoesNotCloseOnItself() {
+        Sketch sketch = new Sketch();
+        PathDetail path =
+                drawActivePath(
+                        sketch,
+                        LineType.WALL,
+                        new Coord2D(0, 0),
+                        new Coord2D(0.5f, 0),
+                        new Coord2D(0.5f, 0.3f));
+
+        sketch.snapActivePath(1);
+
+        Assert.assertEquals(3, path.getPath().size());
+        Assert.assertEquals(new Coord2D(0.5f, 0.3f), path.getPath().get(2));
+    }
 }

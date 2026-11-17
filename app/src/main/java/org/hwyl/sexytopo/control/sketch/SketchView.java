@@ -138,7 +138,7 @@ public class SketchView extends View {
     // are discarded as specks
     private static final float MINIMUM_DETAIL_SIZE_DP = 10.0f;
     private static final float SELECTION_SENSITIVITY_DP = 25.0f;
-    private static final float SNAP_TO_LINE_SENSITIVITY_DP = 25.0f;
+    private static final float SNAP_TO_LINE_SENSITIVITY_DP = 10.0f;
     public static final float HOT_CORNER_DISTANCE_PROPORTION = 0.05f;
     private static final int STATION_LABEL_OFFSET_DP = 10;
 
@@ -640,15 +640,8 @@ public class SketchView extends View {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 actionDownPointOnView = touchPointOnView;
-                Coord2D start = surveyCoords;
-                if (snapToLines) {
-                    Coord2D snappedStart = considerSnapToSketchLine(start);
-                    if (snappedStart != null) {
-                        start = snappedStart;
-                    }
-                }
                 sketch.startNewPath(
-                        start, currentColour, currentLineType, getOrnamentSizeForNewLine());
+                        surveyCoords, currentColour, currentLineType, getOrnamentSizeForNewLine());
                 break;
 
             case MotionEvent.ACTION_MOVE:
@@ -666,17 +659,18 @@ public class SketchView extends View {
                 break;
 
             case MotionEvent.ACTION_UP:
-                if (touchPointOnView.equals(actionDownPointOnView)) { // handle dots
+                boolean isDot = touchPointOnView.equals(actionDownPointOnView);
+                if (isDot) {
                     sketch.getActivePath().lineTo(surveyCoords);
-                } else if (snapToLines) {
-                    Coord2D snappedEnd = considerSnapToSketchLine(surveyCoords);
-                    if (snappedEnd != null) {
-                        sketch.getActivePath().lineTo(snappedEnd);
-                        invalidate();
-                    }
                 }
                 closeActivePathIfOutline();
                 orientActivePathIfRequired();
+                // snapped once the line's direction is settled, as that decides which ends of
+                // other lines it can join
+                if (snapToLines && !isDot) {
+                    sketch.snapActivePath(getSnapDistance());
+                    invalidate();
+                }
                 // A tap with a freehand line leaves a dot, but a typed line that small is a
                 // mistake: it would be meaningless in an export
                 float minimumSize = currentLineType.isSemantic() ? getMinimumLineSize() : 0;
@@ -754,8 +748,7 @@ public class SketchView extends View {
         }
         Coord2D start = points.get(0);
         Coord2D end = points.get(points.size() - 1);
-        float closeDistance = snapToLineSensitivityPx / surveyToViewScale;
-        if (!start.equals(end) && Space2DUtils.getDistance(start, end) <= closeDistance) {
+        if (!start.equals(end) && Space2DUtils.getDistance(start, end) <= getSnapDistance()) {
             activePath.lineTo(start);
         }
     }
@@ -781,14 +774,12 @@ public class SketchView extends View {
                     activePath.getPath(),
                     lineType.hasLoopInsideOnRight(),
                     walls,
-                    snapToLineSensitivityPx / surveyToViewScale);
+                    getSnapDistance());
         }
     }
 
-    private Coord2D considerSnapToSketchLine(Coord2D pointTouched) {
-        float deltaInMetres = snapToLineSensitivityPx / surveyToViewScale;
-        Coord2D closestPathEnd = sketch.findEligibleSnapPointWithin(pointTouched, deltaInMetres);
-        return closestPathEnd; // null if nothing close found
+    private float getSnapDistance() {
+        return snapToLineSensitivityPx / surveyToViewScale;
     }
 
     private boolean handleMove(MotionEvent event) {
