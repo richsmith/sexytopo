@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.hwyl.sexytopo.control.util.LineOrienter;
 import org.hwyl.sexytopo.control.util.PolygonUtils;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.survey.Leg;
@@ -164,9 +163,7 @@ public class SketchTest {
                         0.3f);
         sketch.restoreDetailToSketch(original);
 
-        PathDetail retyped =
-                sketch.retypePathDetail(
-                        original, LineType.PIT, 0.5f, Collections.singletonList(new Coord2D(5, 5)));
+        PathDetail retyped = sketch.retypePathDetail(original, LineType.PIT, 0.5f);
 
         Assert.assertEquals(1, sketch.getPathDetails().size());
         Assert.assertSame(retyped, sketch.getPathDetails().get(0));
@@ -179,37 +176,18 @@ public class SketchTest {
         Assert.assertSame(original, sketch.getPathDetails().get(0));
     }
 
+    // Retyping never turns a line round, even into a wall, which a freshly drawn wall would be
     @Test
-    public void testRetypePathDetailToWallOrientsItLikeADrawnWall() {
-        List<Coord2D> stations = Arrays.asList(new Coord2D(5, 5));
+    public void testRetypePathDetailKeepsPointOrder() {
         List<Coord2D> points = Arrays.asList(new Coord2D(0, 0), new Coord2D(10, 0));
-        List<Coord2D> expected = new ArrayList<>(points);
-        LineOrienter.orientToInterior(expected, stations);
 
         for (List<Coord2D> drawn : Arrays.asList(points, reversed(points))) {
             Sketch sketch = new Sketch();
             PathDetail original = new PathDetail(new ArrayList<>(drawn), Colour.BLACK);
             sketch.restoreDetailToSketch(original);
-            PathDetail retyped = sketch.retypePathDetail(original, LineType.WALL, 0.2f, stations);
-            Assert.assertEquals(expected, retyped.getPath());
+            PathDetail retyped = sketch.retypePathDetail(original, LineType.WALL, 0.2f);
+            Assert.assertEquals(drawn, retyped.getPath());
         }
-    }
-
-    @Test
-    public void testRetypePathDetailBetweenWallTypesKeepsAFlip() {
-        List<Coord2D> stations = Arrays.asList(new Coord2D(5, 5));
-        List<Coord2D> points =
-                new ArrayList<>(Arrays.asList(new Coord2D(0, 0), new Coord2D(10, 0)));
-        LineOrienter.orientToInterior(points, stations);
-        List<Coord2D> flipped = reversed(points);
-
-        Sketch sketch = new Sketch();
-        PathDetail original =
-                new PathDetail(new ArrayList<>(flipped), Colour.BLACK, LineType.WALL, 0.2f);
-        sketch.restoreDetailToSketch(original);
-        PathDetail retyped =
-                sketch.retypePathDetail(original, LineType.PRESUMED_WALL, 0.2f, stations);
-        Assert.assertEquals(flipped, retyped.getPath());
     }
 
     private static List<Coord2D> reversed(List<Coord2D> points) {
@@ -274,13 +252,13 @@ public class SketchTest {
         scribble.lineTo(new Coord2D(6, 5));
         sketch.finishPath();
 
-        PathDetail boulder =
+        PathDetail boulderEdge =
                 sketch.startNewPath(
                         new Coord2D(8, 8),
                         Colour.BLACK,
-                        LineType.ROCK_BORDER,
+                        LineType.ROCK_EDGE,
                         PathDetail.DEFAULT_ORNAMENT_SIZE);
-        boulder.lineTo(new Coord2D(9, 8));
+        boulderEdge.lineTo(new Coord2D(9, 8));
         sketch.finishPath();
 
         Assert.assertSame(wall, sketch.getMostRecentOrientedPath());

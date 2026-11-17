@@ -214,6 +214,7 @@
     <string name="sketch_menu_show_compass">Bússola</string>
     <string name="sketch_menu_blue_water">Água azul auto</string>
     <string name="sketch_menu_snap_to_lines">Ajustar a Linhas</string>
+    <string name="sketch_menu_auto_orientation">Auto-Orientação</string>
     <string name="sketch_menu_pinch_to_zoom">Zoom por aperto</string>
     <string name="sketch_menu_fade_non_active">Esmaecer Não-Ativas</string>
     <string name="sketch_menu_show_wall_sides">Todos os lados das paredes</string>

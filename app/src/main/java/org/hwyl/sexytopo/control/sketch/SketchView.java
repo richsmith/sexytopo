@@ -34,7 +34,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -56,6 +55,7 @@ import org.hwyl.sexytopo.control.util.CohenSutherlandAlgorithm;
 import org.hwyl.sexytopo.control.util.CrossSectioner;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.LineOrienter;
+import org.hwyl.sexytopo.control.util.LoopOrienter;
 import org.hwyl.sexytopo.control.util.PolygonUtils;
 import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
@@ -675,6 +675,7 @@ public class SketchView extends View {
                         invalidate();
                     }
                 }
+                closeActivePathIfOutline();
                 orientActivePathIfRequired();
                 // A tap with a freehand line leaves a dot, but a typed line that small is a
                 // mistake: it would be meaningless in an export
@@ -737,12 +738,51 @@ public class SketchView extends View {
      * Wall-kind lines get their point order normalised on completion so the passage interior is on
      * a consistent side, whichever way the user drew the stroke (see LineOrienter).
      */
-    private void orientActivePathIfRequired() {
+    /**
+     * Joins up an outline (a boulder) whose ends nearly meet, so it's a closed line, as Therion
+     * takes a line whose first and last points coincide to be. Ends count as meeting when they're
+     * as close as Snap to Lines would join.
+     */
+    private void closeActivePathIfOutline() {
         PathDetail activePath = sketch.getActivePath();
-        if (activePath == null || !activePath.getLineType().isWall() || projection == null) {
+        if (activePath == null || !activePath.getLineType().isOutline()) {
             return;
         }
-        LineOrienter.orientToInterior(activePath.getPath(), projection.getStationMap().values());
+        List<Coord2D> points = activePath.getPath();
+        if (points.size() < 3) {
+            return;
+        }
+        Coord2D start = points.get(0);
+        Coord2D end = points.get(points.size() - 1);
+        float closeDistance = snapToLineSensitivityPx / surveyToViewScale;
+        if (!start.equals(end) && Space2DUtils.getDistance(start, end) <= closeDistance) {
+            activePath.lineTo(start);
+        }
+    }
+
+    private void orientActivePathIfRequired() {
+        PathDetail activePath = sketch.getActivePath();
+        if (activePath == null || !SketchPreferences.Toggle.AUTO_ORIENTATION.isOn()) {
+            return;
+        }
+        LineType lineType = activePath.getLineType();
+        if (lineType.isWall() && projection != null) {
+            LineOrienter.orientToInterior(activePath.getPath(), getLegLines());
+        } else if (lineType.isOrientedByLoop()) {
+            // a pit or chimney edge drawn round its hole, alone or with a wall, has its ticks
+            // inside, and a boulder outline its rock; ends count as meeting when they're as close
+            // as Snap to Lines would join
+            List<List<Coord2D>> walls =
+                    sketch.getPathDetails().stream()
+                            .filter(path -> path.getLineType().isWall())
+                            .map(PathDetail::getPath)
+                            .collect(Collectors.toList());
+            LoopOrienter.orientInsideOfLoop(
+                    activePath.getPath(),
+                    lineType.hasLoopInsideOnRight(),
+                    walls,
+                    snapToLineSensitivityPx / surveyToViewScale);
+        }
     }
 
     private Coord2D considerSnapToSketchLine(Coord2D pointTouched) {
@@ -1212,7 +1252,7 @@ public class SketchView extends View {
 
         LineType currentType = pathDetail.getLineType();
         menu.findItem(R.id.line_title).setTitle(currentType.getStringId());
-        // Orientation means nothing for a plain sketch line or a rock outline
+        // Orientation means nothing for a plain sketch line or a rock edge
         menu.findItem(R.id.action_flip_line).setEnabled(currentType.isOriented());
 
         Map<Integer, LineType> lineTypesByItemId = new HashMap<>();
@@ -1250,10 +1290,22 @@ public class SketchView extends View {
                 pathDetail.getLineType().isSemantic()
                         ? pathDetail.getOrnamentSize()
                         : getOrnamentSizeForNewLine();
-        Collection<Coord2D> stationPositions =
-                projection == null ? Collections.emptyList() : projection.getStationMap().values();
-        sketch.retypePathDetail(pathDetail, lineType, ornamentSize, stationPositions);
+        sketch.retypePathDetail(pathDetail, lineType, ornamentSize);
         invalidate();
+    }
+
+    /**
+     * The legs as drawn in this view, for orienting walls against. Splays are left out: they run to
+     * the walls themselves, and may run on beyond them into a neighbouring passage.
+     */
+    private List<Line<Coord2D>> getLegLines() {
+        if (projection == null) {
+            return Collections.emptyList();
+        }
+        return projection.getLegMap().entrySet().stream()
+                .filter(entry -> entry.getKey().hasDestination())
+                .map(Map.Entry::getValue)
+                .collect(Collectors.toList());
     }
 
     /**

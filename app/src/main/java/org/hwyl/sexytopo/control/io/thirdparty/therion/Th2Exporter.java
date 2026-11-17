@@ -19,6 +19,7 @@ import org.hwyl.sexytopo.model.geometry.Space;
 import org.hwyl.sexytopo.model.sketch.AreaDetail;
 import org.hwyl.sexytopo.model.sketch.AutoScalableDetail;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
+import org.hwyl.sexytopo.model.sketch.LineType;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.Symbol;
@@ -465,10 +466,19 @@ public class Th2Exporter {
 
     private static String getLine(PathDetail pathDetail, float scale) {
         List<String> lines = new ArrayList<>();
-        lines.add("line " + pathDetail.getLineType().getTherionName());
+        LineType lineType = pathDetail.getLineType();
+        lines.add("line " + lineType.getTherionName());
+        // Therion requires a slope's l-size (its hachure length) on at least one point; it
+        // interpolates along the line from there
+        float lineSize = lineType.getTherionLineSize(pathDetail.getOrnamentSize()) * scale;
+        boolean isFirstPoint = true;
         for (Coord2D point : pathDetail.getPath()) {
             Coord2D coord = point.scale(scale).flipVertically();
             lines.add("  " + coord.x + " " + coord.y);
+            if (isFirstPoint && lineSize > 0) {
+                lines.add("  l-size " + lineSize);
+            }
+            isFirstPoint = false;
         }
         lines.add("endline");
         return TextTools.join("\n", lines);

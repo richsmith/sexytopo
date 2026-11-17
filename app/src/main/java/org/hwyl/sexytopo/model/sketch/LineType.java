@@ -27,14 +27,34 @@ import org.hwyl.sexytopo.R;
  * the user drew the path in. Wall types are instead auto-oriented on completion (see LineOrienter).
  */
 public enum LineType {
-    SKETCH(R.string.line_type_sketch, R.drawable.pencil, null, false, 1.0f, null, null),
-    WALL(R.string.line_type_wall, R.drawable.line_wall, "wall", true, 1.5f, null, null),
+    SKETCH(
+            R.string.line_type_sketch,
+            R.drawable.pencil,
+            null,
+            false,
+            false,
+            false,
+            1.0f,
+            null,
+            null),
+    WALL(
+            R.string.line_type_wall,
+            R.drawable.line_wall,
+            "wall",
+            true,
+            false,
+            false,
+            1.5f,
+            null,
+            null),
     // a drop too small to be a pit: as PIT, with shorter ticks (Therion draws the two alike, but
     // they need telling apart while sketching)
     FLOOR_STEP(
             R.string.line_type_floor_step,
             R.drawable.line_floor_step,
             "floor-step",
+            false,
+            false,
             false,
             1.0f,
             null,
@@ -44,6 +64,8 @@ public enum LineType {
             R.string.line_type_pit,
             R.drawable.line_pit,
             "pit",
+            false,
+            true,
             false,
             1.0f,
             null,
@@ -55,6 +77,8 @@ public enum LineType {
             R.drawable.line_chimney,
             "chimney",
             false,
+            true,
+            false,
             1.0f,
             new float[] {0.8f, 0.4f},
             Stamp.ticked(1.2f, 0.8f, 0.5f)),
@@ -63,6 +87,8 @@ public enum LineType {
             R.string.line_type_ceiling_step,
             R.drawable.line_ceiling_step,
             "ceiling-step",
+            false,
+            false,
             false,
             1.0f,
             new float[] {0.8f, 0.4f},
@@ -73,24 +99,31 @@ public enum LineType {
             R.drawable.line_overhang,
             "overhang",
             false,
+            false,
+            false,
             1.0f,
             null,
             Stamp.toothed(1.2f, -0.9f)),
-    // hachures hanging down the slope on the same side as PIT's ticks, alternating long and short
+    // hachures alternating long and short, hanging down the slope on the line's left in Therion's
+    // frame (which the y-flip on export makes the right on screen), as Therion draws them
     SLOPE(
             R.string.line_type_slope,
             R.drawable.line_slope,
             "slope",
             false,
+            false,
+            false,
             1.0f,
             null,
-            Stamp.hachured(1.0f, -1.2f, -0.6f)),
+            Stamp.hachured(1.0f, 1.2f, 0.6f)),
     // the outline of a boulder: a plain line, thinner than a wall in Therion's proportions
     ROCK_BORDER(
             R.string.line_type_rock_border,
             R.drawable.line_rock_border,
             "rock-border",
             false,
+            false,
+            true,
             0.75f,
             null,
             null),
@@ -100,6 +133,8 @@ public enum LineType {
             R.drawable.line_rock_edge,
             "rock-edge",
             false,
+            false,
+            false,
             0.5f,
             null,
             null),
@@ -108,6 +143,8 @@ public enum LineType {
             R.drawable.line_presumed_wall,
             "wall:presumed",
             true,
+            false,
+            false,
             1.0f,
             new float[] {0.8f, 0.4f},
             null),
@@ -117,6 +154,8 @@ public enum LineType {
             R.drawable.line_underlying_wall,
             "wall:underlying",
             true,
+            false,
+            false,
             1.5f,
             new float[] {0.4f, 0.4f},
             null);
@@ -148,6 +187,18 @@ public enum LineType {
         static Stamp hachured(float advance, float longTickLength, float shortTickLength) {
             return new Stamp(
                     advance, advance, new float[] {longTickLength, shortTickLength}, false);
+        }
+
+        boolean isHachured() {
+            return !isTooth && tickLengths.length > 1;
+        }
+
+        float getExtent() {
+            float extent = 0;
+            for (float tickLength : tickLengths) {
+                extent = Math.max(extent, Math.abs(tickLength));
+            }
+            return extent;
         }
 
         // teeth abut, so the bar runs the full advance
@@ -193,6 +244,8 @@ public enum LineType {
     private final int drawableId;
     private final String therionName;
     private final boolean isWall;
+    private final boolean isHoleEdge;
+    private final boolean isOutline;
     private final float strokeWidthFactor;
     private final float[] dashPattern; // {on, off} in ornament-size multiples, or null for solid
     private final Stamp stamp;
@@ -205,6 +258,8 @@ public enum LineType {
             int drawableId,
             String therionName,
             boolean isWall,
+            boolean isHoleEdge,
+            boolean isOutline,
             float strokeWidthFactor,
             float[] dashPattern,
             Stamp stamp) {
@@ -212,6 +267,8 @@ public enum LineType {
         this.drawableId = drawableId;
         this.therionName = therionName;
         this.isWall = isWall;
+        this.isHoleEdge = isHoleEdge;
+        this.isOutline = isOutline;
         this.strokeWidthFactor = strokeWidthFactor;
         this.dashPattern = dashPattern;
         this.stamp = stamp;
@@ -256,6 +313,58 @@ public enum LineType {
     }
 
     /**
+     * Whether this is the edge of a hole in the floor or ceiling (a pit or chimney). Drawn round
+     * its hole, such a line always has its ticks on the inside, which Auto-Orientation uses.
+     */
+    public boolean isHoleEdge() {
+        return isHoleEdge;
+    }
+
+    /**
+     * Whether this outlines something (a boulder), so a line of it whose ends nearly meet is meant
+     * to be closed, and is joined up when drawn.
+     */
+    public boolean isOutline() {
+        return isOutline;
+    }
+
+    /**
+     * Whether a line of this type drawn as a loop, alone or closed by a wall, can be turned to face
+     * its inside: a hole edge's ticks point into the hole, and a boulder outline has the rock
+     * inside. Auto-Orientation uses this.
+     */
+    public boolean isOrientedByLoop() {
+        return isHoleEdge || isOutline;
+    }
+
+    /**
+     * Which side of the drawing direction, as seen on screen, the inside of such a loop belongs on.
+     * For a hole edge it's the side its ticks fall on. A boulder outline has its rock on the left
+     * in Therion's frame (the Therion wiki's convention for rock-border), which the y-flip on
+     * export makes the right on screen.
+     */
+    public boolean hasLoopInsideOnRight() {
+        return isOutline || hasTicksOnRight();
+    }
+
+    /**
+     * Therion's l-size for a line of this type drawn with the given ornament size (in metres), or 0
+     * if it takes none. Therion requires one for a slope: the length of its hachures.
+     */
+    public float getTherionLineSize(float ornamentSize) {
+        return stamp != null && stamp.isHachured() ? stamp.getExtent() * ornamentSize : 0;
+    }
+
+    /**
+     * Whether the ticks (or teeth) fall on the right of the direction the line was drawn in, as
+     * seen on screen; false for the left, or if there are none.
+     */
+    public boolean hasTicksOnRight() {
+        // the stamp's y axis is the line's right-hand side, and its sign picks the side
+        return stamp != null && stamp.tickLengths[0] > 0;
+    }
+
+    /**
      * Whether a new line of this type is clipped to the walls around it (when Clip to Walls is on):
      * true for the features that lie within a passage. Walls themselves aren't, since they're what
      * does the clipping (and an underlying wall crosses the walls above by definition), and nor are
@@ -266,11 +375,12 @@ public enum LineType {
     }
 
     /**
-     * Whether it matters which way the line runs: true for walls (passage side) and for types with
-     * ticks or teeth (which side they fall on). For the rest, flipping changes nothing.
+     * Whether it matters which way the line runs: true for walls (passage side), for types with
+     * ticks or teeth (which side they fall on), and for outlines (which side the rock is). For the
+     * rest, flipping changes nothing.
      */
     public boolean isOriented() {
-        return isWall || stamp != null;
+        return isWall || stamp != null || isOutline;
     }
 
     public float getStrokeWidthFactor() {

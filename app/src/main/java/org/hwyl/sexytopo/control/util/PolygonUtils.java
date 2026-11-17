@@ -728,6 +728,14 @@ public class PolygonUtils {
 
     /** The area enclosed by a closed contour (shoelace formula), whichever way round it runs. */
     public static double area(List<Coord2D> polygon) {
+        return Math.abs(signedArea(polygon));
+    }
+
+    /**
+     * The area enclosed by a closed contour, positive if it runs clockwise as seen on screen
+     * (survey y is down), so with its interior on the right, and negative if anticlockwise.
+     */
+    public static double signedArea(List<Coord2D> polygon) {
         double twiceSignedArea = 0;
         int size = polygon.size();
         for (int i = 0, j = size - 1; i < size; j = i++) {
@@ -735,7 +743,7 @@ public class PolygonUtils {
             Coord2D b = polygon.get(i);
             twiceSignedArea += (double) a.x * b.y - (double) b.x * a.y;
         }
-        return Math.abs(twiceSignedArea) / 2;
+        return twiceSignedArea / 2;
     }
 
     /** Standard ray-casting point-in-polygon test. */

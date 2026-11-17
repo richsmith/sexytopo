@@ -37,6 +37,7 @@ public class SketchPreferences {
         SHOW_COMPASS(R.id.buttonShowCompass, true),
         BLUE_WATER(R.id.buttonBlueWater, true),
         CLIP_TO_WALLS(R.id.buttonClipToWalls, true),
+        AUTO_ORIENTATION(R.id.buttonAutoOrientation, true),
         PINCH_TO_ZOOM(R.id.buttonPinchToZoom, true);
 
         private final int controlId;

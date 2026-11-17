@@ -439,6 +439,9 @@ public abstract class SketchActivity extends SurveyEditorActivity
         } else if (itemId == R.id.buttonClipToWalls) {
             SketchPreferences.Toggle.CLIP_TO_WALLS.set(!item.isChecked());
             return true;
+        } else if (itemId == R.id.buttonAutoOrientation) {
+            SketchPreferences.Toggle.AUTO_ORIENTATION.set(!item.isChecked());
+            return true;
         } else if (itemId == R.id.buttonPinchToZoom) {
             SketchPreferences.Toggle.PINCH_TO_ZOOM.set(!item.isChecked());
             return true;

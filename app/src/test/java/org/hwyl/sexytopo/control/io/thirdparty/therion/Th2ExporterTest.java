@@ -123,6 +123,46 @@ public class Th2ExporterTest {
     }
 
     @Test
+    public void testSlopeExportsLineSizeOnItsFirstPoint() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+
+        List<Coord2D> slopePoints =
+                Arrays.asList(new Coord2D(1, 1), new Coord2D(4, 2), new Coord2D(6, 2));
+        List<PathDetail> pathDetails = new ArrayList<>();
+        pathDetails.add(
+                new PathDetail(new ArrayList<>(slopePoints), Colour.BLACK, LineType.SLOPE, 0.5f));
+        survey.getPlanSketch().setPathDetails(pathDetails);
+
+        float scale = TherionExporter.getScale();
+        Projection2D projection = Projection2D.PLAN;
+        Frame exportFrame = ExportFrameFactory.getExportFrame(survey, projection).scale(scale);
+        Space<Coord2D> space = projection.project(survey);
+        String th2 =
+                Th2Exporter.getContent(
+                        survey, projection, space, "filename.xvi", exportFrame, exportFrame, scale);
+
+        float lineSize = LineType.SLOPE.getTherionLineSize(0.5f) * scale;
+        Assert.assertTrue(lineSize > 0);
+        Assert.assertTrue(
+                th2.contains(
+                        "line slope\n  "
+                                + (1 * scale)
+                                + " "
+                                + (-1 * scale)
+                                + "\n  l-size "
+                                + lineSize
+                                + "\n  "
+                                + (4 * scale)));
+        Assert.assertEquals(1, th2.split("l-size", -1).length - 1);
+    }
+
+    @Test
+    public void testLinesOtherThanSlopeHaveNoLineSize() {
+        Assert.assertEquals(0, LineType.PIT.getTherionLineSize(0.5f), 0);
+        Assert.assertEquals(0, LineType.WALL.getTherionLineSize(0.5f), 0);
+    }
+
+    @Test
     public void testAreaWithHoleExportsBorderPerContour() {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
 

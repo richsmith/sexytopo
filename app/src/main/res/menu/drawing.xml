@@ -32,6 +32,10 @@
                     android:title="@string/sketch_menu_clip_to_walls"
                     android:checkable="true"/>
                 <item
+                    android:id="@+id/buttonAutoOrientation"
+                    android:title="@string/sketch_menu_auto_orientation"
+                    android:checkable="true"/>
+                <item
                     android:id="@+id/buttonPinchToZoom"
                     android:title="@string/sketch_menu_pinch_to_zoom"
                     android:checkable="true"/>
