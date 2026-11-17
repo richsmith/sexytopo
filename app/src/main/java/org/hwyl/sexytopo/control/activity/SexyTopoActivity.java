@@ -10,6 +10,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -22,7 +23,9 @@ import android.view.SubMenu;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
+import androidx.activity.SystemBarStyle;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.StringRes;
@@ -88,6 +91,10 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         R.id.action_table, R.id.action_plan, R.id.action_elevation
     };
 
+    // behind the navigation bar in light theme on devices that can't draw dark nav bar icons
+    // (before API 26), so the light icons stay visible
+    private static final int LEGACY_NAV_BAR_SCRIM = Color.argb(0x80, 0x1b, 0x1b, 0x1b);
+
     protected SurveyManager dataManager;
 
     protected static Instrument instrument;
@@ -117,18 +124,13 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Enable edge-to-edge display - allows content to extend behind system bars
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-
-        // Set icon colors for readability based on theme
-        boolean isDarkMode = isDarkModeActive();
-        View decor = getWindow().getDecorView();
-
-        // Use WindowInsetsController for icon colors (API 30+)
-        WindowInsetsControllerCompat insetsController =
-                WindowCompat.getInsetsController(getWindow(), decor);
-        insetsController.setAppearanceLightStatusBars(!isDarkMode);
-        insetsController.setAppearanceLightNavigationBars(!isDarkMode);
+        // Enable edge-to-edge display - content extends behind the (transparent) system bars,
+        // with bar icons chosen to suit the app's theme rather than the system's
+        SystemBarStyle barStyle =
+                isDarkModeActive()
+                        ? SystemBarStyle.dark(Color.TRANSPARENT)
+                        : SystemBarStyle.light(Color.TRANSPARENT, LEGACY_NAV_BAR_SCRIM);
+        EdgeToEdge.enable(this, barStyle, barStyle);
 
         dataManager = SurveyManager.getInstance(this.getApplicationContext());
 
@@ -213,11 +215,6 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         super.onResume();
         setTheme();
         setOrientation();
-
-        // Reapply system bar colors after theme changes
-        int panelColor = ContextCompat.getColor(this, R.color.panelBackground);
-        getWindow().setStatusBarColor(panelColor);
-        getWindow().setNavigationBarColor(panelColor);
     }
 
     @Override
@@ -1398,19 +1395,19 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
      * edges to temporarily reveal system bars.
      */
     private void applyImmersiveMode(boolean enabled) {
-        View decorView = getWindow().getDecorView();
+        // Go through the insets controller rather than setSystemUiVisibility: before API 30 the
+        // latter overwrites the layout flags edge-to-edge relies on, so Android pads for the
+        // system bars on top of our own inset padding
+        WindowInsetsControllerCompat controller =
+                WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
 
         if (enabled) {
-            // Hide status bar, navigation bar, and action bar
-            // Use IMMERSIVE_STICKY so system bars reappear on gesture
-            int flags =
-                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-            decorView.setSystemUiVisibility(flags);
+            // Bars reappear temporarily on a swipe from the edge
+            controller.setSystemBarsBehavior(
+                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+            controller.hide(WindowInsetsCompat.Type.systemBars());
         } else {
-            // Restore normal visibility
-            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+            controller.show(WindowInsetsCompat.Type.systemBars());
         }
     }
 
