@@ -9,45 +9,28 @@ import org.hwyl.sexytopo.model.geometry.Coord2D;
 
 public final class PathDetail extends SketchDetail {
 
-    /**
-     * Ornament size for a line drawn before line types existed, or where no size was recorded. In
-     * survey-space metres, as ornamentSize always is.
-     */
-    public static final float DEFAULT_ORNAMENT_SIZE = 0.2f;
-
     private List<Coord2D> path;
     private final LineType lineType;
-    private final float ornamentSize;
 
     public PathDetail(Coord2D start, Colour colour) {
-        this(start, colour, LineType.SKETCH, DEFAULT_ORNAMENT_SIZE);
+        this(start, colour, LineType.SKETCH);
     }
 
     public PathDetail(Coord2D start, Colour colour, LineType lineType) {
-        this(start, colour, lineType, DEFAULT_ORNAMENT_SIZE);
-    }
-
-    public PathDetail(Coord2D start, Colour colour, LineType lineType, float ornamentSize) {
         super(colour);
         this.lineType = lineType;
-        this.ornamentSize = ornamentSize;
         this.path = new ArrayList<>();
         path.add(start);
         updateBoundingBox(start);
     }
 
     public PathDetail(List<Coord2D> path, Colour colour) {
-        this(path, colour, LineType.SKETCH, DEFAULT_ORNAMENT_SIZE);
+        this(path, colour, LineType.SKETCH);
     }
 
     public PathDetail(List<Coord2D> path, Colour colour, LineType lineType) {
-        this(path, colour, lineType, DEFAULT_ORNAMENT_SIZE);
-    }
-
-    public PathDetail(List<Coord2D> path, Colour colour, LineType lineType, float ornamentSize) {
         super(colour);
         this.lineType = lineType;
-        this.ornamentSize = ornamentSize;
         this.path = path;
         for (Coord2D point : path) {
             updateBoundingBox(point);
@@ -147,20 +130,17 @@ public final class PathDetail extends SketchDetail {
      * This line with before joined on at its start and after at its end, as one new line, or this
      * line itself if neither meets it. A line counts as meeting only where its end and this one's
      * coincide and the two run the same way (see getEndToJoinAfter). If before and after are the
-     * same line, it's joined once, which closes it into a loop. The joined line takes the existing
-     * lines' ornament size, so their ticks don't change; the lines actually joined are added to
-     * joined.
+     * same line, it's joined once, which closes it into a loop. The lines actually joined are added
+     * to joined.
      */
     public PathDetail joinedWith(PathDetail before, PathDetail after, List<PathDetail> joined) {
         List<Coord2D> points = new ArrayList<>(path);
-        float joinedOrnamentSize = ornamentSize;
 
         List<Coord2D> leadingIn = before == null ? null : before.pointsRunningInto(getStart());
         if (leadingIn != null) {
             leadingIn.addAll(points.subList(1, points.size()));
             points = leadingIn;
             joined.add(before);
-            joinedOrnamentSize = before.ornamentSize;
         }
 
         // joined at both ends to the same line, this one has already closed it into a loop
@@ -170,13 +150,12 @@ public final class PathDetail extends SketchDetail {
         if (leadingOut != null) {
             points.addAll(leadingOut.subList(1, leadingOut.size()));
             joined.add(after);
-            joinedOrnamentSize = leadingIn == null ? after.ornamentSize : joinedOrnamentSize;
         }
 
         if (leadingIn == null && leadingOut == null) {
             return this;
         }
-        return new PathDetail(points, getColour(), lineType, joinedOrnamentSize);
+        return new PathDetail(points, getColour(), lineType);
     }
 
     /**
@@ -209,19 +188,6 @@ public final class PathDetail extends SketchDetail {
         return null;
     }
 
-    /**
-     * The size of this line's ornamentation (tick length and spacing) in survey-space metres, fixed
-     * when the line was drawn from the zoom level in force at the time — the same approach symbols
-     * use for their size. Being a survey-space quantity, the ornamentation stays put over the cave
-     * as the view is zoomed instead of crawling along the line.
-     *
-     * <p>This is a display property only: Therion applies its own styling to line commands, so it
-     * is not exported to th2 (SVG, whose appearance we do control, does use it).
-     */
-    public float getOrnamentSize() {
-        return ornamentSize;
-    }
-
     @Override
     public float getDistanceFrom(Coord2D point) {
         return getClosestDistance(point, getPath());
@@ -233,7 +199,7 @@ public final class PathDetail extends SketchDetail {
         for (Coord2D step : path) {
             newPath.add(step.plus(translation));
         }
-        return new PathDetail(newPath, getColour(), lineType, ornamentSize);
+        return new PathDetail(newPath, getColour(), lineType);
     }
 
     @Override
@@ -242,9 +208,7 @@ public final class PathDetail extends SketchDetail {
         for (Coord2D step : path) {
             newPath.add(step.scale(scale));
         }
-        // the ornamentation is a survey-space size, so it scales with the geometry (as a
-        // symbol's size does) — e.g. when a cross-section sub-sketch is scaled onto the plan
-        return new PathDetail(newPath, getColour(), lineType, ornamentSize * scale);
+        return new PathDetail(newPath, getColour(), lineType);
     }
 
     public List<SketchDetail> getPathFragmentsOutsideRadius(Coord2D targetPoint, double radius) {
@@ -264,8 +228,7 @@ public final class PathDetail extends SketchDetail {
                     Space2DUtils.getDistanceFromLine(targetPoint, lastPoint, currentPoint);
             if (distance < radius) {
                 if (currentLine.size() > 1) {
-                    PathDetail fragment =
-                            new PathDetail(currentLine, getColour(), lineType, ornamentSize);
+                    PathDetail fragment = new PathDetail(currentLine, getColour(), lineType);
                     fragments.add(fragment);
                 }
                 currentLine = new ArrayList<>();
@@ -275,7 +238,7 @@ public final class PathDetail extends SketchDetail {
         }
 
         if (currentLine.size() > 1) {
-            PathDetail fragment = new PathDetail(currentLine, getColour(), lineType, ornamentSize);
+            PathDetail fragment = new PathDetail(currentLine, getColour(), lineType);
             fragments.add(fragment);
         }
 

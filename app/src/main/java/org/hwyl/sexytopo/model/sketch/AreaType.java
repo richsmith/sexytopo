@@ -12,8 +12,8 @@ import org.hwyl.sexytopo.R;
  *
  * <p>Each type is filled with a repeating pattern, defined once here as a square tile of marks so
  * that the on-screen rendering and the SVG export draw the same thing. Tile measurements are in dp:
- * on screen the pattern stays a fixed size whatever the zoom, and the SVG export converts dp to
- * metres at a fixed ratio (see Fill.METRES_PER_DP).
+ * on screen they're scaled with the zoom (see SketchView.getPatternScale), and the SVG export
+ * converts dp to metres at a fixed ratio (see Fill.METRES_PER_DP).
  */
 public enum AreaType {
     WATER(

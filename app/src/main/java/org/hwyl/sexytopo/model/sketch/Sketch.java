@@ -114,16 +114,11 @@ public class Sketch extends Shape {
     }
 
     public PathDetail startNewPath(Coord2D start) {
-        return startNewPath(start, Colour.BLACK, LineType.SKETCH, PathDetail.DEFAULT_ORNAMENT_SIZE);
+        return startNewPath(start, Colour.BLACK, LineType.SKETCH);
     }
 
-    /**
-     * Starts a new path, recording the ornament size (in survey metres) new lines should use —
-     * derived by the caller from the current zoom, as symbol sizes are.
-     */
-    public PathDetail startNewPath(
-            Coord2D start, Colour colour, LineType lineType, float ornamentSize) {
-        activePath = new PathDetail(start, colour, lineType, ornamentSize);
+    public PathDetail startNewPath(Coord2D start, Colour colour, LineType lineType) {
+        activePath = new PathDetail(start, colour, lineType);
         startJoin = null;
         endJoin = null;
         // Registered in the undo history only on finishPath, so an unfinished path can be
@@ -192,13 +187,7 @@ public class Sketch extends Shape {
         List<PathDetail> joined = new ArrayList<>();
         List<SketchDetail> kept =
                 pieces.stream()
-                        .map(
-                                piece ->
-                                        new PathDetail(
-                                                piece,
-                                                drawn.getColour(),
-                                                drawn.getLineType(),
-                                                drawn.getOrnamentSize()))
+                        .map(piece -> new PathDetail(piece, drawn.getColour(), drawn.getLineType()))
                         .filter(piece -> piece.getMaxDimension() >= minimumSize)
                         .map(piece -> piece.joinedWith(startJoin, endJoin, joined))
                         .collect(Collectors.toList());
@@ -485,11 +474,7 @@ public class Sketch extends Shape {
         List<Coord2D> reversedPoints = new ArrayList<>(pathDetail.getPath());
         Collections.reverse(reversedPoints);
         PathDetail flipped =
-                new PathDetail(
-                        reversedPoints,
-                        pathDetail.getColour(),
-                        pathDetail.getLineType(),
-                        pathDetail.getOrnamentSize());
+                new PathDetail(reversedPoints, pathDetail.getColour(), pathDetail.getLineType());
         deleteDetail(pathDetail, Collections.singletonList((SketchDetail) flipped));
         return flipped;
     }
@@ -499,10 +484,9 @@ public class Sketch extends Shape {
      * flipPathDetail). The point order is kept, so the line faces the same way as before: once
      * drawn, a line only turns round when deliberately flipped.
      */
-    public PathDetail retypePathDetail(
-            PathDetail pathDetail, LineType lineType, float ornamentSize) {
+    public PathDetail retypePathDetail(PathDetail pathDetail, LineType lineType) {
         List<Coord2D> points = new ArrayList<>(pathDetail.getPath());
-        PathDetail retyped = new PathDetail(points, pathDetail.getColour(), lineType, ornamentSize);
+        PathDetail retyped = new PathDetail(points, pathDetail.getColour(), lineType);
         deleteDetail(pathDetail, Collections.singletonList((SketchDetail) retyped));
         return retyped;
     }

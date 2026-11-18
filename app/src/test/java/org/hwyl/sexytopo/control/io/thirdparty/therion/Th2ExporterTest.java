@@ -129,8 +129,7 @@ public class Th2ExporterTest {
         List<Coord2D> slopePoints =
                 Arrays.asList(new Coord2D(1, 1), new Coord2D(4, 2), new Coord2D(6, 2));
         List<PathDetail> pathDetails = new ArrayList<>();
-        pathDetails.add(
-                new PathDetail(new ArrayList<>(slopePoints), Colour.BLACK, LineType.SLOPE, 0.5f));
+        pathDetails.add(new PathDetail(new ArrayList<>(slopePoints), Colour.BLACK, LineType.SLOPE));
         survey.getPlanSketch().setPathDetails(pathDetails);
 
         float scale = TherionExporter.getScale();
@@ -141,7 +140,7 @@ public class Th2ExporterTest {
                 Th2Exporter.getContent(
                         survey, projection, space, "filename.xvi", exportFrame, exportFrame, scale);
 
-        float lineSize = LineType.SLOPE.getTherionLineSize(0.5f) * scale;
+        float lineSize = LineType.SLOPE.getTherionLineSize() * scale;
         Assert.assertTrue(lineSize > 0);
         Assert.assertTrue(
                 th2.contains(
@@ -158,8 +157,8 @@ public class Th2ExporterTest {
 
     @Test
     public void testLinesOtherThanSlopeHaveNoLineSize() {
-        Assert.assertEquals(0, LineType.PIT.getTherionLineSize(0.5f), 0);
-        Assert.assertEquals(0, LineType.WALL.getTherionLineSize(0.5f), 0);
+        Assert.assertEquals(0, LineType.PIT.getTherionLineSize(), 0);
+        Assert.assertEquals(0, LineType.WALL.getTherionLineSize(), 0);
     }
 
     @Test

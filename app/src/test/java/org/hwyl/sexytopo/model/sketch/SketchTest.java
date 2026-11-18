@@ -38,20 +38,10 @@ public class SketchTest {
     @Test
     public void testStartNewPathUsesGivenLineType() {
         Sketch sketch = new Sketch();
-        PathDetail pathDetail =
-                sketch.startNewPath(
-                        Coord2D.ORIGIN,
-                        Colour.BLACK,
-                        LineType.WALL,
-                        PathDetail.DEFAULT_ORNAMENT_SIZE);
+        PathDetail pathDetail = sketch.startNewPath(Coord2D.ORIGIN, Colour.BLACK, LineType.WALL);
         Assert.assertEquals(LineType.WALL, pathDetail.getLineType());
 
-        PathDetail plain =
-                sketch.startNewPath(
-                        new Coord2D(1, 1),
-                        Colour.BLACK,
-                        LineType.SKETCH,
-                        PathDetail.DEFAULT_ORNAMENT_SIZE);
+        PathDetail plain = sketch.startNewPath(new Coord2D(1, 1), Colour.BLACK, LineType.SKETCH);
         Assert.assertEquals(LineType.SKETCH, plain.getLineType());
     }
 
@@ -79,12 +69,7 @@ public class SketchTest {
     @Test
     public void testFlipPathDetailReversesPointsAsSingleUndoStep() {
         Sketch sketch = new Sketch();
-        PathDetail original =
-                sketch.startNewPath(
-                        new Coord2D(0, 0),
-                        Colour.BLACK,
-                        LineType.PIT,
-                        PathDetail.DEFAULT_ORNAMENT_SIZE);
+        PathDetail original = sketch.startNewPath(new Coord2D(0, 0), Colour.BLACK, LineType.PIT);
         original.lineTo(new Coord2D(5, 0));
         original.lineTo(new Coord2D(10, 0));
         sketch.finishPath();
@@ -147,8 +132,7 @@ public class SketchTest {
     }
 
     private static void drawLine(Sketch sketch, LineType lineType, Coord2D from, Coord2D to) {
-        sketch.startNewPath(from, Colour.BLACK, lineType, PathDetail.DEFAULT_ORNAMENT_SIZE)
-                .lineTo(to);
+        sketch.startNewPath(from, Colour.BLACK, lineType).lineTo(to);
         sketch.finishPath();
     }
 
@@ -159,17 +143,15 @@ public class SketchTest {
                 new PathDetail(
                         new ArrayList<>(Arrays.asList(new Coord2D(0, 0), new Coord2D(10, 0))),
                         Colour.RED,
-                        LineType.CHIMNEY,
-                        0.3f);
+                        LineType.CHIMNEY);
         sketch.restoreDetailToSketch(original);
 
-        PathDetail retyped = sketch.retypePathDetail(original, LineType.PIT, 0.5f);
+        PathDetail retyped = sketch.retypePathDetail(original, LineType.PIT);
 
         Assert.assertEquals(1, sketch.getPathDetails().size());
         Assert.assertSame(retyped, sketch.getPathDetails().get(0));
         Assert.assertEquals(LineType.PIT, retyped.getLineType());
         Assert.assertEquals(Colour.RED, retyped.getColour());
-        Assert.assertEquals(0.5f, retyped.getOrnamentSize(), 0.0001f);
         Assert.assertEquals(original.getPath(), retyped.getPath());
 
         sketch.undo();
@@ -185,7 +167,7 @@ public class SketchTest {
             Sketch sketch = new Sketch();
             PathDetail original = new PathDetail(new ArrayList<>(drawn), Colour.BLACK);
             sketch.restoreDetailToSketch(original);
-            PathDetail retyped = sketch.retypePathDetail(original, LineType.WALL, 0.2f);
+            PathDetail retyped = sketch.retypePathDetail(original, LineType.WALL);
             Assert.assertEquals(drawn, retyped.getPath());
         }
     }
@@ -197,67 +179,20 @@ public class SketchTest {
     }
 
     @Test
-    public void testOrnamentSizeSurvivesFragmentingFlippingAndScaling() {
-        List<Coord2D> points =
-                Arrays.asList(
-                        new Coord2D(0, 0),
-                        new Coord2D(2, 0),
-                        new Coord2D(4, 0),
-                        new Coord2D(6, 0),
-                        new Coord2D(8, 0));
-        PathDetail pathDetail =
-                new PathDetail(new ArrayList<>(points), Colour.BLACK, LineType.PIT, 0.5f);
-
-        // erasing keeps the size on each surviving fragment
-        List<SketchDetail> fragments =
-                pathDetail.getPathFragmentsOutsideRadius(new Coord2D(4, 0), 0.5);
-        Assert.assertEquals(2, fragments.size());
-        for (SketchDetail fragment : fragments) {
-            Assert.assertEquals(0.5f, ((PathDetail) fragment).getOrnamentSize(), 0.0001f);
-        }
-
-        // flipping keeps it too
-        Sketch sketch = new Sketch();
-        sketch.restoreDetailToSketch(pathDetail);
-        PathDetail flipped = sketch.flipPathDetail(pathDetail);
-        Assert.assertEquals(0.5f, flipped.getOrnamentSize(), 0.0001f);
-
-        // but geometric scaling scales it, as it is a survey-space size (cf. symbols)
-        PathDetail scaled = pathDetail.scale(2f);
-        Assert.assertEquals(1.0f, scaled.getOrnamentSize(), 0.0001f);
-        PathDetail translated = pathDetail.translate(new Coord2D(3, 3));
-        Assert.assertEquals(0.5f, translated.getOrnamentSize(), 0.0001f);
-    }
-
-    @Test
     public void testGetMostRecentOrientedPathSkipsUnorientedLines() {
         Sketch sketch = new Sketch();
         Assert.assertNull(sketch.getMostRecentOrientedPath());
 
-        PathDetail wall =
-                sketch.startNewPath(
-                        new Coord2D(0, 0),
-                        Colour.BLACK,
-                        LineType.WALL,
-                        PathDetail.DEFAULT_ORNAMENT_SIZE);
+        PathDetail wall = sketch.startNewPath(new Coord2D(0, 0), Colour.BLACK, LineType.WALL);
         wall.lineTo(new Coord2D(1, 0));
         sketch.finishPath();
 
-        PathDetail scribble =
-                sketch.startNewPath(
-                        new Coord2D(5, 5),
-                        Colour.BLACK,
-                        LineType.SKETCH,
-                        PathDetail.DEFAULT_ORNAMENT_SIZE);
+        PathDetail scribble = sketch.startNewPath(new Coord2D(5, 5), Colour.BLACK, LineType.SKETCH);
         scribble.lineTo(new Coord2D(6, 5));
         sketch.finishPath();
 
         PathDetail boulderEdge =
-                sketch.startNewPath(
-                        new Coord2D(8, 8),
-                        Colour.BLACK,
-                        LineType.ROCK_EDGE,
-                        PathDetail.DEFAULT_ORNAMENT_SIZE);
+                sketch.startNewPath(new Coord2D(8, 8), Colour.BLACK, LineType.ROCK_EDGE);
         boulderEdge.lineTo(new Coord2D(9, 8));
         sketch.finishPath();
 
@@ -712,7 +647,7 @@ public class SketchTest {
     }
 
     private static PathDetail drawActivePath(Sketch sketch, LineType lineType, Coord2D... points) {
-        PathDetail path = sketch.startNewPath(points[0], Colour.BLACK, lineType, 0.2f);
+        PathDetail path = sketch.startNewPath(points[0], Colour.BLACK, lineType);
         for (int i = 1; i < points.length; i++) {
             path.lineTo(points[i]);
         }

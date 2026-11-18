@@ -18,10 +18,9 @@ import org.hwyl.sexytopo.R;
  * rendering them is just an ordinary drawPath call. Where a type needs both dashes and ticks, the
  * gaps are built into the stamp itself, which avoids composing effects.
  *
- * <p>Stamp and dash measurements are multiples of the drawn line's ornament size (see
- * PathDetail.getOrnamentSize), which is a survey-space quantity fixed when the line was drawn. So
- * ornamentation is anchored to the cave: it stays put over the rock and scales with everything else
- * as the view is zoomed, rather than crawling along the line.
+ * <p>Stamp and dash measurements are multiples of an ornament size. On screen that's chosen by the
+ * sketch view from the zoom (see SketchView.getPatternScale), so ornamentation zooms with the cave
+ * rather than crawling along the line; in exports it's the fixed EXPORT_ORNAMENT_SIZE.
  *
  * <p>Directional note: tick stamps are drawn on one side of the line, determined by the direction
  * the user drew the path in. Wall types are instead auto-oriented on completion (see LineOrienter).
@@ -240,6 +239,9 @@ public enum LineType {
      */
     private static final float MINIMUM_VISIBLE_ADVANCE_PIXELS = 4f;
 
+    /** The ornament size, in survey metres, used when exporting: the unit of dashes and ticks. */
+    public static final float EXPORT_ORNAMENT_SIZE = 0.2f;
+
     private final int stringId;
     private final int drawableId;
     private final String therionName;
@@ -348,11 +350,11 @@ public enum LineType {
     }
 
     /**
-     * Therion's l-size for a line of this type drawn with the given ornament size (in metres), or 0
-     * if it takes none. Therion requires one for a slope: the length of its hachures.
+     * Therion's l-size for a line of this type, in metres, or 0 if it takes none. Therion requires
+     * one for a slope: the length of its hachures.
      */
-    public float getTherionLineSize(float ornamentSize) {
-        return stamp != null && stamp.isHachured() ? stamp.getExtent() * ornamentSize : 0;
+    public float getTherionLineSize() {
+        return stamp != null && stamp.isHachured() ? stamp.getExtent() * EXPORT_ORNAMENT_SIZE : 0;
     }
 
     /**
@@ -388,22 +390,20 @@ public enum LineType {
     }
 
     /**
-     * SVG stroke-dasharray value for a line of the given ornament size (in survey metres) at the
-     * given export scale, or null for solid types.
+     * SVG stroke-dasharray value for a line of this type at the given export scale, or null for
+     * solid types.
      */
-    public String getSvgDashArray(float ornamentSize, int scale) {
+    public String getSvgDashArray(int scale) {
         if (dashPattern == null) {
             return null;
         }
-        float unit = ornamentSize * scale;
+        float unit = EXPORT_ORNAMENT_SIZE * scale;
         return (dashPattern[0] * unit) + " " + (dashPattern[1] * unit);
     }
 
     /**
-     * The path effect giving this type its on-screen ornamentation, or null for a plain stroke. The
-     * ornament size is passed in already converted to pixels (the line's survey-space size times
-     * the current view scale), so the ornamentation is anchored to the cave rather than to the
-     * screen and stays put as the view is zoomed.
+     * The path effect giving this type its on-screen ornamentation, or null for a plain stroke, for
+     * the given ornament size in pixels.
      *
      * <p>A stamp takes precedence over a dash pattern since any dashing is built into the stamp
      * itself (the dash values are still used for SVG export). Returns null when the result would be

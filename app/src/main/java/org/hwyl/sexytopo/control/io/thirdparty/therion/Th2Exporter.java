@@ -470,7 +470,7 @@ public class Th2Exporter {
         lines.add("line " + lineType.getTherionName());
         // Therion requires a slope's l-size (its hachure length) on at least one point; it
         // interpolates along the line from there
-        float lineSize = lineType.getTherionLineSize(pathDetail.getOrnamentSize()) * scale;
+        float lineSize = lineType.getTherionLineSize() * scale;
         boolean isFirstPoint = true;
         for (Coord2D point : pathDetail.getPath()) {
             Coord2D coord = point.scale(scale).flipVertically();

@@ -143,6 +143,11 @@ public class SketchView extends View {
     private static final float SNAP_TO_LINE_SENSITIVITY_DP = 10.0f;
     public static final float HOT_CORNER_DISTANCE_PROPORTION = 0.05f;
     private static final int STATION_LABEL_OFFSET_DP = 10;
+    // fill tiles are rendered at this multiple of their on-screen size and scaled down to draw
+    private static final int AREA_FILL_OVERSAMPLE = 2;
+    // the most a dp of line ornamentation or area fill can stand for in the cave, so zoomed far
+    // out a decoration can't dwarf what it decorates (the default 12dp tick comes to 0.6m)
+    private static final float MAX_PATTERN_METRES_PER_DP = 0.05f;
 
     private float deleteDetailsWithinPx;
     private float selectionSensitivityPx;
@@ -231,7 +236,7 @@ public class SketchView extends View {
     private final Paint drawPaint = new Paint();
     // one paint per semantic line type (stroke width and ornamentation baked in), alongside the
     // on-screen ornament size each paint's effect was last built for, so the effect is only
-    // rebuilt when that changes (i.e. on zoom, or moving between lines drawn at different zooms)
+    // rebuilt when that changes (i.e. on zoom)
     private final Map<LineType, Paint> lineTypePaints = new EnumMap<>(LineType.class);
     private final Map<LineType, Float> lineTypePaintOrnamentSizePixels =
             new EnumMap<>(LineType.class);
@@ -372,6 +377,8 @@ public class SketchView extends View {
         areaPaint.setStrokeCap(Paint.Cap.ROUND);
 
         areaFillPaint.setStyle(Paint.Style.FILL);
+        areaFillPaint.setFilterBitmap(true);
+        areaFillPaint.setAntiAlias(true);
         areaFillShaders.clear();
         for (AreaType areaType : AreaType.values()) {
             areaFillShaders.put(areaType, createAreaFillShader(areaType.getFill()));
@@ -645,18 +652,13 @@ public class SketchView extends View {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 actionDownPointOnView = touchPointOnView;
-                sketch.startNewPath(
-                        surveyCoords, currentColour, currentLineType, getOrnamentSizeForNewLine());
+                sketch.startNewPath(surveyCoords, currentColour, currentLineType);
                 break;
 
             case MotionEvent.ACTION_MOVE:
                 if (sketch.getActivePath() == null) {
                     // shouldn't be null, but just in case...
-                    sketch.startNewPath(
-                            surveyCoords,
-                            currentColour,
-                            currentLineType,
-                            getOrnamentSizeForNewLine());
+                    sketch.startNewPath(surveyCoords, currentColour, currentLineType);
                 } else {
                     sketch.getActivePath().lineTo(surveyCoords);
                 }
@@ -723,20 +725,19 @@ public class SketchView extends View {
     }
 
     /**
-     * The ornament size (in survey metres) to record on a line drawn now: a fixed on-screen size
-     * converted at the current zoom, exactly as a symbol's size is chosen. Drawing zoomed in
-     * therefore gives finer ticks than drawing zoomed out, and either way the ornamentation is then
-     * fixed relative to the cave.
+     * How much to scale line ornamentation and area fills from their designed size, so they zoom
+     * with the cave instead of crawling across it.
      */
-    private float getOrnamentSizeForNewLine() {
-        float sizePixels = SexyTopo.dpToPixels(GeneralPreferences.getLineOrnamentSizeDp());
-        return sizePixels / surveyToViewScale;
+    private float getPatternScale() {
+        // re-pick the density each time the zoom doubles or halves, so it never strays more than
+        // √2 from its designed size; doubling keeps existing marks in place and adds new ones
+        double octave = Math.round(Math.log(surveyToViewScale) / Math.log(2));
+        float scale = (float) (surveyToViewScale / Math.pow(2, octave));
+        // but zoomed far out, don't let a tick dwarf the line it's on
+        float maxScale = MAX_PATTERN_METRES_PER_DP * surveyToViewScale / dpToPixels(1);
+        return Math.min(scale, maxScale);
     }
 
-    /**
-     * Wall-kind lines get their point order normalised on completion so the passage interior is on
-     * a consistent side, whichever way the user drew the stroke (see LineOrienter).
-     */
     /**
      * Joins up an outline (a boulder) whose ends nearly meet, so it's a closed line, as Therion
      * takes a line whose first and last points coincide to be. Ends count as meeting when they're
@@ -758,6 +759,11 @@ public class SketchView extends View {
         }
     }
 
+    /**
+     * With Auto-Orientation on, sets a finished line's point order so its interior is on a
+     * consistent side whichever way the user drew it: the passage side of a wall (see
+     * LineOrienter), or the inside of a loop for a ticked edge or outline (see LoopOrienter).
+     */
     private void orientActivePathIfRequired() {
         PathDetail activePath = sketch.getActivePath();
         if (activePath == null || !SketchPreferences.Toggle.AUTO_ORIENTATION.isOn()) {
@@ -1328,13 +1334,7 @@ public class SketchView extends View {
     }
 
     private void retypeLine(PathDetail pathDetail, LineType lineType) {
-        // A sketch line's ornament size never shows and isn't saved, so it can't be trusted; size
-        // the new ornamentation as for a line drawn now instead
-        float ornamentSize =
-                pathDetail.getLineType().isSemantic()
-                        ? pathDetail.getOrnamentSize()
-                        : getOrnamentSizeForNewLine();
-        sketch.retypePathDetail(pathDetail, lineType, ornamentSize);
+        sketch.retypePathDetail(pathDetail, lineType);
         invalidate();
     }
 
@@ -2427,8 +2427,7 @@ public class SketchView extends View {
 
     /**
      * Semantic lines are drawn individually via drawPath so their type's ornamentation (dashes,
-     * tick stamps) can apply. The path is built in view space, so the ornamentation keeps a
-     * constant on-screen size across zoom levels rather than scaling with the survey.
+     * tick stamps) can apply. Ornamentation is sized by getPatternScale.
      */
     private void drawTypedPath(Canvas canvas, PathDetail pathDetail, int alpha) {
         LineType lineType = pathDetail.getLineType();
@@ -2457,9 +2456,8 @@ public class SketchView extends View {
     }
 
     /**
-     * Rebuilds a line type's path effect if the line's ornament size on screen differs from the one
-     * the cached effect was built for. Ornament sizes are survey-space, so this happens on zoom and
-     * when moving between lines drawn at different zoom levels — not on every frame.
+     * Rebuilds a line type's path effect if the ornament size on screen differs from the one the
+     * cached effect was built for, which happens on zoom — not on every frame.
      *
      * <p>Path effects only render on a hardware-accelerated canvas from API 28, so on older devices
      * semantic lines keep a plain stroke (still distinguished by width).
@@ -2469,7 +2467,8 @@ public class SketchView extends View {
             return;
         }
         LineType lineType = pathDetail.getLineType();
-        float ornamentSizePixels = pathDetail.getOrnamentSize() * surveyToViewScale;
+        float ornamentSizePixels =
+                SexyTopo.dpToPixels(GeneralPreferences.getLineOrnamentSizeDp()) * getPatternScale();
         Float builtFor = lineTypePaintOrnamentSizePixels.get(lineType);
         if (builtFor != null && builtFor == ornamentSizePixels) {
             return;
@@ -2572,12 +2571,18 @@ public class SketchView extends View {
     /**
      * Draw the sketch's areas: each region is filled with its type's pattern and outlined. Holes
      * are drawn as further contours of the same path under the even-odd fill rule, so they are
-     * outlined too but left unfilled. The pattern is anchored to survey space so it doesn't crawl
-     * when the view is panned.
+     * outlined too but left unfilled.
+     *
+     * <p>The pattern is anchored to survey space and sized by getPatternScale, so it stays put on
+     * the cave as the view is panned or zoomed. Every area of a type shares the same pattern, so
+     * adjacent areas join seamlessly.
      */
     private void drawAreas(Canvas canvas, Sketch sketch, int alpha) {
 
-        areaFillMatrix.setTranslate(
+        float patternScale = getPatternScale();
+        areaFillMatrix.setScale(
+                patternScale / AREA_FILL_OVERSAMPLE, patternScale / AREA_FILL_OVERSAMPLE);
+        areaFillMatrix.postTranslate(
                 -viewpointOffset.x * surveyToViewScale, -viewpointOffset.y * surveyToViewScale);
 
         for (AreaDetail areaDetail : sketch.getAreaDetails()) {
@@ -2627,10 +2632,12 @@ public class SketchView extends View {
 
     /**
      * Render one tile of an area fill pattern into an alpha mask, to be repeated by a shader. The
-     * tile is rounded to a whole number of pixels so the repeats line up exactly.
+     * tile is rounded to a whole number of pixels so the repeats line up exactly, and rendered
+     * oversampled so it stays crisp when scaled up between zoom octaves (see drawAreas).
      */
     private static BitmapShader createAreaFillShader(AreaType.Fill fill) {
-        int sizePixels = Math.max(1, Math.round(dpToPixels(fill.getTileSize())));
+        int sizePixels =
+                Math.max(1, Math.round(dpToPixels(fill.getTileSize()) * AREA_FILL_OVERSAMPLE));
         float scale = sizePixels / fill.getTileSize();
 
         Bitmap tile = Bitmap.createBitmap(sizePixels, sizePixels, Bitmap.Config.ALPHA_8);
@@ -2638,7 +2645,8 @@ public class SketchView extends View {
 
         Paint strokePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         strokePaint.setStyle(Paint.Style.STROKE);
-        strokePaint.setStrokeWidth(dpToPixels(AreaType.Fill.STROKE_WIDTH_DP));
+        strokePaint.setStrokeWidth(
+                dpToPixels(AreaType.Fill.STROKE_WIDTH_DP) * AREA_FILL_OVERSAMPLE);
         strokePaint.setStrokeJoin(Paint.Join.ROUND);
         strokePaint.setStrokeCap(Paint.Cap.ROUND);
         Paint fillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);

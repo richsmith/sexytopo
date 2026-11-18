@@ -32,7 +32,6 @@ public class SketchJsonTranslater {
     public static final String AREAS_TAG = "areas";
     public static final String AREA_TYPE_TAG = "area-type";
     public static final String LINE_TYPE_TAG = "line-type";
-    public static final String ORNAMENT_SIZE_TAG = "ornament-size";
     public static final String HOLES_TAG = "holes";
     public static final String POINTS_TAG = "points";
     public static final String COLOUR_TAG = "colour";
@@ -192,10 +191,9 @@ public class SketchJsonTranslater {
         JSONObject json = new JSONObject();
         json.put(COLOUR_TAG, pathDetail.getColour().toString());
 
-        // plain sketch paths omit the tags (and predate them), keeping old and new files alike
+        // plain sketch paths omit the tag (and predate it), keeping old and new files alike
         if (pathDetail.getLineType() != LineType.SKETCH) {
             json.put(LINE_TYPE_TAG, pathDetail.getLineType().toString());
-            json.put(ORNAMENT_SIZE_TAG, pathDetail.getOrnamentSize());
         }
 
         JSONArray points = new JSONArray();
@@ -211,8 +209,6 @@ public class SketchJsonTranslater {
 
         Colour colour = Colour.valueOf(json.getString(COLOUR_TAG));
         LineType lineType = LineType.fromString(json.optString(LINE_TYPE_TAG, null));
-        float ornamentSize =
-                (float) json.optDouble(ORNAMENT_SIZE_TAG, PathDetail.DEFAULT_ORNAMENT_SIZE);
 
         JSONArray array = json.getJSONArray(POINTS_TAG);
         List<Coord2D> path = new ArrayList<>();
@@ -220,7 +216,7 @@ public class SketchJsonTranslater {
             path.add(toCoord2D(object));
         }
 
-        PathDetail pathDetail = new PathDetail(path, colour, lineType, ornamentSize);
+        PathDetail pathDetail = new PathDetail(path, colour, lineType);
 
         float epsilon = Space2DUtils.simplificationEpsilon(pathDetail);
         List<Coord2D> simplifiedPath = Space2DUtils.simplify(path, epsilon);

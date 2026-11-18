@@ -950,7 +950,7 @@ public class SvgExporter extends DoubleSketchFileExporter {
         xmlSerializer.attribute(null, "points", TextTools.join(" ", coordStrings));
         xmlSerializer.attribute(null, "stroke", getSvgColour(pathDetail));
         xmlSerializer.attribute(null, "stroke-width", Integer.toString(strokeWidth));
-        String dashArray = lineType.getSvgDashArray(pathDetail.getOrnamentSize(), scale);
+        String dashArray = lineType.getSvgDashArray(scale);
         if (dashArray != null) {
             xmlSerializer.attribute(null, "stroke-dasharray", dashArray);
         }
