@@ -38,8 +38,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/picker_panel_background"
-            android:padding="2dp"
-            android:paddingTop="6dp"
+            android:paddingLeft="2dp"
+            android:paddingRight="2dp"
+            android:paddingBottom="2dp"
+            android:paddingTop="4dp"
             android:visibility="gone">
             <GridLayout
                 android:id="@+id/lineTypeToolbarButtonPanel"
@@ -54,8 +56,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/picker_panel_background"
-            android:padding="2dp"
-            android:paddingTop="6dp"
+            android:paddingLeft="2dp"
+            android:paddingRight="2dp"
+            android:paddingBottom="2dp"
+            android:paddingTop="4dp"
             android:visibility="gone">
             <GridLayout
                 android:id="@+id/areaTypeToolbarButtonPanel"
@@ -70,8 +74,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/picker_panel_background"
-            android:padding="2dp"
-            android:paddingTop="6dp"
+            android:paddingLeft="2dp"
+            android:paddingRight="2dp"
+            android:paddingBottom="2dp"
+            android:paddingTop="4dp"
             android:visibility="gone">
             <GridLayout
                 android:id="@+id/symbolToolbarButtonPanel"
