@@ -67,6 +67,45 @@ public class SketchTest {
     }
 
     @Test
+    public void testEraserCutsLongSegmentAtEdgeOfRadius() {
+        // a single long segment: erasing its middle should leave a gap the size of the eraser,
+        // not remove the whole segment
+        PathDetail pathDetail =
+                new PathDetail(
+                        new ArrayList<>(Arrays.asList(new Coord2D(0, 0), new Coord2D(10, 0))),
+                        Colour.BLACK,
+                        LineType.WALL);
+
+        List<SketchDetail> fragments =
+                pathDetail.getPathFragmentsOutsideRadius(new Coord2D(5, 0.3f), 0.5);
+
+        Assert.assertEquals(2, fragments.size());
+        List<Coord2D> first = ((PathDetail) fragments.get(0)).getPath();
+        List<Coord2D> second = ((PathDetail) fragments.get(1)).getPath();
+        Assert.assertEquals(new Coord2D(0, 0), first.get(0));
+        Assert.assertEquals(4.6f, first.get(first.size() - 1).x, 0.001f);
+        Assert.assertEquals(5.4f, second.get(0).x, 0.001f);
+        Assert.assertEquals(new Coord2D(10, 0), second.get(second.size() - 1));
+    }
+
+    @Test
+    public void testEraserTrimsEndOfLine() {
+        PathDetail pathDetail =
+                new PathDetail(
+                        new ArrayList<>(Arrays.asList(new Coord2D(0, 0), new Coord2D(10, 0))),
+                        Colour.BLACK,
+                        LineType.WALL);
+
+        List<SketchDetail> fragments =
+                pathDetail.getPathFragmentsOutsideRadius(new Coord2D(0, 0), 1);
+
+        Assert.assertEquals(1, fragments.size());
+        List<Coord2D> path = ((PathDetail) fragments.get(0)).getPath();
+        Assert.assertEquals(1f, path.get(0).x, 0.001f);
+        Assert.assertEquals(new Coord2D(10, 0), path.get(path.size() - 1));
+    }
+
+    @Test
     public void testFlipPathDetailReversesPointsAsSingleUndoStep() {
         Sketch sketch = new Sketch();
         PathDetail original = sketch.startNewPath(new Coord2D(0, 0), Colour.BLACK, LineType.PIT);

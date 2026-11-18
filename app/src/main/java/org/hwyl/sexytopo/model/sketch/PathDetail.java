@@ -211,38 +211,85 @@ public final class PathDetail extends SketchDetail {
         return new PathDetail(newPath, getColour(), lineType);
     }
 
+    /**
+     * What's left of this line after erasing a disc from it. Segments crossing the disc are cut at
+     * its edge, so the gap is the size of the eraser however far apart the line's points are, the
+     * same as erasing from an area.
+     */
     public List<SketchDetail> getPathFragmentsOutsideRadius(Coord2D targetPoint, double radius) {
         List<SketchDetail> fragments = new ArrayList<>();
+        if (path.isEmpty()) {
+            return fragments;
+        }
 
         List<Coord2D> currentLine = new ArrayList<>();
-        for (Coord2D currentPoint : path) {
+        if (targetPoint.minus(path.get(0)).mag() >= radius) {
+            currentLine.add(path.get(0));
+        }
 
-            if (currentLine.isEmpty()) {
-                currentLine.add(currentPoint);
+        for (int i = 1; i < path.size(); i++) {
+            Coord2D start = path.get(i - 1);
+            Coord2D end = path.get(i);
+            double[] inside = getStretchInsideDisc(start, end, targetPoint, radius);
+
+            if (inside == null) {
+                // segment misses the disc entirely
+                currentLine.add(end);
                 continue;
             }
 
-            Coord2D lastPoint = currentLine.get(currentLine.size() - 1);
-
-            double distance =
-                    Space2DUtils.getDistanceFromLine(targetPoint, lastPoint, currentPoint);
-            if (distance < radius) {
-                if (currentLine.size() > 1) {
-                    PathDetail fragment = new PathDetail(currentLine, getColour(), lineType);
-                    fragments.add(fragment);
-                }
-                currentLine = new ArrayList<>();
+            if (inside[0] > 0) {
+                currentLine.add(pointAlong(start, end, inside[0]));
             }
-
-            currentLine.add(currentPoint);
+            if (currentLine.size() > 1) {
+                fragments.add(new PathDetail(currentLine, getColour(), lineType));
+            }
+            currentLine = new ArrayList<>();
+            if (inside[1] < 1) {
+                currentLine.add(pointAlong(start, end, inside[1]));
+                currentLine.add(end);
+            }
         }
 
         if (currentLine.size() > 1) {
-            PathDetail fragment = new PathDetail(currentLine, getColour(), lineType);
-            fragments.add(fragment);
+            fragments.add(new PathDetail(currentLine, getColour(), lineType));
         }
 
         return fragments;
+    }
+
+    /**
+     * The stretch of the segment from start to end lying inside the disc, as fractions of the way
+     * along it clamped to 0..1, or null if the segment doesn't enter the disc.
+     */
+    private static double[] getStretchInsideDisc(
+            Coord2D start, Coord2D end, Coord2D centre, double radius) {
+        Coord2D direction = end.minus(start);
+        Coord2D fromCentre = start.minus(centre);
+        double a = direction.x * direction.x + direction.y * direction.y;
+        double b = 2 * (fromCentre.x * direction.x + fromCentre.y * direction.y);
+        double c = fromCentre.x * fromCentre.x + fromCentre.y * fromCentre.y - radius * radius;
+
+        if (a == 0) {
+            // zero-length segment: it's inside or it isn't
+            return c < 0 ? new double[] {0, 1} : null;
+        }
+
+        double discriminant = b * b - 4 * a * c;
+        if (discriminant <= 0) {
+            return null;
+        }
+        double root = Math.sqrt(discriminant);
+        double enter = (-b - root) / (2 * a);
+        double exit = (-b + root) / (2 * a);
+        if (exit <= 0 || enter >= 1) {
+            return null;
+        }
+        return new double[] {Math.max(0, enter), Math.min(1, exit)};
+    }
+
+    private static Coord2D pointAlong(Coord2D start, Coord2D end, double fraction) {
+        return start.plus(end.minus(start).scale((float) fraction));
     }
 
     private static float getClosestDistance(Coord2D point, List<Coord2D> line) {
