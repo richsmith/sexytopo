@@ -385,7 +385,7 @@ public class GeneralPreferences {
     }
 
     public static boolean isTherionLineCurveExportEnabled() {
-        return getBoolean("pref_therion_export_line_curves", false);
+        return getBoolean("pref_therion_export_line_curves", true);
     }
 
     public static String getTherionPlanSuffix() {

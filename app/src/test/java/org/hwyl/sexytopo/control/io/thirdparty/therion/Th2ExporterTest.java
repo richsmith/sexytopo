@@ -150,8 +150,7 @@ public class Th2ExporterTest {
                                 + (-1 * scale)
                                 + "\n  l-size "
                                 + lineSize
-                                + "\n  "
-                                + (4 * scale)));
+                                + "\n"));
         Assert.assertEquals(1, th2.split("l-size", -1).length - 1);
     }
 
