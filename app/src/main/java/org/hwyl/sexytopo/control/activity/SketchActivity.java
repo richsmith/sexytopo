@@ -529,6 +529,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
 
         for (Symbol symbol : Symbol.values()) {
             if (itemId == symbol.getButtonViewId()) {
+                showNameIfReselected(itemId, symbol == SketchPreferences.getSelectedSymbol());
                 selectSketchTool(SketchTool.SYMBOL);
                 selectSymbol(symbol);
                 return true;
@@ -551,11 +552,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
 
         for (LineType lineType : LineType.values()) {
             if (itemId == lineType.getButtonViewId()) {
-                // Several line types have similar icons, so tapping the selected one again shows
-                // its name, as a long press does
-                if (lineType == SketchPreferences.getSelectedLineType()) {
-                    findViewById(itemId).performLongClick();
-                }
+                showNameIfReselected(itemId, lineType == SketchPreferences.getSelectedLineType());
                 selectSketchTool(SketchTool.LINE);
                 selectLineType(lineType);
                 return true;
@@ -578,6 +575,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
 
         for (AreaType areaType : AreaType.values()) {
             if (itemId == areaType.getButtonViewId()) {
+                showNameIfReselected(itemId, areaType == SketchPreferences.getSelectedAreaType());
                 selectSketchTool(SketchTool.AREA);
                 selectAreaType(areaType);
                 return true;
@@ -594,6 +592,16 @@ public abstract class SketchActivity extends SurveyEditorActivity
         }
 
         return false;
+    }
+
+    /**
+     * Several picker icons look alike, so tapping the already-selected one again shows its name, as
+     * a long press does.
+     */
+    private void showNameIfReselected(int buttonViewId, boolean alreadySelected) {
+        if (alreadySelected) {
+            findViewById(buttonViewId).performLongClick();
+        }
     }
 
     private void openDisplayMenu() {
