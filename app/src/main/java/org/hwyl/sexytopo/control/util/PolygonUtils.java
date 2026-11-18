@@ -3,6 +3,8 @@ package org.hwyl.sexytopo.control.util;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
+import android.graphics.RectF;
+import android.os.Build;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.IdentityHashMap;
@@ -12,14 +14,14 @@ import java.util.stream.Collectors;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 
 /**
- * Boolean operations on filled regions, implemented on top of android.graphics.Path so the hard
- * geometry cases are handled by the platform. Results are recovered by sampling the output contours
- * with PathMeasure and then simplifying, so exact vertex positions are not preserved — fine for
- * hand-sketched shapes.
+ * Boolean operations on filled regions: union, difference and intersection, as used to merge areas,
+ * erase part of one or clip it to walls. These are done with Path.op so the hard geometry cases are
+ * handled by the platform, and the results read back as polygons.
  *
- * <p>A region is represented as a Region: an outline contour plus any hole contours. Operations
- * take and return regions, so a hole is preserved through merges and erases rather than being
- * silently filled in. Both inputs and outputs use the even-odd fill rule.
+ * <p>A contour is one closed loop of a region's boundary, as a polygon: either its outline (the
+ * outer edge) or the edge of a hole. A region is represented as a Region: an outline contour plus
+ * any hole contours. Operations take and return regions, so a hole is preserved through merges and
+ * erases rather than being silently filled in. Both inputs and outputs use the even-odd fill rule.
  */
 public class PolygonUtils {
 
@@ -628,10 +630,67 @@ public class PolygonUtils {
         path.close();
     }
 
+    /**
+     * Convert the Path produced by Path.op back into regions. The vertices come back exactly, so
+     * the parts of a region the op didn't touch are unchanged; only curves are approximated.
+     */
     private static List<Region> extractRegions(Path path) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            RectF bounds = new RectF();
+            path.computeBounds(bounds, true);
+            float acceptableError =
+                    Space2DUtils.simplificationEpsilon(bounds.width(), bounds.height());
+            return groupIntoRegions(splitIntoContours(path.approximate(acceptableError)));
+        } else {
+            // before Android 8 a Path's vertices can't be read, so sample its outline instead;
+            // this cuts corners, so a region shrinks a little with each op
+            return groupIntoRegions(sampleContours(path));
+        }
+    }
 
+    /**
+     * Split the output of Path.approximate into contours.
+     *
+     * <p>Package-private so it can be unit tested; Robolectric's Path doesn't implement
+     * approximate.
+     */
+    static List<List<Coord2D>> splitIntoContours(float[] approximation) {
         List<List<Coord2D>> contours = new ArrayList<>();
+        List<Coord2D> contour = new ArrayList<>();
+        float previousFraction = -1;
+        // triples of (fraction along the path, x, y); a repeated fraction marks a move to a new
+        // contour, unless the point is repeated too, which is just a zero-length segment
+        for (int i = 0; i + 2 < approximation.length; i += 3) {
+            float fraction = approximation[i];
+            Coord2D point = new Coord2D(approximation[i + 1], approximation[i + 2]);
+            if (!contour.isEmpty() && fraction == previousFraction) {
+                if (point.equals(contour.get(contour.size() - 1))) {
+                    continue;
+                }
+                addIfPolygon(contours, contour);
+                contour = new ArrayList<>();
+            }
+            contour.add(point);
+            previousFraction = fraction;
+        }
+        addIfPolygon(contours, contour);
+        return contours;
+    }
 
+    /** Add a contour unless it's too small to enclose anything. */
+    private static void addIfPolygon(List<List<Coord2D>> contours, List<Coord2D> contour) {
+        // a closed contour ends back at its start, but a polygon closes implicitly
+        if (contour.size() > 1 && contour.get(0).equals(contour.get(contour.size() - 1))) {
+            contour.remove(contour.size() - 1);
+        }
+        if (contour.size() >= 3) {
+            contours.add(contour);
+        }
+    }
+
+    /** The contours of a Path, sampled at intervals along each. */
+    private static List<List<Coord2D>> sampleContours(Path path) {
+        List<List<Coord2D>> contours = new ArrayList<>();
         PathMeasure pathMeasure = new PathMeasure(path, false);
         do {
             List<Coord2D> contour = sampleContour(pathMeasure);
@@ -639,8 +698,7 @@ public class PolygonUtils {
                 contours.add(contour);
             }
         } while (pathMeasure.nextContour());
-
-        return groupIntoRegions(contours);
+        return contours;
     }
 
     /**

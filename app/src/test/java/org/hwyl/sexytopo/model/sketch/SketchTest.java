@@ -320,6 +320,54 @@ public class SketchTest {
     }
 
     @Test
+    public void testGroupedDeletionsAreSingleUndoStep() {
+        // simulates dragging the eraser across two areas, nibbling one twice
+        Sketch sketch = new Sketch();
+        AreaDetail first = squareArea(0, 0, 4);
+        AreaDetail second = squareArea(5, 0, 2);
+        sketch.addAreaDetail(first);
+        sketch.addAreaDetail(second);
+
+        sketch.startGroupingDeletions();
+        AreaDetail nibbled = squareArea(0, 0, 3);
+        sketch.deleteDetail(first, Collections.singletonList(nibbled));
+        AreaDetail nibbledAgain = squareArea(0, 0, 2);
+        sketch.deleteDetail(nibbled, Collections.singletonList(nibbledAgain));
+        sketch.deleteDetail(second);
+        sketch.endGroupingDeletions();
+
+        Assert.assertEquals(1, sketch.getAreaDetails().size());
+        Assert.assertSame(nibbledAgain, sketch.getAreaDetails().get(0));
+
+        sketch.undo();
+        Assert.assertEquals(2, sketch.getAreaDetails().size());
+        Assert.assertTrue(sketch.getAreaDetails().contains(first));
+        Assert.assertTrue(sketch.getAreaDetails().contains(second));
+
+        sketch.redo();
+        Assert.assertEquals(1, sketch.getAreaDetails().size());
+        Assert.assertSame(nibbledAgain, sketch.getAreaDetails().get(0));
+    }
+
+    @Test
+    public void testDeletionsAfterGroupEndsAreSeparateUndoSteps() {
+        Sketch sketch = new Sketch();
+        AreaDetail first = squareArea(0, 0, 2);
+        AreaDetail second = squareArea(3, 0, 2);
+        sketch.addAreaDetail(first);
+        sketch.addAreaDetail(second);
+
+        sketch.startGroupingDeletions();
+        sketch.deleteDetail(first);
+        sketch.endGroupingDeletions();
+        sketch.deleteDetail(second);
+
+        sketch.undo();
+        Assert.assertEquals(1, sketch.getAreaDetails().size());
+        Assert.assertSame(second, sketch.getAreaDetails().get(0));
+    }
+
+    @Test
     public void testFinishAreaCreatesPolygonFromOutline() {
         Sketch sketch = new Sketch();
         sketch.startNewArea(new Coord2D(0, 0), Colour.BLACK, AreaType.WATER);

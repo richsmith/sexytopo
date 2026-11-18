@@ -449,4 +449,65 @@ public class PolygonUtilsTest {
                                 line, Collections.singletonList(LOWER_WALL), 0.25f)
                         .get(0));
     }
+
+    @Test
+    public void testSplitIntoContoursKeepsVerticesExactly() {
+        // a closed square, as Path.approximate gives it: back to its start at the end
+        float[] approximation = {
+            0.00f, 0, 0,
+            0.25f, 4, 0,
+            0.50f, 4, 4,
+            0.75f, 0, 4,
+            1.00f, 0, 0
+        };
+        List<List<Coord2D>> contours = PolygonUtils.splitIntoContours(approximation);
+        Assert.assertEquals(1, contours.size());
+        Assert.assertEquals(
+                Arrays.asList(
+                        new Coord2D(0, 0), new Coord2D(4, 0), new Coord2D(4, 4), new Coord2D(0, 4)),
+                contours.get(0));
+    }
+
+    @Test
+    public void testSplitIntoContoursSplitsAtMoves() {
+        // an outline and a hole: the move between them repeats the fraction at a new position
+        float[] approximation = {
+            0.0f, 0, 0,
+            0.1f, 4, 0,
+            0.2f, 4, 4,
+            0.3f, 0, 4,
+            0.4f, 0, 0,
+            0.4f, 1, 1,
+            0.5f, 2, 1,
+            0.6f, 2, 2,
+            0.7f, 1, 2,
+            0.8f, 1, 1
+        };
+        List<List<Coord2D>> contours = PolygonUtils.splitIntoContours(approximation);
+        Assert.assertEquals(2, contours.size());
+        Assert.assertEquals(4, contours.get(0).size());
+        Assert.assertEquals(new Coord2D(1, 1), contours.get(1).get(0));
+        Assert.assertEquals(4, contours.get(1).size());
+    }
+
+    @Test
+    public void testSplitIntoContoursIgnoresZeroLengthSegments() {
+        float[] approximation = {
+            0.00f, 0, 0,
+            0.25f, 4, 0,
+            0.25f, 4, 0,
+            0.50f, 4, 4,
+            0.75f, 0, 4,
+            1.00f, 0, 0
+        };
+        List<List<Coord2D>> contours = PolygonUtils.splitIntoContours(approximation);
+        Assert.assertEquals(1, contours.size());
+        Assert.assertEquals(4, contours.get(0).size());
+    }
+
+    @Test
+    public void testSplitIntoContoursDropsDegenerateContours() {
+        float[] approximation = {0.0f, 0, 0, 0.5f, 1, 0, 1.0f, 0, 0};
+        Assert.assertTrue(PolygonUtils.splitIntoContours(approximation).isEmpty());
+    }
 }

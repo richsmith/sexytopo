@@ -43,6 +43,22 @@ public class DeletedDetail extends SketchDetail {
         this.replacementDetails = replacementDetails;
     }
 
+    /**
+     * This deletion followed by a later one, as a single deletion. Anything this one added that the
+     * later one deletes again (e.g. a fragment of a line erased twice) drops out altogether.
+     */
+    public DeletedDetail followedBy(DeletedDetail later) {
+        List<SketchDetail> deleted = new ArrayList<>(deletedDetails);
+        List<SketchDetail> replacements = new ArrayList<>(replacementDetails);
+        for (SketchDetail sketchDetail : later.getDeletedDetails()) {
+            if (!replacements.remove(sketchDetail)) {
+                deleted.add(sketchDetail);
+            }
+        }
+        replacements.addAll(later.getReplacementDetails());
+        return new DeletedDetail(deleted, replacements);
+    }
+
     @Override
     public float getDistanceFrom(Coord2D point) {
         float minDistance = Float.MAX_VALUE;

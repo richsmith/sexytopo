@@ -34,6 +34,9 @@ public class Sketch extends Shape {
 
     private final List<SketchDetail> sketchHistory = new ArrayList<>();
     private final List<SketchDetail> undoneHistory = new ArrayList<>();
+    // while deletions are being grouped (e.g. a drag of the eraser), the one they merge into
+    private boolean isGroupingDeletions = false;
+    private DeletedDetail groupedDeletion;
 
     private PathDetail activePath;
     // the lines the active path's start and end were snapped to, to be joined into it on finishing
@@ -576,13 +579,41 @@ public class Sketch extends Shape {
     public void deleteDetails(
             List<SketchDetail> sketchDetails, List<SketchDetail> replacementDetails) {
         DeletedDetail deletedDetail = new DeletedDetail(sketchDetails, replacementDetails);
-        addSketchDetail(deletedDetail);
+        if (groupedDeletion != null && isLastInHistory(groupedDeletion)) {
+            deletedDetail = groupedDeletion.followedBy(deletedDetail);
+            sketchHistory.set(sketchHistory.size() - 1, deletedDetail);
+            setSaved(false);
+        } else {
+            addSketchDetail(deletedDetail);
+        }
+        if (isGroupingDeletions) {
+            groupedDeletion = deletedDetail;
+        }
         for (SketchDetail sketchDetail : sketchDetails) {
             removeDetailFromSketch(sketchDetail);
         }
         for (SketchDetail replacementDetail : replacementDetails) {
             restoreDetailToSketch(replacementDetail);
         }
+    }
+
+    /**
+     * Merge the deletions made from now until endGroupingDeletions into a single undo step, so
+     * erasing by dragging across several details is undone in one go.
+     */
+    public void startGroupingDeletions() {
+        isGroupingDeletions = true;
+        groupedDeletion = null;
+    }
+
+    public void endGroupingDeletions() {
+        isGroupingDeletions = false;
+        groupedDeletion = null;
+    }
+
+    private boolean isLastInHistory(SketchDetail sketchDetail) {
+        return !sketchHistory.isEmpty()
+                && sketchHistory.get(sketchHistory.size() - 1) == sketchDetail;
     }
 
     private void removeDetailFromSketch(SketchDetail sketchDetail) {

@@ -84,9 +84,9 @@ Holes are not nested — a hole never contains a further filled region. That can
 
 Because the courtyard of a ring isn't part of the area, `PolygonUtils.overlap` tests against the whole contour set rather than just the outline: an area drawn inside a courtyard stays separate instead of merging and filling it in.
 
-`PolygonUtils` (control/util) implements region union/subtraction on top of `android.graphics.Path` boolean ops, recovering contours by sampling the result with `PathMeasure` and then sorting them into regions (a contour inside another is a hole). Inputs and outputs both use the even-odd fill rule.
+`PolygonUtils` (control/util) implements region union/subtraction on top of `android.graphics.Path` boolean ops, recovering contours by reading the result's vertices back with `Path.approximate` (so untouched stretches of boundary survive any number of operations unchanged; only the eraser's curved cut is approximated) and then sorting them into regions (a contour inside another is a hole). Inputs and outputs both use the even-odd fill rule.
 
-Note that under Robolectric, `Path`'s shadow implements neither real boolean geometry nor multi-contour `PathMeasure` iteration, so union/subtract/overlap can only be exercised on a device or emulator. The contour-grouping step is pure geometry and is unit tested directly (`PolygonUtilsTest`).
+Note that under Robolectric, `Path`'s shadow implements neither real boolean geometry nor multi-contour `PathMeasure` iteration, so union/subtract/overlap can only be exercised on a device or emulator. Below Android 8 (no `Path.approximate`) the contours are sampled with `PathMeasure` instead, which cuts corners a little each time. The contour-splitting and grouping steps are pure geometry and are unit tested directly (`PolygonUtilsTest`).
 
 ### Export
 
@@ -109,6 +109,8 @@ sketch.deleteDetail(SketchDetail toDelete, List<SketchDetail> replacements)
 ```
 
 When erasing a path fragment (rather than the whole path), `replacements` contains the surviving path segments. Erasing part of an area similarly subtracts a disc from the region; the survivors become the replacements — possibly one shrunken region, possibly one with a new hole if the user erased into the middle, possibly two or more if the notch split it, possibly none if the disc swallowed it. The deleted detail(s) are wrapped in a `DeletedDetail` and pushed onto `sketchHistory`. `deleteDetails` deletes several details in one undoable step (used when merging areas).
+
+Between `startGroupingDeletions` and `endGroupingDeletions`, each deletion is merged into the previous one (`DeletedDetail.followedBy`) rather than pushed as a new entry, so an erasing drag is a single undo step. Anything the group added as a replacement and then deleted again (a fragment erased twice) drops out of the merged entry, as it wasn't there before the group began. `SketchView.eraseAlong` steps along the gap between touch events so a quick drag doesn't skip over a line; unlike a tap it ignores cross-section bodies, and area interiors unless deleting fragments.
 
 ## Undo / Redo
 

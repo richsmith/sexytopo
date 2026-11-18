@@ -94,6 +94,8 @@ public class SketchView extends View {
 
     // These variables are used in handling the dragging of the viewing window
     private Coord2D actionDownPointOnView = Coord2D.ORIGIN;
+    // where the eraser last was during a drag, or null if it isn't being dragged
+    private Coord2D lastErasePointOnSurvey;
     private Coord2D actionDownViewpointOffset = Coord2D.ORIGIN;
 
     // The cross-section whose body was pressed at the start of the current touch gesture. While
@@ -498,6 +500,9 @@ public class SketchView extends View {
         longPressDetector.onTouchEvent(event);
 
         if (scaleGestureDetector.isInProgress()) {
+            // a pinch interrupts an erasing drag: don't erase a line from where it left off
+            lastErasePointOnSurvey = null;
+            sketch.endGroupingDeletions();
             return true;
         }
 
@@ -817,18 +822,37 @@ public class SketchView extends View {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                // everything erased in one drag is undone together
+                sketch.startGroupingDeletions();
+                lastErasePointOnSurvey = touchPointOnSurvey;
                 SketchDetail tapped = findDetailTapped(touchPointOnSurvey, deleteToleranceInMetres);
-                if (tapped == null) {
-                    // you missed, try again :P
-                    return true;
+                if (tapped != null) {
+                    eraseDetail(
+                            tapped,
+                            touchPointOnSurvey,
+                            deleteToleranceInMetres,
+                            deleteLineFragments);
+                    invalidate();
                 }
-                eraseDetail(
-                        tapped, touchPointOnSurvey, deleteToleranceInMetres, deleteLineFragments);
-                invalidate();
                 break;
 
             case MotionEvent.ACTION_MOVE:
+                if (lastErasePointOnSurvey == null) {
+                    break;
+                }
+                eraseAlong(
+                        lastErasePointOnSurvey,
+                        touchPointOnSurvey,
+                        deleteToleranceInMetres,
+                        deleteLineFragments);
+                lastErasePointOnSurvey = touchPointOnSurvey;
+                invalidate();
+                break;
+
             case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                sketch.endGroupingDeletions();
+                lastErasePointOnSurvey = null;
                 break;
 
             default:
@@ -836,6 +860,35 @@ public class SketchView extends View {
         }
 
         return true;
+    }
+
+    /**
+     * Erase whatever the finger passed over between two touch events. Unlike a tap, this leaves
+     * cross-sections alone, as they're too easy to hit by accident.
+     */
+    private void eraseAlong(
+            Coord2D from, Coord2D to, float toleranceInMetres, boolean deleteLineFragments) {
+        // step along the gap, as on a quick drag the touch events can be far enough apart to jump
+        // over a line
+        float distance = to.minus(from).mag();
+        int steps = Math.max(1, (int) Math.ceil(distance / (toleranceInMetres / 2)));
+        for (int i = 1; i <= steps; i++) {
+            Coord2D point = from.plus(to.minus(from).scale((float) i / steps));
+            SketchDetail detail =
+                    sketch.findNearestVisibleDetailWithin(
+                            point, toleranceInMetres, surveyToViewScale);
+            if (detail instanceof CrossSectionDetail) {
+                continue;
+            }
+            // crossing the middle of an area only cuts through it; it would be too easy to delete
+            // a whole one by accident
+            if (detail == null && deleteLineFragments) {
+                detail = sketch.findAreaContaining(point);
+            }
+            if (detail != null) {
+                eraseDetail(detail, point, toleranceInMetres, deleteLineFragments);
+            }
+        }
     }
 
     /**
