@@ -384,6 +384,10 @@ public class GeneralPreferences {
         return getBoolean("pref_therion_export_lines", true);
     }
 
+    public static boolean isTherionLineCurveExportEnabled() {
+        return getBoolean("pref_therion_export_line_curves", false);
+    }
+
     public static String getTherionPlanSuffix() {
         return getString("pref_therion_plan_suffix", ".plan");
     }

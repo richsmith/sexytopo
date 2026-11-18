@@ -667,6 +667,8 @@
     <string name="settings_export_therion_symbols_summary">Include symbols in th2 file</string>
     <string name="settings_export_therion_lines_title">Export typed lines</string>
     <string name="settings_export_therion_lines_summary">Include lines with a type (wall, pit etc.) as Therion line commands when exporting</string>
+    <string name="settings_export_therion_line_curves_title">Export lines as curves</string>
+    <string name="settings_export_therion_line_curves_summary">Fit smooth curves to typed lines rather than joining each drawn point with a straight segment, giving far fewer points to edit in xtherion</string>
     <string name="settings_export_therion_text_title">Export text</string>
     <string name="settings_export_therion_text_summary">Include text in th2 file</string>
     <string name="settings_export_folder_name_title">Export folder name</string>

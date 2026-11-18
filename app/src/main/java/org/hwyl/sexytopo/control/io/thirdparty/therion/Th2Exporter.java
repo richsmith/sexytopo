@@ -10,6 +10,7 @@ import java.util.Locale;
 import java.util.Map;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
+import org.hwyl.sexytopo.control.util.BezierFitter;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.common.Shape;
@@ -33,6 +34,9 @@ import org.hwyl.sexytopo.model.survey.Survey;
  * image - scrap commands - semantic data (e.g. points like stalactites)
  */
 public class Th2Exporter {
+
+    private static final float MIN_CURVE_TOLERANCE = 0.01f;
+    private static final float MAX_CURVE_TOLERANCE = 0.1f;
 
     public static String getContent(
             Survey survey,
@@ -468,20 +472,60 @@ public class Th2Exporter {
         List<String> lines = new ArrayList<>();
         LineType lineType = pathDetail.getLineType();
         lines.add("line " + lineType.getTherionName());
+
+        List<BezierFitter.CubicBezier> curves =
+                GeneralPreferences.isTherionLineCurveExportEnabled()
+                        ? BezierFitter.fit(pathDetail.getPath(), getCurveTolerance(pathDetail))
+                        : Collections.emptyList();
+
         // Therion requires a slope's l-size (its hachure length) on at least one point; it
         // interpolates along the line from there
         float lineSize = lineType.getTherionLineSize() * scale;
-        boolean isFirstPoint = true;
-        for (Coord2D point : pathDetail.getPath()) {
-            Coord2D coord = point.scale(scale).flipVertically();
-            lines.add("  " + coord.x + " " + coord.y);
-            if (isFirstPoint && lineSize > 0) {
+
+        if (curves.isEmpty()) {
+            // each point joined to the last by a straight segment
+            boolean isFirstPoint = true;
+            for (Coord2D point : pathDetail.getPath()) {
+                lines.add("  " + toTh2(point, scale));
+                if (isFirstPoint && lineSize > 0) {
+                    lines.add("  l-size " + lineSize);
+                }
+                isFirstPoint = false;
+            }
+        } else {
+            // the first point on its own, then a row per curve: its two control points and end
+            lines.add("  " + toTh2(curves.get(0).start, scale));
+            if (lineSize > 0) {
                 lines.add("  l-size " + lineSize);
             }
-            isFirstPoint = false;
+            for (BezierFitter.CubicBezier curve : curves) {
+                lines.add(
+                        "  "
+                                + toTh2(curve.control1, scale)
+                                + " "
+                                + toTh2(curve.control2, scale)
+                                + " "
+                                + toTh2(curve.end, scale));
+            }
         }
+
         lines.add("endline");
         return TextTools.join("\n", lines);
+    }
+
+    /**
+     * How far, in metres, a fitted curve may stray from the drawn line: proportional to the line's
+     * size, as with the simplification applied when it was drawn, so small details keep their shape
+     * and long walls don't end up with needlessly many nodes.
+     */
+    private static float getCurveTolerance(PathDetail pathDetail) {
+        float size = Math.max(pathDetail.getWidth(), pathDetail.getHeight());
+        return Math.min(Math.max(size / 200, MIN_CURVE_TOLERANCE), MAX_CURVE_TOLERANCE);
+    }
+
+    private static String toTh2(Coord2D point, float scale) {
+        Coord2D coord = point.scale(scale).flipVertically();
+        return coord.x + " " + coord.y;
     }
 
     /**

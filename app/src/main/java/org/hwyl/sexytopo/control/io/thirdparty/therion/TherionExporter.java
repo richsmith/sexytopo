@@ -226,11 +226,17 @@ public class TherionExporter extends Exporter {
         CheckBox crossSectionsCheckbox = dialogView.findViewById(R.id.therionCrossSectionsCheckbox);
         CheckBox symbolsCheckbox = dialogView.findViewById(R.id.therionSymbolsCheckbox);
         CheckBox linesCheckbox = dialogView.findViewById(R.id.therionLinesCheckbox);
+        CheckBox lineCurvesCheckbox = dialogView.findViewById(R.id.therionLineCurvesCheckbox);
         CheckBox textCheckbox = dialogView.findViewById(R.id.therionTextCheckbox);
 
         crossSectionsCheckbox.setChecked(GeneralPreferences.isTherionCrossSectionsEnabled());
         symbolsCheckbox.setChecked(GeneralPreferences.isXviExportSymbolsEnabled());
         linesCheckbox.setChecked(GeneralPreferences.isTherionLineExportEnabled());
+        lineCurvesCheckbox.setChecked(GeneralPreferences.isTherionLineCurveExportEnabled());
+        // curves only apply to exported lines
+        lineCurvesCheckbox.setEnabled(linesCheckbox.isChecked());
+        linesCheckbox.setOnCheckedChangeListener(
+                (button, isChecked) -> lineCurvesCheckbox.setEnabled(isChecked));
         textCheckbox.setChecked(GeneralPreferences.isXviExportTextEnabled());
 
         new MaterialAlertDialogBuilder(context)
@@ -251,6 +257,7 @@ public class TherionExporter extends Exporter {
                                     crossSectionsCheckbox.isChecked(),
                                     symbolsCheckbox.isChecked(),
                                     linesCheckbox.isChecked(),
+                                    lineCurvesCheckbox.isChecked(),
                                     textCheckbox.isChecked());
                             onReady.run();
                         })
@@ -259,7 +266,11 @@ public class TherionExporter extends Exporter {
     }
 
     private static void saveOptions(
-            boolean crossSections, boolean symbols, boolean lines, boolean text) {
+            boolean crossSections,
+            boolean symbols,
+            boolean lines,
+            boolean lineCurves,
+            boolean text) {
         SharedPreferences prefs = GeneralPreferences.getRawPreferences();
         if (prefs == null) {
             return;
@@ -268,6 +279,7 @@ public class TherionExporter extends Exporter {
                 .putBoolean("pref_therion_cross_sections", crossSections)
                 .putBoolean("pref_therion_export_symbols", symbols)
                 .putBoolean("pref_therion_export_lines", lines)
+                .putBoolean("pref_therion_export_line_curves", lineCurves)
                 .putBoolean("pref_therion_export_text", text)
                 .apply();
     }
