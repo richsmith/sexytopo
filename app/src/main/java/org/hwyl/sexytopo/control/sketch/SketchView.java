@@ -243,9 +243,8 @@ public class SketchView extends View {
             new EnumMap<>(LineType.class);
     // scratch object reused when drawing typed paths, to avoid per-frame allocation
     private final Path typedPathScratch = new Path();
-    // one paint per layer of the shading on a wall's rock side, and the ornament size they were
-    // built for
-    private final List<Paint> wallRockSidePaints = new ArrayList<>();
+    // one paint per layer of wall rock-side shading
+    private final Paint[] wallRockSidePaints = createWallRockSidePaints();
     private float wallRockSidePaintsOrnamentSizePixels = -1;
     private final Paint areaPaint = new Paint();
     // fills areas with their type's pattern; the shader is swapped per area type
@@ -370,7 +369,8 @@ public class SketchView extends View {
         drawPaint.setStrokeJoin(Paint.Join.ROUND);
         drawPaint.setStrokeCap(Paint.Cap.ROUND);
 
-        wallRockSidePaints.clear();
+        // the stipple is sized by the line width
+        wallRockSidePaintsOrnamentSizePixels = -1;
 
         lineTypePaints.clear();
         for (LineType lineType : LineType.values()) {
@@ -2470,25 +2470,30 @@ public class SketchView extends View {
         List<WallRockSide.Layer> layers = WallRockSide.getLayers();
         float ornamentSizePixels =
                 SexyTopo.dpToPixels(GeneralPreferences.getLineOrnamentSizeDp()) * getPatternScale();
-        if (wallRockSidePaints.isEmpty()
-                || ornamentSizePixels != wallRockSidePaintsOrnamentSizePixels) {
-            wallRockSidePaints.clear();
+        if (ornamentSizePixels != wallRockSidePaintsOrnamentSizePixels) {
             float lineWidth = drawPaint.getStrokeWidth();
-            for (WallRockSide.Layer layer : layers) {
-                Paint paint = new Paint();
-                paint.setStyle(Paint.Style.FILL);
-                paint.setAntiAlias(true);
-                paint.setPathEffect(layer.createEffect(ornamentSizePixels, lineWidth));
-                wallRockSidePaints.add(paint);
+            for (int i = 0; i < layers.size(); i++) {
+                wallRockSidePaints[i].setPathEffect(
+                        layers.get(i).createEffect(ornamentSizePixels, lineWidth));
             }
             wallRockSidePaintsOrnamentSizePixels = ornamentSizePixels;
         }
         for (int i = 0; i < layers.size(); i++) {
-            Paint paint = wallRockSidePaints.get(i);
+            Paint paint = wallRockSidePaints[i];
             paint.setColor(colour);
             paint.setAlpha(alpha * layers.get(i).getAlpha() / 255);
             canvas.drawPath(path, paint);
         }
+    }
+
+    private static Paint[] createWallRockSidePaints() {
+        Paint[] paints = new Paint[WallRockSide.getLayers().size()];
+        for (int i = 0; i < paints.length; i++) {
+            paints[i] = new Paint();
+            paints[i].setStyle(Paint.Style.FILL);
+            paints[i].setAntiAlias(true);
+        }
+        return paints;
     }
 
     /**

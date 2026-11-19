@@ -78,9 +78,9 @@ public final class WallRockSide {
         return new Layer(
                 (ornament, lineWidth) -> {
                     float depthPixels = Math.max(depth * ornament, 1);
-                    // short pieces bend smoothly round tight curves; the slight overlap stops
-                    // seams (the pieces are one path, so overlaps don't darken)
-                    float advance = Math.max(depthPixels / 2, 1);
+                    // shorter pieces follow curves better but cost more to draw; the overlap
+                    // stops seams
+                    float advance = Math.max(Math.max(depthPixels / 2, ornament / 4), 1);
                     Path stamp = new Path();
                     stamp.addRect(0, -depthPixels, advance + 0.5f, 0, Path.Direction.CW);
                     return morph(stamp, advance);
