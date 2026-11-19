@@ -1,7 +1,7 @@
 # Unreleased
 - New area sketching tool for marking filled regions such as water
 - Sketch lines can now be given a semantic type (e.g. wall)
-- Delete / erase tool can now be dragged to remove multiple details
+- Delete / erase tool can now be dragged to remove multiple details and generally works better
 - Highlight for active view button in action bar
 - New Edit menu with sketch Undo / Redo, Undo Last Reading, Add Leg and Add Splay (the last three moved from the Tools menu); Redo is no longer in the sketch quick menu
 - Pressing back out of the app now warns if the survey isn't saved

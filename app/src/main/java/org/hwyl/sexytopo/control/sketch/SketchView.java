@@ -938,10 +938,16 @@ public class SketchView extends View {
             boolean deleteLineFragments) {
 
         if (deleteLineFragments && detail instanceof PathDetail) {
-            // you got part of the line
+            // you got part of the line; as when drawing, a typed line too small to see properly
+            // is a speck, so a stub left at the edge of the eraser is dropped
+            PathDetail pathDetail = (PathDetail) detail;
+            float minimumSize = pathDetail.getLineType().isSemantic() ? getMinimumLineSize() : 0;
             List<SketchDetail> fragments =
-                    ((PathDetail) detail)
-                            .getPathFragmentsOutsideRadius(touchPointOnSurvey, toleranceInMetres);
+                    pathDetail
+                            .getPathFragmentsOutsideRadius(touchPointOnSurvey, toleranceInMetres)
+                            .stream()
+                            .filter(fragment -> fragment.getMaxDimension() >= minimumSize)
+                            .collect(Collectors.toList());
             sketch.deleteDetail(detail, fragments);
 
         } else if (deleteLineFragments && detail instanceof AreaDetail) {
