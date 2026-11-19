@@ -44,15 +44,9 @@ import org.hwyl.sexytopo.model.survey.Survey;
  */
 class CrossSectionLayer {
 
-    /** What the layer needs the view it's part of to do. */
-    interface Host {
-        Context getContext();
-
+    /** What the layer needs the view it's part of to do, beyond what any tool does. */
+    interface Host extends ToolHost {
         ViewContext getViewContext();
-
-        void showToast(int stringId);
-
-        void invalidate();
 
         void drawSketch(Canvas canvas, Sketch sketch, int alpha);
 

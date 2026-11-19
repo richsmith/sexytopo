@@ -18,7 +18,6 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RotateDrawable;
 import android.os.Build;
-import android.text.Editable;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.Menu;
@@ -26,33 +25,22 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.SubMenu;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.PopupMenu;
 import androidx.core.content.ContextCompat;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.Log;
-import org.hwyl.sexytopo.control.SexyTopo;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.SketchActivity;
-import org.hwyl.sexytopo.control.components.DialogUtils;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
-import org.hwyl.sexytopo.control.util.LineOrienter;
-import org.hwyl.sexytopo.control.util.LoopOrienter;
-import org.hwyl.sexytopo.control.util.PolygonUtils;
 import org.hwyl.sexytopo.control.util.SketchPreferences;
-import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.geometry.Line;
@@ -89,27 +77,11 @@ public class SketchView extends View {
     // What's being shown, and which tool is in use
     protected final SketchState state = new SketchState();
 
-    // These variables are used in handling the dragging of the viewing window
-    private Coord2D actionDownPointOnView = Coord2D.ORIGIN;
-    // where the eraser last was during a drag, or null if it isn't being dragged
-    private Coord2D lastErasePointOnSurvey;
-    private Coord2D actionDownViewpointOffset = Coord2D.ORIGIN;
-
     private static final int BOX_SIZE = 10; // every grid box is 10 units square
 
     public static final int LEGEND_SIZE = 18;
 
-    private static final float DELETE_DETAILS_WITHIN_N_DP = 10.0f;
-    // typed lines spanning less than this on screen, and areas smaller than a square this size,
-    // are discarded as specks
-    private static final float MINIMUM_DETAIL_SIZE_DP = 10.0f;
-    private static final float SELECTION_SENSITIVITY_DP = 25.0f;
-    private static final float SNAP_TO_LINE_SENSITIVITY_DP = 10.0f;
     public static final float HOT_CORNER_DISTANCE_PROPORTION = 0.05f;
-
-    private float deleteDetailsWithinPx;
-    private float selectionSensitivityPx;
-    private float snapToLineSensitivityPx;
 
     private SketchActivity activity;
 
@@ -134,25 +106,50 @@ public class SketchView extends View {
     // Flag to prevent double menu opening during this touch sequence
     private boolean menuShownInThisTouch = false;
 
-    private Symbol currentSymbol = Symbol.getDefault();
-
-    private AreaType currentAreaType = AreaType.WATER;
-
-    private Colour currentColour = Colour.BLACK;
-
-    private LineType currentLineType = LineType.SKETCH;
-
     // ********** Drawing **********
 
     private final SketchPaints paints = new SketchPaints();
-
-    private final CrossSectionLayer crossSections =
-            new CrossSectionLayer(viewport, state, paints, new CrossSectionHost());
 
     // scratch object reused when drawing typed paths, to avoid per-frame allocation
     private final Path typedPathScratch = new Path();
     // scratch object reused to position the fill pattern, to avoid per-frame allocation
     private final Matrix areaFillMatrix = new Matrix();
+
+    // ********** Cross-sections and tools **********
+
+    private final ViewHost host = new ViewHost();
+
+    private final CrossSectionLayer crossSections =
+            new CrossSectionLayer(viewport, state, paints, host);
+
+    private final SketchSelector selector = new SketchSelector(viewport, state);
+
+    private final MoveTool moveTool = new MoveTool(viewport, host);
+    private final LineTool lineTool = new LineTool(viewport, state, host);
+    private final AreaTool areaTool = new AreaTool(viewport, state, host);
+    private final EraseTool eraseTool = new EraseTool(viewport, state, crossSections, host);
+    private final TextTool textTool = new TextTool(viewport, state, host);
+    private final SymbolTool symbolTool = new SymbolTool(viewport, state, host, textTool);
+    private final SelectTool selectTool = new SelectTool(state, selector, host);
+
+    // what each tool does with a touch; PINCH_TO_ZOOM has no entry, as the scale detector drives it
+    private final Map<SketchTool, ToolHandler> sketchToolsToHandlers = createSketchToolMap();
+
+    private Map<SketchTool, ToolHandler> createSketchToolMap() {
+        Map<SketchTool, ToolHandler> handlers = new EnumMap<>(SketchTool.class);
+        handlers.put(SketchTool.MOVE, moveTool);
+        handlers.put(SketchTool.MODAL_MOVE, moveTool);
+        handlers.put(SketchTool.LINE, lineTool);
+        handlers.put(SketchTool.AREA, areaTool);
+        handlers.put(SketchTool.ERASE, eraseTool);
+        handlers.put(SketchTool.SYMBOL, symbolTool);
+        handlers.put(SketchTool.TEXT, textTool);
+        handlers.put(SketchTool.SELECT, selectTool);
+        handlers.put(SketchTool.POSITION_CROSS_SECTION, crossSections.positionTool);
+        handlers.put(SketchTool.ROTATE_CROSS_SECTION, crossSections.rotateTool);
+        handlers.put(SketchTool.MOVE_CROSS_SECTION, crossSections.moveTool);
+        return handlers;
+    }
 
     public SketchView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -173,10 +170,6 @@ public class SketchView extends View {
 
         isTwoFingerModeActive = GeneralPreferences.isTwoFingerModeActive();
         isHotCornersModeActive = GeneralPreferences.isHotCornersModeActive();
-
-        deleteDetailsWithinPx = dpToPixels(DELETE_DETAILS_WITHIN_N_DP);
-        selectionSensitivityPx = dpToPixels(SELECTION_SENSITIVITY_DP);
-        snapToLineSensitivityPx = dpToPixels(SNAP_TO_LINE_SENSITIVITY_DP);
     }
 
     public void setActivity(SketchActivity sketchActivity) {
@@ -228,8 +221,7 @@ public class SketchView extends View {
 
         if (scaleGestureDetector.isInProgress()) {
             // a pinch interrupts an erasing drag: don't erase a line from where it left off
-            lastErasePointOnSurvey = null;
-            state.getSketch().endGroupingDeletions();
+            eraseTool.cancel();
             return true;
         }
 
@@ -264,31 +256,8 @@ public class SketchView extends View {
             return true;
         }
 
-        switch (state.getSketchTool()) {
-            case MOVE:
-                return handleMove(event);
-            case MODAL_MOVE:
-                return handleMove(event);
-            case LINE:
-                return handleLine(event);
-            case AREA:
-                return handleDrawArea(event);
-            case ERASE:
-                return handleErase(event);
-            case SYMBOL:
-                return handleSymbol(event);
-            case TEXT:
-                return handleText(event);
-            case SELECT:
-                return handleSelect(event);
-            case POSITION_CROSS_SECTION:
-                return crossSections.positionTool.onTouch(event);
-            case ROTATE_CROSS_SECTION:
-                return crossSections.rotateTool.onTouch(event);
-            case MOVE_CROSS_SECTION:
-                return crossSections.moveTool.onTouch(event);
-        }
-        return false;
+        ToolHandler handler = sketchToolsToHandlers.get(state.getSketchTool());
+        return handler != null && handler.onTouch(event);
     }
 
     private boolean isModalMoveSelection(MotionEvent event) {
@@ -332,504 +301,6 @@ public class SketchView extends View {
         return hitCorner;
     }
 
-    private boolean handleLine(MotionEvent event) {
-
-        Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
-        Coord2D surveyCoords = viewport.toSurvey(touchPointOnView);
-
-        boolean snapToLines = SketchPreferences.Toggle.SNAP_TO_LINES.isOn();
-
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                actionDownPointOnView = touchPointOnView;
-                state.getSketch().startNewPath(surveyCoords, currentColour, currentLineType);
-                break;
-
-            case MotionEvent.ACTION_MOVE:
-                if (state.getSketch().getActivePath() == null) {
-                    // shouldn't be null, but just in case...
-                    state.getSketch().startNewPath(surveyCoords, currentColour, currentLineType);
-                } else {
-                    state.getSketch().getActivePath().lineTo(surveyCoords);
-                }
-                invalidate();
-                break;
-
-            case MotionEvent.ACTION_UP:
-                boolean isDot = touchPointOnView.equals(actionDownPointOnView);
-                if (isDot) {
-                    state.getSketch().getActivePath().lineTo(surveyCoords);
-                }
-                closeActivePathIfOutline();
-                orientActivePathIfRequired();
-                // snapped once the line's direction is settled, as that decides which ends of
-                // other lines it can join
-                if (snapToLines && !isDot) {
-                    state.getSketch().snapActivePath(getSnapDistance());
-                    invalidate();
-                }
-                // A tap with a freehand line leaves a dot, but a typed line that small is a
-                // mistake: it would be meaningless in an export
-                float minimumSize = currentLineType.isSemantic() ? getMinimumLineSize() : 0;
-                state.getSketch().finishPath(minimumSize);
-                break;
-
-            default:
-                return false;
-        }
-
-        return true;
-    }
-
-    private boolean handleDrawArea(MotionEvent event) {
-
-        Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
-        Coord2D surveyCoords = viewport.toSurvey(touchPointOnView);
-
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                actionDownPointOnView = touchPointOnView;
-                state.getSketch().startNewArea(surveyCoords, currentColour, currentAreaType);
-                break;
-
-            case MotionEvent.ACTION_MOVE:
-                if (state.getSketch().getActivePath() == null) {
-                    // shouldn't be null, but just in case...
-                    state.getSketch().startNewArea(surveyCoords, currentColour, currentAreaType);
-                } else {
-                    state.getSketch().getActivePath().lineTo(surveyCoords);
-                }
-                invalidate();
-                break;
-
-            case MotionEvent.ACTION_UP:
-                state.getSketch().finishArea(currentAreaType, getMinimumArea());
-                invalidate();
-                break;
-
-            default:
-                return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Joins up an outline (a boulder) whose ends nearly meet, so it's a closed line, as Therion
-     * takes a line whose first and last points coincide to be. Ends count as meeting when they're
-     * as close as Snap to Lines would join.
-     */
-    private void closeActivePathIfOutline() {
-        PathDetail activePath = state.getSketch().getActivePath();
-        if (activePath == null || !activePath.getLineType().isOutline()) {
-            return;
-        }
-        List<Coord2D> points = activePath.getPath();
-        if (points.size() < 3) {
-            return;
-        }
-        Coord2D start = points.get(0);
-        Coord2D end = points.get(points.size() - 1);
-        if (!start.equals(end) && Space2DUtils.getDistance(start, end) <= getSnapDistance()) {
-            activePath.lineTo(start);
-        }
-    }
-
-    /**
-     * With Auto-Orientation on, sets a finished line's point order so its interior is on a
-     * consistent side whichever way the user drew it: the passage side of a wall (see
-     * LineOrienter), or the inside of a loop for a ticked edge or outline (see LoopOrienter).
-     */
-    private void orientActivePathIfRequired() {
-        PathDetail activePath = state.getSketch().getActivePath();
-        if (activePath == null || !SketchPreferences.Toggle.AUTO_ORIENTATION.isOn()) {
-            return;
-        }
-        LineType lineType = activePath.getLineType();
-        if (lineType.isWall() && state.getProjection() != null) {
-            LineOrienter.orientToInterior(activePath.getPath(), getLegLines());
-        } else if (lineType.isOrientedByLoop()) {
-            // a pit or chimney edge drawn round its hole, alone or with a wall, has its ticks
-            // inside, and a boulder outline its rock; ends count as meeting when they're as close
-            // as Snap to Lines would join
-            List<List<Coord2D>> walls =
-                    state.getSketch().getPathDetails().stream()
-                            .filter(path -> path.getLineType().isWall())
-                            .map(PathDetail::getPath)
-                            .collect(Collectors.toList());
-            LoopOrienter.orientInsideOfLoop(
-                    activePath.getPath(),
-                    lineType.hasLoopInsideOnRight(),
-                    walls,
-                    getSnapDistance());
-        }
-    }
-
-    private float getSnapDistance() {
-        return snapToLineSensitivityPx / viewport.getScale();
-    }
-
-    private boolean handleMove(MotionEvent event) {
-
-        Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
-
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                actionDownPointOnView = touchPointOnView;
-                actionDownViewpointOffset = viewport.getOffset();
-                break;
-            case MotionEvent.ACTION_MOVE:
-                Coord2D surveyDelta =
-                        touchPointOnView
-                                .minus(actionDownPointOnView)
-                                .scale(1 / viewport.getScale());
-                viewport.setOffset(actionDownViewpointOffset.minus(surveyDelta));
-                invalidate();
-            // fall through
-            case MotionEvent.ACTION_UP:
-                break;
-            default:
-                return false;
-        }
-
-        return true;
-    }
-
-    private boolean handleErase(MotionEvent event) {
-
-        Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
-        Coord2D touchPointOnSurvey = viewport.toSurvey(touchPointOnView);
-
-        boolean deleteLineFragments = GeneralPreferences.isDeletePathFragmentsModeOn();
-
-        float deleteToleranceInMetres = deleteDetailsWithinPx / viewport.getScale();
-
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                // everything erased in one drag is undone together
-                state.getSketch().startGroupingDeletions();
-                lastErasePointOnSurvey = touchPointOnSurvey;
-                SketchDetail tapped = findDetailTapped(touchPointOnSurvey, deleteToleranceInMetres);
-                if (tapped != null) {
-                    eraseDetail(
-                            tapped,
-                            touchPointOnSurvey,
-                            deleteToleranceInMetres,
-                            deleteLineFragments);
-                    invalidate();
-                }
-                break;
-
-            case MotionEvent.ACTION_MOVE:
-                if (lastErasePointOnSurvey == null) {
-                    break;
-                }
-                eraseAlong(
-                        lastErasePointOnSurvey,
-                        touchPointOnSurvey,
-                        deleteToleranceInMetres,
-                        deleteLineFragments);
-                lastErasePointOnSurvey = touchPointOnSurvey;
-                invalidate();
-                break;
-
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_CANCEL:
-                state.getSketch().endGroupingDeletions();
-                lastErasePointOnSurvey = null;
-                break;
-
-            default:
-                return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Erase whatever the finger passed over between two touch events. Unlike a tap, this leaves
-     * cross-sections alone, as they're too easy to hit by accident.
-     */
-    private void eraseAlong(
-            Coord2D from, Coord2D to, float toleranceInMetres, boolean deleteLineFragments) {
-        // step along the gap, as on a quick drag the touch events can be far enough apart to jump
-        // over a line
-        float distance = to.minus(from).mag();
-        int steps = Math.max(1, (int) Math.ceil(distance / (toleranceInMetres / 2)));
-        for (int i = 1; i <= steps; i++) {
-            Coord2D point = from.plus(to.minus(from).scale((float) i / steps));
-            SketchDetail detail =
-                    state.getSketch()
-                            .findNearestVisibleDetailWithin(
-                                    point, toleranceInMetres, viewport.getScale());
-            if (detail instanceof CrossSectionDetail) {
-                continue;
-            }
-            // crossing the middle of an area only cuts through it; it would be too easy to delete
-            // a whole one by accident
-            if (detail == null && deleteLineFragments) {
-                detail = state.getSketch().findAreaContaining(point);
-            }
-            if (detail != null) {
-                eraseDetail(detail, point, toleranceInMetres, deleteLineFragments);
-            }
-        }
-    }
-
-    /**
-     * Work out which sketch detail the user has just tapped, or null if they missed everything.
-     * This only decides what was hit; what to do about it is up to the caller.
-     *
-     * <p>Details are tried in order of how specifically the tap identifies them. Whatever lies
-     * nearest the tap wins first, so a line drawn across an area is still picked out when the user
-     * aims at the line. Cross-sections come next: a press anywhere on the body counts, which is a
-     * bigger target than a point and so shouldn't pre-empt something the user aimed at precisely.
-     * Last comes an area under the finger, which covers tapping the middle of one — too far from
-     * its boundary for the distance test to reach, and otherwise unhittable.
-     */
-    private SketchDetail findDetailTapped(Coord2D touchPointOnSurvey, float toleranceInMetres) {
-
-        SketchDetail nearest =
-                state.getSketch()
-                        .findNearestVisibleDetailWithin(
-                                touchPointOnSurvey, toleranceInMetres, viewport.getScale());
-        if (nearest != null) {
-            return nearest;
-        }
-
-        if (SketchPreferences.Toggle.SHOW_X_SECTIONS.isOn()) {
-            CrossSectionDetail crossSection = crossSections.findBodyAt(touchPointOnSurvey);
-            if (crossSection != null) {
-                return crossSection;
-            }
-        }
-
-        return state.getSketch().findAreaContaining(touchPointOnSurvey);
-    }
-
-    /**
-     * Delete a tapped detail. With "delete line fragments" on, lines and areas are cut into rather
-     * than removed whole; everything else is deleted outright.
-     */
-    private void eraseDetail(
-            SketchDetail detail,
-            Coord2D touchPointOnSurvey,
-            float toleranceInMetres,
-            boolean deleteLineFragments) {
-
-        if (deleteLineFragments && detail instanceof PathDetail) {
-            // you got part of the line; as when drawing, a typed line too small to see properly
-            // is a speck, so a stub left at the edge of the eraser is dropped
-            PathDetail pathDetail = (PathDetail) detail;
-            float minimumSize = pathDetail.getLineType().isSemantic() ? getMinimumLineSize() : 0;
-            List<SketchDetail> fragments =
-                    pathDetail
-                            .getPathFragmentsOutsideRadius(touchPointOnSurvey, toleranceInMetres)
-                            .stream()
-                            .filter(fragment -> fragment.getMaxDimension() >= minimumSize)
-                            .collect(Collectors.toList());
-            state.getSketch().deleteDetail(detail, fragments);
-
-        } else if (deleteLineFragments && detail instanceof AreaDetail) {
-            // carve a notch out of the area; this can split it into several areas, or punch a
-            // hole if the user is erasing in the middle of one
-            eraseFromArea((AreaDetail) detail, touchPointOnSurvey, toleranceInMetres);
-
-        } else {
-            // bullseye!
-            state.getSketch().deleteDetail(detail);
-        }
-    }
-
-    /**
-     * Erase a disc from an area as an undoable operation. Whatever survives comes back as
-     * replacement areas: possibly one shrunken region, possibly one with a new hole if the user
-     * erased into the middle of it, possibly several if the notch split it, possibly none if the
-     * disc swallowed it. Falls back to deleting the whole area if the geometry op fails.
-     */
-    private void eraseFromArea(AreaDetail areaDetail, Coord2D touchPointOnSurvey, float radius) {
-        List<PolygonUtils.Region> remaining =
-                PolygonUtils.subtract(areaDetail.toRegion(), touchPointOnSurvey, radius);
-        if (remaining == null) {
-            state.getSketch().deleteDetail(areaDetail);
-            return;
-        }
-        // a nibble can leave slivers too small to be worth keeping
-        double minimumArea = getMinimumArea();
-        List<SketchDetail> replacements =
-                remaining.stream()
-                        .filter(region -> region.getArea() >= minimumArea)
-                        .map(region -> (SketchDetail) areaDetail.withRegion(region))
-                        .collect(Collectors.toList());
-        state.getSketch().deleteDetail(areaDetail, replacements);
-    }
-
-    /**
-     * The smallest area (in square metres) worth keeping: a square of fixed on-screen size,
-     * converted at the current zoom. So the threshold follows what the user can actually see,
-     * rather than being a fixed size in the cave.
-     */
-    private double getMinimumArea() {
-        double sizeInMetres = getMinimumLineSize();
-        return sizeInMetres * sizeInMetres;
-    }
-
-    /**
-     * The smallest extent (in metres) a typed line must span to be kept, so a stray tap doesn't
-     * leave a speck. Like getMinimumArea, it's a fixed on-screen size converted at the current
-     * zoom.
-     */
-    private float getMinimumLineSize() {
-        return dpToPixels(MINIMUM_DETAIL_SIZE_DP) / viewport.getScale();
-    }
-
-    private boolean handleSymbol(MotionEvent event) {
-
-        if (currentSymbol == Symbol.TEXT) {
-            return handleText(event);
-        }
-
-        final Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
-        final Coord2D touchPointOnSurvey = viewport.toSurvey(touchPointOnView);
-        float startingSizeDp = GeneralPreferences.getSymbolStartingSizeDp();
-        float startingSizePixels = SexyTopo.dpToPixels(startingSizeDp);
-        float size = startingSizePixels / viewport.getScale();
-
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                // Only record the start point; the symbol is placed on ACTION_UP so a long-press
-                // that opens a station menu doesn't also leave a symbol behind.
-                actionDownPointOnView = touchPointOnView;
-                return true;
-
-            case MotionEvent.ACTION_UP:
-                if (currentSymbol.isDirectional()) {
-                    float angle =
-                            Space2DUtils.getAngleBetween(actionDownPointOnView, touchPointOnView);
-                    angle = Space2DUtils.adjustAngle(angle, -90);
-                    Coord2D firstTouch = viewport.toSurvey(actionDownPointOnView);
-                    state.getSketch()
-                            .addSymbolDetail(firstTouch, currentSymbol, currentColour, size, angle);
-                    float distance =
-                            Space2DUtils.getDistance(actionDownPointOnView, touchPointOnView);
-                    if (distance < 5) {
-                        activity.showSimpleToast(R.string.sketch_symbol_orientation_education);
-                    }
-                } else {
-                    state.getSketch()
-                            .addSymbolDetail(
-                                    touchPointOnSurvey, currentSymbol, currentColour, size, 0);
-                }
-                invalidate();
-                return true;
-
-            default:
-                return false;
-        }
-    }
-
-    @SuppressWarnings("SwitchStatementWithTooFewBranches")
-    private boolean handleText(MotionEvent event) {
-
-        final Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
-        final Coord2D touchPointOnSurvey = viewport.toSurvey(touchPointOnView);
-
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                TextInputLayout inputLayout =
-                        DialogUtils.createStandardTextInputLayout(
-                                getContext(), R.string.sketch_text_hint);
-
-                TextInputEditText input = DialogUtils.getEditText(inputLayout);
-
-                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
-                builder.setView(inputLayout)
-                        .setPositiveButton(
-                                R.string.ok,
-                                (dialog, which) -> {
-                                    Editable editable = input.getText();
-                                    if (editable == null || editable.length() == 0) {
-                                        return;
-                                    }
-                                    String text = editable.toString();
-                                    int startingSizeSp = GeneralPreferences.getTextStartingSizeSp();
-                                    float startingSizePixels =
-                                            SketchPaints.spToPixels(getContext(), startingSizeSp);
-                                    float size = startingSizePixels / viewport.getScale();
-                                    state.getSketch()
-                                            .addTextDetail(
-                                                    touchPointOnSurvey, text, currentColour, size);
-                                    invalidate();
-                                })
-                        .setNegativeButton(R.string.cancel, null);
-
-                android.app.Dialog dialog = builder.create();
-
-                // Automatically select text field
-                dialog.setOnShowListener(
-                        dialogInterface -> {
-                            input.requestFocus();
-                            InputMethodManager imm =
-                                    (InputMethodManager)
-                                            getContext()
-                                                    .getSystemService(Context.INPUT_METHOD_SERVICE);
-                            imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
-                        });
-
-                DialogUtils.showKeyboardOnDisplay(dialog);
-                dialog.show();
-                return true;
-
-            default:
-                return false;
-        }
-    }
-
-    private boolean handleSelect(MotionEvent event) {
-
-        Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
-
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                Station newSelectedStation = checkForStation(touchPointOnView);
-
-                if (newSelectedStation == null) {
-                    return false;
-
-                } else if (newSelectedStation != state.getSurvey().getActiveStation()) {
-                    state.getSurvey().setActiveStation(newSelectedStation);
-                    broadcastSurveyUpdated();
-                    invalidate();
-                    return true;
-
-                } else { // double selection opens context menu
-                    if (!menuShownInThisTouch) {
-                        showContextMenu(event, newSelectedStation);
-                        menuShownInThisTouch = true;
-                    }
-                    return true;
-                }
-
-            case MotionEvent.ACTION_MOVE:
-            case MotionEvent.ACTION_UP:
-                break;
-            default:
-                return false;
-        }
-
-        return true;
-    }
-
-    private Station checkForStation(Coord2D touchPointOnView) {
-        float selectionTolerance = selectionSensitivityPx / viewport.getScale();
-        Coord2D touchPointOnSurvey = viewport.toSurvey(touchPointOnView);
-
-        Station matchedStation =
-                findNearestStationWithinDelta(
-                        state.getProjection(), touchPointOnSurvey, selectionTolerance);
-        return matchedStation; // this could be null if nothing is near
-    }
-
     private void showContextMenu(MotionEvent event, final Station station) {
         // Determine view context based on projection type
         ViewContext viewContext = getViewContext();
@@ -842,20 +313,6 @@ public class SketchView extends View {
                 new ContextMenuManager(getContext(), viewContext, activity);
         menuManager.showMenuForStation(
                 this, station, state.getSurvey(), (int) event.getX(), (int) event.getY());
-    }
-
-    /**
-     * The line the user pressed on, or null. Only the nearest detail counts, so pressing on a
-     * symbol that sits on a line picks out the symbol rather than the line.
-     */
-    private PathDetail checkForPath(Coord2D touchPointOnView) {
-        float selectionTolerance = selectionSensitivityPx / viewport.getScale();
-        Coord2D touchPointOnSurvey = viewport.toSurvey(touchPointOnView);
-        SketchDetail nearest =
-                state.getSketch()
-                        .findNearestVisibleDetailWithin(
-                                touchPointOnSurvey, selectionTolerance, viewport.getScale());
-        return nearest instanceof PathDetail ? (PathDetail) nearest : null;
     }
 
     /** Offers to flip a line or change its type. Both are single undoable steps. */
@@ -905,20 +362,6 @@ public class SketchView extends View {
     }
 
     /**
-     * The legs as drawn in this view, for orienting walls against. Splays are left out: they run to
-     * the walls themselves, and may run on beyond them into a neighbouring passage.
-     */
-    private List<Line<Coord2D>> getLegLines() {
-        if (state.getProjection() == null) {
-            return Collections.emptyList();
-        }
-        return state.getProjection().getLegMap().entrySet().stream()
-                .filter(entry -> entry.getKey().hasDestination())
-                .map(Map.Entry::getValue)
-                .collect(Collectors.toList());
-    }
-
-    /**
      * @noinspection DuplicateBranchesInSwitch
      */
     protected ViewContext getViewContext() {
@@ -938,30 +381,6 @@ public class SketchView extends View {
             default:
                 return ViewContext.PLAN;
         }
-    }
-
-    private static Station findNearestStationWithinDelta(
-            Space<Coord2D> space, Coord2D target, float delta) {
-
-        float shortest = Float.MAX_VALUE;
-        Station best = null;
-
-        for (Station station : space.getStationMap().keySet()) {
-            Coord2D point = space.getStationMap().get(station);
-            //noinspection ConstantConditions
-            float distance = Space2DUtils.getDistance(point, target);
-
-            if (distance > delta) {
-                continue;
-            }
-
-            if (best == null || (distance < shortest)) {
-                best = station;
-                shortest = distance;
-            }
-        }
-
-        return best;
     }
 
     public void handleNewCrossSection(Station station) {
@@ -1740,19 +1159,19 @@ public class SketchView extends View {
     }
 
     public void setBrushColour(BrushColour brushColour) {
-        currentColour = brushColour.getColour();
+        state.setColour(brushColour.getColour());
     }
 
     public void setLineType(LineType lineType) {
-        currentLineType = lineType;
+        lineTool.setLineType(lineType);
     }
 
     public void setAreaType(AreaType areaType) {
-        currentAreaType = areaType;
+        areaTool.setAreaType(areaType);
     }
 
     public void setCurrentSymbol(Symbol symbol) {
-        currentSymbol = symbol;
+        symbolTool.setSymbol(symbol);
     }
 
     public void setSketchTool(SketchTool sketchTool) {
@@ -1776,8 +1195,11 @@ public class SketchView extends View {
         return state.getSketchTool();
     }
 
-    /** Gives the cross-section layer what it needs from this view, without making it public. */
-    private class CrossSectionHost implements CrossSectionLayer.Host {
+    /**
+     * Gives the tools and the cross-section layer what they need from this view, without making it
+     * public.
+     */
+    private class ViewHost implements CrossSectionLayer.Host {
         @Override
         public Context getContext() {
             return SketchView.this.getContext();
@@ -1791,6 +1213,19 @@ public class SketchView extends View {
         @Override
         public void showToast(int stringId) {
             activity.showSimpleToast(stringId);
+        }
+
+        @Override
+        public void broadcastSurveyUpdated() {
+            SketchView.this.broadcastSurveyUpdated();
+        }
+
+        @Override
+        public void openStationMenu(MotionEvent event, Station station) {
+            if (!menuShownInThisTouch) {
+                showContextMenu(event, station);
+                menuShownInThisTouch = true;
+            }
         }
 
         @Override
@@ -1837,7 +1272,7 @@ public class SketchView extends View {
         @Override
         public void onLongPress(MotionEvent motionEvent) {
             Coord2D touchPointOnView = new Coord2D(motionEvent.getX(), motionEvent.getY());
-            Station matchedStation = checkForStation(touchPointOnView);
+            Station matchedStation = selector.findStationAt(touchPointOnView);
             if (matchedStation != null && !menuShownInThisTouch) {
                 if (state.getSketchTool().drawsPath()) {
                     state.getSketch().abandonActivePath();
@@ -1850,7 +1285,7 @@ public class SketchView extends View {
             if (!state.getSketchTool().offersLineMenu()) {
                 return;
             }
-            PathDetail matchedPath = checkForPath(touchPointOnView);
+            PathDetail matchedPath = selector.findPathAt(touchPointOnView);
             if (matchedPath != null && !menuShownInThisTouch) {
                 state.getSketch().abandonActivePath();
                 showLineContextMenu(motionEvent, matchedPath);

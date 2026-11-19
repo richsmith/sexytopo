@@ -3,14 +3,15 @@ package org.hwyl.sexytopo.control.sketch;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.geometry.Projection2D;
 import org.hwyl.sexytopo.model.geometry.Space;
+import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchTool;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 /**
- * What a sketch view is showing and which tool is in use. The view and the parts it hands work to
- * share one of these, so those parts read the current survey, sketch and tool here rather than
- * asking the view for them.
+ * What a sketch view is showing, which tool is in use and in what colour. The view and the parts it
+ * hands work to share one of these, so those parts read the current survey, sketch and tool here
+ * rather than asking the view for them.
  */
 class SketchState {
 
@@ -22,6 +23,9 @@ class SketchState {
     private SketchTool currentTool = SketchTool.MOVE;
     // used to jump back to the previous tool when using one-use tools
     private SketchTool previousTool = SketchTool.SELECT;
+
+    // what lines, areas, symbols and text are drawn in
+    private Colour colour = Colour.BLACK;
 
     Survey getSurvey() {
         return survey;
@@ -78,5 +82,13 @@ class SketchState {
     /** Go back to the tool in use before the current, one-use, one. */
     void revertToPreviousTool() {
         setSketchTool(previousTool);
+    }
+
+    Colour getColour() {
+        return colour;
+    }
+
+    void setColour(Colour colour) {
+        this.colour = colour;
     }
 }
