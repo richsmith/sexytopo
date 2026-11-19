@@ -18,6 +18,7 @@ import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RotateDrawable;
+import android.os.Build;
 import android.text.Editable;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -296,6 +297,13 @@ public class SketchView extends View {
         super(context, attrs);
         scaleGestureDetector = new ScaleGestureDetector(context, new ScaleListener());
         longPressDetector = new GestureDetector(context, new LongPressListener());
+
+        // Line decoration and the shading on walls are drawn with path effects, which a
+        // hardware-accelerated canvas only renders from Android 9 (API 28). Before that, draw in
+        // software so they still show; it's slower, but a plain freehand sketch stays quick.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+            setLayerType(LAYER_TYPE_SOFTWARE, null);
+        }
     }
 
     public void initialisePaint() {
@@ -2459,11 +2467,6 @@ public class SketchView extends View {
 
     /** Shades the outer side of a wall line type. */
     private void drawRockSide(Canvas canvas, Path path, int colour, int alpha) {
-        // path effects only render on a hardware-accelerated canvas from API 28; without them the
-        // path would be filled as a polygon
-        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.P) {
-            return;
-        }
         List<WallRockSide.Layer> layers = WallRockSide.getLayers();
         float ornamentSizePixels =
                 SexyTopo.dpToPixels(GeneralPreferences.getLineOrnamentSizeDp()) * getPatternScale();
@@ -2491,14 +2494,8 @@ public class SketchView extends View {
     /**
      * Rebuilds a line type's path effect if the ornament size on screen differs from the one the
      * cached effect was built for, which happens on zoom — not on every frame.
-     *
-     * <p>Path effects only render on a hardware-accelerated canvas from API 28, so on older devices
-     * semantic lines keep a plain stroke (still distinguished by width).
      */
     private void updateOrnamentation(Paint paint, PathDetail pathDetail) {
-        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.P) {
-            return;
-        }
         LineType lineType = pathDetail.getLineType();
         float ornamentSizePixels =
                 SexyTopo.dpToPixels(GeneralPreferences.getLineOrnamentSizeDp()) * getPatternScale();
