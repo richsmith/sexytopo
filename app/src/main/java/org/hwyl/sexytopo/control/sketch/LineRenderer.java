@@ -44,6 +44,10 @@ class LineRenderer {
     private final Paint[] wallRockSidePaints = createWallRockSidePaints();
     private float wallRockSidePaintsOrnamentSizePixels = -1;
 
+    // the line ornament size preference in pixels, before scaling with the zoom; read once here, as
+    // reading it is slow and it's needed for every typed line on every frame
+    private float ornamentSizePixelsUnscaled;
+
     // scratch object reused when drawing typed paths, to avoid per-frame allocation
     private final Path typedPathScratch = new Path();
 
@@ -61,6 +65,9 @@ class LineRenderer {
         drawPaint.setStyle(Paint.Style.STROKE);
         drawPaint.setStrokeJoin(Paint.Join.ROUND);
         drawPaint.setStrokeCap(Paint.Cap.ROUND);
+
+        ornamentSizePixelsUnscaled =
+                SexyTopo.dpToPixels(GeneralPreferences.getLineOrnamentSizeDp());
 
         // the stipple is sized by the line width
         wallRockSidePaintsOrnamentSizePixels = -1;
@@ -213,8 +220,8 @@ class LineRenderer {
         return pathDetail.getLineType().isWall() && pathDetail != sketch.getActivePath();
     }
 
-    private static float getOrnamentSizePixels(float patternScale) {
-        return SexyTopo.dpToPixels(GeneralPreferences.getLineOrnamentSizeDp()) * patternScale;
+    private float getOrnamentSizePixels(float patternScale) {
+        return ornamentSizePixelsUnscaled * patternScale;
     }
 
     /**
