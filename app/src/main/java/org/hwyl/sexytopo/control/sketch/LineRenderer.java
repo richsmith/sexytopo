@@ -111,7 +111,9 @@ class LineRenderer {
             Colour drawColour = pathDetail.getDrawColour(isDarkModeActive);
             if (drawColour != lastColour) {
                 lastColour = drawColour;
+                // setColor replaces the alpha too, so a faded sketch has to be faded again
                 drawPaint.setColor(lastColour.intValue);
+                drawPaint.setAlpha(alpha);
             }
 
             List<Coord2D> path = pathDetail.getPath();

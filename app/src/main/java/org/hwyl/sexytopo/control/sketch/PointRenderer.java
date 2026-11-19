@@ -49,13 +49,13 @@ class PointRenderer {
     private void drawText(Canvas canvas, Sketch sketch, int alpha, boolean isDarkModeActive) {
         float viewScale = viewport.getScale();
 
-        labelPaint.setAlpha(alpha);
-
         for (TextDetail textDetail : sketch.getTextDetails()) {
             Coord2D location = viewport.toView(textDetail.getPosition());
             float x = location.x, y = location.y;
             String text = textDetail.getText();
+            // setColor replaces the alpha too, so set the alpha after it
             labelPaint.setColor(textDetail.getDrawColour(isDarkModeActive).intValue);
+            labelPaint.setAlpha(alpha);
             labelPaint.setTextSize(textDetail.getSize() * viewScale);
             for (String line : text.split("\n")) {
                 canvas.drawText(line, x, y, labelPaint);
