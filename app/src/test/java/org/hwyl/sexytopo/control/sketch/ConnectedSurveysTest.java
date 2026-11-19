@@ -130,6 +130,88 @@ public class ConnectedSurveysTest {
         Assert.assertEquals(-3.0, newStationPoint.y, SexyTopoConstants.ALLOWED_DOUBLE_DELTA);
     }
 
+    @Test
+    public void testChainedLinksAreNotWorkedOutAgainWhenNothingHasChanged() {
+
+        Survey currentSurvey = getBasicSurvey("current");
+        Survey joinedSurvey0 = getBasicSurvey("joined-0");
+        Survey joinedSurvey1 = getBasicSurvey("joined-1");
+        connectTwoSurveys(
+                currentSurvey,
+                currentSurvey.getActiveStation(),
+                joinedSurvey0,
+                joinedSurvey0.getOrigin());
+        connectTwoSurveys(
+                joinedSurvey0,
+                joinedSurvey0.getActiveStation(),
+                joinedSurvey1,
+                joinedSurvey1.getOrigin());
+
+        ConnectedSurveys connectedSurveys = new ConnectedSurveys();
+        Space<Coord2D> planProjection = Projection2D.PLAN.project(currentSurvey);
+        Map<Survey, Space<Coord2D>> first =
+                connectedSurveys.getSurveysToProjections(
+                        Projection2D.PLAN, currentSurvey, planProjection);
+        Map<Survey, Space<Coord2D>> second =
+                connectedSurveys.getSurveysToProjections(
+                        Projection2D.PLAN, currentSurvey, planProjection);
+
+        Assert.assertEquals(2, first.size());
+        Assert.assertSame(first, second);
+    }
+
+    @Test
+    public void testANewLinkIsPickedUp() {
+
+        Survey currentSurvey = getBasicSurvey("current");
+        Survey joinedSurvey = getBasicSurvey("joined");
+
+        ConnectedSurveys connectedSurveys = new ConnectedSurveys();
+        Space<Coord2D> planProjection = Projection2D.PLAN.project(currentSurvey);
+        Assert.assertEquals(
+                0,
+                connectedSurveys
+                        .getSurveysToProjections(Projection2D.PLAN, currentSurvey, planProjection)
+                        .size());
+
+        connectTwoSurveys(
+                currentSurvey,
+                currentSurvey.getActiveStation(),
+                joinedSurvey,
+                joinedSurvey.getOrigin());
+
+        Assert.assertEquals(
+                1,
+                connectedSurveys
+                        .getSurveysToProjections(Projection2D.PLAN, currentSurvey, planProjection)
+                        .size());
+    }
+
+    @Test
+    public void testAForgottenSurveyStaysForgotten() {
+
+        Survey currentSurvey = getBasicSurvey("current");
+        Survey joinedSurvey = getBasicSurvey("joined");
+        connectTwoSurveys(
+                currentSurvey,
+                currentSurvey.getActiveStation(),
+                joinedSurvey,
+                joinedSurvey.getOrigin());
+
+        ConnectedSurveys connectedSurveys = new ConnectedSurveys();
+        Space<Coord2D> planProjection = Projection2D.PLAN.project(currentSurvey);
+        Map<Survey, Space<Coord2D>> surveysToProjections =
+                connectedSurveys.getSurveysToProjections(
+                        Projection2D.PLAN, currentSurvey, planProjection);
+        connectedSurveys.forget(surveysToProjections.keySet().iterator().next());
+
+        Assert.assertEquals(
+                0,
+                connectedSurveys
+                        .getSurveysToProjections(Projection2D.PLAN, currentSurvey, planProjection)
+                        .size());
+    }
+
     private Survey getSurveyWithUri(Map<Survey, Space<Coord2D>> map, String uri) throws Exception {
         for (Survey survey : map.keySet()) {
             if (survey.getUri().toString().equals(uri)) {

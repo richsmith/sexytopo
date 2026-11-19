@@ -24,16 +24,23 @@ public class ConnectedSurveys {
 
     private Map<Survey, Space<Coord2D>> surveysToProjections = new HashMap<>();
 
+    // the surveys directly linked to the one being shown when surveysToProjections was worked out;
+    // the map also holds surveys linked through those, so it can't be compared with directly
+    private Set<Survey> directlyLinkedSurveys = Collections.emptySet();
+
     /**
-     * The linked surveys, lined up with the survey being shown, and where each is drawn. If they
-     * can't be worked out, the problem is logged and none are returned.
+     * The linked surveys, lined up with the survey being shown, and where each is drawn. They're
+     * worked out again only when the surveys directly linked to it change. If they can't be worked
+     * out, the problem is logged and none are returned.
      */
     Map<Survey, Space<Coord2D>> getSurveysToProjections(
             Projection2D projectionType, Survey survey, Space<Coord2D> projection) {
-        if (!getFlatSetOfConnectedSurveys(survey).equals(surveysToProjections.keySet())) {
+        Set<Survey> linkedSurveys = getFlatSetOfConnectedSurveys(survey);
+        if (!linkedSurveys.equals(directlyLinkedSurveys)) {
             try {
                 surveysToProjections =
                         getTranslatedConnectedSurveys(projectionType, survey, projection);
+                directlyLinkedSurveys = linkedSurveys;
             } catch (Exception exception) {
                 Log.e("Error getting translated connected surveys");
                 Log.e(exception);
