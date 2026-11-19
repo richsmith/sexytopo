@@ -409,18 +409,20 @@ public class SketchView extends View {
         updateViewBounds();
 
         drawGrid(canvas);
-        drawConnectedSurveys(canvas, state.getProjection(), FADED_ALPHA);
-        drawSurvey(canvas, state.getSurvey(), state.getProjection(), SOLID_ALPHA);
+        drawConnectedSurveys(canvas);
+        drawSurvey(canvas);
         drawLegend(canvas);
         drawCompass(canvas);
-        hotCorners.draw(
-                canvas, getWidth(), getHeight(), state.getSketchTool() == SketchTool.MODAL_MOVE);
-        if (activity.isDebugMode()) {
-            overlays.drawDebuggingInfo(canvas, getWidth());
-        }
+        drawHotCorners(canvas);
+        drawDebuggingInfo(canvas);
     }
 
-    protected void drawSurvey(Canvas canvas, Survey survey, Space<Coord2D> projection, int alpha) {
+    /** Draw the survey being shown: its sketch, cross-sections, legs and stations. */
+    protected void drawSurvey(Canvas canvas) {
+        drawSurvey(canvas, state.getSurvey(), state.getProjection(), SOLID_ALPHA);
+    }
+
+    private void drawSurvey(Canvas canvas, Survey survey, Space<Coord2D> projection, int alpha) {
         sketchRenderer.draw(canvas, activity.getSketch(survey), alpha);
         if (survey == state.getSurvey()) {
             // Linked surveys are drawn without their cross-sections, to cut down on clutter
@@ -429,7 +431,8 @@ public class SketchView extends View {
         drawSurveyData(survey, canvas, projection, alpha);
     }
 
-    private void drawConnectedSurveys(Canvas canvas, Space<Coord2D> projection, int alpha) {
+    /** Draw the surveys linked to this one, faded, without their cross-sections. */
+    private void drawConnectedSurveys(Canvas canvas) {
 
         if (!SketchPreferences.Toggle.SHOW_CONNECTIONS.isOn()) {
             return;
@@ -439,7 +442,9 @@ public class SketchView extends View {
             try {
                 this.translatedConnectedSurveys =
                         ConnectedSurveys.getTranslatedConnectedSurveys(
-                                activity.getProjectionType(), state.getSurvey(), projection);
+                                activity.getProjectionType(),
+                                state.getSurvey(),
+                                state.getProjection());
             } catch (Exception exception) {
                 Log.e("Error getting translated connected surveys");
                 Log.e(exception);
@@ -451,7 +456,7 @@ public class SketchView extends View {
             try {
                 Space<Coord2D> connectedProjection =
                         translatedConnectedSurveys.get(translatedConnectedSurvey);
-                drawSurvey(canvas, translatedConnectedSurvey, connectedProjection, alpha);
+                drawSurvey(canvas, translatedConnectedSurvey, connectedProjection, FADED_ALPHA);
             } catch (Exception exception) {
                 String name = translatedConnectedSurvey.getName();
                 Log.e("Error drawing connected survey " + name);
@@ -511,6 +516,17 @@ public class SketchView extends View {
     protected void drawCompass(Canvas canvas) {
         if (isCompassShown()) {
             overlays.drawCompass(canvas, getHeight());
+        }
+    }
+
+    private void drawHotCorners(Canvas canvas) {
+        boolean isPanning = state.getSketchTool() == SketchTool.MODAL_MOVE;
+        hotCorners.draw(canvas, getWidth(), getHeight(), isPanning);
+    }
+
+    private void drawDebuggingInfo(Canvas canvas) {
+        if (activity.isDebugMode()) {
+            overlays.drawDebuggingInfo(canvas, getWidth());
         }
     }
 
