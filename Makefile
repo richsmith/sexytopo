@@ -1,6 +1,6 @@
 GRADLE := ./gradlew
 
-.PHONY: help format check test build clean install lint apk release bump bump-minor publish export-therion export-svg check-translations
+.PHONY: help format check test build clean install lint apk release adb-wifi bump bump-minor publish export-therion export-svg check-translations
 
 help:
 	@echo "Common targets:"
@@ -12,6 +12,7 @@ help:
 	@echo "  make apk       Build debug APK"
 	@echo "  make release   Build release APK"
 	@echo "  make install   Install debug APK on connected device"
+	@echo "  make adb-wifi  Connect adb to the phone over wifi (PORT=<port> the first time after a reboot)"
 	@echo "  make bump        Bump patch version in app/build.gradle"
 	@echo "  make bump-minor  Bump minor version (resets patch to 0) in app/build.gradle"
 	@echo "  make publish     Commit and tag the release (then push to trigger the workflow)"
@@ -43,6 +44,9 @@ release:
 
 install:
 	$(GRADLE) installDebug
+
+adb-wifi:
+	scripts/adb_wifi.sh $(PORT)
 
 bump:
 	python3 scripts/bump.py
