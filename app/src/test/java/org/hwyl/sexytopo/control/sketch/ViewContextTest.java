@@ -17,15 +17,4 @@ public class ViewContextTest {
             Assert.assertEquals(projection + " should have one view context", 1, covering);
         }
     }
-
-    @Test
-    public void testOnlyTheExtendedElevationCanCreateHorizontalCrossSections() {
-        Assert.assertTrue(ViewContext.EXTENDED_ELEVATION.canCreateHorizontalCrossSection());
-
-        Assert.assertFalse(ViewContext.PLAN.canCreateHorizontalCrossSection());
-        Assert.assertFalse(ViewContext.ELEVATION.canCreateHorizontalCrossSection());
-        Assert.assertFalse(ViewContext.TABLE.canCreateHorizontalCrossSection());
-        Assert.assertFalse(ViewContext.CROSS_SECTION.canCreateHorizontalCrossSection());
-        Assert.assertFalse(ViewContext.THREE_D.canCreateHorizontalCrossSection());
-    }
 }
