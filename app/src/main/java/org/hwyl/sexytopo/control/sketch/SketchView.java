@@ -176,8 +176,7 @@ public class SketchView extends View {
 
     public void setCompassAzimuth(float degrees) {
         overlays.setCompassAzimuth(degrees);
-        if (SketchPreferences.Toggle.SHOW_COMPASS.isOn()
-                && state.getProjectionType() == Projection2D.PLAN) {
+        if (SketchPreferences.Toggle.SHOW_COMPASS.isOn() && isCompassShown()) {
             invalidate();
         }
     }
