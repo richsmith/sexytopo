@@ -62,6 +62,7 @@ class SurveyDataRenderer {
             new Paint[] {
                 stationPaint,
                 iconPaint,
+                legPaint,
                 latestLegPaint,
                 splayPaint,
                 fadedLegPaint,
@@ -140,7 +141,7 @@ class SurveyDataRenderer {
     /**
      * Draws the legs, dashing those that isInPlane says point into or out of the page. Which leg is
      * the latest, and which are attached to the active station, is judged against the survey being
-     * shown, even when drawing a linked one.
+     * shown, so a linked survey's legs are never highlighted.
      */
     void drawLegs(Canvas canvas, Space<Coord2D> space, int baseAlpha, Predicate<Leg> isInPlane) {
 
