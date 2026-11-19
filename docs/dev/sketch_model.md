@@ -159,14 +159,44 @@ Path simplification is re-applied on load. History stacks are not serialized.
 
 ## Rendering Overview
 
-`SketchRenderer.draw()` iterates each detail collection:
+`SketchRenderer.draw()` draws a sketch's details in this order, through `AreaRenderer`, `LineRenderer` and `PointRenderer`:
 - **Areas:** drawn first (underneath lines): each region is filled with its type's pattern through a repeating bitmap shader and its contours outlined (an even-odd `Path`, so holes are outlined but left unfilled); the shader is anchored to survey space so the pattern doesn't crawl when panning. Only water and sump (`AreaType.hasDefinedEdge`) are outlined at full line weight, since a shoreline is a real edge; other areas get a light outline, at the weight of their fill marks and faded to `AreaType.LIGHT_OUTLINE_OPACITY`, so they don't compete with walls (likewise in SVG export)
-- **Paths:** SKETCH paths are sorted by colour (to minimize paint changes), then batched into `float[]` arrays for `canvas.drawLines()`; semantic lines are drawn individually via `canvas.drawPath()` with their type's paint so dashes and tick stamps can apply
-- **Symbols:** rendered as scaled, optionally rotated `Drawable` objects with a colour filter
+- **Paths:** SKETCH paths are batched into `float[]` arrays for `canvas.drawLines()`, the paint colour only being changed when a path's colour differs from the one before; semantic lines are drawn individually via `canvas.drawPath()` with their type's paint so dashes and tick stamps can apply
 - **Text:** font size = `textSize * viewport.getScale()`; supports `\n` for multiline
-- **Cross-sections:** `CrossSectionDetail.getProjection()` computes the legs; drawn with dashed connector line to the actual station
+- **Symbols:** rendered as scaled, optionally rotated `Drawable` objects with a colour filter
 
-Off-screen and sub-pixel details are culled via `couldBeVisible()` before rendering.
+Off-screen and sub-pixel details are culled via `Viewport.couldBeVisible()` before rendering. Cross-sections are drawn by `CrossSectionLayer` (below), not `SketchRenderer`: `CrossSectionDetail.getProjection()` computes the legs, drawn with a dashed connector line to the actual station.
+
+## The Sketch View
+
+`SketchView` (an Android `View`; `CrossSectionView` extends it for the cross-section editor) is mostly wiring. It owns the parts below, passes the activity's setters on to them, routes touches, and lists the drawing steps in `onDraw`.
+
+Two objects are shared by every part:
+
+- **`Viewport`**: the pan offset and the scale (pixels per metre). It converts between survey and view coordinates, turns an on-screen size in dp into metres at the current zoom (`dpToSurvey`), gives the pattern scale for ornamentation and fills, and holds the visible bounds used for culling. It's plain Java and unit-tested.
+- **`SketchState`**: the survey, sketch and projection being shown, the current and previous tool, and the brush colour. The view's setters write here, and the parts read from here rather than asking the view.
+
+**Drawing.** `onDraw` draws, in order:
+
+1. the grid (`OverlayRenderer`)
+2. linked surveys, faded; `ConnectedSurveys` keeps them lined up with the survey being shown
+3. the survey itself: its sketch (`SketchRenderer`), its cross-sections (`CrossSectionLayer`, main survey only), then its legs and stations (`SurveyDataRenderer`, which calls back for each station so the cross-section layer can draw its facing indicator)
+4. the legend and compass (`OverlayRenderer`), the hot corners (`HotCorners`) and, in debug mode, debugging info
+
+Each of these owns its paints and sets them up in an `initialise` method, which `SketchView.initialisePaint` calls. `SketchPaints` holds only what they share (the solid and faded alphas, applying the anti-aliasing preference, looking up theme colours), and `ScreenUnits` converts dp and sp to pixels. The busiest loops (lines, areas, the grid) copy the viewport's offset and scale into locals and do the transform inline, rather than calling `Viewport.toView` for every point.
+
+**Touch.** `onTouchEvent` first deals with what applies whatever the tool:
+
+- a pinch (the scale detector), which also ends an erasing drag
+- the end of a modal tool
+- a two-finger or hot-corner pan, which switches to `MODAL_MOVE`
+- a press on a cross-section's handle or body
+
+It then passes the event to the current tool's `ToolHandler`, looked up in a map from `SketchTool` to handler (`createSketchToolMap`). Each tool class (`MoveTool`, `LineTool`, `AreaTool`, `EraseTool`, `SymbolTool`, `TextTool`, `SelectTool`) keeps its own gesture state and settings: the line type lives on `LineTool`, the area type on `AreaTool`, the symbol on `SymbolTool`. `TouchTolerances` gives touch radii and minimum detail sizes, fixed on screen and converted at the current zoom, and `SketchSelector` finds the station or line under the finger. Tools reach the view only through `ToolHost` (redraw, context, toast, announcing a survey change, opening a station menu), which a private inner class implements so the view's public API stays small. A long press opens the station menu, or for a line `LineContextMenu`; which tools allow the line menu is a `SketchTool` trait.
+
+**Cross-sections** are one vertical slice, `CrossSectionLayer`, because drawing and touch share state there. Drawing records where each handle is, for touch to hit-test, and the move and rotate gestures keep the in-progress drag or angle, for drawing to preview. The layer owns its paints, its drawing, hit-testing, the position, move and rotate tools, and opening the editor. It draws each section's legs and centre mark through `SurveyDataRenderer`, and its sub-sketch through `SketchRenderer`. Its host adds `getViewContext` to `ToolHost`.
+
+`CrossSectionView` changes the view's behaviour by overriding `getViewContext`, `isLegInPlane`, `isCompassShown`, `checkForChangedSurvey` and `onDraw`.
 
 ## Key Files
 
