@@ -159,7 +159,7 @@ Path simplification is re-applied on load. History stacks are not serialized.
 
 ## Rendering Overview
 
-`SketchView.drawSketch()` iterates each detail collection:
+`SketchRenderer.draw()` iterates each detail collection:
 - **Areas:** drawn first (underneath lines): each region is filled with its type's pattern through a repeating bitmap shader and its contours outlined (an even-odd `Path`, so holes are outlined but left unfilled); the shader is anchored to survey space so the pattern doesn't crawl when panning. Only water and sump (`AreaType.hasDefinedEdge`) are outlined at full line weight, since a shoreline is a real edge; other areas get a light outline, at the weight of their fill marks and faded to `AreaType.LIGHT_OUTLINE_OPACITY`, so they don't compete with walls (likewise in SVG export)
 - **Paths:** SKETCH paths are sorted by colour (to minimize paint changes), then batched into `float[]` arrays for `canvas.drawLines()`; semantic lines are drawn individually via `canvas.drawPath()` with their type's paint so dashes and tick stamps can apply
 - **Symbols:** rendered as scaled, optionally rotated `Drawable` objects with a colour filter
@@ -189,6 +189,7 @@ Off-screen and sub-pixel details are culled via `couldBeVisible()` before render
 | `control/sketch/Viewport.java` | Pan and zoom; survey↔screen coordinates; culling |
 | `control/sketch/SketchState.java` | The survey, sketch and projection being shown, and the current and previous tool; shared by the view and its parts |
 | `control/sketch/SketchPaints.java` | Paints, ornament and fill caches, pattern scale |
+| `control/sketch/SketchRenderer.java` | Draws a sketch's areas, lines, text and symbols |
 | `control/sketch/CrossSectionLayer.java` | Cross-sections on the sketch: drawing, hit-testing, and the place/move/rotate/open gestures |
 | `control/sketch/*Tool.java` | One class per sketch tool (`ToolHandler`), each owning its gesture state; dispatched from `SketchView.onTouchEvent` by tool |
 | `control/sketch/TouchTolerances.java` | Touch radii and minimum detail sizes, fixed on screen and converted at the current zoom |

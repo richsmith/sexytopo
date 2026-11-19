@@ -48,8 +48,6 @@ class CrossSectionLayer {
     interface Host extends ToolHost {
         ViewContext getViewContext();
 
-        void drawSketch(Canvas canvas, Sketch sketch, int alpha);
-
         void drawLegs(Canvas canvas, Space<Coord2D> space, int alpha, Predicate<Leg> isInPlane);
     }
 
@@ -71,6 +69,7 @@ class CrossSectionLayer {
     private final Viewport viewport;
     private final SketchState state;
     private final SketchPaints paints;
+    private final SketchRenderer sketchRenderer;
     private final Host host;
 
     private final Paint connectorPaint = new Paint();
@@ -123,10 +122,16 @@ class CrossSectionLayer {
     /** Turns a cross-section to face the finger. */
     final ToolHandler rotateTool = this::handleRotate;
 
-    CrossSectionLayer(Viewport viewport, SketchState state, SketchPaints paints, Host host) {
+    CrossSectionLayer(
+            Viewport viewport,
+            SketchState state,
+            SketchPaints paints,
+            SketchRenderer sketchRenderer,
+            Host host) {
         this.viewport = viewport;
         this.state = state;
         this.paints = paints;
+        this.sketchRenderer = sketchRenderer;
         this.host = host;
     }
 
@@ -710,7 +715,7 @@ class CrossSectionLayer {
 
         float xsScale = state.getSketch().getCrossSectionScale();
         Sketch subSketch = sectionDetail.getSketch().scale(xsScale).translate(centreOnSurvey);
-        host.drawSketch(canvas, subSketch, alpha);
+        sketchRenderer.draw(canvas, subSketch, alpha);
     }
 
     /**
