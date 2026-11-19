@@ -1,5 +1,7 @@
 package org.hwyl.sexytopo.control.sketch;
 
+import static org.hwyl.sexytopo.control.sketch.SketchPaints.SOLID_ALPHA;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;

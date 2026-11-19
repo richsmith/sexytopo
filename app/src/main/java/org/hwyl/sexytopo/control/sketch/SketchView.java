@@ -1,27 +1,26 @@
 package org.hwyl.sexytopo.control.sketch;
 
+import static org.hwyl.sexytopo.control.sketch.SketchPaints.FADED_ALPHA;
+import static org.hwyl.sexytopo.control.sketch.SketchPaints.SOLID_ALPHA;
+import static org.hwyl.sexytopo.control.sketch.SketchPaints.dpToPixels;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.PathDashPathEffect;
-import android.graphics.PathEffect;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RotateDrawable;
 import android.os.Build;
 import android.text.Editable;
 import android.util.AttributeSet;
-import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MotionEvent;
@@ -36,7 +35,6 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -105,28 +103,16 @@ public class SketchView extends View {
 
     private static final int BOX_SIZE = 10; // every grid box is 10 units square
 
-    public static final int SOLID_ALPHA = 0xff;
-    public static final int FADED_ALPHA = 0xff / 5;
-    private static final int STATION_STROKE_WIDTH_DP = 2;
-    private static final int DASHED_LINE_INTERVAL_DP = 4;
-    private static final int CROSS_SECTION_CONNECTOR_WIDTH_DP = 2;
-    private static final int CROSS_SECTION_INDICATOR_WIDTH_DP = 2;
-    private static final int CROSS_SECTION_BORDER_WIDTH_DP = 2;
     private static final int CROSS_SECTION_BORDER_PADDING_MIN_DP = 4;
     private static final int CROSS_SECTION_BORDER_PADDING_MAX_DP = 16;
     private static final float CROSS_SECTION_BORDER_PADDING_FRACTION = 0.05f;
     private static final float CROSS_SECTION_BORDER_CORNER_RADIUS_DP = 6.0f;
     private static final int CROSS_SECTION_HANDLE_WIDTH_DP = 8;
-    private static final float CROSS_SECTION_GLYPH_SIZE_DP = 13f;
     private static final float CROSS_SECTION_GLYPH_BOX_SIZE_DP = 18f;
-    private static final int CROSS_SECTION_HANDLE_GRIP_WIDTH_DP = 2;
     private static final float CROSS_SECTION_HANDLE_GRIP_SPACING_DP = 5f;
     private static final float CROSS_SECTION_HANDLE_GRIP_LENGTH_FRACTION = 0.45f;
 
     public static final int LEGEND_SIZE = 18;
-    private static final int LEGEND_TICK_SIZE_DP = 5;
-    private float legendTickSizePx;
-    private float dashedLineIntervalPx;
 
     private static final float DELETE_DETAILS_WITHIN_N_DP = 10.0f;
     // typed lines spanning less than this on screen, and areas smaller than a square this size,
@@ -135,17 +121,10 @@ public class SketchView extends View {
     private static final float SELECTION_SENSITIVITY_DP = 25.0f;
     private static final float SNAP_TO_LINE_SENSITIVITY_DP = 10.0f;
     public static final float HOT_CORNER_DISTANCE_PROPORTION = 0.05f;
-    private static final int STATION_LABEL_OFFSET_DP = 10;
-    // fill tiles are rendered at this multiple of their on-screen size and scaled down to draw
-    private static final int AREA_FILL_OVERSAMPLE = 2;
-    // the most a dp of line ornamentation or area fill can stand for in the cave, so zoomed far
-    // out a decoration can't dwarf what it decorates (the default 12dp tick comes to 0.6m)
-    private static final float MAX_PATTERN_METRES_PER_DP = 0.05f;
 
     private float deleteDetailsWithinPx;
     private float selectionSensitivityPx;
     private float snapToLineSensitivityPx;
-    private float stationLabelOffsetPx;
 
     private SketchActivity activity;
 
@@ -169,8 +148,6 @@ public class SketchView extends View {
     private Rect topLeftCorner;
     private Rect topRightCorner;
     private Rect bottomRightCorner;
-
-    private Bitmap commentIcon, linkIcon;
 
     private float compassAzimuthDegrees = 0f;
 
@@ -210,76 +187,14 @@ public class SketchView extends View {
     // Cached per-detail handle rectangles (in view coords) populated each draw; used for hit-test.
     private final Map<CrossSectionDetail, RectF> crossSectionHandleRects = new LinkedHashMap<>();
 
-    // ********** Paints and other drawing variables **********
+    // ********** Drawing **********
 
-    protected final Paint stationPaint = new Paint();
-    private final Paint iconPaint = new Paint();
+    private final SketchPaints paints = new SketchPaints();
 
-    private final Paint legPaint = new Paint();
-    private final Paint latestLegPaint = new Paint();
-    private final Paint splayPaint = new Paint();
-
-    private final Paint fadedLegPaint = new Paint();
-    private final Paint fadedLatestLegPaint = new Paint();
-    private final Paint fadedSplayPaint = new Paint();
-
-    private final Paint drawPaint = new Paint();
-    // one paint per semantic line type (stroke width and ornamentation baked in), alongside the
-    // on-screen ornament size each paint's effect was last built for, so the effect is only
-    // rebuilt when that changes (i.e. on zoom)
-    private final Map<LineType, Paint> lineTypePaints = new EnumMap<>(LineType.class);
-    private final Map<LineType, Float> lineTypePaintOrnamentSizePixels =
-            new EnumMap<>(LineType.class);
     // scratch object reused when drawing typed paths, to avoid per-frame allocation
     private final Path typedPathScratch = new Path();
-    // one paint per layer of wall rock-side shading
-    private final Paint[] wallRockSidePaints = createWallRockSidePaints();
-    private float wallRockSidePaintsOrnamentSizePixels = -1;
-    private final Paint areaPaint = new Paint();
-    // fills areas with their type's pattern; the shader is swapped per area type
-    private final Paint areaFillPaint = new Paint();
-    private final Map<AreaType, BitmapShader> areaFillShaders = new EnumMap<>(AreaType.class);
     // scratch object reused to position the fill pattern, to avoid per-frame allocation
     private final Matrix areaFillMatrix = new Matrix();
-    private final Paint labelPaint = new Paint();
-    private final Paint highlightPaint = new Paint();
-    private final Paint legendPaint = new Paint();
-    private final Paint gridPaint = new Paint();
-    private final Paint crossSectionConnectorPaint = new Paint();
-    private final Paint crossSectionIndicatorPaint = new Paint();
-    private final Paint crossSectionHandlePaint = new Paint();
-    private final Paint crossSectionHandleGripPaint = new Paint();
-    private final Paint crossSectionBorderPaint = new Paint();
-    private final Paint crossSectionHorizontalHandlePaint = new Paint();
-    private final Paint crossSectionHorizontalBorderPaint = new Paint();
-    private final Paint crossSectionGlyphPaint = new Paint();
-    private final Paint hotCornersPaint = new Paint();
-
-    private final Paint[] ANTI_ALIAS_PAINTS =
-            new Paint[] {
-                stationPaint,
-                iconPaint,
-                legendPaint,
-                latestLegPaint,
-                splayPaint,
-                fadedLegPaint,
-                fadedLatestLegPaint,
-                fadedSplayPaint,
-                drawPaint,
-                areaPaint,
-                labelPaint,
-                legendPaint,
-                crossSectionConnectorPaint,
-                crossSectionIndicatorPaint,
-                crossSectionHandlePaint,
-                crossSectionHandleGripPaint,
-                crossSectionBorderPaint,
-                crossSectionHorizontalHandlePaint,
-                crossSectionHorizontalBorderPaint,
-                crossSectionGlyphPaint
-            };
-
-    protected float stationCrossDiameterPx;
 
     public SketchView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -295,165 +210,14 @@ public class SketchView extends View {
     }
 
     public void initialisePaint() {
-
-        boolean applyAntiAlias = GeneralPreferences.isAntialiasingModeOn();
-        for (Paint paint : ANTI_ALIAS_PAINTS) {
-            if (paint.isAntiAlias() != applyAntiAlias) {
-                paint.setAntiAlias(applyAntiAlias);
-            }
-        }
-
-        int gridColour = ContextCompat.getColor(activity, R.color.grid);
-        gridPaint.setColor(gridColour);
-
-        int stationColour = ContextCompat.getColor(activity, R.color.station);
-        stationPaint.setColor(stationColour);
-        float stationStrokeWidthPx = dpToPixels(STATION_STROKE_WIDTH_DP);
-        stationPaint.setStrokeWidth(stationStrokeWidthPx);
-        int stationLabelFontSizeSp = GeneralPreferences.getStationLabelFontSizeSp();
-        float stationLabelFontSizePixels = spToPixels(stationLabelFontSizeSp);
-        stationPaint.setTextSize(stationLabelFontSizePixels);
-
-        iconPaint.setColorFilter(new PorterDuffColorFilter(stationColour, PorterDuff.Mode.SRC_IN));
-
-        highlightPaint.setStyle(Paint.Style.STROKE);
-        highlightPaint.setStrokeWidth(stationStrokeWidthPx * 1.25f);
-        int activeStationHighlightColor =
-                androidx.core.content.ContextCompat.getColor(
-                        getContext(), R.color.activeStationHighlight);
-        highlightPaint.setColor(activeStationHighlightColor);
-
-        // active legs/splays
-        int legColour = ContextCompat.getColor(activity, R.color.leg);
-        int latestLegColour = ContextCompat.getColor(activity, R.color.legLatest);
-        int splayColour = ContextCompat.getColor(activity, R.color.splay);
-        float legStrokeWidth = dpToPixels(GeneralPreferences.getLegStrokeWidthDp());
-        legPaint.setStrokeWidth(legStrokeWidth);
-        legPaint.setColor(legColour);
-
-        latestLegPaint.setStrokeWidth(legStrokeWidth);
-        latestLegPaint.setColor(latestLegColour);
-
-        float splayStrokeWidth = dpToPixels(GeneralPreferences.getSplayStrokeWidthDp());
-        splayPaint.setStrokeWidth(splayStrokeWidth);
-        splayPaint.setColor(splayColour);
-
-        // faded legs/splays
-        fadedLegPaint.setStrokeWidth(legStrokeWidth);
-        fadedLegPaint.setColor(legColour);
-        fadedLegPaint.setAlpha(FADED_ALPHA);
-
-        fadedLatestLegPaint.setStrokeWidth(legStrokeWidth);
-        fadedLatestLegPaint.setColor(latestLegColour);
-        fadedLatestLegPaint.setAlpha(FADED_ALPHA);
-
-        fadedSplayPaint.setStrokeWidth(splayStrokeWidth);
-        fadedSplayPaint.setColor(splayColour);
-        fadedSplayPaint.setAlpha(FADED_ALPHA);
-
-        int sketchDefaultColour = ContextCompat.getColor(activity, R.color.sketchDefault);
-        drawPaint.setColor(sketchDefaultColour);
-        drawPaint.setStrokeWidth(dpToPixels(GeneralPreferences.getSketchLineWidthDp()));
-        drawPaint.setStyle(Paint.Style.STROKE);
-        drawPaint.setStrokeJoin(Paint.Join.ROUND);
-        drawPaint.setStrokeCap(Paint.Cap.ROUND);
-
-        // the stipple is sized by the line width
-        wallRockSidePaintsOrnamentSizePixels = -1;
-
-        lineTypePaints.clear();
-        for (LineType lineType : LineType.values()) {
-            Paint paint = new Paint(drawPaint);
-            paint.setStrokeWidth(drawPaint.getStrokeWidth() * lineType.getStrokeWidthFactor());
-            lineTypePaints.put(lineType, paint);
-        }
-        lineTypePaintOrnamentSizePixels.clear();
-
-        areaPaint.setStyle(Paint.Style.STROKE);
-        areaPaint.setStrokeJoin(Paint.Join.ROUND);
-        areaPaint.setStrokeCap(Paint.Cap.ROUND);
-
-        areaFillPaint.setStyle(Paint.Style.FILL);
-        areaFillPaint.setFilterBitmap(true);
-        areaFillPaint.setAntiAlias(true);
-        areaFillShaders.clear();
-        for (AreaType areaType : AreaType.values()) {
-            areaFillShaders.put(areaType, createAreaFillShader(areaType.getFill()));
-        }
-
-        int legendColour = ContextCompat.getColor(activity, R.color.legend);
-        legendPaint.setColor(legendColour);
-        float legendSizeSp = GeneralPreferences.getLegendFontSizeSp();
-        float legendSizePixels = spToPixels(legendSizeSp);
-        float strokeWidthPixels = spToPixels(legendSizeSp * 0.1f);
-        legendPaint.setStrokeWidth(strokeWidthPixels);
-        legendPaint.setTextSize(legendSizePixels);
-
-        int labelColour = ContextCompat.getColor(activity, R.color.station);
-        labelPaint.setColor(labelColour);
-        int labelSizeSp = GeneralPreferences.getLabelFontSizeSp();
-        float labelSizePixels = spToPixels(labelSizeSp);
-        labelPaint.setTextSize(labelSizePixels);
-
-        crossSectionConnectorPaint.setColor(
-                ContextCompat.getColor(activity, R.color.crossSectionConnection));
-        crossSectionConnectorPaint.setStrokeWidth(dpToPixels(CROSS_SECTION_CONNECTOR_WIDTH_DP));
-        crossSectionConnectorPaint.setStyle(Paint.Style.STROKE);
-
-        crossSectionIndicatorPaint.setColor(
-                ContextCompat.getColor(activity, R.color.crossSectionIndicator));
-        crossSectionIndicatorPaint.setStrokeWidth(dpToPixels(CROSS_SECTION_INDICATOR_WIDTH_DP));
-        crossSectionIndicatorPaint.setStyle(Paint.Style.FILL);
-
-        int primaryColor = resolveThemeColor(activity, androidx.appcompat.R.attr.colorPrimary);
-
-        crossSectionHandlePaint.setColor(primaryColor);
-        crossSectionHandlePaint.setStyle(Paint.Style.FILL);
-        crossSectionHandlePaint.setAntiAlias(true);
-
-        crossSectionHandleGripPaint.setColor(
-                resolveThemeColor(activity, com.google.android.material.R.attr.colorOnPrimary));
-        crossSectionHandleGripPaint.setStrokeWidth(dpToPixels(CROSS_SECTION_HANDLE_GRIP_WIDTH_DP));
-        crossSectionHandleGripPaint.setStyle(Paint.Style.STROKE);
-        crossSectionHandleGripPaint.setStrokeCap(Paint.Cap.ROUND);
-
-        crossSectionBorderPaint.setColor(primaryColor);
-        crossSectionBorderPaint.setStrokeWidth(dpToPixels(CROSS_SECTION_BORDER_WIDTH_DP));
-        crossSectionBorderPaint.setStyle(Paint.Style.STROKE);
-
-        // Horizontal cross-sections get a differently coloured box so they can be told apart from
-        // vertical ones at a glance
-        int horizontalBoxColour =
-                ContextCompat.getColor(activity, R.color.crossSectionHorizontalBox);
-
-        crossSectionHorizontalHandlePaint.setColor(horizontalBoxColour);
-        crossSectionHorizontalHandlePaint.setStyle(Paint.Style.FILL);
-        crossSectionHorizontalHandlePaint.setAntiAlias(true);
-
-        crossSectionHorizontalBorderPaint.setColor(horizontalBoxColour);
-        crossSectionHorizontalBorderPaint.setStrokeWidth(dpToPixels(CROSS_SECTION_BORDER_WIDTH_DP));
-        crossSectionHorizontalBorderPaint.setStyle(Paint.Style.STROKE);
-
-        crossSectionGlyphPaint.setTextSize(dpToPixels(CROSS_SECTION_GLYPH_SIZE_DP));
-        crossSectionGlyphPaint.setTextAlign(Paint.Align.CENTER);
-        crossSectionGlyphPaint.setStyle(Paint.Style.FILL);
+        paints.initialise(getContext());
 
         isTwoFingerModeActive = GeneralPreferences.isTwoFingerModeActive();
-
         isHotCornersModeActive = GeneralPreferences.isHotCornersModeActive();
-        hotCornersPaint.setColor(ContextCompat.getColor(activity, R.color.hotCorner));
-        hotCornersPaint.setAlpha(FADED_ALPHA);
 
-        stationCrossDiameterPx = dpToPixels(GeneralPreferences.getStationCrossDiameterDp());
-        legendTickSizePx = dpToPixels(LEGEND_TICK_SIZE_DP);
-        dashedLineIntervalPx = dpToPixels(DASHED_LINE_INTERVAL_DP);
         deleteDetailsWithinPx = dpToPixels(DELETE_DETAILS_WITHIN_N_DP);
         selectionSensitivityPx = dpToPixels(SELECTION_SENSITIVITY_DP);
         snapToLineSensitivityPx = dpToPixels(SNAP_TO_LINE_SENSITIVITY_DP);
-        stationLabelOffsetPx = dpToPixels(STATION_LABEL_OFFSET_DP);
-
-        commentIcon = BitmapFactory.decodeResource(getResources(), R.drawable.speech_bubble);
-        linkIcon = BitmapFactory.decodeResource(getResources(), R.drawable.link);
     }
 
     public void setActivity(SketchActivity sketchActivity) {
@@ -699,20 +463,6 @@ public class SketchView extends View {
         }
 
         return true;
-    }
-
-    /**
-     * How much to scale line ornamentation and area fills from their designed size, so they zoom
-     * with the cave instead of crawling across it.
-     */
-    private float getPatternScale() {
-        // re-pick the density each time the zoom doubles or halves, so it never strays more than
-        // √2 from its designed size; doubling keeps existing marks in place and adds new ones
-        double octave = Math.round(Math.log(viewport.getScale()) / Math.log(2));
-        float scale = (float) (viewport.getScale() / Math.pow(2, octave));
-        // but zoomed far out, don't let a tick dwarf the line it's on
-        float maxScale = MAX_PATTERN_METRES_PER_DP * viewport.getScale() / dpToPixels(1);
-        return Math.min(scale, maxScale);
     }
 
     /**
@@ -1050,7 +800,8 @@ public class SketchView extends View {
                                     }
                                     String text = editable.toString();
                                     int startingSizeSp = GeneralPreferences.getTextStartingSizeSp();
-                                    float startingSizePixels = spToPixels(startingSizeSp);
+                                    float startingSizePixels =
+                                            SketchPaints.spToPixels(getContext(), startingSizeSp);
                                     float size = startingSizePixels / viewport.getScale();
                                     sketch.addTextDetail(
                                             touchPointOnSurvey, text, currentColour, size);
@@ -1358,22 +1109,6 @@ public class SketchView extends View {
         }
     }
 
-    private static float dpToPixels(float dp) {
-        return Math.max(1f, SexyTopo.dpToPixels(dp));
-    }
-
-    private static int resolveThemeColor(Context context, int attr) {
-        TypedValue value = new TypedValue();
-        context.getTheme().resolveAttribute(attr, value, true);
-        return value.data;
-    }
-
-    public float spToPixels(float sp) {
-        float scaledSizeInPixels =
-                sp * getContext().getResources().getDisplayMetrics().scaledDensity;
-        return scaledSizeInPixels;
-    }
-
     private static Station findNearestStationWithinDelta(
             Space<Coord2D> space, Coord2D target, float delta) {
 
@@ -1624,8 +1359,8 @@ public class SketchView extends View {
         for (int n = numberTicksJustBeforeViewpointOffsetX; true; n++) {
             float xSurvey = n * tickSizeInMetres;
             int xView = (int) ((xSurvey - viewOffsetX) * viewScale);
-            gridPaint.setStrokeWidth(n % BOX_SIZE == 0 ? 3 : 1);
-            canvas.drawLine(xView, 0, xView, getHeight(), gridPaint);
+            paints.gridPaint.setStrokeWidth(n % BOX_SIZE == 0 ? 3 : 1);
+            canvas.drawLine(xView, 0, xView, getHeight(), paints.gridPaint);
             if (xView >= getWidth()) {
                 break;
             }
@@ -1636,8 +1371,8 @@ public class SketchView extends View {
         for (int n = numberTicksJustBeforeViewpointOffsetY; true; n++) {
             float ySurvey = n * tickSizeInMetres;
             int yView = (int) ((ySurvey - viewOffsetY) * viewScale);
-            gridPaint.setStrokeWidth(n % BOX_SIZE == 0 ? 3 : 1);
-            canvas.drawLine(0, yView, getWidth(), yView, gridPaint);
+            paints.gridPaint.setStrokeWidth(n % BOX_SIZE == 0 ? 3 : 1);
+            canvas.drawLine(0, yView, getWidth(), yView, paints.gridPaint);
             if (yView >= getHeight()) {
                 break;
             }
@@ -1667,12 +1402,12 @@ public class SketchView extends View {
             return;
         }
 
-        crossSectionConnectorPaint.setAlpha(alpha);
-        crossSectionHandlePaint.setAlpha(alpha);
-        crossSectionHandleGripPaint.setAlpha(alpha);
-        crossSectionBorderPaint.setAlpha(alpha);
-        crossSectionHorizontalHandlePaint.setAlpha(alpha);
-        crossSectionHorizontalBorderPaint.setAlpha(alpha);
+        paints.crossSectionConnectorPaint.setAlpha(alpha);
+        paints.crossSectionHandlePaint.setAlpha(alpha);
+        paints.crossSectionHandleGripPaint.setAlpha(alpha);
+        paints.crossSectionBorderPaint.setAlpha(alpha);
+        paints.crossSectionHorizontalHandlePaint.setAlpha(alpha);
+        paints.crossSectionHorizontalBorderPaint.setAlpha(alpha);
 
         crossSectionHandleRects.clear();
 
@@ -1737,16 +1472,16 @@ public class SketchView extends View {
         Coord2D centreOnView = viewport.toView(centreOnSurvey);
         drawStationCross(
                 canvas,
-                stationPaint,
+                paints.stationPaint,
                 centreOnView.x,
                 centreOnView.y,
-                Math.round(stationCrossDiameterPx),
+                Math.round(paints.stationCrossDiameterPx),
                 alpha);
 
         if (SketchPreferences.Toggle.SHOW_STATION_LABELS.isOn()) {
             String description = station.getName() + " X";
-            stationPaint.setAlpha(alpha);
-            canvas.drawText(description, centreOnView.x, centreOnView.y, stationPaint);
+            paints.stationPaint.setAlpha(alpha);
+            canvas.drawText(description, centreOnView.x, centreOnView.y, paints.stationPaint);
         }
 
         Space<Coord2D> rawProjection = crossSection.getProjection();
@@ -1765,8 +1500,8 @@ public class SketchView extends View {
                     canvas,
                     viewStationLocation,
                     centreOnView,
-                    dashedLineIntervalPx,
-                    crossSectionConnectorPaint);
+                    paints.dashedLineIntervalPx,
+                    paints.crossSectionConnectorPaint);
             return true;
         }
 
@@ -1776,9 +1511,13 @@ public class SketchView extends View {
                 sectionDetail.getCrossSection().getOrientation()
                         == CrossSection.Orientation.HORIZONTAL;
         Paint borderPaint =
-                isHorizontal ? crossSectionHorizontalBorderPaint : crossSectionBorderPaint;
+                isHorizontal
+                        ? paints.crossSectionHorizontalBorderPaint
+                        : paints.crossSectionBorderPaint;
         Paint handlePaint =
-                isHorizontal ? crossSectionHorizontalHandlePaint : crossSectionHandlePaint;
+                isHorizontal
+                        ? paints.crossSectionHorizontalHandlePaint
+                        : paints.crossSectionHandlePaint;
 
         RectF borderRect = drawCrossSectionBorder(canvas, sectionDetail, dragDelta, borderPaint);
 
@@ -1789,8 +1528,8 @@ public class SketchView extends View {
                     canvas,
                     viewStationLocation,
                     connectorEnd,
-                    dashedLineIntervalPx,
-                    crossSectionConnectorPaint);
+                    paints.dashedLineIntervalPx,
+                    paints.crossSectionConnectorPaint);
         }
 
         RectF handleRect = drawCrossSectionHandle(canvas, borderRect, handlePaint);
@@ -1842,16 +1581,18 @@ public class SketchView extends View {
                 Path.Direction.CW);
         canvas.drawPath(boxPath, handlePaint);
 
-        crossSectionGlyphPaint.setColor(crossSectionHandleGripPaint.getColor());
-        crossSectionGlyphPaint.setAlpha(crossSectionHandleGripPaint.getAlpha());
+        paints.crossSectionGlyphPaint.setColor(paints.crossSectionHandleGripPaint.getColor());
+        paints.crossSectionGlyphPaint.setAlpha(paints.crossSectionHandleGripPaint.getAlpha());
         float baseline =
                 box.centerY()
-                        - (crossSectionGlyphPaint.ascent() + crossSectionGlyphPaint.descent()) / 2f;
+                        - (paints.crossSectionGlyphPaint.ascent()
+                                        + paints.crossSectionGlyphPaint.descent())
+                                / 2f;
         canvas.drawText(
                 CrossSectionLabels.getGlyph(orientation),
                 box.centerX(),
                 baseline,
-                crossSectionGlyphPaint);
+                paints.crossSectionGlyphPaint);
     }
 
     /**
@@ -1871,7 +1612,7 @@ public class SketchView extends View {
                 pivotOnView.y,
                 crossSectionRotateFingerOnView.x,
                 crossSectionRotateFingerOnView.y,
-                crossSectionConnectorPaint);
+                paints.crossSectionConnectorPaint);
     }
 
     /**
@@ -1985,7 +1726,7 @@ public class SketchView extends View {
                     centreY - gripHalfLength,
                     gripX,
                     centreY + gripHalfLength,
-                    crossSectionHandleGripPaint);
+                    paints.crossSectionHandleGripPaint);
         }
 
         // Expand the rect a bit for friendlier hit-testing.
@@ -2065,17 +1806,17 @@ public class SketchView extends View {
 
             Paint paint;
             if (highlightLatestLeg && survey.getMostRecentLeg() == leg) {
-                paint = fade ? fadedLatestLegPaint : latestLegPaint;
+                paint = fade ? paints.fadedLatestLegPaint : paints.latestLegPaint;
             } else if (!leg.hasDestination()) {
-                paint = fade ? fadedSplayPaint : splayPaint;
+                paint = fade ? paints.fadedSplayPaint : paints.splayPaint;
             } else {
-                paint = fade ? fadedLegPaint : legPaint;
+                paint = fade ? paints.fadedLegPaint : paints.legPaint;
             }
 
             if (isInPlane.test(leg)) {
                 canvas.drawLine(start.x, start.y, end.x, end.y, paint);
             } else {
-                drawDashedLine(canvas, start, end, dashedLineIntervalPx, paint);
+                drawDashedLine(canvas, start, end, paints.dashedLineIntervalPx, paint);
             }
         }
     }
@@ -2102,7 +1843,7 @@ public class SketchView extends View {
         }
 
         int alpha = baseAlpha;
-        stationPaint.setAlpha(alpha);
+        paints.stationPaint.setAlpha(alpha);
 
         for (Map.Entry<Station, Coord2D> entry : space.getStationMap().entrySet()) {
             Station station = entry.getKey();
@@ -2111,7 +1852,7 @@ public class SketchView extends View {
                 alpha = SOLID_ALPHA;
                 // setting alpha is measured as a relatively expensive call, so we change this as
                 // little as possible
-                stationPaint.setAlpha(alpha);
+                paints.stationPaint.setAlpha(alpha);
             }
 
             Coord2D translatedStation = viewport.toView(entry.getValue());
@@ -2119,8 +1860,8 @@ public class SketchView extends View {
             int x = (int) (translatedStation.x);
             int y = (int) (translatedStation.y);
 
-            int stationCrossDiameterIntPx = Math.round(stationCrossDiameterPx);
-            drawStationCross(canvas, stationPaint, x, y, stationCrossDiameterIntPx, alpha);
+            int stationCrossDiameterIntPx = Math.round(paints.stationCrossDiameterPx);
+            drawStationCross(canvas, paints.stationPaint, x, y, stationCrossDiameterIntPx, alpha);
 
             if (station == survey.getActiveStation()) {
                 highlightActiveStation(canvas, x, y);
@@ -2134,16 +1875,16 @@ public class SketchView extends View {
                 if (station == survey.getOrigin()) {
                     name = name + " (" + survey.getName() + ")";
                 }
-                canvas.drawText(name, nextX, y + stationLabelOffsetPx, stationPaint);
-                nextX += Math.round(stationPaint.measureText(name)) + spacing;
+                canvas.drawText(name, nextX, y + paints.stationLabelOffsetPx, paints.stationPaint);
+                nextX += Math.round(paints.stationPaint.measureText(name)) + spacing;
             }
 
             List<Bitmap> icons = new ArrayList<>();
             if (station.hasComment()) {
-                icons.add(commentIcon);
+                icons.add(paints.commentIcon);
             }
             if (survey.hasLinkedSurveys(station)) {
-                icons.add(linkIcon);
+                icons.add(paints.linkIcon);
             }
 
             for (Bitmap icon : icons) {
@@ -2154,7 +1895,7 @@ public class SketchView extends View {
                                 yTop,
                                 nextX + stationCrossDiameterIntPx,
                                 yTop + stationCrossDiameterIntPx);
-                canvas.drawBitmap(icon, null, rect, iconPaint);
+                canvas.drawBitmap(icon, null, rect, paints.iconPaint);
                 nextX += stationCrossDiameterIntPx + spacing;
             }
 
@@ -2165,7 +1906,7 @@ public class SketchView extends View {
 
             if (fadingNonActive && (station == survey.getActiveStation())) {
                 alpha = baseAlpha;
-                stationPaint.setAlpha(alpha);
+                paints.stationPaint.setAlpha(alpha);
             }
         }
     }
@@ -2173,7 +1914,7 @@ public class SketchView extends View {
     private void drawCrossSectionIndicator(
             Canvas canvas, CrossSectionDetail crossSectionDetail, float x, float y, int alpha) {
 
-        crossSectionIndicatorPaint.setAlpha(alpha / 2);
+        paints.crossSectionIndicatorPaint.setAlpha(alpha / 2);
         CrossSection crossSection = crossSectionDetail.getCrossSection();
 
         float indicatorWidth = (1 * viewport.getScale());
@@ -2184,7 +1925,7 @@ public class SketchView extends View {
                 indicator.getStartY(),
                 indicator.getEndX(),
                 indicator.getEndY(),
-                crossSectionIndicatorPaint);
+                paints.crossSectionIndicatorPaint);
 
         Path path = new Path();
         path.moveTo(indicator.getArrowInnerX(), indicator.getArrowInnerY());
@@ -2192,7 +1933,7 @@ public class SketchView extends View {
         path.lineTo(indicator.getArrowTipX(), indicator.getArrowTipY());
         path.lineTo(indicator.getArrowInnerX(), indicator.getArrowInnerY());
 
-        canvas.drawPath(path, crossSectionIndicatorPaint);
+        canvas.drawPath(path, paints.crossSectionIndicatorPaint);
     }
 
     /**
@@ -2222,7 +1963,7 @@ public class SketchView extends View {
 
     private void highlightActiveStation(Canvas canvas, float x, float y) {
 
-        float diameter = stationCrossDiameterPx * 1.1f;
+        float diameter = paints.stationCrossDiameterPx * 1.1f;
         float gap = diameter / 3f;
         float topY = y - (diameter / 2);
         float bottomY = y + (diameter / 2);
@@ -2239,28 +1980,28 @@ public class SketchView extends View {
         topLeft.moveTo(innerLeft, topY);
         topLeft.lineTo(leftX, topY);
         topLeft.lineTo(leftX, innerTop);
-        canvas.drawPath(topLeft, highlightPaint);
+        canvas.drawPath(topLeft, paints.highlightPaint);
 
         // top-right corner
         Path topRight = new Path();
         topRight.moveTo(innerRight, topY);
         topRight.lineTo(rightX, topY);
         topRight.lineTo(rightX, innerTop);
-        canvas.drawPath(topRight, highlightPaint);
+        canvas.drawPath(topRight, paints.highlightPaint);
 
         // bottom-left corner
         Path bottomLeft = new Path();
         bottomLeft.moveTo(leftX, innerBottom);
         bottomLeft.lineTo(leftX, bottomY);
         bottomLeft.lineTo(innerLeft, bottomY);
-        canvas.drawPath(bottomLeft, highlightPaint);
+        canvas.drawPath(bottomLeft, paints.highlightPaint);
 
         // bottom-right corner
         Path bottomRight = new Path();
         bottomRight.moveTo(rightX, innerBottom);
         bottomRight.lineTo(rightX, bottomY);
         bottomRight.lineTo(innerRight, bottomY);
-        canvas.drawPath(bottomRight, highlightPaint);
+        canvas.drawPath(bottomRight, paints.highlightPaint);
     }
 
     protected void drawStationCross(
@@ -2284,8 +2025,8 @@ public class SketchView extends View {
 
         Colour lastColour = Colour.BLACK;
 
-        drawPaint.setColor(lastColour.intValue);
-        drawPaint.setAlpha(alpha);
+        paints.drawPaint.setColor(lastColour.intValue);
+        paints.drawPaint.setAlpha(alpha);
 
         boolean isDebugMode = activity.isDebugMode();
 
@@ -2306,7 +2047,7 @@ public class SketchView extends View {
             Colour drawColour = pathDetail.getDrawColour(isDarkModeActive);
             if (drawColour != lastColour) {
                 lastColour = drawColour;
-                drawPaint.setColor(lastColour.intValue);
+                paints.drawPaint.setColor(lastColour.intValue);
             }
 
             List<Coord2D> path = pathDetail.getPath();
@@ -2325,7 +2066,7 @@ public class SketchView extends View {
                     fromY = (point.y - viewOffsetY) * viewScale;
 
                     if (isDebugMode) {
-                        canvas.drawCircle(fromX, fromY, 3, drawPaint);
+                        canvas.drawCircle(fromX, fromY, 3, paints.drawPaint);
                     }
                 } else {
                     // Coord2D to = viewport.toView(point);
@@ -2338,7 +2079,7 @@ public class SketchView extends View {
                     lines[lineIndex++] = toY;
 
                     if (isDebugMode) {
-                        canvas.drawCircle(toX, toY, 3, drawPaint);
+                        canvas.drawCircle(toX, toY, 3, paints.drawPaint);
                     }
 
                     fromX = toX;
@@ -2346,20 +2087,20 @@ public class SketchView extends View {
                 }
             }
 
-            canvas.drawLines(lines, drawPaint);
+            canvas.drawLines(lines, paints.drawPaint);
         }
 
-        labelPaint.setAlpha(alpha);
+        paints.labelPaint.setAlpha(alpha);
 
         for (TextDetail textDetail : sketch.getTextDetails()) {
             Coord2D location = viewport.toView(textDetail.getPosition());
             float x = location.x, y = location.y;
             String text = textDetail.getText();
-            setDrawColour(labelPaint, textDetail);
-            labelPaint.setTextSize(textDetail.getSize() * viewScale);
+            setDrawColour(paints.labelPaint, textDetail);
+            paints.labelPaint.setTextSize(textDetail.getSize() * viewScale);
             for (String line : text.split("\n")) {
-                canvas.drawText(line, x, y, labelPaint);
-                y += labelPaint.descent() - labelPaint.ascent();
+                canvas.drawText(line, x, y, paints.labelPaint);
+                y += paints.labelPaint.descent() - paints.labelPaint.ascent();
             }
         }
 
@@ -2409,13 +2150,9 @@ public class SketchView extends View {
         float viewOffsetX = viewport.getOffsetX();
         float viewOffsetY = viewport.getOffsetY();
         float viewScale = viewport.getScale();
-        LineType lineType = pathDetail.getLineType();
-        Paint paint = lineTypePaints.get(lineType);
-        if (paint == null) { // paints not initialised yet
-            paint = drawPaint;
-        } else {
-            updateOrnamentation(paint, pathDetail);
-        }
+        Paint paint =
+                paints.getLineTypePaint(
+                        pathDetail.getLineType(), SketchPaints.getPatternScale(viewScale));
         paint.setColor(pathDetail.getDrawColour(isDarkModeActive).intValue);
         paint.setAlpha(alpha);
 
@@ -2440,56 +2177,14 @@ public class SketchView extends View {
     /** Shades the outer side of a wall line type. */
     private void drawRockSide(Canvas canvas, Path path, int colour, int alpha) {
         List<WallRockSide.Layer> layers = WallRockSide.getLayers();
-        float ornamentSizePixels =
-                SexyTopo.dpToPixels(GeneralPreferences.getLineOrnamentSizeDp()) * getPatternScale();
-        if (ornamentSizePixels != wallRockSidePaintsOrnamentSizePixels) {
-            float lineWidth = drawPaint.getStrokeWidth();
-            for (int i = 0; i < layers.size(); i++) {
-                wallRockSidePaints[i].setPathEffect(
-                        layers.get(i).createEffect(ornamentSizePixels, lineWidth));
-            }
-            wallRockSidePaintsOrnamentSizePixels = ornamentSizePixels;
-        }
+        Paint[] layerPaints =
+                paints.getWallRockSidePaints(SketchPaints.getPatternScale(viewport.getScale()));
         for (int i = 0; i < layers.size(); i++) {
-            Paint paint = wallRockSidePaints[i];
+            Paint paint = layerPaints[i];
             paint.setColor(colour);
             paint.setAlpha(alpha * layers.get(i).getAlpha() / 255);
             canvas.drawPath(path, paint);
         }
-    }
-
-    private static Paint[] createWallRockSidePaints() {
-        Paint[] paints = new Paint[WallRockSide.getLayers().size()];
-        for (int i = 0; i < paints.length; i++) {
-            paints[i] = new Paint();
-            paints[i].setStyle(Paint.Style.FILL);
-            paints[i].setAntiAlias(true);
-        }
-        return paints;
-    }
-
-    /**
-     * Rebuilds a line type's path effect if the ornament size on screen differs from the one the
-     * cached effect was built for, which happens on zoom — not on every frame.
-     */
-    private void updateOrnamentation(Paint paint, PathDetail pathDetail) {
-        LineType lineType = pathDetail.getLineType();
-        float ornamentSizePixels =
-                SexyTopo.dpToPixels(GeneralPreferences.getLineOrnamentSizeDp()) * getPatternScale();
-        Float builtFor = lineTypePaintOrnamentSizePixels.get(lineType);
-        if (builtFor != null && builtFor == ornamentSizePixels) {
-            return;
-        }
-        PathEffect pathEffect =
-                lineType.createPathEffect(ornamentSizePixels, paint.getStrokeWidth());
-        paint.setPathEffect(pathEffect);
-        // Stamped shapes are filled as well as outlined, so overhang teeth come out solid. Only
-        // while the stamp is in use, though: filling a plain path would fill the area it encloses.
-        paint.setStyle(
-                pathEffect instanceof PathDashPathEffect
-                        ? Paint.Style.FILL_AND_STROKE
-                        : Paint.Style.STROKE);
-        lineTypePaintOrnamentSizePixels.put(lineType, ornamentSizePixels);
     }
 
     /**
@@ -2515,9 +2210,10 @@ public class SketchView extends View {
         float viewOffsetY = viewport.getOffsetY();
         float viewScale = viewport.getScale();
 
-        float patternScale = getPatternScale();
+        float patternScale = SketchPaints.getPatternScale(viewScale);
         areaFillMatrix.setScale(
-                patternScale / AREA_FILL_OVERSAMPLE, patternScale / AREA_FILL_OVERSAMPLE);
+                patternScale / SketchPaints.AREA_FILL_OVERSAMPLE,
+                patternScale / SketchPaints.AREA_FILL_OVERSAMPLE);
         areaFillMatrix.postTranslate(-viewOffsetX * viewScale, -viewOffsetY * viewScale);
 
         for (AreaDetail areaDetail : sketch.getAreaDetails()) {
@@ -2546,77 +2242,23 @@ public class SketchView extends View {
             Colour colour = areaDetail.getDrawColour(isDarkModeActive);
 
             // the fill tile is an alpha mask, so it takes the paint's colour
-            BitmapShader shader = areaFillShaders.get(areaDetail.getAreaType());
+            BitmapShader shader = paints.getAreaFillShader(areaDetail.getAreaType());
             shader.setLocalMatrix(areaFillMatrix);
-            areaFillPaint.setShader(shader);
-            areaFillPaint.setColor(colour.intValue);
-            areaFillPaint.setAlpha(alpha);
-            canvas.drawPath(outline, areaFillPaint);
+            paints.areaFillPaint.setShader(shader);
+            paints.areaFillPaint.setColor(colour.intValue);
+            paints.areaFillPaint.setAlpha(alpha);
+            canvas.drawPath(outline, paints.areaFillPaint);
 
-            areaPaint.setColor(colour.intValue);
+            paints.areaPaint.setColor(colour.intValue);
             if (areaDetail.getAreaType().hasDefinedEdge()) {
-                areaPaint.setAlpha(alpha);
-                areaPaint.setStrokeWidth(drawPaint.getStrokeWidth());
+                paints.areaPaint.setAlpha(alpha);
+                paints.areaPaint.setStrokeWidth(paints.drawPaint.getStrokeWidth());
             } else {
-                areaPaint.setAlpha(Math.round(alpha * AreaType.LIGHT_OUTLINE_OPACITY));
-                areaPaint.setStrokeWidth(dpToPixels(AreaType.Fill.STROKE_WIDTH_DP));
+                paints.areaPaint.setAlpha(Math.round(alpha * AreaType.LIGHT_OUTLINE_OPACITY));
+                paints.areaPaint.setStrokeWidth(dpToPixels(AreaType.Fill.STROKE_WIDTH_DP));
             }
-            canvas.drawPath(outline, areaPaint);
+            canvas.drawPath(outline, paints.areaPaint);
         }
-    }
-
-    /**
-     * Render one tile of an area fill pattern into an alpha mask, to be repeated by a shader. The
-     * tile is rounded to a whole number of pixels so the repeats line up exactly, and rendered
-     * oversampled so it stays crisp when scaled up between zoom octaves (see drawAreas).
-     */
-    private static BitmapShader createAreaFillShader(AreaType.Fill fill) {
-        int sizePixels =
-                Math.max(1, Math.round(dpToPixels(fill.getTileSize()) * AREA_FILL_OVERSAMPLE));
-        float scale = sizePixels / fill.getTileSize();
-
-        Bitmap tile = Bitmap.createBitmap(sizePixels, sizePixels, Bitmap.Config.ALPHA_8);
-        Canvas tileCanvas = new Canvas(tile);
-
-        Paint strokePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        strokePaint.setStyle(Paint.Style.STROKE);
-        strokePaint.setStrokeWidth(
-                dpToPixels(AreaType.Fill.STROKE_WIDTH_DP) * AREA_FILL_OVERSAMPLE);
-        strokePaint.setStrokeJoin(Paint.Join.ROUND);
-        strokePaint.setStrokeCap(Paint.Cap.ROUND);
-        Paint fillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        fillPaint.setStyle(Paint.Style.FILL);
-
-        for (AreaType.Mark mark : fill.getMarks()) {
-            float[] values = mark.getValues();
-            Path path = new Path();
-            switch (mark.getKind()) {
-                case LINE:
-                case POLYGON:
-                    path.moveTo(values[0] * scale, values[1] * scale);
-                    for (int i = 2; i < values.length; i += 2) {
-                        path.lineTo(values[i] * scale, values[i + 1] * scale);
-                    }
-                    if (mark.getKind() == AreaType.Mark.Kind.POLYGON) {
-                        path.close();
-                    }
-                    tileCanvas.drawPath(path, strokePaint);
-                    break;
-                case DOT:
-                case RING:
-                    path.addCircle(
-                            values[0] * scale,
-                            values[1] * scale,
-                            values[2] * scale,
-                            Path.Direction.CW);
-                    Paint paint =
-                            mark.getKind() == AreaType.Mark.Kind.DOT ? fillPaint : strokePaint;
-                    tileCanvas.drawPath(path, paint);
-                    break;
-            }
-        }
-
-        return new BitmapShader(tile, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
     }
 
     private void setDrawColour(Paint paint, SketchDetail sketchDetail) {
@@ -2633,27 +2275,27 @@ public class SketchView extends View {
                         + " V"
                         + TextTools.formatTo0dpWithComma(surveyHeight);
 
-        float legendSize = legendPaint.getTextSize();
+        float legendSize = paints.legendPaint.getTextSize();
         float offsetX = legendSize * 1.25f;
         float offsetY = legendSize * 1.25f;
         float y = getHeight() - offsetY;
         float x = offsetX;
-        canvas.drawText(surveyLabel, x, y, legendPaint);
+        canvas.drawText(surveyLabel, x, y, paints.legendPaint);
 
         int minorGridSize = getMinorGridBoxSize();
         float scaleWidth = viewport.getScale() * minorGridSize;
         float scaleOffsetY = offsetY * 2;
         float scaleY = getHeight() - scaleOffsetY;
-        legendPaint.setStyle(Paint.Style.STROKE);
+        paints.legendPaint.setStyle(Paint.Style.STROKE);
         Path scalePath = new Path();
-        scalePath.moveTo(x, scaleY - legendTickSizePx);
+        scalePath.moveTo(x, scaleY - paints.legendTickSizePx);
         scalePath.lineTo(x, scaleY);
         scalePath.lineTo(x + scaleWidth, scaleY);
-        scalePath.lineTo(x + scaleWidth, scaleY - legendTickSizePx);
-        canvas.drawPath(scalePath, legendPaint);
-        legendPaint.setStyle(Paint.Style.FILL);
+        scalePath.lineTo(x + scaleWidth, scaleY - paints.legendTickSizePx);
+        canvas.drawPath(scalePath, paints.legendPaint);
+        paints.legendPaint.setStyle(Paint.Style.FILL);
         String scaleLabel = minorGridSize + "m";
-        canvas.drawText(scaleLabel, x + scaleWidth + 0.3f * legendSize, scaleY, legendPaint);
+        canvas.drawText(scaleLabel, x + scaleWidth + 0.3f * legendSize, scaleY, paints.legendPaint);
     }
 
     /**
@@ -2669,8 +2311,8 @@ public class SketchView extends View {
             return;
         }
 
-        float textSize = legendPaint.getTextSize();
-        Paint.FontMetrics metrics = legendPaint.getFontMetrics();
+        float textSize = paints.legendPaint.getTextSize();
+        Paint.FontMetrics metrics = paints.legendPaint.getFontMetrics();
         float textHeight = metrics.descent - metrics.ascent;
         float offsetX = textSize * 1.25f; // matches legend x
         float arrowLength = textSize * 2.5f;
@@ -2685,16 +2327,16 @@ public class SketchView extends View {
         float tipY = cy - arrowLength / 2f;
         float tailY = cy + arrowLength / 2f;
 
-        legendPaint.setStyle(Paint.Style.STROKE);
+        paints.legendPaint.setStyle(Paint.Style.STROKE);
         Path arrowPath = new Path();
         arrowPath.moveTo(cx - arrowHeadSize, tipY + arrowHeadSize);
         arrowPath.lineTo(cx, tipY);
         arrowPath.lineTo(cx + arrowHeadSize, tipY + arrowHeadSize);
         arrowPath.moveTo(cx, tipY);
         arrowPath.lineTo(cx, tailY);
-        canvas.drawPath(arrowPath, legendPaint);
-        legendPaint.setStyle(Paint.Style.FILL);
-        canvas.drawText("N", cx - textSize * 0.35f, tipY - textSize * 0.2f, legendPaint);
+        canvas.drawPath(arrowPath, paints.legendPaint);
+        paints.legendPaint.setStyle(Paint.Style.FILL);
+        canvas.drawText("N", cx - textSize * 0.35f, tipY - textSize * 0.2f, paints.legendPaint);
 
         canvas.restore();
     }
@@ -2706,8 +2348,9 @@ public class SketchView extends View {
         }
 
         if (currentSketchTool == SketchTool.MODAL_MOVE) {
-            hotCornersPaint.setColor(ContextCompat.getColor(getContext(), R.color.hotCornerActive));
-            hotCornersPaint.setAlpha(FADED_ALPHA);
+            paints.hotCornersPaint.setColor(
+                    ContextCompat.getColor(getContext(), R.color.hotCornerActive));
+            paints.hotCornersPaint.setAlpha(FADED_ALPHA);
         }
 
         final int side = (int) (HOT_CORNER_DISTANCE_PROPORTION * Math.min(getWidth(), getHeight()));
@@ -2716,13 +2359,14 @@ public class SketchView extends View {
         bottomRightCorner =
                 new Rect(getWidth() - side, getHeight() - side, getWidth(), getHeight());
 
-        canvas.drawRect(topLeftCorner, hotCornersPaint);
-        canvas.drawRect(topRightCorner, hotCornersPaint);
-        canvas.drawRect(bottomRightCorner, hotCornersPaint);
+        canvas.drawRect(topLeftCorner, paints.hotCornersPaint);
+        canvas.drawRect(topRightCorner, paints.hotCornersPaint);
+        canvas.drawRect(bottomRightCorner, paints.hotCornersPaint);
 
         if (currentSketchTool == SketchTool.MODAL_MOVE) {
-            hotCornersPaint.setColor(ContextCompat.getColor(getContext(), R.color.hotCorner));
-            hotCornersPaint.setAlpha(FADED_ALPHA);
+            paints.hotCornersPaint.setColor(
+                    ContextCompat.getColor(getContext(), R.color.hotCorner));
+            paints.hotCornersPaint.setAlpha(FADED_ALPHA);
         }
     }
 
@@ -2747,7 +2391,7 @@ public class SketchView extends View {
                         + "\n log10 (1/s2v) ="
                         + TextTools.formatTo2dp(Math.log10(1 / viewport.getScale()));
 
-        canvas.drawText(label, offsetX, offsetY, legendPaint);
+        canvas.drawText(label, offsetX, offsetY, paints.legendPaint);
     }
 
     /**
