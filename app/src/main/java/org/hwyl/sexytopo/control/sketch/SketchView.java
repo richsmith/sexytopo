@@ -9,18 +9,14 @@ import android.graphics.Canvas;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
-import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
-import android.view.SubMenu;
 import android.view.View;
-import android.widget.PopupMenu;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.SketchActivity;
@@ -254,52 +250,6 @@ public class SketchView extends View {
                 new ContextMenuManager(getContext(), viewContext, activity);
         menuManager.showMenuForStation(
                 this, station, state.getSurvey(), (int) event.getX(), (int) event.getY());
-    }
-
-    /** Offers to flip a line or change its type. Both are single undoable steps. */
-    private void showLineContextMenu(MotionEvent event, final PathDetail pathDetail) {
-        PopupMenu popup =
-                ContextMenuManager.createPopupMenuAt(
-                        getContext(), this, (int) event.getX(), (int) event.getY());
-        popup.inflate(R.menu.context_line);
-        Menu menu = popup.getMenu();
-
-        LineType currentType = pathDetail.getLineType();
-        menu.findItem(R.id.line_title).setTitle(currentType.getStringId());
-        // Orientation means nothing for a plain sketch line or a rock edge
-        menu.findItem(R.id.action_flip_line).setEnabled(currentType.isOriented());
-
-        Map<Integer, LineType> lineTypesByItemId = new HashMap<>();
-        SubMenu lineTypeMenu = menu.findItem(R.id.menu_line_type).getSubMenu();
-        for (LineType lineType : LineType.values()) {
-            int itemId = lineType.getButtonViewId();
-            lineTypeMenu
-                    .add(R.id.menu_line_type, itemId, Menu.NONE, lineType.getStringId())
-                    .setChecked(lineType == currentType);
-            lineTypesByItemId.put(itemId, lineType);
-        }
-        lineTypeMenu.setGroupCheckable(R.id.menu_line_type, true, true);
-
-        popup.setOnMenuItemClickListener(
-                item -> {
-                    if (item.getItemId() == R.id.action_flip_line) {
-                        state.getSketch().flipPathDetail(pathDetail);
-                        invalidate();
-                        return true;
-                    }
-                    LineType lineType = lineTypesByItemId.get(item.getItemId());
-                    if (lineType != null && lineType != currentType) {
-                        retypeLine(pathDetail, lineType);
-                        return true;
-                    }
-                    return false;
-                });
-        popup.show();
-    }
-
-    private void retypeLine(PathDetail pathDetail, LineType lineType) {
-        state.getSketch().retypePathDetail(pathDetail, lineType);
-        invalidate();
     }
 
     /**
@@ -631,7 +581,13 @@ public class SketchView extends View {
             PathDetail matchedPath = selector.findPathAt(touchPointOnView);
             if (matchedPath != null && !menuShownInThisTouch) {
                 state.getSketch().abandonActivePath();
-                showLineContextMenu(motionEvent, matchedPath);
+                LineContextMenu.show(
+                        SketchView.this,
+                        (int) motionEvent.getX(),
+                        (int) motionEvent.getY(),
+                        state.getSketch(),
+                        matchedPath,
+                        SketchView.this::invalidate);
                 menuShownInThisTouch = true;
             }
         }
