@@ -12,11 +12,9 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.SketchActivity;
@@ -37,7 +35,6 @@ import org.hwyl.sexytopo.model.sketch.Symbol;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
-import org.hwyl.sexytopo.model.survey.SurveyConnection;
 
 public class SketchView extends View {
 
@@ -52,7 +49,7 @@ public class SketchView extends View {
 
     private SketchActivity activity;
 
-    private Map<Survey, Space<Coord2D>> translatedConnectedSurveys = new HashMap<>();
+    private final ConnectedSurveys connectedSurveys = new ConnectedSurveys();
 
     private boolean surveyChanged;
 
@@ -412,57 +409,31 @@ public class SketchView extends View {
         drawSurveyData(survey, canvas, projection, alpha);
     }
 
-    /** Draw the surveys linked to this one, faded, without their cross-sections. */
+    /** Draw the surveys linked to the current survey, faded. */
     private void drawConnectedSurveys(Canvas canvas) {
 
         if (!SketchPreferences.Toggle.SHOW_CONNECTIONS.isOn()) {
             return;
         }
 
-        if (doTranslatedConnectedSurveysNeedUpdating()) {
-            try {
-                this.translatedConnectedSurveys =
-                        ConnectedSurveys.getTranslatedConnectedSurveys(
-                                activity.getProjectionType(),
-                                state.getSurvey(),
-                                state.getProjection());
-            } catch (Exception exception) {
-                Log.e("Error getting translated connected surveys");
-                Log.e(exception);
-                return;
-            }
-        }
+        Map<Survey, Space<Coord2D>> surveysToProjections =
+                connectedSurveys.getSurveysToProjections(
+                        state.getProjectionType(), state.getSurvey(), state.getProjection());
 
-        for (Survey translatedConnectedSurvey : translatedConnectedSurveys.keySet()) {
+        // a copy, as a survey that can't be drawn is dropped from the original along the way
+        for (Map.Entry<Survey, Space<Coord2D>> entry :
+                new ArrayList<>(surveysToProjections.entrySet())) {
+            Survey connectedSurvey = entry.getKey();
             try {
-                Space<Coord2D> connectedProjection =
-                        translatedConnectedSurveys.get(translatedConnectedSurvey);
-                drawSurvey(canvas, translatedConnectedSurvey, connectedProjection, FADED_ALPHA);
+                drawSurvey(canvas, connectedSurvey, entry.getValue(), FADED_ALPHA);
             } catch (Exception exception) {
-                String name = translatedConnectedSurvey.getName();
+                String name = connectedSurvey.getName();
                 Log.e("Error drawing connected survey " + name);
                 Log.e(exception);
                 Log.e("Sorry, having to unlink connected survey " + name);
-                translatedConnectedSurveys.remove(translatedConnectedSurvey);
+                connectedSurveys.forget(connectedSurvey);
             }
         }
-    }
-
-    private boolean doTranslatedConnectedSurveysNeedUpdating() {
-        Set<Survey> flatSetOfConnectedSurveys = getFlatSetOfConnectedSurveys();
-        Set<Survey> flatSetOfTranslatedConnectedSurveys = translatedConnectedSurveys.keySet();
-        return !flatSetOfConnectedSurveys.equals(flatSetOfTranslatedConnectedSurveys);
-    }
-
-    private Set<Survey> getFlatSetOfConnectedSurveys() {
-        Set<Survey> flatSet = new HashSet<>();
-        for (Set<SurveyConnection> connectionSet :
-                state.getSurvey().getConnectedSurveys().values()) {
-            for (SurveyConnection connection : connectionSet) {
-                flatSet.add(connection.otherSurvey);
-            }
-        }
-        return flatSet;
     }
 
     protected void drawGrid(Canvas canvas) {

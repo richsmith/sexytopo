@@ -1,8 +1,11 @@
 package org.hwyl.sexytopo.control.sketch;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.geometry.Projection2D;
@@ -12,7 +15,48 @@ import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.SurveyConnection;
 
+/**
+ * The surveys linked to the one being shown, each moved so its linking station lines up with the
+ * station it links to. The static method works them out; an instance keeps the result for a view,
+ * working it out again only when the set of linked surveys changes.
+ */
 public class ConnectedSurveys {
+
+    private Map<Survey, Space<Coord2D>> surveysToProjections = new HashMap<>();
+
+    /**
+     * The linked surveys, lined up with the survey being shown, and where each is drawn. If they
+     * can't be worked out, the problem is logged and none are returned.
+     */
+    Map<Survey, Space<Coord2D>> getSurveysToProjections(
+            Projection2D projectionType, Survey survey, Space<Coord2D> projection) {
+        if (!getFlatSetOfConnectedSurveys(survey).equals(surveysToProjections.keySet())) {
+            try {
+                surveysToProjections =
+                        getTranslatedConnectedSurveys(projectionType, survey, projection);
+            } catch (Exception exception) {
+                Log.e("Error getting translated connected surveys");
+                Log.e(exception);
+                return Collections.emptyMap();
+            }
+        }
+        return surveysToProjections;
+    }
+
+    /** Stop showing a linked survey, e.g. because it couldn't be drawn. */
+    void forget(Survey survey) {
+        surveysToProjections.remove(survey);
+    }
+
+    private static Set<Survey> getFlatSetOfConnectedSurveys(Survey survey) {
+        Set<Survey> flatSet = new HashSet<>();
+        for (Set<SurveyConnection> connectionSet : survey.getConnectedSurveys().values()) {
+            for (SurveyConnection connection : connectionSet) {
+                flatSet.add(connection.otherSurvey);
+            }
+        }
+        return flatSet;
+    }
 
     public static Map<Survey, Space<Coord2D>> getTranslatedConnectedSurveys(
             Projection2D projectionType, Survey survey, Space<Coord2D> projection) {
