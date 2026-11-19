@@ -2,7 +2,11 @@ package org.hwyl.sexytopo.control.sketch;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.Set;
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.model.geometry.Projection2D;
 
 /**
  * Represents the different view contexts where station context menus can be displayed. Each context
@@ -17,7 +21,7 @@ public enum ViewContext {
             setCrossSectionVisible(menu, false);
         }
     },
-    PLAN {
+    PLAN(Projection2D.PLAN) {
         @Override
         public void configureViewSpecificItems(Menu menu) {
             setItemVisible(menu, R.id.action_jump_to_plan, false);
@@ -25,7 +29,7 @@ public enum ViewContext {
             setCrossSectionVisible(menu, true);
         }
     },
-    ELEVATION {
+    ELEVATION(Projection2D.ELEVATION_NS, Projection2D.ELEVATION_EW) {
         @Override
         public void configureViewSpecificItems(Menu menu) {
             setItemVisible(menu, R.id.action_jump_to_elevation, false);
@@ -33,7 +37,7 @@ public enum ViewContext {
             setCrossSectionVisible(menu, false);
         }
     },
-    EXTENDED_ELEVATION {
+    EXTENDED_ELEVATION(Projection2D.EXTENDED_ELEVATION) {
         @Override
         public void configureViewSpecificItems(Menu menu) {
             setItemVisible(menu, R.id.action_jump_to_elevation, false);
@@ -46,7 +50,7 @@ public enum ViewContext {
             return true;
         }
     },
-    CROSS_SECTION {
+    CROSS_SECTION(Projection2D.CROSS_SECTION) {
         @Override
         public void configureViewSpecificItems(Menu menu) {
             // No station context menu is shown in the cross-section editor.
@@ -69,6 +73,24 @@ public enum ViewContext {
             return false;
         }
     };
+
+    // the projections a sketch is drawn in when shown in this context
+    private final Set<Projection2D> projections;
+
+    ViewContext(Projection2D... projections) {
+        this.projections =
+                projections.length == 0
+                        ? EnumSet.noneOf(Projection2D.class)
+                        : EnumSet.of(projections[0], projections);
+    }
+
+    /** The context a sketch drawn in the given projection is shown in: the plan if there's none. */
+    public static ViewContext forProjection(Projection2D projection) {
+        return Arrays.stream(values())
+                .filter(viewContext -> viewContext.projections.contains(projection))
+                .findFirst()
+                .orElse(PLAN);
+    }
 
     public abstract void configureViewSpecificItems(Menu menu);
 

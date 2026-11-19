@@ -367,26 +367,8 @@ public class SketchView extends View {
                 this, station, state.getSurvey(), (int) event.getX(), (int) event.getY());
     }
 
-    /**
-     * @noinspection DuplicateBranchesInSwitch
-     */
     protected ViewContext getViewContext() {
-        if (state.getProjectionType() == null) {
-            return ViewContext.PLAN;
-        }
-        switch (state.getProjectionType()) {
-            case PLAN:
-                return ViewContext.PLAN;
-            case EXTENDED_ELEVATION:
-                return ViewContext.EXTENDED_ELEVATION;
-            case ELEVATION_NS:
-            case ELEVATION_EW:
-                return ViewContext.ELEVATION;
-            case CROSS_SECTION:
-                return ViewContext.CROSS_SECTION;
-            default:
-                return ViewContext.PLAN;
-        }
+        return ViewContext.forProjection(state.getProjectionType());
     }
 
     private void broadcastSurveyUpdated() {
@@ -594,14 +576,17 @@ public class SketchView extends View {
     private class LongPressListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public void onLongPress(MotionEvent motionEvent) {
+            if (menuShownInThisTouch) {
+                return;
+            }
+
             Coord2D touchPointOnView = new Coord2D(motionEvent.getX(), motionEvent.getY());
             Station matchedStation = selector.findStationAt(touchPointOnView);
-            if (matchedStation != null && !menuShownInThisTouch) {
+            if (matchedStation != null) {
                 if (state.getSketchTool().drawsPath()) {
                     state.getSketch().abandonActivePath();
                 }
-                showContextMenu(motionEvent, matchedStation);
-                menuShownInThisTouch = true;
+                host.openStationMenu(motionEvent, matchedStation);
                 return;
             }
 
@@ -609,7 +594,7 @@ public class SketchView extends View {
                 return;
             }
             PathDetail matchedPath = selector.findPathAt(touchPointOnView);
-            if (matchedPath != null && !menuShownInThisTouch) {
+            if (matchedPath != null) {
                 state.getSketch().abandonActivePath();
                 LineContextMenu.show(
                         SketchView.this,
