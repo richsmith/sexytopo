@@ -1,0 +1,119 @@
+package org.hwyl.sexytopo.control.sketch;
+
+import java.util.Arrays;
+import org.hwyl.sexytopo.model.geometry.Coord2D;
+import org.hwyl.sexytopo.model.sketch.Colour;
+import org.hwyl.sexytopo.model.sketch.PathDetail;
+import org.junit.Assert;
+import org.junit.Test;
+
+public class ViewportTest {
+
+    private static final float DELTA = 0.0001f;
+
+    @Test
+    public void testDefaultsToOriginAtDefaultScale() {
+        Viewport viewport = new Viewport();
+        Assert.assertEquals(Coord2D.ORIGIN, viewport.getOffset());
+        Assert.assertEquals(Viewport.DEFAULT_SCALE, viewport.getScale(), DELTA);
+    }
+
+    @Test
+    public void testToViewAndToSurveyAreInverses() {
+        Viewport viewport = new Viewport();
+        viewport.setOffset(new Coord2D(3, -2));
+        viewport.setZoom(20, Coord2D.ORIGIN);
+
+        Coord2D surveyPoint = new Coord2D(5.5f, 1.25f);
+        Coord2D viewPoint = viewport.toView(surveyPoint);
+        Assert.assertEquals(surveyPoint, viewport.toSurvey(viewPoint));
+    }
+
+    @Test
+    public void testToViewAppliesOffsetThenScale() {
+        Viewport viewport = new Viewport();
+        viewport.setOffset(new Coord2D(1, 2));
+        // 60 pixels per metre by default
+        Assert.assertEquals(new Coord2D(60, 120), viewport.toView(new Coord2D(2, 4)));
+    }
+
+    @Test
+    public void testZoomKeepsFocusPointStill() {
+        Viewport viewport = new Viewport();
+        viewport.setOffset(new Coord2D(10, 10));
+
+        Coord2D focusOnView = new Coord2D(200, 150);
+        Coord2D focusOnSurvey = viewport.toSurvey(focusOnView);
+
+        viewport.setZoom(25, focusOnView);
+
+        Assert.assertEquals(25, viewport.getScale(), DELTA);
+        Assert.assertEquals(focusOnView, viewport.toView(focusOnSurvey));
+    }
+
+    @Test
+    public void testZoomOutsideLimitsIsIgnored() {
+        Viewport viewport = new Viewport();
+        viewport.setZoom(Viewport.MAX_ZOOM, Coord2D.ORIGIN);
+        viewport.setZoom(Viewport.MIN_ZOOM, Coord2D.ORIGIN);
+        viewport.setZoom(Viewport.MIN_ZOOM / 2, Coord2D.ORIGIN);
+        Assert.assertEquals(Viewport.DEFAULT_SCALE, viewport.getScale(), DELTA);
+    }
+
+    @Test
+    public void testCentreOnPutsPointInMiddleOfView() {
+        Viewport viewport = new Viewport();
+        Coord2D point = new Coord2D(7, -3);
+        viewport.centreOn(point, 600, 400);
+        Assert.assertEquals(new Coord2D(300, 200), viewport.toView(point));
+    }
+
+    @Test
+    public void testLineOnCanvasUsesLatestBounds() {
+        Viewport viewport = new Viewport();
+        viewport.updateBounds(100, 100);
+
+        Assert.assertTrue(viewport.isLineOnCanvas(new Coord2D(-10, 50), new Coord2D(50, 50)));
+        Assert.assertFalse(viewport.isLineOnCanvas(new Coord2D(150, 0), new Coord2D(200, 100)));
+    }
+
+    @Test
+    public void testCouldBeVisibleCullsOffscreenShapes() {
+        Viewport viewport = new Viewport();
+        // 600x600 pixels at 60px/m shows survey (0,0) to (10,10)
+        viewport.updateBounds(600, 600);
+
+        PathDetail onScreen = path(new Coord2D(1, 1), new Coord2D(2, 2));
+        PathDetail offScreen = path(new Coord2D(20, 20), new Coord2D(21, 21));
+
+        Assert.assertTrue(viewport.couldBeVisible(onScreen));
+        Assert.assertFalse(viewport.couldBeVisible(offScreen));
+    }
+
+    @Test
+    public void testCouldBeVisibleCullsShapesSmallerThanAPixel() {
+        Viewport viewport = new Viewport();
+        viewport.updateBounds(600, 600);
+
+        // a hundredth of a metre is less than a pixel at 60px/m
+        PathDetail tiny = path(new Coord2D(1, 1), new Coord2D(1.01f, 1));
+        Assert.assertFalse(viewport.couldBeVisible(tiny));
+    }
+
+    @Test
+    public void testBoundsFollowPanOnlyAfterUpdate() {
+        Viewport viewport = new Viewport();
+        viewport.updateBounds(600, 600);
+        PathDetail shape = path(new Coord2D(1, 1), new Coord2D(2, 2));
+
+        viewport.setOffset(new Coord2D(50, 50));
+        Assert.assertTrue(viewport.couldBeVisible(shape));
+
+        viewport.updateBounds(600, 600);
+        Assert.assertFalse(viewport.couldBeVisible(shape));
+    }
+
+    private static PathDetail path(Coord2D... points) {
+        return new PathDetail(Arrays.asList(points), Colour.BLACK);
+    }
+}

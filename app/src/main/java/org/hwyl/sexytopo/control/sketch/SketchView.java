@@ -52,7 +52,6 @@ import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.CrossSectionActivity;
 import org.hwyl.sexytopo.control.activity.SketchActivity;
 import org.hwyl.sexytopo.control.components.DialogUtils;
-import org.hwyl.sexytopo.control.util.CohenSutherlandAlgorithm;
 import org.hwyl.sexytopo.control.util.CrossSectioner;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.LineOrienter;
@@ -90,8 +89,8 @@ public class SketchView extends View {
     private final ScaleGestureDetector scaleGestureDetector;
     private final GestureDetector longPressDetector;
 
-    // The offset of the viewing window (what can be seen on the screen) from the whole survey
-    private Coord2D viewpointOffset = Coord2D.ORIGIN;
+    // Which part of the survey is on screen, and at what zoom
+    protected final Viewport viewport = new Viewport();
 
     // These variables are used in handling the dragging of the viewing window
     private Coord2D actionDownPointOnView = Coord2D.ORIGIN;
@@ -103,13 +102,6 @@ public class SketchView extends View {
     // set, the gesture is consumed by the cross-section (and not drawn onto the main sketch); a
     // clean tap opens its editor on ACTION_UP.
     private CrossSectionDetail crossSectionBodyPressed = null;
-
-    // ratio of metres on the survey to pixels on the view
-    // zooming in increases this, zooming out decreases it
-    private float surveyToViewScale = 60.0f;
-
-    public static final float MIN_ZOOM = 0.1f;
-    public static final float MAX_ZOOM = 500.0f;
 
     private static final int BOX_SIZE = 10; // every grid box is 10 units square
 
@@ -172,9 +164,6 @@ public class SketchView extends View {
     private boolean isHotCornersModeActive = true;
 
     // cached for performance
-    protected Coord2D canvasBottomRight;
-    protected Coord2D viewpointTopLeftOnSurvey;
-    protected Coord2D viewpointBottomRightOnSurvey;
     private float surveyLength = 0;
     private float surveyHeight = 0;
     private Rect topLeftCorner;
@@ -630,30 +619,10 @@ public class SketchView extends View {
         return !currentlyActive && isDown && hitAHandle;
     }
 
-    protected Coord2D viewCoordsToSurveyCoords(final Coord2D coords) {
-        // The more elegant way to do this is:
-        // return coords.scale(1 / surveyToViewScale).plus(viewpointOffset);
-        // ...but this method gets hit hard (profiled) so let's avoid creating intermediate objects:
-        return new Coord2D(
-                ((coords.x * (1 / surveyToViewScale)) + viewpointOffset.x),
-                ((coords.y * (1 / surveyToViewScale)) + viewpointOffset.y));
-    }
-
-    // Warning: In tight loops during the draw phase we duplicate this logic to avoid
-    //          creating too many Coord2D objects - be sure to mirror any updates in those places
-    protected Coord2D surveyCoordsToViewCoords(final Coord2D coords) {
-        // The more elegant way to do this is:
-        // return coords.minus(viewpointOffset).scale(surveyToViewScale);
-        // ...but this method gets hit hard (profiled) so let's avoid creating intermediate objects:
-        return new Coord2D(
-                ((coords.x - viewpointOffset.x) * surveyToViewScale),
-                ((coords.y - viewpointOffset.y) * surveyToViewScale));
-    }
-
     private boolean handleLine(MotionEvent event) {
 
         Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
-        Coord2D surveyCoords = viewCoordsToSurveyCoords(touchPointOnView);
+        Coord2D surveyCoords = viewport.toSurvey(touchPointOnView);
 
         boolean snapToLines = SketchPreferences.Toggle.SNAP_TO_LINES.isOn();
 
@@ -702,7 +671,7 @@ public class SketchView extends View {
     private boolean handleDrawArea(MotionEvent event) {
 
         Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
-        Coord2D surveyCoords = viewCoordsToSurveyCoords(touchPointOnView);
+        Coord2D surveyCoords = viewport.toSurvey(touchPointOnView);
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -739,10 +708,10 @@ public class SketchView extends View {
     private float getPatternScale() {
         // re-pick the density each time the zoom doubles or halves, so it never strays more than
         // √2 from its designed size; doubling keeps existing marks in place and adds new ones
-        double octave = Math.round(Math.log(surveyToViewScale) / Math.log(2));
-        float scale = (float) (surveyToViewScale / Math.pow(2, octave));
+        double octave = Math.round(Math.log(viewport.getScale()) / Math.log(2));
+        float scale = (float) (viewport.getScale() / Math.pow(2, octave));
         // but zoomed far out, don't let a tick dwarf the line it's on
-        float maxScale = MAX_PATTERN_METRES_PER_DP * surveyToViewScale / dpToPixels(1);
+        float maxScale = MAX_PATTERN_METRES_PER_DP * viewport.getScale() / dpToPixels(1);
         return Math.min(scale, maxScale);
     }
 
@@ -798,7 +767,7 @@ public class SketchView extends View {
     }
 
     private float getSnapDistance() {
-        return snapToLineSensitivityPx / surveyToViewScale;
+        return snapToLineSensitivityPx / viewport.getScale();
     }
 
     private boolean handleMove(MotionEvent event) {
@@ -808,12 +777,14 @@ public class SketchView extends View {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 actionDownPointOnView = touchPointOnView;
-                actionDownViewpointOffset = viewpointOffset;
+                actionDownViewpointOffset = viewport.getOffset();
                 break;
             case MotionEvent.ACTION_MOVE:
                 Coord2D surveyDelta =
-                        touchPointOnView.minus(actionDownPointOnView).scale(1 / surveyToViewScale);
-                viewpointOffset = actionDownViewpointOffset.minus(surveyDelta);
+                        touchPointOnView
+                                .minus(actionDownPointOnView)
+                                .scale(1 / viewport.getScale());
+                viewport.setOffset(actionDownViewpointOffset.minus(surveyDelta));
                 invalidate();
             // fall through
             case MotionEvent.ACTION_UP:
@@ -828,11 +799,11 @@ public class SketchView extends View {
     private boolean handleErase(MotionEvent event) {
 
         Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
-        Coord2D touchPointOnSurvey = viewCoordsToSurveyCoords(touchPointOnView);
+        Coord2D touchPointOnSurvey = viewport.toSurvey(touchPointOnView);
 
         boolean deleteLineFragments = GeneralPreferences.isDeletePathFragmentsModeOn();
 
-        float deleteToleranceInMetres = deleteDetailsWithinPx / surveyToViewScale;
+        float deleteToleranceInMetres = deleteDetailsWithinPx / viewport.getScale();
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -890,7 +861,7 @@ public class SketchView extends View {
             Coord2D point = from.plus(to.minus(from).scale((float) i / steps));
             SketchDetail detail =
                     sketch.findNearestVisibleDetailWithin(
-                            point, toleranceInMetres, surveyToViewScale);
+                            point, toleranceInMetres, viewport.getScale());
             if (detail instanceof CrossSectionDetail) {
                 continue;
             }
@@ -920,7 +891,7 @@ public class SketchView extends View {
 
         SketchDetail nearest =
                 sketch.findNearestVisibleDetailWithin(
-                        touchPointOnSurvey, toleranceInMetres, surveyToViewScale);
+                        touchPointOnSurvey, toleranceInMetres, viewport.getScale());
         if (nearest != null) {
             return nearest;
         }
@@ -1008,7 +979,7 @@ public class SketchView extends View {
      * zoom.
      */
     private float getMinimumLineSize() {
-        return dpToPixels(MINIMUM_DETAIL_SIZE_DP) / surveyToViewScale;
+        return dpToPixels(MINIMUM_DETAIL_SIZE_DP) / viewport.getScale();
     }
 
     private boolean handleSymbol(MotionEvent event) {
@@ -1018,10 +989,10 @@ public class SketchView extends View {
         }
 
         final Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
-        final Coord2D touchPointOnSurvey = viewCoordsToSurveyCoords(touchPointOnView);
+        final Coord2D touchPointOnSurvey = viewport.toSurvey(touchPointOnView);
         float startingSizeDp = GeneralPreferences.getSymbolStartingSizeDp();
         float startingSizePixels = SexyTopo.dpToPixels(startingSizeDp);
-        float size = startingSizePixels / surveyToViewScale;
+        float size = startingSizePixels / viewport.getScale();
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -1035,7 +1006,7 @@ public class SketchView extends View {
                     float angle =
                             Space2DUtils.getAngleBetween(actionDownPointOnView, touchPointOnView);
                     angle = Space2DUtils.adjustAngle(angle, -90);
-                    Coord2D firstTouch = viewCoordsToSurveyCoords(actionDownPointOnView);
+                    Coord2D firstTouch = viewport.toSurvey(actionDownPointOnView);
                     sketch.addSymbolDetail(firstTouch, currentSymbol, currentColour, size, angle);
                     float distance =
                             Space2DUtils.getDistance(actionDownPointOnView, touchPointOnView);
@@ -1058,7 +1029,7 @@ public class SketchView extends View {
     private boolean handleText(MotionEvent event) {
 
         final Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
-        final Coord2D touchPointOnSurvey = viewCoordsToSurveyCoords(touchPointOnView);
+        final Coord2D touchPointOnSurvey = viewport.toSurvey(touchPointOnView);
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -1080,7 +1051,7 @@ public class SketchView extends View {
                                     String text = editable.toString();
                                     int startingSizeSp = GeneralPreferences.getTextStartingSizeSp();
                                     float startingSizePixels = spToPixels(startingSizeSp);
-                                    float size = startingSizePixels / surveyToViewScale;
+                                    float size = startingSizePixels / viewport.getScale();
                                     sketch.addTextDetail(
                                             touchPointOnSurvey, text, currentColour, size);
                                     invalidate();
@@ -1145,8 +1116,8 @@ public class SketchView extends View {
     }
 
     private Station checkForStation(Coord2D touchPointOnView) {
-        float selectionTolerance = selectionSensitivityPx / surveyToViewScale;
-        Coord2D touchPointOnSurvey = viewCoordsToSurveyCoords(touchPointOnView);
+        float selectionTolerance = selectionSensitivityPx / viewport.getScale();
+        Coord2D touchPointOnSurvey = viewport.toSurvey(touchPointOnView);
 
         Station matchedStation =
                 findNearestStationWithinDelta(projection, touchPointOnSurvey, selectionTolerance);
@@ -1170,7 +1141,7 @@ public class SketchView extends View {
         }
 
         Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
-        Coord2D touchPointOnSurvey = viewCoordsToSurveyCoords(touchPointOnView);
+        Coord2D touchPointOnSurvey = viewport.toSurvey(touchPointOnView);
 
         final Station station = survey.getStationByName(stationNameBeingCrossSectioned);
         stationNameBeingCrossSectioned = null;
@@ -1208,13 +1179,13 @@ public class SketchView extends View {
                     return false;
                 }
                 crossSectionBeingMoved = detailOnHandle;
-                crossSectionMoveAnchorOnSurvey = viewCoordsToSurveyCoords(touchPointOnView);
+                crossSectionMoveAnchorOnSurvey = viewport.toSurvey(touchPointOnView);
                 crossSectionMoveCurrentDelta = Coord2D.ORIGIN;
                 return true;
 
             case MotionEvent.ACTION_MOVE:
                 if (crossSectionBeingMoved != null) {
-                    Coord2D current = viewCoordsToSurveyCoords(touchPointOnView);
+                    Coord2D current = viewport.toSurvey(touchPointOnView);
                     crossSectionMoveCurrentDelta = current.minus(crossSectionMoveAnchorOnSurvey);
                     invalidate();
                 }
@@ -1222,7 +1193,7 @@ public class SketchView extends View {
 
             case MotionEvent.ACTION_UP:
                 if (crossSectionBeingMoved != null) {
-                    Coord2D current = viewCoordsToSurveyCoords(touchPointOnView);
+                    Coord2D current = viewport.toSurvey(touchPointOnView);
                     Coord2D delta = current.minus(crossSectionMoveAnchorOnSurvey);
                     CrossSectionDetail moved = crossSectionBeingMoved;
                     crossSectionBeingMoved = null;
@@ -1267,8 +1238,7 @@ public class SketchView extends View {
         // Open the editor as soon as a press lands on a cross-section body, before any stroke can
         // start on the main sketch over it. The remaining events of this gesture are swallowed.
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            Coord2D touchOnSurvey =
-                    viewCoordsToSurveyCoords(new Coord2D(event.getX(), event.getY()));
+            Coord2D touchOnSurvey = viewport.toSurvey(new Coord2D(event.getX(), event.getY()));
             CrossSectionDetail tapped = findCrossSectionBodyAt(touchOnSurvey);
             if (tapped != null) {
                 launchCrossSectionEditor(tapped);
@@ -1298,11 +1268,11 @@ public class SketchView extends View {
      * symbol that sits on a line picks out the symbol rather than the line.
      */
     private PathDetail checkForPath(Coord2D touchPointOnView) {
-        float selectionTolerance = selectionSensitivityPx / surveyToViewScale;
-        Coord2D touchPointOnSurvey = viewCoordsToSurveyCoords(touchPointOnView);
+        float selectionTolerance = selectionSensitivityPx / viewport.getScale();
+        Coord2D touchPointOnSurvey = viewport.toSurvey(touchPointOnView);
         SketchDetail nearest =
                 sketch.findNearestVisibleDetailWithin(
-                        touchPointOnSurvey, selectionTolerance, surveyToViewScale);
+                        touchPointOnSurvey, selectionTolerance, viewport.getScale());
         return nearest instanceof PathDetail ? (PathDetail) nearest : null;
     }
 
@@ -1469,7 +1439,7 @@ public class SketchView extends View {
             return false;
         }
         Coord2D fingerOnView = new Coord2D(event.getX(), event.getY());
-        Coord2D fingerOnSurvey = viewCoordsToSurveyCoords(fingerOnView);
+        Coord2D fingerOnSurvey = viewport.toSurvey(fingerOnView);
         float dx = fingerOnSurvey.x - pivotOnSurvey.x;
         float dy = fingerOnSurvey.y - pivotOnSurvey.y;
 
@@ -1561,9 +1531,7 @@ public class SketchView extends View {
     }
 
     protected void updateViewBounds() {
-        canvasBottomRight = new Coord2D(getWidth(), getHeight());
-        viewpointTopLeftOnSurvey = viewCoordsToSurveyCoords(Coord2D.ORIGIN);
-        viewpointBottomRightOnSurvey = viewCoordsToSurveyCoords(canvasBottomRight);
+        viewport.updateBounds(getWidth(), getHeight());
     }
 
     @SuppressLint("DrawAllocation")
@@ -1642,17 +1610,20 @@ public class SketchView extends View {
     }
 
     protected void drawGrid(Canvas canvas) {
+        float viewOffsetX = viewport.getOffsetX();
+        float viewOffsetY = viewport.getOffsetY();
+        float viewScale = viewport.getScale();
 
         if (!SketchPreferences.Toggle.SHOW_GRID.isOn()) {
             return;
         }
 
         int tickSizeInMetres = getMinorGridBoxSize();
-        int numberTicksJustBeforeViewpointOffsetX = (int) (viewpointOffset.x / tickSizeInMetres);
+        int numberTicksJustBeforeViewpointOffsetX = (int) (viewOffsetX / tickSizeInMetres);
 
         for (int n = numberTicksJustBeforeViewpointOffsetX; true; n++) {
             float xSurvey = n * tickSizeInMetres;
-            int xView = (int) ((xSurvey - viewpointOffset.x) * surveyToViewScale);
+            int xView = (int) ((xSurvey - viewOffsetX) * viewScale);
             gridPaint.setStrokeWidth(n % BOX_SIZE == 0 ? 3 : 1);
             canvas.drawLine(xView, 0, xView, getHeight(), gridPaint);
             if (xView >= getWidth()) {
@@ -1660,11 +1631,11 @@ public class SketchView extends View {
             }
         }
 
-        int numberTicksJustBeforeViewpointOffsetY = (int) (viewpointOffset.y / tickSizeInMetres);
+        int numberTicksJustBeforeViewpointOffsetY = (int) (viewOffsetY / tickSizeInMetres);
 
         for (int n = numberTicksJustBeforeViewpointOffsetY; true; n++) {
             float ySurvey = n * tickSizeInMetres;
-            int yView = (int) ((ySurvey - viewpointOffset.y) * surveyToViewScale);
+            int yView = (int) ((ySurvey - viewOffsetY) * viewScale);
             gridPaint.setStrokeWidth(n % BOX_SIZE == 0 ? 3 : 1);
             canvas.drawLine(0, yView, getWidth(), yView, gridPaint);
             if (yView >= getHeight()) {
@@ -1675,9 +1646,9 @@ public class SketchView extends View {
 
     public int getMinorGridBoxSize() {
 
-        if (surveyToViewScale > 15) {
+        if (viewport.getScale() > 15) {
             return 1;
-        } else if (surveyToViewScale > 2) {
+        } else if (viewport.getScale() > 2) {
             return 10;
         } else {
             return 100;
@@ -1763,7 +1734,7 @@ public class SketchView extends View {
         }
 
         Coord2D centreOnSurvey = sectionDetail.getPosition().plus(dragDelta);
-        Coord2D centreOnView = surveyCoordsToViewCoords(centreOnSurvey);
+        Coord2D centreOnView = viewport.toView(centreOnSurvey);
         drawStationCross(
                 canvas,
                 stationPaint,
@@ -1785,7 +1756,7 @@ public class SketchView extends View {
         // Judge which splays are in the section's plane the same way the section editor does
         drawLegs(canvas, sectionProjection, alpha, crossSection.getProjectionType()::isLegInPlane);
 
-        Coord2D viewStationLocation = surveyCoordsToViewCoords(surveyStationLocation);
+        Coord2D viewStationLocation = viewport.toView(surveyStationLocation);
 
         if (GeneralPreferences.isLegacyCrossSectionsOn()) {
             // Legacy cross-sections: just the projected legs and a connector running to the centre,
@@ -1894,7 +1865,7 @@ public class SketchView extends View {
         if (pivotOnSurvey == null) {
             return;
         }
-        Coord2D pivotOnView = surveyCoordsToViewCoords(pivotOnSurvey);
+        Coord2D pivotOnView = viewport.toView(pivotOnSurvey);
         canvas.drawLine(
                 pivotOnView.x,
                 pivotOnView.y,
@@ -1951,8 +1922,8 @@ public class SketchView extends View {
         float xsScale = sketch.getCrossSectionScale();
         Coord2D scaledTopLeft = sectionDetail.getTopLeftAtScale(xsScale).plus(dragDelta);
         Coord2D scaledBottomRight = sectionDetail.getBottomRightAtScale(xsScale).plus(dragDelta);
-        Coord2D topLeft = surveyCoordsToViewCoords(scaledTopLeft);
-        Coord2D bottomRight = surveyCoordsToViewCoords(scaledBottomRight);
+        Coord2D topLeft = viewport.toView(scaledTopLeft);
+        Coord2D bottomRight = viewport.toView(scaledBottomRight);
         float contentWidth = bottomRight.x - topLeft.x;
         float contentHeight = bottomRight.y - topLeft.y;
         float scaledPadding =
@@ -2082,10 +2053,10 @@ public class SketchView extends View {
             Line<Coord2D> line = legMap.get(leg);
 
             //noinspection ConstantConditions
-            Coord2D start = surveyCoordsToViewCoords(line.getStart());
-            Coord2D end = surveyCoordsToViewCoords(line.getEnd());
+            Coord2D start = viewport.toView(line.getStart());
+            Coord2D end = viewport.toView(line.getEnd());
 
-            if (!isLineOnCanvas(start, end)) {
+            if (!viewport.isLineOnCanvas(start, end)) {
                 continue;
             }
 
@@ -2121,11 +2092,6 @@ public class SketchView extends View {
         return survey.getActiveStation().getOnwardLegs().contains(leg);
     }
 
-    private boolean isLineOnCanvas(Coord2D start, Coord2D end) {
-        return !CohenSutherlandAlgorithm.whollyOutside(
-                start, end, Coord2D.ORIGIN, canvasBottomRight);
-    }
-
     private void drawStations(Survey survey, Canvas canvas, Space<Coord2D> space, int baseAlpha) {
 
         boolean fadingNonActive = SketchPreferences.Toggle.FADE_NON_ACTIVE.isOn();
@@ -2148,7 +2114,7 @@ public class SketchView extends View {
                 stationPaint.setAlpha(alpha);
             }
 
-            Coord2D translatedStation = surveyCoordsToViewCoords(entry.getValue());
+            Coord2D translatedStation = viewport.toView(entry.getValue());
 
             int x = (int) (translatedStation.x);
             int y = (int) (translatedStation.y);
@@ -2210,7 +2176,7 @@ public class SketchView extends View {
         crossSectionIndicatorPaint.setAlpha(alpha / 2);
         CrossSection crossSection = crossSectionDetail.getCrossSection();
 
-        float indicatorWidth = (1 * surveyToViewScale);
+        float indicatorWidth = (1 * viewport.getScale());
         CrossSectionIndicator indicator = getIndicator(crossSectionDetail, x, y, indicatorWidth);
 
         canvas.drawLine(
@@ -2306,6 +2272,9 @@ public class SketchView extends View {
     }
 
     protected void drawSketch(Canvas canvas, Sketch sketch, int alpha) {
+        float viewOffsetX = viewport.getOffsetX();
+        float viewOffsetY = viewport.getOffsetY();
+        float viewScale = viewport.getScale();
 
         if (!SketchPreferences.Toggle.SHOW_SKETCH.isOn()) {
             return;
@@ -2347,21 +2316,21 @@ public class SketchView extends View {
             float[] lines = new float[path.size() * 4];
 
             // This loop is the slowest part of the draw phase. Pulling out the calculations from
-            // within surveyCoordsToViewCoords saves a not insignificant amount of time by not
+            // within Viewport.toView saves a not insignificant amount of time by not
             // constructing many thousands of Coord2D objects (approx. 10% of sketch draw time)
             for (Coord2D point : path) {
                 if (fromX == -1) {
-                    // from = surveyCoordsToViewCoords(point);
-                    fromX = (point.x - viewpointOffset.x) * surveyToViewScale;
-                    fromY = (point.y - viewpointOffset.y) * surveyToViewScale;
+                    // from = viewport.toView(point);
+                    fromX = (point.x - viewOffsetX) * viewScale;
+                    fromY = (point.y - viewOffsetY) * viewScale;
 
                     if (isDebugMode) {
                         canvas.drawCircle(fromX, fromY, 3, drawPaint);
                     }
                 } else {
-                    // Coord2D to = surveyCoordsToViewCoords(point);
-                    float toX = (point.x - viewpointOffset.x) * surveyToViewScale;
-                    float toY = (point.y - viewpointOffset.y) * surveyToViewScale;
+                    // Coord2D to = viewport.toView(point);
+                    float toX = (point.x - viewOffsetX) * viewScale;
+                    float toY = (point.y - viewOffsetY) * viewScale;
 
                     lines[lineIndex++] = fromX;
                     lines[lineIndex++] = fromY;
@@ -2383,11 +2352,11 @@ public class SketchView extends View {
         labelPaint.setAlpha(alpha);
 
         for (TextDetail textDetail : sketch.getTextDetails()) {
-            Coord2D location = surveyCoordsToViewCoords(textDetail.getPosition());
+            Coord2D location = viewport.toView(textDetail.getPosition());
             float x = location.x, y = location.y;
             String text = textDetail.getText();
             setDrawColour(labelPaint, textDetail);
-            labelPaint.setTextSize(textDetail.getSize() * surveyToViewScale);
+            labelPaint.setTextSize(textDetail.getSize() * viewScale);
             for (String line : text.split("\n")) {
                 canvas.drawText(line, x, y, labelPaint);
                 y += labelPaint.descent() - labelPaint.ascent();
@@ -2398,11 +2367,11 @@ public class SketchView extends View {
             if (!couldBeVisible(symbolDetail)) {
                 continue;
             }
-            Coord2D location = surveyCoordsToViewCoords(symbolDetail.getPosition());
+            Coord2D location = viewport.toView(symbolDetail.getPosition());
 
             Symbol symbol = symbolDetail.getSymbol();
 
-            int size = Math.round(symbolDetail.getSize() * surveyToViewScale);
+            int size = Math.round(symbolDetail.getSize() * viewScale);
             if (size < 1) {
                 continue;
             }
@@ -2437,6 +2406,9 @@ public class SketchView extends View {
      */
     private void drawTypedPath(
             Canvas canvas, PathDetail pathDetail, int alpha, boolean shadeRockSide) {
+        float viewOffsetX = viewport.getOffsetX();
+        float viewOffsetY = viewport.getOffsetY();
+        float viewScale = viewport.getScale();
         LineType lineType = pathDetail.getLineType();
         Paint paint = lineTypePaints.get(lineType);
         if (paint == null) { // paints not initialised yet
@@ -2450,8 +2422,8 @@ public class SketchView extends View {
         typedPathScratch.rewind();
         boolean first = true;
         for (Coord2D point : pathDetail.getPath()) {
-            float x = (point.x - viewpointOffset.x) * surveyToViewScale;
-            float y = (point.y - viewpointOffset.y) * surveyToViewScale;
+            float x = (point.x - viewOffsetX) * viewScale;
+            float y = (point.y - viewOffsetY) * viewScale;
             if (first) {
                 typedPathScratch.moveTo(x, y);
                 first = false;
@@ -2539,12 +2511,14 @@ public class SketchView extends View {
      * adjacent areas join seamlessly.
      */
     private void drawAreas(Canvas canvas, Sketch sketch, int alpha) {
+        float viewOffsetX = viewport.getOffsetX();
+        float viewOffsetY = viewport.getOffsetY();
+        float viewScale = viewport.getScale();
 
         float patternScale = getPatternScale();
         areaFillMatrix.setScale(
                 patternScale / AREA_FILL_OVERSAMPLE, patternScale / AREA_FILL_OVERSAMPLE);
-        areaFillMatrix.postTranslate(
-                -viewpointOffset.x * surveyToViewScale, -viewpointOffset.y * surveyToViewScale);
+        areaFillMatrix.postTranslate(-viewOffsetX * viewScale, -viewOffsetY * viewScale);
 
         for (AreaDetail areaDetail : sketch.getAreaDetails()) {
 
@@ -2557,8 +2531,8 @@ public class SketchView extends View {
             for (List<Coord2D> contour : areaDetail.getContours()) {
                 boolean first = true;
                 for (Coord2D point : contour) {
-                    float x = (point.x - viewpointOffset.x) * surveyToViewScale;
-                    float y = (point.y - viewpointOffset.y) * surveyToViewScale;
+                    float x = (point.x - viewOffsetX) * viewScale;
+                    float y = (point.y - viewOffsetY) * viewScale;
                     if (first) {
                         outline.moveTo(x, y);
                         first = false;
@@ -2667,7 +2641,7 @@ public class SketchView extends View {
         canvas.drawText(surveyLabel, x, y, legendPaint);
 
         int minorGridSize = getMinorGridBoxSize();
-        float scaleWidth = surveyToViewScale * minorGridSize;
+        float scaleWidth = viewport.getScale() * minorGridSize;
         float scaleOffsetY = offsetY * 2;
         float scaleY = getHeight() - scaleOffsetY;
         legendPaint.setStyle(Paint.Style.STROKE);
@@ -2765,16 +2739,13 @@ public class SketchView extends View {
                         + " y="
                         + offsetY
                         + " s2v="
-                        + TextTools.formatTo2dp(surveyToViewScale)
+                        + TextTools.formatTo2dp(viewport.getScale())
                         + " 1/s2v="
-                        + TextTools.formatTo2dp(1 / surveyToViewScale)
-                        +
-                        // " 1/log=" + TextTools.formatTo2dp(1 / Math.log(surveyToViewScale)) +
-                        // " 1/log10=" + TextTools.formatTo2dp(1 / Math.log10(surveyToViewScale)) +
-                        "\n log (1/s2v) ="
-                        + TextTools.formatTo2dp(Math.log(1 / surveyToViewScale))
+                        + TextTools.formatTo2dp(1 / viewport.getScale())
+                        + "\n log (1/s2v) ="
+                        + TextTools.formatTo2dp(Math.log(1 / viewport.getScale()))
                         + "\n log10 (1/s2v) ="
-                        + TextTools.formatTo2dp(Math.log10(1 / surveyToViewScale));
+                        + TextTools.formatTo2dp(Math.log10(1 / viewport.getScale()));
 
         canvas.drawText(label, offsetX, offsetY, legendPaint);
     }
@@ -2785,12 +2756,7 @@ public class SketchView extends View {
      * zoom level. Details that fail either check can be skipped without drawing.
      */
     private boolean couldBeVisible(SketchDetail sketchDetail) {
-        boolean possiblyOnScreen =
-                sketchDetail.intersectsRectangle(
-                        viewpointTopLeftOnSurvey, viewpointBottomRightOnSurvey);
-        boolean bigEnough = sketchDetail.couldBeVisibleAtScale(surveyToViewScale);
-
-        return (possiblyOnScreen && bigEnough);
+        return viewport.couldBeVisible(sketchDetail);
     }
 
     public void centreViewOnActiveStation() {
@@ -2809,14 +2775,7 @@ public class SketchView extends View {
     }
 
     public void centreViewOnSurveyPoint(Coord2D point) {
-
-        float xDeltaInMetres = (getWidth() / 2f) / surveyToViewScale;
-        float yDeltaInMetres = (getHeight() / 2f) / surveyToViewScale;
-
-        float x = point.x - xDeltaInMetres;
-        float y = point.y - yDeltaInMetres;
-
-        viewpointOffset = new Coord2D(x, y);
+        viewport.centreOn(point, getWidth(), getHeight());
     }
 
     private void drawDashedLine(
@@ -2869,7 +2828,7 @@ public class SketchView extends View {
     }
 
     public void adjustZoomBy(float delta) {
-        float newZoom = surveyToViewScale * delta;
+        float newZoom = viewport.getScale() * delta;
         setZoom(newZoom);
     }
 
@@ -2879,19 +2838,7 @@ public class SketchView extends View {
     }
 
     public void setZoom(float newZoom, Coord2D focusOnScreen) {
-
-        if (MIN_ZOOM >= newZoom || newZoom >= MAX_ZOOM) {
-            return;
-        }
-
-        Coord2D focusInSurveyCoords = viewCoordsToSurveyCoords(focusOnScreen);
-
-        Coord2D delta = focusInSurveyCoords.minus(viewpointOffset);
-
-        Coord2D scaledDelta = delta.scale(surveyToViewScale / newZoom);
-        viewpointOffset = focusInSurveyCoords.minus(scaledDelta);
-
-        surveyToViewScale = newZoom;
+        viewport.setZoom(newZoom, focusOnScreen);
     }
 
     public boolean canUndo() {
@@ -2967,7 +2914,7 @@ public class SketchView extends View {
             Coord2D focus = new Coord2D(x, y);
 
             float scaleFactor = detector.getScaleFactor();
-            setZoom(surveyToViewScale * scaleFactor, focus);
+            setZoom(viewport.getScale() * scaleFactor, focus);
 
             invalidate();
             return true;

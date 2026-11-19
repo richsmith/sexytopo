@@ -141,7 +141,7 @@ The UI exposes only 8 colours via `BrushColour` (BLACK, BROWN, GREY, RED, ORANGE
 
 ## Coordinate System
 
-Sketch coordinates are in **survey space** (metres). `SketchView` converts to screen pixels using `surveyToViewScale` (default 60.0f, range 0.1–500.0f). Avoid storing pixel coordinates in sketch data.
+Sketch coordinates are in **survey space** (metres). `SketchView` converts to screen pixels through its `Viewport`, which holds the pan offset and the scale in pixels per metre (default 60.0f, range 0.1–500.0f). Hot drawing loops copy the offset and scale into locals and apply the transform inline rather than calling `Viewport.toView` per point. Avoid storing pixel coordinates in sketch data.
 
 ## Serialization
 
@@ -163,7 +163,7 @@ Path simplification is re-applied on load. History stacks are not serialized.
 - **Areas:** drawn first (underneath lines): each region is filled with its type's pattern through a repeating bitmap shader and its contours outlined (an even-odd `Path`, so holes are outlined but left unfilled); the shader is anchored to survey space so the pattern doesn't crawl when panning. Only water and sump (`AreaType.hasDefinedEdge`) are outlined at full line weight, since a shoreline is a real edge; other areas get a light outline, at the weight of their fill marks and faded to `AreaType.LIGHT_OUTLINE_OPACITY`, so they don't compete with walls (likewise in SVG export)
 - **Paths:** SKETCH paths are sorted by colour (to minimize paint changes), then batched into `float[]` arrays for `canvas.drawLines()`; semantic lines are drawn individually via `canvas.drawPath()` with their type's paint so dashes and tick stamps can apply
 - **Symbols:** rendered as scaled, optionally rotated `Drawable` objects with a colour filter
-- **Text:** font size = `textSize * surveyToViewScale`; supports `\n` for multiline
+- **Text:** font size = `textSize * viewport.getScale()`; supports `\n` for multiline
 - **Cross-sections:** `CrossSectionDetail.getProjection()` computes the legs; drawn with dashed connector line to the actual station
 
 Off-screen and sub-pixel details are culled via `couldBeVisible()` before rendering.
