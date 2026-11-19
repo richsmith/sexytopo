@@ -87,9 +87,14 @@ public enum ViewContext {
     /** The context a sketch drawn in the given projection is shown in: the plan if there's none. */
     public static ViewContext forProjection(Projection2D projection) {
         return Arrays.stream(values())
-                .filter(viewContext -> viewContext.projections.contains(projection))
+                .filter(viewContext -> viewContext.covers(projection))
                 .findFirst()
                 .orElse(PLAN);
+    }
+
+    /** Whether a sketch drawn in the given projection is shown in this context. */
+    boolean covers(Projection2D projection) {
+        return projections.contains(projection);
     }
 
     public abstract void configureViewSpecificItems(Menu menu);
