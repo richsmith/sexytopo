@@ -50,6 +50,9 @@ class LineRenderer {
 
     // scratch object reused when drawing typed paths, to avoid per-frame allocation
     private final Path typedPathScratch = new Path();
+    // scratch array of segment end points for plain lines, grown as needed and reused, to avoid
+    // allocating one for every line on every frame
+    private float[] linesScratch = new float[0];
 
     LineRenderer(Viewport viewport) {
         this.viewport = viewport;
@@ -125,18 +128,26 @@ class LineRenderer {
 
             List<Coord2D> path = pathDetail.getPath();
 
+            // four values (the start and end x and y) for each segment between points
+            int segmentValues = Math.max(0, path.size() - 1) * 4;
+            if (linesScratch.length < segmentValues) {
+                linesScratch = new float[Math.max(segmentValues, linesScratch.length * 2)];
+            }
+            float[] lines = linesScratch;
+
             int lineIndex = 0;
-            float fromX = -1, fromY = -1;
-            float[] lines = new float[path.size() * 4];
+            boolean first = true;
+            float fromX = 0, fromY = 0;
 
             // This loop is the slowest part of the draw phase. Pulling out the calculations from
             // within Viewport.toView saves a not insignificant amount of time by not
             // constructing many thousands of Coord2D objects (approx. 10% of sketch draw time)
             for (Coord2D point : path) {
-                if (fromX == -1) {
+                if (first) {
                     // from = viewport.toView(point);
                     fromX = (point.x - viewOffsetX) * viewScale;
                     fromY = (point.y - viewOffsetY) * viewScale;
+                    first = false;
 
                     if (isDebugMode) {
                         canvas.drawCircle(fromX, fromY, 3, drawPaint);
@@ -160,7 +171,7 @@ class LineRenderer {
                 }
             }
 
-            canvas.drawLines(lines, drawPaint);
+            canvas.drawLines(lines, 0, lineIndex, drawPaint);
         }
     }
 
