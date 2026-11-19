@@ -38,11 +38,6 @@ class SketchPaints {
 
     private static final int STATION_STROKE_WIDTH_DP = 2;
     private static final int DASHED_LINE_INTERVAL_DP = 4;
-    private static final int CROSS_SECTION_CONNECTOR_WIDTH_DP = 2;
-    private static final int CROSS_SECTION_INDICATOR_WIDTH_DP = 2;
-    private static final int CROSS_SECTION_BORDER_WIDTH_DP = 2;
-    private static final float CROSS_SECTION_GLYPH_SIZE_DP = 13f;
-    private static final int CROSS_SECTION_HANDLE_GRIP_WIDTH_DP = 2;
     private static final int LEGEND_TICK_SIZE_DP = 5;
     private static final int STATION_LABEL_OFFSET_DP = 10;
 
@@ -81,14 +76,6 @@ class SketchPaints {
     final Paint highlightPaint = new Paint();
     final Paint legendPaint = new Paint();
     final Paint gridPaint = new Paint();
-    final Paint crossSectionConnectorPaint = new Paint();
-    final Paint crossSectionIndicatorPaint = new Paint();
-    final Paint crossSectionHandlePaint = new Paint();
-    final Paint crossSectionHandleGripPaint = new Paint();
-    final Paint crossSectionBorderPaint = new Paint();
-    final Paint crossSectionHorizontalHandlePaint = new Paint();
-    final Paint crossSectionHorizontalBorderPaint = new Paint();
-    final Paint crossSectionGlyphPaint = new Paint();
     final Paint hotCornersPaint = new Paint();
 
     private final Paint[] ANTI_ALIAS_PAINTS =
@@ -103,15 +90,7 @@ class SketchPaints {
                 fadedSplayPaint,
                 drawPaint,
                 areaPaint,
-                labelPaint,
-                crossSectionConnectorPaint,
-                crossSectionIndicatorPaint,
-                crossSectionHandlePaint,
-                crossSectionHandleGripPaint,
-                crossSectionBorderPaint,
-                crossSectionHorizontalHandlePaint,
-                crossSectionHorizontalBorderPaint,
-                crossSectionGlyphPaint
+                labelPaint
             };
 
     float stationCrossDiameterPx;
@@ -222,49 +201,6 @@ class SketchPaints {
         int labelSizeSp = GeneralPreferences.getLabelFontSizeSp();
         float labelSizePixels = spToPixels(context, labelSizeSp);
         labelPaint.setTextSize(labelSizePixels);
-
-        crossSectionConnectorPaint.setColor(
-                ContextCompat.getColor(context, R.color.crossSectionConnection));
-        crossSectionConnectorPaint.setStrokeWidth(dpToPixels(CROSS_SECTION_CONNECTOR_WIDTH_DP));
-        crossSectionConnectorPaint.setStyle(Paint.Style.STROKE);
-
-        crossSectionIndicatorPaint.setColor(
-                ContextCompat.getColor(context, R.color.crossSectionIndicator));
-        crossSectionIndicatorPaint.setStrokeWidth(dpToPixels(CROSS_SECTION_INDICATOR_WIDTH_DP));
-        crossSectionIndicatorPaint.setStyle(Paint.Style.FILL);
-
-        int primaryColor = resolveThemeColor(context, androidx.appcompat.R.attr.colorPrimary);
-
-        crossSectionHandlePaint.setColor(primaryColor);
-        crossSectionHandlePaint.setStyle(Paint.Style.FILL);
-        crossSectionHandlePaint.setAntiAlias(true);
-
-        crossSectionHandleGripPaint.setColor(
-                resolveThemeColor(context, com.google.android.material.R.attr.colorOnPrimary));
-        crossSectionHandleGripPaint.setStrokeWidth(dpToPixels(CROSS_SECTION_HANDLE_GRIP_WIDTH_DP));
-        crossSectionHandleGripPaint.setStyle(Paint.Style.STROKE);
-        crossSectionHandleGripPaint.setStrokeCap(Paint.Cap.ROUND);
-
-        crossSectionBorderPaint.setColor(primaryColor);
-        crossSectionBorderPaint.setStrokeWidth(dpToPixels(CROSS_SECTION_BORDER_WIDTH_DP));
-        crossSectionBorderPaint.setStyle(Paint.Style.STROKE);
-
-        // Horizontal cross-sections get a differently coloured box so they can be told apart from
-        // vertical ones at a glance
-        int horizontalBoxColour =
-                ContextCompat.getColor(context, R.color.crossSectionHorizontalBox);
-
-        crossSectionHorizontalHandlePaint.setColor(horizontalBoxColour);
-        crossSectionHorizontalHandlePaint.setStyle(Paint.Style.FILL);
-        crossSectionHorizontalHandlePaint.setAntiAlias(true);
-
-        crossSectionHorizontalBorderPaint.setColor(horizontalBoxColour);
-        crossSectionHorizontalBorderPaint.setStrokeWidth(dpToPixels(CROSS_SECTION_BORDER_WIDTH_DP));
-        crossSectionHorizontalBorderPaint.setStyle(Paint.Style.STROKE);
-
-        crossSectionGlyphPaint.setTextSize(dpToPixels(CROSS_SECTION_GLYPH_SIZE_DP));
-        crossSectionGlyphPaint.setTextAlign(Paint.Align.CENTER);
-        crossSectionGlyphPaint.setStyle(Paint.Style.FILL);
 
         hotCornersPaint.setColor(ContextCompat.getColor(context, R.color.hotCorner));
         hotCornersPaint.setAlpha(FADED_ALPHA);
@@ -427,7 +363,7 @@ class SketchPaints {
         return sp * context.getResources().getDisplayMetrics().scaledDensity;
     }
 
-    private static int resolveThemeColor(Context context, int attr) {
+    static int resolveThemeColor(Context context, int attr) {
         TypedValue value = new TypedValue();
         context.getTheme().resolveAttribute(attr, value, true);
         return value.data;

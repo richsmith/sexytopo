@@ -186,4 +186,8 @@ Off-screen and sub-pixel details are culled via `couldBeVisible()` before render
 | `model/sketch/Colour.java` | Colour enum |
 | `model/sketch/BrushColour.java` | UI colour picker enum |
 | `control/sketch/SketchView.java` | Rendering and touch handling |
+| `control/sketch/Viewport.java` | Pan and zoom; survey↔screen coordinates; culling |
+| `control/sketch/SketchState.java` | The survey, sketch and projection being shown, and the current and previous tool; shared by the view and its parts |
+| `control/sketch/SketchPaints.java` | Paints, ornament and fill caches, pattern scale |
+| `control/sketch/CrossSectionLayer.java` | Cross-sections on the sketch: drawing, hit-testing, and the place/move/rotate/open gestures |
 | `control/io/basic/SketchJsonTranslater.java` | Serialization |

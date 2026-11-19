@@ -15,7 +15,6 @@ import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RotateDrawable;
 import android.os.Build;
@@ -37,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,10 +45,8 @@ import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.SexyTopo;
 import org.hwyl.sexytopo.control.SurveyManager;
-import org.hwyl.sexytopo.control.activity.CrossSectionActivity;
 import org.hwyl.sexytopo.control.activity.SketchActivity;
 import org.hwyl.sexytopo.control.components.DialogUtils;
-import org.hwyl.sexytopo.control.util.CrossSectioner;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.LineOrienter;
 import org.hwyl.sexytopo.control.util.LoopOrienter;
@@ -90,27 +86,16 @@ public class SketchView extends View {
     // Which part of the survey is on screen, and at what zoom
     protected final Viewport viewport = new Viewport();
 
+    // What's being shown, and which tool is in use
+    protected final SketchState state = new SketchState();
+
     // These variables are used in handling the dragging of the viewing window
     private Coord2D actionDownPointOnView = Coord2D.ORIGIN;
     // where the eraser last was during a drag, or null if it isn't being dragged
     private Coord2D lastErasePointOnSurvey;
     private Coord2D actionDownViewpointOffset = Coord2D.ORIGIN;
 
-    // The cross-section whose body was pressed at the start of the current touch gesture. While
-    // set, the gesture is consumed by the cross-section (and not drawn onto the main sketch); a
-    // clean tap opens its editor on ACTION_UP.
-    private CrossSectionDetail crossSectionBodyPressed = null;
-
     private static final int BOX_SIZE = 10; // every grid box is 10 units square
-
-    private static final int CROSS_SECTION_BORDER_PADDING_MIN_DP = 4;
-    private static final int CROSS_SECTION_BORDER_PADDING_MAX_DP = 16;
-    private static final float CROSS_SECTION_BORDER_PADDING_FRACTION = 0.05f;
-    private static final float CROSS_SECTION_BORDER_CORNER_RADIUS_DP = 6.0f;
-    private static final int CROSS_SECTION_HANDLE_WIDTH_DP = 8;
-    private static final float CROSS_SECTION_GLYPH_BOX_SIZE_DP = 18f;
-    private static final float CROSS_SECTION_HANDLE_GRIP_SPACING_DP = 5f;
-    private static final float CROSS_SECTION_HANDLE_GRIP_LENGTH_FRACTION = 0.45f;
 
     public static final int LEGEND_SIZE = 18;
 
@@ -127,11 +112,6 @@ public class SketchView extends View {
     private float snapToLineSensitivityPx;
 
     private SketchActivity activity;
-
-    protected Projection2D projectionType = Projection2D.PLAN;
-    protected Survey survey;
-    protected Space<Coord2D> projection;
-    protected Sketch sketch;
 
     private Map<Survey, Space<Coord2D>> translatedConnectedSurveys = new HashMap<>();
 
@@ -151,15 +131,8 @@ public class SketchView extends View {
 
     private float compassAzimuthDegrees = 0f;
 
-    public SketchTool currentSketchTool = SketchTool.MOVE;
-    // used to jump back to the previous tool when using one-use tools
-    private SketchTool previousSketchTool = SketchTool.SELECT;
-
     // Flag to prevent double menu opening during this touch sequence
     private boolean menuShownInThisTouch = false;
-    // Flag: this touch sequence landed on a cross-section body, so it opens the editor rather
-    // than drawing onto the main sketch over it.
-    private boolean crossSectionTappedInThisTouch = false;
 
     private Symbol currentSymbol = Symbol.getDefault();
 
@@ -169,27 +142,12 @@ public class SketchView extends View {
 
     private LineType currentLineType = LineType.SKETCH;
 
-    // a bit hacky but I can't think of a better way to do this
-    private String stationNameBeingCrossSectioned = null;
-    private CrossSection.Orientation crossSectionOrientationBeingCreated =
-            CrossSection.Orientation.VERTICAL;
-
-    // State for dragging a cross-section component's handle on the plan.
-    private CrossSectionDetail crossSectionBeingMoved = null;
-    private Coord2D crossSectionMoveAnchorOnSurvey = Coord2D.ORIGIN;
-    private Coord2D crossSectionMoveCurrentDelta = Coord2D.ORIGIN;
-
-    // State for rotating a cross-section via drag-from-station gesture.
-    private CrossSectionDetail crossSectionBeingRotated = null;
-    private Coord2D crossSectionRotateFingerOnView = null;
-    private Float crossSectionPreviewAngle = null;
-
-    // Cached per-detail handle rectangles (in view coords) populated each draw; used for hit-test.
-    private final Map<CrossSectionDetail, RectF> crossSectionHandleRects = new LinkedHashMap<>();
-
     // ********** Drawing **********
 
     private final SketchPaints paints = new SketchPaints();
+
+    private final CrossSectionLayer crossSections =
+            new CrossSectionLayer(viewport, state, paints, new CrossSectionHost());
 
     // scratch object reused when drawing typed paths, to avoid per-frame allocation
     private final Path typedPathScratch = new Path();
@@ -211,6 +169,7 @@ public class SketchView extends View {
 
     public void initialisePaint() {
         paints.initialise(getContext());
+        crossSections.initialisePaints(getContext());
 
         isTwoFingerModeActive = GeneralPreferences.isTwoFingerModeActive();
         isHotCornersModeActive = GeneralPreferences.isHotCornersModeActive();
@@ -225,8 +184,8 @@ public class SketchView extends View {
     }
 
     public void setSurvey(Survey survey) {
-        if (survey != this.survey) {
-            this.survey = survey;
+        if (survey != state.getSurvey()) {
+            state.setSurvey(survey);
             surveyChanged = true;
         }
     }
@@ -239,15 +198,15 @@ public class SketchView extends View {
     }
 
     public void setProjectionType(Projection2D projectionType) {
-        this.projectionType = projectionType;
+        state.setProjectionType(projectionType);
     }
 
     public void setProjection(Space<Coord2D> projection) {
-        this.projection = projection;
+        state.setProjection(projection);
     }
 
     public void setSketch(Sketch sketch) {
-        this.sketch = sketch;
+        state.setSketch(sketch);
     }
 
     public void setIsDarkModeActive(boolean isDarkModeActive) {
@@ -261,7 +220,7 @@ public class SketchView extends View {
         // Reset per-touch flags at start of new touch sequence
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             menuShownInThisTouch = false;
-            crossSectionTappedInThisTouch = false;
+            crossSections.onTouchStart();
         }
 
         scaleGestureDetector.onTouchEvent(event);
@@ -270,15 +229,15 @@ public class SketchView extends View {
         if (scaleGestureDetector.isInProgress()) {
             // a pinch interrupts an erasing drag: don't erase a line from where it left off
             lastErasePointOnSurvey = null;
-            sketch.endGroupingDeletions();
+            state.getSketch().endGroupingDeletions();
             return true;
         }
 
-        if (currentSketchTool.isModal()
-                && currentSketchTool != SketchTool.MOVE_CROSS_SECTION
+        if (state.getSketchTool().isModal()
+                && state.getSketchTool() != SketchTool.MOVE_CROSS_SECTION
                 && event.getAction() == MotionEvent.ACTION_UP) {
-            if (previousSketchTool != currentSketchTool) {
-                setSketchTool(previousSketchTool);
+            if (state.getPreviousSketchTool() != state.getSketchTool()) {
+                state.revertToPreviousTool();
             } else {
                 setSketchTool(SketchTool.MOVE);
             }
@@ -291,11 +250,11 @@ public class SketchView extends View {
             // handled below
         }
 
-        if (isCrossSectionMoveSelection(event)) {
+        if (crossSections.isHandlePress(event)) {
             setSketchTool(SketchTool.MOVE_CROSS_SECTION);
         }
 
-        if (handleCrossSectionBodyTap(event)) {
+        if (crossSections.handleBodyTap(event)) {
             return true;
         }
 
@@ -305,7 +264,7 @@ public class SketchView extends View {
             return true;
         }
 
-        switch (currentSketchTool) {
+        switch (state.getSketchTool()) {
             case MOVE:
                 return handleMove(event);
             case MODAL_MOVE:
@@ -323,18 +282,18 @@ public class SketchView extends View {
             case SELECT:
                 return handleSelect(event);
             case POSITION_CROSS_SECTION:
-                return handlePositionCrossSection(event);
+                return crossSections.positionTool.onTouch(event);
             case ROTATE_CROSS_SECTION:
-                return handleRotateCrossSection(event);
+                return crossSections.rotateTool.onTouch(event);
             case MOVE_CROSS_SECTION:
-                return handleMoveCrossSection(event);
+                return crossSections.moveTool.onTouch(event);
         }
         return false;
     }
 
     private boolean isModalMoveSelection(MotionEvent event) {
 
-        if (currentSketchTool == SketchTool.MODAL_MOVE) {
+        if (state.getSketchTool() == SketchTool.MODAL_MOVE) {
             return false;
         }
 
@@ -373,16 +332,6 @@ public class SketchView extends View {
         return hitCorner;
     }
 
-    private boolean isCrossSectionMoveSelection(MotionEvent event) {
-        if (GeneralPreferences.isLegacyCrossSectionsOn()) {
-            return false; // no drag handle is drawn for legacy cross-sections
-        }
-        boolean currentlyActive = currentSketchTool == SketchTool.MOVE_CROSS_SECTION;
-        boolean isDown = event.getAction() == MotionEvent.ACTION_DOWN;
-        boolean hitAHandle = findCrossSectionHandleAt(event.getX(), event.getY()) != null;
-        return !currentlyActive && isDown && hitAHandle;
-    }
-
     private boolean handleLine(MotionEvent event) {
 
         Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
@@ -393,15 +342,15 @@ public class SketchView extends View {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 actionDownPointOnView = touchPointOnView;
-                sketch.startNewPath(surveyCoords, currentColour, currentLineType);
+                state.getSketch().startNewPath(surveyCoords, currentColour, currentLineType);
                 break;
 
             case MotionEvent.ACTION_MOVE:
-                if (sketch.getActivePath() == null) {
+                if (state.getSketch().getActivePath() == null) {
                     // shouldn't be null, but just in case...
-                    sketch.startNewPath(surveyCoords, currentColour, currentLineType);
+                    state.getSketch().startNewPath(surveyCoords, currentColour, currentLineType);
                 } else {
-                    sketch.getActivePath().lineTo(surveyCoords);
+                    state.getSketch().getActivePath().lineTo(surveyCoords);
                 }
                 invalidate();
                 break;
@@ -409,20 +358,20 @@ public class SketchView extends View {
             case MotionEvent.ACTION_UP:
                 boolean isDot = touchPointOnView.equals(actionDownPointOnView);
                 if (isDot) {
-                    sketch.getActivePath().lineTo(surveyCoords);
+                    state.getSketch().getActivePath().lineTo(surveyCoords);
                 }
                 closeActivePathIfOutline();
                 orientActivePathIfRequired();
                 // snapped once the line's direction is settled, as that decides which ends of
                 // other lines it can join
                 if (snapToLines && !isDot) {
-                    sketch.snapActivePath(getSnapDistance());
+                    state.getSketch().snapActivePath(getSnapDistance());
                     invalidate();
                 }
                 // A tap with a freehand line leaves a dot, but a typed line that small is a
                 // mistake: it would be meaningless in an export
                 float minimumSize = currentLineType.isSemantic() ? getMinimumLineSize() : 0;
-                sketch.finishPath(minimumSize);
+                state.getSketch().finishPath(minimumSize);
                 break;
 
             default:
@@ -440,21 +389,21 @@ public class SketchView extends View {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 actionDownPointOnView = touchPointOnView;
-                sketch.startNewArea(surveyCoords, currentColour, currentAreaType);
+                state.getSketch().startNewArea(surveyCoords, currentColour, currentAreaType);
                 break;
 
             case MotionEvent.ACTION_MOVE:
-                if (sketch.getActivePath() == null) {
+                if (state.getSketch().getActivePath() == null) {
                     // shouldn't be null, but just in case...
-                    sketch.startNewArea(surveyCoords, currentColour, currentAreaType);
+                    state.getSketch().startNewArea(surveyCoords, currentColour, currentAreaType);
                 } else {
-                    sketch.getActivePath().lineTo(surveyCoords);
+                    state.getSketch().getActivePath().lineTo(surveyCoords);
                 }
                 invalidate();
                 break;
 
             case MotionEvent.ACTION_UP:
-                sketch.finishArea(currentAreaType, getMinimumArea());
+                state.getSketch().finishArea(currentAreaType, getMinimumArea());
                 invalidate();
                 break;
 
@@ -471,7 +420,7 @@ public class SketchView extends View {
      * as close as Snap to Lines would join.
      */
     private void closeActivePathIfOutline() {
-        PathDetail activePath = sketch.getActivePath();
+        PathDetail activePath = state.getSketch().getActivePath();
         if (activePath == null || !activePath.getLineType().isOutline()) {
             return;
         }
@@ -492,19 +441,19 @@ public class SketchView extends View {
      * LineOrienter), or the inside of a loop for a ticked edge or outline (see LoopOrienter).
      */
     private void orientActivePathIfRequired() {
-        PathDetail activePath = sketch.getActivePath();
+        PathDetail activePath = state.getSketch().getActivePath();
         if (activePath == null || !SketchPreferences.Toggle.AUTO_ORIENTATION.isOn()) {
             return;
         }
         LineType lineType = activePath.getLineType();
-        if (lineType.isWall() && projection != null) {
+        if (lineType.isWall() && state.getProjection() != null) {
             LineOrienter.orientToInterior(activePath.getPath(), getLegLines());
         } else if (lineType.isOrientedByLoop()) {
             // a pit or chimney edge drawn round its hole, alone or with a wall, has its ticks
             // inside, and a boulder outline its rock; ends count as meeting when they're as close
             // as Snap to Lines would join
             List<List<Coord2D>> walls =
-                    sketch.getPathDetails().stream()
+                    state.getSketch().getPathDetails().stream()
                             .filter(path -> path.getLineType().isWall())
                             .map(PathDetail::getPath)
                             .collect(Collectors.toList());
@@ -558,7 +507,7 @@ public class SketchView extends View {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 // everything erased in one drag is undone together
-                sketch.startGroupingDeletions();
+                state.getSketch().startGroupingDeletions();
                 lastErasePointOnSurvey = touchPointOnSurvey;
                 SketchDetail tapped = findDetailTapped(touchPointOnSurvey, deleteToleranceInMetres);
                 if (tapped != null) {
@@ -586,7 +535,7 @@ public class SketchView extends View {
 
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                sketch.endGroupingDeletions();
+                state.getSketch().endGroupingDeletions();
                 lastErasePointOnSurvey = null;
                 break;
 
@@ -610,15 +559,16 @@ public class SketchView extends View {
         for (int i = 1; i <= steps; i++) {
             Coord2D point = from.plus(to.minus(from).scale((float) i / steps));
             SketchDetail detail =
-                    sketch.findNearestVisibleDetailWithin(
-                            point, toleranceInMetres, viewport.getScale());
+                    state.getSketch()
+                            .findNearestVisibleDetailWithin(
+                                    point, toleranceInMetres, viewport.getScale());
             if (detail instanceof CrossSectionDetail) {
                 continue;
             }
             // crossing the middle of an area only cuts through it; it would be too easy to delete
             // a whole one by accident
             if (detail == null && deleteLineFragments) {
-                detail = sketch.findAreaContaining(point);
+                detail = state.getSketch().findAreaContaining(point);
             }
             if (detail != null) {
                 eraseDetail(detail, point, toleranceInMetres, deleteLineFragments);
@@ -640,20 +590,21 @@ public class SketchView extends View {
     private SketchDetail findDetailTapped(Coord2D touchPointOnSurvey, float toleranceInMetres) {
 
         SketchDetail nearest =
-                sketch.findNearestVisibleDetailWithin(
-                        touchPointOnSurvey, toleranceInMetres, viewport.getScale());
+                state.getSketch()
+                        .findNearestVisibleDetailWithin(
+                                touchPointOnSurvey, toleranceInMetres, viewport.getScale());
         if (nearest != null) {
             return nearest;
         }
 
         if (SketchPreferences.Toggle.SHOW_X_SECTIONS.isOn()) {
-            CrossSectionDetail crossSection = findCrossSectionBodyAt(touchPointOnSurvey);
+            CrossSectionDetail crossSection = crossSections.findBodyAt(touchPointOnSurvey);
             if (crossSection != null) {
                 return crossSection;
             }
         }
 
-        return sketch.findAreaContaining(touchPointOnSurvey);
+        return state.getSketch().findAreaContaining(touchPointOnSurvey);
     }
 
     /**
@@ -677,7 +628,7 @@ public class SketchView extends View {
                             .stream()
                             .filter(fragment -> fragment.getMaxDimension() >= minimumSize)
                             .collect(Collectors.toList());
-            sketch.deleteDetail(detail, fragments);
+            state.getSketch().deleteDetail(detail, fragments);
 
         } else if (deleteLineFragments && detail instanceof AreaDetail) {
             // carve a notch out of the area; this can split it into several areas, or punch a
@@ -686,7 +637,7 @@ public class SketchView extends View {
 
         } else {
             // bullseye!
-            sketch.deleteDetail(detail);
+            state.getSketch().deleteDetail(detail);
         }
     }
 
@@ -700,7 +651,7 @@ public class SketchView extends View {
         List<PolygonUtils.Region> remaining =
                 PolygonUtils.subtract(areaDetail.toRegion(), touchPointOnSurvey, radius);
         if (remaining == null) {
-            sketch.deleteDetail(areaDetail);
+            state.getSketch().deleteDetail(areaDetail);
             return;
         }
         // a nibble can leave slivers too small to be worth keeping
@@ -710,7 +661,7 @@ public class SketchView extends View {
                         .filter(region -> region.getArea() >= minimumArea)
                         .map(region -> (SketchDetail) areaDetail.withRegion(region))
                         .collect(Collectors.toList());
-        sketch.deleteDetail(areaDetail, replacements);
+        state.getSketch().deleteDetail(areaDetail, replacements);
     }
 
     /**
@@ -757,15 +708,17 @@ public class SketchView extends View {
                             Space2DUtils.getAngleBetween(actionDownPointOnView, touchPointOnView);
                     angle = Space2DUtils.adjustAngle(angle, -90);
                     Coord2D firstTouch = viewport.toSurvey(actionDownPointOnView);
-                    sketch.addSymbolDetail(firstTouch, currentSymbol, currentColour, size, angle);
+                    state.getSketch()
+                            .addSymbolDetail(firstTouch, currentSymbol, currentColour, size, angle);
                     float distance =
                             Space2DUtils.getDistance(actionDownPointOnView, touchPointOnView);
                     if (distance < 5) {
                         activity.showSimpleToast(R.string.sketch_symbol_orientation_education);
                     }
                 } else {
-                    sketch.addSymbolDetail(
-                            touchPointOnSurvey, currentSymbol, currentColour, size, 0);
+                    state.getSketch()
+                            .addSymbolDetail(
+                                    touchPointOnSurvey, currentSymbol, currentColour, size, 0);
                 }
                 invalidate();
                 return true;
@@ -803,8 +756,9 @@ public class SketchView extends View {
                                     float startingSizePixels =
                                             SketchPaints.spToPixels(getContext(), startingSizeSp);
                                     float size = startingSizePixels / viewport.getScale();
-                                    sketch.addTextDetail(
-                                            touchPointOnSurvey, text, currentColour, size);
+                                    state.getSketch()
+                                            .addTextDetail(
+                                                    touchPointOnSurvey, text, currentColour, size);
                                     invalidate();
                                 })
                         .setNegativeButton(R.string.cancel, null);
@@ -842,8 +796,8 @@ public class SketchView extends View {
                 if (newSelectedStation == null) {
                     return false;
 
-                } else if (newSelectedStation != survey.getActiveStation()) {
-                    survey.setActiveStation(newSelectedStation);
+                } else if (newSelectedStation != state.getSurvey().getActiveStation()) {
+                    state.getSurvey().setActiveStation(newSelectedStation);
                     broadcastSurveyUpdated();
                     invalidate();
                     return true;
@@ -871,133 +825,9 @@ public class SketchView extends View {
         Coord2D touchPointOnSurvey = viewport.toSurvey(touchPointOnView);
 
         Station matchedStation =
-                findNearestStationWithinDelta(projection, touchPointOnSurvey, selectionTolerance);
+                findNearestStationWithinDelta(
+                        state.getProjection(), touchPointOnSurvey, selectionTolerance);
         return matchedStation; // this could be null if nothing is near
-    }
-
-    /**
-     * Place the cross-section where the user has selected lifts.
-     *
-     * @noinspection SameReturnValue
-     */
-    private boolean handlePositionCrossSection(MotionEvent event) {
-
-        // Acting on UP rather than DOWN means this tool owns the
-        // whole gesture; switching tools on DOWN would hand the rest
-        // of the gesture to the previous tool, which never saw its
-        // DOWN (e.g. MOVE would pan from a stale anchor and jump the
-        // screen).
-        if (event.getAction() != MotionEvent.ACTION_UP) {
-            return true;
-        }
-
-        Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
-        Coord2D touchPointOnSurvey = viewport.toSurvey(touchPointOnView);
-
-        final Station station = survey.getStationByName(stationNameBeingCrossSectioned);
-        stationNameBeingCrossSectioned = null;
-        CrossSection.Orientation orientation = crossSectionOrientationBeingCreated;
-        crossSectionOrientationBeingCreated = CrossSection.Orientation.VERTICAL;
-        if (station == null) {
-            return true;
-        }
-
-        CrossSection crossSection = CrossSectioner.section(survey, station, orientation);
-
-        CrossSectionDetail detail = new CrossSectionDetail(crossSection, touchPointOnSurvey);
-        sketch.addCrossSection(detail);
-
-        setSketchTool(previousSketchTool);
-        invalidate();
-
-        return true;
-    }
-
-    /**
-     * Drive the {@link SketchTool#MOVE_CROSS_SECTION} drag. Entry is set up in {@link
-     * #onTouchEvent} when DOWN lands on a handle; this method is then dispatched for the rest of
-     * the touch sequence.
-     */
-    private boolean handleMoveCrossSection(MotionEvent event) {
-        Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
-
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                CrossSectionDetail detailOnHandle =
-                        findCrossSectionHandleAt(touchPointOnView.x, touchPointOnView.y);
-                if (detailOnHandle == null) {
-                    setSketchTool(previousSketchTool);
-                    return false;
-                }
-                crossSectionBeingMoved = detailOnHandle;
-                crossSectionMoveAnchorOnSurvey = viewport.toSurvey(touchPointOnView);
-                crossSectionMoveCurrentDelta = Coord2D.ORIGIN;
-                return true;
-
-            case MotionEvent.ACTION_MOVE:
-                if (crossSectionBeingMoved != null) {
-                    Coord2D current = viewport.toSurvey(touchPointOnView);
-                    crossSectionMoveCurrentDelta = current.minus(crossSectionMoveAnchorOnSurvey);
-                    invalidate();
-                }
-                return true;
-
-            case MotionEvent.ACTION_UP:
-                if (crossSectionBeingMoved != null) {
-                    Coord2D current = viewport.toSurvey(touchPointOnView);
-                    Coord2D delta = current.minus(crossSectionMoveAnchorOnSurvey);
-                    CrossSectionDetail moved = crossSectionBeingMoved;
-                    crossSectionBeingMoved = null;
-                    crossSectionMoveCurrentDelta = Coord2D.ORIGIN;
-                    if (delta.x != 0 || delta.y != 0) {
-                        sketch.replaceCrossSectionDetail(moved, moved.translate(delta));
-                    }
-                    invalidate();
-                }
-                setSketchTool(previousSketchTool);
-                return true;
-
-            case MotionEvent.ACTION_CANCEL:
-                crossSectionBeingMoved = null;
-                crossSectionMoveCurrentDelta = Coord2D.ORIGIN;
-                setSketchTool(previousSketchTool);
-                return true;
-
-            default:
-                return false;
-        }
-    }
-
-    /** If user taps on a cross-section then open the editor. */
-    private boolean handleCrossSectionBodyTap(MotionEvent event) {
-        if (!SketchPreferences.Toggle.SHOW_X_SECTIONS.isOn()) {
-            return false; // special case: can't tap on invisible X-sections
-        }
-        if (GeneralPreferences.isLegacyCrossSectionsOn()) {
-            return false; // in legacy mode there is no frame to tap
-        }
-        if (currentSketchTool == SketchTool.MOVE) {
-            return false; // MOVE just pans; don't open the cross-section view on a tap
-        }
-        if (currentSketchTool == SketchTool.ERASE) {
-            return false; // let handleErase deal with deleting cross-sections
-        }
-        if (currentSketchTool.isModal() || currentSketchTool == SketchTool.MOVE_CROSS_SECTION) {
-            return false; // a handle drag, pan or pinch is in progress; let it run
-        }
-
-        // Open the editor as soon as a press lands on a cross-section body, before any stroke can
-        // start on the main sketch over it. The remaining events of this gesture are swallowed.
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            Coord2D touchOnSurvey = viewport.toSurvey(new Coord2D(event.getX(), event.getY()));
-            CrossSectionDetail tapped = findCrossSectionBodyAt(touchOnSurvey);
-            if (tapped != null) {
-                launchCrossSectionEditor(tapped);
-                crossSectionTappedInThisTouch = true;
-            }
-            return crossSectionTappedInThisTouch;
-        }
-        return crossSectionTappedInThisTouch;
     }
 
     private void showContextMenu(MotionEvent event, final Station station) {
@@ -1011,7 +841,7 @@ public class SketchView extends View {
         ContextMenuManager menuManager =
                 new ContextMenuManager(getContext(), viewContext, activity);
         menuManager.showMenuForStation(
-                this, station, survey, (int) event.getX(), (int) event.getY());
+                this, station, state.getSurvey(), (int) event.getX(), (int) event.getY());
     }
 
     /**
@@ -1022,8 +852,9 @@ public class SketchView extends View {
         float selectionTolerance = selectionSensitivityPx / viewport.getScale();
         Coord2D touchPointOnSurvey = viewport.toSurvey(touchPointOnView);
         SketchDetail nearest =
-                sketch.findNearestVisibleDetailWithin(
-                        touchPointOnSurvey, selectionTolerance, viewport.getScale());
+                state.getSketch()
+                        .findNearestVisibleDetailWithin(
+                                touchPointOnSurvey, selectionTolerance, viewport.getScale());
         return nearest instanceof PathDetail ? (PathDetail) nearest : null;
     }
 
@@ -1054,7 +885,7 @@ public class SketchView extends View {
         popup.setOnMenuItemClickListener(
                 item -> {
                     if (item.getItemId() == R.id.action_flip_line) {
-                        sketch.flipPathDetail(pathDetail);
+                        state.getSketch().flipPathDetail(pathDetail);
                         invalidate();
                         return true;
                     }
@@ -1069,7 +900,7 @@ public class SketchView extends View {
     }
 
     private void retypeLine(PathDetail pathDetail, LineType lineType) {
-        sketch.retypePathDetail(pathDetail, lineType);
+        state.getSketch().retypePathDetail(pathDetail, lineType);
         invalidate();
     }
 
@@ -1078,10 +909,10 @@ public class SketchView extends View {
      * the walls themselves, and may run on beyond them into a neighbouring passage.
      */
     private List<Line<Coord2D>> getLegLines() {
-        if (projection == null) {
+        if (state.getProjection() == null) {
             return Collections.emptyList();
         }
-        return projection.getLegMap().entrySet().stream()
+        return state.getProjection().getLegMap().entrySet().stream()
                 .filter(entry -> entry.getKey().hasDestination())
                 .map(Map.Entry::getValue)
                 .collect(Collectors.toList());
@@ -1091,10 +922,10 @@ public class SketchView extends View {
      * @noinspection DuplicateBranchesInSwitch
      */
     protected ViewContext getViewContext() {
-        if (projectionType == null) {
+        if (state.getProjectionType() == null) {
             return ViewContext.PLAN;
         }
-        switch (projectionType) {
+        switch (state.getProjectionType()) {
             case PLAN:
                 return ViewContext.PLAN;
             case EXTENDED_ELEVATION:
@@ -1138,127 +969,15 @@ public class SketchView extends View {
     }
 
     public void handleNewCrossSection(Station station, CrossSection.Orientation orientation) {
-        stationNameBeingCrossSectioned = station.getName();
-        crossSectionOrientationBeingCreated = orientation;
-        setSketchTool(SketchTool.POSITION_CROSS_SECTION);
-        activity.showSimpleToast(R.string.sketch_position_cross_section_instruction);
+        crossSections.startPositioning(station, orientation);
     }
 
     public void handleRotateCrossSection(Station station) {
-        CrossSectionDetail detail = sketch.getCrossSectionDetail(station);
-        if (detail == null || !detail.getCrossSection().isRotatable()) {
-            return;
-        }
-        crossSectionBeingRotated = detail;
-        crossSectionRotateFingerOnView = null;
-        crossSectionPreviewAngle = null;
-        setSketchTool(SketchTool.ROTATE_CROSS_SECTION);
-        activity.showSimpleToast(R.string.sketch_rotate_cross_section_instruction);
-    }
-
-    /**
-     * Handle the rotation drag for a cross-section. On the plan the compass azimuth is computed
-     * from the station's position in the main survey to the finger location. On the elevation,
-     * which has no bearings, the section snaps to face left or right, whichever side of the station
-     * the finger is on.
-     */
-    private boolean handleRotateCrossSection(MotionEvent event) {
-        if (crossSectionBeingRotated == null) {
-            setSketchTool(previousSketchTool);
-            return false;
-        }
-
-        Coord2D pivotOnSurvey = getRotationPivot(crossSectionBeingRotated);
-        if (pivotOnSurvey == null) {
-            setSketchTool(previousSketchTool);
-            return false;
-        }
-        Coord2D fingerOnView = new Coord2D(event.getX(), event.getY());
-        Coord2D fingerOnSurvey = viewport.toSurvey(fingerOnView);
-        float dx = fingerOnSurvey.x - pivotOnSurvey.x;
-        float dy = fingerOnSurvey.y - pivotOnSurvey.y;
-
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-            case MotionEvent.ACTION_MOVE:
-                crossSectionRotateFingerOnView = fingerOnView;
-                Float previewAngle = getRotationAngle(crossSectionBeingRotated, dx, dy);
-                if (previewAngle != null) {
-                    crossSectionPreviewAngle = previewAngle;
-                }
-                invalidate();
-                return true;
-
-            case MotionEvent.ACTION_UP:
-                Float newAngle = getRotationAngle(crossSectionBeingRotated, dx, dy);
-                if (newAngle != null) {
-                    CrossSectionDetail rotated = crossSectionBeingRotated.withAngle(newAngle);
-                    sketch.replaceCrossSectionDetail(crossSectionBeingRotated, rotated);
-                }
-                crossSectionBeingRotated = null;
-                crossSectionRotateFingerOnView = null;
-                crossSectionPreviewAngle = null;
-                setSketchTool(previousSketchTool);
-                invalidate();
-                return true;
-
-            case MotionEvent.ACTION_CANCEL:
-                crossSectionBeingRotated = null;
-                crossSectionRotateFingerOnView = null;
-                crossSectionPreviewAngle = null;
-                setSketchTool(previousSketchTool);
-                invalidate();
-                return true;
-        }
-        return true;
-    }
-
-    /** Pivot for rotation: the station's location in the main survey projection. */
-    private Coord2D getRotationPivot(CrossSectionDetail detail) {
-        Station station = detail.getCrossSection().getStation();
-        if (station == null || projection == null) {
-            return null;
-        }
-        return projection.getStationMap().get(station);
-    }
-
-    /**
-     * The bearing to turn a cross-section to for a finger at (dx, dy) from its station, or null if
-     * the finger is too close to the station to say.
-     */
-    private Float getRotationAngle(CrossSectionDetail detail, float dx, float dy) {
-        if (projectionType == Projection2D.EXTENDED_ELEVATION) {
-            if (dx == 0) {
-                return null;
-            }
-            return CrossSectioner.getAngleFacingOnElevation(
-                    survey, detail.getCrossSection().getStation(), dx > 0);
-        }
-        if (dx == 0 && dy == 0) {
-            return null;
-        }
-        return toAzimuth(dx, dy);
-    }
-
-    /** Compass azimuth (0 = North, 90 = East) for a vector in plan-view survey coords. */
-    private static float toAzimuth(float dx, float dy) {
-        // Plan view: +x = East, -y = North. atan2(x, -y) gives bearing clockwise from North.
-        double radians = Math.atan2(dx, -dy);
-        float degrees = (float) Math.toDegrees(radians);
-        return ((degrees % 360) + 360) % 360;
+        crossSections.startRotating(station);
     }
 
     public void launchCrossSectionEditor(CrossSectionDetail detail) {
-        Station station = detail.getCrossSection().getStation();
-        if (station == null) {
-            return;
-        }
-        android.content.Intent intent =
-                new android.content.Intent(getContext(), CrossSectionActivity.class);
-        intent.putExtra(CrossSectionActivity.EXTRA_STATION_NAME, station.getName());
-        Projection2D parentProjection = projectionType == null ? Projection2D.PLAN : projectionType;
-        intent.putExtra(CrossSectionActivity.EXTRA_PROJECTION, parentProjection.getAbbreviation());
-        getContext().startActivity(intent);
+        crossSections.launchEditor(detail);
     }
 
     private void broadcastSurveyUpdated() {
@@ -1278,8 +997,8 @@ public class SketchView extends View {
         updateViewBounds();
 
         drawGrid(canvas);
-        drawConnectedSurveys(canvas, projection, FADED_ALPHA);
-        drawSurvey(canvas, survey, projection, SOLID_ALPHA);
+        drawConnectedSurveys(canvas, state.getProjection(), FADED_ALPHA);
+        drawSurvey(canvas, state.getSurvey(), state.getProjection(), SOLID_ALPHA);
         drawLegend(canvas);
         drawCompass(canvas);
         drawHotCorners(canvas);
@@ -1288,9 +1007,9 @@ public class SketchView extends View {
 
     protected void drawSurvey(Canvas canvas, Survey survey, Space<Coord2D> projection, int alpha) {
         drawSketch(canvas, activity.getSketch(survey), alpha);
-        if (survey == this.survey) {
+        if (survey == state.getSurvey()) {
             // Linked surveys are drawn without their cross-sections, to cut down on clutter
-            drawCrossSections(canvas, sketch.getCrossSectionDetails(), alpha);
+            crossSections.draw(canvas, state.getSketch().getCrossSectionDetails(), alpha);
         }
         drawSurveyData(survey, canvas, projection, alpha);
     }
@@ -1305,7 +1024,7 @@ public class SketchView extends View {
             try {
                 this.translatedConnectedSurveys =
                         ConnectedSurveys.getTranslatedConnectedSurveys(
-                                activity.getProjectionType(), survey, projection);
+                                activity.getProjectionType(), state.getSurvey(), projection);
             } catch (Exception exception) {
                 Log.e("Error getting translated connected surveys");
                 Log.e(exception);
@@ -1336,7 +1055,8 @@ public class SketchView extends View {
 
     private Set<Survey> getFlatSetOfConnectedSurveys() {
         Set<Survey> flatSet = new HashSet<>();
-        for (Set<SurveyConnection> connectionSet : survey.getConnectedSurveys().values()) {
+        for (Set<SurveyConnection> connectionSet :
+                state.getSurvey().getConnectedSurveys().values()) {
             for (SurveyConnection connection : connectionSet) {
                 flatSet.add(connection.otherSurvey);
             }
@@ -1395,381 +1115,6 @@ public class SketchView extends View {
         drawStations(survey, canvas, space, alpha);
     }
 
-    private void drawCrossSections(
-            Canvas canvas, List<CrossSectionDetail> crossSectionDetails, int alpha) {
-
-        if (!SketchPreferences.Toggle.SHOW_X_SECTIONS.isOn()) {
-            return;
-        }
-
-        paints.crossSectionConnectorPaint.setAlpha(alpha);
-        paints.crossSectionHandlePaint.setAlpha(alpha);
-        paints.crossSectionHandleGripPaint.setAlpha(alpha);
-        paints.crossSectionBorderPaint.setAlpha(alpha);
-        paints.crossSectionHorizontalHandlePaint.setAlpha(alpha);
-        paints.crossSectionHorizontalBorderPaint.setAlpha(alpha);
-
-        crossSectionHandleRects.clear();
-
-        List<CrossSectionDetail> badXSections = new ArrayList<>();
-
-        for (CrossSectionDetail detail : crossSectionDetails) {
-            if (!drawCrossSection(canvas, detail, alpha)) {
-                badXSections.add(detail);
-            }
-        }
-
-        drawRotationGuideLine(canvas);
-
-        for (CrossSectionDetail badDetail : badXSections) {
-            CrossSection xs = badDetail.getCrossSection();
-            Station station = (xs != null) ? xs.getStation() : null;
-            String name = (station != null) ? station.getName() : "Unknown";
-            Log.e("Missing station details for cross section on station " + name + "; removing");
-            crossSectionDetails.remove(badDetail);
-        }
-    }
-
-    /**
-     * Draw a single cross-section component: projected legs, sub-sketch, border, handle, connector,
-     * and optional station label. Returns true on success, false if the detail has invalid data and
-     * should be removed.
-     */
-    private boolean drawCrossSection(Canvas canvas, CrossSectionDetail originalDetail, int alpha) {
-
-        // If this detail is being rotated, render a preview using the in-progress angle.
-        CrossSectionDetail sectionDetail = originalDetail;
-        if (originalDetail == crossSectionBeingRotated && crossSectionPreviewAngle != null) {
-            sectionDetail = originalDetail.withAngle(crossSectionPreviewAngle);
-        }
-
-        // A detail being dragged is visualised at its new position via the drag delta.
-        Coord2D dragDelta =
-                (originalDetail == crossSectionBeingMoved)
-                        ? crossSectionMoveCurrentDelta
-                        : Coord2D.ORIGIN;
-
-        if (!couldBeVisible(sectionDetail)) {
-            return true;
-        }
-
-        CrossSection crossSection = sectionDetail.getCrossSection();
-        if (crossSection == null) {
-            return false;
-        }
-
-        Station station = crossSection.getStation();
-        if (station == null) {
-            return false;
-        }
-
-        Coord2D surveyStationLocation = this.projection.getStationMap().get(station);
-        if (surveyStationLocation == null) {
-            return false;
-        }
-
-        Coord2D centreOnSurvey = sectionDetail.getPosition().plus(dragDelta);
-        Coord2D centreOnView = viewport.toView(centreOnSurvey);
-        drawStationCross(
-                canvas,
-                paints.stationPaint,
-                centreOnView.x,
-                centreOnView.y,
-                Math.round(paints.stationCrossDiameterPx),
-                alpha);
-
-        if (SketchPreferences.Toggle.SHOW_STATION_LABELS.isOn()) {
-            String description = station.getName() + " X";
-            paints.stationPaint.setAlpha(alpha);
-            canvas.drawText(description, centreOnView.x, centreOnView.y, paints.stationPaint);
-        }
-
-        Space<Coord2D> rawProjection = crossSection.getProjection();
-        float xsScale = sketch.getCrossSectionScale();
-        Space<Coord2D> scaledProjection = rawProjection.scale(xsScale);
-        Space<Coord2D> sectionProjection = Space2DUtils.translate(scaledProjection, centreOnSurvey);
-        // Judge which splays are in the section's plane the same way the section editor does
-        drawLegs(canvas, sectionProjection, alpha, crossSection.getProjectionType()::isLegInPlane);
-
-        Coord2D viewStationLocation = viewport.toView(surveyStationLocation);
-
-        if (GeneralPreferences.isLegacyCrossSectionsOn()) {
-            // Legacy cross-sections: just the projected legs and a connector running to the centre,
-            // with no editable frame, sub-sketch or drag handle.
-            drawDashedLine(
-                    canvas,
-                    viewStationLocation,
-                    centreOnView,
-                    paints.dashedLineIntervalPx,
-                    paints.crossSectionConnectorPaint);
-            return true;
-        }
-
-        drawCrossSectionSubSketch(canvas, sectionDetail, centreOnSurvey, alpha);
-
-        boolean isHorizontal =
-                sectionDetail.getCrossSection().getOrientation()
-                        == CrossSection.Orientation.HORIZONTAL;
-        Paint borderPaint =
-                isHorizontal
-                        ? paints.crossSectionHorizontalBorderPaint
-                        : paints.crossSectionBorderPaint;
-        Paint handlePaint =
-                isHorizontal
-                        ? paints.crossSectionHorizontalHandlePaint
-                        : paints.crossSectionHandlePaint;
-
-        RectF borderRect = drawCrossSectionBorder(canvas, sectionDetail, dragDelta, borderPaint);
-
-        Coord2D connectorEnd =
-                clipSegmentToRectBoundary(viewStationLocation, centreOnView, borderRect);
-        if (connectorEnd != null) {
-            drawDashedLine(
-                    canvas,
-                    viewStationLocation,
-                    connectorEnd,
-                    paints.dashedLineIntervalPx,
-                    paints.crossSectionConnectorPaint);
-        }
-
-        RectF handleRect = drawCrossSectionHandle(canvas, borderRect, handlePaint);
-        crossSectionHandleRects.put(originalDetail, handleRect);
-
-        if (getViewContext().canCreateHorizontalCrossSection()) {
-            // Where both kinds can be made, mark each with the glyph from its menu item
-            drawCrossSectionGlyph(
-                    canvas,
-                    borderRect,
-                    sectionDetail.getCrossSection().getOrientation(),
-                    handlePaint);
-        }
-        return true;
-    }
-
-    /**
-     * Draw the orientation's glyph in a tab filling the bottom-right corner of the border, styled
-     * like the handle bar.
-     */
-    private void drawCrossSectionGlyph(
-            Canvas canvas,
-            RectF borderRect,
-            CrossSection.Orientation orientation,
-            Paint handlePaint) {
-        float size = dpToPixels(CROSS_SECTION_GLYPH_BOX_SIZE_DP);
-        float cornerRadius = dpToPixels(CROSS_SECTION_BORDER_CORNER_RADIUS_DP);
-        RectF box =
-                new RectF(
-                        borderRect.right - size,
-                        borderRect.bottom - size,
-                        borderRect.right,
-                        borderRect.bottom);
-
-        // Only the bottom-right corner is rounded, to follow the border
-        Path boxPath = new Path();
-        boxPath.addRoundRect(
-                box,
-                new float[] {
-                    0f,
-                    0f, // top-left
-                    0f,
-                    0f, // top-right
-                    cornerRadius,
-                    cornerRadius, // bottom-right
-                    0f,
-                    0f // bottom-left
-                },
-                Path.Direction.CW);
-        canvas.drawPath(boxPath, handlePaint);
-
-        paints.crossSectionGlyphPaint.setColor(paints.crossSectionHandleGripPaint.getColor());
-        paints.crossSectionGlyphPaint.setAlpha(paints.crossSectionHandleGripPaint.getAlpha());
-        float baseline =
-                box.centerY()
-                        - (paints.crossSectionGlyphPaint.ascent()
-                                        + paints.crossSectionGlyphPaint.descent())
-                                / 2f;
-        canvas.drawText(
-                CrossSectionLabels.getGlyph(orientation),
-                box.centerX(),
-                baseline,
-                paints.crossSectionGlyphPaint);
-    }
-
-    /**
-     * Draws a guide line from the station (in the main survey) to the touch point while rotating.
-     */
-    private void drawRotationGuideLine(Canvas canvas) {
-        if (crossSectionBeingRotated == null || crossSectionRotateFingerOnView == null) {
-            return;
-        }
-        Coord2D pivotOnSurvey = getRotationPivot(crossSectionBeingRotated);
-        if (pivotOnSurvey == null) {
-            return;
-        }
-        Coord2D pivotOnView = viewport.toView(pivotOnSurvey);
-        canvas.drawLine(
-                pivotOnView.x,
-                pivotOnView.y,
-                crossSectionRotateFingerOnView.x,
-                crossSectionRotateFingerOnView.y,
-                paints.crossSectionConnectorPaint);
-    }
-
-    /**
-     * Draw the user-drawn overlay (paths only) for a cross-section on the plan view, translated
-     * from station-relative coords to the component's current display centre.
-     */
-    private void drawCrossSectionSubSketch(
-            Canvas canvas, CrossSectionDetail sectionDetail, Coord2D centreOnSurvey, int alpha) {
-
-        float xsScale = sketch.getCrossSectionScale();
-        Sketch subSketch = sectionDetail.getSketch().scale(xsScale).translate(centreOnSurvey);
-        drawSketch(canvas, subSketch, alpha);
-    }
-
-    /**
-     * Clip the segment `from to to` to stop at the rectangle boundary. `to` is assumed to lie
-     * inside the rect (it's the rect centre in practice). Returns the clipped endpoint, or `null`
-     * if `from` is also inside (in which case there's no visible connector to draw).
-     */
-    private Coord2D clipSegmentToRectBoundary(Coord2D from, Coord2D to, RectF rect) {
-        if (rect.contains(from.x, from.y)) {
-            return null;
-        }
-        float dx = to.x - from.x;
-        float dy = to.y - from.y;
-        // Find the largest t in [0,1] such that from + t*(to-from) is on the rect boundary while
-        // moving from outside to inside.
-        float tEnter = 0f;
-        if (dx != 0) {
-            float tLeft = (rect.left - from.x) / dx;
-            float tRight = (rect.right - from.x) / dx;
-            tEnter = Math.max(tEnter, Math.min(tLeft, tRight));
-        }
-        if (dy != 0) {
-            float tTop = (rect.top - from.y) / dy;
-            float tBottom = (rect.bottom - from.y) / dy;
-            tEnter = Math.max(tEnter, Math.min(tTop, tBottom));
-        }
-        if (tEnter <= 0 || tEnter >= 1) {
-            return to;
-        }
-        return new Coord2D(from.x + tEnter * dx, from.y + tEnter * dy);
-    }
-
-    /** Draw a rectangular border around the cross-section's full extent (legs + sub-sketch). */
-    private RectF drawCrossSectionBorder(
-            Canvas canvas, CrossSectionDetail sectionDetail, Coord2D dragDelta, Paint borderPaint) {
-        float xsScale = sketch.getCrossSectionScale();
-        Coord2D scaledTopLeft = sectionDetail.getTopLeftAtScale(xsScale).plus(dragDelta);
-        Coord2D scaledBottomRight = sectionDetail.getBottomRightAtScale(xsScale).plus(dragDelta);
-        Coord2D topLeft = viewport.toView(scaledTopLeft);
-        Coord2D bottomRight = viewport.toView(scaledBottomRight);
-        float contentWidth = bottomRight.x - topLeft.x;
-        float contentHeight = bottomRight.y - topLeft.y;
-        float scaledPadding =
-                Math.min(contentWidth, contentHeight) * CROSS_SECTION_BORDER_PADDING_FRACTION;
-        float padding =
-                Math.max(
-                        dpToPixels(CROSS_SECTION_BORDER_PADDING_MIN_DP),
-                        Math.min(dpToPixels(CROSS_SECTION_BORDER_PADDING_MAX_DP), scaledPadding));
-        float topPadding = padding + dpToPixels(CROSS_SECTION_HANDLE_WIDTH_DP);
-        RectF rect =
-                new RectF(
-                        topLeft.x - padding,
-                        topLeft.y - topPadding,
-                        bottomRight.x + padding,
-                        bottomRight.y + padding);
-        float cornerRadius = dpToPixels(CROSS_SECTION_BORDER_CORNER_RADIUS_DP);
-        canvas.drawRoundRect(rect, cornerRadius, cornerRadius, borderPaint);
-        return rect;
-    }
-
-    /** Draw a full-width handle bar along the top edge of the cross-section border. */
-    private RectF drawCrossSectionHandle(Canvas canvas, RectF borderRect, Paint handlePaint) {
-        float handleHeight = dpToPixels(CROSS_SECTION_HANDLE_WIDTH_DP);
-        float cornerRadius = dpToPixels(CROSS_SECTION_BORDER_CORNER_RADIUS_DP);
-
-        RectF handleRect =
-                new RectF(
-                        borderRect.left,
-                        borderRect.top,
-                        borderRect.right,
-                        borderRect.top + handleHeight);
-
-        // Filled bar with rounded top corners, square bottom corners (flush with border).
-        Path handlePath = new Path();
-        handlePath.addRoundRect(
-                handleRect,
-                new float[] {
-                    cornerRadius,
-                    cornerRadius, // top-left
-                    cornerRadius,
-                    cornerRadius, // top-right
-                    0f,
-                    0f, // bottom-right
-                    0f,
-                    0f // bottom-left
-                },
-                Path.Direction.CW);
-        canvas.drawPath(handlePath, handlePaint);
-
-        // Grip ticks: three short vertical marks centred on the bar.
-        float centreX = (handleRect.left + handleRect.right) / 2f;
-        float centreY = (handleRect.top + handleRect.bottom) / 2f;
-        float gripHalfLength = handleHeight * CROSS_SECTION_HANDLE_GRIP_LENGTH_FRACTION / 2f;
-        float gripSpacing = dpToPixels(CROSS_SECTION_HANDLE_GRIP_SPACING_DP);
-        float[] gripXs = {centreX - gripSpacing, centreX, centreX + gripSpacing};
-        for (float gripX : gripXs) {
-            canvas.drawLine(
-                    gripX,
-                    centreY - gripHalfLength,
-                    gripX,
-                    centreY + gripHalfLength,
-                    paints.crossSectionHandleGripPaint);
-        }
-
-        // Expand the rect a bit for friendlier hit-testing.
-        float hitPadding = dpToPixels(8);
-        return new RectF(
-                handleRect.left - hitPadding,
-                handleRect.top - hitPadding,
-                handleRect.right + hitPadding,
-                handleRect.bottom + hitPadding);
-    }
-
-    /** Hit-test the cross-section handles. Returns the matching detail or null. */
-    private CrossSectionDetail findCrossSectionHandleAt(float viewX, float viewY) {
-        for (Map.Entry<CrossSectionDetail, RectF> entry : crossSectionHandleRects.entrySet()) {
-            if (entry.getValue().contains(viewX, viewY)) {
-                return entry.getKey();
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Hit-test the body of a cross-section component (used to open the editor on tap). A component
-     * occupies the area around its display centre; we pick whichever is closest within a tolerance.
-     */
-    private CrossSectionDetail findCrossSectionBodyAt(Coord2D surveyPoint) {
-        // Hit-test the detail's bounding box (legs + sub-sketch). If multiple overlap, pick the
-        // one whose display centre is closest to the touch point.
-        CrossSectionDetail best = null;
-        float bestDistance = Float.MAX_VALUE;
-        for (CrossSectionDetail detail : sketch.getCrossSectionDetails()) {
-            if (!detail.intersectsRectangle(surveyPoint, surveyPoint)) {
-                continue;
-            }
-            float distance = detail.getDistanceFrom(surveyPoint);
-            if (distance < bestDistance) {
-                best = detail;
-                bestDistance = distance;
-            }
-        }
-        return best;
-    }
-
     protected void drawLegs(Canvas canvas, Space<Coord2D> space, int baseAlpha) {
         drawLegs(canvas, space, baseAlpha, this::isLegInPlane);
     }
@@ -1805,7 +1150,7 @@ public class SketchView extends View {
                     baseAlpha == FADED_ALPHA || (fadingNonActive && !isAttachedToActive(leg));
 
             Paint paint;
-            if (highlightLatestLeg && survey.getMostRecentLeg() == leg) {
+            if (highlightLatestLeg && state.getSurvey().getMostRecentLeg() == leg) {
                 paint = fade ? paints.fadedLatestLegPaint : paints.latestLegPaint;
             } else if (!leg.hasDestination()) {
                 paint = fade ? paints.fadedSplayPaint : paints.splayPaint;
@@ -1816,7 +1161,7 @@ public class SketchView extends View {
             if (isInPlane.test(leg)) {
                 canvas.drawLine(start.x, start.y, end.x, end.y, paint);
             } else {
-                drawDashedLine(canvas, start, end, paints.dashedLineIntervalPx, paint);
+                CanvasShapes.drawDashedLine(canvas, start, end, paints.dashedLineIntervalPx, paint);
             }
         }
     }
@@ -1826,11 +1171,11 @@ public class SketchView extends View {
      * they point into or out of the page.
      */
     protected boolean isLegInPlane(Leg leg) {
-        return projectionType.isLegInPlane(leg);
+        return state.getProjectionType().isLegInPlane(leg);
     }
 
     private boolean isAttachedToActive(Leg leg) {
-        return survey.getActiveStation().getOnwardLegs().contains(leg);
+        return state.getSurvey().getActiveStation().getOnwardLegs().contains(leg);
     }
 
     private void drawStations(Survey survey, Canvas canvas, Space<Coord2D> space, int baseAlpha) {
@@ -1861,7 +1206,8 @@ public class SketchView extends View {
             int y = (int) (translatedStation.y);
 
             int stationCrossDiameterIntPx = Math.round(paints.stationCrossDiameterPx);
-            drawStationCross(canvas, paints.stationPaint, x, y, stationCrossDiameterIntPx, alpha);
+            CanvasShapes.drawStationCross(
+                    canvas, paints.stationPaint, x, y, stationCrossDiameterIntPx, alpha);
 
             if (station == survey.getActiveStation()) {
                 highlightActiveStation(canvas, x, y);
@@ -1899,66 +1245,13 @@ public class SketchView extends View {
                 nextX += stationCrossDiameterIntPx + spacing;
             }
 
-            CrossSectionDetail crossSectionDetail = sketch.getCrossSectionDetail(station);
-            if (crossSectionDetail != null) {
-                drawCrossSectionIndicator(canvas, crossSectionDetail, x, y, alpha);
-            }
+            crossSections.drawIndicator(canvas, station, x, y, alpha);
 
             if (fadingNonActive && (station == survey.getActiveStation())) {
                 alpha = baseAlpha;
                 paints.stationPaint.setAlpha(alpha);
             }
         }
-    }
-
-    private void drawCrossSectionIndicator(
-            Canvas canvas, CrossSectionDetail crossSectionDetail, float x, float y, int alpha) {
-
-        paints.crossSectionIndicatorPaint.setAlpha(alpha / 2);
-        CrossSection crossSection = crossSectionDetail.getCrossSection();
-
-        float indicatorWidth = (1 * viewport.getScale());
-        CrossSectionIndicator indicator = getIndicator(crossSectionDetail, x, y, indicatorWidth);
-
-        canvas.drawLine(
-                indicator.getStartX(),
-                indicator.getStartY(),
-                indicator.getEndX(),
-                indicator.getEndY(),
-                paints.crossSectionIndicatorPaint);
-
-        Path path = new Path();
-        path.moveTo(indicator.getArrowInnerX(), indicator.getArrowInnerY());
-        path.lineTo(indicator.getArrowOuterX(), indicator.getArrowOuterY());
-        path.lineTo(indicator.getArrowTipX(), indicator.getArrowTipY());
-        path.lineTo(indicator.getArrowInnerX(), indicator.getArrowInnerY());
-
-        canvas.drawPath(path, paints.crossSectionIndicatorPaint);
-    }
-
-    /**
-     * The indicator for a cross-section, facing the way it faces or the way it is being turned to.
-     * On the plan that is its compass bearing. The elevation has no bearings, so a vertical section
-     * faces left or right on the page and a horizontal one is looked at from above.
-     */
-    private CrossSectionIndicator getIndicator(
-            CrossSectionDetail detail, float x, float y, float length) {
-        CrossSection crossSection = detail.getCrossSection();
-        if (!crossSection.isRotatable()) {
-            return CrossSectionIndicator.lookingDown(x, y, length);
-        }
-
-        float angle =
-                detail == crossSectionBeingRotated && crossSectionPreviewAngle != null
-                        ? crossSectionPreviewAngle
-                        : crossSection.getAngle();
-        if (projectionType == Projection2D.EXTENDED_ELEVATION) {
-            boolean facingRight =
-                    CrossSectioner.isFacingRightOnElevation(
-                            survey, crossSection.getStation(), angle);
-            return CrossSectionIndicator.onElevation(x, y, length, facingRight);
-        }
-        return CrossSectionIndicator.atAngle(x, y, length, angle);
     }
 
     private void highlightActiveStation(Canvas canvas, float x, float y) {
@@ -2002,14 +1295,6 @@ public class SketchView extends View {
         bottomRight.lineTo(rightX, bottomY);
         bottomRight.lineTo(innerRight, bottomY);
         canvas.drawPath(bottomRight, paints.highlightPaint);
-    }
-
-    protected void drawStationCross(
-            Canvas canvas, Paint paint, float x, float y, int crossDiameter, int alpha) {
-        paint.setAlpha(alpha);
-        float halfCross = crossDiameter / 2f;
-        canvas.drawLine(x, y - halfCross, x, y + halfCross, paint);
-        canvas.drawLine(x - halfCross, y, x + halfCross, y, paint);
     }
 
     protected void drawSketch(Canvas canvas, Sketch sketch, int alpha) {
@@ -2269,7 +1554,7 @@ public class SketchView extends View {
     protected void drawLegend(Canvas canvas) {
 
         String surveyLabel =
-                survey.getName()
+                state.getSurvey().getName()
                         + " L"
                         + TextTools.formatTo0dpWithComma(surveyLength)
                         + " V"
@@ -2303,7 +1588,7 @@ public class SketchView extends View {
      * means something in a view drawn with north at the top.
      */
     protected boolean isCompassShown() {
-        return projectionType == Projection2D.PLAN;
+        return state.getProjectionType() == Projection2D.PLAN;
     }
 
     protected void drawCompass(Canvas canvas) {
@@ -2347,7 +1632,7 @@ public class SketchView extends View {
             return;
         }
 
-        if (currentSketchTool == SketchTool.MODAL_MOVE) {
+        if (state.getSketchTool() == SketchTool.MODAL_MOVE) {
             paints.hotCornersPaint.setColor(
                     ContextCompat.getColor(getContext(), R.color.hotCornerActive));
             paints.hotCornersPaint.setAlpha(FADED_ALPHA);
@@ -2363,7 +1648,7 @@ public class SketchView extends View {
         canvas.drawRect(topRightCorner, paints.hotCornersPaint);
         canvas.drawRect(bottomRightCorner, paints.hotCornersPaint);
 
-        if (currentSketchTool == SketchTool.MODAL_MOVE) {
+        if (state.getSketchTool() == SketchTool.MODAL_MOVE) {
             paints.hotCornersPaint.setColor(
                     ContextCompat.getColor(getContext(), R.color.hotCorner));
             paints.hotCornersPaint.setAlpha(FADED_ALPHA);
@@ -2404,11 +1689,11 @@ public class SketchView extends View {
     }
 
     public void centreViewOnActiveStation() {
-        centreViewOnStation(survey.getActiveStation());
+        centreViewOnStation(state.getSurvey().getActiveStation());
     }
 
     public void centreViewOnStation(Station station) {
-        Coord2D activeStationCoord = projection.getStationMap().get(station);
+        Coord2D activeStationCoord = state.getProjection().getStationMap().get(station);
 
         // not sure how this could be null, but at least one null pointer has been reported
         if (activeStationCoord == null) {
@@ -2420,55 +1705,6 @@ public class SketchView extends View {
 
     public void centreViewOnSurveyPoint(Coord2D point) {
         viewport.centreOn(point, getWidth(), getHeight());
-    }
-
-    private void drawDashedLine(
-            Canvas canvas, Coord2D start, Coord2D end, float dashLength, Paint paint) {
-
-        // this switcheroo is so we start from the end of the line and draw backwards
-        // (we prefer the end of the line to line up with a dash rather than the start)
-        Coord2D swap = end;
-        end = start;
-        start = swap;
-
-        float lineLength = Space2DUtils.getDistance(start, end);
-        int dashes = (int) (lineLength / dashLength / 2f);
-
-        Coord2D direction = end.minus(start).normalise();
-        Coord2D dashStep = direction.scale(dashLength);
-
-        float stepX = dashStep.x;
-        float stepY = dashStep.y;
-
-        float[] lines = new float[dashes * 4]; // xy coords for start and end of dashes == 4
-
-        int lineIndex = 0;
-        float startX, startY, endX, endY;
-        float previousX = 0, previousY = 0;
-
-        for (int dashIndex = 0; dashIndex < dashes; dashIndex++) {
-
-            if (dashIndex == 0) {
-                startX = start.x;
-                startY = start.y;
-            } else {
-                startX = previousX + stepX;
-                startY = previousY + stepY;
-            }
-
-            endX = startX + stepX;
-            endY = startY + stepY;
-
-            lines[lineIndex++] = startX;
-            lines[lineIndex++] = startY;
-            lines[lineIndex++] = endX;
-            lines[lineIndex++] = endY;
-
-            previousX = endX;
-            previousY = endY;
-        }
-
-        canvas.drawLines(lines, paint);
     }
 
     public void adjustZoomBy(float delta) {
@@ -2486,20 +1722,20 @@ public class SketchView extends View {
     }
 
     public boolean canUndo() {
-        return sketch.canUndo();
+        return state.getSketch().canUndo();
     }
 
     public boolean canRedo() {
-        return sketch.canRedo();
+        return state.getSketch().canRedo();
     }
 
     public void undo() {
-        sketch.undo();
+        state.getSketch().undo();
         invalidate();
     }
 
     public void redo() {
-        sketch.redo();
+        state.getSketch().redo();
         invalidate();
     }
 
@@ -2520,15 +1756,13 @@ public class SketchView extends View {
     }
 
     public void setSketchTool(SketchTool sketchTool) {
-        if (previousSketchTool != currentSketchTool && !currentSketchTool.isModal()) {
-            previousSketchTool = currentSketchTool;
-        }
-        currentSketchTool = sketchTool;
+        state.setSketchTool(sketchTool);
     }
 
     public void setCompassAzimuth(float degrees) {
         compassAzimuthDegrees = degrees;
-        if (SketchPreferences.Toggle.SHOW_COMPASS.isOn() && projectionType == Projection2D.PLAN) {
+        if (SketchPreferences.Toggle.SHOW_COMPASS.isOn()
+                && state.getProjectionType() == Projection2D.PLAN) {
             invalidate();
         }
     }
@@ -2539,7 +1773,41 @@ public class SketchView extends View {
     }
 
     public SketchTool getSketchTool() {
-        return currentSketchTool;
+        return state.getSketchTool();
+    }
+
+    /** Gives the cross-section layer what it needs from this view, without making it public. */
+    private class CrossSectionHost implements CrossSectionLayer.Host {
+        @Override
+        public Context getContext() {
+            return SketchView.this.getContext();
+        }
+
+        @Override
+        public ViewContext getViewContext() {
+            return SketchView.this.getViewContext();
+        }
+
+        @Override
+        public void showToast(int stringId) {
+            activity.showSimpleToast(stringId);
+        }
+
+        @Override
+        public void invalidate() {
+            SketchView.this.invalidate();
+        }
+
+        @Override
+        public void drawSketch(Canvas canvas, Sketch sketch, int alpha) {
+            SketchView.this.drawSketch(canvas, sketch, alpha);
+        }
+
+        @Override
+        public void drawLegs(
+                Canvas canvas, Space<Coord2D> space, int alpha, Predicate<Leg> isInPlane) {
+            SketchView.this.drawLegs(canvas, space, alpha, isInPlane);
+        }
     }
 
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
@@ -2549,7 +1817,7 @@ public class SketchView extends View {
                 return false;
             }
 
-            if (currentSketchTool != SketchTool.PINCH_TO_ZOOM) {
+            if (state.getSketchTool() != SketchTool.PINCH_TO_ZOOM) {
                 setSketchTool(SketchTool.PINCH_TO_ZOOM);
             }
 
@@ -2571,8 +1839,9 @@ public class SketchView extends View {
             Coord2D touchPointOnView = new Coord2D(motionEvent.getX(), motionEvent.getY());
             Station matchedStation = checkForStation(touchPointOnView);
             if (matchedStation != null && !menuShownInThisTouch) {
-                if (currentSketchTool == SketchTool.LINE || currentSketchTool == SketchTool.AREA) {
-                    sketch.abandonActivePath();
+                if (state.getSketchTool() == SketchTool.LINE
+                        || state.getSketchTool() == SketchTool.AREA) {
+                    state.getSketch().abandonActivePath();
                 }
                 showContextMenu(motionEvent, matchedStation);
                 menuShownInThisTouch = true;
@@ -2582,15 +1851,15 @@ public class SketchView extends View {
             // Not offered by tools that act as soon as the finger lands (erasing, placing a symbol
             // or text), since by then a long press has already done something, nor while placing
             // or adjusting a cross-section
-            if (currentSketchTool != SketchTool.MOVE
-                    && currentSketchTool != SketchTool.SELECT
-                    && currentSketchTool != SketchTool.LINE
-                    && currentSketchTool != SketchTool.AREA) {
+            if (state.getSketchTool() != SketchTool.MOVE
+                    && state.getSketchTool() != SketchTool.SELECT
+                    && state.getSketchTool() != SketchTool.LINE
+                    && state.getSketchTool() != SketchTool.AREA) {
                 return;
             }
             PathDetail matchedPath = checkForPath(touchPointOnView);
             if (matchedPath != null && !menuShownInThisTouch) {
-                sketch.abandonActivePath();
+                state.getSketch().abandonActivePath();
                 showLineContextMenu(motionEvent, matchedPath);
                 menuShownInThisTouch = true;
             }

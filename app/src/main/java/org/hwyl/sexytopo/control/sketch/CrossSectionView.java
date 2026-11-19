@@ -72,11 +72,11 @@ public class CrossSectionView extends SketchView {
      * the smaller screen dimension.
      */
     private void autoFitZoom() {
-        if (projection == null) {
+        if (state.getProjection() == null) {
             return;
         }
         float longestSplay = 0f;
-        for (Line<Coord2D> line : projection.getLegMap().values()) {
+        for (Line<Coord2D> line : state.getProjection().getLegMap().values()) {
             float length = Space2DUtils.getDistance(line.getStart(), line.getEnd());
             if (length > longestSplay) {
                 longestSplay = length;
@@ -97,7 +97,7 @@ public class CrossSectionView extends SketchView {
         updateViewBounds();
 
         drawGrid(canvas);
-        drawSurvey(canvas, survey, projection, SOLID_ALPHA);
+        drawSurvey(canvas, state.getSurvey(), state.getProjection(), SOLID_ALPHA);
         drawLegend(canvas);
         drawCompass(canvas);
     }
