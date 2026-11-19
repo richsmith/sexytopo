@@ -217,7 +217,6 @@
     <string name="sketch_menu_auto_orientation">Automatyczna orientacja</string>
     <string name="sketch_menu_pinch_to_zoom">Zoom szczypaniem</string>
     <string name="sketch_menu_fade_non_active">Przyciemnij nieaktywne</string>
-    <string name="sketch_menu_show_wall_sides">Wszystkie strony ścian</string>
     <string name="sketch_menu_show_station_labels">Etykiety stanowisk</string>
     <string name="sketch_menu_show_xsections">Przekroje</string>
     <string name="sketch_menu_show_splays">Pomiary szczegółowe</string>

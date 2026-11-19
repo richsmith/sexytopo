@@ -242,9 +242,10 @@ public class SketchView extends View {
             new EnumMap<>(LineType.class);
     // scratch object reused when drawing typed paths, to avoid per-frame allocation
     private final Path typedPathScratch = new Path();
-    // the red interior-side marker on the last-drawn wall (a plain stroke — the wall paints'
-    // path effects must not apply to it)
-    private final Paint wallInsideTickPaint = new Paint();
+    // one paint per layer of the shading on a wall's rock side, and the ornament size they were
+    // built for
+    private final List<Paint> wallRockSidePaints = new ArrayList<>();
+    private float wallRockSidePaintsOrnamentSizePixels = -1;
     private final Paint areaPaint = new Paint();
     // fills areas with their type's pattern; the shader is swapped per area type
     private final Paint areaFillPaint = new Paint();
@@ -361,8 +362,7 @@ public class SketchView extends View {
         drawPaint.setStrokeJoin(Paint.Join.ROUND);
         drawPaint.setStrokeCap(Paint.Cap.ROUND);
 
-        wallInsideTickPaint.set(drawPaint);
-        wallInsideTickPaint.setColor(Colour.RED.intValue);
+        wallRockSidePaints.clear();
 
         lineTypePaints.clear();
         for (LineType lineType : LineType.values()) {
@@ -2312,9 +2312,6 @@ public class SketchView extends View {
 
         boolean isDebugMode = activity.isDebugMode();
 
-        boolean showWallSides = SketchPreferences.Toggle.SHOW_WALL_SIDES.isOn();
-        PathDetail mostRecentWall = findMostRecentWall(sketch);
-
         for (PathDetail pathDetail : sketch.getPathDetails()) {
 
             if (!couldBeVisible(pathDetail)) {
@@ -2322,12 +2319,7 @@ public class SketchView extends View {
             }
 
             if (pathDetail.getLineType() != LineType.SKETCH) {
-                drawTypedPath(canvas, pathDetail, alpha);
-                if (pathDetail == mostRecentWall) {
-                    drawWallInsideTick(canvas, pathDetail, true, alpha);
-                } else if (showWallSides && isFinishedWall(sketch, pathDetail)) {
-                    drawWallInsideTick(canvas, pathDetail, false, alpha);
-                }
+                drawTypedPath(canvas, pathDetail, alpha, isFinishedWall(sketch, pathDetail));
                 continue;
             }
 
@@ -2435,7 +2427,8 @@ public class SketchView extends View {
      * Semantic lines are drawn individually via drawPath so their type's ornamentation (dashes,
      * tick stamps) can apply. Ornamentation is sized by getPatternScale.
      */
-    private void drawTypedPath(Canvas canvas, PathDetail pathDetail, int alpha) {
+    private void drawTypedPath(
+            Canvas canvas, PathDetail pathDetail, int alpha, boolean shadeRockSide) {
         LineType lineType = pathDetail.getLineType();
         Paint paint = lineTypePaints.get(lineType);
         if (paint == null) { // paints not initialised yet
@@ -2458,7 +2451,41 @@ public class SketchView extends View {
                 typedPathScratch.lineTo(x, y);
             }
         }
+        if (shadeRockSide) {
+            drawRockSide(canvas, typedPathScratch, paint.getColor(), alpha);
+        }
         canvas.drawPath(typedPathScratch, paint);
+    }
+
+    /** Shades the outer side of a wall line type. */
+    private void drawRockSide(Canvas canvas, Path path, int colour, int alpha) {
+        // path effects only render on a hardware-accelerated canvas from API 28; without them the
+        // path would be filled as a polygon
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.P) {
+            return;
+        }
+        List<WallRockSide.Layer> layers = WallRockSide.getLayers();
+        float ornamentSizePixels =
+                SexyTopo.dpToPixels(GeneralPreferences.getLineOrnamentSizeDp()) * getPatternScale();
+        if (wallRockSidePaints.isEmpty()
+                || ornamentSizePixels != wallRockSidePaintsOrnamentSizePixels) {
+            wallRockSidePaints.clear();
+            float lineWidth = drawPaint.getStrokeWidth();
+            for (WallRockSide.Layer layer : layers) {
+                Paint paint = new Paint();
+                paint.setStyle(Paint.Style.FILL);
+                paint.setAntiAlias(true);
+                paint.setPathEffect(layer.createEffect(ornamentSizePixels, lineWidth));
+                wallRockSidePaints.add(paint);
+            }
+            wallRockSidePaintsOrnamentSizePixels = ornamentSizePixels;
+        }
+        for (int i = 0; i < layers.size(); i++) {
+            Paint paint = wallRockSidePaints.get(i);
+            paint.setColor(colour);
+            paint.setAlpha(alpha * layers.get(i).getAlpha() / 255);
+            canvas.drawPath(path, paint);
+        }
     }
 
     /**
@@ -2492,86 +2519,12 @@ public class SketchView extends View {
     }
 
     /**
-     * The most recently drawn wall-kind line, whose interior-side marker is always shown so a wrong
-     * auto-orientation guess is visible immediately; the Wall Sides toggle marks the rest too.
-     */
-    private static PathDetail findMostRecentWall(Sketch sketch) {
-        List<PathDetail> pathDetails = sketch.getPathDetails();
-        for (int i = pathDetails.size() - 1; i >= 0; i--) {
-            PathDetail candidate = pathDetails.get(i);
-            if (isFinishedWall(sketch, candidate)) {
-                return candidate;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Whether a line can carry an interior-side marker: any wall-kind line, excluding a stroke
-     * still in progress (the marker hopping along a growing line is disconcerting, and orientation
-     * isn't decided until the stroke finishes anyway). Ticked types need no marker — their
-     * ornamentation already shows their orientation.
+     * Whether a line can have its rock side shaded: any wall-kind line, excluding a stroke still in
+     * progress (its orientation isn't decided until the stroke finishes). Ticked types need no
+     * shading — their ornamentation already shows their orientation.
      */
     private static boolean isFinishedWall(Sketch sketch, PathDetail pathDetail) {
         return pathDetail.getLineType().isWall() && pathDetail != sketch.getActivePath();
-    }
-
-    /**
-     * A slim red arrowhead on a wall, pointing to the side SexyTopo believes is the passage
-     * interior. Red and arrow-shaped so it reads as UI feedback rather than a drawing artefact; it
-     * is never exported.
-     *
-     * <p>It goes at the middle of the wall, or, if atEnd, of the wall's last segment: on the wall
-     * just drawn, that's the part still on screen even once a stroke has been joined on to the end
-     * of a long wall.
-     */
-    private void drawWallInsideTick(
-            Canvas canvas, PathDetail pathDetail, boolean atEnd, int alpha) {
-        List<Coord2D> points = pathDetail.getPath();
-        if (points.size() < 2) {
-            return;
-        }
-        int midIndex = atEnd ? points.size() - 1 : points.size() / 2;
-        Coord2D from = points.get(midIndex - 1);
-        Coord2D to = points.get(midIndex);
-
-        float fromX = (from.x - viewpointOffset.x) * surveyToViewScale;
-        float fromY = (from.y - viewpointOffset.y) * surveyToViewScale;
-        float toX = (to.x - viewpointOffset.x) * surveyToViewScale;
-        float toY = (to.y - viewpointOffset.y) * surveyToViewScale;
-
-        float dx = toX - fromX, dy = toY - fromY;
-        float length = (float) Math.sqrt(dx * dx + dy * dy);
-        if (length < 0.001f) {
-            return;
-        }
-
-        // interior normal: the direction rotated +90 degrees, matching LineOrienter's canonical
-        // side (positive cross product of direction with the vector to the interior)
-        float nx = -dy / length, ny = dx / length;
-        // tangent along the wall, for the arrowhead's narrow base
-        float tx = dx / length, ty = dy / length;
-
-        float midX = (fromX + toX) / 2, midY = (fromY + toY) / 2;
-        float arrowLength = dpToPixels(8);
-        float halfBaseWidth = dpToPixels(2.5f);
-
-        // slim arrowhead: tip out in the passage, narrow base astride the wall's midpoint
-        float tipX = midX + nx * arrowLength, tipY = midY + ny * arrowLength;
-
-        wallInsideTickPaint.setAlpha(alpha);
-        canvas.drawLine(
-                tipX,
-                tipY,
-                midX + tx * halfBaseWidth,
-                midY + ty * halfBaseWidth,
-                wallInsideTickPaint);
-        canvas.drawLine(
-                tipX,
-                tipY,
-                midX - tx * halfBaseWidth,
-                midY - ty * halfBaseWidth,
-                wallInsideTickPaint);
     }
 
     /**

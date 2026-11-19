@@ -217,7 +217,6 @@
     <string name="sketch_menu_auto_orientation">Auto-Orientamento</string>
     <string name="sketch_menu_pinch_to_zoom">Zoom con pizzico</string>
     <string name="sketch_menu_fade_non_active">Sfuma Non-Attive</string>
-    <string name="sketch_menu_show_wall_sides">Tutti i lati delle pareti</string>
     <string name="sketch_menu_show_station_labels">Etichette Stazioni</string>
     <string name="sketch_menu_show_xsections">Sezioni</string>
     <string name="sketch_menu_show_splays">Splay</string>

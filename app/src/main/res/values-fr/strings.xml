@@ -217,7 +217,6 @@
     <string name="sketch_menu_auto_orientation">Orientation automatique</string>
     <string name="sketch_menu_pinch_to_zoom">Zoom par pincement</string>
     <string name="sketch_menu_fade_non_active">Atténuer les inactifs</string>
-    <string name="sketch_menu_show_wall_sides">Tous les côtés de paroi</string>
     <string name="sketch_menu_show_station_labels">Noms des stations</string>
     <string name="sketch_menu_show_xsections">Coupes</string>
     <string name="sketch_menu_show_splays">Radiales</string>

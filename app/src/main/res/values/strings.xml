@@ -250,7 +250,6 @@
     <string name="sketch_menu_snap_to_lines">Snap to Lines</string>
     <string name="sketch_menu_fade_non_active">Fade Non-Active</string>
     <string name="sketch_menu_show_station_labels">Station Labels</string>
-    <string name="sketch_menu_show_wall_sides">All Wall Sides</string>
     <string name="sketch_menu_show_xsections">Cross-Sections</string>
     <string name="sketch_menu_show_splays">Splays</string>
     <string name="sketch_menu_show_sketch">Sketch</string>

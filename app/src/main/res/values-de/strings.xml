@@ -217,7 +217,6 @@
     <string name="sketch_menu_auto_orientation">Automatische Ausrichtung</string>
     <string name="sketch_menu_pinch_to_zoom">Zoom durch Kneifen</string>
     <string name="sketch_menu_fade_non_active">Inaktive ausblenden</string>
-    <string name="sketch_menu_show_wall_sides">Alle Wandseiten</string>
     <string name="sketch_menu_show_station_labels">Messpunkt-Beschriftungen</string>
     <string name="sketch_menu_show_xsections">Querschnitte</string>
     <string name="sketch_menu_show_splays">Hilfslinien</string>

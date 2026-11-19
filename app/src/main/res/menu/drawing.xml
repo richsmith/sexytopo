@@ -77,10 +77,6 @@
                     android:title="@string/sketch_menu_show_grid"
                     android:checkable="true"/>
                 <item
-                    android:id="@+id/buttonShowWallSides"
-                    android:title="@string/sketch_menu_show_wall_sides"
-                    android:checkable="true"/>
-                <item
                     android:id="@+id/buttonShowCompass"
                     android:title="@string/sketch_menu_show_compass"
                     android:checkable="true"/>
