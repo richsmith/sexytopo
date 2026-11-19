@@ -6,9 +6,6 @@ import static org.hwyl.sexytopo.control.sketch.SketchPaints.SOLID_ALPHA;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.Rect;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
@@ -18,7 +15,6 @@ import android.view.ScaleGestureDetector;
 import android.view.SubMenu;
 import android.view.View;
 import android.widget.PopupMenu;
-import androidx.core.content.ContextCompat;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,7 +26,6 @@ import org.hwyl.sexytopo.control.SurveyManager;
 import org.hwyl.sexytopo.control.activity.SketchActivity;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.SketchPreferences;
-import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.geometry.Projection2D;
 import org.hwyl.sexytopo.model.geometry.Space;
@@ -60,46 +55,32 @@ public class SketchView extends View {
     // What's being shown, and which tool is in use
     protected final SketchState state = new SketchState();
 
-    private static final int BOX_SIZE = 10; // every grid box is 10 units square
-
-    public static final int LEGEND_SIZE = 18;
-
-    public static final float HOT_CORNER_DISTANCE_PROPORTION = 0.05f;
-
     private SketchActivity activity;
 
     private Map<Survey, Space<Coord2D>> translatedConnectedSurveys = new HashMap<>();
 
     boolean surveyChanged;
 
-    // cached preferences for performance
+    // cached preference for performance
     private boolean isTwoFingerModeActive = true;
-    private boolean isHotCornersModeActive = true;
-
-    // cached for performance
-    private float surveyLength = 0;
-    private float surveyHeight = 0;
-    private Rect topLeftCorner;
-    private Rect topRightCorner;
-    private Rect bottomRightCorner;
-
-    private float compassAzimuthDegrees = 0f;
 
     // Flag to prevent double menu opening during this touch sequence
     private boolean menuShownInThisTouch = false;
 
     // ********** Drawing **********
 
-    private final SketchPaints paints = new SketchPaints();
-
     private final SketchRenderer sketchRenderer =
             new SketchRenderer(viewport, () -> activity.isDebugMode());
+
+    private final SurveyDataRenderer surveyDataRenderer = new SurveyDataRenderer(viewport, state);
+
+    private final OverlayRenderer overlays = new OverlayRenderer(viewport, state);
+
+    private final HotCorners hotCorners = new HotCorners();
 
     // ********** Cross-sections and tools **********
 
     private final ViewHost host = new ViewHost();
-
-    private final SurveyDataRenderer surveyDataRenderer = new SurveyDataRenderer(viewport, state);
 
     private final CrossSectionLayer crossSections =
             new CrossSectionLayer(viewport, state, surveyDataRenderer, sketchRenderer, host);
@@ -147,13 +128,13 @@ public class SketchView extends View {
     }
 
     public void initialisePaint() {
-        paints.initialise(getContext());
         sketchRenderer.initialise(getContext());
         surveyDataRenderer.initialise(getContext());
+        overlays.initialise(getContext());
+        hotCorners.initialise(getContext());
         crossSections.initialisePaints(getContext());
 
         isTwoFingerModeActive = GeneralPreferences.isTwoFingerModeActive();
-        isHotCornersModeActive = GeneralPreferences.isHotCornersModeActive();
     }
 
     public void setActivity(SketchActivity sketchActivity) {
@@ -254,35 +235,11 @@ public class SketchView extends View {
             return true;
         }
 
-        if (isHotCornersModeActive && didEventHitHotCorner(event)) {
+        if (hotCorners.isHit(event, getWidth(), getHeight())) {
             return true;
         }
 
         return false;
-    }
-
-    private boolean didEventHitHotCorner(MotionEvent event) {
-        if (!isHotCornersModeActive) {
-            return false;
-        }
-
-        float x = event.getX();
-        float y = event.getY();
-        int height = getHeight();
-        int width = getWidth();
-
-        float corner_delta = Math.min(height, width) * HOT_CORNER_DISTANCE_PROPORTION;
-
-        boolean hitLeftEdge = x < corner_delta;
-        boolean hitRightEdge = x > width - corner_delta;
-        boolean hitTopEdge = y < corner_delta;
-        boolean hitBottomEdge = y > height - corner_delta;
-
-        boolean hitCorner =
-                (hitLeftEdge && (hitBottomEdge || hitTopEdge))
-                        || (hitRightEdge && (hitBottomEdge || hitTopEdge));
-
-        return hitCorner;
     }
 
     private void showContextMenu(MotionEvent event, final Station station) {
@@ -404,8 +361,11 @@ public class SketchView extends View {
         drawSurvey(canvas, state.getSurvey(), state.getProjection(), SOLID_ALPHA);
         drawLegend(canvas);
         drawCompass(canvas);
-        drawHotCorners(canvas);
-        drawDebuggingInfo(canvas);
+        hotCorners.draw(
+                canvas, getWidth(), getHeight(), state.getSketchTool() == SketchTool.MODAL_MOVE);
+        if (activity.isDebugMode()) {
+            overlays.drawDebuggingInfo(canvas, getWidth());
+        }
     }
 
     protected void drawSurvey(Canvas canvas, Survey survey, Space<Coord2D> projection, int alpha) {
@@ -468,49 +428,7 @@ public class SketchView extends View {
     }
 
     protected void drawGrid(Canvas canvas) {
-        float viewOffsetX = viewport.getOffsetX();
-        float viewOffsetY = viewport.getOffsetY();
-        float viewScale = viewport.getScale();
-
-        if (!SketchPreferences.Toggle.SHOW_GRID.isOn()) {
-            return;
-        }
-
-        int tickSizeInMetres = getMinorGridBoxSize();
-        int numberTicksJustBeforeViewpointOffsetX = (int) (viewOffsetX / tickSizeInMetres);
-
-        for (int n = numberTicksJustBeforeViewpointOffsetX; true; n++) {
-            float xSurvey = n * tickSizeInMetres;
-            int xView = (int) ((xSurvey - viewOffsetX) * viewScale);
-            paints.gridPaint.setStrokeWidth(n % BOX_SIZE == 0 ? 3 : 1);
-            canvas.drawLine(xView, 0, xView, getHeight(), paints.gridPaint);
-            if (xView >= getWidth()) {
-                break;
-            }
-        }
-
-        int numberTicksJustBeforeViewpointOffsetY = (int) (viewOffsetY / tickSizeInMetres);
-
-        for (int n = numberTicksJustBeforeViewpointOffsetY; true; n++) {
-            float ySurvey = n * tickSizeInMetres;
-            int yView = (int) ((ySurvey - viewOffsetY) * viewScale);
-            paints.gridPaint.setStrokeWidth(n % BOX_SIZE == 0 ? 3 : 1);
-            canvas.drawLine(0, yView, getWidth(), yView, paints.gridPaint);
-            if (yView >= getHeight()) {
-                break;
-            }
-        }
-    }
-
-    public int getMinorGridBoxSize() {
-
-        if (viewport.getScale() > 15) {
-            return 1;
-        } else if (viewport.getScale() > 2) {
-            return 10;
-        } else {
-            return 100;
-        }
+        overlays.drawGrid(canvas, getWidth(), getHeight());
     }
 
     private void drawSurveyData(Survey survey, Canvas canvas, Space<Coord2D> space, int alpha) {
@@ -527,35 +445,7 @@ public class SketchView extends View {
     }
 
     protected void drawLegend(Canvas canvas) {
-
-        String surveyLabel =
-                state.getSurvey().getName()
-                        + " L"
-                        + TextTools.formatTo0dpWithComma(surveyLength)
-                        + " V"
-                        + TextTools.formatTo0dpWithComma(surveyHeight);
-
-        float legendSize = paints.legendPaint.getTextSize();
-        float offsetX = legendSize * 1.25f;
-        float offsetY = legendSize * 1.25f;
-        float y = getHeight() - offsetY;
-        float x = offsetX;
-        canvas.drawText(surveyLabel, x, y, paints.legendPaint);
-
-        int minorGridSize = getMinorGridBoxSize();
-        float scaleWidth = viewport.getScale() * minorGridSize;
-        float scaleOffsetY = offsetY * 2;
-        float scaleY = getHeight() - scaleOffsetY;
-        paints.legendPaint.setStyle(Paint.Style.STROKE);
-        Path scalePath = new Path();
-        scalePath.moveTo(x, scaleY - paints.legendTickSizePx);
-        scalePath.lineTo(x, scaleY);
-        scalePath.lineTo(x + scaleWidth, scaleY);
-        scalePath.lineTo(x + scaleWidth, scaleY - paints.legendTickSizePx);
-        canvas.drawPath(scalePath, paints.legendPaint);
-        paints.legendPaint.setStyle(Paint.Style.FILL);
-        String scaleLabel = minorGridSize + "m";
-        canvas.drawText(scaleLabel, x + scaleWidth + 0.3f * legendSize, scaleY, paints.legendPaint);
+        overlays.drawLegend(canvas, getHeight());
     }
 
     /**
@@ -567,91 +457,9 @@ public class SketchView extends View {
     }
 
     protected void drawCompass(Canvas canvas) {
-        if (!SketchPreferences.Toggle.SHOW_COMPASS.isOn() || !isCompassShown()) {
-            return;
+        if (isCompassShown()) {
+            overlays.drawCompass(canvas, getHeight());
         }
-
-        float textSize = paints.legendPaint.getTextSize();
-        Paint.FontMetrics metrics = paints.legendPaint.getFontMetrics();
-        float textHeight = metrics.descent - metrics.ascent;
-        float offsetX = textSize * 1.25f; // matches legend x
-        float arrowLength = textSize * 2.5f;
-        float arrowHeadSize = textSize * 0.6f;
-        float cx = offsetX + arrowLength / 2f + textSize;
-        float scaleBarY = getHeight() - textSize * 4f;
-        float cy = scaleBarY - arrowLength / 2f - textHeight;
-
-        canvas.save();
-        canvas.rotate(-compassAzimuthDegrees, cx, cy);
-
-        float tipY = cy - arrowLength / 2f;
-        float tailY = cy + arrowLength / 2f;
-
-        paints.legendPaint.setStyle(Paint.Style.STROKE);
-        Path arrowPath = new Path();
-        arrowPath.moveTo(cx - arrowHeadSize, tipY + arrowHeadSize);
-        arrowPath.lineTo(cx, tipY);
-        arrowPath.lineTo(cx + arrowHeadSize, tipY + arrowHeadSize);
-        arrowPath.moveTo(cx, tipY);
-        arrowPath.lineTo(cx, tailY);
-        canvas.drawPath(arrowPath, paints.legendPaint);
-        paints.legendPaint.setStyle(Paint.Style.FILL);
-        canvas.drawText("N", cx - textSize * 0.35f, tipY - textSize * 0.2f, paints.legendPaint);
-
-        canvas.restore();
-    }
-
-    private void drawHotCorners(Canvas canvas) {
-
-        if (!isHotCornersModeActive) {
-            return;
-        }
-
-        if (state.getSketchTool() == SketchTool.MODAL_MOVE) {
-            paints.hotCornersPaint.setColor(
-                    ContextCompat.getColor(getContext(), R.color.hotCornerActive));
-            paints.hotCornersPaint.setAlpha(FADED_ALPHA);
-        }
-
-        final int side = (int) (HOT_CORNER_DISTANCE_PROPORTION * Math.min(getWidth(), getHeight()));
-        topLeftCorner = new Rect(0, 0, side, side);
-        topRightCorner = new Rect(getWidth() - side, 0, getWidth(), side);
-        bottomRightCorner =
-                new Rect(getWidth() - side, getHeight() - side, getWidth(), getHeight());
-
-        canvas.drawRect(topLeftCorner, paints.hotCornersPaint);
-        canvas.drawRect(topRightCorner, paints.hotCornersPaint);
-        canvas.drawRect(bottomRightCorner, paints.hotCornersPaint);
-
-        if (state.getSketchTool() == SketchTool.MODAL_MOVE) {
-            paints.hotCornersPaint.setColor(
-                    ContextCompat.getColor(getContext(), R.color.hotCorner));
-            paints.hotCornersPaint.setAlpha(FADED_ALPHA);
-        }
-    }
-
-    private void drawDebuggingInfo(Canvas canvas) {
-        if (!activity.isDebugMode()) {
-            return;
-        }
-
-        float offsetX = getWidth() * 0.03f;
-        float offsetY = LEGEND_SIZE * 2;
-        String label =
-                "x="
-                        + offsetX
-                        + " y="
-                        + offsetY
-                        + " s2v="
-                        + TextTools.formatTo2dp(viewport.getScale())
-                        + " 1/s2v="
-                        + TextTools.formatTo2dp(1 / viewport.getScale())
-                        + "\n log (1/s2v) ="
-                        + TextTools.formatTo2dp(Math.log(1 / viewport.getScale()))
-                        + "\n log10 (1/s2v) ="
-                        + TextTools.formatTo2dp(Math.log10(1 / viewport.getScale()));
-
-        canvas.drawText(label, offsetX, offsetY, paints.legendPaint);
     }
 
     public void centreViewOnActiveStation() {
@@ -726,7 +534,7 @@ public class SketchView extends View {
     }
 
     public void setCompassAzimuth(float degrees) {
-        compassAzimuthDegrees = degrees;
+        overlays.setCompassAzimuth(degrees);
         if (SketchPreferences.Toggle.SHOW_COMPASS.isOn()
                 && state.getProjectionType() == Projection2D.PLAN) {
             invalidate();
@@ -734,8 +542,7 @@ public class SketchView extends View {
     }
 
     public void setCachedStats(float surveyLength, float surveyHeight) {
-        this.surveyLength = surveyLength;
-        this.surveyHeight = surveyHeight;
+        overlays.setStats(surveyLength, surveyHeight);
     }
 
     public SketchTool getSketchTool() {

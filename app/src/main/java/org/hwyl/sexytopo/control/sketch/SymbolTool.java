@@ -2,7 +2,6 @@ package org.hwyl.sexytopo.control.sketch;
 
 import android.view.MotionEvent;
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.control.SexyTopo;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
@@ -45,8 +44,7 @@ class SymbolTool implements ToolHandler {
         final Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
         final Coord2D touchPointOnSurvey = viewport.toSurvey(touchPointOnView);
         float startingSizeDp = GeneralPreferences.getSymbolStartingSizeDp();
-        float startingSizePixels = SexyTopo.dpToPixels(startingSizeDp);
-        float size = startingSizePixels / viewport.getScale();
+        float size = viewport.dpToSurvey(startingSizeDp);
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:

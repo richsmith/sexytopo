@@ -37,7 +37,7 @@ class PointRenderer {
         int labelColour = ContextCompat.getColor(context, R.color.station);
         labelPaint.setColor(labelColour);
         int labelSizeSp = GeneralPreferences.getLabelFontSizeSp();
-        float labelSizePixels = SketchPaints.spToPixels(context, labelSizeSp);
+        float labelSizePixels = ScreenUnits.spToPixels(context, labelSizeSp);
         labelPaint.setTextSize(labelSizePixels);
     }
 

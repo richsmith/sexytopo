@@ -113,6 +113,45 @@ public class ViewportTest {
         Assert.assertFalse(viewport.couldBeVisible(shape));
     }
 
+    @Test
+    public void testDpToSurveyConvertsAtCurrentZoom() {
+        Viewport viewport = new Viewport();
+        // without Android resources, as in unit tests, a dp is a pixel; 60px/m by default
+        Assert.assertEquals(0.5f, viewport.dpToSurvey(30), DELTA);
+
+        viewport.setZoom(120, Coord2D.ORIGIN);
+        Assert.assertEquals(0.25f, viewport.dpToSurvey(30), DELTA);
+    }
+
+    @Test
+    public void testPatternScaleIsUnchangedByDoublingTheZoom() {
+        Viewport viewport = new Viewport();
+        float atDefault = viewport.getPatternScale();
+
+        viewport.setZoom(Viewport.DEFAULT_SCALE * 2, Coord2D.ORIGIN);
+        Assert.assertEquals(atDefault, viewport.getPatternScale(), DELTA);
+    }
+
+    @Test
+    public void testPatternScaleStaysWithinRootTwoOfDesignedSize() {
+        Viewport viewport = new Viewport();
+        // from where the far-out cap (0.05 x scale, with a dp a pixel) no longer applies
+        for (float scale = 30; scale < Viewport.MAX_ZOOM; scale *= 1.1f) {
+            viewport.setZoom(scale, Coord2D.ORIGIN);
+            float patternScale = viewport.getPatternScale();
+            Assert.assertTrue(patternScale <= Math.sqrt(2) + DELTA);
+            Assert.assertTrue(patternScale >= 1 / Math.sqrt(2) - DELTA);
+        }
+    }
+
+    @Test
+    public void testPatternScaleIsCappedWhenZoomedFarOut() {
+        Viewport viewport = new Viewport();
+        viewport.setZoom(1, Coord2D.ORIGIN);
+        // at 1px/m a dp can stand for at most 0.05m of cave
+        Assert.assertEquals(0.05f, viewport.getPatternScale(), DELTA);
+    }
+
     private static PathDetail path(Coord2D... points) {
         return new PathDetail(Arrays.asList(points), Colour.BLACK);
     }

@@ -1,8 +1,8 @@
 package org.hwyl.sexytopo.control.sketch;
 
+import static org.hwyl.sexytopo.control.sketch.ScreenUnits.dpToPixels;
 import static org.hwyl.sexytopo.control.sketch.SketchPaints.FADED_ALPHA;
 import static org.hwyl.sexytopo.control.sketch.SketchPaints.SOLID_ALPHA;
-import static org.hwyl.sexytopo.control.sketch.SketchPaints.dpToPixels;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -90,7 +90,7 @@ class SurveyDataRenderer {
         float stationStrokeWidthPx = dpToPixels(STATION_STROKE_WIDTH_DP);
         stationPaint.setStrokeWidth(stationStrokeWidthPx);
         int stationLabelFontSizeSp = GeneralPreferences.getStationLabelFontSizeSp();
-        float stationLabelFontSizePixels = SketchPaints.spToPixels(context, stationLabelFontSizeSp);
+        float stationLabelFontSizePixels = ScreenUnits.spToPixels(context, stationLabelFontSizeSp);
         stationPaint.setTextSize(stationLabelFontSizePixels);
 
         iconPaint.setColorFilter(new PorterDuffColorFilter(stationColour, PorterDuff.Mode.SRC_IN));

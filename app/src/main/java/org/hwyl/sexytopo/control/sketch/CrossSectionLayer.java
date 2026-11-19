@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.control.sketch;
 
-import static org.hwyl.sexytopo.control.sketch.SketchPaints.dpToPixels;
+import static org.hwyl.sexytopo.control.sketch.ScreenUnits.dpToPixels;
 
 import android.content.Context;
 import android.content.Intent;

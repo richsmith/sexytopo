@@ -54,7 +54,7 @@ class TextTool implements ToolHandler {
                                     String text = editable.toString();
                                     int startingSizeSp = GeneralPreferences.getTextStartingSizeSp();
                                     float startingSizePixels =
-                                            SketchPaints.spToPixels(context, startingSizeSp);
+                                            ScreenUnits.spToPixels(context, startingSizeSp);
                                     float size = startingSizePixels / viewport.getScale();
                                     state.getSketch()
                                             .addTextDetail(

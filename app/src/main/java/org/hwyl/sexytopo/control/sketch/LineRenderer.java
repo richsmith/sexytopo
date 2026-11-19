@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.control.sketch;
 
-import static org.hwyl.sexytopo.control.sketch.SketchPaints.dpToPixels;
+import static org.hwyl.sexytopo.control.sketch.ScreenUnits.dpToPixels;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -168,8 +168,7 @@ class LineRenderer {
         float viewOffsetX = viewport.getOffsetX();
         float viewOffsetY = viewport.getOffsetY();
         float viewScale = viewport.getScale();
-        Paint paint =
-                getLineTypePaint(pathDetail.getLineType(), SketchPaints.getPatternScale(viewScale));
+        Paint paint = getLineTypePaint(pathDetail.getLineType(), viewport.getPatternScale());
         paint.setColor(pathDetail.getDrawColour(isDarkModeActive).intValue);
         paint.setAlpha(alpha);
 
@@ -194,8 +193,7 @@ class LineRenderer {
     /** Shades the outer side of a wall line type. */
     private void drawRockSide(Canvas canvas, Path path, int colour, int alpha) {
         List<WallRockSide.Layer> layers = WallRockSide.getLayers();
-        Paint[] layerPaints =
-                getWallRockSidePaints(SketchPaints.getPatternScale(viewport.getScale()));
+        Paint[] layerPaints = getWallRockSidePaints(viewport.getPatternScale());
         for (int i = 0; i < layers.size(); i++) {
             Paint paint = layerPaints[i];
             paint.setColor(colour);

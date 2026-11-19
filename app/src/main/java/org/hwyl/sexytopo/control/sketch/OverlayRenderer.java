@@ -1,0 +1,206 @@
+package org.hwyl.sexytopo.control.sketch;
+
+import static org.hwyl.sexytopo.control.sketch.ScreenUnits.dpToPixels;
+
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Path;
+import androidx.core.content.ContextCompat;
+import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.control.util.GeneralPreferences;
+import org.hwyl.sexytopo.control.util.SketchPreferences;
+import org.hwyl.sexytopo.control.util.TextTools;
+
+/**
+ * Draws what sits on the screen rather than in the cave: the grid behind the survey, and in front
+ * of it the legend (survey name, length, depth and a scale bar), the compass and debugging info.
+ */
+class OverlayRenderer {
+
+    private static final int BOX_SIZE = 10; // every grid box is 10 units square
+    private static final int LEGEND_SIZE = 18;
+    private static final int LEGEND_TICK_SIZE_DP = 5;
+
+    private final Viewport viewport;
+    private final SketchState state;
+
+    private final Paint legendPaint = new Paint();
+    private final Paint gridPaint = new Paint();
+
+    private float legendTickSizePx;
+
+    private float surveyLength = 0;
+    private float surveyHeight = 0;
+    private float compassAzimuthDegrees = 0f;
+
+    OverlayRenderer(Viewport viewport, SketchState state) {
+        this.viewport = viewport;
+        this.state = state;
+    }
+
+    /** Set the paints up from the theme and current preferences. */
+    void initialise(Context context) {
+
+        SketchPaints.applyAntiAliasPreference(legendPaint);
+
+        int gridColour = ContextCompat.getColor(context, R.color.grid);
+        gridPaint.setColor(gridColour);
+
+        int legendColour = ContextCompat.getColor(context, R.color.legend);
+        legendPaint.setColor(legendColour);
+        float legendSizeSp = GeneralPreferences.getLegendFontSizeSp();
+        float legendSizePixels = ScreenUnits.spToPixels(context, legendSizeSp);
+        float strokeWidthPixels = ScreenUnits.spToPixels(context, legendSizeSp * 0.1f);
+        legendPaint.setStrokeWidth(strokeWidthPixels);
+        legendPaint.setTextSize(legendSizePixels);
+
+        legendTickSizePx = dpToPixels(LEGEND_TICK_SIZE_DP);
+    }
+
+    /** The survey's length and vertical range, as shown in the legend. */
+    void setStats(float surveyLength, float surveyHeight) {
+        this.surveyLength = surveyLength;
+        this.surveyHeight = surveyHeight;
+    }
+
+    /** Which way the device is facing, for the compass. */
+    void setCompassAzimuth(float degrees) {
+        compassAzimuthDegrees = degrees;
+    }
+
+    void drawGrid(Canvas canvas, int width, int height) {
+        float viewOffsetX = viewport.getOffsetX();
+        float viewOffsetY = viewport.getOffsetY();
+        float viewScale = viewport.getScale();
+
+        if (!SketchPreferences.Toggle.SHOW_GRID.isOn()) {
+            return;
+        }
+
+        int tickSizeInMetres = getMinorGridBoxSize();
+        int numberTicksJustBeforeViewpointOffsetX = (int) (viewOffsetX / tickSizeInMetres);
+
+        for (int n = numberTicksJustBeforeViewpointOffsetX; true; n++) {
+            float xSurvey = n * tickSizeInMetres;
+            int xView = (int) ((xSurvey - viewOffsetX) * viewScale);
+            gridPaint.setStrokeWidth(n % BOX_SIZE == 0 ? 3 : 1);
+            canvas.drawLine(xView, 0, xView, height, gridPaint);
+            if (xView >= width) {
+                break;
+            }
+        }
+
+        int numberTicksJustBeforeViewpointOffsetY = (int) (viewOffsetY / tickSizeInMetres);
+
+        for (int n = numberTicksJustBeforeViewpointOffsetY; true; n++) {
+            float ySurvey = n * tickSizeInMetres;
+            int yView = (int) ((ySurvey - viewOffsetY) * viewScale);
+            gridPaint.setStrokeWidth(n % BOX_SIZE == 0 ? 3 : 1);
+            canvas.drawLine(0, yView, width, yView, gridPaint);
+            if (yView >= height) {
+                break;
+            }
+        }
+    }
+
+    /** The minor grid spacing in metres, coarser as the view zooms out. */
+    private int getMinorGridBoxSize() {
+
+        if (viewport.getScale() > 15) {
+            return 1;
+        } else if (viewport.getScale() > 2) {
+            return 10;
+        } else {
+            return 100;
+        }
+    }
+
+    void drawLegend(Canvas canvas, int height) {
+
+        String surveyLabel =
+                state.getSurvey().getName()
+                        + " L"
+                        + TextTools.formatTo0dpWithComma(surveyLength)
+                        + " V"
+                        + TextTools.formatTo0dpWithComma(surveyHeight);
+
+        float legendSize = legendPaint.getTextSize();
+        float offsetX = legendSize * 1.25f;
+        float offsetY = legendSize * 1.25f;
+        float y = height - offsetY;
+        float x = offsetX;
+        canvas.drawText(surveyLabel, x, y, legendPaint);
+
+        int minorGridSize = getMinorGridBoxSize();
+        float scaleWidth = viewport.getScale() * minorGridSize;
+        float scaleOffsetY = offsetY * 2;
+        float scaleY = height - scaleOffsetY;
+        legendPaint.setStyle(Paint.Style.STROKE);
+        Path scalePath = new Path();
+        scalePath.moveTo(x, scaleY - legendTickSizePx);
+        scalePath.lineTo(x, scaleY);
+        scalePath.lineTo(x + scaleWidth, scaleY);
+        scalePath.lineTo(x + scaleWidth, scaleY - legendTickSizePx);
+        canvas.drawPath(scalePath, legendPaint);
+        legendPaint.setStyle(Paint.Style.FILL);
+        String scaleLabel = minorGridSize + "m";
+        canvas.drawText(scaleLabel, x + scaleWidth + 0.3f * legendSize, scaleY, legendPaint);
+    }
+
+    /** Draw the compass, turned to show which way the device is facing, if it's switched on. */
+    void drawCompass(Canvas canvas, int height) {
+        if (!SketchPreferences.Toggle.SHOW_COMPASS.isOn()) {
+            return;
+        }
+
+        float textSize = legendPaint.getTextSize();
+        Paint.FontMetrics metrics = legendPaint.getFontMetrics();
+        float textHeight = metrics.descent - metrics.ascent;
+        float offsetX = textSize * 1.25f; // matches legend x
+        float arrowLength = textSize * 2.5f;
+        float arrowHeadSize = textSize * 0.6f;
+        float cx = offsetX + arrowLength / 2f + textSize;
+        float scaleBarY = height - textSize * 4f;
+        float cy = scaleBarY - arrowLength / 2f - textHeight;
+
+        canvas.save();
+        canvas.rotate(-compassAzimuthDegrees, cx, cy);
+
+        float tipY = cy - arrowLength / 2f;
+        float tailY = cy + arrowLength / 2f;
+
+        legendPaint.setStyle(Paint.Style.STROKE);
+        Path arrowPath = new Path();
+        arrowPath.moveTo(cx - arrowHeadSize, tipY + arrowHeadSize);
+        arrowPath.lineTo(cx, tipY);
+        arrowPath.lineTo(cx + arrowHeadSize, tipY + arrowHeadSize);
+        arrowPath.moveTo(cx, tipY);
+        arrowPath.lineTo(cx, tailY);
+        canvas.drawPath(arrowPath, legendPaint);
+        legendPaint.setStyle(Paint.Style.FILL);
+        canvas.drawText("N", cx - textSize * 0.35f, tipY - textSize * 0.2f, legendPaint);
+
+        canvas.restore();
+    }
+
+    void drawDebuggingInfo(Canvas canvas, int width) {
+        float offsetX = width * 0.03f;
+        float offsetY = LEGEND_SIZE * 2;
+        String label =
+                "x="
+                        + offsetX
+                        + " y="
+                        + offsetY
+                        + " s2v="
+                        + TextTools.formatTo2dp(viewport.getScale())
+                        + " 1/s2v="
+                        + TextTools.formatTo2dp(1 / viewport.getScale())
+                        + "\n log (1/s2v) ="
+                        + TextTools.formatTo2dp(Math.log(1 / viewport.getScale()))
+                        + "\n log10 (1/s2v) ="
+                        + TextTools.formatTo2dp(Math.log10(1 / viewport.getScale()));
+
+        canvas.drawText(label, offsetX, offsetY, legendPaint);
+    }
+}

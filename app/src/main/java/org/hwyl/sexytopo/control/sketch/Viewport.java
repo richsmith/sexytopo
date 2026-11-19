@@ -21,6 +21,10 @@ public class Viewport {
     public static final float MAX_ZOOM = 500.0f;
     public static final float DEFAULT_SCALE = 60.0f;
 
+    // the most a dp of line ornamentation or area fill can stand for in the cave, so zoomed far
+    // out a decoration can't dwarf what it decorates (the default 12dp tick comes to 0.6m)
+    private static final float MAX_PATTERN_METRES_PER_DP = 0.05f;
+
     private Coord2D offset = Coord2D.ORIGIN;
     private float scale = DEFAULT_SCALE;
 
@@ -47,6 +51,25 @@ public class Viewport {
     /** Pixels per metre. */
     public float getScale() {
         return scale;
+    }
+
+    /** A length on screen, given in dp, as metres in the survey at the current zoom. */
+    public float dpToSurvey(float dp) {
+        return ScreenUnits.dpToPixels(dp) / scale;
+    }
+
+    /**
+     * How much to scale line ornamentation and area fills from their designed size, so they zoom
+     * with the cave instead of crawling across it.
+     */
+    public float getPatternScale() {
+        // re-pick the density each time the zoom doubles or halves, so it never strays more than
+        // √2 from its designed size; doubling keeps existing marks in place and adds new ones
+        double octave = Math.round(Math.log(scale) / Math.log(2));
+        float patternScale = (float) (scale / Math.pow(2, octave));
+        // but zoomed far out, don't let a tick dwarf the line it's on
+        float maxScale = MAX_PATTERN_METRES_PER_DP * scale / ScreenUnits.dpToPixels(1);
+        return Math.min(patternScale, maxScale);
     }
 
     public Coord2D toSurvey(final Coord2D coords) {

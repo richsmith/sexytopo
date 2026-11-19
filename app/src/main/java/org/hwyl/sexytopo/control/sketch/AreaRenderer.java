@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.control.sketch;
 
-import static org.hwyl.sexytopo.control.sketch.SketchPaints.dpToPixels;
+import static org.hwyl.sexytopo.control.sketch.ScreenUnits.dpToPixels;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
@@ -73,7 +73,7 @@ class AreaRenderer {
         float viewOffsetY = viewport.getOffsetY();
         float viewScale = viewport.getScale();
 
-        float patternScale = SketchPaints.getPatternScale(viewScale);
+        float patternScale = viewport.getPatternScale();
         areaFillMatrix.setScale(
                 patternScale / AREA_FILL_OVERSAMPLE, patternScale / AREA_FILL_OVERSAMPLE);
         areaFillMatrix.postTranslate(-viewOffsetX * viewScale, -viewOffsetY * viewScale);

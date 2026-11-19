@@ -1,7 +1,5 @@
 package org.hwyl.sexytopo.control.sketch;
 
-import static org.hwyl.sexytopo.control.sketch.SketchPaints.dpToPixels;
-
 /**
  * How near a finger has to be to count, and how small a drawn detail can be before it's discarded.
  * Each is a fixed size on screen, converted to metres at the current zoom, so it follows what the
@@ -20,17 +18,17 @@ final class TouchTolerances {
 
     /** How far from the finger the eraser reaches, in metres. */
     static float getEraseRadius(Viewport viewport) {
-        return dpToPixels(ERASE_RADIUS_DP) / viewport.getScale();
+        return viewport.dpToSurvey(ERASE_RADIUS_DP);
     }
 
     /** How far from the finger a station or line can be and still be picked, in metres. */
     static float getSelectionRadius(Viewport viewport) {
-        return dpToPixels(SELECTION_RADIUS_DP) / viewport.getScale();
+        return viewport.dpToSurvey(SELECTION_RADIUS_DP);
     }
 
     /** How close line ends must be for Snap to Lines to join them, in metres. */
     static float getSnapDistance(Viewport viewport) {
-        return dpToPixels(SNAP_DISTANCE_DP) / viewport.getScale();
+        return viewport.dpToSurvey(SNAP_DISTANCE_DP);
     }
 
     /**
@@ -38,7 +36,7 @@ final class TouchTolerances {
      * leave a speck.
      */
     static float getMinimumLineSize(Viewport viewport) {
-        return dpToPixels(MINIMUM_DETAIL_SIZE_DP) / viewport.getScale();
+        return viewport.dpToSurvey(MINIMUM_DETAIL_SIZE_DP);
     }
 
     /** The smallest area (in square metres) worth keeping: a square of the minimum line size. */
