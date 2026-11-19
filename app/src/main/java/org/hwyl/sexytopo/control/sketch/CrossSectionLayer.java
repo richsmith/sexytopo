@@ -138,12 +138,7 @@ class CrossSectionLayer {
     /** Set the paints up from the theme and current preferences. */
     void initialisePaints(Context context) {
 
-        boolean applyAntiAlias = GeneralPreferences.isAntialiasingModeOn();
-        for (Paint paint : ANTI_ALIAS_PAINTS) {
-            if (paint.isAntiAlias() != applyAntiAlias) {
-                paint.setAntiAlias(applyAntiAlias);
-            }
-        }
+        SketchPaints.applyAntiAliasPreference(ANTI_ALIAS_PAINTS);
 
         connectorPaint.setColor(ContextCompat.getColor(context, R.color.crossSectionConnection));
         connectorPaint.setStrokeWidth(dpToPixels(CONNECTOR_WIDTH_DP));

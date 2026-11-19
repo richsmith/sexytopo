@@ -98,7 +98,7 @@ public class SketchView extends View {
     private final SketchPaints paints = new SketchPaints();
 
     private final SketchRenderer sketchRenderer =
-            new SketchRenderer(viewport, paints, () -> activity.isDebugMode());
+            new SketchRenderer(viewport, () -> activity.isDebugMode());
 
     // ********** Cross-sections and tools **********
 
@@ -151,6 +151,7 @@ public class SketchView extends View {
 
     public void initialisePaint() {
         paints.initialise(getContext());
+        sketchRenderer.initialise(getContext());
         crossSections.initialisePaints(getContext());
 
         isTwoFingerModeActive = GeneralPreferences.isTwoFingerModeActive();
