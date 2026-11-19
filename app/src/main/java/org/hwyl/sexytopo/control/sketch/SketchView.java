@@ -1839,8 +1839,7 @@ public class SketchView extends View {
             Coord2D touchPointOnView = new Coord2D(motionEvent.getX(), motionEvent.getY());
             Station matchedStation = checkForStation(touchPointOnView);
             if (matchedStation != null && !menuShownInThisTouch) {
-                if (state.getSketchTool() == SketchTool.LINE
-                        || state.getSketchTool() == SketchTool.AREA) {
+                if (state.getSketchTool().drawsPath()) {
                     state.getSketch().abandonActivePath();
                 }
                 showContextMenu(motionEvent, matchedStation);
@@ -1848,13 +1847,7 @@ public class SketchView extends View {
                 return;
             }
 
-            // Not offered by tools that act as soon as the finger lands (erasing, placing a symbol
-            // or text), since by then a long press has already done something, nor while placing
-            // or adjusting a cross-section
-            if (state.getSketchTool() != SketchTool.MOVE
-                    && state.getSketchTool() != SketchTool.SELECT
-                    && state.getSketchTool() != SketchTool.LINE
-                    && state.getSketchTool() != SketchTool.AREA) {
+            if (!state.getSketchTool().offersLineMenu()) {
                 return;
             }
             PathDetail matchedPath = checkForPath(touchPointOnView);
