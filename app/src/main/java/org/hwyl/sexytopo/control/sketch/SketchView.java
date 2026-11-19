@@ -39,7 +39,6 @@ import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.SurveyConnection;
 
-@SuppressWarnings({"SameParameterValue", "UnnecessaryLocalVariable"})
 public class SketchView extends View {
 
     private final ScaleGestureDetector scaleGestureDetector;
@@ -55,7 +54,7 @@ public class SketchView extends View {
 
     private Map<Survey, Space<Coord2D>> translatedConnectedSurveys = new HashMap<>();
 
-    boolean surveyChanged;
+    private boolean surveyChanged;
 
     // cached preference for performance
     private boolean isTwoFingerModeActive = true;
@@ -63,7 +62,7 @@ public class SketchView extends View {
     // Flag to prevent double menu opening during this touch sequence
     private boolean menuShownInThisTouch = false;
 
-    // ********** Drawing **********
+    // ********** Renderers **********
 
     private final SketchRenderer sketchRenderer =
             new SketchRenderer(viewport, () -> activity.isDebugMode());
@@ -74,7 +73,7 @@ public class SketchView extends View {
 
     private final HotCorners hotCorners = new HotCorners();
 
-    // ********** Cross-sections and tools **********
+    // ********** Cross-section layer and tool handlers **********
 
     private final ViewHost host = new ViewHost();
 
@@ -123,6 +122,8 @@ public class SketchView extends View {
         }
     }
 
+    // ********** Set-up **********
+
     public void initialisePaint() {
         sketchRenderer.initialise(getContext());
         surveyDataRenderer.initialise(getContext());
@@ -136,6 +137,8 @@ public class SketchView extends View {
     public void setActivity(SketchActivity sketchActivity) {
         this.activity = sketchActivity;
     }
+
+    // ********** Survey and display **********
 
     public void setSurvey(Survey survey) {
         if (survey != state.getSurvey()) {
@@ -166,6 +169,119 @@ public class SketchView extends View {
     public void setIsDarkModeActive(boolean isDarkModeActive) {
         sketchRenderer.setDarkModeActive(isDarkModeActive);
     }
+
+    public void setCachedStats(float surveyLength, float surveyHeight) {
+        overlays.setStats(surveyLength, surveyHeight);
+    }
+
+    public void setCompassAzimuth(float degrees) {
+        overlays.setCompassAzimuth(degrees);
+        if (SketchPreferences.Toggle.SHOW_COMPASS.isOn()
+                && state.getProjectionType() == Projection2D.PLAN) {
+            invalidate();
+        }
+    }
+
+    // ********** Tools **********
+
+    public void setSketchTool(SketchTool sketchTool) {
+        state.setSketchTool(sketchTool);
+    }
+
+    public SketchTool getSketchTool() {
+        return state.getSketchTool();
+    }
+
+    public void setBrushColour(BrushColour brushColour) {
+        state.setColour(brushColour.getColour());
+    }
+
+    public void setLineType(LineType lineType) {
+        lineTool.setLineType(lineType);
+    }
+
+    public void setAreaType(AreaType areaType) {
+        areaTool.setAreaType(areaType);
+    }
+
+    public void setCurrentSymbol(Symbol symbol) {
+        symbolTool.setSymbol(symbol);
+    }
+
+    // ********** Cross-sections **********
+
+    public void handleNewCrossSection(Station station) {
+        handleNewCrossSection(station, CrossSection.Orientation.VERTICAL);
+    }
+
+    public void handleNewCrossSection(Station station, CrossSection.Orientation orientation) {
+        crossSections.startPositioning(station, orientation);
+    }
+
+    public void handleRotateCrossSection(Station station) {
+        crossSections.startRotating(station);
+    }
+
+    public void launchCrossSectionEditor(CrossSectionDetail detail) {
+        crossSections.launchEditor(detail);
+    }
+
+    // ********** Panning and zooming **********
+
+    public void centreViewOnActiveStation() {
+        centreViewOnStation(state.getSurvey().getActiveStation());
+    }
+
+    public void centreViewOnStation(Station station) {
+        Coord2D activeStationCoord = state.getProjection().getStationMap().get(station);
+
+        // not sure how this could be null, but at least one null pointer has been reported
+        if (activeStationCoord == null) {
+            activeStationCoord = Coord2D.ORIGIN;
+        }
+
+        centreViewOnSurveyPoint(activeStationCoord);
+    }
+
+    public void centreViewOnSurveyPoint(Coord2D point) {
+        viewport.centreOn(point, getWidth(), getHeight());
+    }
+
+    public void adjustZoomBy(float delta) {
+        float newZoom = viewport.getScale() * delta;
+        setZoom(newZoom);
+    }
+
+    public void setZoom(float newZoom) {
+        Coord2D centre = new Coord2D(getWidth() / 2f, getHeight() / 2f);
+        setZoom(newZoom, centre);
+    }
+
+    public void setZoom(float newZoom, Coord2D focusOnScreen) {
+        viewport.setZoom(newZoom, focusOnScreen);
+    }
+
+    // ********** Undo and redo **********
+
+    public boolean canUndo() {
+        return state.getSketch().canUndo();
+    }
+
+    public boolean canRedo() {
+        return state.getSketch().canRedo();
+    }
+
+    public void undo() {
+        state.getSketch().undo();
+        invalidate();
+    }
+
+    public void redo() {
+        state.getSketch().redo();
+        invalidate();
+    }
+
+    // ********** Touch **********
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -274,25 +390,11 @@ public class SketchView extends View {
         }
     }
 
-    public void handleNewCrossSection(Station station) {
-        handleNewCrossSection(station, CrossSection.Orientation.VERTICAL);
-    }
-
-    public void handleNewCrossSection(Station station, CrossSection.Orientation orientation) {
-        crossSections.startPositioning(station, orientation);
-    }
-
-    public void handleRotateCrossSection(Station station) {
-        crossSections.startRotating(station);
-    }
-
-    public void launchCrossSectionEditor(CrossSectionDetail detail) {
-        crossSections.launchEditor(detail);
-    }
-
     private void broadcastSurveyUpdated() {
         SurveyManager.getInstance(getContext().getApplicationContext()).broadcastSurveyUpdated();
     }
+
+    // ********** Drawing **********
 
     protected void updateViewBounds() {
         viewport.updateBounds(getWidth(), getHeight());
@@ -410,93 +512,6 @@ public class SketchView extends View {
         if (isCompassShown()) {
             overlays.drawCompass(canvas, getHeight());
         }
-    }
-
-    public void centreViewOnActiveStation() {
-        centreViewOnStation(state.getSurvey().getActiveStation());
-    }
-
-    public void centreViewOnStation(Station station) {
-        Coord2D activeStationCoord = state.getProjection().getStationMap().get(station);
-
-        // not sure how this could be null, but at least one null pointer has been reported
-        if (activeStationCoord == null) {
-            activeStationCoord = Coord2D.ORIGIN;
-        }
-
-        centreViewOnSurveyPoint(activeStationCoord);
-    }
-
-    public void centreViewOnSurveyPoint(Coord2D point) {
-        viewport.centreOn(point, getWidth(), getHeight());
-    }
-
-    public void adjustZoomBy(float delta) {
-        float newZoom = viewport.getScale() * delta;
-        setZoom(newZoom);
-    }
-
-    public void setZoom(float newZoom) {
-        Coord2D centre = new Coord2D(getWidth() / 2f, getHeight() / 2f);
-        setZoom(newZoom, centre);
-    }
-
-    public void setZoom(float newZoom, Coord2D focusOnScreen) {
-        viewport.setZoom(newZoom, focusOnScreen);
-    }
-
-    public boolean canUndo() {
-        return state.getSketch().canUndo();
-    }
-
-    public boolean canRedo() {
-        return state.getSketch().canRedo();
-    }
-
-    public void undo() {
-        state.getSketch().undo();
-        invalidate();
-    }
-
-    public void redo() {
-        state.getSketch().redo();
-        invalidate();
-    }
-
-    public void setBrushColour(BrushColour brushColour) {
-        state.setColour(brushColour.getColour());
-    }
-
-    public void setLineType(LineType lineType) {
-        lineTool.setLineType(lineType);
-    }
-
-    public void setAreaType(AreaType areaType) {
-        areaTool.setAreaType(areaType);
-    }
-
-    public void setCurrentSymbol(Symbol symbol) {
-        symbolTool.setSymbol(symbol);
-    }
-
-    public void setSketchTool(SketchTool sketchTool) {
-        state.setSketchTool(sketchTool);
-    }
-
-    public void setCompassAzimuth(float degrees) {
-        overlays.setCompassAzimuth(degrees);
-        if (SketchPreferences.Toggle.SHOW_COMPASS.isOn()
-                && state.getProjectionType() == Projection2D.PLAN) {
-            invalidate();
-        }
-    }
-
-    public void setCachedStats(float surveyLength, float surveyHeight) {
-        overlays.setStats(surveyLength, surveyHeight);
-    }
-
-    public SketchTool getSketchTool() {
-        return state.getSketchTool();
     }
 
     /**
