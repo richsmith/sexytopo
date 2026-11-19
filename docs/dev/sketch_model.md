@@ -188,11 +188,12 @@ Off-screen and sub-pixel details are culled via `couldBeVisible()` before render
 | `control/sketch/SketchView.java` | Rendering and touch handling |
 | `control/sketch/Viewport.java` | Pan and zoom; survey↔screen coordinates; culling |
 | `control/sketch/SketchState.java` | The survey, sketch and projection being shown, and the current and previous tool; shared by the view and its parts |
-| `control/sketch/SketchPaints.java` | Shared paints (stations, legs, legend, grid), pattern scale, anti-alias preference, dp/sp conversion |
+| `control/sketch/SketchPaints.java` | Overlay paints (legend, grid, hot corners); shared alphas, pattern scale, anti-alias preference, dp/sp conversion |
 | `control/sketch/SketchRenderer.java` | Draws a sketch: areas, then lines, then text and symbols |
 | `control/sketch/LineRenderer.java` | Plain and typed lines, ornament and rock-side shading paints and caches |
 | `control/sketch/AreaRenderer.java` | Area fills and outlines, fill pattern shaders |
 | `control/sketch/PointRenderer.java` | Text and symbols, the details placed at a point |
+| `control/sketch/SurveyDataRenderer.java` | Legs, splays and stations, with their paints, labels, icons and the active station's highlight |
 | `control/sketch/CrossSectionLayer.java` | Cross-sections on the sketch: drawing, hit-testing, and the place/move/rotate/open gestures |
 | `control/sketch/*Tool.java` | One class per sketch tool (`ToolHandler`), each owning its gesture state; dispatched from `SketchView.onTouchEvent` by tool |
 | `control/sketch/TouchTolerances.java` | Touch radii and minimum detail sizes, fixed on screen and converted at the current zoom |

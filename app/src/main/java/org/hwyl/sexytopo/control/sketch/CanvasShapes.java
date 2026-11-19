@@ -1,5 +1,7 @@
 package org.hwyl.sexytopo.control.sketch;
 
+import static org.hwyl.sexytopo.control.sketch.SketchPaints.dpToPixels;
+
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
@@ -8,18 +10,13 @@ import org.hwyl.sexytopo.model.geometry.Coord2D;
 /** Simple shapes drawn in view coordinates, shared by the different parts of a sketch view. */
 final class CanvasShapes {
 
+    private static final int DASHED_LINE_INTERVAL_DP = 4;
+
     private CanvasShapes() {}
 
-    static void drawStationCross(
-            Canvas canvas, Paint paint, float x, float y, int crossDiameter, int alpha) {
-        paint.setAlpha(alpha);
-        float halfCross = crossDiameter / 2f;
-        canvas.drawLine(x, y - halfCross, x, y + halfCross, paint);
-        canvas.drawLine(x - halfCross, y, x + halfCross, y, paint);
-    }
-
-    static void drawDashedLine(
-            Canvas canvas, Coord2D start, Coord2D end, float dashLength, Paint paint) {
+    /** Draws a dashed line between two points on the view. */
+    static void drawDashedLine(Canvas canvas, Coord2D start, Coord2D end, Paint paint) {
+        float dashLength = dpToPixels(DASHED_LINE_INTERVAL_DP);
 
         // this switcheroo is so we start from the end of the line and draw backwards
         // (we prefer the end of the line to line up with a dash rather than the start)

@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.activity.CrossSectionActivity;
@@ -29,7 +28,6 @@ import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchTool;
-import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
@@ -47,8 +45,6 @@ class CrossSectionLayer {
     /** What the layer needs the view it's part of to do, beyond what any tool does. */
     interface Host extends ToolHost {
         ViewContext getViewContext();
-
-        void drawLegs(Canvas canvas, Space<Coord2D> space, int alpha, Predicate<Leg> isInPlane);
     }
 
     private static final int CONNECTOR_WIDTH_DP = 2;
@@ -68,7 +64,7 @@ class CrossSectionLayer {
 
     private final Viewport viewport;
     private final SketchState state;
-    private final SketchPaints paints;
+    private final SurveyDataRenderer surveyDataRenderer;
     private final SketchRenderer sketchRenderer;
     private final Host host;
 
@@ -125,12 +121,12 @@ class CrossSectionLayer {
     CrossSectionLayer(
             Viewport viewport,
             SketchState state,
-            SketchPaints paints,
+            SurveyDataRenderer surveyDataRenderer,
             SketchRenderer sketchRenderer,
             Host host) {
         this.viewport = viewport;
         this.state = state;
-        this.paints = paints;
+        this.surveyDataRenderer = surveyDataRenderer;
         this.sketchRenderer = sketchRenderer;
         this.host = host;
     }
@@ -568,18 +564,12 @@ class CrossSectionLayer {
 
         Coord2D centreOnSurvey = sectionDetail.getPosition().plus(dragDelta);
         Coord2D centreOnView = viewport.toView(centreOnSurvey);
-        CanvasShapes.drawStationCross(
-                canvas,
-                paints.stationPaint,
-                centreOnView.x,
-                centreOnView.y,
-                Math.round(paints.stationCrossDiameterPx),
-                alpha);
+        surveyDataRenderer.drawStationCross(canvas, centreOnView.x, centreOnView.y, alpha);
 
         if (SketchPreferences.Toggle.SHOW_STATION_LABELS.isOn()) {
             String description = station.getName() + " X";
-            paints.stationPaint.setAlpha(alpha);
-            canvas.drawText(description, centreOnView.x, centreOnView.y, paints.stationPaint);
+            surveyDataRenderer.drawStationLabel(
+                    canvas, description, centreOnView.x, centreOnView.y, alpha);
         }
 
         Space<Coord2D> rawProjection = crossSection.getProjection();
@@ -587,7 +577,7 @@ class CrossSectionLayer {
         Space<Coord2D> scaledProjection = rawProjection.scale(xsScale);
         Space<Coord2D> sectionProjection = Space2DUtils.translate(scaledProjection, centreOnSurvey);
         // Judge which splays are in the section's plane the same way the section editor does
-        host.drawLegs(
+        surveyDataRenderer.drawLegs(
                 canvas, sectionProjection, alpha, crossSection.getProjectionType()::isLegInPlane);
 
         Coord2D viewStationLocation = viewport.toView(surveyStationLocation);
@@ -595,12 +585,7 @@ class CrossSectionLayer {
         if (GeneralPreferences.isLegacyCrossSectionsOn()) {
             // Legacy cross-sections: just the projected legs and a connector running to the centre,
             // with no editable frame, sub-sketch or drag handle.
-            CanvasShapes.drawDashedLine(
-                    canvas,
-                    viewStationLocation,
-                    centreOnView,
-                    paints.dashedLineIntervalPx,
-                    connectorPaint);
+            CanvasShapes.drawDashedLine(canvas, viewStationLocation, centreOnView, connectorPaint);
             return true;
         }
 
@@ -617,12 +602,7 @@ class CrossSectionLayer {
         Coord2D connectorEnd =
                 clipSegmentToRectBoundary(viewStationLocation, centreOnView, borderRect);
         if (connectorEnd != null) {
-            CanvasShapes.drawDashedLine(
-                    canvas,
-                    viewStationLocation,
-                    connectorEnd,
-                    paints.dashedLineIntervalPx,
-                    connectorPaint);
+            CanvasShapes.drawDashedLine(canvas, viewStationLocation, connectorEnd, connectorPaint);
         }
 
         RectF handleRect = drawHandle(canvas, borderRect, handlePaint);
