@@ -78,6 +78,19 @@ public class ViewportTest {
     }
 
     @Test
+    public void testRectOnCanvasIncludesPartialOverlapAndExcludesRectsBeyondAnEdge() {
+        Viewport viewport = new Viewport();
+        viewport.updateBounds(100, 100);
+
+        Assert.assertTrue(viewport.isRectOnCanvas(10, 10, 20, 20));
+        Assert.assertTrue(viewport.isRectOnCanvas(-50, 40, 5, 60));
+        Assert.assertFalse(viewport.isRectOnCanvas(-50, 40, -1, 60));
+        Assert.assertFalse(viewport.isRectOnCanvas(101, 40, 150, 60));
+        Assert.assertFalse(viewport.isRectOnCanvas(40, -50, 60, -1));
+        Assert.assertFalse(viewport.isRectOnCanvas(40, 101, 60, 150));
+    }
+
+    @Test
     public void testCouldBeVisibleCullsOffscreenShapes() {
         Viewport viewport = new Viewport();
         // 600x600 pixels at 60px/m shows survey (0,0) to (10,10)

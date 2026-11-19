@@ -41,6 +41,8 @@ class SurveyDataRenderer {
 
     private static final int STATION_STROKE_WIDTH_DP = 2;
     private static final int STATION_LABEL_OFFSET_DP = 10;
+    // how long a name can hang in from off the left of the screen and still be drawn
+    private static final int OFF_SCREEN_LABEL_ALLOWANCE_CHARACTERS = 40;
 
     private final Viewport viewport;
     private final SketchState state;
@@ -72,6 +74,11 @@ class SurveyDataRenderer {
 
     private float stationCrossDiameterPx;
     private float stationLabelOffsetPx;
+
+    // how far off screen a station can be and still have part of it on screen: on the left, its
+    // name and icons can reach in; on the other sides only its cross and the edge of its name can
+    private float offScreenReachLeft;
+    private float offScreenReach;
 
     private Bitmap commentIcon;
     private Bitmap linkIcon;
@@ -132,6 +139,16 @@ class SurveyDataRenderer {
 
         stationCrossDiameterPx = dpToPixels(GeneralPreferences.getStationCrossDiameterDp());
         stationLabelOffsetPx = dpToPixels(STATION_LABEL_OFFSET_DP);
+
+        float crossDiameter = Math.round(stationCrossDiameterPx);
+        float textSize = stationPaint.getTextSize();
+        offScreenReach = crossDiameter + stationLabelOffsetPx + textSize;
+        // the cross, a name up to the allowance (a text size per character is a generous width),
+        // and two icons, with spacing between each
+        offScreenReachLeft =
+                crossDiameter * 2
+                        + OFF_SCREEN_LABEL_ALLOWANCE_CHARACTERS * textSize
+                        + 2 * crossDiameter * 1.5f;
 
         commentIcon =
                 BitmapFactory.decodeResource(context.getResources(), R.drawable.speech_bubble);
@@ -194,7 +211,9 @@ class SurveyDataRenderer {
 
     /**
      * Draws the stations, each followed by the decoration given (if any) at the same alpha. With
-     * Fade Non-Active on, only the active station is drawn solid.
+     * Fade Non-Active on, only the active station is drawn solid. Stations too far off screen for
+     * any of their cross, name or icons to show aren't drawn, but the decoration is still called
+     * for them, as it can reach further than this knows.
      */
     void drawStations(
             Canvas canvas,
@@ -210,71 +229,85 @@ class SurveyDataRenderer {
             baseAlpha = FADED_ALPHA;
         }
 
-        int alpha = baseAlpha;
-        stationPaint.setAlpha(alpha);
+        Station activeStation = survey.getActiveStation();
 
         for (Map.Entry<Station, Coord2D> entry : space.getStationMap().entrySet()) {
             Station station = entry.getKey();
 
-            if (fadingNonActive && (station == survey.getActiveStation())) {
-                alpha = SOLID_ALPHA;
-                // setting alpha is measured as a relatively expensive call, so we change this as
-                // little as possible
-                stationPaint.setAlpha(alpha);
-            }
+            int alpha = (fadingNonActive && station == activeStation) ? SOLID_ALPHA : baseAlpha;
 
             Coord2D translatedStation = viewport.toView(entry.getValue());
 
             int x = (int) (translatedStation.x);
             int y = (int) (translatedStation.y);
 
-            int stationCrossDiameterIntPx = Math.round(stationCrossDiameterPx);
-            drawStationCross(canvas, x, y, alpha);
-
-            if (station == survey.getActiveStation()) {
-                highlightActiveStation(canvas, x, y);
-            }
-
-            int spacing = stationCrossDiameterIntPx / 2;
-            int nextX = x + stationCrossDiameterIntPx;
-
-            if (showStationLabels) {
-                String name = station.getName();
-                if (station == survey.getOrigin()) {
-                    name = name + " (" + survey.getName() + ")";
-                }
-                canvas.drawText(name, nextX, y + stationLabelOffsetPx, stationPaint);
-                nextX += Math.round(stationPaint.measureText(name)) + spacing;
-            }
-
-            List<Bitmap> icons = new ArrayList<>();
-            if (station.hasComment()) {
-                icons.add(commentIcon);
-            }
-            if (survey.hasLinkedSurveys(station)) {
-                icons.add(linkIcon);
-            }
-
-            for (Bitmap icon : icons) {
-                int yTop = y - stationCrossDiameterIntPx / 2;
-                Rect rect =
-                        new Rect(
-                                nextX,
-                                yTop,
-                                nextX + stationCrossDiameterIntPx,
-                                yTop + stationCrossDiameterIntPx);
-                canvas.drawBitmap(icon, null, rect, iconPaint);
-                nextX += stationCrossDiameterIntPx + spacing;
+            if (couldStationBeVisible(x, y)) {
+                drawStation(canvas, survey, station, x, y, alpha, showStationLabels);
             }
 
             if (decoration != null) {
                 decoration.draw(canvas, station, x, y, alpha);
             }
+        }
+    }
 
-            if (fadingNonActive && (station == survey.getActiveStation())) {
-                alpha = baseAlpha;
-                stationPaint.setAlpha(alpha);
-            }
+    private static String getLabel(Survey survey, Station station) {
+        String name = station.getName();
+        if (station == survey.getOrigin()) {
+            name = name + " (" + survey.getName() + ")";
+        }
+        return name;
+    }
+
+    /** Whether any part of a station drawn at this point on the view could be on screen. */
+    private boolean couldStationBeVisible(int x, int y) {
+        return viewport.isRectOnCanvas(
+                x - offScreenReach, y - offScreenReach, x + offScreenReachLeft, y + offScreenReach);
+    }
+
+    private void drawStation(
+            Canvas canvas,
+            Survey survey,
+            Station station,
+            int x,
+            int y,
+            int alpha,
+            boolean showLabel) {
+
+        int stationCrossDiameterIntPx = Math.round(stationCrossDiameterPx);
+        drawStationCross(canvas, x, y, alpha);
+
+        if (station == survey.getActiveStation()) {
+            highlightActiveStation(canvas, x, y);
+        }
+
+        int spacing = stationCrossDiameterIntPx / 2;
+        int nextX = x + stationCrossDiameterIntPx;
+
+        if (showLabel) {
+            String label = getLabel(survey, station);
+            canvas.drawText(label, nextX, y + stationLabelOffsetPx, stationPaint);
+            nextX += Math.round(stationPaint.measureText(label)) + spacing;
+        }
+
+        List<Bitmap> icons = new ArrayList<>();
+        if (station.hasComment()) {
+            icons.add(commentIcon);
+        }
+        if (survey.hasLinkedSurveys(station)) {
+            icons.add(linkIcon);
+        }
+
+        for (Bitmap icon : icons) {
+            int yTop = y - stationCrossDiameterIntPx / 2;
+            Rect rect =
+                    new Rect(
+                            nextX,
+                            yTop,
+                            nextX + stationCrossDiameterIntPx,
+                            yTop + stationCrossDiameterIntPx);
+            canvas.drawBitmap(icon, null, rect, iconPaint);
+            nextX += stationCrossDiameterIntPx + spacing;
         }
     }
 

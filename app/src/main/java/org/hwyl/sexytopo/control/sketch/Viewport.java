@@ -128,6 +128,14 @@ public class Viewport {
         bottomRightOnSurvey = toSurvey(canvasBottomRight);
     }
 
+    /** Whether a rectangle in view coordinates overlaps the visible area. */
+    public boolean isRectOnCanvas(float left, float top, float right, float bottom) {
+        return right >= 0
+                && left <= canvasBottomRight.x
+                && bottom >= 0
+                && top <= canvasBottomRight.y;
+    }
+
     /** Whether a line in view coordinates could cross the visible area. */
     public boolean isLineOnCanvas(Coord2D start, Coord2D end) {
         return !CohenSutherlandAlgorithm.whollyOutside(
