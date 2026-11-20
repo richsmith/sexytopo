@@ -718,8 +718,9 @@ public class Sketch extends Shape {
      * orientation over whatever it was drawn or oriented with.
      *
      * <p>The points drawn near a join are dropped, so a stroke that starts or finishes a little
-     * beyond its target, or wobbles about it, runs straight into it rather than doubling back. A
-     * stroke that never strays beyond delta of its start is too small to close on itself.
+     * beyond its target, or wobbles about it, doesn't double back, and the end of the stroke is
+     * bent smoothly round to meet it. A stroke that never strays beyond delta of its start is too
+     * small to close on itself.
      */
     public void snapActivePath(float delta) {
         startJoin = null;

@@ -9,6 +9,10 @@ import org.hwyl.sexytopo.model.geometry.Coord2D;
 
 public final class PathDetail extends SketchDetail {
 
+    // how far back along a line its end is bent round to meet a join, as a multiple of the snap
+    // distance
+    private static final float SNAP_BEND_LENGTH_FACTOR = 3;
+
     private List<Coord2D> path;
     private final LineType lineType;
 
@@ -106,24 +110,61 @@ public final class PathDetail extends SketchDetail {
     }
 
     /**
-     * Moves the start of the line to the join, first dropping the points drawn within delta of it,
-     * so a stroke that starts a little beyond the join, or wobbles about it, runs straight out from
-     * it rather than doubling back. At least one point is kept.
+     * Brings the start of the line to the join. The stroke is cut back to where it first came
+     * within delta of the join, so one that starts a little beyond it, or wobbles about it, doesn't
+     * double back; then its last stretch is bent smoothly round to meet it, rather than running
+     * straight across, so the join doesn't leave a kink. The far end of the line stays put.
      */
     public void snapStartTo(Coord2D join, float delta) {
-        while (path.size() > 1 && Space2DUtils.getDistance(join, getStart()) < delta) {
-            path.remove(0);
-        }
-        path.add(0, join);
-        updateBoundingBox(join);
+        Collections.reverse(path);
+        snapEndTo(join, delta);
+        Collections.reverse(path);
     }
 
     /** As snapStartTo, but for the end of the line. */
     public void snapEndTo(Coord2D join, float delta) {
-        while (path.size() > 1 && Space2DUtils.getDistance(join, getEnd()) < delta) {
-            path.remove(path.size() - 1);
+        int last = path.size() - 1;
+        while (last > 1 && Space2DUtils.getDistance(join, path.get(last - 1)) < delta) {
+            last--;
         }
-        lineTo(join);
+        path.subList(last + 1, path.size()).clear();
+
+        if (path.size() < 2) {
+            lineTo(join);
+            return;
+        }
+
+        bendEndTo(join, delta * SNAP_BEND_LENGTH_FACTOR);
+
+        resetBoundingBox();
+        path.forEach(this::updateBoundingBox);
+    }
+
+    /**
+     * Moves the end of the line onto the point, dragging the points before it along by less and
+     * less the further back they are, easing off to nothing at the given distance along the line or
+     * at its start, whichever comes first.
+     */
+    private void bendEndTo(Coord2D point, float bendLength) {
+        int last = path.size() - 1;
+        Coord2D offset = point.minus(path.get(last));
+
+        float[] distancesFromEnd = new float[path.size()];
+        for (int i = last - 1; i >= 0; i--) {
+            distancesFromEnd[i] =
+                    distancesFromEnd[i + 1]
+                            + Space2DUtils.getDistance(path.get(i), path.get(i + 1));
+        }
+        float length = Math.min(bendLength, distancesFromEnd[0]);
+
+        for (int i = 1; i < last; i++) {
+            float t = 1 - distancesFromEnd[i] / length;
+            if (t > 0) {
+                float weight = t * t * (3 - 2 * t);
+                path.set(i, path.get(i).plus(offset.scale(weight)));
+            }
+        }
+        path.set(last, point);
     }
 
     /**

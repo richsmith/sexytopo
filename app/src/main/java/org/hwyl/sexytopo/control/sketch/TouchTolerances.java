@@ -12,7 +12,7 @@ final class TouchTolerances {
     // are discarded as specks
     private static final float MINIMUM_DETAIL_SIZE_DP = 10.0f;
     private static final float SELECTION_RADIUS_DP = 25.0f;
-    private static final float SNAP_DISTANCE_DP = 10.0f;
+    private static final float SNAP_DISTANCE_DP = 20.0f;
 
     private TouchTolerances() {}
 
