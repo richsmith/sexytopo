@@ -1,6 +1,5 @@
 package org.hwyl.sexytopo.control.sketch;
 
-import org.hwyl.sexytopo.control.util.CohenSutherlandAlgorithm;
 import org.hwyl.sexytopo.model.common.Shape;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 
@@ -134,12 +133,6 @@ public class Viewport {
                 && left <= canvasBottomRight.x
                 && bottom >= 0
                 && top <= canvasBottomRight.y;
-    }
-
-    /** Whether a line in view coordinates could cross the visible area. */
-    public boolean isLineOnCanvas(Coord2D start, Coord2D end) {
-        return !CohenSutherlandAlgorithm.whollyOutside(
-                start, end, Coord2D.ORIGIN, canvasBottomRight);
     }
 
     /**

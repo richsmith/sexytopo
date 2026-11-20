@@ -15,6 +15,7 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import androidx.core.content.ContextCompat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -167,29 +168,47 @@ class SurveyDataRenderer {
         boolean showSplays = SketchPreferences.Toggle.SHOW_SPLAYS.isOn();
         boolean fadingNonActive = SketchPreferences.Toggle.FADE_NON_ACTIVE.isOn();
 
-        Map<Leg, Line<Coord2D>> legMap = space.getLegMap();
+        Survey survey = state.getSurvey();
+        List<Leg> activeLegs =
+                fadingNonActive
+                        ? survey.getActiveStation().getOnwardLegs()
+                        : Collections.emptyList();
+        Leg latestLeg = highlightLatestLeg ? survey.getMostRecentLeg() : null;
 
-        for (Leg leg : legMap.keySet()) {
+        float viewOffsetX = viewport.getOffsetX();
+        float viewOffsetY = viewport.getOffsetY();
+        float viewScale = viewport.getScale();
+
+        for (Map.Entry<Leg, Line<Coord2D>> entry : space.getLegMap().entrySet()) {
+            Leg leg = entry.getKey();
 
             if (!showSplays && !leg.hasDestination()) {
                 continue;
             }
 
-            Line<Coord2D> line = legMap.get(leg);
+            Line<Coord2D> line = entry.getValue();
 
-            //noinspection ConstantConditions
-            Coord2D start = viewport.toView(line.getStart());
-            Coord2D end = viewport.toView(line.getEnd());
+            // inlined viewport.toView, to save allocating two Coord2Ds for every leg
+            Coord2D lineStart = line.getStart(), lineEnd = line.getEnd();
+            float startX = (lineStart.x - viewOffsetX) * viewScale;
+            float startY = (lineStart.y - viewOffsetY) * viewScale;
+            float endX = (lineEnd.x - viewOffsetX) * viewScale;
+            float endY = (lineEnd.y - viewOffsetY) * viewScale;
 
-            if (!viewport.isLineOnCanvas(start, end)) {
+            // a straight line can only cross the view if the rectangle around it overlaps it
+            if (!viewport.isRectOnCanvas(
+                    Math.min(startX, endX),
+                    Math.min(startY, endY),
+                    Math.max(startX, endX),
+                    Math.max(startY, endY))) {
                 continue;
             }
 
             boolean fade =
-                    baseAlpha == FADED_ALPHA || (fadingNonActive && !isAttachedToActive(leg));
+                    baseAlpha == FADED_ALPHA || (fadingNonActive && !activeLegs.contains(leg));
 
             Paint paint;
-            if (highlightLatestLeg && state.getSurvey().getMostRecentLeg() == leg) {
+            if (leg == latestLeg) {
                 paint = fade ? fadedLatestLegPaint : latestLegPaint;
             } else if (!leg.hasDestination()) {
                 paint = fade ? fadedSplayPaint : splayPaint;
@@ -198,15 +217,12 @@ class SurveyDataRenderer {
             }
 
             if (isInPlane.test(leg)) {
-                canvas.drawLine(start.x, start.y, end.x, end.y, paint);
+                canvas.drawLine(startX, startY, endX, endY, paint);
             } else {
-                CanvasShapes.drawDashedLine(canvas, start, end, paint);
+                CanvasShapes.drawDashedLine(
+                        canvas, new Coord2D(startX, startY), new Coord2D(endX, endY), paint);
             }
         }
-    }
-
-    private boolean isAttachedToActive(Leg leg) {
-        return state.getSurvey().getActiveStation().getOnwardLegs().contains(leg);
     }
 
     /**

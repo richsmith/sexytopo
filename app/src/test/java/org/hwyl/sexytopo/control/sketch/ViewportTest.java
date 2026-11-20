@@ -69,15 +69,6 @@ public class ViewportTest {
     }
 
     @Test
-    public void testLineOnCanvasUsesLatestBounds() {
-        Viewport viewport = new Viewport();
-        viewport.updateBounds(100, 100);
-
-        Assert.assertTrue(viewport.isLineOnCanvas(new Coord2D(-10, 50), new Coord2D(50, 50)));
-        Assert.assertFalse(viewport.isLineOnCanvas(new Coord2D(150, 0), new Coord2D(200, 100)));
-    }
-
-    @Test
     public void testRectOnCanvasIncludesPartialOverlapAndExcludesRectsBeyondAnEdge() {
         Viewport viewport = new Viewport();
         viewport.updateBounds(100, 100);
