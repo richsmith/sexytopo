@@ -6,7 +6,7 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.RotateDrawable;
+import android.util.SparseArray;
 import androidx.core.content.ContextCompat;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
@@ -25,6 +25,9 @@ class PointRenderer {
     private final Viewport viewport;
 
     private final Paint labelPaint = new Paint();
+
+    // one colour filter per colour used, so symbols don't each need a new one on every frame
+    private final SparseArray<PorterDuffColorFilter> colourFilters = new SparseArray<>();
 
     PointRenderer(Viewport viewport) {
         this.viewport = viewport;
@@ -88,22 +91,29 @@ class PointRenderer {
             int x = Math.round(location.x - offset), y = Math.round(location.y - offset);
             drawable.setBounds(x, y, x + size, y + size);
             drawable.setAlpha(alpha);
-            Colour drawColour = symbolDetail.getDrawColour(isDarkModeActive);
-            drawable.setColorFilter(
-                    new PorterDuffColorFilter(drawColour.intValue, PorterDuff.Mode.SRC_IN));
+            PorterDuffColorFilter colourFilter =
+                    getColourFilter(symbolDetail.getDrawColour(isDarkModeActive));
+            if (drawable.getColorFilter() != colourFilter) {
+                drawable.setColorFilter(colourFilter);
+            }
 
             if (symbol.isDirectional()) {
-                RotateDrawable rotateDrawable = new RotateDrawable();
-                rotateDrawable.setDrawable(drawable);
-                rotateDrawable.setPivotX(0.5f);
-                rotateDrawable.setPivotY(0.5f);
-                rotateDrawable.setLevel((int) (10000 * (symbolDetail.getAngle() / 360f)));
-                rotateDrawable.setBounds(x, y, x + size, y + size);
-                rotateDrawable.draw(canvas);
-
-            } else { // skip some calcs for efficiency
+                canvas.save();
+                canvas.rotate(symbolDetail.getAngle(), location.x, location.y);
+                drawable.draw(canvas);
+                canvas.restore();
+            } else {
                 drawable.draw(canvas);
             }
         }
+    }
+
+    private PorterDuffColorFilter getColourFilter(Colour colour) {
+        PorterDuffColorFilter colourFilter = colourFilters.get(colour.intValue);
+        if (colourFilter == null) {
+            colourFilter = new PorterDuffColorFilter(colour.intValue, PorterDuff.Mode.SRC_IN);
+            colourFilters.put(colour.intValue, colourFilter);
+        }
+        return colourFilter;
     }
 }
