@@ -41,6 +41,22 @@ public class LineOrienterTest {
         Assert.assertEquals(10f, points.get(0).x, 0.0001f);
     }
 
+    // A cross-section's station stands in for the legs as a line with no length, and a wall
+    // drawn round it has its inside facing it.
+    @Test
+    public void testWallIsOrientedAgainstAPoint() {
+        List<Coord2D> points =
+                new ArrayList<>(
+                        Arrays.asList(new Coord2D(-5, 3), new Coord2D(0, 4), new Coord2D(5, 3)));
+        Coord2D station = Coord2D.ORIGIN;
+        List<Line<Coord2D>> legs = Collections.singletonList(new Line<>(station, station));
+
+        boolean reversed = LineOrienter.orientToInterior(points, legs);
+
+        Assert.assertTrue(reversed);
+        Assert.assertEquals(new Coord2D(5, 3), points.get(0));
+    }
+
     // Whichever direction the same wall is drawn in, the result should be identical.
     @Test
     public void testOrientationIsCanonicalRegardlessOfDrawnDirection() {

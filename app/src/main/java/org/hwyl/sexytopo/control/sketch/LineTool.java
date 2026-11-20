@@ -150,15 +150,26 @@ class LineTool implements ToolHandler {
     /**
      * The legs as drawn in this view, for orienting walls against. Splays are left out: they run to
      * the walls themselves, and may run on beyond them into a neighbouring passage.
+     *
+     * <p>With no legs, as in a cross-section, which has only splays out from its station, the
+     * stations stand in for them, as lines with no length: a lone station is in the middle of the
+     * passage, so the inside of every wall faces it.
      */
     private List<Line<Coord2D>> getLegLines() {
         Space<Coord2D> projection = state.getProjection();
         if (projection == null) {
             return Collections.emptyList();
         }
-        return projection.getLegMap().entrySet().stream()
-                .filter(entry -> entry.getKey().hasDestination())
-                .map(Map.Entry::getValue)
+        List<Line<Coord2D>> legs =
+                projection.getLegMap().entrySet().stream()
+                        .filter(entry -> entry.getKey().hasDestination())
+                        .map(Map.Entry::getValue)
+                        .collect(Collectors.toList());
+        if (!legs.isEmpty()) {
+            return legs;
+        }
+        return projection.getStationMap().values().stream()
+                .map(station -> new Line<>(station, station))
                 .collect(Collectors.toList());
     }
 }
