@@ -63,9 +63,17 @@ class PointRenderer {
             labelPaint.setColor(textDetail.getDrawColour(isDarkModeActive).intValue);
             labelPaint.setAlpha(alpha);
             labelPaint.setTextSize(textDetail.getSize() * viewScale);
-            for (String line : text.split("\n")) {
-                canvas.drawText(line, x, y, labelPaint);
-                y += labelPaint.descent() - labelPaint.ascent();
+            float lineHeight = labelPaint.descent() - labelPaint.ascent();
+            // draw each line by its place in the text, rather than splitting it into new strings
+            int lineStart = 0;
+            while (lineStart <= text.length()) {
+                int lineEnd = text.indexOf('\n', lineStart);
+                if (lineEnd == -1) {
+                    lineEnd = text.length();
+                }
+                canvas.drawText(text, lineStart, lineEnd, x, y, labelPaint);
+                y += lineHeight;
+                lineStart = lineEnd + 1;
             }
         }
     }
