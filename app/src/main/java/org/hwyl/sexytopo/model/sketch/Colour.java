@@ -152,6 +152,9 @@ public enum Colour {
     /** The colour water areas and symbols are drawn in when blue water is on. */
     public static final Colour WATER = BLUE;
 
+    /** The colour mud (sand and clay) areas and symbols are drawn in when brown mud is on. */
+    public static final Colour MUD = BROWN;
+
     public final int intValue;
     public final int baseValue;
 

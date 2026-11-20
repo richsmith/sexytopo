@@ -213,6 +213,7 @@
     <string name="sketch_menu_show_grid">Carta Millimetrata</string>
     <string name="sketch_menu_show_compass">Bussola</string>
     <string name="sketch_menu_blue_water">Acqua blu auto</string>
+    <string name="sketch_menu_brown_mud">Fango marrone auto</string>
     <string name="sketch_menu_snap_to_lines">Aggancia alle Linee</string>
     <string name="sketch_menu_auto_orientation">Auto-Orientamento</string>
     <string name="sketch_menu_pinch_to_zoom">Zoom con pizzico</string>

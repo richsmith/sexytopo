@@ -192,8 +192,14 @@ public enum Symbol {
         return isDirectional;
     }
 
-    public boolean isWater() {
-        return this == WATER_FLOW;
+    public AutoColour getAutoColour() {
+        if (this == WATER_FLOW) {
+            return AutoColour.WATER;
+        } else if (this == SAND || this == CLAY) {
+            return AutoColour.MUD;
+        } else {
+            return AutoColour.NONE;
+        }
     }
 
     public String getTherionName() {

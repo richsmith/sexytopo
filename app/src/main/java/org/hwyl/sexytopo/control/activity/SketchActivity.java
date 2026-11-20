@@ -46,6 +46,7 @@ import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.geometry.Projection2D;
 import org.hwyl.sexytopo.model.geometry.Space;
 import org.hwyl.sexytopo.model.sketch.AreaType;
+import org.hwyl.sexytopo.model.sketch.AutoColour;
 import org.hwyl.sexytopo.model.sketch.BrushColour;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
@@ -448,11 +449,17 @@ public abstract class SketchActivity extends SurveyEditorActivity
             SketchPreferences.Toggle.AUTO_RECENTRE.set(!item.isChecked());
             sketchView.invalidate();
             return true;
-        } else if (itemId == R.id.buttonBlueWater) {
-            SketchPreferences.Toggle.BLUE_WATER.set(!item.isChecked());
-            // the water area icons follow the setting
+        } else if (itemId == R.id.buttonBlueWater || itemId == R.id.buttonBrownMud) {
+            SketchPreferences.Toggle toggle =
+                    itemId == R.id.buttonBlueWater
+                            ? SketchPreferences.Toggle.BLUE_WATER
+                            : SketchPreferences.Toggle.BROWN_MUD;
+            toggle.set(!item.isChecked());
+            // the area and symbol icons follow the setting
             initialiseAreaTypeToolbar();
             selectAreaType(SketchPreferences.getSelectedAreaType());
+            initialiseSymbolToolbar();
+            selectSymbol(SketchPreferences.getSelectedSymbol());
             return true;
         } else if (itemId == R.id.buttonClipToWalls) {
             SketchPreferences.Toggle.CLIP_TO_WALLS.set(!item.isChecked());
@@ -647,11 +654,13 @@ public abstract class SketchActivity extends SurveyEditorActivity
         GridLayout buttonPanel =
                 preparePickerPanel(R.id.symbolToolbarButtonPanel, Symbol.values().length);
         for (Symbol symbol : Symbol.values()) {
+            AutoColour autoColour = symbol.getAutoColour();
+            Drawable icon =
+                    autoColour.isOn()
+                            ? applyAutoColour(symbol.createDrawable(), autoColour)
+                            : tintPickerIcon(symbol.createDrawable());
             buttonPanel.addView(
-                    createPickerButton(
-                            symbol.getButtonViewId(),
-                            tintPickerIcon(symbol.createDrawable()),
-                            symbol.getName()));
+                    createPickerButton(symbol.getButtonViewId(), icon, symbol.getName()));
         }
     }
 
@@ -724,7 +733,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
                 preparePickerPanel(R.id.areaTypeToolbarButtonPanel, AreaType.values().length);
         for (AreaType areaType : AreaType.values()) {
             Drawable icon = getAreaTypeIcon(areaType, areaType.getFillDrawableId());
-            if (!isDrawnBlue(areaType)) {
+            if (!areaType.getAutoColour().isOn()) {
                 tintPickerIcon(icon);
             }
             buttonPanel.addView(
@@ -752,23 +761,25 @@ public abstract class SketchActivity extends SurveyEditorActivity
         sketchView.setAreaType(areaType);
     }
 
-    /**
-     * One of an area type's icons, in blue for water types when blue water is on, to match how the
-     * area will be drawn.
-     */
+    /** One of an area type's icons, in its auto colour if it has one. */
     private Drawable getAreaTypeIcon(AreaType areaType, int drawableId) {
-        Drawable drawable = AppCompatResources.getDrawable(this, drawableId).mutate();
-        if (isDrawnBlue(areaType)) {
-            drawable.setColorFilter(
-                    new PorterDuffColorFilter(
-                            Colour.WATER.getDrawColour(isDarkModeActive()).intValue,
-                            PorterDuff.Mode.SRC_IN));
-        }
-        return drawable;
+        return applyAutoColour(
+                AppCompatResources.getDrawable(this, drawableId), areaType.getAutoColour());
     }
 
-    private boolean isDrawnBlue(AreaType areaType) {
-        return areaType.isWater() && SketchPreferences.Toggle.BLUE_WATER.isOn();
+    /**
+     * Colours an icon in its auto colour (blue for water, brown for mud) if that mode is on, to
+     * match how the feature will be drawn. Otherwise the icon is left as it is.
+     */
+    private Drawable applyAutoColour(Drawable drawable, AutoColour autoColour) {
+        Drawable coloured = drawable.mutate();
+        if (autoColour.isOn()) {
+            coloured.setColorFilter(
+                    new PorterDuffColorFilter(
+                            autoColour.getColour().getDrawColour(isDarkModeActive()).intValue,
+                            PorterDuff.Mode.SRC_IN));
+        }
+        return coloured;
     }
 
     /**
@@ -801,7 +812,9 @@ public abstract class SketchActivity extends SurveyEditorActivity
 
         ImageButton symbolButton = findViewById(R.id.buttonSymbol);
         symbolButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        symbolButton.setImageDrawable(addSelectionBorder(symbol.createDrawable()));
+        symbolButton.setImageDrawable(
+                addSelectionBorder(
+                        applyAutoColour(symbol.createDrawable(), symbol.getAutoColour())));
 
         sketchView.setCurrentSymbol(symbol);
     }

@@ -14,6 +14,7 @@
 - Change default for floating manual-entry buttons on table view to off (can be turned back on in settings, and manual entry can already be triggered from the menu)
 - Fix Cavway X1 downward shots being recorded with clinos of 270-360° rather than negative values (#357)
 - Lighter blue colour (including display of water) in dark mode for better visibility
+- New Auto-Brown Mud quick-menu mode draws sand and clay areas and symbols in brown
 - Tidy up sketch quick-menu (now with submenus)
 
 

@@ -21,7 +21,7 @@ public enum AreaType {
             R.drawable.area_water,
             R.drawable.area_water_fill,
             "water",
-            true,
+            AutoColour.WATER,
             new Fill(8, Mark.line(0, 4, 8, 4))),
     // cross-hatched, to read as water filling the passage
     SUMP(
@@ -29,14 +29,14 @@ public enum AreaType {
             R.drawable.area_sump,
             R.drawable.area_sump_fill,
             "sump",
-            true,
+            AutoColour.WATER,
             new Fill(8, Mark.line(0, 4, 8, 4), Mark.line(4, 0, 4, 8))),
     SAND(
             R.string.area_type_sand,
             R.drawable.area_sand,
             R.drawable.area_sand_fill,
             "sand",
-            false,
+            AutoColour.MUD,
             new Fill(
                     16,
                     Mark.dot(2.5f, 3, 0.8f),
@@ -53,7 +53,7 @@ public enum AreaType {
             R.drawable.area_clay,
             R.drawable.area_clay_fill,
             "clay",
-            false,
+            AutoColour.MUD,
             new Fill(
                     20,
                     Mark.line(1.9f, 6.3f, 3.8f, 4.8f, 5.6f, 6.3f, 7.5f, 4.8f),
@@ -66,7 +66,7 @@ public enum AreaType {
             R.drawable.area_pebbles,
             R.drawable.area_pebbles_fill,
             "pebbles",
-            false,
+            AutoColour.NONE,
             new Fill(
                     24,
                     Mark.ring(5, 6, 2.2f),
@@ -81,7 +81,7 @@ public enum AreaType {
             R.drawable.area_blocks,
             R.drawable.area_blocks_fill,
             "blocks",
-            false,
+            AutoColour.NONE,
             new Fill(
                     40,
                     Mark.polygon(3, 5, 15, 2, 18, 12, 6, 16),
@@ -94,7 +94,7 @@ public enum AreaType {
             R.drawable.area_debris,
             R.drawable.area_debris_fill,
             "debris",
-            false,
+            AutoColour.NONE,
             new Fill(
                     24,
                     Mark.polygon(3, 3, 7.5f, 2, 6, 6.5f),
@@ -192,7 +192,7 @@ public enum AreaType {
     private final int drawableId;
     private final int fillDrawableId;
     private final String therionName;
-    private final boolean isWater;
+    private final AutoColour autoColour;
     private final Fill fill;
     private final int viewId;
 
@@ -201,13 +201,13 @@ public enum AreaType {
             int drawableId,
             int fillDrawableId,
             String therionName,
-            boolean isWater,
+            AutoColour autoColour,
             Fill fill) {
         this.stringId = stringId;
         this.drawableId = drawableId;
         this.fillDrawableId = fillDrawableId;
         this.therionName = therionName;
-        this.isWater = isWater;
+        this.autoColour = autoColour;
         this.fill = fill;
         this.viewId = View.generateViewId();
     }
@@ -242,8 +242,8 @@ public enum AreaType {
         return therionName;
     }
 
-    public boolean isWater() {
-        return isWater;
+    public AutoColour getAutoColour() {
+        return autoColour;
     }
 
     /**
@@ -253,7 +253,7 @@ public enum AreaType {
      * lines.
      */
     public boolean hasDefinedEdge() {
-        return isWater;
+        return autoColour == AutoColour.WATER;
     }
 
     public Fill getFill() {

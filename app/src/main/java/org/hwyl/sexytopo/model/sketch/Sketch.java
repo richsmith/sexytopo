@@ -225,10 +225,7 @@ public class Sketch extends Shape {
      * renders as the user drags) and is turned into a polygon by finishArea.
      */
     public PathDetail startNewArea(Coord2D start, Colour colour, AreaType areaType) {
-        if (areaType.isWater() && SketchPreferences.Toggle.BLUE_WATER.isOn()) {
-            colour = Colour.WATER;
-        }
-        activePath = new PathDetail(start, colour);
+        activePath = new PathDetail(start, areaType.getAutoColour().applyTo(colour));
         pathDetails.add(activePath);
         return activePath;
     }
@@ -440,10 +437,9 @@ public class Sketch extends Shape {
 
     public void addSymbolDetail(
             Coord2D location, Symbol symbol, Colour colour, float size, float angle) {
-        if (symbol.isWater() && SketchPreferences.Toggle.BLUE_WATER.isOn()) {
-            colour = Colour.WATER;
-        }
-        SymbolDetail symbolDetail = new SymbolDetail(location, symbol, colour, size, angle);
+        SymbolDetail symbolDetail =
+                new SymbolDetail(
+                        location, symbol, symbol.getAutoColour().applyTo(colour), size, angle);
         symbolDetails.add(symbolDetail);
         addSketchDetail(symbolDetail);
     }
