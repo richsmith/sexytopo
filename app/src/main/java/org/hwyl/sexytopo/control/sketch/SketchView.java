@@ -416,11 +416,12 @@ public class SketchView extends View {
 
     private void drawSurvey(Canvas canvas, Survey survey, Space<Coord2D> projection, int alpha) {
         sketchRenderer.draw(canvas, activity.getSketch(survey), alpha);
+        drawSurveyData(survey, canvas, projection, alpha);
         if (survey == state.getSurvey()) {
-            // Linked surveys are drawn without their cross-sections, to cut down on clutter
+            // Linked surveys are drawn without their cross-sections, to cut down on clutter.
+            // Drawn last, as their opaque frames sit over everything else.
             crossSections.draw(canvas, state.getSketch().getCrossSectionDetails(), alpha);
         }
-        drawSurveyData(survey, canvas, projection, alpha);
     }
 
     /** Draw the surveys linked to the current survey, faded. */

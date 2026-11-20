@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
 import android.view.MotionEvent;
+import android.view.ViewConfiguration;
 import androidx.core.content.ContextCompat;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -76,6 +77,7 @@ class CrossSectionLayer {
     private final Paint horizontalHandlePaint = new Paint();
     private final Paint horizontalBorderPaint = new Paint();
     private final Paint glyphPaint = new Paint();
+    private final Paint backgroundPaint = new Paint();
 
     private final Paint[] ANTI_ALIAS_PAINTS =
             new Paint[] {
@@ -91,6 +93,11 @@ class CrossSectionLayer {
 
     // Set when a press opens a cross-section's editor; the rest of that touch is swallowed.
     private boolean tappedInThisTouch = false;
+
+    // With the move tool, a press on a cross-section opens it only if it turns out to be a tap
+    // rather than a pan, so this is the one pressed, until the finger lifts or wanders off
+    private CrossSectionDetail pressedWhileMoving = null;
+    private Coord2D pressedWhileMovingAt = Coord2D.ORIGIN;
 
     // The station and orientation a new cross-section is being made for, until it's placed
     private String stationNameBeingSectioned = null;
@@ -178,6 +185,11 @@ class CrossSectionLayer {
         glyphPaint.setTextSize(dpToPixels(GLYPH_SIZE_DP));
         glyphPaint.setTextAlign(Paint.Align.CENTER);
         glyphPaint.setStyle(Paint.Style.FILL);
+
+        // The frame is filled with the sketch's own background, so what's underneath doesn't show
+        // through and muddle the section
+        backgroundPaint.setColor(ContextCompat.getColor(context, R.color.lightBackground));
+        backgroundPaint.setStyle(Paint.Style.FILL);
     }
 
     // ********** Starting gestures from outside the view **********
@@ -220,6 +232,7 @@ class CrossSectionLayer {
     /** Call at the start of each touch sequence. */
     void onTouchStart() {
         tappedInThisTouch = false;
+        pressedWhileMoving = null;
     }
 
     /** Whether this event is a press on a cross-section's drag handle, starting a move. */
@@ -246,7 +259,8 @@ class CrossSectionLayer {
         }
         SketchTool currentSketchTool = state.getSketchTool();
         if (currentSketchTool == SketchTool.MOVE) {
-            return false; // MOVE just pans; don't open the cross-section view on a tap
+            handleTapWhileMoving(event);
+            return false; // let the pan run; it's harmless if this turns out to be a tap
         }
         if (currentSketchTool == SketchTool.ERASE) {
             return false; // let handleErase deal with deleting cross-sections
@@ -267,6 +281,46 @@ class CrossSectionLayer {
             return tappedInThisTouch;
         }
         return tappedInThisTouch;
+    }
+
+    /**
+     * With the move tool a press could be the start of a pan, so a cross-section is only opened
+     * once the finger lifts, if it hasn't moved far or been held down long enough to be a
+     * long-press.
+     */
+    private void handleTapWhileMoving(MotionEvent event) {
+        Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
+        switch (event.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN:
+                pressedWhileMoving = findBodyAt(viewport.toSurvey(touchPointOnView));
+                pressedWhileMovingAt = touchPointOnView;
+                break;
+
+            case MotionEvent.ACTION_MOVE:
+                if (pressedWhileMoving != null
+                        && Space2DUtils.getDistance(touchPointOnView, pressedWhileMovingAt)
+                                > getTouchSlop()) {
+                    pressedWhileMoving = null;
+                }
+                break;
+
+            case MotionEvent.ACTION_UP:
+                long heldFor = event.getEventTime() - event.getDownTime();
+                if (pressedWhileMoving != null
+                        && heldFor < ViewConfiguration.getLongPressTimeout()) {
+                    launchEditor(pressedWhileMoving);
+                }
+                pressedWhileMoving = null;
+                break;
+
+            default: // a second finger or a cancel: not a tap
+                pressedWhileMoving = null;
+                break;
+        }
+    }
+
+    private float getTouchSlop() {
+        return ViewConfiguration.get(host.getContext()).getScaledTouchSlop();
     }
 
     /**
@@ -505,6 +559,7 @@ class CrossSectionLayer {
         verticalBorderPaint.setAlpha(alpha);
         horizontalHandlePaint.setAlpha(alpha);
         horizontalBorderPaint.setAlpha(alpha);
+        backgroundPaint.setAlpha(alpha);
 
         handleRects.clear();
 
@@ -564,6 +619,17 @@ class CrossSectionLayer {
 
         Coord2D centreOnSurvey = sectionDetail.getPosition().plus(dragDelta);
         Coord2D centreOnView = viewport.toView(centreOnSurvey);
+
+        boolean isLegacy = GeneralPreferences.isLegacyCrossSectionsOn();
+
+        // Legacy cross-sections have no frame, so nothing to fill
+        RectF borderRect = null;
+        if (!isLegacy) {
+            borderRect = getBorderRect(sectionDetail, dragDelta);
+            float cornerRadius = dpToPixels(BORDER_CORNER_RADIUS_DP);
+            canvas.drawRoundRect(borderRect, cornerRadius, cornerRadius, backgroundPaint);
+        }
+
         surveyDataRenderer.drawStationCross(canvas, centreOnView.x, centreOnView.y, alpha);
 
         if (SketchPreferences.Toggle.SHOW_STATION_LABELS.isOn()) {
@@ -582,7 +648,7 @@ class CrossSectionLayer {
 
         Coord2D viewStationLocation = viewport.toView(surveyStationLocation);
 
-        if (GeneralPreferences.isLegacyCrossSectionsOn()) {
+        if (isLegacy) {
             // Legacy cross-sections: just the projected legs and a connector running to the centre,
             // with no editable frame, sub-sketch or drag handle.
             CanvasShapes.drawDashedLine(canvas, viewStationLocation, centreOnView, connectorPaint);
@@ -597,7 +663,8 @@ class CrossSectionLayer {
         Paint borderPaint = isHorizontal ? horizontalBorderPaint : verticalBorderPaint;
         Paint handlePaint = isHorizontal ? horizontalHandlePaint : verticalHandlePaint;
 
-        RectF borderRect = drawBorder(canvas, sectionDetail, dragDelta, borderPaint);
+        float cornerRadius = dpToPixels(BORDER_CORNER_RADIUS_DP);
+        canvas.drawRoundRect(borderRect, cornerRadius, cornerRadius, borderPaint);
 
         Coord2D connectorEnd =
                 clipSegmentToRectBoundary(viewStationLocation, centreOnView, borderRect);
@@ -723,9 +790,11 @@ class CrossSectionLayer {
         return new Coord2D(from.x + tEnter * dx, from.y + tEnter * dy);
     }
 
-    /** Draw a rectangular border around the cross-section's full extent (legs + sub-sketch). */
-    private RectF drawBorder(
-            Canvas canvas, CrossSectionDetail sectionDetail, Coord2D dragDelta, Paint borderPaint) {
+    /**
+     * The frame around the cross-section's full extent (legs + sub-sketch), in view coords, with
+     * room along the top for the handle.
+     */
+    private RectF getBorderRect(CrossSectionDetail sectionDetail, Coord2D dragDelta) {
         float xsScale = state.getSketch().getCrossSectionScale();
         Coord2D scaledTopLeft = sectionDetail.getTopLeftAtScale(xsScale).plus(dragDelta);
         Coord2D scaledBottomRight = sectionDetail.getBottomRightAtScale(xsScale).plus(dragDelta);
@@ -739,15 +808,11 @@ class CrossSectionLayer {
                         dpToPixels(BORDER_PADDING_MIN_DP),
                         Math.min(dpToPixels(BORDER_PADDING_MAX_DP), scaledPadding));
         float topPadding = padding + dpToPixels(HANDLE_WIDTH_DP);
-        RectF rect =
-                new RectF(
-                        topLeft.x - padding,
-                        topLeft.y - topPadding,
-                        bottomRight.x + padding,
-                        bottomRight.y + padding);
-        float cornerRadius = dpToPixels(BORDER_CORNER_RADIUS_DP);
-        canvas.drawRoundRect(rect, cornerRadius, cornerRadius, borderPaint);
-        return rect;
+        return new RectF(
+                topLeft.x - padding,
+                topLeft.y - topPadding,
+                bottomRight.x + padding,
+                bottomRight.y + padding);
     }
 
     /**
