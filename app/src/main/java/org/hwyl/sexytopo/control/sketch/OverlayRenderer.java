@@ -2,6 +2,9 @@ package org.hwyl.sexytopo.control.sketch;
 
 import static org.hwyl.sexytopo.control.sketch.ScreenUnits.dpToPixels;
 
+import org.hwyl.sexytopo.model.sketch.SketchTool;
+import org.hwyl.sexytopo.model.sketch.Colour;
+import org.hwyl.sexytopo.model.geometry.Projection2D;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -191,24 +194,32 @@ class OverlayRenderer {
     void drawDebuggingInfo(Canvas canvas, int width, long lastDrawNanos, long averageDrawNanos) {
         float offsetX = width * 0.03f;
         float offsetY = LEGEND_SIZE * 2;
-        String label =
-                "draw="
-                        + TextTools.formatTo2dp(lastDrawNanos / 1e6)
-                        + "ms avg="
-                        + TextTools.formatTo2dp(averageDrawNanos / 1e6)
-                        + "ms x="
-                        + offsetX
-                        + " y="
-                        + offsetY
-                        + " s2v="
-                        + TextTools.formatTo2dp(viewport.getScale())
-                        + " 1/s2v="
-                        + TextTools.formatTo2dp(1 / viewport.getScale())
-                        + "\n log (1/s2v) ="
-                        + TextTools.formatTo2dp(Math.log(1 / viewport.getScale()))
-                        + "\n log10 (1/s2v) ="
-                        + TextTools.formatTo2dp(Math.log10(1 / viewport.getScale()));
 
-        canvas.drawText(label, offsetX, offsetY, legendPaint);
+
+        String x = TextTools.formatTo2dp(viewport.getOffsetX());
+        String y = TextTools.formatTo2dp(viewport.getOffsetY());
+        String scale = TextTools.formatTo2dp(viewport.getScale());
+        SketchTool tool = state.getSketchTool();
+        Colour colour = state.getColour();
+        Projection2D projection = state.getProjectionType();
+
+        String[] lines = {
+            "project=" + projection,
+            "tool=" + tool + " colour=" + colour,
+            "x=" + x + " y=" + y + " x" + scale,
+            "draw="
+                    + TextTools.formatTo2dp(lastDrawNanos / 1e6)
+                    + "ms avg="
+                    + TextTools.formatTo2dp(averageDrawNanos / 1e6)
+                    + "ms"
+        };
+
+        // drawText doesn't break lines at a newline, so draw each line separately
+        float lineHeight = legendPaint.descent() - legendPaint.ascent();
+        float lineY = offsetY;
+        for (String line : lines) {
+            canvas.drawText(line, offsetX, lineY, legendPaint);
+            lineY += lineHeight;
+        }
     }
 }
