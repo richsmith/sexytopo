@@ -567,12 +567,12 @@ public class SketchView extends View {
     private class GestureListener extends GestureDetector.SimpleOnGestureListener {
 
         /**
-         * With the move tool, a tap on a linked survey offers to open it. This only comes for a
-         * tap: not a pan, a pinch or a long-press.
+         * With the move or select tool, a tap on a linked survey offers to open it. This only comes
+         * for a tap: not a pan, a pinch or a long-press.
          */
         @Override
         public boolean onSingleTapUp(MotionEvent motionEvent) {
-            if (state.getSketchTool() != SketchTool.MOVE || !areConnectedSurveysShown()) {
+            if (!state.getSketchTool().opensLinkedSurveys() || !areConnectedSurveysShown()) {
                 return false;
             }
 

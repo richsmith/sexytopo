@@ -3,6 +3,7 @@ package org.hwyl.sexytopo.model.sketch;
 import static org.hwyl.sexytopo.model.sketch.SketchTool.Trait.DRAWS_PATH;
 import static org.hwyl.sexytopo.model.sketch.SketchTool.Trait.MODAL;
 import static org.hwyl.sexytopo.model.sketch.SketchTool.Trait.OFFERS_LINE_MENU;
+import static org.hwyl.sexytopo.model.sketch.SketchTool.Trait.OPENS_LINKED_SURVEYS;
 import static org.hwyl.sexytopo.model.sketch.SketchTool.Trait.USES_COLOUR;
 
 import java.util.EnumSet;
@@ -10,13 +11,13 @@ import java.util.Set;
 import org.hwyl.sexytopo.R;
 
 public enum SketchTool {
-    MOVE(R.id.buttonMove, OFFERS_LINE_MENU),
+    MOVE(R.id.buttonMove, OFFERS_LINE_MENU, OPENS_LINKED_SURVEYS),
     LINE(R.id.buttonLine, USES_COLOUR, DRAWS_PATH, OFFERS_LINE_MENU),
     AREA(R.id.buttonArea, USES_COLOUR, DRAWS_PATH, OFFERS_LINE_MENU),
     ERASE(R.id.buttonErase),
     SYMBOL(R.id.buttonSymbol, USES_COLOUR),
     TEXT(387348957, USES_COLOUR),
-    SELECT(R.id.buttonSelect, OFFERS_LINE_MENU),
+    SELECT(R.id.buttonSelect, OFFERS_LINE_MENU, OPENS_LINKED_SURVEYS),
     POSITION_CROSS_SECTION(-1),
     ROTATE_CROSS_SECTION(-1),
     MOVE_CROSS_SECTION(-1, MODAL),
@@ -30,12 +31,10 @@ public enum SketchTool {
         MODAL,
         /** Starts an in-progress line or area as soon as the finger lands. */
         DRAWS_PATH,
-        /**
-         * A long press on a line opens its context menu. Not offered by tools that act as soon as
-         * the finger lands (erasing, placing a symbol or text), since by then a long press has
-         * already done something, nor while placing or adjusting a cross-section.
-         */
-        OFFERS_LINE_MENU
+        /** A long press on a line opens its context menu. */
+        OFFERS_LINE_MENU,
+        /** A tap on a linked survey in this mode triggers an offer to open it */
+        OPENS_LINKED_SURVEYS
     }
 
     private final int id;
@@ -78,5 +77,9 @@ public enum SketchTool {
 
     public boolean offersLineMenu() {
         return traits.contains(OFFERS_LINE_MENU);
+    }
+
+    public boolean opensLinkedSurveys() {
+        return traits.contains(OPENS_LINKED_SURVEYS);
     }
 }

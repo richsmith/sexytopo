@@ -32,7 +32,8 @@ class SelectTool implements ToolHandler {
                 Survey survey = state.getSurvey();
 
                 if (newSelectedStation == null) {
-                    return false;
+                    // keep the rest of the touch coming: it may be a tap on a linked survey
+                    return true;
 
                 } else if (newSelectedStation != survey.getActiveStation()) {
                     survey.setActiveStation(newSelectedStation);

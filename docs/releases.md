@@ -5,15 +5,17 @@
 - Big rendering engine refactor with some performance improvements
 - Highlight for active view button in action bar
 - New Edit menu with sketch Undo / Redo, Undo Last Reading, Add Leg and Add Splay (the last three moved from the Tools menu); Redo is no longer in the sketch quick menu
+- Snap to Lines quick-menu mode now works more intelligently and is consequently on by default
+- Tapping a linked survey in move or select mode offers to open it
 - Pressing back out of the app now warns if the survey isn't saved
 - Surveys that haven't been saved yet are now autosaved and restored when the app restarts
 - Sketch and table edits are now autosaved when you leave a screen, not just when a new leg arrives
 - Fix bug where automatic autosave restore was not fetching the extended elevation
-- Snap to Lines quick-menu mode now works more intelligently and is consequently on by default
 - Change default for floating manual-entry buttons on table view to off (can be turned back on in settings, and manual entry can already be triggered from the menu)
 - Fix Cavway X1 downward shots being recorded with clinos of 270-360° rather than negative values (#357)
 - Lighter blue colour (including display of water) in dark mode for better visibility
 - Tidy up sketch quick-menu (now with submenus)
+
 
 # 2026-11-09 1.15.0
 - Another new leg agreement algorithm "Slope-corrected angular deltas" that ought to solve issues with taking repeated readings on steep legs while remaining close in spirit to BCRA Grade 5; testing and feedback welcome (#321)
