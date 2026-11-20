@@ -41,6 +41,8 @@ class AreaRenderer {
     private final Map<AreaType, BitmapShader> areaFillShaders = new EnumMap<>(AreaType.class);
     // scratch object reused to position the fill pattern, to avoid per-frame allocation
     private final Matrix areaFillMatrix = new Matrix();
+    // scratch object reused for each area's outline, to avoid per-frame allocation
+    private final Path outline = new Path();
 
     // an area with a defined edge is outlined as heavily as a sketch line
     private float definedEdgeWidth;
@@ -84,7 +86,7 @@ class AreaRenderer {
                 continue;
             }
 
-            Path outline = new Path();
+            outline.rewind();
             outline.setFillType(Path.FillType.EVEN_ODD);
             for (List<Coord2D> contour : areaDetail.getContours()) {
                 boolean first = true;
