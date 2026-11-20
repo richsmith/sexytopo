@@ -15,8 +15,8 @@ public enum SketchTool {
     LINE(R.id.buttonLine, USES_COLOUR, DRAWS_PATH, OFFERS_DETAIL_MENU),
     AREA(R.id.buttonArea, USES_COLOUR, DRAWS_PATH, OFFERS_DETAIL_MENU),
     ERASE(R.id.buttonErase),
-    SYMBOL(R.id.buttonSymbol, USES_COLOUR),
-    TEXT(387348957, USES_COLOUR),
+    SYMBOL(R.id.buttonSymbol, USES_COLOUR, OFFERS_DETAIL_MENU),
+    TEXT(387348957, USES_COLOUR, OFFERS_DETAIL_MENU),
     // not currently on the toolbar
     SELECT(-1, OFFERS_DETAIL_MENU, OPENS_LINKED_SURVEYS),
     POSITION_CROSS_SECTION(-1),

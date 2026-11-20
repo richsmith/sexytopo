@@ -19,7 +19,6 @@ class TextTool implements ToolHandler {
     }
 
     @Override
-    @SuppressWarnings("SwitchStatementWithTooFewBranches")
     public boolean onTouch(MotionEvent event) {
 
         final Coord2D touchPointOnView = new Coord2D(event.getX(), event.getY());
@@ -28,6 +27,10 @@ class TextTool implements ToolHandler {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                // Wait for ACTION_UP in case this is a long-press
+                return true;
+
+            case MotionEvent.ACTION_UP:
                 TextEntryDialog.show(
                         context,
                         "",
