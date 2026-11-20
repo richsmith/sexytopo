@@ -30,6 +30,11 @@ import org.hwyl.sexytopo.model.sketch.Sketch;
  */
 class LineRenderer {
 
+    // Points closer than this to the last one drawn are skipped, as they'd make no visible
+    // difference; zoomed out, a long line can have many points to a pixel. Squared, to compare
+    // against squared distances. The last point of a line is always drawn, so it ends in place.
+    private static final float MIN_POINT_SPACING_PIXELS_SQUARED = 1;
+
     private final Viewport viewport;
 
     // plain freehand lines
@@ -50,8 +55,9 @@ class LineRenderer {
 
     // scratch object reused when drawing typed paths, to avoid per-frame allocation
     private final Path typedPathScratch = new Path();
-    // scratch array of segment end points for plain lines, grown as needed and reused, to avoid
-    // allocating one for every line on every frame
+    // scratch arrays, grown as needed and reused to avoid allocating for every line on every frame:
+    // a line's points on screen (x, y pairs) after thinning, and a plain line's segment end points
+    private float[] pointsScratch = new float[0];
     private float[] linesScratch = new float[0];
 
     LineRenderer(Viewport viewport) {
@@ -90,10 +96,6 @@ class LineRenderer {
             int alpha,
             boolean isDarkModeActive,
             boolean isDebugMode) {
-        float viewOffsetX = viewport.getOffsetX();
-        float viewOffsetY = viewport.getOffsetY();
-        float viewScale = viewport.getScale();
-
         Colour lastColour = Colour.BLACK;
 
         drawPaint.setColor(lastColour.intValue);
@@ -126,52 +128,30 @@ class LineRenderer {
                 drawPaint.setAlpha(alpha);
             }
 
-            List<Coord2D> path = pathDetail.getPath();
+            int pointValues = toPointsOnScreen(pathDetail.getPath());
+            float[] points = pointsScratch;
 
             // four values (the start and end x and y) for each segment between points
-            int segmentValues = Math.max(0, path.size() - 1) * 4;
+            int segmentValues = Math.max(0, pointValues - 2) * 2;
             if (linesScratch.length < segmentValues) {
                 linesScratch = new float[Math.max(segmentValues, linesScratch.length * 2)];
             }
             float[] lines = linesScratch;
 
             int lineIndex = 0;
-            boolean first = true;
-            float fromX = 0, fromY = 0;
+            for (int i = 2; i < pointValues; i += 2) {
+                lines[lineIndex++] = points[i - 2];
+                lines[lineIndex++] = points[i - 1];
+                lines[lineIndex++] = points[i];
+                lines[lineIndex++] = points[i + 1];
+            }
+            canvas.drawLines(lines, 0, lineIndex, drawPaint);
 
-            // This loop is the slowest part of the draw phase. Pulling out the calculations from
-            // within Viewport.toView saves a not insignificant amount of time by not
-            // constructing many thousands of Coord2D objects (approx. 10% of sketch draw time)
-            for (Coord2D point : path) {
-                if (first) {
-                    // from = viewport.toView(point);
-                    fromX = (point.x - viewOffsetX) * viewScale;
-                    fromY = (point.y - viewOffsetY) * viewScale;
-                    first = false;
-
-                    if (isDebugMode) {
-                        canvas.drawCircle(fromX, fromY, 3, drawPaint);
-                    }
-                } else {
-                    // Coord2D to = viewport.toView(point);
-                    float toX = (point.x - viewOffsetX) * viewScale;
-                    float toY = (point.y - viewOffsetY) * viewScale;
-
-                    lines[lineIndex++] = fromX;
-                    lines[lineIndex++] = fromY;
-                    lines[lineIndex++] = toX;
-                    lines[lineIndex++] = toY;
-
-                    if (isDebugMode) {
-                        canvas.drawCircle(toX, toY, 3, drawPaint);
-                    }
-
-                    fromX = toX;
-                    fromY = toY;
+            if (isDebugMode) {
+                for (int i = 0; i < pointValues; i += 2) {
+                    canvas.drawCircle(points[i], points[i + 1], 3, drawPaint);
                 }
             }
-
-            canvas.drawLines(lines, 0, lineIndex, drawPaint);
         }
     }
 
@@ -185,29 +165,66 @@ class LineRenderer {
             int alpha,
             boolean isDarkModeActive,
             boolean shadeRockSide) {
-        float viewOffsetX = viewport.getOffsetX();
-        float viewOffsetY = viewport.getOffsetY();
-        float viewScale = viewport.getScale();
         Paint paint = getLineTypePaint(pathDetail.getLineType(), viewport.getPatternScale());
         paint.setColor(pathDetail.getDrawColour(isDarkModeActive).intValue);
         paint.setAlpha(alpha);
 
+        int pointValues = toPointsOnScreen(pathDetail.getPath());
+        float[] points = pointsScratch;
+
         typedPathScratch.rewind();
-        boolean first = true;
-        for (Coord2D point : pathDetail.getPath()) {
-            float x = (point.x - viewOffsetX) * viewScale;
-            float y = (point.y - viewOffsetY) * viewScale;
-            if (first) {
-                typedPathScratch.moveTo(x, y);
-                first = false;
-            } else {
-                typedPathScratch.lineTo(x, y);
-            }
+        if (pointValues > 0) {
+            typedPathScratch.moveTo(points[0], points[1]);
+        }
+        for (int i = 2; i < pointValues; i += 2) {
+            typedPathScratch.lineTo(points[i], points[i + 1]);
         }
         if (shadeRockSide) {
             drawRockSide(canvas, typedPathScratch, paint.getColor(), alpha);
         }
         canvas.drawPath(typedPathScratch, paint);
+    }
+
+    /**
+     * Put a line's points on screen into pointsScratch as x, y pairs, skipping any too close to the
+     * last one kept to make a visible difference (but always keeping the first and last). Returns
+     * how many values were written: twice the number of points kept.
+     */
+    private int toPointsOnScreen(List<Coord2D> path) {
+        if (pointsScratch.length < path.size() * 2) {
+            pointsScratch = new float[Math.max(path.size() * 2, pointsScratch.length * 2)];
+        }
+        float[] points = pointsScratch;
+
+        float viewOffsetX = viewport.getOffsetX();
+        float viewOffsetY = viewport.getOffsetY();
+        float viewScale = viewport.getScale();
+
+        int lastPointIndex = path.size() - 1;
+        int pointIndex = 0;
+        int pointValues = 0;
+
+        // This loop is the slowest part of the draw phase. Pulling out the calculations from
+        // within Viewport.toView saves a not insignificant amount of time by not constructing many
+        // thousands of Coord2D objects (approx. 10% of sketch draw time)
+        for (Coord2D point : path) {
+            // Coord2D onScreen = viewport.toView(point);
+            float x = (point.x - viewOffsetX) * viewScale;
+            float y = (point.y - viewOffsetY) * viewScale;
+
+            boolean keep = pointIndex == 0 || pointIndex == lastPointIndex;
+            if (!keep) {
+                float dx = x - points[pointValues - 2];
+                float dy = y - points[pointValues - 1];
+                keep = dx * dx + dy * dy >= MIN_POINT_SPACING_PIXELS_SQUARED;
+            }
+            if (keep) {
+                points[pointValues++] = x;
+                points[pointValues++] = y;
+            }
+            pointIndex++;
+        }
+        return pointValues;
     }
 
     /** Shades the outer side of a wall line type. */
