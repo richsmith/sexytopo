@@ -30,7 +30,7 @@ public class CrossSectionDetail extends SinglePositionDetail {
 
     // Minimum half-extent in metres so a cross-section with no splays is still
     // visible and interactive
-    private static final float MIN_HALF_EXTENT = 1.0f;
+    private static final float MIN_HALF_EXTENT = 0.5f;
     private static final Coord2D MIN_EXTENT_NW = new Coord2D(-MIN_HALF_EXTENT, -MIN_HALF_EXTENT);
     private static final Coord2D MIN_EXTENT_SE = new Coord2D(MIN_HALF_EXTENT, MIN_HALF_EXTENT);
 
