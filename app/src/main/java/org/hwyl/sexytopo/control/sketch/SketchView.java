@@ -59,6 +59,10 @@ public class SketchView extends View {
     // Flag to prevent double menu opening during this touch sequence
     private boolean menuShownInThisTouch = false;
 
+    // how long drawing took, for the debugging info: the last frame, and a smoothed average
+    private long lastDrawNanos = 0;
+    private long averageDrawNanos = 0;
+
     // ********** Renderers **********
 
     private final SketchRenderer sketchRenderer =
@@ -384,6 +388,8 @@ public class SketchView extends View {
 
         super.onDraw(canvas);
 
+        long drawStart = System.nanoTime();
+
         updateViewBounds();
 
         drawGrid(canvas);
@@ -393,6 +399,14 @@ public class SketchView extends View {
         drawCompass(canvas);
         drawHotCorners(canvas);
         drawDebuggingInfo(canvas);
+
+        recordDrawTime(System.nanoTime() - drawStart);
+    }
+
+    private void recordDrawTime(long drawNanos) {
+        lastDrawNanos = drawNanos;
+        averageDrawNanos =
+                averageDrawNanos == 0 ? drawNanos : (averageDrawNanos * 9 + drawNanos) / 10;
     }
 
     /** Draw the survey being shown: its sketch, cross-sections, legs and stations. */
@@ -478,7 +492,7 @@ public class SketchView extends View {
 
     private void drawDebuggingInfo(Canvas canvas) {
         if (activity.isDebugMode()) {
-            overlays.drawDebuggingInfo(canvas, getWidth());
+            overlays.drawDebuggingInfo(canvas, getWidth(), lastDrawNanos, averageDrawNanos);
         }
     }
 

@@ -184,11 +184,19 @@ class OverlayRenderer {
         canvas.restore();
     }
 
-    void drawDebuggingInfo(Canvas canvas, int width) {
+    /**
+     * Draw debugging info: how long the last frame took to draw, and a smoothed average, then the
+     * zoom figures. The times cover building the frame on the UI thread, not the GPU rendering it.
+     */
+    void drawDebuggingInfo(Canvas canvas, int width, long lastDrawNanos, long averageDrawNanos) {
         float offsetX = width * 0.03f;
         float offsetY = LEGEND_SIZE * 2;
         String label =
-                "x="
+                "draw="
+                        + TextTools.formatTo2dp(lastDrawNanos / 1e6)
+                        + "ms avg="
+                        + TextTools.formatTo2dp(averageDrawNanos / 1e6)
+                        + "ms x="
                         + offsetX
                         + " y="
                         + offsetY
