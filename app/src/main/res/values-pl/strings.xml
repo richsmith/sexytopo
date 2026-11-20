@@ -769,6 +769,11 @@
     <string name="menu_line">Linia</string>
     <string name="menu_flip_line">Odwróć</string>
     <string name="menu_line_type">Typ linii</string>
+    <string name="menu_area">Obszar</string>
+    <string name="menu_area_type">Typ obszaru</string>
+    <string name="menu_colour">Kolor</string>
+    <string name="menu_symbol">Symbol</string>
+    <string name="menu_symbol_type">Typ symbolu</string>
     <string name="menu_switch_direction">Przełącz kierunek</string>
     <string name="menu_navigate">Nawiguj</string>
     <string name="menu_links">Połączenia</string>

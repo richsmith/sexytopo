@@ -18,4 +18,15 @@
         <menu/>
     </item>
 
+    <!-- Populated from BrushColour -->
+    <item
+        android:id="@+id/menu_colour"
+        android:title="@string/menu_colour">
+        <menu/>
+    </item>
+
+    <item
+        android:id="@+id/action_delete_line"
+        android:title="@string/delete"/>
+
 </menu>

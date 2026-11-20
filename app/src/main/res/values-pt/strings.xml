@@ -769,6 +769,11 @@
     <string name="menu_line">Linha</string>
     <string name="menu_flip_line">Inverter</string>
     <string name="menu_line_type">Tipo de linha</string>
+    <string name="menu_area">Área</string>
+    <string name="menu_area_type">Tipo de área</string>
+    <string name="menu_colour">Cor</string>
+    <string name="menu_symbol">Símbolo</string>
+    <string name="menu_symbol_type">Tipo de símbolo</string>
     <string name="menu_switch_direction">Mudar Direção</string>
     <string name="menu_navigate">Navegar</string>
     <string name="menu_survey">Topografia</string>

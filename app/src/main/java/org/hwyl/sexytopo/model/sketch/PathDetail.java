@@ -193,6 +193,11 @@ public final class PathDetail extends SketchDetail {
         return getClosestDistance(point, getPath());
     }
 
+    /** A line the same as this one but in a different colour. */
+    public PathDetail withColour(Colour colour) {
+        return new PathDetail(new ArrayList<>(path), colour, lineType);
+    }
+
     @Override
     public PathDetail translate(Coord2D translation) {
         List<Coord2D> newPath = new ArrayList<>();

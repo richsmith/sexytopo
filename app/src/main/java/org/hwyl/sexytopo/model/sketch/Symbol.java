@@ -184,6 +184,10 @@ public enum Symbol {
         return "symbol_" + underscored;
     }
 
+    public int getStringId() {
+        return stringId;
+    }
+
     public String getName() {
         return resources == null ? this.toString() : resources.getString(stringId);
     }

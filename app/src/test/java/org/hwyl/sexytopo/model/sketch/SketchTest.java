@@ -197,6 +197,126 @@ public class SketchTest {
         Assert.assertSame(original, sketch.getPathDetails().get(0));
     }
 
+    @Test
+    public void testRetypeAreaDetailIsOneUndoableStepKeepingColour() {
+        Sketch sketch = new Sketch();
+        AreaDetail original =
+                new AreaDetail(rectangleContour(0, 0, 10, 10), AreaType.PEBBLES, Colour.RED);
+        sketch.restoreDetailToSketch(original);
+
+        sketch.retypeAreaDetail(original, AreaType.DEBRIS);
+
+        Assert.assertEquals(1, sketch.getAreaDetails().size());
+        AreaDetail retyped = sketch.getAreaDetails().get(0);
+        Assert.assertEquals(AreaType.DEBRIS, retyped.getAreaType());
+        Assert.assertEquals(Colour.RED, retyped.getColour());
+        Assert.assertEquals(original.getOutline(), retyped.getOutline());
+
+        sketch.undo();
+        Assert.assertEquals(1, sketch.getAreaDetails().size());
+        Assert.assertSame(original, sketch.getAreaDetails().get(0));
+    }
+
+    @Test
+    public void testRetypeAreaDetailToWaterTakesBlueWhenBlueWaterIsOn() {
+        // Blue Water is on by default, which is what the unit tests see
+        Sketch sketch = new Sketch();
+        AreaDetail original =
+                new AreaDetail(rectangleContour(0, 0, 10, 10), AreaType.PEBBLES, Colour.RED);
+        sketch.restoreDetailToSketch(original);
+
+        sketch.retypeAreaDetail(original, AreaType.WATER);
+
+        Assert.assertEquals(Colour.WATER, sketch.getAreaDetails().get(0).getColour());
+    }
+
+    @Test
+    public void testRecolourAreaDetailIsOneUndoableStepKeepingType() {
+        Sketch sketch = new Sketch();
+        AreaDetail original =
+                new AreaDetail(rectangleContour(0, 0, 10, 10), AreaType.PEBBLES, Colour.RED);
+        sketch.restoreDetailToSketch(original);
+
+        sketch.recolourAreaDetail(original, Colour.GREEN);
+
+        Assert.assertEquals(1, sketch.getAreaDetails().size());
+        AreaDetail recoloured = sketch.getAreaDetails().get(0);
+        Assert.assertEquals(Colour.GREEN, recoloured.getColour());
+        Assert.assertEquals(AreaType.PEBBLES, recoloured.getAreaType());
+
+        sketch.undo();
+        Assert.assertSame(original, sketch.getAreaDetails().get(0));
+    }
+
+    @Test
+    public void testRecolourAreaDetailOverridesAutoColour() {
+        // Blue Water is on by default, which is what the unit tests see
+        Sketch sketch = new Sketch();
+        AreaDetail original =
+                new AreaDetail(rectangleContour(0, 0, 10, 10), AreaType.WATER, Colour.WATER);
+        sketch.restoreDetailToSketch(original);
+
+        sketch.recolourAreaDetail(original, Colour.PURPLE);
+
+        Assert.assertEquals(Colour.PURPLE, sketch.getAreaDetails().get(0).getColour());
+    }
+
+    @Test
+    public void testRecolourPathDetailIsOneUndoableStepKeepingPointsAndType() {
+        Sketch sketch = new Sketch();
+        PathDetail original =
+                new PathDetail(
+                        new ArrayList<>(Arrays.asList(new Coord2D(0, 0), new Coord2D(5, 5))),
+                        Colour.BLACK,
+                        LineType.PIT);
+        sketch.restoreDetailToSketch(original);
+
+        PathDetail recoloured = sketch.recolourPathDetail(original, Colour.BROWN);
+
+        Assert.assertEquals(Colour.BROWN, recoloured.getColour());
+        Assert.assertEquals(LineType.PIT, recoloured.getLineType());
+        Assert.assertEquals(original.getPath(), recoloured.getPath());
+        Assert.assertEquals(1, sketch.getPathDetails().size());
+
+        sketch.undo();
+        Assert.assertSame(original, sketch.getPathDetails().get(0));
+    }
+
+    @Test
+    public void testRecolourTextDetailKeepsTextPlaceAndSize() {
+        Sketch sketch = new Sketch();
+        sketch.addTextDetail(new Coord2D(3, 4), "sump", Colour.RED, 2);
+        TextDetail original = sketch.getTextDetails().get(0);
+
+        TextDetail recoloured = sketch.recolourTextDetail(original, Colour.BLUE);
+
+        Assert.assertEquals(Colour.BLUE, recoloured.getColour());
+        Assert.assertEquals("sump", recoloured.getText());
+        Assert.assertEquals(original.getPosition(), recoloured.getPosition());
+        Assert.assertEquals(2, recoloured.getSize(), DELTA);
+        Assert.assertEquals(1, sketch.getTextDetails().size());
+    }
+
+    @Test
+    public void testChangeTextIsOneUndoableStepKeepingPlaceColourAndSize() {
+        Sketch sketch = new Sketch();
+        sketch.addTextDetail(new Coord2D(3, 4), "sump", Colour.RED, 2);
+        TextDetail original = sketch.getTextDetails().get(0);
+
+        TextDetail changed = sketch.changeText(original, "duck");
+
+        Assert.assertEquals(1, sketch.getTextDetails().size());
+        Assert.assertSame(changed, sketch.getTextDetails().get(0));
+        Assert.assertEquals("duck", changed.getText());
+        Assert.assertEquals(original.getPosition(), changed.getPosition());
+        Assert.assertEquals(Colour.RED, changed.getColour());
+        Assert.assertEquals(2, changed.getSize(), DELTA);
+
+        sketch.undo();
+        Assert.assertEquals(1, sketch.getTextDetails().size());
+        Assert.assertSame(original, sketch.getTextDetails().get(0));
+    }
+
     // Retyping never turns a line round, even into a wall, which a freshly drawn wall would be
     @Test
     public void testRetypePathDetailKeepsPointOrder() {

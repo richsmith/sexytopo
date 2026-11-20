@@ -831,6 +831,11 @@
     <string name="menu_line">Line</string>
     <string name="menu_flip_line">Flip</string>
     <string name="menu_line_type">Line Type</string>
+    <string name="menu_area">Area</string>
+    <string name="menu_area_type">Area Type</string>
+    <string name="menu_colour">Colour</string>
+    <string name="menu_symbol">Symbol</string>
+    <string name="menu_symbol_type">Symbol Type</string>
     <string name="menu_switch_direction">Switch Direction</string>
     <string name="menu_navigate">Navigate</string>
     <string name="menu_survey">Survey</string>

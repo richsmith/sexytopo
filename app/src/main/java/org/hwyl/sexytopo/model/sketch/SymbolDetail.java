@@ -37,6 +37,11 @@ public class SymbolDetail extends SinglePositionDetail implements AutoScalableDe
         return angle;
     }
 
+    /** A symbol the same as this one but in a different colour. */
+    public SymbolDetail withColour(Colour colour) {
+        return new SymbolDetail(getPosition(), getSymbol(), colour, getSize(), getAngle());
+    }
+
     @Override
     public SymbolDetail translate(Coord2D translation) {
         return new SymbolDetail(

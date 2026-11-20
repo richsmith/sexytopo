@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Symbol title (disabled, shows which symbol it is) -->
+    <item
+        android:id="@+id/symbol_title"
+        android:title="@string/menu_symbol"
+        android:enabled="false"/>
+
+    <!-- Populated from Symbol -->
+    <item
+        android:id="@+id/menu_symbol_type"
+        android:title="@string/menu_symbol_type">
+        <menu/>
+    </item>
+
+    <!-- Populated from BrushColour -->
+    <item
+        android:id="@+id/menu_colour"
+        android:title="@string/menu_colour">
+        <menu/>
+    </item>
+
+    <item
+        android:id="@+id/action_delete_symbol"
+        android:title="@string/delete"/>
+
+</menu>

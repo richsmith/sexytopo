@@ -37,6 +37,11 @@ public class TextDetail extends SinglePositionDetail implements AutoScalableDeta
         return size;
     }
 
+    /** Text the same as this but in a different colour. */
+    public TextDetail withColour(Colour colour) {
+        return new TextDetail(getPosition(), getText(), colour, getSize());
+    }
+
     @Override
     public TextDetail translate(Coord2D translation) {
         return new TextDetail(getPosition().plus(translation), getText(), getColour(), getSize());

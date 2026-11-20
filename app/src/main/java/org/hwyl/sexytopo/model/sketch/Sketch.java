@@ -368,12 +368,37 @@ public class Sketch extends Shape {
      * of the same type and colour, or each other.
      */
     public void addAreaDetails(List<AreaDetail> newAreas) {
+        replaceAreaDetails(Collections.emptyList(), newAreas);
+    }
 
-        if (newAreas.isEmpty()) {
+    /** Changes an area's type as a single undoable operation. */
+    public void retypeAreaDetail(AreaDetail areaDetail, AreaType areaType) {
+        Colour colour = areaType.getAutoColour().applyTo(areaDetail.getColour());
+        AreaDetail retyped =
+                new AreaDetail(areaDetail.getOutline(), areaDetail.getHoles(), areaType, colour);
+        replaceAreaDetails(
+                Collections.singletonList(areaDetail), Collections.singletonList(retyped));
+    }
+
+    /** Changes an area's colour as a single undoable operation. */
+    public void recolourAreaDetail(AreaDetail areaDetail, Colour colour) {
+        replaceAreaDetails(
+                Collections.singletonList(areaDetail),
+                Collections.singletonList(areaDetail.withColour(colour)));
+    }
+
+    /**
+     * Removes some details and adds new areas in their place as one undoable step, merging the new
+     * areas with any existing ones of the same type and colour they overlap, and with each other.
+     */
+    private void replaceAreaDetails(List<SketchDetail> replaced, List<AreaDetail> newAreas) {
+
+        if (newAreas.isEmpty() && replaced.isEmpty()) {
             return;
         }
 
-        List<SketchDetail> mergedAway = new ArrayList<>();
+        // anything being replaced is gone, so it's left out of the merging
+        List<SketchDetail> mergedAway = new ArrayList<>(replaced);
         List<AreaDetail> added = new ArrayList<>();
 
         for (AreaDetail newArea : newAreas) {
@@ -476,15 +501,68 @@ public class Sketch extends Shape {
     }
 
     /**
-     * Changes a path's line type as a single undoable operation (a delete-and-replace, as for
-     * flipPathDetail). The point order is kept, so the line faces the same way as before: once
-     * drawn, a line only turns round when deliberately flipped.
+     * Changes a path's line type as a single undoable operation. The point order is kept, so the
+     * line faces the same way as before: once drawn, a line only turns round when deliberately
+     * flipped.
      */
     public PathDetail retypePathDetail(PathDetail pathDetail, LineType lineType) {
         List<Coord2D> points = new ArrayList<>(pathDetail.getPath());
         PathDetail retyped = new PathDetail(points, pathDetail.getColour(), lineType);
         deleteDetail(pathDetail, Collections.singletonList((SketchDetail) retyped));
         return retyped;
+    }
+
+    /**
+     * Swaps a symbol for another in the same place, as a single undoable operation. It keeps its
+     * size and angle, and its colour unless the new symbol has an auto colour that's on (blue
+     * water, brown mud), as it would if drawn as that symbol.
+     */
+    public SymbolDetail changeSymbol(SymbolDetail symbolDetail, Symbol symbol) {
+        SymbolDetail changed =
+                new SymbolDetail(
+                        symbolDetail.getPosition(),
+                        symbol,
+                        symbol.getAutoColour().applyTo(symbolDetail.getColour()),
+                        symbolDetail.getSize(),
+                        symbolDetail.getAngle());
+        deleteDetail(symbolDetail, Collections.singletonList((SketchDetail) changed));
+        return changed;
+    }
+
+    /** Changes what a piece of text says, as a single undoable operation. */
+    public TextDetail changeText(TextDetail textDetail, String text) {
+        TextDetail changed =
+                new TextDetail(
+                        textDetail.getPosition(),
+                        text,
+                        textDetail.getColour(),
+                        textDetail.getSize());
+        deleteDetail(textDetail, Collections.singletonList((SketchDetail) changed));
+        return changed;
+    }
+
+    /** Changes a line's colour, as a single undoable operation. */
+    public PathDetail recolourPathDetail(PathDetail pathDetail, Colour colour) {
+        PathDetail recoloured = pathDetail.withColour(colour);
+        deleteDetail(pathDetail, Collections.singletonList((SketchDetail) recoloured));
+        return recoloured;
+    }
+
+    /**
+     * Changes a symbol's colour, as a single undoable operation. The chosen colour holds even for a
+     * symbol with an auto colour.
+     */
+    public SymbolDetail recolourSymbolDetail(SymbolDetail symbolDetail, Colour colour) {
+        SymbolDetail recoloured = symbolDetail.withColour(colour);
+        deleteDetail(symbolDetail, Collections.singletonList((SketchDetail) recoloured));
+        return recoloured;
+    }
+
+    /** Changes the colour of a piece of text, as a single undoable operation. */
+    public TextDetail recolourTextDetail(TextDetail textDetail, Colour colour) {
+        TextDetail recoloured = textDetail.withColour(colour);
+        deleteDetail(textDetail, Collections.singletonList((SketchDetail) recoloured));
+        return recoloured;
     }
 
     public float getCrossSectionScale() {

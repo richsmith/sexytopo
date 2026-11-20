@@ -7,21 +7,19 @@ import android.widget.PopupMenu;
 import java.util.HashMap;
 import java.util.Map;
 import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.LineType;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 
-/**
- * The menu shown on long-pressing a line, offering to flip it or change its type. Both are single
- * undoable steps.
- */
+/** The context menu shown by long-pressing on a line. */
 final class LineContextMenu {
 
     private LineContextMenu() {}
 
     /**
      * Show the menu for a line at a point on the anchor view. onChanged is run after the line has
-     * been flipped or retyped, so the view can redraw.
+     * been changed or deleted, so the view can redraw.
      */
     static void show(
             View anchorView,
@@ -51,8 +49,16 @@ final class LineContextMenu {
         }
         lineTypeMenu.setGroupCheckable(R.id.menu_line_type, true, true);
 
+        Map<Integer, Colour> itemIdsToColours =
+                ColourSubMenu.populate(menu, pathDetail.getColour());
+
         popup.setOnMenuItemClickListener(
                 item -> {
+                    if (item.getItemId() == R.id.action_delete_line) {
+                        sketch.deleteDetail(pathDetail);
+                        onChanged.run();
+                        return true;
+                    }
                     if (item.getItemId() == R.id.action_flip_line) {
                         sketch.flipPathDetail(pathDetail);
                         onChanged.run();
@@ -61,6 +67,12 @@ final class LineContextMenu {
                     LineType lineType = itemIdsToLineTypes.get(item.getItemId());
                     if (lineType != null && lineType != currentType) {
                         sketch.retypePathDetail(pathDetail, lineType);
+                        onChanged.run();
+                        return true;
+                    }
+                    Colour colour = itemIdsToColours.get(item.getItemId());
+                    if (colour != null && colour != pathDetail.getColour()) {
+                        sketch.recolourPathDetail(pathDetail, colour);
                         onChanged.run();
                         return true;
                     }

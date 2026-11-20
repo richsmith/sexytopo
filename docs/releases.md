@@ -1,6 +1,7 @@
 # Unreleased
 - New area sketching tool for marking filled regions such as water
 - Sketch lines can now be given a semantic type (e.g. wall)
+- Context menus (long press) for the the new and existing sketch details
 - Delete / erase tool can now be dragged to remove multiple details and generally works better
 - Big rendering engine refactor with some performance improvements
 - Highlight for active view button in action bar
@@ -16,6 +17,7 @@
 - Lighter blue colour (including display of water) in dark mode for better visibility
 - New Auto-Brown Mud quick-menu mode draws sand and clay areas and symbols in brown
 - Tidy up sketch quick-menu (now with submenus)
+
 
 
 # 2026-11-09 1.15.0

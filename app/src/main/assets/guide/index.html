@@ -162,7 +162,7 @@
 	<li><strong>Zoom In/Out</strong> scales the survey (alternative to pinch-to-zoom)</li>
 </ul>
 
-<p>The <strong>Line</strong> tool defaults to a freehand line; this allows for drawing details of any type on the sketch. Tapping on the icon twice allows for the selection of a line type, including walls and other features. Tap the opened line selection icon to select it, and tap again (or long-press) to see the name of the type. Once selected, the line will be drawn with the appropriate pattern. Selecting a line type allows SexyTopo to understand what is being drawn and use that information intelligently. For example, lines can optionally be <a href="#therion-export">exported to Therion</a> as proper semantic lines (e.g. <i>line wall</i>), and the "clip to walls" quick setting (on by default) clips areas and other lines so that they don't overlap walls. Note that some line types have an orientation (see <a href="#auto-orientation">Auto-Orientation</a>): decorations on the line shows which side is which. Lines can be long-pressed to get a context menu which allows you to change the type and orientation of the line.</p>
+<p>The <strong>Line</strong> tool defaults to a freehand line; this allows for drawing details of any type on the sketch. Tapping on the icon twice allows for the selection of a line type, including walls and other features. Tap the opened line selection icon to select it, and tap again (or long-press) to see the name of the type. Once selected, the line will be drawn with the appropriate pattern. Selecting a line type allows SexyTopo to understand what is being drawn and use that information intelligently. For example, lines can optionally be <a href="#therion-export">exported to Therion</a> as proper semantic lines (e.g. <i>line wall</i>), and the "clip to walls" quick setting (on by default) clips areas and other lines so that they don't overlap walls. Note that some line types have an orientation (see <a href="#auto-orientation">Auto-Orientation</a>): decorations on the line shows which side is which. Long-press a line to flip it or change its type (see <a href="#editing-sketch-details">Editing Sketch Details</a> below).</p>
 
 <p>The <strong>Symbol</strong> tool is for drawing point symbols (e.g. to show the location of a stalactite). Tap the icon twice to select the symbol type as per the line tool, and tap the selected symbol again (or long-press) to see its name. The size of the symbol is set automatically according to the current scale of the sketch; zoom in to draw small symbols and zoom out to draw larger ones. Symbols may be optionally exported to Therion.</p>
 
@@ -196,6 +196,15 @@
 	<li><strong>Graph Paper</strong> draws a grid behind the survey.</li>
 	<li><strong>Compass</strong> shows the compass on the plan view. Turn it off to save a small amount of battery.</li>
 </ul>
+
+<p id="editing-sketch-details">Lines, areas, symbols and text can be changed after they have been drawn by long-pressing them with the Move, Select, Line or Area tool. The context menu that appears depends on what was pressed:</p>
+<ul>
+	<li><strong>Lines</strong> can be flipped (for line types with an orientation), changed to another line type, recoloured or deleted.</li>
+	<li><strong>Areas</strong> can be changed to another area type, recoloured or deleted.</li>
+	<li><strong>Symbols</strong> can be swapped for another symbol (keeping their place, size and direction), recoloured or deleted.</li>
+	<li><strong>Text</strong> can be edited, recoloured or deleted.</li>
+</ul>
+<p>Every change can be undone.</p>
 
 
 <h2 id="cross-sections">Cross-Sections</h2>

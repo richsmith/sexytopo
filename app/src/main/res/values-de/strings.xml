@@ -770,6 +770,11 @@
     <string name="menu_line">Linie</string>
     <string name="menu_flip_line">Umdrehen</string>
     <string name="menu_line_type">Linientyp</string>
+    <string name="menu_area">Fläche</string>
+    <string name="menu_area_type">Flächentyp</string>
+    <string name="menu_colour">Farbe</string>
+    <string name="menu_symbol">Symbol</string>
+    <string name="menu_symbol_type">Symboltyp</string>
     <string name="menu_switch_direction">Richtung wechseln</string>
     <string name="menu_navigate">Navigieren</string>
     <string name="menu_survey">Vermessung</string>

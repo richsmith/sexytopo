@@ -76,6 +76,11 @@ public final class AreaDetail extends SketchDetail {
         return new AreaDetail(region.getOutline(), region.getHoles(), areaType, getColour());
     }
 
+    /** An area the same as this one but in a different colour. */
+    public AreaDetail withColour(Colour colour) {
+        return new AreaDetail(outline, holes, areaType, colour);
+    }
+
     /**
      * Whether a point lies in the filled part of this area — inside the outline, but not inside one
      * of its holes.

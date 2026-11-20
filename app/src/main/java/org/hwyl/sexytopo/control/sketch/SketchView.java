@@ -23,6 +23,7 @@ import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.geometry.Projection2D;
 import org.hwyl.sexytopo.model.geometry.Space;
+import org.hwyl.sexytopo.model.sketch.AreaDetail;
 import org.hwyl.sexytopo.model.sketch.AreaType;
 import org.hwyl.sexytopo.model.sketch.BrushColour;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
@@ -30,8 +31,11 @@ import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
 import org.hwyl.sexytopo.model.sketch.LineType;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
+import org.hwyl.sexytopo.model.sketch.SketchDetail;
 import org.hwyl.sexytopo.model.sketch.SketchTool;
 import org.hwyl.sexytopo.model.sketch.Symbol;
+import org.hwyl.sexytopo.model.sketch.SymbolDetail;
+import org.hwyl.sexytopo.model.sketch.TextDetail;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -611,21 +615,39 @@ public class SketchView extends View {
                 return;
             }
 
-            if (!state.getSketchTool().offersLineMenu()) {
+            if (!state.getSketchTool().offersDetailMenu()) {
                 return;
             }
-            PathDetail matchedPath = selector.findPathAt(touchPointOnView);
-            if (matchedPath != null) {
-                state.getSketch().abandonActivePath();
-                LineContextMenu.show(
-                        SketchView.this,
-                        (int) motionEvent.getX(),
-                        (int) motionEvent.getY(),
-                        state.getSketch(),
-                        matchedPath,
-                        SketchView.this::invalidate);
-                menuShownInThisTouch = true;
+            SketchDetail matchedDetail = selector.findDetailAt(touchPointOnView);
+            if (matchedDetail == null
+                    && !crossSections.isBodyShownAt(viewport.toSurvey(touchPointOnView))) {
+                // nothing's edge is near, but the finger may be in the middle of an area
+                matchedDetail = selector.findAreaUnder(touchPointOnView);
             }
+
+            // a cross-section has no menu of its own here
+            if (matchedDetail == null || matchedDetail instanceof CrossSectionDetail) {
+                return;
+            }
+            Sketch sketch = state.getSketch();
+            sketch.abandonActivePath();
+            int x = (int) motionEvent.getX();
+            int y = (int) motionEvent.getY();
+            Runnable onChanged = SketchView.this::invalidate;
+            if (matchedDetail instanceof PathDetail) {
+                LineContextMenu.show(
+                        SketchView.this, x, y, sketch, (PathDetail) matchedDetail, onChanged);
+            } else if (matchedDetail instanceof AreaDetail) {
+                AreaContextMenu.show(
+                        SketchView.this, x, y, sketch, (AreaDetail) matchedDetail, onChanged);
+            } else if (matchedDetail instanceof SymbolDetail) {
+                SymbolContextMenu.show(
+                        SketchView.this, x, y, sketch, (SymbolDetail) matchedDetail, onChanged);
+            } else if (matchedDetail instanceof TextDetail) {
+                TextContextMenu.show(
+                        SketchView.this, x, y, sketch, (TextDetail) matchedDetail, onChanged);
+            }
+            menuShownInThisTouch = true;
         }
     }
 }

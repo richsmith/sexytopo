@@ -4,12 +4,12 @@ import java.util.Map;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.geometry.Space;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
+import org.hwyl.sexytopo.model.sketch.AreaDetail;
 import org.hwyl.sexytopo.model.sketch.SketchDetail;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
-/** Works out which station, line or linked survey is under the finger. */
+/** Works out which station, sketch detail or linked survey is under the finger. */
 class SketchSelector {
 
     private final Viewport viewport;
@@ -29,17 +29,21 @@ class SketchSelector {
     }
 
     /**
-     * The line the user pressed on, or null. Only the nearest detail counts, so pressing on a
-     * symbol that sits on a line picks out the symbol rather than the line.
+     * The detail the user pressed on, or null. Only the nearest detail counts, so pressing on a
+     * symbol that sits on a line picks out the symbol rather than the line. An area counts as near
+     * by its edge only, not its middle.
      */
-    PathDetail findPathAt(Coord2D touchPointOnView) {
+    SketchDetail findDetailAt(Coord2D touchPointOnView) {
         float selectionTolerance = TouchTolerances.getSelectionRadius(viewport);
         Coord2D touchPointOnSurvey = viewport.toSurvey(touchPointOnView);
-        SketchDetail nearest =
-                state.getSketch()
-                        .findNearestVisibleDetailWithin(
-                                touchPointOnSurvey, selectionTolerance, viewport.getScale());
-        return nearest instanceof PathDetail ? (PathDetail) nearest : null;
+        return state.getSketch()
+                .findNearestVisibleDetailWithin(
+                        touchPointOnSurvey, selectionTolerance, viewport.getScale());
+    }
+
+    /** The topmost area whose filled part is under the finger, or null. */
+    AreaDetail findAreaUnder(Coord2D touchPointOnView) {
+        return state.getSketch().findAreaContaining(viewport.toSurvey(touchPointOnView));
     }
 
     /**

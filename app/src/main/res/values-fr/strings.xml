@@ -772,6 +772,11 @@
     <string name="menu_line">Ligne</string>
     <string name="menu_flip_line">Inverser</string>
     <string name="menu_line_type">Type de ligne</string>
+    <string name="menu_area">Zone</string>
+    <string name="menu_area_type">Type de zone</string>
+    <string name="menu_colour">Couleur</string>
+    <string name="menu_symbol">Symbole</string>
+    <string name="menu_symbol_type">Type de symbole</string>
     <string name="menu_switch_direction">Changer de direction</string>
     <string name="menu_navigate">Naviguer</string>
     <string name="menu_links">Liens</string>
