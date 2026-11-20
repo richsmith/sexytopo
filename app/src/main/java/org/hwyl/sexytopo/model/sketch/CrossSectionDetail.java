@@ -5,6 +5,7 @@ import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.geometry.Line;
 import org.hwyl.sexytopo.model.geometry.Space;
+import org.hwyl.sexytopo.model.survey.LegFilter;
 
 public class CrossSectionDetail extends SinglePositionDetail {
 
@@ -44,7 +45,7 @@ public class CrossSectionDetail extends SinglePositionDetail {
         updateBoundingBox(position.plus(MIN_EXTENT_SE));
 
         // refresh bbox with outer ends of projection legs
-        for (Line<Coord2D> line : crossSection.getProjection().getLegMap().values()) {
+        for (Line<Coord2D> line : crossSection.getProjection().getLegLines(LegFilter.SPLAYS)) {
             updateBoundingBox(line.getEnd().plus(position));
         }
 

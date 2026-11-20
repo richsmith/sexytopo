@@ -310,7 +310,8 @@ public class ExampleSurveyCreator {
      */
     private static void drawCrossSectionWalls(CrossSectionDetail xsDetail) {
         List<Coord2D> endpoints = new ArrayList<>();
-        for (Line<Coord2D> line : xsDetail.getCrossSection().getProjection().getLegMap().values()) {
+        for (Line<Coord2D> line :
+                xsDetail.getCrossSection().getProjection().getLegLines(LegFilter.SPLAYS)) {
             endpoints.add(line.getEnd());
         }
         if (endpoints.size() < 2) {

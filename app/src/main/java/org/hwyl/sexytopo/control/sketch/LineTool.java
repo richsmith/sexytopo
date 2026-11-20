@@ -3,7 +3,6 @@ package org.hwyl.sexytopo.control.sketch;
 import android.view.MotionEvent;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import org.hwyl.sexytopo.control.util.LineOrienter;
 import org.hwyl.sexytopo.control.util.LoopOrienter;
@@ -15,6 +14,7 @@ import org.hwyl.sexytopo.model.geometry.Space;
 import org.hwyl.sexytopo.model.sketch.LineType;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
+import org.hwyl.sexytopo.model.survey.LegFilter;
 
 /**
  * Draws a line of the chosen type. When the stroke ends, an outline whose ends nearly meet is
@@ -160,11 +160,7 @@ class LineTool implements ToolHandler {
         if (projection == null) {
             return Collections.emptyList();
         }
-        List<Line<Coord2D>> legs =
-                projection.getLegMap().entrySet().stream()
-                        .filter(entry -> entry.getKey().hasDestination())
-                        .map(Map.Entry::getValue)
-                        .collect(Collectors.toList());
+        List<Line<Coord2D>> legs = projection.getLegLines(LegFilter.LEGS);
         if (!legs.isEmpty()) {
             return legs;
         }

@@ -10,6 +10,7 @@ import org.hwyl.sexytopo.model.geometry.Line;
 import org.hwyl.sexytopo.model.geometry.Projection2D;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.LegFilter;
 
 /**
  * Overrides parent provide a slightly more minimal editing experience for the cross-section sketch
@@ -74,7 +75,7 @@ public class CrossSectionView extends SketchView {
             return;
         }
         float longestSplay = 0f;
-        for (Line<Coord2D> line : state.getProjection().getLegMap().values()) {
+        for (Line<Coord2D> line : state.getProjection().getLegLines(LegFilter.SPLAYS)) {
             float length = Space2DUtils.getDistance(line.getStart(), line.getEnd());
             if (length > longestSplay) {
                 longestSplay = length;

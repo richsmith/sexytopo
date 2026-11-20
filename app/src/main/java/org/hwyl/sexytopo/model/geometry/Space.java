@@ -1,8 +1,11 @@
 package org.hwyl.sexytopo.model.geometry;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.LegFilter;
 import org.hwyl.sexytopo.model.survey.Station;
 
 public class Space<T extends Coord<T>> {
@@ -15,6 +18,14 @@ public class Space<T extends Coord<T>> {
 
     public Map<Leg, Line<T>> getLegMap() {
         return legs;
+    }
+
+    /** The lines of the legs that match the filter, e.g. LegFilter.LEGS. This is a new list. */
+    public List<Line<T>> getLegLines(LegFilter filter) {
+        return legs.entrySet().stream()
+                .filter(entry -> filter.test(entry.getKey()))
+                .map(Map.Entry::getValue)
+                .collect(Collectors.toList());
     }
 
     public void addStation(Station station, T coord) {
