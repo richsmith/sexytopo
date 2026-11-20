@@ -639,7 +639,9 @@ public class Sketch extends Shape {
      * be joined into one line with them when it's finished, or closes it into a loop if its end
      * comes back to its own start. Lines only join head to tail: where it matters which way a line
      * runs (see LineType.isOriented), the path's start only snaps to another line's end and its end
-     * to another line's start, so the joined line doesn't change direction partway.
+     * to another line's start, so the joined line doesn't change direction partway. A path drawn
+     * against the way of the lines it would join is reversed to run with them, so it takes their
+     * orientation over whatever it was drawn or oriented with.
      *
      * <p>The points drawn near a join are dropped, so a stroke that starts or finishes a little
      * beyond its target, or wobbles about it, runs straight into it rather than doubling back. A
@@ -653,6 +655,16 @@ public class Sketch extends Shape {
         }
         Coord2D start = activePath.getStart();
         Coord2D end = activePath.getEnd();
+
+        if (activePath.getLineType().isOriented()) {
+            int joinsAsDrawn = countLinesToSnapTo(start, end, delta);
+            int joinsReversed = countLinesToSnapTo(end, start, delta);
+            if (joinsReversed > joinsAsDrawn) {
+                Collections.reverse(activePath.getPath());
+                start = activePath.getStart();
+                end = activePath.getEnd();
+            }
+        }
 
         float distanceToStart = Space2DUtils.getDistance(end, start);
         PathDetail endTarget = findLineToSnapTo(end, delta, false, null);
@@ -678,6 +690,18 @@ public class Sketch extends Shape {
             activePath.snapEndTo(endTarget.getEndToJoinBefore(end), delta);
             endJoin = endTarget;
         }
+    }
+
+    /** How many of a path's ends, were it to run from start to end, would snap to another line. */
+    private int countLinesToSnapTo(Coord2D start, Coord2D end, float delta) {
+        int count = 0;
+        if (findLineToSnapTo(start, delta, true, null) != null) {
+            count++;
+        }
+        if (findLineToSnapTo(end, delta, false, null) != null) {
+            count++;
+        }
+        return count;
     }
 
     /**

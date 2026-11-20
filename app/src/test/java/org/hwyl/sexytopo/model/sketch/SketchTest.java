@@ -758,15 +758,41 @@ public class SketchTest {
     }
 
     @Test
-    public void testOrientedLinesRunningOppositeWaysDoNotSnap() {
+    public void testOrientedLineDrawnAgainstAnotherIsReversedToJoinIt() {
         Sketch sketch = sketchWithLine(LineType.WALL);
-        // starts at the wall's start, so would run against it
+        // starts at the wall's start, so runs against it
+        drawActivePath(sketch, LineType.WALL, new Coord2D(-0.5f, 0), new Coord2D(-10, 0));
+
+        sketch.snapActivePath(1);
+        sketch.finishPath();
+
+        Assert.assertEquals(
+                Arrays.asList(
+                        new Coord2D(-10, 0),
+                        Coord2D.ORIGIN,
+                        new Coord2D(5, -2),
+                        new Coord2D(10, 0)),
+                onlyLine(sketch));
+    }
+
+    @Test
+    public void testOrientedLineJoiningOneLineEachWayKeepsItsDirection() {
+        Sketch sketch = sketchWithLine(LineType.WALL);
+        drawActivePath(sketch, LineType.WALL, new Coord2D(20, 0.5f), new Coord2D(20, 10));
+        sketch.finishPath();
+        // runs on from the first wall's end and into the second's end: one join either way
         PathDetail path =
-                drawActivePath(sketch, LineType.WALL, new Coord2D(-0.5f, 0), new Coord2D(-10, 0));
+                drawActivePath(
+                        sketch,
+                        LineType.WALL,
+                        new Coord2D(10.5f, 0),
+                        new Coord2D(15, 5),
+                        new Coord2D(20, 10.5f));
 
         sketch.snapActivePath(1);
 
-        Assert.assertEquals(new Coord2D(-0.5f, 0), path.getPath().get(0));
+        Assert.assertEquals(new Coord2D(10, 0), path.getStart());
+        Assert.assertEquals(new Coord2D(20, 10.5f), path.getEnd());
     }
 
     @Test
