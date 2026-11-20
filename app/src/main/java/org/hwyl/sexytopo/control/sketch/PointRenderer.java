@@ -50,6 +50,9 @@ class PointRenderer {
         float viewScale = viewport.getScale();
 
         for (TextDetail textDetail : sketch.getTextDetails()) {
+            if (!viewport.couldBeVisible(textDetail)) {
+                continue;
+            }
             Coord2D location = viewport.toView(textDetail.getPosition());
             float x = location.x, y = location.y;
             String text = textDetail.getText();
