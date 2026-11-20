@@ -2,11 +2,8 @@ package org.hwyl.sexytopo.control.table;
 
 import android.content.Context;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -21,9 +18,6 @@ import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 public class EditLegForm extends Form {
-    private static final int SPINNER_FORWARD = 0;
-    private static final int SPINNER_BACKWARD = 1;
-
     /**
      * A TextWatcher that, in addition to triggering validation, enables live-error display as soon
      * as the watched field contains any non-empty text. This lets out-of-range errors appear
@@ -93,7 +87,7 @@ public class EditLegForm extends Form {
     private EditText inclinationMinutesField;
     private EditText inclinationSecondsField;
 
-    private Spinner inputModeSpinner;
+    private TextView directionText;
     private InputMode inputMode = InputMode.FORWARD;
 
     // Shown for splays only
@@ -104,8 +98,6 @@ public class EditLegForm extends Form {
 
     // The readings the fields were filled with, rounded for display, if editing a leg
     @Nullable private Leg shownReadings;
-
-    private boolean isInitialising;
 
     /** Constructor for editing an existing leg */
     public EditLegForm(
@@ -142,12 +134,10 @@ public class EditLegForm extends Form {
     }
 
     private void initialise(View dialogView) {
-        this.isInitialising = true;
         this.initialiseFields(dialogView);
-        this.initialiseInputMode(dialogView);
+        this.initialiseDirection(dialogView);
         this.initialiseSplayOptions(dialogView);
         this.initialiseStationDisplay();
-        this.isInitialising = false;
     }
 
     private void initialiseSplayOptions(View dialogView) {
@@ -202,7 +192,6 @@ public class EditLegForm extends Form {
         this.inclinationDegreesField = dialogView.findViewById(R.id.editInclinationDegrees);
         this.inclinationMinutesField = dialogView.findViewById(R.id.editInclinationMinutes);
         this.inclinationSecondsField = dialogView.findViewById(R.id.editInclinationSeconds);
-        this.inputModeSpinner = dialogView.findViewById(R.id.inputModeSpinner);
         this.shotsWarning = dialogView.findViewById(R.id.shotsWarning);
 
         // Set up validation listeners
@@ -255,51 +244,30 @@ public class EditLegForm extends Form {
         }
     }
 
-    private void initialiseInputMode(View dialogView) {
+    private void initialiseDirection(View dialogView) {
         if (!isSplay) {
-            View inputModeContainer = dialogView.findViewById(R.id.inputModeContainer);
-            inputModeContainer.setVisibility(View.VISIBLE);
-
-            ArrayAdapter<CharSequence> adapter =
-                    ArrayAdapter.createFromResource(
-                            context,
-                            R.array.leg_edit_input_mode_options,
-                            android.R.layout.simple_spinner_item);
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            this.inputModeSpinner.setAdapter(adapter);
-
-            // Set initial selection
-            this.inputModeSpinner.setSelection(
-                    inputMode == InputMode.FORWARD ? SPINNER_FORWARD : SPINNER_BACKWARD);
-
-            // Set up spinner listener to update display when selection changes
-            this.inputModeSpinner.setOnItemSelectedListener(
-                    new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(
-                                AdapterView<?> parent, View view, int position, long id) {
-                            InputMode newMode =
-                                    position == SPINNER_FORWARD
-                                            ? InputMode.FORWARD
-                                            : InputMode.BACKWARD;
-                            boolean isChange = inputMode != newMode;
-
-                            if (isChange) {
-                                inputMode = newMode;
-
-                                if (!isInitialising) {
-                                    swapStationDisplay();
-                                }
-                                validate();
-                            }
-                        }
-
-                        @Override
-                        public void onNothingSelected(AdapterView<?> parent) {
-                            // Do nothing
-                        }
-                    });
+            dialogView.findViewById(R.id.directionContainer).setVisibility(View.VISIBLE);
+            this.directionText = dialogView.findViewById(R.id.directionText);
+            showDirection();
+            dialogView.findViewById(R.id.reverseButton).setOnClickListener(v -> reverse());
         }
+    }
+
+    /** Reverses the shot direction, swapping the station names to match. */
+    private void reverse() {
+        inputMode = reversed(inputMode);
+        swapStationDisplay();
+        showDirection();
+        validate();
+    }
+
+    private void showDirection() {
+        int direction =
+                inputMode == InputMode.BACKWARD
+                        ? R.string.manual_edit_direction_backsight
+                        : R.string.action_input_mode_forward;
+        directionText.setText(
+                context.getString(R.string.manual_edit_direction, context.getString(direction)));
     }
 
     @Override
@@ -956,6 +924,11 @@ public class EditLegForm extends Form {
     static InputMode getInitialInputMode(Leg leg) {
         boolean backwards = leg.hasDestination() && leg.wasShotBackwards();
         return backwards ? InputMode.BACKWARD : InputMode.FORWARD;
+    }
+
+    /** The other shot direction. */
+    static InputMode reversed(InputMode inputMode) {
+        return inputMode == InputMode.BACKWARD ? InputMode.FORWARD : InputMode.BACKWARD;
     }
 
     /**

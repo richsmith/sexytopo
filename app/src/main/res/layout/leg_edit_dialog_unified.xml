@@ -11,7 +11,7 @@
         android:padding="16dp">
 
         <LinearLayout
-            android:id="@+id/inputModeContainer"
+            android:id="@+id/directionContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
@@ -20,16 +20,18 @@
             android:baselineAligned="false"
             android:visibility="gone">
             <TextView
-                android:layout_width="wrap_content"
+                android:id="@+id/directionText"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@string/action_input"
+                android:layout_weight="1"
                 android:layout_marginEnd="8dp"
                 android:textSize="14sp"/>
-            <Spinner
-                android:id="@+id/inputModeSpinner"
+            <Button
+                android:id="@+id/reverseButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minWidth="120dp"/>
+                android:text="@string/menu_reverse"
+                style="@style/Widget.Material3.Button.OutlinedButton"/>
         </LinearLayout>
 
         <LinearLayout

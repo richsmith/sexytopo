@@ -291,6 +291,8 @@
     <string name="manual_edit_to_station_error">Invalid to station</string>
     <string name="manual_edit_shot_backwards">⬅ Shot backwards</string>
     <string name="manual_edit_station_comment">Station comment</string>
+    <string name="manual_edit_direction">Direction: %1$s</string>
+    <string name="manual_edit_direction_backsight">Backsight</string>
     <string name="manual_edit_leg_comment">Leg comment</string>
     <string name="manual_edit_shots_warning">Manually editing the readings will discard the shots this leg was averaged from</string>
     <string name="manual_edit_to_wall_info_title">About To wall</string>
@@ -755,12 +757,6 @@
     <string name="validation_error_mins_secs_range">Must be 0 to 59</string>
     <string name="validation_error_secs_range">Must be 0 to less than 60</string>
     <string name="validation_error_must_be_zero_for_90">Must be 0 for ±90°</string>
-
-    <!-- Input mode for leg editing -->
-    <string-array name="leg_edit_input_mode_options">
-        <item>@string/action_input_mode_forward</item>
-        <item>@string/action_input_mode_backward</item>
-    </string-array>
 
     <!-- Survey symbols -->
     <string name="symbol_text">Text</string>

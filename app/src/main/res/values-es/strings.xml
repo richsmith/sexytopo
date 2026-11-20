@@ -259,6 +259,8 @@
     <string name="manual_edit_to_station_error">Estación de destino no válida</string>
     <string name="manual_edit_shot_backwards">⬅ Lectura hacia atrás</string>
     <string name="manual_edit_station_comment">Comentario de la estación</string>
+    <string name="manual_edit_direction">Dirección: %1$s</string>
+    <string name="manual_edit_direction_backsight">Contravisual</string>
     <string name="manual_edit_leg_comment">Comentario del tramo</string>
     <string name="manual_edit_shots_warning">Al cambiar manualmente las lecturas se descartarán los disparos de los que se promedió este tramo</string>
     <string name="manual_edit_to_wall_info_title">Acerca de A la pared</string>
@@ -697,12 +699,6 @@
     <string name="validation_error_mins_secs_range">Debe ser de 0 a 59</string>
     <string name="validation_error_secs_range">Debe ser de 0 a menos de 60</string>
     <string name="validation_error_must_be_zero_for_90">Debe ser 0 para ±90°</string>
-
-    <!-- Input mode for leg editing -->
-    <string-array name="leg_edit_input_mode_options">
-        <item>@string/action_input_mode_forward</item>
-        <item>@string/action_input_mode_backward</item>
-    </string-array>
 
     <!-- Survey symbols -->
     <string name="symbol_text">Texto</string>

@@ -259,6 +259,8 @@
     <string name="manual_edit_to_station_error">Station d\'arrivée invalide</string>
     <string name="manual_edit_shot_backwards">⬅ Tir en arrière</string>
     <string name="manual_edit_station_comment">Commentaire de la station</string>
+    <string name="manual_edit_direction">Direction : %1$s</string>
+    <string name="manual_edit_direction_backsight">Visée arrière</string>
     <string name="manual_edit_leg_comment">Commentaire du segment</string>
     <string name="manual_edit_shots_warning">Modifier manuellement les mesures supprimera les visées dont cette visée est la moyenne</string>
     <string name="manual_edit_to_wall_info_title">À propos de Vers la paroi</string>
@@ -697,12 +699,6 @@
     <string name="validation_error_mins_secs_range">Doit être compris entre 0 et 59</string>
     <string name="validation_error_secs_range">Doit être compris entre 0 et moins de 60</string>
     <string name="validation_error_must_be_zero_for_90">Doit être 0 pour ±90°</string>
-
-    <!-- Input mode for leg editing -->
-    <string-array name="leg_edit_input_mode_options">
-        <item>@string/action_input_mode_forward</item>
-        <item>@string/action_input_mode_backward</item>
-    </string-array>
 
     <!-- Survey symbols -->
     <string name="symbol_text">Texte</string>

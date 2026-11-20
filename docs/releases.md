@@ -5,6 +5,7 @@
 - Highlight for active view button in action bar
 - Tidy up sketch quick-menu (now with submenus)
 - New Edit menu with sketch Undo / Redo, Undo Last Reading, Add Leg and Add Splay (the last three moved from the Tools menu); Redo is no longer in the sketch quick menu
+- The leg dialog's Input Mode drop-down is replaced by the shot's direction, Forward or Backsight, and a Reverse button that changes it and swaps the station names
 - Change default for floating manual-entry buttons on table view to off (can be turned back on in settings, and manual entry can already be triggered from the menu)
 - Fix Cavway X1 downward shots being recorded with clinos of 270-360° rather than negative values (#357)
 - Pressing back out of the app now warns if the survey isn't saved

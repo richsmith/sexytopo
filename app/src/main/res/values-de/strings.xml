@@ -259,6 +259,8 @@
     <string name="manual_edit_to_station_error">Ungültige Zielstation</string>
     <string name="manual_edit_shot_backwards">⬅ Rückwärts gemessen</string>
     <string name="manual_edit_station_comment">Messpunkt-Kommentar</string>
+    <string name="manual_edit_direction">Richtung: %1$s</string>
+    <string name="manual_edit_direction_backsight">Rückblick</string>
     <string name="manual_edit_leg_comment">Messstrecken-Kommentar</string>
     <string name="manual_edit_shots_warning">Wenn die Werte manuell geändert werden, werden die Messungen verworfen, aus denen diese Messstrecke gemittelt wurde</string>
     <string name="manual_edit_to_wall_info_title">Über Zur Wand</string>
@@ -698,12 +700,6 @@
     <string name="validation_error_secs_range">Muss zwischen 0 und weniger als 60 liegen</string>
     <string name="validation_error_must_be_zero_for_90">Muss 0 sein für ±90°</string>
 
-    <!-- Input mode for leg editing -->
-    <string-array name="leg_edit_input_mode_options">
-        <item>@string/action_input_mode_forward</item>
-        <item>@string/action_input_mode_backward</item>
-    </string-array>
-
     <!--  Survey symbols  -->
     <string name="symbol_text">Text</string>
     <string name="symbol_entrance">Eingang</string>
@@ -765,7 +761,7 @@
 
     <string name="menu_jump_to_station_in_table">&#10132; Daten-Tabelle</string>
     <string name="menu_delete_station">Löschen</string>
-    <string name="menu_reverse">Rückblick</string>
+    <string name="menu_reverse">Umkehren</string>
     <string name="menu_line">Linie</string>
     <string name="menu_flip_line">Umdrehen</string>
     <string name="menu_line_type">Linientyp</string>

@@ -247,6 +247,17 @@ public class EditLegFormTest {
         Assert.assertEquals(45.0f, applied.getAzimuth(), DELTA);
     }
 
+    @Test
+    public void testReverseSwapsForwardAndBackward() {
+        InputMode[][] cases = {
+            {InputMode.FORWARD, InputMode.BACKWARD},
+            {InputMode.BACKWARD, InputMode.FORWARD},
+        };
+        for (InputMode[] c : cases) {
+            Assert.assertEquals(c[0].name(), c[1], EditLegForm.reversed(c[0]));
+        }
+    }
+
     // ---- whether the readings shown have been changed ----
 
     @Test

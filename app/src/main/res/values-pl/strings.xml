@@ -259,6 +259,8 @@
     <string name="manual_edit_to_station_error">Nieprawidłowe stanowisko końcowe</string>
     <string name="manual_edit_shot_backwards">⬅ Pomiar wsteczny</string>
     <string name="manual_edit_station_comment">Komentarz stanowiska</string>
+    <string name="manual_edit_direction">Kierunek: %1$s</string>
+    <string name="manual_edit_direction_backsight">Do tyłu</string>
     <string name="manual_edit_leg_comment">Komentarz ciągu</string>
     <string name="manual_edit_shots_warning">Ręczna zmiana odczytów usunie pomiary, z których uśredniono ten ciąg</string>
     <string name="manual_edit_to_wall_info_title">Informacje o Do ściany</string>
@@ -697,12 +699,6 @@
     <string name="validation_error_mins_secs_range">Musi być od 0 do 59</string>
     <string name="validation_error_secs_range">Musi być od 0 do mniej niż 60</string>
     <string name="validation_error_must_be_zero_for_90">Musi być 0 dla ±90°</string>
-
-    <!-- Input mode for leg editing -->
-    <string-array name="leg_edit_input_mode_options">
-        <item>@string/action_input_mode_forward</item>
-        <item>@string/action_input_mode_backward</item>
-    </string-array>
 
     <!-- Survey symbols -->
     <string name="symbol_text">Tekst</string>
