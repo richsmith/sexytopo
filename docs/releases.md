@@ -5,7 +5,8 @@
 - Delete / erase tool can now be dragged to remove multiple details and generally works better
 - Big rendering engine refactor with some performance improvements
 - Highlight for active view button in action bar
-- New Edit menu with sketch Undo / Redo, Undo Last Reading, Add Leg and Add Splay (the last three moved from the Tools menu); Redo is no longer in the sketch quick menu
+- New Edit menu
+- Little-used select tool retired to make way for area button
 - Snap to Lines quick-menu mode now works more intelligently and is consequently on by default
 - Tapping a linked survey in move or select mode offers to open it
 - Pressing back out of the app now warns if the survey isn't saved
