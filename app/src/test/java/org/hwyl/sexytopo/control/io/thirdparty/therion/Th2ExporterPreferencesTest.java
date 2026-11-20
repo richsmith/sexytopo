@@ -84,7 +84,7 @@ public class Th2ExporterPreferencesTest {
 
     @Test
     public void testLinesArePointByPointWhenCurvesAreOff() {
-        prefs.edit().putBoolean("pref_therion_export_line_curves", false).apply();
+        prefs.edit().putString("pref_therion_export_line_shape", "straight").apply();
         String wall = getExportedLine(LineType.WALL);
         for (String row : getPointRows(wall)) {
             Assert.assertEquals(row, 2, row.split(" ").length);

@@ -27,6 +27,14 @@
         <item>cartesian</item>
         <item>pairwise</item>
     </string-array>
+    <string-array name="therion_export_line_shape_entries">
+        <item>@string/therion_export_line_shape_bezier</item>
+        <item>@string/therion_export_line_shape_straight</item>
+    </string-array>
+    <string-array name="therion_export_line_shape_values">
+        <item>bezier</item>
+        <item>straight</item>
+    </string-array>
     <string-array name="settings_export_svg_background_values">
         <item>transparent</item>
         <item>white</item>

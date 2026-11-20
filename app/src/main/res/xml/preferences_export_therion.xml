@@ -62,12 +62,14 @@
         android:summary="@string/settings_export_therion_lines_summary"
         android:defaultValue="true"/>
 
-    <CheckBoxPreference
-        android:key="pref_therion_export_line_curves"
+    <ListPreference
+        android:key="pref_therion_export_line_shape"
         android:dependency="pref_therion_export_lines"
-        android:title="@string/settings_export_therion_line_curves_title"
-        android:summary="@string/settings_export_therion_line_curves_summary"
-        android:defaultValue="true"/>
+        android:title="@string/therion_export_line_shape"
+        android:summary="@string/settings_export_therion_line_shape_summary"
+        android:entries="@array/therion_export_line_shape_entries"
+        android:entryValues="@array/therion_export_line_shape_values"
+        android:defaultValue="bezier"/>
 
     <CheckBoxPreference
         android:key="pref_therion_export_text"

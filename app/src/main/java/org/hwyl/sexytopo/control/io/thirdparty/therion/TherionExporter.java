@@ -6,9 +6,12 @@ import android.content.SharedPreferences;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.io.SurveyDirectory;
@@ -226,17 +229,24 @@ public class TherionExporter extends Exporter {
         CheckBox crossSectionsCheckbox = dialogView.findViewById(R.id.therionCrossSectionsCheckbox);
         CheckBox symbolsCheckbox = dialogView.findViewById(R.id.therionSymbolsCheckbox);
         CheckBox linesCheckbox = dialogView.findViewById(R.id.therionLinesCheckbox);
-        CheckBox lineCurvesCheckbox = dialogView.findViewById(R.id.therionLineCurvesCheckbox);
+        TextView lineShapeLabel = dialogView.findViewById(R.id.therionLineShapeLabel);
+        Spinner lineShapeSpinner = dialogView.findViewById(R.id.therionLineShapeSpinner);
         CheckBox textCheckbox = dialogView.findViewById(R.id.therionTextCheckbox);
 
         crossSectionsCheckbox.setChecked(GeneralPreferences.isTherionCrossSectionsEnabled());
         symbolsCheckbox.setChecked(GeneralPreferences.isXviExportSymbolsEnabled());
         linesCheckbox.setChecked(GeneralPreferences.isTherionLineExportEnabled());
-        lineCurvesCheckbox.setChecked(GeneralPreferences.isTherionLineCurveExportEnabled());
-        // curves only apply to exported lines
-        lineCurvesCheckbox.setEnabled(linesCheckbox.isChecked());
+        List<String> lineShapeValues =
+                Arrays.asList(
+                        context.getResources()
+                                .getStringArray(R.array.therion_export_line_shape_values));
+        lineShapeSpinner.setSelection(
+                Math.max(0, lineShapeValues.indexOf(GeneralPreferences.getTherionLineShape())));
+        // line shape only applies to exported lines
+        setLineShapeEnabled(lineShapeLabel, lineShapeSpinner, linesCheckbox.isChecked());
         linesCheckbox.setOnCheckedChangeListener(
-                (button, isChecked) -> lineCurvesCheckbox.setEnabled(isChecked));
+                (button, isChecked) ->
+                        setLineShapeEnabled(lineShapeLabel, lineShapeSpinner, isChecked));
         textCheckbox.setChecked(GeneralPreferences.isXviExportTextEnabled());
 
         new MaterialAlertDialogBuilder(context)
@@ -257,7 +267,7 @@ public class TherionExporter extends Exporter {
                                     crossSectionsCheckbox.isChecked(),
                                     symbolsCheckbox.isChecked(),
                                     linesCheckbox.isChecked(),
-                                    lineCurvesCheckbox.isChecked(),
+                                    lineShapeValues.get(lineShapeSpinner.getSelectedItemPosition()),
                                     textCheckbox.isChecked());
                             onReady.run();
                         })
@@ -265,12 +275,13 @@ public class TherionExporter extends Exporter {
                 .show();
     }
 
+    private static void setLineShapeEnabled(TextView label, Spinner spinner, boolean enabled) {
+        label.setEnabled(enabled);
+        spinner.setEnabled(enabled);
+    }
+
     private static void saveOptions(
-            boolean crossSections,
-            boolean symbols,
-            boolean lines,
-            boolean lineCurves,
-            boolean text) {
+            boolean crossSections, boolean symbols, boolean lines, String lineShape, boolean text) {
         SharedPreferences prefs = GeneralPreferences.getRawPreferences();
         if (prefs == null) {
             return;
@@ -279,7 +290,7 @@ public class TherionExporter extends Exporter {
                 .putBoolean("pref_therion_cross_sections", crossSections)
                 .putBoolean("pref_therion_export_symbols", symbols)
                 .putBoolean("pref_therion_export_lines", lines)
-                .putBoolean("pref_therion_export_line_curves", lineCurves)
+                .putString("pref_therion_export_line_shape", lineShape)
                 .putBoolean("pref_therion_export_text", text)
                 .apply();
     }

@@ -384,8 +384,12 @@ public class GeneralPreferences {
         return getBoolean("pref_therion_export_lines", true);
     }
 
-    public static boolean isTherionLineCurveExportEnabled() {
-        return getBoolean("pref_therion_export_line_curves", true);
+    public static String getTherionLineShape() {
+        return getString("pref_therion_export_line_shape", "bezier");
+    }
+
+    public static boolean isTherionBezierLineExportEnabled() {
+        return getTherionLineShape().equals("bezier");
     }
 
     public static String getTherionPlanSuffix() {

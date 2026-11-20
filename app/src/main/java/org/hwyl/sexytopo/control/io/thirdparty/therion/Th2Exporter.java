@@ -474,7 +474,7 @@ public class Th2Exporter {
         lines.add("line " + lineType.getTherionName());
 
         List<BezierFitter.CubicBezier> curves =
-                GeneralPreferences.isTherionLineCurveExportEnabled()
+                GeneralPreferences.isTherionBezierLineExportEnabled()
                         ? BezierFitter.fit(pathDetail.getPath(), getCurveTolerance(pathDetail))
                         : Collections.emptyList();
 

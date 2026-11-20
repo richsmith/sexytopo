@@ -89,13 +89,21 @@
             android:layout_marginTop="8dp"
             android:text="@string/settings_export_therion_lines_title" />
 
-        <CheckBox
-            android:id="@+id/therionLineCurvesCheckbox"
+        <TextView
+            android:id="@+id/therionLineShapeLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:layout_marginStart="24dp"
-            android:text="@string/settings_export_therion_line_curves_title" />
+            android:layout_marginStart="32dp"
+            android:text="@string/therion_export_line_shape" />
+
+        <Spinner
+            android:id="@+id/therionLineShapeSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginStart="32dp"
+            android:entries="@array/therion_export_line_shape_entries" />
 
         <CheckBox
             android:id="@+id/therionTextCheckbox"
