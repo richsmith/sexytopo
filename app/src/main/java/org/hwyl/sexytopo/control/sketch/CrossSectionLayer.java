@@ -655,7 +655,15 @@ class CrossSectionLayer {
             return true;
         }
 
+        // The frame fits the lines, not their decoration (e.g. the ticks on a wall), which would
+        // otherwise spill out over the sketch around it
+        float cornerRadius = dpToPixels(BORDER_CORNER_RADIUS_DP);
+        Path frame = new Path();
+        frame.addRoundRect(borderRect, cornerRadius, cornerRadius, Path.Direction.CW);
+        canvas.save();
+        canvas.clipPath(frame);
         drawSubSketch(canvas, sectionDetail, centreOnSurvey, alpha);
+        canvas.restore();
 
         boolean isHorizontal =
                 sectionDetail.getCrossSection().getOrientation()
@@ -663,7 +671,6 @@ class CrossSectionLayer {
         Paint borderPaint = isHorizontal ? horizontalBorderPaint : verticalBorderPaint;
         Paint handlePaint = isHorizontal ? horizontalHandlePaint : verticalHandlePaint;
 
-        float cornerRadius = dpToPixels(BORDER_CORNER_RADIUS_DP);
         canvas.drawRoundRect(borderRect, cornerRadius, cornerRadius, borderPaint);
 
         Coord2D connectorEnd =
