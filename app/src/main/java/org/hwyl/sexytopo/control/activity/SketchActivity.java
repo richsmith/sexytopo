@@ -11,6 +11,7 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.RectShape;
 import android.graphics.drawable.shapes.RoundRectShape;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -64,6 +65,9 @@ public abstract class SketchActivity extends SurveyEditorActivity
 
     private static final float ZOOM_INCREMENT = 1.1f;
     private static final float ZOOM_DECREMENT = 0.9f;
+
+    /** Thickness in pixels of the bar under the line button's icon. */
+    private static final int SELECTION_BASELINE_THICKNESS = 6;
 
     private static final int[] SKETCH_BUTTON_IDS =
             new int[] {
@@ -721,7 +725,8 @@ public abstract class SketchActivity extends SurveyEditorActivity
         ImageButton lineButton = findViewById(R.id.buttonLine);
         lineButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
         lineButton.setImageDrawable(
-                addSelectionBorder(AppCompatResources.getDrawable(this, lineType.getDrawableId())));
+                addSelectionBaseline(
+                        AppCompatResources.getDrawable(this, lineType.getDrawableId())));
 
         sketchView.setLineType(lineType);
     }
@@ -818,11 +823,11 @@ public abstract class SketchActivity extends SurveyEditorActivity
     }
 
     /**
-     * Wraps a toolbar drawable in the border used to show what is currently selected on the line,
-     * area and symbol buttons.
+     * Wraps a toolbar drawable in the box used to show what is currently selected on the symbol
+     * button.
      *
-     * <p>The border is given an explicit size rather than being allowed to take the size of the
-     * drawable it wraps, so that the box stays the same whatever is selected.
+     * <p>The box is given an explicit size rather than being allowed to take the size of the
+     * drawable it wraps, so that it stays the same whatever is selected.
      */
     private Drawable addSelectionBorder(Drawable drawable) {
         ShapeDrawable border =
@@ -832,7 +837,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
         border.getPaint().setStyle(Paint.Style.STROKE);
         border.getPaint().setStrokeWidth(10);
 
-        int size = Math.round(getResources().getDimension(R.dimen.toolbar_button_height));
+        int size = getSelectionFrameSize();
         border.setIntrinsicWidth(size);
         border.setIntrinsicHeight(size);
 
@@ -840,6 +845,27 @@ public abstract class SketchActivity extends SurveyEditorActivity
         layers.setLayerSize(0, size, size);
         layers.setLayerSize(1, size, size);
         return layers;
+    }
+
+    /**
+     * Puts a bar under a toolbar drawable to show what is currently selected on the line button.
+     * This is a bar rather than the box used on the symbol button, so the two buttons are easy to
+     * tell apart, and the line icon keeps the full size of the button.
+     */
+    private Drawable addSelectionBaseline(Drawable drawable) {
+        ShapeDrawable baseline = new ShapeDrawable(new RectShape());
+        baseline.getPaint().setColor(Color.BLACK);
+
+        int size = getSelectionFrameSize();
+        LayerDrawable layers = new LayerDrawable(new Drawable[] {drawable, baseline});
+        layers.setLayerSize(0, size, size);
+        layers.setLayerInsetTop(1, size - SELECTION_BASELINE_THICKNESS);
+        layers.setLayerSize(1, size, SELECTION_BASELINE_THICKNESS);
+        return layers;
+    }
+
+    private int getSelectionFrameSize() {
+        return Math.round(getResources().getDimension(R.dimen.toolbar_button_height));
     }
 
     private void initialiseTools() {
