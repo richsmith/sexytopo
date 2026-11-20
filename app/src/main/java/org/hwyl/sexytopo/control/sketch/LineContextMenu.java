@@ -31,6 +31,7 @@ final class LineContextMenu {
         PopupMenu popup =
                 ContextMenuManager.createPopupMenuAt(anchorView.getContext(), anchorView, x, y);
         popup.inflate(R.menu.context_line);
+        ContextMenuManager.enableGroupDividers(popup);
         Menu menu = popup.getMenu();
 
         LineType currentType = pathDetail.getLineType();

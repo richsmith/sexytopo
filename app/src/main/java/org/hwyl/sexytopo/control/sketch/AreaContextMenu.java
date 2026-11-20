@@ -34,6 +34,7 @@ final class AreaContextMenu {
         PopupMenu popup =
                 ContextMenuManager.createPopupMenuAt(anchorView.getContext(), anchorView, x, y);
         popup.inflate(R.menu.context_area);
+        ContextMenuManager.enableGroupDividers(popup);
         Menu menu = popup.getMenu();
 
         AreaType currentType = areaDetail.getAreaType();

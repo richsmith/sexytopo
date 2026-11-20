@@ -34,6 +34,7 @@ final class SymbolContextMenu {
         PopupMenu popup =
                 ContextMenuManager.createPopupMenuAt(anchorView.getContext(), anchorView, x, y);
         popup.inflate(R.menu.context_symbol);
+        ContextMenuManager.enableGroupDividers(popup);
         Menu menu = popup.getMenu();
 
         Symbol currentSymbol = symbolDetail.getSymbol();

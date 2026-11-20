@@ -7,22 +7,27 @@
         android:title="@string/menu_area"
         android:enabled="false"/>
 
-    <!-- Populated from AreaType -->
-    <item
-        android:id="@+id/menu_area_type"
-        android:title="@string/menu_area_type">
-        <menu/>
-    </item>
+    <group android:id="@+id/group_area_actions">
+        <!-- Populated from AreaType -->
+        <item
+            android:id="@+id/menu_area_type"
+            android:title="@string/menu_area_type">
+            <menu/>
+        </item>
 
-    <!-- Populated from BrushColour -->
-    <item
-        android:id="@+id/menu_colour"
-        android:title="@string/menu_colour">
-        <menu/>
-    </item>
+        <!-- Populated from BrushColour -->
+        <item
+            android:id="@+id/menu_colour"
+            android:title="@string/menu_colour">
+            <menu/>
+        </item>
+    </group>
 
-    <item
-        android:id="@+id/action_delete_area"
-        android:title="@string/delete"/>
+    <!-- Delete separated by divider -->
+    <group android:id="@+id/group_area_delete">
+        <item
+            android:id="@+id/action_delete_area"
+            android:title="@string/delete"/>
+    </group>
 
 </menu>

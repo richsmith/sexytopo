@@ -30,6 +30,7 @@ final class TextContextMenu {
         PopupMenu popup =
                 ContextMenuManager.createPopupMenuAt(anchorView.getContext(), anchorView, x, y);
         popup.inflate(R.menu.context_text);
+        ContextMenuManager.enableGroupDividers(popup);
         Map<Integer, Colour> itemIdsToColours =
                 ColourSubMenu.populate(popup.getMenu(), textDetail.getColour());
 

@@ -167,7 +167,7 @@ public class ContextMenuManager {
         popup.show();
     }
 
-    private void enableGroupDividers(PopupMenu popup) {
+    static void enableGroupDividers(PopupMenu popup) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             popup.getMenu().setGroupDividerEnabled(true);
         }

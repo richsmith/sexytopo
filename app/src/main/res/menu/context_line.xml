@@ -7,26 +7,31 @@
         android:title="@string/menu_line"
         android:enabled="false"/>
 
-    <item
-        android:id="@+id/action_flip_line"
-        android:title="@string/menu_flip_line"/>
+    <group android:id="@+id/group_line_actions">
+        <item
+            android:id="@+id/action_flip_line"
+            android:title="@string/menu_flip_line"/>
 
-    <!-- Populated from LineType -->
-    <item
-        android:id="@+id/menu_line_type"
-        android:title="@string/menu_line_type">
-        <menu/>
-    </item>
+        <!-- Populated from LineType -->
+        <item
+            android:id="@+id/menu_line_type"
+            android:title="@string/menu_line_type">
+            <menu/>
+        </item>
 
-    <!-- Populated from BrushColour -->
-    <item
-        android:id="@+id/menu_colour"
-        android:title="@string/menu_colour">
-        <menu/>
-    </item>
+        <!-- Populated from BrushColour -->
+        <item
+            android:id="@+id/menu_colour"
+            android:title="@string/menu_colour">
+            <menu/>
+        </item>
+    </group>
 
-    <item
-        android:id="@+id/action_delete_line"
-        android:title="@string/delete"/>
+    <!-- Delete separated by divider -->
+    <group android:id="@+id/group_line_delete">
+        <item
+            android:id="@+id/action_delete_line"
+            android:title="@string/delete"/>
+    </group>
 
 </menu>

@@ -7,19 +7,24 @@
         android:title="@string/symbol_text"
         android:enabled="false"/>
 
-    <item
-        android:id="@+id/action_edit_text"
-        android:title="@string/edit"/>
+    <group android:id="@+id/group_text_actions">
+        <item
+            android:id="@+id/action_edit_text"
+            android:title="@string/edit"/>
 
-    <!-- Populated from BrushColour -->
-    <item
-        android:id="@+id/menu_colour"
-        android:title="@string/menu_colour">
-        <menu/>
-    </item>
+        <!-- Populated from BrushColour -->
+        <item
+            android:id="@+id/menu_colour"
+            android:title="@string/menu_colour">
+            <menu/>
+        </item>
+    </group>
 
-    <item
-        android:id="@+id/action_delete_text"
-        android:title="@string/delete"/>
+    <!-- Delete separated by divider -->
+    <group android:id="@+id/group_text_delete">
+        <item
+            android:id="@+id/action_delete_text"
+            android:title="@string/delete"/>
+    </group>
 
 </menu>
