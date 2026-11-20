@@ -39,7 +39,7 @@ import org.hwyl.sexytopo.model.survey.Survey;
 public class SketchView extends View {
 
     private final ScaleGestureDetector scaleGestureDetector;
-    private final GestureDetector longPressDetector;
+    private final GestureDetector gestureDetector;
 
     // Which part of the survey is on screen, and at what zoom
     protected final Viewport viewport = new Viewport();
@@ -113,7 +113,7 @@ public class SketchView extends View {
     public SketchView(Context context, AttributeSet attrs) {
         super(context, attrs);
         scaleGestureDetector = new ScaleGestureDetector(context, new ScaleListener());
-        longPressDetector = new GestureDetector(context, new LongPressListener());
+        gestureDetector = new GestureDetector(context, new GestureListener());
 
         // Line decoration and the shading on walls are drawn with path effects, which a
         // hardware-accelerated canvas only renders from Android 9 (API 28). Before that, draw in
@@ -294,7 +294,7 @@ public class SketchView extends View {
         }
 
         scaleGestureDetector.onTouchEvent(event);
-        longPressDetector.onTouchEvent(event);
+        gestureDetector.onTouchEvent(event);
 
         if (scaleGestureDetector.isInProgress()) {
             // a pinch interrupts an erasing drag: don't erase a line from where it left off
@@ -427,7 +427,7 @@ public class SketchView extends View {
     /** Draw the surveys linked to the current survey, faded. */
     private void drawConnectedSurveys(Canvas canvas) {
 
-        if (!SketchPreferences.Toggle.SHOW_CONNECTIONS.isOn()) {
+        if (!areConnectedSurveysShown()) {
             return;
         }
 
@@ -449,6 +449,11 @@ public class SketchView extends View {
                 connectedSurveys.forget(connectedSurvey);
             }
         }
+    }
+
+    /** Whether the surveys linked to this one are drawn, and so can be tapped on. */
+    protected boolean areConnectedSurveysShown() {
+        return SketchPreferences.Toggle.SHOW_CONNECTIONS.isOn();
     }
 
     protected void drawGrid(Canvas canvas) {
@@ -559,7 +564,37 @@ public class SketchView extends View {
         }
     }
 
-    private class LongPressListener extends GestureDetector.SimpleOnGestureListener {
+    private class GestureListener extends GestureDetector.SimpleOnGestureListener {
+
+        /**
+         * With the move tool, a tap on a linked survey offers to open it. This only comes for a
+         * tap: not a pan, a pinch or a long-press.
+         */
+        @Override
+        public boolean onSingleTapUp(MotionEvent motionEvent) {
+            if (state.getSketchTool() != SketchTool.MOVE || !areConnectedSurveysShown()) {
+                return false;
+            }
+
+            Coord2D touchPointOnView = new Coord2D(motionEvent.getX(), motionEvent.getY());
+            if (crossSections.isBodyShownAt(viewport.toSurvey(touchPointOnView))) {
+                return false; // the cross-section is drawn over everything, and the tap opens it
+            }
+
+            Survey linkedSurvey =
+                    selector.findConnectedSurveyAt(
+                            touchPointOnView,
+                            connectedSurveys.getSurveysToProjections(
+                                    state.getProjectionType(),
+                                    state.getSurvey(),
+                                    state.getProjection()));
+            if (linkedSurvey == null) {
+                return false;
+            }
+            activity.requestOpenLinkedSurvey(linkedSurvey);
+            return true;
+        }
+
         @Override
         public void onLongPress(MotionEvent motionEvent) {
             if (menuShownInThisTouch) {

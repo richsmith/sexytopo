@@ -519,6 +519,13 @@ class CrossSectionLayer {
         return null;
     }
 
+    /** Whether a cross-section is drawn at this point, so a tap there would open it. */
+    boolean isBodyShownAt(Coord2D surveyPoint) {
+        return SketchPreferences.Toggle.SHOW_X_SECTIONS.isOn()
+                && !GeneralPreferences.isLegacyCrossSectionsOn()
+                && findBodyAt(surveyPoint) != null;
+    }
+
     /**
      * Hit-test the body of a cross-section component (used to open the editor on tap). A component
      * occupies the area around its display centre; we pick whichever is closest within a tolerance.

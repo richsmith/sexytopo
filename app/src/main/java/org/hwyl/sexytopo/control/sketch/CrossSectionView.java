@@ -90,6 +90,12 @@ public class CrossSectionView extends SketchView {
         setZoom(targetPixels / longestSplay);
     }
 
+    /** A cross-section is drawn on its own, without the surveys linked to its survey. */
+    @Override
+    protected boolean areConnectedSurveysShown() {
+        return false;
+    }
+
     @SuppressLint("DrawAllocation")
     @Override
     protected void onDraw(Canvas canvas) {

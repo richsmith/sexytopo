@@ -34,6 +34,7 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.TooltipCompat;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import org.apache.commons.lang3.ArrayUtils;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
@@ -284,6 +285,27 @@ public abstract class SketchActivity extends SurveyEditorActivity
         float surveyHeight = SurveyStats.calcHeightRange(survey);
         sketchView.setCachedStats(surveyLength, surveyHeight);
         sketchView.invalidate();
+    }
+
+    /**
+     * Offer to open a linked survey the user tapped on, in place of the one being worked on. It
+     * opens in this view, so a tap in the elevation stays in the elevation.
+     */
+    public void requestOpenLinkedSurvey(Survey linkedSurvey) {
+        MaterialAlertDialogBuilder builder =
+                new MaterialAlertDialogBuilder(this)
+                        .setTitle(
+                                getString(
+                                        R.string.sketch_open_linked_survey_title,
+                                        linkedSurvey.getName()))
+                        .setPositiveButton(
+                                R.string.sketch_open_linked_survey_confirm,
+                                (dialog, which) -> loadSurveyInPlace(linkedSurvey.getDirectory()))
+                        .setNegativeButton(R.string.cancel, null);
+        if (!getSurvey().isSaved()) {
+            builder.setMessage(R.string.file_warning_survey_not_saved);
+        }
+        builder.show();
     }
 
     /** The sketch this activity shows, from the survey being worked on. */

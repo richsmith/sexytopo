@@ -1156,16 +1156,27 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
     }
 
     protected void loadSurvey(DocumentFile surveyDirectory) {
+        if (loadSurveyInPlace(surveyDirectory)) {
+            startActivity(PlanActivity.class);
+        }
+    }
+
+    /**
+     * Load a survey and make it the one being worked on, staying in this activity. Returns whether
+     * it loaded; if it didn't, the user has been told why.
+     */
+    protected boolean loadSurveyInPlace(DocumentFile surveyDirectory) {
         try {
             Log.i(R.string.file_loading_survey, surveyDirectory.getName());
             Survey survey = Loader.loadSurvey(SexyTopoActivity.this, surveyDirectory);
             getSurveyManager().setCurrentSurvey(survey);
             updateRememberedSurvey();
-            startActivity(PlanActivity.class);
             showSimpleToast(R.string.file_loaded_survey, survey.getName());
+            return true;
 
         } catch (Exception exception) {
             showExceptionAndLog(R.string.file_load_survey_error, exception);
+            return false;
         }
     }
 
