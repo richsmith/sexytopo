@@ -36,6 +36,9 @@ public class CrossSectionDetail extends SinglePositionDetail {
 
     private void refreshBoundingBox() {
 
+        // Start afresh, so the box can shrink when the sub-sketch or splays do
+        resetBoundingBox();
+
         // Ensure a minimum size so cross-sections with no splays are still usable
         updateBoundingBox(position.plus(MIN_EXTENT_NW));
         updateBoundingBox(position.plus(MIN_EXTENT_SE));

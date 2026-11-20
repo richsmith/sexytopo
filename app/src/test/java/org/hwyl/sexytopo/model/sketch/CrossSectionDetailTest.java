@@ -42,9 +42,9 @@ public class CrossSectionDetailTest {
         CrossSectionDetail detail =
                 new CrossSectionDetail(CrossSection.horizontal(station), new Coord2D(10, 20));
 
-        // The splay runs 5 to the east of the centre; the minimum extent is 1 either way
+        // The splay runs 5 to the east of the centre; the minimum extent is 0.5 either way
         Assert.assertEquals(15f, detail.getRight(), 1e-4f);
-        Assert.assertEquals(9f, detail.getLeft(), 1e-4f);
+        Assert.assertEquals(9.5f, detail.getLeft(), 1e-4f);
     }
 
     @Test
@@ -79,5 +79,27 @@ public class CrossSectionDetailTest {
                         CrossSection.horizontal(new Station("A1")), new Coord2D(1, 2));
 
         Assert.assertSame(detail, detail.withAngle(80f));
+    }
+
+    @Test
+    public void testBoundingBoxShrinksWhenTheSubSketchIsReplacedWithASmallerOne() {
+        CrossSectionDetail detail =
+                new CrossSectionDetail(new CrossSection(new Station("A1"), 0f), Coord2D.ORIGIN);
+
+        detail.setSketch(sketchWithLine(new Coord2D(0, 0), new Coord2D(10, 0)));
+        Assert.assertEquals(10f, detail.getRight(), 1e-4f);
+
+        detail.setSketch(sketchWithLine(new Coord2D(0, 0), new Coord2D(2, 0)));
+        Assert.assertEquals(2f, detail.getRight(), 1e-4f);
+    }
+
+    private static Sketch sketchWithLine(Coord2D start, Coord2D end) {
+        PathDetail line = new PathDetail(start, Colour.BLACK);
+        line.lineTo(end);
+        Sketch sketch = new Sketch();
+        List<PathDetail> pathDetails = new ArrayList<>();
+        pathDetails.add(line);
+        sketch.setPathDetails(pathDetails);
+        return sketch;
     }
 }
