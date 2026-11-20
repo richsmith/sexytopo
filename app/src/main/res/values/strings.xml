@@ -207,6 +207,7 @@
     <string name="sketch_toolbar_selector">Selector</string>
     <string name="sketch_toolbar_settings">Quick settings</string>
     <string name="sketch_toolbar_undo">Undo</string>
+    <string name="sketch_toolbar_redo">Redo</string>
     <string name="sketch_toolbar_zoom_in">Zoom in</string>
     <string name="sketch_toolbar_zoom_out">Zoom out</string>
     <string name="sketch_toolbar_colour_main">Main colour</string>

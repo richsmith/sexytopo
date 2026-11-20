@@ -182,6 +182,7 @@
     <string name="sketch_toolbar_selector">Auswahl-Werkzeug</string>
     <string name="sketch_toolbar_settings">Schnelleinstellungen</string>
     <string name="sketch_toolbar_undo">Rückgängig</string>
+    <string name="sketch_toolbar_redo">Wiederholen</string>
     <string name="sketch_toolbar_zoom_in">Vergrößern</string>
     <string name="sketch_toolbar_zoom_out">Verkleinern</string>
     <string name="sketch_toolbar_colour_main">Hauptfarbe</string>

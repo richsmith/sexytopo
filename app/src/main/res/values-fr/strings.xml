@@ -182,6 +182,7 @@
     <string name="sketch_toolbar_selector">Sélectioneur</string>
     <string name="sketch_toolbar_settings">Paramètres rapides</string>
     <string name="sketch_toolbar_undo">Annuler</string>
+    <string name="sketch_toolbar_redo">Refaire</string>
     <string name="sketch_toolbar_zoom_in">Zoom grossissant</string>
     <string name="sketch_toolbar_zoom_out">Zoom dégrossissant</string>
     <string name="sketch_toolbar_colour_main">Couleur principale</string>

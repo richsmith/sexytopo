@@ -182,6 +182,7 @@
     <string name="sketch_toolbar_selector">Seletor</string>
     <string name="sketch_toolbar_settings">Configurações rápidas</string>
     <string name="sketch_toolbar_undo">Desfazer</string>
+    <string name="sketch_toolbar_redo">Refazer</string>
     <string name="sketch_toolbar_zoom_in">Ampliar</string>
     <string name="sketch_toolbar_zoom_out">Reduzir</string>
     <string name="sketch_toolbar_colour_main">Cor principal</string>

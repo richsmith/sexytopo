@@ -17,7 +17,8 @@ public enum SketchTool {
     ERASE(R.id.buttonErase),
     SYMBOL(R.id.buttonSymbol, USES_COLOUR),
     TEXT(387348957, USES_COLOUR),
-    SELECT(R.id.buttonSelect, OFFERS_DETAIL_MENU, OPENS_LINKED_SURVEYS),
+    // not currently on the toolbar
+    SELECT(-1, OFFERS_DETAIL_MENU, OPENS_LINKED_SURVEYS),
     POSITION_CROSS_SECTION(-1),
     ROTATE_CROSS_SECTION(-1),
     MOVE_CROSS_SECTION(-1, MODAL),

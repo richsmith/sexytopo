@@ -182,6 +182,7 @@
     <string name="sketch_toolbar_selector">Selector</string>
     <string name="sketch_toolbar_settings">Ajustes rápidos</string>
     <string name="sketch_toolbar_undo">Deshacer</string>
+    <string name="sketch_toolbar_redo">Rehacer</string>
     <string name="sketch_toolbar_zoom_in">Acercar</string>
     <string name="sketch_toolbar_zoom_out">Alejar</string>
     <string name="sketch_toolbar_colour_main">Color principal</string>

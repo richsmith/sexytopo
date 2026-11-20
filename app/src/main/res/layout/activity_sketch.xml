@@ -304,20 +304,6 @@
 
 
 
-            <ImageButton
-                style="@style/ToolbarImageButton"
-                android:id="@+id/buttonSelect"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/toolbar_button_height"
-                android:layout_columnWeight="1"
-                android:layout_margin="0dp"
-                android:layout_marginTop="-4dp"
-                android:contentDescription="@string/sketch_toolbar_selector"
-                android:cropToPadding="false"
-                android:hapticFeedbackEnabled="true"
-                android:scaleType="fitCenter"
-                android:src="@drawable/select"
-                android:tooltipText="@string/sketch_toolbar_selector" />
 
             <ImageButton
                 style="@style/ToolbarImageButton"
@@ -348,6 +334,20 @@
                 android:scaleType="fitCenter"
                 android:src="@drawable/undo"
                 android:tooltipText="@string/sketch_toolbar_undo" />
+            <ImageButton
+                style="@style/ToolbarImageButton"
+                android:id="@+id/buttonRedo"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/toolbar_button_height"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:layout_marginTop="-4dp"
+                android:contentDescription="@string/sketch_toolbar_redo"
+                android:cropToPadding="false"
+                android:hapticFeedbackEnabled="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/redo"
+                android:tooltipText="@string/sketch_toolbar_redo" />
 
 
             <ImageButton

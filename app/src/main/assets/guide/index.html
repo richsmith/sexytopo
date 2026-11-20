@@ -143,7 +143,7 @@
 <p>This is a tabular view of the collected data. It can be accessed through the first icon on the Action Bar. SexyTopo is designed with the intention that most interaction should be through the sketch screens but it is occasionally useful to check the raw data.</p>
 <p>There are onscreen buttons for manually inputting data: there are two buttons for adding new stations and splays.</p>
 <p>Tapping on a table row opens the view/edit dialog for that row, where the data can be seen in detail and updated if necessary.</p>
-<p>Long-pressing on a table row or selecting a station in the graph views activates a unified context menu.</p>
+<p>Long-pressing on a table row or on a station in the sketch views activates a unified context menu.</p>
 
 
 <h2 id="sketch-views">Sketch Views</h2>
@@ -156,9 +156,9 @@
 	<li><strong>Symbol</strong> enters symbol mode (tap again to open symbol/text selection option)</li>
 	<li><strong>Area</strong> enters area mode for marking regions such as water (see below)</li>
 	<li><strong>Erase</strong> deletes sketch features</li>
-	<li><strong>Select</strong> (dashed square) marks a station as the active station (select twice to open context menu)</li>
 	<li><strong>Quick Settings</strong> opens settings for adjusting sketch view on the fly (see <a href="#quick-settings">Quick Settings</a> below)</li>
 	<li><strong>Undo</strong> undoes the last sketching command</li>
+	<li><strong>Redo</strong> redoes the last undone sketching command</li>
 	<li><strong>Zoom In/Out</strong> scales the survey (alternative to pinch-to-zoom)</li>
 </ul>
 
@@ -197,7 +197,7 @@
 	<li><strong>Compass</strong> shows the compass on the plan view. Turn it off to save a small amount of battery.</li>
 </ul>
 
-<p id="editing-sketch-details">Lines, areas, symbols and text can be changed after they have been drawn by long-pressing them with the Move, Select, Line or Area tool. The context menu that appears depends on what was pressed:</p>
+<p id="editing-sketch-details">Lines, areas, symbols and text can be changed after they have been drawn by long-pressing them with the Move, Line or Area tool. The context menu that appears depends on what was pressed:</p>
 <ul>
 	<li><strong>Lines</strong> can be flipped (for line types with an orientation), changed to another line type, recoloured or deleted.</li>
 	<li><strong>Areas</strong> can be changed to another area type, recoloured or deleted.</li>
@@ -325,7 +325,7 @@
 </ul>
 
 <h2 id="context-menu">Context Menu</h2>
-<p>A unified context menu is available from the table view and graph views. Long-press a table row or select a station in the sketch views to access it. The menu is organized into submenus with options depending on what's selected.</p>
+<p>A unified context menu is available from the table view and graph views. Long-press a table row, or a station in the sketch views, to access it. The menu is organized into submenus with options depending on what's selected.</p>
 
 <h3>Station Actions</h3>
 <ul>
@@ -399,7 +399,7 @@
   <p>To manage the complexity of anything other than very small caves, you will likely need to break the overall survey of a cave into smaller individual surveys. This provides several advantages, including managing the cognitive load of understanding how the survey fits together, improving rendering performance in SexyTopo, and aligning with the standard workflow of cave drawing packages such as Therion.</p>
   <p>SexyTopo provides UI controls such as fading out or hiding the parts of the survey not currently being worked on. This is particularly helpful for dealing with extended overlapping sections of cave passage, and starting a new linked survey is the recommended way of handling this kind of continuation.</p>
   <p>To start a new linked survey, select a station from the context menu and select Survey → Start New Survey Here. There is also an option to link to an existing survey and to unlink a survey.</p>
-  <p>Linked surveys are drawn faded in the plan and elevation views. SexyTopo will offer to open the linked survey if you tap on it in move or select mode.</p>
+  <p>Linked surveys are drawn faded in the plan and elevation views. SexyTopo will offer to open the linked survey if you tap on it in move mode.</p>
 
 <h2 id="import-export">Import and Export</h2>
   <p>SexyTopo can exchange data with other cave surveying software through import and export functions.</p>

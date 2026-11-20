@@ -3,7 +3,6 @@ package org.hwyl.sexytopo.control.activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import androidx.annotation.NonNull;
 import java.util.ArrayList;
 import org.hwyl.sexytopo.R;
@@ -74,8 +73,6 @@ public class CrossSectionActivity extends SketchActivity {
 
         workingSketch = buildWorkingSketch(originalDetail.getSketch());
 
-        disableUnsupportedTools();
-
         CrossSectionView sketchView = findViewById(R.id.sketchView);
         Space<Coord2D> projection = originalDetail.getCrossSection().getProjection();
         sketchView.setProjection(projection);
@@ -98,16 +95,6 @@ public class CrossSectionActivity extends SketchActivity {
     private static Sketch buildWorkingSketch(Sketch source) {
         Sketch working = new Sketch(source);
         return working;
-    }
-
-    private void disableUnsupportedTools() {
-        int[] toolsToHide = new int[] {R.id.buttonSelect};
-        for (int id : toolsToHide) {
-            View view = findViewById(id);
-            if (view != null) {
-                view.setEnabled(false);
-            }
-        }
     }
 
     @Override

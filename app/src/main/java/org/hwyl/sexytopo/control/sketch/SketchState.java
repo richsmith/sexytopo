@@ -22,7 +22,7 @@ class SketchState {
 
     private SketchTool currentTool = SketchTool.MOVE;
     // used to jump back to the previous tool when using one-use tools
-    private SketchTool previousTool = SketchTool.SELECT;
+    private SketchTool previousTool = SketchTool.MOVE;
 
     // what lines, areas, symbols and text are drawn in
     private Colour colour = Colour.BLACK;

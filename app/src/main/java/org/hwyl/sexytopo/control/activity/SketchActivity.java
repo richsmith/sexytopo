@@ -72,6 +72,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
                 R.id.buttonErase,
                 R.id.buttonSymbol,
                 R.id.buttonUndo,
+                R.id.buttonRedo,
                 R.id.buttonBlack,
                 R.id.buttonBrown,
                 R.id.buttonGrey,
@@ -83,13 +84,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
             };
 
     private static final int[] CONTROL_BUTTON_IDS =
-            new int[] {
-                R.id.buttonMove,
-                R.id.buttonSelect,
-                R.id.buttonZoomIn,
-                R.id.buttonZoomOut,
-                R.id.buttonMenu
-            };
+            new int[] {R.id.buttonMove, R.id.buttonZoomIn, R.id.buttonZoomOut, R.id.buttonMenu};
 
     private static final int[] BUTTON_IDS =
             ArrayUtils.addAll(SKETCH_BUTTON_IDS, CONTROL_BUTTON_IDS);
@@ -512,6 +507,9 @@ public abstract class SketchActivity extends SurveyEditorActivity
             return true;
         } else if (itemId == R.id.buttonUndo) {
             sketchView.undo();
+            return true;
+        } else if (itemId == R.id.buttonRedo) {
+            sketchView.redo();
             return true;
         } else if (itemId == R.id.buttonMenu) {
             openDisplayMenu();

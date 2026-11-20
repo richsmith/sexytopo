@@ -182,6 +182,7 @@
     <string name="sketch_toolbar_selector">Selektor</string>
     <string name="sketch_toolbar_settings">Szybkie ustawienia</string>
     <string name="sketch_toolbar_undo">Cofnij</string>
+    <string name="sketch_toolbar_redo">Ponów</string>
     <string name="sketch_toolbar_zoom_in">Powiększ</string>
     <string name="sketch_toolbar_zoom_out">Pomniejsz</string>
     <string name="sketch_toolbar_colour_main">Kolor główny</string>

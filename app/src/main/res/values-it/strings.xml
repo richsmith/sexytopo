@@ -182,6 +182,7 @@
     <string name="sketch_toolbar_selector">Selettore</string>
     <string name="sketch_toolbar_settings">Impostazioni rapide</string>
     <string name="sketch_toolbar_undo">Annulla</string>
+    <string name="sketch_toolbar_redo">Ripeti</string>
     <string name="sketch_toolbar_zoom_in">Ingrandisci</string>
     <string name="sketch_toolbar_zoom_out">Riduci</string>
     <string name="sketch_toolbar_colour_main">Colore principale</string>
