@@ -2,9 +2,6 @@ package org.hwyl.sexytopo.control.sketch;
 
 import static org.hwyl.sexytopo.control.sketch.ScreenUnits.dpToPixels;
 
-import org.hwyl.sexytopo.model.sketch.SketchTool;
-import org.hwyl.sexytopo.model.sketch.Colour;
-import org.hwyl.sexytopo.model.geometry.Projection2D;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -14,6 +11,9 @@ import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.control.util.TextTools;
+import org.hwyl.sexytopo.model.geometry.Projection2D;
+import org.hwyl.sexytopo.model.sketch.Colour;
+import org.hwyl.sexytopo.model.sketch.SketchTool;
 
 /**
  * Draws what sits on the screen rather than in the cave: the grid behind the survey, and in front
@@ -194,7 +194,6 @@ class OverlayRenderer {
     void drawDebuggingInfo(Canvas canvas, int width, long lastDrawNanos, long averageDrawNanos) {
         float offsetX = width * 0.03f;
         float offsetY = LEGEND_SIZE * 2;
-
 
         String x = TextTools.formatTo2dp(viewport.getOffsetX());
         String y = TextTools.formatTo2dp(viewport.getOffsetY());
