@@ -716,7 +716,8 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         try {
             String text = DialogUtils.getEditText(inputLayout).getText().toString();
             float scale = Float.parseFloat(text);
-            if (scale != sketch.getCrossSectionScale()) {
+            // a section has to be drawn at some size, the right way round
+            if (scale > 0 && scale != sketch.getCrossSectionScale()) {
                 sketch.setCrossSectionScale(scale);
                 sketch.setSaved(false);
             }
