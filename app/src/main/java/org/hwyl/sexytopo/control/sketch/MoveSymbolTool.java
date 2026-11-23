@@ -42,6 +42,7 @@ class MoveSymbolTool implements ToolHandler {
         this.state = state;
         this.sketchRenderer = sketchRenderer;
         this.host = host;
+        sketchRenderer.setHiddenSymbol(this::getSymbolBeingMoved);
     }
 
     /** Set the highlight up from the theme. */
@@ -57,8 +58,6 @@ class MoveSymbolTool implements ToolHandler {
         // to here rather than relying on the previous tool
         toolToReturnTo = state.getSketchTool();
         state.setSketchTool(SketchTool.MOVE_SYMBOL);
-        // drawn here instead while it's waiting to be moved
-        sketchRenderer.setHiddenSymbol(symbolDetail);
         host.showToast(R.string.sketch_move_symbol_instruction);
         host.invalidate();
     }
@@ -104,17 +103,10 @@ class MoveSymbolTool implements ToolHandler {
         }
     }
 
-    /**
-     * Draw the symbol being moved where it will go, highlighted. Drawn over everything else, as
-     * it's what's being worked on.
-     */
-    void draw(Canvas canvas) {
-        if (beingMoved == null) {
-            return;
-        }
+    /** Draw the symbol being moved where it will go, highlighted. */
+    @Override
+    public void drawFeedback(Canvas canvas) {
         if (!isActive()) {
-            // given up on without a touch, so put the symbol back in its sketch
-            finish();
             return;
         }
         SymbolDetail preview = beingMoved.translate(dragOffset);
@@ -124,13 +116,17 @@ class MoveSymbolTool implements ToolHandler {
         CanvasShapes.drawHighlightBrackets(canvas, centre.x, centre.y, size, highlightPaint);
     }
 
+    private SymbolDetail getSymbolBeingMoved() {
+        return isActive() ? beingMoved : null;
+    }
+
     /**
      * Whether a symbol is waiting to be moved. It may have gone from the sketch meanwhile (undone,
      * say), or the user may have picked another tool instead.
      */
     private boolean isActive() {
         return beingMoved != null
-                && state.getSketchTool() == SketchTool.MOVE_SYMBOL
+                && state.getUnderlyingSketchTool() == SketchTool.MOVE_SYMBOL
                 && state.getSketch().getSymbolDetails().contains(beingMoved);
     }
 
@@ -138,7 +134,6 @@ class MoveSymbolTool implements ToolHandler {
         beingMoved = null;
         dragStartOnSurvey = null;
         dragOffset = Coord2D.ORIGIN;
-        sketchRenderer.setHiddenSymbol(null);
         if (state.getSketchTool() == SketchTool.MOVE_SYMBOL) {
             state.setSketchTool(toolToReturnTo);
         }

@@ -103,7 +103,7 @@ public class CrossSectionView extends SketchView {
 
         drawGrid(canvas);
         drawSurvey(canvas);
-        drawSymbolBeingMoved(canvas);
+        drawToolFeedback(canvas);
         drawLegend(canvas);
         drawCompass(canvas);
     }

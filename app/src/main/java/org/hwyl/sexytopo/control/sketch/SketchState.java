@@ -69,6 +69,14 @@ class SketchState {
     }
 
     /**
+     * The tool the user is working with: the current one, unless that's a pinch or pan, in which
+     * case the one it interrupted, which it goes back to after.
+     */
+    SketchTool getUnderlyingSketchTool() {
+        return currentTool.isModal() ? previousTool : currentTool;
+    }
+
+    /**
      * Switch tool. The tool being left is remembered, so a one-use tool can go back to it, unless
      * it's a modal one (a pinch or a pan) that is itself only temporary.
      */

@@ -3,6 +3,7 @@ package org.hwyl.sexytopo.control.sketch;
 import android.content.Context;
 import android.graphics.Canvas;
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SymbolDetail;
@@ -52,9 +53,12 @@ class SketchRenderer {
         pointRenderer.draw(canvas, sketch, alpha, isDarkModeActive);
     }
 
-    /** Leave a symbol out when drawing its sketch, e.g. while it's drawn elsewhere being moved. */
-    void setHiddenSymbol(SymbolDetail symbolDetail) {
-        pointRenderer.setHiddenSymbol(symbolDetail);
+    /**
+     * Where to find a symbol to leave out when drawing its sketch, e.g. while it's drawn elsewhere
+     * being moved. It gives null when there's nothing to leave out.
+     */
+    void setHiddenSymbol(Supplier<SymbolDetail> hiddenSymbol) {
+        pointRenderer.setHiddenSymbol(hiddenSymbol);
     }
 
     void drawSymbol(Canvas canvas, SymbolDetail symbolDetail) {

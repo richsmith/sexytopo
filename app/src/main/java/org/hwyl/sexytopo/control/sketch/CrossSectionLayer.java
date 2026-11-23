@@ -122,8 +122,19 @@ class CrossSectionLayer {
     /** Drags a cross-section by its handle. */
     final ToolHandler moveTool = this::handleMove;
 
-    /** Turns a cross-section to face the finger. */
-    final ToolHandler rotateTool = this::handleRotate;
+    /** Turns a cross-section to face the finger, showing a guide line from its station. */
+    final ToolHandler rotateTool =
+            new ToolHandler() {
+                @Override
+                public boolean onTouch(MotionEvent event) {
+                    return handleRotate(event);
+                }
+
+                @Override
+                public void drawFeedback(Canvas canvas) {
+                    drawRotationGuideLine(canvas);
+                }
+            };
 
     CrossSectionLayer(
             Viewport viewport,
@@ -577,8 +588,6 @@ class CrossSectionLayer {
                 badXSections.add(detail);
             }
         }
-
-        drawRotationGuideLine(canvas);
 
         for (CrossSectionDetail badDetail : badXSections) {
             CrossSection xs = badDetail.getCrossSection();

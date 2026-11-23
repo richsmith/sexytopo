@@ -403,7 +403,7 @@ public class SketchView extends View {
         drawGrid(canvas);
         drawConnectedSurveys(canvas);
         drawSurvey(canvas);
-        drawSymbolBeingMoved(canvas);
+        drawToolFeedback(canvas);
         drawLegend(canvas);
         drawCompass(canvas);
         drawHotCorners(canvas);
@@ -423,9 +423,15 @@ public class SketchView extends View {
         drawSurvey(canvas, state.getSurvey(), state.getProjection(), SOLID_ALPHA);
     }
 
-    /** Draw the symbol being moved, if any, over everything else in the survey. */
-    protected void drawSymbolBeingMoved(Canvas canvas) {
-        moveSymbolTool.draw(canvas);
+    /**
+     * Draw anything showing what the tool in use is in the middle of doing, over the survey. While
+     * a pinch or pan interrupts a tool, that tool's feedback stays.
+     */
+    protected void drawToolFeedback(Canvas canvas) {
+        ToolHandler handler = sketchToolsToHandlers.get(state.getUnderlyingSketchTool());
+        if (handler != null) {
+            handler.drawFeedback(canvas);
+        }
     }
 
     private void drawSurvey(Canvas canvas, Survey survey, Space<Coord2D> projection, int alpha) {

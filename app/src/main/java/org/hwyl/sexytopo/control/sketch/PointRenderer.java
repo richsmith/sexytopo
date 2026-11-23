@@ -8,6 +8,7 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.util.SparseArray;
 import androidx.core.content.ContextCompat;
+import java.util.function.Supplier;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
@@ -28,7 +29,7 @@ class PointRenderer {
     // one colour filter per colour used, so symbols don't each need a new one on every frame
     private final SparseArray<PorterDuffColorFilter> colourFilters = new SparseArray<>();
 
-    private SymbolDetail hiddenSymbol = null;
+    private Supplier<SymbolDetail> hiddenSymbol = () -> null;
 
     PointRenderer(Viewport viewport) {
         this.viewport = viewport;
@@ -80,17 +81,21 @@ class PointRenderer {
     }
 
     private void drawSymbols(Canvas canvas, Sketch sketch, int alpha, boolean isDarkModeActive) {
+        SymbolDetail hidden = hiddenSymbol.get();
         for (SymbolDetail symbolDetail : sketch.getSymbolDetails()) {
-            if (symbolDetail == hiddenSymbol || !viewport.couldBeVisible(symbolDetail)) {
+            if (symbolDetail == hidden || !viewport.couldBeVisible(symbolDetail)) {
                 continue;
             }
             drawSymbol(canvas, symbolDetail, alpha, isDarkModeActive);
         }
     }
 
-    /** Leave a symbol out when drawing its sketch, e.g. while it's drawn elsewhere being moved. */
-    void setHiddenSymbol(SymbolDetail symbolDetail) {
-        this.hiddenSymbol = symbolDetail;
+    /**
+     * Where to find a symbol to leave out when drawing its sketch, e.g. while it's drawn elsewhere
+     * being moved. It gives null when there's nothing to leave out.
+     */
+    void setHiddenSymbol(Supplier<SymbolDetail> hiddenSymbol) {
+        this.hiddenSymbol = hiddenSymbol;
     }
 
     void drawSymbol(Canvas canvas, SymbolDetail symbolDetail, int alpha, boolean isDarkModeActive) {
