@@ -228,6 +228,7 @@
     <string name="sketch_position_cross_section_instruction">Seleziona dove disegnare la sezione trasversale</string>
     <string name="sketch_rotate_cross_section_instruction">Trascina dalla stazione per impostare la direzione della sezione</string>
     <string name="sketch_symbol_orientation_education">Trascina per impostare la direzione del simbolo</string>
+    <string name="sketch_move_detail_instruction">Trascina per riposizionare</string>
     <string name="sketch_text_hint">Inserisci testo</string>
 
     <!-- Table view -->

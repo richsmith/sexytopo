@@ -558,10 +558,10 @@ public class Sketch extends Shape {
         return recoloured;
     }
 
-    /** Moves a symbol by the given offset, as a single undoable operation. */
-    public SymbolDetail moveSymbolDetail(SymbolDetail symbolDetail, Coord2D offset) {
-        SymbolDetail moved = symbolDetail.translate(offset);
-        deleteDetail(symbolDetail, Collections.singletonList((SketchDetail) moved));
+    /** Moves a symbol or piece of text by the given offset, as a single undoable operation. */
+    public SketchDetail moveDetail(SinglePositionDetail detail, Coord2D offset) {
+        SketchDetail moved = detail.translate(offset);
+        deleteDetail(detail, Collections.singletonList(moved));
         return moved;
     }
 

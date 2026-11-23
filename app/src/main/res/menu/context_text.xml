@@ -7,11 +7,18 @@
         android:title="@string/symbol_text"
         android:enabled="false"/>
 
-    <group android:id="@+id/group_text_actions">
+    <!-- Edit and Move separated by divider -->
+    <group android:id="@+id/group_text_edit">
         <item
             android:id="@+id/action_edit_text"
             android:title="@string/edit"/>
 
+        <item
+            android:id="@+id/action_move_text"
+            android:title="@string/move"/>
+    </group>
+
+    <group android:id="@+id/group_text_actions">
         <!-- Populated from BrushColour -->
         <item
             android:id="@+id/menu_colour"

@@ -5,6 +5,7 @@ import static org.hwyl.sexytopo.control.sketch.ScreenUnits.dpToPixels;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.RectF;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 
@@ -70,17 +71,26 @@ final class CanvasShapes {
      * as for the active station.
      */
     static void drawHighlightBrackets(Canvas canvas, float x, float y, float size, Paint paint) {
+        float half = size / 2;
+        drawHighlightBrackets(canvas, new RectF(x - half, y - half, x + half, y + half), paint);
+    }
 
-        float gap = size / 3f;
-        float topY = y - (size / 2);
-        float bottomY = y + (size / 2);
-        float leftX = x - (size / 2);
-        float rightX = x + (size / 2);
+    /**
+     * Draws the four corners of a rectangle on the view, to highlight what's in it. Each corner
+     * reaches a third of the way along the shorter side.
+     */
+    static void drawHighlightBrackets(Canvas canvas, RectF box, Paint paint) {
 
-        float innerLeft = leftX + ((size - gap) / 2);
-        float innerRight = innerLeft + gap;
-        float innerTop = topY + ((size - gap) / 2);
-        float innerBottom = innerTop + gap;
+        float arm = Math.min(box.width(), box.height()) / 3f;
+        float topY = box.top;
+        float bottomY = box.bottom;
+        float leftX = box.left;
+        float rightX = box.right;
+
+        float innerLeft = leftX + arm;
+        float innerRight = rightX - arm;
+        float innerTop = topY + arm;
+        float innerBottom = bottomY - arm;
 
         Path corners = new Path();
 

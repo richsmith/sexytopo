@@ -228,6 +228,7 @@
     <string name="sketch_position_cross_section_instruction">Wybierz miejsce narysowania przekroju</string>
     <string name="sketch_rotate_cross_section_instruction">Przeciągnij od stacji, aby ustawić kierunek przekroju</string>
     <string name="sketch_symbol_orientation_education">Przeciągnij, aby ustawić kierunek symbolu</string>
+    <string name="sketch_move_detail_instruction">Przeciągnij, aby przenieść</string>
     <string name="sketch_text_hint">Wprowadź tekst</string>
 
     <!-- Table view -->

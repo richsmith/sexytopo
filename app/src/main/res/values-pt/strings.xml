@@ -228,6 +228,7 @@
     <string name="sketch_position_cross_section_instruction">Selecionar onde desenhar a secção transversal</string>
     <string name="sketch_rotate_cross_section_instruction">Arraste a partir da estação para definir a direção da secção</string>
     <string name="sketch_symbol_orientation_education">Arrastar para definir a direção do símbolo</string>
+    <string name="sketch_move_detail_instruction">Arrastar para reposicionar</string>
     <string name="sketch_text_hint">Introduzir texto</string>
 
     <!-- Table view -->

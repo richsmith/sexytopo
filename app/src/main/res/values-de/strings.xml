@@ -228,6 +228,7 @@
     <string name="sketch_position_cross_section_instruction">Ort zum Zeichnen eines Querschnitts auswählen</string>
     <string name="sketch_rotate_cross_section_instruction">Von der Station ziehen, um die Querschnittsrichtung festzulegen</string>
     <string name="sketch_symbol_orientation_education"> Ziehen, um die Richtung des Symbols festzulegen</string>
+    <string name="sketch_move_detail_instruction">Ziehen, um neu zu positionieren</string>
     <string name="sketch_text_hint">Text eingeben</string>
 
     <!--  Table view  -->
