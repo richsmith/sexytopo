@@ -60,13 +60,13 @@ class OverlayRenderer {
     }
 
     void drawGrid(Canvas canvas, int width, int height) {
-        float viewOffsetX = viewport.getOffsetX();
-        float viewOffsetY = viewport.getOffsetY();
-        float viewScale = viewport.getScale();
-
         if (!SketchPreferences.Toggle.SHOW_GRID.isOn()) {
             return;
         }
+
+        float viewOffsetX = viewport.getOffsetX();
+        float viewOffsetY = viewport.getOffsetY();
+        float viewScale = viewport.getScale();
 
         int tickSizeInMetres = getMinorGridBoxSize();
         int numberTicksJustBeforeViewpointOffsetX = (int) (viewOffsetX / tickSizeInMetres);
