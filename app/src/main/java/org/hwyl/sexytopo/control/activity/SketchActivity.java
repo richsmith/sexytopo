@@ -39,6 +39,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import org.apache.commons.lang3.ArrayUtils;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
+import org.hwyl.sexytopo.control.sketch.CompassView;
 import org.hwyl.sexytopo.control.sketch.SketchView;
 import org.hwyl.sexytopo.control.table.LegDialogs;
 import org.hwyl.sexytopo.control.util.SketchPreferences;
@@ -94,6 +95,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
             ArrayUtils.addAll(SKETCH_BUTTON_IDS, CONTROL_BUTTON_IDS);
 
     private SketchView sketchView;
+    private CompassView compassView;
 
     private SensorManager sensorManager;
     private Sensor rotationSensor;
@@ -149,6 +151,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
 
         sketchView = findViewById(R.id.sketchView);
         sketchView.setActivity(this);
+        compassView = findViewById(R.id.compassView);
 
         // Needs to be threaded so it is only run once we know height and width
         sketchView.post(this::setViewLocation);
@@ -164,15 +167,12 @@ public abstract class SketchActivity extends SurveyEditorActivity
     protected void onResume() {
         super.onResume();
 
-        if (SketchPreferences.Toggle.SHOW_COMPASS.isOn()) {
-            registerCompassSensor();
-        }
-
         registerReceivers();
         syncWithSurvey();
 
         intialiseActivity();
         initialiseSketchView();
+        initialiseCompass();
         initialiseSymbolToolbar();
         initialiseLineTypeToolbar();
         initialiseAreaTypeToolbar();
@@ -185,6 +185,24 @@ public abstract class SketchActivity extends SurveyEditorActivity
         super.onPause();
         unregisterCompassSensor();
         unregisterReceivers();
+    }
+
+    private void initialiseCompass() {
+        compassView.initialise();
+        showOrHideCompass();
+    }
+
+    /**
+     * Show the compass if it's switched on and the view has one, listening to the sensor only while
+     * it's shown.
+     */
+    private void showOrHideCompass() {
+        boolean isShown = SketchPreferences.Toggle.SHOW_COMPASS.isOn() && sketchView.hasCompass();
+        compassView.setVisibility(isShown ? View.VISIBLE : View.GONE);
+        unregisterCompassSensor();
+        if (isShown) {
+            registerCompassSensor();
+        }
     }
 
     private void registerCompassSensor() {
@@ -230,7 +248,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
             float[] orientation = new float[3];
             SensorManager.getOrientation(remapped, orientation);
             float azimuthDeg = (float) Math.toDegrees(orientation[0]);
-            sketchView.setCompassAzimuth(azimuthDeg);
+            compassView.setAzimuth(azimuthDeg);
         }
     }
 
@@ -412,12 +430,7 @@ public abstract class SketchActivity extends SurveyEditorActivity
         } else if (itemId == R.id.buttonShowCompass) {
             boolean turningOn = !item.isChecked();
             SketchPreferences.Toggle.SHOW_COMPASS.set(turningOn);
-            if (turningOn) {
-                registerCompassSensor();
-            } else {
-                unregisterCompassSensor();
-            }
-            sketchView.invalidate();
+            showOrHideCompass();
             return true;
         } else if (itemId == R.id.buttonFadeNonActive) {
             SketchPreferences.Toggle.FADE_NON_ACTIVE.set(!item.isChecked());

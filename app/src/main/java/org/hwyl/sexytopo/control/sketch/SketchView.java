@@ -185,13 +185,6 @@ public class SketchView extends View {
         overlays.setStats(surveyLength, surveyHeight);
     }
 
-    public void setCompassAzimuth(float degrees) {
-        overlays.setCompassAzimuth(degrees);
-        if (SketchPreferences.Toggle.SHOW_COMPASS.isOn() && isCompassShown()) {
-            invalidate();
-        }
-    }
-
     // ********** Tools **********
 
     public void setSketchTool(SketchTool sketchTool) {
@@ -407,7 +400,6 @@ public class SketchView extends View {
         drawSurvey(canvas);
         drawToolFeedback(canvas);
         drawLegend(canvas);
-        drawCompass(canvas);
         drawHotCorners(canvas);
         drawDebuggingInfo(canvas);
 
@@ -500,17 +492,11 @@ public class SketchView extends View {
     }
 
     /**
-     * Whether to draw the compass, which turns to show which way the device is facing. That only
-     * means something in a view drawn with north at the top.
+     * Whether this view can have a compass, which turns to show which way the device is facing.
+     * That only means something in a view drawn with north at the top.
      */
-    protected boolean isCompassShown() {
+    public boolean hasCompass() {
         return state.getProjectionType() == Projection2D.PLAN;
-    }
-
-    protected void drawCompass(Canvas canvas) {
-        if (isCompassShown()) {
-            overlays.drawCompass(canvas, getHeight());
-        }
     }
 
     private void drawHotCorners(Canvas canvas) {

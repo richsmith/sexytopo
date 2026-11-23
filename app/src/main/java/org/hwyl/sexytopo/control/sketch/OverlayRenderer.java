@@ -8,7 +8,6 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import androidx.core.content.ContextCompat;
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.geometry.Projection2D;
@@ -17,7 +16,7 @@ import org.hwyl.sexytopo.model.sketch.SketchTool;
 
 /**
  * Draws what sits on the screen rather than in the cave: the grid behind the survey, and in front
- * of it the legend (survey name, length, depth and a scale bar), the compass and debugging info.
+ * of it the legend (survey name, length, depth and a scale bar) and debugging info.
  */
 class OverlayRenderer {
 
@@ -35,7 +34,6 @@ class OverlayRenderer {
 
     private float surveyLength = 0;
     private float surveyHeight = 0;
-    private float compassAzimuthDegrees = 0f;
 
     OverlayRenderer(Viewport viewport, SketchState state) {
         this.viewport = viewport;
@@ -50,13 +48,7 @@ class OverlayRenderer {
         int gridColour = ContextCompat.getColor(context, R.color.grid);
         gridPaint.setColor(gridColour);
 
-        int legendColour = ContextCompat.getColor(context, R.color.legend);
-        legendPaint.setColor(legendColour);
-        float legendSizeSp = GeneralPreferences.getLegendFontSizeSp();
-        float legendSizePixels = ScreenUnits.spToPixels(context, legendSizeSp);
-        float strokeWidthPixels = ScreenUnits.spToPixels(context, legendSizeSp * 0.1f);
-        legendPaint.setStrokeWidth(strokeWidthPixels);
-        legendPaint.setTextSize(legendSizePixels);
+        SketchPaints.setUpLegendPaint(context, legendPaint);
 
         legendTickSizePx = dpToPixels(LEGEND_TICK_SIZE_DP);
     }
@@ -65,11 +57,6 @@ class OverlayRenderer {
     void setStats(float surveyLength, float surveyHeight) {
         this.surveyLength = surveyLength;
         this.surveyHeight = surveyHeight;
-    }
-
-    /** Which way the device is facing, for the compass. */
-    void setCompassAzimuth(float degrees) {
-        compassAzimuthDegrees = degrees;
     }
 
     void drawGrid(Canvas canvas, int width, int height) {
@@ -149,42 +136,6 @@ class OverlayRenderer {
         legendPaint.setStyle(Paint.Style.FILL);
         String scaleLabel = minorGridSize + "m";
         canvas.drawText(scaleLabel, x + scaleWidth + 0.3f * legendSize, scaleY, legendPaint);
-    }
-
-    /** Draw the compass, turned to show which way the device is facing, if it's switched on. */
-    void drawCompass(Canvas canvas, int height) {
-        if (!SketchPreferences.Toggle.SHOW_COMPASS.isOn()) {
-            return;
-        }
-
-        float textSize = legendPaint.getTextSize();
-        Paint.FontMetrics metrics = legendPaint.getFontMetrics();
-        float textHeight = metrics.descent - metrics.ascent;
-        float offsetX = textSize * 1.25f; // matches legend x
-        float arrowLength = textSize * 2.5f;
-        float arrowHeadSize = textSize * 0.6f;
-        float cx = offsetX + arrowLength / 2f + textSize;
-        float scaleBarY = height - textSize * 4f;
-        float cy = scaleBarY - arrowLength / 2f - textHeight;
-
-        canvas.save();
-        canvas.rotate(-compassAzimuthDegrees, cx, cy);
-
-        float tipY = cy - arrowLength / 2f;
-        float tailY = cy + arrowLength / 2f;
-
-        legendPaint.setStyle(Paint.Style.STROKE);
-        Path arrowPath = new Path();
-        arrowPath.moveTo(cx - arrowHeadSize, tipY + arrowHeadSize);
-        arrowPath.lineTo(cx, tipY);
-        arrowPath.lineTo(cx + arrowHeadSize, tipY + arrowHeadSize);
-        arrowPath.moveTo(cx, tipY);
-        arrowPath.lineTo(cx, tailY);
-        canvas.drawPath(arrowPath, legendPaint);
-        legendPaint.setStyle(Paint.Style.FILL);
-        canvas.drawText("N", cx - textSize * 0.35f, tipY - textSize * 0.2f, legendPaint);
-
-        canvas.restore();
     }
 
     /**

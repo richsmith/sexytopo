@@ -29,6 +29,17 @@ final class SketchPaints {
         paint.setColor(ContextCompat.getColor(context, R.color.activeStationHighlight));
     }
 
+    /**
+     * Set a paint up to draw what sits on the screen rather than in the cave, such as the legend
+     * and the compass: in the legend colour, at the legend font size.
+     */
+    static void setUpLegendPaint(Context context, Paint paint) {
+        paint.setColor(ContextCompat.getColor(context, R.color.legend));
+        float legendSizeSp = GeneralPreferences.getLegendFontSizeSp();
+        paint.setTextSize(ScreenUnits.spToPixels(context, legendSizeSp));
+        paint.setStrokeWidth(ScreenUnits.spToPixels(context, legendSizeSp * 0.1f));
+    }
+
     /** Turn anti-aliasing on or off for each paint, as the user's preference says. */
     static void applyAntiAliasPreference(Paint... paints) {
         boolean applyAntiAlias = GeneralPreferences.isAntialiasingModeOn();

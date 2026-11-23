@@ -27,11 +27,26 @@
         android:orientation="vertical"
         android:background="@color/lightBackground">
 
-        <org.hwyl.sexytopo.control.sketch.CrossSectionView
-            android:id="@+id/sketchView"
+        <!-- the compass sits over the sketch, as a view of its own so turning it doesn't
+             redraw the sketch -->
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"/>
+            android:layout_weight="1">
+
+            <org.hwyl.sexytopo.control.sketch.CrossSectionView
+                android:id="@+id/sketchView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <org.hwyl.sexytopo.control.sketch.CompassView
+                android:id="@+id/compassView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:importantForAccessibility="no"
+                android:visibility="gone"/>
+
+        </FrameLayout>
 
         <FrameLayout
             android:id="@+id/lineTypeToolbar"
