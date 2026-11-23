@@ -55,8 +55,8 @@ class SketchRenderer {
     }
 
     /**
-     * Tracks a point detail to leave out when drawing a sketch, e.g. a detail currently
-     * being moved. It gives null when there's nothing to leave out.
+     * Tracks a point detail to leave out when drawing a sketch, e.g. a detail currently being
+     * moved. It gives null when there's nothing to leave out.
      */
     void setHiddenDetail(Supplier<SinglePositionDetail> hiddenDetail) {
         pointRenderer.setHiddenDetail(hiddenDetail);

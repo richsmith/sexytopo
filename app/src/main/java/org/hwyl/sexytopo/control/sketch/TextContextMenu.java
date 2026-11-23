@@ -9,9 +9,7 @@ import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.TextDetail;
 
-/**
- * The menu shown on long-pressing some text.
- */
+/** The menu shown on long-pressing some text. */
 final class TextContextMenu {
 
     private TextContextMenu() {}
