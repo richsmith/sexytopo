@@ -186,7 +186,7 @@
     <string name="sketch_toolbar_redo">Wiederholen</string>
     <string name="sketch_toolbar_zoom_in">Vergrößern</string>
     <string name="sketch_toolbar_zoom_out">Verkleinern</string>
-    <string name="sketch_toolbar_colour_main">Hauptfarbe</string>
+    <string name="sketch_toolbar_colour_main">Standard</string>
     <string name="sketch_toolbar_colour_brown">Braun</string>
     <string name="sketch_toolbar_colour_grey">Grau</string>
     <string name="sketch_toolbar_colour_red">Rot</string>

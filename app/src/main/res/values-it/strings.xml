@@ -186,7 +186,7 @@
     <string name="sketch_toolbar_redo">Ripeti</string>
     <string name="sketch_toolbar_zoom_in">Ingrandisci</string>
     <string name="sketch_toolbar_zoom_out">Riduci</string>
-    <string name="sketch_toolbar_colour_main">Colore principale</string>
+    <string name="sketch_toolbar_colour_main">Predefinito</string>
     <string name="sketch_toolbar_colour_brown">Marrone</string>
     <string name="sketch_toolbar_colour_grey">Grigio</string>
     <string name="sketch_toolbar_colour_red">Rosso</string>

@@ -186,7 +186,7 @@
     <string name="sketch_toolbar_redo">Rehacer</string>
     <string name="sketch_toolbar_zoom_in">Acercar</string>
     <string name="sketch_toolbar_zoom_out">Alejar</string>
-    <string name="sketch_toolbar_colour_main">Color principal</string>
+    <string name="sketch_toolbar_colour_main">Predeterminado</string>
     <string name="sketch_toolbar_colour_brown">Marrón</string>
     <string name="sketch_toolbar_colour_grey">Gris</string>
     <string name="sketch_toolbar_colour_red">Rojo</string>

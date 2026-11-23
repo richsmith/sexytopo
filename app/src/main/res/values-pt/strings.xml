@@ -186,7 +186,7 @@
     <string name="sketch_toolbar_redo">Refazer</string>
     <string name="sketch_toolbar_zoom_in">Ampliar</string>
     <string name="sketch_toolbar_zoom_out">Reduzir</string>
-    <string name="sketch_toolbar_colour_main">Cor principal</string>
+    <string name="sketch_toolbar_colour_main">Padrão</string>
     <string name="sketch_toolbar_colour_brown">Castanho</string>
     <string name="sketch_toolbar_colour_grey">Cinzento</string>
     <string name="sketch_toolbar_colour_red">Vermelho</string>

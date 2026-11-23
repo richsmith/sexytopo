@@ -211,7 +211,7 @@
     <string name="sketch_toolbar_redo">Redo</string>
     <string name="sketch_toolbar_zoom_in">Zoom in</string>
     <string name="sketch_toolbar_zoom_out">Zoom out</string>
-    <string name="sketch_toolbar_colour_main">Main colour</string>
+    <string name="sketch_toolbar_colour_main">Default</string>
     <string name="sketch_toolbar_colour_brown">Brown</string>
     <string name="sketch_toolbar_colour_grey">Grey</string>
     <string name="sketch_toolbar_colour_red">Red</string>

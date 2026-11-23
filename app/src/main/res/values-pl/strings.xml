@@ -186,7 +186,7 @@
     <string name="sketch_toolbar_redo">Ponów</string>
     <string name="sketch_toolbar_zoom_in">Powiększ</string>
     <string name="sketch_toolbar_zoom_out">Pomniejsz</string>
-    <string name="sketch_toolbar_colour_main">Kolor główny</string>
+    <string name="sketch_toolbar_colour_main">Domyślny</string>
     <string name="sketch_toolbar_colour_brown">Brązowy</string>
     <string name="sketch_toolbar_colour_grey">Szary</string>
     <string name="sketch_toolbar_colour_red">Czerwony</string>

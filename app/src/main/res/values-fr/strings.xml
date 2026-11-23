@@ -186,7 +186,7 @@
     <string name="sketch_toolbar_redo">Refaire</string>
     <string name="sketch_toolbar_zoom_in">Zoom grossissant</string>
     <string name="sketch_toolbar_zoom_out">Zoom dégrossissant</string>
-    <string name="sketch_toolbar_colour_main">Couleur principale</string>
+    <string name="sketch_toolbar_colour_main">Par défaut</string>
     <string name="sketch_toolbar_colour_brown">Marron</string>
     <string name="sketch_toolbar_colour_grey">Gris</string>
     <string name="sketch_toolbar_colour_red">Rouge</string>
