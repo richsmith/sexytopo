@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import androidx.annotation.NonNull;
-import java.util.ArrayList;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.sketch.CrossSectionLabels;
 import org.hwyl.sexytopo.control.sketch.CrossSectionView;
@@ -12,7 +11,6 @@ import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.geometry.Projection2D;
 import org.hwyl.sexytopo.model.geometry.Space;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -147,9 +145,7 @@ public class CrossSectionActivity extends SketchActivity {
             return;
         }
 
-        Sketch persistedSubSketch = new Sketch();
-        persistedSubSketch.setPathDetails(
-                new ArrayList<PathDetail>(workingSketch.getPathDetails()));
+        Sketch persistedSubSketch = new Sketch(workingSketch);
 
         // Mutate the live detail in place rather than swapping in a new instance: this keeps the
         // detail's identity stable so the plan's undo/redo stacks don't end up referencing a
