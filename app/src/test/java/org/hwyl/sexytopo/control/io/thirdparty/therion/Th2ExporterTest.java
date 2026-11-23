@@ -263,7 +263,7 @@ public class Th2ExporterTest {
     }
 
     /** The regular expression's groups for every line of the th2 that it matches. */
-    private static List<List<String>> match(String th2, Pattern pattern) {
+    static List<List<String>> match(String th2, Pattern pattern) {
         List<List<String>> matches = new ArrayList<>();
         for (String line : th2.split("\n")) {
             Matcher matcher = pattern.matcher(line);

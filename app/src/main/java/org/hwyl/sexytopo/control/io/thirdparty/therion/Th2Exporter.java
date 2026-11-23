@@ -203,6 +203,9 @@ public class Th2Exporter {
             startLine = startLine + "\n" + copyrightLine.substring(0, copyrightLine.length() - 1);
         }
         lines.add(startLine);
+        // Drawn where the XVI background shows the cross-section, so it lines up in xtherion
+        Placement placement = new Placement(xsDetail.getPosition(), xsScale, scale);
+        lines.addAll(getSketchCommands(xsDetail.getSketch(), placement, name + "_"));
         lines.add("endscrap");
 
         return TextTools.join("\n\n", lines);
@@ -415,60 +418,68 @@ public class Th2Exporter {
         }
 
         if (includeSketchContent) {
-            if (GeneralPreferences.isXviExportTextEnabled()) {
-                for (TextDetail textDetail : sketch.getTextDetails()) {
-                    Coord2D coord = textDetail.getPosition().scale(scale).flipVertically();
-                    commands.add(
-                            getPoint(
-                                    coord.x,
-                                    coord.y,
-                                    "label",
-                                    "-text \"",
-                                    textDetail.getText(),
-                                    "\" -scale",
-                                    getScale(textDetail)));
+            commands.addAll(getSketchCommands(sketch, new Placement(scale), ""));
+        }
+
+        return commands;
+    }
+
+    /**
+     * The text, lines, areas and symbols of a sketch. Area border ids start with idPrefix, so those
+     * of different scraps don't clash.
+     */
+    private static List<String> getSketchCommands(
+            Sketch sketch, Placement placement, String idPrefix) {
+        List<String> commands = new ArrayList<>();
+
+        if (GeneralPreferences.isXviExportTextEnabled()) {
+            for (TextDetail textDetail : sketch.getTextDetails()) {
+                Coord2D coord = placement.toCanvas(textDetail.getPosition());
+                commands.add(
+                        getPoint(
+                                coord.x,
+                                coord.y,
+                                "label",
+                                "-text \"",
+                                textDetail.getText(),
+                                "\" -scale",
+                                getScale(textDetail)));
+            }
+        }
+
+        // semantic lines (walls etc.) can be exported as first-class Therion lines on top
+        // of their appearance in the XVI tracing background
+        if (GeneralPreferences.isTherionLineExportEnabled()) {
+            for (PathDetail pathDetail : sketch.getPathDetails()) {
+                if (pathDetail.getLineType().isSemantic()) {
+                    commands.add(getLine(pathDetail, placement));
                 }
             }
+        }
 
-            // semantic lines (walls etc.) can be exported as first-class Therion lines on top
-            // of their appearance in the XVI tracing background
-            if (GeneralPreferences.isTherionLineExportEnabled()) {
-                for (PathDetail pathDetail : sketch.getPathDetails()) {
-                    if (pathDetail.getLineType().isSemantic()) {
-                        commands.add(getLine(pathDetail, scale));
-                    }
+        List<AreaDetail> areaDetails = sketch.getAreaDetails();
+        for (int i = 0; i < areaDetails.size(); i++) {
+            commands.add(getArea(areaDetails.get(i), idPrefix, i + 1, placement));
+        }
+
+        if (GeneralPreferences.isXviExportSymbolsEnabled()) {
+            for (SymbolDetail symbolDetail : sketch.getSymbolDetails()) {
+                Coord2D coord = placement.toCanvas(symbolDetail.getPosition());
+                Symbol symbol = symbolDetail.getSymbol();
+
+                List<String> args = new ArrayList<>();
+                args.add("-scale " + getScale(symbolDetail));
+                if (symbol.isDirectional()) {
+                    args.add("-orientation " + symbolDetail.getAngle());
                 }
-            }
-
-            List<AreaDetail> areaDetails = sketch.getAreaDetails();
-            for (int i = 0; i < areaDetails.size(); i++) {
-                commands.add(getArea(areaDetails.get(i), i + 1, scale));
-            }
-
-            if (GeneralPreferences.isXviExportSymbolsEnabled()) {
-                for (SymbolDetail symbolDetail : sketch.getSymbolDetails()) {
-                    Coord2D coord = symbolDetail.getPosition().scale(scale).flipVertically();
-                    Symbol symbol = symbolDetail.getSymbol();
-
-                    List<String> args = new ArrayList<>();
-                    args.add("-scale " + getScale(symbolDetail));
-                    if (symbol.isDirectional()) {
-                        args.add("-orientation " + symbolDetail.getAngle());
-                    }
-                    commands.add(
-                            getPoint(
-                                    coord.x,
-                                    coord.y,
-                                    symbolDetail.getSymbol().getTherionName(),
-                                    args));
-                }
+                commands.add(getPoint(coord.x, coord.y, symbol.getTherionName(), args));
             }
         }
 
         return commands;
     }
 
-    private static String getLine(PathDetail pathDetail, float scale) {
+    private static String getLine(PathDetail pathDetail, Placement placement) {
         List<String> lines = new ArrayList<>();
         LineType lineType = pathDetail.getLineType();
         lines.add("line " + lineType.getTherionName());
@@ -480,13 +491,13 @@ public class Th2Exporter {
 
         // Therion requires a slope's l-size (its hachure length) on at least one point; it
         // interpolates along the line from there
-        float lineSize = lineType.getTherionLineSize() * scale;
+        float lineSize = lineType.getTherionLineSize() * placement.unitsPerMetre;
 
         if (curves.isEmpty()) {
             // each point joined to the last by a straight segment
             boolean isFirstPoint = true;
             for (Coord2D point : pathDetail.getPath()) {
-                lines.add("  " + toTh2(point, scale));
+                lines.add("  " + toTh2(point, placement));
                 if (isFirstPoint && lineSize > 0) {
                     lines.add("  l-size " + lineSize);
                 }
@@ -494,18 +505,18 @@ public class Th2Exporter {
             }
         } else {
             // the first point on its own, then a row per curve: its two control points and end
-            lines.add("  " + toTh2(curves.get(0).start, scale));
+            lines.add("  " + toTh2(curves.get(0).start, placement));
             if (lineSize > 0) {
                 lines.add("  l-size " + lineSize);
             }
             for (BezierFitter.CubicBezier curve : curves) {
                 lines.add(
                         "  "
-                                + toTh2(curve.control1, scale)
+                                + toTh2(curve.control1, placement)
                                 + " "
-                                + toTh2(curve.control2, scale)
+                                + toTh2(curve.control2, placement)
                                 + " "
-                                + toTh2(curve.end, scale));
+                                + toTh2(curve.end, placement));
             }
         }
 
@@ -523,8 +534,8 @@ public class Th2Exporter {
         return Math.min(Math.max(size / 200, MIN_CURVE_TOLERANCE), MAX_CURVE_TOLERANCE);
     }
 
-    private static String toTh2(Coord2D point, float scale) {
-        Coord2D coord = point.scale(scale).flipVertically();
+    private static String toTh2(Coord2D point, Placement placement) {
+        Coord2D coord = placement.toCanvas(point);
         return coord.x + " " + coord.y;
     }
 
@@ -534,7 +545,8 @@ public class Th2Exporter {
      * construction aids, not drawn walls. Therion treats the borders after the first as holes, so
      * an area with a hole maps directly onto this form.
      */
-    private static String getArea(AreaDetail areaDetail, int index, float scale) {
+    private static String getArea(
+            AreaDetail areaDetail, String idPrefix, int index, Placement placement) {
         String therionName = areaDetail.getAreaType().getTherionName();
 
         List<String> lines = new ArrayList<>();
@@ -543,17 +555,19 @@ public class Th2Exporter {
         List<List<Coord2D>> contours = areaDetail.getContours();
         for (int i = 0; i < contours.size(); i++) {
             // one id per contour: water1, water1b, water1c, ...
-            String id = therionName + index + (i == 0 ? "" : Character.toString((char) ('a' + i)));
+            String id =
+                    idPrefix
+                            + therionName
+                            + index
+                            + (i == 0 ? "" : Character.toString((char) ('a' + i)));
             ids.add(id);
             lines.add("line border:invisible -id " + id + " -close on");
             List<Coord2D> contour = contours.get(i);
             for (Coord2D point : contour) {
-                Coord2D coord = point.scale(scale).flipVertically();
-                lines.add("  " + coord.x + " " + coord.y);
+                lines.add("  " + toTh2(point, placement));
             }
             // xtherion expects the start point repeated to close the loop
-            Coord2D first = contour.get(0).scale(scale).flipVertically();
-            lines.add("  " + first.x + " " + first.y);
+            lines.add("  " + toTh2(contour.get(0), placement));
             lines.add("endline");
         }
 
@@ -563,6 +577,33 @@ public class Th2Exporter {
         }
         lines.add("endarea");
         return TextTools.join("\n", lines);
+    }
+
+    /**
+     * Where sketch content goes on the th2 canvas. A cross-section's sketch is drawn about the
+     * cross-section's position, enlarged by the cross-section scale, as it is in the XVI.
+     */
+    private static final class Placement {
+        private final Coord2D origin;
+        private final float detailScale;
+        private final float scale;
+        private final float unitsPerMetre;
+
+        Placement(float scale) {
+            this(Coord2D.ORIGIN, 1, scale);
+        }
+
+        Placement(Coord2D origin, float detailScale, float scale) {
+            this.origin = origin;
+            this.detailScale = detailScale;
+            this.scale = scale;
+            this.unitsPerMetre = detailScale * scale;
+        }
+
+        /** Survey y is down relative to the Therion canvas, so it is flipped. */
+        Coord2D toCanvas(Coord2D point) {
+            return origin.plus(point.scale(detailScale)).scale(scale).flipVertically();
+        }
     }
 
     private static String getPoint(float x, float y, String name, String... args) {
