@@ -22,6 +22,7 @@ public enum SketchTool {
     POSITION_CROSS_SECTION(-1),
     ROTATE_CROSS_SECTION(-1),
     MOVE_CROSS_SECTION(-1, MODAL),
+    MOVE_SYMBOL(-1),
     PINCH_TO_ZOOM(-1, MODAL),
     MODAL_MOVE(-1, MODAL);
 

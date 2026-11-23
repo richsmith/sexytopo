@@ -94,6 +94,8 @@ public class SketchView extends View {
     private final TextTool textTool = new TextTool(viewport, state, host);
     private final SymbolTool symbolTool = new SymbolTool(viewport, state, host, textTool);
     private final SelectTool selectTool = new SelectTool(state, selector, host);
+    private final MoveSymbolTool moveSymbolTool =
+            new MoveSymbolTool(viewport, state, sketchRenderer, host);
 
     // what each tool does with a touch; PINCH_TO_ZOOM has no entry, as the scale detector drives it
     private final Map<SketchTool, ToolHandler> sketchToolsToHandlers = createSketchToolMap();
@@ -111,6 +113,7 @@ public class SketchView extends View {
         handlers.put(SketchTool.POSITION_CROSS_SECTION, crossSections.positionTool);
         handlers.put(SketchTool.ROTATE_CROSS_SECTION, crossSections.rotateTool);
         handlers.put(SketchTool.MOVE_CROSS_SECTION, crossSections.moveTool);
+        handlers.put(SketchTool.MOVE_SYMBOL, moveSymbolTool);
         return handlers;
     }
 
@@ -135,6 +138,7 @@ public class SketchView extends View {
         overlays.initialise(getContext());
         hotCorners.initialise(getContext());
         crossSections.initialisePaints(getContext());
+        moveSymbolTool.initialise(getContext());
 
         isTwoFingerModeActive = GeneralPreferences.isTwoFingerModeActive();
     }
@@ -399,6 +403,7 @@ public class SketchView extends View {
         drawGrid(canvas);
         drawConnectedSurveys(canvas);
         drawSurvey(canvas);
+        drawSymbolBeingMoved(canvas);
         drawLegend(canvas);
         drawCompass(canvas);
         drawHotCorners(canvas);
@@ -416,6 +421,11 @@ public class SketchView extends View {
     /** Draw the survey being shown: its sketch, cross-sections, legs and stations. */
     protected void drawSurvey(Canvas canvas) {
         drawSurvey(canvas, state.getSurvey(), state.getProjection(), SOLID_ALPHA);
+    }
+
+    /** Draw the symbol being moved, if any, over everything else in the survey. */
+    protected void drawSymbolBeingMoved(Canvas canvas) {
+        moveSymbolTool.draw(canvas);
     }
 
     private void drawSurvey(Canvas canvas, Survey survey, Space<Coord2D> projection, int alpha) {
@@ -642,7 +652,13 @@ public class SketchView extends View {
                         SketchView.this, x, y, sketch, (AreaDetail) matchedDetail, onChanged);
             } else if (matchedDetail instanceof SymbolDetail) {
                 SymbolContextMenu.show(
-                        SketchView.this, x, y, sketch, (SymbolDetail) matchedDetail, onChanged);
+                        SketchView.this,
+                        x,
+                        y,
+                        sketch,
+                        (SymbolDetail) matchedDetail,
+                        onChanged,
+                        moveSymbolTool::start);
             } else if (matchedDetail instanceof TextDetail) {
                 TextContextMenu.show(
                         SketchView.this, x, y, sketch, (TextDetail) matchedDetail, onChanged);

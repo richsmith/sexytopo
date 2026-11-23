@@ -13,7 +13,6 @@ import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.Sketch;
-import org.hwyl.sexytopo.model.sketch.Symbol;
 import org.hwyl.sexytopo.model.sketch.SymbolDetail;
 import org.hwyl.sexytopo.model.sketch.TextDetail;
 
@@ -28,6 +27,8 @@ class PointRenderer {
 
     // one colour filter per colour used, so symbols don't each need a new one on every frame
     private final SparseArray<PorterDuffColorFilter> colourFilters = new SparseArray<>();
+
+    private SymbolDetail hiddenSymbol = null;
 
     PointRenderer(Viewport viewport) {
         this.viewport = viewport;
@@ -79,40 +80,45 @@ class PointRenderer {
     }
 
     private void drawSymbols(Canvas canvas, Sketch sketch, int alpha, boolean isDarkModeActive) {
-        float viewScale = viewport.getScale();
-
         for (SymbolDetail symbolDetail : sketch.getSymbolDetails()) {
-            if (!viewport.couldBeVisible(symbolDetail)) {
+            if (symbolDetail == hiddenSymbol || !viewport.couldBeVisible(symbolDetail)) {
                 continue;
             }
-            Coord2D location = viewport.toView(symbolDetail.getPosition());
+            drawSymbol(canvas, symbolDetail, alpha, isDarkModeActive);
+        }
+    }
 
-            Symbol symbol = symbolDetail.getSymbol();
+    /** Leave a symbol out when drawing its sketch, e.g. while it's drawn elsewhere being moved. */
+    void setHiddenSymbol(SymbolDetail symbolDetail) {
+        this.hiddenSymbol = symbolDetail;
+    }
 
-            int size = Math.round(symbolDetail.getSize() * viewScale);
-            if (size < 1) {
-                continue;
-            }
+    void drawSymbol(Canvas canvas, SymbolDetail symbolDetail, int alpha, boolean isDarkModeActive) {
+        Coord2D location = viewport.toView(symbolDetail.getPosition());
 
-            Drawable drawable = symbolDetail.getDrawable();
-            float offset = size / 2f;
-            int x = Math.round(location.x - offset), y = Math.round(location.y - offset);
-            drawable.setBounds(x, y, x + size, y + size);
-            drawable.setAlpha(alpha);
-            PorterDuffColorFilter colourFilter =
-                    getColourFilter(symbolDetail.getDrawColour(isDarkModeActive));
-            if (drawable.getColorFilter() != colourFilter) {
-                drawable.setColorFilter(colourFilter);
-            }
+        int size = Math.round(symbolDetail.getSize() * viewport.getScale());
+        if (size < 1) {
+            return;
+        }
 
-            if (symbol.isDirectional()) {
-                canvas.save();
-                canvas.rotate(symbolDetail.getAngle(), location.x, location.y);
-                drawable.draw(canvas);
-                canvas.restore();
-            } else {
-                drawable.draw(canvas);
-            }
+        Drawable drawable = symbolDetail.getDrawable();
+        float offset = size / 2f;
+        int x = Math.round(location.x - offset), y = Math.round(location.y - offset);
+        drawable.setBounds(x, y, x + size, y + size);
+        drawable.setAlpha(alpha);
+        PorterDuffColorFilter colourFilter =
+                getColourFilter(symbolDetail.getDrawColour(isDarkModeActive));
+        if (drawable.getColorFilter() != colourFilter) {
+            drawable.setColorFilter(colourFilter);
+        }
+
+        if (symbolDetail.getSymbol().isDirectional()) {
+            canvas.save();
+            canvas.rotate(symbolDetail.getAngle(), location.x, location.y);
+            drawable.draw(canvas);
+            canvas.restore();
+        } else {
+            drawable.draw(canvas);
         }
     }
 

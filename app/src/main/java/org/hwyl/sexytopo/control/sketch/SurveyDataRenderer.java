@@ -9,7 +9,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
@@ -104,11 +103,7 @@ class SurveyDataRenderer {
 
         iconPaint.setColorFilter(new PorterDuffColorFilter(stationColour, PorterDuff.Mode.SRC_IN));
 
-        highlightPaint.setStyle(Paint.Style.STROKE);
-        highlightPaint.setStrokeWidth(stationStrokeWidthPx * 1.25f);
-        int activeStationHighlightColor =
-                ContextCompat.getColor(context, R.color.activeStationHighlight);
-        highlightPaint.setColor(activeStationHighlightColor);
+        SketchPaints.setUpHighlightPaint(context, highlightPaint);
 
         // active legs/splays
         int legColour = ContextCompat.getColor(context, R.color.leg);
@@ -342,45 +337,7 @@ class SurveyDataRenderer {
     }
 
     private void highlightActiveStation(Canvas canvas, float x, float y) {
-
-        float diameter = stationCrossDiameterPx * 1.1f;
-        float gap = diameter / 3f;
-        float topY = y - (diameter / 2);
-        float bottomY = y + (diameter / 2);
-        float leftX = x - (diameter / 2);
-        float rightX = x + (diameter / 2);
-
-        float innerLeft = leftX + ((diameter - gap) / 2);
-        float innerRight = innerLeft + gap;
-        float innerTop = topY + ((diameter - gap) / 2);
-        float innerBottom = innerTop + gap;
-
-        // top-left corner
-        Path topLeft = new Path();
-        topLeft.moveTo(innerLeft, topY);
-        topLeft.lineTo(leftX, topY);
-        topLeft.lineTo(leftX, innerTop);
-        canvas.drawPath(topLeft, highlightPaint);
-
-        // top-right corner
-        Path topRight = new Path();
-        topRight.moveTo(innerRight, topY);
-        topRight.lineTo(rightX, topY);
-        topRight.lineTo(rightX, innerTop);
-        canvas.drawPath(topRight, highlightPaint);
-
-        // bottom-left corner
-        Path bottomLeft = new Path();
-        bottomLeft.moveTo(leftX, innerBottom);
-        bottomLeft.lineTo(leftX, bottomY);
-        bottomLeft.lineTo(innerLeft, bottomY);
-        canvas.drawPath(bottomLeft, highlightPaint);
-
-        // bottom-right corner
-        Path bottomRight = new Path();
-        bottomRight.moveTo(rightX, innerBottom);
-        bottomRight.lineTo(rightX, bottomY);
-        bottomRight.lineTo(innerRight, bottomY);
-        canvas.drawPath(bottomRight, highlightPaint);
+        CanvasShapes.drawHighlightBrackets(
+                canvas, x, y, stationCrossDiameterPx * 1.1f, highlightPaint);
     }
 }

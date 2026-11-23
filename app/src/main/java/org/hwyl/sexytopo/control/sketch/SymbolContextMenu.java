@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.PopupMenu;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.Sketch;
@@ -13,8 +14,8 @@ import org.hwyl.sexytopo.model.sketch.Symbol;
 import org.hwyl.sexytopo.model.sketch.SymbolDetail;
 
 /**
- * The menu shown on long-pressing a symbol, offering to swap it for another symbol, change its
- * colour or delete it. Each is a single undoable step.
+ * The menu shown on long-pressing a symbol, offering to move it, swap it for another symbol, change
+ * its colour or delete it. Each is a single undoable step.
  */
 final class SymbolContextMenu {
 
@@ -22,7 +23,8 @@ final class SymbolContextMenu {
 
     /**
      * Show the menu for a symbol at a point on the anchor view. onChanged is run after the symbol
-     * has been changed or deleted, so the view can redraw.
+     * has been changed or deleted, so the view can redraw. onMove is given the symbol if the user
+     * chooses to move it.
      */
     static void show(
             View anchorView,
@@ -30,7 +32,8 @@ final class SymbolContextMenu {
             int y,
             Sketch sketch,
             SymbolDetail symbolDetail,
-            Runnable onChanged) {
+            Runnable onChanged,
+            Consumer<SymbolDetail> onMove) {
         PopupMenu popup =
                 ContextMenuManager.createPopupMenuAt(anchorView.getContext(), anchorView, x, y);
         popup.inflate(R.menu.context_symbol);
@@ -59,6 +62,10 @@ final class SymbolContextMenu {
 
         popup.setOnMenuItemClickListener(
                 item -> {
+                    if (item.getItemId() == R.id.action_move_symbol) {
+                        onMove.accept(symbolDetail);
+                        return true;
+                    }
                     if (item.getItemId() == R.id.action_delete_symbol) {
                         sketch.deleteDetail(symbolDetail);
                         onChanged.run();

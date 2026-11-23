@@ -7,6 +7,13 @@
         android:title="@string/menu_symbol"
         android:enabled="false"/>
 
+    <!-- Move separated by divider -->
+    <group android:id="@+id/group_symbol_move">
+        <item
+            android:id="@+id/action_move_symbol"
+            android:title="@string/move"/>
+    </group>
+
     <group android:id="@+id/group_symbol_actions">
         <!-- Populated from Symbol -->
         <item

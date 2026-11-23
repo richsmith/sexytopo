@@ -129,6 +129,8 @@ Between `startGroupingDeletions` and `endGroupingDeletions`, each deletion is me
 - `svgFilename` — SVG asset used by the SVG exporter
 - `createDrawable()` — creates a mutable `Drawable` for rendering
 
+Long-pressing a symbol opens `SymbolContextMenu`, to move it, swap it for another symbol, change its colour or delete it. Move switches to the `MOVE_SYMBOL` tool (`MoveSymbolTool`), which highlights the symbol and moves it by however far the next drag goes, wherever that drag starts, so the finger needn't cover it. Lifting puts it down (`Sketch.moveSymbolDetail`, a delete-and-replace, so one undo step) and goes back to the tool in use before. A pinch or pan in between leaves the move waiting. While waiting, the symbol is left out of the normal rendering and drawn by the tool on top of everything, at its dragged position.
+
 ## CrossSectionDetail
 
 A `CrossSectionDetail` marks a position on the plan sketch where a cross-section view appears. It holds a reference to a `Station` and an angle. The actual cross-section geometry is **computed dynamically** at render time from the survey legs at that station — it is not stored in the sketch.

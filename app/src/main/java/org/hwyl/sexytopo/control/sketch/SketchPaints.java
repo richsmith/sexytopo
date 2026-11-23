@@ -3,6 +3,8 @@ package org.hwyl.sexytopo.control.sketch;
 import android.content.Context;
 import android.graphics.Paint;
 import android.util.TypedValue;
+import androidx.core.content.ContextCompat;
+import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 
 /**
@@ -15,7 +17,17 @@ final class SketchPaints {
     static final int SOLID_ALPHA = 0xff;
     static final int FADED_ALPHA = 0xff / 5;
 
+    // the line width of the highlight round the active station, and anything else highlighted
+    private static final float HIGHLIGHT_STROKE_WIDTH_DP = 2.5f;
+
     private SketchPaints() {}
+
+    /** Set a paint up to draw highlight brackets, as round the active station. */
+    static void setUpHighlightPaint(Context context, Paint paint) {
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(ScreenUnits.dpToPixels(HIGHLIGHT_STROKE_WIDTH_DP));
+        paint.setColor(ContextCompat.getColor(context, R.color.activeStationHighlight));
+    }
 
     /** Turn anti-aliasing on or off for each paint, as the user's preference says. */
     static void applyAntiAliasPreference(Paint... paints) {

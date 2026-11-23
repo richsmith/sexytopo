@@ -262,6 +262,7 @@
     <string name="sketch_position_cross_section_instruction">Select where to draw cross-section</string>
     <string name="sketch_rotate_cross_section_instruction">Drag from the station to set cross-section direction</string>
     <string name="sketch_symbol_orientation_education">Drag to set symbol direction</string>
+    <string name="sketch_move_symbol_instruction">Drag to reposition</string>
     <string name="sketch_text_hint">Enter text</string>
 
     <!-- Table view -->

@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import java.util.function.BooleanSupplier;
 import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.model.sketch.Sketch;
+import org.hwyl.sexytopo.model.sketch.SymbolDetail;
 
 /**
  * Draws a sketch: areas underneath, then lines, then text and symbols on top. Used for the main
@@ -49,5 +50,14 @@ class SketchRenderer {
         areaRenderer.draw(canvas, sketch, alpha, isDarkModeActive);
         lineRenderer.draw(canvas, sketch, alpha, isDarkModeActive, isDebugMode.getAsBoolean());
         pointRenderer.draw(canvas, sketch, alpha, isDarkModeActive);
+    }
+
+    /** Leave a symbol out when drawing its sketch, e.g. while it's drawn elsewhere being moved. */
+    void setHiddenSymbol(SymbolDetail symbolDetail) {
+        pointRenderer.setHiddenSymbol(symbolDetail);
+    }
+
+    void drawSymbol(Canvas canvas, SymbolDetail symbolDetail) {
+        pointRenderer.drawSymbol(canvas, symbolDetail, SketchPaints.SOLID_ALPHA, isDarkModeActive);
     }
 }

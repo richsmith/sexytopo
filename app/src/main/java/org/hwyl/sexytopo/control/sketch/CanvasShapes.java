@@ -4,6 +4,7 @@ import static org.hwyl.sexytopo.control.sketch.ScreenUnits.dpToPixels;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 
@@ -62,5 +63,47 @@ final class CanvasShapes {
         }
 
         canvas.drawLines(lines, paint);
+    }
+
+    /**
+     * Draws the four corners of a square centred on a point on the view, to highlight what's in it,
+     * as for the active station.
+     */
+    static void drawHighlightBrackets(Canvas canvas, float x, float y, float size, Paint paint) {
+
+        float gap = size / 3f;
+        float topY = y - (size / 2);
+        float bottomY = y + (size / 2);
+        float leftX = x - (size / 2);
+        float rightX = x + (size / 2);
+
+        float innerLeft = leftX + ((size - gap) / 2);
+        float innerRight = innerLeft + gap;
+        float innerTop = topY + ((size - gap) / 2);
+        float innerBottom = innerTop + gap;
+
+        Path corners = new Path();
+
+        // top-left corner
+        corners.moveTo(innerLeft, topY);
+        corners.lineTo(leftX, topY);
+        corners.lineTo(leftX, innerTop);
+
+        // top-right corner
+        corners.moveTo(innerRight, topY);
+        corners.lineTo(rightX, topY);
+        corners.lineTo(rightX, innerTop);
+
+        // bottom-left corner
+        corners.moveTo(leftX, innerBottom);
+        corners.lineTo(leftX, bottomY);
+        corners.lineTo(innerLeft, bottomY);
+
+        // bottom-right corner
+        corners.moveTo(rightX, innerBottom);
+        corners.lineTo(rightX, bottomY);
+        corners.lineTo(innerRight, bottomY);
+
+        canvas.drawPath(corners, paint);
     }
 }
