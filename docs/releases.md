@@ -1,7 +1,7 @@
 # Unreleased
 - New area sketching tool for marking filled regions such as water
 - Sketch lines can now be given a semantic type (e.g. wall)
-- Context menus (long press) for the the new and existing sketch details
+- Context menus (long press) for the the new and existing sketch details; move, resize, change type etc.
 - Delete / erase tool can now be dragged to remove multiple details and generally works better
 - Big rendering engine refactor with some performance improvements
 - Highlight for active view button in action bar
