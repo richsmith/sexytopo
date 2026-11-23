@@ -9,6 +9,7 @@ import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.sketch.AreaDetail;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
+import org.hwyl.sexytopo.model.sketch.GeometryType;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchDetail;
@@ -16,6 +17,8 @@ import org.hwyl.sexytopo.model.sketch.SketchDetail;
 /**
  * Erases what the finger touches or passes over. Everything erased in one drag is undone together.
  * With "delete line fragments" on, lines and areas are cut into rather than removed whole.
+ *
+ * <p>Each drag only erases one type of detail: areas, lines or points.
  */
 class EraseTool implements ToolHandler {
 
@@ -26,6 +29,9 @@ class EraseTool implements ToolHandler {
 
     // where the eraser last was during a drag, or null if it isn't being dragged
     private Coord2D lastErasePointOnSurvey;
+
+    // the type of detail this drag is erasing, or null until it has hit something
+    private GeometryType typeBeingErased;
 
     EraseTool(
             Viewport viewport, SketchState state, CrossSectionLayer crossSections, ToolHost host) {
@@ -50,8 +56,10 @@ class EraseTool implements ToolHandler {
                 // everything erased in one drag is undone together
                 state.getSketch().startGroupingDeletions();
                 lastErasePointOnSurvey = touchPointOnSurvey;
+                typeBeingErased = null;
                 SketchDetail tapped = findDetailTapped(touchPointOnSurvey, deleteToleranceInMetres);
                 if (tapped != null) {
+                    typeBeingErased = tapped.getGeometryType();
                     eraseDetail(
                             tapped,
                             touchPointOnSurvey,
@@ -93,6 +101,7 @@ class EraseTool implements ToolHandler {
     void cancel() {
         state.getSketch().endGroupingDeletions();
         lastErasePointOnSurvey = null;
+        typeBeingErased = null;
     }
 
     /**
@@ -110,19 +119,30 @@ class EraseTool implements ToolHandler {
             Coord2D point = from.plus(to.minus(from).scale((float) i / steps));
             SketchDetail detail =
                     sketch.findNearestVisibleDetailWithin(
-                            point, toleranceInMetres, viewport.getScale());
-            if (detail instanceof CrossSectionDetail) {
-                continue;
-            }
+                            point,
+                            toleranceInMetres,
+                            viewport.getScale(),
+                            this::isErasableInThisDrag);
             // crossing the middle of an area only cuts through it; it would be too easy to delete
             // a whole one by accident
-            if (detail == null && deleteLineFragments) {
+            if (detail == null
+                    && deleteLineFragments
+                    && (typeBeingErased == null || typeBeingErased == GeometryType.AREA)) {
                 detail = sketch.findAreaContaining(point);
             }
             if (detail != null) {
+                typeBeingErased = detail.getGeometryType();
                 eraseDetail(detail, point, toleranceInMetres, deleteLineFragments);
             }
         }
+    }
+
+    /** Whether a drag may erase this detail, given what it has already been erasing. */
+    private boolean isErasableInThisDrag(SketchDetail detail) {
+        if (detail instanceof CrossSectionDetail) {
+            return false;
+        }
+        return typeBeingErased == null || typeBeingErased == detail.getGeometryType();
     }
 
     /**

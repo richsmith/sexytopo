@@ -96,6 +96,11 @@ public final class AreaDetail extends SketchDetail {
         return holes.stream().noneMatch(hole -> PolygonUtils.contains(hole, point));
     }
 
+    @Override
+    public GeometryType getGeometryType() {
+        return GeometryType.AREA;
+    }
+
     /**
      * Distance from the region's boundary (not its interior); a point well inside the area is
      * considered far from it, which stops an area outranking a line drawn on top of it when the

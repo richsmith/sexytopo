@@ -230,6 +230,11 @@ public final class PathDetail extends SketchDetail {
     }
 
     @Override
+    public GeometryType getGeometryType() {
+        return GeometryType.LINE;
+    }
+
+    @Override
     public float getDistanceFrom(Coord2D point) {
         return getClosestDistance(point, getPath());
     }

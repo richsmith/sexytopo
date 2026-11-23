@@ -24,6 +24,10 @@ public abstract class SketchDetail extends Shape {
         return null;
     }
 
+    public GeometryType getGeometryType() {
+        return GeometryType.OTHER;
+    }
+
     public abstract float getDistanceFrom(Coord2D point);
 
     @Override

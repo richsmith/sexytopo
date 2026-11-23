@@ -18,6 +18,11 @@ public abstract class SinglePositionDetail extends SketchDetail {
     }
 
     @Override
+    public GeometryType getGeometryType() {
+        return GeometryType.POINT;
+    }
+
+    @Override
     public float getDistanceFrom(Coord2D point) {
         return Space2DUtils.getDistance(point, position);
     }

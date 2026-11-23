@@ -821,13 +821,21 @@ public class Sketch extends Shape {
 
     public SketchDetail findNearestVisibleDetailWithin(
             Coord2D point, float delta, float viewScale) {
+        return findNearestVisibleDetailWithin(point, delta, viewScale, detail -> true);
+    }
+
+    /** The nearest visible detail within delta of the point that passes the filter, or null. */
+    public SketchDetail findNearestVisibleDetailWithin(
+            Coord2D point, float delta, float viewScale, Predicate<SketchDetail> filter) {
 
         SketchDetail closest = null;
         float minDistance = Float.MAX_VALUE;
 
         for (SketchDetail detail : allSketchDetails()) {
             // a stroke still being drawn isn't part of the sketch yet
-            if (detail == activePath || !detail.couldBeVisibleAtScale(viewScale)) {
+            if (detail == activePath
+                    || !detail.couldBeVisibleAtScale(viewScale)
+                    || !filter.test(detail)) {
                 continue;
             }
             float distance = detail.getDistanceFrom(point);

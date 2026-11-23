@@ -1023,4 +1023,29 @@ public class SketchTest {
         Assert.assertEquals(3, path.getPath().size());
         Assert.assertEquals(new Coord2D(0.5f, 0.3f), path.getPath().get(2));
     }
+
+    @Test
+    public void testFindNearestDetailSkipsThoseTheFilterRejects() {
+        Sketch sketch = new Sketch();
+        sketch.addTextDetail(new Coord2D(0, 0), "Nearer", Colour.BLACK, 0.3f);
+        sketch.addTextDetail(new Coord2D(0.5f, 0), "Further", Colour.BLACK, 0.3f);
+
+        SketchDetail found =
+                sketch.findNearestVisibleDetailWithin(
+                        new Coord2D(0, 0),
+                        1f,
+                        60f,
+                        detail -> ((TextDetail) detail).getText().equals("Further"));
+
+        Assert.assertEquals("Further", ((TextDetail) found).getText());
+    }
+
+    @Test
+    public void testFindNearestDetailIsNullWhenTheFilterRejectsEverything() {
+        Sketch sketch = new Sketch();
+        sketch.addTextDetail(new Coord2D(0, 0), "Hello", Colour.BLACK, 0.3f);
+
+        Assert.assertNull(
+                sketch.findNearestVisibleDetailWithin(new Coord2D(0, 0), 1f, 60f, detail -> false));
+    }
 }
