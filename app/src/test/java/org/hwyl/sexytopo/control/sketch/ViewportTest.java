@@ -189,6 +189,16 @@ public class ViewportTest {
         Assert.assertFalse(inset.couldBeVisible(path(new Coord2D(3, 3), new Coord2D(4, 4))));
     }
 
+    @Test
+    public void testInsetKeepsItsParentsPatternScale() {
+        Viewport parent = new Viewport();
+        parent.updateBounds(600, 600);
+        Viewport inset = new Viewport();
+        // a third of the parent's zoom would otherwise round to a different octave
+        inset.setAsInsetOf(parent, Coord2D.ORIGIN, 0.3f);
+        Assert.assertEquals(parent.getPatternScale(), inset.getPatternScale(), DELTA);
+    }
+
     private static PathDetail path(Coord2D... points) {
         return new PathDetail(Arrays.asList(points), Colour.BLACK);
     }

@@ -31,6 +31,11 @@ public class Viewport {
     private Coord2D topLeftOnSurvey = Coord2D.ORIGIN;
     private Coord2D bottomRightOnSurvey = Coord2D.ORIGIN;
 
+    // whether this is an inset in another view; if so, it keeps the pattern scale of the view it's
+    // in, so its ornamentation and fills match what's around it
+    private boolean isInset = false;
+    private float insetPatternScale;
+
     public Coord2D getOffset() {
         return offset;
     }
@@ -62,6 +67,9 @@ public class Viewport {
      * with the cave instead of crawling across it.
      */
     public float getPatternScale() {
+        if (isInset) {
+            return insetPatternScale;
+        }
         // re-pick the density each time the zoom doubles or halves, so it never strays more than
         // √2 from its designed size; doubling keeps existing marks in place and adds new ones
         double octave = Math.round(Math.log(scale) / Math.log(2));
@@ -132,11 +140,14 @@ public class Viewport {
      * insetScale and placed with its origin at origin in the parent, as a cross-section's sketch
      * is. A point p is drawn where p * insetScale + origin would be in the parent, so the inset can
      * be drawn without making a moved and scaled copy of it. Call this after the parent's bounds
-     * are up to date; insetScale must be positive.
+     * are up to date; insetScale must be positive. Line ornamentation and area fills keep the
+     * parent's size, so they match those around the inset.
      */
     public void setAsInsetOf(Viewport parent, Coord2D origin, float insetScale) {
         offset = parent.offset.minus(origin).scale(1 / insetScale);
         scale = parent.scale * insetScale;
+        isInset = true;
+        insetPatternScale = parent.getPatternScale();
         canvasBottomRight = parent.canvasBottomRight;
         topLeftOnSurvey = toSurvey(Coord2D.ORIGIN);
         bottomRightOnSurvey = toSurvey(canvasBottomRight);
