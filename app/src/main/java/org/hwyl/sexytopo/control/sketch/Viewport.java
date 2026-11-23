@@ -127,6 +127,21 @@ public class Viewport {
         bottomRightOnSurvey = toSurvey(canvasBottomRight);
     }
 
+    /**
+     * Make this an inset in the parent's view: something drawn in coordinates of its own, scaled by
+     * insetScale and placed with its origin at origin in the parent, as a cross-section's sketch
+     * is. A point p is drawn where p * insetScale + origin would be in the parent, so the inset can
+     * be drawn without making a moved and scaled copy of it. Call this after the parent's bounds
+     * are up to date; insetScale must be positive.
+     */
+    public void setAsInsetOf(Viewport parent, Coord2D origin, float insetScale) {
+        offset = parent.offset.minus(origin).scale(1 / insetScale);
+        scale = parent.scale * insetScale;
+        canvasBottomRight = parent.canvasBottomRight;
+        topLeftOnSurvey = toSurvey(Coord2D.ORIGIN);
+        bottomRightOnSurvey = toSurvey(canvasBottomRight);
+    }
+
     /** Whether a rectangle in view coordinates overlaps the visible area. */
     public boolean isRectOnCanvas(float left, float top, float right, float bottom) {
         return right >= 0

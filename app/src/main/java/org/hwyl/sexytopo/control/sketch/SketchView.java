@@ -83,7 +83,8 @@ public class SketchView extends View {
     private final ViewHost host = new ViewHost();
 
     private final CrossSectionLayer crossSections =
-            new CrossSectionLayer(viewport, state, surveyDataRenderer, sketchRenderer, host);
+            new CrossSectionLayer(
+                    viewport, state, surveyDataRenderer, () -> activity.isDebugMode(), host);
 
     private final SketchSelector selector = new SketchSelector(viewport, state);
 
@@ -177,6 +178,7 @@ public class SketchView extends View {
 
     public void setIsDarkModeActive(boolean isDarkModeActive) {
         sketchRenderer.setDarkModeActive(isDarkModeActive);
+        crossSections.setDarkModeActive(isDarkModeActive);
     }
 
     public void setCachedStats(float surveyLength, float surveyHeight) {

@@ -156,6 +156,39 @@ public class ViewportTest {
         Assert.assertEquals(0.05f, viewport.getPatternScale(), DELTA);
     }
 
+    @Test
+    public void testInsetDrawsAPointWhereItsScaledAndMovedPlaceIsInTheParent() {
+        Viewport parent = new Viewport();
+        parent.setOffset(new Coord2D(3, -2));
+        parent.setZoom(25, Coord2D.ORIGIN);
+        parent.updateBounds(600, 400);
+
+        Coord2D origin = new Coord2D(7, 4);
+        float insetScale = 0.5f;
+        Viewport inset = new Viewport();
+        inset.setAsInsetOf(parent, origin, insetScale);
+
+        Coord2D point = new Coord2D(-1.5f, 2.25f);
+        Coord2D expected = parent.toView(point.scale(insetScale).plus(origin));
+        Coord2D actual = inset.toView(point);
+        Assert.assertEquals(expected.x, actual.x, DELTA);
+        Assert.assertEquals(expected.y, actual.y, DELTA);
+    }
+
+    @Test
+    public void testInsetCullsAgainstTheParentsView() {
+        Viewport parent = new Viewport();
+        // 600x600 pixels at 60px/m shows survey (0,0) to (10,10)
+        parent.updateBounds(600, 600);
+
+        // a scale of 2 about (5, 5) shows the inset's (-2.5, -2.5) to (2.5, 2.5)
+        Viewport inset = new Viewport();
+        inset.setAsInsetOf(parent, new Coord2D(5, 5), 2);
+
+        Assert.assertTrue(inset.couldBeVisible(path(new Coord2D(2, 2), new Coord2D(2.4f, 2.4f))));
+        Assert.assertFalse(inset.couldBeVisible(path(new Coord2D(3, 3), new Coord2D(4, 4))));
+    }
+
     private static PathDetail path(Coord2D... points) {
         return new PathDetail(Arrays.asList(points), Colour.BLACK);
     }

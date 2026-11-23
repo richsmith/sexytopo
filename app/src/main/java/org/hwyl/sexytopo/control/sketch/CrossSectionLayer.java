@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.activity.CrossSectionActivity;
@@ -27,7 +28,6 @@ import org.hwyl.sexytopo.model.geometry.Projection2D;
 import org.hwyl.sexytopo.model.geometry.Space;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
-import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchTool;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -66,8 +66,13 @@ class CrossSectionLayer {
     private final Viewport viewport;
     private final SketchState state;
     private final SurveyDataRenderer surveyDataRenderer;
-    private final SketchRenderer sketchRenderer;
     private final Host host;
+
+    // Each cross-section's legs and sketch are drawn through this, set up in turn for each section
+    // as an inset in the main view, rather than from a copy moved and scaled into place
+    private final Viewport insetViewport = new Viewport();
+    private final SurveyDataRenderer insetDataRenderer;
+    private final SketchRenderer insetSketchRenderer;
 
     private final Paint connectorPaint = new Paint();
     private final Paint indicatorPaint = new Paint();
@@ -140,17 +145,26 @@ class CrossSectionLayer {
             Viewport viewport,
             SketchState state,
             SurveyDataRenderer surveyDataRenderer,
-            SketchRenderer sketchRenderer,
+            BooleanSupplier isDebugMode,
             Host host) {
         this.viewport = viewport;
         this.state = state;
         this.surveyDataRenderer = surveyDataRenderer;
-        this.sketchRenderer = sketchRenderer;
         this.host = host;
+        this.insetDataRenderer = new SurveyDataRenderer(insetViewport, state);
+        this.insetSketchRenderer = new SketchRenderer(insetViewport, isDebugMode);
+    }
+
+    /** In dark mode, details drawn in black are drawn in white instead. */
+    void setDarkModeActive(boolean isDarkModeActive) {
+        insetSketchRenderer.setDarkModeActive(isDarkModeActive);
     }
 
     /** Set the paints up from the theme and current preferences. */
     void initialisePaints(Context context) {
+
+        insetDataRenderer.initialise(context);
+        insetSketchRenderer.initialise(context);
 
         SketchPaints.applyAntiAliasPreference(ANTI_ALIAS_PAINTS);
 
@@ -654,13 +668,14 @@ class CrossSectionLayer {
                     canvas, description, centreOnView.x, centreOnView.y, alpha);
         }
 
-        Space<Coord2D> rawProjection = crossSection.getProjection();
         float xsScale = state.getSketch().getCrossSectionScale();
-        Space<Coord2D> scaledProjection = rawProjection.scale(xsScale);
-        Space<Coord2D> sectionProjection = Space2DUtils.translate(scaledProjection, centreOnSurvey);
+        insetViewport.setAsInsetOf(viewport, centreOnSurvey, xsScale);
         // Judge which splays are in the section's plane the same way the section editor does
-        surveyDataRenderer.drawLegs(
-                canvas, sectionProjection, alpha, crossSection.getProjectionType()::isLegInPlane);
+        insetDataRenderer.drawLegs(
+                canvas,
+                crossSection.getProjection(),
+                alpha,
+                crossSection.getProjectionType()::isLegInPlane);
 
         Coord2D viewStationLocation = viewport.toView(surveyStationLocation);
 
@@ -678,7 +693,7 @@ class CrossSectionLayer {
         frame.addRoundRect(borderRect, cornerRadius, cornerRadius, Path.Direction.CW);
         canvas.save();
         canvas.clipPath(frame);
-        drawSubSketch(canvas, sectionDetail, centreOnSurvey, alpha);
+        insetSketchRenderer.draw(canvas, sectionDetail.getSketch(), alpha);
         canvas.restore();
 
         boolean isHorizontal =
@@ -769,18 +784,6 @@ class CrossSectionLayer {
                 rotateFingerOnView.x,
                 rotateFingerOnView.y,
                 connectorPaint);
-    }
-
-    /**
-     * Draw the user-drawn overlay (paths only) for a cross-section on the plan view, translated
-     * from station-relative coords to the component's current display centre.
-     */
-    private void drawSubSketch(
-            Canvas canvas, CrossSectionDetail sectionDetail, Coord2D centreOnSurvey, int alpha) {
-
-        float xsScale = state.getSketch().getCrossSectionScale();
-        Sketch subSketch = sectionDetail.getSketch().scale(xsScale).translate(centreOnSurvey);
-        sketchRenderer.draw(canvas, subSketch, alpha);
     }
 
     /**
