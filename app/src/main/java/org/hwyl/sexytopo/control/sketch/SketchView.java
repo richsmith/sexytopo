@@ -97,6 +97,8 @@ public class SketchView extends View {
     private final SelectTool selectTool = new SelectTool(state, selector, host);
     private final MoveDetailTool moveDetailTool =
             new MoveDetailTool(viewport, state, sketchRenderer, host);
+    private final ResizeDetailTool resizeDetailTool =
+            new ResizeDetailTool(viewport, state, sketchRenderer, host);
 
     // what each tool does with a touch; PINCH_TO_ZOOM has no entry, as the scale detector drives it
     private final Map<SketchTool, ToolHandler> sketchToolsToHandlers = createSketchToolMap();
@@ -115,6 +117,7 @@ public class SketchView extends View {
         handlers.put(SketchTool.ROTATE_CROSS_SECTION, crossSections.rotateTool);
         handlers.put(SketchTool.MOVE_CROSS_SECTION, crossSections.moveTool);
         handlers.put(SketchTool.MOVE_DETAIL, moveDetailTool);
+        handlers.put(SketchTool.RESIZE_DETAIL, resizeDetailTool);
         return handlers;
     }
 
@@ -140,6 +143,7 @@ public class SketchView extends View {
         hotCorners.initialise(getContext());
         crossSections.initialisePaints(getContext());
         moveDetailTool.initialise(getContext());
+        resizeDetailTool.initialise(getContext());
 
         isTwoFingerModeActive = GeneralPreferences.isTwoFingerModeActive();
     }
@@ -308,22 +312,18 @@ public class SketchView extends View {
         if (state.getSketchTool().isModal()
                 && state.getSketchTool() != SketchTool.MOVE_CROSS_SECTION
                 && event.getAction() == MotionEvent.ACTION_UP) {
-            if (state.getPreviousSketchTool() != state.getSketchTool()) {
-                state.revertToPreviousTool();
-            } else {
-                setSketchTool(SketchTool.MOVE);
-            }
+            state.endTemporaryTool();
             invalidate();
             return true;
         }
 
         if (isModalMoveSelection(event)) {
-            setSketchTool(SketchTool.MODAL_MOVE);
+            state.startTemporaryTool(SketchTool.MODAL_MOVE);
             // handled below
         }
 
         if (crossSections.isHandlePress(event)) {
-            setSketchTool(SketchTool.MOVE_CROSS_SECTION);
+            state.startTemporaryTool(SketchTool.MOVE_CROSS_SECTION);
         }
 
         if (crossSections.handleBodyTap(event)) {
@@ -422,14 +422,21 @@ public class SketchView extends View {
      * a pinch or pan interrupts a tool, that tool's feedback stays.
      */
     protected void drawToolFeedback(Canvas canvas) {
-        ToolHandler handler = sketchToolsToHandlers.get(state.getUnderlyingSketchTool());
+        ToolHandler handler = getUnderlyingToolHandler();
         if (handler != null) {
             handler.drawFeedback(canvas);
         }
     }
 
+    /** The handler for the tool in use, or the one a pinch or pan interrupted. */
+    private ToolHandler getUnderlyingToolHandler() {
+        return sketchToolsToHandlers.get(state.getUnderlyingSketchTool());
+    }
+
     private void drawSurvey(Canvas canvas, Survey survey, Space<Coord2D> projection, int alpha) {
-        sketchRenderer.draw(canvas, activity.getSketch(survey), alpha);
+        ToolHandler handler = getUnderlyingToolHandler();
+        SketchDetail hidden = handler == null ? null : handler.getHiddenDetail();
+        sketchRenderer.draw(canvas, activity.getSketch(survey), alpha, hidden);
         drawSurveyData(survey, canvas, projection, alpha);
         if (survey == state.getSurvey()) {
             // Linked surveys are drawn without their cross-sections, to cut down on clutter.
@@ -557,7 +564,7 @@ public class SketchView extends View {
             }
 
             if (state.getSketchTool() != SketchTool.PINCH_TO_ZOOM) {
-                setSketchTool(SketchTool.PINCH_TO_ZOOM);
+                state.startTemporaryTool(SketchTool.PINCH_TO_ZOOM);
             }
 
             float x = detector.getFocusX();
@@ -652,7 +659,8 @@ public class SketchView extends View {
                         sketch,
                         (SymbolDetail) matchedDetail,
                         onChanged,
-                        moveDetailTool::start);
+                        moveDetailTool::start,
+                        resizeDetailTool::start);
             } else if (matchedDetail instanceof TextDetail) {
                 TextContextMenu.show(
                         SketchView.this,
@@ -661,7 +669,8 @@ public class SketchView extends View {
                         sketch,
                         (TextDetail) matchedDetail,
                         onChanged,
-                        moveDetailTool::start);
+                        moveDetailTool::start,
+                        resizeDetailTool::start);
             }
             menuShownInThisTouch = true;
         }

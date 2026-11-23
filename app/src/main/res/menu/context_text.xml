@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Title (disabled) -->
     <item
         android:id="@+id/text_title"
         android:title="@string/symbol_text"
         android:enabled="false"/>
 
-    <!-- Edit and Move separated by divider -->
     <group android:id="@+id/group_text_edit">
         <item
             android:id="@+id/action_edit_text"
@@ -16,10 +14,13 @@
         <item
             android:id="@+id/action_move_text"
             android:title="@string/move"/>
+
+        <item
+            android:id="@+id/action_resize_text"
+            android:title="@string/resize"/>
     </group>
 
     <group android:id="@+id/group_text_actions">
-        <!-- Populated from BrushColour -->
         <item
             android:id="@+id/menu_colour"
             android:title="@string/menu_colour">
@@ -27,7 +28,6 @@
         </item>
     </group>
 
-    <!-- Delete separated by divider -->
     <group android:id="@+id/group_text_delete">
         <item
             android:id="@+id/action_delete_text"

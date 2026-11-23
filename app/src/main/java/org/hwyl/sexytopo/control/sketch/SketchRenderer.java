@@ -4,10 +4,10 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
 import org.hwyl.sexytopo.control.util.SketchPreferences;
 import org.hwyl.sexytopo.model.sketch.SinglePositionDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
+import org.hwyl.sexytopo.model.sketch.SketchDetail;
 
 /**
  * Draws a sketch: areas underneath, then lines, then text and symbols on top. Used for the main
@@ -44,6 +44,14 @@ class SketchRenderer {
     }
 
     void draw(Canvas canvas, Sketch sketch, int alpha) {
+        draw(canvas, sketch, alpha, null);
+    }
+
+    /**
+     * Draws the sketch, leaving out the hidden detail, which something else is drawing (e.g. a
+     * symbol being moved), if there is one.
+     */
+    void draw(Canvas canvas, Sketch sketch, int alpha, SketchDetail hidden) {
 
         if (!SketchPreferences.Toggle.SHOW_SKETCH.isOn()) {
             return;
@@ -51,15 +59,7 @@ class SketchRenderer {
 
         areaRenderer.draw(canvas, sketch, alpha, isDarkModeActive);
         lineRenderer.draw(canvas, sketch, alpha, isDarkModeActive, isDebugMode.getAsBoolean());
-        pointRenderer.draw(canvas, sketch, alpha, isDarkModeActive);
-    }
-
-    /**
-     * Tracks a point detail to leave out when drawing a sketch, e.g. a detail currently being
-     * moved. It gives null when there's nothing to leave out.
-     */
-    void setHiddenDetail(Supplier<SinglePositionDetail> hiddenDetail) {
-        pointRenderer.setHiddenDetail(hiddenDetail);
+        pointRenderer.draw(canvas, sketch, alpha, isDarkModeActive, hidden);
     }
 
     /** Draws a single symbol or piece of text. */

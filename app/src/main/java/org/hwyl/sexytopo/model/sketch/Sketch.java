@@ -565,6 +565,16 @@ public class Sketch extends Shape {
         return moved;
     }
 
+    /**
+     * Scales a symbol or piece of text by the given factor, keeping its place, as a single undoable
+     * operation.
+     */
+    public SketchDetail resizeDetail(SinglePositionDetail detail, float scale) {
+        SketchDetail resized = detail.scale(scale);
+        deleteDetail(detail, Collections.singletonList(resized));
+        return resized;
+    }
+
     /** Changes the colour of a piece of text, as a single undoable operation. */
     public TextDetail recolourTextDetail(TextDetail textDetail, Colour colour) {
         TextDetail recoloured = textDetail.withColour(colour);

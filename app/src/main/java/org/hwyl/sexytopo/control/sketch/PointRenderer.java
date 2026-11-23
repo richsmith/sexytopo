@@ -9,13 +9,13 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.util.SparseArray;
 import androidx.core.content.ContextCompat;
-import java.util.function.Supplier;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.SinglePositionDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
+import org.hwyl.sexytopo.model.sketch.SketchDetail;
 import org.hwyl.sexytopo.model.sketch.SymbolDetail;
 import org.hwyl.sexytopo.model.sketch.TextDetail;
 
@@ -30,8 +30,6 @@ class PointRenderer {
 
     // one colour filter per colour used, so symbols don't each need a new one on every frame
     private final SparseArray<PorterDuffColorFilter> colourFilters = new SparseArray<>();
-
-    private Supplier<SinglePositionDetail> hiddenDetail = () -> null;
 
     PointRenderer(Viewport viewport) {
         this.viewport = viewport;
@@ -48,13 +46,23 @@ class PointRenderer {
         labelPaint.setTextSize(labelSizePixels);
     }
 
-    void draw(Canvas canvas, Sketch sketch, int alpha, boolean isDarkModeActive) {
-        drawText(canvas, sketch, alpha, isDarkModeActive);
-        drawSymbols(canvas, sketch, alpha, isDarkModeActive);
+    /** Draws the sketch's text and symbols, apart from any hidden one. */
+    void draw(
+            Canvas canvas,
+            Sketch sketch,
+            int alpha,
+            boolean isDarkModeActive,
+            SketchDetail hidden) {
+        drawText(canvas, sketch, alpha, isDarkModeActive, hidden);
+        drawSymbols(canvas, sketch, alpha, isDarkModeActive, hidden);
     }
 
-    private void drawText(Canvas canvas, Sketch sketch, int alpha, boolean isDarkModeActive) {
-        SinglePositionDetail hidden = hiddenDetail.get();
+    private void drawText(
+            Canvas canvas,
+            Sketch sketch,
+            int alpha,
+            boolean isDarkModeActive,
+            SketchDetail hidden) {
         for (TextDetail textDetail : sketch.getTextDetails()) {
             if (textDetail == hidden || !viewport.couldBeVisible(textDetail)) {
                 continue;
@@ -63,22 +71,18 @@ class PointRenderer {
         }
     }
 
-    private void drawSymbols(Canvas canvas, Sketch sketch, int alpha, boolean isDarkModeActive) {
-        SinglePositionDetail hidden = hiddenDetail.get();
+    private void drawSymbols(
+            Canvas canvas,
+            Sketch sketch,
+            int alpha,
+            boolean isDarkModeActive,
+            SketchDetail hidden) {
         for (SymbolDetail symbolDetail : sketch.getSymbolDetails()) {
             if (symbolDetail == hidden || !viewport.couldBeVisible(symbolDetail)) {
                 continue;
             }
             drawSymbol(canvas, symbolDetail, alpha, isDarkModeActive);
         }
-    }
-
-    /**
-     * Where to find a symbol or text to leave out when drawing its sketch, e.g. while it's drawn
-     * elsewhere being moved. It gives null when there's nothing to leave out.
-     */
-    void setHiddenDetail(Supplier<SinglePositionDetail> hiddenDetail) {
-        this.hiddenDetail = hiddenDetail;
     }
 
     /** Draws a single symbol or piece of text. */

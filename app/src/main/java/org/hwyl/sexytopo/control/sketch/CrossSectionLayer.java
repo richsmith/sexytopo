@@ -222,7 +222,7 @@ class CrossSectionLayer {
     void startPositioning(Station station, CrossSection.Orientation orientation) {
         stationNameBeingSectioned = station.getName();
         orientationBeingCreated = orientation;
-        state.setSketchTool(SketchTool.POSITION_CROSS_SECTION);
+        state.startTemporaryTool(SketchTool.POSITION_CROSS_SECTION);
         host.showToast(R.string.sketch_position_cross_section_instruction);
     }
 
@@ -234,7 +234,7 @@ class CrossSectionLayer {
         beingRotated = detail;
         rotateFingerOnView = null;
         previewAngle = null;
-        state.setSketchTool(SketchTool.ROTATE_CROSS_SECTION);
+        state.startTemporaryTool(SketchTool.ROTATE_CROSS_SECTION);
         host.showToast(R.string.sketch_rotate_cross_section_instruction);
     }
 
@@ -381,7 +381,7 @@ class CrossSectionLayer {
         CrossSectionDetail detail = new CrossSectionDetail(crossSection, touchPointOnSurvey);
         state.getSketch().addCrossSection(detail);
 
-        state.revertToPreviousTool();
+        state.endTemporaryTool();
         host.invalidate();
 
         return true;
@@ -399,7 +399,7 @@ class CrossSectionLayer {
                 CrossSectionDetail detailOnHandle =
                         findHandleAt(touchPointOnView.x, touchPointOnView.y);
                 if (detailOnHandle == null) {
-                    state.revertToPreviousTool();
+                    state.endTemporaryTool();
                     return false;
                 }
                 beingMoved = detailOnHandle;
@@ -427,13 +427,13 @@ class CrossSectionLayer {
                     }
                     host.invalidate();
                 }
-                state.revertToPreviousTool();
+                state.endTemporaryTool();
                 return true;
 
             case MotionEvent.ACTION_CANCEL:
                 beingMoved = null;
                 moveCurrentDelta = Coord2D.ORIGIN;
-                state.revertToPreviousTool();
+                state.endTemporaryTool();
                 return true;
 
             default:
@@ -449,13 +449,13 @@ class CrossSectionLayer {
      */
     private boolean handleRotate(MotionEvent event) {
         if (beingRotated == null) {
-            state.revertToPreviousTool();
+            state.endTemporaryTool();
             return false;
         }
 
         Coord2D pivotOnSurvey = getRotationPivot(beingRotated);
         if (pivotOnSurvey == null) {
-            state.revertToPreviousTool();
+            state.endTemporaryTool();
             return false;
         }
         Coord2D fingerOnView = new Coord2D(event.getX(), event.getY());
@@ -483,7 +483,7 @@ class CrossSectionLayer {
                 beingRotated = null;
                 rotateFingerOnView = null;
                 previewAngle = null;
-                state.revertToPreviousTool();
+                state.endTemporaryTool();
                 host.invalidate();
                 return true;
 
@@ -491,7 +491,7 @@ class CrossSectionLayer {
                 beingRotated = null;
                 rotateFingerOnView = null;
                 previewAngle = null;
-                state.revertToPreviousTool();
+                state.endTemporaryTool();
                 host.invalidate();
                 return true;
         }

@@ -1,5 +1,7 @@
 package org.hwyl.sexytopo.control.sketch;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.geometry.Projection2D;
 import org.hwyl.sexytopo.model.geometry.Space;
@@ -21,8 +23,8 @@ class SketchState {
     private Projection2D projectionType = Projection2D.PLAN;
 
     private SketchTool currentTool = SketchTool.MOVE;
-    // used to jump back to the previous tool when using one-use tools
-    private SketchTool previousTool = SketchTool.MOVE;
+    // the tools the current one interrupted, to go back to when it's done, most recent first
+    private final Deque<SketchTool> interruptedTools = new ArrayDeque<>();
 
     // what lines, areas, symbols and text are drawn in
     private Colour colour = Colour.BLACK;
@@ -64,32 +66,45 @@ class SketchState {
         return currentTool;
     }
 
-    SketchTool getPreviousSketchTool() {
-        return previousTool;
-    }
-
     /**
      * The tool the user is working with: the current one, unless that's a pinch or pan, in which
      * case the one it interrupted, which it goes back to after.
      */
     SketchTool getUnderlyingSketchTool() {
-        return currentTool.isModal() ? previousTool : currentTool;
+        if (currentTool.isModal() && !interruptedTools.isEmpty()) {
+            return interruptedTools.peek();
+        }
+        return currentTool;
+    }
+
+    /** Switch to an ordinary tool, as chosen by the user, forgetting anything interrupted. */
+    void setSketchTool(SketchTool sketchTool) {
+        interruptedTools.clear();
+        currentTool = sketchTool;
     }
 
     /**
-     * Switch tool. The tool being left is remembered, so a one-use tool can go back to it, unless
-     * it's a modal one (a pinch or a pan) that is itself only temporary.
+     * Start a one-use or modal tool, to last until endTemporaryTool. A one-use tool interrupts an
+     * ordinary one, and a modal one (a pinch or a pan) interrupts either, so the tool interrupted
+     * is remembered to go back to. Otherwise the new tool replaces the current one.
      */
-    void setSketchTool(SketchTool sketchTool) {
-        if (previousTool != currentTool && !currentTool.isModal()) {
-            previousTool = currentTool;
+    void startTemporaryTool(SketchTool sketchTool) {
+        if (getRank(currentTool) < getRank(sketchTool)) {
+            interruptedTools.push(currentTool);
         }
         currentTool = sketchTool;
     }
 
-    /** Go back to the tool in use before the current, one-use, one. */
-    void revertToPreviousTool() {
-        setSketchTool(previousTool);
+    /** Go back to the tool the temporary one interrupted, or to Move if there isn't one. */
+    void endTemporaryTool() {
+        currentTool = interruptedTools.isEmpty() ? SketchTool.MOVE : interruptedTools.pop();
+    }
+
+    private static int getRank(SketchTool sketchTool) {
+        if (sketchTool.isModal()) {
+            return 2;
+        }
+        return sketchTool.isOneUse() ? 1 : 0;
     }
 
     Colour getColour() {

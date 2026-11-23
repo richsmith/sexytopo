@@ -317,6 +317,25 @@ public class SketchTest {
     }
 
     @Test
+    public void testResizeDetailIsOneUndoableStepKeepingTextPlaceAndColour() {
+        Sketch sketch = new Sketch();
+        sketch.addTextDetail(new Coord2D(3, 4), "sump", Colour.RED, 2);
+        TextDetail original = sketch.getTextDetails().get(0);
+
+        sketch.resizeDetail(original, 1.5f);
+
+        Assert.assertEquals(1, sketch.getTextDetails().size());
+        TextDetail resized = sketch.getTextDetails().get(0);
+        Assert.assertEquals(3, resized.getSize(), DELTA);
+        Assert.assertEquals(original.getPosition(), resized.getPosition());
+        Assert.assertEquals("sump", resized.getText());
+        Assert.assertEquals(Colour.RED, resized.getColour());
+
+        sketch.undo();
+        Assert.assertEquals(Collections.singletonList(original), sketch.getTextDetails());
+    }
+
+    @Test
     public void testChangeTextIsOneUndoableStepKeepingPlaceColourAndSize() {
         Sketch sketch = new Sketch();
         sketch.addTextDetail(new Coord2D(3, 4), "sump", Colour.RED, 2);

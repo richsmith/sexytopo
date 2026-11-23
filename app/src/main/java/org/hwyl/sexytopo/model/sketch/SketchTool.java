@@ -3,6 +3,7 @@ package org.hwyl.sexytopo.model.sketch;
 import static org.hwyl.sexytopo.model.sketch.SketchTool.Trait.DRAWS_PATH;
 import static org.hwyl.sexytopo.model.sketch.SketchTool.Trait.MODAL;
 import static org.hwyl.sexytopo.model.sketch.SketchTool.Trait.OFFERS_DETAIL_MENU;
+import static org.hwyl.sexytopo.model.sketch.SketchTool.Trait.ONE_USE;
 import static org.hwyl.sexytopo.model.sketch.SketchTool.Trait.OPENS_LINKED_SURVEYS;
 import static org.hwyl.sexytopo.model.sketch.SketchTool.Trait.USES_COLOUR;
 
@@ -19,10 +20,11 @@ public enum SketchTool {
     TEXT(387348957, USES_COLOUR, OFFERS_DETAIL_MENU),
     // not currently on the toolbar
     SELECT(-1, OFFERS_DETAIL_MENU, OPENS_LINKED_SURVEYS),
-    POSITION_CROSS_SECTION(-1),
-    ROTATE_CROSS_SECTION(-1),
+    POSITION_CROSS_SECTION(-1, ONE_USE),
+    ROTATE_CROSS_SECTION(-1, ONE_USE),
     MOVE_CROSS_SECTION(-1, MODAL),
-    MOVE_DETAIL(-1),
+    MOVE_DETAIL(-1, ONE_USE),
+    RESIZE_DETAIL(-1, ONE_USE),
     PINCH_TO_ZOOM(-1, MODAL),
     MODAL_MOVE(-1, MODAL);
 
@@ -31,6 +33,8 @@ public enum SketchTool {
         USES_COLOUR,
         /** Only lasts as long as the gesture that started it. */
         MODAL,
+        /** Does one thing, then goes back to the tool in use before. */
+        ONE_USE,
         /** Starts an in-progress line or area as soon as the finger lands. */
         DRAWS_PATH,
         /** A long press on a line or area opens its context menu. */
@@ -71,6 +75,10 @@ public enum SketchTool {
 
     public boolean isModal() {
         return traits.contains(MODAL);
+    }
+
+    public boolean isOneUse() {
+        return traits.contains(ONE_USE);
     }
 
     public boolean drawsPath() {

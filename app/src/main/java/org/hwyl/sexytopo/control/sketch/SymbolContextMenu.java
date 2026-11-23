@@ -14,8 +14,8 @@ import org.hwyl.sexytopo.model.sketch.Symbol;
 import org.hwyl.sexytopo.model.sketch.SymbolDetail;
 
 /**
- * The menu shown on long-pressing a symbol, offering to move it, swap it for another symbol, change
- * its colour or delete it. Each is a single undoable step.
+ * The menu shown on long-pressing a symbol, offering to move or resize it, swap it for another
+ * symbol, change its colour or delete it. Each is a single undoable step.
  */
 final class SymbolContextMenu {
 
@@ -23,8 +23,8 @@ final class SymbolContextMenu {
 
     /**
      * Show the menu for a symbol at a point on the anchor view. onChanged is run after the symbol
-     * has been changed or deleted, so the view can redraw. onMove is given the symbol if the user
-     * chooses to move it.
+     * has been changed or deleted, so the view can redraw. onMove or onResize is given the symbol
+     * if the user chooses to move or resize it.
      */
     static void show(
             View anchorView,
@@ -33,7 +33,8 @@ final class SymbolContextMenu {
             Sketch sketch,
             SymbolDetail symbolDetail,
             Runnable onChanged,
-            Consumer<SymbolDetail> onMove) {
+            Consumer<SymbolDetail> onMove,
+            Consumer<SymbolDetail> onResize) {
         PopupMenu popup =
                 ContextMenuManager.createPopupMenuAt(anchorView.getContext(), anchorView, x, y);
         popup.inflate(R.menu.context_symbol);
@@ -64,6 +65,10 @@ final class SymbolContextMenu {
                 item -> {
                     if (item.getItemId() == R.id.action_move_symbol) {
                         onMove.accept(symbolDetail);
+                        return true;
+                    }
+                    if (item.getItemId() == R.id.action_resize_symbol) {
+                        onResize.accept(symbolDetail);
                         return true;
                     }
                     if (item.getItemId() == R.id.action_delete_symbol) {

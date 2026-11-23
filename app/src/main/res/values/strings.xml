@@ -19,6 +19,7 @@
     <string name="update">Update</string>
     <string name="overwrite">Overwrite</string>
     <string name="move">Move</string>
+    <string name="resize">Resize</string>
     <string name="replace">Replace</string>
     <string name="rename">Rename</string>
     <string name="clear">Clear</string>
@@ -263,6 +264,7 @@
     <string name="sketch_rotate_cross_section_instruction">Drag from the station to set cross-section direction</string>
     <string name="sketch_symbol_orientation_education">Drag to set symbol direction</string>
     <string name="sketch_move_detail_instruction">Drag to reposition</string>
+    <string name="sketch_resize_detail_instruction">Drag to resize</string>
     <string name="sketch_text_hint">Enter text</string>
 
     <!-- Table view -->

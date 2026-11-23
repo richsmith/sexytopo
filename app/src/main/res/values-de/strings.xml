@@ -11,6 +11,7 @@
     <string name="update">Aktualisieren</string>
     <string name="overwrite">Überschreiben</string>
     <string name="move">Verschieben</string>
+    <string name="resize">Größe ändern</string>
     <string name="replace">Ersetzen</string>
     <string name="rename">Umbenennen</string>
     <string name="clear">Löschen</string>
@@ -229,6 +230,7 @@
     <string name="sketch_rotate_cross_section_instruction">Von der Station ziehen, um die Querschnittsrichtung festzulegen</string>
     <string name="sketch_symbol_orientation_education"> Ziehen, um die Richtung des Symbols festzulegen</string>
     <string name="sketch_move_detail_instruction">Ziehen, um neu zu positionieren</string>
+    <string name="sketch_resize_detail_instruction">Ziehen, um die Größe zu ändern</string>
     <string name="sketch_text_hint">Text eingeben</string>
 
     <!--  Table view  -->
