@@ -48,6 +48,14 @@ public class SymbolDetail extends SinglePositionDetail implements AutoScalableDe
                 getPosition().plus(translation), getSymbol(), getColour(), getSize(), getAngle());
     }
 
+    /** A symbol that points somewhere is turned as well as moved. */
+    @Override
+    public SymbolDetail rotate(float degrees) {
+        float newAngle = symbol.isDirectional() ? (getAngle() + degrees) % 360 : getAngle();
+        return new SymbolDetail(
+                getPosition().rotate(degrees), getSymbol(), getColour(), getSize(), newAngle);
+    }
+
     @Override
     public SymbolDetail scale(float scale) {
         return new SymbolDetail(

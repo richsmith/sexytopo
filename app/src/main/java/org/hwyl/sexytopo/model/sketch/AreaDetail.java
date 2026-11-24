@@ -138,6 +138,11 @@ public final class AreaDetail extends SketchDetail {
         return transform(point -> point.scale(scale));
     }
 
+    @Override
+    public AreaDetail rotate(float degrees) {
+        return transform(point -> point.rotate(degrees));
+    }
+
     private AreaDetail transform(UnaryOperator<Coord2D> operator) {
         List<Coord2D> newOutline = transformContour(outline, operator);
         List<List<Coord2D>> newHoles =

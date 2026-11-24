@@ -48,6 +48,11 @@ public class TextDetail extends SinglePositionDetail implements AutoScalableDeta
     }
 
     @Override
+    public TextDetail rotate(float degrees) {
+        return new TextDetail(getPosition().rotate(degrees), getText(), getColour(), getSize());
+    }
+
+    @Override
     public TextDetail scale(float scale) {
         return new TextDetail(getPosition(), getText(), getColour(), getSize() * scale);
     }

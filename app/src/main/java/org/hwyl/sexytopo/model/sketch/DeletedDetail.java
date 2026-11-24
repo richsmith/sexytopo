@@ -86,6 +86,15 @@ public class DeletedDetail extends SketchDetail {
         return new DeletedDetail(scaled);
     }
 
+    @Override
+    public SketchDetail rotate(float degrees) {
+        List<SketchDetail> rotated = new ArrayList<>();
+        for (SketchDetail deletedDetail : deletedDetails) {
+            rotated.add(deletedDetail.rotate(degrees));
+        }
+        return new DeletedDetail(rotated);
+    }
+
     public List<SketchDetail> getDeletedDetails() {
         return deletedDetails;
     }

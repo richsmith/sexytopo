@@ -35,6 +35,20 @@ public final class Coord2D extends Coord<Coord2D> {
         return new Coord2D(x * scale, y * scale);
     }
 
+    /**
+     * Turned about the origin by the given degrees, clockwise as seen on a page whose y axis runs
+     * downwards (as both the screen and the projected sketch do).
+     */
+    public Coord2D rotate(float degrees) {
+        if (degrees == 0) {
+            return this;
+        }
+        double radians = Math.toRadians(degrees);
+        float cos = (float) Math.cos(radians);
+        float sin = (float) Math.sin(radians);
+        return new Coord2D(x * cos - y * sin, x * sin + y * cos);
+    }
+
     public float mag() {
         return (float) Math.sqrt(this.x * this.x + this.y * this.y);
     }

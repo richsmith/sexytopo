@@ -36,4 +36,9 @@ public class SketchDetailProjection extends SketchDetail {
     public SketchDetail scale(float scale) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public SketchDetail rotate(float degrees) {
+        throw new UnsupportedOperationException();
+    }
 }

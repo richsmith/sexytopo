@@ -35,4 +35,10 @@ public abstract class SketchDetail extends Shape {
 
     @Override
     public abstract SketchDetail scale(float scale);
+
+    /**
+     * Turned about the origin by the given degrees clockwise. Text and cross-sections are only
+     * moved, as they're always drawn upright.
+     */
+    public abstract SketchDetail rotate(float degrees);
 }

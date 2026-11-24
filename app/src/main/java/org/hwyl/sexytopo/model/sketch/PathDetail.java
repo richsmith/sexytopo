@@ -3,6 +3,7 @@ package org.hwyl.sexytopo.model.sketch;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
@@ -250,6 +251,13 @@ public final class PathDetail extends SketchDetail {
         for (Coord2D step : path) {
             newPath.add(step.plus(translation));
         }
+        return new PathDetail(newPath, getColour(), lineType);
+    }
+
+    @Override
+    public PathDetail rotate(float degrees) {
+        List<Coord2D> newPath =
+                path.stream().map(step -> step.rotate(degrees)).collect(Collectors.toList());
         return new PathDetail(newPath, getColour(), lineType);
     }
 

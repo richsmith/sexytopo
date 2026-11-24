@@ -115,6 +115,12 @@ public class CrossSectionDetail extends SinglePositionDetail {
         return pixelSize >= MIN_VISIBLE_PIXELS;
     }
 
+    /** The section itself stays upright, as it's drawn in a plane of its own. */
+    @Override
+    public CrossSectionDetail rotate(float degrees) {
+        return new CrossSectionDetail(getCrossSection(), getPosition().rotate(degrees), sketch);
+    }
+
     @Override
     public CrossSectionDetail translate(Coord2D translation) {
         return new CrossSectionDetail(getCrossSection(), getPosition().plus(translation), sketch);
