@@ -190,6 +190,97 @@ public class Th2ExporterTest {
     }
 
     @Test
+    public void testAreaOutlineRunsAnticlockwiseWhicheverWayItWasDrawn() {
+        List<Coord2D> anticlockwise =
+                Arrays.asList(
+                        new Coord2D(0, 0), new Coord2D(4, 0), new Coord2D(4, 4), new Coord2D(0, 4));
+        List<Coord2D> clockwise = new ArrayList<>(anticlockwise);
+        Collections.reverse(clockwise);
+
+        for (List<Coord2D> outline : Arrays.asList(anticlockwise, clockwise)) {
+            Survey survey = BasicTestSurveyCreator.createStraightNorth();
+            survey.getPlanSketch()
+                    .setAreaDetails(
+                            Collections.singletonList(
+                                    new AreaDetail(outline, AreaType.CLAY, Colour.BROWN)));
+            String th2 = export(survey, Projection2D.PLAN);
+
+            Assert.assertTrue(getSignedArea(getBorderPoints(th2, "clay1")) > 0);
+        }
+    }
+
+    @Test
+    public void testAreaHoleRunsClockwiseWhicheverWayItWasDrawn() {
+        List<Coord2D> outline =
+                Arrays.asList(
+                        new Coord2D(0, 0), new Coord2D(4, 0), new Coord2D(4, 4), new Coord2D(0, 4));
+        List<Coord2D> anticlockwise =
+                Arrays.asList(
+                        new Coord2D(1, 1), new Coord2D(3, 1), new Coord2D(3, 3), new Coord2D(1, 3));
+        List<Coord2D> clockwise = new ArrayList<>(anticlockwise);
+        Collections.reverse(clockwise);
+
+        for (List<Coord2D> hole : Arrays.asList(anticlockwise, clockwise)) {
+            Survey survey = BasicTestSurveyCreator.createStraightNorth();
+            survey.getPlanSketch()
+                    .setAreaDetails(
+                            Collections.singletonList(
+                                    new AreaDetail(
+                                            outline,
+                                            Collections.singletonList(hole),
+                                            AreaType.WATER,
+                                            Colour.BLUE)));
+            String th2 = export(survey, Projection2D.PLAN);
+
+            Assert.assertTrue(getSignedArea(getBorderPoints(th2, "water1b")) < 0);
+        }
+    }
+
+    @Test
+    public void testReversedAreaBorderKeepsItsStartPoint() {
+        List<Coord2D> outline =
+                Arrays.asList(
+                        new Coord2D(1, 1), new Coord2D(1, 3), new Coord2D(4, 3), new Coord2D(4, 1));
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        survey.getPlanSketch()
+                .setAreaDetails(
+                        Collections.singletonList(
+                                new AreaDetail(outline, AreaType.SAND, Colour.BROWN)));
+        float scale = TherionExporter.getScale();
+
+        List<Coord2D> border = getBorderPoints(export(survey, Projection2D.PLAN), "sand1");
+
+        Coord2D start = new Coord2D(1 * scale, -1 * scale);
+        Assert.assertEquals(start, border.get(0));
+        Assert.assertEquals(start, border.get(border.size() - 1));
+    }
+
+    /** The points of the area border line with the given id, in th2 coordinates. */
+    private static List<Coord2D> getBorderPoints(String th2, String id) {
+        String start = "line border:invisible -id " + id + " -close on\n";
+        int from = th2.indexOf(start);
+        Assert.assertTrue(from >= 0);
+        String body = th2.substring(from + start.length(), th2.indexOf("endline", from));
+        List<Coord2D> points = new ArrayList<>();
+        for (String row : body.trim().split("\n")) {
+            String[] numbers = row.trim().split(" ");
+            points.add(new Coord2D(Float.parseFloat(numbers[0]), Float.parseFloat(numbers[1])));
+        }
+        return points;
+    }
+
+    /** Positive if the loop runs anticlockwise, with y up. */
+    private static double getSignedArea(List<Coord2D> loop) {
+        double sum = 0;
+        for (int i = 0; i < loop.size(); i++) {
+            Coord2D a = loop.get(i);
+            Coord2D b = loop.get((i + 1) % loop.size());
+            sum += a.x * b.y - b.x * a.y;
+        }
+        return sum / 2;
+    }
+
+    @Test
     public void testCopyrightLineAppearsAfterScrapLineInEveryScrap() {
         // createWithCrossSections() gives us one main "plan" scrap plus two cross-section
         // scraps, so this exercises both getScrap() and getCrossSectionScrap().

@@ -16,6 +16,8 @@ import org.hwyl.sexytopo.model.common.Shape;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.geometry.Line;
 import org.hwyl.sexytopo.model.geometry.Space;
+import org.hwyl.sexytopo.model.sketch.AreaDetail;
+import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
@@ -74,6 +76,14 @@ public class XviExporter {
             // the tracing background regardless so it is always a complete record of the
             // sketch (th2 line export is optional, and th2 lines are freely editable/deletable)
             content.sketchLines.add(getPathDetailText(pathDetail, scale));
+        }
+        for (AreaDetail areaDetail : sketch.getAreaDetails()) {
+            // the XVI has only polylines, so an area is traced as its outline and any holes
+            for (List<Coord2D> contour : areaDetail.getContours()) {
+                List<Coord2D> loop = new ArrayList<>(contour);
+                loop.add(contour.get(0));
+                content.sketchLines.add(getPolylineText(areaDetail.getColour(), loop, scale));
+            }
         }
         for (TextDetail textDetail : sketch.getTextDetails()) {
             content.sketchLines.add(getTextDetailAsPathsText(textDetail, scale));
@@ -136,9 +146,13 @@ public class XviExporter {
     }
 
     private static String getPathDetailText(PathDetail pathDetail, double scale) {
+        return getPolylineText(pathDetail.getColour(), pathDetail.getPath(), scale);
+    }
+
+    private static String getPolylineText(Colour colour, List<Coord2D> points, double scale) {
         List<Object> fields = new ArrayList<>();
-        fields.add(pathDetail.getColour().toString());
-        for (Coord2D coord2D : pathDetail.getPath()) {
+        fields.add(colour.toString());
+        for (Coord2D coord2D : points) {
             String x = TextTools.formatTo2dpWithDot(coord2D.x * scale);
             String y =
                     TextTools.formatTo2dpWithDot((-coord2D.y + 0.0) * scale); // +0.0 to avoid -0.0

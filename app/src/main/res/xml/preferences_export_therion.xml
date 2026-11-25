@@ -51,12 +51,6 @@
         android:defaultValue="EEX#"/>
 
     <CheckBoxPreference
-        android:key="pref_therion_export_symbols"
-        android:title="@string/settings_export_therion_symbols_title"
-        android:summary="@string/settings_export_therion_symbols_summary"
-        android:defaultValue="true"/>
-
-    <CheckBoxPreference
         android:key="pref_therion_export_lines"
         android:title="@string/settings_export_therion_lines_title"
         android:summary="@string/settings_export_therion_lines_summary"
@@ -72,9 +66,21 @@
         android:defaultValue="bezier"/>
 
     <CheckBoxPreference
+        android:key="pref_therion_export_symbols"
+        android:title="@string/settings_export_therion_symbols_title"
+        android:summary="@string/settings_export_therion_symbols_summary"
+        android:defaultValue="true"/>
+
+    <CheckBoxPreference
         android:key="pref_therion_export_text"
         android:title="@string/settings_export_therion_text_title"
         android:summary="@string/settings_export_therion_text_summary"
+        android:defaultValue="true"/>
+
+    <CheckBoxPreference
+        android:key="pref_therion_export_areas"
+        android:title="@string/settings_export_therion_areas_title"
+        android:summary="@string/settings_export_therion_areas_summary"
         android:defaultValue="true"/>
 
 </PreferenceScreen>

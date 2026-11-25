@@ -91,6 +91,42 @@ public class BezierFitterTest {
         Assert.assertEquals(outgoing.y, incoming.y, 0.001);
     }
 
+    @Test
+    public void testCurveStaysCloseToTheLineBetweenSparsePoints() {
+        // a wall as left by stroke simplification: long straight runs with gentle turns
+        List<Coord2D> points =
+                Arrays.asList(
+                        new Coord2D(0, 0),
+                        new Coord2D(0.4f, -2.5f),
+                        new Coord2D(0.5f, -3),
+                        new Coord2D(1.6f, -5.5f),
+                        new Coord2D(2, -6),
+                        new Coord2D(2.3f, -8.5f),
+                        new Coord2D(3.5f, -10));
+        List<BezierFitter.CubicBezier> curves = BezierFitter.fit(points, TOLERANCE);
+        assertFits(points, curves);
+
+        float worst = 0;
+        for (BezierFitter.CubicBezier curve : curves) {
+            for (int i = 0; i <= 100; i++) {
+                worst = Math.max(worst, distanceToPolyline(curve.pointAt(i / 100f), points));
+            }
+        }
+        Assert.assertTrue("strays " + worst + " from the line", worst <= TOLERANCE * 1.01);
+    }
+
+    private static float distanceToPolyline(Coord2D point, List<Coord2D> polyline) {
+        float nearest = Float.MAX_VALUE;
+        for (int i = 1; i < polyline.size(); i++) {
+            nearest =
+                    Math.min(
+                            nearest,
+                            Space2DUtils.getDistanceFromLine(
+                                    point, polyline.get(i - 1), polyline.get(i)));
+        }
+        return nearest;
+    }
+
     /** The chain is continuous, runs end to end, and passes within tolerance of every point. */
     private static void assertFits(List<Coord2D> points, List<BezierFitter.CubicBezier> curves) {
         Assert.assertFalse(curves.isEmpty());

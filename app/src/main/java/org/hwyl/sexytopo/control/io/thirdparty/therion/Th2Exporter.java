@@ -8,6 +8,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
 import org.hwyl.sexytopo.control.util.BezierFitter;
@@ -457,9 +459,11 @@ public class Th2Exporter {
             }
         }
 
-        List<AreaDetail> areaDetails = sketch.getAreaDetails();
-        for (int i = 0; i < areaDetails.size(); i++) {
-            commands.add(getArea(areaDetails.get(i), idPrefix, i + 1, placement));
+        if (GeneralPreferences.isTherionAreaExportEnabled()) {
+            List<AreaDetail> areaDetails = sketch.getAreaDetails();
+            for (int i = 0; i < areaDetails.size(); i++) {
+                commands.add(getArea(areaDetails.get(i), idPrefix, i + 1, placement));
+            }
         }
 
         if (GeneralPreferences.isXviExportSymbolsEnabled()) {
@@ -542,8 +546,10 @@ public class Th2Exporter {
     /**
      * An area is expressed in Therion as one closed border line per contour, plus an area command
      * referencing them all by id. The borders use the invisible subtype since they are just
-     * construction aids, not drawn walls. Therion treats the borders after the first as holes, so
-     * an area with a hole maps directly onto this form.
+     * construction aids, not drawn walls.
+     *
+     * <p>Each border runs with the filled region on its left in Therion's frame, as xtherion's tick
+     * on a line's first point shows it: anticlockwise round the outline, clockwise round a hole.
      */
     private static String getArea(
             AreaDetail areaDetail, String idPrefix, int index, Placement placement) {
@@ -562,12 +568,17 @@ public class Th2Exporter {
                             + (i == 0 ? "" : Character.toString((char) ('a' + i)));
             ids.add(id);
             lines.add("line border:invisible -id " + id + " -close on");
-            List<Coord2D> contour = contours.get(i);
+            List<Coord2D> contour = toCanvas(contours.get(i), placement);
+            boolean isOutline = i == 0;
+            if ((getSignedArea(contour) > 0) != isOutline) {
+                contour = reverseLoop(contour);
+            }
             for (Coord2D point : contour) {
-                lines.add("  " + toTh2(point, placement));
+                lines.add("  " + point.x + " " + point.y);
             }
             // xtherion expects the start point repeated to close the loop
-            lines.add("  " + toTh2(contour.get(0), placement));
+            Coord2D start = contour.get(0);
+            lines.add("  " + start.x + " " + start.y);
             lines.add("endline");
         }
 
@@ -577,6 +588,32 @@ public class Th2Exporter {
         }
         lines.add("endarea");
         return TextTools.join("\n", lines);
+    }
+
+    private static List<Coord2D> toCanvas(List<Coord2D> points, Placement placement) {
+        return points.stream().map(placement::toCanvas).collect(Collectors.toList());
+    }
+
+    /** Positive if the loop runs anticlockwise (with y up, as on the Therion canvas). */
+    private static double getSignedArea(List<Coord2D> loop) {
+        int size = loop.size();
+        return IntStream.range(0, size)
+                        .mapToDouble(
+                                i -> {
+                                    Coord2D a = loop.get(i);
+                                    Coord2D b = loop.get((i + 1) % size);
+                                    return (double) a.x * b.y - (double) b.x * a.y;
+                                })
+                        .sum()
+                / 2;
+    }
+
+    /** The same loop run the other way, from the same start point. */
+    private static List<Coord2D> reverseLoop(List<Coord2D> loop) {
+        List<Coord2D> reversed = new ArrayList<>(loop.subList(1, loop.size()));
+        Collections.reverse(reversed);
+        reversed.add(0, loop.get(0));
+        return reversed;
     }
 
     /**

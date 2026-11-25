@@ -231,6 +231,7 @@ public class TherionExporter extends Exporter {
         CheckBox linesCheckbox = dialogView.findViewById(R.id.therionLinesCheckbox);
         TextView lineShapeLabel = dialogView.findViewById(R.id.therionLineShapeLabel);
         Spinner lineShapeSpinner = dialogView.findViewById(R.id.therionLineShapeSpinner);
+        CheckBox areasCheckbox = dialogView.findViewById(R.id.therionAreasCheckbox);
         CheckBox textCheckbox = dialogView.findViewById(R.id.therionTextCheckbox);
 
         crossSectionsCheckbox.setChecked(GeneralPreferences.isTherionCrossSectionsEnabled());
@@ -247,6 +248,7 @@ public class TherionExporter extends Exporter {
         linesCheckbox.setOnCheckedChangeListener(
                 (button, isChecked) ->
                         setLineShapeEnabled(lineShapeLabel, lineShapeSpinner, isChecked));
+        areasCheckbox.setChecked(GeneralPreferences.isTherionAreaExportEnabled());
         textCheckbox.setChecked(GeneralPreferences.isXviExportTextEnabled());
 
         new MaterialAlertDialogBuilder(context)
@@ -268,6 +270,7 @@ public class TherionExporter extends Exporter {
                                     symbolsCheckbox.isChecked(),
                                     linesCheckbox.isChecked(),
                                     lineShapeValues.get(lineShapeSpinner.getSelectedItemPosition()),
+                                    areasCheckbox.isChecked(),
                                     textCheckbox.isChecked());
                             onReady.run();
                         })
@@ -281,7 +284,12 @@ public class TherionExporter extends Exporter {
     }
 
     private static void saveOptions(
-            boolean crossSections, boolean symbols, boolean lines, String lineShape, boolean text) {
+            boolean crossSections,
+            boolean symbols,
+            boolean lines,
+            String lineShape,
+            boolean areas,
+            boolean text) {
         SharedPreferences prefs = GeneralPreferences.getRawPreferences();
         if (prefs == null) {
             return;
@@ -291,6 +299,7 @@ public class TherionExporter extends Exporter {
                 .putBoolean("pref_therion_export_symbols", symbols)
                 .putBoolean("pref_therion_export_lines", lines)
                 .putString("pref_therion_export_line_shape", lineShape)
+                .putBoolean("pref_therion_export_areas", areas)
                 .putBoolean("pref_therion_export_text", text)
                 .apply();
     }

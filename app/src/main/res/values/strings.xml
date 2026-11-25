@@ -677,6 +677,8 @@
     <string name="therion_export_line_shape">Line shape</string>
     <string name="therion_export_line_shape_bezier">Bézier curves</string>
     <string name="therion_export_line_shape_straight">Straight segments</string>
+    <string name="settings_export_therion_areas_title">Export areas as Therion areas</string>
+    <string name="settings_export_therion_areas_summary">Include sketch areas (water, sand etc.) in the th2 file as Therion area commands</string>
     <string name="settings_export_therion_text_title">Export text as Therion labels</string>
     <string name="settings_export_therion_text_summary">Include sketch text in the th2 file as Therion label points</string>
     <string name="settings_export_folder_name_title">Export folder name</string>

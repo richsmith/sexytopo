@@ -10,6 +10,9 @@ import org.hwyl.sexytopo.model.common.Frame;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.geometry.Projection2D;
 import org.hwyl.sexytopo.model.geometry.Space;
+import org.hwyl.sexytopo.model.sketch.AreaDetail;
+import org.hwyl.sexytopo.model.sketch.AreaType;
+import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -30,6 +33,47 @@ public class XviExporterTest {
         Space<Coord2D> space = projection.project(testSurvey);
         String xvi = XviExporter.getContent(sketch, space, 1.0f, frame);
         Assert.assertTrue(xvi.contains("{BLACK 5.00 0.00 10.00 0.00}"));
+    }
+
+    @Test
+    public void testAreaIsTracedAsAClosedLineInItsColour() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        List<Coord2D> outline =
+                Arrays.asList(
+                        new Coord2D(1, 1), new Coord2D(4, 1), new Coord2D(4, 3), new Coord2D(1, 3));
+        survey.getPlanSketch()
+                .setAreaDetails(
+                        Collections.singletonList(
+                                new AreaDetail(outline, AreaType.CLAY, Colour.BROWN)));
+
+        String xvi = export(survey, Projection2D.PLAN);
+
+        Assert.assertTrue(
+                xvi.contains("{BROWN 1.00 -1.00 4.00 -1.00 4.00 -3.00 1.00 -3.00 1.00 -1.00}"));
+    }
+
+    @Test
+    public void testAreaHoleIsTracedToo() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        List<Coord2D> outline =
+                Arrays.asList(
+                        new Coord2D(0, 0), new Coord2D(4, 0), new Coord2D(4, 4), new Coord2D(0, 4));
+        List<Coord2D> hole =
+                Arrays.asList(
+                        new Coord2D(1, 1), new Coord2D(3, 1), new Coord2D(3, 3), new Coord2D(1, 3));
+        survey.getPlanSketch()
+                .setAreaDetails(
+                        Collections.singletonList(
+                                new AreaDetail(
+                                        outline,
+                                        Collections.singletonList(hole),
+                                        AreaType.WATER,
+                                        Colour.BLUE)));
+
+        String xvi = export(survey, Projection2D.PLAN);
+
+        Assert.assertTrue(
+                xvi.contains("{BLUE 1.00 -1.00 3.00 -1.00 3.00 -3.00 1.00 -3.00 1.00 -1.00}"));
     }
 
     // Cross-sections on the elevation

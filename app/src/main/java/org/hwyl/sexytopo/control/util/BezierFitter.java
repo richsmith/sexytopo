@@ -5,9 +5,9 @@ import java.util.List;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 
 /**
- * Fits a chain of cubic Bézier curves through a polyline, to within a given distance of every
- * point. This is Philip Schneider's algorithm from Graphics Gems ("An Algorithm for Automatically
- * Fitting Digitized Curves"): fit one curve by least squares, nudge the parameterisation with
+ * Fits a chain of cubic Bézier curves through a polyline, to within a given distance of it. This is
+ * Philip Schneider's algorithm from Graphics Gems ("An Algorithm for Automatically Fitting
+ * Digitized Curves"): fit one curve by least squares, nudge the parameterisation with
  * Newton-Raphson if it's nearly good enough, and otherwise split at the worst point and recurse.
  *
  * <p>The line is first broken at sharp corners, which are kept as corners rather than rounded off.
@@ -49,11 +49,14 @@ public final class BezierFitter {
     }
 
     /**
-     * Fits curves to the points so that none is further than tolerance from the chain. Each curve
-     * starts where the previous one ends. Returns an empty list for fewer than two distinct points.
+     * Fits curves to the line so that no part of it is further than tolerance from the chain. Each
+     * curve starts where the previous one ends. Returns an empty list for fewer than two distinct
+     * points.
      */
     public static List<CubicBezier> fit(List<Coord2D> points, float tolerance) {
-        List<Coord2D> distinct = removeRepeats(points);
+        // the fit is only checked at the points, so a long straight run between two of them would
+        // leave the curve free to wander off it: fill such runs in with points a tolerance apart
+        List<Coord2D> distinct = fillIn(removeRepeats(points), tolerance);
         List<CubicBezier> curves = new ArrayList<>();
         if (distinct.size() < 2) {
             return curves;
@@ -294,6 +297,22 @@ public final class BezierFitter {
             }
         }
         return distinct;
+    }
+
+    private static List<Coord2D> fillIn(List<Coord2D> points, float spacing) {
+        List<Coord2D> filled = new ArrayList<>();
+        for (int i = 0; i < points.size(); i++) {
+            Coord2D point = points.get(i);
+            if (i > 0) {
+                Coord2D previous = points.get(i - 1);
+                int steps = (int) Math.ceil(distance(previous, point) / spacing);
+                for (int step = 1; step < steps; step++) {
+                    filled.add(previous.plus(point.minus(previous).scale((float) step / steps)));
+                }
+            }
+            filled.add(point);
+        }
+        return filled;
     }
 
     private static Coord2D last(List<Coord2D> points) {

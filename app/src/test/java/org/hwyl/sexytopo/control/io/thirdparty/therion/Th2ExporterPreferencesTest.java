@@ -3,10 +3,13 @@ package org.hwyl.sexytopo.control.io.thirdparty.therion;
 import android.content.SharedPreferences;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.hwyl.sexytopo.control.util.GeneralPreferences;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.geometry.Projection2D;
+import org.hwyl.sexytopo.model.sketch.AreaDetail;
+import org.hwyl.sexytopo.model.sketch.AreaType;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.LineType;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
@@ -80,6 +83,33 @@ public class Th2ExporterPreferencesTest {
             Assert.assertTrue(
                     projection.name(), Th2ExporterTest.getSectionScrapNames(th2).isEmpty());
         }
+    }
+
+    @Test
+    public void testAreasAreExportedByDefault() {
+        String th2 = Th2ExporterTest.export(createSurveyWithArea(), Projection2D.PLAN);
+        Assert.assertTrue(th2.contains("area clay\n"));
+        Assert.assertTrue(th2.contains("line border:invisible -id clay1"));
+    }
+
+    @Test
+    public void testNoAreasAreExportedWhenTheOptionIsOff() {
+        prefs.edit().putBoolean("pref_therion_export_areas", false).apply();
+        String th2 = Th2ExporterTest.export(createSurveyWithArea(), Projection2D.PLAN);
+        Assert.assertFalse(th2.contains("area clay"));
+        Assert.assertFalse(th2.contains("line border"));
+    }
+
+    private static Survey createSurveyWithArea() {
+        Survey survey = BasicTestSurveyCreator.createStraightNorth();
+        List<Coord2D> outline =
+                Arrays.asList(
+                        new Coord2D(1, 1), new Coord2D(4, 1), new Coord2D(4, 3), new Coord2D(1, 3));
+        survey.getPlanSketch()
+                .setAreaDetails(
+                        Collections.singletonList(
+                                new AreaDetail(outline, AreaType.CLAY, Colour.BROWN)));
+        return survey;
     }
 
     @Test

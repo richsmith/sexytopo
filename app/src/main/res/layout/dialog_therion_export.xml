@@ -76,13 +76,6 @@
             android:text="@string/settings_export_therion_cross_sections_title" />
 
         <CheckBox
-            android:id="@+id/therionSymbolsCheckbox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/settings_export_therion_symbols_title" />
-
-        <CheckBox
             android:id="@+id/therionLinesCheckbox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -106,11 +99,25 @@
             android:entries="@array/therion_export_line_shape_entries" />
 
         <CheckBox
+            android:id="@+id/therionSymbolsCheckbox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/settings_export_therion_symbols_title" />
+
+        <CheckBox
             android:id="@+id/therionTextCheckbox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="@string/settings_export_therion_text_title" />
+
+        <CheckBox
+            android:id="@+id/therionAreasCheckbox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/settings_export_therion_areas_title" />
 
     </LinearLayout>
 

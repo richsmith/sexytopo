@@ -384,6 +384,10 @@ public class GeneralPreferences {
         return getBoolean("pref_therion_export_lines", true);
     }
 
+    public static boolean isTherionAreaExportEnabled() {
+        return getBoolean("pref_therion_export_areas", true);
+    }
+
     public static String getTherionLineShape() {
         return getString("pref_therion_export_line_shape", "bezier");
     }
