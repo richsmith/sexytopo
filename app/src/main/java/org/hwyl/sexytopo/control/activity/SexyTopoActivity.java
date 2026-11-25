@@ -260,6 +260,10 @@ public abstract class SexyTopoActivity extends AppCompatActivity {
         boolean isDevMenuVisible = GeneralPreferences.isDevModeOn();
         MenuItem devMenu = menu.findItem(R.id.action_dev_menu);
         devMenu.setVisible(isDevMenuVisible);
+        MenuItem debugModeItem = menu.findItem(R.id.action_debug_mode);
+        if (debugModeItem != null) {
+            debugModeItem.setChecked(debugMode);
+        }
 
         // update Fullscreen menu item checked state
         MenuItem fullscreenItem = menu.findItem(R.id.action_fullscreen);
