@@ -45,6 +45,8 @@ class LineRenderer {
     private final Map<LineType, Paint> lineTypePaints = new EnumMap<>(LineType.class);
     private final Map<LineType, Float> lineTypePaintOrnamentSizePixels =
             new EnumMap<>(LineType.class);
+    // the points of each line in debug mode: plain fill, as a typed line's paint has ornamentation
+    private final Paint debugPointPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     // one paint per layer of wall rock-side shading
     private final Paint[] wallRockSidePaints = createWallRockSidePaints();
     private float wallRockSidePaintsOrnamentSizePixels = -1;
@@ -113,7 +115,8 @@ class LineRenderer {
                         pathDetail,
                         alpha,
                         isDarkModeActive,
-                        isFinishedWall(sketch, pathDetail));
+                        isFinishedWall(sketch, pathDetail),
+                        isDebugMode);
                 continue;
             }
 
@@ -148,9 +151,7 @@ class LineRenderer {
             canvas.drawLines(lines, 0, lineIndex, drawPaint);
 
             if (isDebugMode) {
-                for (int i = 0; i < pointValues; i += 2) {
-                    canvas.drawCircle(points[i], points[i + 1], 3, drawPaint);
-                }
+                drawDebugPoints(canvas, pointValues, drawPaint);
             }
         }
     }
@@ -164,7 +165,8 @@ class LineRenderer {
             PathDetail pathDetail,
             int alpha,
             boolean isDarkModeActive,
-            boolean shadeRockSide) {
+            boolean shadeRockSide,
+            boolean isDebugMode) {
         Paint paint = getLineTypePaint(pathDetail.getLineType(), viewport.getPatternScale());
         paint.setColor(pathDetail.getDrawColour(isDarkModeActive).intValue);
         paint.setAlpha(alpha);
@@ -183,6 +185,23 @@ class LineRenderer {
             drawRockSide(canvas, typedPathScratch, paint.getColor(), alpha);
         }
         canvas.drawPath(typedPathScratch, paint);
+
+        if (isDebugMode) {
+            drawDebugPoints(canvas, pointValues, paint);
+        }
+    }
+
+    /**
+     * Marks each of the points in pointsScratch (the first pointValues values) with a dot in the
+     * line's colour, twice the line's width across so it stands out from the line.
+     */
+    private void drawDebugPoints(Canvas canvas, int pointValues, Paint linePaint) {
+        debugPointPaint.setColor(linePaint.getColor());
+        float radius = linePaint.getStrokeWidth();
+        float[] points = pointsScratch;
+        for (int i = 0; i < pointValues; i += 2) {
+            canvas.drawCircle(points[i], points[i + 1], radius, debugPointPaint);
+        }
     }
 
     /**
