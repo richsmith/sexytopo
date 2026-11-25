@@ -7,7 +7,6 @@ import org.hwyl.sexytopo.model.common.Frame;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.geometry.Line;
 import org.hwyl.sexytopo.model.geometry.Space;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 
@@ -164,16 +163,14 @@ public class Space2DUtils {
         return simplifiedPath;
     }
 
-    public static float simplificationEpsilon(float width, float height) {
-
-        // TODO: this is a pretty crude simplification factor but we can revisit after more testing
-        float maxDim = Math.max(width, height);
-        return Math.max(maxDim / 500, 0.001f);
-    }
-
-    public static float simplificationEpsilon(PathDetail pathDetail) {
-        return simplificationEpsilon(pathDetail.getWidth(), pathDetail.getHeight());
-    }
+    /**
+     * How far, in metres, simplification may move a drawn line. What shows isn't so much the
+     * distance moved as the bend at each point left behind, which grows with the square root of
+     * this, so it's kept small enough that curves drawn zoomed in don't come out faceted. It's
+     * fixed rather than relative to the line's size, so a line comes out the same however it's
+     * later joined, resized or reloaded.
+     */
+    public static final float SIMPLIFICATION_EPSILON = 0.002f;
 
     public static List<Coord2D> simplify(List<Coord2D> path, float epsilon) {
 

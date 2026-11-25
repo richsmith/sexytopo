@@ -3,7 +3,6 @@ package org.hwyl.sexytopo.control.util;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
-import android.graphics.RectF;
 import android.os.Build;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -636,10 +635,7 @@ public class PolygonUtils {
      */
     private static List<Region> extractRegions(Path path) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            RectF bounds = new RectF();
-            path.computeBounds(bounds, true);
-            float acceptableError =
-                    Space2DUtils.simplificationEpsilon(bounds.width(), bounds.height());
+            float acceptableError = Space2DUtils.SIMPLIFICATION_EPSILON;
             return groupIntoRegions(splitIntoContours(path.approximate(acceptableError)));
         } else {
             // before Android 8 a Path's vertices can't be read, so sample its outline instead;
@@ -770,16 +766,7 @@ public class PolygonUtils {
             return null;
         }
 
-        float minX = Float.MAX_VALUE, minY = Float.MAX_VALUE;
-        float maxX = -Float.MAX_VALUE, maxY = -Float.MAX_VALUE;
-        for (Coord2D point : sampled) {
-            minX = Math.min(minX, point.x);
-            maxX = Math.max(maxX, point.x);
-            minY = Math.min(minY, point.y);
-            maxY = Math.max(maxY, point.y);
-        }
-        float epsilon = Space2DUtils.simplificationEpsilon(maxX - minX, maxY - minY);
-        List<Coord2D> polygon = Space2DUtils.simplify(sampled, epsilon);
+        List<Coord2D> polygon = Space2DUtils.simplify(sampled, Space2DUtils.SIMPLIFICATION_EPSILON);
 
         return polygon.size() >= 3 ? polygon : null;
     }

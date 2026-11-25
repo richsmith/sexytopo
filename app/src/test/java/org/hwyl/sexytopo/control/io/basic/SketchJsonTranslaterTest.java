@@ -66,6 +66,21 @@ public class SketchJsonTranslaterTest {
     }
 
     @Test
+    public void testLongLineKeepsItsDetailThroughARoundTrip() throws Exception {
+        // a 50m wall with 3cm wiggles, as if joined from strokes each simplified on its own
+        List<Coord2D> wall = new ArrayList<>();
+        for (int i = 0; i <= 100; i++) {
+            wall.add(new Coord2D(i * 0.5f, i % 2 == 0 ? 0 : 0.03f));
+        }
+        PathDetail pathDetail = new PathDetail(wall, Colour.BLACK, LineType.WALL);
+
+        PathDetail restored =
+                SketchJsonTranslater.toPathDetail(SketchJsonTranslater.toJson(pathDetail));
+
+        Assert.assertEquals(wall, restored.getPath());
+    }
+
+    @Test
     public void testAreaDetailRoundTrip() throws Exception {
         List<Coord2D> polygon = new ArrayList<>();
         polygon.add(new Coord2D(0, 0));

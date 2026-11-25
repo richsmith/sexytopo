@@ -6,7 +6,6 @@ import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.SexyTopoConstants;
 import org.hwyl.sexytopo.control.Log;
 import org.hwyl.sexytopo.control.io.IoUtils;
-import org.hwyl.sexytopo.control.util.Space2DUtils;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.sketch.AreaDetail;
 import org.hwyl.sexytopo.model.sketch.AreaType;
@@ -216,13 +215,7 @@ public class SketchJsonTranslater {
             path.add(toCoord2D(object));
         }
 
-        PathDetail pathDetail = new PathDetail(path, colour, lineType);
-
-        float epsilon = Space2DUtils.simplificationEpsilon(pathDetail);
-        List<Coord2D> simplifiedPath = Space2DUtils.simplify(path, epsilon);
-        pathDetail.setPath(simplifiedPath);
-
-        return pathDetail;
+        return new PathDetail(path, colour, lineType);
     }
 
     public static JSONObject toJson(AreaDetail areaDetail) throws JSONException {

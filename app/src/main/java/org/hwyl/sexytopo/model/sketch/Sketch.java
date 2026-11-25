@@ -169,8 +169,8 @@ public class Sketch extends Shape {
             abandonActivePath();
             return;
         }
-        float epsilon = Space2DUtils.simplificationEpsilon(activePath);
-        activePath.setPath(Space2DUtils.simplify(activePath.getPath(), epsilon));
+        activePath.setPath(
+                Space2DUtils.simplify(activePath.getPath(), Space2DUtils.SIMPLIFICATION_EPSILON));
 
         List<List<Coord2D>> pieces = clipToWalls(activePath);
         if (pieces.size() == 1
@@ -254,10 +254,9 @@ public class Sketch extends Shape {
         PathDetail outlinePath = activePath;
         abandonActivePath();
 
-        float epsilon = Space2DUtils.simplificationEpsilon(outlinePath);
         List<Coord2D> stroke =
                 PolygonUtils.trimHooks(PolygonUtils.trimOvershoot(outlinePath.getPath()));
-        List<Coord2D> outline = Space2DUtils.simplify(stroke, epsilon);
+        List<Coord2D> outline = Space2DUtils.simplify(stroke, Space2DUtils.SIMPLIFICATION_EPSILON);
         if (outline.size() < 3) {
             return; // too small to form a polygon; treat as an accidental tap
         }

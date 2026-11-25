@@ -530,8 +530,8 @@ public class Th2Exporter {
 
     /**
      * How far, in metres, a fitted curve may stray from the drawn line: proportional to the line's
-     * size, as with the simplification applied when it was drawn, so small details keep their shape
-     * and long walls don't end up with needlessly many nodes.
+     * size, so small details keep their shape and long walls don't end up with needlessly many
+     * nodes.
      */
     private static float getCurveTolerance(PathDetail pathDetail) {
         float size = Math.max(pathDetail.getWidth(), pathDetail.getHeight());

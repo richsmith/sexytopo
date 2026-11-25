@@ -55,7 +55,7 @@ public class Space2DUtilsTest {
         path.add(new Coord2D(40, 0));
         path.add(new Coord2D(50, 0));
 
-        float epsilon = Space2DUtils.simplificationEpsilon(50, 50);
+        float epsilon = Space2DUtils.SIMPLIFICATION_EPSILON;
         List<Coord2D> simplifiedPath = Space2DUtils.simplify(path, epsilon);
 
         ArrayList<Coord2D> expectedPath = new ArrayList<>();
@@ -75,7 +75,7 @@ public class Space2DUtilsTest {
         path.add(new Coord2D(10, 5));
         path.add(new Coord2D(10, 10));
 
-        float epsilon = Space2DUtils.simplificationEpsilon(10, 10);
+        float epsilon = Space2DUtils.SIMPLIFICATION_EPSILON;
         List<Coord2D> simplifiedPath = Space2DUtils.simplify(path, epsilon);
 
         ArrayList<Coord2D> expectedPath = new ArrayList<>();
@@ -104,7 +104,7 @@ public class Space2DUtilsTest {
         path.add(path.get(0));
 
         {
-            float epsilon = Space2DUtils.simplificationEpsilon(10, 10);
+            float epsilon = Space2DUtils.SIMPLIFICATION_EPSILON;
             List<Coord2D> simplifiedPath = Space2DUtils.simplify(path, epsilon);
 
             // Remains unchanged
