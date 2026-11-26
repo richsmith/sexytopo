@@ -6,8 +6,8 @@ import android.content.res.Resources;
 import android.util.DisplayMetrics;
 import android.widget.Toast;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
-import org.hwyl.sexytopo.control.util.GeneralPreferences;
-import org.hwyl.sexytopo.control.util.SketchPreferences;
+import org.hwyl.sexytopo.control.preferences.GeneralPreferences;
+import org.hwyl.sexytopo.control.preferences.SketchPreferences;
 import org.hwyl.sexytopo.model.sketch.Symbol;
 
 public class SexyTopo extends Application {

@@ -10,7 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.util.SparseArray;
 import androidx.core.content.ContextCompat;
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.control.util.GeneralPreferences;
+import org.hwyl.sexytopo.control.preferences.GeneralPreferences;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.SinglePositionDetail;

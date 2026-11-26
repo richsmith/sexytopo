@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.model.sketch;
 
-import org.hwyl.sexytopo.control.util.SketchPreferences.Toggle;
+import org.hwyl.sexytopo.control.preferences.SketchPreferences.Toggle;
 
 /**
  * A colour some kinds of feature are always drawn in, whatever the selected brush colour, while its

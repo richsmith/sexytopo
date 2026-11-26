@@ -23,8 +23,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.control.util.GeneralPreferences;
-import org.hwyl.sexytopo.control.util.amalgamation.LegAmalgamationAlgorithm;
+import org.hwyl.sexytopo.control.preferences.GeneralPreferences;
+import org.hwyl.sexytopo.control.survey.amalgamation.LegAmalgamationAlgorithm;
 import org.hwyl.sexytopo.model.survey.Licence;
 
 public class SettingsActivity extends SexyTopoActivity

@@ -27,7 +27,7 @@ import org.hwyl.sexytopo.comms.Communicator;
 import org.hwyl.sexytopo.comms.Instrument;
 import org.hwyl.sexytopo.comms.InstrumentType;
 import org.hwyl.sexytopo.control.Log;
-import org.hwyl.sexytopo.control.util.GeneralPreferences;
+import org.hwyl.sexytopo.control.preferences.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.LogUpdateReceiver;
 
 public class DeviceActivity extends SexyTopoActivity {

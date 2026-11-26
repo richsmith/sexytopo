@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurvexTherionUtil;
 import org.hwyl.sexytopo.control.io.thirdparty.survextherion.SurveyFormat;
-import org.hwyl.sexytopo.control.util.SurveyUpdater;
+import org.hwyl.sexytopo.control.survey.SurveyUpdater;
 import org.hwyl.sexytopo.model.geometry.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.LegFilter;

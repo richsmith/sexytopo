@@ -1,8 +1,8 @@
 package org.hwyl.sexytopo.model.geometry;
 
 import java.util.Map;
-import org.hwyl.sexytopo.control.util.Space3DTransformer;
-import org.hwyl.sexytopo.control.util.Space3DTransformerForElevation;
+import org.hwyl.sexytopo.control.geometry.Space3DTransformer;
+import org.hwyl.sexytopo.control.geometry.Space3DTransformerForElevation;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;

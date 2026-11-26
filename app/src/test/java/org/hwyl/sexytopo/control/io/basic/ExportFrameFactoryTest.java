@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.control.io.basic;
 
-import org.hwyl.sexytopo.control.util.CrossSectioner;
+import org.hwyl.sexytopo.control.geometry.CrossSectioner;
 import org.hwyl.sexytopo.model.common.Frame;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.geometry.Projection2D;

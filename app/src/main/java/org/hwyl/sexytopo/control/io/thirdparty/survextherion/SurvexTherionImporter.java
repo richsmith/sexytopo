@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.hwyl.sexytopo.control.Log;
-import org.hwyl.sexytopo.control.util.SurveyUpdater;
+import org.hwyl.sexytopo.control.survey.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;

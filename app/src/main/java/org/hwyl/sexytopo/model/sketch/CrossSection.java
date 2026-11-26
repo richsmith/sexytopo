@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.model.sketch;
 
-import org.hwyl.sexytopo.control.util.Space3DUtils;
+import org.hwyl.sexytopo.control.geometry.Space3DUtils;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.geometry.Coord3D;
 import org.hwyl.sexytopo.model.geometry.Line;

@@ -8,7 +8,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import androidx.core.content.ContextCompat;
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.control.util.SketchPreferences;
+import org.hwyl.sexytopo.control.preferences.SketchPreferences;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.geometry.Projection2D;
 import org.hwyl.sexytopo.model.sketch.Colour;

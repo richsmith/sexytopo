@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.control.sketch;
 
-import org.hwyl.sexytopo.control.util.Space2DUtils;
+import org.hwyl.sexytopo.control.geometry.Space2DUtils;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 
 /**

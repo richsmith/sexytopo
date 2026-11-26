@@ -1,0 +1,490 @@
+package org.hwyl.sexytopo.control.survey;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import org.hwyl.sexytopo.R;
+import org.hwyl.sexytopo.SexyTopoConstants;
+import org.hwyl.sexytopo.control.Log;
+import org.hwyl.sexytopo.control.SexyTopo;
+import org.hwyl.sexytopo.control.preferences.InputMode;
+import org.hwyl.sexytopo.control.survey.amalgamation.LegAmalgamationAlgorithm;
+import org.hwyl.sexytopo.model.geometry.ExtendedElevationDirection;
+import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.LegFilter;
+import org.hwyl.sexytopo.model.survey.Station;
+import org.hwyl.sexytopo.model.survey.Survey;
+
+public class SurveyUpdater {
+
+    public static boolean update(Survey survey, List<Leg> legs, InputMode inputMode) {
+        boolean anyStationsAdded = false;
+        for (Leg leg : legs) {
+            anyStationsAdded = anyStationsAdded || update(survey, leg, inputMode);
+        }
+        return anyStationsAdded;
+    }
+
+    public static boolean update(Survey survey, List<Leg> legs) {
+        boolean anyStationsAdded = false;
+        for (Leg leg : legs) {
+            anyStationsAdded = anyStationsAdded || update(survey, leg);
+        }
+        return anyStationsAdded;
+    }
+
+    public static boolean update(Survey survey, Leg leg) {
+        return update(survey, leg, InputMode.FORWARD);
+    }
+
+    public static synchronized boolean update(Survey survey, Leg leg, InputMode inputMode) {
+        Station activeStation = survey.getActiveStation();
+
+        Log.i(R.string.survey_update_adding_leg, leg);
+        activeStation.addOnwardLeg(leg);
+        survey.setSaved(false);
+        survey.addLegRecord(leg);
+
+        boolean justCreatedNewStation = false;
+        switch (inputMode) {
+            case FORWARD:
+                justCreatedNewStation = createNewStationIfTripleShot(survey, false);
+                break;
+            case BACKWARD:
+                justCreatedNewStation = createNewStationIfTripleShot(survey, true);
+                break;
+            case COMBO:
+                justCreatedNewStation =
+                        createNewStationIfBacksight(survey)
+                                || createNewStationIfTripleShot(survey, false);
+            case CALIBRATION_CHECK:
+                break; // do nothing :)
+        }
+
+        return justCreatedNewStation;
+    }
+
+    public static void updateWithNewStation(Survey survey, Leg leg) {
+        Station activeStation = survey.getActiveStation();
+
+        if (!leg.hasDestination()) {
+            Station newStation =
+                    new Station(StationNamer.generateNextStationName(survey, activeStation));
+            leg = Leg.toFullLeg(leg, newStation);
+        }
+
+        addLegFromStation(survey, activeStation, leg);
+    }
+
+    public static void addLegFromStation(Survey survey, Station fromStation, Leg leg) {
+        Log.i(R.string.survey_update_adding_leg, leg);
+        fromStation.addOnwardLeg(leg);
+        survey.setSaved(false);
+        survey.addLegRecord(leg);
+        if (leg.hasDestination()) {
+            survey.setActiveStation(leg.getDestination());
+        }
+    }
+
+    /**
+     * Turns a splay into a leg to a new station. A disabled splay can't be made into a leg, so this
+     * throws an IllegalStateException if asked to.
+     */
+    public static void upgradeSplay(Survey survey, Leg leg, InputMode inputMode) {
+        if (!leg.isEnabled()) {
+            throw new IllegalStateException("Cannot upgrade a disabled splay to a leg");
+        }
+
+        Station newStation = new Station(getNextStationName(survey));
+
+        Leg newLeg = Leg.fromRecordedReading(leg, newStation, inputMode == InputMode.BACKWARD);
+
+        editLeg(survey, leg, newLeg);
+        survey.setActiveStation(newStation);
+    }
+
+    /**
+     * Enables or disables a splay. A disabled splay stays in the survey and its comment can still
+     * be edited, but it is otherwise left out: it isn't drawn and is commented out on export. Only
+     * splays can be disabled, so this throws an IllegalStateException if asked to disable a leg.
+     */
+    public static void setSplayEnabled(Survey survey, Leg splay, boolean enabled) {
+        splay.setEnabled(enabled);
+        survey.setSaved(false);
+    }
+
+    /**
+     * Promote a splay to the leg above it (add it to the promoted legs array).
+     *
+     * <p>Searches the parent station's legs list for the nearest full leg above this splay in
+     * chrono order and averages the splay into it. A disabled splay can't be made part of a leg, so
+     * this throws an IllegalStateException if asked to.
+     *
+     * @param survey The survey containing the legs
+     * @param splay The splay to promote
+     * @return true if successful, false if no compatible leg above was found
+     */
+    public static boolean promoteToAboveLeg(Survey survey, Leg splay) {
+        if (splay.hasDestination()) {
+            return false;
+        }
+
+        if (!splay.isEnabled()) {
+            throw new IllegalStateException("Cannot promote a disabled splay to the leg above");
+        }
+
+        Leg above = findMostRecentPreviousLeg(survey, splay);
+        if (above == null) {
+            return false;
+        }
+
+        Station parent = survey.getOriginatingStation(splay);
+        Leg newLegAbove = combineSplayWithLeg(splay, above);
+
+        editLeg(survey, above, newLegAbove);
+        parent.removeOnwardLeg(splay);
+        survey.removeLegRecord(splay);
+
+        return true;
+    }
+
+    private static Leg findMostRecentPreviousLeg(Survey survey, Leg leg) {
+        List<Leg> chronoLegs = survey.getAllLegsInChronoOrder();
+        List<Leg> before = new ArrayList<>(chronoLegs.subList(0, chronoLegs.indexOf(leg)));
+        Collections.reverse(before); // have to reverse in-place in old Java :/
+        return before.stream()
+                .filter(candidate -> candidate.hasDestination())
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * Averages a splay into a leg.
+     *
+     * <p>The promoted-from readings are the readings exactly as they were recorded, so the splay is
+     * added to them untouched. The leg keeps its direction, and so stays backwards if it was.
+     */
+    private static Leg combineSplayWithLeg(Leg splay, Leg leg) {
+        List<Leg> readings = new ArrayList<>(Arrays.asList(getRecordedReadings(leg)));
+        readings.add(splay);
+
+        Leg newLeg = createLegFromReadings(readings, leg.getDestination(), leg.wasShotBackwards());
+        newLeg.setComment(leg.getComment());
+        return newLeg;
+    }
+
+    /**
+     * The readings a leg was made from, as they were recorded. For a promoted leg these are its
+     * promoted-from readings. A leg made from a single reading has none, so the leg itself is the
+     * reading, reversed back if it was shot backwards.
+     */
+    private static Leg[] getRecordedReadings(Leg leg) {
+        if (leg.wasPromoted()) {
+            return leg.getPromotedFrom();
+        }
+        return new Leg[] {leg.toRecordedReading()};
+    }
+
+    /**
+     * Builds a connected leg from readings as they were recorded: multiple readings are averaged
+     * and kept as the leg's promoted-from readings, while a single reading is used as it is. A leg
+     * shot backwards is reversed into the direction it is plotted and flagged.
+     */
+    public static Leg createLegFromReadings(
+            List<Leg> readings, Station destination, boolean shotBackwards) {
+        if (readings.isEmpty()) {
+            throw new IllegalArgumentException("A leg needs at least one reading");
+        }
+        boolean repeated = readings.size() > 1;
+        Leg recorded = repeated ? averageLegs(readings) : readings.get(0);
+        Leg[] promotedFrom = repeated ? readings.toArray(new Leg[0]) : new Leg[] {};
+        return Leg.fromRecordedReading(recorded, destination, promotedFrom, shotBackwards);
+    }
+
+    private static synchronized String getNextStationName(Survey survey) {
+        return StationNamer.generateNextStationName(survey, survey.getActiveStation());
+    }
+
+    private static boolean createNewStationIfTripleShot(Survey survey, boolean backsightMode) {
+
+        int requiredNumber = SexyTopoConstants.NUM_OF_REPEATS_FOR_NEW_STATION;
+
+        Station activeStation = survey.getActiveStation();
+        List<Leg> activeLegs = activeStation.getOnwardLegs();
+        if (activeLegs.size() < requiredNumber) {
+            return false;
+        }
+
+        List<Leg> lastNLegs = survey.getLastNLegs(requiredNumber);
+        if (lastNLegs.size() < requiredNumber) {
+            return false;
+        }
+
+        // check all the last legs are from the active station
+        for (Leg leg : lastNLegs) {
+            if (!activeLegs.contains(leg)) {
+                return false;
+            }
+        }
+
+        if (areLegsAboutTheSame(lastNLegs)) {
+
+            Station newStation = new Station(getNextStationName(survey));
+            newStation.setExtendedElevationDirection(
+                    SurveyTraversal.getOnwardExtendedElevationDirection(survey, activeStation));
+
+            Leg newLeg = createLegFromReadings(lastNLegs, newStation, backsightMode);
+
+            for (int i = 0; i < requiredNumber; i++) {
+                survey.undoAddLeg();
+            }
+
+            activeStation.addOnwardLeg(newLeg);
+            survey.addLegRecord(newLeg);
+            survey.setActiveStation(newStation);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private static boolean createNewStationIfBacksight(Survey survey) {
+        // Examine splays of the current active station to determine if the previous two were a
+        // foreward and backsight; if so, promote to a new named station
+
+        Station activeStation = survey.getActiveStation();
+        List<Leg> activeLegs = activeStation.getOnwardLegs();
+        if (activeLegs.size() < 2) {
+            return false;
+        }
+
+        List<Leg> lastPair = survey.getLastNLegs(2);
+
+        if (lastPair.size() < 2) {
+            return false;
+        }
+
+        for (Leg leg : lastPair) {
+            if (!activeLegs.contains(leg)) {
+                return false;
+            }
+        }
+
+        Leg fore = lastPair.get(lastPair.size() - 2);
+        Leg back =
+                lastPair.get(
+                        lastPair.size()
+                                - 1); // TODO: check for "reverse mode" to see if backsight comes
+        // first?
+
+        if (areLegsBacksights(fore, back)) {
+            Station newStation = new Station(getNextStationName(survey));
+            newStation.setExtendedElevationDirection(
+                    SurveyTraversal.getOnwardExtendedElevationDirection(survey, activeStation));
+
+            Leg newLeg = averageBacksights(fore, back);
+            newLeg = Leg.toFullLeg(newLeg, newStation);
+
+            survey.undoAddLeg();
+            survey.undoAddLeg();
+
+            activeStation.addOnwardLeg(newLeg);
+            survey.addLegRecord(newLeg);
+
+            survey.setActiveStation(newStation);
+            return true;
+        }
+
+        return false;
+    }
+
+    public static synchronized void editLeg(
+            final Survey survey, final Leg toEdit, final Leg edited) {
+        SurveyTraversal.traverseLegs(
+                survey,
+                (origin, leg) -> {
+                    if (leg == toEdit) {
+                        origin.removeOnwardLeg(toEdit);
+                        origin.addOnwardLeg(edited);
+                        survey.replaceLegInRecord(toEdit, edited);
+                        Log.d(R.string.survey_update_edited_leg, toEdit, edited);
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
+        survey.setSaved(false);
+    }
+
+    /**
+     * Sets whether a splay goes to a wall or to another feature. The splay stays where it is in the
+     * survey and keeps its readings; a leg, which has a destination, is left alone.
+     */
+    public static void setSplayToWall(Survey survey, Leg splay, boolean toWall) {
+        if (splay.hasDestination() || splay.isToWall() == toWall) {
+            return;
+        }
+        editLeg(survey, splay, splay.withToWall(toWall));
+    }
+
+    public static void renameStation(Survey survey, Station station, String name) {
+        String previousName = station.getName();
+
+        Station existing = survey.getStationByName(name);
+        if (existing != null) {
+            String message =
+                    SexyTopo.staticGetString(R.string.survey_update_rename_error_not_unique);
+            throw new IllegalArgumentException(message);
+        }
+
+        station.setName(name);
+        survey.setSaved(false);
+        Log.i(R.string.survey_update_renamed_station, previousName, name);
+    }
+
+    public static void renameOrigin(Survey survey, String name) {
+        renameStation(survey, survey.getOrigin(), name);
+    }
+
+    public static void moveLeg(Survey survey, Leg leg, Station newSource) {
+        Station originating = survey.getOriginatingStation(leg);
+        originating.removeOnwardLeg(leg);
+        newSource.addOnwardLeg(leg);
+        survey.setSaved(false);
+        Log.i(R.string.survey_update_moved_leg, newSource.getName());
+    }
+
+    public static void deleteStation(final Survey survey, final Station toDelete) {
+        if (!survey.isOrigin(toDelete)) {
+            // Station comes as a package with the leg that forms it, so
+            // remove that to delete the station from the graph
+            Leg referringLeg = survey.getReferringLeg(toDelete);
+            Station fromStation = survey.getOriginatingStation(referringLeg);
+            deleteLeg(survey, fromStation, referringLeg);
+        }
+    }
+
+    public static void deleteLeg(Survey survey, Station fromStation, Leg leg) {
+
+        // First remove all legs in the subtree from the survey record
+        if (leg.hasDestination()) {
+            SurveyTraversal.traverseLegs(
+                    leg.getDestination(),
+                    (origin, subLeg) -> {
+                        survey.removeLegRecord(subLeg);
+                        return false;
+                    });
+        }
+
+        // Remove this leg's record
+        survey.removeLegRecord(leg);
+
+        // Then remove the leg from its originating station
+        fromStation.removeOnwardLeg(leg);
+        survey.checkSurveyIntegrity();
+        survey.setSaved(false);
+    }
+
+    public static void downgradeLeg(Survey survey, Leg leg) {
+        if (!leg.hasDestination()) {
+            // Already a splay, so nothing to do
+            return;
+        }
+
+        Station destination = leg.getDestination();
+
+        if (!destination.getOnwardLegs(LegFilter.ALL.includeDisabled(true)).isEmpty()) {
+            throw new IllegalStateException(
+                    "Cannot downgrade leg to splay: destination station has onward legs");
+        }
+
+        // The originating station has to be found before the leg is replaced
+        Station originatingStation = survey.getOriginatingStation(leg);
+        Leg[] readings = getRecordedReadings(leg);
+        editLeg(survey, leg, readings[0].toSplay());
+        for (int i = 1; i < readings.length; i++) {
+            Leg splay = readings[i].toSplay();
+            originatingStation.addOnwardLeg(splay);
+            survey.addLegRecord(splay);
+        }
+
+        survey.checkSurveyIntegrity();
+        survey.setSaved(false);
+    }
+
+    public static boolean areLegsAboutTheSame(List<Leg> legs) {
+
+        for (Leg leg : legs) { // full legs must be unique by definition
+            if (leg.hasDestination()) {
+                return false;
+            }
+        }
+
+        return LegAmalgamationAlgorithm.getActive().areReadingsCompatible(legs);
+    }
+
+    public static boolean areLegsBacksights(Leg fore, Leg back) {
+        // Given two legs, determine if they are in agreement as foresight and backsight.
+        Leg correctedBack = back.asBacksight();
+        return areLegsAboutTheSame(Arrays.asList(fore, correctedBack));
+    }
+
+    public static Leg averageLegs(List<Leg> repeats) {
+        return LegAmalgamationAlgorithm.getActive().average(repeats);
+    }
+
+    public static Leg averageBacksights(Leg fore, Leg back) {
+        // Given a foresight and backsight which may not exactly agree, produce an averaged
+        // foresight
+        return averageLegs(Arrays.asList(fore, back.asBacksight()));
+    }
+
+    public static void reverseLeg(final Survey survey, final Station toReverse) {
+        SurveyTraversal.traverseLegs(
+                survey,
+                (origin, leg) -> {
+                    if (leg.hasDestination() && leg.getDestination() == toReverse) {
+                        String previousDescription = leg.toString();
+                        Leg reversed = leg.reverse();
+                        String newDescription = reversed.toString();
+                        origin.removeOnwardLeg(leg);
+                        origin.addOnwardLeg(reversed);
+                        survey.replaceLegInRecord(leg, reversed);
+                        Log.i(
+                                R.string.survey_update_reversed_leg,
+                                previousDescription,
+                                newDescription);
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
+        survey.setSaved(false);
+    }
+
+    /**
+     * Sets the extended elevation direction on a station, applying it to the stations below too if
+     * the direction propagates. Directions that don't propagate affect only the leg into this
+     * station, leaving the rest of the survey to carry on as it was.
+     */
+    public static void setExtendedElevationDirection(
+            Survey survey, Station station, ExtendedElevationDirection direction) {
+        if (direction.propagates()) {
+            setExtendedElevationDirectionOfSubtree(station, direction);
+        } else {
+            station.setExtendedElevationDirection(direction);
+        }
+        survey.setSaved(false);
+    }
+
+    public static void setExtendedElevationDirectionOfSubtree(
+            Station station, ExtendedElevationDirection direction) {
+        station.setExtendedElevationDirection(direction);
+        for (Leg leg : station.getOnwardLegs(LegFilter.LEGS)) {
+            Station destination = leg.getDestination();
+            setExtendedElevationDirectionOfSubtree(destination, direction);
+        }
+    }
+}

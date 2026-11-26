@@ -9,7 +9,7 @@ import android.graphics.Rect;
 import android.view.MotionEvent;
 import androidx.core.content.ContextCompat;
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.control.util.GeneralPreferences;
+import org.hwyl.sexytopo.control.preferences.GeneralPreferences;
 
 /**
  * The hot corners: touching one pans the view, whatever tool is selected. Three of the four corners

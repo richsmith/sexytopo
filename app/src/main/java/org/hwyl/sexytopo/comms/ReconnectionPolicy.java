@@ -4,7 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.Log;
-import org.hwyl.sexytopo.control.util.GeneralPreferences;
+import org.hwyl.sexytopo.control.preferences.GeneralPreferences;
 
 /**
  * Decides whether a communicator should reconnect after losing its device, and schedules the

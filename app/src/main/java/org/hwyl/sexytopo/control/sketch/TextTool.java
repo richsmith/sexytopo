@@ -2,7 +2,7 @@ package org.hwyl.sexytopo.control.sketch;
 
 import android.content.Context;
 import android.view.MotionEvent;
-import org.hwyl.sexytopo.control.util.GeneralPreferences;
+import org.hwyl.sexytopo.control.preferences.GeneralPreferences;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 
 /** Asks for some text and places it where the user tapped. */

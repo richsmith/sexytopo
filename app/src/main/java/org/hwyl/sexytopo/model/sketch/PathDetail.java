@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.hwyl.sexytopo.control.Log;
-import org.hwyl.sexytopo.control.util.Space2DUtils;
+import org.hwyl.sexytopo.control.geometry.Space2DUtils;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 
 public final class PathDetail extends SketchDetail {

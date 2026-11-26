@@ -6,7 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
-import org.hwyl.sexytopo.control.util.Space2DUtils;
+import org.hwyl.sexytopo.control.geometry.Space2DUtils;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 
 /** Simple shapes drawn in view coordinates, shared by the different parts of a sketch view. */

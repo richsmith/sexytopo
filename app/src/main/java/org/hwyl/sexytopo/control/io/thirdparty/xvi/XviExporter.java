@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import org.hwyl.sexytopo.control.util.Space2DUtils;
+import org.hwyl.sexytopo.control.geometry.Space2DUtils;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.common.Shape;
 import org.hwyl.sexytopo.model.geometry.Coord2D;

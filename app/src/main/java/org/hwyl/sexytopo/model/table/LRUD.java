@@ -1,8 +1,8 @@
 package org.hwyl.sexytopo.model.table;
 
 import org.hwyl.sexytopo.control.Log;
-import org.hwyl.sexytopo.control.util.CrossSectioner;
-import org.hwyl.sexytopo.control.util.Space2DUtils;
+import org.hwyl.sexytopo.control.geometry.CrossSectioner;
+import org.hwyl.sexytopo.control.geometry.Space2DUtils;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.LegFilter;
 import org.hwyl.sexytopo.model.survey.Station;

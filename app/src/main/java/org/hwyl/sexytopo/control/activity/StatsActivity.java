@@ -6,7 +6,7 @@ import android.widget.TextView;
 import com.google.android.material.card.MaterialCardView;
 import java.util.Set;
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.control.util.SurveyStats;
+import org.hwyl.sexytopo.control.survey.SurveyStats;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.survey.Survey;
 

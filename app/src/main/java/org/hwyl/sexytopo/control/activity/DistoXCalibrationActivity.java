@@ -46,7 +46,7 @@ import org.hwyl.sexytopo.control.components.CalibrationReadingView;
 import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.io.StartLocation;
 import org.hwyl.sexytopo.control.io.basic.CalibrationJsonTranslater;
-import org.hwyl.sexytopo.control.util.GeneralPreferences;
+import org.hwyl.sexytopo.control.preferences.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.calibration.CalibrationReading;
 import org.hwyl.sexytopo.model.calibration.CalibrationReadingList;

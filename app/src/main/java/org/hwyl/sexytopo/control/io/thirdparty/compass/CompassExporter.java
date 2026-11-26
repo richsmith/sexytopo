@@ -9,7 +9,7 @@ import java.util.Locale;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.io.translation.Experimental;
 import org.hwyl.sexytopo.control.io.translation.SingleFileExporter;
-import org.hwyl.sexytopo.control.util.GraphToListTranslator;
+import org.hwyl.sexytopo.control.survey.GraphToListTranslator;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;

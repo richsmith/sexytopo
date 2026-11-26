@@ -89,7 +89,10 @@ All model classes validate data at construction time (fail-fast approach).
 
 ### `control/` - UI & Business Logic
 - **Activities**: Top-level UI components (SurveyActivity, etc.)
-- **Utilities** (`util/`): helper functions for calculations, file operations, string manipulation
+- **Geometry** (`geometry/`): 2D/3D maths, polygon operations, curve fitting, projections and line orientation
+- **Survey operations** (`survey/`): updating the survey as readings arrive, naming and moving stations, statistics, leg amalgamation
+- **Preferences** (`preferences/`): access to the app's settings
+- **Utilities** (`util/`): general helpers such as string and number formatting
 - **Services**: Background operations and Bluetooth management
 
 ### `control/io/` - Format Conversion

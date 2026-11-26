@@ -2,7 +2,7 @@ package org.hwyl.sexytopo.control.io.basic;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.hwyl.sexytopo.control.util.SurveyUpdater;
+import org.hwyl.sexytopo.control.survey.SurveyUpdater;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.LegFilter;
 import org.hwyl.sexytopo.model.survey.Station;

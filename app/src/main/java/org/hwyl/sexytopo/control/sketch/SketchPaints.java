@@ -5,7 +5,7 @@ import android.graphics.Paint;
 import android.util.TypedValue;
 import androidx.core.content.ContextCompat;
 import org.hwyl.sexytopo.R;
-import org.hwyl.sexytopo.control.util.GeneralPreferences;
+import org.hwyl.sexytopo.control.preferences.GeneralPreferences;
 
 /**
  * What the paints in a sketch view share: the solid and faded alphas they draw the survey with, how

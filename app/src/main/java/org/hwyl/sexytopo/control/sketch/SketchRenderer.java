@@ -4,7 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 import java.util.function.BooleanSupplier;
-import org.hwyl.sexytopo.control.util.SketchPreferences;
+import org.hwyl.sexytopo.control.preferences.SketchPreferences;
 import org.hwyl.sexytopo.model.sketch.SinglePositionDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchDetail;

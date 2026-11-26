@@ -1,0 +1,21 @@
+package org.hwyl.sexytopo.control.survey;
+
+import org.hwyl.sexytopo.model.survey.Leg;
+import org.hwyl.sexytopo.model.survey.LegFilter;
+import org.hwyl.sexytopo.model.survey.Station;
+
+public class StationRotator {
+
+    public static Station rotate(Station station, float angle) {
+        Station rotated = new Station(station.getName());
+
+        // this would be a lot cleaner with the Java 8 streaming API :'(
+        for (Leg leg : station.getOnwardLegs(LegFilter.ALL.includeDisabled(true))) {
+            if (leg.hasDestination()) {
+                rotated.addOnwardLeg(leg.rotate(angle));
+            }
+        }
+
+        return rotated;
+    }
+}

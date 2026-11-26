@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.model.survey;
 
-import org.hwyl.sexytopo.control.util.SurveyUpdater;
+import org.hwyl.sexytopo.control.survey.SurveyUpdater;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;

@@ -1,6 +1,6 @@
 package org.hwyl.sexytopo.control.table;
 
-import org.hwyl.sexytopo.control.util.InputMode;
+import org.hwyl.sexytopo.control.preferences.InputMode;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.junit.Assert;

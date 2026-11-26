@@ -4,7 +4,7 @@ import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import org.hwyl.sexytopo.control.util.SketchPreferences;
+import org.hwyl.sexytopo.control.preferences.SketchPreferences;
 
 public class SurveyView3D extends GLSurfaceView {
 

@@ -1,7 +1,7 @@
 package org.hwyl.sexytopo.model.survey;
 
 import androidx.annotation.NonNull;
-import org.hwyl.sexytopo.control.util.Space2DUtils;
+import org.hwyl.sexytopo.control.geometry.Space2DUtils;
 import org.hwyl.sexytopo.model.table.TableCol;
 
 @SuppressWarnings("UnnecessaryLocalVariable")

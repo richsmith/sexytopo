@@ -239,7 +239,10 @@ Listen via `LocalBroadcastManager.registerReceiver()`
 - `org.hwyl.sexytopo.comms.*` - Device drivers
 - `org.hwyl.sexytopo.model.*` - Data models
 - `org.hwyl.sexytopo.control.*` - Logic & UI
-- `org.hwyl.sexytopo.control.util` - Utilities
+- `org.hwyl.sexytopo.control.geometry` - Geometry algorithms (Space2DUtils, PolygonUtils, BezierFitter, projections, line orientation etc.)
+- `org.hwyl.sexytopo.control.survey` - Operations on the survey (SurveyUpdater, StationNamer, leg amalgamation etc.)
+- `org.hwyl.sexytopo.control.preferences` - Settings access (GeneralPreferences, SketchPreferences)
+- `org.hwyl.sexytopo.control.util` - General utilities (TextTools, NumberTools)
 
 **Naming:**
 - Interfaces: `Communicator`, `Exporter`

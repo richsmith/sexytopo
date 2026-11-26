@@ -9,7 +9,7 @@ import java.util.Map;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.io.translation.Experimental;
 import org.hwyl.sexytopo.control.io.translation.SingleFileExporter;
-import org.hwyl.sexytopo.control.util.GraphToListTranslator;
+import org.hwyl.sexytopo.control.survey.GraphToListTranslator;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.geometry.Line;

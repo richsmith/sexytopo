@@ -20,7 +20,7 @@ import org.hwyl.sexytopo.control.io.basic.ExportFrameFactory;
 import org.hwyl.sexytopo.control.io.thirdparty.xvi.XviConstants;
 import org.hwyl.sexytopo.control.io.thirdparty.xvi.XviExporter;
 import org.hwyl.sexytopo.control.io.translation.Exporter;
-import org.hwyl.sexytopo.control.util.GeneralPreferences;
+import org.hwyl.sexytopo.control.preferences.GeneralPreferences;
 import org.hwyl.sexytopo.control.util.TextTools;
 import org.hwyl.sexytopo.model.common.Frame;
 import org.hwyl.sexytopo.model.geometry.Coord2D;

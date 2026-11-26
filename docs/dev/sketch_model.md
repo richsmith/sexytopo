@@ -84,7 +84,7 @@ Holes are not nested — a hole never contains a further filled region. That can
 
 Because the courtyard of a ring isn't part of the area, `PolygonUtils.overlap` tests against the whole contour set rather than just the outline: an area drawn inside a courtyard stays separate instead of merging and filling it in.
 
-`PolygonUtils` (control/util) implements region union/subtraction on top of `android.graphics.Path` boolean ops, recovering contours by reading the result's vertices back with `Path.approximate` (so untouched stretches of boundary survive any number of operations unchanged; only the eraser's curved cut is approximated) and then sorting them into regions (a contour inside another is a hole). Inputs and outputs both use the even-odd fill rule.
+`PolygonUtils` (control/geometry) implements region union/subtraction on top of `android.graphics.Path` boolean ops, recovering contours by reading the result's vertices back with `Path.approximate` (so untouched stretches of boundary survive any number of operations unchanged; only the eraser's curved cut is approximated) and then sorting them into regions (a contour inside another is a hole). Inputs and outputs both use the even-odd fill rule.
 
 Note that under Robolectric, `Path`'s shadow implements neither real boolean geometry nor multi-contour `PathMeasure` iteration, so union/subtract/overlap can only be exercised on a device or emulator. Below Android 8 (no `Path.approximate`) the contours are sampled with `PathMeasure` instead, which cuts corners a little each time. The contour-splitting and grouping steps are pure geometry and are unit tested directly (`PolygonUtilsTest`).
 
@@ -209,7 +209,7 @@ It then passes the event to the current tool's `ToolHandler`, looked up in a map
 | `model/sketch/LineType.java` | Line type enum (wall, pit etc.) with per-type appearance |
 | `model/sketch/AreaDetail.java` | Filled region element (outline plus holes) |
 | `model/sketch/AreaType.java` | Area type enum, with each type's Therion name and fill pattern |
-| `control/util/PolygonUtils.java` | Polygon union/subtraction (Path ops) |
+| `control/geometry/PolygonUtils.java` | Polygon union/subtraction (Path ops) |
 | `model/sketch/SymbolDetail.java` | Symbol element |
 | `model/sketch/TextDetail.java` | Text label element |
 | `model/sketch/CrossSectionDetail.java` | Cross-section element |

@@ -10,7 +10,7 @@ import org.hwyl.sexytopo.control.NewStationNotificationService;
 import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.io.SurveyFile;
 import org.hwyl.sexytopo.control.io.basic.ScratchAutosave;
-import org.hwyl.sexytopo.control.util.GeneralPreferences;
+import org.hwyl.sexytopo.control.preferences.GeneralPreferences;
 import org.hwyl.sexytopo.model.survey.Survey;
 
 public class StartUpActivity extends SexyTopoActivity {
