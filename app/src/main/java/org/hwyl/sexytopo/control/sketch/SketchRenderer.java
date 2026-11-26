@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.RectF;
 import java.util.function.BooleanSupplier;
 import org.hwyl.sexytopo.control.preferences.SketchPreferences;
+import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.SinglePositionDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchDetail;
@@ -49,7 +50,7 @@ class SketchRenderer {
 
     /**
      * Draws the sketch, leaving out the hidden detail, which something else is drawing (e.g. a
-     * symbol being moved), if there is one.
+     * symbol being moved or a line being reshaped), if there is one.
      */
     void draw(Canvas canvas, Sketch sketch, int alpha, SketchDetail hidden) {
 
@@ -58,13 +59,19 @@ class SketchRenderer {
         }
 
         areaRenderer.draw(canvas, sketch, alpha, isDarkModeActive);
-        lineRenderer.draw(canvas, sketch, alpha, isDarkModeActive, isDebugMode.getAsBoolean());
+        lineRenderer.draw(
+                canvas, sketch, alpha, isDarkModeActive, isDebugMode.getAsBoolean(), hidden);
         pointRenderer.draw(canvas, sketch, alpha, isDarkModeActive, hidden);
     }
 
     /** Draws a single symbol or piece of text. */
     void drawDetail(Canvas canvas, SinglePositionDetail detail) {
         pointRenderer.drawDetail(canvas, detail, SketchPaints.SOLID_ALPHA, isDarkModeActive);
+    }
+
+    /** Draws a single line, such as one being reshaped. */
+    void drawLine(Canvas canvas, PathDetail pathDetail) {
+        lineRenderer.drawLine(canvas, pathDetail, SketchPaints.SOLID_ALPHA, isDarkModeActive);
     }
 
     /** Where a symbol or piece of text is drawn on the view. */

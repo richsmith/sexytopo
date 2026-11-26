@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.hwyl.sexytopo.control.Log;
+import org.hwyl.sexytopo.control.geometry.LineReshaper;
 import org.hwyl.sexytopo.control.geometry.Space2DUtils;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 
@@ -166,6 +167,16 @@ public final class PathDetail extends SketchDetail {
             }
         }
         path.set(last, point);
+    }
+
+    /**
+     * This line with the point on it nearest grab pulled by the offset, and the line either side
+     * curving to follow, as a new line.
+     */
+    public PathDetail pulled(Coord2D grab, Coord2D offset, float reach, float endTolerance) {
+        List<Coord2D> points =
+                LineReshaper.pull(path, isClosed(), grab, offset, reach, endTolerance);
+        return new PathDetail(points, getColour(), lineType);
     }
 
     /**

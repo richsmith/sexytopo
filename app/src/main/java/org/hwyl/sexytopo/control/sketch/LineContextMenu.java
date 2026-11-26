@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.PopupMenu;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.LineType;
@@ -19,7 +20,8 @@ final class LineContextMenu {
 
     /**
      * Show the menu for a line at a point on the anchor view. onChanged is run after the line has
-     * been changed or deleted, so the view can redraw.
+     * been changed or deleted, so the view can redraw; onReshape is given the line to start
+     * reshaping it.
      */
     static void show(
             View anchorView,
@@ -27,7 +29,8 @@ final class LineContextMenu {
             int y,
             Sketch sketch,
             PathDetail pathDetail,
-            Runnable onChanged) {
+            Runnable onChanged,
+            Consumer<PathDetail> onReshape) {
         PopupMenu popup =
                 ContextMenuManager.createPopupMenuAt(anchorView.getContext(), anchorView, x, y);
         popup.inflate(R.menu.context_line);
@@ -58,6 +61,10 @@ final class LineContextMenu {
                     if (item.getItemId() == R.id.action_delete_line) {
                         sketch.deleteDetail(pathDetail);
                         onChanged.run();
+                        return true;
+                    }
+                    if (item.getItemId() == R.id.action_reshape_line) {
+                        onReshape.accept(pathDetail);
                         return true;
                     }
                     if (item.getItemId() == R.id.action_flip_line) {

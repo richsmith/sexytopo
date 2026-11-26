@@ -265,6 +265,7 @@
     <string name="sketch_symbol_orientation_education">Drag to set symbol direction</string>
     <string name="sketch_move_detail_instruction">Drag to reposition</string>
     <string name="sketch_resize_detail_instruction">Drag to resize</string>
+    <string name="sketch_reshape_line_instruction">Drag from the line to bend it</string>
     <string name="sketch_text_hint">Enter text</string>
 
     <!-- Table view -->
@@ -838,6 +839,7 @@
     <string name="menu_reverse">Reverse</string>
     <string name="menu_line">Line</string>
     <string name="menu_flip_line">Flip</string>
+    <string name="menu_reshape_line">Reshape</string>
     <string name="menu_line_type">Line Type</string>
     <string name="menu_area">Area</string>
     <string name="menu_area_type">Area Type</string>

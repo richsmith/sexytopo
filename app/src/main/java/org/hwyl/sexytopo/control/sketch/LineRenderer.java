@@ -20,6 +20,7 @@ import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.LineType;
 import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
+import org.hwyl.sexytopo.model.sketch.SketchDetail;
 
 /**
  * Draws a sketch's lines. Plain freehand lines are batched for speed; typed lines are drawn one by
@@ -97,7 +98,8 @@ class LineRenderer {
             Sketch sketch,
             int alpha,
             boolean isDarkModeActive,
-            boolean isDebugMode) {
+            boolean isDebugMode,
+            SketchDetail hidden) {
         Colour lastColour = Colour.BLACK;
 
         drawPaint.setColor(lastColour.intValue);
@@ -105,7 +107,7 @@ class LineRenderer {
 
         for (PathDetail pathDetail : sketch.getPathDetails()) {
 
-            if (!viewport.couldBeVisible(pathDetail)) {
+            if (pathDetail == hidden || !viewport.couldBeVisible(pathDetail)) {
                 continue;
             }
 
@@ -154,6 +156,35 @@ class LineRenderer {
                 drawDebugPoints(canvas, pointValues, drawPaint);
             }
         }
+    }
+
+    /**
+     * Draws a single line on its own, such as one being reshaped, with its ornamentation and any
+     * rock-side shading.
+     */
+    void drawLine(Canvas canvas, PathDetail pathDetail, int alpha, boolean isDarkModeActive) {
+        if (pathDetail.getLineType() != LineType.SKETCH) {
+            drawTypedPath(
+                    canvas,
+                    pathDetail,
+                    alpha,
+                    isDarkModeActive,
+                    pathDetail.getLineType().isWall(),
+                    false);
+            return;
+        }
+        drawPaint.setColor(pathDetail.getDrawColour(isDarkModeActive).intValue);
+        drawPaint.setAlpha(alpha);
+        int pointValues = toPointsOnScreen(pathDetail.getPath());
+        float[] points = pointsScratch;
+        typedPathScratch.rewind();
+        if (pointValues > 0) {
+            typedPathScratch.moveTo(points[0], points[1]);
+        }
+        for (int i = 2; i < pointValues; i += 2) {
+            typedPathScratch.lineTo(points[i], points[i + 1]);
+        }
+        canvas.drawPath(typedPathScratch, drawPaint);
     }
 
     /**

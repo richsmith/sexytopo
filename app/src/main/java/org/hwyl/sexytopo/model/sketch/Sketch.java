@@ -574,6 +574,12 @@ public class Sketch extends Shape {
         return resized;
     }
 
+    /** Swaps a line for a reshaped version of it, as a single undoable operation. */
+    public PathDetail reshapePathDetail(PathDetail pathDetail, PathDetail reshaped) {
+        deleteDetail(pathDetail, Collections.singletonList((SketchDetail) reshaped));
+        return reshaped;
+    }
+
     /** Changes the colour of a piece of text, as a single undoable operation. */
     public TextDetail recolourTextDetail(TextDetail textDetail, Colour colour) {
         TextDetail recoloured = textDetail.withColour(colour);

@@ -99,6 +99,8 @@ public class SketchView extends View {
             new MoveDetailTool(viewport, state, sketchRenderer, host);
     private final ResizeDetailTool resizeDetailTool =
             new ResizeDetailTool(viewport, state, sketchRenderer, host);
+    private final ReshapeLineTool reshapeLineTool =
+            new ReshapeLineTool(viewport, state, sketchRenderer, host);
 
     // what each tool does with a touch; PINCH_TO_ZOOM has no entry, as the scale detector drives it
     private final Map<SketchTool, ToolHandler> sketchToolsToHandlers = createSketchToolMap();
@@ -118,6 +120,7 @@ public class SketchView extends View {
         handlers.put(SketchTool.MOVE_CROSS_SECTION, crossSections.moveTool);
         handlers.put(SketchTool.MOVE_DETAIL, moveDetailTool);
         handlers.put(SketchTool.RESIZE_DETAIL, resizeDetailTool);
+        handlers.put(SketchTool.RESHAPE_LINE, reshapeLineTool);
         return handlers;
     }
 
@@ -647,7 +650,13 @@ public class SketchView extends View {
             Runnable onChanged = SketchView.this::invalidate;
             if (matchedDetail instanceof PathDetail) {
                 LineContextMenu.show(
-                        SketchView.this, x, y, sketch, (PathDetail) matchedDetail, onChanged);
+                        SketchView.this,
+                        x,
+                        y,
+                        sketch,
+                        (PathDetail) matchedDetail,
+                        onChanged,
+                        reshapeLineTool::start);
             } else if (matchedDetail instanceof AreaDetail) {
                 AreaContextMenu.show(
                         SketchView.this, x, y, sketch, (AreaDetail) matchedDetail, onChanged);

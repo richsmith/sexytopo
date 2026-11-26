@@ -231,6 +231,7 @@
     <string name="sketch_symbol_orientation_education">Arrastrar para establecer la dirección del símbolo</string>
     <string name="sketch_move_detail_instruction">Arrastrar para reposicionar</string>
     <string name="sketch_resize_detail_instruction">Arrastrar para redimensionar</string>
+    <string name="sketch_reshape_line_instruction">Arrastrar desde la línea para curvarla</string>
     <string name="sketch_text_hint">Introducir texto</string>
 
     <!-- Table view -->
@@ -772,6 +773,7 @@
     <string name="menu_reverse">Invertir</string>
     <string name="menu_line">Línea</string>
     <string name="menu_flip_line">Invertir</string>
+    <string name="menu_reshape_line">Remodelar</string>
     <string name="menu_line_type">Tipo de línea</string>
     <string name="menu_area">Área</string>
     <string name="menu_area_type">Tipo de área</string>

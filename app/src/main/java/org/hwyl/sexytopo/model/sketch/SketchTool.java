@@ -25,6 +25,7 @@ public enum SketchTool {
     MOVE_CROSS_SECTION(-1, MODAL),
     MOVE_DETAIL(-1, ONE_USE),
     RESIZE_DETAIL(-1, ONE_USE),
+    RESHAPE_LINE(-1, ONE_USE),
     PINCH_TO_ZOOM(-1, MODAL),
     MODAL_MOVE(-1, MODAL);
 

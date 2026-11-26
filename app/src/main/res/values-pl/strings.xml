@@ -231,6 +231,7 @@
     <string name="sketch_symbol_orientation_education">Przeciągnij, aby ustawić kierunek symbolu</string>
     <string name="sketch_move_detail_instruction">Przeciągnij, aby przenieść</string>
     <string name="sketch_resize_detail_instruction">Przeciągnij, aby zmienić rozmiar</string>
+    <string name="sketch_reshape_line_instruction">Przeciągnij od linii, aby ją wygiąć</string>
     <string name="sketch_text_hint">Wprowadź tekst</string>
 
     <!-- Table view -->
@@ -772,6 +773,7 @@
     <string name="menu_reverse">Odwróć</string>
     <string name="menu_line">Linia</string>
     <string name="menu_flip_line">Odwróć</string>
+    <string name="menu_reshape_line">Zmień kształt</string>
     <string name="menu_line_type">Typ linii</string>
     <string name="menu_area">Obszar</string>
     <string name="menu_area_type">Typ obszaru</string>
