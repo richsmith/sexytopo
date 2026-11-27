@@ -22,8 +22,8 @@ import org.hwyl.sexytopo.model.geometry.Space;
 import org.hwyl.sexytopo.model.sketch.AreaDetail;
 import org.hwyl.sexytopo.model.sketch.AutoScalableDetail;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
+import org.hwyl.sexytopo.model.sketch.LineDetail;
 import org.hwyl.sexytopo.model.sketch.LineType;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.Symbol;
 import org.hwyl.sexytopo.model.sketch.SymbolDetail;
@@ -452,9 +452,9 @@ public class Th2Exporter {
         // semantic lines (walls etc.) can be exported as first-class Therion lines on top
         // of their appearance in the XVI tracing background
         if (GeneralPreferences.isTherionLineExportEnabled()) {
-            for (PathDetail pathDetail : sketch.getPathDetails()) {
-                if (pathDetail.getLineType().isSemantic()) {
-                    commands.add(getLine(pathDetail, placement));
+            for (LineDetail lineDetail : sketch.getLineDetails()) {
+                if (lineDetail.getLineType().isSemantic()) {
+                    commands.add(getLine(lineDetail, placement));
                 }
             }
         }
@@ -483,14 +483,14 @@ public class Th2Exporter {
         return commands;
     }
 
-    private static String getLine(PathDetail pathDetail, Placement placement) {
+    private static String getLine(LineDetail lineDetail, Placement placement) {
         List<String> lines = new ArrayList<>();
-        LineType lineType = pathDetail.getLineType();
+        LineType lineType = lineDetail.getLineType();
         lines.add("line " + lineType.getTherionName());
 
         List<BezierFitter.CubicBezier> curves =
                 GeneralPreferences.isTherionBezierLineExportEnabled()
-                        ? BezierFitter.fit(pathDetail.getPath(), getCurveTolerance(pathDetail))
+                        ? BezierFitter.fit(lineDetail.getPath(), getCurveTolerance(lineDetail))
                         : Collections.emptyList();
 
         // Therion requires a slope's l-size (its hachure length) on at least one point; it
@@ -500,7 +500,7 @@ public class Th2Exporter {
         if (curves.isEmpty()) {
             // each point joined to the last by a straight segment
             boolean isFirstPoint = true;
-            for (Coord2D point : pathDetail.getPath()) {
+            for (Coord2D point : lineDetail.getPath()) {
                 lines.add("  " + toTh2(point, placement));
                 if (isFirstPoint && lineSize > 0) {
                     lines.add("  l-size " + lineSize);
@@ -533,8 +533,8 @@ public class Th2Exporter {
      * size, so small details keep their shape and long walls don't end up with needlessly many
      * nodes.
      */
-    private static float getCurveTolerance(PathDetail pathDetail) {
-        float size = Math.max(pathDetail.getWidth(), pathDetail.getHeight());
+    private static float getCurveTolerance(LineDetail lineDetail) {
+        float size = Math.max(lineDetail.getWidth(), lineDetail.getHeight());
         return Math.min(Math.max(size / 200, MIN_CURVE_TOLERANCE), MAX_CURVE_TOLERANCE);
     }
 

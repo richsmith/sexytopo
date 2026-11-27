@@ -2,7 +2,7 @@ package org.hwyl.sexytopo.control.sketch;
 
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
-import org.hwyl.sexytopo.model.sketch.SinglePositionDetail;
+import org.hwyl.sexytopo.model.sketch.PointDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchTool;
 
@@ -21,13 +21,13 @@ class MoveDetailTool extends DragDetailTool {
     }
 
     @Override
-    SinglePositionDetail drag(SinglePositionDetail detail, Coord2D from, Coord2D to) {
+    PointDetail drag(PointDetail detail, Coord2D from, Coord2D to) {
         Coord2D offset = getOffset(from, to);
-        return isNoMove(offset) ? detail : (SinglePositionDetail) detail.translate(offset);
+        return isNoMove(offset) ? detail : (PointDetail) detail.translate(offset);
     }
 
     @Override
-    void commit(Sketch sketch, SinglePositionDetail detail, Coord2D from, Coord2D to) {
+    void commit(Sketch sketch, PointDetail detail, Coord2D from, Coord2D to) {
         Coord2D offset = getOffset(from, to);
         if (!isNoMove(offset)) {
             sketch.moveDetail(detail, offset);

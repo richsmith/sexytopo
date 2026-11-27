@@ -8,7 +8,7 @@ import org.hwyl.sexytopo.control.survey.SurveyUpdater;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.geometry.Projection2D;
 import org.hwyl.sexytopo.model.geometry.Space;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
+import org.hwyl.sexytopo.model.sketch.LineDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -228,8 +228,8 @@ public class ConnectedSurveysTest {
         Survey joinedSurvey = getBasicSurvey("joined");
 
         Sketch sketch = joinedSurvey.getPlanSketch();
-        PathDetail pathDetail = sketch.startNewPath(new Coord2D(0, 0));
-        pathDetail.lineTo(new Coord2D(0, 1));
+        LineDetail lineDetail = sketch.startNewPath(new Coord2D(0, 0));
+        lineDetail.lineTo(new Coord2D(0, 1));
         sketch.finishPath();
 
         connectTwoSurveys(
@@ -247,9 +247,9 @@ public class ConnectedSurveysTest {
                         Projection2D.PLAN, currentSurvey, planProjection);
 
         Sketch translatedSketch = translated.keySet().iterator().next().getPlanSketch();
-        PathDetail translatedPathDetail =
-                translatedSketch.getPathDetails().toArray(new PathDetail[] {})[0];
-        List<Coord2D> coords = translatedPathDetail.getPath();
+        LineDetail translatedLineDetail =
+                translatedSketch.getLineDetails().toArray(new LineDetail[] {})[0];
+        List<Coord2D> coords = translatedLineDetail.getPath();
         Assert.assertEquals(new Coord2D(0, -1), coords.get(0));
         Assert.assertEquals(new Coord2D(0, 0), coords.get(1));
     }

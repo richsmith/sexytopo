@@ -45,8 +45,8 @@ import org.hwyl.sexytopo.model.sketch.AreaDetail;
 import org.hwyl.sexytopo.model.sketch.AreaType;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
+import org.hwyl.sexytopo.model.sketch.LineDetail;
 import org.hwyl.sexytopo.model.sketch.LineType;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchDetail;
 import org.hwyl.sexytopo.model.sketch.Symbol;
@@ -710,8 +710,8 @@ public class SvgExporter extends DoubleSketchFileExporter {
             writeAreaDetail(xmlSerializer, areaDetail, scale);
         }
 
-        for (PathDetail pathDetail : sketch.getPathDetails()) {
-            writePathDetail(xmlSerializer, pathDetail, scale);
+        for (LineDetail lineDetail : sketch.getLineDetails()) {
+            writeLineDetail(xmlSerializer, lineDetail, scale);
         }
 
         for (TextDetail textDetail : sketch.getTextDetails()) {
@@ -767,8 +767,8 @@ public class SvgExporter extends DoubleSketchFileExporter {
             for (AreaDetail areaDetail : subSketch.getAreaDetails()) {
                 writeAreaDetail(xmlSerializer, areaDetail, scale);
             }
-            for (PathDetail pathDetail : subSketch.getPathDetails()) {
-                writePathDetail(xmlSerializer, pathDetail, scale);
+            for (LineDetail lineDetail : subSketch.getLineDetails()) {
+                writeLineDetail(xmlSerializer, lineDetail, scale);
             }
             for (TextDetail textDetail : subSketch.getTextDetails()) {
                 writeTextDetail(xmlSerializer, textDetail, scale);
@@ -933,13 +933,13 @@ public class SvgExporter extends DoubleSketchFileExporter {
      * Semantic line types get a class attribute naming the type, a scaled stroke width and (for
      * dashed types) a dash array. Tick ornamentation is not reproduced in SVG yet.
      */
-    private static void writePathDetail(
-            XmlSerializer xmlSerializer, PathDetail pathDetail, int scale) throws IOException {
+    private static void writeLineDetail(
+            XmlSerializer xmlSerializer, LineDetail lineDetail, int scale) throws IOException {
         int strokeWidth = GeneralPreferences.getExportSvgStrokeWidth();
-        LineType lineType = pathDetail.getLineType();
+        LineType lineType = lineDetail.getLineType();
         strokeWidth = Math.round(strokeWidth * lineType.getStrokeWidthFactor());
         List<String> coordStrings = new ArrayList<>();
-        for (Coord2D coord2D : pathDetail.getPath()) {
+        for (Coord2D coord2D : lineDetail.getPath()) {
             coordStrings.add(toXmlText(coord2D, scale));
         }
         xmlSerializer.startTag(null, "polyline");
@@ -948,7 +948,7 @@ public class SvgExporter extends DoubleSketchFileExporter {
                     null, "class", lineType.toString().toLowerCase(Locale.ROOT).replace("_", "-"));
         }
         xmlSerializer.attribute(null, "points", TextTools.join(" ", coordStrings));
-        xmlSerializer.attribute(null, "stroke", getSvgColour(pathDetail));
+        xmlSerializer.attribute(null, "stroke", getSvgColour(lineDetail));
         xmlSerializer.attribute(null, "stroke-width", Integer.toString(strokeWidth));
         String dashArray = lineType.getSvgDashArray(scale);
         if (dashArray != null) {

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.sketch.Colour;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
+import org.hwyl.sexytopo.model.sketch.LineDetail;
 import org.hwyl.sexytopo.model.sketch.TextDetail;
 
 public class TextDetailTranslater extends SketchDetailTranslater<TextDetail> {
@@ -82,27 +82,27 @@ public class TextDetailTranslater extends SketchDetailTranslater<TextDetail> {
                 new int[] {2, 2, 1, 4, 1, 4, 0, 2, 0, 2, 1, 0, 1, 0, 2, 2}); // Question mark box
     }
 
-    private static List<PathDetail> getPathsForChar(char ch, Colour colour) {
+    private static List<LineDetail> getPathsForChar(char ch, Colour colour) {
         // Get glyph data, defaulting to the unknown character glyph
         int[] glyph = GLYPH_DATA.containsKey(ch) ? GLYPH_DATA.get(ch) : GLYPH_DATA.get('\0');
 
-        List<PathDetail> glyphPaths = new ArrayList<>();
+        List<LineDetail> glyphPaths = new ArrayList<>();
         for (int i = 0; i < glyph.length; i += 4) {
             Coord2D from = new Coord2D(glyph[i], -glyph[i + 1] + CHAR_HEIGHT);
             Coord2D to = new Coord2D(glyph[i + 2], -glyph[i + 3] + CHAR_HEIGHT);
-            PathDetail pathDetail = new PathDetail(List.of(from, to), colour);
-            glyphPaths.add(pathDetail);
+            LineDetail lineDetail = new LineDetail(List.of(from, to), colour);
+            glyphPaths.add(lineDetail);
         }
         return glyphPaths;
     }
 
     @Override
-    public List<PathDetail> asPathDetails(TextDetail textDetail) {
-        return getPathDetailsForText(textDetail);
+    public List<LineDetail> asLineDetails(TextDetail textDetail) {
+        return getLineDetailsForText(textDetail);
     }
 
-    static List<PathDetail> getPathDetailsForText(TextDetail textDetail) {
-        List<PathDetail> pathDetails = new ArrayList<>();
+    static List<LineDetail> getLineDetailsForText(TextDetail textDetail) {
+        List<LineDetail> lineDetails = new ArrayList<>();
 
         Colour colour = textDetail.getColour();
         String text = textDetail.getText();
@@ -126,20 +126,20 @@ public class TextDetailTranslater extends SketchDetailTranslater<TextDetail> {
             float xPos = 0;
             for (int i = 0; i < line.length(); i++) {
                 char ch = chars[i];
-                List<PathDetail> charPaths = getPathsForChar(ch, colour);
+                List<LineDetail> charPaths = getPathsForChar(ch, colour);
 
                 // Letters such as "1" are vertical lines so have no width!
                 // Set a minimum width to handle this
                 float minWidth = INTER_CHAR_SPACE * scale;
 
                 float charWidth = minWidth;
-                for (PathDetail pathDetail : charPaths) {
-                    PathDetail scaledPath = pathDetail.scale(scale);
+                for (LineDetail lineDetail : charPaths) {
+                    LineDetail scaledPath = lineDetail.scale(scale);
                     // adjust for position in string
-                    PathDetail translatedPath = scaledPath.translate(new Coord2D(xPos, 0));
+                    LineDetail translatedPath = scaledPath.translate(new Coord2D(xPos, 0));
                     // adjust for position on sketch
                     translatedPath = translatedPath.translate(linePosition);
-                    pathDetails.add(translatedPath);
+                    lineDetails.add(translatedPath);
 
                     // keep a total of widest bit to get total char width
                     charWidth = Math.max(charWidth, scaledPath.getWidth());
@@ -150,6 +150,6 @@ public class TextDetailTranslater extends SketchDetailTranslater<TextDetail> {
             }
         }
 
-        return pathDetails;
+        return lineDetails;
     }
 }

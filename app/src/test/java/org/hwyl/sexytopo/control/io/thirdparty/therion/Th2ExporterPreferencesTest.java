@@ -11,8 +11,8 @@ import org.hwyl.sexytopo.model.geometry.Projection2D;
 import org.hwyl.sexytopo.model.sketch.AreaDetail;
 import org.hwyl.sexytopo.model.sketch.AreaType;
 import org.hwyl.sexytopo.model.sketch.Colour;
+import org.hwyl.sexytopo.model.sketch.LineDetail;
 import org.hwyl.sexytopo.model.sketch.LineType;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
 import org.junit.Assert;
@@ -152,9 +152,9 @@ public class Th2ExporterPreferencesTest {
 
     private static String getExportedLine(LineType lineType) {
         Survey survey = BasicTestSurveyCreator.createStraightNorth();
-        List<PathDetail> pathDetails = new ArrayList<>();
-        pathDetails.add(new PathDetail(getCurvedWall(), Colour.BLACK, lineType));
-        survey.getPlanSketch().setPathDetails(pathDetails);
+        List<LineDetail> lineDetails = new ArrayList<>();
+        lineDetails.add(new LineDetail(getCurvedWall(), Colour.BLACK, lineType));
+        survey.getPlanSketch().setLineDetails(lineDetails);
 
         String th2 = Th2ExporterTest.export(survey, Projection2D.PLAN);
         String start = "line " + lineType.getTherionName() + "\n";

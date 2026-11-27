@@ -53,8 +53,8 @@ import org.hwyl.sexytopo.model.sketch.BrushColour;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
+import org.hwyl.sexytopo.model.sketch.LineDetail;
 import org.hwyl.sexytopo.model.sketch.LineType;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchTool;
 import org.hwyl.sexytopo.model.sketch.Symbol;
@@ -406,12 +406,12 @@ public abstract class SketchActivity extends SurveyEditorActivity
      */
     private void flipLastLine() {
         Sketch sketch = getSketch(getSurvey());
-        PathDetail toFlip = sketch.getMostRecentOrientedPath();
+        LineDetail toFlip = sketch.getMostRecentOrientedPath();
         if (toFlip == null) {
             showSimpleToast(R.string.tools_flip_last_line_none);
             return;
         }
-        sketch.flipPathDetail(toFlip);
+        sketch.flipLineDetail(toFlip);
         sketchView.invalidate();
     }
 

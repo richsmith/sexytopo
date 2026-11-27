@@ -8,7 +8,7 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.view.MotionEvent;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
-import org.hwyl.sexytopo.model.sketch.SinglePositionDetail;
+import org.hwyl.sexytopo.model.sketch.PointDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchTool;
 
@@ -31,7 +31,7 @@ abstract class DragDetailTool implements ToolHandler {
 
     private final Paint highlightPaint = new Paint();
 
-    private SinglePositionDetail beingDragged = null;
+    private PointDetail beingDragged = null;
 
     // where the drag started and where it's got to, on the view
     private Coord2D dragStart = null;
@@ -56,17 +56,17 @@ abstract class DragDetailTool implements ToolHandler {
      * The detail as a drag between two points on the view would leave it, or the detail itself if
      * the drag changes nothing.
      */
-    abstract SinglePositionDetail drag(SinglePositionDetail detail, Coord2D from, Coord2D to);
+    abstract PointDetail drag(PointDetail detail, Coord2D from, Coord2D to);
 
     /** Make the change a finished drag stands for, as a single undoable step. */
-    abstract void commit(Sketch sketch, SinglePositionDetail detail, Coord2D from, Coord2D to);
+    abstract void commit(Sketch sketch, PointDetail detail, Coord2D from, Coord2D to);
 
     /** Set the highlight up from the theme. */
     void initialise(Context context) {
         SketchPaints.setUpHighlightPaint(context, highlightPaint);
     }
 
-    void start(SinglePositionDetail detail) {
+    void start(PointDetail detail) {
         beingDragged = detail;
         dragStart = null;
         dragEnd = null;
@@ -119,7 +119,7 @@ abstract class DragDetailTool implements ToolHandler {
         if (!isActive()) {
             return;
         }
-        SinglePositionDetail preview =
+        PointDetail preview =
                 dragStart == null ? beingDragged : drag(beingDragged, dragStart, dragEnd);
         sketchRenderer.drawDetail(canvas, preview);
         RectF box = sketchRenderer.getBoundsOnView(preview);
@@ -129,7 +129,7 @@ abstract class DragDetailTool implements ToolHandler {
     }
 
     @Override
-    public SinglePositionDetail getHiddenDetail() {
+    public PointDetail getHiddenDetail() {
         return isActive() ? beingDragged : null;
     }
 

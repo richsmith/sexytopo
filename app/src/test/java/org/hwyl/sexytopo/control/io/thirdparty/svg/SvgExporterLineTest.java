@@ -7,8 +7,8 @@ import org.hwyl.sexytopo.control.preferences.GeneralPreferences;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.geometry.Projection2D;
 import org.hwyl.sexytopo.model.sketch.Colour;
+import org.hwyl.sexytopo.model.sketch.LineDetail;
 import org.hwyl.sexytopo.model.sketch.LineType;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
 import org.junit.Assert;
@@ -28,10 +28,10 @@ public class SvgExporterLineTest {
 
     private static void addPath(Survey survey, LineType lineType) {
         List<Coord2D> points = Arrays.asList(new Coord2D(1, 1), new Coord2D(4, 2));
-        PathDetail pathDetail = new PathDetail(new ArrayList<>(points), Colour.BLACK, lineType);
-        List<PathDetail> pathDetails = new ArrayList<>(survey.getPlanSketch().getPathDetails());
-        pathDetails.add(pathDetail);
-        survey.getPlanSketch().setPathDetails(pathDetails);
+        LineDetail lineDetail = new LineDetail(new ArrayList<>(points), Colour.BLACK, lineType);
+        List<LineDetail> lineDetails = new ArrayList<>(survey.getPlanSketch().getLineDetails());
+        lineDetails.add(lineDetail);
+        survey.getPlanSketch().setLineDetails(lineDetails);
     }
 
     @Test

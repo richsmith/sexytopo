@@ -3,7 +3,7 @@ package org.hwyl.sexytopo.control.sketch;
 import java.util.Arrays;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.sketch.Colour;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
+import org.hwyl.sexytopo.model.sketch.LineDetail;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -87,8 +87,8 @@ public class ViewportTest {
         // 600x600 pixels at 60px/m shows survey (0,0) to (10,10)
         viewport.updateBounds(600, 600);
 
-        PathDetail onScreen = path(new Coord2D(1, 1), new Coord2D(2, 2));
-        PathDetail offScreen = path(new Coord2D(20, 20), new Coord2D(21, 21));
+        LineDetail onScreen = path(new Coord2D(1, 1), new Coord2D(2, 2));
+        LineDetail offScreen = path(new Coord2D(20, 20), new Coord2D(21, 21));
 
         Assert.assertTrue(viewport.couldBeVisible(onScreen));
         Assert.assertFalse(viewport.couldBeVisible(offScreen));
@@ -100,7 +100,7 @@ public class ViewportTest {
         viewport.updateBounds(600, 600);
 
         // a hundredth of a metre is less than a pixel at 60px/m
-        PathDetail tiny = path(new Coord2D(1, 1), new Coord2D(1.01f, 1));
+        LineDetail tiny = path(new Coord2D(1, 1), new Coord2D(1.01f, 1));
         Assert.assertFalse(viewport.couldBeVisible(tiny));
     }
 
@@ -108,7 +108,7 @@ public class ViewportTest {
     public void testBoundsFollowPanOnlyAfterUpdate() {
         Viewport viewport = new Viewport();
         viewport.updateBounds(600, 600);
-        PathDetail shape = path(new Coord2D(1, 1), new Coord2D(2, 2));
+        LineDetail shape = path(new Coord2D(1, 1), new Coord2D(2, 2));
 
         viewport.setOffset(new Coord2D(50, 50));
         Assert.assertTrue(viewport.couldBeVisible(shape));
@@ -199,7 +199,7 @@ public class ViewportTest {
         Assert.assertEquals(parent.getPatternScale(), inset.getPatternScale(), DELTA);
     }
 
-    private static PathDetail path(Coord2D... points) {
-        return new PathDetail(Arrays.asList(points), Colour.BLACK);
+    private static LineDetail path(Coord2D... points) {
+        return new LineDetail(Arrays.asList(points), Colour.BLACK);
     }
 }

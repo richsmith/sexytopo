@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
+import org.hwyl.sexytopo.model.sketch.LineDetail;
 import org.hwyl.sexytopo.model.sketch.Symbol;
 import org.hwyl.sexytopo.model.sketch.SymbolDetail;
 
@@ -222,12 +222,12 @@ public class SymbolDetailTranslater extends SketchDetailTranslater<SymbolDetail>
     }
 
     @Override
-    public List<PathDetail> asPathDetails(SymbolDetail symbolDetail) {
-        List<PathDetail> pathDetails = new ArrayList<>();
+    public List<LineDetail> asLineDetails(SymbolDetail symbolDetail) {
+        List<LineDetail> lineDetails = new ArrayList<>();
 
         float[][] pathData = XVI_PATH_DATA.get(symbolDetail.getSymbol());
         if (pathData == null) {
-            return pathDetails; // Return empty list if no path data defined
+            return lineDetails; // Return empty list if no path data defined
         }
 
         float scale = symbolDetail.getSize() / SVG_VIEWBOX_SIZE;
@@ -268,11 +268,11 @@ public class SymbolDetailTranslater extends SketchDetailTranslater<SymbolDetail>
             }
 
             if (coords.size() >= 2) {
-                PathDetail pathDetail = new PathDetail(coords, symbolDetail.getColour());
-                pathDetails.add(pathDetail);
+                LineDetail lineDetail = new LineDetail(coords, symbolDetail.getColour());
+                lineDetails.add(lineDetail);
             }
         }
 
-        return pathDetails;
+        return lineDetails;
     }
 }

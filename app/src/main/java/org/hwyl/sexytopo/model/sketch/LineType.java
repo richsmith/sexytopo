@@ -8,7 +8,7 @@ import android.view.View;
 import org.hwyl.sexytopo.R;
 
 /**
- * The kind of cave feature a PathDetail represents. SKETCH is a free-form sketched line (the
+ * The kind of cave feature a LineDetail represents. SKETCH is a free-form sketched line (the
  * historical behaviour); the other types carry cartographic meaning and are exported to Therion as
  * first-class line commands.
  *

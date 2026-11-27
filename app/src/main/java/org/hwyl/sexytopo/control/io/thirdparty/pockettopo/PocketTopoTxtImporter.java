@@ -16,7 +16,7 @@ import org.hwyl.sexytopo.model.geometry.Projection2D;
 import org.hwyl.sexytopo.model.geometry.Space;
 import org.hwyl.sexytopo.model.sketch.BrushColour;
 import org.hwyl.sexytopo.model.sketch.Colour;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
+import org.hwyl.sexytopo.model.sketch.LineDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.LegFilter;
@@ -105,8 +105,8 @@ public class PocketTopoTxtImporter extends Importer {
     private static Sketch parseSketch(Survey survey, String text, Space<Coord2D> projection) {
         Sketch sketch = new Sketch();
         Coord2D offset = extractOffset(survey, text, projection);
-        List<PathDetail> pathDetails = parsePolylines(text, offset);
-        sketch.setPathDetails(pathDetails);
+        List<LineDetail> lineDetails = parsePolylines(text, offset);
+        sketch.setLineDetails(lineDetails);
         return sketch;
     }
 
@@ -189,16 +189,16 @@ public class PocketTopoTxtImporter extends Importer {
         return TextTools.join("\n", subSection);
     }
 
-    public static List<PathDetail> parsePolylines(String text, Coord2D offset) {
-        List<PathDetail> paths = new ArrayList<>();
+    public static List<LineDetail> parsePolylines(String text, Coord2D offset) {
+        List<LineDetail> paths = new ArrayList<>();
         boolean inPolyline = false;
         Colour currentPathColour = null;
-        PathDetail currentPathDetail = null;
+        LineDetail currentLineDetail = null;
         for (String line : TextTools.toArrayOfLines(text)) {
             if (line.startsWith("POLYLINE")) {
                 if (inPolyline) {
-                    paths.add(currentPathDetail);
-                    currentPathDetail = null;
+                    paths.add(currentLineDetail);
+                    currentLineDetail = null;
                 }
                 String colourText = line.substring("POLYLINE ".length());
                 currentPathColour = interpretColour(colourText);
@@ -214,15 +214,15 @@ public class PocketTopoTxtImporter extends Importer {
             float y = Float.parseFloat(coords[1]) - offset.y;
             Coord2D coord = new Coord2D(x, -y);
 
-            if (currentPathDetail == null) {
-                currentPathDetail = new PathDetail(coord, currentPathColour);
+            if (currentLineDetail == null) {
+                currentLineDetail = new LineDetail(coord, currentPathColour);
             } else {
-                currentPathDetail.lineTo(coord);
+                currentLineDetail.lineTo(coord);
             }
         }
 
-        if (currentPathDetail != null) {
-            paths.add(currentPathDetail);
+        if (currentLineDetail != null) {
+            paths.add(currentLineDetail);
         }
 
         return paths;

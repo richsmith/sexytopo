@@ -40,8 +40,8 @@ public class ScratchAutosaveTest {
         Assert.assertEquals(
                 survey.getActiveStation().getName(), loaded.getActiveStation().getName());
         Assert.assertEquals(
-                survey.getPlanSketch().getPathDetails().size(),
-                loaded.getPlanSketch().getPathDetails().size());
+                survey.getPlanSketch().getLineDetails().size(),
+                loaded.getPlanSketch().getLineDetails().size());
         Assert.assertFalse(loaded.hasHome());
     }
 

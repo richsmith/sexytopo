@@ -10,8 +10,8 @@ import org.hwyl.sexytopo.model.sketch.AreaType;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
+import org.hwyl.sexytopo.model.sketch.LineDetail;
 import org.hwyl.sexytopo.model.sketch.LineType;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Station;
 import org.hwyl.sexytopo.model.survey.Survey;
@@ -38,11 +38,11 @@ public class SketchJsonTranslaterTest {
         Survey survey = new Survey();
         CrossSection crossSection = new CrossSection(survey.getOrigin(), 0f);
         Sketch subSketch = new Sketch();
-        List<PathDetail> paths = new ArrayList<>();
-        PathDetail path = new PathDetail(Coord2D.ORIGIN, Colour.BLACK);
+        List<LineDetail> paths = new ArrayList<>();
+        LineDetail path = new LineDetail(Coord2D.ORIGIN, Colour.BLACK);
         path.lineTo(new Coord2D(1, 2));
         paths.add(path);
-        subSketch.setPathDetails(paths);
+        subSketch.setLineDetails(paths);
         CrossSectionDetail detail =
                 new CrossSectionDetail(crossSection, new Coord2D(3, 4), subSketch);
 
@@ -50,7 +50,7 @@ public class SketchJsonTranslaterTest {
         Assert.assertTrue(json.has(SketchJsonTranslater.SKETCH_TAG));
 
         CrossSectionDetail restored = SketchJsonTranslater.toCrossSectionDetail(survey, json);
-        Assert.assertEquals(1, restored.getSketch().getPathDetails().size());
+        Assert.assertEquals(1, restored.getSketch().getLineDetails().size());
     }
 
     @Test
@@ -62,7 +62,7 @@ public class SketchJsonTranslaterTest {
 
         JSONObject json = SketchJsonTranslater.toJson(detail);
         CrossSectionDetail restored = SketchJsonTranslater.toCrossSectionDetail(survey, json);
-        Assert.assertTrue(restored.getSketch().getPathDetails().isEmpty());
+        Assert.assertTrue(restored.getSketch().getLineDetails().isEmpty());
     }
 
     @Test
@@ -72,10 +72,10 @@ public class SketchJsonTranslaterTest {
         for (int i = 0; i <= 100; i++) {
             wall.add(new Coord2D(i * 0.5f, i % 2 == 0 ? 0 : 0.03f));
         }
-        PathDetail pathDetail = new PathDetail(wall, Colour.BLACK, LineType.WALL);
+        LineDetail lineDetail = new LineDetail(wall, Colour.BLACK, LineType.WALL);
 
-        PathDetail restored =
-                SketchJsonTranslater.toPathDetail(SketchJsonTranslater.toJson(pathDetail));
+        LineDetail restored =
+                SketchJsonTranslater.toLineDetail(SketchJsonTranslater.toJson(lineDetail));
 
         Assert.assertEquals(wall, restored.getPath());
     }
@@ -166,15 +166,15 @@ public class SketchJsonTranslaterTest {
     }
 
     @Test
-    public void testPathDetailLineTypeRoundTrip() throws Exception {
+    public void testLineDetailLineTypeRoundTrip() throws Exception {
         List<Coord2D> points =
                 Arrays.asList(new Coord2D(0, 0), new Coord2D(2, 0), new Coord2D(4, 1));
-        PathDetail pathDetail = new PathDetail(points, Colour.BLACK, LineType.WALL);
+        LineDetail lineDetail = new LineDetail(points, Colour.BLACK, LineType.WALL);
 
-        JSONObject json = SketchJsonTranslater.toJson(pathDetail);
+        JSONObject json = SketchJsonTranslater.toJson(lineDetail);
         Assert.assertTrue(json.has(SketchJsonTranslater.LINE_TYPE_TAG));
 
-        PathDetail restored = SketchJsonTranslater.toPathDetail(json);
+        LineDetail restored = SketchJsonTranslater.toLineDetail(json);
         Assert.assertEquals(LineType.WALL, restored.getLineType());
     }
 
@@ -183,10 +183,10 @@ public class SketchJsonTranslaterTest {
         // paths written before line types existed have no "line-type" key, so general paths
         // are written the same way to keep old and new files alike
         List<Coord2D> points = Arrays.asList(new Coord2D(0, 0), new Coord2D(2, 0));
-        JSONObject json = SketchJsonTranslater.toJson(new PathDetail(points, Colour.BLACK));
+        JSONObject json = SketchJsonTranslater.toJson(new LineDetail(points, Colour.BLACK));
         Assert.assertFalse(json.has(SketchJsonTranslater.LINE_TYPE_TAG));
 
-        PathDetail restored = SketchJsonTranslater.toPathDetail(json);
+        LineDetail restored = SketchJsonTranslater.toLineDetail(json);
         Assert.assertEquals(LineType.SKETCH, restored.getLineType());
     }
 

@@ -19,7 +19,7 @@ import org.hwyl.sexytopo.model.geometry.Space;
 import org.hwyl.sexytopo.model.sketch.AreaDetail;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
+import org.hwyl.sexytopo.model.sketch.LineDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SymbolDetail;
 import org.hwyl.sexytopo.model.sketch.TextDetail;
@@ -60,7 +60,7 @@ public class XviExporter {
 
     /**
      * Inputs are in survey-frame metres (y north-positive). The XVI emit-helpers (getStationText /
-     * getLegText / getPathDetailText) handle the y-flip on the way out — keep that the only place
+     * getLegText / getLineDetailText) handle the y-flip on the way out — keep that the only place
      * flipping happens.
      */
     private static void addSketch(
@@ -71,11 +71,11 @@ public class XviExporter {
         for (Line<Coord2D> line : space.getLegMap().values()) {
             content.shots.add(getLegText(line, scale));
         }
-        for (PathDetail pathDetail : sketch.getPathDetails()) {
+        for (LineDetail lineDetail : sketch.getLineDetails()) {
             // Semantic lines can also be exported as first-class th2 lines, but they stay in
             // the tracing background regardless so it is always a complete record of the
             // sketch (th2 line export is optional, and th2 lines are freely editable/deletable)
-            content.sketchLines.add(getPathDetailText(pathDetail, scale));
+            content.sketchLines.add(getLineDetailText(lineDetail, scale));
         }
         for (AreaDetail areaDetail : sketch.getAreaDetails()) {
             // the XVI has only polylines, so an area is traced as its outline and any holes
@@ -145,8 +145,8 @@ public class XviExporter {
         return field("\t", TextTools.joinAll(" ", "connect", x1, y1, x2, y2));
     }
 
-    private static String getPathDetailText(PathDetail pathDetail, double scale) {
-        return getPolylineText(pathDetail.getColour(), pathDetail.getPath(), scale);
+    private static String getLineDetailText(LineDetail lineDetail, double scale) {
+        return getPolylineText(lineDetail.getColour(), lineDetail.getPath(), scale);
     }
 
     private static String getPolylineText(Colour colour, List<Coord2D> points, double scale) {
@@ -164,18 +164,18 @@ public class XviExporter {
 
     private static String getTextDetailAsPathsText(TextDetail textDetail, double scale) {
         StringBuilder builder = new StringBuilder();
-        List<PathDetail> pathDetails = TextDetailTranslater.getPathDetailsForText(textDetail);
-        for (PathDetail pathDetail : pathDetails) {
-            builder.append(getPathDetailText(pathDetail, scale));
+        List<LineDetail> lineDetails = TextDetailTranslater.getLineDetailsForText(textDetail);
+        for (LineDetail lineDetail : lineDetails) {
+            builder.append(getLineDetailText(lineDetail, scale));
         }
         return builder.toString();
     }
 
     private static String getSymbolDetailAsPathsText(SymbolDetail symbolDetail, double scale) {
         StringBuilder builder = new StringBuilder();
-        List<PathDetail> pathDetails = new SymbolDetailTranslater().asPathDetails(symbolDetail);
-        for (PathDetail pathDetail : pathDetails) {
-            builder.append(getPathDetailText(pathDetail, scale));
+        List<LineDetail> lineDetails = new SymbolDetailTranslater().asLineDetails(symbolDetail);
+        for (LineDetail lineDetail : lineDetails) {
+            builder.append(getLineDetailText(lineDetail, scale));
         }
         return builder.toString();
     }

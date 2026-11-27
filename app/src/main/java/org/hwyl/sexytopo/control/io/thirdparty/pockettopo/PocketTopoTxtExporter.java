@@ -15,7 +15,7 @@ import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.geometry.Line;
 import org.hwyl.sexytopo.model.geometry.Projection2D;
 import org.hwyl.sexytopo.model.geometry.Space;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
+import org.hwyl.sexytopo.model.sketch.LineDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -83,9 +83,9 @@ public class PocketTopoTxtExporter extends SingleFileExporter implements Experim
     public static String exportSketch(Sketch sketch) {
         List<String> lines = new ArrayList<>();
 
-        for (PathDetail pathDetail : sketch.getPathDetails()) {
-            lines.add("POLYLINE " + pathDetail.getColour().toString());
-            for (Coord2D coords : pathDetail.getPath()) {
+        for (LineDetail lineDetail : sketch.getLineDetails()) {
+            lines.add("POLYLINE " + lineDetail.getColour().toString());
+            for (Coord2D coords : lineDetail.getPath()) {
                 lines.add(coords.x + "\t" + -coords.y);
             }
         }

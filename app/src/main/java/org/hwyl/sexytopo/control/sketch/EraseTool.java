@@ -10,7 +10,7 @@ import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.sketch.AreaDetail;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
 import org.hwyl.sexytopo.model.sketch.GeometryType;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
+import org.hwyl.sexytopo.model.sketch.LineDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchDetail;
 
@@ -186,16 +186,16 @@ class EraseTool implements ToolHandler {
             float toleranceInMetres,
             boolean deleteLineFragments) {
 
-        if (deleteLineFragments && detail instanceof PathDetail) {
+        if (deleteLineFragments && detail instanceof LineDetail) {
             // you got part of the line; as when drawing, a typed line too small to see properly
             // is a speck, so a stub left at the edge of the eraser is dropped
-            PathDetail pathDetail = (PathDetail) detail;
+            LineDetail lineDetail = (LineDetail) detail;
             float minimumSize =
-                    pathDetail.getLineType().isSemantic()
+                    lineDetail.getLineType().isSemantic()
                             ? TouchTolerances.getMinimumLineSize(viewport)
                             : 0;
             List<SketchDetail> fragments =
-                    pathDetail
+                    lineDetail
                             .getPathFragmentsOutsideRadius(touchPointOnSurvey, toleranceInMetres)
                             .stream()
                             .filter(fragment -> fragment.getMaxDimension() >= minimumSize)

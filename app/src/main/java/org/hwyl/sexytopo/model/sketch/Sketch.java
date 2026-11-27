@@ -26,7 +26,7 @@ public class Sketch extends Shape {
     // How far past its ends a wall cuts, in metres, so one stopping just short still cuts across
     private static final float WALL_CLIP_EXTENSION = 0.25f;
 
-    private List<PathDetail> pathDetails = new ArrayList<>();
+    private List<LineDetail> lineDetails = new ArrayList<>();
     private List<AreaDetail> areaDetails = new ArrayList<>();
     private List<SymbolDetail> symbolDetails = new ArrayList<>();
     private List<TextDetail> textDetails = new ArrayList<>();
@@ -38,10 +38,10 @@ public class Sketch extends Shape {
     private boolean isGroupingDeletions = false;
     private DeletedDetail groupedDeletion;
 
-    private PathDetail activePath;
+    private LineDetail activePath;
     // the lines the active path's start and end were snapped to, to be joined into it on finishing
-    private PathDetail startJoin;
-    private PathDetail endJoin;
+    private LineDetail startJoin;
+    private LineDetail endJoin;
 
     private float crossSectionScale = DEFAULT_XSECTION_SCALE;
 
@@ -51,9 +51,9 @@ public class Sketch extends Shape {
     public Sketch() {}
 
     public Sketch(Sketch sketch) {
-        // shallow copies are OK here because paths are immutable
+        // shallow copies are OK here because lines are immutable
         this.crossSectionScale = sketch.crossSectionScale;
-        setPathDetails(new ArrayList<>(sketch.getPathDetails()));
+        setLineDetails(new ArrayList<>(sketch.getLineDetails()));
         setAreaDetails(new ArrayList<>(sketch.getAreaDetails()));
         setSymbolDetails(new ArrayList<>(sketch.getSymbolDetails()));
         setTextDetails(new ArrayList<>(sketch.getTextDetails()));
@@ -81,8 +81,8 @@ public class Sketch extends Shape {
         this.isAutosaved = isAutosaved;
     }
 
-    public void setPathDetails(List<PathDetail> pathDetails) {
-        this.pathDetails = pathDetails;
+    public void setLineDetails(List<LineDetail> lineDetails) {
+        this.lineDetails = lineDetails;
         recalculateBoundingBox();
     }
 
@@ -105,25 +105,25 @@ public class Sketch extends Shape {
         recalculateBoundingBox();
     }
 
-    public List<PathDetail> getPathDetails() {
-        return pathDetails;
+    public List<LineDetail> getLineDetails() {
+        return lineDetails;
     }
 
-    public PathDetail getActivePath() {
+    public LineDetail getActivePath() {
         return activePath;
     }
 
-    public PathDetail startNewPath(Coord2D start) {
+    public LineDetail startNewPath(Coord2D start) {
         return startNewPath(start, Colour.BLACK, LineType.SKETCH);
     }
 
-    public PathDetail startNewPath(Coord2D start, Colour colour, LineType lineType) {
-        activePath = new PathDetail(start, colour, lineType);
+    public LineDetail startNewPath(Coord2D start, Colour colour, LineType lineType) {
+        activePath = new LineDetail(start, colour, lineType);
         startJoin = null;
         endJoin = null;
         // Registered in the undo history only on finishPath, so an unfinished path can be
         // abandoned without leaving a trace.
-        pathDetails.add(activePath);
+        lineDetails.add(activePath);
         return activePath;
     }
 
@@ -139,7 +139,7 @@ public class Sketch extends Shape {
         if (activePath == null) {
             return;
         }
-        pathDetails.remove(activePath);
+        lineDetails.remove(activePath);
         activePath = null;
         recalculateBoundingBox();
     }
@@ -160,8 +160,8 @@ public class Sketch extends Shape {
         if (activePath == null) {
             return;
         }
-        PathDetail startJoin = this.startJoin;
-        PathDetail endJoin = this.endJoin;
+        LineDetail startJoin = this.startJoin;
+        LineDetail endJoin = this.endJoin;
         this.startJoin = null;
         this.endJoin = null;
 
@@ -182,12 +182,12 @@ public class Sketch extends Shape {
             return;
         }
 
-        PathDetail drawn = activePath;
+        LineDetail drawn = activePath;
         abandonActivePath();
-        List<PathDetail> joined = new ArrayList<>();
+        List<LineDetail> joined = new ArrayList<>();
         List<SketchDetail> kept =
                 pieces.stream()
-                        .map(piece -> new PathDetail(piece, drawn.getColour(), drawn.getLineType()))
+                        .map(piece -> new LineDetail(piece, drawn.getColour(), drawn.getLineType()))
                         .filter(piece -> piece.getMaxDimension() >= minimumSize)
                         .map(piece -> piece.joinedWith(startJoin, endJoin, joined))
                         .collect(Collectors.toList());
@@ -200,7 +200,7 @@ public class Sketch extends Shape {
      * The line cut along any walls it strays across, keeping the parts on their inner side; may be
      * several pieces. Returns the line's own points, as the only piece, if it isn't to be clipped.
      */
-    private List<List<Coord2D>> clipToWalls(PathDetail line) {
+    private List<List<Coord2D>> clipToWalls(LineDetail line) {
 
         if (!SketchPreferences.Toggle.CLIP_TO_WALLS.isOn()
                 || !line.getLineType().isClippedToWalls()) {
@@ -211,7 +211,7 @@ public class Sketch extends Shape {
         // wall is nearest it, so an outlying one has no say
         List<List<Coord2D>> walls =
                 findWallsNear(line, getWallClipMargin(line), wall -> true).stream()
-                        .map(PathDetail::getPath)
+                        .map(LineDetail::getPath)
                         .collect(Collectors.toList());
         if (walls.isEmpty()) {
             return Collections.singletonList(line.getPath());
@@ -224,9 +224,9 @@ public class Sketch extends Shape {
      * Start sketching the outline of a new area. The outline is drawn like a normal path (so it
      * renders as the user drags) and is turned into a polygon by finishArea.
      */
-    public PathDetail startNewArea(Coord2D start, Colour colour, AreaType areaType) {
-        activePath = new PathDetail(start, areaType.getAutoColour().applyTo(colour));
-        pathDetails.add(activePath);
+    public LineDetail startNewArea(Coord2D start, Colour colour, AreaType areaType) {
+        activePath = new LineDetail(start, areaType.getAutoColour().applyTo(colour));
+        lineDetails.add(activePath);
         return activePath;
     }
 
@@ -251,7 +251,7 @@ public class Sketch extends Shape {
         if (activePath == null) {
             return;
         }
-        PathDetail outlinePath = activePath;
+        LineDetail outlinePath = activePath;
         abandonActivePath();
 
         List<Coord2D> stroke =
@@ -294,7 +294,7 @@ public class Sketch extends Shape {
 
         List<List<Coord2D>> walls =
                 findClippingWalls(area).stream()
-                        .map(PathDetail::getPath)
+                        .map(LineDetail::getPath)
                         .collect(Collectors.toList());
         if (walls.isEmpty()) {
             return Collections.singletonList(area);
@@ -314,7 +314,7 @@ public class Sketch extends Shape {
      * edges and chimneys don't count: they aren't passage boundaries and have no inferred interior
      * side.
      */
-    private List<PathDetail> findClippingWalls(AreaDetail area) {
+    private List<LineDetail> findClippingWalls(AreaDetail area) {
         float margin = getWallClipMargin(area);
         return findWallsNear(area, margin, wall -> comesWithin(wall, area, margin));
     }
@@ -330,13 +330,13 @@ public class Sketch extends Shape {
      * Wall-kind lines within the margin of the shape's bounding box that pass the closer check
      * given, which says whether a wall really comes near enough the shape itself.
      */
-    private List<PathDetail> findWallsNear(
-            Shape shape, float margin, Predicate<PathDetail> comesNear) {
+    private List<LineDetail> findWallsNear(
+            Shape shape, float margin, Predicate<LineDetail> comesNear) {
         Coord2D grow = new Coord2D(margin, margin);
         Coord2D topLeft = shape.getTopLeft().minus(grow);
         Coord2D bottomRight = shape.getBottomRight().plus(grow);
 
-        return pathDetails.stream()
+        return lineDetails.stream()
                 .filter(path -> path.getLineType().isWall())
                 .filter(path -> path.getPath().size() >= 2)
                 .filter(path -> path.intersectsRectangle(topLeft, bottomRight))
@@ -348,7 +348,7 @@ public class Sketch extends Shape {
      * Whether the line comes within the given distance of the area. Checks both ways round, so
      * neither a long straight stretch of wall nor a long straight edge of area slips through.
      */
-    private static boolean comesWithin(PathDetail path, AreaDetail area, float margin) {
+    private static boolean comesWithin(LineDetail path, AreaDetail area, float margin) {
         return path.getPath().stream()
                         .anyMatch(
                                 point ->
@@ -473,41 +473,40 @@ public class Sketch extends Shape {
     }
 
     /**
-     * The most recently added path whose direction matters, or null if there isn't one. Used by the
+     * The most recently added line whose direction matters, or null if there isn't one. Used by the
      * "Flip Last Line" tool, since flipping any other line would do nothing visible.
      */
-    public PathDetail getMostRecentOrientedPath() {
-        for (int i = pathDetails.size() - 1; i >= 0; i--) {
-            PathDetail pathDetail = pathDetails.get(i);
-            if (pathDetail.getLineType().isOriented()) {
-                return pathDetail;
+    public LineDetail getMostRecentOrientedPath() {
+        for (int i = lineDetails.size() - 1; i >= 0; i--) {
+            LineDetail lineDetail = lineDetails.get(i);
+            if (lineDetail.getLineType().isOriented()) {
+                return lineDetail;
             }
         }
         return null;
     }
 
     /**
-     * Reverses the point order of a path (flipping which side its ticks fall on) as a single
+     * Reverses the point order of a line (flipping which side its ticks fall on) as a single
      * undoable operation. Since details are immutable this is a delete-and-replace.
      */
-    public PathDetail flipPathDetail(PathDetail pathDetail) {
-        List<Coord2D> reversedPoints = new ArrayList<>(pathDetail.getPath());
+    public LineDetail flipLineDetail(LineDetail lineDetail) {
+        List<Coord2D> reversedPoints = new ArrayList<>(lineDetail.getPath());
         Collections.reverse(reversedPoints);
-        PathDetail flipped =
-                new PathDetail(reversedPoints, pathDetail.getColour(), pathDetail.getLineType());
-        deleteDetail(pathDetail, Collections.singletonList((SketchDetail) flipped));
+        LineDetail flipped =
+                new LineDetail(reversedPoints, lineDetail.getColour(), lineDetail.getLineType());
+        deleteDetail(lineDetail, Collections.singletonList((SketchDetail) flipped));
         return flipped;
     }
 
     /**
-     * Changes a path's line type as a single undoable operation. The point order is kept, so the
-     * line faces the same way as before: once drawn, a line only turns round when deliberately
-     * flipped.
+     * Changes a line's type as a single undoable operation. The point order is kept, so the line
+     * faces the same way as before: once drawn, a line only turns round when deliberately flipped.
      */
-    public PathDetail retypePathDetail(PathDetail pathDetail, LineType lineType) {
-        List<Coord2D> points = new ArrayList<>(pathDetail.getPath());
-        PathDetail retyped = new PathDetail(points, pathDetail.getColour(), lineType);
-        deleteDetail(pathDetail, Collections.singletonList((SketchDetail) retyped));
+    public LineDetail retypeLineDetail(LineDetail lineDetail, LineType lineType) {
+        List<Coord2D> points = new ArrayList<>(lineDetail.getPath());
+        LineDetail retyped = new LineDetail(points, lineDetail.getColour(), lineType);
+        deleteDetail(lineDetail, Collections.singletonList((SketchDetail) retyped));
         return retyped;
     }
 
@@ -541,9 +540,9 @@ public class Sketch extends Shape {
     }
 
     /** Changes a line's colour, as a single undoable operation. */
-    public PathDetail recolourPathDetail(PathDetail pathDetail, Colour colour) {
-        PathDetail recoloured = pathDetail.withColour(colour);
-        deleteDetail(pathDetail, Collections.singletonList((SketchDetail) recoloured));
+    public LineDetail recolourLineDetail(LineDetail lineDetail, Colour colour) {
+        LineDetail recoloured = lineDetail.withColour(colour);
+        deleteDetail(lineDetail, Collections.singletonList((SketchDetail) recoloured));
         return recoloured;
     }
 
@@ -558,7 +557,7 @@ public class Sketch extends Shape {
     }
 
     /** Moves a symbol or piece of text by the given offset, as a single undoable operation. */
-    public SketchDetail moveDetail(SinglePositionDetail detail, Coord2D offset) {
+    public SketchDetail moveDetail(PointDetail detail, Coord2D offset) {
         SketchDetail moved = detail.translate(offset);
         deleteDetail(detail, Collections.singletonList(moved));
         return moved;
@@ -568,15 +567,15 @@ public class Sketch extends Shape {
      * Scales a symbol or piece of text by the given factor, keeping its place, as a single undoable
      * operation.
      */
-    public SketchDetail resizeDetail(SinglePositionDetail detail, float scale) {
+    public SketchDetail resizeDetail(PointDetail detail, float scale) {
         SketchDetail resized = detail.scale(scale);
         deleteDetail(detail, Collections.singletonList(resized));
         return resized;
     }
 
     /** Swaps a line for a reshaped version of it, as a single undoable operation. */
-    public PathDetail reshapePathDetail(PathDetail pathDetail, PathDetail reshaped) {
-        deleteDetail(pathDetail, Collections.singletonList((SketchDetail) reshaped));
+    public LineDetail reshapeLineDetail(LineDetail lineDetail, LineDetail reshaped) {
+        deleteDetail(lineDetail, Collections.singletonList((SketchDetail) reshaped));
         return reshaped;
     }
 
@@ -699,8 +698,8 @@ public class Sketch extends Shape {
     private void removeDetailFromSketch(SketchDetail sketchDetail) {
         // this is a separate function to deleteDetail because former is user-called and handles
         // undo history etc. whereas this actually removes the data
-        if (sketchDetail instanceof PathDetail) {
-            pathDetails.remove(sketchDetail);
+        if (sketchDetail instanceof LineDetail) {
+            lineDetails.remove(sketchDetail);
         } else if (sketchDetail instanceof AreaDetail) {
             areaDetails.remove(sketchDetail);
         } else if (sketchDetail instanceof SymbolDetail) {
@@ -715,8 +714,8 @@ public class Sketch extends Shape {
     }
 
     public void restoreDetailToSketch(SketchDetail sketchDetail) {
-        if (sketchDetail instanceof PathDetail) {
-            pathDetails.add((PathDetail) sketchDetail);
+        if (sketchDetail instanceof LineDetail) {
+            lineDetails.add((LineDetail) sketchDetail);
         } else if (sketchDetail instanceof AreaDetail) {
             areaDetails.add((AreaDetail) sketchDetail);
         } else if (sketchDetail instanceof SymbolDetail) {
@@ -764,7 +763,7 @@ public class Sketch extends Shape {
         }
 
         float distanceToStart = Space2DUtils.getDistance(end, start);
-        PathDetail endTarget = findLineToSnapTo(end, delta, false, null);
+        LineDetail endTarget = findLineToSnapTo(end, delta, false, null);
         if (activePath.reachesBeyond(delta)
                 && distanceToStart < delta
                 && (endTarget == null
@@ -775,7 +774,7 @@ public class Sketch extends Shape {
             return;
         }
 
-        PathDetail startTarget = findLineToSnapTo(start, delta, true, null);
+        LineDetail startTarget = findLineToSnapTo(start, delta, true, null);
         if (startTarget != null) {
             activePath.snapStartTo(startTarget.getEndToJoinAfter(start), delta);
             startJoin = startTarget;
@@ -806,13 +805,13 @@ public class Sketch extends Shape {
      * within delta of it, or null if there isn't one. atStart says which end of the active path is
      * joining: its start joins on after another line, its end before one.
      */
-    private PathDetail findLineToSnapTo(
+    private LineDetail findLineToSnapTo(
             Coord2D point, float delta, boolean atStart, Coord2D excluded) {
-        Function<PathDetail, Coord2D> joinableEnd =
+        Function<LineDetail, Coord2D> joinableEnd =
                 line -> atStart ? line.getEndToJoinAfter(point) : line.getEndToJoinBefore(point);
-        Function<PathDetail, Float> distance =
+        Function<LineDetail, Float> distance =
                 line -> Space2DUtils.getDistance(point, joinableEnd.apply(line));
-        return pathDetails.stream()
+        return lineDetails.stream()
                 .filter(line -> line != activePath && activePath.canJoin(line))
                 .filter(line -> !joinableEnd.apply(line).equals(excluded))
                 .filter(line -> distance.apply(line) < delta)
@@ -822,7 +821,7 @@ public class Sketch extends Shape {
 
     private List<SketchDetail> allSketchDetails() {
         List<SketchDetail> all = new ArrayList<>();
-        all.addAll(pathDetails);
+        all.addAll(lineDetails);
         all.addAll(areaDetails);
         all.addAll(symbolDetails);
         all.addAll(textDetails);
@@ -925,11 +924,11 @@ public class Sketch extends Shape {
     public Sketch translate(Coord2D translation) {
         Sketch sketch = new Sketch();
 
-        List<PathDetail> newPathDetails = new ArrayList<>();
-        for (PathDetail pathDetail : pathDetails) {
-            newPathDetails.add(pathDetail.translate(translation));
+        List<LineDetail> newLineDetails = new ArrayList<>();
+        for (LineDetail lineDetail : lineDetails) {
+            newLineDetails.add(lineDetail.translate(translation));
         }
-        sketch.setPathDetails(newPathDetails);
+        sketch.setLineDetails(newLineDetails);
 
         List<AreaDetail> newAreaDetails = new ArrayList<>();
         for (AreaDetail areaDetail : areaDetails) {
@@ -962,11 +961,11 @@ public class Sketch extends Shape {
     public Sketch scale(float scale) {
         Sketch sketch = new Sketch();
 
-        List<PathDetail> newPathDetails = new ArrayList<>();
-        for (PathDetail pathDetail : pathDetails) {
-            newPathDetails.add(pathDetail.scale(scale));
+        List<LineDetail> newLineDetails = new ArrayList<>();
+        for (LineDetail lineDetail : lineDetails) {
+            newLineDetails.add(lineDetail.scale(scale));
         }
-        sketch.setPathDetails(newPathDetails);
+        sketch.setLineDetails(newLineDetails);
 
         List<AreaDetail> newAreaDetails = new ArrayList<>();
         for (AreaDetail areaDetail : areaDetails) {

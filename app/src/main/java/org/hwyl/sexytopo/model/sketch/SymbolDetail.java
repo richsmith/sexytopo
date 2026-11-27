@@ -3,7 +3,7 @@ package org.hwyl.sexytopo.model.sketch;
 import android.graphics.drawable.Drawable;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 
-public class SymbolDetail extends SinglePositionDetail implements AutoScalableDetail {
+public class SymbolDetail extends PointDetail implements AutoScalableDetail {
 
     private final Symbol symbol;
     private final float size;

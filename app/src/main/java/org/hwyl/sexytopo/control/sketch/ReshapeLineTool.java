@@ -4,7 +4,7 @@ import android.graphics.Canvas;
 import android.view.MotionEvent;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
+import org.hwyl.sexytopo.model.sketch.LineDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchTool;
 
@@ -30,7 +30,7 @@ class ReshapeLineTool implements ToolHandler {
     private final SketchRenderer sketchRenderer;
     private final ToolHost host;
 
-    private PathDetail beingReshaped = null;
+    private LineDetail beingReshaped = null;
 
     // where the drag started and where it's got to, on the view
     private Coord2D dragStart = null;
@@ -44,8 +44,8 @@ class ReshapeLineTool implements ToolHandler {
         this.host = host;
     }
 
-    void start(PathDetail pathDetail) {
-        beingReshaped = pathDetail;
+    void start(LineDetail lineDetail) {
+        beingReshaped = lineDetail;
         dragStart = null;
         dragEnd = null;
         state.startTemporaryTool(SketchTool.RESHAPE_LINE);
@@ -83,7 +83,7 @@ class ReshapeLineTool implements ToolHandler {
             case MotionEvent.ACTION_UP:
                 if (dragStart != null && !touchPoint.equals(dragStart)) {
                     Sketch sketch = state.getSketch();
-                    sketch.reshapePathDetail(beingReshaped, reshape(dragStart, touchPoint));
+                    sketch.reshapeLineDetail(beingReshaped, reshape(dragStart, touchPoint));
                 }
                 finish();
                 return true;
@@ -98,7 +98,7 @@ class ReshapeLineTool implements ToolHandler {
     }
 
     /** The line as a drag between two points on the view would leave it. */
-    private PathDetail reshape(Coord2D from, Coord2D to) {
+    private LineDetail reshape(Coord2D from, Coord2D to) {
         Coord2D grab = viewport.toSurvey(from);
         Coord2D offset = viewport.toSurvey(to).minus(grab);
         float reach =
@@ -112,7 +112,7 @@ class ReshapeLineTool implements ToolHandler {
         if (!isActive()) {
             return;
         }
-        PathDetail preview =
+        LineDetail preview =
                 dragStart == null || dragStart.equals(dragEnd)
                         ? beingReshaped
                         : reshape(dragStart, dragEnd);
@@ -120,7 +120,7 @@ class ReshapeLineTool implements ToolHandler {
     }
 
     @Override
-    public PathDetail getHiddenDetail() {
+    public LineDetail getHiddenDetail() {
         return isActive() ? beingReshaped : null;
     }
 
@@ -131,7 +131,7 @@ class ReshapeLineTool implements ToolHandler {
     private boolean isActive() {
         return beingReshaped != null
                 && state.getUnderlyingSketchTool() == SketchTool.RESHAPE_LINE
-                && state.getSketch().getPathDetails().contains(beingReshaped);
+                && state.getSketch().getLineDetails().contains(beingReshaped);
     }
 
     private void finish() {

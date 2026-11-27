@@ -17,8 +17,8 @@ import org.hwyl.sexytopo.control.SexyTopo;
 import org.hwyl.sexytopo.control.preferences.GeneralPreferences;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.sketch.Colour;
+import org.hwyl.sexytopo.model.sketch.LineDetail;
 import org.hwyl.sexytopo.model.sketch.LineType;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchDetail;
 
@@ -105,27 +105,27 @@ class LineRenderer {
         drawPaint.setColor(lastColour.intValue);
         drawPaint.setAlpha(alpha);
 
-        for (PathDetail pathDetail : sketch.getPathDetails()) {
+        for (LineDetail lineDetail : sketch.getLineDetails()) {
 
-            if (pathDetail == hidden || !viewport.couldBeVisible(pathDetail)) {
+            if (lineDetail == hidden || !viewport.couldBeVisible(lineDetail)) {
                 continue;
             }
 
-            if (pathDetail.getLineType() != LineType.SKETCH) {
+            if (lineDetail.getLineType() != LineType.SKETCH) {
                 drawTypedPath(
                         canvas,
-                        pathDetail,
+                        lineDetail,
                         alpha,
                         isDarkModeActive,
-                        isFinishedWall(sketch, pathDetail),
+                        isFinishedWall(sketch, lineDetail),
                         isDebugMode);
                 continue;
             }
 
             // Avoiding constantly updating the paint colour saves approx. 10% of sketch draw time.
-            // Ideally getPathDetails() would return the paths in colour order but HashSets
+            // Ideally getLineDetails() would return the lines in colour order but HashSets
             // are unordered collections
-            Colour drawColour = pathDetail.getDrawColour(isDarkModeActive);
+            Colour drawColour = lineDetail.getDrawColour(isDarkModeActive);
             if (drawColour != lastColour) {
                 lastColour = drawColour;
                 // setColor replaces the alpha too, so a faded sketch has to be faded again
@@ -133,7 +133,7 @@ class LineRenderer {
                 drawPaint.setAlpha(alpha);
             }
 
-            int pointValues = toPointsOnScreen(pathDetail.getPath());
+            int pointValues = toPointsOnScreen(lineDetail.getPath());
             float[] points = pointsScratch;
 
             // four values (the start and end x and y) for each segment between points
@@ -162,20 +162,20 @@ class LineRenderer {
      * Draws a single line on its own, such as one being reshaped, with its ornamentation and any
      * rock-side shading.
      */
-    void drawLine(Canvas canvas, PathDetail pathDetail, int alpha, boolean isDarkModeActive) {
-        if (pathDetail.getLineType() != LineType.SKETCH) {
+    void drawLine(Canvas canvas, LineDetail lineDetail, int alpha, boolean isDarkModeActive) {
+        if (lineDetail.getLineType() != LineType.SKETCH) {
             drawTypedPath(
                     canvas,
-                    pathDetail,
+                    lineDetail,
                     alpha,
                     isDarkModeActive,
-                    pathDetail.getLineType().isWall(),
+                    lineDetail.getLineType().isWall(),
                     false);
             return;
         }
-        drawPaint.setColor(pathDetail.getDrawColour(isDarkModeActive).intValue);
+        drawPaint.setColor(lineDetail.getDrawColour(isDarkModeActive).intValue);
         drawPaint.setAlpha(alpha);
-        int pointValues = toPointsOnScreen(pathDetail.getPath());
+        int pointValues = toPointsOnScreen(lineDetail.getPath());
         float[] points = pointsScratch;
         typedPathScratch.rewind();
         if (pointValues > 0) {
@@ -193,16 +193,16 @@ class LineRenderer {
      */
     private void drawTypedPath(
             Canvas canvas,
-            PathDetail pathDetail,
+            LineDetail lineDetail,
             int alpha,
             boolean isDarkModeActive,
             boolean shadeRockSide,
             boolean isDebugMode) {
-        Paint paint = getLineTypePaint(pathDetail.getLineType(), viewport.getPatternScale());
-        paint.setColor(pathDetail.getDrawColour(isDarkModeActive).intValue);
+        Paint paint = getLineTypePaint(lineDetail.getLineType(), viewport.getPatternScale());
+        paint.setColor(lineDetail.getDrawColour(isDarkModeActive).intValue);
         paint.setAlpha(alpha);
 
-        int pointValues = toPointsOnScreen(pathDetail.getPath());
+        int pointValues = toPointsOnScreen(lineDetail.getPath());
         float[] points = pointsScratch;
 
         typedPathScratch.rewind();
@@ -294,8 +294,8 @@ class LineRenderer {
      * progress (its orientation isn't decided until the stroke finishes). Ticked types need no
      * shading — their ornamentation already shows their orientation.
      */
-    private static boolean isFinishedWall(Sketch sketch, PathDetail pathDetail) {
-        return pathDetail.getLineType().isWall() && pathDetail != sketch.getActivePath();
+    private static boolean isFinishedWall(Sketch sketch, LineDetail lineDetail) {
+        return lineDetail.getLineType().isWall() && lineDetail != sketch.getActivePath();
     }
 
     private float getOrnamentSizePixels(float patternScale) {

@@ -20,7 +20,7 @@ import org.hwyl.sexytopo.model.geometry.Projection2D;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
+import org.hwyl.sexytopo.model.sketch.LineDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.Symbol;
 import org.hwyl.sexytopo.model.survey.Leg;
@@ -246,7 +246,7 @@ public class ExampleSurveyCreator {
             Map<Station, Coord2D> wallPoints,
             Station from,
             LRUD side,
-            PathDetail path) {
+            LineDetail path) {
         List<Leg> onward = from.getOnwardLegs(LegFilter.LEGS);
         Coord2D fromWall = wallPoints.get(from);
         if (fromWall == null) {
@@ -275,7 +275,7 @@ public class ExampleSurveyCreator {
                 if (childWall == null) {
                     continue;
                 }
-                PathDetail branch = plan.startNewPath(fromWall);
+                LineDetail branch = plan.startNewPath(fromWall);
                 toFreehand(branch, fromWall, childWall);
                 drawWallChain(survey, plan, stationPositions, wallPoints, child, side, branch);
             }
@@ -288,7 +288,7 @@ public class ExampleSurveyCreator {
      * the interior points and `to` are appended. Endpoints stay exact so adjacent segments still
      * meet at stations.
      */
-    private static PathDetail toFreehand(PathDetail path, Coord2D from, Coord2D to) {
+    private static LineDetail toFreehand(LineDetail path, Coord2D from, Coord2D to) {
         int subSegments = 6 + random.nextInt(7);
         Coord2D delta = to.minus(from);
         float length = delta.mag();
@@ -319,7 +319,7 @@ public class ExampleSurveyCreator {
         }
         endpoints.sort(Comparator.comparingDouble(p -> Math.atan2(p.y, p.x)));
         Sketch sub = xsDetail.getSketch();
-        PathDetail path = sub.startNewPath(endpoints.get(0));
+        LineDetail path = sub.startNewPath(endpoints.get(0));
         for (int i = 1; i < endpoints.size(); i++) {
             toFreehand(path, endpoints.get(i - 1), endpoints.get(i));
         }

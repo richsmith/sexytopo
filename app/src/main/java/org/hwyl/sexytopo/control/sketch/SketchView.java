@@ -28,8 +28,8 @@ import org.hwyl.sexytopo.model.sketch.AreaType;
 import org.hwyl.sexytopo.model.sketch.BrushColour;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
+import org.hwyl.sexytopo.model.sketch.LineDetail;
 import org.hwyl.sexytopo.model.sketch.LineType;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchDetail;
 import org.hwyl.sexytopo.model.sketch.SketchTool;
@@ -648,13 +648,13 @@ public class SketchView extends View {
             int x = (int) motionEvent.getX();
             int y = (int) motionEvent.getY();
             Runnable onChanged = SketchView.this::invalidate;
-            if (matchedDetail instanceof PathDetail) {
+            if (matchedDetail instanceof LineDetail) {
                 LineContextMenu.show(
                         SketchView.this,
                         x,
                         y,
                         sketch,
-                        (PathDetail) matchedDetail,
+                        (LineDetail) matchedDetail,
                         onChanged,
                         reshapeLineTool::start);
             } else if (matchedDetail instanceof AreaDetail) {

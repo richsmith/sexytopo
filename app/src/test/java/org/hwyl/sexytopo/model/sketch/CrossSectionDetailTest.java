@@ -14,9 +14,9 @@ public class CrossSectionDetailTest {
     public void testTranslatePreservesSubSketchReference() {
         CrossSection crossSection = new CrossSection(new Station("A1"), 0f);
         Sketch subSketch = new Sketch();
-        List<PathDetail> pathDetails = new ArrayList<>();
-        pathDetails.add(new PathDetail(Coord2D.ORIGIN, Colour.BLACK));
-        subSketch.setPathDetails(pathDetails);
+        List<LineDetail> lineDetails = new ArrayList<>();
+        lineDetails.add(new LineDetail(Coord2D.ORIGIN, Colour.BLACK));
+        subSketch.setLineDetails(lineDetails);
 
         CrossSectionDetail original =
                 new CrossSectionDetail(crossSection, Coord2D.ORIGIN, subSketch);
@@ -31,7 +31,7 @@ public class CrossSectionDetailTest {
         CrossSection crossSection = new CrossSection(new Station("A1"), 0f);
         CrossSectionDetail detail = new CrossSectionDetail(crossSection, Coord2D.ORIGIN);
         Assert.assertNotNull(detail.getSketch());
-        Assert.assertTrue(detail.getSketch().getPathDetails().isEmpty());
+        Assert.assertTrue(detail.getSketch().getLineDetails().isEmpty());
     }
 
     @Test
@@ -94,12 +94,12 @@ public class CrossSectionDetailTest {
     }
 
     private static Sketch sketchWithLine(Coord2D start, Coord2D end) {
-        PathDetail line = new PathDetail(start, Colour.BLACK);
+        LineDetail line = new LineDetail(start, Colour.BLACK);
         line.lineTo(end);
         Sketch sketch = new Sketch();
-        List<PathDetail> pathDetails = new ArrayList<>();
-        pathDetails.add(line);
-        sketch.setPathDetails(pathDetails);
+        List<LineDetail> lineDetails = new ArrayList<>();
+        lineDetails.add(line);
+        sketch.setLineDetails(lineDetails);
         return sketch;
     }
 }

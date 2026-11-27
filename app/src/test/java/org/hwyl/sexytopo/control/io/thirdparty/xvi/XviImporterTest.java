@@ -3,7 +3,7 @@ package org.hwyl.sexytopo.control.io.thirdparty.xvi;
 import java.util.List;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.sketch.Colour;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
+import org.hwyl.sexytopo.model.sketch.LineDetail;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -84,35 +84,35 @@ public class XviImporterTest {
     @Test
     public void testParseSketchEntryGetsRightColour() throws Exception {
         String simpleText = "red 0 0";
-        PathDetail pathDetail = XviImporter.parseSketchEntry(1, simpleText);
-        Assert.assertEquals(Colour.RED, pathDetail.getColour());
+        LineDetail lineDetail = XviImporter.parseSketchEntry(1, simpleText);
+        Assert.assertEquals(Colour.RED, lineDetail.getColour());
     }
 
     @Test
     public void testParseSketchEntryParsesFirstEntry() throws Exception {
         String simpleText = "red 0 0";
-        PathDetail pathDetail = XviImporter.parseSketchEntry(1, simpleText);
-        Assert.assertEquals(Coord2D.ORIGIN, pathDetail.getPath().get(0));
-        Assert.assertEquals(1, pathDetail.getPath().size());
+        LineDetail lineDetail = XviImporter.parseSketchEntry(1, simpleText);
+        Assert.assertEquals(Coord2D.ORIGIN, lineDetail.getPath().get(0));
+        Assert.assertEquals(1, lineDetail.getPath().size());
     }
 
     @Test
     public void testParseSketchEntryParsesSecondEntry() throws Exception {
         String simpleText = "blue 0 0 1 0";
-        PathDetail pathDetail = XviImporter.parseSketchEntry(1, simpleText);
-        Assert.assertEquals(new Coord2D(1, 0), pathDetail.getPath().get(1));
-        Assert.assertEquals(2, pathDetail.getPath().size());
+        LineDetail lineDetail = XviImporter.parseSketchEntry(1, simpleText);
+        Assert.assertEquals(new Coord2D(1, 0), lineDetail.getPath().get(1));
+        Assert.assertEquals(2, lineDetail.getPath().size());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testParseSketchEntryFailsForUnevenData() throws Exception {
         String simpleText = "red 0 0 1";
-        PathDetail pathDetail = XviImporter.parseSketchEntry(1, simpleText);
+        LineDetail lineDetail = XviImporter.parseSketchEntry(1, simpleText);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testParseSketchEntryFailsForUnknownFirstCommand() throws Exception {
         String simpleText = "connect 0 0";
-        PathDetail pathDetail = XviImporter.parseSketchEntry(1, simpleText);
+        LineDetail lineDetail = XviImporter.parseSketchEntry(1, simpleText);
     }
 }

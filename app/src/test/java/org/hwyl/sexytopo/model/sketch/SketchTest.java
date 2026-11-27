@@ -38,10 +38,10 @@ public class SketchTest {
     @Test
     public void testStartNewPathUsesGivenLineType() {
         Sketch sketch = new Sketch();
-        PathDetail pathDetail = sketch.startNewPath(Coord2D.ORIGIN, Colour.BLACK, LineType.WALL);
-        Assert.assertEquals(LineType.WALL, pathDetail.getLineType());
+        LineDetail lineDetail = sketch.startNewPath(Coord2D.ORIGIN, Colour.BLACK, LineType.WALL);
+        Assert.assertEquals(LineType.WALL, lineDetail.getLineType());
 
-        PathDetail plain = sketch.startNewPath(new Coord2D(1, 1), Colour.BLACK, LineType.SKETCH);
+        LineDetail plain = sketch.startNewPath(new Coord2D(1, 1), Colour.BLACK, LineType.SKETCH);
         Assert.assertEquals(LineType.SKETCH, plain.getLineType());
     }
 
@@ -54,15 +54,15 @@ public class SketchTest {
                         new Coord2D(4, 0),
                         new Coord2D(6, 0),
                         new Coord2D(8, 0));
-        PathDetail pathDetail = new PathDetail(new ArrayList<>(points), Colour.BLACK, LineType.PIT);
+        LineDetail lineDetail = new LineDetail(new ArrayList<>(points), Colour.BLACK, LineType.PIT);
 
         // erase through the middle, splitting the path in two
         List<SketchDetail> fragments =
-                pathDetail.getPathFragmentsOutsideRadius(new Coord2D(4, 0), 0.5);
+                lineDetail.getPathFragmentsOutsideRadius(new Coord2D(4, 0), 0.5);
 
         Assert.assertEquals(2, fragments.size());
         for (SketchDetail fragment : fragments) {
-            Assert.assertEquals(LineType.PIT, ((PathDetail) fragment).getLineType());
+            Assert.assertEquals(LineType.PIT, ((LineDetail) fragment).getLineType());
         }
     }
 
@@ -70,18 +70,18 @@ public class SketchTest {
     public void testEraserCutsLongSegmentAtEdgeOfRadius() {
         // a single long segment: erasing its middle should leave a gap the size of the eraser,
         // not remove the whole segment
-        PathDetail pathDetail =
-                new PathDetail(
+        LineDetail lineDetail =
+                new LineDetail(
                         new ArrayList<>(Arrays.asList(new Coord2D(0, 0), new Coord2D(10, 0))),
                         Colour.BLACK,
                         LineType.WALL);
 
         List<SketchDetail> fragments =
-                pathDetail.getPathFragmentsOutsideRadius(new Coord2D(5, 0.3f), 0.5);
+                lineDetail.getPathFragmentsOutsideRadius(new Coord2D(5, 0.3f), 0.5);
 
         Assert.assertEquals(2, fragments.size());
-        List<Coord2D> first = ((PathDetail) fragments.get(0)).getPath();
-        List<Coord2D> second = ((PathDetail) fragments.get(1)).getPath();
+        List<Coord2D> first = ((LineDetail) fragments.get(0)).getPath();
+        List<Coord2D> second = ((LineDetail) fragments.get(1)).getPath();
         Assert.assertEquals(new Coord2D(0, 0), first.get(0));
         Assert.assertEquals(4.6f, first.get(first.size() - 1).x, 0.001f);
         Assert.assertEquals(5.4f, second.get(0).x, 0.001f);
@@ -90,42 +90,42 @@ public class SketchTest {
 
     @Test
     public void testEraserTrimsEndOfLine() {
-        PathDetail pathDetail =
-                new PathDetail(
+        LineDetail lineDetail =
+                new LineDetail(
                         new ArrayList<>(Arrays.asList(new Coord2D(0, 0), new Coord2D(10, 0))),
                         Colour.BLACK,
                         LineType.WALL);
 
         List<SketchDetail> fragments =
-                pathDetail.getPathFragmentsOutsideRadius(new Coord2D(0, 0), 1);
+                lineDetail.getPathFragmentsOutsideRadius(new Coord2D(0, 0), 1);
 
         Assert.assertEquals(1, fragments.size());
-        List<Coord2D> path = ((PathDetail) fragments.get(0)).getPath();
+        List<Coord2D> path = ((LineDetail) fragments.get(0)).getPath();
         Assert.assertEquals(1f, path.get(0).x, 0.001f);
         Assert.assertEquals(new Coord2D(10, 0), path.get(path.size() - 1));
     }
 
     @Test
-    public void testFlipPathDetailReversesPointsAsSingleUndoStep() {
+    public void testFlipLineDetailReversesPointsAsSingleUndoStep() {
         Sketch sketch = new Sketch();
-        PathDetail original = sketch.startNewPath(new Coord2D(0, 0), Colour.BLACK, LineType.PIT);
+        LineDetail original = sketch.startNewPath(new Coord2D(0, 0), Colour.BLACK, LineType.PIT);
         original.lineTo(new Coord2D(5, 0));
         original.lineTo(new Coord2D(10, 0));
         sketch.finishPath();
 
-        PathDetail flipped = sketch.flipPathDetail(original);
+        LineDetail flipped = sketch.flipLineDetail(original);
 
-        Assert.assertEquals(1, sketch.getPathDetails().size());
-        Assert.assertSame(flipped, sketch.getPathDetails().get(0));
+        Assert.assertEquals(1, sketch.getLineDetails().size());
+        Assert.assertSame(flipped, sketch.getLineDetails().get(0));
         Assert.assertEquals(10f, flipped.getPath().get(0).x, 0.0001f);
         Assert.assertEquals(LineType.PIT, flipped.getLineType());
 
         sketch.undo();
-        Assert.assertEquals(1, sketch.getPathDetails().size());
-        Assert.assertSame(original, sketch.getPathDetails().get(0));
+        Assert.assertEquals(1, sketch.getLineDetails().size());
+        Assert.assertSame(original, sketch.getLineDetails().get(0));
 
         sketch.redo();
-        Assert.assertSame(flipped, sketch.getPathDetails().get(0));
+        Assert.assertSame(flipped, sketch.getLineDetails().get(0));
     }
 
     @Test
@@ -133,12 +133,12 @@ public class SketchTest {
         Sketch sketch = new Sketch();
         sketch.startNewPath(new Coord2D(0, 0)).lineTo(new Coord2D(0.05f, 0.05f));
         sketch.finishPath(0.1f);
-        Assert.assertTrue(sketch.getPathDetails().isEmpty());
+        Assert.assertTrue(sketch.getLineDetails().isEmpty());
         Assert.assertNull(sketch.getActivePath());
 
         sketch.startNewPath(new Coord2D(0, 0)).lineTo(new Coord2D(0.05f, 0.2f));
         sketch.finishPath(0.1f);
-        Assert.assertEquals(1, sketch.getPathDetails().size());
+        Assert.assertEquals(1, sketch.getLineDetails().size());
     }
 
     @Test
@@ -149,13 +149,13 @@ public class SketchTest {
 
         drawLine(sketch, LineType.PIT, new Coord2D(5, 3), new Coord2D(5, -2));
 
-        Assert.assertEquals(2, sketch.getPathDetails().size());
-        PathDetail pit = sketch.getPathDetails().get(1);
+        Assert.assertEquals(2, sketch.getLineDetails().size());
+        LineDetail pit = sketch.getLineDetails().get(1);
         Assert.assertEquals(LineType.PIT, pit.getLineType());
         Assert.assertEquals(0, pit.getPath().get(pit.getPath().size() - 1).y, 0.0001f);
 
         sketch.undo();
-        Assert.assertEquals(1, sketch.getPathDetails().size());
+        Assert.assertEquals(1, sketch.getLineDetails().size());
     }
 
     @Test
@@ -166,8 +166,8 @@ public class SketchTest {
         drawLine(sketch, LineType.SKETCH, new Coord2D(5, 3), new Coord2D(5, -2));
         drawLine(sketch, LineType.PRESUMED_WALL, new Coord2D(3, 3), new Coord2D(3, -2));
 
-        Assert.assertEquals(-2, sketch.getPathDetails().get(1).getPath().get(1).y, 0.0001f);
-        Assert.assertEquals(-2, sketch.getPathDetails().get(2).getPath().get(1).y, 0.0001f);
+        Assert.assertEquals(-2, sketch.getLineDetails().get(1).getPath().get(1).y, 0.0001f);
+        Assert.assertEquals(-2, sketch.getLineDetails().get(2).getPath().get(1).y, 0.0001f);
     }
 
     private static void drawLine(Sketch sketch, LineType lineType, Coord2D from, Coord2D to) {
@@ -176,25 +176,25 @@ public class SketchTest {
     }
 
     @Test
-    public void testRetypePathDetailIsOneUndoableStepKeepingPointOrder() {
+    public void testRetypeLineDetailIsOneUndoableStepKeepingPointOrder() {
         Sketch sketch = new Sketch();
-        PathDetail original =
-                new PathDetail(
+        LineDetail original =
+                new LineDetail(
                         new ArrayList<>(Arrays.asList(new Coord2D(0, 0), new Coord2D(10, 0))),
                         Colour.RED,
                         LineType.CHIMNEY);
         sketch.restoreDetailToSketch(original);
 
-        PathDetail retyped = sketch.retypePathDetail(original, LineType.PIT);
+        LineDetail retyped = sketch.retypeLineDetail(original, LineType.PIT);
 
-        Assert.assertEquals(1, sketch.getPathDetails().size());
-        Assert.assertSame(retyped, sketch.getPathDetails().get(0));
+        Assert.assertEquals(1, sketch.getLineDetails().size());
+        Assert.assertSame(retyped, sketch.getLineDetails().get(0));
         Assert.assertEquals(LineType.PIT, retyped.getLineType());
         Assert.assertEquals(Colour.RED, retyped.getColour());
         Assert.assertEquals(original.getPath(), retyped.getPath());
 
         sketch.undo();
-        Assert.assertSame(original, sketch.getPathDetails().get(0));
+        Assert.assertSame(original, sketch.getLineDetails().get(0));
     }
 
     @Test
@@ -262,24 +262,24 @@ public class SketchTest {
     }
 
     @Test
-    public void testRecolourPathDetailIsOneUndoableStepKeepingPointsAndType() {
+    public void testRecolourLineDetailIsOneUndoableStepKeepingPointsAndType() {
         Sketch sketch = new Sketch();
-        PathDetail original =
-                new PathDetail(
+        LineDetail original =
+                new LineDetail(
                         new ArrayList<>(Arrays.asList(new Coord2D(0, 0), new Coord2D(5, 5))),
                         Colour.BLACK,
                         LineType.PIT);
         sketch.restoreDetailToSketch(original);
 
-        PathDetail recoloured = sketch.recolourPathDetail(original, Colour.BROWN);
+        LineDetail recoloured = sketch.recolourLineDetail(original, Colour.BROWN);
 
         Assert.assertEquals(Colour.BROWN, recoloured.getColour());
         Assert.assertEquals(LineType.PIT, recoloured.getLineType());
         Assert.assertEquals(original.getPath(), recoloured.getPath());
-        Assert.assertEquals(1, sketch.getPathDetails().size());
+        Assert.assertEquals(1, sketch.getLineDetails().size());
 
         sketch.undo();
-        Assert.assertSame(original, sketch.getPathDetails().get(0));
+        Assert.assertSame(original, sketch.getLineDetails().get(0));
     }
 
     @Test
@@ -357,14 +357,14 @@ public class SketchTest {
 
     // Retyping never turns a line round, even into a wall, which a freshly drawn wall would be
     @Test
-    public void testRetypePathDetailKeepsPointOrder() {
+    public void testRetypeLineDetailKeepsPointOrder() {
         List<Coord2D> points = Arrays.asList(new Coord2D(0, 0), new Coord2D(10, 0));
 
         for (List<Coord2D> drawn : Arrays.asList(points, reversed(points))) {
             Sketch sketch = new Sketch();
-            PathDetail original = new PathDetail(new ArrayList<>(drawn), Colour.BLACK);
+            LineDetail original = new LineDetail(new ArrayList<>(drawn), Colour.BLACK);
             sketch.restoreDetailToSketch(original);
-            PathDetail retyped = sketch.retypePathDetail(original, LineType.WALL);
+            LineDetail retyped = sketch.retypeLineDetail(original, LineType.WALL);
             Assert.assertEquals(drawn, retyped.getPath());
         }
     }
@@ -380,15 +380,15 @@ public class SketchTest {
         Sketch sketch = new Sketch();
         Assert.assertNull(sketch.getMostRecentOrientedPath());
 
-        PathDetail wall = sketch.startNewPath(new Coord2D(0, 0), Colour.BLACK, LineType.WALL);
+        LineDetail wall = sketch.startNewPath(new Coord2D(0, 0), Colour.BLACK, LineType.WALL);
         wall.lineTo(new Coord2D(1, 0));
         sketch.finishPath();
 
-        PathDetail scribble = sketch.startNewPath(new Coord2D(5, 5), Colour.BLACK, LineType.SKETCH);
+        LineDetail scribble = sketch.startNewPath(new Coord2D(5, 5), Colour.BLACK, LineType.SKETCH);
         scribble.lineTo(new Coord2D(6, 5));
         sketch.finishPath();
 
-        PathDetail boulderEdge =
+        LineDetail boulderEdge =
                 sketch.startNewPath(new Coord2D(8, 8), Colour.BLACK, LineType.ROCK_EDGE);
         boulderEdge.lineTo(new Coord2D(9, 8));
         sketch.finishPath();
@@ -509,7 +509,7 @@ public class SketchTest {
         sketch.finishArea(AreaType.WATER, 0);
 
         Assert.assertEquals(1, sketch.getAreaDetails().size());
-        Assert.assertEquals(0, sketch.getPathDetails().size());
+        Assert.assertEquals(0, sketch.getLineDetails().size());
         Assert.assertNull(sketch.getActivePath());
     }
 
@@ -537,7 +537,7 @@ public class SketchTest {
         sketch.finishArea(AreaType.WATER, 0);
 
         Assert.assertEquals(0, sketch.getAreaDetails().size());
-        Assert.assertEquals(0, sketch.getPathDetails().size());
+        Assert.assertEquals(0, sketch.getLineDetails().size());
         sketch.undo(); // must not blow up or resurrect anything
         Assert.assertEquals(0, sketch.getAreaDetails().size());
     }
@@ -591,7 +591,7 @@ public class SketchTest {
         sketch.finishArea(AreaType.WATER, 5); // encloses 4 square metres
 
         Assert.assertEquals(0, sketch.getAreaDetails().size());
-        Assert.assertEquals(0, sketch.getPathDetails().size());
+        Assert.assertEquals(0, sketch.getLineDetails().size());
         Assert.assertNull(sketch.getActivePath());
     }
 
@@ -843,8 +843,8 @@ public class SketchTest {
         return sketch;
     }
 
-    private static PathDetail drawActivePath(Sketch sketch, LineType lineType, Coord2D... points) {
-        PathDetail path = sketch.startNewPath(points[0], Colour.BLACK, lineType);
+    private static LineDetail drawActivePath(Sketch sketch, LineType lineType, Coord2D... points) {
+        LineDetail path = sketch.startNewPath(points[0], Colour.BLACK, lineType);
         for (int i = 1; i < points.length; i++) {
             path.lineTo(points[i]);
         }
@@ -852,8 +852,8 @@ public class SketchTest {
     }
 
     private static List<Coord2D> onlyLine(Sketch sketch) {
-        Assert.assertEquals(1, sketch.getPathDetails().size());
-        return sketch.getPathDetails().get(0).getPath();
+        Assert.assertEquals(1, sketch.getLineDetails().size());
+        return sketch.getLineDetails().get(0).getPath();
     }
 
     @Test
@@ -939,7 +939,7 @@ public class SketchTest {
         drawActivePath(sketch, LineType.WALL, new Coord2D(20, 0.5f), new Coord2D(20, 10));
         sketch.finishPath();
         // runs on from the first wall's end and into the second's end: one join either way
-        PathDetail path =
+        LineDetail path =
                 drawActivePath(
                         sketch,
                         LineType.WALL,
@@ -973,7 +973,7 @@ public class SketchTest {
     @Test
     public void testLinesOfAnotherTypeAreNotSnappedTo() {
         Sketch sketch = sketchWithLine(LineType.WALL);
-        PathDetail path =
+        LineDetail path =
                 drawActivePath(sketch, LineType.PIT, new Coord2D(10, 10), new Coord2D(10, 0.5f));
 
         sketch.snapActivePath(1);
@@ -1008,7 +1008,7 @@ public class SketchTest {
     @Test
     public void testEndSnapsBackToItsOwnStart() {
         Sketch sketch = new Sketch();
-        PathDetail path =
+        LineDetail path =
                 drawActivePath(
                         sketch,
                         LineType.WALL,
@@ -1029,7 +1029,7 @@ public class SketchTest {
     @Test
     public void testSmallStrokeDoesNotCloseOnItself() {
         Sketch sketch = new Sketch();
-        PathDetail path =
+        LineDetail path =
                 drawActivePath(
                         sketch,
                         LineType.WALL,

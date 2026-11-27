@@ -5,7 +5,7 @@ import static org.hwyl.sexytopo.control.sketch.ScreenUnits.dpToPixels;
 import android.graphics.RectF;
 import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
-import org.hwyl.sexytopo.model.sketch.SinglePositionDetail;
+import org.hwyl.sexytopo.model.sketch.PointDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchTool;
 
@@ -33,20 +33,20 @@ class ResizeDetailTool extends DragDetailTool {
     }
 
     @Override
-    SinglePositionDetail drag(SinglePositionDetail detail, Coord2D from, Coord2D to) {
+    PointDetail drag(PointDetail detail, Coord2D from, Coord2D to) {
         float scale = getScale(detail, from, to);
         return scale == 1 ? detail : detail.scale(scale);
     }
 
     @Override
-    void commit(Sketch sketch, SinglePositionDetail detail, Coord2D from, Coord2D to) {
+    void commit(Sketch sketch, PointDetail detail, Coord2D from, Coord2D to) {
         float scale = getScale(detail, from, to);
         if (scale != 1) {
             sketch.resizeDetail(detail, scale);
         }
     }
 
-    private float getScale(SinglePositionDetail detail, Coord2D from, Coord2D to) {
+    private float getScale(PointDetail detail, Coord2D from, Coord2D to) {
         RectF bounds = sketchRenderer.getBoundsOnView(detail);
         float currentSize = Math.max(bounds.width(), bounds.height());
         return calculateScale(

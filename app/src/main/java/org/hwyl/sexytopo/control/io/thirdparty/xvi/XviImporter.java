@@ -14,7 +14,7 @@ import org.hwyl.sexytopo.control.io.IoUtils;
 import org.hwyl.sexytopo.control.io.translation.Importer;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.sketch.Colour;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
+import org.hwyl.sexytopo.model.sketch.LineDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Survey;
 
@@ -39,8 +39,8 @@ public class XviImporter extends Importer {
         Grid grid = instance.parseGrid(contents);
         double scale = grid.dy;
 
-        List<PathDetail> pathDetails = parseSketchlineBlock(scale, contents);
-        sketch.setPathDetails(pathDetails);
+        List<LineDetail> lineDetails = parseSketchlineBlock(scale, contents);
+        sketch.setLineDetails(lineDetails);
 
         return sketch;
     }
@@ -67,16 +67,16 @@ public class XviImporter extends Importer {
         return grid;
     }
 
-    public static List<PathDetail> parseSketchlineBlock(double scale, String contents)
+    public static List<LineDetail> parseSketchlineBlock(double scale, String contents)
             throws Exception {
         String sketchBlock = getBlockContents(contents, SKETCHLINE_COMMAND);
         List<String> entries = parseBlockEntries(sketchBlock);
-        List<PathDetail> pathDetails = new ArrayList<>();
+        List<LineDetail> lineDetails = new ArrayList<>();
         for (String entry : entries) {
-            PathDetail pathDetail = parseSketchEntry(scale, entry);
-            pathDetails.add(pathDetail);
+            LineDetail lineDetail = parseSketchEntry(scale, entry);
+            lineDetails.add(lineDetail);
         }
-        return pathDetails;
+        return lineDetails;
     }
 
     public static List<String> parseBlockEntries(String content) {
@@ -89,7 +89,7 @@ public class XviImporter extends Importer {
         return entries;
     }
 
-    public static PathDetail parseSketchEntry(double scale, String entry)
+    public static LineDetail parseSketchEntry(double scale, String entry)
             throws IllegalArgumentException {
         List<String> tokens = Arrays.asList(entry.split(" "));
 
@@ -108,9 +108,9 @@ public class XviImporter extends Importer {
             float y1 = Float.parseFloat(tokens.get(2)) / (float) scale;
             float x2 = Float.parseFloat(tokens.get(3)) / (float) scale;
             float y2 = Float.parseFloat(tokens.get(4)) / (float) scale;
-            PathDetail pathDetail = new PathDetail(new Coord2D(x1, -y1), Colour.BLACK);
-            pathDetail.lineTo(new Coord2D(x2, -y2));
-            return pathDetail;
+            LineDetail lineDetail = new LineDetail(new Coord2D(x1, -y1), Colour.BLACK);
+            lineDetail.lineTo(new Coord2D(x2, -y2));
+            return lineDetail;
         }
 
         if (tokens.size() % 2 != 1) {
@@ -133,12 +133,12 @@ public class XviImporter extends Importer {
             points.add(coord2D);
         }
 
-        PathDetail pathDetail = new PathDetail(points.get(0), colour);
+        LineDetail lineDetail = new LineDetail(points.get(0), colour);
         for (Coord2D point : points.subList(1, points.size())) {
-            pathDetail.lineTo(point);
+            lineDetail.lineTo(point);
         }
 
-        return pathDetail;
+        return lineDetail;
     }
 
     @SuppressWarnings("UnnecessaryLabelOnContinueStatement")

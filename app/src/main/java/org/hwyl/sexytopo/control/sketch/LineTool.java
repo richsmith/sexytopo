@@ -11,8 +11,8 @@ import org.hwyl.sexytopo.control.preferences.SketchPreferences;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.geometry.Line;
 import org.hwyl.sexytopo.model.geometry.Space;
+import org.hwyl.sexytopo.model.sketch.LineDetail;
 import org.hwyl.sexytopo.model.sketch.LineType;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.LegFilter;
 
@@ -100,7 +100,7 @@ class LineTool implements ToolHandler {
      * as close as Snap to Lines would join.
      */
     private void closeActivePathIfOutline() {
-        PathDetail activePath = state.getSketch().getActivePath();
+        LineDetail activePath = state.getSketch().getActivePath();
         if (activePath == null || !activePath.getLineType().isOutline()) {
             return;
         }
@@ -123,7 +123,7 @@ class LineTool implements ToolHandler {
      * LineOrienter), or the inside of a loop for a ticked edge or outline (see LoopOrienter).
      */
     private void orientActivePathIfRequired() {
-        PathDetail activePath = state.getSketch().getActivePath();
+        LineDetail activePath = state.getSketch().getActivePath();
         if (activePath == null || !SketchPreferences.Toggle.AUTO_ORIENTATION.isOn()) {
             return;
         }
@@ -135,9 +135,9 @@ class LineTool implements ToolHandler {
             // inside, and a boulder outline its rock; ends count as meeting when they're as close
             // as Snap to Lines would join
             List<List<Coord2D>> walls =
-                    state.getSketch().getPathDetails().stream()
+                    state.getSketch().getLineDetails().stream()
                             .filter(path -> path.getLineType().isWall())
-                            .map(PathDetail::getPath)
+                            .map(LineDetail::getPath)
                             .collect(Collectors.toList());
             LoopOrienter.orientInsideOfLoop(
                     activePath.getPath(),

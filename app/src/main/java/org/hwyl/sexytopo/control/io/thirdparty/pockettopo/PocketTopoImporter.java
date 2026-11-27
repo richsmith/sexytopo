@@ -13,7 +13,7 @@ import org.hwyl.sexytopo.control.survey.SurveyUpdater;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.geometry.ExtendedElevationDirection;
 import org.hwyl.sexytopo.model.sketch.Colour;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
+import org.hwyl.sexytopo.model.sketch.LineDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -354,7 +354,7 @@ public class PocketTopoImporter extends Importer {
 
     private static Sketch buildSketch(DrawingData drawingData) {
         Sketch sketch = new Sketch();
-        List<PathDetail> pathDetails = new ArrayList<>();
+        List<LineDetail> lineDetails = new ArrayList<>();
 
         for (PolygonData polygon : drawingData.polygons) {
             if (polygon.points.isEmpty()) {
@@ -363,14 +363,14 @@ public class PocketTopoImporter extends Importer {
 
             // PocketTopo .top uses screen-oriented coordinates (Y increases downward)
             Coord2D first = polygon.points.get(0);
-            PathDetail pathDetail = new PathDetail(first, polygon.colour);
+            LineDetail lineDetail = new LineDetail(first, polygon.colour);
             for (int i = 1; i < polygon.points.size(); i++) {
-                pathDetail.lineTo(polygon.points.get(i));
+                lineDetail.lineTo(polygon.points.get(i));
             }
-            pathDetails.add(pathDetail);
+            lineDetails.add(lineDetail);
         }
 
-        sketch.setPathDetails(pathDetails);
+        sketch.setLineDetails(lineDetails);
         return sketch;
     }
 }

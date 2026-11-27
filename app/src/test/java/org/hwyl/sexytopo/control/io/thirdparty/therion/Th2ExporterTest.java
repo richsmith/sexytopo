@@ -17,8 +17,8 @@ import org.hwyl.sexytopo.model.sketch.AreaDetail;
 import org.hwyl.sexytopo.model.sketch.AreaType;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
+import org.hwyl.sexytopo.model.sketch.LineDetail;
 import org.hwyl.sexytopo.model.sketch.LineType;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.survey.Survey;
 import org.hwyl.sexytopo.model.survey.Trip;
 import org.hwyl.sexytopo.testutils.BasicTestSurveyCreator;
@@ -103,10 +103,10 @@ public class Th2ExporterTest {
 
         List<Coord2D> wallPoints = Arrays.asList(new Coord2D(1, 1), new Coord2D(4, 2));
         List<Coord2D> generalPoints = Arrays.asList(new Coord2D(6, 7), new Coord2D(8, 9));
-        List<PathDetail> pathDetails = new ArrayList<>();
-        pathDetails.add(new PathDetail(new ArrayList<>(wallPoints), Colour.BLACK, LineType.WALL));
-        pathDetails.add(new PathDetail(new ArrayList<>(generalPoints), Colour.BLACK));
-        survey.getPlanSketch().setPathDetails(pathDetails);
+        List<LineDetail> lineDetails = new ArrayList<>();
+        lineDetails.add(new LineDetail(new ArrayList<>(wallPoints), Colour.BLACK, LineType.WALL));
+        lineDetails.add(new LineDetail(new ArrayList<>(generalPoints), Colour.BLACK));
+        survey.getPlanSketch().setLineDetails(lineDetails);
 
         float scale = TherionExporter.getScale();
         Projection2D projection = Projection2D.PLAN;
@@ -128,9 +128,9 @@ public class Th2ExporterTest {
 
         List<Coord2D> slopePoints =
                 Arrays.asList(new Coord2D(1, 1), new Coord2D(4, 2), new Coord2D(6, 2));
-        List<PathDetail> pathDetails = new ArrayList<>();
-        pathDetails.add(new PathDetail(new ArrayList<>(slopePoints), Colour.BLACK, LineType.SLOPE));
-        survey.getPlanSketch().setPathDetails(pathDetails);
+        List<LineDetail> lineDetails = new ArrayList<>();
+        lineDetails.add(new LineDetail(new ArrayList<>(slopePoints), Colour.BLACK, LineType.SLOPE));
+        survey.getPlanSketch().setLineDetails(lineDetails);
 
         float scale = TherionExporter.getScale();
         Projection2D projection = Projection2D.PLAN;

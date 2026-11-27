@@ -9,7 +9,7 @@ import org.hwyl.sexytopo.control.geometry.LineReshaper;
 import org.hwyl.sexytopo.control.geometry.Space2DUtils;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 
-public final class PathDetail extends SketchDetail {
+public final class LineDetail extends SketchDetail {
 
     // how far back along a line its end is bent round to meet a join, as a multiple of the snap
     // distance
@@ -18,11 +18,11 @@ public final class PathDetail extends SketchDetail {
     private List<Coord2D> path;
     private final LineType lineType;
 
-    public PathDetail(Coord2D start, Colour colour) {
+    public LineDetail(Coord2D start, Colour colour) {
         this(start, colour, LineType.SKETCH);
     }
 
-    public PathDetail(Coord2D start, Colour colour, LineType lineType) {
+    public LineDetail(Coord2D start, Colour colour, LineType lineType) {
         super(colour);
         this.lineType = lineType;
         this.path = new ArrayList<>();
@@ -30,11 +30,11 @@ public final class PathDetail extends SketchDetail {
         updateBoundingBox(start);
     }
 
-    public PathDetail(List<Coord2D> path, Colour colour) {
+    public LineDetail(List<Coord2D> path, Colour colour) {
         this(path, colour, LineType.SKETCH);
     }
 
-    public PathDetail(List<Coord2D> path, Colour colour, LineType lineType) {
+    public LineDetail(List<Coord2D> path, Colour colour, LineType lineType) {
         super(colour);
         this.lineType = lineType;
         this.path = path;
@@ -83,7 +83,7 @@ public final class PathDetail extends SketchDetail {
      * Whether another line could be joined on to this one to make a single line: it has to be of
      * the same type and colour, and neither can be a closed loop, with no loose end to join.
      */
-    public boolean canJoin(PathDetail other) {
+    public boolean canJoin(LineDetail other) {
         return other.lineType == lineType
                 && other.getColour() == getColour()
                 && !isClosed()
@@ -173,10 +173,10 @@ public final class PathDetail extends SketchDetail {
      * This line with the point on it nearest grab pulled by the offset, and the line either side
      * curving to follow, as a new line.
      */
-    public PathDetail pulled(Coord2D grab, Coord2D offset, float reach, float endTolerance) {
+    public LineDetail pulled(Coord2D grab, Coord2D offset, float reach, float endTolerance) {
         List<Coord2D> points =
                 LineReshaper.pull(path, isClosed(), grab, offset, reach, endTolerance);
-        return new PathDetail(points, getColour(), lineType);
+        return new LineDetail(points, getColour(), lineType);
     }
 
     /**
@@ -186,7 +186,7 @@ public final class PathDetail extends SketchDetail {
      * same line, it's joined once, which closes it into a loop. The lines actually joined are added
      * to joined.
      */
-    public PathDetail joinedWith(PathDetail before, PathDetail after, List<PathDetail> joined) {
+    public LineDetail joinedWith(LineDetail before, LineDetail after, List<LineDetail> joined) {
         List<Coord2D> points = new ArrayList<>(path);
 
         List<Coord2D> leadingIn = before == null ? null : before.pointsRunningInto(getStart());
@@ -208,7 +208,7 @@ public final class PathDetail extends SketchDetail {
         if (leadingIn == null && leadingOut == null) {
             return this;
         }
-        return new PathDetail(points, getColour(), lineType);
+        return new LineDetail(points, getColour(), lineType);
     }
 
     /**
@@ -252,33 +252,33 @@ public final class PathDetail extends SketchDetail {
     }
 
     /** A line the same as this one but in a different colour. */
-    public PathDetail withColour(Colour colour) {
-        return new PathDetail(new ArrayList<>(path), colour, lineType);
+    public LineDetail withColour(Colour colour) {
+        return new LineDetail(new ArrayList<>(path), colour, lineType);
     }
 
     @Override
-    public PathDetail translate(Coord2D translation) {
+    public LineDetail translate(Coord2D translation) {
         List<Coord2D> newPath = new ArrayList<>();
         for (Coord2D step : path) {
             newPath.add(step.plus(translation));
         }
-        return new PathDetail(newPath, getColour(), lineType);
+        return new LineDetail(newPath, getColour(), lineType);
     }
 
     @Override
-    public PathDetail rotate(float degrees) {
+    public LineDetail rotate(float degrees) {
         List<Coord2D> newPath =
                 path.stream().map(step -> step.rotate(degrees)).collect(Collectors.toList());
-        return new PathDetail(newPath, getColour(), lineType);
+        return new LineDetail(newPath, getColour(), lineType);
     }
 
     @Override
-    public PathDetail scale(float scale) {
+    public LineDetail scale(float scale) {
         List<Coord2D> newPath = new ArrayList<>();
         for (Coord2D step : path) {
             newPath.add(step.scale(scale));
         }
-        return new PathDetail(newPath, getColour(), lineType);
+        return new LineDetail(newPath, getColour(), lineType);
     }
 
     /**
@@ -312,7 +312,7 @@ public final class PathDetail extends SketchDetail {
                 currentLine.add(pointAlong(start, end, inside[0]));
             }
             if (currentLine.size() > 1) {
-                fragments.add(new PathDetail(currentLine, getColour(), lineType));
+                fragments.add(new LineDetail(currentLine, getColour(), lineType));
             }
             currentLine = new ArrayList<>();
             if (inside[1] < 1) {
@@ -322,7 +322,7 @@ public final class PathDetail extends SketchDetail {
         }
 
         if (currentLine.size() > 1) {
-            fragments.add(new PathDetail(currentLine, getColour(), lineType));
+            fragments.add(new LineDetail(currentLine, getColour(), lineType));
         }
 
         return fragments;

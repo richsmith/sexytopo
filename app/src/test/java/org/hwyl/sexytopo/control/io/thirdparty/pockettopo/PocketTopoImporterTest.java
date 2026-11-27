@@ -8,7 +8,7 @@ import java.io.InputStream;
 import java.util.List;
 import org.hwyl.sexytopo.control.survey.GraphToListTranslator;
 import org.hwyl.sexytopo.model.sketch.Colour;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
+import org.hwyl.sexytopo.model.sketch.LineDetail;
 import org.hwyl.sexytopo.model.survey.Leg;
 import org.hwyl.sexytopo.model.survey.LegFilter;
 import org.hwyl.sexytopo.model.survey.Station;
@@ -229,7 +229,7 @@ public class PocketTopoImporterTest {
     public void testPlanSketchHasPath() throws IOException {
         byte[] data = buildMinimalTopFile();
         Survey survey = PocketTopoImporter.parseSurvey(new ByteArrayInputStream(data));
-        List<PathDetail> paths = survey.getPlanSketch().getPathDetails();
+        List<LineDetail> paths = survey.getPlanSketch().getLineDetails();
         Assert.assertEquals(1, paths.size());
     }
 
@@ -237,7 +237,7 @@ public class PocketTopoImporterTest {
     public void testPlanSketchPathColour() throws IOException {
         byte[] data = buildMinimalTopFile();
         Survey survey = PocketTopoImporter.parseSurvey(new ByteArrayInputStream(data));
-        PathDetail path = survey.getPlanSketch().getPathDetails().get(0);
+        LineDetail path = survey.getPlanSketch().getLineDetails().get(0);
         Assert.assertEquals(Colour.BROWN, path.getColour());
     }
 
@@ -245,7 +245,7 @@ public class PocketTopoImporterTest {
     public void testPlanSketchPathCoordinates() throws IOException {
         byte[] data = buildMinimalTopFile();
         Survey survey = PocketTopoImporter.parseSurvey(new ByteArrayInputStream(data));
-        PathDetail path = survey.getPlanSketch().getPathDetails().get(0);
+        LineDetail path = survey.getPlanSketch().getLineDetails().get(0);
         // Point 0: x=1.0m, y=-2.0m (no Y flip — .top uses screen coordinates)
         Assert.assertEquals(1.0f, path.getPath().get(0).x, 0.01f);
         Assert.assertEquals(-2.0f, path.getPath().get(0).y, 0.01f);
@@ -258,7 +258,7 @@ public class PocketTopoImporterTest {
     public void testElevationSketchEmpty() throws IOException {
         byte[] data = buildMinimalTopFile();
         Survey survey = PocketTopoImporter.parseSurvey(new ByteArrayInputStream(data));
-        Assert.assertTrue(survey.getElevationSketch().getPathDetails().isEmpty());
+        Assert.assertTrue(survey.getElevationSketch().getLineDetails().isEmpty());
     }
 
     @Test

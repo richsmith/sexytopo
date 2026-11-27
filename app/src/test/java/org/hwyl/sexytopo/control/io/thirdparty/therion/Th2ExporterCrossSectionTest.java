@@ -11,8 +11,8 @@ import org.hwyl.sexytopo.model.geometry.Projection2D;
 import org.hwyl.sexytopo.model.sketch.AreaDetail;
 import org.hwyl.sexytopo.model.sketch.AreaType;
 import org.hwyl.sexytopo.model.sketch.Colour;
+import org.hwyl.sexytopo.model.sketch.LineDetail;
 import org.hwyl.sexytopo.model.sketch.LineType;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.Symbol;
 import org.hwyl.sexytopo.model.sketch.SymbolDetail;
@@ -57,10 +57,10 @@ public class Th2ExporterCrossSectionTest {
                 new ArrayList<>(
                         Collections.singletonList(
                                 new TextDetail(new Coord2D(0, 1), "mud", Colour.BLACK, 0.5f))));
-        subSketch.setPathDetails(
+        subSketch.setLineDetails(
                 new ArrayList<>(
                         Collections.singletonList(
-                                new PathDetail(
+                                new LineDetail(
                                         Arrays.asList(new Coord2D(-1, -1), new Coord2D(-1, 1)),
                                         Colour.BLACK,
                                         LineType.WALL))));

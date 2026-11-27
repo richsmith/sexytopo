@@ -12,8 +12,8 @@ import org.hwyl.sexytopo.model.sketch.AreaType;
 import org.hwyl.sexytopo.model.sketch.Colour;
 import org.hwyl.sexytopo.model.sketch.CrossSection;
 import org.hwyl.sexytopo.model.sketch.CrossSectionDetail;
+import org.hwyl.sexytopo.model.sketch.LineDetail;
 import org.hwyl.sexytopo.model.sketch.LineType;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.Symbol;
 import org.hwyl.sexytopo.model.sketch.SymbolDetail;
@@ -72,11 +72,11 @@ public class SketchJsonTranslater {
         json.put(JsonTranslaterConstants.VERSION_CODE_TAG, versionCode);
         json.put(JsonTranslaterConstants.SURVEY_NAME_TAG, survey.getName());
 
-        JSONArray pathDetailArray = new JSONArray();
-        for (PathDetail pathDetail : sketch.getPathDetails()) {
-            pathDetailArray.put(toJson(pathDetail));
+        JSONArray lineDetailArray = new JSONArray();
+        for (LineDetail lineDetail : sketch.getLineDetails()) {
+            lineDetailArray.put(toJson(lineDetail));
         }
-        json.put(PATHS_TAG, pathDetailArray);
+        json.put(PATHS_TAG, lineDetailArray);
 
         JSONArray areaDetailArray = new JSONArray();
         for (AreaDetail areaDetail : sketch.getAreaDetails()) {
@@ -115,11 +115,11 @@ public class SketchJsonTranslater {
 
         try {
             JSONArray pathsArray = json.getJSONArray(PATHS_TAG);
-            List<PathDetail> pathDetails = new ArrayList<>();
+            List<LineDetail> lineDetails = new ArrayList<>();
             for (JSONObject object : IoUtils.toList(pathsArray)) {
-                pathDetails.add(toPathDetail(object));
+                lineDetails.add(toLineDetail(object));
             }
-            sketch.setPathDetails(pathDetails);
+            sketch.setLineDetails(lineDetails);
         } catch (Exception e) {
             Log.e(R.string.file_load_sketch_paths_error, e);
         }
@@ -185,18 +185,18 @@ public class SketchJsonTranslater {
         return sketch;
     }
 
-    public static JSONObject toJson(PathDetail pathDetail) throws JSONException {
+    public static JSONObject toJson(LineDetail lineDetail) throws JSONException {
 
         JSONObject json = new JSONObject();
-        json.put(COLOUR_TAG, pathDetail.getColour().toString());
+        json.put(COLOUR_TAG, lineDetail.getColour().toString());
 
         // plain sketch paths omit the tag (and predate it), keeping old and new files alike
-        if (pathDetail.getLineType() != LineType.SKETCH) {
-            json.put(LINE_TYPE_TAG, pathDetail.getLineType().toString());
+        if (lineDetail.getLineType() != LineType.SKETCH) {
+            json.put(LINE_TYPE_TAG, lineDetail.getLineType().toString());
         }
 
         JSONArray points = new JSONArray();
-        for (Coord2D coord : pathDetail.getPath()) {
+        for (Coord2D coord : lineDetail.getPath()) {
             points.put(toJson(coord));
         }
         json.put(POINTS_TAG, points);
@@ -204,7 +204,7 @@ public class SketchJsonTranslater {
         return json;
     }
 
-    public static PathDetail toPathDetail(JSONObject json) throws JSONException {
+    public static LineDetail toLineDetail(JSONObject json) throws JSONException {
 
         Colour colour = Colour.valueOf(json.getString(COLOUR_TAG));
         LineType lineType = LineType.fromString(json.optString(LINE_TYPE_TAG, null));
@@ -215,7 +215,7 @@ public class SketchJsonTranslater {
             path.add(toCoord2D(object));
         }
 
-        return new PathDetail(path, colour, lineType);
+        return new LineDetail(path, colour, lineType);
     }
 
     public static JSONObject toJson(AreaDetail areaDetail) throws JSONException {
@@ -370,7 +370,7 @@ public class SketchJsonTranslater {
     }
 
     private static boolean isSketchEmpty(Sketch sketch) {
-        return sketch.getPathDetails().isEmpty()
+        return sketch.getLineDetails().isEmpty()
                 && sketch.getAreaDetails().isEmpty()
                 && sketch.getSymbolDetails().isEmpty()
                 && sketch.getTextDetails().isEmpty();
@@ -379,11 +379,11 @@ public class SketchJsonTranslater {
     private static JSONObject toSubSketchJson(Sketch sketch) throws JSONException {
         JSONObject json = new JSONObject();
 
-        JSONArray pathDetailArray = new JSONArray();
-        for (PathDetail pathDetail : sketch.getPathDetails()) {
-            pathDetailArray.put(toJson(pathDetail));
+        JSONArray lineDetailArray = new JSONArray();
+        for (LineDetail lineDetail : sketch.getLineDetails()) {
+            lineDetailArray.put(toJson(lineDetail));
         }
-        json.put(PATHS_TAG, pathDetailArray);
+        json.put(PATHS_TAG, lineDetailArray);
 
         JSONArray areaDetailArray = new JSONArray();
         for (AreaDetail areaDetail : sketch.getAreaDetails()) {
@@ -413,11 +413,11 @@ public class SketchJsonTranslater {
         try {
             if (json.has(PATHS_TAG)) {
                 JSONArray pathsArray = json.getJSONArray(PATHS_TAG);
-                List<PathDetail> pathDetails = new ArrayList<>();
+                List<LineDetail> lineDetails = new ArrayList<>();
                 for (JSONObject object : IoUtils.toList(pathsArray)) {
-                    pathDetails.add(toPathDetail(object));
+                    lineDetails.add(toLineDetail(object));
                 }
-                sketch.setPathDetails(pathDetails);
+                sketch.setLineDetails(lineDetails);
             }
         } catch (Exception e) {
             Log.e(R.string.file_load_sketch_paths_error, e);

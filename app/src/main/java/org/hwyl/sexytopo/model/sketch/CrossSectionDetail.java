@@ -7,7 +7,7 @@ import org.hwyl.sexytopo.model.geometry.Line;
 import org.hwyl.sexytopo.model.geometry.Space;
 import org.hwyl.sexytopo.model.survey.LegFilter;
 
-public class CrossSectionDetail extends SinglePositionDetail {
+public class CrossSectionDetail extends PointDetail {
 
     // Limit for how small to draw cross-sections on the sketch
     // This is a bit arbitrary... is there a better way of determining this?

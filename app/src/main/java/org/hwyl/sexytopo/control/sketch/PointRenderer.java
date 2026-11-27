@@ -13,7 +13,7 @@ import org.hwyl.sexytopo.R;
 import org.hwyl.sexytopo.control.preferences.GeneralPreferences;
 import org.hwyl.sexytopo.model.geometry.Coord2D;
 import org.hwyl.sexytopo.model.sketch.Colour;
-import org.hwyl.sexytopo.model.sketch.SinglePositionDetail;
+import org.hwyl.sexytopo.model.sketch.PointDetail;
 import org.hwyl.sexytopo.model.sketch.Sketch;
 import org.hwyl.sexytopo.model.sketch.SketchDetail;
 import org.hwyl.sexytopo.model.sketch.SymbolDetail;
@@ -86,8 +86,7 @@ class PointRenderer {
     }
 
     /** Draws a single symbol or piece of text. */
-    void drawDetail(
-            Canvas canvas, SinglePositionDetail detail, int alpha, boolean isDarkModeActive) {
+    void drawDetail(Canvas canvas, PointDetail detail, int alpha, boolean isDarkModeActive) {
         if (detail instanceof SymbolDetail) {
             drawSymbol(canvas, (SymbolDetail) detail, alpha, isDarkModeActive);
         } else if (detail instanceof TextDetail) {
@@ -99,7 +98,7 @@ class PointRenderer {
      * Where a symbol or piece of text is drawn on the view: the square a symbol is drawn in (before
      * any turning), or the box round the text as drawn.
      */
-    RectF getBoundsOnView(SinglePositionDetail detail) {
+    RectF getBoundsOnView(PointDetail detail) {
         Coord2D location = viewport.toView(detail.getPosition());
         if (detail instanceof TextDetail) {
             return getTextBoundsOnView((TextDetail) detail, location);

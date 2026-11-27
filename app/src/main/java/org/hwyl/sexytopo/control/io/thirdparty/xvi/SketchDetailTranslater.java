@@ -3,20 +3,20 @@ package org.hwyl.sexytopo.control.io.thirdparty.xvi;
 import java.util.ArrayList;
 import java.util.List;
 import org.hwyl.sexytopo.model.sketch.AutoScalableDetail;
-import org.hwyl.sexytopo.model.sketch.PathDetail;
+import org.hwyl.sexytopo.model.sketch.LineDetail;
 
 public abstract class SketchDetailTranslater<T extends AutoScalableDetail> {
 
-    public List<PathDetail> translate(T sketchDetail) {
-        List<PathDetail> relativePaths = asPathDetails(sketchDetail);
-        List<PathDetail> sketchPaths = new ArrayList<>();
-        for (PathDetail pathDetail : relativePaths) {
-            PathDetail updated = pathDetail.translate(sketchDetail.getPosition());
-            PathDetail scaled = updated.scale(sketchDetail.getSize());
+    public List<LineDetail> translate(T sketchDetail) {
+        List<LineDetail> relativePaths = asLineDetails(sketchDetail);
+        List<LineDetail> sketchPaths = new ArrayList<>();
+        for (LineDetail lineDetail : relativePaths) {
+            LineDetail updated = lineDetail.translate(sketchDetail.getPosition());
+            LineDetail scaled = updated.scale(sketchDetail.getSize());
             sketchPaths.add(scaled);
         }
         return sketchPaths;
     }
 
-    public abstract List<PathDetail> asPathDetails(T sketchDetail);
+    public abstract List<LineDetail> asLineDetails(T sketchDetail);
 }
