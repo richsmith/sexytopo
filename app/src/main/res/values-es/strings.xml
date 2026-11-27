@@ -92,6 +92,8 @@
     <string name="action_add_leg">Añadir Tramo…</string>
     <string name="action_add_splay">Añadir Radial…</string>
     <string name="action_undo_last_leg">Deshacer última lectura</string>
+    <string name="action_flip_last_line">Invertir última línea</string>
+    <string name="tools_flip_last_line_none">No hay ninguna línea con tipo que invertir</string>
     <string name="action_find_station">Buscar Estación…</string>
     <string name="action_link_to_existing_survey">Enlazar a una Topografía Existente</string>
     <string name="action_system_log">Registro del Sistema</string>
@@ -207,6 +209,13 @@
     <string name="line_type_slope">Pendiente</string>
     <string name="line_type_rock_border">Contorno de bloque</string>
     <string name="line_type_rock_edge">Arista de bloque</string>
+    <string name="area_type_water">Agua</string>
+    <string name="area_type_sump">Sifón</string>
+    <string name="area_type_sand">Arena</string>
+    <string name="area_type_clay">Arcilla</string>
+    <string name="area_type_pebbles">Cantos rodados</string>
+    <string name="area_type_debris">Derrubios</string>
+    <string name="area_type_blocks">Bloques</string>
     <string name="sketch_menu_delete_last_leg">Deshacer Última Lectura</string>
     <string name="sketch_menu_centre_view">Centrar en Activa</string>
     <string name="sketch_menu_auto_recentre">Auto-Centrado</string>
@@ -216,6 +225,7 @@
     <string name="sketch_menu_show_compass">Brújula</string>
     <string name="sketch_menu_blue_water">Agua azul auto</string>
     <string name="sketch_menu_brown_mud">Barro marrón auto</string>
+    <string name="sketch_menu_clip_to_walls">Recortar a Paredes</string>
     <string name="sketch_menu_snap_to_lines">Ajustar a Líneas</string>
     <string name="sketch_menu_auto_orientation">Auto-Orientación</string>
     <string name="sketch_menu_pinch_to_zoom">Zoom por pellizco</string>
@@ -572,6 +582,8 @@
     <string name="settings_survey_text_tool_font_size_summary">Qué tan grande dibujar inicialmente el texto colocado manualmente (sp)</string>
     <string name="settings_survey_symbol_size_title">Tamaño de símbolos de topografía</string>
     <string name="settings_survey_symbol_size_summary">Qué tan grandes dibujar inicialmente los símbolos (dp)</string>
+    <string name="settings_survey_line_ornament_size_title">Tamaño de los adornos de línea</string>
+    <string name="settings_survey_line_ornament_size_summary">Tamaño inicial de las marcas y guiones en las líneas de pared, pozo y chimenea (dp)</string>
     <string name="settings_leg_width_title">Grosor de línea de tramo</string>
     <string name="settings_leg_width_summary">Qué tan gruesas dibujar las líneas de tramos (dp)</string>
     <string name="settings_sketch_line_width_title">Grosor de línea de boceto</string>
@@ -643,6 +655,14 @@
     <string name="settings_export_svg_copyright_summary">El copyright y la licencia siempre se guardan en el archivo; esto también muestra una línea de crédito en la leyenda</string>
     <string name="settings_export_therion_symbols_title">Símbolos de exportación Therion</string>
     <string name="settings_export_therion_symbols_summary">Incluir símbolos en el archivo th2</string>
+    <string name="settings_export_therion_lines_title">Exportar líneas con tipo como líneas de Therion</string>
+    <string name="settings_export_therion_lines_summary">Incluir las líneas con tipo (pared, pozo, etc.) como comandos line de Therion al exportar</string>
+    <string name="settings_export_therion_line_shape_summary">Forma de las líneas con tipo en el archivo th2</string>
+    <string name="therion_export_line_shape">Forma de línea</string>
+    <string name="therion_export_line_shape_bezier">Curvas de Bézier</string>
+    <string name="therion_export_line_shape_straight">Segmentos rectos</string>
+    <string name="settings_export_therion_areas_title">Exportar áreas como áreas de Therion</string>
+    <string name="settings_export_therion_areas_summary">Incluir las áreas del croquis (agua, arena, etc.) en el archivo th2 como comandos area de Therion</string>
     <string name="settings_export_therion_text_title">Texto de exportación Therion</string>
     <string name="settings_export_therion_text_summary">Incluir texto en el archivo th2</string>
     <string name="settings_export_folder_name_title">Nombre de carpeta de exportación</string>
@@ -675,6 +695,8 @@
     <string name="therion_export_stations_in_plan">Añadir estaciones al primer scrap de planta</string>
     <string name="therion_export_stations_in_ee">Añadir estaciones al primer scrap de desarrollo</string>
     <string name="svg_export_dialog_title">Opciones de exportación SVG</string>
+    <string name="sketch_open_linked_survey_title">¿Abrir %1$s?</string>
+    <string name="sketch_open_linked_survey_confirm">Abrir</string>
     <string name="settings_developer_title">Desarrollador</string>
     <string name="settings_developer_summary">Opciones de depuración</string>
     <string name="settings_key_developer_mode_title">Modo desarrollador</string>

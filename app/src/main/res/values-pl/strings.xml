@@ -92,6 +92,8 @@
     <string name="action_add_leg">Dodaj ciąg…</string>
     <string name="action_add_splay">Dodaj pomiar szczegółowy…</string>
     <string name="action_undo_last_leg">Cofnij ostatni pomiar</string>
+    <string name="action_flip_last_line">Odwróć ostatnią linię</string>
+    <string name="tools_flip_last_line_none">Brak linii z typem do odwrócenia</string>
     <string name="action_find_station">Znajdź stanowisko…</string>
     <string name="action_link_to_existing_survey">Połącz z istniejącym pomiarem</string>
     <string name="action_system_log">Dziennik systemowy</string>
@@ -207,6 +209,13 @@
     <string name="line_type_slope">Stok</string>
     <string name="line_type_rock_border">Obrys bloku</string>
     <string name="line_type_rock_edge">Krawędź bloku</string>
+    <string name="area_type_water">Woda</string>
+    <string name="area_type_sump">Syfon</string>
+    <string name="area_type_sand">Piasek</string>
+    <string name="area_type_clay">Glina</string>
+    <string name="area_type_pebbles">Otoczaki</string>
+    <string name="area_type_debris">Rumosz</string>
+    <string name="area_type_blocks">Bloki</string>
     <string name="sketch_menu_delete_last_leg">Cofnij ostatni pomiar</string>
     <string name="sketch_menu_centre_view">Wyśrodkuj na aktywnym</string>
     <string name="sketch_menu_auto_recentre">Automatyczne wyśrodkowywanie</string>
@@ -216,6 +225,7 @@
     <string name="sketch_menu_show_compass">Kompas</string>
     <string name="sketch_menu_blue_water">Auto niebieska woda</string>
     <string name="sketch_menu_brown_mud">Auto brązowe błoto</string>
+    <string name="sketch_menu_clip_to_walls">Przytnij do ścian</string>
     <string name="sketch_menu_snap_to_lines">Przyciąganie do linii</string>
     <string name="sketch_menu_auto_orientation">Automatyczna orientacja</string>
     <string name="sketch_menu_pinch_to_zoom">Zoom szczypaniem</string>
@@ -572,6 +582,8 @@
     <string name="settings_survey_text_tool_font_size_summary">Początkowy rozmiar ręcznie umieszczonego tekstu (sp)</string>
     <string name="settings_survey_symbol_size_title">Rozmiar symbolu pomiaru</string>
     <string name="settings_survey_symbol_size_summary">Początkowy rozmiar symboli (dp)</string>
+    <string name="settings_survey_line_ornament_size_title">Rozmiar ozdobników linii</string>
+    <string name="settings_survey_line_ornament_size_summary">Początkowy rozmiar kresek i znaczników na liniach ściany, studni i komina (dp)</string>
     <string name="settings_leg_width_title">Grubość linii ciągu</string>
     <string name="settings_leg_width_summary">Grubość rysowania linii ciągów (dp)</string>
     <string name="settings_sketch_line_width_title">Grubość linii szkicu</string>
@@ -643,6 +655,14 @@
     <string name="settings_export_svg_copyright_summary">Copyright i licencja są zawsze zapisywane w pliku; to dodatkowo pokazuje informację w legendzie</string>
     <string name="settings_export_therion_symbols_title">Symbole eksportu Therion</string>
     <string name="settings_export_therion_symbols_summary">Uwzględnij symbole w pliku th2</string>
+    <string name="settings_export_therion_lines_title">Eksportuj linie z typem jako linie Therion</string>
+    <string name="settings_export_therion_lines_summary">Podczas eksportu zapisuj linie z typem (ściana, studnia itp.) jako polecenia line Therion</string>
+    <string name="settings_export_therion_line_shape_summary">Kształt linii z typem w pliku th2</string>
+    <string name="therion_export_line_shape">Kształt linii</string>
+    <string name="therion_export_line_shape_bezier">Krzywe Béziera</string>
+    <string name="therion_export_line_shape_straight">Odcinki proste</string>
+    <string name="settings_export_therion_areas_title">Eksportuj obszary jako obszary Therion</string>
+    <string name="settings_export_therion_areas_summary">Zapisuj obszary szkicu (woda, piasek itp.) w pliku th2 jako polecenia area Therion</string>
     <string name="settings_export_therion_text_title">Tekst eksportu Therion</string>
     <string name="settings_export_therion_text_summary">Uwzględnij tekst w pliku th2</string>
     <string name="settings_export_folder_name_title">Nazwa folderu eksportu</string>
@@ -675,6 +695,8 @@
     <string name="therion_export_stations_in_plan">Dodaj stacje do pierwszego scrapu planu</string>
     <string name="therion_export_stations_in_ee">Dodaj stacje do pierwszego scrapu przekroju rozwinięcia</string>
     <string name="svg_export_dialog_title">Opcje eksportu SVG</string>
+    <string name="sketch_open_linked_survey_title">Otworzyć %1$s?</string>
+    <string name="sketch_open_linked_survey_confirm">Otwórz</string>
     <string name="settings_developer_title">Deweloper</string>
     <string name="settings_developer_summary">Opcje debugowania</string>
     <string name="settings_key_developer_mode_title">Tryb dewelopera</string>
