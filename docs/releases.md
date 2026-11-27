@@ -1,26 +1,24 @@
-# Unreleased
+# 2026-11-27 1.16.0
 - New area sketching tool for marking filled regions such as water
 - Sketch lines can now be given a semantic type (e.g. wall)
 - Context menus (long press) for the the new and existing sketch details; move, resize, change type etc.
 - Delete / erase tool can now be dragged to remove multiple details and generally works better
 - Big rendering engine refactor with some performance improvements
+- Improved line simplification algorithm (with fix for bug which could cause progressive detail loss on joining lines)
 - Highlight for active view button in action bar
-- New Edit menu
 - Little-used select tool retired to make way for area button
 - Snap to Lines quick-menu mode now works more intelligently and is consequently on by default
 - Tapping a linked survey in move or select mode offers to open it
+- New Edit menu
+- Tidy up sketch quick-menu (now with submenus)
 - Pressing back out of the app now warns if the survey isn't saved
 - Surveys that haven't been saved yet are now autosaved and restored when the app restarts
 - Sketch and table edits are now autosaved when you leave a screen, not just when a new leg arrives
-- Improved line simplification algorithm (and turned off application when loading surveys)
 - Fix bug where automatic autosave restore was not fetching the extended elevation
 - Change default for floating manual-entry buttons on table view to off (can be turned back on in settings, and manual entry can already be triggered from the menu)
 - Fix Cavway X1 downward shots being recorded with clinos of 270-360° rather than negative values (#357)
 - Lighter blue colour (including display of water) in dark mode for better visibility
 - New Auto-Brown Mud quick-menu mode draws sand and clay areas and symbols in brown
-- Tidy up sketch quick-menu (now with submenus)
-
-
 
 # 2026-11-09 1.15.0
 - Another new leg agreement algorithm "Slope-corrected angular deltas" that ought to solve issues with taking repeated readings on steep legs while remaining close in spirit to BCRA Grade 5; testing and feedback welcome (#321)
